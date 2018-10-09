@@ -13,10 +13,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 
 public class XlsxExporter implements IFileExporter {
@@ -295,5 +292,25 @@ public class XlsxExporter implements IFileExporter {
     addxlsxRows(exportBean, workBook, sheet, recordRowList);
     return workBook;
   }
+
+    /**
+     * Function accepts workbook and auto adjusts the size of columns to fit the size of any row in that column.
+     * @param workbook
+     */
+    public void autoSizeColumns(Workbook workbook) {
+        int numberOfSheets = workbook.getNumberOfSheets();
+        for (int i = 0; i < numberOfSheets; i++) {
+            Sheet sheet = workbook.getSheetAt(i);
+            if (sheet.getPhysicalNumberOfRows() > 0) {
+                Row row = sheet.getRow(0);
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    int columnIndex = cell.getColumnIndex();
+                    sheet.autoSizeColumn(columnIndex);
+                }
+            }
+        }
+    }
 }
 

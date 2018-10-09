@@ -184,13 +184,13 @@ public class ExportServiceImpl implements ExportService{
             exportBean.setFileType(fileType);
             String dir = UUID.randomUUID().toString();
             MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
+              exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
             exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "." + ((LinkedHashMap) dispatchBean).get("fileType"));
+                dispatchBean).get("name")) + "." + exportBean.getFileType());
             exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
             exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
             exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
             exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
             try {
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
@@ -241,15 +241,13 @@ public class ExportServiceImpl implements ExportService{
         String dir = UUID.randomUUID().toString();
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
         String strFile = exportBean.getFileType();
-        if(exportBean.getFileType().equalsIgnoreCase("csv") || strFile == null || strFile.isEmpty() )    {
+        if(strFile.equalsIgnoreCase("csv") || strFile == null || strFile.isEmpty() )    {
             exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "."
-                +(((LinkedHashMap) dispatchBean).get("fileType") !=null ? ((LinkedHashMap) dispatchBean).get("fileType") : ".csv"));
+                dispatchBean).get("name")) + "." + exportBean.getFileType());
         }
         else {
             exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "."
-                +(((LinkedHashMap) dispatchBean).get("fileType") !=null ? ((LinkedHashMap) dispatchBean).get("fileType") : ".xlsx"));
+                dispatchBean).get("name")) + "." + exportBean.getFileType());
         }
 
         exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
@@ -484,7 +482,7 @@ public class ExportServiceImpl implements ExportService{
                         xlsxExporter.addxlsxRow(exportBean, workBook, sheet, line);
                     }
                 );
-            autoSizeColumns(workBook);
+            xlsxExporter.autoSizeColumns(workBook);
             workBook.write(stream);
         }
         finally {
@@ -493,27 +491,6 @@ public class ExportServiceImpl implements ExportService{
         }
         return true;
     }
-
-    /**
-     *
-     * @param workbook
-     */
-    public void autoSizeColumns(Workbook workbook) {
-        int numberOfSheets = workbook.getNumberOfSheets();
-        for (int i = 0; i < numberOfSheets; i++) {
-            Sheet sheet = workbook.getSheetAt(i);
-            if (sheet.getPhysicalNumberOfRows() > 0) {
-                Row row = sheet.getRow(0);
-                Iterator<Cell> cellIterator = row.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    int columnIndex = cell.getColumnIndex();
-                    sheet.autoSizeColumn(columnIndex);
-                }
-            }
-        }
-    }
-
 
     @Override
   @Async
@@ -553,13 +530,13 @@ public class ExportServiceImpl implements ExportService{
             ExportBean exportBean = new ExportBean();
             String dir = UUID.randomUUID().toString();
             MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + ".xlsx");
-            exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-            exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-            exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-            exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+              exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+              exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                dispatchBean).get("name")) + "." + exportBean.getFileType());
+              exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+              exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+              exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+              exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
             try {
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
@@ -604,13 +581,13 @@ public class ExportServiceImpl implements ExportService{
             ExportBean exportBean = new ExportBean();
             String dir = UUID.randomUUID().toString();
 
-            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + ".xlsx");
-            exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-            exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-            exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-            exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+              exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+              exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                dispatchBean).get("name")) + "." + exportBean.getFileType());
+              exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+              exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+              exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+              exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
 
             File cfile = new File(exportBean.getFileName());
             String zipFileName = cfile.getAbsolutePath().concat(".zip");
@@ -663,7 +640,7 @@ public class ExportServiceImpl implements ExportService{
                             zipFileName,
                             alias.getLocation(),
                             cfile.getName().substring(0, cfile.getName().lastIndexOf(".") + 1) + dtf
-                                .format(now).toString() + ".xlsx" + ".zip",
+                                .format(now).toString() + "." + exportBean.getFileType() + ".zip",
                             alias.getType());
                         logger.debug(
                             "Uploaded to ftp alias: " + alias.getCustomerName() + ":" + alias
