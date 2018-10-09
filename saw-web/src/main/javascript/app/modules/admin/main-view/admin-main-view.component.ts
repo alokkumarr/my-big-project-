@@ -14,6 +14,7 @@ import {
 import { RoleService } from '../role/role.service';
 import { CategoryService } from '../category/category.service';
 import { PrivilegeService } from '../privilege/privilege.service';
+import { UserAssignmentService } from '../datasecurity/userassignment.service'
 import { JwtService } from '../../../../login/services/jwt.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
@@ -91,6 +92,7 @@ export class AdminMainViewComponent implements OnDestroy {
     private _categoryService: CategoryService,
     private _userService: UserService,
     private _roleService: RoleService,
+    private _userassignmentsService: UserAssignmentService,
     private _jwtService: JwtService,
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService,
@@ -191,6 +193,7 @@ export class AdminMainViewComponent implements OnDestroy {
 
   getService() {
     /* prettier-ignore */
+    console.log(this.section);
     switch (this.section) {
     case 'user':
       return this._userService;
@@ -200,6 +203,8 @@ export class AdminMainViewComponent implements OnDestroy {
       return this._categoryService;
     case 'privilege':
       return this._privilegeService;
+    case 'user assignments':
+      return this._userassignmentsService;
     default:
       break;
     }
@@ -225,6 +230,7 @@ export class AdminMainViewComponent implements OnDestroy {
 
   getListData(customerId) {
     const service = this.getService() as any;
+    console.log(service.getList(customerId));
     return service.getList(customerId);
   }
 

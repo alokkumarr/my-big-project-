@@ -11,6 +11,7 @@ import { RoleService } from './role/role.service';
 import { PrivilegeService } from './privilege/privilege.service';
 import { ExportService } from './export/export.service';
 import { ImportService } from './import/import.service';
+import { UserAssignmentService } from './datasecurity/userassignment.service';
 import { routes } from './routes';
 import {
   AdminExportViewComponent,
@@ -95,6 +96,7 @@ const SERVICES = [
   PrivilegeService,
   ExportService,
   ImportService,
+  UserAssignmentService,
   CategoryService
 ];
 @NgModule({

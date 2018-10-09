@@ -38,6 +38,22 @@ export const AdminMenuData = [
         url: ['/admin/import']
       }
     ]
+  },
+  {
+    id: '',
+    name: 'Data Security',
+    children: [
+      {
+        id: '',
+        name: 'Security Groups',
+        url: ['/admin/export']
+      },
+      {
+        id: '',
+        name: 'User Assignments',
+        url: ['/admin/userassignments']
+      }
+    ]
   }
 ];
 
@@ -237,6 +253,38 @@ export const CategoriesTableHeader = [
       }
       return '';
     }
+  },
+  {
+    caption: '',
+    width: '8%',
+    cellTemplate: 'actionCellTemplate'
+  }
+];
+
+export const UserAssignmentsTableHeader = [
+  {
+    caption: 'PRODUCT',
+    dataField: 'productName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '15%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'MODULE',
+    dataField: 'moduleName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '15%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'CATEGORY',
+    dataField: 'categoryName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '20%',
+    cellTemplate: 'highlightCellTemplate'
   },
   {
     caption: '',

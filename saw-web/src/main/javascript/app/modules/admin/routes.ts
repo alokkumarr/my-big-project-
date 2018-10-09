@@ -8,7 +8,8 @@ import {
   UsersTableHeader,
   RolesTableHeader,
   PrivilegesTableHeader,
-  CategoriesTableHeader
+  CategoriesTableHeader,
+  UserAssignmentsTableHeader
 } from './consts';
 
 export const routes: Routes = [
@@ -65,6 +66,14 @@ export const routes: Routes = [
         // name: 'admin.import',
         path: 'import',
         component: AdminImportViewComponent
+      },
+      {
+        path: 'userassignments',
+        component: AdminMainViewComponent,
+        data: {
+          columns: UserAssignmentsTableHeader,
+          section: 'user assignments'
+        }
       },
       {
         path: '',
