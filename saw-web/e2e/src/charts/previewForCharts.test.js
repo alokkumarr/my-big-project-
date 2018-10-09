@@ -1,4 +1,4 @@
-var testDataReader = require('../javascript/testdata/testDataReader.js');
+var testDataReader = require('../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const login = require('../javascript/pages/loginPage.po');
 const analyzePage = require('../javascript/pages/analyzePage.po');
