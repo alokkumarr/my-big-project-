@@ -26,15 +26,15 @@ import org.slf4j.LoggerFactory;
  * executing components.
  */
 public class WorkbenchIT extends BaseIT {
-  private static final String WORKBENCH_PROJECT = "workbench";
-  private static final String WORKBENCH_PATH =
-      "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
+    private static final String WORKBENCH_PROJECT = "workbench";
+    private static final String WORKBENCH_PATH =
+        "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
 
-  private static final String PARSE_DATASET_NAME = "WBAPARSER01";
+    private static final String PARSE_DATASET_NAME = "WBAPARSER01";
 
-  private static final int WAIT_RETRIES = 30;
-  private static final int WAIT_SLEEP_SECONDS = 5;
-  private final Logger log = LoggerFactory.getLogger(getClass().getName());
+    private static final int WAIT_RETRIES = 30;
+    private static final int WAIT_SLEEP_SECONDS = 5;
+    private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     /**
      * Parse a CSV file into dataset with given name using Workbench
@@ -235,7 +235,7 @@ public class WorkbenchIT extends BaseIT {
                     "Timed out waiting while waiting for dataset");
             }
             log.debug("Waiting for dataset: id = {}, retries = {}",
-                      id, retries);
+                id, retries);
             try {
                 Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
             } catch (InterruptedException e) {
@@ -243,8 +243,8 @@ public class WorkbenchIT extends BaseIT {
             }
             waitForDataset(id, retries - 1);
         } else if (!status.equals("SUCCESS")
-                    && !status.equals("FAILED")
-                    && !status.equals("PARTIAL")) {
+            && !status.equals("FAILED")
+            && !status.equals("PARTIAL")) {
             throw new RuntimeException(
                 "Unknown dataset status: " + status);
         } else if (status.equals("SUCCESS")) {
@@ -364,7 +364,7 @@ public class WorkbenchIT extends BaseIT {
             .when().get(WORKBENCH_PATH + "/previews/" + previewId)
             .then().assertThat().statusCode(200)
             .body("status", equalTo("success"));
-            //.body("rows[0].field1", equalTo("foo"));
+        //.body("rows[0].field1", equalTo("foo"));
     }
 
     @Test
@@ -404,44 +404,44 @@ public class WorkbenchIT extends BaseIT {
             .then().assertThat().statusCode(200)
             .body("rows", hasSize(3))
             .body("rows[0].field1", equalTo("foo"));
-   }
+    }
 
-  /**
-   * Wait until preview becomes visible in Workbench Services, using
-   * the given number of retries before timing out.
-   */
-  private void waitForPreview(String id, int retries)
-      throws JsonProcessingException {
-    Response response = given(authSpec)
-                        .when().get(WORKBENCH_PATH + "/previews/" + id)
-                        .then().assertThat().statusCode(200)
-                        .extract().response();
-    String status = response.path("status");
-    if (status.equals("success")) {
-      return;
-    } else if (!status.equals("queued")) {
-      throw new RuntimeException("Unknown preview status: " + status);
+    /**
+     * Wait until preview becomes visible in Workbench Services, using
+     * the given number of retries before timing out.
+     */
+    private void waitForPreview(String id, int retries)
+        throws JsonProcessingException {
+        Response response = given(authSpec)
+            .when().get(WORKBENCH_PATH + "/previews/" + id)
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        String status = response.path("status");
+        if (status.equals("success")) {
+            return;
+        } else if (!status.equals("queued")) {
+            throw new RuntimeException("Unknown preview status: " + status);
+        }
+        /* Preview not found yet, so wait more */
+        if (retries == 0) {
+            throw new RuntimeException(
+                "Timed out waiting while waiting for preview");
+        }
+        log.debug("Waiting for preview: id = {}, retries = {}",
+            id, retries);
+        try {
+            Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
+        } catch (InterruptedException e) {
+            log.debug("Interrupted");
+        }
+        waitForPreview(id, retries - 1);
     }
-    /* Preview not found yet, so wait more */
-    if (retries == 0) {
-      throw new RuntimeException(
-        "Timed out waiting while waiting for preview");
-    }
-    log.debug("Waiting for preview: id = {}, retries = {}",
-              id, retries);
-    try {
-      Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
-    } catch (InterruptedException e) {
-      log.debug("Interrupted");
-    }
-    waitForPreview(id, retries - 1);
-  }
 
-  /**
-   * Generate ID suitable for use as suffix in dataset names to ensure
-   * each test gets a unique dataset name.
-   */
-  private String testId() {
-    return UUID.randomUUID().toString();
-  }
+    /**
+     * Generate ID suitable for use as suffix in dataset names to ensure
+     * each test gets a unique dataset name.
+     */
+    private String testId() {
+        return UUID.randomUUID().toString();
+    }
 }

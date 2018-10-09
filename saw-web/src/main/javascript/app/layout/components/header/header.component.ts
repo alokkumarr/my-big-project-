@@ -30,7 +30,7 @@ export class LayoutHeaderComponent {
     private _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
-      this.showProgress = showProgress
+      this.showProgress = showProgress;
     });
   }
 
