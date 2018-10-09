@@ -13,8 +13,8 @@ spring:
       file-size-threshold: 2KB
 logging:
   level:
-    com.synchronoss.saw.workbench: TRACE
-    com.synchronoss.bda: TRACE
+    com.synchronoss.saw.workbench: INFO
+    com.synchronoss.bda: INFO
 server:
   address: localhost
   port: 9701

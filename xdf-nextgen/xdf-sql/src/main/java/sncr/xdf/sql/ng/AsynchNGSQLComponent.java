@@ -51,7 +51,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
                     ngctx.batchID,
                     ngctx.componentName,
                     null, null);
-        logger.warn("tempDir : " +tempDir);
+        logger.debug("tempDir : " +tempDir);
         executor.start(tempDir);
     } catch (Exception e) {
         error = "SQL Executor runtime exception: " + e.getMessage();
@@ -66,7 +66,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-      logger.warn("validateConfig : " + config);
+      logger.trace("Validate Config : " + config);
         return analyzeAndValidate(config);
     }
 

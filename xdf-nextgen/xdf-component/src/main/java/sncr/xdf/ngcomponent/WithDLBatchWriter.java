@@ -65,15 +65,15 @@ public interface WithDLBatchWriter {
                     String sampleDirDest = helper.getSampleDestDir(moveTask);
 
 
-                    WithDLBatchWriterHelper.logger.warn("Clean up sample for " + moveTask.objectName);
+                    WithDLBatchWriterHelper.logger.debug("Clean up sample for " + moveTask.objectName);
                     if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName) < 0) return -1;
 
-                    WithDLBatchWriterHelper.logger.warn("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
+                    WithDLBatchWriterHelper.logger.debug("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
                     helper.moveFilesForDataset(sampleDirSource, sampleDirDest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
 
                 }
                 else{
-                    WithDLBatchWriterHelper.logger.warn("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
+                    WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
@@ -83,7 +83,7 @@ public interface WithDLBatchWriter {
                     if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
                         if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName) < 0) return -1;
                     }
-                    WithDLBatchWriterHelper.logger.warn("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
+                    WithDLBatchWriterHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
                     helper.moveFilesForDataset(moveTask.source, moveTask.dest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
                 }
                 else // else - move partitions result
@@ -93,11 +93,11 @@ public interface WithDLBatchWriter {
                     Path lp = new Path(moveTask.source);
 
                     String m = "/"; for (String s : moveTask.partitionList) m += s + "*/"; m += "*/";
-                    WithDLBatchWriterHelper.logger.warn("Glob depth: " + m);
+                    WithDLBatchWriterHelper.logger.trace("Glob depth: " + m);
 
 
                     FileStatus[] it = HFileOperations.fs.globStatus(new Path(moveTask.source + m ), DLDataSetOperations.FILEDIR_FILTER);
-                    WithDLBatchWriterHelper.logger.warn("Got " + it.length + " files, enumerating partitions. Look for partitions into: " + lp);
+                    WithDLBatchWriterHelper.logger.debug("Got " + it.length + " files, enumerating partitions. Look for partitions into: " + lp);
                     for(FileStatus file : it){
                         if(file.isFile()){
                             // We also need list of partitions (directories) for reporting and appending/replacing
@@ -110,7 +110,7 @@ public interface WithDLBatchWriter {
                             // Store full partition path for future use in unique collection
                             // Should <set> to be used instead of <map>?
                             String p = file.getPath().getParent().toString().substring(i + lp.getName().length());
-                            WithDLBatchWriterHelper.logger.warn("Add partition to result set: " + p);
+                            WithDLBatchWriterHelper.logger.debug("Add partition to result set: " + p);
                             partitions.add(p);
                             // Update file counter for reporting purposes
                             ctx.globalFileCount++;
@@ -121,7 +121,7 @@ public interface WithDLBatchWriter {
                     Map<String, Tuple3<Long, Integer, Integer>> partitionsInfo = new HashMap<>();
                     // Check if configuration asks data to be copied
                     // to final processed location
-                    WithDLBatchWriterHelper.logger.warn("Merge partitions (" + partitions.size() + ")...");
+                    WithDLBatchWriterHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
