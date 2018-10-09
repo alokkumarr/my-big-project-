@@ -252,9 +252,6 @@
             <saw.docker.port>${saw.docker.port}</saw.docker.port>
           </systemPropertyVariables>
           <!-- The below integration test case is excluded until we fix all the issue with Workbench (SIP-4038) -->
-          <excludes>
-           <exclude>WorkbenchIT.java</exclude>
-          </excludes>
         </configuration>
       </plugin>
       <plugin>
