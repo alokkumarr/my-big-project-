@@ -54,6 +54,7 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+   
     <repositories>
         <repository>
             <id>mapr-maven</id>
@@ -462,6 +463,18 @@
         <defaultGoal>package</defaultGoal>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
         <testSourceDirectory>${project.basedir}/test</testSourceDirectory>
+        
+          <resources>
+          
+         
+	<resource>
+	
+		<directory>public</directory>
+		<targetPath>public</targetPath>
+		
+ <filtering>false</filtering>
+	</resource>
+</resources>
         <!-- To define the plugin version in your parent POM -->
         <pluginManagement>
             <plugins>
@@ -497,7 +510,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <!-- Assembly plugin -->
+            <!-- a plugin -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.5.5</version>
@@ -675,6 +688,7 @@ getent passwd rtis-user &gt;/dev/null || {
             </plugin>
         </plugins>
     </build>
+    
   <!-- Workaround: This project uses the rpm-maven-plugin, which
        requires RPM tools to be installed.  It should be migrated to
        using the Java RPM builder.  Until then, put building RPMs
