@@ -463,18 +463,13 @@
         <defaultGoal>package</defaultGoal>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
         <testSourceDirectory>${project.basedir}/test</testSourceDirectory>
-        
-          <resources>
-          
-         
-	<resource>
-	
-		<directory>public</directory>
-		<targetPath>public</targetPath>
-		
- <filtering>false</filtering>
-	</resource>
-</resources>
+	<resources>
+		<resource>
+			<directory>public</directory>
+			<targetPath>public</targetPath>
+			<filtering>false</filtering>
+		</resource>
+	</resources>
         <!-- To define the plugin version in your parent POM -->
         <pluginManagement>
             <plugins>
