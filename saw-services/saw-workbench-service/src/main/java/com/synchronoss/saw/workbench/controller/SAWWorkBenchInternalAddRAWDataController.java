@@ -314,7 +314,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
       try {
           dataset = sawWorkbenchService.getDataSet(projectId, datasetId);
       } catch(Exception ex) {
-          logger.error("Error occurred while retriving the dataset properties");
+          logger.error("Error occurred while retriving the dataset properties " + ex);
       }
 
       return dataset;

@@ -480,8 +480,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonElement dataset = mdtStore.read(dataSetId);
-    return objectMapper.readValue(dataset.toString(), DataSet.class);
+    String dataset = mdtStore.readDataSet(projectId, dataSetId);
+    return objectMapper.readValue(dataset, DataSet.class);
   }
   
   //TODO: This method needs re-factoring in future once SIP-4218 & SIP-4217 is resolved

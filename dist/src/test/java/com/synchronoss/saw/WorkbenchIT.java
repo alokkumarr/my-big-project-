@@ -29,6 +29,9 @@ public class WorkbenchIT extends BaseIT {
   private static final String WORKBENCH_PROJECT = "workbench";
   private static final String WORKBENCH_PATH =
       "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
+
+  private static final String PARSE_DATASET_NAME = "WBAPARSER01";
+
   private static final int WAIT_RETRIES = 30;
   private static final int WAIT_SLEEP_SECONDS = 5;
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
@@ -40,7 +43,7 @@ public class WorkbenchIT extends BaseIT {
     private String registerParseDataset() throws IOException {
 
         ObjectNode root = mapper.createObjectNode();
-        root.put("name", "WBAPARSER01");
+        root.put("name", PARSE_DATASET_NAME);
         root.put("component", "parser");
         ObjectNode config = root.putObject("configuration");
         ArrayNode fields = config.putArray("fields");
@@ -120,7 +123,7 @@ public class WorkbenchIT extends BaseIT {
         config.put("quoteEscape", "\\");
         config.put("headerSize", "4");
         ObjectNode outputs = config.putObject("output");
-        outputs.put("dataSet", "WBAPARSER01");
+        outputs.put("dataSet", PARSE_DATASET_NAME);
         outputs.put("mode", "replace");
         outputs.put("format", "parquet");
         outputs.put("catalog", "data");
@@ -147,10 +150,39 @@ public class WorkbenchIT extends BaseIT {
 
         assert (resp != null);
         log.debug("Response: " + resp);
+
+        resp = getDatasetById(PARSE_DATASET_NAME);
+
+        assert (resp != null);
+        log.debug("Response: " + resp);
+
         JsonNode node = mapper.reader().readTree(resp);
         assert (node != null);
         String id = node.get("id").asText();
         return id;
+    }
+
+    /**
+     *
+     * @param datasetId ID of the dataset without the projectId
+     * @return Details of the dataset
+     */
+    private String getDatasetById(String datasetId) {
+        Response response = given(authSpec)
+            .when()
+            .get(WORKBENCH_PATH + "/datasets" + "/" + datasetId )
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+
+        String resp = response.getBody().asString();
+
+        assert (resp != null);
+        log.debug("Response: " + resp);
+
+        return resp;
     }
     /**
      * Parse a CSV file into dataset with given name using Workbench
@@ -246,14 +278,14 @@ public class WorkbenchIT extends BaseIT {
         return response.path(statusPath);
     }
 
-//    @Test
-//    public void testListPreregDatasets() throws IOException {
-//        // id = parseDataset("test_list")
-//        String id = registerParseDataset();
-//        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
-//        log.debug("ID: " + id);
-//        waitForDataset(id, WAIT_RETRIES);
-//    }
+    @Test
+    public void testListPreregDatasets() throws IOException {
+        // id = parseDataset("test_list")
+        String id = registerParseDataset();
+        assert (id.equalsIgnoreCase(WORKBENCH_PROJECT + "::" + PARSE_DATASET_NAME));
+        log.debug("ID: " + id);
+        waitForDataset(id, WAIT_RETRIES);
+    }
     @Test
     public void testParseDataset() throws IOException {
         String name = "test-parse-" + testId();
