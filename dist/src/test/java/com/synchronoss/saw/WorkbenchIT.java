@@ -246,14 +246,14 @@ public class WorkbenchIT extends BaseIT {
         return response.path(statusPath);
     }
 
-    @Test
-    public void testListPreregDatasets() throws IOException {
-        // id = parseDataset("test_list")
-        String id = registerParseDataset();
-        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
-        log.debug("ID: " + id);
-        waitForDataset(id, WAIT_RETRIES);
-    }
+//    @Test
+//    public void testListPreregDatasets() throws IOException {
+//        // id = parseDataset("test_list")
+//        String id = registerParseDataset();
+//        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
+//        log.debug("ID: " + id);
+//        waitForDataset(id, WAIT_RETRIES);
+//    }
     @Test
     public void testParseDataset() throws IOException {
         String name = "test-parse-" + testId();
