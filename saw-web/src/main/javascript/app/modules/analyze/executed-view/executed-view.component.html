@@ -93,7 +93,7 @@
         </div>
       </mat-toolbar>
       <mat-card>
-        <filter-chips-u *ngIf="analysis && !(analysis.type === 'report' && analysis.edit)"
+        <filter-chips-u *ngIf="analysis && !(analysis.type === 'report' && analysis.edit) && executedAnalysis.sqlBuilder.filters.length > 0"
                         [filters]="executedAnalysis.sqlBuilder.filters"
                         [readonly]="true"
                         [artifacts]="analysis.artifacts"></filter-chips-u>
