@@ -1,0 +1,82 @@
+@import 'src/themes/base/colors';
+
+:host {
+  width: 100%;
+}
+
+.action-buttons {
+  .mat-icon-button {
+    font-size: 22px;
+    line-height: 32px !important;
+    height: 34px !important;
+  }
+
+  .mat-raised-button {
+    line-height: 32px !important;
+    vertical-align: middle;
+  }
+}
+
+.mat-slide-toggle {
+  padding-top: 5px;
+}
+
+.icon-search {
+  font-size: 26px !important;
+}
+
+.toolbar-white {
+  background-color: $primary-white;
+  height: 45px !important;
+  min-height: 45px !important;
+}
+
+.md-subhead {
+  color: $primary-blue-b2;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mat-button-toggle-checked {
+  background-color: $primary-blue-b2;
+  color: white;
+}
+
+.mat-button-toggle {
+  font-size: 16px;
+  height: 34px;
+}
+
+.mat-button-toggle-label-content {
+  padding: 0 7px;
+  line-height: 32px !important;
+
+  .mat-icon {
+    width: auto;
+  }
+}
+
+.mat-button-toggle-label-content > * {
+  vertical-align: bottom;
+}
+
+.view-mode {
+  .mat-button-toggle-group {
+    box-shadow: none;
+  }
+
+  .mat-button-toggle-checked {
+    background-color: white;
+    color: $primary-blue-b2;
+  }
+}
+
+.grid-view {
+  padding: 5px;
+  background-color: $background-color;
+}
+
+.card-view {
+  overflow: auto;
+  background-color: $background-color;
+}

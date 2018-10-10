@@ -1,0 +1,57 @@
+:host {
+  height: 100%;
+
+}
+
+.mat-sidenav-container {
+  height: 100%;
+
+  mat-sidenav-content {
+    height: 100%;
+  }
+}
+
+mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {
+  background: none;
+}
+
+.page-header-toolbar {
+  display: flex;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  h2 {
+    flex-grow: 1;
+  }
+
+  .page-header-actions {
+    align-self: center;
+    display: flex;
+    align-items: center;
+
+    button {
+      height: 36px;
+    }
+
+    mat-slide-toggle {
+      margin-left: 10px;
+    }
+  }
+}
+
+.mat-drawer-container {
+  height: 100%;
+}
+
+.page-content {
+  width: 100%;
+  height: calc(100% - 62px);
+  display: flex;
+  align-items: center;
+
+  span.no-dashboard-notice {
+    margin: 0 auto;
+    font-size: 1.5em;
+  }
+}
