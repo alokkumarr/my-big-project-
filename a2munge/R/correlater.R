@@ -16,6 +16,7 @@
 #'  'target_variable'. this differs from stats::cor function which returns NxN
 #'  matrix with column and row names. First column returned by corr is
 #'  equivalent to rownames in cor function
+#'@param ... not currently implemented  
 #'
 #'@return Dataframe of either 1xN vector or NxN martrix with pearson
 #'  correlation values with additional rowname id column
@@ -26,7 +27,7 @@
 #'corr(mtcars)
 #'corr(mtcars, "mpg")
 #'corr(mtcars, "mpg", "id_var")
-corr <- function(df, target_var, target_var_name) {
+corr <- function(df, target_var, target_var_name, ...) {
   UseMethod("corr", df)
 }
 
@@ -37,7 +38,8 @@ corr <- function(df, target_var, target_var_name) {
 #' @export
 corr.data.frame <- function(df,
                             target_var = NULL,
-                            target_var_name = "target_variable"){
+                            target_var_name = "target_variable",
+                            ...){
   variables <- colnames(df)
   stopifnot(target_var %in% c(variables) | is.null(target_var))
   result <- cor(df) %>%
@@ -55,36 +57,44 @@ corr.data.frame <- function(df,
 
 
 
-
-#' @importFrom magrittr %>%
+#' @param table_name string input for spark table name created. Default is
+#'   'corr'. Table is overwritten
 #' @rdname corr
 #' @export
 corr.tbl_spark <- function(df,
                            target_var = NULL,
-                           target_var_name = "target_variable") {
+                           target_var_name = "target_variable",
+                           table_name = "corr",
+                           ...) {
   variables <- colnames(df)
-  stopifnot(target_var %in% c(variables) | is.null(target_var))
-
-  if (!is.null(target_var)) {
-    result <- df %>%
-      dplyr::summarise_all(funs(cor(., !!rlang::sym(target_var)))) %>%
-      dplyr::mutate(!!target_var_name := target_var)
-  } else{
-    i <- 1
-    for (tv in variables) {
-      sub_result <- df %>%
-        dplyr::summarise_all(funs(cor(., !!rlang::sym(tv)))) %>%
-        dplyr::mutate(!!target_var_name := tv)
-      if (i == 1) {
-        result <- sub_result
-      } else{
-        result <- dplyr::union_all(result, sub_result)
-      }
-      i <- i + 1
-    }
+  checkmate::assert_choice(target_var, variables, null.ok = TRUE)
+  checkmate::assert_string(target_var_name)
+  
+  num_features <- length(variables)
+  features_col <- sparklyr::random_string("features")
+  result <- df %>%
+    sparklyr::ft_vector_assembler(variables, features_col) %>%
+    sparklyr::spark_dataframe() %>% 
+    sparklyr::invoke_static(sparklyr::spark_connection(.),
+                            "org.apache.spark.ml.stat.Correlation",
+                            "corr", 
+                            .,
+                            features_col) %>%
+    sparklyr::invoke("first") %>%
+    sapply(invoke, "toArray") %>%
+    matrix(nrow = num_features) %>%
+    as.data.frame() %>%
+    dplyr::rename(!!!rlang::set_names(paste0("V", seq_len(num_features)),
+                                      variables)) %>% 
+    dplyr::mutate(!!target_var_name := variables) %>% 
+    dplyr::select_at(c(target_var_name, variables))
+  
+  if(!is.null(target_var)){
+    result <- result %>%
+      dplyr::filter_at(target_var_name, dplyr::any_vars(. == target_var))
   }
-
-  dplyr::select_at(result, c(target_var_name, variables))
+  
+  dplyr::copy_to(spark_connection(df), result, table_name, overwrite = TRUE)
 }
 
 

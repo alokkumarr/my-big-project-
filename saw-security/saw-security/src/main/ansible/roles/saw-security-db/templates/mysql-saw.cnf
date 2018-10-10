@@ -1,2 +1,12 @@
 [mysqld]
 lower_case_table_names=1
+binlog_format=ROW
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+wsrep_on=ON
+wsrep_provider=/usr/lib64/galera/libgalera_smm.so
+wsrep_cluster_name=sip
+wsrep_cluster_address=gcomm://
+{%- for host in groups['saw-security'] -%}
+  {{ host }}{% if not loop.last %},{% endif %}
+{%- endfor %}

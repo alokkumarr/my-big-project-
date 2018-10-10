@@ -13,7 +13,7 @@
 
 evaluate_model(mobj, ...)
 
-\method{evaluate_model}{spark_ml_clustering}(mobj, measure)
+\method{evaluate_model}{spark_ml_clustering}(mobj, measure, ...)
 
 \method{evaluate_model}{spark_model}(mobj, data, measure,
   prediction_col = "predicted", ...)

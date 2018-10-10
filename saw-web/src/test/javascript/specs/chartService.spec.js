@@ -1,4 +1,3 @@
-// import angular from 'angular';
 import {ChartService} from '../../../main/javascript/app/modules/analyze/services/chart.service';
 import {bubbleChartDataGrouped, columnChartData, columnChartGroupedData} from './chartData';
 import {bubbleChartGrouped, columnChart, columnChartGrouped} from './sqlBuilder';

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { UIRouter } from '@uirouter/angular';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
@@ -10,7 +10,6 @@ import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
-import * as isUndefined from 'lodash/isUndefined';
 import * as add from 'lodash/add';
 
 import { JwtService } from '../../../../login/services/jwt.service';
@@ -26,7 +25,8 @@ export class ObserveService {
   constructor(
     private http: HttpClient,
     private jwt: JwtService,
-    private router: UIRouter,
+    private router: Router,
+    private route: ActivatedRoute,
     private menu: MenuService
   ) {}
 
@@ -151,15 +151,14 @@ export class ObserveService {
             this.getDashboardsForCategory(subCategory.id).subscribe(
               (dashboards: Array<Dashboard>) => {
                 dashboards = dashboards || [];
-                subCategory.children = subCategory.children || [];
+                subCategory.children = [];
 
                 subCategory.children = subCategory.children.concat(
                   map(dashboards, dashboard => ({
                     id: dashboard.entityId,
                     name: dashboard.name,
-                    url: `#!/observe/${subCategory.id}?dashboard=${
-                      dashboard.entityId
-                    }`,
+                    url: [`/observe`, subCategory.id],
+                    queryParams: { dashboard: dashboard.entityId },
                     data: dashboard
                   }))
                 );
@@ -199,8 +198,16 @@ export class ObserveService {
 
   /* Try to redirect to first dashboard or first empty subcategory */
   redirectToFirstDash(menu, force = false) {
-    /* Only redirect if on root observe state */
-    if (this.router.stateService.current.name !== 'observe' && !force) {
+
+    const basePath = this.route.snapshot.children[0].url[0].path;
+    const { dashboard } = this.route.snapshot.queryParams;
+
+    /* If not on observe page, or a dashboard is being provided in url, don't
+     * load first dashboard automatically.
+     * If force is set, this behaviour is overrided, and first dashboard is
+     * loaded regardless.
+     */
+    if ((basePath !== 'observe' || dashboard) && !force) {
       return;
     }
 
@@ -220,16 +227,21 @@ export class ObserveService {
         return subCat.children.length > 0;
       });
 
-      this.router.stateService.go('observe.dashboard', {
-        subCategory: subCategory.id,
-        dashboard: subCategory.children[0].id
+      this.router.navigate(['observe', subCategory.id], {
+        queryParams: {
+          dashboard: subCategory.children[0].id
+        }
       });
     } else if (categoryWithSubCategory) {
       /* Otherwise, redirect to the first empty subcategory available. */
-      this.router.stateService.go('observe.dashboard', {
-        subCategory: categoryWithSubCategory.children[0].id,
-        dashboard: ''
-      });
+      this.router.navigate(
+        ['observe', categoryWithSubCategory.children[0].id],
+        {
+          queryParams: {
+            dashboard: ''
+          }
+        }
+      );
     }
   }
 
@@ -243,7 +255,7 @@ export class ObserveService {
   }
 
   buildPlotBandsForBullet(bandColVal, b1, b2, bulletVal, bullTarget) {
-    const cb = find(BULLET_CHART_COLORS, { 'value': bandColVal });
+    const cb = find(BULLET_CHART_COLORS, { value: bandColVal });
     const plotBands = [];
     const seriesData = [{ y: bulletVal, target: bullTarget }];
     if (b1 === 0 || b2 === 0) {

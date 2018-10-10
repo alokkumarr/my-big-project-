@@ -25,9 +25,16 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
-import { AGGREGATE_TYPES_OBJ, DATE_FORMATS_OBJ } from '../../consts.js';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as filter from 'lodash/filter';
+import * as map from 'lodash/map';
+
+import {
+  AGGREGATE_TYPES,
+  AGGREGATE_TYPES_OBJ
+} from '../../consts';
+
 import {
   ArtifactColumnReport,
   Artifact,
@@ -36,13 +43,13 @@ import {
 } from './types';
 import {
   DATE_TYPES,
-  NUMBER_TYPES,
-  FLOAT_TYPES,
-  INT_TYPES,
-  DATE_INTERVALS_OBJ
+  NUMBER_TYPES
 } from '../../../modules/analyze/consts';
-import { componentFactoryName } from '@angular/compiler';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
+
+import {
+  flattenReportData
+} from '../../../common/utils/dataFlattener';
 
 const template = require('./report-grid.component.html');
 require('./report-grid.component.scss');
@@ -66,6 +73,7 @@ type ReportGridField = {
   sortOrder?: 'asc' | 'desc';
   sortIndex?: number;
   changeColumnProp: Function;
+  headerCellTemplate: string;
 };
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -87,6 +95,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   dataGrid: DxDataGridComponent;
   @Input()
   query: string;
+  @Input() isInQueryMode;
   @Input()
   analysis;
   @Input()
@@ -114,9 +123,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
-    this.columns = isUndefined(this.analysis.sqlBuilder.dataFields)
-      ? this.artifacts2Columns(this.artifacts)
-      : this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
+    this.columns = this.artifacts2Columns(this.artifacts);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
@@ -139,7 +146,16 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
-    this.data = data;
+
+    if (!this.isInQueryMode) {      
+      const artifact = this.fetchColumsUponCheck();
+      if (!this.artifacts) {
+        return;
+      }
+      this.columns = this.artifacts2Columns(artifact);
+    }
+    this.data = flattenReportData(data, this.analysis)
+    
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -175,7 +191,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   // grid settings
   public columnAutoWidth = false;
-  public columnMinWidth = 150;
+  public columnMinWidth = 172;
   public columnResizingMode = 'widget';
   public allowColumnReordering = true;
   public allowColumnResizing = true;
@@ -199,6 +215,9 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     showPageSizeSelector: true
   };
   public loadPanel;
+  public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
+  public aggregates;
+  public isQueryMode;
 
   constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
     self = this;
@@ -305,42 +324,33 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     }
   }
 
-  onContextMenuPreparing(event) {
-    const { target, column } = event;
-    if (target !== 'header') {
-      return;
-    }
-    if (!this.isEditable || !this.columns) {
-      return;
-    }
-    event.items = [
-      {
-        text: 'Rename',
-        icon: 'grid-menu-item icon-edit',
-        onItemClick: () => {
-          this.renameColumn(column);
-        }
-      },
-      {
-        text: `Remove ${column.caption}`,
-        icon: 'grid-menu-item icon-eye-disabled',
-        onItemClick: () => {
-          this.removeColumn(column);
-        }
-      }
-    ];
-    if (
-      NUMBER_TYPES.includes(column.type) ||
-      DATE_TYPES.includes(column.type)
-    ) {
-      event.items.unshift({
-        text: 'Format Data',
-        icon: 'grid-menu-item icon-filter',
-        onItemClick: () => {
-          this.formatColumn(column);
-        }
+  fetchAggregation(type) {
+    if (NUMBER_TYPES.includes(type)) {
+      this.aggregates = AGGREGATE_TYPES;
+    } else {
+      this.aggregates = filter(AGGREGATE_TYPES, type => {
+        return type.value === 'count';
       });
     }
+  }
+
+  checkFormatDataCondition(type) {
+    if (NUMBER_TYPES.includes(type) || DATE_TYPES.includes(type)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  aggregateColumn(payload, value) {
+    payload.aggregate = value;
+    if (value === 'clear') {
+      delete payload.aggregate;
+    }
+    this.change.emit({
+      subject: 'aggregate',
+      column: payload
+    });
   }
 
   removeColumn({ changeColumnProp, payload }: ReportGridField) {
@@ -397,8 +407,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
-      fpFlatMap((artifact: Artifact) => artifact.columns),
-      fpFilter('checked'),
+      fpFlatMap((artifact: Artifact) => artifact.columns || [artifact]),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
@@ -426,6 +435,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
           visible: isUndefined(column.visible) ? true : column.visible,
           payload: column,
           format,
+          headerCellTemplate: 'headerCellTemplate',
           changeColumnProp: (prop, value) => {
             column[prop] = value;
           },
@@ -476,5 +486,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     }
     return {};
+  }
+
+  fetchColumsUponCheck() {
+    return map(this.analysis.artifacts, artifact => {
+      const columns = filter(artifact.columns, 'checked');
+      return {
+        ...artifact,
+        columns
+      };
+    })
   }
 }

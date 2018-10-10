@@ -4,11 +4,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import * as merge from 'lodash/merge';
-import * as omit from 'lodash/omit';
-import * as set from 'lodash/set';
 import * as isUndefined from 'lodash/isUndefined';
 
 import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs'
@@ -43,7 +40,7 @@ export class CreateDatasetsComponent implements OnInit {
   private folNamePattern = '[A-Za-z0-9]+';
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     private dialog: MatDialog,
     private workBench: WorkbenchService,
     private notify: ToastService
@@ -138,10 +135,10 @@ export class CreateDatasetsComponent implements OnInit {
     this.workBench.triggerParser(payload).subscribe(data => {
       this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 9000 });
     });
-    this.router.stateService.go('workbench.dataobjects');
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 
   backtoLists() {
-    this.router.stateService.go('workbench.dataobjects');
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 }

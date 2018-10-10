@@ -7,9 +7,11 @@ sip-proxy
 
 [saw-web]
 sip-app1
+sip-app2
 
 [saw-services]
 sip-app1
+sip-app2
 
 [saw-services:vars]
 #
@@ -101,11 +103,14 @@ saw_ftp_export_size=1000000
 ## Chunk size for processing exports
 saw_export_chunk_size=10000
 
+saw_email_host=sip-admin
+
 [saw-security]
 sip-app1
+sip-app2
 
 [saw-security:vars]
-#
-# Outgoing email configuration
-#
-saw_security_email_host=outgoing.sncrcorp.net
+saw_security_email_host=sip-admin
+
+[saw-security-arbitrator]
+sip-app3

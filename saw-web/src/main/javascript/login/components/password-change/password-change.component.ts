@@ -24,23 +24,23 @@ export class PasswordChangeComponent {
   private errorMsg;
 
   private formState: boolean;
-    
+
   changePwd() {
     const token = this._JwtService.get();
 
     if (!token) {
       this.errorMsg = 'Please login to change password';
       return;
-    } 
+    }
 
     this._UserService.changePwd(this)
       .then(res => {
-        if (res.data.valid) {
+        if (res.valid) {
           this._UserService.logout('logout').then(() => {
-            window.location.assign('./login.html?changePassMsg='+res.data.validityMessage);
+            window.location.assign('./login.html?changePassMsg='+res.validityMessage);
           });
         } else {
-          this.errorMsg = res.data.validityMessage;
+          this.errorMsg = res.validityMessage;
         }
       });
   }

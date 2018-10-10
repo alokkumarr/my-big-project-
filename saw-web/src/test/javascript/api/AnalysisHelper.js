@@ -49,6 +49,26 @@ class AnalysisHelper {
       //Make a delete api call
       return apiCall.post(host + 'services/analysis', deletePayload, token);
     }
+
+    getSubCategoriesByCatgeoryName(url,token, categoryName) {
+      let requestPayLoad = 1;
+      let response = apiCall.post(url + 'security/auth/admin/cust/manage/categories/fetch', requestPayLoad, token);
+      if (response) {
+        for(let category of response.categories) {
+          if(category.categoryName.trim().toLowerCase() === categoryName.trim().toLowerCase()) {
+            return category.subCategories;
+          }
+        }
+      }
+      return null;
+    }
+
+    getSubCategoryIdBySubCatgeoryName(subCategories, subCategoryName) {
+      return this.getValueFromListByKeyValue(subCategories, 'subCategoryName', subCategoryName, 'subCategoryId'); 
+    }
+
+    getSubCategoriesByCatgeoryId(categoryId) {
+    }
     /**
      *
      * @param {*} url
@@ -57,19 +77,19 @@ class AnalysisHelper {
      * @param {*} description
      * @param {*} analysisType
      */
-    createNewAnalysis(url, token, name, description, analysisType, subType) {
+    createNewAnalysis(url, token, name, description, analysisType, subType, filters = null) {
 
       if(analysisType === Constants.ES_REPORT) {
-        return this.createEsReport(url, token, name, description, analysisType, subType);
+        return this.createEsReport(url, token, name, description, analysisType, subType, filters);
 
       } else if(analysisType === Constants.CHART) {
-        return this.createChart(url, token, name, description, analysisType, subType);
+        return this.createChart(url, token, name, description, analysisType, subType, filters);
       }
       else if(analysisType === Constants.PIVOT) {
-        return this.createPivot(url, token, name, description, analysisType, subType);
+        return this.createPivot(url, token, name, description, analysisType, subType, filters);
       }
       else if(analysisType === Constants.REPORT) {
-        return this.createReport(url, token, name, description, analysisType, subType);
+        return this.createReport(url, token, name, description, analysisType, subType, filters);
       }else {
         throw new Error('Invalid analysisType: '+analysisType);
       }
@@ -89,28 +109,29 @@ class AnalysisHelper {
     }
 
     //analysisType = esReport
-    createEsReport(url, token,name, description, analysisType, subType) {
+    createEsReport(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
 
      //analysisType = chart
-     createChart(url, token,name, description, analysisType, subType) {
+     createChart(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
     //analysisType = pivot
-    createPivot(url, token,name, description, analysisType, subType) {
+    createPivot(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
     //analysisType = report
-    createReport(url, token,name, description, analysisType, subType) {
+    createReport(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.report;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
 
-    createAnalysis(url, token,name, description, analysisType, subType, dataSetName) {
+    createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters = null) {
+      let _self = this;
        // Get semanticId (dataset ID)
        let semanticId = this.getSemanticId(url,dataSetName, token);
        // Create
@@ -120,38 +141,46 @@ class AnalysisHelper {
        //Update analysis with fields
        let currentTimeStamp = new Date().getTime();
        let user = users.masterAdmin;
-       let subCategory = subCategories.createAnalysis;
        let updatePayload;
        let executePayload;
+       let subCategoryId;
 
-       if(analysisType === Constants.ES_REPORT) {
-        updatePayload = new RequestModel().getEsReportBody(customerCode,id,'update',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
-        executePayload = new RequestModel().getEsReportBody(customerCode,id,'execute',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
-       } else if (analysisType === Constants.CHART) {
-          updatePayload = new RequestModel().getChartBody(customerCode,id,'update',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
-          executePayload = new RequestModel().getChartBody(customerCode,id,'execute',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
-       } else if (analysisType === Constants.PIVOT) {
-        updatePayload = new RequestModel().getPivotBody(customerCode,id,'update',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
-        executePayload = new RequestModel().getPivotBody(customerCode,id,'execute',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
-      } else if (analysisType === Constants.REPORT) {
-        updatePayload = new RequestModel().getReportBody(customerCode,id,'update',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
-        executePayload = new RequestModel().getReportBody(customerCode,id,'execute',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+      let cubCatList = _self.getSubCategoriesByCatgeoryName(url,token, categories.analyses.name);
+      if(subCategories) {
+        subCategoryId = _self.getSubCategoryIdBySubCatgeoryName(cubCatList, subCategories.createAnalysis.name);
       } else {
-        throw new Error('Invalid analysis type: '+ analysisType);
+        throw new Error('There is subcategories found for categories' + categories.analyses.name);
       }
       //Update
-       apiCall.post(url + 'services/analysis', updatePayload, token);
-       //execute
-       let response = apiCall.post(url + 'services/analysis', executePayload, token);
-       return response;
+
+      if(analysisType === Constants.ES_REPORT) {
+      updatePayload = new RequestModel().getEsReportBody(customerCode,id,'update',
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+      executePayload = new RequestModel().getEsReportBody(customerCode,id,'execute',
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+      } else if (analysisType === Constants.CHART) {
+        updatePayload = new RequestModel().getChartBody(customerCode,id,'update',
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+        executePayload = new RequestModel().getChartBody(customerCode,id,'execute',
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+      } else if (analysisType === Constants.PIVOT) {
+      updatePayload = new RequestModel().getPivotBody(customerCode,id,'update',
+                            dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+      executePayload = new RequestModel().getPivotBody(customerCode,id,'execute',
+                            dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+    } else if (analysisType === Constants.REPORT) {
+      updatePayload = new RequestModel().getReportBody(customerCode,id,'update',
+                            dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+      executePayload = new RequestModel().getReportBody(customerCode,id,'execute',
+                            dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType, filters);
+    } else {
+      throw new Error('Invalid analysis type: '+ analysisType);
+    }
+    //Update
+      apiCall.post(url + 'services/analysis', updatePayload, token);
+      //execute
+      let response = apiCall.post(url + 'services/analysis', executePayload, token);
+      return response;
     }
 
 
@@ -199,6 +228,15 @@ class AnalysisHelper {
 
 
       generateChart(url,semanticId, dataSetName, user, subCategory, token, name, description, analysisType, subType) {
+        
+        let subCategoryId;
+        let subCatList = _self.getSubCategoriesByCatgeoryName(url,token, categories.analyses.name);
+        if(subCategories) {
+          subCategoryId = _self.getSubCategoryIdBySubCatgeoryName(subCatList, subCategories.createAnalysis.name);
+        } else {
+          throw new Error('There is subcategories found for categories' + categories.analyses.name);
+        }
+        
         // Create chart
         const createPayload = new RequestModel().getAnalysisCreatePayload(semanticId, analysisType, customerCode);
         // Get chart ID
@@ -206,11 +244,11 @@ class AnalysisHelper {
         //Update charts with fields
         let currentTimeStamp = new Date().getTime();
         const updatePayload = new RequestModel().getPayloadPivotChart(customerCode,chartID,'update',
-                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType);
         apiCall.post(url + 'services/analysis', updatePayload, token);
         //Execute the analysis
         const executePayload = new RequestModel().getPayloadPivotChart(customerCode,chartID,'execute',
-                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategoryId, currentTimeStamp, analysisType, subType);
         return apiCall.post(url + 'services/analysis', executePayload, token);
     }
 

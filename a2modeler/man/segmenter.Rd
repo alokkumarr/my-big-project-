@@ -43,5 +43,5 @@ Creates a segmenter object which inherits from modeler class
 \seealso{
 Other use cases: \code{\link{classifier}},
   \code{\link{forecaster}}, \code{\link{modeler}},
-  \code{\link{regressor}}
+  \code{\link{multiclassifier}}, \code{\link{regressor}}
 }

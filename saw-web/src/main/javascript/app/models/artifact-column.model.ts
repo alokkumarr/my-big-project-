@@ -19,6 +19,8 @@ export interface ArtifactColumn {
 export interface ArtifactColumnChart extends ArtifactColumn {
   area?: 'x' | 'y' | 'z' | 'g';
   comboType?: string;
+  limitValue?: number;
+  limitType?: string;
   dateFormat?: string;
   dateInterval?: string;
 }

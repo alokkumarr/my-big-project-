@@ -11,7 +11,7 @@ import {
   MatDialog,
   MatSidenav
 } from '@angular/material';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
@@ -23,11 +23,8 @@ import { animations } from './create-dashboard.animations';
 
 import { Subscription } from 'rxjs/Subscription';
 import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
-import * as map from 'lodash/map';
 import * as get from 'lodash/get';
-import * as findIndex from 'lodash/findIndex';
 import { GlobalFilterService } from '../../services/global-filter.service';
 
 const template = require('./create-dashboard.component.html');
@@ -56,7 +53,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
   constructor(
     public dialogRef: MatDialogRef<CreateDashboardComponent>,
     private dialog: MatDialog,
-    private router: UIRouter,
+    private router: Router,
     private menu: MenuService,
     private globalFilterService: GlobalFilterService,
     private dashboardService: DashboardService,
@@ -227,15 +224,9 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
       if (result) {
         this.dialogRef.afterClosed().subscribe(() => {
           this.updateSideMenu(result);
-          this.router.stateService.go(
-            'observe.dashboard',
-            {
-              dashboard: result.entityId,
-              subCategory: result.categoryId
-            },
-            {
-              reload: true
-            }
+          this.router.navigate(
+            ['observe', result.categoryId],
+            {queryParams: {dashboard: result.entityId}}
           );
         });
         this.dialogRef.close();

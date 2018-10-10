@@ -16,11 +16,30 @@ module.exports = {
   dashboardDesc: element(by.css('textarea[e2e="dashboard-save-description-input"]')),
   subCategorySelect: name => element(by.xpath(`//span[@class="mat-option-text"and contains(text(),"${name}")]`)),
   saveDialogBtn: element(by.css(`[e2e="dashboard-save-save-button"]`)),
-  metricFetchProgressBar:element(by.xpath('//div[contains(@class,"mat-progress-bar-element")]')),
+  metricFetchProgressBar: element(by.xpath('//div[contains(@class,"mat-progress-bar-element")]')),
+  filterButton: element(by.css('button[e2e="dashboard-open-global-filters-button"]')),
+  globalFilters: {
+    stringFilter: element(by.css(`input[e2e="dashboard-global-filter-string-input"]`)),
+    stringFilterValue : value => element(by.xpath(`//mat-option[contains(text(),"${value}")]`)),
+    applyFilter: element(by.css(`button[e2e="dashboard-global-filters-apply-button"]`)),
+    dateFilterPreset: element(by.css('[e2e="filter-date-preset"]')),
+    dateFilterPresetValue: value => element(by.xpath(`//mat-option[contains(text(),"${value}")]`)),
+    selectedPreset: element(by.css('[e2e="dasbhoard-global-filter-date-preset-select"]')),
+    selectedPresetValue: value => element(by.xpath(`//*[contains(text(),"${value}")]`)),
+    numberSlider: element(by.css('[e2e="dashboard-global-filter-number-slider"]')),
+    numberSliderLow: element(by.xpath('//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"noUi-handle-lower")]')),
+    cancelButton: element(by.css('[e2e="dashboard-global-filters-cancel-button"]'))
+
+
+  },
   dashboard:{
-    dashboardTitle: name => element(by.xpath(`//h2[text()="${name}"]`)),
+    dashboardTitle: name => element(by.xpath(`//h2[contains(text(),"${name}")]`)),
     dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),
     dashboardConfirmDeleteButton: element(by.css('[e2e="dashboard-confirm-dialog-confirm"]')),
+    refreshButton: element(by.css('[e2e="dashboard-manual-refresh-button"]')),
+    deleteButton: element(by.css('[e2e="dashboard-delete-dashboard-button"]')),
+    downloadButton: element(by.css('[e2e="dashboard-download-dashboard-button"]')),
+    editButton: element(by.css('[e2e="dashboard-edit-dashboard-button"]')),
     addedAnalysisByName : name => element(by.xpath(`//h1[text()="${name}"]`))
   },
   snapshotKPI: {

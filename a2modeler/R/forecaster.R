@@ -24,7 +24,7 @@ forecaster <- function(df,
                        frequency = NULL,
                        prediction_conf_levels = c(80, 95),
                        name = NULL,
-                       id = NULL,
+                       uid = NULL,
                        version = NULL,
                        desc = NULL,
                        scientist = NULL,
@@ -44,7 +44,7 @@ forecaster <- function(df,
                   target,
                   type = "forecaster",
                   name,
-                  id,
+                  uid,
                   version,
                   desc,
                   scientist,
@@ -83,11 +83,10 @@ predict.forecaster <- function(obj,
   }
   
   if(! is.null(data)) {
-    schema <- obj$schema[! names(obj$schema) %in% c(obj$target, obj$index_var)]
-    schema_check <- all.equal(get_schema(data), schema)
-    if(schema_check[1] != TRUE) {
-      stop(paste("New Data shema check failed:\n", schema_check))
-    }
+  # Schema Check
+  schema_compare <- obj$schema %>% 
+    purrr::keep(! names(obj$schema) %in% c(obj$target, obj$index_var)) %>% 
+    a2munge::schema_check(., a2munge::get_schema(data))
   }
   
   pipe <- execute(data, obj$pipelines[[final_model$pipe]])

@@ -223,7 +223,6 @@ public class GatewayController {
   
   private HttpHeaders makeResponseHeadersInvalid() {
 	    HttpHeaders result = new HttpHeaders();
-	    result.setAccessControlAllowOrigin("*");
 	    List<String> allowedHeaders = new ArrayList<String>();
 	    allowedHeaders.add("Origin");
 	    allowedHeaders.add("X-Requested-With");

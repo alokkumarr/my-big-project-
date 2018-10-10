@@ -10,6 +10,25 @@
 # Start from SIP base image
 FROM sip-base-maprclient:${project.version}
 
+# Install log receiver
+COPY sip-journal-remote.conf \
+  /etc/systemd/system/systemd-journal-remote.service.d/
+COPY sip-tmpfiles-journal-remote.conf /etc/tmpfiles.d/
+RUN systemctl enable systemd-journal-remote.socket
+# Disable the log sender on the admin node itself
+RUN systemctl disable systemd-journal-upload.service
+
+# Forward system logs to Docker logs (only needed on admin node as it
+# aggregates the logs of other nodes)
+COPY sip-logger/sip-logger.service /etc/systemd/system/
+RUN systemctl enable sip-logger
+
+# Install mail server for testing
+RUN yum -y -q install postfix
+RUN echo "inet_interfaces = all" >> /etc/postfix/main.cf
+RUN echo "inet_protocols = ipv4" >> /etc/postfix/main.cf
+RUN systemctl enable postfix
+
 # Install Ansible from EPEL repository
 RUN yum -y -q install ansible rsync
 
@@ -29,11 +48,15 @@ RUN chmod a+x /root
 COPY saw-analyze-samples /root/saw-analyze-samples/
 COPY saw-analyze-samples/sample-spark/saw-analyze-spark-samples.service /etc/systemd/system/
 COPY saw-analyze-samples/sample-elasticsearch/saw-analyze-elasticsearch-samples.service /etc/systemd/system/
+# workaround: Set recursive execute bit for Windows (cygwin rsync) users
+RUN chmod -R 0755 /root/saw-analyze-samples
 RUN systemctl enable saw-analyze-spark-samples
 RUN systemctl enable saw-analyze-elasticsearch-samples
 # Add SAW Workbench test data
 COPY saw-workbench-samples /root/saw-workbench-samples/
 COPY saw-workbench-samples/saw-workbench-samples.service /etc/systemd/system/
+# workaround: Set recursive execute bit for Windows (cygwin rsync) users
+RUN chmod -R 0755 /root/saw-workbench-samples
 RUN systemctl enable saw-workbench-samples
 # Workaround: Set execute bit for Windows users
 RUN chmod a+x /root/saw-*/sample-*/load*

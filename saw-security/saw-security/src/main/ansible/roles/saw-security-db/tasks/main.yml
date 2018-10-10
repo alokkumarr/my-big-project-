@@ -1,6 +1,67 @@
+# Workaround: High availability requires the Galera cluster, but
+# MariaDB 5 that comes by default with CentOS 7 does not include it.
+# So add the MariaDB package repository to make MariaDB 10 available,
+# which does include the Galera cluster.  Remove the MariaDB
+# repository CentOS defaults to MariaDB 10 or higher.
+- name: Install MariaDB package repository
+  yum_repository:
+    name: mariadb
+    description: MariaDB repository
+    baseurl: http://yum.mariadb.org/10.3/centos7-amd64
+    gpgcheck: no
 - name: Install MariaDB package
-  yum: name=mariadb-server state=present
+  # Note: While using the MariaDB repository, use the capitalized
+  # package name "MariaDB-server" instead of "mariadb-server"
+  yum: name=MariaDB-server state=present
+  notify:
+    - restart mariadb
+# Workaround: MariaDB 10.3.10 introduced changes that cause the error
+# "/bin/galera_new_cluster: line 31: return: can only `return' from a
+# function or sourced script" when bootstrapping the cluster.  Remove
+# the offending line until MariaDB is fixed.
+- name: Remove invalid line from galera_new_cluster
+  lineinfile:
+    path: /bin/galera_new_cluster
+    state: absent
+    regexp: '^return \$extcode$'
 - name: Install MariaDB configuration additions
   template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.cnf
+# Workaround: The MariaDB Galera cluster initialization below invokes
+# "systemctl start" (instead of "systemctl restart").  Trigger
+# handlers here to ensure that the MariaDB service is stopped after a
+# possible package update and is subsequently started with the new
+# version.
+- meta: flush_handlers
+# Note: This script cannot be put into the SAW Security package
+# because it is installed only after the database initialization.
+- name: Install MariaDB Galera cluster initialization script
+  template:
+    src: sip-mariadb-cluster-init
+    dest: /root/sip-mariadb-cluster-init
+    mode: a+x
+# Log the safe to bootstrap value of the node
+- name: Check the MariaDB Galera safe to bootstrap value
+  command: grep "^safe_to_bootstrap:" /var/lib/mysql/grastate.dat
+  register: safe_to_bootstrap
+  # Proceed even if the grastate.dat file does not exist
+  failed_when: false
+- name: Log the MariaDB Galera safe to boostrap value
+  debug:
+    msg: "MariaDB Galera cluster safe to bootstrap:
+      {{ safe_to_bootstrap.stdout }}"
+# Note: The MariaDB Galera cluster initialization must run before
+# MariaDB service is started, because the "galera_new_cluster" will
+# start the MariaDB service if the node is chosen as a bootstrap node.
+- name: Initialize MariaDB Galera Cluster
+  command: /root/sip-mariadb-cluster-init
+    {{ groups['saw-security'].index(inventory_hostname) }}
+# Start any non-bootstrap nodes, which will join the MariaDB Galera
+# cluster initialized above
 - name: Enable and start MariaDB service
   systemd: name=mariadb enabled=true state=started
+# Note: Run mysql_upgrade for upgrades from MariaDB 5.5, which are
+# always single-node environments.  When environments with MariaDB 5.5
+# no longer exist, the mysql_upgrade task below can be removed.
+- name: Run MariaDB databases upgrade
+  shell: "mysql_upgrade --password=$(< /etc/bda/mariadb-root-password)"
+  when: "groups['saw-security'].index(inventory_hostname) == 0"

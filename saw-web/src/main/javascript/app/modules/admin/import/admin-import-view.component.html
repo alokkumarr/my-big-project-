@@ -1,0 +1,67 @@
+<mat-toolbar fxLayout="row" fxLayoutAlign="space-between center" style="width: 100%;">
+
+  <div fxLayout="row" fxLayoutAlign="space-between center">
+    <div class="admin-title" i18n>Import Analysis</div>
+    <div fxLayout="row" fxLayoutAlign="start center" style="font-size: 16px; margin-left: 100px;">
+      <div i18n style="margin-left: 10px;">
+        Select package file(s)
+      </div>
+      <input type="file" id="input-file-id"
+              style="display: none;" (change)="readFiles($event)"
+              file-upload multiple accept="json/*"
+      />
+      <label for="input-file-id"
+              class="mat-raised-button mat-primary"
+              style="margin: 0 10px;"
+              i18n
+      >
+        Browse
+      </label>
+      <div i18n>
+        to import into
+      </div>
+      <mat-form-field class="select-form-field category-selector"
+                      appearance="outline"
+      >
+        <mat-label i18n>Category</mat-label>
+        <mat-select class="form-field" [value]="selectedCategory" (selectionChange)="onCategoryChange($event.value)">
+          <mat-optgroup *ngFor="let category of categories$ | async" [label]="category.categoryName">
+            <mat-option *ngFor="let subCategory of category.subCategories" [value]="subCategory.subCategoryId">
+              {{subCategory.subCategoryName}}
+            </mat-option>
+          </mat-optgroup>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+</mat-toolbar>
+<mat-card>
+  <div i18n class="grid-title">
+    Package file(s) details
+  </div>
+  <admin-import-file-list [files]="files" (remove)="onRemoveFile($event)"></admin-import-file-list>
+</mat-card>
+<mat-card>
+  <div fxLayout="row" fxLayoutAlign="space-between center">
+    <div i18n class="grid-title">
+      Analyses to import
+    </div>
+    <div>
+      <button mat-raised-button color="primary" i18n
+              (click)="import()"
+              style="margin-right: 10px;"
+              [disabled]="!(atLeast1AnalysisIsSelected && selectedCategory)"
+      >
+        Import
+      </button>
+      <button mat-raised-button color="primary" i18n
+              (click)="exportErrors()"
+              [disabled]="!userCanExportErrors"
+      >
+        Export Error Logs
+      </button>
+    </div>
+  </div>
+  <admin-import-list [analyses]="analyses" (validityChange)="onAnalysesValiditychange($event)"></admin-import-list>
+</mat-card>

@@ -73,7 +73,7 @@ R_data_count <- n_distinct(R_data)
 
 count_data_r <- as.integer(n_distinct(dat) * 0.5) + 50
 
-test_that("Sampler R DF expected count of 0.5 maches generated count", {
+test_that("Sampler R DF is 50% of total rows plus 10% cushion or less", {
   expect_lte(R_data_count, count_data_r)
 })
 
@@ -89,40 +89,26 @@ test_that("Sampler R DF subset is derived from main set", {
 
 #Test 3:Test sampler for Spark data frame sample ------------------------
 
-Sprk_data <-
-  sampler(
-    dat_tbl,
-    group_vars = NULL,
-    method = "fraction",
-    size = 0.5,
-    replace = FALSE,
-    weight = NULL,
-    seed = NULL
-  )
+Sprk_data <- sampler(
+  dat_tbl,
+  group_vars = NULL,
+  method = "fraction",
+  size = 0.5,
+  replace = FALSE,
+  weight = NULL,
+  seed = NULL
+)
 
 count_data_spark <- Sprk_data %>%
   count() %>%
-  collect
+  collect() %>% 
+  pull()
 
-count_data_spark <- as.numeric(count_data_spark)
 
-
-test_that("Saprk-data sample set is equal to expected 0.5 of total count", {
-  expect_lte((count_data_spark), (count_data_r))
+test_that("Spark-data sample set is less than total count", {
+  expect_lte(count_data_spark, nrow(dat))
 })
 
-
-# Test 4:Make sure Saprk DF sample is subset data of saprk_data ----------
-
-diff_val_spark <- setdiff(Sprk_data, dat_tbl)
-
-Val_spark <- diff_val_spark %>%
-  count() %>%
-  collect
-
-test_that("Sampler Spark DF subset is derived from main set", {
-  expect_equal(Val_spark$n, 0)
-})
 
 
 # Test 5: Make sure head returns correct set of rows ----------------------
@@ -198,70 +184,58 @@ test_that("Sampler for N records- R DF subset is derived from main set", {
 
 # Test 8:Check if the tail give bottom N records --------------------------
 
-Spark_tail_data <- sampler(
+n <- 10
+R_tail_data <- sampler(
   dat,
   group_vars = NULL,
   method = "tail",
-  size = 10,
+  size = n,
   replace = FALSE,
   weight = NULL,
   seed = NULL
 )
 
 
-tail_rows <- tail(dat, 10)
+tail_rows <- tail(dat, n)
 
 
 test_that("Sampler tail methods consistent", {
-  expect_equal(Spark_tail_data, tail_rows)
-  expect_equal(colnames(Spark_tail_data), colnames(tail_rows))
+  expect_equal(R_tail_data, tail_rows)
+  expect_equal(colnames(R_tail_data), colnames(tail_rows))
 })
 
 
 # Test 9:Collecter with fraction method functionality test  ---------------
 
-spark_coll_frac_data <-
-  collecter(
-    dat_tbl,
-    sample = TRUE,
-    method = "fraction",
-    size = 0.2,
-    replace = FALSE,
-    seed = NULL
-  )
+spark_coll_frac_data <- collecter(
+  dat_tbl,
+  sample = TRUE,
+  method = "fraction",
+  size = 0.2,
+  replace = FALSE,
+  seed = NULL)
 
+Int_data <- sdf_nrow(dat_tbl)
+count_collect_data_R <- nrow(spark_coll_frac_data) 
 
-Int_data <- dat_tbl %>%
-  count() %>%
-  collect
-
-exp_frac_data <- as.numeric(Int_data) * 0.2 + 20
-
-count_collect_data_R <- spark_coll_frac_data %>%
-  count() %>%
-  collect
-
-count_col_num_data_R <- as.numeric(count_collect_data_R)
-
-test_that("Saprk-data collect set is equal to expected 0.2 of total count", {
-  expect_lte((count_col_num_data_R), (exp_frac_data))
+test_that("Spark-data collect set is less than total count", {
+  expect_lte(count_collect_data_R, Int_data)
 })
 
 
 # Test 10:Collecter with head method  test  -------------------------------
 
-spark_coll_head_data <-
-  collecter(
-    dat_tbl,
-    sample = TRUE,
-    method = "head",
-    size = 6,
-    replace = FALSE,
-    seed = NULL
-  )
+spark_coll_head_data <- collecter(
+  dat_tbl,
+  sample = TRUE,
+  method = "head",
+  size = 6,
+  replace = FALSE,
+  seed = NULL
+)
 
 actual_head_data <- head(dat_tbl, 6)
 
-test_that("Saprk-data collect for head method", {
-  expect_equal((spark_coll_head_data), (actual_head_data))
+test_that("Spark-data collect for head method", {
+  expect_equal(spark_coll_head_data, actual_head_data)
 })

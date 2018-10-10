@@ -7,6 +7,8 @@
 #' Model Class Constructer
 #' 
 #' @inheritParams model
+#' @param status model status. new models are givend added status
+#' @param created_on model creation timestamp 
 new_model <- function(pipe,
                       target,
                       method,
