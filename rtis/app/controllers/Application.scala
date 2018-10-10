@@ -19,7 +19,8 @@ import scala.collection.Seq
 
 @Api(value = "SynchronossClientEvents",
   produces = "application/json",
-  consumes = "application/json")
+  consumes = "application/json",
+  protocols = "http,https")
 class Application extends Controller {
 
   val countlyEventHandler = "countly_event"

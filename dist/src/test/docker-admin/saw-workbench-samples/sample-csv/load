@@ -8,7 +8,7 @@ dir=$(dirname $0)
 
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
-datalake_raw=/var/sip/raw
+datalake_raw=/var/sip/workbench
 
 wait_maprfs() {
     # The MapR container might still be starting up, so wait until MapR-FS
@@ -26,8 +26,8 @@ init_datalake() {
 
 load_data() {
     echo "Loading sample CSV data"
-    $sudo_mapr $hadoop_put $dir/test.csv $datalake_raw
-}
+    $sudo_mapr $hadoop_put $dir/test*.csv $datalake_raw
+    }
 
 wait_maprfs
 init_datalake
