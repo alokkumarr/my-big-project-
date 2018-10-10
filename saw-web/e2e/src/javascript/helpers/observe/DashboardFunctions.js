@@ -1,6 +1,6 @@
 const commonFunctions = require('../commonFunctions.js');
-const observePage = require('../pages/observe/observePage.po');
-const homePage = require('../pages/homePage.po.js');
+const observePage = require('../../pages/observe/observePage.po');
+const homePage = require('../../pages/homePage.po.js');
 let AnalysisHelper = require('../../api/AnalysisHelper');
 const utils = require('../utils');
 
