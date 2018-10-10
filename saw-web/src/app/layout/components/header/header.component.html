@@ -8,10 +8,10 @@
 
       <div layout="row" class="lh-links">
         <div *ngFor="let module of modules" class="link"
-             routerLink="{{lowerCase(module.productModName)}}"
+             [routerLink]="module.path"
              [routerLinkActive]="'m-active'"
         >
-          {{module.productModName}}
+          {{module.label}}
         </div>
       </div>
 

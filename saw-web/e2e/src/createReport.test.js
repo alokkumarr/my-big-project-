@@ -1,13 +1,13 @@
-var testDataReader = require('../testdata/testDataReader.js');
+var testDataReader = require('./testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const loginPage = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const homePage = require('../javascript/pages/homePage.po.js');
+const loginPage = require('./javascript/pages/loginPage.po.js');
+const analyzePage = require('./javascript/pages/analyzePage.po.js');
+const homePage = require('./javascript/pages/homePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require('../protractor.conf');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
-const dataSets = require('../javascript/data/datasets');
-const designModePage = require('../javascript/pages/designModePage.po.js');
+const protractorConf = require('./protractor.conf');
+const commonFunctions = require('./javascript/helpers/commonFunctions.js');
+const dataSets = require('./javascript/data/datasets');
+const designModePage = require('./javascript/pages/designModePage.po.js');
 
 describe('Create report type analysis: createReport.test.js', () => {
   const reportDesigner = analyzePage.designerDialog.report;

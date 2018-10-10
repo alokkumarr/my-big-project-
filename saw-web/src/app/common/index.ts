@@ -67,7 +67,8 @@ import {
   UserService,
   JwtService,
   ConfigService,
-  WindowService
+  WindowService,
+  DynamicModuleService
 } from './services';
 
 const MODULES = [
@@ -128,7 +129,8 @@ const SERVICES = [
   WindowService,
   JwtService,
   UserService,
-  MenuService
+  MenuService,
+  DynamicModuleService
 ];
 
 const INTERCEPTORS = [

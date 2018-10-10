@@ -1,11 +1,11 @@
 const element = require('protractor');
 const path = require('path');
-const LoginPage = require('../javascript/pages/loginPage.po');
-const AnalyzePage = require('../javascript/pages/analyzePage.po');
-const WorkbenchPage = require('../javascript/pages/workbenchPage.po');
-const commonFunctions = require('../javascript/helpers/commonFunctions');
+const LoginPage = require('./javascript/pages/loginPage.po');
+const AnalyzePage = require('./javascript/pages/analyzePage.po');
+const WorkbenchPage = require('./javascript/pages/workbenchPage.po');
+const commonFunctions = require('./javascript/helpers/commonFunctions');
 const Using = require('jasmine-data-provider');
-const users = require('../javascript/data/users.js');
+const users = require('./javascript/data/users.js');
 const Protractor = require('protractor');
 const protractorConf = require('../protractor.conf');
 

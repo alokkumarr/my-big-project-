@@ -1,4 +1,4 @@
-var testDataReader = require('../testdata/testDataReader.js');
+var testDataReader = require('./testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../protractor.conf');
 var appRoot = require('app-root-path');

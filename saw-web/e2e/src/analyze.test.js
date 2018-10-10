@@ -1,11 +1,11 @@
-var testDataReader = require('../testdata/testDataReader.js');
+var testDataReader = require('./testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const loginPage = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const users = require('../javascript/data/users.js');
+const loginPage = require('./javascript/pages/loginPage.po.js');
+const analyzePage = require('./javascript/pages/analyzePage.po.js');
+const users = require('./javascript/data/users.js');
 const ec = protractor.ExpectedConditions;
 const protractorConf = require('../protractor.conf');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const commonFunctions = require('./javascript/helpers/commonFunctions.js');
 
 describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 

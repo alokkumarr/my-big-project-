@@ -20,7 +20,7 @@ observe-view {
   }
 }
 
-observe-page {
+:host {
   width: 100%;
 
   observe-view mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {

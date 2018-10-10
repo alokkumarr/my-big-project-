@@ -126,4 +126,4 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   providers: [...SERVICES, ...GUARDS],
   exports: [AnalyzePageComponent]
 })
-export class AnalyzeModuleTs {}
+export class AnalyzeModule {}

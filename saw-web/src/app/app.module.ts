@@ -13,7 +13,7 @@ import { CommonModuleTs, CommonModuleGlobal } from './common';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
 
-import { AnalyzeModuleTs } from './modules/analyze';
+import { AnalyzeModule } from './modules/analyze/analyze.module';
 import { AdminModule } from './modules/admin';
 import { WorkbenchUpgradeModule } from './modules/workbench';
 import { LoginModule } from './login';
@@ -44,7 +44,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     FlexLayoutModule,
     MaterialModule,
     LoginModule,
-    AnalyzeModuleTs,
+    AnalyzeModule,
     WorkbenchUpgradeModule,
     AdminModule
   ],

@@ -6,11 +6,7 @@ import { MenuService } from '../../../../common/services/menu.service';
 @Component({
   selector: 'observe-page',
   templateUrl: './observe-page.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-    }`
-  ]
+  styleUrls: ['./observe-page.component.scss']
 })
 export class ObservePageComponent implements OnInit {
   constructor(private menu: MenuService, public observe: ObserveService) {}

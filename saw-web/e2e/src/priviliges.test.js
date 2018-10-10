@@ -1,16 +1,16 @@
-var testDataReader = require('../testdata/testDataReader.js');
+var testDataReader = require('./testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const loginPage = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const homePage = require('../javascript/pages/homePage.po.js');
-const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
+const loginPage = require('./javascript/pages/loginPage.po.js');
+const analyzePage = require('./javascript/pages/analyzePage.po.js');
+const homePage = require('./javascript/pages/homePage.po.js');
+const executedAnalysis = require('./javascript/pages/savedAlaysisPage.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
-const commonFunctions = require('../javascript/helpers/commonFunctions');
+const commonFunctions = require('./javascript/helpers/commonFunctions');
 const protractorConf = require('../protractor.conf');
-const categories = require('../javascript/data/categories');
-const subCategories = require('../javascript/data/subCategories');
-const utils = require('../javascript/helpers/utils');
+const categories = require('./javascript/data/categories');
+const subCategories = require('./javascript/data/subCategories');
+const utils = require('./javascript/helpers/utils');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges

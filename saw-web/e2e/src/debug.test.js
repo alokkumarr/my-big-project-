@@ -1,4 +1,4 @@
-const login = require('../javascript/pages/loginPage.po');
+const login = require('./javascript/pages/loginPage.po');
 
 describe('Generate data tests', function () {
 

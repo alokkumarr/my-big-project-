@@ -10,3 +10,4 @@ export { UserService } from './user.service';
 export { JwtService, CUSTOM_JWT_CONFIG } from './jwt.service';
 export { ConfigService } from './configuration.service';
 export { WindowService } from './window.service';
+export { DynamicModuleService } from './dynamic-module.service';
