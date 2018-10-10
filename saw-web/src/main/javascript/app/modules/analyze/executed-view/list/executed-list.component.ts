@@ -35,7 +35,8 @@ export class ExecutedListComponent {
 
   goToExecution(executedAnalysis) {
     this._router.navigate(
-      ['analyze', 'analysis', this.analysis.id, 'executed'], {
+      ['analyze', 'analysis', this.analysis.id, 'executed'],
+      {
         queryParams: {
           executedAnalysis,
           awaitingExecution: false,
@@ -47,20 +48,6 @@ export class ExecutedListComponent {
 
   getGridConfig() {
     const columns = [
-      {
-        caption: 'ID',
-        dataField: 'id',
-        allowSorting: true,
-        alignment: 'left',
-        width: '40%'
-      },
-      {
-        caption: 'TYPE',
-        dataField: 'executionType',
-        allowSorting: true,
-        alignment: 'left',
-        width: '20%'
-      },
       {
         caption: 'DATE',
         dataField: 'finished',
@@ -75,14 +62,21 @@ export class ExecutedListComponent {
         },
         allowSorting: true,
         alignment: 'left',
-        width: '20%'
+        width: '40%'
+      },
+      {
+        caption: 'TYPE',
+        dataField: 'executionType',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
       },
       {
         caption: 'STATUS',
         dataField: 'status',
         allowSorting: true,
         alignment: 'left',
-        width: '20%'
+        width: '30%'
       }
     ];
     return this._dxDataGridService.mergeWithDefaultConfig({

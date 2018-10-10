@@ -16,7 +16,6 @@ const template = require('./analyze-actions-menu.component.html');
   selector: 'analyze-actions-menu-u',
   template
 })
-
 export class AnalyzeActionsMenuComponent {
   @Output() afterEdit: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   @Output() afterExport: EventEmitter<null> = new EventEmitter();
@@ -24,49 +23,69 @@ export class AnalyzeActionsMenuComponent {
   @Output() afterDelete: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterPublish: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterSchedule: EventEmitter<Analysis> = new EventEmitter();
+  @Output() detailsRequested: EventEmitter<boolean> = new EventEmitter();
   @Input() analysis: Analysis;
   @Input() exclude: string;
-  @Input('actionsToDisable') set disabledActions(actionsToDisable: string) {
+  @Input('actionsToDisable')
+  set disabledActions(actionsToDisable: string) {
     this.actionsToDisable = fpPipe(
-      actionsToDisableString => isString(actionsToDisableString) ? actionsToDisableString.split('-') : [],
+      actionsToDisableString =>
+        isString(actionsToDisableString)
+          ? actionsToDisableString.split('-')
+          : [],
       fpReduce((acc, action) => {
         acc[action] = true;
         return acc;
       }, {})
     )(actionsToDisable);
-  };
+  }
   public actionsToDisable = {};
 
-  actions = [{
-    label: 'Execute',
-    value: 'execute',
-    fn: this.execute.bind(this)
-  }, {
-    label: 'Fork & Edit',
-    value: 'fork',
-    fn: this.fork.bind(this)
-  }, {
-    label: 'Edit',
-    value: 'edit',
-    fn: this.edit.bind(this)
-  }, {
-    label: 'Publish',
-    value: 'publish',
-    fn: this.publish.bind(this, 'publish')
-  }, {
-    label: 'Schedule',
-    value: 'publish',
-    fn: this.publish.bind(this, 'schedule')
-  }, {
-    label: 'Export',
-    value: 'export',
-    fn: this.export.bind(this)
-  }, {
-    label: 'Delete',
-    value: 'delete',
-    fn: this.delete.bind(this),
-    color: 'red'
-  }]
+  actions = [
+    {
+      label: 'Details',
+      value: 'details',
+      fn: () => {
+        this.detailsRequested.emit(true);
+      }
+    },
+    {
+      label: 'Execute',
+      value: 'execute',
+      fn: this.execute.bind(this)
+    },
+    {
+      label: 'Fork & Edit',
+      value: 'fork',
+      fn: this.fork.bind(this)
+    },
+    {
+      label: 'Edit',
+      value: 'edit',
+      fn: this.edit.bind(this)
+    },
+    {
+      label: 'Publish',
+      value: 'publish',
+      fn: this.publish.bind(this, 'publish')
+    },
+    {
+      label: 'Schedule',
+      value: 'publish',
+      fn: this.publish.bind(this, 'schedule')
+    },
+    {
+      label: 'Export',
+      value: 'export',
+      fn: this.export.bind(this)
+    },
+    {
+      label: 'Delete',
+      value: 'delete',
+      fn: this.delete.bind(this),
+      color: 'red'
+    }
+  ];
 
   constructor(
     private _analyzeActionsService: AnalyzeActionsService,
@@ -74,10 +93,13 @@ export class AnalyzeActionsMenuComponent {
   ) {}
 
   ngOnInit() {
-    const actionsToExclude = isString(this.exclude) ? this.exclude.split('-') : [];
-    this.actions = filter(this.actions, ({value}) => {
+    const privilegeMap = { print: 'export', details: 'access' };
+    const actionsToExclude = isString(this.exclude)
+      ? this.exclude.split('-')
+      : [];
+    this.actions = filter(this.actions, ({ value }) => {
       const notExcluded = !actionsToExclude.includes(value);
-      const privilegeName = upperCase(value === 'print' ? 'export' : value);
+      const privilegeName = upperCase(privilegeMap[value] || value);
       const hasPriviledge = this._jwt.hasPrivilege(privilegeName, {
         subCategoryId: this.analysis.categoryId,
         creatorId: this.analysis.userId
@@ -88,19 +110,23 @@ export class AnalyzeActionsMenuComponent {
   }
 
   edit() {
-    this._analyzeActionsService.edit(this.analysis).then((result: DesignerSaveEvent) => {
-      if (result) {
-        this.afterEdit.emit(result);
-      }
-    });
+    this._analyzeActionsService
+      .edit(this.analysis)
+      .then((result: DesignerSaveEvent) => {
+        if (result) {
+          this.afterEdit.emit(result);
+        }
+      });
   }
 
   fork() {
-    this._analyzeActionsService.fork(this.analysis).then((result: DesignerSaveEvent) => {
-      if (result) {
-        this.afterEdit.emit(result);
-      }
-    });
+    this._analyzeActionsService
+      .fork(this.analysis)
+      .then((result: DesignerSaveEvent) => {
+        if (result) {
+          this.afterEdit.emit(result);
+        }
+      });
   }
 
   execute() {
@@ -121,7 +147,7 @@ export class AnalyzeActionsMenuComponent {
 
   publish(type) {
     const analysis = clone(this.analysis);
-    this._analyzeActionsService.publish(analysis,type).then(analysis => {
+    this._analyzeActionsService.publish(analysis, type).then(analysis => {
       this.analysis = analysis;
       this.afterPublish.emit(analysis);
     });

@@ -16,6 +16,14 @@ executed-view {
     height: $back-button-size;
   }
 
+  mat-sidenav-container {
+    height: 100%;
+
+    mat-sidenav {
+      width: 400px;
+    }
+  }
+
   .prompt-execution-container {
     padding: 50px;
     text-align: center;
