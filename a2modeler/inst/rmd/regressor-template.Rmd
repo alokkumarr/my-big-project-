@@ -69,6 +69,17 @@ seed <- 319
 ```
 
 
+```{r deploy-options, eval = FALSE}
+
+# Deploy Model Option
+deploy_model <- FALSE
+
+# Model Deploy Path
+deploy_path <- "changeme"
+```
+
+
+
 ```{r regressor-creation, eval = FALSE}
 
 # Create Regressor
@@ -210,7 +221,17 @@ if(spark) {
 ```
 
 
-```{r execution, ref.label=c('r-config', 'r-setup', 'spark-config', 'spark-setup', 'input-data-params', 'data-import', 'inputs', 'regressor-creation', 'measure', 'sampling', 'feature-generation', 'models', 'train-models', 'set-final')}
+```{r model-deploy, eval = FALSE}
+
+# Deploy Model
+if(deploy_model) {
+  a2modeler::deploy(r1, path = deploy_path)
+}
+```
+
+
+
+```{r execution, ref.label=c('r-config', 'r-setup', 'spark-config', 'spark-setup', 'input-data-params', 'data-import', 'deploy-options', 'inputs', 'regressor-creation', 'measure', 'sampling', 'feature-generation', 'models', 'train-models', 'set-final', 'model-deploy')}
 
 ```
 
@@ -351,6 +372,7 @@ r1$final_model$fit$stages[[2]]$param_map %>%
 
 
 ```{r test-fit-print, results='asis'}
+
 if(! is.null(r1$samples$test_holdout_prct)) {
   cat("#### Test Holdout Fit\n")
   cat("Final Model Performance on Test Holdout:\n\n")
@@ -360,6 +382,7 @@ if(! is.null(r1$samples$test_holdout_prct)) {
 
 
 ```{r test-resid}
+
 if(! is.null(r1$samples$test_holdout_prct)) {
   tpdf <- r1$final_model$test_predictions %>% 
     a2munge::collecter(., sample = TRUE, method = "head", size = 1000) 
@@ -390,6 +413,15 @@ if(! is.null(r1$samples$test_holdout_prct)) {
 }
 ```
 
+
+```{r test-deploy, results='asis'}
+
+if(deploy_model) {
+  cat("### Deployment\n\n")
+  cat("*", r1$name, "saved here:", paste0("_", deploy_path, "_"))
+  cat("\n")
+}
+```
 
 
 ## Configuration
