@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { AdminMainViewComponent } from './main-view';
 import { AdminExportViewComponent } from './export';
 import { AdminImportViewComponent } from './import';
+import { SecurityGroupComponent } from './datasecurity/security-group/security-group.component';
 import { isAdminGuard } from './guards';
 import {
   UsersTableHeader,
@@ -66,6 +67,11 @@ export const routes: Routes = [
         // name: 'admin.import',
         path: 'import',
         component: AdminImportViewComponent
+      },
+      {
+        // name: 'admin.import',
+        path: 'securitygroups',
+        component: SecurityGroupComponent
       },
       {
         path: 'userassignments',

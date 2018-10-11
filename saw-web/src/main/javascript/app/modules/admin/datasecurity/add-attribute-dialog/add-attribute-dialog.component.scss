@@ -1,0 +1,44 @@
+@import "themes/base/colors";
+
+add-attribute-dialog {
+  max-width: 860px;
+  width: 860px;
+
+  .base-dialog__header {
+    padding: 0 0 10px;
+    border-bottom: 1px solid #999;
+
+    strong {
+      font-size: 20px;
+      color: #5C6670;
+    }
+  }
+
+  .base-dialog__content {
+    padding: 10px !important;
+    max-height: 450px;
+
+    .mat-form-field {
+      width: 100%;
+    }
+
+    .form-field {
+      margin-bottom: 5px;
+    }
+
+    .seperator {
+      width: 100px;
+      margin: 19px 0 0 27px;
+      font-weight: bold;
+    }
+  }
+
+  .base-dialog__actions {
+    padding-top: 10px;
+    border-top: 1px solid #999;
+  }
+
+  .red {
+    color: #E53935;
+  }
+}

@@ -46,7 +46,7 @@ export const AdminMenuData = [
       {
         id: '',
         name: 'Security Groups',
-        url: ['/admin/export']
+        url: ['/admin/securitygroups']
       },
       {
         id: '',

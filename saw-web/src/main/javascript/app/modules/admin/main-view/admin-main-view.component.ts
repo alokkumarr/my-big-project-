@@ -87,6 +87,8 @@ export class AdminMainViewComponent implements OnDestroy {
 
   ticket: { custID: string; custCode: string; masterLoginId?: string };
 
+  showAddButton: boolean;
+
   constructor(
     private _privilegeService: PrivilegeService,
     private _categoryService: CategoryService,
@@ -113,6 +115,7 @@ export class AdminMainViewComponent implements OnDestroy {
   }
 
   initialise() {
+    this.showAddButton = true;
     const token = this._jwtService.getTokenObj();
     this.ticket = token.ticket;
     const customerId = parseInt(this.ticket.custID, 10);
@@ -204,6 +207,7 @@ export class AdminMainViewComponent implements OnDestroy {
     case 'privilege':
       return this._privilegeService;
     case 'user assignments':
+      this.showAddButton = false;
       return this._userassignmentsService;
     default:
       break;
@@ -376,6 +380,7 @@ export class AdminMainViewComponent implements OnDestroy {
       mode
     };
     const component = this.getModalComponent() as any;
+    console.log(component);
     return this._dialog.open(component, {
       width: 'auto',
       height: 'auto',

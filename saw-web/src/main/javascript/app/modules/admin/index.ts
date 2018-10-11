@@ -39,6 +39,11 @@ import {
   PrivilegeEditorComponent,
   PrivilegeRowComponent
 } from './privilege';
+import {
+  SecurityGroupComponent,
+  AddSecurityDialogComponent,
+  AddAttributeDialogComponent
+} from './datasecurity';
 import {JwtService} from '../../../login/services/jwt.service';
 import {
   AddTokenInterceptor,
@@ -59,6 +64,9 @@ const COMPONENTS = [
   PrivilegeEditDialogComponent,
   PrivilegeEditorComponent,
   PrivilegeRowComponent,
+  SecurityGroupComponent,
+  AddSecurityDialogComponent,
+  AddAttributeDialogComponent,
   AdminExportViewComponent,
   AdminExportListComponent,
   CategoryEditDialogComponent,

@@ -1,0 +1,17 @@
+@import "themes/base/colors";
+
+security-group {
+  .mat-toolbar {
+    background-color: transparent;
+
+    .admin-title {
+      color: $grey-text-color;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .customer-name {
+      color: $grey-text-color;
+    }
+  }
+}
