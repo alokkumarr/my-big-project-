@@ -75,22 +75,21 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
 
     const externalModules = filter(this.modules, ({label}) => !baseModules.includes(label));
     // hardcoded stuff
-    const externalModulesHard = [{
-      path: 'plugin',
-      label: 'PLUGIN',
-      name: 'plugin',
-      moduleName: 'PluginModule',
-      moduleURL: 'http://localhost:4200/assets/plugin.umd.js'
-    }];
+    // const externalModulesHard = [{
+    //   path: 'plugin',
+    //   label: 'PLUGIN',
+    //   name: 'plugin',
+    //   moduleName: 'PluginModule',
+    //   moduleURL: 'http://localhost:4200/assets/plugin.umd.js'
+    // }];
 
-    forEach(externalModulesHard, externalModule => {
+    forEach(externalModules, externalModule => {
       this._dynamicModuleService.loadModuleSystemJs(externalModule).then(success => {
         if (success) {
           this.modules = [
             ...this.modules,
             externalModule
           ];
-          console.log('modules', this.modules);
         }
       }, err => {
         console.error(err);

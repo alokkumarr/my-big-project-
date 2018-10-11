@@ -1,11 +1,16 @@
 import { Injectable, Compiler } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Route, Router } from '@angular/router';
 import * as AngularCore from '@angular/core';
 import * as AngularRouting from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import { forEach } from 'lodash';
 
 declare var SystemJS: any;
+
+const dependencies = {
+  '@angular/core': AngularCore,
+  '@angular/router': AngularRouting
+};
 
 interface ModuleInfo {
   path: string;
@@ -21,15 +26,13 @@ export class DynamicModuleService {
 
   constructor(
     private compiler: Compiler,
-    private router: Router,
-    private http: HttpClient
+    private router: Router
     ) {
       this.existingRoutes$ = new BehaviorSubject<Route[]>(this.routes);
     }
 
   loadModuleSystemJs(moduleInfo: ModuleInfo) {
-    SystemJS.set('@angular/core', SystemJS.newModule(AngularCore));
-    SystemJS.set('@angular/router', SystemJS.newModule(AngularRouting));
+    forEach(dependencies, (dep, key) => SystemJS.set(key, SystemJS.newModule(dep)));
 
     // now, import the new module
 
@@ -50,24 +53,6 @@ export class DynamicModuleService {
         reject(err);
       });
     });
-  }
-
-  loadModule(moduleInfo) {
-    this.http.get(moduleInfo.moduleURL)
-      .map((res: any) => res.text())
-      .map(source => {
-        const exports = {}; // this will hold module exports
-        const modules = {   // this is the list of modules accessible by plugins
-            '@angular/core': AngularCore,
-            '@angular/router': AngularRouting
-        };
-
-        // shim 'require' and eval
-        const require: any = (module) => modules[module];
-        // tslint:disable-next-line
-        eval(source);
-        this.compiler.compileModuleAndAllComponentsSync(exports[`${moduleInfo.moduleName}`])
-      });
   }
 
   private get routes(): Route[] {

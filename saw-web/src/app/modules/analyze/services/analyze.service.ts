@@ -133,11 +133,11 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
     const onetimeExecution = options.executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
-    return this.getRequest(
-      `analysis/${analysisId}/executions/${executionId}/
-      data?page=${page}&pageSize=${options.take}&
-      analysisType=${options.analysisType}${onetimeExecution}`
-    ).then(resp => {
+    const url = `analysis/${analysisId}/executions/${executionId}/
+    data?page=${page}&pageSize=${options.take}&
+    analysisType=${options.analysisType}${onetimeExecution}`;
+    console.log('url', url);
+    return this.getRequest(url).then(resp => {
       const data = fpGet(`data`, resp);
       const queryBuilder = fpGet(`queryBuilder`, resp);
       const executedBy = fpGet(`executedBy`, resp);
