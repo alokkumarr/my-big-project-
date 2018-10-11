@@ -133,9 +133,9 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
     const onetimeExecution = options.executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
-    const url = `analysis/${analysisId}/executions/${executionId}/
-    data?page=${page}&pageSize=${options.take}&
-    analysisType=${options.analysisType}${onetimeExecution}`;
+    const path = `analysis/${analysisId}/executions/${executionId}/data`;
+    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`;
+    const url = `${path}${queryParams}`;
     console.log('url', url);
     return this.getRequest(url).then(resp => {
       const data = fpGet(`data`, resp);
