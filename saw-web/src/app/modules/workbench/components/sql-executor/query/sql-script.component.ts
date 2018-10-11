@@ -43,7 +43,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
     wrapBehavioursEnabled: true,
     cursorStyle: 'ace'
   };
-  public langTools = ace.acequire('ace/ext/language_tools');
+  public langTools = ace.require('ace/ext/language_tools');
   public completions = [];
 
   constructor(private workBench: WorkbenchService) {}

@@ -35,7 +35,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
     wrapBehavioursEnabled: true,
     fontSize: 16
   };
-  public langTools = ace.acequire('ace/ext/language_tools');
+  public langTools = ace.require('ace/ext/language_tools');
   public completions = [];
 
   ngAfterViewInit() {
