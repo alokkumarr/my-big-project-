@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
@@ -64,6 +65,8 @@ export class ExecutedViewComponent implements OnInit {
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
 
+  @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
+
   constructor(
     private _executeService: ExecuteService,
     private _analyzeService: AnalyzeService,
@@ -96,13 +99,17 @@ export class ExecutedViewComponent implements OnInit {
 
     this.executionId = executionId;
 
-    this.loadAnalysisById(analysisId).then(analysis => {
+    this.detailsSidenav && this.detailsSidenav.close();
+
+    this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
       this.setPrivileges(analysis);
 
       this.executeIfNotWaiting(
         analysis,
-        awaitingExecution,
-        loadLastExecution,
+        /* awaitingExecution and loadLastExecution paramaters are supposed to be boolean,
+         * but all query params come as strings. So typecast them properly */
+        awaitingExecution === 'true',
+        loadLastExecution === 'true',
         executionId
       );
     });
@@ -294,7 +301,7 @@ export class ExecutedViewComponent implements OnInit {
     return this._analyzeService
       .getPublishedAnalysesByAnalysisId(analysisId)
       .then(
-        analyses => {
+        (analyses: Analysis[]) => {
           this.analyses = analyses;
           this.setExecutedAt(this.executionId);
           return analyses;
@@ -307,7 +314,7 @@ export class ExecutedViewComponent implements OnInit {
 
   loadAnalysisById(analysisId) {
     return this._analyzeService.readAnalysis(analysisId).then(
-      analysis => {
+      (analysis: Analysis) => {
         this.analysis = analysis;
         this.executedAnalysis = { ...this.analysis };
         return analysis;
