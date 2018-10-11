@@ -12,8 +12,55 @@
       </div>
     </mat-toolbar-row>
   </mat-toolbar>
-  <div class="grid-container mat-elevation-z9">
-    <dx-data-grid #dsGrid fxFlex [dataSource]="gridData" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
+  <div class="body-container" fxLayout="column">
+    <div fxFlex="1 1 100px" fxLayout="row" fxLayoutAlign="space-around start">
+      <div [attr.aria-label]="source.name" class="mat-elevation-z3 source-row" fxLayoutAlign="center center"
+        [class.selected]="selectedSource === source.uid" *ngFor="let source of sources" (click)="sourceSelected(source.uid)"
+        matBadge="8" matBadgePosition="after" matBadgeColor="accent" [matTooltip]="source.name">
+        <img [src]="source.imgsrc" [attr.alt]="source.name" />
+      </div>
+    </div>
+
+    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+      <dx-data-grid fxFlex="25" class="mat-elevation-z3 sources-grid" [dataSource]="sourceData" [showBorders]="false"
+        [columnAutoWidth]="flase" [showColumnLines]="false" [showRowLines]="true" (onToolbarPreparing)="onToolbarPreparing($event)"
+        keyExpr="id" [rowAlternationEnabled]="flase" (onSelectionChanged)="onSourceSelectionChanged($event)">
+        <dxo-selection mode="single"></dxo-selection>
+        <dxo-filter-row [visible]="false" [applyFilter]="auto"></dxo-filter-row>
+        <dxo-search-panel [visible]="true" [width]="220" placeholder="Search..."></dxo-search-panel>
+        <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+        <dxi-column caption="Source Name" dataField="sourceName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
+        <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
+        <div *dxTemplate="let data of 'sourceTypeTemplate'">
+          <div class="master-detail-caption">{{selectedSource | uppercase}}</div>
+        </div>
+        <div *dxTemplate="let data of 'nameTemplate'">
+          <a [innerHTML]="data.value"></a>
+        </div>
+      </dx-data-grid>
+
+      <mat-card fxFlex class="routes-card" fxLayout="column">
+        <div fxFlex="1 1 36px" fxLayout="row" fxLayoutGap="5px">
+          <div>{{selectedSourceData?.sourceName | uppercase}}</div>
+          <span fxFlex></span>
+          <button mat-mini-fab class="mat-elevation-z2" color="secondary" (click)="editSource()" matTooltip="Edit Source">
+            <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
+          </button>
+          <button mat-mini-fab class="mat-elevation-z3" color="secondary" (click)="editSource()" matTooltip="Delete Source">
+            <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
+          </button>
+          <button mat-raised-button color="primary" (click)="createRoute()">
+            <span>+ Route</span>
+          </button>
+        </div>
+      </mat-card>
+    </div>
+
+
+
+
+
+    <!-- <dx-data-grid #dsGrid fxFlex [dataSource]="gridData" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
       [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="false" [masterDetail]="{ enabled: true, template: 'routes' }">
       <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
       <dxo-search-panel [visible]="false" [width]="240" placeholder="Search..."></dxo-search-panel>
@@ -46,10 +93,11 @@
 
       <div *dxTemplate="let route of 'routes'">
         <dx-data-grid class="mat-elevation-z1 routes-grid" [dataSource]="route.data.routes" [showBorders]="false"
-          [columnAutoWidth]="flase" [showColumnLines]="false" (onToolbarPreparing)="onToolbarPreparing($event)" [rowAlternationEnabled]="true">
+          [columnAutoWidth]="flase" [showColumnLines]="false" (onToolbarPreparing)="onToolbarPreparing($event)"
+          [rowAlternationEnabled]="true">
           <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
           <dxo-search-panel [visible]="false" [width]="240" placeholder="Search..."></dxo-search-panel>
-          <dxo-scrolling mode="virtual" showScrollbar="always"  [useNative]="false"></dxo-scrolling>
+          <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
 
           <div *dxTemplate="let data of 'sourceNameTemplate'">
             <div class="master-detail-caption">{{route.data.sourceName}}</div>
@@ -58,6 +106,6 @@
         </dx-data-grid>
       </div>
 
-    </dx-data-grid>
+    </dx-data-grid> -->
   </div>
 </div>

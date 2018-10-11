@@ -21,13 +21,32 @@ datasource-page {
     font-size: 26px !important;
   }
 
+  .source-row {
+    border-radius: 50%;
+    background-color: white;
+    width: 70px;
+    height: 70px;
+    margin: 20px 10px;
+    cursor: pointer;
+
+    & > img {
+      height: 45px;
+      width: 45px;
+      border-radius: 20%;
+    }
+  }
+
+  .selected {
+    border: 2px $primary-blue-b1 solid;
+  }
+
   .toolbar-white {
     background-color: $primary-white;
     height: 45px !important;
     min-height: 45px !important;
   }
 
-  .grid-container {
+  .body-container {
     height: calc(100% - 52px);
     margin: 3px;
     padding: 5px 3px 0;
@@ -37,15 +56,26 @@ datasource-page {
     padding: 12px;
     font-size: 14px;
     font-weight: 600;
+    color: $primary-blue-b1;
   }
 
-  .routes-grid {
-    margin: 9px 0;
-    padding: 3px;
+  .sources-grid {
+    padding: 3px 3px 3px 0;
+    border-radius: 5px;
 
     .dx-datagrid-headers .dx-header-row {
       background-color: $background-color !important;
       border-bottom: 1px solid $primary-grey-g1;
+    }
+  }
+
+  .routes-card {
+    padding: 3px;
+    border-radius: 5px;
+
+    .mat-mini-fab {
+      height: 36px !important;
+      width: 36px !important;
     }
   }
 

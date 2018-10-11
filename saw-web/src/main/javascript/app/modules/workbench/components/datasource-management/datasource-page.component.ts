@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 
+import { sourceTypes } from '../../wb-comp-configs';
+
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
@@ -17,7 +19,10 @@ require('./datasource-page.component.scss');
   styles: []
 })
 export class DatasourceComponent implements OnInit, OnDestroy {
-  private gridData: any = SAMPLE_SOURCE_DATA;
+  private sourceData: any = SAMPLE_SOURCE_DATA;
+  sources = sourceTypes;
+  selectedSource: string = 'sftp';
+  selectedSourceData: any;
 
   constructor(
     public dialog: MatDialog,
@@ -29,6 +34,10 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   ngOnDestroy() {}
+
+  sourceSelected(source) {
+    this.selectedSource = source;
+  }
 
   createSource() {
     const dateDialogRef = this.dialog.open(CreateSourceDialogComponent, {
@@ -55,10 +64,14 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
   }
 
+  onSourceSelectionChanged(event) {
+    this.selectedSourceData = event.selectedRowsData[0];
+  }
+
   onToolbarPreparing(e) {
-    // e.toolbarOptions.items.unshift({
-    //   location: 'before',
-    //   template: 'sourceNameTemplate'
-    // });
+    e.toolbarOptions.items.unshift({
+      location: 'before',
+      template: 'sourceTypeTemplate'
+    });
   }
 }

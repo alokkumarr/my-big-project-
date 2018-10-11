@@ -30,6 +30,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -71,7 +72,8 @@ import '../../../../themes/_angular_next.scss';
     MatSlideToggleModule,
     MatDividerModule,
     NouisliderModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatBadgeModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -105,7 +107,8 @@ import '../../../../themes/_angular_next.scss';
     MatSlideToggleModule,
     MatDividerModule,
     NouisliderModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatBadgeModule
   ]
 })
 export class MaterialModule {}

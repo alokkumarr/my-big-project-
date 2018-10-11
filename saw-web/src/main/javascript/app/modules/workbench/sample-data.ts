@@ -169,7 +169,7 @@ export const SQL_AQCTIONS = [
 export const SAMPLE_SOURCE_DATA = [
   {
     id: 1,
-    sourceName: 'SBMessaging',
+    sourceName: 'Messaging',
     sourceType: 'SFTP',
     hostName: 'saw01.ana.demo.vaste.sncrcorp.net',
     portNo: '8300',
@@ -232,8 +232,8 @@ export const SAMPLE_SOURCE_DATA = [
     ]
   },
   {
-    id: 1,
-    sourceName: 'SBRatings',
+    id: 2,
+    sourceName: 'Ratings',
     sourceType: 'SFTP',
     hostName: 'saw01.ana.demo.vaste.sncrcorp.net',
     portNo: '8300',
