@@ -35,11 +35,11 @@ public class ServiceHealthIndicator implements HealthIndicator {
         continue;
       }
       checked.add(uri);
+      HttpURLConnection connection = null;
       try {
         log.debug("Checking health: {}", uri);
         URL url = new URL(uri);
-        HttpURLConnection connection =
-            (HttpURLConnection) url.openConnection();
+        connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
         int code = connection.getResponseCode();
@@ -50,6 +50,13 @@ public class ServiceHealthIndicator implements HealthIndicator {
       } catch (Exception e) {
         log.debug("Health check error: {}", e.getMessage());
         errors.add(uri + ": health check error: " + e.getMessage());
+      } finally {
+        if (connection != null) {
+          /* Disconnect explicitly to avoid keeping too many
+           * connections open which might exhaust socket resources on
+           * the host */
+          connection.disconnect();
+        }
       }
     }
     if (!errors.isEmpty()) {
