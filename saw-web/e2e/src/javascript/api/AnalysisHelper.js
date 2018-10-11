@@ -1,6 +1,7 @@
 'use strict';
 const apiCall = require('../helpers/apiCall');
 const users = require('../data/users');
+const categories = require('../data/categories');
 const subCategories = require('../data/subCategories');
 const request = require('sync-request');
 const dataSets = require('../data/datasets');
@@ -58,7 +59,7 @@ class AnalysisHelper {
     }
 
     getSubCategoryIdBySubCatgeoryName(subCategories, subCategoryName) {
-      return this.getValueFromListByKeyValue(subCategories, 'subCategoryName', subCategoryName, 'subCategoryId'); 
+      return this.getValueFromListByKeyValue(subCategories, 'subCategoryName', subCategoryName, 'subCategoryId');
     }
 
     getSubCategoriesByCatgeoryId(categoryId) {
@@ -222,7 +223,7 @@ class AnalysisHelper {
 
 
       generateChart(url,semanticId, dataSetName, user, subCategory, token, name, description, analysisType, subType) {
-        
+
         let subCategoryId;
         let subCatList = _self.getSubCategoriesByCatgeoryName(url,token, categories.analyses.name);
         if(subCategories) {
@@ -230,7 +231,7 @@ class AnalysisHelper {
         } else {
           throw new Error('There is subcategories found for categories' + categories.analyses.name);
         }
-        
+
         // Create chart
         const createPayload = new RequestModel().getAnalysisCreatePayload(semanticId, analysisType, customerCode);
         // Get chart ID
