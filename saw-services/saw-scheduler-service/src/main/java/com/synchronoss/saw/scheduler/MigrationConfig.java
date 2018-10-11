@@ -13,6 +13,14 @@ import javax.validation.constraints.NotNull;
 
 @Configuration
 public class MigrationConfig {
+  /* Number of times to retry waiting for first node having completed
+   * database migration, before proceeding */
+  private static final int RETRY_COUNT = 5;
+
+  /* Time to wait between checks for first node having completed
+   * database migration */
+  private static final int RETRY_WAIT_MILLISECONDS = 5000;
+
   private final Logger log = LoggerFactory.getLogger(MigrationConfig.class);
 
   @Value("${sip.service.index}")
@@ -33,7 +41,7 @@ public class MigrationConfig {
           flyway.migrate();
         } else {
           log.info("Letting migration run on first node");
-          waitForMigration(flyway, 5);
+          waitForMigration(flyway, RETRY_COUNT);
         }
         log.info("Finished migration");
       }
@@ -42,7 +50,7 @@ public class MigrationConfig {
         if (flyway.info().pending().length > 0) {
           try {
             log.info("Waiting for first node to complete migration");
-            Thread.sleep(5000);
+            Thread.sleep(RETRY_WAIT_MILLISECONDS);
           } catch (InterruptedException e) {
             log.info("Interrupted");
           }
