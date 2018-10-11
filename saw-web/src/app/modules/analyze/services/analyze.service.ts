@@ -136,7 +136,6 @@ export class AnalyzeService {
     const path = `analysis/${analysisId}/executions/${executionId}/data`;
     const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`;
     const url = `${path}${queryParams}`;
-    console.log('url', url);
     return this.getRequest(url).then(resp => {
       const data = fpGet(`data`, resp);
       const queryBuilder = fpGet(`queryBuilder`, resp);

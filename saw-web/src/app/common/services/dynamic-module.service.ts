@@ -42,14 +42,11 @@ export class DynamicModuleService {
           const mod = module[moduleInfo.moduleName];
           this.compiler.compileModuleAndAllComponentsAsync(mod).then(compiled => {
             this.createAndRegisterRoute(moduleInfo, module);
-            console.log('resolved');
             resolve(true);
         }, err => {
-          console.log('rejeted1', err);
           reject(err);
         });
       }, err => {
-        console.log('rejeted2', err);
         reject(err);
       });
     });
@@ -75,7 +72,6 @@ export class DynamicModuleService {
     }
 
     this.router.config.unshift(route);
-    console.log('routes', this.router.config);
     this.updateRouteConfig(this.router.config);
   }
 
