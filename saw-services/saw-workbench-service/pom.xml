@@ -322,7 +322,7 @@
                                 make also these files conform to checkstyle rules and remove the exclusions -->
               <excludes>
                 **/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*,
-                **/WorkbenchExe*,**/Preview*, **/XDF*,/Work*IT*
+                **/WorkbenchExe*,**/Preview*
               </excludes>
             </configuration>
             <goals>
