@@ -55,6 +55,12 @@ sequence.  This token is then passed to the client, which provides it
 with subsequent requests.  The server can then validate the token by
 inspecting its signature and the secret key.
 
+.Authentication using JSON Web Tokens
+plantuml::sip-design/figure-authentication.pum[format=svg]
+
+For more details see the <<SAW Gateway Service>> and <<SAW Security>>
+sections.
+
 === Authorization
 
 Clients are authorized by the SIP Gateway Service using the user
