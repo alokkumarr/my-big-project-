@@ -122,10 +122,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
        /*commonFunctions.waitFor.elementToBePresent(createdAnalysis)
          .then(() => expect(createdAnalysis.isPresent()).toBe(true));*/
        //Verify chart type on home page
-       analyzePage.main.getCardTypeByName(chartName).then(actualChartType =>
-         expect(actualChartType).toEqual(data.chartType,
-           "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
-
+       commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.analysisWithType(chartName, data.chartType), 10000);
        //Delete created chart
        const main = analyzePage.main;
        const cards = main.getAnalysisCards(chartName);

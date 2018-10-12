@@ -68,7 +68,8 @@ function generateFailedTests(dir) {
     // write processedFiles
     fs.writeFileSync('target/testData/processed/processedFiles.json', JSON.stringify(files), { encoding: 'utf8' });
   }
-  let mainTestData = JSON.parse(fs.readFileSync('./e2e/src/testdata/data.json','utf8'));
+
+  let mainTestData = JSON.parse(fs.readFileSync('../saw-web/e2e/src/testdata/data.json','utf8'));
 
   filesToProcess.forEach(function(file) {
 

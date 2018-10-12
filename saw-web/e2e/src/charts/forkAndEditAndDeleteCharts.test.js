@@ -171,10 +171,8 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
             }
           }));
 
-          //Verify chart type on home page
-          analyzePage.main.getCardTypeByName(forkedName).then(actualChartType =>
-            expect(actualChartType).toEqual(data.chartType,
-              "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
+          //Verify analysis with chart type on home page
+          commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.analysisWithType(forkedName, data.chartType), 10000);
 
           const forkedAnalysis = analyzePage.main.getCardTitle(forkedName);
           //Change to Card View

@@ -252,7 +252,7 @@ module.exports = {
       getMetricsFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Metrics")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
       getDimensionFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Dimension")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
       getGroupByFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Group By")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
-      fieldSearchInput: element(by.xpath('//input[@id="mat-input-0"]')),
+      fieldSearchInput: element(by.xpath('//input[contains(@id,"mat-input-")]')),
       selectFields: name => selectFields(name),
       getXRadio: name => getChartSettingsRadio('x', name),
       getYRadio: name => getChartSettingsRadio('y', name),
@@ -359,6 +359,7 @@ module.exports = {
 
   // OLD test elements
   analysisElems: {
+    analysisWithType:(name,type) => element(by.xpath(`//*[@e2e="analysis-type:${type}"]/parent::*/descendant::a[@e2e="analysis-name" and contains(text(),"${name}")]`)),
     listView: element(by.css('[e2e="analyze-list-view"]')),
     cardView: element(by.css('[fonticon="icon-card-view"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
