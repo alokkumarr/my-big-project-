@@ -42,11 +42,11 @@
       }
     }
 
-    .mat-radio-container {
+    ::ng-deep .mat-radio-container {
       display: none;
     }
 
-    .mat-radio-label {
+    ::ng-deep .mat-radio-label {
       margin: 0;
 
       mat-icon {

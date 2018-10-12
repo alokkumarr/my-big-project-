@@ -71,7 +71,7 @@ mat-expansion-panel.sidenav-mainmenu {
     color: white;
   }
 
-  .mat-expansion-panel-body {
+  ::ng-deep .mat-expansion-panel-body {
     padding: 0 0 24px 16px !important;
   }
 }
