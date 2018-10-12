@@ -154,20 +154,13 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
           commonFunctions.waitFor.textToBePresent(savedAlaysisPage.analysisViewPageElements.text(updatedName).getText(), updatedName);
           expect(savedAlaysisPage.analysisViewPageElements.text(updatedName).getText()).toBe(updatedName);
 
-          commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
-          commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
-          commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
+          commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
+          savedAlaysisPage.actionsMenuBtn.click();
+          commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.detailsOption);
+          savedAlaysisPage.detailsOption.click();
 
-          element(utils.hasClass(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard, 'mat-expanded').then(function(isPresent) {
-            if(!isPresent) {
-              savedAlaysisPage.analysisViewPageElements.analysisDetailsCard.click();
-              commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.text(updatedDescription));
-              expect(savedAlaysisPage.analysisViewPageElements.text(updatedDescription).getText()).toBe(updatedDescription);
-            } else {
-              commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.text(updatedDescription));
-              expect(savedAlaysisPage.analysisViewPageElements.text(updatedDescription).getText()).toBe(updatedDescription);
-            }
-          }));
+          commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.detailsNav.analysisDetailLabel);
+          expect(savedAlaysisPage.analysisViewPageElements.text(updatedDescription).getText()).toBe(updatedDescription);
 
         }catch (e) {
           console.log(e);
