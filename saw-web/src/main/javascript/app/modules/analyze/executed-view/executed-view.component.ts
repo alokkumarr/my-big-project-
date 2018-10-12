@@ -99,8 +99,6 @@ export class ExecutedViewComponent implements OnInit {
 
     this.executionId = executionId;
 
-    this.detailsSidenav && this.detailsSidenav.close();
-
     this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
       this.setPrivileges(analysis);
 
@@ -211,6 +209,22 @@ export class ExecutedViewComponent implements OnInit {
       null,
       this.analysis.type,
       null
+    );
+  }
+
+  onSelectExecution(executionId) {
+    if (!executionId) return;
+    this.detailsSidenav && this.detailsSidenav.close();
+    window['siden'] = this.detailsSidenav;
+    this._router.navigate(
+      ['analyze', 'analysis', this.analysis.id, 'executed'],
+      {
+        queryParams: {
+          executionId,
+          awaitingExecution: false,
+          loadLastExecution: false
+        }
+      }
     );
   }
 

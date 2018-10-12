@@ -16,11 +16,17 @@ executed-view {
     height: $back-button-size;
   }
 
-  mat-sidenav-container {
+  mat-sidenav-container.analysis-details-container {
     height: 100%;
 
     mat-sidenav {
       width: 400px;
+    }
+
+    .mat-drawer-backdrop:not(.mat-drawer-shown) ~ mat-sidenav {
+      * {
+        display: none;
+      }
     }
   }
 

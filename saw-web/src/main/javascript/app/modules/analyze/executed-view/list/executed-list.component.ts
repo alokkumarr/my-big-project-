@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as moment from 'moment';
+import * as get from 'lodash/get';
 
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { Analysis } from '../../types';
@@ -24,27 +24,12 @@ export class ExecutedListComponent {
     this.config = this.getGridConfig();
   }
   @Input() analysis: Analysis;
+  @Output() selectExecution: EventEmitter<string> = new EventEmitter();
 
   config: any;
   analyses: Analysis[];
 
-  constructor(
-    private _dxDataGridService: dxDataGridService,
-    private _router: Router
-  ) {}
-
-  goToExecution(executedAnalysis) {
-    this._router.navigate(
-      ['analyze', 'analysis', this.analysis.id, 'executed'],
-      {
-        queryParams: {
-          executionId: executedAnalysis.id,
-          awaitingExecution: false,
-          loadLastExecution: false
-        }
-      }
-    );
-  }
+  constructor(private _dxDataGridService: dxDataGridService) {}
 
   getGridConfig() {
     const columns = [
@@ -86,7 +71,7 @@ export class ExecutedListComponent {
     ];
     return this._dxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
-        this.goToExecution(row.data);
+        this.selectExecution.emit(get(row, 'data.id'));
       },
       columns,
       paging: {

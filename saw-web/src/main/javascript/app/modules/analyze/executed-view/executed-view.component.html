@@ -44,6 +44,7 @@
                 style="padding-top: 20px;"
                 [analyses]="analyses"
                 [analysis]="analysis"
+                (selectExecution)="onSelectExecution($event)"
                 ></executed-list>
       </mat-expansion-panel>
     </mat-card>
