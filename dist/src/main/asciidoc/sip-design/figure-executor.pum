@@ -1,0 +1,18 @@
+cloud "MapR cluster\n" {
+    [Spark master] -> [Spark workers]
+    [Spark workers]
+    [Datasets]
+}
+
+database "Message Queue\n" {
+    [Executor Queue]
+}
+
+interface "Workbench Executor" as Workbench_Executor
+Workbench_Executor --> [Executor Queue]
+
+package "SAW Workbench Executor" {
+    [Executor Queue Client] -> [Executor Queue]
+    [Spark driver] --> [Spark master]
+    [XDF Components]
+}
