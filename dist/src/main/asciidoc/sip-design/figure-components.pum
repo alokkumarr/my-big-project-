@@ -1,0 +1,15 @@
+cloud "MapR cluster" {
+    [Spark cluster]
+    [Datasets]
+}
+
+database "Message Queue" {
+    [Executor Queue]
+}
+
+interface HTTP
+
+HTTP .> [SAW Workbench Service]
+[SAW Workbench Service] --> [Executor Queue]
+[SAW Workbench Executor] --> [Executor Queue]
+[SAW Workbench Executor] --> [Spark cluster]
