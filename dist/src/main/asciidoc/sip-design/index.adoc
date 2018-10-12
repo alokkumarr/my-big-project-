@@ -84,6 +84,25 @@ external or other SIP services) to only route requests to service
 instances which are indicated as being healthy.  See the SIP
 Operations Guide for more details on service health checks.
 
+=== High availability proxy
+
+SIP provides a high availability proxy by default, which allows
+external clients to connect to a single host, which in turn routes the
+request to the appropriate service instance based on health checks.
+This is implemented using http://www.haproxy.org/[HAProxy].
+
+Using the high availability proxy simplifies SIP client requirements,
+because it removes the need for clients to keep track of multiple SIP
+service instances and their health statuses.  The downside of using it
+is that if the high availability proxy itself becomes unavailable, for
+example due to the node that it is running on failing, clients will
+not be able to connect at all.  To make also the HAProxy service
+highly available, configure redundant HAProxy nodes that listen to a
+virtual IP maintained by Keepalived.
+
+.High availability proxy for services
+plantuml::sip-design/figure-ha-proxy.pum[format=svg]
+
 === High availability for stateless services
 
 SIP provides high availability for stateless services by running
@@ -108,21 +127,8 @@ contain logic for following or failing over to a specific member.  All
 writes are replicated synchronously across the entire cluster to
 ensure consistency and availability.
 
-=== High availability proxy
-
-SIP provides a high availability proxy by default, which allows
-external clients to connect to a single host, which in turn routes the
-request to the appropriate service instance based on health checks.
-This is implemented using http://www.haproxy.org/[HAProxy].
-
-Using the high availability proxy simplifies SIP client requirements,
-because it removes the need for clients to keep track of multiple SIP
-service instances and their health statuses.  The downside of using it
-is that if the high availability proxy itself becomes unavailable, for
-example due to the node that it is running on failing, clients will
-not be able to connect at all.  To make also the HAProxy service
-highly available, configure redundant HAProxy nodes that listen to a
-virtual IP maintained by Keepalived.
+.High availability for MariaDB
+plantuml::sip-design/figure-ha-mariadb.pum[format=svg]
 
 == SAW Web
 
