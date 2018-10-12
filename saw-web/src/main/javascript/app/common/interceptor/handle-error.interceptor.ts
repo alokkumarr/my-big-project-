@@ -25,7 +25,7 @@ export class HandleErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     //send the newly created request
     return next.handle(req).catch((error, caught) => {
-      this.toast.error(this.getTitle(error));
+      this.toast.error(this.getTitle(error), '', { error });
       return Observable.throw(error);
     }) as any;
   }
@@ -34,8 +34,8 @@ export class HandleErrorInterceptor implements HttpInterceptor {
     const title =
       get(error, 'error.error.message') ||
       get(error, 'error.message') ||
-      get(error, 'error', '') ||
-      get(error, 'message', '');
+      get(error, 'message', '') ||
+      get(error, 'error', '');
     /* prettier-ignore */
     return title ? truncate(title, {
       length: ERROR_TITLE_LENGTH
