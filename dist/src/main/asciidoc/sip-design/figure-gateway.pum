@@ -1,0 +1,25 @@
+cloud {
+    component [Client] as Client
+}
+
+package "SIP" {
+    interface HTTP as HTTPGateway
+
+    component [Gateway Service] as GatewayService
+    HTTPGateway - GatewayService
+
+    interface HTTP as HTTPService1
+    interface HTTP as HTTPService2
+    interface HTTP as HTTPServiceN
+
+    HTTPService1 - [Service 1]
+    HTTPService2 - [Service 2]
+    HTTPServiceN - [Service N]
+
+    GatewayService .> HTTPService1
+    GatewayService .> HTTPService2
+    GatewayService .> HTTPServiceN
+}
+
+Client .> HTTPGateway
+

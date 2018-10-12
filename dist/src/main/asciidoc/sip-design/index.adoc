@@ -148,8 +148,13 @@ tables.  Additionally SAW Services access files on the MapR-FS.
 The SAW Gateway Service acts as single entry point for all upstream
 micro services.  It is a Spring Boot based microservice. It upholds
 the concerns regarding security.  It acts as edge service and
-authenticates every request that passes by it nad makes sure that it
-is valid.  In addition to these, it comes with the following benefits:
+authenticates every request that passes by it and makes sure that it
+is valid.
+
+.Gateway Service routes requests to upstream services
+plantuml::sip-design/figure-gateway.pum[format=svg]
+
+It comes with the following benefits:
 
 . Insulates the clients from how the application is partitioned into
   micro-services
