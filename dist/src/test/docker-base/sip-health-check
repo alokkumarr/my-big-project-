@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# SIP container health check command
+#
+# Returns with success exit status if SIP container is considered
+# healthy: services up and running and responding.
+
+# Exit on any error, to indicate failing health check
+set -eu
+
+# Ensure all systemd services are up and running
+systemctl is-system-running --quiet
+
+services_pass=/var/run/sip-health-check-services-pass
+
+# Ensure SIP services are accessible and healthy (for HAProxy to route
+# requests to them, the services need to be responding with passing
+# health checks)
+if [ "$(hostname)" == "sip-proxy" ]; then
+    # If services health check has not already passed once, check it
+    if [ ! -e $services_pass ]; then
+        # Request services health status: if response is 503 Service
+        # Unavailable, curl will exit with non-zero status code
+        curl -s -f http://localhost/saw/services/actuator/health
+        # Mark services health check as having passed once, which is
+        # enough to ensure that integration tests can proceed.  After
+        # the initial pass the services health does not need to be
+        # part of the container health check.
+        touch $services_pass
+    fi
+fi

@@ -564,7 +564,7 @@ class DashboardFunctions {
 
         } else if(currentFilter.name.toLowerCase() === 'date'){
           browser.sleep(2000);
-          expect(observePage.globalFilters.selectedPreset.getAttribute('ng-reflect-value')).toBe(currentFilter.preset);
+          expect(observePage.globalFilters.selectedPresetValue(currentFilter.preset).getText()).toContain(currentFilter.preset);
         } else if(currentFilter.name.toLowerCase() === 'long'
           || currentFilter.name.toLowerCase() === 'integer'
           || currentFilter.name.toLowerCase() === 'float'

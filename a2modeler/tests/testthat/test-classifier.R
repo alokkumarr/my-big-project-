@@ -13,7 +13,7 @@ context("classifier unit tests")
 
 # Basic Tests -------------------------------------------------------------
 
-# 
+
 # # Create Spark Connection
 # spark_home_dir <- sparklyr::spark_installed_versions() %>%
 #   as.data.frame() %>%
@@ -47,7 +47,7 @@ context("classifier unit tests")
 #     train_models() %>%
 #     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 # 
-#  
+# 
 #   expect_subset("spark_model", class(c1$final_model))
 #   expect_subset("spark_model_classification", class(c1$final_model))
 #   expect_subset(
@@ -58,7 +58,7 @@ context("classifier unit tests")
 #       dplyr::pull(model_uid)
 #   )
 #   expect_equal(c1$models[[1]]$pipe, c1$models[[2]]$pipe)
-#   
+# 
 #   p1 <- predict(c1, data = df)
 #   expect_class(p1, "predictions")
 # })

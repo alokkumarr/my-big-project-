@@ -15,6 +15,15 @@
   yum: name=MariaDB-server state=present
   notify:
     - restart mariadb
+# Workaround: MariaDB 10.3.10 introduced changes that cause the error
+# "/bin/galera_new_cluster: line 31: return: can only `return' from a
+# function or sourced script" when bootstrapping the cluster.  Remove
+# the offending line until MariaDB is fixed.
+- name: Remove invalid line from galera_new_cluster
+  lineinfile:
+    path: /bin/galera_new_cluster
+    state: absent
+    regexp: '^return \$extcode$'
 - name: Install MariaDB configuration additions
   template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.cnf
 # Workaround: The MariaDB Galera cluster initialization below invokes

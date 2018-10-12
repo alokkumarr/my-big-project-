@@ -239,8 +239,6 @@ function getValueFromListByKeyValue(list, inputKey, inputValue, getValueOfKey) {
 
   for (let i = 0; i < list.length; i++) {
     const data = list[i];
-    //console.log(JSON.stringify(list[i]));
-
     // Iterate each item in list
     // If inputValue matches, return value of getValueOfKey from this item in list
     Object.keys(data).forEach(function (key) {

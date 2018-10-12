@@ -397,20 +397,23 @@ test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(spk_typ, "StringType")
 })
 
-# Test 12:Different input date formats dd/MM/yyyy HH:mm:ss-------------------------------------------
+# Test 12:Test for formatting of multiple measure variables-------------------------------------------
 
-date_format6 <- dat
+date_format7 <- dat
 
-date_format6$date <-
-  format(as.POSIXct(date_format6$date), "%d/%m/%Y %H:%M:%S")
+date_format7 <- date_format7 %>%
+  mutate(., date_tmp = date) %>%
+  mutate(., date = format(as.POSIXct(date_tmp), "%d/%m/%Y %H:%M:%S"),
+         date1 = format(as.POSIXct(date_tmp) + duration(30, 'days'), "%d/%m/%Y %H:%M:%S")
+  )
 
-dat_tbl_format_6 <-
-  copy_to(sc, date_format6 %>% mutate(date = as.character(date)), overwrite = TRUE)
+dat_tbl_format_7 <-
+  copy_to(sc, date_format7 %>% mutate(date = as.character(date), date1 = as.character(date1)), overwrite = TRUE)
 
 Date1_R_format_dtTime <-
   formatter(
-    date_format6,
-    measure_vars = "date",
+    date_format7,
+    measure_vars = c("date", "date1"),
     input_format = "dd/MM/yyyy HH:mm:ss",
     output_format = "yyyy-MM-dd HH:mm:ss",
     output_suffix = "FORMATTER"
@@ -418,18 +421,21 @@ Date1_R_format_dtTime <-
 
 Date1_spk_format_dttime <-
   formatter(
-    dat_tbl_format_6,
-    measure_vars = "date",
+    dat_tbl_format_7,
+    measure_vars = c("date", "date1"),
     input_format = "dd/MM/yyyy HH:mm:ss",
     output_format = "yyyy-MM-dd HH:mm:ss",
     output_suffix = "FORMATTER"
   )
 
 spk_typ <- sdf_schema(Date1_spk_format_dttime)$date_FORMATTER$type
+spk_typ1 <- sdf_schema(Date1_spk_format_dttime)$date1_FORMATTER$type
 
 test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(colnames(Date1_R_format_dtTime),
                colnames(Date1_spk_format_dttime))
   expect_equal(class(Date1_R_format_dtTime$date_FORMATTER), "character")
+  expect_equal(class(Date1_R_format_dtTime$date1_FORMATTER), "character")
   expect_equal(spk_typ, "StringType")
+  expect_equal(spk_typ1, "StringType")
 })

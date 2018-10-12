@@ -19,7 +19,8 @@ import synchronoss.handlers.charter.smartcare.CharterEventHandler
 
 @Api(value = "SynchronossGenericEvent",
   produces = "application/json",
-  consumes = "application/octet-stream")
+  consumes = "application/octet-stream",
+  protocols = "http,https")
 class GenericHandler extends Controller {
 
   EventHandler.buildEventHandlerList
