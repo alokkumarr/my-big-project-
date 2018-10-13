@@ -1,7 +1,0 @@
-[SAW Web]
-[SAW Services]
-[SAW Security]
-
-[SAW Web] .> [SAW Services]
-[SAW Web] .> [SAW Security]
-[SAW Services] .> [SAW Security]
