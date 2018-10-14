@@ -251,28 +251,34 @@ plantuml::sip-design/figure-components.pum[format=svg]
 .SIP Workbench Executor
 plantuml::sip-design/figure-executor.pum[format=svg]
 
-=== SAW Proxy Service
+=== SAW Storage Proxy Service
 
-The SAW Proxy Service will act as proxy for our storage. The intention of this services
-to provide common storage proxy service behind our gateway for our polyglot persistence layer (ES, DL, RDMS & MapRDB).
-The purpose is to bring back all of transformation which is being done currently in UI to the backend service and UI just
-needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
+he SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
+The intention of this services to provide access behind our gateway for our polyglot persistence
+layer *(ElasticSearch, Datalake, RDMS & MapRDB).*
 
-.Figure: Executing an data query using the SAW Proxy Service
+[%hardbreaks]
+One of the reason to access this service to perform transformation at backend service and API consumer
+just needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
+
+.Figure: Executing an data query using the SAW Proxy Service via SIP Gateway Service
 plantuml::sip-design/figure-proxy-sequence.pum[format=svg]
 
-The request body shall provide the query, storage type & other details. The below are salient feature for the service which are as follows:
-1. It will return either in JSON or Tabular Format.
+The request (link:sip-developer/index.html[SIP Developer Guide]) body shall provide the query,
+storage type & other details. The below are salient feature for the service which are as follows:
+
+[[goals]]
+[role="incremental"]
+* It will return either in JSON or Tabular Format.
    ES returns in JSON format in terms of search, it should be converted into Tabular format if in
    the request body tabular format is requested.
-2. Input JSON Schema Validation.
-3. support create, search, update & delete operations.
-4. It should support to flatten our in house build pivot format.
-5. Search results will provided in paginated format either in JSON or Tabular format.
-6. Implicit ES Query validation.
-7. Every incoming request to this story proxy service will be validated in gateway service layer.
-8. It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to
-   certain structure i.e request & response specification.
+* Input JSON Schema Validation.
+* support create, search, update, delete & aggregate operations.
+* It should support to flatten our in house build pivot format.
+* Search results will provided in paginated format either in JSON or Tabular format.
+* Implicit ES Query validation.
+* Every incoming request to this story proxy service will be validated in gateway service layer.
+* It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to certain structure i.e request & response specification.
 
 === SAW Semantic Service
 
