@@ -74,7 +74,7 @@ object AnalysisProvHelper{
 
   def apply(source: String): AnalysisProvHelper = {
     try {
-      val requests = parse(source, false, false)
+      val requests = parse(source, false)
       new AnalysisProvHelper( requests )
     }
     catch {

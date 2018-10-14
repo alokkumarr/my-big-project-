@@ -9,11 +9,12 @@ import sncr.datalake.engine.ExecutionStatus.ExecutionStatus
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
-import org.json4s.JsonAST.JValue
+import org.json4s.JsonAST.{JObject, JValue}
 import sncr.metadata.engine.ProcessingResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
+
 
 import org.apache.hadoop.fs.FileStatus
 
@@ -37,8 +38,9 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
   protected var executionMessage : String = null
   protected var executionCode : Integer = -1
   protected var status : ExecutionStatus = ExecutionStatus.INIT
-  protected var startTS : java.lang.Long = null
-  protected var finishTS : java.lang.Long = null
+  // This has been modified due to version incompatibility issue with json4s 3.3.0 version
+  protected var startTS : java.math.BigInteger = null
+  protected var finishTS : java.math.BigInteger = null
 
   implicit val formats = new DefaultFormats {
     override def dateFormatter = new SimpleDateFormat(
@@ -50,12 +52,12 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     try {
       analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime, false, resultId)
       id = analysisNodeExecution.resId
-      m_log debug s"Started execution, result ID: $id"
+      m_log trace s"Started execution, result ID: $id"
       status = ExecutionStatus.STARTED
       analysisNodeExecution.loadObjects()
       analysisNodeExecution.setStartTime
       startTS = analysisNodeExecution.getStartTS
-      m_log debug s"Loaded objects, Started TS: $startTS "
+      m_log trace s"Loaded objects, Started TS: $startTS "
       status = ExecutionStatus.IN_PROGRESS
       /* Execute the query and use the execution ID also as the analysis
        * result node ID (and do not load any results into the Spark
@@ -132,12 +134,12 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
   /**
     * Returns execution start timestamp as milliseconds since epoch
     */
-  def getStartedTimestamp : java.lang.Long =  if (startTS == null ) -1L else startTS
+  def getStartedTimestamp : java.math.BigInteger =  if (startTS == null ) java.math.BigInteger.valueOf(-1L) else startTS
 
   /**
     * Returns execution finished timestamp as milliseconds since epoch
     */
-  def getFinishedTimestamp : java.lang.Long = if (finishTS == null ) -1L else finishTS
+  def getFinishedTimestamp : java.math.BigInteger = if (finishTS == null ) java.math.BigInteger.valueOf(-1L) else finishTS
 
   /**
     * Returns Futute with the query execution result

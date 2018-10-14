@@ -26,7 +26,7 @@
       </div>
       <span fxFlex></span>
       <div class="action-buttons" fxLayout="row" fxLayoutGap="10px">
-        <mat-slide-toggle checked="false" (change)="togglePoll()">Auto Refresh</mat-slide-toggle>
+        <mat-slide-toggle *ngIf="dataView == 'sets'" checked="false" (change)="togglePoll()">Auto Refresh</mat-slide-toggle>
 
         <button mat-raised-button e2e="add-new-data-sets" color="primary" i18n (click)="addDataSet()">
           <span>+ Dataset</span>
