@@ -8,7 +8,7 @@ import { DefaultAnalyzeCategoryGuard } from './guards';
 export const routes: Routes = [
   {
     // name: 'analyze',
-    path: 'analyze',
+    path: '',
     canActivate: [IsUserLoggedInGuard, DefaultAnalyzeCategoryGuard],
     canActivateChild: [IsUserLoggedInGuard],
     component: AnalyzePageComponent,

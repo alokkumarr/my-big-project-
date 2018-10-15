@@ -10,6 +10,7 @@ import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { CommonModuleTs, CommonModuleGlobal } from './common';
+import { AnalyzeModuleGlobal } from './modules/analyze/analyze.global.module';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
 
@@ -39,6 +40,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     NgIdleModule.forRoot(),
     CommonModuleTs,
     CommonModuleGlobal.forRoot(),
+    AnalyzeModuleGlobal.forRoot(),
     FlexLayoutModule,
     MaterialModule,
     WorkbenchUpgradeModule,

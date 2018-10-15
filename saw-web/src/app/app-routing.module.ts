@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { IsUserLoggedInGuard, DefaultModuleGuard } from './common/guards';
 import { MainPageComponent } from './layout';
-import { AnalyzeModule } from './modules/analyze/analyze.module';
-import { routes as AnalyzeRoutes } from './modules/analyze/routes';
 import { AdminModule } from './modules/admin';
 import { WorkbenchUpgradeModule } from './modules/workbench';
 import { routes as WorkbenchRoutes } from './modules/workbench/routes';
@@ -18,11 +16,15 @@ const routes: Routes = [
     // redirectTo: 'analyze',
     component: MainPageComponent,
     pathMatch: 'full',
-    children: [...AnalyzeRoutes, ...WorkbenchRoutes, ...AdminRoutes]
+    children: [...WorkbenchRoutes, ...AdminRoutes]
   },
   {
     path: 'observe',
     loadChildren: './modules/observe/observe.module#ObserveUpgradeModule'
+  },
+  {
+    path: 'analyze',
+    loadChildren: './modules/analyze/analyze.module#AnalyzeModule'
   },
   {
     path: 'login',
@@ -36,7 +38,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    AnalyzeModule,
     AdminModule,
     WorkbenchUpgradeModule,
     RouterModule.forRoot(routes, {
