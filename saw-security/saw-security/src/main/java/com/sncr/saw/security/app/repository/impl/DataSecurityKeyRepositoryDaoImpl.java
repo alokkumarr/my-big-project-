@@ -41,7 +41,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 ps.setString(3,securityGroups.getCreatedBy());
             });
             logger.trace(insertResult + " Security Group created successfully.");
-            return this.updateUser(securityGroups.getSecurityGroupName(),securityGroups.getUserId());
+            return true; // Here we need not to assign default user to newly created Group name. By default it should be left unassigned.
         }
         catch (Exception e) {
             logger.error(e.getMessage());
@@ -69,7 +69,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Boolean deleteSecurityGroups(String securityGroupName) {
+    public Boolean deleteSecurityGroups(String securityGroupName, String userId) {
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
         String delSql = "DELETE FROM SEC_GROUP WHERE SEC_GROUP_SYS_ID = ?";
         try{
@@ -77,9 +77,30 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 ps.setLong(1,securityGroupSysId);
             });
             logger.trace(deleteResult + "Security Group deleted successfully");
-            return this.updateUser(securityGroupName,null);
+            return this.unAssignGroupFromUser(userId);
+            // Note : This is intentional here to update SEC_GROUP_SYS_ID as null in USERS, Whenever we delete a security group,
         }
         catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Function to update user table to set SEC_GROUP_SYS_ID as null in case of corresponding group deletion.
+     * @param userId
+     * @return
+     */
+    public Boolean unAssignGroupFromUser(String userId) {
+        String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = null WHERE USER_ID = ? ";
+        try{
+            int updateRes = jdbcTemplate.update(updateSql, ps -> {
+                ps.setString(1,userId);
+            });
+            logger.trace(updateRes + "User Table updated ");
+            return true;
+        }
+        catch (Exception e){
             logger.error(e.getMessage());
             return false;
         }
@@ -88,7 +109,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     @Override
     public List<SecurityGroups> fetchSecurityGroupNames() {
         String fetchSql = "SELECT SEC_GROUP_NAME,DESCRIPTION,CREATED_BY FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1";
-
 
         List<SecurityGroups> groupNames = jdbcTemplate.query(fetchSql,
             preparedStatement -> {},
@@ -107,6 +127,11 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         return groupNames;
     }
 
+    /**
+     * Function returns corresponding sec_group_sys_id when group name is given.
+     * @param securityGroupName
+     * @return
+     */
     public Long getSecurityGroupSysId(String securityGroupName) {
         Long groupSysId = null;
         String fetchSql = "SELECT SEC_GROUP_SYS_ID FROM SEC_GROUP WHERE SEC_GROUP_NAME = ?";
@@ -130,6 +155,12 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         return groupSysId;
     }
 
+    /**
+     * Functions returns corresponding AttributeSysId
+     * @param securityGroupSysId
+     * @param attributeName
+     * @return
+     */
     public Long getSecurityGroupDskAttributeSysId(Long securityGroupSysId,String attributeName) {
         Long attributeSysId = null;
         String fetchSql = "SELECT SEC_GROUP_DSK_ATTRIBUTE_SYS_ID FROM SEC_GROUP_DSK_ATTRIBUTE WHERE SEC_GROUP_SYS_ID = ? AND ATTRIBUTE_NAME = ?";
@@ -154,6 +185,11 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         return attributeSysId;
     }
 
+    /**
+     * Function returns the list of Attribute sys id for corresponding security group.
+     * @param securityGroupSysId
+     * @return
+     */
     public List<Long> getSecurityGroupDskAttributeSysIdList(Long securityGroupSysId) {
         List<Long> attributeSysId = new ArrayList<>();
         String fetchSql = "SELECT SEC_GROUP_DSK_ATTRIBUTE_SYS_ID FROM SEC_GROUP_DSK_ATTRIBUTE WHERE SEC_GROUP_SYS_ID = ?";

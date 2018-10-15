@@ -10,7 +10,7 @@ import java.util.Map;
 public interface DataSecurityKeyRepository {
     public Boolean addSecurityGroups(SecurityGroups securityGroups);
     public Boolean updateSecurityGroups(List<SecurityGroups> groupNames);
-    public Boolean deleteSecurityGroups(String securityGroupName);
+    public Boolean deleteSecurityGroups(String securityGroupName, String userId);
     public List<SecurityGroups> fetchSecurityGroupNames();
     public Boolean addSecurityGroupDskAttributeValues(AttributeValues attributeValues);
     public List<String> fetchSecurityGroupDskAttributes(String securityGroupName);
