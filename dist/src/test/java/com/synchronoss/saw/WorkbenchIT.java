@@ -2,6 +2,7 @@ package com.synchronoss.saw;
 
 
 import static io.restassured.RestAssured.given;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -9,13 +10,16 @@ import static org.hamcrest.Matchers.hasSize;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import io.restassured.response.Response;
+
+import java.io.IOException;
+import java.util.UUID;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.UUID;
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
  * executing components.
@@ -157,7 +161,7 @@ public class WorkbenchIT extends BaseIT {
   }
 
   /**
-   * Returns the dataset specified by the dataset name
+   * Returns the dataset specified by the dataset name.
    *
    * @param datasetName ID of the dataset without the projectId
    * @return Details of the dataset
@@ -218,7 +222,7 @@ public class WorkbenchIT extends BaseIT {
   }
 
   /**
-   * Waits for dataset to be created on datalake
+   * Waits for dataset to be created on datalake.
    *
    * @param id Dataset ID
    * @param retries Number of retries
@@ -227,7 +231,9 @@ public class WorkbenchIT extends BaseIT {
   private void waitForDataset(String id, int retries) {
     String status = getDatasetStatus(id);
     log.info("waitForDataset id : {}", id);
-    if (status == null || status.equals("INIT") || status.equals("IN-PROGRESS") || status.equals("STARTED")) {
+    if (status == null || status.equals("INIT")
+        || status.equals("IN-PROGRESS")
+        || status.equals("STARTED")) {
       if (retries == 0) {
         throw new RuntimeException("Timed out waiting while waiting for dataset");
       }
@@ -245,19 +251,19 @@ public class WorkbenchIT extends BaseIT {
     } else if (status.equals("FAILED")) {
       log.info("XDF failed.");
     } else {
-        log.info("XDF partially succeeded.");
+      log.info("XDF partially succeeded.");
     }
     /* Dataset is in SUCCESS state, so return */
   }
   /* Dataset is in SUCCESS state, so return */
 
 
-    /**
-     * Get the status of a dataset in the Workbench Service.
-     *
-     * @param id Dataset ID
-     * @return Status of the dataset
-     */
+  /**
+   * Get the status of a dataset in the Workbench Service.
+   *
+   * @param id Dataset ID
+   * @return Status of the dataset
+   */
   private String getDatasetStatus(String id) {
     String datasetPath = "find { it._id == '" + id + "' }";
     String statusPath = datasetPath + ".asOfNow.status";
@@ -402,13 +408,14 @@ public class WorkbenchIT extends BaseIT {
         .body("rows[0].field1", equalTo("foo"));
   }
 
-    /**
-     *
-     * Wait until preview becomes visible in Workbench Services, using
-     * the given number of retries before timing out.
-     * @param id ID of the dataset
-     * @param retries Number of retries
-     */
+  /**
+   *
+   * Wait until preview becomes visible in Workbench Services, using
+   * the given number of retries before timing out.
+   *
+   * @param id ID of the dataset
+   * @param retries Number of retries
+   */
   private void waitForPreview(String id, int retries) {
     Response response = given(authSpec)
         .when().get(WORKBENCH_PATH + "/previews/" + id)
