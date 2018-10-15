@@ -12,6 +12,12 @@ module.exports = {
       json: payload
     }).getBody());
   },
+  get: (url, token) => {
+
+    return JSON.parse(request('GET', url, {
+      headers: {'Authorization': token},
+    }).getBody());
+  },
   delete: (url, token) => {
 
     return JSON.parse(request('DELETE', url, {
