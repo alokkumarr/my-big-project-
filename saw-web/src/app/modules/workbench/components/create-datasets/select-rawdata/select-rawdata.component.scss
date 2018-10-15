@@ -55,13 +55,6 @@
   flex: 1 1 auto;
 }
 
-.staging-image {
-  background-image: url('/assets/img/staging-img.png');
-  background-size: cover;
-  height: 38px;
-  width: 38px;
-}
-
 .margin-9 {
   margin: 3px 3px 0 0;
   padding-bottom: 0;
@@ -82,11 +75,11 @@
     font-size: 19px;
   }
 
-  .mat-form-field-wrapper {
+  ::ng-deep .mat-form-field-wrapper {
     padding-bottom: 0;
   }
 
-  .mat-form-field-underline {
+  ::ng-deep .mat-form-field-underline {
     bottom: 0.25em;
   }
 }

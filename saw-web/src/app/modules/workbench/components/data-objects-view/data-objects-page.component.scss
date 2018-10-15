@@ -47,7 +47,7 @@
   height: 34px;
 }
 
-.mat-button-toggle-label-content {
+::ng-deep .mat-button-toggle-label-content {
   padding: 0 7px;
   line-height: 32px !important;
 
@@ -56,8 +56,8 @@
   }
 }
 
-.mat-button-toggle-label-content > * {
-  vertical-align: bottom;
+::ng-deep .mat-button-toggle-label-content > * {
+  vertical-align: bottom !important;
 }
 
 .view-mode {
@@ -65,7 +65,7 @@
     box-shadow: none;
   }
 
-  .mat-button-toggle-checked {
+  ::ng-deep .mat-button-toggle-checked {
     background-color: white;
     color: $primary-blue-b2;
   }

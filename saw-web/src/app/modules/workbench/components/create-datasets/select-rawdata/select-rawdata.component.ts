@@ -14,7 +14,7 @@ import * as filter from 'lodash/filter';
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
 
-import { TreeNode, ITreeOptions } from 'angular-tree-component';
+// import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
@@ -33,8 +33,7 @@ export class SelectRawdataComponent
   implements OnInit, AfterViewInit, OnDestroy {
   public treeConfig: any; // tslint:disable-line
   public treeNodes: Array<any>; // tslint:disable-line
-  public treeOptions: ITreeOptions;
-  public maskHelper: any; // tslint:disable-line
+  // public treeOptions: ITreeOptions;
   public gridConfig: Array<any>;
   public selFiles: Array<any> = [];
   public filePath: string;
@@ -50,15 +49,17 @@ export class SelectRawdataComponent
     public notify: ToastService
   ) {}
 
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
-  @ViewChild('tree') tree;
-  @Output() onSelectFullfilled: EventEmitter<any> = new EventEmitter<any>();
+  @ViewChild(DxDataGridComponent)
+  dataGrid: DxDataGridComponent;
+  @ViewChild('tree')
+  tree;
+  @Output()
+  onSelectFullfilled: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     this.treeNodes = cloneDeep(STAGING_TREE);
     this.gridConfig = this.getGridConfig();
-    this.treeConfig = this.getTreeConfig();
-    this.maskHelper = 'INFO_TEXT';
+    // this.treeConfig = this.getTreeConfig();
   }
 
   ngAfterViewInit() {
@@ -84,32 +85,32 @@ export class SelectRawdataComponent
     });
   }
 
-  getTreeConfig() {
-    this.treeOptions = {
-      displayField: 'name',
-      hasChildrenField: 'isDirectory',
-      getChildren: (node: TreeNode) => {
-        const parentPath = node.data.path;
-        const path =
-          parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
-        // this.currentPath = path;
-        // this.nodeID = node.id;
-        return this.workBench
-          .getStagingData(path)
-          .toPromise()
-          .then(function(data) {
-            const dir = filter(data.data, ['isDirectory', true]);
-            return dir;
-          });
-      },
-      useVirtualScroll: false,
-      animateExpand: true,
-      animateSpeed: 30,
-      animateAcceleration: 1.2
-    };
+  // getTreeConfig() {
+  //   this.treeOptions = {
+  //     displayField: 'name',
+  //     hasChildrenField: 'isDirectory',
+  //     getChildren: (node: TreeNode) => {
+  //       const parentPath = node.data.path;
+  //       const path =
+  //         parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
+  //       // this.currentPath = path;
+  //       // this.nodeID = node.id;
+  //       return this.workBench
+  //         .getStagingData(path)
+  //         .toPromise()
+  //         .then(function(data) {
+  //           const dir = filter(data.data, ['isDirectory', true]);
+  //           return dir;
+  //         });
+  //     },
+  //     useVirtualScroll: false,
+  //     animateExpand: true,
+  //     animateSpeed: 30,
+  //     animateAcceleration: 1.2
+  //   };
 
-    return this.treeOptions;
-  }
+  //   return this.treeOptions;
+  // }
 
   openFolder(node) {
     const parentPath = node.data.path;

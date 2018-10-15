@@ -26,7 +26,7 @@
         <div fxFlex="70" fxFill fxLayout="column">
           <mat-form-field id="infoForMask">
             <input matInput autocomplete="off" i18n placeholder="Enter file mask" [formControl]="fileMaskControl" required />
-            <mat-icon matSuffix fontIcon="icon-info" matTooltip="{{maskHelper}}"></mat-icon>
+            <mat-icon matSuffix fontIcon="icon-info" matTooltip="File mask to select Files (e.g: *.csv, user*.csv...)"></mat-icon>
           </mat-form-field>
           <div class="gridContainer" e2e="grid-container">
             <dx-data-grid id="gridContainer">
