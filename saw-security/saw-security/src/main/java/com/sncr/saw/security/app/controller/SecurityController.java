@@ -7,29 +7,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
+import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.*;
-import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
-import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
-import com.sncr.saw.security.common.bean.repo.admin.DeletePrivilege;
-import com.sncr.saw.security.common.bean.repo.admin.DeleteRole;
-import com.sncr.saw.security.common.bean.repo.admin.DeleteUser;
-import com.sncr.saw.security.common.bean.repo.admin.ModuleDropDownList;
-import com.sncr.saw.security.common.bean.repo.admin.PrivilegesList;
-import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
-import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
-import com.sncr.saw.security.common.bean.repo.admin.RolesList;
-import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
-import com.sncr.saw.security.common.bean.repo.admin.UsersList;
+import com.sncr.saw.security.common.bean.repo.admin.*;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
+import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
+import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
+import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.TicketHelper;
 import io.jsonwebtoken.Claims;
@@ -76,6 +69,9 @@ public class SecurityController {
 
 	@Autowired
     PreferenceRepository preferenceRepository;
+
+	@Autowired
+    DataSecurityKeyRepository dataSecurityKeyRepository;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -718,7 +714,131 @@ public class SecurityController {
 		return userList;
 	}
 
-	/**
+    @RequestMapping(value = "/getSecurityGroups",method = RequestMethod.GET)
+    public List<SecurityGroups> getSecurityGroups() {
+        List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames();
+	    return groupNames;
+    }
+
+    @RequestMapping(value = "/addSecurityGroups",method = RequestMethod.POST)
+    public Valid addSecurityGroups(@RequestBody SecurityGroups securityGroups)  {
+	    Valid valid = new Valid();
+	    if (dataSecurityKeyRepository.addSecurityGroups(securityGroups))    {
+	        valid.setValid(true);
+	        valid.setValidityMessage("Security Group successfully created");
+        }
+        else
+        {
+            valid.setValid(false);
+            valid.setValidityMessage("Error in creating security group");
+        }
+	    return valid;
+    }
+
+    @RequestMapping(value = "/updateSecurityGroups",method = RequestMethod.PUT)
+    public Valid updateSecurityGroups(@RequestBody List<SecurityGroups> securityGroups) {
+        Valid valid = new Valid();
+        if(dataSecurityKeyRepository.updateSecurityGroups(securityGroups))  {
+            valid.setValid(true);
+            valid.setValidityMessage("Security Group Updated sucessfully");
+        }
+        else {
+            valid.setValid(false);
+            valid.setValidityMessage("Error in Updating Group Name");
+        }
+	    return valid;
+    }
+
+    @RequestMapping(value = "/deleteSecurityGroups",method = RequestMethod.DELETE)
+    public Valid deleteSecurityGroups(@RequestBody String securityGroupName)  {
+	    Valid valid = new Valid();
+	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupName))  {
+	        valid.setValid(true);
+	        valid.setValidityMessage("Successfully deleted security group");
+        }
+        else {
+            valid.setValid(false);
+            valid.setValidityMessage("Error in deleting security group");
+        }
+	    return valid;
+    }
+
+    @RequestMapping (value = "/addSecurityGroupDskAttributeValues", method = RequestMethod.POST)
+    public Valid addSecurityGroupDskAttributeValues(@RequestBody AttributeValues attributeValues)  {
+	    Valid valid = new Valid();
+	    if(dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(attributeValues))   {
+	        valid.setValid(true);
+	        valid.setValidityMessage("Adding Attribute-Values is succesfull");
+        }
+        else {
+	        valid.setValid(false);
+	        valid.setValidityMessage("Error in Adding Attribute-Values");
+        }
+	    return valid;
+    }
+
+    @RequestMapping ( value = "/updateAttributeValues", method =  RequestMethod.PUT)
+    public Valid updateAttributeValues(@RequestBody AttributeValues attributeValues)    {
+	    Valid valid = new Valid();
+	    if (dataSecurityKeyRepository.updateAttributeValues(attributeValues))   {
+	        valid.setValid(true);
+	        valid.setValidityMessage("DSK value Updated sucessfully");
+        }
+        else {
+	        valid.setValid(false);
+	        valid.setValidityMessage("Error in updating DSK value");
+        }
+        return valid;
+    }
+
+    @RequestMapping (value = "/getSecurityGroupDskAttributes", method = RequestMethod.POST)
+    public List<String> fetchSecurityGroupDskAttributes(@RequestBody String securityGroupName)   {
+	    List<String> attributeNames = dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupName);
+	    return attributeNames;
+    }
+
+    @RequestMapping (value = "/deleteSecurityGroupDskAttributeValues", method = RequestMethod.DELETE)
+    public Valid deleteSecurityGroupDskAttributeValues(@RequestBody List<String> dskList)   {
+        Valid valid = new Valid();
+        if (dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList))   {
+            valid.setValid(true);
+            valid.setValidityMessage("Deleted Attribute values");
+        }
+        else {
+            valid.setValid(false);
+            valid.setValidityMessage("Error in deleting Attribute Values");
+        }
+        return valid;
+    }
+
+    @RequestMapping ( value = "/updateUser", method = RequestMethod.PUT)
+    public Valid updateUser(@RequestBody List<String> groupNameUserId)  {
+	    Valid valid = new Valid();
+	    if (dataSecurityKeyRepository.updateUser(groupNameUserId.get(0),groupNameUserId.get(1)))    {
+	        valid.setValid(true);
+	        valid.setValidityMessage("Group Name succesfully updated");
+        }
+        else {
+	        valid.setValid(false);
+	        valid.setValidityMessage("Error in updating Group Name");
+        }
+	    return valid;
+    }
+
+    @RequestMapping ( value = "/fetchDskAllAttributeValues", method = RequestMethod.POST)
+    public List<AttributeValues> fetchDskAllAttributeValues(@RequestBody String securityGroupName)    {
+        List<AttributeValues> res = dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupName);
+        return  res;
+    }
+
+    @RequestMapping ( value = "/getAlluserAssignments", method = RequestMethod.GET)
+    public List<UserAssignment> getAlluserAssignments()  {
+	    return dataSecurityKeyRepository.getAlluserAssignments();
+    }
+
+
+
+    /**
 	 * 
 	 * @param user
 	 * @return
