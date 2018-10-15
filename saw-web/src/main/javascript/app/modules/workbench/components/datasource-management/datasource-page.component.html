@@ -35,23 +35,38 @@
           <div class="master-detail-caption">{{selectedSource | uppercase}}</div>
         </div>
         <div *dxTemplate="let data of 'nameTemplate'">
-          <a [innerHTML]="data.value"></a>
+          <div class="s-name">{{data.value}}</div>
         </div>
       </dx-data-grid>
 
       <mat-card fxFlex class="routes-card" fxLayout="column">
-        <div fxFlex="1 1 36px" fxLayout="row" fxLayoutGap="5px">
-          <div>{{selectedSourceData?.sourceName | uppercase}}</div>
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="9px" fxLayoutAlign="space-around center">
+          <div class="mat-body-1">
+            <span class="item-name">Source Name: &nbsp;</span>
+            <span class="item-value">{{selectedSourceData?.sourceName | uppercase}}</span>
+          </div>
           <span fxFlex></span>
-          <button mat-mini-fab class="mat-elevation-z2" color="secondary" (click)="editSource()" matTooltip="Edit Source">
-            <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
+          <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="testConnection()" matTooltip="Test Connectivity">
+            <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
-          <button mat-mini-fab class="mat-elevation-z3" color="secondary" (click)="editSource()" matTooltip="Delete Source">
-            <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
+          <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="editSource()" matTooltip="Edit Source">
+            <mat-icon fontIcon="icon-edit-solid"></mat-icon>
+          </button>
+          <button mat-mini-fab class="mat-elevation-z3" color="warn" (click)="editSource()" matTooltip="Delete Source">
+            <mat-icon fontIcon="icon-delete-solid"></mat-icon>
           </button>
           <button mat-raised-button color="primary" (click)="createRoute()">
             <span>+ Route</span>
           </button>
+        </div>
+        <div style="padding-top: 5px;">
+          <mat-divider></mat-divider>
+        </div>
+        <div>
+          <div class="mat-body-2">
+            <span class="item-name">Host Name: &nbsp;</span>
+            <span class="item-value">{{selectedSourceData?.hostName}}</span>
+          </div>
         </div>
       </mat-card>
     </div>

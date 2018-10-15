@@ -67,6 +67,12 @@ datasource-page {
       background-color: $background-color !important;
       border-bottom: 1px solid $primary-grey-g1;
     }
+
+    .s-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: $primary-blue-b1;
+    }
   }
 
   .routes-card {
@@ -76,6 +82,10 @@ datasource-page {
     .mat-mini-fab {
       height: 36px !important;
       width: 36px !important;
+    }
+
+    .item-name {
+      color: $primary-grey-g3;
     }
   }
 
