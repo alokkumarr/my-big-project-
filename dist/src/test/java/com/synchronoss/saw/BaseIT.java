@@ -1,12 +1,5 @@
 package com.synchronoss.saw;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -15,12 +8,20 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
+
+import java.util.regex.Pattern;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 public class BaseIT {
   @Rule
@@ -34,16 +35,16 @@ public class BaseIT {
 
     @BeforeClass
     public static void setUpClass() {
-        String host = System.getProperty("saw.docker.host");
-        String port = System.getProperty("saw.docker.port");
-        if (host == null) {
-            throw new RuntimeException("Property saw.docker.host unset");
-        }
-        if (port == null) {
-            throw new RuntimeException("Property saw.docker.port unset");
-        }
-        RestAssured.baseURI = "http://" + host + ":" + port + "/saw";
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+      String host = System.getProperty("saw.docker.host");
+      String port = System.getProperty("saw.docker.port");
+      if (host == null) {
+        throw new RuntimeException("Property saw.docker.host unset");
+      }
+      if (port == null) {
+        throw new RuntimeException("Property saw.docker.port unset");
+      }
+      RestAssured.baseURI = "http://" + host + ":" + port + "/saw";
+      RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
     }
     
 
