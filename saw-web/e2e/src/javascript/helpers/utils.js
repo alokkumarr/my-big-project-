@@ -65,11 +65,15 @@ function arrayContainsArray (superset, subset) {
     return (superset.indexOf(value) >= 0);
   });
 }
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 module.exports = {
   hasClass,
   doMdSelectOption,
   getMdSelectOptions,
   getMdSelectOptionsNew,
-  arrayContainsArray
+  arrayContainsArray,
+  getRandomInt
 };

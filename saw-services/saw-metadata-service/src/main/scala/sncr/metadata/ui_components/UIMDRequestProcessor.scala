@@ -184,7 +184,7 @@ object UIMDRequestProcessor{
 
   def getHandlerForRequest(document: String, printPretty: Boolean) : List[UIMDRequestProcessor] = {
     try {
-      val docAsJson = parse(document, false, false)
+      val docAsJson = parse(document, false)
       docAsJson.children.flatMap(reqSegment => {
         m_log trace "Process JSON: " + compact(render(reqSegment))
         reqSegment match {

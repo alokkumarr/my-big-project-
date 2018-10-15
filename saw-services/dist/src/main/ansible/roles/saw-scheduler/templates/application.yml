@@ -30,5 +30,8 @@ management:
     health:
       show-details: always
 
+sip:
+  service:
+    index: {{ groups['saw-services'].index(inventory_hostname) }}
 saw-analysis-service-url: http://localhost:9200/analysis
 saw-dispatch-service-url: http://localhost:9400/exports

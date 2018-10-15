@@ -10,7 +10,7 @@
         "type": "semantic",
         "module": "ANALYZE",
         "metric": "sample-elasticsearch",
-        "metricName": "Sample (pivot/chart) - new",
+        "metricName": "sample-elasticsearch",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
         "checked": "false",
@@ -95,7 +95,7 @@
         ],
         "esRepository": {
           "storageType":"ES",
-          "indexName":"sample",
+          "indexName":"sampleAlias",
           "type":"sample"
         },
         "artifacts": [

@@ -19,6 +19,7 @@ export class CreateSemanticComponent implements OnInit {
   public gridDataAvailableDS: any;
   public isSelected = false;
   public selectedDSData: any = [];
+  public contentHeight: number;
 
   constructor(public router: Router, public workBench: WorkbenchService) {}
 
@@ -28,6 +29,10 @@ export class CreateSemanticComponent implements OnInit {
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableDS = data;
       this.gridDataAvailableDS = cloneDeep(data);
+    });
+
+    setTimeout(() => {
+      this.contentHeight = window.innerHeight - 175;
     });
   }
 
@@ -66,5 +71,9 @@ export class CreateSemanticComponent implements OnInit {
   gotoValidate() {
     this.workBench.setDataToLS('selectedDS', this.selectedDSData);
     this.router.navigate(['workbench', 'semantic', 'validate']);
+  }
+
+  onResize(event) {
+    this.contentHeight = event.target.innerHeight - 165;
   }
 }

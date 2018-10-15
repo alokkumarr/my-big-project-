@@ -109,7 +109,7 @@ object QueryBuilder extends {
 
   private def column(artifactName: String, column: JValue) = {
     val aggregate = (column \ "aggregate")
-    if (!(aggregate ==JNothing || aggregate == None))
+    if (!(aggregate ==JNothing))
       aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
     else
     artifactName + "." + (column \ "columnName").extract[String]
@@ -377,8 +377,7 @@ object QueryBuilder extends {
       (orderBy \ name).extract[String]
     }
     val aggregate = (orderBy \ "aggregate")
-    if (aggregate!=null && aggregate!=None
-      && aggregate!= JNothing ) {
+    if (aggregate!=null && aggregate!= JNothing) {
       "%s(%s.%s) %s".format(
         property("aggregate"),
         property("tableName"),

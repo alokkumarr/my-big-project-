@@ -91,10 +91,8 @@ tr.dx-row.dx-header-row[role="row"] td[role="columnheader"] {
 }
 
 .dx-datagrid .dx-checkbox-indeterminate .dx-checkbox-icon:before {
-  width: 6px;
-  height: 6px;
-  left: 2px;
-  top: 2px;
+  left: 2px !important;
+  top: 2px !important;
   background-color: $primary-blue-b2 !important;
 }
 

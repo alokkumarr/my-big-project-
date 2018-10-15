@@ -143,6 +143,36 @@ exports.config = {
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
      */
+    critical: [
+      // login logout tests
+      testBaseDir + 'login.test.js',
+      testBaseDir + 'priviliges.test.js',
+      testBaseDir + 'analyze.test.js',
+      testBaseDir + 'createReport.test.js',
+      // charts tests
+      testBaseDir + 'charts/applyFiltersToCharts.js',
+      testBaseDir + 'charts/createAndDeleteCharts.test.js',
+      testBaseDir + 'charts/previewForCharts.test.js',
+      // chartEditFork tests
+      testBaseDir + 'charts/editAndDeleteCharts.test.js',
+      testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js',
+      // filters tests
+      testBaseDir + 'promptFilter/chartPromptFilters.test.js',
+      testBaseDir + 'promptFilter/esReportPromptFilters.test.js',
+      testBaseDir + 'promptFilter/pivotPromptFilters.test.js',
+      testBaseDir + 'promptFilter/reportPromptFilters.test.js',
+      // pivots tests
+      testBaseDir + 'pivots/pivotFilters.test.js',
+      // Observe module test cases
+      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilter.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
+    ],
     regression: [
       // login logout tests
       testBaseDir + 'login.test.js',

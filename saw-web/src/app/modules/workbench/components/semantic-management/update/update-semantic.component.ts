@@ -126,8 +126,8 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
    * @memberof UpdateSemanticComponent
    */
   updateSemantic() {
+    this.selectedDPDetails.artifacts = [];
     forIn(this.selectedDPData, ds => {
-      this.selectedDPDetails.artifacts = [];
       this.selectedDPDetails.artifacts.push({
         artifactName: ds.artifactName,
         columns: filter(ds.columns, 'include')

@@ -1,0 +1,19 @@
+cloud {
+    component [Client] as Client
+}
+
+package "SIP" {
+    interface HTTP as HTTPHaProxy
+
+    component [High Availability Proxy] as HaProxy
+    HTTPHaProxy - HaProxy
+
+    component [Service (instance #1)] as Service1
+    component [Service (instance #2)] as Service2
+    component [Service (instance #N)] as ServiceN
+    HaProxy --> [Service1] : health check
+    HaProxy --> [Service2] : health check
+    HaProxy --> [ServiceN] : health check
+}
+
+Client .> HTTPHaProxy
