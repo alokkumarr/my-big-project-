@@ -1,6 +1,5 @@
 package com.synchronoss.saw;
 
-
 import static io.restassured.RestAssured.given;
 
 import static org.hamcrest.Matchers.containsString;
@@ -365,7 +364,7 @@ public class WorkbenchIT extends BaseIT {
         .when().get(WORKBENCH_PATH + "/previews/" + previewId)
         .then().assertThat().statusCode(200)
         .body("status", equalTo("success"));
-//        .body("rows[0].field1", equalTo("foo"));
+    //        .body("rows[0].field1", equalTo("foo"));
   }
 
   @Test
@@ -409,7 +408,6 @@ public class WorkbenchIT extends BaseIT {
   }
 
   /**
-   *
    * Wait until preview becomes visible in Workbench Services, using
    * the given number of retries before timing out.
    *
