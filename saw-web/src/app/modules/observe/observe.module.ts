@@ -19,7 +19,6 @@ import { AnalyzeService } from '../analyze/services/analyze.service';
 import { FilterService } from '../analyze/services/filter.service';
 import {
   MenuService,
-  HeaderProgressService,
   ToastService,
   SideNavService
 } from '../../common/services';
@@ -113,7 +112,6 @@ const components = [
     UserService,
     AnalyzeService,
     MenuService,
-    HeaderProgressService,
     ToastService,
     SideNavService,
     FilterService

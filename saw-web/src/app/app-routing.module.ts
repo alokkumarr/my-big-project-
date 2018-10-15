@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { IsUserLoggedInGuard, DefaultModuleGuard } from './common/guards';
 import { MainPageComponent } from './layout';
-import { AdminModule } from './modules/admin';
-import { routes as AdminRoutes } from './modules/admin/routes';
 
 const routes: Routes = [
   {
@@ -13,12 +11,15 @@ const routes: Routes = [
     canActivateChild: [IsUserLoggedInGuard],
     // redirectTo: 'analyze',
     component: MainPageComponent,
-    pathMatch: 'full',
-    children: [...AdminRoutes]
+    pathMatch: 'full'
   },
   {
     path: 'workbench',
     loadChildren: './modules/workbench/workbench.module#WorkbenchModule'
+  },
+  {
+    path: 'admin',
+    loadChildren: './modules/admin/admin.module#AdminModule'
   },
   {
     path: 'observe',
@@ -40,7 +41,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    AdminModule,
     RouterModule.forRoot(routes, {
       useHash: true,
       onSameUrlNavigation: 'reload'

@@ -14,8 +14,6 @@ import { AnalyzeModuleGlobal } from './modules/analyze/analyze.global.module';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
 
-import { AdminModule } from './modules/admin';
-
 import {
   LayoutContentComponent,
   LayoutHeaderComponent,
@@ -41,8 +39,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     CommonModuleGlobal.forRoot(),
     AnalyzeModuleGlobal.forRoot(),
     FlexLayoutModule,
-    MaterialModule,
-    AdminModule
+    MaterialModule
   ],
   exports: [FlexLayoutModule],
   providers: [...SERVICES],

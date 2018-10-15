@@ -68,6 +68,7 @@ import {
   JwtService,
   ConfigService,
   WindowService,
+  HeaderProgressService,
   DynamicModuleService
 } from './services';
 
@@ -121,6 +122,7 @@ const DIRECTIVES = [
 
 const SERVICES = [
   SidenavMenuService,
+  HeaderProgressService,
   ErrorDetailService,
   ErrorDetailDialogService,
   ToastService,
