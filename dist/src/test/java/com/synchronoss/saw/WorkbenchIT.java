@@ -1,5 +1,11 @@
 package com.synchronoss.saw;
 
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,12 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.UUID;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
  * executing components.

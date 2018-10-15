@@ -1,5 +1,12 @@
 package com.synchronoss.saw;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,13 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 public class BaseIT {
   @Rule
