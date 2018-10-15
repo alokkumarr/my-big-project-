@@ -8,13 +8,14 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
+import java.util.regex.Pattern;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
-
-import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.startsWith;
@@ -33,19 +34,19 @@ public class BaseIT {
   protected ObjectMapper mapper;
   protected String token;
 
-    @BeforeClass
-    public static void setUpClass() {
-      String host = System.getProperty("saw.docker.host");
-      String port = System.getProperty("saw.docker.port");
-      if (host == null) {
-        throw new RuntimeException("Property saw.docker.host unset");
-      }
-      if (port == null) {
-        throw new RuntimeException("Property saw.docker.port unset");
-      }
-      RestAssured.baseURI = "http://" + host + ":" + port + "/saw";
-      RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+  @BeforeClass
+  public static void setUpClass() {
+    String host = System.getProperty("saw.docker.host");
+    String port = System.getProperty("saw.docker.port");
+    if (host == null) {
+      throw new RuntimeException("Property saw.docker.host unset");
     }
+    if (port == null) {
+      throw new RuntimeException("Property saw.docker.port unset");
+    }
+    RestAssured.baseURI = "http://" + host + ":" + port + "/saw";
+    RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+  }
     
 
   @Before

@@ -1,6 +1,5 @@
 package com.synchronoss.saw;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -158,14 +157,15 @@ public class WorkbenchIT extends BaseIT {
   }
 
   /**
+   * Returns the dataset specified by the dataset name
    *
-   * @param datasetId ID of the dataset without the projectId
+   * @param datasetName ID of the dataset without the projectId
    * @return Details of the dataset
    */
-  private String getDatasetById(String datasetId) {
+  private String getDatasetById(String datasetName) {
     Response response = given(authSpec)
         .when()
-        .get(WORKBENCH_PATH + "/datasets" + "/" + datasetId )
+        .get(WORKBENCH_PATH + "/datasets" + "/" + datasetName)
         .then()
         .assertThat()
         .statusCode(200)
@@ -179,13 +179,16 @@ public class WorkbenchIT extends BaseIT {
 
     return resp;
   }
+
   /**
    * Parse a CSV file into dataset with given name using Workbench
    * Services.
-   * @throws IOException
+   *
+   * @param name Dataset name
+   * @param fileName Location of the input file to be parsed
    */
-  private void parseDataset(String name, String fileName)
-        throws JsonProcessingException {
+
+  private void parseDataset(String name, String fileName) {
     log.info("parseDataset name : {}", name);
     ObjectNode root = mapper.createObjectNode();
     root.put("name", name);
@@ -213,39 +216,34 @@ public class WorkbenchIT extends BaseIT {
         .when().post(WORKBENCH_PATH + "/datasets")
         .then().assertThat().statusCode(200);
   }
+
   /**
-   * Wait until dataset becomes visible in Workbench Services, using
-   * the given number of retries before timing out.
+   * Waits for dataset to be created on datalake
+   *
+   * @param id Dataset ID
+   * @param retries Number of retries
    */
-  private void waitForDataset(String id, int retries)
-        throws JsonProcessingException {
+
+  private void waitForDataset(String id, int retries) {
     String status = getDatasetStatus(id);
     log.info("waitForDataset id : {}", id);
-    if (status == null
-        || status.equals("INIT")
-        || status.equals("IN-PROGRESS")
-        || status.equals("STARTED")) {
-        if (retries == 0) {
-            throw new RuntimeException(
-                "Timed out waiting while waiting for dataset");
-        }
-        log.debug("Waiting for dataset: id = {}, retries = {}",
-            id, retries);
-        try {
-            Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
-        } catch (InterruptedException e) {
-            log.debug("Interrupted");
-        }
-        waitForDataset(id, retries - 1);
-    } else if (!status.equals("SUCCESS")
-        && !status.equals("FAILED")
-        && !status.equals("PARTIAL")) {
-        throw new RuntimeException(
-            "Unknown dataset status: " + status);
+    if (status == null || status.equals("INIT") || status.equals("IN-PROGRESS") || status.equals("STARTED")) {
+      if (retries == 0) {
+        throw new RuntimeException("Timed out waiting while waiting for dataset");
+      }
+      log.debug("Waiting for dataset: id = {}, retries = {}", id, retries);
+      try {
+        Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
+      } catch (InterruptedException e) {
+        log.debug("Interrupted");
+      }
+      waitForDataset(id, retries - 1);
+    } else if (!status.equals("SUCCESS") && !status.equals("FAILED") && !status.equals("PARTIAL")) {
+      throw new RuntimeException("Unknown dataset status: " + status);
     } else if (status.equals("SUCCESS")) {
-        log.info("XDF successfully completed.");
+      log.info("XDF successfully completed.");
     } else if (status.equals("FAILED")) {
-        log.info("XDF failed.");
+      log.info("XDF failed.");
     } else {
         log.info("XDF partially succeeded.");
     }
@@ -254,11 +252,13 @@ public class WorkbenchIT extends BaseIT {
   /* Dataset is in SUCCESS state, so return */
 
 
-  /**
-   * Get the status of a dataset in the Workbench Service.
-   */
-  private String getDatasetStatus(String id)
-        throws JsonProcessingException {
+    /**
+     * Get the status of a dataset in the Workbench Service.
+     *
+     * @param id Dataset ID
+     * @return Status of the dataset
+     */
+  private String getDatasetStatus(String id) {
     String datasetPath = "find { it._id == '" + id + "' }";
     String statusPath = datasetPath + ".asOfNow.status";
     Response response = given(authSpec)
@@ -293,12 +293,12 @@ public class WorkbenchIT extends BaseIT {
   }
 
   @Test
-  public void testSQLDataset() throws IOException {
+  public void testSqlDataset() throws IOException {
     String name = "test-sql-" + testId();
     /* Use only characters suitable for a SQL table name */
     name = name.replace("-", "_");
     /* Execute SQL */
-    executeSQLDataset(name);
+    executeSqlDataset(name);
     /* Workaround: Until the dataset creation API provides the
      * dataset ID, construct it manually here. */
     String id = "workbench::" + name;
@@ -308,10 +308,10 @@ public class WorkbenchIT extends BaseIT {
   /**
    * Execute SQL on a dataset with given name using Workbench
    * Services.
-   * @throws IOException
+   *
+   * @param name Name of the dataset
    */
-  private void executeSQLDataset(String name)
-        throws IOException {
+  private void executeSqlDataset(String name) {
     String inputName = "test-parse-" + testId();
     /* Use only characters suitable for a SQL table name */
     inputName = inputName.replace("-", "_");
@@ -342,8 +342,7 @@ public class WorkbenchIT extends BaseIT {
     viewDataset(name);
   }
 
-  private void viewDataset(String name)
-        throws JsonProcessingException {
+  private void viewDataset(String name) {
     ObjectNode root = mapper.createObjectNode();
     root.put("name", name);
     Response response = given(authSpec)
@@ -367,7 +366,8 @@ public class WorkbenchIT extends BaseIT {
   public void testListDatasets() {
     /* Note: Placeholder for Workbench list datasets integration
      * test.  To be done: Create a dataset and then make
-     * assertions on it when listing available datasets. */
+     * assertions on it when listing available datasets.
+     */
     given(authSpec)
         .when().get(WORKBENCH_PATH + "/datasets")
         .then().assertThat().statusCode(200)
@@ -402,33 +402,34 @@ public class WorkbenchIT extends BaseIT {
         .body("rows[0].field1", equalTo("foo"));
   }
 
-  /**
-   * Wait until preview becomes visible in Workbench Services, using
-   * the given number of retries before timing out.
-   */
-  private void waitForPreview(String id, int retries)
-        throws JsonProcessingException {
+    /**
+     *
+     * Wait until preview becomes visible in Workbench Services, using
+     * the given number of retries before timing out.
+     * @param id ID of the dataset
+     * @param retries Number of retries
+     */
+  private void waitForPreview(String id, int retries) {
     Response response = given(authSpec)
         .when().get(WORKBENCH_PATH + "/previews/" + id)
         .then().assertThat().statusCode(200)
         .extract().response();
     String status = response.path("status");
     if (status.equals("success")) {
-        return;
+      return;
     } else if (!status.equals("queued")) {
-        throw new RuntimeException("Unknown preview status: " + status);
+      throw new RuntimeException("Unknown preview status: " + status);
     }
     /* Preview not found yet, so wait more */
     if (retries == 0) {
-        throw new RuntimeException(
-            "Timed out waiting while waiting for preview");
+      throw new RuntimeException("Timed out waiting while waiting for preview");
     }
-    log.debug("Waiting for preview: id = {}, retries = {}",
-        id, retries);
+    log.debug("Waiting for preview: id = {}, retries = {}", id, retries);
+
     try {
-        Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
+      Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
     } catch (InterruptedException e) {
-        log.debug("Interrupted");
+      log.debug("Interrupted");
     }
     waitForPreview(id, retries - 1);
   }
@@ -436,6 +437,8 @@ public class WorkbenchIT extends BaseIT {
   /**
    * Generate ID suitable for use as suffix in dataset names to ensure
    * each test gets a unique dataset name.
+   *
+   * @return Randomly generated test ID which will be used for dataset id creation
    */
   private String testId() {
     return UUID.randomUUID().toString();
