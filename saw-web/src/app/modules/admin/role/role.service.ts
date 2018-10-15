@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AdminService } from '../main-view/admin.service';
 import { IAdminDataService } from '../admin-data-service.interface';
+import { map } from 'rxjs/operators';
 
 interface RolesResponse {
   roles: any[];
@@ -10,14 +11,12 @@ interface RolesResponse {
 
 @Injectable()
 export class RoleService implements IAdminDataService {
-
-  constructor(
-    public _adminService: AdminService
-  ) {}
+  constructor(public _adminService: AdminService) {}
 
   getList(customerId) {
-    return this._adminService.request<RolesResponse>('roles/fetch', customerId)
-      .map(resp => resp.roles)
+    return this._adminService
+      .request<RolesResponse>('roles/fetch', customerId)
+      .pipe(map(resp => resp.roles))
       .toPromise();
   }
 
@@ -25,8 +24,9 @@ export class RoleService implements IAdminDataService {
     const options = {
       toast: { successMsg: 'Role is successfully added' }
     };
-    return this._adminService.request<RolesResponse>('roles/add', user, options)
-      .map(resp => resp.valid ? resp.roles : null)
+    return this._adminService
+      .request<RolesResponse>('roles/add', user, options)
+      .pipe(map(resp => (resp.valid ? resp.roles : null)))
       .toPromise();
   }
 
@@ -34,8 +34,9 @@ export class RoleService implements IAdminDataService {
     const options = {
       toast: { successMsg: 'Role is successfully deleted' }
     };
-    return this._adminService.request<RolesResponse>('roles/delete', user, options)
-      .map(resp => resp.valid ? resp.roles : null)
+    return this._adminService
+      .request<RolesResponse>('roles/delete', user, options)
+      .pipe(map(resp => (resp.valid ? resp.roles : null)))
       .toPromise();
   }
 
@@ -43,13 +44,15 @@ export class RoleService implements IAdminDataService {
     const options = {
       toast: { successMsg: 'Role is successfully Updated' }
     };
-    return this._adminService.request<RolesResponse>('roles/edit', user, options)
-      .map(resp => resp.valid ? resp.roles : null)
+    return this._adminService
+      .request<RolesResponse>('roles/edit', user, options)
+      .pipe(map(resp => (resp.valid ? resp.roles : null)))
       .toPromise();
   }
 
   getRoleTypes(customerId) {
-    return this._adminService.request<RolesResponse>('roles/types/list', customerId)
-      .map(resp => resp.roles);
+    return this._adminService
+      .request<RolesResponse>('roles/types/list', customerId)
+      .pipe(map(resp => resp.roles));
   }
 }

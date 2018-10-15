@@ -24,12 +24,6 @@ import {
 } from '../../common/services';
 import { ObserveService } from './services/observe.service';
 
-import {
-  AddTokenInterceptor,
-  HandleErrorInterceptor,
-  RefreshTokenInterceptor
-} from '../../common/interceptor';
-
 import { UChartModule } from '../../common/components/charts';
 
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
@@ -95,17 +89,6 @@ const components = [
   entryComponents: components,
   exports: [DxDataGridModule, DxDataGridComponent, DxTemplateModule],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HandleErrorInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RefreshTokenInterceptor,
-      multi: true
-    },
     DashboardService,
     ObserveService,
     JwtService,

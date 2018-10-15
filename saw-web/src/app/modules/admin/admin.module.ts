@@ -30,11 +30,6 @@ import {
   PrivilegeRowComponent
 } from './privilege';
 import { JwtService } from '../../common/services';
-import {
-  AddTokenInterceptor,
-  HandleErrorInterceptor,
-  RefreshTokenInterceptor
-} from '../../common/interceptor';
 import { SidenavMenuService } from '../../common/components/sidenav';
 import {
   DxDataGridService,
@@ -62,20 +57,6 @@ const COMPONENTS = [
   AdminImportFileListComponent
 ];
 
-const INTERCEPTORS = [
-  { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: HandleErrorInterceptor,
-    multi: true
-  },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: RefreshTokenInterceptor,
-    multi: true
-  }
-];
-
 const GUARDS = [isAdminGuard, GoToDefaultAdminPageGuard];
 
 const SERVICES = [
@@ -96,7 +77,7 @@ const SERVICES = [
   imports: [CommonModuleTs, RouterModule.forChild(routes)],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [...INTERCEPTORS, ...SERVICES, ...GUARDS],
+  providers: [...SERVICES, ...GUARDS],
   exports: [AdminPageComponent]
 })
 export class AdminModule {}
