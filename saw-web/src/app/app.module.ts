@@ -15,7 +15,6 @@ import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AdminModule } from './modules/admin';
-import { WorkbenchUpgradeModule } from './modules/workbench';
 
 import {
   LayoutContentComponent,
@@ -43,7 +42,6 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     AnalyzeModuleGlobal.forRoot(),
     FlexLayoutModule,
     MaterialModule,
-    WorkbenchUpgradeModule,
     AdminModule
   ],
   exports: [FlexLayoutModule],

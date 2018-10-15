@@ -114,4 +114,4 @@ const SERVICES = [
   entryComponents: COMPONENTS,
   providers: [...SERVICES, ...GUARDS]
 })
-export class WorkbenchUpgradeModule {}
+export class WorkbenchModule {}

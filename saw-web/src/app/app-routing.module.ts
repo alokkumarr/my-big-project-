@@ -3,8 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { IsUserLoggedInGuard, DefaultModuleGuard } from './common/guards';
 import { MainPageComponent } from './layout';
 import { AdminModule } from './modules/admin';
-import { WorkbenchUpgradeModule } from './modules/workbench';
-import { routes as WorkbenchRoutes } from './modules/workbench/routes';
 import { routes as AdminRoutes } from './modules/admin/routes';
 
 const routes: Routes = [
@@ -16,7 +14,11 @@ const routes: Routes = [
     // redirectTo: 'analyze',
     component: MainPageComponent,
     pathMatch: 'full',
-    children: [...WorkbenchRoutes, ...AdminRoutes]
+    children: [...AdminRoutes]
+  },
+  {
+    path: 'workbench',
+    loadChildren: './modules/workbench/workbench.module#WorkbenchModule'
   },
   {
     path: 'observe',
@@ -39,7 +41,6 @@ const routes: Routes = [
 @NgModule({
   imports: [
     AdminModule,
-    WorkbenchUpgradeModule,
     RouterModule.forRoot(routes, {
       useHash: true,
       onSameUrlNavigation: 'reload'
