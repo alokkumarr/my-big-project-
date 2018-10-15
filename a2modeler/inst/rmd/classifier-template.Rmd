@@ -12,7 +12,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, error = TRUE, 
                       warning = FALSE,  message = FALSE,
-                      fig.align = "center", fig.width = 9, fig.height = 5)
+                      fig.align = "center", fig.width = 10, fig.height = 5)
 ```
 
 ## Version Notes
@@ -25,7 +25,7 @@ knitr::opts_chunk$set(echo = FALSE, error = TRUE,
 # Path to dataset
 dataset_path <- "CHANGEME"
 
-# Name to assign to Data
+# Name to assign to Data (no hyphens)
 dataset_name <- "df"
 
 # Dataset type
@@ -36,21 +36,21 @@ dataset_type <- "CHANGEME"
 
 ```{r inputs, eval = FALSE}
 
-## Regressor Configuration Inputs 
+## Classifier Configuration Inputs 
 
 # target variable name
 target <- "changeme"
 
-# Optional Regressor name
+# Optional Classifier name
 name <- NULL
 
-# Optional Regressor Unique ID
-uid <- sparklyr::random_string("regressor")
+# Optional Classifier Unique ID
+uid <- sparklyr::random_string("classifier")
 
-# Optional Regressor Version 
+# Optional Classifier Version 
 version <- NULL
 
-# Optional Description of Regressor
+# Optional Description of Classifier
 desc <- NULL
 
 # Optional Input for Data Scientist Author
@@ -82,87 +82,6 @@ deploy_path <- "changeme"
 
 
 
-
-```{r classifier-creation, eval = FALSE}
-
-# Create Classifier
-c1 <- classifier(df,
-                target,
-                name = name,
-                uid = uid,
-                version = version,
-                desc = desc,
-                scientist = scientist,
-                execution_strategy = execution_strategy,
-                refit = refit,
-                save_submodels = save_submodels,
-                seed = seed)
-```
-
-
-```{r measure, eval = FALSE}
-
-# Set Measure. AUC is default
-c1 <- set_measure(c1, AUC)
-
-```
-
-
-```{r sampling, eval = FALSE}
-
-# Set Sampling Method. Options include cross_validation, holdout, random or
-# default
-c1 <- add_holdout_samples(c1, splits = c(.6, .2, .2))
-
-```
-
-
-```{r feature-generation, eval = FALSE}
-
-# Create one or more feature generation pipelines. Each can be applied in one or
-# more models
-feature_pipe1 <- pipeline(expr = identity,
-                          uid  = "Feature-Pipe-1",
-                          desc = "")
-
-```
-
-
-```{r models, eval = FALSE}
-
-# Add Classification Models
-c1 <- c1 %>% 
-  add_model(., 
-            method = "ml_logistic_regression",
-            pipe = feature_pipe1,
-            param_map = list(standardization = TRUE),
-            uid = "logistic-baseline",
-            desc = "Simple logistic model to create baseline prediction accuracy")
-```
-
-
-```{r train-models, eval = FALSE}
-
-# Train models
-c1 <- train_models(c1)
-
-```
-
-
-```{r set-final, eval = FALSE}
-
-# Set Final Model 
-c1 <- set_final_model(c1, "best", reevaluate = TRUE, refit = TRUE)
-```
-
-
-```{r set-final, eval = FALSE}
-
-# Set Final Model 
-c1 <- set_final_model(c1, "best", reevaluate = TRUE, refit = TRUE)
-```
-
-
 ```{r r-config, eval = FALSE}
 
 ## R Configuration Parameters
@@ -171,7 +90,7 @@ c1 <- set_final_model(c1, "best", reevaluate = TRUE, refit = TRUE)
 lib_path <- .libPaths()[1]
 
 # R packages
-packages <- c("a2munge", "a2modeler", "a2charter", "sparklyr", "dplyr", "purrr", "ggplot2", "rlang", "tidyr")
+packages <- c("a2munge", "a2modeler", "a2charter", "sparklyr", "dplyr", "purrr", "ggplot2", "rlang", "tidyr", "DT", "knitr", "gridExtra")
 
 
 ```
@@ -230,6 +149,79 @@ if(spark) {
 ```
 
 
+```{r classifier-creation, eval = FALSE}
+
+# Create Classifier
+c1 <- classifier(df,
+                 target,
+                 name = name,
+                 uid = uid,
+                 version = version,
+                 desc = desc,
+                 scientist = scientist,
+                 execution_strategy = execution_strategy,
+                 refit = refit,
+                 save_submodels = save_submodels,
+                 seed = seed)
+```
+
+
+```{r measure, eval = FALSE}
+
+# Set Measure. AUC is default
+c1 <- set_measure(c1, AUC)
+
+```
+
+
+```{r sampling, eval = FALSE}
+
+# Set Sampling Method. Options include cross_validation, holdout, random or
+# default
+c1 <- add_holdout_samples(c1, splits = c(.6, .2, .2))
+
+```
+
+
+```{r feature-generation, eval = FALSE}
+
+# Create one or more feature generation pipelines. Each can be applied in one or
+# more models
+feature_pipe1 <- pipeline(expr = identity,
+                          uid  = "Feature-Pipe-1",
+                          desc = "")
+
+```
+
+
+```{r models, eval = FALSE}
+
+# Add Classification Models
+c1 <- c1 %>% 
+  add_model(., 
+            method = "ml_logistic_regression",
+            pipe = feature_pipe1,
+             param_map = list(),
+            uid = "logistic-baseline",
+            desc = "Simple logistic model to create baseline prediction accuracy")
+```
+
+
+```{r train-models, eval = FALSE}
+
+# Train models
+c1 <- train_models(c1)
+
+```
+
+
+```{r set-final, eval = FALSE}
+
+# Set Final Model 
+c1 <- set_final_model(c1, "best", reevaluate = TRUE, refit = TRUE)
+```
+
+
 ```{r model-deploy, eval = FALSE}
 
 # Deploy Model
@@ -274,9 +266,9 @@ cat("###", "Input Data:", dataset_name,"\n")
 # Datatable with sample records
 c1$data %>% 
   collecter(sample = TRUE, method = "head", size = 100) %>% 
-  DT::datatable(.,
-                options = list(scrollX = TRUE),
-                caption = paste(dataset_name, "Sample Records"))
+  datatable(.,
+            options = list(scrollX = TRUE),
+            caption = paste(dataset_name, "Sample Records"))
 ```
 
 
@@ -288,11 +280,12 @@ cat("###", "Target:", c1$target,"\n")
 
 ```{r target-summary, echo=FALSE}
 df %>%
-  dplyr::count(target) %>% 
-  dplyr::mutate(percent = n/sum(n)) %>% 
-  knitr::kable(., 
-               digits = 3,
-               caption = paste(paste0(c1$name, ":"), c1$target, "Summary"))
+  count(!! sym(c1$target)) %>% 
+  mutate(percent = n/sum(n)) %>% 
+  collect() %>%
+  kable(., 
+        digits = 3,
+        caption = paste(paste0(c1$name, ":"), c1$target, "Summary"))
 ```
 
 
@@ -339,11 +332,11 @@ for(i in seq_along(c1$models)) {
 
 ```{r leaderboard}
 c1$performance %>% 
-  dplyr::select(model_uid, pipeline_uid, method, param_grid, sample, !!c1$measure$method) %>% 
-  dplyr::arrange_at(c1$measure$method) %>% 
-  knitr::kable(.,
-               digits = 3,
-               caption = paste(c1$name, "Model Leaderboard"))
+  select(model_uid, pipeline_uid, method, param_grid, sample, !!c1$measure$method) %>% 
+  arrange_at(c1$measure$method) %>% 
+  kable(.,
+        digits = 3,
+        caption = paste(c1$name, "Model Leaderboard"))
 ```
 
 
@@ -366,11 +359,11 @@ cat("\n")
 
 c1$final_model$fit$stages[[2]]$param_map %>%
   as.data.frame() %>%
-  tidyr::gather(key = "parameter") %>% 
-  dplyr::filter(! grepl("_col|seed", parameter)) %>% 
-  knitr::kable(.,
-               table.attr = "style='width:30%;'",
-               caption = "Final Model Parameters")
+  gather(key = "parameter") %>% 
+  filter(! grepl("_col|seed", parameter)) %>% 
+  kable(.,
+        table.attr = "style='width:30%;'",
+        caption = "Final Model Parameters")
 ```
 
 
@@ -390,18 +383,23 @@ if(! is.null(c1$samples$test_holdout_prct)) {
   
   # Test Predictions with Actuals
   tpdf <- c1$final_model$test_predictions %>% 
-    a2munge::collecter(., sample = FALSE) 
+    collecter(., sample = FALSE) 
   
   pred_var <- colnames(tpdf)[1] 
   
   # count table
   t1 <- tpdf %>% 
-    dplyr::select(!!sym(pred_var), !!sym(c1$target)) %>% 
+    select(!!sym(pred_var), !!sym(c1$target)) %>% 
     table(.)
-  addmargins(t1, c(1,2))
+ 
+  cat("Confusion Matrix Counts:\n")
+  print(addmargins(t1, c(1, 2)))
+  cat("\n")
   
   # prop table
-  round(addmargins(prop.table(t1), c(1,2)), 3)
+  cat("Confusion Matrix Rates:\n")
+  print(round(addmargins(prop.table(t1), c(1,2)), 3))
+  cat("\n\n")
   
   # Confusion Matrix Counts
   cm <- tpdf %>% 
@@ -413,9 +411,9 @@ if(! is.null(c1$samples$test_holdout_prct)) {
       !!sym(pred_var) == 1 & !!sym(c1$target) == 0 ~ "FP",
       !!sym(pred_var) == 1 & !!sym(c1$target) == 1 ~ "TP")) %>% 
     select(-!!sym(pred_var), -!!sym(c1$target)) %>% 
-    a2munge::expander(., fun = funs(label = c("TN", "FN", "FP", "TP"))) %>% 
-    tidyr::replace_na(list(n = 0)) %>% 
-    tidyr::spread(key = "label", value = "n", drop=T, fill=0)
+    expander(., fun = funs(label = c("TN", "FN", "FP", "TP"))) %>% 
+    replace_na(list(n = 0)) %>% 
+    spread(key = "label", value = "n", drop=T, fill=0)
   
   tibble(metric = "Sensitivity", value = cm$TP/(cm$TP + cm$FN)) %>% 
     add_row(metric = "Specificity", value = cm$TN/(cm$TN + cm$FP)) %>% 
@@ -425,9 +423,9 @@ if(! is.null(c1$samples$test_holdout_prct)) {
     add_row(metric = "Accuracy", value = (cm$TP + cm$TN) / sum(cm)) %>% 
     add_row(metric = "Threshold", value = c1$final_model$fit$stages[[2]]$threshold) %>% 
     add_row(metric = "No Info Rate", value = max(cm$FP+cm$TP, cm$FN+cm$TN) / sum(cm)) %>% 
-    knitr::kable(.,
-                 digits = 3,
-                 caption = "Confusion Matrix Metrics")
+    kable(.,
+          digits = 3,
+          caption = "Confusion Matrix Metrics")
 }
 ```
 
@@ -451,13 +449,13 @@ if(! is.null(c1$samples$test_holdout_prct)) {
           total = tp + fp + fn + tn) 
   
   roc %>%
-   a2charter::gg_line_chart("fpr", "tpr", 
-                 title = "ROC Curve",
-                 subtitle = paste("Model:", c1$final_model$uid),
-                 x_axis_title = "False Positive Rate (1 - Specificity)",
-                 y_axis_title = "True Positive Rate (Sensitivity)") +
-     ggplot2::geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1),
-                         linetype = 5, color = "grey50", size = 1.05) 
+    gg_line_chart("fpr", "tpr", 
+                  title = "ROC Curve",
+                  subtitle = paste("Model:", c1$final_model$uid),
+                  x_axis_title = "False Positive Rate (1 - Specificity)",
+                  y_axis_title = "True Positive Rate (Sensitivity)") +
+    geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1),
+                 linetype = 5, color = "grey50", size = 1.05) 
 }
 ```
 
@@ -469,57 +467,57 @@ if(! is.null(c1$samples$test_holdout_prct)) {
   # Calculate Gain & Lifts
   bin_n <- 10
   gains <- roc %>% 
-    dplyr::mutate(bin = ntile(n, bin_n)) %>% 
-    dplyr::group_by(bin) %>% 
-    dplyr::summarise(n  = n(),
-                     tp = sum(!!sym(c1$target))) %>% 
-    dplyr::ungroup() %>% 
-    dplyr::mutate(decile = cumsum(n) / sum(n),
-                  cumtp  = cumsum(tp), 
-                  gain   = cumtp / sum(tp),
-                  lift   = gain / decile)
+    mutate(bin = ntile(n, bin_n)) %>% 
+    group_by(bin) %>% 
+    summarise(n  = n(),
+              tp = sum(!!sym(c1$target))) %>% 
+    ungroup() %>% 
+    mutate(decile = cumsum(n) / sum(n),
+           cumtp  = cumsum(tp), 
+           gain   = cumtp / sum(tp),
+           lift   = gain / decile)
   
-  p1 <- a2charter::gg_line_chart(gains, 
-                                 x_variable = "decile",
-                                 y_variable = "gain",
-                                 points = TRUE,
-                                 point_args = list(size=3, shape=1),
-                                 title = "Gains Chart",
-                                 subtitle = paste("Model:", c1$final_model$uid),
-                                 x_axis_title = "% of Test Holdout Sample",
-                                 y_axis_title = "Gain (% of Positive Class)",
-                                 caption = "Sample ordered by positive class probability") +
-    ggplot2::geom_ribbon(aes(ymin = decile, ymax = gain), fill = sncr_cols(1), alpha=.2) +
-    ggplot2::geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1),
-                         linetype = 5, color = "grey50", size = 1.05) +
-    ggplot2::scale_x_continuous(limits = c(0, 1), breaks = round(gains$decile, 2)) +
-    ggplot2::scale_y_continuous(limits = c(0, 1))
+  p1 <- gg_line_chart(gains, 
+                      x_variable = "decile",
+                      y_variable = "gain",
+                      points = TRUE,
+                      point_args = list(size=3, shape=1),
+                      title = "Gains Chart",
+                      subtitle = paste("Model:", c1$final_model$uid),
+                      x_axis_title = "% of Test Holdout Sample",
+                      y_axis_title = "Gain (% of Positive Class)",
+                      caption = "Sample ordered by positive class probability") +
+    geom_ribbon(aes(ymin = decile, ymax = gain), fill = sncr_cols(1), alpha=.2) +
+    geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1),
+                 linetype = 5, color = "grey50", size = 1.05) +
+    scale_x_continuous(limits = c(0, 1), breaks = round(gains$decile, 2)) +
+    scale_y_continuous(limits = c(0, 1))
   
-  p2 <- a2charter::gg_line_chart(gains, 
-                                 x_variable = "decile",
-                                 y_variable = "lift",
-                                 color = sncr_cols(9),
-                                 points = TRUE,
-                                 point_args = list(size=3, shape=1, color=sncr_cols(9)),
-                                 title = "Lift Chart",
-                                 subtitle = paste("Model:", c1$final_model$uid),
-                                 x_axis_title = "% of Test Holdout Sample",
-                                 y_axis_title = "Lift (% of Target Identified over Random)",
-                                 caption = "Sample ordered by positive class probability") +
-    ggplot2::geom_ribbon(aes(ymin = 1, ymax = lift), fill = sncr_cols(9), alpha=.2) +
-    ggplot2::scale_x_continuous(limits = c(0, 1), breaks = round(gains$decile, 2)) 
+  p2 <- gg_line_chart(gains, 
+                      x_variable = "decile",
+                      y_variable = "lift",
+                      color = sncr_cols(9),
+                      points = TRUE,
+                      point_args = list(size=3, shape=1, color=sncr_cols(9)),
+                      title = "Lift Chart",
+                      subtitle = paste("Model:", c1$final_model$uid),
+                      x_axis_title = "% of Test Holdout Sample",
+                      y_axis_title = "Lift (% of Target Identified over Random)",
+                      caption = "Sample ordered by positive class probability") +
+    geom_ribbon(aes(ymin = 1, ymax = lift), fill = sncr_cols(9), alpha=.2) +
+    scale_x_continuous(limits = c(0, 1), breaks = round(gains$decile, 2)) 
   
   gridExtra::grid.arrange(p1, p2, ncol = 2)
   
   gains %>% 
-    dplyr::rename(!!quo_name(paste('Cumulated', c1$target)) := cumtp,
+    rename(!!quo_name(paste('Cumulated', c1$target)) := cumtp,
            !!quo_name(c1$target) := tp) %>%
-    dplyr::select(bin, decile, n,
-                  !!sym(c1$target), !!sym(paste('Cumulated', c1$target)),
-                  gain, lift) %>% 
-    knitr::kable(., 
-                 digits = 3,
-                 caption = "Gains Table")
+    select(bin, decile, n,
+           !!sym(c1$target), !!sym(paste('Cumulated', c1$target)),
+           gain, lift) %>% 
+    kable(., 
+          digits = 3,
+          caption = "Gains Table")
 }
 
 ```
@@ -529,7 +527,7 @@ if(! is.null(c1$samples$test_holdout_prct)) {
 
 if(deploy_model) {
   cat("### Deployment\n\n")
-  cat("*", r1$name, "saved here:", paste0("_", deploy_path, "_"))
+  cat("*", c1$name, "saved here:", paste0("_", deploy_path, "_"))
   cat("\n")
 }
 ```
@@ -539,7 +537,7 @@ if(deploy_model) {
 
 ## Configuration
 
-```{r regressor-config, echo=TRUE, eval=FALSE, ref.label=c('inputs', 'classifier-creation', 'measure', 'sampling', 'feature-generation', 'models', 'train-models', 'set-final')}
+```{r classifier-config, echo=TRUE, eval=FALSE, ref.label=c('inputs', 'classifier-creation', 'measure', 'sampling', 'feature-generation', 'models', 'train-models', 'set-final')}
 
 ```
 
