@@ -10,12 +10,20 @@ import sncr.xdf.services.NGContextServices;
 
 
 
-public class XDFContextProvider {
+public class XdfContextProvider {
 
   private final NGContextServices ngCtxSvc;
 
-
-  public XDFContextProvider(@NotNull String root, String project, String component, String config)
+  /**
+   * Provides context to the called component.
+   *
+   * @param root XDF Root location
+   * @param project Project ID
+   * @param component Name of the component
+   * @param config Component configuration
+   * @throws Exception Throws exception when when ngCtcSvc is null
+   */
+  public XdfContextProvider(@NotNull String root, String project, String component, String config)
       throws Exception {
     String batch = "batch-" + Instant.now().toEpochMilli();
     ComponentConfiguration cfg = null;
@@ -53,7 +61,7 @@ public class XDFContextProvider {
     return ngCtxSvc.getNgctx().registeredOutputDSIds;
   }
 
-  public NGContext getNGContext() {
+  public NGContext getNgContext() {
     return ngCtxSvc.getNgctx();
   }
 }
