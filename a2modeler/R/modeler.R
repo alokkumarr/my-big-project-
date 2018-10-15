@@ -97,6 +97,10 @@ valid_modeler <- function(obj){
     stop("df input class not supported. modeler supports only data.frame and tbl_spark objects")
   }
   
+  if("rn" %in% colnames(obj$data)) {
+    stop("data input contains column name 'rn' which conflicts with internal data processing.\n Please update column name or remove")
+  }
+  
   obj
 }
 
@@ -303,7 +307,7 @@ deploy <- function(obj, path, ...) {
   }
   
   # Create directory & write modeler and Final Model
-  dir.create(modeler_path)
+  dir.create(modeler_path, recursive = TRUE)
   if("spark_model" %in% class(obj$final_model)) {
     sparklyr::ml_save(obj$final_model$fit, model_path)
   }
@@ -577,7 +581,7 @@ print.modeler <- function(obj, ...) {
   cat("---------------------------- \n")
   cat(obj$name, obj$type, "\n")
   cat("---------------------------- \n\n")
-  cat("uid:         ", obj$uid, "\n")
+  cat("uid:        ", obj$uid, "\n")
   cat("version:    ", obj$version, "\n")
   cat("created on: ", as.character(obj$created_on), "\n")
   cat("created by: ", obj$scientist, "\n")
