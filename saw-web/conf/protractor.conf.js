@@ -17,7 +17,7 @@ var argv = require('yargs').argv;
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 500000;
+const pageLoadTimeout = webpackHelper.distRun() ? 300000 : 150000;
 
 /**
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
@@ -234,7 +234,7 @@ exports.config = {
 
 
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
-    browser.manage().timeouts().implicitlyWait(implicitlyWait);
+    browser.manage().timeouts().implicitlyWait(2000);
 
     let jasmineReporters = require('jasmine-reporters');
     let junitReporter = new jasmineReporters.JUnitXmlReporter({
@@ -279,6 +279,14 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
+    //clean up any residual/leftover from a previous run. Ensure we have clean
+    //files for both locking and merging.
+    if (fs.existsSync('jasmine-results.json.lock')) {
+      fs.unlinkSync('jasmine-results.json.lock');
+    }
+    if (fs.existsSync('jasmine-results.json')) {
+      fs.unlink('jasmine-results.json');
+    }
     //console.log('beforeLaunch....generating the testdata...')
     // Generate test data
     if(webpackHelper.getSawWebUrl()) {
