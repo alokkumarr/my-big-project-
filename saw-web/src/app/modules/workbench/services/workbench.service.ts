@@ -55,7 +55,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig).pipe(
       catchError((e: any) => {
-        return Observable.of(e);
+        return of(e);
       })
     );
   }

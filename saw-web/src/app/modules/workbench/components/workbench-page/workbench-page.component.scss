@@ -16,25 +16,3 @@
 .dx-freespace-row {
   height: 0 !important;
 }
-
-.mat-tab-label-active {
-  color: $primary-blue-b2;
-}
-
-.mat-tab-body-wrapper {
-  height: 100%;
-
-  .mat-tab-body {
-    overflow: hidden !important;
-
-    .mat-tab-body-content {
-      overflow: hidden !important;
-    }
-  }
-}
-
-.mat-tab-label,
-.mat-tab-link {
-  font-size: 17px;
-  font-weight: 600;
-}

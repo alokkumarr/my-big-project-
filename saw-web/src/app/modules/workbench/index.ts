@@ -105,7 +105,7 @@ const SERVICES = [
     DxDataGridModule,
     DxTemplateModule,
     FlexLayoutModule,
-    TreeModule,
+    TreeModule.forRoot(),
     AceEditorModule,
     AngularSplitModule,
     CommonModuleTs

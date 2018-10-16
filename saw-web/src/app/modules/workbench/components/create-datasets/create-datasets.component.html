@@ -9,7 +9,7 @@
     <mat-step e2e="create-dataset-first-window" [completed]="selectFullfilled" i18n label="SELECT">
       <select-rawdata (onSelectFullfilled)="markSelectDone($event)"></select-rawdata>
       <div fxLayout="row" fxLayoutGap="20px">
-        <button e2e="first-window-stepperCancel" mat-stroked-button (click)="backtoLists()" class="stepperBtn Outline">
+        <button e2e="first-window-stepperCancel" mat-stroked-button (click)="backtoLists()" color="warn" class="stepperBtn">
           <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
@@ -22,7 +22,7 @@
     <mat-step e2e="create-dataset-second-window" [completed]="detailsFilled" i18n label="DETAILS">
       <dataset-details #detailsComponent [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
       <div fxLayout="row" fxLayoutGap="20px">
-        <button e2e="second-window-stepperCancel" mat-stroked-button (click)="backtoLists()" class="stepperBtn Outline">
+        <button e2e="second-window-stepperCancel" mat-stroked-button (click)="backtoLists()" color="warn" class="stepperBtn">
           <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
@@ -39,7 +39,7 @@
     <mat-step e2e="create-dataset-third-window" [completed]="previewDone" i18n label="PREVIEW">
       <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
       <div fxLayout="row" fxLayoutGap="20px">
-        <button e2e="third-window-stepperCancel" mat-stroked-button (click)="backtoLists()" class="stepperBtn Outline">
+        <button e2e="third-window-stepperCancel" mat-stroked-button (click)="backtoLists()" color="warn" class="stepperBtn">
           <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
@@ -69,7 +69,7 @@
         </div>
         <mat-card fxFlex class="top-margin">
           <mat-card-header class="headerGradient">
-            <mat-card-title class="headerText" i18n>NAME_DATASET</mat-card-title>
+            <div class="mat-body-1" i18n>Describe Your Dataset</div>
           </mat-card-header>
           <mat-card-content>
             <div class="form-div">

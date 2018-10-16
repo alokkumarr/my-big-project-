@@ -1,5 +1,4 @@
-@import "src/themes/base/colors";
-@import '~angular-tree-component/dist/angular-tree-component.css';
+@import 'src/themes/base/colors';
 
 :host {
   width: 100%;
@@ -11,39 +10,10 @@
   mat-card {
     height: 99%;
 
-    .staging-title {
-      font-size: 16px;
-    }
-
-    .sec-btn {
-      color: $primary-blue-b2;
-      line-height: 32px !important;
-      height: 32px !important;
-      padding: 0 3px;
-
-      .mat-button {
-        vertical-align: middle;
-        line-height: 32px !important;
-        height: 32px !important;
-        border-radius: 2px;
-        background-color: white;
-        border: solid 1px $primary-blue-b2;
-      }
-
-      .mat-button .mat-button-wrapper > * {
-        vertical-align: initial !important;
-      }
+    ::ng-deep .mat-card-header-text {
+      display: none;
     }
   }
-}
-
-.border-right-style {
-  border-right-style: inset;
-  background-color: white;
-}
-
-.yellow-icon {
-  color: rgb(238, 203, 0);
 }
 
 .tree-icon {
@@ -58,12 +28,6 @@
 .margin-9 {
   margin: 3px 3px 0 0;
   padding-bottom: 0;
-}
-
-.headerText {
-  margin: 9px !important;
-  font-size: 16px !important;
-  font-weight: normal !important;
 }
 
 #infoForMask {
@@ -84,18 +48,14 @@
   }
 }
 
-.borderPrimary {
-  border-top-color: $primary-blue-b2;
-  border-top-width: 1.6px;
-}
-
 .selectCard {
   padding: 0;
   background-color: $background-color;
 }
 
 .whiteFrame {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 2px 1px -1px rgba(0, 0, 0, 0.12);
   background-color: white;
 }
 
@@ -132,10 +92,6 @@
   font-size: 18px;
   cursor: pointer;
   color: $primary-blue-b2;
-}
-
-.xBtn {
-  color: $primary-red;
 }
 
 .staging-content {
