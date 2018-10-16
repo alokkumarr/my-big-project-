@@ -1,5 +1,6 @@
 package com.sncr.saw.security.app.repository;
 
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataSecurityKeyRepository {
-    public Boolean addSecurityGroups(SecurityGroups securityGroups);
+    public Valid addSecurityGroups(SecurityGroups securityGroups);
     public Boolean updateSecurityGroups(List<SecurityGroups> groupNames);
     public Boolean deleteSecurityGroups(String securityGroupName, String userId);
     public List<SecurityGroups> fetchSecurityGroupNames();

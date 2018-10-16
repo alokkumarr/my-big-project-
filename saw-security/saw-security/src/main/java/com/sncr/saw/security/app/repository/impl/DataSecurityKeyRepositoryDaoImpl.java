@@ -1,6 +1,7 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
@@ -28,25 +29,73 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Boolean addSecurityGroups(SecurityGroups securityGroups) {
-
+    public Valid addSecurityGroups(SecurityGroups securityGroups) {
+        Valid valid = new Valid();
         String addSql = "INSERT INTO `SEC_GROUP` " +
             "(`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
             + "VALUES (?,?,1,now(),?)";
 
-        try{
-            int insertResult = jdbcTemplate.update(addSql,ps -> {
-                ps.setString(1,securityGroups.getSecurityGroupName());
-                ps.setString(2,securityGroups.getDescription());
-                ps.setString(3,securityGroups.getCreatedBy());
+        if (this.isGroupNameExists(securityGroups.getSecurityGroupName())){
+            valid.setValid(false);
+            valid.setValidityMessage("Group Name already Exists !!");
+        }
+        else {
+            try{
+                int insertResult = jdbcTemplate.update(addSql,ps -> {
+                    ps.setString(1,securityGroups.getSecurityGroupName());
+                    ps.setString(2,securityGroups.getDescription());
+                    ps.setString(3,securityGroups.getCreatedBy());
+                });
+                logger.trace(insertResult + " Security Group created successfully.");
+                valid.setValid(true);
+                valid.setValidityMessage("Security Group created successfully.");
+                // Here we need not to assign default user to newly created Group name. By default it should be left unassigned.
+            }
+            catch (Exception e) {
+                logger.error(e.getMessage());
+                valid.setValid(false);
+                valid.setValidityMessage("Error in creating Security Group");
+            }
+        }
+        return valid;
+    }
+
+    /**
+     * is Group Name exists in TABLE
+     * @param groupName
+     * @return
+     */
+    public Boolean isGroupNameExists(String groupName)  {
+        List<String> groupNames = this.getAllGroupNameList();
+        Boolean flag = false ;
+
+        for (String temp : groupNames)  {
+            if(temp.equalsIgnoreCase(groupName))    {
+                flag = true;
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * Get List of GroupNames from SEC_GROUP
+     * @return GroupName List
+     */
+    public List<String> getAllGroupNameList()  {
+        String fetchSql = "SELECT SEC_GROUP_NAME FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1";
+
+        List<String> groupNames = jdbcTemplate.query(fetchSql,
+            preparedStatement -> {},
+            resultSet -> {
+                List<String> nameList = new ArrayList<>();
+                while (resultSet.next()) {
+                    SecurityGroups securityGroups = new SecurityGroups();
+                    nameList.add(resultSet.getString("SEC_GROUP_NAME"));
+                }
+                return nameList;
             });
-            logger.trace(insertResult + " Security Group created successfully.");
-            return true; // Here we need not to assign default user to newly created Group name. By default it should be left unassigned.
-        }
-        catch (Exception e) {
-            logger.error(e.getMessage());
-            return false;
-        }
+
+        return groupNames;
     }
 
     @Override
