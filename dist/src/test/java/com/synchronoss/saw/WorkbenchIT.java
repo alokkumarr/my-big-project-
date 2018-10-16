@@ -355,6 +355,9 @@ public class WorkbenchIT extends BaseIT {
         .when().post(WORKBENCH_PATH + "/previews")
         .then().assertThat().statusCode(200)
         .extract().response();
+
+    log.info("Response = " + response);
+
     String previewId = response.path("id");
     log.info("previewId looking for data: {}", previewId);
     /* Wait for preview to become available */
@@ -363,8 +366,8 @@ public class WorkbenchIT extends BaseIT {
     given(authSpec)
         .when().get(WORKBENCH_PATH + "/previews/" + previewId)
         .then().assertThat().statusCode(200)
-        .body("status", equalTo("success"));
-    //        .body("rows[0].field1", equalTo("foo"));
+        .body("status", equalTo("success"))
+        .body("rows[0].field1", equalTo("foo"));
   }
 
   @Test
