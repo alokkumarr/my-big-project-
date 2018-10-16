@@ -34,7 +34,6 @@ export class UserAssignmentService {
   }
 
   addAttributetoGroup(attribute) {
-    console.log(attribute);
     const requestBody = {
       ...attribute,
       createdBy: this._jwtService.getUserName(),
@@ -46,12 +45,11 @@ export class UserAssignmentService {
   }
 
   getSecurityGroups() {
-    console.log("inside");
     return this.getRequest();
   }
 
-  getRequest(path) {
-    return this._http.get(`http://54.204.235.199/saw/security/getSecurityGroups`).toPromise();
+  getRequest() {
+    return this._http.get(`http://54.157.215.36/saw/security/auth/getSecurityGroups`).toPromise();
   }
 
   postRequest(path: string, params: Object) {
@@ -60,7 +58,7 @@ export class UserAssignmentService {
         'Content-Type':  'application/json'
       })
     };
-    return this._http.post(`http://54.204.235.199/saw/security/auth/addSecurityGroups`, params, httpOptions).toPromise();
+    return this._http.post(`http://54.157.215.36/saw/security/auth/addSecurityGroups`, params, httpOptions).toPromise();
     //return this._http.post(`${apiUrl}/${path}`, params, httpOptions).toPromise();
   }
 }

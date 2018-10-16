@@ -10,13 +10,17 @@ require('./field-attribute-view.component.scss');
 })
 export class FieldAttributeViewComponent {
   config: any;
-  @Input() selectedGroupDetails: any;
+  @Input() groupSelected;
   constructor(
     private _dxDataGridService: dxDataGridService
   ) {}
 
   ngOnInit() {
     this.config = this.getConfig();
+  }
+
+  ngOnChanges() {
+    console.log(this.groupSelected); // logs undefined
   }
 
   getConfig() {

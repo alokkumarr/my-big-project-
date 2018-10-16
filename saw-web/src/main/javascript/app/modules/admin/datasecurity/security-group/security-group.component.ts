@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { JwtService } from '../../../../../login/services/jwt.service';
@@ -7,10 +7,11 @@ import { AddSecurityDialogComponent } from './../add-security-dialog/add-securit
 import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attribute-dialog.component';
 import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 import { UserAssignmentService } from './../userassignment.service';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
-
+let self;
 
 @Component({
   selector: 'security-group',
@@ -25,8 +26,10 @@ export class SecurityGroupComponent {
   };
 
   config: any;
-  selectedGroupDetails: any;
   data: any;
+  groupSelected: any = '';
+
+  @Output() public loadAttributesGrid: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private _router: Router,
@@ -46,11 +49,7 @@ export class SecurityGroupComponent {
 
   ngOnInit() {
     this.config = this.getConfig();
-    this._userAssignmentService.getSecurityGroups().then(response => {
-      this.data = response;
-    });
-    //console.log(this.securityGroups__zone_symbol__value);
-    //this.data = this.securityGroups.__zone_symbol__value;
+    this.loadGroupGridWithData();
   }
 
   initialise() {
@@ -59,11 +58,19 @@ export class SecurityGroupComponent {
     //const customerId = parseInt(this.ticket.custID, 10);
   }
 
+  loadGroupGridWithData() {
+    this._userAssignmentService.getSecurityGroups().then(response => {
+      this.data = response;
+      this.groupSelected = this.data[0].securityGroupName;
+    });
+  }
+
   addPropperty(property, mode: 'edit' | 'create') {
     mode = 'create';
     const data = {
       property,
-      mode
+      mode,
+      groupSelected: this.groupSelected
     };
     const component = this.getModalComponent(property, mode) as any;
     return this._dialog.open(component, {
@@ -73,7 +80,9 @@ export class SecurityGroupComponent {
       data
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
-      console.log(result);
+      if (result) {
+        this.loadGroupGridWithData();
+      }
     });;
   }
 
@@ -94,7 +103,7 @@ export class SecurityGroupComponent {
   getConfig() {
     const columns = [{
       caption: 'Group Name',
-      dataField: 'data.securityGroupName',
+      dataField: 'securityGroupName',
       allowSorting: true,
       alignment: 'left',
       width: '70%'
@@ -107,6 +116,9 @@ export class SecurityGroupComponent {
       cellTemplate: 'actionCellTemplate'
     }];
     return this._dxDataGridService.mergeWithDefaultConfig({
+      onRowClick: row => {
+        this.groupSelected = row.data.securityGroupName;
+      },
       columns,
       width: '100%',
       height: '100%',

@@ -6,7 +6,7 @@ if (__PRODUCTION__) {
   apiUrl = window.location.origin;
 } else {
   // Note: To run against a local Docker environment, use localhost
-  apiUrl = 'http://54.204.235.199';
+  apiUrl = 'http://54.157.215.36';
 }
 /* eslint-enable */
 apiUrl += '/saw';

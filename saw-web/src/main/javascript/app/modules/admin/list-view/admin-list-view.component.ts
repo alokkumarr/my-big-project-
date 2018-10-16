@@ -32,6 +32,7 @@ export class AdminListViewComponent {
   ) { }
 
   ngOnInit() {
+    console.log(this.data);
     this.config = this.getConfig();
   }
 
