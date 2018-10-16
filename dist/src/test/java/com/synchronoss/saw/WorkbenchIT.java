@@ -363,9 +363,12 @@ public class WorkbenchIT extends BaseIT {
     /* Wait for preview to become available */
     waitForPreview(previewId, WAIT_RETRIES);
     /* Assert preview rows exist */
-    given(authSpec)
-        .when().get(WORKBENCH_PATH + "/previews/" + previewId)
-        .then().assertThat().statusCode(200)
+    Response res = given(authSpec)
+        .when().get(WORKBENCH_PATH + "/previews/" + previewId);
+
+
+    log.info("Preview Response = " + res.getBody().prettyPrint());
+        res.then().assertThat().statusCode(200)
         .body("status", equalTo("success"))
         .body("rows[0].field1", equalTo("foo"));
   }
