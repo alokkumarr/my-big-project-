@@ -15,7 +15,7 @@ module.exports = {
   get: (url, token) => {
 
     return JSON.parse(request('GET', url, {
-      headers: {'Authorization': token},
+      headers: {'Authorization': token}
     }).getBody());
   },
   delete: (url, token) => {
