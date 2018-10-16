@@ -216,11 +216,12 @@ stream.send.timeout = 60
 
 api.version="1.2"
 swagger.api.info.title="Syncronoss Real Time Ingestion Service API 1.0"
-swagger.api.info.description="Syncronoss RTI is designed to accept events and crash reports in countly formats, please see  http://count.ly"
-swagger.api.info.termsOfServiceUrl="http://termsOfServiceUrl"
+swagger.api.info.description="Syncronoss  events to ingest data into RTS system"
+swagger.api.info.description="Syncronoss  events to ingest data into RTS system"
+swagger.api.info.termsOfServiceUrl="https://synchronoss.com/terms-of-use-2/"
 swagger.api.info.contact="Suren.Nathan@synchronoss.com"
-swagger.api.info.license="TBD"
-swagger.api.info.licenseUrl="TBD"
+swagger.api.info.license="License"
+swagger.api.info.licenseUrl="https://synchronoss.com/privacy-policy/"
 swagger.api.basepath="/"
 swagger.api.host="TBS"
 

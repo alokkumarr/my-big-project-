@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/nareshgangishetty/swagger-work/sip/rtis/conf/routes
-// @DATE:Wed Oct 03 15:10:59 EDT 2018
+// @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
+// @DATE:Fri Oct 12 15:19:21 EDT 2018
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }
@@ -13,14 +13,14 @@ import _root_.play.libs.F
 // @LINE:4
 package controllers {
 
-  // @LINE:15
+  // @LINE:23
   class ReverseAssets(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:15
+    // @LINE:23
     def at(file:String): Call = {
       implicit val _rrc = new ReverseRouteContext(Map(("path", "/public/swagger-ui")))
       Call("GET", _prefix + { _defaultPrefix } + "docs/" + implicitly[PathBindable[String]].unbind("file", file))
@@ -28,26 +28,34 @@ package controllers {
   
   }
 
-  // @LINE:22
+  // @LINE:30
   class ReverseRTISControl(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:24
+    // @LINE:32
     def sr(parameters:Option[String]): Call = {
-      import ReverseRouteContext.empty
-      Call("GET", _prefix + { _defaultPrefix } + "sr" + queryString(List(Some(implicitly[QueryStringBindable[Option[String]]].unbind("parameters", parameters)))))
+    
+      (parameters: @unchecked) match {
+      
+        // @LINE:32
+        case (parameters)  =>
+          import ReverseRouteContext.empty
+          Call("GET", _prefix + { _defaultPrefix } + "sr" + queryString(List(Some(implicitly[QueryStringBindable[Option[String]]].unbind("parameters", parameters)))))
+      
+      }
+    
     }
   
-    // @LINE:22
+    // @LINE:30
     def executeCmd(CMD:String, PARAMETERS:Option[String]): Call = {
       import ReverseRouteContext.empty
       Call("GET", _prefix + { _defaultPrefix } + "control" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("CMD", CMD)), Some(implicitly[QueryStringBindable[Option[String]]].unbind("PARAMETERS", PARAMETERS)))))
     }
   
-    // @LINE:23
+    // @LINE:31
     def executeExtendedCmd(CMD:String): Call = {
       import ReverseRouteContext.empty
       Call("POST", _prefix + { _defaultPrefix } + "control" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("CMD", CMD)))))
@@ -55,14 +63,14 @@ package controllers {
   
   }
 
-  // @LINE:28
+  // @LINE:39
   class ReverseGenericLog(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:28
+    // @LINE:39
     def doPost(CID:String, LOG_TYPE:String): Call = {
       import ReverseRouteContext.empty
       Call("POST", _prefix + { _defaultPrefix } + "genericlog" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("CID", CID)), Some(implicitly[QueryStringBindable[String]].unbind("LOG_TYPE", LOG_TYPE)))))
@@ -70,35 +78,43 @@ package controllers {
   
   }
 
-  // @LINE:9
+  // @LINE:14
   class ReverseGenericHandler(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:9
-    def event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String], payload:Option[String]): Call = {
-      import ReverseRouteContext.empty
-      Call("POST", _prefix + { _defaultPrefix } + "publishevent" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("APP_KEY", APP_KEY)), Some(implicitly[QueryStringBindable[String]].unbind("APP_VERSION", APP_VERSION)), Some(implicitly[QueryStringBindable[String]].unbind("APP_MODULE", APP_MODULE)), Some(implicitly[QueryStringBindable[String]].unbind("EVENT_ID", EVENT_ID)), Some(implicitly[QueryStringBindable[String]].unbind("EVENT_DATE", EVENT_DATE)), Some(implicitly[QueryStringBindable[Option[String]]].unbind("EVENT_TYPE", EVENT_TYPE)), Some(implicitly[QueryStringBindable[Option[String]]].unbind("payload", payload)))))
+    // @LINE:14
+    def event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String]): Call = {
+    
+      (APP_KEY: @unchecked, APP_VERSION: @unchecked, APP_MODULE: @unchecked, EVENT_ID: @unchecked, EVENT_DATE: @unchecked, EVENT_TYPE: @unchecked) match {
+      
+        // @LINE:14
+        case (APP_KEY, APP_VERSION, APP_MODULE, EVENT_ID, EVENT_DATE, EVENT_TYPE)  =>
+          import ReverseRouteContext.empty
+          Call("POST", _prefix + { _defaultPrefix } + "publishevent" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("APP_KEY", APP_KEY)), Some(implicitly[QueryStringBindable[String]].unbind("APP_VERSION", APP_VERSION)), Some(implicitly[QueryStringBindable[String]].unbind("APP_MODULE", APP_MODULE)), Some(implicitly[QueryStringBindable[String]].unbind("EVENT_ID", EVENT_ID)), Some(implicitly[QueryStringBindable[String]].unbind("EVENT_DATE", EVENT_DATE)), Some(implicitly[QueryStringBindable[Option[String]]].unbind("EVENT_TYPE", EVENT_TYPE)))))
+      
+      }
+    
     }
   
   }
 
-  // @LINE:12
+  // @LINE:20
   class ReverseApiHelpController(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:14
+    // @LINE:22
     def viewSwaggerUI(): Call = {
       import ReverseRouteContext.empty
       Call("GET", _prefix + { _defaultPrefix } + "docs")
     }
   
-    // @LINE:12
+    // @LINE:20
     def getResources(): Call = {
       import ReverseRouteContext.empty
       Call("GET", _prefix + { _defaultPrefix } + "api-docs")
@@ -115,14 +131,30 @@ package controllers {
   
     // @LINE:6
     def iPost(): Call = {
-      import ReverseRouteContext.empty
-      Call("POST", _prefix + { _defaultPrefix } + "i")
+    
+      () match {
+      
+        // @LINE:6
+        case ()  =>
+          import ReverseRouteContext.empty
+          Call("POST", _prefix + { _defaultPrefix } + "i")
+      
+      }
+    
     }
   
     // @LINE:5
     def i(): Call = {
-      import ReverseRouteContext.empty
-      Call("GET", _prefix + { _defaultPrefix } + "i")
+    
+      () match {
+      
+        // @LINE:5
+        case ()  =>
+          import ReverseRouteContext.empty
+          Call("GET", _prefix + { _defaultPrefix } + "i")
+      
+      }
+    
     }
   
     // @LINE:4
