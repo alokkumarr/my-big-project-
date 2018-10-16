@@ -1,7 +1,7 @@
 package sncr.metadata.engine.responses
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.{JArray, JBool, JLong, JNothing, _}
+import org.json4s.JsonAST.{JArray, JBool, JNothing, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.ProcessingResult
@@ -21,7 +21,7 @@ trait Response {
     new JObject(data.map(d => JField(d._1, d._2 match {
       case s: String => new JString(d._2.asInstanceOf[String])
       case i: Int => new JInt(d._2.asInstanceOf[Int])
-      case l: Long => new JLong(d._2.asInstanceOf[Long])
+      case l: Long => new JInt(d._2.asInstanceOf[java.math.BigInteger])
       case b: Boolean => new JBool(d._2.asInstanceOf[Boolean])
       case j: JValue => j
       case _ => JNothing

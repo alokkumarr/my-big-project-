@@ -79,14 +79,11 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    combineLatest(
-      this._route.params,
-      this._route.queryParams
-    ).pipe(
-      debounce(() => timer(100))
-    ).subscribe(([params, queryParams]) => {
-      this.onParamsChange(params, queryParams);
-    });
+    combineLatest(this._route.params, this._route.queryParams)
+      .pipe(debounce(() => timer(100)))
+      .subscribe(([params, queryParams]) => {
+        this.onParamsChange(params, queryParams);
+      });
 
     this.canAutoRefresh = this._jwt.hasCustomConfig(
       CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
@@ -94,14 +91,8 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   onParamsChange(params, queryParams) {
-    const {
-      analysisId
-    } = params;
-    const {
-      awaitingExecution,
-      loadLastExecution,
-      executionId
-    } = queryParams;
+    const { analysisId } = params;
+    const { awaitingExecution, loadLastExecution, executionId } = queryParams;
 
     this.executionId = executionId;
 
@@ -219,15 +210,13 @@ export class ExecutedViewComponent implements OnInit {
   gotoLastPublished(analysis, { executionId }) {
     return () => {
       this._toastMessage.clear();
-      this._router.navigate(
-        ['analyze', 'analysis', analysis.id, 'executed'], {
-          queryParams: {
-            executionId,
-            awaitingExecution: false,
-            loadLastExecution: true
-          }
+      this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+        queryParams: {
+          executionId,
+          awaitingExecution: false,
+          loadLastExecution: true
         }
-      );
+      });
     };
   }
 
@@ -340,7 +329,9 @@ export class ExecutedViewComponent implements OnInit {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
-        executeResponse.data = clone(flattenReportData(executeResponse.data, this.executedAnalysis));
+        executeResponse.data = clone(
+          flattenReportData(executeResponse.data, this.executedAnalysis)
+        );
         // resolve the data that is sent by the execution
         // and the paginated data after that
         this.executedAnalysis = {
@@ -396,11 +387,14 @@ export class ExecutedViewComponent implements OnInit {
           .utc(executeResponse.executedAt)
           .local()
           .format('YYYY/MM/DD h:mm A');
-        this.data = executeResponse.data;
+        this.data = this.flattenData(
+          executeResponse.data,
+          this.executedAnalysis
+        );
       } else {
         this.loadExecutionData(analysisId, executionId, analysisType).then(
           ({ data }) => {
-            this.data = data;
+            this.data = this.flattenData(data, this.executedAnalysis);
           }
         );
       }
@@ -418,7 +412,6 @@ export class ExecutedViewComponent implements OnInit {
       return data;
     }
   }
-
 
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;
@@ -463,9 +456,7 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   goBackToMainPage(analysis) {
-    this._router.navigate(
-      ['analyze', get(analysis, 'categoryId')]
-    );
+    this._router.navigate(['analyze', get(analysis, 'categoryId')]);
   }
 
   edit() {
@@ -502,15 +493,13 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   gotoForkedAnalysis(analysis) {
-    this._router.navigate(
-      ['analyze', 'analysis', analysis.id, 'executed'], {
-        queryParams: {
-          executionId: null,
-          awaitingExecution: true,
-          loadLastExecution: false
-        }
+    this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+      queryParams: {
+        executionId: null,
+        awaitingExecution: true,
+        loadLastExecution: false
       }
-    );
+    });
   }
 
   afterDelete(analysis) {

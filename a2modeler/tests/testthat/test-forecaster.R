@@ -349,19 +349,18 @@ test_that("Deploy Function works as expected", {
     train_models(.) %>%
     set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
   
-  temp_path <- paste(tempdir(), "test.rds", sep="/")
+  temp_path <- paste(tempdir(), "deploy-test", sep="/")
   deploy(f12, path = temp_path)
-  expect_file_exists(temp_path)
+  expect_directory_exists(temp_path)
+  temp_file_path <-  paste0(temp_path, '/',
+                            paste(f12$name, f12$version, sep="-"), '/', 
+                            f12$name, "-", f12$version, '.rds')
+  expect_file_exists(temp_file_path)
   
-  f13 <- readRDS(temp_path)
+  f13 <- readRDS(temp_file_path)
   expect_equal(f12$created_on, f13$created_on)
   expect_equal(f12$name, f13$name)
   expect_equal(f12$final_model$uid, f13$final_model$uid)
-  
-  deploy(f12, path = temp_path, lighten = TRUE)
-  f13 <- readRDS(temp_path)
-  expect_null(f13$models[[1]]$fit)
-  expect_null(f13$models[[2]]$fit)
   
   p13 <- predict(f13, periods = 7)
   expect_class(p13, "predictions")

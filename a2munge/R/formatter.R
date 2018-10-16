@@ -25,19 +25,19 @@
 #'library(dplyr)
 #'library(lubridate)
 #'
-#'date_func_df <-
-#' data.frame(TIME_COL = as.POSIXlt(
-#'  c(
-#'    "2017-01-01 10:15:15",
-#'    "2017-09-23 14:26:59",
-#'    "2017-11-15 05:05:05",
-#'    "2018-05-11 08:15:18",
-#'    "2018-03-27 23:59:59"
-#'  )
-#'), stringsAsFactors = FALSE)
+#' date_func_df <-
+#'   data.frame(TIME_COL = as.POSIXlt(
+#'     c(
+#'       "2017-01-01 10:15:15",
+#'       "2017-09-23 14:26:59",
+#'       "2017-11-15 05:05:05",
+#'       "2018-05-11 08:15:18",
+#'       "2018-03-27 23:59:59"
+#'     )
+#'   ), stringsAsFactors = FALSE)
 #'
 #'formatter(date_func_df, "TIME_COL", "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss")
-#'
+
 formatter <-
   function(df,
            measure_vars,
@@ -51,10 +51,10 @@ formatter <-
 #' @rdname formatter
 #' @export
 formatter.data.frame <- function(df,
-                                     measure_vars,
-                                     input_format,
-                                     output_format = "yyyy-MM-dd HH:mm:ss",
-                                     output_suffix = "FMT") {
+                                 measure_vars,
+                                 input_format,
+                                 output_format = "yyyy-MM-dd HH:mm:ss",
+                                 output_suffix = "FMT") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
 
   checkmate::assert_choice(
@@ -106,6 +106,14 @@ formatter.data.frame <- function(df,
 
   select_vars <- c(colnames(df), output_col_name)
 
+  if(length(measure_vars) == 1) {
+    f1_col_name <- "F1"
+    f2_col_name <- "F2"
+  } else {
+    f1_col_name <- paste(measure_vars, "F1", sep = "_")
+    f2_col_name <- paste(f1_col_name, "F2", sep = "_")
+  }
+
   # Derive the Input & Output formats required for R data frames in the
   # format required for the lubridate functions
 
@@ -146,12 +154,15 @@ formatter.data.frame <- function(df,
   # Update the DF with the output column which will have required
   # format date value
 
+  dt_chk_fun <- match.fun(inp_for_chk)
+
   df <- df %>%
-    dplyr::rename(., DT_CHK_1 = !!measure_vars) %>%
-    mutate(., DT_CHK_2 = do.call(inp_for_chk, list(DT_CHK_1))) %>%
-    mutate(.,!!output_col_name := format(DT_CHK_2, !!rdf_output_format)) %>%
-    dplyr::rename(.,!!measure_vars := DT_CHK_1) %>%
-    select(., select_vars)
+    dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 = dt_chk_fun)
+    ) %>%
+    dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = format, .args = list(rdf_output_format))
+    ) %>%
+    dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name)) %>%
+    dplyr::select(., select_vars)
 
   df
 }
@@ -161,10 +172,10 @@ formatter.data.frame <- function(df,
 #' @rdname formatter
 #' @export
 formatter.tbl_spark <- function(df,
-                                    measure_vars,
-                                    input_format,
-                                    output_format = "yyyy-MM-dd HH:mm:ss",
-                                    output_suffix = "FMT") {
+                                measure_vars,
+                                input_format,
+                                output_format = "yyyy-MM-dd HH:mm:ss",
+                                output_suffix = "FMT") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
 
   checkmate::assert_choice(
@@ -211,16 +222,29 @@ formatter.tbl_spark <- function(df,
 
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
 
+  select_vars <- c(colnames(df), output_col_name)
+
+  if(length(measure_vars) == 1) {
+    f1_col_name <- "F1"
+    f2_col_name <- "F2"
+  } else {
+    f1_col_name <- paste(measure_vars, "F1", sep = "_")
+    f2_col_name <- paste(f1_col_name, "F2", sep = "_")
+  }
+
   # If period is Month & Collapse direction is end, Last_Day function has
   # to be used to get last day of the month.
   # Important Note. More testing is required to check if Time zones might be
   # an issue here due to the usage of epoch time for date formatting.
 
   df <- df %>%
-    rename(., DT_CHK_1 = !!measure_vars) %>%
-    mutate(.,
-           !!output_col_name := from_unixtime(unix_timestamp(DT_CHK_1,!!input_format),!!output_format)) %>%
-    rename(.,!!measure_vars := DT_CHK_1)
+    dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                          unix_timestamp, .args = list(input_format))
+    ) %>%
+    dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = from_unixtime, .args = list(output_format))
+    ) %>%
+    dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name)) %>%
+    dplyr::select(., select_vars)
 
   df
 }

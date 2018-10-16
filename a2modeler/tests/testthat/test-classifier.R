@@ -15,10 +15,12 @@ context("classifier unit tests")
 
 
 # Create Spark Connection
-# spark_home_dir <- sparklyr::spark_installed_versions() %>%
-#   as.data.frame() %>%
-#   dplyr::filter(spark == "2.3.0") %>%
-#   dplyr::pull(dir)
+spk_versions <- sparklyr::spark_installed_versions() 
+
+if(! "2.3.0" %in% spk_versions$spark) {
+  sparklyr::spark_install(version = "2.3.0")
+}
+
 sc <- spark_connect(master = "local")
 
 # Copy data to spark

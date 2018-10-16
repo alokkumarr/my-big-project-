@@ -30,7 +30,7 @@ public class WorkbenchIT extends BaseIT {
    * Parse a CSV file into dataset with given name using Workbench
    * Services.
    */
-  private void parseDataset(String name) throws JsonProcessingException {
+  private void parseDataset(String name, String fileName) throws JsonProcessingException {
     ObjectNode root = mapper.createObjectNode();
     root.put("name", name);
     root.put("component", "parser");
@@ -46,7 +46,7 @@ public class WorkbenchIT extends BaseIT {
     ObjectNode field3 = fields.addObject();
     field3.put("name", "field3");
     field3.put("type", "string");
-    config.put("file", "test.csv");
+    config.put("file", fileName);
     config.put("lineSeparator", "\n");
     config.put("delimiter", ",");
     config.put("quoteChar", "\"");
@@ -105,7 +105,7 @@ public class WorkbenchIT extends BaseIT {
   @Test
   public void testParseDataset() throws JsonProcessingException {
     String name = "test-parse-" + testId();
-    parseDataset(name);
+    parseDataset(name, "test_1.csv");
     /* Workaround: Until the dataset creation API provides the
      * dataset ID, construct it manually here. */
     String id = "workbench::" + name;
@@ -135,7 +135,7 @@ public class WorkbenchIT extends BaseIT {
     /* Use only characters suitable for a SQL table name */
     inputName = inputName.replace("-", "_");
     /* Create dataset to be used for testing viewing dataset */
-    parseDataset(inputName);
+    parseDataset(inputName, "test_2.csv");
     /* Workaround: Until the dataset creation API provides the
      * dataset ID, construct it manually here. */
     String inputId = "workbench::" + inputName;
@@ -175,7 +175,7 @@ public class WorkbenchIT extends BaseIT {
   public void testPreviewDataset() throws JsonProcessingException {
     String name = "test-preview-" + testId();
     /* Create dataset to be used for testing viewing dataset */
-    parseDataset(name);
+    parseDataset(name, "test_3.csv");
     /* Workaround: Until the dataset creation API provides the
      * dataset ID, construct it manually here. */
     String id = "workbench::" + name;

@@ -26,7 +26,7 @@ class Semantic extends BaseServiceProvider {
 
   override def process(txt: String): Result =
   {
-    process( parse(txt, false, false))
+    process( parse(txt, false))
   }
 
   def process(json: JValue): Result = {

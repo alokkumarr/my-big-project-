@@ -86,23 +86,27 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   def loadObject(name: String, location: String, format: String, limit:Int = DLConfiguration.rowLimit) : Unit  =
   {
     //Recycling
-    m_log debug s"Load object: $name at location: $location, sample size: $limit"
-
+    m_log trace s"Load object 1: $name at location: $location, sample size: $limit"
     if (loadedData.get(name).isDefined) loadedData -= name
+    m_log trace s"Load object 2: $name at location: $location, sample size: $limit"
     if (nativeloadedData.get(name).isDefined) nativeloadedData -= name
+    m_log trace s"Load object 3: $name at location: $location, sample size: $limit"
 
     //Reload/load
     val df = format match {
       case "parquet" => sparkSession.read.parquet(location);
       case "json" => sparkSession.read.json(location)
       case "cvs" =>  sparkSession.read.csv(location)
+      case "ndjson" =>  sparkSession.read.json(location)
       case _ =>  throw new DAException(ErrorCodes.UnsupportedFormat, format )
     }
     /* Note: Preloading of data objects into driver memory disabled for
      * now to avoid running out of memory. */
     //val data = DLSession.convert(df, limit)
+    m_log trace s"Before creating createOrReplaceTempView: $name at location: $location, sample size: $limit"
     df.createOrReplaceTempView(name)
     //loadedData += (name -> data)
+    m_log.trace("loadObject name: " + name)
     nativeloadedData += (name -> df)
   }
 
@@ -209,10 +213,11 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     */
   protected def execute(viewName: String, sql: String,limit : Integer) : (Integer, String) = {
     try{
-      m_log debug s"Execute SQL: $sql, view name: $viewName"
+      m_log info s"Execute SQL: $sql, view name: $viewName"
       val newSql = createSQlWithLimit(sql,limit)
-      m_log.debug("Onetime/Preview sql : "+newSql)
+      m_log.info("Onetime/Preview sql : "+newSql)
       val newDf = sparkSession.sql(newSql)
+      m_log.info("execute viewName :" + viewName)
       newDf.createOrReplaceTempView(viewName)
       if (nativeloadedData.get(viewName).isDefined) nativeloadedData -= viewName
       nativeloadedData += (viewName -> newDf)
@@ -298,8 +303,11 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * @param format - output format: parquet, json
     */
   def saveData(doName : String, location: String, format : String): (Int, String) = {
+    m_log.trace("saveData doName: " + doName)
     val df1 = nativeloadedData(doName)
     val df = df1.coalesce(1)
+    m_log.trace("saveData format: " + format)
+    m_log.trace("saveData location: " + location)
     format match {
       case "parquet" => df.write.parquet(location); (ProcessingResult.Success.id, "Data have been successfully saved as parquet file")
       case "json" =>
@@ -358,7 +366,9 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
                  case "StringType" =>JString(m.get(k)._2.asInstanceOf[String])
                  case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
                  case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
-                 case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+                 // This has been commented due to version incompatibility issue
+                 //case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+                 case "LongType" => JInt(java.math.BigInteger.valueOf(m.get(k)._2.asInstanceOf[Long]))
                  case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
               }) ).toList
           )

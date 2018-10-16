@@ -37,7 +37,7 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
   val definition: JValue =
     dSemanticRaw.get match {
       case x: JValue => x
-      case s: String => parse(s, false, false)
+      case s: String => parse(s, false)
       case _  =>
         val m = "Incorrect SemanticNode representation"; m_log error m
         throw new Exception(m)
