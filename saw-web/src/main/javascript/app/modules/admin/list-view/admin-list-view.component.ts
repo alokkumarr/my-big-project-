@@ -19,6 +19,12 @@ export class AdminListViewComponent {
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
   @Output() rowClick: EventEmitter<any> = new EventEmitter();
 
+  securityGroups = [
+    {value: 'group1', viewValue: 'Group 1'},
+    {value: 'group2', viewValue: 'Group 2'},
+    {value: 'group3', viewValue: 'Group 3'}
+  ];
+
   config: any;
 
   constructor(

@@ -52,4 +52,18 @@
     </div>
   </div>
 
+  <div *dxTemplate="let cell of 'groupAssignCellTemplate'">
+    <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container group-select">
+      <mat-form-field>
+        <mat-select placeholder="Select Group" class="group-select-dropdown">
+          <mat-option *ngFor="let group of securityGroups">
+            {{group.viewValue}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-icon *ngIf="true" fontIcon="icon-checkmark"></mat-icon>
+      <mat-icon *ngIf="true" fontIcon="icon-close"></mat-icon>
+    </div>
+  </div>
+
 </dx-data-grid>

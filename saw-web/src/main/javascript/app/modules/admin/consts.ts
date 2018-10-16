@@ -263,32 +263,58 @@ export const CategoriesTableHeader = [
 
 export const UserAssignmentsTableHeader = [
   {
-    caption: 'PRODUCT',
-    dataField: 'productName',
-    allowSorting: true,
-    alignment: 'left',
-    width: '15%',
-    cellTemplate: 'highlightCellTemplate'
-  },
-  {
-    caption: 'MODULE',
-    dataField: 'moduleName',
-    allowSorting: true,
-    alignment: 'left',
-    width: '15%',
-    cellTemplate: 'highlightCellTemplate'
-  },
-  {
-    caption: 'CATEGORY',
-    dataField: 'categoryName',
+    caption: 'LOGIN ID',
+    dataField: 'masterLoginId',
     allowSorting: true,
     alignment: 'left',
     width: '20%',
     cellTemplate: 'highlightCellTemplate'
   },
   {
-    caption: '',
+    caption: 'ROLE',
+    dataField: 'roleName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '10%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'FIRST NAME',
+    dataField: 'firstName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '15%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'LAST NAME',
+    dataField: 'lastName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '15%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'EMAIL',
+    dataField: 'email',
+    allowSorting: true,
+    alignment: 'left',
+    width: '20%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'STATUS',
+    dataField: 'activeStatusInd',
+    allowSorting: true,
+    alignment: 'left',
     width: '8%',
-    cellTemplate: 'actionCellTemplate'
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'Data Security Group',
+    width: '12%',
+    allowSorting: true,
+    alignment: 'left',
+    cellTemplate: 'groupAssignCellTemplate'
   }
-];
+];;

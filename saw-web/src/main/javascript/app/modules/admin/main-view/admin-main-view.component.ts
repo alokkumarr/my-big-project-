@@ -169,6 +169,8 @@ export class AdminMainViewComponent implements OnDestroy {
       return CATEGORY_SEARCH_CONFIG;
     case 'privilege':
       return PRIVILEGE_SEARCH_CONFIG;
+    case 'user assignments':
+      return USER_SEARCH_CONFIG;
     }
   }
 
@@ -196,7 +198,6 @@ export class AdminMainViewComponent implements OnDestroy {
 
   getService() {
     /* prettier-ignore */
-    console.log(this.section);
     switch (this.section) {
     case 'user':
       return this._userService;
@@ -208,7 +209,7 @@ export class AdminMainViewComponent implements OnDestroy {
       return this._privilegeService;
     case 'user assignments':
       this.showAddButton = false;
-      return this._userassignmentsService;
+      return this._userService;
     default:
       break;
     }

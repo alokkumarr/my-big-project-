@@ -9,15 +9,15 @@
   </strong>
 </header>
 <div class="base-dialog__content">
-  <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="center start">
+  <div fxLayout="column" fxLayoutAlign="center start">
     <mat-form-field>
-      <input matInput placeholder="Security Group Name" required/>
+      <input matInput [(ngModel)]="securityGroup.name" placeholder="Security Group Name" required/>
     </mat-form-field>
 
     <mat-form-field>
-        <textarea matInput placeholder="Description"></textarea>
+        <textarea matInput [(ngModel)]="securityGroup.desc" placeholder="Description"></textarea>
       </mat-form-field>
-  </form>
+  </div>
 </div>
 
 <div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">

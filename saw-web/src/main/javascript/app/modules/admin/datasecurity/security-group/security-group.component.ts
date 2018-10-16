@@ -5,6 +5,7 @@ import { JwtService } from '../../../../../login/services/jwt.service';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AddSecurityDialogComponent } from './../add-security-dialog/add-security-dialog.component';
 import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attribute-dialog.component';
+import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
@@ -22,10 +23,14 @@ export class SecurityGroupComponent {
     searchTermValue: ''
   };
 
+  config: any;
+  selectedGroupDetails: any;
+
   constructor(
     private _router: Router,
     private _jwtService: JwtService,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    private _dxDataGridService: dxDataGridService
   ) {
     const navigationListener = this._router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -34,6 +39,10 @@ export class SecurityGroupComponent {
     });
 
     this.listeners.push(navigationListener);
+  }
+
+  ngOnInit() {
+    this.config = this.getConfig();
   }
 
   initialise() {
@@ -53,6 +62,7 @@ export class SecurityGroupComponent {
   }
 
   openSecurityModal(property, mode: 'edit' | 'create') {
+    mode = 'create';
     const data = {
       property,
       mode
@@ -79,6 +89,37 @@ export class SecurityGroupComponent {
         return AddAttributeDialogComponent;
       }
     }
+  }
 
+  getConfig() {
+    const columns = [{
+      caption: 'Group Name',
+      //dataField: 'analysis.name',
+      allowSorting: true,
+      alignment: 'left',
+      width: '70%'
+    },{
+      caption: '',
+      //dataField: 'analysis.name',
+      allowSorting: true,
+      alignment: 'left',
+      width: '30%',
+      cellTemplate: 'actionCellTemplate'
+    }];
+    return this._dxDataGridService.mergeWithDefaultConfig({
+      onRowClick: row => {
+        this.selectedGroupDetails = row.data;
+      },
+      columns,
+      width: '100%',
+      height: '100%',
+      paging: {
+        pageSize: 10
+      },
+      pager: {
+        showPageSizeSelector: true,
+        showInfo: true
+      }
+    });
   }
 }

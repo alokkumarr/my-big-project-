@@ -42,7 +42,8 @@ import {
 import {
   SecurityGroupComponent,
   AddSecurityDialogComponent,
-  AddAttributeDialogComponent
+  AddAttributeDialogComponent,
+  FieldAttributeViewComponent
 } from './datasecurity';
 import {JwtService} from '../../../login/services/jwt.service';
 import {
@@ -67,6 +68,7 @@ const COMPONENTS = [
   SecurityGroupComponent,
   AddSecurityDialogComponent,
   AddAttributeDialogComponent,
+  FieldAttributeViewComponent,
   AdminExportViewComponent,
   AdminExportListComponent,
   CategoryEditDialogComponent,

@@ -1,30 +1,4 @@
-<mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
-  <div fxLayout="row" fxFlex="40">
-    <div class="admin-title" e2e="security-group-title">Data Security Groups</div>
-    <search-box placeholder="Search"
-                [value]="filterObj.searchTerm"
-                (searchTermChange)="applySearchFilter($event)"
-                [delay]="1000">
-    </search-box>
-  </div>
-
-  <div fxLayout="row" class="customer-name" fxLayoutAlign="start center" fxFlex="40">
-    Customer: {{ticket.custCode}}
-  </div>
-  <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
-    <button (click)="addPropperty('securityGroup')"
-            mat-raised-button
-            color="primary" style="margin-right:10px;">
-      + <span i18n>Security Group</span>
-    </button>
-    <button (click)="addPropperty('attribute')"
-            mat-raised-button
-            color="primary">
-      + <span i18n>Attribute</span>
-    </button>
-  </div>
-</mat-toolbar>
-<dx-data-grid class="security-group-grid" [customizeColumns]="config.customizeColumns"
+<dx-data-grid class="attribute-group-grid" [customizeColumns]="config.customizeColumns"
               [columnAutoWidth]="config.columnAutoWidth"
               [columnMinWidth]="config.columnMinWidth"
               [columnResizingMode]="config.columnResizingMode"
@@ -45,7 +19,6 @@
               [paging]="config.paging"
               [width]="config.width"
               [height]="config.height"
-              (onRowClick)="config.onRowClick($event)"
 >
 
 <div *dxTemplate="let cell of 'actionCellTemplate'">
@@ -55,6 +28,7 @@
       <mat-icon fontIcon="icon-edit"></mat-icon>
     </button>
     <button mat-icon-button
+
             [matTooltip]="Delete">
       <mat-icon fontIcon="icon-trash"></mat-icon>
     </button>
@@ -62,5 +36,5 @@
 </div>
 
 </dx-data-grid>
-<field-attribute-view [selectedGroupDetails]="selectedGroupDetails"></field-attribute-view>
 
+<!-- (click)="deleteRow.emit(cell.data)" -->

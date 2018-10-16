@@ -9,10 +9,40 @@ require('./add-security-dialog.component.scss');
   template
 })
 export class AddSecurityDialogComponent {
+  public securityGroup = {};
+
   constructor(
     private _dialogRef: MatDialogRef<AddSecurityDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       mode: 'edit' | 'create'
     }
   ) {}
+
+  create() {
+    console.log(this.securityGroup.name);
+
+    console.log(this.securityGroup.desc);
+    // const model = {
+    //   ...this.data.model,
+    //   ...formValues
+    // };
+
+    // let actionPromise;
+    // switch (this.data.mode) {
+    // case 'edit':
+    //   actionPromise = this._userService.update(model);
+    //   break;
+    // case 'create':
+    //   actionPromise = this._userService.save(model);
+    //   break;
+    // }
+
+    // actionPromise && actionPromise.then(
+    //   rows => {
+    //     if (rows) {
+    //       this._dialogRef.close(rows);
+    //     }
+    //   }
+    // );
+  }
 }
