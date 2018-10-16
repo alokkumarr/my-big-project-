@@ -3,6 +3,7 @@ package com.sncr.saw.security.app.repository.impl;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
+import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Valid addSecurityGroups(SecurityGroups securityGroups) {
+    public Valid addSecurityGroups(SecurityGroups securityGroups,String createdBy) {
         Valid valid = new Valid();
         String addSql = "INSERT INTO `SEC_GROUP` " +
             "(`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
@@ -44,7 +45,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 int insertResult = jdbcTemplate.update(addSql,ps -> {
                     ps.setString(1,securityGroups.getSecurityGroupName());
                     ps.setString(2,securityGroups.getDescription());
-                    ps.setString(3,securityGroups.getCreatedBy());
+                    ps.setString(3,createdBy);
                 });
                 logger.trace(insertResult + " Security Group created successfully.");
                 valid.setValid(true);
@@ -99,28 +100,41 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Boolean updateSecurityGroups(List<SecurityGroups> securityGroups) {
+    public Valid updateSecurityGroups(List<String> oldNewGroups) {
+        Valid valid = new Valid();
         String updateSql = "UPDATE SEC_GROUP SET SEC_GROUP_NAME = ?, DESCRIPTION = ? WHERE SEC_GROUP_NAME = ?";
-        try{
-            int updateResult = jdbcTemplate.update(updateSql,ps-> {
-               ps.setString(1,securityGroups.get(0).getSecurityGroupName());
-               ps.setString(2,securityGroups.get(0).getDescription());
-               ps.setString(3,securityGroups.get(1).getSecurityGroupName());
-            });
+        if (this.isGroupNameExists(oldNewGroups.get(0))){
+            valid.setValid(false);
+            valid.setValidityMessage("Group Name already Exists !!");
+        }
+        else {
+            try{
+                int updateResult = jdbcTemplate.update(updateSql,ps-> {
+                    ps.setString(1,oldNewGroups.get(0));
+                    ps.setString(2,oldNewGroups.get(1));
+                    ps.setString(3,oldNewGroups.get(2));
+                });
+                valid.setValid(true);
+                valid.setValidityMessage("Security Group updated successfully");
+                logger.trace(updateResult + "Security Group updated successfully");
+            }
+            catch (Exception e) {
+                logger.error(e.getMessage());
+                valid.setValid(false);
+                valid.setValidityMessage("Error in Updating Group Name ");
+            }
+        }
 
-            logger.trace(updateResult + "Security Group updated successfully");
-        }
-        catch (Exception e) {
-            logger.error(e.getMessage());
-            return false;
-        }
-        return true;
+        return valid;
     }
 
     @Override
     public Boolean deleteSecurityGroups(String securityGroupName, String userId) {
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
         String delSql = "DELETE FROM SEC_GROUP WHERE SEC_GROUP_SYS_ID = ?";
+        /** NOTE: Deleting a row from SEC_GROUP will inturn deletes corresponding reference rows in child tables.
+         * That is, SEC_GROUP_DSK_ATTRIBUTE and SEC_GROUP_DSK_VALUE. So, no need of deleting its references in other tables.
+         **/
         try{
             int deleteResult = jdbcTemplate.update(delSql,ps -> {
                 ps.setLong(1,securityGroupSysId);
@@ -157,7 +171,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
     @Override
     public List<SecurityGroups> fetchSecurityGroupNames() {
-        String fetchSql = "SELECT SEC_GROUP_NAME,DESCRIPTION,CREATED_BY FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1";
+        String fetchSql = "SELECT SEC_GROUP_NAME,DESCRIPTION FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1";
 
         List<SecurityGroups> groupNames = jdbcTemplate.query(fetchSql,
             preparedStatement -> {},
@@ -167,7 +181,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 SecurityGroups securityGroups = new SecurityGroups();
                 securityGroups.setSecurityGroupName(resultSet.getString("SEC_GROUP_NAME"));
                 securityGroups.setDescription(resultSet.getString("DESCRIPTION"));
-                securityGroups.setCreatedBy(resultSet.getString("CREATED_BY"));
                 nameList.add(securityGroups);
             }
             return nameList;
@@ -340,6 +353,10 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         if (groupSysId != null) {
             try{
                 String delSql = "DELETE FROM sec_group_dsk_attribute WHERE SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = ? ";
+                /**
+                    Note : Deleting Atrribute row from sec_group_dsk_attribute inturn deletes corresponding value from sec_group_dsk_value,
+                 Since we have defined a relation between the tables; So deleting other row from DSK_VALUE table is not required here.
+                 **/
                 int delResult = jdbcTemplate.update(delSql, ps -> {
                     ps.setLong(1,groupAttributeSysId);
                 });
@@ -358,8 +375,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public List<AttributeValues> fetchDskAllAttributeValues(String secuityGroupName) {
-        List<AttributeValues> attributeValuesList = new ArrayList<>();
+    public List<DskDetails> fetchDskAllAttributeValues(String secuityGroupName) {
+        List<DskDetails> dskValueList = new ArrayList<>();
         String fetchSql = "SELECT sg.CREATED_BY as CREATED_BY, sg.CREATED_DATE as CREATED_DATE, sga.ATTRIBUTE_NAME as ATTRIBUTE_NAME, sgv.DSK_VALUE as VALUE " +
             " FROM SEC_GROUP sg, sec_group_dsk_attribute sga, sec_group_dsk_value sgv " +
             " WHERE " +
@@ -368,17 +385,17 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             " sga.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = sgv.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID ";
 
         try{
-            attributeValuesList = jdbcTemplate.query(fetchSql, ps -> {
+            dskValueList = jdbcTemplate.query(fetchSql, ps -> {
                 ps.setString(1,secuityGroupName);
             },resultSet -> {
-                List<AttributeValues> tempList = new ArrayList<>();
+                List<DskDetails> tempList = new ArrayList<>();
                 while (resultSet.next())    {
-                    AttributeValues attributeValues = new AttributeValues();
-                    attributeValues.setCreated_by(resultSet.getString("CREATED_BY"));
-                    attributeValues.setCreated_date(resultSet.getString("CREATED_DATE"));
-                    attributeValues.setAttributeName(resultSet.getString("ATTRIBUTE_NAME"));
-                    attributeValues.setValue(resultSet.getString("VALUE"));
-                    tempList.add(attributeValues);
+                    DskDetails dskDetails = new DskDetails();
+                    dskDetails.setCreated_by(resultSet.getString("CREATED_BY"));
+                    dskDetails.setCreated_date(resultSet.getString("CREATED_DATE"));
+                    dskDetails.setAttributeName(resultSet.getString("ATTRIBUTE_NAME"));
+                    dskDetails.setValue(resultSet.getString("VALUE"));
+                    tempList.add(dskDetails);
                 }
                 return tempList;
             });
@@ -387,7 +404,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             logger.error(e.getMessage());
         }
 
-        return attributeValuesList;
+        return dskValueList;
     }
 
 

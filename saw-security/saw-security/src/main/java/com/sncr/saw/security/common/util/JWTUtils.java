@@ -36,6 +36,9 @@ public class JWTUtils {
             if (pair.getKey().equals("custID")) {
                 parsedValues[1] =(pair.getValue().toString());
             }
+            if (pair.getKey().equals("userFullName"))   {
+                parsedValues[2] =(pair.getValue().toString());
+            }
         }
         return parsedValues;
     }
