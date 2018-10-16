@@ -199,6 +199,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
    * @memberof DataobjectsComponent
    */
   onDataObjectViewChange() {
+    this.stopPolling();
     this.states.searchTerm === '';
 
     // Have to directly interact with search component to clear and close it while switching views

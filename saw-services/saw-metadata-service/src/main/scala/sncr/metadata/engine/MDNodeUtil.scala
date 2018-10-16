@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.{JBool, JInt, JLong, JValue}
+import org.json4s.JsonAST.{JBool, JInt, JValue}
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -45,7 +45,7 @@ object MDNodeUtil {
 
   def extractSearchData( src: String, searchDictionary: Map[String, String]) : Map[String, Any] =
   {
-    val json: JValue = parse(src, false, false)
+    val json: JValue = parse(src, false)
     extractSearchData(json, searchDictionary)
   }
 
@@ -72,7 +72,7 @@ object MDNodeUtil {
         case s: JString =>  Bytes.toBytes(s.extract[String])
         case i: JInt => Bytes.toBytes(i.extract[Int])
         case b: JBool => Bytes.toBytes(b.extract[Boolean])
-        case l: JLong => Bytes.toBytes(l.extract[Long])
+        case l: JInt => Bytes.toBytes(l.extract[Long])
         case d: JDouble => Bytes.toBytes(d.extract[Double])
 
         case _ =>  m_log error s"Unsupported search field type: ${v.toString}"; Array.empty
@@ -105,7 +105,7 @@ object MDNodeUtil {
       case s:JString => s.s
       case i:JInt    => i.num.intValue()
       case b:JBool   => b.value
-      case l:JLong   =>  l.num
+      case l:JInt   =>  l.num.bigInteger
       case _ => null
     })})
 

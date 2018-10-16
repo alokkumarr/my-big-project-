@@ -38,7 +38,7 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
  * executes it and lists the execution results.
  */
 public class AnalyzeIT extends BaseIT {
-  @Test(timeout=300000)
+ @Test(timeout=300000)
   public void testExecuteAnalysis() throws JsonProcessingException {
     String metricId = listMetrics(token,"sample-elasticsearch");
     ObjectNode analysis = createAnalysis(token, metricId,"pivot");
@@ -149,25 +149,14 @@ public class AnalyzeIT extends BaseIT {
      * @throws JsonProcessingException
      */
     private String listMetrics(String token,String metricName) throws JsonProcessingException {
-        ObjectNode node = mapper.createObjectNode();
-        ObjectNode contents = node.putObject("contents");
-        contents.put("action", "search");
-        contents.put("context", "Semantic");
-        contents.put("select", "headers");
-        ArrayNode keys = contents.putArray("keys");
-        ObjectNode key = keys.addObject();
-        key.put("customerCode", "SYNCHRONOSS");
-        key.put("module", "ANALYZE");
-        String json = mapper.writeValueAsString(node);
         String path = "contents[0]['ANALYZE'].find "
-            + "{it.metric == '"+metricName+"'}.id";
+            + "{it.metricName == '"+metricName+"'}.id";
         Response response = given(spec)
             .header("Authorization", "Bearer " + token)
             .filter(document("list-metrics",
                 preprocessResponse(prettyPrint())))
-            .body(json)
-            .when().post("/services/md")
-            .then().assertThat().statusCode(200)
+            .when().get("/services/internal/semantic/md?projectId=workbench")
+            .then().assertThat().statusCode(202)
             .extract().response();
         try {
             String metricId = response.path(path);
@@ -355,7 +344,7 @@ public class AnalyzeIT extends BaseIT {
     key.put("categoryId", "4");
     String json = mapper.writeValueAsString(node);
     String path = "contents.analyze.find { it.name == '"
-                  + analysisName + "' }.metric";
+                  + analysisName + "' }.metricName";
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(json)
@@ -437,7 +426,7 @@ public class AnalyzeIT extends BaseIT {
     filter1.put("size","10");
     filter1.put("order","asc");
     ObjectNode es = mapper.createObjectNode();
-    es.put("storageType","es");
+    es.put("storageType","ES");
     es.put("indexName","sample");
     es.put("type","sample");
     globalFilter.putPOJO("esRepository",

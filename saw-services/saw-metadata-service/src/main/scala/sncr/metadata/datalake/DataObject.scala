@@ -45,7 +45,7 @@ class DataObject(final private var descriptor : JValue, final private var schema
 
   def setDescriptor(newDescriptor : String): Unit =
   {
-    descriptor = parse(newDescriptor, false, false)
+    descriptor = parse(newDescriptor, false)
     setDescriptor
   }
 
@@ -69,7 +69,7 @@ class DataObject(final private var descriptor : JValue, final private var schema
     val schemaConvertedToString = Bytes.toString(res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Schema.id)))
     if (schemaConvertedToString != null && schemaConvertedToString.nonEmpty) {
       m_log debug s"Convert schema to JSON: $schemaConvertedToString"
-      schema = parse(schemaConvertedToString, false, false)
+      schema = parse(schemaConvertedToString, false)
       schema
     }
     else
@@ -78,7 +78,7 @@ class DataObject(final private var descriptor : JValue, final private var schema
 
   def getDataObjectSchemaAsString : String = compact(render(schema))
   def getDataObjectSchema : JValue = schema
-  def setDataObjectSchemaFromString(a_schema : String ) : Unit = schema = parse(a_schema, false, false)
+  def setDataObjectSchemaFromString(a_schema : String ) : Unit = schema = parse(a_schema, false)
 
   override protected def getData(res: Result): Option[Map[String, Any]] = {
     val (dataAsJValue, dataAsByteArray) = getSourceData(res)
@@ -303,8 +303,8 @@ object DataObject{
   def apply(d: String, s: String) :DataObject =
   {
     try {
-      val descriptor = parse(d, false, false)
-      val schema = parse(s, false, false)
+      val descriptor = parse(d, false)
+      val schema = parse(s, false)
       new DataObject(descriptor, schema)
     }
     catch{

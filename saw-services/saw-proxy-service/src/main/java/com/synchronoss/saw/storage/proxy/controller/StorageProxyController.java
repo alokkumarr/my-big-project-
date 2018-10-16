@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +22,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.synchronoss.saw.storage.proxy.AsyncConfiguration;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
@@ -33,6 +33,13 @@ import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Storage;
 import com.synchronoss.saw.storage.proxy.model.StorageProxyRequestBody;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+import io.swagger.annotations.AuthorizationScope;
 
 /**
  * @author spau0004
@@ -61,7 +68,9 @@ import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 }
 }"
  */
+@CrossOrigin(origins = "*")
 @RestController
+@Api(value="The controller provides operations pertaining to polyglot persistence layer of synchronoss analytics platform ")
 public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
@@ -78,9 +87,9 @@ public class StorageProxyController {
    * @param requestBody
    * @return
    */
-  @Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
-  @RequestMapping(value = "/internal/proxy/storage/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  //@Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
+ // @RequestMapping(value = "/internal/proxy/storage/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+ // @ResponseStatus(HttpStatus.ACCEPTED)
   public CompletableFuture<StorageProxy> retrieveStorageDataAsync(@RequestBody StorageProxy requestBody) {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
@@ -137,9 +146,24 @@ public class StorageProxyController {
    * @throws JsonProcessingException 
    */
   
+  @ApiOperation(value = "Provides an access to persistence using commmon specification", nickname = "actionStorage", 
+      notes = "", authorizations = {
+      @Authorization(value = "petstore_auth", scopes = {
+          @AuthorizationScope(scope = "write:storage", description = "write to storage depending on storage type"),
+          @AuthorizationScope(scope = "read:storage", description = "read from storage depending on the storage type")
+          })
+  }, response = StorageProxy.class)
+  @ApiResponses(value = {
+      @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+      @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+      @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")
+})
   @RequestMapping(value = "/internal/proxy/storage", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public StorageProxy retrieveStorageDataSync(@RequestBody StorageProxy requestBody) throws JsonProcessingException {
+  public StorageProxy retrieveStorageDataSync(@ApiParam(value = "Storage object that needs to be added/updated/deleted to the store" ,required=true )
+      @Valid @RequestBody StorageProxy requestBody) throws JsonProcessingException {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new JSONMissingSAWException("json body is missing in request body");

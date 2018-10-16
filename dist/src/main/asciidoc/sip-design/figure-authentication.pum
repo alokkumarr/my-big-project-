@@ -1,0 +1,22 @@
+cloud {
+    component [Client] as Client
+}
+
+package "SIP" {
+    interface HTTP as HTTPGateway
+    interface HTTP as HTTPSecurity
+
+    component [Gateway Service] as GatewayService
+    component [Security Service] as SecurityService
+    HTTPGateway - GatewayService
+    HTTPSecurity - SecurityService
+
+    database "Environment configuration" {
+        component [JSON Web Token server secret] as Secret
+    }
+}
+
+Client .> HTTPGateway
+Client .> HTTPSecurity
+
+SecurityService -> Secret
