@@ -15,7 +15,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AnalyzeModule } from './modules/analyze/analyze.module';
 import { AdminModule } from './modules/admin';
-import { WorkbenchUpgradeModule } from './modules/workbench';
+import { WorkbenchUpgradeModule } from './modules/workbench/workbench.module';
 import { LoginModule } from './login';
 
 import {

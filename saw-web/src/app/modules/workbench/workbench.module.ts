@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router';
 import { routes } from './routes';
 
 import { WorkbenchService } from './services/workbench.service';
-import { AnalyzeService } from '../analyze/services/analyze.service';
+
 import {
   MenuService,
   HeaderProgressService,
@@ -87,7 +87,6 @@ const GUARDS = [DefaultWorkbenchPageGuard];
 const SERVICES = [
   JwtService,
   WorkbenchService,
-  AnalyzeService,
   MenuService,
   HeaderProgressService,
   ToastService,
@@ -105,7 +104,7 @@ const SERVICES = [
     DxDataGridModule,
     DxTemplateModule,
     FlexLayoutModule,
-    TreeModule.forRoot(),
+    TreeModule,
     AceEditorModule,
     AngularSplitModule,
     CommonModuleTs

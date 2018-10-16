@@ -5,7 +5,7 @@ import { MainPageComponent } from './layout';
 import { LoginModule } from './login';
 import { AnalyzeModule } from './modules/analyze/analyze.module';
 import { AdminModule } from './modules/admin';
-import { WorkbenchUpgradeModule } from './modules/workbench';
+import { WorkbenchUpgradeModule } from './modules/workbench/workbench.module';
 import { routes as loginRoutes } from './login/routes';
 import { routes as AnalyzeRoutes } from './modules/analyze/routes';
 import { routes as WorkbenchRoutes } from './modules/workbench/routes';
