@@ -368,7 +368,7 @@ public class WorkbenchIT extends BaseIT {
 
 
     log.info("Preview Response = " + res.getBody().prettyPrint());
-        res.then().assertThat().statusCode(200)
+    res.then().assertThat().statusCode(200)
         .body("status", equalTo("success"))
         .body("rows[0].field1", equalTo("foo"));
   }
