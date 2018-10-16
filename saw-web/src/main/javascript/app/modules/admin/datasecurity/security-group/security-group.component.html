@@ -12,12 +12,12 @@
     Customer: {{ticket.custCode}}
   </div>
   <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
-    <button (click)="addPropperty('securityGroup')"
+    <button (click)="addPropperty('securityGroup','create')"
             mat-raised-button
             color="primary" style="margin-right:10px;">
       + <span i18n>Security Group</span>
     </button>
-    <button (click)="addPropperty('attribute')"
+    <button (click)="addPropperty('attribute','create')"
             mat-raised-button
             color="primary">
       + <span i18n>Attribute</span>
@@ -39,7 +39,7 @@
               [wordWrapEnabled]="config.wordWrapEnabled"
               [scrolling]="config.scrolling"
               [sorting]="config.sorting"
-              [dataSource]="analyses"
+              [dataSource]="data"
               [columns]="config.columns"
               [pager]="config.pager"
               [paging]="config.paging"

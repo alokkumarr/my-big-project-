@@ -25,6 +25,12 @@ add-secuirty-dialog {
     .form-field {
       margin-bottom: 5px;
     }
+
+    div .errors {
+      width: 100%;
+      text-align: center;
+      color: red;
+    }
   }
 
   .base-dialog__actions {

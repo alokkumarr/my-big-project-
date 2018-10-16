@@ -9,22 +9,22 @@
   </strong>
 </header>
 <div class="base-dialog__content">
-  <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="center start">
+  <div fxLayout="column" fxLayoutAlign="center start">
     <mat-form-field>
-      <input matInput placeholder="Security Group Name" disabled required/>
+      <input matInput placeholder="Security Group Name" [(ngModel)]="attribute.securityGroupName" disabled required/>
     </mat-form-field>
     <div fxLayout="row" fxLayoutAlign="center start">
       <mat-form-field>
-        <input matInput placeholder="Field Name" required/>
+        <input matInput [(ngModel)]="attribute.attributeName" placeholder="Field Name" required/>
       </mat-form-field>
 
       <span class="seperator">=</span>
 
       <mat-form-field>
-        <input matInput placeholder="Value" required/>
+        <input matInput [(ngModel)]="attribute.value" placeholder="Value" required/>
       </mat-form-field>
     </div>
-  </form>
+  </div>
 </div>
 
 <div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">

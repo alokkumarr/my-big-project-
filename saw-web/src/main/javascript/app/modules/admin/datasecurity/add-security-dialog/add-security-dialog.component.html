@@ -10,12 +10,15 @@
 </header>
 <div class="base-dialog__content">
   <div fxLayout="column" fxLayoutAlign="center start">
+    <div class="errors" *ngIf="errorState">
+      <span [innerHtml]="errorMessage"></span>
+    </div>
     <mat-form-field>
-      <input matInput [(ngModel)]="securityGroup.name" placeholder="Security Group Name" required/>
+      <input matInput [(ngModel)]="securityGroup.securityGroupName" placeholder="Security Group Name" required/>
     </mat-form-field>
 
     <mat-form-field>
-        <textarea matInput [(ngModel)]="securityGroup.desc" placeholder="Description"></textarea>
+        <textarea matInput [(ngModel)]="securityGroup.description" placeholder="Description"></textarea>
       </mat-form-field>
   </div>
 </div>
