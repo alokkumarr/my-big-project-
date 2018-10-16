@@ -718,7 +718,7 @@ public class SecurityController {
      * Fetches all the security Group Names
      * @return List of group names
      */
-	@RequestMapping(value = "/getSecurityGroups",method = RequestMethod.GET)
+	@RequestMapping(value = "/auth/getSecurityGroups",method = RequestMethod.GET)
     public List<SecurityGroups> getSecurityGroups() {
         List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames();
 	    return groupNames;
@@ -731,17 +731,7 @@ public class SecurityController {
      */
     @RequestMapping(value = "/auth/addSecurityGroups",method = RequestMethod.POST)
     public Valid addSecurityGroups(@RequestBody SecurityGroups securityGroups)  {
-	    Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.addSecurityGroups(securityGroups))    {
-	        valid.setValid(true);
-	        valid.setValidityMessage("Security Group successfully created");
-        }
-        else
-        {
-            valid.setValid(false);
-            valid.setValidityMessage("Error in creating security group");
-        }
-	    return valid;
+        return dataSecurityKeyRepository.addSecurityGroups(securityGroups);
     }
 
     /**
