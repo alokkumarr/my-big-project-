@@ -186,6 +186,9 @@ export class AnalyzeViewComponent implements OnInit {
         } as MatDialogConfig)
         .afterClosed()
         .subscribe(event => {
+          if (!event) {
+            return;
+          }
           const { analysis, requestExecution } = event;
           if (analysis) {
             this.loadAnalyses(this.analysisId).then(() => {
