@@ -21,6 +21,7 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
+import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
@@ -730,38 +731,35 @@ public class SecurityController {
      * @return Valid obj containing Boolean, suceess/failure msg
      */
     @RequestMapping(value = "/auth/addSecurityGroups",method = RequestMethod.POST)
-    public Valid addSecurityGroups(@RequestBody SecurityGroups securityGroups)  {
-        return dataSecurityKeyRepository.addSecurityGroups(securityGroups);
+    public Valid addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String createdBy = extractValuesFromToken[2];
+        return dataSecurityKeyRepository.addSecurityGroups(securityGroups,createdBy);
     }
 
     /**
      * Updating existing Security Group name with new name
-     * @param securityGroups two objects. 1st one resembles new security Group and second resembles existing.
+     * @param oldNewGroups 1st String resembles new security Group, second -> description of new security group name and third resembles existing.
      * @return Valid obj containing Boolean, suceess/failure msg
      */
-    @RequestMapping(value = "/auth/updateSecurityGroups",method = RequestMethod.PUT)
-    public Valid updateSecurityGroups(@RequestBody List<SecurityGroups> securityGroups) {
-        Valid valid = new Valid();
-        if(dataSecurityKeyRepository.updateSecurityGroups(securityGroups))  {
-            valid.setValid(true);
-            valid.setValidityMessage("Security Group Updated sucessfully");
-        }
-        else {
-            valid.setValid(false);
-            valid.setValidityMessage("Error in Updating Group Name");
-        }
-	    return valid;
+    @RequestMapping(value = "/auth/updateSecurityGroups",method = RequestMethod.POST)
+    public Valid updateSecurityGroups(@RequestBody List<String> oldNewGroups) {
+        return (dataSecurityKeyRepository.updateSecurityGroups(oldNewGroups));
     }
 
     /**
      * Deleting security group
-     * @param securityGroupNameUserId Name of the Group and user id
+     * @param securityGroupName Name of the Group and user id
      * @return Valid obj containing Boolean and suceess/failure msg
      */
     @RequestMapping(value = "/auth/deleteSecurityGroups",method = RequestMethod.DELETE)
-    public Valid deleteSecurityGroups(@RequestBody List<String> securityGroupNameUserId)  {
+    public Valid deleteSecurityGroups(HttpServletRequest request, HttpServletResponse response, @RequestBody String securityGroupName)  {
 	    Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupNameUserId.get(0),securityGroupNameUserId.get(1)))  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String userId =extractValuesFromToken[0];
+	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupName,userId))   {
 	        valid.setValid(true);
 	        valid.setValidityMessage("Successfully deleted security group");
         }
@@ -779,7 +777,7 @@ public class SecurityController {
      */
     @RequestMapping (value = "/auth/addSecurityGroupDskAttributeValues", method = RequestMethod.POST)
     public Valid addSecurityGroupDskAttributeValues(@RequestBody AttributeValues attributeValues)  {
-	    Valid valid = new Valid();
+        Valid valid = new Valid();
 	    if(dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(attributeValues))   {
 	        valid.setValid(true);
 	        valid.setValidityMessage("Adding Attribute-Values is succesfull");
@@ -796,7 +794,7 @@ public class SecurityController {
      * @param attributeValues
      * @return Valid obj containing Boolean, suceess/failure msg
      */
-    @RequestMapping ( value = "/auth/updateAttributeValues", method =  RequestMethod.PUT)
+    @RequestMapping ( value = "/auth/updateAttributeValues", method =  RequestMethod.POST)
     public Valid updateAttributeValues(@RequestBody AttributeValues attributeValues)    {
 	    Valid valid = new Valid();
 	    if (dataSecurityKeyRepository.updateAttributeValues(attributeValues))   {
@@ -842,13 +840,16 @@ public class SecurityController {
 
     /**
      * Updating Group reference in user tbl
-     * @param groupNameUserId [Groupname, userId]
+     * @param
      * @return Valid obj containing Boolean, suceess/failure msg
      */
-    @RequestMapping ( value = "/auth/updateUser", method = RequestMethod.PUT)
-    public Valid updateUser(@RequestBody List<String> groupNameUserId)  {
-	    Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.updateUser(groupNameUserId.get(0),groupNameUserId.get(1)))    {
+    @RequestMapping ( value = "/auth/updateUser", method = RequestMethod.POST)
+    public Valid updateUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String groupName)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String userId = extractValuesFromToken[0];
+        Valid valid = new Valid();
+	    if (dataSecurityKeyRepository.updateUser(groupName,userId))    {
 	        valid.setValid(true);
 	        valid.setValidityMessage("Group Name succesfully updated");
         }
@@ -865,7 +866,7 @@ public class SecurityController {
      * @return List of Attribute-values
      */
     @RequestMapping ( value = "/auth/fetchDskAllAttributeValues", method = RequestMethod.POST)
-    public List<AttributeValues> fetchDskAllAttributeValues(@RequestBody String securityGroupName)    {
+    public List<DskDetails> fetchDskAllAttributeValues(@RequestBody String securityGroupName)    {
         return dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupName);
     }
 

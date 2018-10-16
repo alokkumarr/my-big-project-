@@ -7,15 +7,6 @@ public class SecurityGroups implements Serializable {
     private static final long serialVersionUID = 7684700123455735559L;
     private String securityGroupName;
     private String description;
-    private String userId;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public String getSecurityGroupName() {
         return securityGroupName;
@@ -32,15 +23,5 @@ public class SecurityGroups implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    private String createdBy;
 
 }
