@@ -445,8 +445,6 @@ get_target <- function(obj) {
 #'
 #' @return updated modeler object with new final model
 #' @export
-#'
-#' @examples
 refit <- function(obj, df, append = TRUE, ...) {
   UseMethod("refit", obj)
   checkmate::assert_class(obj, "modeler")
