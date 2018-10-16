@@ -342,13 +342,11 @@ export class AnalyzeService {
   }
 
   getSemanticLayerData() {
-    const params = this.getRequestParams([
-      ['contents.action', 'search'],
-      ['contents.select', 'headers'],
-      ['contents.context', 'Semantic']
-    ]);
-    return this.postRequest(`md`, params).then(fpGet(`contents.[0].${MODULE_NAME}`));
-  }
+      const userProject = 'workbench';
+      return this.getRequest(
+        `internal/semantic/md?projectId=${userProject}`
+      ).then(fpGet(`contents.[0].${MODULE_NAME}`));
+    }
 
   createAnalysis(metricId, type) {
     const params = this.getRequestParams([

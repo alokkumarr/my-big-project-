@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" (window:resize)="onResize($event)">
     <div class="header" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
         <button mat-button class="bck-btn">
             <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
@@ -14,8 +14,8 @@
     </div>
     <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
         <mat-card fxFlex="25">
-            <mat-card-content>
-                <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDS" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
+            <mat-card-content style="overflow:hidden;">
+                <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDS" [rowAlternationEnabled]="true" [height]="contentHeight" [width]="'100%'"
                     [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDSSelectionChanged($event)">
                     <dxo-selection selectAllMode="allMode" showCheckBoxesMode="always" [mode]="selectionMode"></dxo-selection>
                     <dxi-column caption="Dataset Name" dataField="system.name"></dxi-column>

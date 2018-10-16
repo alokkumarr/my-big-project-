@@ -24,12 +24,14 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import com.synchronoss.SAWRetryTestCasesRunner;
 import com.synchronoss.querybuilder.EntityType;
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import pl.allegro.tech.embeddedelasticsearch.IndexSettings;
 import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
-
+@RunWith(SAWRetryTestCasesRunner.class)
 public class PivotQueryBuilderTest {
 
   private  EmbeddedElastic embeddedElastic = null;
@@ -155,7 +157,9 @@ public class PivotQueryBuilderTest {
     Assert.assertTrue(entity.getContent()!=null);
   }
 
-  }
+  
+
+}
   
   
   

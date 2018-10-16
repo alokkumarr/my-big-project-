@@ -17,6 +17,8 @@
   yum: name=haproxy state=present
 - name: Install HAProxy configuration
   template: src=haproxy.cfg dest=/etc/haproxy
+  notify:
+    - restart haproxy
 - name: Create HAProxy error pages directory
   file: path=/etc/haproxy/errors state=directory
 - name: Install HAProxy error pages
