@@ -358,7 +358,7 @@ public class WorkbenchIT extends BaseIT {
 
     log.info("Response = " + response.getBody().prettyPrint());
 
-    String previewId = response.path("_id");
+    String previewId = response.path("id");
     log.info("previewId looking for data: {}", previewId);
     /* Wait for preview to become available */
     waitForPreview(previewId, WAIT_RETRIES);
