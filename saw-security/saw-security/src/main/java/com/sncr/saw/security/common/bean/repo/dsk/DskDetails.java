@@ -1,7 +1,9 @@
 package com.sncr.saw.security.common.bean.repo.dsk;
 
-public class DskDetails {
-    private static final long serialVersionUID = 7684700754231735559L;
+import java.io.Serializable;
+
+public class DskDetails implements Serializable {
+    private static final long serialVersionUID = 7684700543215735559L;
     private String securityGroupName;
     private String attributeName;
     private String Value;

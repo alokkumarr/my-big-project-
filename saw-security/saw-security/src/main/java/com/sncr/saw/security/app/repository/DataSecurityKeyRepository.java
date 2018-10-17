@@ -11,7 +11,7 @@ import java.util.List;
 public interface DataSecurityKeyRepository {
     public Valid addSecurityGroups(SecurityGroups securityGroups,String createdBy);
     public Valid updateSecurityGroups(List<String> groupNames);
-    public Boolean deleteSecurityGroups(String securityGroupName, String userId);
+    public Boolean deleteSecurityGroups(String securityGroupName);
     public List<SecurityGroups> fetchSecurityGroupNames();
     public Boolean addSecurityGroupDskAttributeValues(AttributeValues attributeValues);
     public List<String> fetchSecurityGroupDskAttributes(String securityGroupName);

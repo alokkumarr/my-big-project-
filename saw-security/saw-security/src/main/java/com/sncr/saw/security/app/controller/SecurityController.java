@@ -20,10 +20,7 @@ import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
-import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
-import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
-import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
-import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
+import com.sncr.saw.security.common.bean.repo.dsk.*;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.TicketHelper;
 import io.jsonwebtoken.Claims;
@@ -753,13 +750,11 @@ public class SecurityController {
      * @param securityGroupName Name of the Group and user id
      * @return Valid obj containing Boolean and suceess/failure msg
      */
-    @RequestMapping(value = "/auth/deleteSecurityGroups",method = RequestMethod.DELETE)
-    public Valid deleteSecurityGroups(HttpServletRequest request, HttpServletResponse response, @RequestBody String securityGroupName)  {
+    @RequestMapping(value = "/auth/deleteSecurityGroups",method = RequestMethod.POST)
+    public Valid deleteSecurityGroups(@RequestBody String securityGroupName)  {
 	    Valid valid = new Valid();
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
-        String userId =extractValuesFromToken[0];
-	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupName,userId))   {
+
+	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupName))   {
 	        valid.setValid(true);
 	        valid.setValidityMessage("Successfully deleted security group");
         }
@@ -824,7 +819,7 @@ public class SecurityController {
      * @param dskList [securityGroupName, AttributeName]
      * @return Valid obj containing Boolean, suceess/failure msg
      */
-    @RequestMapping (value = "/auth/deleteSecurityGroupDskAttributeValues", method = RequestMethod.DELETE)
+    @RequestMapping (value = "/auth/deleteSecurityGroupDskAttributeValues", method = RequestMethod.POST)
     public Valid deleteSecurityGroupDskAttributeValues(@RequestBody List<String> dskList)   {
         Valid valid = new Valid();
         if (dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList))   {
@@ -844,10 +839,9 @@ public class SecurityController {
      * @return Valid obj containing Boolean, suceess/failure msg
      */
     @RequestMapping ( value = "/auth/updateUser", method = RequestMethod.POST)
-    public Valid updateUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String groupName)  {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
-        String userId = extractValuesFromToken[0];
+    public Valid updateUser(@RequestBody UpdateUserGroup updateUserGroup)  {
+        String userId = updateUserGroup.getUserId();
+        String groupName = updateUserGroup.getGroupName();
         Valid valid = new Valid();
 	    if (dataSecurityKeyRepository.updateUser(groupName,userId))    {
 	        valid.setValid(true);
@@ -865,8 +859,8 @@ public class SecurityController {
      * @param securityGroupName
      * @return List of Attribute-values
      */
-    @RequestMapping ( value = "/auth/fetchDskAllAttributeValues", method = RequestMethod.POST)
-    public List<DskDetails> fetchDskAllAttributeValues(@RequestBody String securityGroupName)    {
+    @RequestMapping ( value = "/auth/fetchDskAllAttributeValues", method = RequestMethod.GET)
+    public List<DskDetails> fetchDskAllAttributeValues(@RequestParam String securityGroupName)    {
         return dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupName);
     }
 
