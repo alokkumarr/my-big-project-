@@ -11,12 +11,12 @@ function gen_const(val,...ign) {
 
 // int value generator
 function gen_int(mi,ma,...ign) {
-      return ()=>parseInt(mi+Math.random()*(ma-mi))
+  return ()=>parseInt(mi+Math.random()*(ma-mi))
 }
 
 // float value generator
 function gen_float(mi,ma,...ign) {
-    return ()=>parseFloat(mi+Math.random()*(ma-mi))
+  return ()=>parseFloat(mi+Math.random()*(ma-mi))
 }
 
 // Object generator
