@@ -16,6 +16,8 @@ require('./field-attribute-view.component.scss');
 export class FieldAttributeViewComponent {
   config: any;
   data: any;
+  emptyState: boolean;
+
   @Input() groupSelected;
   constructor(
     private _dxDataGridService: dxDataGridService,
@@ -36,33 +38,38 @@ export class FieldAttributeViewComponent {
 
   loadAttributesGrid() {
     const request = {
-      SecurityGroupName: this.groupSelected
+      securityGroupName: this.groupSelected
     }
     this._userAssignmentService.getSecurityAttributes(request).then(response => {
       console.log(response);
-      //this.data = response;
-      this.data = [
-        {
-          attributeName: "sampleOne",
-          securityGroupName: this.groupSelected,
-          created_by: "string",
-          created_date: "string",
-          value: 1
-        }, {
-          attributeName: "samplene",
-          securityGroupName: this.groupSelected,
-          created_by: "string",
-          created_date: "string",
-          value: 2
-        }, {
-          attributeName: "sampletne",
-          securityGroupName: this.groupSelected,
-          created_by: "string",
-          created_date: "string",
-          value: 3
-        }
-      ];
+      this.data = response;
+      // this.data = [
+      //   {
+      //     attributeName: "sampleOne",
+      //     securityGroupName: this.groupSelected,
+      //     created_by: "string",
+      //     created_date: "string",
+      //     value: 1
+      //   }, {
+      //     attributeName: "samplene",
+      //     securityGroupName: this.groupSelected,
+      //     created_by: "string",
+      //     created_date: "string",
+      //     value: 2
+      //   }, {
+      //     attributeName: "sampletne",
+      //     securityGroupName: this.groupSelected,
+      //     created_by: "string",
+      //     created_date: "string",
+      //     value: 3
+      //   }
+      // ];
       console.log(this.data);
+      if (isEmpty(this.data)) {
+        this.emptyState = true;
+      } else {
+        this.emptyState = false;
+      }
       //this.groupSelected = this.data[0].securityGroupName;
     });
   }
@@ -92,7 +99,7 @@ export class FieldAttributeViewComponent {
 
   deleteAtttribute(cellData) {
     const data = {
-      title: `Are you sure you want to delete this attribute?`,
+      title: `Are you sure you want to delete this attribute for group ${this.groupSelected}?`,
       content: `Attribute Name: ${cellData.attributeName}`,
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
@@ -104,6 +111,15 @@ export class FieldAttributeViewComponent {
       autoFocus: false,
       data
     } as MatDialogConfig)
+    .afterClosed().subscribe((result) => {
+      const path = 'auth/deleteSecurityGroupDskAttributeValues';
+      const requestBody = [this.groupSelected, cellData.attributeName]
+      if (result) {
+        this._userAssignmentService.deleteGroupOrAttribute(path, requestBody).then(response => {
+          console.log(response);
+        })
+      }
+    });
   }
 
   getConfig() {

@@ -13,6 +13,11 @@ export class UserAssignmentService {
     private _jwtService: JwtService
   ) {}
 
+  getList(customerId) {
+    console.log(customerId);
+    return this.getRequest('auth/getlluserAssignments');
+  }
+
   //Add a new security group detail.
   addSecurityGroup(data) {
     let requestBody = {};
@@ -27,26 +32,22 @@ export class UserAssignmentService {
       path = 'auth/addSecurityGroups';
       break;
     case 'edit':
-      requestBody = {
-        description: data.description,
-        securityGroupName: data.securityGroupName,
-        oldsecurityGroupName: data.groupSelected
-      }
-      path = 'auth/UpdateSecurityGroups';
+      requestBody = [data.securityGroupName, data.description, data.groupSelected];
+      path = 'auth/updateSecurityGroups';
       break;
     }
     return this.postRequest(path, requestBody);
   }
 
   ////edit an exiting security group detail.
-  editSecurityGroup(securityGroup) {
-    const requestBody = {
-      ...securityGroup,
-      createdBy: this._jwtService.getUserName(),
-      userId: this._jwtService.getUserId()
-    }
-    return this.postRequest(`auth/addSecurityGroups`, requestBody);
-  }
+  // editSecurityGroup(securityGroup) {
+  //   const requestBody = {
+  //     ...securityGroup,
+  //     createdBy: this._jwtService.getUserName(),
+  //     userId: this._jwtService.getUserId()
+  //   }
+  //   return this.postRequest(`auth/addSecurityGroups`, requestBody);
+  // }
 
   addAttributetoGroup(attribute, mode) {
     let path;
@@ -69,8 +70,17 @@ export class UserAssignmentService {
     return this.getRequest('auth/getSecurityGroups');
   }
 
+  deleteGroupOrAttribute(path, request) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      })
+    };
+    return this._http.post(`http://34.229.20.66/saw/security/${path}`, request, httpOptions).toPromise();
+  }
+
   getRequest(path) {
-    return this._http.get(`http://54.87.146.107/saw/security/${path}`).toPromise();
+    return this._http.get(`http://34.229.20.66/saw/security/${path}`).toPromise();
   }
 
   postRequest(path: string, params: Object) {
@@ -79,7 +89,7 @@ export class UserAssignmentService {
         'Content-Type':  'application/json'
       })
     };
-    return this._http.post(`http://54.87.146.107/saw/security/${path}`, params, httpOptions).toPromise();
+    return this._http.post(`http://34.229.20.66/saw/security/${path}`, params, httpOptions).toPromise();
     //return this._http.post(`${apiUrl}/${path}`, params, httpOptions).toPromise();
   }
 }

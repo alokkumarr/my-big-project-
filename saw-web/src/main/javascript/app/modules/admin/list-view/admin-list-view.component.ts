@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {dxDataGridService} from '../../../common/services/dxDataGrid.service';
+import { UserAssignmentService } from './../datasecurity/userassignment.service';
 
 const template = require('./admin-list-view.component.html');
 require('./admin-list-view.component.scss');
@@ -19,25 +20,35 @@ export class AdminListViewComponent {
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
   @Output() rowClick: EventEmitter<any> = new EventEmitter();
 
-  securityGroups = [
-    {value: 'group1', viewValue: 'Group 1'},
-    {value: 'group2', viewValue: 'Group 2'},
-    {value: 'group3', viewValue: 'Group 3'}
-  ];
+  securityGroups= {};
+  // securityGroups = [
+  //   {value: 'group1', viewValue: 'Group 1'},
+  //   {value: 'group2', viewValue: 'Group 2'},
+  //   {value: 'group3', viewValue: 'Group 3'}
+  // ];
 
   config: any;
+  groupValue: any;
 
   constructor(
-    private _dxDataGridService: dxDataGridService
+    private _dxDataGridService: dxDataGridService,
+    private _userAssignmentService: UserAssignmentService
   ) { }
 
   ngOnInit() {
-    console.log(this.data);
     this.config = this.getConfig();
+    this._userAssignmentService.getSecurityGroups().then(response => {
+      console.log(response);
+      this.securityGroups = response;
+    })
   }
 
   getLinkTooltip() {
     return 'View Privileges';
+  }
+
+  assignGrouptoUser(groupName) {
+    console.log(groupName.value);
   }
 
   getConfig() {

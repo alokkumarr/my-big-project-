@@ -209,7 +209,7 @@ export class AdminMainViewComponent implements OnDestroy {
       return this._privilegeService;
     case 'user assignments':
       this.showAddButton = false;
-      return this._userService;
+      return this._userassignmentsService;
     default:
       break;
     }
@@ -235,7 +235,6 @@ export class AdminMainViewComponent implements OnDestroy {
 
   getListData(customerId) {
     const service = this.getService() as any;
-    console.log(service.getList(customerId));
     return service.getList(customerId);
   }
 

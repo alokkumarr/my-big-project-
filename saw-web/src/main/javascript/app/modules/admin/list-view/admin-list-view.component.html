@@ -55,9 +55,9 @@
   <div *dxTemplate="let cell of 'groupAssignCellTemplate'">
     <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container group-select">
       <mat-form-field>
-        <mat-select placeholder="Select Group" class="group-select-dropdown">
-          <mat-option *ngFor="let group of securityGroups">
-            {{group.viewValue}}
+        <mat-select placeholder="Select Group" (selectionChange)="assignGrouptoUser($event)" class="group-select-dropdown">
+          <mat-option *ngFor="let group of securityGroups" [value]="group.securityGroupName">
+            {{group.securityGroupName}}
           </mat-option>
         </mat-select>
       </mat-form-field>

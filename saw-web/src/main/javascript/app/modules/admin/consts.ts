@@ -45,12 +45,12 @@ export const AdminMenuData = [
     children: [
       {
         id: '',
-        name: 'Security Groups',
+        name: 'Manage Security Groups',
         url: ['/admin/securitygroups']
       },
       {
         id: '',
-        name: 'User Assignments',
+        name: 'Manage User Assignments',
         url: ['/admin/userassignments']
       }
     ]

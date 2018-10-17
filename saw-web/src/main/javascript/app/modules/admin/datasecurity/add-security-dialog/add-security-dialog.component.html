@@ -14,7 +14,7 @@
       <span [innerHtml]="errorMessage"></span>
     </div>
     <mat-form-field>
-      <input matInput [(ngModel)]="data.securityGroupName" placeholder="Security Group Name" required/>
+      <input matInput [(ngModel)]="data.securityGroupName" placeholder="Security Group Name" maxlength="30" required/>
     </mat-form-field>
 
     <mat-form-field>
@@ -28,6 +28,7 @@
           e2e="create-analysis-btn"
           color="primary"
           [ngSwitch]="data.mode"
+          [disabled]="!data.securityGroupName"
           mat-raised-button
   >
     <ng-container *ngSwitchCase="'create'" i18n>

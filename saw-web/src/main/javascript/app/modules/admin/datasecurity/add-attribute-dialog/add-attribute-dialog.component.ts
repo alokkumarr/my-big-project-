@@ -23,7 +23,7 @@ export class AddAttributeDialogComponent {
     console.log(this.data);
     console.log(this.attribute);
     const request = {
-      attributeName: this.data.attributeName,
+      attributeName: this.data.attributeName.trim(),
       value: this.data.value,
       securityGroupName: this.data.groupSelected
     }

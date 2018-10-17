@@ -8,6 +8,7 @@ import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attri
 import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 import { UserAssignmentService } from './../userassignment.service';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
+import { isEmpty } from 'rxjs/operators';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
@@ -28,6 +29,7 @@ export class SecurityGroupComponent {
   config: any;
   data: any;
   groupSelected: any = '';columnData: {};
+  emptyState: boolean;
 
   constructor(
     private _router: Router,
@@ -48,6 +50,7 @@ export class SecurityGroupComponent {
   ngOnInit() {
     this.config = this.getConfig();
     this.loadGroupGridWithData();
+    this.emptyState = true;
   }
 
   initialise() {
@@ -57,37 +60,29 @@ export class SecurityGroupComponent {
   }
 
   loadGroupGridWithData() {
-    this.data = [
-      {
-        securityGroupName: "sampleOne",
-        description: "jkanskjjasdn"
-      }, {
-        securityGroupName: "sample5ne",
-        description: "jkanskjjasdn"
-      }, {
-        securityGroupName: "sampletne",
-        description: "jkanskjjasdn"
+    // this.data = [
+    //   {
+    //     securityGroupName: "sampleOne",
+    //     description: "jkanskjjasdn"
+    //   }, {
+    //     securityGroupName: "sample5ne",
+    //     description: "jkanskjjasdn"
+    //   }, {
+    //     securityGroupName: "sampletne",
+    //     description: "jkanskjjasdn"
+    //   }
+    // ];
+    //this.groupSelected = this.data[0].securityGroupName;
+    this.groupSelected = '';
+    this._userAssignmentService.getSecurityGroups().then(response => {console.log(response);
+      this.data = response;
+      if (this.data.length === 0) {
+        this.emptyState = true;
+      } else {
+        this.emptyState = false;
+        this.groupSelected = this.data[0].securityGroupName;
       }
-    ];
-    this.groupSelected = this.data[0].securityGroupName;
-    // this._userAssignmentService.getSecurityGroups().then(response => {
-    //   console.log(response);
-    //   //this.data = response;
-    //   this.data = [
-    //     {
-    //       securityGroupName: "sampleOne",
-    //       description: "jkanskjjasdn"
-    //     }, {
-    //       securityGroupName: "sample5ne",
-    //       description: "jkanskjjasdn"
-    //     }, {
-    //       securityGroupName: "sampletne",
-    //       description: "jkanskjjasdn"
-    //     }
-    //   ];
-    //   console.log(this.data);
-    //   this.groupSelected = this.data[0].securityGroupName;
-    // });
+    });
   }
 
   addPropperty(property, mode: 'edit' | 'create') {
@@ -100,7 +95,6 @@ export class SecurityGroupComponent {
       groupSelected: this.groupSelected,
       ...this.columnData
     };
-    console.log(data);
     const component = this.getModalComponent(property) as any;
     return this._dialog.open(component, {
       width: 'auto',
@@ -135,6 +129,17 @@ export class SecurityGroupComponent {
       autoFocus: false,
       data
     } as MatDialogConfig)
+    .afterClosed().subscribe((result) => {
+      const path = 'auth/deleteSecurityGroupDskAttributeValues';
+      const requestBody = {
+        securityGroupName : cellData.securityGroupName
+      }
+      if (result) {
+        this._userAssignmentService.deleteGroupOrAttribute(path, requestBody).then(response => {
+          console.log(response);
+        })
+      }
+    });
   }
 
   getModalComponent(property) {

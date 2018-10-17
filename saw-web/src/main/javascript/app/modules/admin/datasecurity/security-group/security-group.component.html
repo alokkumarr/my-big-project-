@@ -1,11 +1,6 @@
 <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
   <div fxLayout="row" fxFlex="40">
-    <div class="admin-title" e2e="security-group-title">Data Security Groups</div>
-    <search-box placeholder="Search"
-                [value]="filterObj.searchTerm"
-                (searchTermChange)="applySearchFilter($event)"
-                [delay]="1000">
-    </search-box>
+    <div class="admin-title" e2e="security-group-title">Manage Security Groups</div>
   </div>
 
   <div fxLayout="row" class="customer-name" fxLayoutAlign="start center" fxFlex="40">
@@ -24,7 +19,14 @@
     </button>
   </div>
 </mat-toolbar>
-<dx-data-grid class="security-group-grid" [customizeColumns]="config.customizeColumns"
+
+<div *ngIf="emptyState" style="margin-left: 30%;
+  margin-top: 7%;
+  font-size: 25px;">
+    Add a new Group by clicking on the "+Security Group" button
+</div>
+<div *ngIf="!emptyState" style="float: left;">
+  <dx-data-grid class="security-group-grid" [customizeColumns]="config.customizeColumns"
               [columnAutoWidth]="config.columnAutoWidth"
               [columnMinWidth]="config.columnMinWidth"
               [columnResizingMode]="config.columnResizingMode"
@@ -46,32 +48,34 @@
               [width]="config.width"
               [height]="config.height"
               (onRowClick)="config.onRowClick($event)"
->
+  >
 
-<div *dxTemplate="let cell of 'actionCellTemplate'">
-  <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
-    <button mat-icon-button
-    i18n-matTooltip="Edit Group"
-          matTooltip="Edit Group" (click)="editGroupData(cell.data)"
-            >
-      <mat-icon fontIcon="icon-edit"></mat-icon>
-    </button>
-    <button mat-icon-button
-            (click)="deleteGroup(cell.data)"
-            i18n-matTooltip="Delete Group"
-          matTooltip="Delete Group">
-      <mat-icon fontIcon="icon-trash"></mat-icon>
-    </button>
+  <div *dxTemplate="let cell of 'actionCellTemplate'">
+    <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
+      <button mat-icon-button class="update-security-property"
+      i18n-matTooltip="Edit Group"
+            matTooltip="Edit Group" (click)="editGroupData(cell.data)"
+              >
+        <mat-icon fontIcon="icon-edit"></mat-icon>
+      </button>
+      <button class="update-security-property" mat-icon-button
+              (click)="deleteGroup(cell.data)"
+              i18n-matTooltip="Delete Group"
+            matTooltip="Delete Group">
+        <mat-icon  fontIcon="icon-trash"></mat-icon>
+      </button>
+    </div>
   </div>
+
+  <div *dxTemplate="let cell of 'toolTipCellTemplate'">
+    <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container" style="float: left !important;" >
+      <span i18n-matTooltip="{{cell.data.description}}"
+      matTooltip="{{cell.data.description}}">{{cell.data.securityGroupName}}</span>
+    </div>
+  </div>
+
+  </dx-data-grid>
+  <field-attribute-view [groupSelected]="groupSelected"></field-attribute-view>
 </div>
 
-<div *dxTemplate="let cell of 'toolTipCellTemplate'">
-  <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
-    <span i18n-matTooltip='"cell.data.description"''
-    matTooltip='"cell.data.description"'>{{cell.data.securityGroupName}}</span>
-  </div>
-</div>
-
-</dx-data-grid>
-<field-attribute-view [groupSelected]="groupSelected"></field-attribute-view>
 
