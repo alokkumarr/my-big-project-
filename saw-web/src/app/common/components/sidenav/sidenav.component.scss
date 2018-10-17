@@ -33,6 +33,7 @@ mat-sidenav {
 .sidenav-container {
   position: fixed !important;
   width: 20%;
+  min-width: 250px !important;
   max-width: 300px !important;
   background-color: $primary-blue-b2 !important;
   color: white !important;

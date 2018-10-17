@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import * as orderBy from 'lodash/orderBy';
 import * as isEmpty from 'lodash/isEmpty';
 import * as values from 'lodash/values';
@@ -105,8 +105,10 @@ export class ExecutedChartViewComponent {
     const trimData = data.map(row => {
       const obj = {};
       for (const key in row) {
-        const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
-        obj[trimKey.aliasName] = trimKey.value;
+        if (row.hasOwnProperty(key)) {
+          const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+          obj[trimKey.aliasName] = trimKey.value;
+        }
       }
       return obj;
     });

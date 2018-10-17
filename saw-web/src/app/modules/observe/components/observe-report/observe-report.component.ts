@@ -8,8 +8,7 @@ import {
 import { GridsterItem } from 'angular-gridster2';
 import { AnalysisReport } from '../../../analyze/types';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   AnalyzeService,
   EXECUTION_MODES

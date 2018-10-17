@@ -12,12 +12,11 @@ export const routes: Routes = [
   {
     path: '',
     component: LoginPageComponent,
-    canActivate: [IsUserNotLoggedInGuard],
-    canActivateChild: [IsUserNotLoggedInGuard],
     children: [
       {
         path: '',
         component: LoginComponent,
+        canActivate: [IsUserNotLoggedInGuard],
         pathMatch: 'full'
       },
       {
@@ -28,11 +27,13 @@ export const routes: Routes = [
       {
         // name: 'preResetPassword',
         path: 'preResetPwd',
+        canActivate: [IsUserNotLoggedInGuard],
         component: PasswordPreResetComponent
       },
       {
         // name: 'resetPassword',
         path: 'resetPassword',
+        canActivate: [IsUserNotLoggedInGuard],
         component: PasswordResetComponent
       }
     ]

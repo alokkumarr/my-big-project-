@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class SidenavMenuService {
-  public _subject$ = new Subject<{menu: any[], module: string}>();
+  public _subject$ = new Subject<{ menu: any[]; module: string }>();
 
   subscribe(fn) {
     this._subject$.subscribe(fn);
@@ -11,8 +11,7 @@ export class SidenavMenuService {
 
   updateMenu(menu, module) {
     setTimeout(() => {
-      this._subject$.next({menu, module});
+      this._subject$.next({ menu, module });
     });
   }
 }
-

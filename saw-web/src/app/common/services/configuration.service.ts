@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import AppConfig from '../../../../appConfig';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { tap, flatMap } from 'rxjs/operators';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
@@ -122,7 +122,9 @@ export class ConfigService {
       this.cache = rawConfig ? JSON.parse(rawConfig) : null;
     }
 
-    if (!this.cache) return null;
+    if (!this.cache) {
+      return null;
+    }
 
     const pref = find(
       this.cache.preferences,

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import 'rxjs/add/operator/first';
+import { first } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
@@ -82,7 +82,7 @@ export class AnalyzeActionsService {
       return this._analyzeDialogService
         .openEditAnalysisDialog(analysis, mode)
         .afterClosed()
-        .first()
+        .pipe(first())
         .toPromise();
     default:
     }
@@ -90,65 +90,69 @@ export class AnalyzeActionsService {
 
   openPublishModal(analysis, type) {
     switch (type) {
-    case 'publish':
-      return new Promise<Analysis>((resolve, reject) => {
-        this.dialog
-          .open(AnalyzePublishDialogComponent, {
-            width: 'auto',
-            height: 'auto',
-            data: { analysis }
-          } as MatDialogConfig)
-          .afterClosed()
-          .subscribe(modifiedAnalysis => {
-            if (analysis) {
-              const execute = true;
-              this._publishService.publishAnalysis(modifiedAnalysis, execute, type).then(
-                publishedAnalysis => {
-                  this._toastMessage.info(
-                    execute
-                      ? 'Analysis has been updated.'
-                      : 'Analysis schedule changes have been updated.'
+      case 'publish':
+        return new Promise<Analysis>((resolve, reject) => {
+          this.dialog
+            .open(AnalyzePublishDialogComponent, {
+              width: 'auto',
+              height: 'auto',
+              data: { analysis }
+            } as MatDialogConfig)
+            .afterClosed()
+            .subscribe(modifiedAnalysis => {
+              if (analysis) {
+                const execute = true;
+                this._publishService
+                  .publishAnalysis(modifiedAnalysis, execute, type)
+                  .then(
+                    publishedAnalysis => {
+                      this._toastMessage.info(
+                        execute
+                          ? 'Analysis has been updated.'
+                          : 'Analysis schedule changes have been updated.'
+                      );
+                      resolve(publishedAnalysis);
+                    },
+                    () => {
+                      reject();
+                    }
                   );
-                  resolve(publishedAnalysis);
-                },
-                () => {
-                  reject();
-                }
-              );
-            }
-          });
-      });
-      break;
+              }
+            });
+        });
+        break;
 
-    case 'schedule':
-      return new Promise<Analysis>((resolve, reject) => {
-        this.dialog
-          .open(AnalyzeScheduleDialogComponent, {
-            width: 'auto',
-            height: 'auto',
-            data: { analysis }
-          } as MatDialogConfig)
-          .afterClosed()
-          .subscribe(analysis => {
-            if (analysis) {
-              const execute = false;
-              this._publishService.publishAnalysis(analysis, execute, type).then(
-                updatedAnalysis => {
-                  this._toastMessage.info(
-                    execute
-                      ? 'Analysis has been updated.'
-                      : 'Analysis schedule changes have been updated.'
+      case 'schedule':
+        return new Promise<Analysis>((resolve, reject) => {
+          this.dialog
+            .open(AnalyzeScheduleDialogComponent, {
+              width: 'auto',
+              height: 'auto',
+              data: { analysis }
+            } as MatDialogConfig)
+            .afterClosed()
+            .subscribe(scheduledAnalysis => {
+              if (scheduledAnalysis) {
+                const execute = false;
+                this._publishService
+                  .publishAnalysis(scheduledAnalysis, execute, type)
+                  .then(
+                    updatedAnalysis => {
+                      this._toastMessage.info(
+                        execute
+                          ? 'Analysis has been updated.'
+                          : 'Analysis schedule changes have been updated.'
+                      );
+                      resolve(updatedAnalysis);
+                    },
+                    () => {
+                      reject();
+                    }
                   );
-                  resolve(updatedAnalysis);
-                },
-                () => {
-                  reject();
-                }
-              );
-            }
-          });
-      });
-      break;
+              }
+            });
+        });
+        break;
     }
   }
 

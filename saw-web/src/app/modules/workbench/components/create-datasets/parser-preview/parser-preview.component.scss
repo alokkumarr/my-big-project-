@@ -15,6 +15,10 @@ mat-tab-group {
   color: rgba(0, 0, 0, 0.69);
 }
 
+::ng-deep .mat-tab-label-active {
+  color: $primary-blue-b2;
+}
+
 .formatEditIcon {
   font-size: 18px;
   padding-top: 7px;
@@ -38,6 +42,7 @@ mat-tab-group {
 
 .preview-container {
   height: calc(100% - 47px);
+  padding: 0 3px;
 }
 
 .raw-content {

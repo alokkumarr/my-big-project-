@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router';
 import { routes } from './routes';
 
 import { WorkbenchService } from './services/workbench.service';
-import { AnalyzeService } from '../analyze/services/analyze.service';
+
 import {
   MenuService,
   ToastService,
@@ -86,7 +86,6 @@ const GUARDS = [DefaultWorkbenchPageGuard];
 const SERVICES = [
   JwtService,
   WorkbenchService,
-  AnalyzeService,
   MenuService,
   ToastService,
   SideNavService,

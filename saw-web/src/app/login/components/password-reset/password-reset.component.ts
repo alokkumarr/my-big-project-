@@ -17,6 +17,7 @@ export class PasswordResetComponent implements OnInit {
   public errorMsg;
   public username;
   public confNewPwd;
+  public rhcToken;
   public newPwd;
 
   ngOnInit() {
@@ -25,6 +26,7 @@ export class PasswordResetComponent implements OnInit {
       this._UserService.verify(params).then((res: any) => {
         if (res.valid) {
           this.username = res.masterLoginID;
+          this.rhcToken = rhc;
         } else {
           this.errorMsg =
             res.validityReason + '. Please regenerate the link once again';

@@ -1,5 +1,5 @@
 import { FormControl, FormGroup, ValidationErrors } from '@angular/forms';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 /**
  * Form validation: Used when a field needs to be required depending on
@@ -23,7 +23,9 @@ export const requireIf = (otherFieldName: string, fn: (any) => boolean) => {
       throw new Error(`${otherFieldName} not found in the form.`);
     }
 
-    if (!fn(otherControl.value)) { return null; }
+    if (!fn(otherControl.value)) {
+      return null;
+    }
 
     return thisControl.value
       ? null

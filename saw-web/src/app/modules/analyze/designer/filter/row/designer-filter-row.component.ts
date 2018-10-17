@@ -11,9 +11,8 @@ import * as find from 'lodash/find';
 import * as unset from 'lodash/unset';
 import * as orderBy from 'lodash/orderBy';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
-import { startWith } from 'rxjs/operators/startWith';
-import { map } from 'rxjs/operators/map';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 import { ArtifactColumn, Filter, FilterModel } from '../../types';
 import { TYPE_MAP } from '../../../consts';
 

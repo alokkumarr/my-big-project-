@@ -2,7 +2,8 @@
   <mat-toolbar class="toolbar-white">
     <mat-toolbar-row>
       <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" e2e="data-mode-group" class="data-mode">
-        <mat-button-toggle-group [(ngModel)]="dataView" [value]="dataView" (change)="onDataObjectViewChange()" #viewType="matButtonToggleGroup">
+        <mat-button-toggle-group [(ngModel)]="dataView" [value]="dataView" (change)="onDataObjectViewChange()"
+          #viewType="matButtonToggleGroup">
           <mat-button-toggle e2e="data-sets-view" i18n value="sets">
             <mat-icon fontIcon="icon-exchange"></mat-icon>
             <span>Data Sets</span>
@@ -12,7 +13,8 @@
             <span>Data Pods</span>
           </mat-button-toggle>
         </mat-button-toggle-group>
-        <search-box placeholder="Search" [value]="states.searchTerm" (searchTermChange)="applySearchFilter($event)" [delay]="1000"></search-box>
+        <search-box placeholder="Search" [value]="states.searchTerm" (searchTermChange)="applySearchFilter($event)"
+          [delay]="1000"></search-box>
       </div>
       <div fxFlex="20" fxLayout="row" e2e="view-mode-group" class="view-mode">
         <mat-button-toggle-group [(ngModel)]="viewState" [value]="viewState" (change)="onViewChange()" #viewMode="matButtonToggleGroup">
