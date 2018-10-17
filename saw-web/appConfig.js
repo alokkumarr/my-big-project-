@@ -6,11 +6,10 @@ if (__PRODUCTION__) {
   apiUrl = window.location.origin;
 } else {
   // Note: To run against a local Docker environment, use localhost
-  // apiUrl = 'http://localhost';
   apiUrl = 'http://saw-rd601.ana.dev.vaste.sncrcorp.net';
 }
 /* eslint-enable */
-apiUrl = apiUrl + '/saw';
+apiUrl += '/saw';
 
 export default {
   login: {

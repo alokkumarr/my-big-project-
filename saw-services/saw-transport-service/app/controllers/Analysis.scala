@@ -4,9 +4,8 @@ import java.time.Instant
 import java.util
 import java.util.UUID
 
-import com.synchronoss.querybuilder.{EntityType, SAWElasticSearchQueryBuilder, SAWElasticSearchQueryExecutor}
 import model.{ClientException, PaginateDataSet, QueryBuilder, TransportUtils}
-import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue, JBool => _, JField => _, JInt => _, JNothing => _}
+import org.json4s.JsonAST.{JArray, JObject, JString, JValue}
 import org.json4s.JsonDSL._
 import org.json4s._
 import org.json4s.native.JsonMethods._
@@ -29,10 +28,15 @@ import java.time.LocalDateTime
 
 import scala.collection.JavaConverters._
 import executor.ReportExecutorQueue
+
 import org.json4s
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
-import sncr.metadata.engine.{Fields, MDObjectStruct, MetadataDictionary}
+import sncr.metadata.engine.Fields
 import sncr.saw.common.config.SAWServiceConfig
+import org.json4s.native.Serialization.writePretty
+
+import sncr.service.InternalServiceClient
+import sncr.service.model.SemanticNodeObject
 
 import scala.reflect.io.File
 
@@ -41,6 +45,7 @@ class Analysis extends BaseController {
   val executorRegularQueue = new ReportExecutorQueue("regular")
   val executorFastQueue = new ReportExecutorQueue("fast")
   var totalRows: Int = 0;
+
 
   /**
     * List analyses.  At the moment only used by scheduler to list
@@ -123,7 +128,9 @@ class Analysis extends BaseController {
       case Some(ticket) =>
         (ticket.dataSecurityKey)
     }
-
+    val semanticHost = SAWServiceConfig.semanticService.getString("host")
+    val semanticEndpoint = SAWServiceConfig.semanticService.getString("endpoint")
+    m_log.trace("semanticHost url : {}",semanticHost + semanticEndpoint)
     action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
@@ -141,23 +148,71 @@ class Analysis extends BaseController {
         val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
-        val semanticJson = readSemanticJson(semanticId)
-        val mergeJson = contentsAnalyze(
-          semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
+
+        // This block has been commented change related to SIP-4226 & SIP-4220
+        // val semanticJson = readSemanticJson(semanticId)
+        // m_log.trace("only semanticJson read : {}", writePretty(semanticJson));
+        //val repository = (semanticJsonMetaDataStore \ "repository");
+        //m_log.info("repository : {}",  repository.extract[JArray]);
+
+        m_log.trace("semantic details : {}", semanticHost + semanticEndpoint + semanticId);
+        val semanticJsonMetaDataStore = parse(new InternalServiceClient(semanticHost + semanticEndpoint + semanticId)
+            .retrieveObject(new SemanticNodeObject())).asInstanceOf[JObject];
+        m_log.trace("only semanticJsonStore read from semantic service : {}", writePretty(semanticJsonMetaDataStore));
+        val mergeJsonMetaDataStore = contentsAnalyze(
+          semanticJsonMetaDataStore.merge(idJson).merge(instanceJson).merge(typeJson))
+        m_log.trace("only mergeJsonMetaDataStore read from semantic service : {}", writePretty(mergeJsonMetaDataStore));
+        val responseJsonMetaDataStore = json merge mergeJsonMetaDataStore
+        m_log.trace("only responseJsonMetaDataStore read from semantic service : {}", writePretty(responseJsonMetaDataStore));
+        val analysisJsonMetaDataStore = (responseJsonMetaDataStore \ "contents" \ "analyze") (0)
+        m_log.trace("only analysisJsonMetaDataStore read from semantic service : {}", writePretty(analysisJsonMetaDataStore));
+         val analysisNode = new AnalysisNode(analysisJsonMetaDataStore)
+
+        // This block has been commented change related to SIP-4226 & SIP-4220
+       /**
+       val mergeJson = contentsAnalyze(semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
+        m_log.info("After merging of semanticJson to instanceJson: {}", writePretty(mergeJson));
+        m_log.info("Actual json on create {}", writePretty(json));
         val responseJson = json merge mergeJson
+        m_log.info("responseJson before adding to content: {}", writePretty(responseJson));
         val analysisJson = (responseJson \ "contents" \ "analyze") (0)
-        val analysisNode = new AnalysisNode(analysisJson)
-        val semanticNode = readSemanticNode(semanticId)
-        for ((category, id) <- semanticNode.getRelatedNodes) {
-          if (category == "DataObject") {
-            analysisNode.addNodeToRelation(id, category)
-          }
-        }
+        m_log.info("analysisJson before adding to content: {}", writePretty(analysisJson));
+           val semanticNode = readSemanticNode(semanticId)
+           for ((category, id) <- semanticNode.getRelatedNodes) {
+            if (category == "DataObject") {
+              analysisNode.addNodeToRelation(id, category)
+            }
+           }
+        */
+
+        // The below block should remain because it is creating a node in binary store
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
           throw new ClientException("Writing failed: " + message)
         }
-        responseJson
+        m_log.info("responseJson to user interface : {}", writePretty(responseJsonMetaDataStore))
+        val analysisStoreJsonLocation = readAnalysisJson(analysisId)
+        m_log.info("analysisStoreJsonLocation after saving the data : {}", analysisStoreJsonLocation);
+
+        // TODO: The below section will be removed
+        val repositories = analysisStoreJsonLocation \ "repository" match {
+          case repository: JArray => repository.arr
+          case JNothing => List()
+          case obj: JValue => Nil
+        }
+        var name : String =null
+        var location : String = null
+        var format : String = null
+        m_log.info("repositories : {}", repositories);
+        repositories.foreach(repo => {
+          name = (repo \ "name").extract[String]
+          m_log.info("name : {}", name);
+          location = (repo \ "physicalLocation").extract[String]
+          m_log.info("location : {}", location);
+          format = (repo \ "format").extract[String]
+          m_log.info("format : {}", format);
+        })
+        responseJsonMetaDataStore
       }
       case "update" => {
         m_log.trace("dataSecurityKey before processing in update: {}", dataSecurityKey);
@@ -167,7 +222,6 @@ class Analysis extends BaseController {
           dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
           m_log.trace("dskStr after processing in update: {}", dskStr);
         }
-
         val analysisId = extractAnalysisId(json)
         val analysisNode = AnalysisNode(analysisId)
         m_log.trace("dskStr after processing inside update block before analysisJson(json, dskStr) : {}", dskStr);
@@ -229,18 +283,19 @@ class Analysis extends BaseController {
           val analysisId = extractAnalysisId(json)
           var executionType: String = null
           var queryRuntime: String = null
+          var typeInfo : String = null
           (json \ "contents" \ "analyze") match {
             case obj: JArray => {
               val analysis = analysisJson(json, dskStr)
               val analysisType = (analysis \ "type")
-              val typeInfo = analysisType.extract[String]
+               typeInfo = analysisType.extract[String]
               executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
               if (typeInfo.equals("report")) {
                 /* Build query based on analysis supplied in request body */
                 val runtime = (executionType == ExecutionType.onetime.toString
                   || executionType == ExecutionType.regularExecution.toString
                   || executionType == ExecutionType.publish.toString)
-                m_log.debug("Execution type: {}", executionType)
+                m_log.info("Execution type: {}", executionType)
                 m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
                 m_log.trace("runtime execute block before queryRuntime: {}", runtime);
                 queryRuntime = (analysis \ "queryManual") match {
@@ -248,7 +303,7 @@ class Analysis extends BaseController {
                   case obj: JString => obj.extract[String]
                   case obj => unexpectedElement("string", obj)
                 }
-                m_log.info("RUNTIME_QUERY_RUNTIME" + queryRuntime)
+                m_log.info("RUNTIME_QUERY_RUNTIME : " + queryRuntime)
               }
             }
             case _ => {}
@@ -260,6 +315,9 @@ class Analysis extends BaseController {
 
           m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
           val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
+          if (typeInfo != null && typeInfo.equalsIgnoreCase("report")
+            && executionType.equalsIgnoreCase("preview"))
+            return contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2)) ~ ("query", queryRuntime)
           contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2))
         })
 
@@ -376,6 +434,14 @@ class Analysis extends BaseController {
     ("contents", ("analyze", JArray(analyses)))
   }
 
+  def unexpectedElement(
+                         json: JValue, expected: String, location: String): Nothing = {
+    val name = json.getClass.getSimpleName
+    throw new ClientException(
+      "Unexpected element: %s, expected %s, at %s".format(
+        name, expected, location))
+  }
+
   /**
     * Return the list of analysis created in my analysis category by requested user.
     *
@@ -399,20 +465,32 @@ class Analysis extends BaseController {
     m_log.trace("json dataset: {}", reqJSON);
     val start = (reqJSON \ "contents" \ "page").extractOrElse(1)
     val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
+    var executedBy = (reqJSON \ "contents" \ "executedBy").extractOrElse("Anonymous")
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON, dataSecurityKeyStr); // reading from request body
       case _ => null
     }
+    var analysisDefinition :JObject = null
+
     if (analysis == null) {
       analysisJSON = readAnalysisJson(analysisId); // reading from the store
+      analysisDefinition = analysisJSON
       val analysisType = (analysisJSON \ "type");
       typeInfo = analysisType.extract[String];
       json = compact(render(analysisJSON));
+      // If analysis is null it must be triggered via scheduled job.
+      executedBy="Scheduled"
     }
     else {
       val analysisType = (analysis \ "type");
       typeInfo = analysisType.extract[String];
+      analysisDefinition = analysisJson(reqJSON,dataSecurityKeyStr)
       json = compact(render(analysis));
+    }
+    val queryBuilder : JObject = (analysisDefinition \ "sqlBuilder") match {
+      case obj: JObject => obj
+      case JNothing => JObject()
+      case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
     }
     val analysisNode = AnalysisNode(analysisId)
     val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -474,9 +552,11 @@ class Analysis extends BaseController {
             JField("type", JString("pivot")),
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
-            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("execution_finish_ts", JInt(finishedTS)),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -487,12 +567,14 @@ class Analysis extends BaseController {
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("failed")),
-            JField("execution_finish_ts", JLong(-1L)),
+            JField("execution_finish_ts", JInt(-1)),
             JField("type", JString("pivot")),
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -510,7 +592,6 @@ class Analysis extends BaseController {
 
       return (myArray ,analysisResultNodeID)
     }
-
     if (typeInfo.equals("esReport")) {
       var data: String = null
       val rowLimit: java.lang.Integer = if (SAWServiceConfig.es_conf.hasPath("inline-es-report-data-store-limit-rows"))
@@ -555,9 +636,11 @@ class Analysis extends BaseController {
             JField("type", JString("esReport")),
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
-            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("execution_finish_ts", JInt(finishedTS)),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -568,12 +651,14 @@ class Analysis extends BaseController {
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("failed")),
-            JField("execution_finish_ts", JLong(-1L)),
+            JField("execution_finish_ts", JInt(-1)),
             JField("type", JString("esReport")),
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -628,12 +713,15 @@ class Analysis extends BaseController {
             JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("execution_finish_ts", JInt(finishedTS)),
             JField("type", JString("chart")),
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
+
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -644,12 +732,14 @@ class Analysis extends BaseController {
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("failed")),
-            JField("execution_finish_ts", JLong(-1L)),
+            JField("execution_finish_ts", JInt(-1)),
             JField("type", JString("chart")),
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -671,6 +761,7 @@ class Analysis extends BaseController {
       // This is the part of report type starts here
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
+      m_log.info("analysis retrieved while execution yet to begin : {}", analysis);
       m_log.trace("queryRuntime inside report block before executeAndWait: {}", queryRuntime);
       val query = if (queryRuntime != null) queryRuntime
       // In case of scheduled execution type if manual query exists take the precedence.
@@ -694,18 +785,41 @@ class Analysis extends BaseController {
         case "publish" => ExecutionType.publish
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
-      val execution = analysis.executeAndWaitQueue(
-        executionTypeEnum, query, (analysisId, resultId, query) => {
-          val executorQueue = executionTypeEnum match {
-            case ExecutionType.preview => executorFastQueue
-            case ExecutionType.onetime => executorFastQueue
-            case ExecutionType.scheduled => executorRegularQueue
-            case ExecutionType.regularExecution => executorRegularQueue
-            case ExecutionType.publish => executorRegularQueue
-            case obj => throw new RuntimeException("Unknown execution type: " + obj)
+      var resultNodeId :String = null
+      val execution = try {
+        analysis.executeAndWaitQueue(
+          executionTypeEnum, query, (analysisId, resultId, query) => {
+            val executorQueue = executionTypeEnum match {
+              case ExecutionType.preview => executorFastQueue
+              case ExecutionType.onetime => executorFastQueue
+              case ExecutionType.scheduled => executorRegularQueue
+              case ExecutionType.regularExecution => executorRegularQueue
+              case ExecutionType.publish => executorRegularQueue
+              case obj => throw new RuntimeException("Unknown execution type: " + obj)
+            }
+            executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
+            resultNodeId= resultId
+          })
+      } catch {
+        case throwable: Throwable =>
+          throw throwable
+      } finally {
+        // possibly execution timeOut exception, but still execution may running
+        // as background process, update the queryBuilder metadata, if resultNode exists.
+        resultNode = getResultNode(analysisId,resultNodeId)
+        if(resultNode!=null) {
+          val content = resultNode.getCachedData("content") match {
+            case obj: JObject => obj
+            case obj: JValue => unexpectedElement("object", obj)
           }
-          executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
-        })
+          val newDescriptor = JObject(content.obj ++ List(
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
+          ))
+          resultNode.setDescriptor(compact(render(newDescriptor)))
+          resultNode.update()
+        }
+      }
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
@@ -773,7 +887,7 @@ class Analysis extends BaseController {
           case "StringType" => JString(m.get(k)._2.asInstanceOf[String])
           case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
           case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
-          case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+          case "LongType" => JInt(m.get(k)._2.asInstanceOf[java.math.BigInteger])
           case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
           /* It is possible that the data type information returned from the
            * Spark SQL Executor might not always come through
@@ -782,12 +896,13 @@ class Analysis extends BaseController {
           case dataType => m.get(k)._2 match {
             case obj: String => JString(obj)
             case obj: java.lang.Integer => JInt(obj.intValue())
-            case obj: java.lang.Long => JLong(obj.longValue())
+            case obj: java.lang.Long => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj: java.lang.Float => JDouble(obj.floatValue())
             case obj: java.lang.Double => JDouble(obj.doubleValue())
             case obj: java.lang.Boolean => JBool(obj.booleanValue())
-            case obj: java.sql.Date => JLong(obj.getTime())
-            case obj: scala.math.BigInt => JLong(obj.toLong)
+            case obj: java.sql.Date => JInt(java.math.BigInteger.valueOf(obj.getTime()))
+            case obj: java.math.BigInteger => JInt(java.math.BigInteger.valueOf(obj.longValue()))
+            case obj: scala.math.BigInt => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj =>
               throw new RuntimeException(
                 "Unsupported data type in result: " + dataType
@@ -851,5 +966,18 @@ class Analysis extends BaseController {
           case obj => throw new RuntimeException("Unknown result row type from JSON: " + obj.getClass.getName)
         }
       })
+  }
+
+  private def getResultNode(analysisID:String ,resultID:String): AnalysisResult =
+  {
+    var resultNode: AnalysisResult = null
+    try {
+      m_log debug s"Remove result: " + resultID
+      resultNode = AnalysisResult(analysisID, resultID)
+    }
+    catch {
+      case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+    }
+    resultNode
   }
 }

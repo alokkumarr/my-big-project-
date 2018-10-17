@@ -4,20 +4,26 @@
 \alias{sip_add_dataset}
 \title{SIP Metastore Add Dataset}
 \usage{
-sip_add_dataset(output_path, output_format, output_schema, output_rows = 0,
-  component = "RComponent", script, desc = "", created_by = NULL,
-  project_id, batch_id = "", input_paths = "", input_formats = "",
-  input_ids = "", input_names = "", started = NULL, finished = NULL,
+sip_add_dataset(output_name, output_format, output_schema, catalog = "data",
+  output_rows = 0, component = "RComponent", script, desc = "",
+  created_by = NULL, project_id, batch_id = "", input_paths = "",
+  input_formats = "", input_ids = "", started = NULL, finished = NULL,
   status = "SUCCESS", hostname, token)
 }
 \arguments{
-\item{output_path}{output dataset file path}
+\item{output_name}{output dataset name. Used in the dynamic file path
+creation}
 
 \item{output_format}{output dataset format. accepts parquet, JSON, csv and
 rds}
 
 \item{output_schema}{output dataset sechema. Should be a list with name and
 type elements. list should not be named}
+
+\item{catalog}{catalog location for output dataset. Used in the dynamic file
+path creation}
+
+\item{output_rows}{ouput dataset record count. Default is NULL}
 
 \item{component}{component name used to create dataset. Default is RComponent}
 
@@ -35,8 +41,6 @@ type elements. list should not be named}
 
 \item{input_ids}{vector of input dataset ids. Default is empty string}
 
-\item{input_names}{vectore of input dataset names. Default is empty string}
-
 \item{started}{string with starting time. Format should be YYYYMMDD-HHMMSS.
 Default is NULL which inserts current time}
 
@@ -48,8 +52,6 @@ inserts current time}
 \item{hostname}{hostname only of saw security location. No pathing required}
 
 \item{token}{valid SIP token. Result of sip_authenticate function}
-
-\item{row_count}{ouput dataset record count. Default is NULL}
 }
 \value{
 POST response content

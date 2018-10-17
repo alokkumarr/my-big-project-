@@ -73,6 +73,22 @@ valid_samples <- function(x){
 
 
 #' Sample Class Helper function
+#'
+#' Creates a valid object of samples class
+#'
+#' @param validation_method name of validation method. examples are holdout,
+#'   cross-validation, etc...
+#' @param validation_args list of arguments to pass to validation method
+#' @param test_holdout_prct percent of total data records to use for test
+#'   dataset
+#' @param downsample_prct percent of total data to downsample and use for
+#'   analysis
+#' @param train_indicies list of numeric train indicies. each index contains
+#'   numeric vector pertaining to row numbers to use for model fitting
+#' @param validation_indicies list of numeric validation indicies. each index contains
+#'   numeric vector pertaining to row numbers to use for model validation
+#' @param indicies_names character vector of indicies names
+#' @param test_index  numeric index with records to use for model testing   
 samples <- function(validation_method,
                     validation_args,
                     test_holdout_prct,
@@ -341,7 +357,7 @@ add_holdout_samples <- function(x, splits) {
 
 #' @rdname add_holdout_samples
 #' @export
-add_holdout_samples.integer <- add_holdout_samples.numeric <- function(x, splits){
+add_holdout_samples.numeric <- function(x, splits){
 
   checkmate::assert_numeric(splits, lower = 0, upper = 1, min.len = 2, max.len = 3)
   if(sum(splits) != 1){
@@ -374,6 +390,10 @@ add_holdout_samples.integer <- add_holdout_samples.numeric <- function(x, splits
     test_index = test_index
   )
 }
+
+#' @rdname add_holdout_samples
+#' @export
+add_holdout_samples.integer <- add_holdout_samples.numeric
 
 
 #' @rdname add_holdout_samples
@@ -625,37 +645,40 @@ time_slice <- function(x, width, horizon, skip, fixed_width) {
 
 #' @rdname time_slice
 #' @export
-time_slice.integer <-
-  time_slice.numeric <-  function(x,
-                                  width,
-                                  horizon,
-                                  skip = 0,
-                                  fixed_width = TRUE) {
-    n <- length(x)
-    checkmate::assert_numeric(x, any.missing = FALSE)
-    checkmate::assert_number(width, lower = 1, upper = n - 1)
-    checkmate::assert_number(horizon, lower = 1, upper = n - width)
-    checkmate::assert_number(skip, lower = 0, upper = n - 1)
-    checkmate::assert_flag(fixed_width)
-
-    stops <- seq(width, (n - horizon), by = skip + 1)
-
-    if (fixed_width) {
-      starts <- stops - width + 1
-    } else {
-      starts <- rep(1, length(stops)) # all start at 1
-    }
-
-    train <- mapply(seq, starts, stops, SIMPLIFY = FALSE)
-    validation <-
-      mapply(seq, stops + 1, stops + horizon, SIMPLIFY = FALSE)
-    labels <- paste("slice", gsub(" ", "0", format(stops)), sep = "")
-    names(train) <- labels
-    names(validation) <- labels
-
-    indicies <- list(train = train, validation = validation)
-    indicies
+time_slice.numeric <- function(x,
+                               width,
+                               horizon,
+                               skip = 0,
+                               fixed_width = TRUE) {
+  n <- length(x)
+  checkmate::assert_numeric(x, any.missing = FALSE)
+  checkmate::assert_number(width, lower = 1, upper = n - 1)
+  checkmate::assert_number(horizon, lower = 1, upper = n - width)
+  checkmate::assert_number(skip, lower = 0, upper = n - 1)
+  checkmate::assert_flag(fixed_width)
+  
+  stops <- seq(width, (n - horizon), by = skip + 1)
+  
+  if (fixed_width) {
+    starts <- stops - width + 1
+  } else {
+    starts <- rep(1, length(stops)) # all start at 1
   }
+  
+  train <- mapply(seq, starts, stops, SIMPLIFY = FALSE)
+  validation <-
+    mapply(seq, stops + 1, stops + horizon, SIMPLIFY = FALSE)
+  labels <- paste("slice", gsub(" ", "0", format(stops)), sep = "")
+  names(train) <- labels
+  names(validation) <- labels
+  
+  indicies <- list(train = train, validation = validation)
+  indicies
+}
+
+#' @rdname time_slice
+#' @export
+time_slice.integer <- time_slice.numeric
 
 
 #' @rdname time_slice

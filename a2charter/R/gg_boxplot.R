@@ -22,9 +22,6 @@
 #' @param sort logical option to sort boxplots by y_variable. Default is FALSE
 #' @param desc logical option to sort boxplots in descending order. Default is
 #'   TRUE. Note sort has to be TRUE for desc option to apply
-#' @param ... additional arguments passed to geom_boxplot
-#'
-#'
 #' @inheritDotParams ggplot2::geom_boxplot
 #'
 #' @return returns a ggplot2 boxplot object
@@ -32,14 +29,15 @@
 #' @importFrom ggplot2 geom_boxplot
 #'
 #' @examples
-#' #' # Create a data set
+#' # Create a data set
+#' library(dplyr)
 #' d <- mtcars %>% mutate(am = as.factor(am), cyl = as.factor(cyl))
 #'
 #' # Create series of basic charts
 #' gg_boxplot(d, y_variable = "mpg")
 #' gg_boxplot(d, y_variable = "mpg", x_variable = "am")
 #' gg_boxplot(d, y_variable = "mpg", x_variable = "am", fill="blue")
-#' gg_boxplot(d, y_variable ="mpg", notch=T)
+#' gg_boxplot(d, y_variable ="mpg", notch=TRUE)
 #'
 #' # Create boxplot from values
 #' y <- rnorm(100)
@@ -51,7 +49,9 @@
 #'  y75 = quantile(y, 0.75),
 #'  y100 = max(y))
 #'
-#' gg_boxplot(df, ymin = "y0", lower = "y25", middle = "y50", upper = "y75", ymax = "y100", fill="darkorange")
+#' gg_boxplot(df, ymin = "y0", lower = "y25",
+#'            middle = "y50", upper = "y75",
+#'            ymax = "y100", fill="darkorange")
 gg_boxplot <- function(df,
                        x_variable = NULL,
                        y_variable = NULL,

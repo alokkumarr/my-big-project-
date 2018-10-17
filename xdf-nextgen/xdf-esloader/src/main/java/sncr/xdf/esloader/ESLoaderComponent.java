@@ -112,12 +112,6 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         if (esLoaderConfig.getDestinationIndexName() == null || esLoaderConfig.getDestinationIndexName().isEmpty()) {
             throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Destination Index Name missing.");
         }
-        if (esLoaderConfig.getEsUser() == null || esLoaderConfig.getEsUser().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Username missing.");
-        }
-        if (esLoaderConfig.getEsPass() == null || esLoaderConfig.getEsPass().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Password missing.");
-        }
         if (esLoaderConfig.getEsClusterName() == null || esLoaderConfig.getEsClusterName().isEmpty()) {
             throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch clustername configuration missing.");
         }

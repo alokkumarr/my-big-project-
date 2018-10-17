@@ -17,7 +17,8 @@ Imports:
     zoo,
     checkmate (>= 1.8.2),
     lubridate,
+    purrr,
+    DBI,
 Suggests: 
     testthat,
-    purrr,
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.0

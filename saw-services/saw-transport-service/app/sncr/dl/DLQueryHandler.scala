@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.apache.commons.httpclient.util.TimeoutController.TimeoutException
 import org.apache.http.client.HttpResponseException
-import org.json4s.JsonAST.{JBool, JLong, _}
+import org.json4s.JsonAST.{JBool, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.JsValue
@@ -310,7 +310,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
                 case "StringType" => JString(m.get(k)._2.asInstanceOf[String])
                 case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
                 case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
-                case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+                case "LongType" => JInt(m.get(k)._2.asInstanceOf[java.math.BigInteger])
                 case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
               })).toList
             )

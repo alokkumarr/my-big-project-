@@ -3,10 +3,12 @@ info:
 spring:
   application:
     name: saw-gateway-service
-  http:
+  servlet:
     multipart:
+      enabled : true
       max-request-size: 25MB
       max-file-size: 25MB
+      file-size-threshold: 2KB
   main:
     banner-mode: 'off'
 logging:
@@ -71,9 +73,6 @@ api:
         -   location: ${semantic.service.host}
             method: POST
             path: '[/]semantic*'
-        -   location: ${analysis.service.host}
-            method: GET
-            path: '/api/analyses.*'
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
@@ -121,4 +120,7 @@ api:
             path: '[/]internal/semantic.*'
         -   location: ${datapod.service.host}
             method: GET
+            path: '[/]internal/semantic.*'
+        -   location: ${datapod.service.host}
+            method: PUT
             path: '[/]internal/semantic.*'

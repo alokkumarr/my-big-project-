@@ -17,6 +17,7 @@ import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.esloader.esloadercommon.ElasticSearchStructureManager;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +29,9 @@ import static sncr.xdf.esloader.esloadercommon.ElasticSearchLoader.*;
 public class ElasticSearchLoaderTest {
 
     ESConfig config;
-    String esHost = "localhost";
+    List<String> esHosts = new ArrayList<String>(){{
+        add("localhost");
+    }};
     String esUser = "elasticsearch";
     String esPassword = "elasticsearch";
     int esPort = 9200;
@@ -39,7 +42,7 @@ public class ElasticSearchLoaderTest {
 
     @Before
     public void setUp() {
-        config = new ESConfig(esHost, esUser, esPassword, esPort, index);
+        config = new ESConfig(esHosts, esUser, esPassword, esPort, index);
         config.setEsClusterName(clusterName);
 
         dataEntries = new ArrayList<>();
@@ -49,7 +52,7 @@ public class ElasticSearchLoaderTest {
     public void testGenerateESParamMap() {
         Map<String, String> paramMap = ElasticSearchLoader.generateESParamMap(config);
 
-        assertEquals(esHost, paramMap.get(ES_PARAM_NODES));
+        assertEquals(esHosts.get(0), paramMap.get(ES_PARAM_NODES));
         assertEquals(esUser, paramMap.get(ES_PARAM_USER));
         assertEquals(esPassword, paramMap.get(ES_PARAM_PASSWORD));
         assertEquals(String.valueOf(esPort), paramMap.get(ES_PARAM_ADMIN_PORT));
@@ -62,7 +65,7 @@ public class ElasticSearchLoaderTest {
         ESLoader configuration = new ESLoader("index/type", "file:///this",
                 null, null, new ArrayList<Alias>(){{
                     add(new Alias("alias1", Alias.Mode.APPEND));
-        }}, "localhost", "elasticsearch",
+        }}, esHosts, "elasticsearch",
                 9200, "id1", "elastic", "elastic");
         ElasticSearchStructureManager essm = new ElasticSearchStructureManager(configuration);
         String partition = null;

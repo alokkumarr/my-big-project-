@@ -31,6 +31,13 @@
     <saw.docker.port>80</saw.docker.port>
     <saw.squid.port>3128</saw.squid.port>
     <saw.yarn.enabled>false</saw.yarn.enabled>
+    <!-- SAW e2e test suite configutration supported values are smoke/sanity/regression/development-->
+    <saw.e2e.suite>smoke</saw.e2e.suite>
+    <!-- Test upgrading from old SIP version to new version by
+         disabling the upgrade skip.  The build works the same, except
+         the old SIP version is installed before installing the new
+         version, to simulate upgrading the environment.  -->
+    <sip.upgrade.skip>true</sip.upgrade.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -202,6 +209,33 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
+        <version>1.4.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- Package for old SIP version to test upgrading from -->
+          <!-- Workaround: The SIP 3.0 package fails to deploy on
+               multinode configurations, due to a race condition in
+               the Transport Service MapR-DB table initialization
+               which has been later fixed.  The old version to upgrade
+               from should preferably be a previous release.  However,
+               due to the aforementioned issue, use an intermediate
+               build instead.  When SIP 3.1 is release, use that
+               instead. -->
+          <!--<url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-882/artifact/shared/SIP-Package/saw-3.0.0.tgz</url>-->
+          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-955/artifact/shared/SIP-Package/saw-3.0.0-744-g402624624.tgz</url>
+          <outputDirectory>${project.build.directory}/docker/sip-admin/${revision}/build/maven/sip-old</outputDirectory>
+          <skip>${sip.upgrade.skip}</skip>
+        </configuration>
+      </plugin>
+      <plugin>
 	      <groupId>org.apache.maven.plugins</groupId>
 	      <artifactId>maven-failsafe-plugin</artifactId>
 	      <executions>
@@ -218,9 +252,6 @@
             <saw.docker.port>${saw.docker.port}</saw.docker.port>
           </systemPropertyVariables>
           <!-- The below integration test case is excluded until we fix all the issue with Workbench (SIP-4038) -->
-          <excludes>
-           <exclude>WorkbenchIT.java</exclude>
-          </excludes>
         </configuration>
       </plugin>
       <plugin>
@@ -382,14 +413,15 @@
                 </wait>
               </run>
             </image>
+            <!-- First SIP application node -->
             <image>
               <name>sip-app:${project.version}</name>
               <!-- Note: The node has a suffix "1", because additional
                    SAW nodes might be added for high availability
                    configurations -->
-              <alias>sip-saw1</alias>
+              <alias>sip-app1</alias>
               <run>
-                <hostname>sip-saw1</hostname>
+                <hostname>sip-app1</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -404,11 +436,35 @@
                 </wait>
               </run>
             </image>
+            <!-- Second SIP application node: runs same services as
+                 first node, to provide redundancy -->
             <image>
               <name>sip-app:${project.version}</name>
-              <alias>sip-saw2</alias>
+              <alias>sip-app2</alias>
               <run>
-                <hostname>sip-saw2</hostname>
+                <hostname>sip-app2</hostname>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
+                </wait>
+              </run>
+            </image>
+            <!-- Third SIP application node: only used for MariaDB
+                 Galera cluster arbitrator node to resolve split brain
+                 situations-->
+            <image>
+              <name>sip-app:${project.version}</name>
+              <alias>sip-app3</alias>
+              <run>
+                <hostname>sip-app3</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -422,7 +478,6 @@
                      everyone has moved to cloud deployments with more
                      memory.  So skip running the second SAW container
                      by default. -->
-                <skip>true</skip>
                 <wait>
                   <healthy>true</healthy>
                   <time>${sip.docker.wait.time}</time>
@@ -534,7 +589,17 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/</arguments>
+              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/ --suite=${saw.e2e.suite}</arguments>
+            </configuration>
+          </execution>
+           <execution>
+            <id>npm-run-generate-report</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run generate-report</arguments>
             </configuration>
           </execution>
         </executions>
@@ -542,12 +607,12 @@
       <plugin>
 	      <groupId>org.asciidoctor</groupId>
 	      <artifactId>asciidoctor-maven-plugin</artifactId>
-	      <version>1.5.6</version>
+	      <version>1.5.7.1</version>
 	      <dependencies>
           <dependency>
             <groupId>org.asciidoctor</groupId>
             <artifactId>asciidoctorj-diagram</artifactId>
-            <version>1.5.4.1</version>
+            <version>1.5.10</version>
           </dependency>
           <dependency>
             <groupId>org.asciidoctor</groupId>
@@ -557,7 +622,7 @@
           <dependency>
             <groupId>org.springframework.restdocs</groupId>
             <artifactId>spring-restdocs-asciidoctor</artifactId>
-            <version>1.2.1.RELEASE</version>
+            <version>2.0.2.RELEASE</version>
           </dependency>
         </dependencies>
         <configuration>

@@ -35,14 +35,17 @@ imputer <- function(df,
 
   impute_fun <- match.fun(paste("impute", fun, sep="_"))
   impute_args <- modifyList(list(df = df, measure_vars = measure_vars), list(...))
-  do.call("impute_fun", impute_args)
+  result <- do.call("impute_fun", impute_args)
+  
+  if(! is.null(group_vars) & fun != "constant") {
+    result <- dplyr::ungroup(result)
+  }
+  
+  result
 }
 
 
-#' Is NA
-#'
-#' Function determines if column has any missing values
-#' @return logical
+# Function determines if column has any missing values
 is_na <- function(x) any(is.na(x))
 
 
@@ -145,9 +148,7 @@ impute_constant <- function(df,
 
 
 
-#' Impute Numeric Constant At
-#'
-#' Function imputes numeric constants for specific columns
+# Function imputes numeric constants for specific columns
 impute_constant_at <- function(df, measure_vars, fill) {
   dplyr::mutate_at(df, measure_vars, funs(ifelse(is.na(.), fill, .)))
 }

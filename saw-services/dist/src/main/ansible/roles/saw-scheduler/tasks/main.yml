@@ -5,12 +5,30 @@
   yum: name=/tmp/saw-scheduler.rpm state=present
   notify:
     - restart saw-scheduler
+- name: Migrate Scheduler Service database password from old location
+  fetch:
+    src: /etc/bda/saw-scheduler-db-password
+    dest: "{{ inventory_dir + '/sip-scheduler-db-password' }}"
+    flat: yes
+    fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+- name: Look up Scheduler Service database password
+  set_fact:
+    saw_scheduler_db_password: >-
+      {{ lookup('password', inventory_dir
+        + '/sip-scheduler-db-password chars=ascii_letters,digits') }}
 - name: Install SAW scheduler Service configuration file
   template: src=application.yml dest=/opt/bda/saw-scheduler-service/conf
   notify:
     - restart saw-scheduler
+- name: Set the SAW Scheduler Service database password
+  copy:
+    content: "{{ saw_scheduler_db_password }}"
+    dest: /etc/bda/saw-scheduler-db-password
 - name: Run SAW scheduler initial database setup
   command: /opt/bda/saw-scheduler-service/db-setup/init
+  # Note: Run database initialization only on one of the nodes
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
 # Workaround: The service restart handler will run only after all
 # tasks have completed.  This causes the service to remain running
 # using the old port when the new socket activation proxy starts up,

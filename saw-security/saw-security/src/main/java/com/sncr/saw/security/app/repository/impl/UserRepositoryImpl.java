@@ -2491,6 +2491,9 @@ public class UserRepositoryImpl implements UserRepository {
 					 + "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, ?, ?, ?, '1', sysdate(), ?) ";
 		List<SubCategoriesPrivilege> insertList = new ArrayList<>();
 		List<SubCategoriesPrivilege> updateList = new ArrayList<>();
+        // Insert privilege first entry if doesn't exists.
+        insertPMFAccessPrivilege(addPrivilegeDetails.getMasterLoginId(), addPrivilegeDetails.getRoleId()
+            , addPrivilegeDetails.getModuleId(), addPrivilegeDetails.getProductId());
 		for (SubCategoriesPrivilege subCategoriesPrivilege: addPrivilegeDetails.getSubCategoriesPrivilege()) {
 			if (subCategoriesPrivilege.getPrivilegeId()==0)
 				insertList.add(subCategoriesPrivilege);
@@ -2841,7 +2844,8 @@ public class UserRepositoryImpl implements UserRepository {
 		Valid valid = new Valid();
 		String sql = "INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_SYS_ID,DEFAULT_URL,`DEFAULT`,"
 				+ "FEATURE_NAME,FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY)"
-				+ " VALUES (?,?,0,?,?,?,?,?,sysdate(),?)";
+				+ " VALUES (?,?,0,?,?,?,?,?,sysdate(),?)"
+				+ " ON DUPLICATE KEY UPDATE DEFAULT_URL=DEFAULT_URL";
 
 		String[] categoryCode = category.getCategoryName().toUpperCase().split(" ");
 		StringBuffer featureCode = new StringBuffer();
@@ -2854,6 +2858,7 @@ public class UserRepositoryImpl implements UserRepository {
 		featureCode.append(category.getModuleId());
 		logger.info(""+category.getCustomerId());
 		featureCode.append(category.getCustomerId());
+        featureCode.append(category.getProductId());
 		StringBuffer featureType = new StringBuffer();
 		if (category.isSubCategoryInd()) {
 			featureType.append("CHILD_" + category.getCategoryCode());
@@ -2877,9 +2882,15 @@ public class UserRepositoryImpl implements UserRepository {
 			});
 			valid.setValid(true);
 		} catch (Exception e) {
-			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
-			valid.setValid(false);
-			valid.setError("Something went wrong while adding category!");
+			if (e.getMessage().contains("Resource deadlock avoided")) {
+				/* Retry transaction in case of deadlock */
+				logger.info("Retrying to recover from deadlock");
+				valid = addCategory(category);
+			} else {
+				logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
+				valid.setValid(false);
+				valid.setError("Something went wrong while adding category!");
+			}
 		}
 
 		return valid;
@@ -2888,18 +2899,31 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public boolean checkCatExists(CategoryDetails category) {
 		Boolean catExists;
-		String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES "
-				+ " WHERE CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != ?"
-				+ " AND CUST_PROD_SYS_ID = ?";
+        String sql = "SELECT cust_prod_mod_feature_sys_id, " +
+            "       CPMF.cust_prod_mod_sys_id " +
+            "FROM   customer_product_module_features CPMF, " +
+            "       customer_product_modules CPM, " +
+            "       product_modules PM, " +
+            "       customer_products CP " +
+            "WHERE  CP.customer_sys_id = ? " +
+            "       AND CP.product_sys_id = PM.product_sys_id " +
+            "       AND PM.module_sys_id = ? " +
+            "       AND CP.cust_prod_sys_id = CPM.cust_prod_sys_id " +
+            "       AND PM.prod_mod_sys_id = CPM.prod_mod_sys_id " +
+            "       AND CP.cust_prod_sys_id = ? " +
+            "       AND CPMF.cust_prod_mod_sys_id = CPM.cust_prod_mod_sys_id " +
+            "       AND feature_name = ? " +
+            "       AND cust_prod_mod_feature_sys_id != 0 " ;
 		try {
 			// SAW-1932 and SAW-1950 fix:
 			// include checking moduleID as well while testing for creating new categories.
-			catExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
+			catExists = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setLong(1, category.getModuleId());
-					preparedStatement.setString(2, category.getCategoryName());
-					preparedStatement.setLong(3, category.getCategoryId());
-					preparedStatement.setLong(4, category.getProductId());
+					preparedStatement.setLong(1, category.getCustomerId());
+                    preparedStatement.setLong(2, category.getModuleId());
+                    preparedStatement.setLong(3, category.getProductId());
+					preparedStatement.setString(4, category.getCategoryName());
+
 				}
 			}, new UserRepositoryImpl.CatExistsExtractor());
 		} catch (Exception e) {

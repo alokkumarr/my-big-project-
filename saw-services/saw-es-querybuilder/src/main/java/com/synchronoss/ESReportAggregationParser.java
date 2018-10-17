@@ -1,7 +1,7 @@
 package com.synchronoss;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.synchronoss.querybuilder.model.report.DataField;
+import com.synchronoss.querybuilder.model.report.Column;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,13 +17,13 @@ public class ESReportAggregationParser {
     private final static String VALUE = "value";
 
     private String[] groupByFields;
-    private List<DataField> dataFields;
-    private List<DataField> aggregationFields;
+    private List<Column> dataFields;
+    private List<Column> aggregationFields;
 
 
     private static final Logger logger = LoggerFactory.getLogger(ESReportAggregationParser.class);
 
-    public ESReportAggregationParser(List<DataField> dataFields,List<DataField> aggregationFields)
+    public ESReportAggregationParser(List<Column> dataFields, List<Column> aggregationFields)
     {
         this.dataFields=dataFields;
         this.aggregationFields=aggregationFields;
@@ -93,7 +93,7 @@ public class ESReportAggregationParser {
         else if (groupByFields.length==0 && childNode !=null)
         {
             Map<String,String> flatValues = new LinkedHashMap<>();
-            for (DataField dataField : aggregationFields){
+            for (Column dataField : aggregationFields){
                 String columnName = dataField.getName();
                 flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
             }
@@ -103,7 +103,7 @@ public class ESReportAggregationParser {
         {
             Map<String,String> flatValues = new LinkedHashMap<>();
             flatValues.putAll(dataObj);
-            for (DataField dataField : aggregationFields){
+            for (Column dataField : aggregationFields){
                 String columnName = dataField.getName();
                 flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
             }
@@ -169,11 +169,11 @@ public class ESReportAggregationParser {
     /**
      * Fetch the group By fields for parsing aggregation result.
      */
-    private void prepareGroupByFields(List<DataField> dataFields)
+    private void prepareGroupByFields(List<Column> dataFields)
     {
         groupByFields = new String[dataFields.size()-aggregationFields.size()];
         int fieldCount =0;
-        for (DataField dataField :dataFields)
+        for (Column dataField :dataFields)
         {
             if (dataField.getAggregate()==null)
                 groupByFields[fieldCount++]=dataField.getColumnName();
@@ -181,6 +181,5 @@ public class ESReportAggregationParser {
         logger.trace("groupByFields :" + groupByFields);
         logger.trace(this.getClass().getName() + " prepareGroupByFields ends");
     }
-
 
 }

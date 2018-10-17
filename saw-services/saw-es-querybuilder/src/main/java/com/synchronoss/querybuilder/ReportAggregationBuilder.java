@@ -1,6 +1,6 @@
 package com.synchronoss.querybuilder;
 
-import com.synchronoss.querybuilder.model.report.DataField;
+import com.synchronoss.querybuilder.model.report.Column;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -17,8 +17,8 @@ public class ReportAggregationBuilder {
         this.querySize=querySize;
     }
 
-    public AggregationBuilder reportAggregationBuilder(List<DataField> dataFields,
-                                                       List<DataField> aggregateFields, int fieldCount,
+    public AggregationBuilder reportAggregationBuilder(List<Column> dataFields,
+                                                       List<Column> aggregateFields, int fieldCount,
                                                        int aggregatedFieldCount
             , AggregationBuilder aggregationBuilder)
        {
@@ -26,7 +26,7 @@ public class ReportAggregationBuilder {
          * For Report find the list of Aggregate fields.
          */
         if ((fieldCount + aggregateFields.size())< dataFields.size()) {
-            DataField dataField = dataFields.get(fieldCount+aggregatedFieldCount);
+            Column dataField = dataFields.get(fieldCount+aggregatedFieldCount);
             if(dataField.getAggregate()!=null) {
                 aggregatedFieldCount++;
                 return reportAggregationBuilder(dataFields, aggregateFields,
@@ -36,7 +36,7 @@ public class ReportAggregationBuilder {
                     // initialize the terms aggregation builder.
                     aggregationBuilder = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
                             .field(dataField.getColumnName()).size(querySize);
-                    for(DataField dataField1 : aggregateFields) {
+                    for(Column dataField1 : aggregateFields) {
                         aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldReport(
                                 dataField1));
                     }
@@ -58,10 +58,10 @@ public class ReportAggregationBuilder {
         }
        }
 
-   public static List<DataField> getAggregationField(List<DataField> dataFields)
+   public static List<Column> getAggregationField(List<Column> dataFields)
    {
-       List<DataField> aggregateFields = new ArrayList<>();
-       for(DataField dataField : dataFields) {
+       List<Column> aggregateFields = new ArrayList<>();
+       for(Column dataField : dataFields) {
        if (dataField.getAggregate() != null) {
            aggregateFields.add(dataField);
        }
@@ -69,13 +69,13 @@ public class ReportAggregationBuilder {
        return aggregateFields;
    }
 
-   public void reportAggregationBuilder(List<DataField> dataFields, List<DataField> aggregateFields,
-                                                      SearchSourceBuilder searchSourceBuilder)
+   public void reportAggregationBuilder(List<Column> dataFields, List<Column> aggregateFields,
+                                        SearchSourceBuilder searchSourceBuilder)
     {
         // if only aggregation fields are there.
 
         if (aggregateFields.size() == dataFields.size()) {
-        for (DataField dataField1 : aggregateFields) {
+        for (Column dataField1 : aggregateFields) {
             searchSourceBuilder.aggregation(QueryBuilderUtil.aggregationBuilderDataFieldReport(
                     dataField1));
         }

@@ -17,7 +17,8 @@ export class RoleService implements IAdminDataService {
 
   getList(customerId) {
     return this._adminService.request<RolesResponse>('roles/fetch', customerId)
-      .map(resp => resp.roles);
+      .map(resp => resp.roles)
+      .toPromise();
   }
 
   save(user) {

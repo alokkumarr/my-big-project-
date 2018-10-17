@@ -58,7 +58,7 @@ module.exports = {
     generateSubCategory(categories.privileges, subCategories.view, categoriesList, token);
     generateSubCategory(categories.analyses, subCategories.createAnalysis, categoriesList, token);
 
-    // Generate privileges
+    //Generate privileges
     generatePrivilege(privileges.all, roles.admin, categories.privileges, subCategories.all, token);
     generatePrivilege(privileges.create, roles.admin, categories.privileges, subCategories.create, token);
     generatePrivilege(privileges.edit, roles.admin, categories.privileges, subCategories.edit, token);
@@ -89,7 +89,6 @@ module.exports = {
     // Generate analyses
     let semanticId = getSemanticId(dataSets.pivotChart, token); // Get semanticId (dataset ID)
 
-
     generateChart(semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.all, token);
     generateChart(semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.create, token);
     generateChart(semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.edit, token);
@@ -102,6 +101,13 @@ module.exports = {
     generateChart(semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.noPrivileges, token);
     generateChart(semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.view, token);
     generateChart(semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.createAnalysis, token);
+
+    // Generate categories for observe module
+    let observeCategoriesList = generateCategory(categories.observe, token, 2);
+    // Generate sub-categories
+    generateSubCategory(categories.observe, subCategories.observeSubCategory, observeCategoriesList, token, 2);//moduleID =2 for observe.
+    generatePrivilege(privileges.all, roles.admin, categories.observe, subCategories.observeSubCategory, token, 2);
+    generatePrivilege(privileges.all, roles.userOne, categories.observe, subCategories.observeSubCategory, token, 2);
   }
 };
 
@@ -131,6 +137,7 @@ function getSubCategoryIdBySubCategoryName(subCategoriesList, subCategoryName) {
 }
 
 function generateUser(user, roleId, token) {
+
   const payload = {
     'activeStatusInd': activeStatusInd,
     'customerId': customerId,
@@ -146,18 +153,17 @@ function generateUser(user, roleId, token) {
   return apiCall.post(url + 'security/auth/admin/cust/manage/users/add', payload, token); // return list of all users
 }
 
-function generateCategory(category, token) {
+function generateCategory(category, token, module = null) {
   const payload = {
     'activeStatusInd': activeStatusInd,
     'productId': productId,
-    'moduleId': moduleId,
+    'moduleId': module ? module : moduleId,
     'categoryId': null,
     'categoryName': category.name,
     'categoryDesc': category.description,
     'customerId': customerId,
     'masterLoginId': users.anyUser.email // all users will share same email
   };
-
   // get list of all categories
   const categoriesList = apiCall.post(url + 'security/auth/admin/cust/manage/categories/add', payload, token).categories;
 
@@ -167,7 +173,8 @@ function generateCategory(category, token) {
   return categoriesList;
 }
 
-function generateSubCategory(parentCategory, subCategory, categoriesList, token) {
+function generateSubCategory(parentCategory, subCategory, categoriesList, token, module = null) {
+
   parentCategory.id = getValueFromListByKeyValue(categoriesList, 'categoryName', parentCategory.name, 'categoryId');
   parentCategory.type = getValueFromListByKeyValue(categoriesList, 'categoryName', parentCategory.name, 'categoryType');
   parentCategory.code = getValueFromListByKeyValue(categoriesList, 'categoryName', parentCategory.name, 'categoryCode');
@@ -175,7 +182,7 @@ function generateSubCategory(parentCategory, subCategory, categoriesList, token)
   const payload = {
     'activeStatusInd': activeStatusInd,
     'productId': productId,
-    'moduleId': moduleId,
+    'moduleId': module ? module : moduleId,
     'categoryId': parentCategory.id,
     'categoryName': subCategory.name,
     'categoryDesc': subCategory.description,
@@ -196,10 +203,11 @@ function generateSubCategory(parentCategory, subCategory, categoriesList, token)
 }
 
 // Returns privileges list
-function generatePrivilege(privilege, role, parentCategory, subCategory, token) {
+function generatePrivilege(privilege, role, parentCategory, subCategory, token, module = null) {
+
   const payload = {
     'productId': productId,
-    'moduleId': moduleId,
+    'moduleId': module ? module : moduleId,
     'roleId': role.roleId,
     'categoryCode': parentCategory.code,
     'categoryId': parentCategory.id,
@@ -231,8 +239,6 @@ function getValueFromListByKeyValue(list, inputKey, inputValue, getValueOfKey) {
 
   for (let i = 0; i < list.length; i++) {
     const data = list[i];
-    //console.log(JSON.stringify(list[i]));
-
     // Iterate each item in list
     // If inputValue matches, return value of getValueOfKey from this item in list
     Object.keys(data).forEach(function (key) {

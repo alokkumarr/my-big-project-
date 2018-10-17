@@ -11,13 +11,18 @@
     "id":"/properties/sqlBuilder",
     "properties":
     {
-        "dataFields":{
-          "id":"/properties/sqlBuilder/properties/dataFields",
-          "items":{
-            "id":"/properties/sqlBuilder/properties/dataFields/items",
-            "properties":{
-              "aggregate":{
-                "enum":[
+      "dataFields": {
+        "tableName": {
+          "id": "/properties/sqlBuilder/properties/dataFields/properties/tableName",
+          "type": "string"
+        },
+        "columns": {
+          "id": "/properties/sqlBuilder/properties/dataFields/properties/columns",
+          "items": {
+            "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items",
+            "properties": {
+              "aggregate": {
+                "enum": [
                   "avg",
                   "sum",
                   "min",
@@ -25,19 +30,19 @@
                   "count",
                   "percentage"
                 ],
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/aggregate",
-                "type":"string"
+                "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/aggregate",
+                "type": "string"
               },
-              "columnName":{
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/columnName",
-                "type":"string"
+              "columnName": {
+                "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/columnName",
+                "type": "string"
               },
-              "name":{
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/name",
-                "type":"string"
+              "name": {
+                "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/name",
+                "type": "string"
               },
-              "type":{
-                "enum":[
+              "type": {
+                "enum": [
                   "date",
                   "timestamp",
                   "long",
@@ -46,14 +51,19 @@
                   "string",
                   "float"
                 ],
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/type",
-                "type":"string"
+                "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/type",
+                "type": "string"
               }
             },
-            "required":["columnName","type"]
+            "required": [
+              "columnName",
+              "type"
+            ]
           },
-          "type":"array"
+          "type": "array"
         },
+        "type": "array"
+      },
         "booleanCriteria":{
                 "enum":["OR","AND"],
                 "id":"/properties/filters/items/properties/booleanCriteria",
@@ -211,5 +221,4 @@
     }
   },
   "required":["sqlBuilder"]
-
 }

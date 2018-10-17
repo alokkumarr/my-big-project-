@@ -1,11 +1,9 @@
 package com.synchronoss.querybuilder;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.synchronoss.querybuilder.model.chart.DataField;
+import com.synchronoss.querybuilder.model.report.Column;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -27,8 +25,7 @@ import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import static com.synchronoss.AggregationConstants.*;
-import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.AVG;
-import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.SUM;
+
 
 
 public class QueryBuilderUtil {
@@ -132,7 +129,32 @@ public class QueryBuilderUtil {
  		return aggregationBuilder;
  	}
 
-	public static AggregationBuilder aggregationBuilderDataFieldReport(com.synchronoss.querybuilder.model.report.DataField data)
+    public static AggregationBuilder aggregationBuilderColumn(com.synchronoss.querybuilder.model.pivot.ColumnField columnField,
+                                                             String aggregationName)
+
+    {
+        AggregationBuilder aggregationBuilder = null;
+
+        if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) ||
+            columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
+            if (columnField.getGroupInterval()!=null){
+                aggregationBuilder = AggregationBuilders.
+                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
+                    dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
+            }
+            else {
+                aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
+                    .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+            }
+        }
+        else {
+            aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName()).size(BuilderUtil.SIZE);
+        }
+
+        return aggregationBuilder;
+    }
+
+	public static AggregationBuilder aggregationBuilderDataFieldReport(Column data)
 	{
 		AggregationBuilder aggregationBuilder = null;
 		switch (data.getAggregate())
@@ -305,28 +327,42 @@ public class QueryBuilderUtil {
 
 	public static List<QueryBuilder> stringFilterChart (Filter item, List<QueryBuilder> builder)
 	{
-		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
-			TermsQueryBuilder termsQueryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-			builder.add(termsQueryBuilder);
-		}
+        if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+            TermsQueryBuilder termsQueryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+            TermsQueryBuilder termsQueryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(termsQueryBuilder);
+            boolQueryBuilder.should(termsQueryBuilder1);
+            builder.add(boolQueryBuilder);
+        }
 
-		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
-			QueryBuilder qeuryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-			boolQueryBuilder.mustNot(qeuryBuilder);
-			builder.add(boolQueryBuilder);
-		}
-
+        if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+            QueryBuilder qeuryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.mustNot(qeuryBuilder);
+            QueryBuilder qeuryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
+            builder.add(boolQueryBuilder);
+        }
 
 		// prefix query builder - not analyzed
 		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
 			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
 					(String) item.getModel().getModelValues().get(0));
-			builder.add(pqb);
+            PrefixQueryBuilder pqb1 = new PrefixQueryBuilder(buildFilterColumn(item.getColumnName()),
+                (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(pqb);
+            boolQueryBuilder.should(pqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		// using wildcard as there's no suffix query type provided by
@@ -334,14 +370,24 @@ public class QueryBuilderUtil {
 		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
 			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
 					"*"+item.getModel().getModelValues().get(0));
-			builder.add(wqb);
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*"+  (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		// same for contains clause - not analyzed query
 		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
 			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
 					"*" + item.getModel().getModelValues().get(0)+"*");
-			builder.add(wqb);
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*" +  (String)((String) item.getModel().getModelValues().get(0)).toLowerCase()+"*");
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		return builder;
@@ -478,31 +524,44 @@ public class QueryBuilderUtil {
         }
         return builder;
     }
-
 	public static List<QueryBuilder> stringFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
 	{
-		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
-			TermsQueryBuilder termsQueryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-			builder.add(termsQueryBuilder);
-		}
+        if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+            TermsQueryBuilder termsQueryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+            TermsQueryBuilder termsQueryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(termsQueryBuilder);
+            boolQueryBuilder.should(termsQueryBuilder1);
+            builder.add(boolQueryBuilder);
+        }
 
-		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
-			QueryBuilder qeuryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-			boolQueryBuilder.mustNot(qeuryBuilder);
-			builder.add(boolQueryBuilder);
-		}
-
+        if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+            QueryBuilder qeuryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.mustNot(qeuryBuilder);
+            QueryBuilder qeuryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
+            builder.add(boolQueryBuilder);
+        }
 
 		// prefix query builder - not analyzed
 		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
 			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
 					(String) item.getModel().getModelValues().get(0));
-			builder.add(pqb);
+            PrefixQueryBuilder pqb1 = new PrefixQueryBuilder(buildFilterColumn(item.getColumnName()),
+                (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(pqb);
+            boolQueryBuilder.should(pqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		// using wildcard as there's no suffix query type provided by
@@ -510,14 +569,24 @@ public class QueryBuilderUtil {
 		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
 			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
 					"*"+item.getModel().getModelValues().get(0));
-			builder.add(wqb);
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*"+  (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		// same for contains clause - not analyzed query
 		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
 			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
 					"*" + item.getModel().getModelValues().get(0)+"*");
-			builder.add(wqb);
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*" +  (String)((String) item.getModel().getModelValues().get(0)).toLowerCase()+"*");
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		return builder;
@@ -525,27 +594,42 @@ public class QueryBuilderUtil {
 
 	public static List<QueryBuilder> stringFilterReport (com.synchronoss.querybuilder.model.report.Filter item, List<QueryBuilder> builder)
 	{
-		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
-			TermsQueryBuilder termsQueryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-			builder.add(termsQueryBuilder);
-		}
+        if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+            TermsQueryBuilder termsQueryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+            TermsQueryBuilder termsQueryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(termsQueryBuilder);
+            boolQueryBuilder.should(termsQueryBuilder1);
+            builder.add(boolQueryBuilder);
+        }
 
-		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
-			QueryBuilder qeuryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-			boolQueryBuilder.mustNot(qeuryBuilder);
-			builder.add(boolQueryBuilder);
-		}
+        if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+            QueryBuilder qeuryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.mustNot(qeuryBuilder);
+            QueryBuilder qeuryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
+            builder.add(boolQueryBuilder);
+        }
 
 		// prefix query builder - not analyzed
 		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
 			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
 					(String) item.getModel().getModelValues().get(0));
-			builder.add(pqb);
+            PrefixQueryBuilder pqb1 = new PrefixQueryBuilder(buildFilterColumn(item.getColumnName()),
+                (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(pqb);
+            boolQueryBuilder.should(pqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		// using wildcard as there's no suffix query type provided by
@@ -553,14 +637,24 @@ public class QueryBuilderUtil {
 		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
 			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
 					"*"+item.getModel().getModelValues().get(0));
-			builder.add(wqb);
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*"+  (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		// same for contains clause - not analyzed query
 		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
 			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
 					"*" + item.getModel().getModelValues().get(0)+"*");
-			builder.add(wqb);
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*" +  (String)((String) item.getModel().getModelValues().get(0)).toLowerCase()+"*");
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
 		}
 
 		return builder;
@@ -579,15 +673,25 @@ public class QueryBuilderUtil {
             item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
             TermsQueryBuilder termsQueryBuilder =
                 new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-            builder.add(termsQueryBuilder);
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+            TermsQueryBuilder termsQueryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(termsQueryBuilder);
+            boolQueryBuilder.should(termsQueryBuilder1);
+            builder.add(boolQueryBuilder);
         }
 
         if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
             item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+            List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
             QueryBuilder qeuryBuilder =
                 new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
             BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
             boolQueryBuilder.mustNot(qeuryBuilder);
+            QueryBuilder qeuryBuilder1 =
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
             builder.add(boolQueryBuilder);
         }
 
@@ -595,25 +699,73 @@ public class QueryBuilderUtil {
         if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
             PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
                 (String) item.getModel().getModelValues().get(0));
-            builder.add(pqb);
+            PrefixQueryBuilder pqb1 = new PrefixQueryBuilder(buildFilterColumn(item.getColumnName()),
+                (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(pqb);
+            boolQueryBuilder.should(pqb1);
+            builder.add(boolQueryBuilder);
         }
 
         // using wildcard as there's no suffix query type provided by
         // elasticsearch
         if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
             WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
-                "*"+item.getModel().getModelValues().get(0));
-            builder.add(wqb);
+                "*"+ item.getModel().getModelValues().get(0));
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*"+  (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
         }
 
         // same for contains clause - not analyzed query
         if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
             WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
                 "*" + item.getModel().getModelValues().get(0)+"*");
-            builder.add(wqb);
+            WildcardQueryBuilder wqb1 = new WildcardQueryBuilder(buildFilterColumn(item.getColumnName()),
+                "*" +  (String)((String) item.getModel().getModelValues().get(0)).toLowerCase()+"*");
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.should(wqb);
+            boolQueryBuilder.should(wqb1);
+            builder.add(boolQueryBuilder);
         }
 
         return builder;
+    }
+
+    /**
+     *  Build the terms values to support case insensitive
+     *  search options.
+     * @param modelValues
+     */
+    private static List <?> buildStringTermsfilter(List<?> modelValues )
+    {
+        List<Object> stringValues = new ArrayList<>();
+        modelValues.forEach((val) -> {
+            // Add the lowercase value as terms to lookup based on custom analyser.
+         if (val instanceof String) {
+             stringValues.add(((String) val).toLowerCase());
+          }
+        });
+        return stringValues;
+    }
+
+    /**
+     *  Build the search column to support case insensitive
+     *  search options.
+     * @param columnName
+     */
+    private static String buildFilterColumn(String columnName)
+    {
+       if (columnName.contains(".keyword"))
+       {
+        return columnName.replace(".keyword", ".filter");
+       }
+       else {
+           return columnName+".filter";
+       }
     }
 
     /**
@@ -640,9 +792,9 @@ public class QueryBuilderUtil {
                                 preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
                             }
-                        } else if (dataField instanceof com.synchronoss.querybuilder.model.report.DataField) {
-                            com.synchronoss.querybuilder.model.report.DataField data =
-                                    (com.synchronoss.querybuilder.model.report.DataField) dataField;
+                        } else if (dataField instanceof com.synchronoss.querybuilder.model.report.Column) {
+                            Column data =
+                                    (Column) dataField;
                             if (data.getAggregate()!=null && data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
                                 preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));

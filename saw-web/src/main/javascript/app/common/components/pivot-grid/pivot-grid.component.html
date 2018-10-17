@@ -1,3 +1,4 @@
+<field-details *ngIf="showFieldDetails" [artifactColumns]="artifactColumns"></field-details>
 <dx-pivot-grid id="pivot-grid"
                [rowHeaderLayout]="rowHeaderLayout"
                [allowSortingBySummary]="allowSortingBySummary"
@@ -18,4 +19,5 @@
                    [showFilterFields]="showFilterFields"
                    [allowFieldDragging]="allowFieldDragging">
   </dxo-field-panel>
+  <dxo-scrolling showScrollbar="always" [useNative]="false"></dxo-scrolling>
 </dx-pivot-grid>

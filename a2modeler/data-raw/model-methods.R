@@ -59,7 +59,7 @@ segment_methods <- data.frame(
     "Spark ML Bisecting K-Means",
     "Spark ML Gaussian Mixture clustering"
   ),
-  class = c(rep("spark_ml", 3), rep("spark_ml_clustering", 3)),
+  class = c(rep("spark_model_clustering", 3), rep("spark_model", 3)),
   package = "sparklyr"
 )
 
@@ -85,10 +85,31 @@ classify_methods <- data.frame(
     "Spark ML Random Forest Classifier",
     "Spark ML Multilayer Perceptron Classifier"
   ),
-  class = c(rep("spark_ml", 6), rep("spark_ml_classification", 6)),
+  class = c(rep("spark_model", 6), rep("spark_model_classification", 6)),
   package = "sparklyr"
 )
 
+
+
+# Multi-Classifier Methods ------------------------------------------------------
+
+# Currently support methods
+multiclassify_methods <- data.frame(
+  method = c(
+    "ml_naive_bayes",
+    "ml_decision_tree_classifier",
+    "ml_random_forest_classifier",
+    "ml_multilayer_perceptron_classifier"
+  ),
+  name = c(
+    "Spark ML Naive Bayes Classifier",
+    "Spark ML Decision Tree Classifier",
+    "Spark ML Random Forest Classifier",
+    "Spark ML Multilayer Perceptron Classifier"
+  ),
+  class = c(rep("spark_model", 4), rep("spark_model_multiclassification", 4)),
+  package = "sparklyr"
+)
 
 
 # Regressor Methods -------------------------------------------------------
@@ -112,7 +133,7 @@ regressor_methods <- data.frame(
     "Spark ML Random ForestRegressor",
     "Spark ML Multilayer Perceptron Regressor"
   ),
-  class = c(rep("spark_ml", 7), rep("ml_model_regression", 7)),
+  class = c(rep("spark_model", 7), rep("spark_model_regression", 7)),
   package = "sparklyr"
 )
 
@@ -123,6 +144,7 @@ model_methods <- rbind(
   forecast_methods %>% dplyr::mutate(type = "forecaster"),
   segment_methods %>% dplyr::mutate(type = "segmenter"),
   classify_methods %>% dplyr::mutate(type = "classifier"),
+  multiclassify_methods %>% dplyr::mutate(type = "multiclassifier"),
   regressor_methods %>% dplyr::mutate(type = "regressor")
 ) %>%
   nest(class) %>%

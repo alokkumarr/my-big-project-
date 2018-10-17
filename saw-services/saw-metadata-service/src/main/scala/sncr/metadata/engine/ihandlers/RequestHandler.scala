@@ -84,7 +84,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
 
   var requestJ : JValue = null
   try{
-      requestJ = parse(request, false, false)
+      requestJ = parse(request, false)
   }
   catch{
     case t: Throwable => { m_log.error("Native exceptions", t);   throw new Exception("Request is not parsable")}

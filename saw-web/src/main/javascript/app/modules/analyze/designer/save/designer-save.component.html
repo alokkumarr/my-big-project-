@@ -1,0 +1,35 @@
+<div fxLayout="column" style="width: 400px;">
+  <mat-form-field>
+    <input matInput
+           (input)="onNameChange($event.target.value)"
+           [value]="analysis.name"
+           e2e="save-dialog-name"
+           placeholder="Name"
+           required/>
+  </mat-form-field>
+  <mat-form-field>
+    <textarea matInput
+              (input)="onDescriptionChange($event.target.value)"
+              [value]="analysis.description"
+              placeholder="Description"
+              e2e="save-dialog-description"
+              matTextareaAutosize
+              matAutosizeMinRows="2"
+              matAutosizeMaxRows="10">
+    </textarea>
+  </mat-form-field>
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Category</mat-label>
+    <mat-select (selectionChange)="onCategorySelected($event.value)"
+                e2e="save-dialog-selected-category"
+                [value]="analysis.categoryId">
+      <mat-optgroup *ngFor="let category of categories"
+                    [label]="category.name">
+        <mat-option *ngFor="let subCategory of category.children"
+                    [value]="subCategory.id">
+          {{subCategory.name}}
+        </mat-option>
+      </mat-optgroup>
+    </mat-select>
+  </mat-form-field>
+</div>

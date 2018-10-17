@@ -12,9 +12,12 @@ module.exports = {
   cardViewButton: element(by.css('[e2e="analyze-card-view"]')),
   cardViewInput: element(by.css('[e2e="analyze-card-view"]')),
   listViewInput: element(by.css('[e2e="analyze-list-view"]')),
+  observeLink: element(by.xpath('//div[contains(text(),"OBSERVE")]')),
+  progressbar:element(by.css('mat-progress-bar[mode="indeterminate"]')),
+
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {
-    return element(by.xpath(`//*[text() = "${analysisName}"]`));
+    return element(by.xpath(`//*[contains(text(),"${analysisName}")]`));
   },
   expandedCategory: categoryName => {
     return element(by.xpath(`//span[contains(text(),'${categoryName}')]/../../../button`));
@@ -31,7 +34,7 @@ module.exports = {
     return element(by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`));
   },
   subCategory: subCategoryName => {
-    return element(by.xpath(`(//a[text()='${subCategoryName}'])[1]`));
+    return element(by.xpath(`//a[contains(text(),"${subCategoryName}")]`));
   },
   navigateToSubCategory: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategory(categoryName, subCategoryName, defaultCategory),
   navigateToSubCategoryUpdated: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory),
@@ -45,19 +48,15 @@ module.exports = {
  * @subCategoryName - desirable category to expand
  */
 const navigateToSubCategoryUpdated = (categoryName, subCategoryName, defaultCategory) => {
-
+  browser.sleep(1000);
   module.exports.mainMenuExpandBtn.click();
-  browser.sleep(500);
-  //Collapse default category
-  commonFunctions.waitFor.elementToBeClickable(module.exports.expandedCategoryUpdated(defaultCategory));
-  module.exports.expandedCategoryUpdated(defaultCategory).click();
-  browser.sleep(500);
+  browser.sleep(1000);
   commonFunctions.waitFor.elementToBePresent(module.exports.category(categoryName));
   commonFunctions.waitFor.elementToBeVisible(module.exports.category(categoryName));
   //Navigate to Category/Sub-category, expand category
   commonFunctions.waitFor.elementToBeClickable(module.exports.category(categoryName));
   module.exports.category(categoryName).click();
-  browser.sleep(500);
+  browser.sleep(1000);
   const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickable(subCategory);
   subCategory.click();
@@ -86,9 +85,13 @@ const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) =
 };
 
 const createAnalysis = (metricName, analysisType) => {
+
+  commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.addAnalysisBtn);
   commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.addAnalysisBtn);
   analyzePage.analysisElems.addAnalysisBtn.click();
   let count = 0;
+  browser.sleep(2000);
+  commonFunctions.waitFor.elementToBeNotVisible(module.exports.progressbar, protractorConf.timeouts.extendedFluentWait);
   clickOnMetricRadioAndOnAnalysisType(metricName, analysisType, count);
 
   commonFunctions.waitFor.elementToBeEnabledAndVisible(analyzePage.newDialog.createBtn);
@@ -104,12 +107,14 @@ const clickOnMetricRadioAndOnAnalysisType = (metricName, analysisType, i) => {
   const newDialog = analyzePage.newDialog;
   const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
   const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
+  commonFunctions.waitFor.elementToBeVisible(metricElement);
   commonFunctions.waitFor.elementToBeClickable(metricElement);
   metricElement.click();
 
   // Check if metric selected
   browser.wait(EC.presenceOf(newDialog.getMetricSelectedRadioButtonElementByName(metricName)), 1000).then(
     function () {
+      commonFunctions.waitFor.elementToBeVisible(analysisTypeElement);
       commonFunctions.waitFor.elementToBeClickable(analysisTypeElement);
       analysisTypeElement.click();
     }, function (err) {

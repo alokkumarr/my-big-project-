@@ -41,7 +41,7 @@ setup instructions].
 
 To build and test the project execute the following commands:
 
-        $ cd saw
+        $ cd sip
         $ mvn verify
 
 This includes running both unit and integration tests.  The release
@@ -55,14 +55,14 @@ integration tests can run.
 To build and run the full SAW system locally in development mode,
 execute the following commands to start SAW in Docker containers:
 
-        $ cd saw
+        $ cd sip
         $ mvn package
         $ mvn -Ddocker-start=local
 
 SAW also Support data-lake report execution with YARN.
 To run SAW system locally with YARN execute the following commands:
            
-        $ cd saw
+        $ cd sip
         $ mvn package
         $ mvn -Ddocker-start=local -Dsaw.yarn.enabled=true
 
@@ -80,7 +80,7 @@ To list running containers, execute the following command:
         $ docker ps
         
 All SIP containers are named according to the pattern `sip-*`, for
-example `sip-admin`, `sip-saw1` and so on.  (The `sip-saw` containers
+example `sip-admin`, `sip-app1` and so on.  (The `sip-app` containers
 have a numeric suffix, because there can be multiple of them in high
 availability configurations.)
 
@@ -114,6 +114,17 @@ following command:
         $ docker rm -f $(docker ps -q -f name=sip)
 
 [cloud]: development-cloud.md
+
+# Following logs aggregated from all containers
+
+To follow logs aggregated from all SIP containers, execute the
+following command:
+
+        $ docker exec sip-admin journalctl -f
+
+The above will show logs from all containers except from the
+`sip-admin` container itself.  To follow those logs, simply execute
+`docker exec sip-admin journalctl -f`.  
 
 # Running system tests using local deployment
 
@@ -196,18 +207,17 @@ field mapping].
 [Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
 [Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
 
-# Running manual package upgrade/migration Tests
+# Testing upgrade and migration
 
-To run the saw package upgrade and database migration manually with Local docker instance, execute the
-following command from saw working directory:
-       
-        sh utils/migration-package-upgrade-local.sh
-  
-Above script can be also edited as per the use cases for repeatedly upgrade
-test while development.
+To test upgrading SIP from an old version, including database
+migration, add the `-Dsip.upgrade.skip=false` flag to the build
+command:
 
-Note: Above script is only applicable for local docker instance,
-for cloud docker instance script TBD.
+        $ mvn verify -Dsip.upgrade.skip=false
+
+This will first deploy the old SIP version (see the SIP package URL in
+`pom.xml`) and then deploy the new SIP version on top of it, after
+which integration tests will be executed on the upgraded environment.
 
 # Rendering documentation
 

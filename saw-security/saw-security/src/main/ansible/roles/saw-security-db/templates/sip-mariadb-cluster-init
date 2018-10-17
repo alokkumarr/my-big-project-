@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Initialize MariaDB Galera cluster by executing "galera_new_cluster"
+# if node is marked as safe to bootstrap.  This allows automatic
+# restarts of clusters that have been shut down orderly.
+#
+set -eu
+
+# The Ansible host index allows identifying individual nodes in a
+# group, where the first node has index zero
+ansible_host_index=$(< /etc/sip/sip-mariadb-host-index)
+
+echo "Looking for MariaDB grastate file"
+grastate=/var/lib/mysql/grastate.dat
+if [ -f $grastate ]; then
+    # The grastate file exists, so this is an existing MariaDB 10
+    # environment
+    echo "Looking up MariaDB Galera cluster safe to bootstrap value"
+    if grep "safe_to_bootstrap: 1" $grastate > /dev/null; then
+        echo "Initializing new MariaDB Galera cluster"
+        # If MariaDB is already running, this will have no effect
+        galera_new_cluster
+    fi
+else
+    echo "No MariaDB grastate file found"
+    # The grastate file does not exist, so this is either a fresh
+    # install or upgrade from MariaDB 5, so initialize the cluster
+    if [ $ansible_host_index == 0 ]; then
+        echo "First node, so initializing MariaDB Galera cluster"
+        galera_new_cluster
+    fi
+fi

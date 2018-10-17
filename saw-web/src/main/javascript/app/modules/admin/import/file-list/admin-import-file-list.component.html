@@ -1,0 +1,33 @@
+<dx-data-grid [customizeColumns]="config.customizeColumns"
+              [columnAutoWidth]="config.columnAutoWidth"
+              [columnMinWidth]="config.columnMinWidth"
+              [columnResizingMode]="config.columnResizingMode"
+              [allowColumnReordering]="config.allowColumnReordering"
+              [allowColumnResizing]="config.allowColumnResizing"
+              [showColumnHeaders]="config.showColumnHeaders"
+              [showColumnLines]="config.showColumnLines"
+              [showRowLines]="config.showRowLines"
+              [showBorders]="config.showBorders"
+              [rowAlternationEnabled]="config.rowAlternationEnabled"
+              [hoverStateEnabled]="config.hoverStateEnabled"
+              [wordWrapEnabled]="config.wordWrapEnabled"
+              [scrolling]="config.scrolling"
+              [sorting]="config.sorting"
+              [dataSource]="files"
+              [columns]="config.columns"
+              [pager]="config.pager"
+              [paging]="config.paging"
+              [width]="config.width"
+              [height]="config.height"
+>
+<div *dxTemplate="let cell of 'actionCellTemplate'">
+  <button mat-icon-button
+          (click)="onRemove(cell.data)"
+          class="list-action__button"
+          i18n-matTooltip="Remove file"
+          matTooltip="Remove file"
+    >
+      <mat-icon fontIcon="icon-trash"></mat-icon>
+    </button>
+</div>
+</dx-data-grid>

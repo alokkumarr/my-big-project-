@@ -1,6 +1,11 @@
 <form [formGroup]="kpiForm" autocomplete="off">
   <mat-form-field>
-    <input matInput placeholder="KPI Name" formControlName="name" maxlength="25" />
+    <input matInput
+          placeholder="KPI Name"
+          formControlName="name"
+          maxlength="25"
+          e2e="dashboard-add-kpi-name-input"
+    />
     <mat-error *ngIf="kpiName.errors?.required">
       Name is
       <strong>required</strong>.
@@ -11,16 +16,21 @@
     </mat-error>
   </mat-form-field>
 
-  <mat-form-field *ngIf="_metric" class="select-form-field">
-    <mat-select placeholder="Select Date Field" formControlName="dateField">
+  <mat-form-field *ngIf="_metric"
+                  class="select-form-field"
+                  appearance="outline"
+  >
+    <mat-label>Date Field</mat-label>
+    <mat-select e2e="dashboard-add-kpi-date-column-select" formControlName="dateField">
       <mat-option *ngFor="let field of _metric.dateColumns" [value]="field.columnName">
         {{ field.displayName }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field class="select-form-field">
-    <mat-select placeholder="Filter" formControlName="filter">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Filter</mat-label>
+    <mat-select e2e="dashboard-add-kpi-date-preset-select" formControlName="filter">
       <mat-option *ngFor="let filt of dateFilters" [value]="filt.value">
         {{filt.label}}
       </mat-option>
@@ -28,21 +38,30 @@
   </mat-form-field>
 
   <mat-form-field *ngIf="showDateFields">
-    <input matInput formControlName="gte" [max]="kpiForm.get('lte').value" [matDatepicker]="frompicker" (click)="frompicker.open()"
-      placeholder="From" />
+    <input matInput e2e="dashboard-add-kpi-date-gte-input"
+                    formControlName="gte"
+                    [max]="kpiForm.get('lte').value"
+                    [matDatepicker]="frompicker"
+                    (click)="frompicker.open()"
+                    placeholder="From" />
     <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
     <mat-datepicker #frompicker disabled="false"></mat-datepicker>
   </mat-form-field>
 
   <mat-form-field *ngIf="showDateFields">
-    <input matInput formControlName="lte" [min]="kpiForm.get('gte').value" [matDatepicker]="topicker" (click)="topicker.open()"
-      placeholder="To" />
+    <input matInput e2e="dashboard-add-kpi-date-lte-input"
+                    formControlName="lte"
+                    [min]="kpiForm.get('gte').value"
+                    [matDatepicker]="topicker"
+                    (click)="topicker.open()"
+                    placeholder="To" />
     <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>
     <mat-datepicker #topicker disabled="false"></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field class="select-form-field">
-    <mat-select placeholder="Primary Aggregation" formControlName="primAggregate">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Primary Aggregation</mat-label>
+    <mat-select e2e="dashboard-add-kpi-aggregation-select" formControlName="primAggregate">
       <mat-option *ngFor="let ag of aggregations" [value]="ag.value">
         {{ ag.name }}
       </mat-option>
@@ -51,15 +70,24 @@
 
   <div class="secondary-aggregate-form" formGroupName="secAggregates" *ngIf="_kpiType!== 'bullet'">
     <strong>Secondary Aggregations</strong>
-    <mat-slide-toggle *ngFor="let ag of aggregations" [formControlName]="ag.value">
+    <mat-slide-toggle *ngFor="let ag of aggregations"
+                      [formControlName]="ag.value"
+                      [attr.e2e]="'dashboard-add-kpi-secondary-aggregate-' + ag.name">
       {{ag.name}}
     </mat-slide-toggle>
   </div>
 
   <div class="kpi-bg" formGroupName="kpiBgColor" *ngIf="_kpiType!== 'bullet'">
     <strong> Select KPI Background Color : </strong>
-    <mat-button-toggle-group #kpiBG="matButtonToggleGroup" [(ngModel)]="kpiBgColorValue" [value]="kpiBgColorValue" [ngModelOptions]="{standalone: true}">
-      <mat-button-toggle *ngFor="let bg of kpiBgColors" [style.background-color]="bg.value" [style.color]="bg.value" [value]="bg.label">
+    <mat-button-toggle-group #kpiBG="matButtonToggleGroup"
+                             [(ngModel)]="kpiBgColorValue"
+                             [value]="kpiBgColorValue"
+                             [ngModelOptions]="{standalone: true}">
+      <mat-button-toggle [attr.e2e]="'dashboard-add-kpi-color-' + bg.label"
+                         *ngFor="let bg of kpiBgColors"
+                         [style.background-color]="bg.value"
+                         [style.color]="bg.value"
+                         [value]="bg.label">
       </mat-button-toggle>
     </mat-button-toggle-group>
   </div>
@@ -67,33 +95,56 @@
   <div *ngIf="_kpiType=== 'bullet'">
     <div class="bullet-measures">
       <mat-form-field>
-        <input matInput type="number" placeholder="Measure 1" formControlName="measure1" />
+        <input matInput e2e="dashboard-add-kpi-bullet-measure1-input"
+                        type="number"
+                        placeholder="Measure 1"
+                        formControlName="measure1" />
       </mat-form-field>
       <mat-form-field>
-        <input matInput type="number" placeholder="Measure 2" formControlName="measure2" />
+        <input matInput e2e="dashboard-add-kpi-bullet-measure2-input"
+                        type="number"
+                        placeholder="Measure 2"
+                        formControlName="measure2" />
       </mat-form-field>
     </div>
     <mat-form-field class="target">
-      <input matInput type="number" placeholder="Metric Target" formControlName="target" />
+      <input matInput e2e="dashboard-add-kpi-bullet-target-input"
+                      type="number"
+                      placeholder="Metric Target"
+                      formControlName="target" />
     </mat-form-field>
 
     <div class="bullet-bands">
       <strong>Select Band Color Palette : </strong>
-      <mat-button-toggle-group #bulletPalette="matButtonToggleGroup" [(ngModel)]="bandPaletteValue" [value]="bandPaletteValue"
-        [ngModelOptions]="{standalone: true}">
-        <mat-button-toggle value="rog" class="rog">
+      <mat-button-toggle-group #bulletPalette="matButtonToggleGroup"
+                               [(ngModel)]="bandPaletteValue"
+                               [value]="bandPaletteValue"
+                               [ngModelOptions]="{standalone: true}">
+        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-rog"
+                           value="rog"
+                           class="rog"
+        >
           <span class="text">ROG</span>
         </mat-button-toggle>
-        <mat-button-toggle value="greys" class="grey">
+        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-greys"
+                           value="greys"
+                           class="grey"
+        >
           <span class="text">GREYS</span>
         </mat-button-toggle>
-        <mat-button-toggle value="blues" class="blues">
+        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-blues"
+                           value="blues"
+                           class="blues"
+        >
           <span class="text">BLUES</span>
         </mat-button-toggle>
       </mat-button-toggle-group>
     </div>
   </div>
-  <button mat-raised-button color="primary" (click)="applyKPI()" [disabled]="kpiForm.invalid">
+  <button mat-raised-button e2e="dashboard-add-kpi-apply-button"
+                            color="primary"
+                            (click)="applyKPI()"
+                            [disabled]="kpiForm.invalid">
     Apply
   </button>
 </form>

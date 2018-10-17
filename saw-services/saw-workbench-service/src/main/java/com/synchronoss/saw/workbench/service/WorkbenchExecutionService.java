@@ -20,6 +20,6 @@ public interface WorkbenchExecutionService {
   /**
    * Get dataset preview data by preview ID.
    */
-  String createDatasetDirectory(String project, String name) throws Exception;
+  String createDatasetDirectory(String project, String catalog, String name) throws Exception;
   
 }

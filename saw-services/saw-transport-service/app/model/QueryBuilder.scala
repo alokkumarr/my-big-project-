@@ -1,19 +1,8 @@
 package model
 
-import java.text.SimpleDateFormat
-
-import com.synchronoss.DynamicConvertor
-import controllers.BaseController
 import org.json4s._
-import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JValue
-import org.json4s.native.JsonMethods._
-import org.apache.log4j._
 import org.slf4j.{Logger, LoggerFactory}
-import play.mvc.Controller
-import play.api.Logger
-
-
 
 object QueryBuilder extends {
   implicit val formats = DefaultFormats
@@ -37,7 +26,7 @@ object QueryBuilder extends {
         buildSelect(artifacts, sqlBuilder),
         buildFrom(artifacts, sqlBuilder),
         buildWhere(sqlBuilder, runtime, DSK),
-        buildGroupBy(artifacts, sqlBuilder),
+        buildGroupBy(sqlBuilder),
         buildOrderBy(sqlBuilder)
       ).replaceAll("\\s+", " ").trim
     }
@@ -46,7 +35,7 @@ object QueryBuilder extends {
         buildSelect(artifacts, sqlBuilder),
         buildFrom(artifacts, sqlBuilder),
         buildWhere(sqlBuilder, runtime),
-        buildGroupBy(artifacts, sqlBuilder),
+        buildGroupBy(sqlBuilder),
         buildOrderBy(sqlBuilder)
       ).replaceAll("\\s+", " ").trim
 
@@ -54,14 +43,41 @@ object QueryBuilder extends {
     whereClause
   }
 
+  def buildSelectfromsqlBuilder(sqlBuilder: JObject)  = {
+    val dataFields : List [String] = extractArray(sqlBuilder, "dataFields") match {
+        case Nil => null
+        case dataFields: List[JValue] => {
+          dataFields.flatMap((fields: JValue) => {
+            val tableName = (fields \ "tableName").extract[String]
+            val columns = extractArray(fields, "columns")
+            columns.map(column(tableName, _))
+          })
+        }
+      }
+    dataFields
+  }
+
   private def buildSelect(artifacts: List[JValue], sqlBuilder: JObject) = {
-    "SELECT " + buildSelectColumns(artifacts).map(
+    // Take the precedence of sqlBuilder dataFields to build select columns, if dataFields not found
+    // in sql builder then look in the artifacts to support the backward compatibility.
+    var selectColumn = buildSelectfromsqlBuilder(sqlBuilder)
+    if (selectColumn ==null || selectColumn.isEmpty)
+      selectColumn = buildSelectColumns(artifacts)
+     "SELECT " + selectColumn.map(
       columnAggregate(sqlBuilder, _)).mkString(", ")
   }
 
+  /**
+    * This method is no more used, this has been kept to maintain
+    * the backward Compatibility.
+    * @param sqlBuilder
+    * @param column
+    * @return
+    */
+  @Deprecated
   def columnAggregate(sqlBuilder: JObject, column: String): String = {
     val groupBy = extractArray(sqlBuilder, "groupByColumns")
-    groupBy.find(buildGroupByElement(_) == column) match {
+    groupBy.find(buildGroupByElement(_,"") == column) match {
       case Some(groupBy) => {
         val function = (groupBy \ "function").extract[String]
         if (!List("sum", "avg", "min", "max").contains(function)) {
@@ -92,13 +108,24 @@ object QueryBuilder extends {
   }
 
   private def column(artifactName: String, column: JValue) = {
+    val aggregate = (column \ "aggregate")
+    if (!(aggregate ==JNothing))
+      aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
+    else
     artifactName + "." + (column \ "columnName").extract[String]
   }
 
   private def buildFrom(artifacts: List[JValue], sqlBuilder: JObject) = {
     val joins = buildFromJoins(sqlBuilder)
-    "FROM " + (if (joins.length > 0) joins else
-      buildFromArtifacts(artifacts).mkString(", "))
+    if (joins!=null && joins.isEmpty) {
+      val tableName = buildFromSqlBuilder(sqlBuilder)
+      "FROM " + (if (tableName!=null && tableName.length > 0) tableName else
+        buildFromArtifacts(artifacts).mkString(", "))
+    }
+    else {
+      "FROM " + (if (joins.length > 0) joins else
+        buildFromArtifacts(artifacts).mkString(", "))
+    }
   }
 
   private def buildFromJoins(sqlBuilder: JObject): String = {
@@ -108,6 +135,16 @@ object QueryBuilder extends {
         JoinRelation.toSQL(buildJoinTree(joins.map(JoinRelation(_))))
       }
     }
+  }
+
+  private def buildFromSqlBuilder(sqlBuilder: JObject): String = {
+    val tableName : String = extractArray(sqlBuilder, "dataFields") match {
+      case Nil => null
+      case dataFields: List[JValue] => {
+        ( dataFields(0) \ "tableName").extract[String]
+        }
+      }
+    tableName
   }
 
   private def buildJoinTree(joins: List[JoinRelation]) = {
@@ -274,24 +311,50 @@ object QueryBuilder extends {
     }
   }
 
-  private def buildGroupBy(
-    artifacts: List[JValue], sqlBuilder: JObject): String = {
-    val groupBy = extractArray(sqlBuilder, "groupByColumns")
-    if (groupBy.isEmpty) {
-      ""
-    } else {
-      val selectColumns = buildSelectColumns(artifacts).toSet
-      val groupByColumns = groupBy.map(buildGroupByElement(_)).toSet
-      "GROUP BY " + (selectColumns -- groupByColumns).mkString(", ")
+
+  private def buildGroupBy(sqlBuilder: JObject): String = {
+    val groupByColumns: List[String] = extractArray(sqlBuilder, "dataFields") match {
+      case Nil => null
+      case dataFields: List[JValue] => {
+        var aggregateFlag =false
+        dataFields.flatMap((fields: JValue) => {
+          val tableName = (fields \ "tableName").extract[String]
+          val columns = extractArray(fields, "columns")
+          val aggregateColumns = columns.filter(col => {
+            val aggregate = (col \ "aggregate")
+           !(aggregate ==JNothing || aggregate == None)
+          })
+          // In case of multiple artifacts join if one artifacts contains the
+          // aggregate then another artifacts columns should be considered as
+          // group by columns. initialise the flag to detect that.
+          if (aggregateColumns.size > 0 && columns.size > aggregateColumns.size)
+            aggregateFlag=true;
+          if (aggregateFlag) {
+            val groupByColumn = columns.filter(col => {
+              val groupBy = (col \ "aggregate")
+              (groupBy == JNothing || groupBy == None)
+            })
+            val groupByColumns = groupByColumn.map(buildGroupByElement(_, tableName)).toSet
+            // return groupByColumn
+            groupByColumns
+          }
+          else
+          // No aggregate column present return the empty string.
+            None
+        })
+      }
     }
+    if (groupByColumns!=null && groupByColumns != None && groupByColumns.size>0)
+      "GROUP BY " + (groupByColumns).mkString(", ")
+    else ""
   }
 
-  private def buildGroupByElement(groupBy: JValue): String = {
+  private def buildGroupByElement(groupBy: JValue, tableName :String): String = {
     def property(name: String) = {
       (groupBy \ name).extract[String]
     }
     "%s.%s".format(
-      property("tableName"),
+      tableName,
       property("columnName")
     )
   }
@@ -313,11 +376,21 @@ object QueryBuilder extends {
     def property(name: String) = {
       (orderBy \ name).extract[String]
     }
-    "%s.%s %s".format(
-      property("tableName"),
-      property("columnName"),
-      property("order")
-    )
+    val aggregate = (orderBy \ "aggregate")
+    if (aggregate!=null && aggregate!= JNothing) {
+      "%s(%s.%s) %s".format(
+        property("aggregate"),
+        property("tableName"),
+        property("columnName"),
+        property("order")
+      )
+    }else {
+       "%s.%s %s".format(
+        property("tableName"),
+        property("columnName"),
+        property("order")
+       )
+    }
   }
 
   def extractArray(json: JValue, name: String): List[JValue] = {
@@ -335,8 +408,8 @@ object QueryBuilder extends {
       "Unexpected element: %s, expected %s, at %s".format(
         name, expected, location))
   }
-}
 
+}
 
 
 trait Relation {

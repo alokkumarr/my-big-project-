@@ -10,23 +10,140 @@ Version {project-version}
 This document describes the high-level design of the SIP platform,
 including its architecture and modules.
 
-== Overview
+== Modules
 
-The application consists of three modules: SAW Web, SAW Services and
-SAW Security.  SAW Web provides a web application for creating and
-executing analysis.  It builds on top of SAW Services, which provides
-a REST API for creating and executing analyses.  SAW Security manages
+SIP provides end users three modules: Analyze, Observe and Workbench.
+Additionally SIP is organized into three implementation layers: Web,
+Services and Security.  The figure below explains the relation between
+modules and service layers.
+
+.SIP Modules and layers
+ditaa::sip-design/figure-modules.txt[separation=false]
+
+The web applications are implemented using AngularJS, while services
+are implemented using Spring Boot.  The Metadata Library is a shared
+Java library.
+
+NOTE: The Analysis and Execution Services shown above are currently
+bundled together as the Transport Service, implemented in Scala and
+Play.
+
+== Interfaces
+
+SIP has three main external interfaces: SIP Web, SIP Services and SIP
+Security.  SIP Web provides a web application for creating and
+executing analysis.  It builds on top of SIP Services, which provides
+a REST API for creating and executing analyses.  SIP Security manages
 authentication and privileges of users.
 
-.Figure: SAW modules and their dependencies
-plantuml::sip-design/figure-modules.pum[format=svg]
-
-The modules can be taken into use independently, as long as their
-dependencies are also provided.  Typically all three modules are used
-together.
-
-.Figure: External SAW interfaces and their use
+.External SIP interfaces and their use
 plantuml::sip-design/figure-interfaces.pum[format=svg]
+
+== Security
+
+=== Authentication
+
+Requests to SIP Services require to be authenticated.  Clients that
+need authentication first request a token from the SIP Security
+Service, which is then included with subsequent requests for
+authentication.
+
+The method used is http://www.haproxy.org/[JSON Web Tokens].  The
+server side has a secret key, which is used to sign a set of
+statements about the client during the initial authentication
+sequence.  This token is then passed to the client, which provides it
+with subsequent requests.  The server can then validate the token by
+inspecting its signature and the secret key.
+
+.Authentication using JSON Web Tokens
+plantuml::sip-design/figure-authentication.pum[format=svg]
+
+For more details see the <<SAW Gateway Service>> and <<SAW Security>>
+sections.
+
+=== Authorization
+
+Clients are authorized by the SIP Gateway Service using the user
+database managed by the SIP Security Service.  The database stores
+users, their credentials and privileges.  Examples of privileges are
+permissions to view folders, access SIP modules and so on.
+
+== High availability
+
+SIP is required to provide high availability of its services.  If one
+node in the SIP environment fails or becomes unavailable, services are
+expected to keep working normally.
+
+=== Health checks
+
+High availability is achieved using different techniques based on the
+type of the service.  Common to all services are the use of health
+checks.  Services provide health checks to indicate if they are able
+to serve requests normally.  This allows service clients (which can be
+external or other SIP services) to only route requests to service
+instances which are indicated as being healthy.  See the SIP
+Operations Guide for more details on service health checks.
+
+=== High availability proxy
+
+SIP provides a high availability proxy by default, which allows
+external clients to connect to a single host, which in turn routes the
+request to the appropriate service instance based on health checks.
+This is implemented using http://www.haproxy.org/[HAProxy].
+
+Using the high availability proxy simplifies SIP client requirements,
+because it removes the need for clients to keep track of multiple SIP
+service instances and their health statuses.  The downside of using it
+is that if the high availability proxy itself becomes unavailable, for
+example due to the node that it is running on failing, clients will
+not be able to connect at all.  To make also the HAProxy service
+highly available, configure redundant HAProxy nodes that listen to a
+virtual IP maintained by Keepalived.
+
+.High availability proxy for services
+plantuml::sip-design/figure-ha-proxy.pum[format=svg]
+
+=== High availability for stateless services
+
+SIP provides high availability for stateless services by running
+multiple redundant instances of them on separate nodes.  If one node
+fails and makes the service running on that node unavailable, the
+service instance on the other node can keep serving requests.
+
+:quartz_doc: http://www.quartz-scheduler.org/documentation/
+:quartz_cluster: quartz-2.x/configuration/ConfigJDBCJobStoreClustering.html
+
+The Scheduler Service additionally runs the Quartz scheduler in
+{quartz_doc}/{quartz_cluster}[clustered mode], which ensures that
+scheduled tasks continue to be executed even if one of the Scheduler
+Service instances becomes unavailable.  The clustered mode setting
+ensures that each scheduled task is executed by only one of the
+instances.  The Quartz scheduler is configured to use MariaDB as its
+job store, which itself is highly available through the use of a
+MariaDB Galera cluster setup.
+
+.High availability for Scheduler Service
+plantuml::sip-design/figure-ha-scheduler.pum[format=svg]
+
+=== High availability for stateful services
+
+Services that store some kind of state, such as a database, require
+each their own solutions to provide high availability.  The only
+stateful service is the SIP Security Service, which manages a MariaDB
+database.
+
+The SIP Security Service provides high availability by running the
+database in a multi-master mode using a MariaDB Galera cluster setup.
+In case a single cluster member becomes unavailable, the rest of the
+cluster members will continue providing service.  All cluster members
+are equal and can be used for both read and write operations.  Clients
+can therefore connect to any cluster member, and do not need to
+contain logic for following or failing over to a specific member.  All
+writes are replicated synchronously across the entire cluster to
+ensure consistency and availability.
+
+.High availability for MariaDB
+plantuml::sip-design/figure-ha-mariadb.pum[format=svg]
 
 == SAW Web
 
@@ -58,8 +175,13 @@ tables.  Additionally SAW Services access files on the MapR-FS.
 The SAW Gateway Service acts as single entry point for all upstream
 micro services.  It is a Spring Boot based microservice. It upholds
 the concerns regarding security.  It acts as edge service and
-authenticates every request that passes by it nad makes sure that it
-is valid.  In addition to these, it comes with the following benefits:
+authenticates every request that passes by it and makes sure that it
+is valid.
+
+.Gateway Service routes requests to upstream services
+plantuml::sip-design/figure-gateway.pum[format=svg]
+
+It comes with the following benefits:
 
 . Insulates the clients from how the application is partitioned into
   micro-services
@@ -138,28 +260,40 @@ The SAW Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
 semantic metadata configuration REST APU & data wrangling related REST API.
 
-=== SAW Proxy Service
+.SIP Workbench Components
+plantuml::sip-design/figure-components.pum[format=svg]
 
-The SAW Proxy Service will act as proxy for our storage. The intention of this services
-to provide common storage proxy service behind our gateway for our polyglot persistence layer (ES, DL, RDMS & MapRDB).
-The purpose is to bring back all of transformation which is being done currently in UI to the backend service and UI just
-needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
+.SIP Workbench Executor
+plantuml::sip-design/figure-executor.pum[format=svg]
 
-.Figure: Executing an data query using the SAW Proxy Service
+=== SAW Storage Proxy Service
+
+he SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
+The intention of this services to provide access behind our gateway for our polyglot persistence
+layer *(ElasticSearch, Datalake, RDMS & MapRDB).*
+
+[%hardbreaks]
+One of the reason to access this service to perform transformation at backend service and API consumer
+just needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
+
+.Figure: Executing an data query using the SAW Proxy Service via SIP Gateway Service
 plantuml::sip-design/figure-proxy-sequence.pum[format=svg]
 
-The request body shall provide the query, storage type & other details. The below are salient feature for the service which are as follows:
-1. It will return either in JSON or Tabular Format.
+The request (link:sip-developer/index.html[SIP Developer Guide]) body shall provide the query,
+storage type & other details. The below are salient feature for the service which are as follows:
+
+[[goals]]
+[role="incremental"]
+* It will return either in JSON or Tabular Format.
    ES returns in JSON format in terms of search, it should be converted into Tabular format if in
    the request body tabular format is requested.
-2. Input JSON Schema Validation.
-3. support create, search, update & delete operations.
-4. It should support to flatten our in house build pivot format.
-5. Search results will provided in paginated format either in JSON or Tabular format.
-6. Implicit ES Query validation.
-7. Every incoming request to this story proxy service will be validated in gateway service layer.
-8. It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to
-   certain structure i.e request & response specification.
+* Input JSON Schema Validation.
+* support create, search, update, delete & aggregate operations.
+* It should support to flatten our in house build pivot format.
+* Search results will provided in paginated format either in JSON or Tabular format.
+* Implicit ES Query validation.
+* Every incoming request to this story proxy service will be validated in gateway service layer.
+* It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to certain structure i.e request & response specification.
 
 === SAW Semantic Service
 
@@ -266,40 +400,3 @@ response to the client.
 
 .Figure: Authenticating a client using the SAW Security Service
 plantuml::sip-design/figure-security-sequence.pum[format=svg]
-
-== High availability
-
-SIP is required to provide high availability of its services.  If one
-node in the SIP environment fails or becomes unavailable, services are
-expected to keep working normally.
-
-=== Health checks
-
-High availability is achieved using different techniques based on the
-type of the service.  Common to all services are the use of health
-checks.  Services provide health checks to indicate if they are able
-to serve requests normally.  This allows service clients (which can be
-external or other SIP services) to only route requests to service
-instances which are indicated as being healthy.  See the SIP
-Operations Guide for more details on service health checks.
-
-=== High availability for stateless services
-
-SIP provides high availability for stateless services by running
-multiple redundant instances of them on separate nodes.  If one node
-fails and makes the service running on that node unavailable, the
-service instance on the other node can keep serving requests.
-
-=== High availability proxy
-
-SIP provides a high availability proxy by default, which allows
-external clients to connect to a single host, which in turn routes the
-request to the appropriate service instance based on health checks.
-This is implemented using http://www.haproxy.org/[HAProxy].
-
-Using the high availability proxy simplifies SIP client requirements,
-because it removes the need for clients to keep track of multiple SIP
-service instances and their health statuses.  The downside of using it
-is that if the high availability proxy itself becomes unavailable, for
-example due to the node that it is running on failing, clients will
-not be able to connect at all.

@@ -1,51 +1,58 @@
-import * as angular from 'angular';
-
-import 'angular-material/angular-material.css';
-
 import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';
 
 import 'zone.js/dist/zone';
 import 'hammerjs';
 import 'reflect-metadata';
-import { NgModule, StaticProvider, LOCALE_ID, Injector } from '@angular/core';
+import '../../../../themes/_triton.scss';
+import { NgModule, LOCALE_ID, enableProdMode } from '@angular/core';
+import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
-import { UrlService } from '@uirouter/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { UpgradeModule, downgradeModule, downgradeComponent } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import {MaterialModule} from './material.module';
+import { RouterModule } from '@angular/router';
+import { MaterialModule } from './material.module';
 
-import { routesConfig } from './routes';
-import { themeConfig } from './theme';
-import { i18nConfig } from './i18n';
-import { config } from './config';
-import { interceptor } from './http-interceptor';
-import { runConfig } from './run';
+import { routes } from './routes';
 
-import { ObserveModule, ObserveUpgradeModule } from './modules/observe';
+import { ObserveUpgradeModule } from './modules/observe';
 import { CommonModuleTs } from './common';
-import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
-import { AlertsModule } from './modules/alerts';
-import { OldAdminModule, AdminModule } from './modules/admin';
-import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench';
+import { AnalyzeModuleTs } from './modules/analyze';
+import { AdminModule } from './modules/admin';
+import { WorkbenchUpgradeModule } from './modules/workbench';
 
-import { LayoutContentComponent } from './layout';
+import {
+  LayoutContentComponent,
+  LayoutHeaderComponent,
+  LayoutFooterComponent,
+  MainPageComponent
+} from './layout';
 
-import { LayoutHeaderComponent } from './layout/components/header/header.component';
-import { LayoutFooterComponent } from './layout/components/footer/footer.component';
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
 
 declare global {
   const require: any;
 }
 
+declare const __PRODUCTION__: any;
+
+const COMPONENTS = [
+  ServiceBootstrapComponent,
+  LayoutContentComponent,
+  LayoutHeaderComponent,
+  LayoutFooterComponent,
+  MainPageComponent
+];
+const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
+
 @NgModule({
   imports: [
     BrowserModule,
-    UpgradeModule,
-    UIRouterUpgradeModule,
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      onSameUrlNavigation: 'reload'
+    }),
+    NgIdleModule.forRoot(),
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,
@@ -55,60 +62,16 @@ declare global {
     AdminModule
   ],
   exports: [FlexLayoutModule],
-  providers: [
-    {provide: LOCALE_ID, useValue: 'en'}
-  ],
-  declarations: [ServiceBootstrapComponent, LayoutHeaderComponent, LayoutFooterComponent],
-  entryComponents: [ServiceBootstrapComponent, LayoutHeaderComponent, LayoutFooterComponent]
+  providers: [...SERVICES],
+  declarations: COMPONENTS,
+  entryComponents: COMPONENTS,
+  bootstrap: [LayoutContentComponent]
 })
 export class NewAppModule {
-  constructor() { }
-  ngDoBootstrap() {
-  }
+  constructor() {}
 }
 
-const ng2BootstrapFn = (extraProviders: StaticProvider[]) => {
-  return platformBrowserDynamic(extraProviders).bootstrapModule(NewAppModule).then(platformRef => {
-    const injector: Injector = platformRef.injector;
-
-    // Instruct UIRouter to listen to URL changes
-    const url: UrlService = injector.get(UrlService);
-    url.listen();
-    url.sync();
-    return platformRef;
-  });
+if (__PRODUCTION__) {
+  enableProdMode();
 }
-
-// This AngularJS module represents the AngularJS pieces of the application.
-export const AppModule = 'app';
-
-angular
-  .module(AppModule, [
-    downgradeModule(ng2BootstrapFn),
-    ObserveModule,
-    AnalyzeModule,
-    AlertsModule,
-    OldAdminModule,
-    WorkbenchModule
-  ])
-  .config(routesConfig)
-  .config(themeConfig)
-  .config(i18nConfig)
-  .config(config)
-  .config(interceptor)
-  .run(runConfig)
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({ component: ServiceBootstrapComponent }) as angular.IDirectiveFactory
-  )
-  .directive(
-    'layoutHeader',
-    downgradeComponent({component: LayoutHeaderComponent}) as angular.IDirectiveFactory
-  )
-  .component('layoutContent', LayoutContentComponent)
-  .directive(
-    'layoutFooter',
-    downgradeComponent({component: LayoutFooterComponent}) as angular.IDirectiveFactory
-  );
-
-angular.bootstrap(document, [AppModule]);
+platformBrowserDynamic().bootstrapModule(NewAppModule);

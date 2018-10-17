@@ -4,23 +4,22 @@
 \alias{deploy}
 \title{Deploy Modeler Object}
 \usage{
-deploy(obj, path, lighten = FALSE, ...)
+deploy(obj, path, ...)
 }
 \arguments{
 \item{obj}{modeler object to save}
 
-\item{path}{file path to save to. Extension should be .rds}
+\item{path}{directory path to write a2modeler object to}
 
-\item{lighten}{logical flag to lighten the memory footprint of modeler
-objects by removing all fit and pipeline output from trained models. Note
-the final model fit and pipeline are not impacted}
-
-\item{...}{Arguments passed on to \code{saveRDS}
-\describe{
-  \item{}{}
-}}
+\item{...}{additional arguments to pass to \link[base]{saveRDS} function}
 }
 \description{
-Save Modeler object to file that can be restored later. Deploy uses
-\code{\link{saveRDS}} function to serialize the R object
+Save Modeler object to file that can be restored later. Requires a final
+model to be set. Deploy uses \code{\link{saveRDS}} function to serialize the
+R object. Deploy uses \code{\link{sparklyr::ml_save}} to serialize final
+model fit.
+}
+\details{
+Deploy function creates a new directory at path location and writes a2modeler
+object and final model within
 }

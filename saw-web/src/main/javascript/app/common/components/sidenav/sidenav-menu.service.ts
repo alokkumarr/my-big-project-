@@ -10,7 +10,9 @@ export class SidenavMenuService {
   }
 
   updateMenu(menu, module) {
-    this._subject$.next({menu, module});
+    setTimeout(() => {
+      this._subject$.next({menu, module});
+    });
   }
 }
 

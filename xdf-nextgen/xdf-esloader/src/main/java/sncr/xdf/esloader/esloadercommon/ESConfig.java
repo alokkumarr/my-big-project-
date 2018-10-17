@@ -3,11 +3,13 @@ package sncr.xdf.esloader.esloadercommon;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.List;
+
 /**
  * Created by skbm0001 on 29/1/2018.
  */
 public class ESConfig {
-    private String esHost;
+    private List<String> esHost;
     private String esClusterName;
     private String esUser;
     private String esPassword;
@@ -17,7 +19,7 @@ public class ESConfig {
 
     private String dataLocation;
 
-    public ESConfig(String esHost, String esUser, String esPassword, String esIndex) {
+    public ESConfig(List<String> esHost, String esUser, String esPassword, String esIndex) {
         this.esHost = esHost;
         this.esUser = esUser;
         this.esPassword = esPassword;
@@ -25,7 +27,8 @@ public class ESConfig {
         this.esIndex = esIndex;
     }
 
-    public ESConfig(String esHost, String esUser, String esPassword, int esPort, String esIndex) {
+    public ESConfig(List<String> esHost, String esUser, String esPassword, int esPort, String
+        esIndex) {
         this.esHost = esHost;
         this.esUser = esUser;
         this.esPassword = esPassword;
@@ -34,11 +37,11 @@ public class ESConfig {
         this.esIndex = esIndex;
     }
 
-    public String getEsHost() {
+    public List<String> getEsHosts() {
         return esHost;
     }
 
-    public void setEsHost(String esHost) {
+    public void setEsHost(List<String> esHost) {
         this.esHost = esHost;
     }
 

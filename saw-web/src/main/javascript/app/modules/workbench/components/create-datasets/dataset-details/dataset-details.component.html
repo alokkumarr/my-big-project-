@@ -18,14 +18,16 @@
     <mat-card-content class="form-div">
       <form #datasetDetails novalidate [formGroup]="detailsFormGroup" autocomplete="off">
         <section class="input-section">
-          <mat-form-field class="margin20 select-form-field">
-            <mat-select placeholder="Data format type?" [(value)]="previewConfig.delimiterType">
+          <mat-form-field class="margin20 select-form-field" appearance="outline">
+            <mat-label>Data format type?</mat-label>
+            <mat-select [(value)]="previewConfig.delimiterType">
               <mat-option value="delimited">Delimited</mat-option>
               <mat-option value="parquet" disabled>Parquet</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field class="margin20 select-form-field ">
-            <mat-select placeholder="Header row present?" [(value)]="previewConfig.header">
+          <mat-form-field class="margin20 select-form-field" appearance="outline">
+            <mat-label>Header row present?</mat-label>
+            <mat-select [(value)]="previewConfig.header">
               <mat-option value="yes">Yes</mat-option>
               <mat-option value="no">No</mat-option>
             </mat-select>
@@ -55,8 +57,9 @@
               <strong>required</strong>
             </mat-error>
           </mat-form-field>
-          <mat-form-field class="margin20 select-form-field">
-            <mat-select placeholder="Line Seperator" [(value)]="lineSeperator">
+          <mat-form-field class="margin20 select-form-field" appearance="outline">
+            <mat-label>Line Seperator</mat-label>
+            <mat-select [(value)]="lineSeperator">
               <mat-option value="lineFeed">Line Feed (\n)</mat-option>
               <mat-option value="carriageReturn">Carriage Return (\r)</mat-option>
               <mat-option value="eol">End of Line (\r\n)</mat-option>
@@ -82,7 +85,7 @@
         <section class="input-section">
           <mat-form-field class="margin20">
             <mat-chip-list #chipList>
-              <mat-chip *ngFor="let format of previewConfig.dateFormats" [selectable]="selectable" removable="true" (remove)="removeFormat(format)">
+              <mat-chip *ngFor="let format of previewConfig.dateFormats" [selectable]="selectable" [removable]="true" (removed)="removeFormat(format)">
                 {{format}}
                 <mat-icon fontIcon="icon-remove" matChipRemove></mat-icon>
               </mat-chip>

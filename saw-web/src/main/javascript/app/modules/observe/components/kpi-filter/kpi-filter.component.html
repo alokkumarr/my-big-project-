@@ -1,6 +1,9 @@
 <form [formGroup]="kpiFilterForm">
-  <mat-form-field class="select-form-field">
-    <mat-select placeholder="Select a preset" formControlName="preset">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Preset</mat-label>
+    <mat-select e2e="dashboard-kpi-filter-preset-select"
+                formControlName="preset"
+    >
       <mat-option>None</mat-option>
       <mat-option *ngFor="let filt of dateFilters" [value]="filt.value">
         {{filt.label}}
@@ -9,15 +12,27 @@
   </mat-form-field>
 
   <mat-form-field *ngIf="showDateFields">
-    <input matInput formControlName="gte" [max]="kpiFilterForm.get('lte').value" [matDatepicker]="frompicker" (click)="frompicker.open()"
-      placeholder="From" />
+    <input matInput
+           e2e="dashboard-kpi-filter-gte-input"
+           formControlName="gte"
+           [max]="kpiFilterForm.get('lte').value"
+           [matDatepicker]="frompicker"
+           (click)="frompicker.open()"
+           placeholder="From"
+    />
     <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
     <mat-datepicker #frompicker disabled="false"></mat-datepicker>
   </mat-form-field>
 
   <mat-form-field *ngIf="showDateFields">
-    <input matInput formControlName="lte" [min]="kpiFilterForm.get('gte').value" [matDatepicker]="topicker" (click)="topicker.open()"
-      placeholder="To" />
+    <input matInput
+           e2e="dashboard-kpi-filter-lte-input"
+           formControlName="lte"
+           [min]="kpiFilterForm.get('gte').value"
+           [matDatepicker]="topicker"
+           (click)="topicker.open()"
+           placeholder="To"
+    />
     <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>
     <mat-datepicker #topicker disabled="false"></mat-datepicker>
   </mat-form-field>

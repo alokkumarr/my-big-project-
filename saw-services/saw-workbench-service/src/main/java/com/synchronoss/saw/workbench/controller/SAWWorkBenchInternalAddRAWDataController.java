@@ -35,8 +35,6 @@ import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 /**
  * @author spau0004
@@ -172,13 +170,13 @@ public class SAWWorkBenchInternalAddRAWDataController {
   @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public Project uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
-      @RequestParam("path")  String filePath, @RequestBody Map<String, String> fileList) 
+       @RequestBody Map<String, String> fileList, @RequestHeader(value="directoryPath") String directoryPath) 
       throws IOException, ServletException {
     logger.debug("Retrieve project details By Id {} ", projectId);
-    Preconditions.checkNotNull(filePath, "To upload files path attribute cannot be null");
+    Preconditions.checkNotNull(directoryPath, "To upload files path attribute cannot be null");
     Project project = new Project();
     project.setProjectId(projectId);
-    project.setPath(filePath);
+    project.setPath(directoryPath);
     List<File> files = new ArrayList<File>();
     Project responseProject = null;
     long size = 0;
@@ -319,7 +317,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
 
       return dataset;
   }
-  
+
   /**
    * This method is temporary solution to integrate with XDF-META Store with RComponent.<br>
    * It has to be replaced with r_xdf-ngComponent wrapped around with xdf ngComponent class<br>

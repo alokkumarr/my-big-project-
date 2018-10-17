@@ -98,7 +98,7 @@ public class SAWElasticSearchQueryBuilder {
     SearchSourceBuilder query = null;
     try {
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut).getSearchSourceBuilder(size);
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey, timeOut).getSearchSourceBuilder(size);
       } else {
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey, timeOut)

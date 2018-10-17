@@ -462,6 +462,13 @@
         <defaultGoal>package</defaultGoal>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
         <testSourceDirectory>${project.basedir}/test</testSourceDirectory>
+	<resources>
+		<resource>
+			<directory>public</directory>
+			<targetPath>public</targetPath>
+			<filtering>false</filtering>
+		</resource>
+	</resources>
         <!-- To define the plugin version in your parent POM -->
         <pluginManagement>
             <plugins>
@@ -682,10 +689,11 @@ getent passwd rtis-user &gt;/dev/null || {
        -->
   <profiles>
     <profile>
-      <id>legacy-rpmbuild</id>
+      <id>all-modules</id>
       <activation>
         <property>
-          <name>legacy-rpmbuild</name>
+          <name>sip.modules</name>
+          <value>all</value>
         </property>
       </activation>
       <build>

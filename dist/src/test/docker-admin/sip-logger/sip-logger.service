@@ -1,0 +1,10 @@
+[Unit]
+Description=SIP container logger
+
+[Service]
+ExecStart=/usr/bin/bash -c "journalctl -f > /proc/1/fd/1"
+SyslogIdentifier=sip-logger
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

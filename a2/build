@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Build Advanced Analytics projects in Docker container to get the
+# required R build tools
+#
+set -eu
+
+dir=$(dirname $0)
+cd $dir
+
+# Copy the R packages to build into a TAR archive for inclusion in the
+# Docker image
+modules="a2charter a2modeler a2munge a2sipr"
+tar -cf a2modules.tar -C .. $modules
+
+# Build the Docker image for building R packages
+docker build -t rbuild .
+
+# Workaround: Docker volumes mounted from the host get files created
+# with root, so use a temporary directory to avoid creating root-owned
+# files in the build tree
+tmpdir="$(mktemp -d /tmp/sip-a2-XXXXXX)"
+
+# Run the Docker container to build the R packages
+set -x
+build=/root/build
+docker run --rm -v $tmpdir:$build/target rbuild $build/rbuild "$@"
+cp -r $tmpdir/ target

@@ -1,87 +1,55 @@
 @import "themes/base/colors";
 
-choice-group {
-  .md-button {
-    padding: 8px;
-    flex: 0 0 25%;
-    border: 1px solid #B0BFC8;
-    border-radius: 0;
-    font-size: 16px;
-    color: #596574;
-    text-align: center;
+choice-group-u {
+  .choice-group {
+    .choice-group__item {
+      padding: 8px 0;
+      flex: 0 0 25%;
+      border: 1px solid #B0BFC8;
+      border-radius: 0;
+      font-size: 16px;
+      color: #596574;
+      text-align: center;
 
-    &:hover {
-      background-color: #F3F5F8;
-    }
-
-    &:first-child {
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px;
-    }
-
-    &:last-child {
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
-    }
-
-    [disabled] {
-      background-color: transparent;
-      color: rgba(#596574, 0.7);
-    }
-
-    md-icon[md-svg-src] {
-      transform: translate(-0.25em, -0.25em);
-
-      svg {
-        height: 1em;
-        width: 1em;
-      }
-    }
-
-    &.selected {
-      background-color: $primary-blue-b2;
-      color: rgb(255, 255, 255);
-
-      md-icon {
-        color: #FFF;
-      }
-    }
-  }
-
-  .size-xl {
-    flex-wrap: wrap;
-
-    .md-button {
-      margin-top: 2px;
-      padding: 24px 18px 0;
-
-      p {
+      label {
+        padding-top: 10px;
         margin: 0;
         font-weight: 600;
       }
 
-      md-icon {
+      mat-icon {
         font-size: 48px;
         height: 48px;
-      }
-    }
-  }
-
-  .size-m {
-    flex-wrap: wrap;
-
-    .md-button {
-      margin-top: 2px;
-      min-width: 0;
-
-      p {
-        margin: 0;
-        font-weight: 600;
+        width: 48px;
+        color: #596574;
       }
 
-      md-icon {
-        font-size: 16px;
-        height: 16px;
+      &:first-child {
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+
+      &.disabled {
+        background-color: transparent;
+        color: rgba(#596574, 0.7);
+
+        mat-icon {
+          color: rgba(#596574, 0.7);
+        }
+      }
+
+      &.selected {
+        background-color: $primary-blue-b2;
+        color: rgb(255, 255, 255);
+
+        mat-icon {
+          color: #FFF;
+        }
       }
     }
   }

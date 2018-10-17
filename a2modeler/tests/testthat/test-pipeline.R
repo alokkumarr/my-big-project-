@@ -2,9 +2,9 @@
 
 # Pipeline Uint Tests -----------------------------------------------------
 
+library(a2modeler)
 library(testthat)
 library(checkmate)
-library(a2modeler)
 library(sparklyr)
 library(dplyr)
 
@@ -19,11 +19,11 @@ df <- data.frame(x = x) %>%
 df_y <- data.frame(y = y)
 
 # Create Spark Connection
-spark_home_dir <- sparklyr::spark_installed_versions() %>%
-  as.data.frame() %>%
-  dplyr::filter(spark == "2.3.0") %>%
-  dplyr::pull(dir)
-sc <- spark_connect(master = "local", spark_home = spark_home_dir)
+# spark_home_dir <- sparklyr::spark_installed_versions() %>%
+#   as.data.frame() %>%
+#   dplyr::filter(spark == "2.3.0") %>%
+#   dplyr::pull(dir)
+sc <- spark_connect(master = "local")
 
 # Copy data to spark
 dat <- copy_to(sc, df, overwrite = TRUE)
@@ -43,7 +43,8 @@ s1 <- new_pipeline(
   output = NULL,
   desc = "Example pipeline",
   created_on = Sys.time(),
-  runtime = NULL
+  runtime = NULL,
+  uid = "pipe-test"
 )
 
 test_that("Pipeliner Constructer", {
@@ -77,7 +78,8 @@ s1_id <- new_pipeline(
   output = NULL,
   desc = "Example pipeline",
   created_on = Sys.time(),
-  runtime = NULL
+  runtime = NULL,
+  uid = "pipe-test"
 )
 
 test_that("Pipeliner Constructer with expression=identity", {
@@ -144,7 +146,7 @@ test_that("Post clean up the output should be NULL", {
 # Test-4-Create a "modeler" to test-execute,clean and flow with pipeline -------
 
 add_mod <-
-  new_segmenter(df = dat_y, name = "test") %>%
+  segmenter(df = dat_y, name = "test") %>%
   add_model(pipe = pipeline(
     expr = function(dat_y)
       dat_y

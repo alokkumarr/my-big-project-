@@ -2,6 +2,7 @@
 % Please edit documentation in R/sampling.R
 \name{add_holdout_samples}
 \alias{add_holdout_samples}
+\alias{add_holdout_samples.numeric}
 \alias{add_holdout_samples.integer}
 \alias{add_holdout_samples.data.frame}
 \alias{add_holdout_samples.tbl_spark}
@@ -9,6 +10,8 @@
 \title{Add Holdout Samples function}
 \usage{
 add_holdout_samples(x, splits)
+
+\method{add_holdout_samples}{numeric}(x, splits)
 
 \method{add_holdout_samples}{integer}(x, splits)
 
