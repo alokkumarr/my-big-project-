@@ -25,7 +25,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              { "glob": "**/*", "input": "src/HELP_SAW_User_Guide", "output": "/help_docs" }
+              { "glob": "**/*", "input": "src/HELP_SAW_User_Guide", "output": "/help_docs" },
+              { "glob": "login.html", "input": "src/", "output": "/" }
             ],
             "styles": [
               "src/styles.scss"
@@ -40,7 +41,6 @@
           },
           "configurations": {
             "production": {
-              "deployUrl": "/saw/web/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
