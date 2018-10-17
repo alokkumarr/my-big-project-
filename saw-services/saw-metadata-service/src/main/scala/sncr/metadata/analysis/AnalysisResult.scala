@@ -38,7 +38,7 @@ class AnalysisResult(private val parentAnalysisRowID : String,
 
   def setDescriptor(newDescriptor : String): Unit =
   {
-    descriptor = parse(newDescriptor, false, false)
+    descriptor = parse(newDescriptor, false)
     setDescriptor()
   }
 
@@ -139,10 +139,10 @@ class AnalysisResult(private val parentAnalysisRowID : String,
   def getObjects(res: Result): Map[String, Any]  =
   {
     val _objectDescriptorAsString = Bytes.toString(res.getValue(MDColumnFamilies(_cf_objects.id),Bytes.toBytes(Fields.ObjectDescriptor.toString)))
-    val _objectDescriptorAsJson = parse(_objectDescriptorAsString, false, false)
+    val _objectDescriptorAsJson = parse(_objectDescriptorAsString, false)
 
     val _objectMetadataAsString = Bytes.toString(res.getValue(MDColumnFamilies(_cf_objects.id),Bytes.toBytes(Fields.ObjectMetadata.toString)))
-    val _objectMetadataAsJson = parse(_objectMetadataAsString, false, false)
+    val _objectMetadataAsJson = parse(_objectMetadataAsString, false)
 
     _objects_descriptor = _objectDescriptorAsJson.foldField[Map[String, String]](Map.empty)(
         (ob, f) => ob ++ Map(f._1 -> f._2.extract[String]))
@@ -158,7 +158,7 @@ class AnalysisResult(private val parentAnalysisRowID : String,
       }
       case "json" => {
         val data = Bytes.toString(res.getValue(MDColumnFamilies(_cf_objects.id),Bytes.toBytes(k)))
-        val json = parse(data, false, false)
+        val json = parse(data, false)
         m_log debug s"Object is stored inline, in JSON format"
         _o + (k  -> json)
       }
@@ -185,7 +185,7 @@ class AnalysisResult(private val parentAnalysisRowID : String,
     _objects_schema = _objects_schema + (ref -> schema)
   }
   def addObject( ref: String, data: Any, schema : String) : Unit = {
-    addObject(ref, data, parse(schema, false, false))
+    addObject(ref, data, parse(schema, false))
   }
 
   def removeObject (ref: String) : Unit = {

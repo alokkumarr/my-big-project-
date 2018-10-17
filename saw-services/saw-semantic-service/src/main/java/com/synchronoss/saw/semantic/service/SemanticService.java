@@ -1,6 +1,7 @@
 package com.synchronoss.saw.semantic.service;
 
 
+import org.apache.commons.lang3.StringUtils;
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
@@ -9,7 +10,6 @@ import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
-import java.util.UUID;
 
 public interface SemanticService {
 
@@ -40,9 +40,11 @@ public interface SemanticService {
    * @return String Id for the row
    * @throws JSONValidationSAWException when JSON Parsing fails
    */
-  default String generateId() throws JSONValidationSAWException {
-    String id = UUID.randomUUID().toString() + delimiter + SemanticDataSet + delimiter
-        + System.currentTimeMillis();
+  default String generateId(String project, String metricName) throws JSONValidationSAWException {
+    String id = project + delimiter + metricName;
+    if (StringUtils.containsWhitespace(id)) {
+      id = StringUtils.deleteWhitespace(id);
+    }
     return id;
   }
 }

@@ -58,7 +58,7 @@ object DataObjectHelper{
 
   def apply(source: String): DataObjectHelper = {
     try {
-      val requests = parse(source, false, false)
+      val requests = parse(source, false)
       new DataObjectHelper( requests )
     }
     catch {

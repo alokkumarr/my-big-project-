@@ -44,7 +44,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationEx
 
   def setDefinition(newDefinition: String) : Unit =
   {
-    analysisNode = parse(newDefinition, false, false)
+    analysisNode = parse(newDefinition, false)
     setDefinition
   }
 
@@ -252,7 +252,7 @@ object AnalysisNode{
   def apply( src : String, rowID : String) : AnalysisNode =
   {
     try {
-      val jv = parse(src, false, false)
+      val jv = parse(src, false)
       val anNode = new AnalysisNode(jv)
       if ( rowID != null && rowID.nonEmpty) anNode.setRowKey(Bytes.toBytes(rowID))
       anNode

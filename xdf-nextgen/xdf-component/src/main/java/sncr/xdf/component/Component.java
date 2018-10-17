@@ -81,7 +81,7 @@ public abstract class Component {
     int ret = initializeDataSets();
     if (ret == 0) {
       ret = execute();
-      logger.debug("execute Return code = " + ret);
+      logger.info("execute Return code = " + ret);
       if (ret == 0) {
         ret = move();
         logger.debug("move Return code = " + ret);

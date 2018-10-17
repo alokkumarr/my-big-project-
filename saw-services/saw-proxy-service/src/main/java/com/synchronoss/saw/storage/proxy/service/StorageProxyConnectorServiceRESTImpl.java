@@ -504,11 +504,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     storeField.setName(attributeName);
     System.out.println(storeField.toString()); 
   }
-  
-  
- 
-    
-   }
+}
    private static void withOutXPACK()throws IOException
    {
      RestClient restClient = RestClient.builder(new HttpHost("es-rd601.ana.dev.vaste.sncrcorp.net", 9200, "http"))
