@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map as mapObservable } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import * as fpGet from 'lodash/fp/get';
@@ -52,7 +53,7 @@ export class ObserveService {
     return this.http[method](
       `${this.api}/observe/dashboards/${endpoint}`,
       this.addModelStructure(model)
-    ).pipe(map(fpGet('contents.observe.0')));
+    ).pipe(mapObservable(fpGet('contents.observe.0')));
   }
 
   getArtifacts({ semanticId }): Observable<any> {
@@ -96,7 +97,7 @@ export class ObserveService {
   getDashboard(entityId: string): Observable<Dashboard> {
     return this.http
       .get(`${this.api}/observe/dashboards/${entityId}`)
-      .pipe(map(fpGet('contents.observe.0')));
+      .pipe(mapObservable(fpGet('contents.observe.0')));
   }
 
   getDashboardsForCategory(
@@ -105,13 +106,13 @@ export class ObserveService {
   ): Observable<Array<Dashboard>> {
     return this.http
       .get(`${this.api}/observe/dashboards/${categoryId}/${userId}`)
-      .pipe(map(fpGet('contents.observe')));
+      .pipe(mapObservable(fpGet('contents.observe')));
   }
 
   deleteDashboard(dashboard: Dashboard) {
     return this.http
       .delete(`${this.api}/observe/dashboards/${dashboard.entityId}`)
-      .pipe(map(fpGet('contents.observe')));
+      .pipe(mapObservable(fpGet('contents.observe')));
   }
 
   getModelValues(filter) {
@@ -135,7 +136,7 @@ export class ObserveService {
 
     return this.http
       .post(`${this.api}/filters`, payload)
-      .pipe(map(fpGet(filter.columnName)));
+      .pipe(mapObservable(fpGet(filter.columnName)));
   }
 
   reloadMenu() {

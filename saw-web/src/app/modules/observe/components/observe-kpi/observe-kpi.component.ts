@@ -136,7 +136,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       .executeKPI(kpi)
       /* Parse kpi execution results into primary and secondary aggregation results */
       .pipe(
-        map(res => {
+        mapObservable(res => {
           const primary = {
             current: get(
               res,
