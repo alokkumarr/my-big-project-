@@ -7,9 +7,7 @@ import {
   HttpEventType
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import 'rxjs/add/observable/throw';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/do';
+import { tap } from 'rxjs/operators';
 
 import { HeaderProgressService } from '../../common/services';
 
@@ -21,20 +19,23 @@ export class ProgressIndicatorInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-
-    return next
-      .handle(req).do(event => {
-        switch (event.type) {
-        case HttpEventType.Sent:
-          this._headerProgress.show();
-          break;
-        case HttpEventType.Response:
+    return next.handle(req).pipe(
+      tap(
+        event => {
+          switch (event.type) {
+            case HttpEventType.Sent:
+              this._headerProgress.show();
+              break;
+            case HttpEventType.Response:
+              this._headerProgress.hide();
+              break;
+          }
+        },
+        err => {
           this._headerProgress.hide();
-          break;
+          return err;
         }
-      }, err => {
-        this._headerProgress.hide();
-        return err;
-      });
+      )
+    );
   }
 }

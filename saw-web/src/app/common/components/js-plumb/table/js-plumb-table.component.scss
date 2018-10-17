@@ -1,6 +1,6 @@
 @import "src/themes/base/colors";
 
-.jsp-table {
+::ng-deep .jsp-table {
   position: absolute;
   box-shadow: initial;
   background: #FFF;

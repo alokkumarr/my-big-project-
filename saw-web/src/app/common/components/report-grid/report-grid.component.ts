@@ -24,8 +24,7 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription, BehaviorSubject } from 'rxjs';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 
@@ -40,9 +39,7 @@ import {
 import { DATE_TYPES, NUMBER_TYPES } from '../../../modules/analyze/consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
-import {
-  flattenReportData
-} from '../../../common/utils/dataFlattener';
+import { flattenReportData } from '../../../common/utils/dataFlattener';
 
 const template = require('./report-grid.component.html');
 require('./report-grid.component.scss');
@@ -83,17 +80,12 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
   private listeners: Array<Subscription> = [];
-  @Output()
-  change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
-  @ViewChild(DxDataGridComponent)
-  dataGrid: DxDataGridComponent;
-  @Input()
-  query: string;
+  @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
+  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @Input() query: string;
   @Input() isInQueryMode;
-  @Input()
-  analysis;
-  @Input()
-  dimensionChanged: BehaviorSubject<any>;
+  @Input() analysis;
+  @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
     this.sorts = reduce(
@@ -486,6 +478,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         ...artifact,
         columns
       };
-    })
+    });
   }
 }

@@ -16,8 +16,7 @@ import {
   GridsterItem,
   GridsterComponent
 } from 'angular-gridster2';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription, BehaviorSubject } from 'rxjs';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';

@@ -7,7 +7,6 @@ import {DndSortableContainerDirective} from './sortable-container.directive';
 import {DragnDropService} from './dnd.service';
 
 declare var require: any;
-require('./styles.scss');
 @NgModule({
   declarations: [
     DndDraggableDirective,

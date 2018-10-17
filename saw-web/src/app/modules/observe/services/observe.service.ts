@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
+import { map as mapObservable } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/of';
 
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
@@ -55,7 +53,7 @@ export class ObserveService {
     return this.http[method](
       `${this.api}/observe/dashboards/${endpoint}`,
       this.addModelStructure(model)
-    ).map(fpGet('contents.observe.0'));
+    ).pipe(mapObservable(fpGet('contents.observe.0')));
   }
 
   getArtifacts({ semanticId }): Observable<any> {
@@ -99,7 +97,7 @@ export class ObserveService {
   getDashboard(entityId: string): Observable<Dashboard> {
     return this.http
       .get(`${this.api}/observe/dashboards/${entityId}`)
-      .map(fpGet('contents.observe.0'));
+      .pipe(mapObservable(fpGet('contents.observe.0')));
   }
 
   getDashboardsForCategory(
@@ -108,13 +106,13 @@ export class ObserveService {
   ): Observable<Array<Dashboard>> {
     return this.http
       .get(`${this.api}/observe/dashboards/${categoryId}/${userId}`)
-      .map(fpGet('contents.observe'));
+      .pipe(mapObservable(fpGet('contents.observe')));
   }
 
   deleteDashboard(dashboard: Dashboard) {
     return this.http
       .delete(`${this.api}/observe/dashboards/${dashboard.entityId}`)
-      .map(fpGet('contents.observe'));
+      .pipe(mapObservable(fpGet('contents.observe')));
   }
 
   getModelValues(filter) {
@@ -138,7 +136,7 @@ export class ObserveService {
 
     return this.http
       .post(`${this.api}/filters`, payload)
-      .map(fpGet(filter.columnName));
+      .pipe(mapObservable(fpGet(filter.columnName)));
   }
 
   reloadMenu() {
@@ -197,7 +195,6 @@ export class ObserveService {
 
   /* Try to redirect to first dashboard or first empty subcategory */
   redirectToFirstDash(menu, force = false) {
-
     const basePath = this.route.snapshot.children[0].url[0].path;
     const { dashboard } = this.route.snapshot.queryParams;
 

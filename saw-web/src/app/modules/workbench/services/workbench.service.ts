@@ -3,8 +3,7 @@ import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { of, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { JwtService } from '../../../common/services';
@@ -214,7 +213,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/previews/${id}`;
     return this.http.get(endpoint).pipe(
       catchError((e: any) => {
-        return Observable.of(e);
+        return of(e);
       })
     );
   }

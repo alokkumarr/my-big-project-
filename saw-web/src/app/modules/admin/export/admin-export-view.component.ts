@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { from } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { mergeMap, startWith, map } from 'rxjs/operators';

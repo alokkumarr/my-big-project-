@@ -6,7 +6,7 @@ import {
   OnDestroy,
   ViewChild
 } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';

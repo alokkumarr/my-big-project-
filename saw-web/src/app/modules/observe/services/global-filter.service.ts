@@ -5,8 +5,7 @@ import * as find from 'lodash/find';
 import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject, BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class GlobalFilterService {

@@ -13,7 +13,7 @@ import {
 } from '@angular/material';
 import { Router } from '@angular/router';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { MenuService } from '../../../../common/services/menu.service';
 import { WIDGET_ACTIONS } from '../add-widget/widget.model';
 import { ObserveService } from '../../services/observe.service';
@@ -21,7 +21,6 @@ import { DashboardService } from '../../services/dashboard.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import { animations } from './create-dashboard.animations';
 
-import { Subscription } from 'rxjs/Subscription';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';

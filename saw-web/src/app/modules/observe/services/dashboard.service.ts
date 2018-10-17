@@ -1,11 +1,14 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/operator/map';
+import {
+  Observable,
+  BehaviorSubject,
+  Subject,
+  Subscription,
+  interval
+} from 'rxjs';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
 import { Dashboard } from '../models/dashboard.interface';
+
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class DashboardService {
@@ -37,11 +40,11 @@ export class DashboardService {
     this.unsetAutoRefresh(dashboard.entityId);
 
     if (dashboard.autoRefreshEnabled) {
-      const observable = Observable.interval(
-        dashboard.refreshIntervalSeconds * 1000
-      ).map(() => ({
-        dashboardId: dashboard.entityId
-      }));
+      const observable = interval(dashboard.refreshIntervalSeconds * 1000).pipe(
+        map(() => ({
+          dashboardId: dashboard.entityId
+        }))
+      );
       const sub: Subject<{ dashboardId: string }> = new Subject();
 
       /* We save both - the interval subscription and subject to clean them up correctly */

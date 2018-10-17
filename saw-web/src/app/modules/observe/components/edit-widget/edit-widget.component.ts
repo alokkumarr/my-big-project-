@@ -4,6 +4,8 @@ import * as clone from 'lodash/clone';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 
+import { map } from 'rxjs/operators';
+
 import { ObserveService } from '../../services/observe.service';
 import { DATE_TYPES } from '../../../../common/consts';
 
@@ -55,29 +57,31 @@ export class EditWidgetComponent implements OnInit {
     const semId = model.kpi ? model.kpi.semanticId : model.bullet.semanticId;
     this.observe
       .getArtifacts({ semanticId: semId })
-      .map(metric => {
-        if (!metric) {
-          return;
-        }
-        metric.kpiColumns = flatMap(metric.artifacts, table => {
-          return filter(
-            table.columns,
-            col => col.kpiEligible && !DATE_TYPES.includes(col.type)
-          );
-        });
+      .pipe(
+        map(metric => {
+          if (!metric) {
+            return;
+          }
+          metric.kpiColumns = flatMap(metric.artifacts, table => {
+            return filter(
+              table.columns,
+              col => col.kpiEligible && !DATE_TYPES.includes(col.type)
+            );
+          });
 
-        metric.dateColumns = flatMap(metric.artifacts, table => {
-          return filter(
-            table.columns,
-            col => col.kpiEligible && DATE_TYPES.includes(col.type)
-          );
-        });
+          metric.dateColumns = flatMap(metric.artifacts, table => {
+            return filter(
+              table.columns,
+              col => col.kpiEligible && DATE_TYPES.includes(col.type)
+            );
+          });
 
-        metric.kpiEligible =
-          metric.kpiColumns.length > 0 && metric.dateColumns.length > 0;
+          metric.kpiEligible =
+            metric.kpiColumns.length > 0 && metric.dateColumns.length > 0;
 
-        return metric;
-      })
+          return metric;
+        })
+      )
       .subscribe(metric => {
         if (!metric) {
           return;
