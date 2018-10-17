@@ -27,7 +27,7 @@ public class JWTUtils {
            // This checks the validity of the token. logging out does not need
            // the token to be active.
         Iterator<?> it = ((Map<String, Object>) claims.get("ticket")).entrySet().iterator();
-        String [] parsedValues = new String[2];
+        String [] parsedValues = new String[3];
         while (it.hasNext()) {
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
             if (pair.getKey().equals("userId")) {
