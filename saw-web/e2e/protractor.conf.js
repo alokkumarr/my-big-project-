@@ -295,7 +295,6 @@ exports.config = {
       token = generate.token(webpackHelper.getSawWebUrl());
       generate.usersRolesPrivilegesCategories(token);
     } else {
-      throw new Error('saw web url can not be null');
       process.exit(1);
     }
   },
