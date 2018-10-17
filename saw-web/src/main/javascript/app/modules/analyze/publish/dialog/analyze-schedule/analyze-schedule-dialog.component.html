@@ -15,6 +15,13 @@
         <cron-job-schedular *ngIf="loadCron" [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
 
         <div class="form-container" fxLayout="column">
+          <div class="output-format" *ngIf="isReport">
+            <label i18n>Output Format</label><br/>
+            <mat-radio-group [(ngModel)]="fileType">
+              <mat-radio-button class="format-csv" value="csv">CSV</mat-radio-button>
+              <mat-radio-button class="format-xlsx" value="xslx">XLSX</mat-radio-button>
+            </mat-radio-group>
+          </div>
           <label i18n>Publish to Email</label>
           <mat-form-field flex="20">
             <mat-chip-list #chipList>

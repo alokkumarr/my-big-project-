@@ -12,6 +12,23 @@ public class ExportBean {
 	private String reportDesc;
 	private String publishDate;
 	private String createdBy;
+	private String fileType;
+
+    /**
+     *
+     * @return the filetype as csv or xlsx
+     */
+	public String getFileType() {
+	    return fileType;
+    }
+
+    /**
+     *
+     * @param fileType : filtype will be either csv or xlsx
+     */
+    public void setFileType(String fileType)   {
+	    this.fileType = fileType;
+    }
 	
 	/**
 	 * @return the reportName
