@@ -160,7 +160,29 @@ public class ExportServiceImpl implements ExportService{
       recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
       ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
-      if(recipients!=null && !recipients.equals("") && recipients.contains("@")) {
+        ExportBean exportBean = new ExportBean();
+        exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+        String dir = UUID.randomUUID().toString();
+        MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
+        exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+        exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+            dispatchBean).get("name")) + "." + exportBean.getFileType());
+        exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+        exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+        exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+        exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+        // consider default format as csv if file type is not provided.
+        if(exportBean.getFileType() == null || exportBean.getFileType().isEmpty() )    {
+            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                dispatchBean).get("name")) + ".csv" );
+            exportBean.setFileType("csv");
+        }
+        else {
+            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                dispatchBean).get("name")) + "." + exportBean.getFileType());
+        }
+        String fileType  = exportBean.getFileType();
+        if(recipients!=null && !recipients.equals("") && recipients.contains("@")) {
           logger.trace("Recipients: " +recipients);
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
             +emailExportSize+"&analysisType="+ analysisType;
@@ -173,24 +195,14 @@ public class ExportServiceImpl implements ExportService{
           public void onSuccess(ResponseEntity<DataResponse> entity) {
             logger.debug("Email async success");
             logger.debug("[Success] Response :" + entity.getStatusCode());
-            String fileType  = String.valueOf(((LinkedHashMap) dispatchBean).get("fileType"));
+
             if(fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty())    {
                 IFileExporter iFileExporter = new CSVReportDataExporter();
             }
             else {
                 IFileExporter iFileExporter = new XlsxExporter();
             }
-            ExportBean exportBean = new ExportBean();
-            exportBean.setFileType(fileType);
-            String dir = UUID.randomUUID().toString();
-            MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-              exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "." + exportBean.getFileType());
-            exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-            exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-            exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-            exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+
             try {
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
@@ -237,18 +249,8 @@ public class ExportServiceImpl implements ExportService{
         // Do the background work beforehand
         String finalFtp = ftp;
         String finalJobGroup = jobGroup;
-        ExportBean exportBean = new ExportBean();
-        String dir = UUID.randomUUID().toString();
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
         String strFile = exportBean.getFileType();
-        if(strFile.equalsIgnoreCase("csv") || strFile == null || strFile.isEmpty() )    {
-            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "." + exportBean.getFileType());
-        }
-        else {
-            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "." + exportBean.getFileType());
-        }
 
         exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
         exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
@@ -356,7 +358,7 @@ public class ExportServiceImpl implements ExportService{
                         alias.getPassword(),
                         zipFileName,
                         alias.getLocation(),
-                        cfile.getName().substring(0, cfile.getName().lastIndexOf(".")) + dtf.format(now).toString() + "." + ((LinkedHashMap) dispatchBean).get("fileType") + ".zip",
+                        cfile.getName().substring(0, cfile.getName().lastIndexOf(".")) + dtf.format(now).toString() + "." + fileType + ".zip",
                         alias.getType());
                     logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                   }
