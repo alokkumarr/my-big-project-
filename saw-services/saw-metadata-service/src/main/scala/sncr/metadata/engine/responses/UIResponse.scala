@@ -29,7 +29,7 @@ trait UIResponse extends Response {
           val content: JValue =
           d("content") match {
             case jv: JValue => jv
-            case s: String => parse(s, false, false)
+            case s: String => parse(s, false)
             case _ => val m = "Could not build content mapping, unsupported representation"
               m_log error m
               JObject(Nil)

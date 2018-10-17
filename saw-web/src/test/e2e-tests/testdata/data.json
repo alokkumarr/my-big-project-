@@ -1127,7 +1127,7 @@
           {
             "name": "date",
             "value": null,
-            "preset": "TW"
+            "preset": "Last Quarter"
           }
         ],
         "filters": [
@@ -1337,7 +1337,7 @@
           {
             "name": "date",
             "value": null,
-            "preset": "TW"
+            "preset": "Last Month"
           }
         ],
         "filters": [
@@ -1357,7 +1357,7 @@
           {
             "name": "date",
             "value": null,
-            "preset": "TW"
+            "preset": "Last 6 Months"
           }
         ],
         "filters": [
@@ -1565,7 +1565,7 @@
           {
             "name": "date",
             "value": null,
-            "preset": "TW"
+            "preset": "Last 3 Months"
           }
         ],
         "filters": [
@@ -1585,7 +1585,7 @@
           {
             "name": "date",
             "value": null,
-            "preset": "TW"
+            "preset": "Last Week"
           }
         ],
         "filters": [

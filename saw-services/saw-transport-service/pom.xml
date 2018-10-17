@@ -16,7 +16,6 @@
         <java.version>1.8</java.version>
         <maven.assembly.version>2.5.5</maven.assembly.version>
         <project.basedir>.</project.basedir>
-        <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
         <play2.version>2.5.10</play2.version>
         <play2.plugin.version>1.0.0-beta5</play2.plugin.version>
         <mapr.client>6.0.1-mapr</mapr.client>

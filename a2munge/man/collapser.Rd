@@ -47,7 +47,16 @@ formatted Dates
 library(dplyr)
 library(lubridate)
 
-date_func_df <- data.frame(TIME_COL = as.POSIXlt(c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59")), stringsAsFactors = FALSE)
+date_func_df <-
+  data.frame(TIME_COL = as.POSIXlt(
+    c(
+      "2017-01-01 10:15:15",
+      "2017-09-23 14:26:59",
+      "2017-11-15 05:05:05",
+      "2018-05-11 08:15:18",
+      "2018-03-27 23:59:59"
+    )
+  ), stringsAsFactors = FALSE)
 
 collapser(date_func_df, "TIME_COL", "month", "end")
 }

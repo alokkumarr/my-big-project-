@@ -57,6 +57,7 @@ library(dplyr, lib.loc = r_lib_home)
 library(sparklyr, lib.loc = r_lib_home)
 library(a2sipr, lib.loc = r_lib_home)
 library(a2munge, lib.loc = r_lib_home)
+library(lubridate, lib.loc = r_lib_home)
 
 conf_json <- jsonlite::fromJSON(readLines(conf_file))
 
@@ -167,13 +168,13 @@ output_data_format <- as.character(outputs_df$format)
 output_repart_numb <- as.numeric(outputs_df$numberOfFiles)
 output_partit_by <- as.character(outputs_df[row, "partitionKeys"])
 
-if (is.na(output_partit_by) ||
-    output_partit_by == "" ||
-    identical(output_partit_by, character(0))) {
+if (is.na(output_partit_by) || output_partit_by == "" || identical(output_partit_by, character(0))) {
   output_partit_by <- NULL
 }
 
-output_schema <- list(list(name = "ID", type = "string"))
+output_schema <- list(
+  list(name = "ID", type = "string")
+)
 
 sip_add_dataset(
   output_format = output_data_format,
@@ -228,8 +229,8 @@ if (is.na(.group_vars) || .group_vars == "") {
 
 # Run Detecter functionality & assign result to data frame
 
-rcomp_spk_df <- input_spk_df %>%
-  a2munge::dateconverter(
+rcomp_r_df <- input_spk_df %>%
+  a2munge::converter(
     .,
     measure_vars = .index_var,
     input_format = .field_format,
@@ -244,20 +245,20 @@ rcomp_spk_df <- input_spk_df %>%
     output_suffix = "CEI"
   ) %>%
   a2munge::summariser(.,
-                      group_vars = .summ_group_vars,
-                      measure_vars = .measure_vars,
-                      fun = .fun_var) %>%
+             group_vars = .summ_group_vars,
+             measure_vars = .measure_vars,
+             fun = .fun_var) %>%
   #arrange(., desc(!!as.name(.index_var))) %>%
-  #collect %>%
+  collect %>%
   a2munge::detecter(
     .,
     index_var = paste(.index_var, "CONV_CEI", sep = "_"),
     group_vars = if (is.na(.group_vars) ||
                      .group_vars == "") {
-      NULL
-    } else {
-      .group_vars
-    },
+                                          NULL
+                                        } else {
+                                          .group_vars
+                                        },
     measure_vars = paste(.measure_vars, .fun_var, sep = "_"),
     frequency = .frequency,
     direction = .direction,
@@ -266,25 +267,10 @@ rcomp_spk_df <- input_spk_df %>%
     trend_window = .trendWindow
   ) %>%
   mutate(., expected = value - resid) %>%
-  a2munge::dateformatter(
-    .,
-    measure_vars = paste(.index_var, "CONV_CEI", sep = "_"),
-    input_format = .field_format,
-    output_format = .field_format,
-    output_suffix = "FMT"
-  ) %>%
-  rename(.,!!.index_var := paste(!!.index_var, "CONV_CEI_FMT", sep = "_")) %>%
-  select(.,
-         !!.index_var,
-         measure,
-         value,
-         seasonal,
-         trend,
-         resid,
-         lower,
-         upper,
-         anomaly,
-         expected)
+  rename(., !!.index_var := paste(!!.index_var, "CONV_CEI", sep = "_")) %>%
+  select(., !!.index_var, measure, value, seasonal, trend, resid, lower, upper, anomaly, expected)
+
+rcomp_spk_df <- copy_to(sc, mutate_at(rcomp_r_df, .index_var, as.character), overwrite = TRUE)
 
 a2munge::writer(
   rcomp_spk_df,

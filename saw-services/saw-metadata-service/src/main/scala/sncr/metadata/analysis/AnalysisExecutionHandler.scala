@@ -141,7 +141,7 @@ class AnalysisExecutionHandler(val nodeId : String, sqlRuntime: String) {
     if (readData == null || readData.isEmpty)
       throw new Exception("Could not read SparkSQL Executor result file/ file is empty")
 
-    val jsonResult = parse(readData, false, false)
+    val jsonResult = parse(readData, false)
     m_log.trace("Execution result: {}", shortMessage(pretty(render(jsonResult))))
 
     var nodeExists = false

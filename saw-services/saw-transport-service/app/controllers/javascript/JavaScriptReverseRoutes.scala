@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:sip/saw-services/saw-transport-service/conf/routes
-// @DATE:Wed Jul 04 14:27:39 IST 2018
+// @SOURCE:saw-services/saw-transport-service/conf/routes
+// @DATE:Mon Oct 01 11:25:16 EDT 2018
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -49,6 +49,26 @@ package controllers.javascript {
       """
         function(view0) {
           return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis" + _qS([(""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("view", view0)])})
+        }
+      """
+    )
+  
+  }
+
+  // @LINE:44
+  class ReverseActuator(_prefix: => String) {
+
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:44
+    def health: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.Actuator.health",
+      """
+        function() {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "actuator/health"})
         }
       """
     )

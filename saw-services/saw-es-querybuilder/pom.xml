@@ -16,6 +16,8 @@
 		<okhttp.version>2.7.5</okhttp.version>
 		<elasticsearch.groupid>org.elasticsearch.distribution.zip</elasticsearch.groupid>
 		<elasticsearch.version>5.4.0</elasticsearch.version>
+		<surefire-api>2.19.1</surefire-api>
+		<surefire.rerunFailingTestsCount>5</surefire.rerunFailingTestsCount>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -110,6 +112,15 @@
     </dependencies>
 
 	<build>
+	<pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.surefire</groupId>
+				<artifactId>surefire-api</artifactId>
+				<version>${surefire-api}</version>
+			</plugin>
+		</plugins>
+	</pluginManagement>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -147,4 +158,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 </project>

@@ -1,6 +1,7 @@
 const path = require('path');
 var fs = require('fs');
 var convert = require('xml-js');
+const globalVariables = require('../src/test/javascript/helpers/globalVariables');
 
 var subset={};
 var processedFiles = [];
@@ -17,6 +18,9 @@ function distRun() {
 
 function generateFailedTests(dir) {
 
+  if (!fs.existsSync('target')){
+    fs.mkdirSync('target');
+  }
   if (!fs.existsSync('target/testData')){
     fs.mkdirSync('target/testData');
   }
@@ -151,18 +155,65 @@ module.exports = {
       return (c > d) ? 1 : (c < d) ? -1 : 0;
     };
   },
-  getTestData: () => {
+  getSawWebUrl: () => {
+    let url;
 
+    if (!fs.existsSync('target')){
+      fs.mkdirSync('target');
+    }
+
+    if (fs.existsSync('target/url.json')) {
+      url = JSON.parse(fs.readFileSync('target/url.json','utf8')).baseUrl;
+    } else {
+      process.argv.forEach(function (val) {
+        if(val.includes('--baseUrl')) {
+          url =  val.split('=')[1];
+          let urlObject = {
+            baseUrl:url,
+            e2eId:globalVariables.generateE2eId
+          }
+          fs.writeFileSync('target/url.json', JSON.stringify(urlObject), { encoding: 'utf8' });
+          return;
+        }
+      });
+    }
+    return url;
+  },
+  getTestData: () => {
     if (fs.existsSync('target/testData/failed/failedTests.json')) {
       //console.log('executing failed--tests');
       let data = JSON.parse(fs.readFileSync('target/testData/failed/failedTests.json','utf8'));
       //console.log('Failed test data---'+JSON.stringify(data));
       return data;
     }else {
-       //console.log('executing fresh--tests');
-      let data = JSON.parse(fs.readFileSync('../saw-web/src/test/e2e-tests/testdata/data.json','utf8'));
-      //console.log('Fresh data--->'+JSON.stringify(data));
-      return data;
+
+      let suiteName;
+      if (!fs.existsSync('target')){
+        fs.mkdirSync('target');
+      }
+
+      if (fs.existsSync('target/suite.json')) {
+        suiteName = JSON.parse(fs.readFileSync('target/suite.json','utf8')).suiteName;
+      } else {
+        process.argv.forEach(function (val) {
+          if(val.includes('--suite')) {
+            suiteName =  val.split('=')[1];
+            let suiteObject = {
+              suiteName:suiteName
+            }
+            fs.writeFileSync('target/suite.json', JSON.stringify(suiteObject), { encoding: 'utf8' });
+            return;
+          }
+        });
+      }
+      if(suiteName !== undefined && suiteName ==='critical') {
+        //console.log('Executing critical suite.....');
+        let data = JSON.parse(fs.readFileSync('../saw-web/src/test/e2e-tests/testdata/data.critical.json','utf8'));
+        return data;
+      } else {
+        let data = JSON.parse(fs.readFileSync('../saw-web/src/test/e2e-tests/testdata/data.json','utf8'));
+        return data;
+      }
     }
 
   },

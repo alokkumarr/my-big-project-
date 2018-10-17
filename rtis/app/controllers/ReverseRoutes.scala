@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
-// @DATE:Wed Dec 06 11:51:19 EST 2017
+// @SOURCE:/Users/nareshgangishetty/swagger-work/sip/rtis/conf/routes
+// @DATE:Wed Oct 03 15:10:59 EDT 2018
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }
@@ -13,26 +13,41 @@ import _root_.play.libs.F
 // @LINE:4
 package controllers {
 
-  // @LINE:16
+  // @LINE:15
+  class ReverseAssets(_prefix: => String) {
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:15
+    def at(file:String): Call = {
+      implicit val _rrc = new ReverseRouteContext(Map(("path", "/public/swagger-ui")))
+      Call("GET", _prefix + { _defaultPrefix } + "docs/" + implicitly[PathBindable[String]].unbind("file", file))
+    }
+  
+  }
+
+  // @LINE:22
   class ReverseRTISControl(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:18
+    // @LINE:24
     def sr(parameters:Option[String]): Call = {
       import ReverseRouteContext.empty
       Call("GET", _prefix + { _defaultPrefix } + "sr" + queryString(List(Some(implicitly[QueryStringBindable[Option[String]]].unbind("parameters", parameters)))))
     }
   
-    // @LINE:16
+    // @LINE:22
     def executeCmd(CMD:String, PARAMETERS:Option[String]): Call = {
       import ReverseRouteContext.empty
       Call("GET", _prefix + { _defaultPrefix } + "control" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("CMD", CMD)), Some(implicitly[QueryStringBindable[Option[String]]].unbind("PARAMETERS", PARAMETERS)))))
     }
   
-    // @LINE:17
+    // @LINE:23
     def executeExtendedCmd(CMD:String): Call = {
       import ReverseRouteContext.empty
       Call("POST", _prefix + { _defaultPrefix } + "control" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("CMD", CMD)))))
@@ -40,14 +55,14 @@ package controllers {
   
   }
 
-  // @LINE:22
+  // @LINE:28
   class ReverseGenericLog(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:22
+    // @LINE:28
     def doPost(CID:String, LOG_TYPE:String): Call = {
       import ReverseRouteContext.empty
       Call("POST", _prefix + { _defaultPrefix } + "genericlog" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("CID", CID)), Some(implicitly[QueryStringBindable[String]].unbind("LOG_TYPE", LOG_TYPE)))))
@@ -76,6 +91,12 @@ package controllers {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
+  
+    // @LINE:14
+    def viewSwaggerUI(): Call = {
+      import ReverseRouteContext.empty
+      Call("GET", _prefix + { _defaultPrefix } + "docs")
+    }
   
     // @LINE:12
     def getResources(): Call = {

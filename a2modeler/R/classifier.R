@@ -28,11 +28,16 @@ classifier <- function(df,
   
   # Target Check
   target_dims <- df %>%
-    dplyr::distinct_(target) %>%
-    sparklyr::sdf_nrow()
+    dplyr::distinct(!!rlang::sym(target)) %>%
+    dplyr::collect() %>%
+    pull(!!rlang::sym(target))
   
-  if(target_dims != 2) {
+  if(length(target_dims) != 2) {
     stop(paste("target not a binary distribution.\n  Has", target_dims, "unique values"))
+  }
+  
+  if(! all(c(0,1) %in% target_dims)) {
+    stop("binary target distribution not encoded as 0-1.\nPlease update to numeric with 0/1 values")
   }
   
   mobj <- modeler(df,
@@ -71,30 +76,9 @@ predict.classifier <- function(obj,
   }
   
   # Schema Check
-  schema_check <- purrr::flatten(obj$schema) %>%
-    tibble::as_tibble() %>%
-    tidyr::gather() %>%
-    dplyr::left_join(
-      purrr::flatten(get_schema(data)) %>%
-        tibble::as_tibble() %>%
-        tidyr::gather(),
-      by = "key") %>% 
-    dplyr::filter(value.x != value.y | is.na(value.y))
-  
-  if(nrow(schema_check) > 0) {
-    stop(paste("New Data schema check failed:",
-               "\n     columns missing:",
-               schema_check %>%
-                 dplyr::filter(is.na(value.y)) %>%
-                 dplyr::pull(key) %>% 
-                 paste(collapse = ", "),
-               "\n     columns with miss-matching type:",
-               schema_check %>%
-                 dplyr::filter(!is.na(value.y)) %>%
-                 dplyr::pull(key) %>% 
-                 paste(collapse = ", ")),
-         .call=FALSE)
-  }
+  schema_compare <- obj$schema %>% 
+    purrr::keep(names(obj$schema) != obj$target) %>% 
+    a2munge::schema_check(., a2munge::get_schema(data))
   
   pipe <- obj$pipelines[[final_model$pipe]] %>% 
     execute(data, .) 

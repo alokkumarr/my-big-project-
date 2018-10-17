@@ -2844,7 +2844,8 @@ public class UserRepositoryImpl implements UserRepository {
 		Valid valid = new Valid();
 		String sql = "INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_SYS_ID,DEFAULT_URL,`DEFAULT`,"
 				+ "FEATURE_NAME,FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY)"
-				+ " VALUES (?,?,0,?,?,?,?,?,sysdate(),?)";
+				+ " VALUES (?,?,0,?,?,?,?,?,sysdate(),?)"
+				+ " ON DUPLICATE KEY UPDATE DEFAULT_URL=DEFAULT_URL";
 
 		String[] categoryCode = category.getCategoryName().toUpperCase().split(" ");
 		StringBuffer featureCode = new StringBuffer();
@@ -2881,9 +2882,15 @@ public class UserRepositoryImpl implements UserRepository {
 			});
 			valid.setValid(true);
 		} catch (Exception e) {
-			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
-			valid.setValid(false);
-			valid.setError("Something went wrong while adding category!");
+			if (e.getMessage().contains("Resource deadlock avoided")) {
+				/* Retry transaction in case of deadlock */
+				logger.info("Retrying to recover from deadlock");
+				valid = addCategory(category);
+			} else {
+				logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
+				valid.setValid(false);
+				valid.setError("Something went wrong while adding category!");
+			}
 		}
 
 		return valid;

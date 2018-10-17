@@ -2,9 +2,8 @@
 
 update-semantic {
   width: 100%;
-  height: calc(100% - 3px);
+  height: 100%;
   background-color: $background-color;
-  padding: 0 3px 3px;
   overflow: auto;
 
   .container {

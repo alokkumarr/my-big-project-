@@ -64,9 +64,11 @@ trait CategorizedRelation extends BaseRelation{
         case "DataObject" | "datalake_metadata" => DataObject(pair._2)
         case _ => throw new Exception("The method is not implemented for this category")
       }})
+      m_log.info("loadedRelationElements if block : {}", loadedRelationElements)
       loadedRelationElements
     }
     else
+      m_log.info("loadedRelationElements else block : {}", loadedRelationElements)
       loadedRelationElements
   }
 

@@ -73,9 +73,6 @@ api:
         -   location: ${semantic.service.host}
             method: POST
             path: '[/]semantic*'
-        -   location: ${analysis.service.host}
-            method: GET
-            path: '/api/analyses.*'
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'

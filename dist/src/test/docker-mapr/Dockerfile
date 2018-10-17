@@ -24,12 +24,16 @@ RUN touch /etc/sysconfig/network
 # Install MapR packages
 RUN yum -y -q install mapr-core mapr-cldb mapr-zookeeper mapr-webserver
 
-# Workaround: Local environments have limited memory available, so
-# reduce memory usage of MapR CLDB to 256 MB.  Can be removed when all
-# developers have moved to cloud environments.
+# Limit to amount of memory allocated to MapR in the development
+# environment
 ENV warden_conf=/opt/mapr/conf/warden.conf
 RUN sed -i -e 's/^\(service.command.cldb.heapsize.max\)=.*$/\1=256/' \
   $warden_conf
+RUN sed -i -e 's/^\(service.command.mfs.heapsize.percent\)=.*$/\1=10/' \
+    $warden_conf
+RUN sed -i -e 's/^\(service.command.mfs.heapsize.maxpercent\)=.*$/\1=15/' \
+    $warden_conf
+
 
 # Install YARN, if enabled
 RUN if $yarn_enabled; then \
