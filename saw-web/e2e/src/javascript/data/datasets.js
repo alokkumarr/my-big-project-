@@ -1,6 +1,6 @@
 const datasets = {
-  pivotChart: 'Sample (pivot/chart) - new',
-  report: 'Sample (report) - new'
+  pivotChart: 'sample-elasticsearch',
+  report: 'sample-spark'
 };
 
 module.exports = datasets;

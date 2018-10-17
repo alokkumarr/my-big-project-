@@ -280,6 +280,14 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
+    //clean up any residual/leftover from a previous run. Ensure we have clean
+    //files for both locking and merging.
+    if (fs.existsSync('jasmine-results.json.lock')) {
+      fs.unlinkSync('jasmine-results.json.lock');
+    }
+    if (fs.existsSync('jasmine-results.json')) {
+      fs.unlink('jasmine-results.json');
+    }
     //console.log('beforeLaunch....generating the testdata...')
     // Generate test data
     if(webpackHelper.getSawWebUrl()) {
