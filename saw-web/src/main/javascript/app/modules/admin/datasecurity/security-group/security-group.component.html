@@ -51,17 +51,27 @@
 <div *dxTemplate="let cell of 'actionCellTemplate'">
   <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
     <button mat-icon-button
-            [matTooltip]="Edit">
+    i18n-matTooltip="Edit Group"
+          matTooltip="Edit Group" (click)="editGroupData(cell.data)"
+            >
       <mat-icon fontIcon="icon-edit"></mat-icon>
     </button>
     <button mat-icon-button
-            [matTooltip]="Delete">
+            (click)="deleteGroup(cell.data)"
+            i18n-matTooltip="Delete Group"
+          matTooltip="Delete Group">
       <mat-icon fontIcon="icon-trash"></mat-icon>
     </button>
   </div>
 </div>
 
+<div *dxTemplate="let cell of 'toolTipCellTemplate'">
+  <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
+    <span i18n-matTooltip='"cell.data.description"''
+    matTooltip='"cell.data.description"'>{{cell.data.securityGroupName}}</span>
+  </div>
+</div>
+
 </dx-data-grid>
-{{groupSelected}}
 <field-attribute-view [groupSelected]="groupSelected"></field-attribute-view>
 

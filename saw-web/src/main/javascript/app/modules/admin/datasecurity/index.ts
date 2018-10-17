@@ -2,3 +2,4 @@ export { AddAttributeDialogComponent } from './add-attribute-dialog/add-attribut
 export { AddSecurityDialogComponent } from './add-security-dialog/add-security-dialog.component';
 export { SecurityGroupComponent } from './security-group/security-group.component';
 export { FieldAttributeViewComponent } from './field-attribute-view/field-attribute-view.component';
+export { DeleteDialogComponent } from './delete-dialog/delete-dialog.component';

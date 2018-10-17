@@ -19,31 +19,21 @@ export class AddAttributeDialogComponent {
     }
   ) {}
 
-  create() {
-    this._userAssignmentService.addAttributetoGroup(this.attribute).then(response => {
-      console.log(resposne);
+  submit() {
+    console.log(this.data);
+    console.log(this.attribute);
+    const request = {
+      attributeName: this.data.attributeName,
+      value: this.data.value,
+      securityGroupName: this.data.groupSelected
+    }
+    this._userAssignmentService.addAttributetoGroup(request, this.data.mode).then(response => {
+      console.log(response);
+      if (response.valid) {
+        this._dialogRef.close(response.valid);
+      } else {
+        this.errorState = !response.valid;
+        this.errorMessage = response.validityMessage;
     });
-    // const model = {
-    //   ...this.data.model,
-    //   ...formValues
-    // };
-
-    // let actionPromise;
-    // switch (this.data.mode) {
-    // case 'edit':
-    //   actionPromise = this._userService.update(model);
-    //   break;
-    // case 'create':
-    //   actionPromise = this._userService.save(model);
-    //   break;
-    // }
-
-    // actionPromise && actionPromise.then(
-    //   rows => {
-    //     if (rows) {
-    //       this._dialogRef.close(rows);
-    //     }
-    //   }
-    // );
   }
 }

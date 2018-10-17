@@ -7,7 +7,7 @@ import { AddSecurityDialogComponent } from './../add-security-dialog/add-securit
 import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attribute-dialog.component';
 import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 import { UserAssignmentService } from './../userassignment.service';
-import * as cloneDeep from 'lodash/cloneDeep';
+import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
@@ -27,9 +27,7 @@ export class SecurityGroupComponent {
 
   config: any;
   data: any;
-  groupSelected: any = '';
-
-  @Output() public loadAttributesGrid: EventEmitter<any> = new EventEmitter();
+  groupSelected: any = '';columnData: {};
 
   constructor(
     private _router: Router,
@@ -59,20 +57,51 @@ export class SecurityGroupComponent {
   }
 
   loadGroupGridWithData() {
-    this._userAssignmentService.getSecurityGroups().then(response => {
-      this.data = response;
-      this.groupSelected = this.data[0].securityGroupName;
-    });
+    this.data = [
+      {
+        securityGroupName: "sampleOne",
+        description: "jkanskjjasdn"
+      }, {
+        securityGroupName: "sample5ne",
+        description: "jkanskjjasdn"
+      }, {
+        securityGroupName: "sampletne",
+        description: "jkanskjjasdn"
+      }
+    ];
+    this.groupSelected = this.data[0].securityGroupName;
+    // this._userAssignmentService.getSecurityGroups().then(response => {
+    //   console.log(response);
+    //   //this.data = response;
+    //   this.data = [
+    //     {
+    //       securityGroupName: "sampleOne",
+    //       description: "jkanskjjasdn"
+    //     }, {
+    //       securityGroupName: "sample5ne",
+    //       description: "jkanskjjasdn"
+    //     }, {
+    //       securityGroupName: "sampletne",
+    //       description: "jkanskjjasdn"
+    //     }
+    //   ];
+    //   console.log(this.data);
+    //   this.groupSelected = this.data[0].securityGroupName;
+    // });
   }
 
   addPropperty(property, mode: 'edit' | 'create') {
-    mode = 'create';
+    if (mode === 'create') {
+      this.columnData = {};
+    }
     const data = {
       property,
       mode,
-      groupSelected: this.groupSelected
+      groupSelected: this.groupSelected,
+      ...this.columnData
     };
-    const component = this.getModalComponent(property, mode) as any;
+    console.log(data);
+    const component = this.getModalComponent(property) as any;
     return this._dialog.open(component, {
       width: 'auto',
       height: 'auto',
@@ -83,20 +112,37 @@ export class SecurityGroupComponent {
       if (result) {
         this.loadGroupGridWithData();
       }
-    });;
+    });
   }
 
-  getModalComponent(property, mode) {
-    if (property === 'securityGroup') {
-      switch (mode) {
-      case 'create':
-        return AddSecurityDialogComponent;
-      }
-    } else if (property === 'attribute') {
-      switch (mode) {
-      case 'create':
-        return AddAttributeDialogComponent;
-      }
+  editGroupData(data) {
+    console.log(data);
+    this.columnData = data;
+    this.addPropperty('securityGroup','edit')
+  }
+
+  deleteGroup(cellData) {
+    const data = {
+      title: `Are you sure you want to delete this group?`,
+      content: `Group Name: ${cellData.securityGroupName}`,
+      positiveActionLabel: 'Delete',
+      negativeActionLabel: 'Cancel'
+    }
+    console.log(data);
+    return this._dialog.open(DeleteDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      autoFocus: false,
+      data
+    } as MatDialogConfig)
+  }
+
+  getModalComponent(property) {
+    switch (property) {
+    case 'securityGroup' :
+      return AddSecurityDialogComponent;
+    case 'attribute' :
+      return AddAttributeDialogComponent;
     }
   }
 
@@ -104,10 +150,11 @@ export class SecurityGroupComponent {
     const columns = [{
       caption: 'Group Name',
       dataField: 'securityGroupName',
+      cellTemplate: 'toolTipCellTemplate',
       allowSorting: true,
       alignment: 'left',
-      width: '70%'
-    },{
+      width: '60%'
+    }, {
       caption: '',
       //dataField: 'analysis.name',
       allowSorting: true,

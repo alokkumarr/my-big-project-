@@ -1,4 +1,4 @@
-<dx-data-grid class="attribute-group-grid" [customizeColumns]="config.customizeColumns"
+<dx-data-grid class="attribute-Attribute-grid" [customizeColumns]="config.customizeColumns"
               [columnAutoWidth]="config.columnAutoWidth"
               [columnMinWidth]="config.columnMinWidth"
               [columnResizingMode]="config.columnResizingMode"
@@ -13,7 +13,7 @@
               [wordWrapEnabled]="config.wordWrapEnabled"
               [scrolling]="config.scrolling"
               [sorting]="config.sorting"
-              [dataSource]="analyses"
+              [dataSource]="data"
               [columns]="config.columns"
               [pager]="config.pager"
               [paging]="config.paging"
@@ -24,12 +24,14 @@
 <div *dxTemplate="let cell of 'actionCellTemplate'">
   <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
     <button mat-icon-button
-            [matTooltip]="Edit">
+    i18n-matTooltip="Edit Attribute"
+    matTooltip="Edit Attribute" (click)="editAttribute(cell)">
       <mat-icon fontIcon="icon-edit"></mat-icon>
     </button>
     <button mat-icon-button
-
-            [matTooltip]="Delete">
+            (click)="deleteAtttribute(cell.data)"
+            i18n-matTooltip="Delete Attribute"
+          matTooltip="Delete Attribute">
       <mat-icon fontIcon="icon-trash"></mat-icon>
     </button>
   </div>

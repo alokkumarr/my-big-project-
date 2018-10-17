@@ -10,25 +10,28 @@
 </header>
 <div class="base-dialog__content">
   <div fxLayout="column" fxLayoutAlign="center start">
+    <div class="errors" *ngIf="errorState">
+      <span [innerHtml]="errorMessage"></span>
+    </div>
     <mat-form-field>
-      <input matInput placeholder="Security Group Name" [(ngModel)]="attribute.securityGroupName" disabled required/>
+      <input matInput placeholder="Security Group Name" [(ngModel)]="data.groupSelected" disabled required/>
     </mat-form-field>
     <div fxLayout="row" fxLayoutAlign="center start">
       <mat-form-field>
-        <input matInput [(ngModel)]="attribute.attributeName" placeholder="Field Name" required/>
+        <input matInput [(ngModel)]="data.attributeName" placeholder="Field Name" required/>
       </mat-form-field>
 
       <span class="seperator">=</span>
 
       <mat-form-field>
-        <input matInput [(ngModel)]="attribute.value" placeholder="Value" required/>
+        <input matInput [(ngModel)]="data.value" placeholder="Value" required/>
       </mat-form-field>
     </div>
   </div>
 </div>
 
 <div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
-  <button (click)="create()"
+  <button (click)="submit()"
           e2e="create-analysis-btn"
           color="primary"
           [ngSwitch]="data.mode"

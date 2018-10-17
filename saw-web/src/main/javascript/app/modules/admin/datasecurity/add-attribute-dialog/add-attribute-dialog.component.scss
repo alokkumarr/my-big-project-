@@ -26,6 +26,12 @@ add-attribute-dialog {
       margin-bottom: 5px;
     }
 
+    div .errors {
+      width: 100%;
+      text-align: center;
+      color: red;
+    }
+
     .seperator {
       width: 100px;
       margin: 19px 0 0 27px;

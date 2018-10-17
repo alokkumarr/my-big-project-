@@ -14,17 +14,17 @@
       <span [innerHtml]="errorMessage"></span>
     </div>
     <mat-form-field>
-      <input matInput [(ngModel)]="securityGroup.securityGroupName" placeholder="Security Group Name" required/>
+      <input matInput [(ngModel)]="data.securityGroupName" placeholder="Security Group Name" required/>
     </mat-form-field>
 
     <mat-form-field>
-        <textarea matInput [(ngModel)]="securityGroup.description" placeholder="Description"></textarea>
+        <textarea matInput [(ngModel)]="data.description" placeholder="Description"></textarea>
       </mat-form-field>
   </div>
 </div>
 
 <div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
-  <button (click)="create()"
+  <button (click)="submit()"
           e2e="create-analysis-btn"
           color="primary"
           [ngSwitch]="data.mode"
