@@ -76,8 +76,6 @@ public class MigrationService {
      List<BinarySemanticNode> binaryNodes = objectMapper.readValue(objectMapper.writeValueAsString(binarySemanticStoreData.getBody().getContents().get(0).getAnalyze()), 
          new TypeReference<List<BinarySemanticNode>>(){});
      SemanticNode  semanticNode = null;
-     List<String> listOfDataObjectIds = null;
-     
        for (BinarySemanticNode binarySemanticNode : binaryNodes) {
          String id = binarySemanticNode.getId();
          semanticNode = new SemanticNode();
@@ -90,44 +88,22 @@ public class MigrationService {
          semanticNode.setProjectCode(binarySemanticNode.getProjectCode()!=null ? binarySemanticNode.getProjectCode() : "workbench");
          semanticNode.setUsername("sipadmin@synchronoss.com");
          semanticNode.setMetricName(binarySemanticNode.getMetricName());
-         if (binarySemanticNode.getEsRepository()!=null) 
-           {semanticNode.setEsRepository(binarySemanticNode.getEsRepository());}
-         else {
-         // Constructing the repository the way new JSON store will understand
-          listOfDataObjectIds =  new ArrayList<>();
-         JsonNode repository = objectMapper.readTree(objectMapper.writeValueAsString(binarySemanticNode.getRepository()));
-         ArrayNode repositories = (ArrayNode) repository.get("objects");
-         ObjectNode newRepoNode = null;
-         HttpEntity<?> dataObjectRequestEntity = null;
-         ResponseEntity<DataSemanticObjects> binaryDataObjectNode = null;
-         JsonNode dataObjectData = null;
-         List<Object> repositoryObjects = new ArrayList<>();
-         for (JsonNode repositoryNode : repositories) {
-           String dataObjectId = repositoryNode.get("EnrichedDataObjectId").asText();
-           String dataSetName  = repositoryNode.get("EnrichedDataObjectName").asText();
-           logger.trace("dataObjectId : " + dataObjectId);
-           logger.trace("dataSetName : " + dataSetName);
-           newRepoNode = objectMapper.createObjectNode();
-           newRepoNode.put(DataSetProperties.Name.toString(), dataSetName);
-           requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-           dataObjectRequestEntity = new HttpEntity<Object>(dataObjectQuery(dataObjectId, "read"),requestHeaders);
-           logger.trace("dataObjectRequestEntity : " + objectMapper.writeValueAsString(dataObjectRequestEntity));
-           logger.debug("transportMetadataURIL server URL {}", transportURI + "/md");
-           binaryDataObjectNode = restTemplate.exchange(url, HttpMethod.POST,
-               dataObjectRequestEntity, DataSemanticObjects.class);
-           dataObjectData = objectMapper.readTree(objectMapper.writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0)));
-           logger.trace("dataObjectData : " + objectMapper.writeValueAsString(dataObjectData));
-           newRepoNode.put(DataSetProperties.PhysicalLocation.toString(), dataObjectData.get("dataLocation").asText());
-           Path file = Paths.get(dataObjectData.get("dataLocation").asText());
-           String format = (FilenameUtils.getExtension(file.getFileName().toString()).equals("") || 
-           FilenameUtils.getExtension(file.getFileName().toString()) != null) ? FilenameUtils.getExtension(file.getFileName().toString()) : "parquet" ;
-           newRepoNode.put(DataSetProperties.Format.toString(), format);
-           repositoryObjects.add(newRepoNode);
-           listOfDataObjectIds.add(dataObjectId);
-         }
-         semanticNode.setRepository(repositoryObjects);
-       }
-         semanticNode.setArtifacts(binarySemanticNode.getArtifacts());
+          if (binarySemanticNode.getEsRepository() != null) {
+            JsonNode esRepository = objectMapper
+                .readTree(objectMapper.writeValueAsString(binarySemanticNode.getEsRepository()));
+            String indexName = esRepository.get("indexName").asText();
+            // This check has been introduced due to special case where existing pods are has both esRepository & repository SIP-4960
+            if (indexName != null && !indexName.trim().equals("")) {
+              semanticNode.setEsRepository(binarySemanticNode.getEsRepository());
+            } else {
+              semanticNode = settingRepositories(binarySemanticNode, url, restTemplate,
+                  requestHeaders, semanticNode);
+            }
+          } else {
+            semanticNode = settingRepositories(binarySemanticNode, url, restTemplate,
+                requestHeaders, semanticNode);
+          }
+          semanticNode.setArtifacts(binarySemanticNode.getArtifacts());
          semanticNode.setSupports(binarySemanticNode.getSupports());
          try {
            logger.trace("semanticNode description which is going to migrate :"+ objectMapper.writeValueAsString(semanticNode));
@@ -169,6 +145,48 @@ public class MigrationService {
         + "\"}],\"action\":\""
         + operation
         + "\",\"context\":\"DataObject\"}}";
+  }
+  
+  private SemanticNode settingRepositories (BinarySemanticNode binarySemanticNode, String url, RestTemplate restTemplate, 
+      HttpHeaders requestHeaders, SemanticNode semanticNode) throws JsonProcessingException, IOException{
+    List <String> listOfDataObjectIds =  new ArrayList<>();
+    List <String> listOfDataObjectNames =  new ArrayList<>();
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode repository = objectMapper.readTree(objectMapper.writeValueAsString(binarySemanticNode.getRepository()));
+    ArrayNode repositories = (ArrayNode) repository.get("objects");
+    ObjectNode newRepoNode = null;
+    HttpEntity<?> dataObjectRequestEntity = null;
+    ResponseEntity<DataSemanticObjects> binaryDataObjectNode = null;
+    JsonNode dataObjectData = null;
+    List<Object> repositoryObjects = new ArrayList<>();
+    for (JsonNode repositoryNode : repositories) {
+      String dataObjectId = repositoryNode.get("EnrichedDataObjectId").asText();
+      String dataSetName  = repositoryNode.get("EnrichedDataObjectName").asText();
+      logger.trace("dataObjectId : " + dataObjectId);
+      logger.trace("dataSetName : " + dataSetName);
+      newRepoNode = objectMapper.createObjectNode();
+      newRepoNode.put(DataSetProperties.Name.toString(), dataSetName);
+      requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+      dataObjectRequestEntity = new HttpEntity<Object>(dataObjectQuery(dataObjectId, "read"),requestHeaders);
+      logger.trace("dataObjectRequestEntity : " + objectMapper.writeValueAsString(dataObjectRequestEntity));
+      logger.debug("transportMetadataURIL server URL {}", url);
+      binaryDataObjectNode = restTemplate.exchange(url, HttpMethod.POST,
+          dataObjectRequestEntity, DataSemanticObjects.class);
+      dataObjectData = objectMapper.readTree(objectMapper.writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0)));
+      logger.trace("dataObjectData : " + objectMapper.writeValueAsString(dataObjectData));
+      newRepoNode.put(DataSetProperties.PhysicalLocation.toString(), dataObjectData.get("dataLocation").asText());
+      Path file = Paths.get(dataObjectData.get("dataLocation").asText());
+      String format = (FilenameUtils.getExtension(file.getFileName().toString()).equals("") || 
+      FilenameUtils.getExtension(file.getFileName().toString()) != null) ? FilenameUtils.getExtension(file.getFileName().toString()) : "parquet" ;
+      newRepoNode.put(DataSetProperties.Format.toString(), format);
+      repositoryObjects.add(newRepoNode);
+      listOfDataObjectIds.add(dataObjectId);
+      listOfDataObjectNames.add(dataSetName);
+    }
+    semanticNode.setRepository(repositoryObjects);
+    semanticNode.setParentDataSetIds(listOfDataObjectIds);
+    semanticNode.setParentDataSetNames(listOfDataObjectNames);
+    return semanticNode;
   }
   
   /**

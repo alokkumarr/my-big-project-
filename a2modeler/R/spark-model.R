@@ -83,7 +83,7 @@ train_model.spark_model <- function(mobj,
     if (samples$validation_method == "holdout") {
       validator_args <- list(train_ratio = samples$validation_args$split)
     } else {
-      validator_args <- list(train_ratio = 1.0)
+      validator_args <- list(train_ratio = 0.99)
     }
   }
   

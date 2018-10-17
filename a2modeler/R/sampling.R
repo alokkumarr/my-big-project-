@@ -306,6 +306,7 @@ add_default_samples.data.frame <- function(x){
 
 
 #' @rdname add_default_samples
+#' @export
 add_default_samples.tbl_spark <- function(x){
   z <- 1:sparklyr::sdf_nrow(x)
   add_default_samples(z)
