@@ -1,0 +1,10 @@
+component [Scheduler Service (instance #1)] as Scheduler1
+component [Scheduler Service (instance #2)] as Scheduler2
+
+component [MariaDB (instance #1)] as MariaDb1
+component [MariaDB (instance #2)] as MariaDb2
+
+Scheduler1 --> MariaDb1 : store jobs
+Scheduler2 --> MariaDb2 : store jobs
+
+MariaDb1 <-> MariaDb2 : replicate
