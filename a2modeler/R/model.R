@@ -230,4 +230,15 @@ get_forecasts <- function(mobj) {
   UseMethod("get_forecasts", mobj)
 }
 
+#' Get Model Variable Importance Metrics
+#'
+#' Returns variable importance from tree based models and coefficient summaries
+#' from linear based models
+#'
+#' @param mobj model object
+#' @export
+get_variable_importance <- function(mobj) {
+  UseMethod("get_variable_importance", mobj)
+}
+
 

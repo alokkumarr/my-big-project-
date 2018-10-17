@@ -51,7 +51,43 @@ predict.spark_model_regression <- function(mobj,
 }
 
 
+#' Get Model Coefficients
+#'
+#' Extracts coefficient summary from Spark-ML linear regression model
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_model_linear_regression <- function(mobj) {
+  
+  tibble(feature  = c("Intercept", mobj$.features),
+         estimate = c(mobj$intercept, mobj$coefficients),
+         stderr   = mobj$summary$coefficient_standard_errors(),
+         t_stat   = mobj$summary$t_values,
+         p_values = mobj$summary$p_values)
+}
 
 
+#' Get Model Coefficients
+#'
+#' Extracts coefficient summary from Spark-ML logistic regression model
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_model_logistic_regression <- function(mobj) {
+  
+  tibble(feature  = c("Intercept", mobj$.features),
+         estimate = c(mobj$intercept, mobj$coefficients))
+}
 
 
+#' Get Model Coefficients
+#'
+#' Extracts coefficient summary from Spark-ML generalized regression model
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_model_generalized_linear_regression <- function(mobj) {
+  
+  tibble(feature  = c("Intercept", mobj$.features),
+         estimate = c(mobj$intercept, mobj$coefficients),
+         stderr   = mobj$summary$coefficient_standard_errors(),
+         t_stat   = mobj$summary$t_values(),
+         p_values = mobj$summary$p_values())
+}
