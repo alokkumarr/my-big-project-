@@ -22,7 +22,7 @@ import * as filter from 'lodash/filter';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 // import {PivotGridDataSourceField} from 'devextreme/ui/pivot_grid';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';

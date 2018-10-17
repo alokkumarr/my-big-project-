@@ -19,7 +19,6 @@ import * as trimEnd from 'lodash/trimEnd';
 import * as fpMap from 'lodash/fp/map';
 import * as get from 'lodash/get';
 
-
 export function flattenPivotData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
 
@@ -129,13 +128,13 @@ export function flattenChartData(data, sqlBuilder) {
 }
 
 export function flattenReportData(data, analysis) {
-  if(analysis.edit) {
+  if (analysis.edit) {
     return data;
   }
   const columnMap = fpPipe(
     fpFlatMap(artifact => artifact.columns),
     fpReduce((accumulator, column) => {
-      const {columnName, aggregate} = column;
+      const { columnName, aggregate } = column;
       const key = `${columnName})-${aggregate}`;
       accumulator[key] = column;
       return accumulator;
@@ -148,9 +147,7 @@ export function flattenReportData(data, analysis) {
       if (!hasAggregateFunction) {
         return key;
       }
-      const [aggregate, columnName] = fpPipe(
-        fpSplit('(')
-      )(key);
+      const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
 
       const columnMapKey = `${columnName}-${aggregate}`;
       const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
@@ -159,8 +156,8 @@ export function flattenReportData(data, analysis) {
         return columnName.split(')')[0];
       }
       return key;
-    })
-  })
+    });
+  });
 }
 
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {

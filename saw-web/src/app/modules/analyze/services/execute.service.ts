@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
 import { FilterService } from '../services/filter.service';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/scan';
+import { ReplaySubject, BehaviorSubject } from 'rxjs';
+import { map, filter, mergeMap, scan } from 'rxjs/operators';
 export enum EXECUTION_STATES {
   SUCCESS,
   ERROR,
@@ -77,21 +74,25 @@ export class ExecuteService {
 
   subscribe(analysisId: string, callback: (IExecuteEvent) => void) {
     return this.execs$
-      .filter(eventEmitter => !eventEmitter.subject.isStopped)
-      .filter(({ id }: IExecuteEventEmitter) => analysisId === id)
+      .pipe(
+        filter(eventEmitter => !eventEmitter.subject.isStopped),
+        filter(({ id }: IExecuteEventEmitter) => analysisId === id)
+      )
       .subscribe(callback);
   }
 
   subscribeToAllExecuting(callback: (executions: Object) => void) {
     return this.execs$
-      .filter(({ subject }) => !subject.isStopped)
-      .mergeMap<IExecuteEventEmitter, IExecuteAggregateEvent>(
-        ({ id, subject }) => subject.map(({ state }) => ({ id, state }))
+      .pipe(
+        filter(({ subject }) => !subject.isStopped),
+        mergeMap<IExecuteEventEmitter, IExecuteAggregateEvent>(
+          ({ id, subject }) => subject.pipe(map(({ state }) => ({ id, state })))
+        ),
+        scan<IExecuteAggregateEvent, Object>((acc, e) => {
+          acc[e.id] = e.state;
+          return acc;
+        }, {})
       )
-      .scan<IExecuteAggregateEvent, Object>((acc, e) => {
-        acc[e.id] = e.state;
-        return acc;
-      }, {})
       .subscribe(callback);
   }
 }

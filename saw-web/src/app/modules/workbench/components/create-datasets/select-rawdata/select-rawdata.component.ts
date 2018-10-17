@@ -24,6 +24,8 @@ import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialo
 import { WorkbenchService } from '../../../services/workbench.service';
 import { STAGING_TREE } from '../../../wb-comp-configs';
 
+import { debounceTime } from 'rxjs/operators';
+
 @Component({
   selector: 'select-rawdata',
   templateUrl: './select-rawdata.component.html',
@@ -49,12 +51,9 @@ export class SelectRawdataComponent
     public notify: ToastService
   ) {}
 
-  @ViewChild(DxDataGridComponent)
-  dataGrid: DxDataGridComponent;
-  @ViewChild('tree')
-  tree;
-  @Output()
-  onSelectFullfilled: EventEmitter<any> = new EventEmitter<any>();
+  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild('tree') tree;
+  @Output() onSelectFullfilled: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     this.treeNodes = cloneDeep(STAGING_TREE);
@@ -70,7 +69,7 @@ export class SelectRawdataComponent
     stagingNode.setIsActive(true);
     this.nodeID = stagingNode.id;
     this.fileMaskControl.valueChanges
-      .debounceTime(1000)
+      .pipe(debounceTime(1000))
       .subscribe(mask => this.maskSearch(mask));
   }
 

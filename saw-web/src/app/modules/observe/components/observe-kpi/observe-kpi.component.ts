@@ -14,7 +14,8 @@ import * as moment from 'moment';
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
+import { map as mapObservable } from 'rxjs/operators';
 
 @Component({
   selector: 'observe-kpi',
@@ -134,24 +135,26 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     this.observe
       .executeKPI(kpi)
       /* Parse kpi execution results into primary and secondary aggregation results */
-      .map(res => {
-        const primary = {
-          current: get(
-            res,
-            `data.current.${dataFieldName}._${primaryAggregate}`
-          ),
-          prior: get(res, `data.prior.${dataFieldName}._${primaryAggregate}`)
-        };
+      .pipe(
+        map(res => {
+          const primary = {
+            current: get(
+              res,
+              `data.current.${dataFieldName}._${primaryAggregate}`
+            ),
+            prior: get(res, `data.prior.${dataFieldName}._${primaryAggregate}`)
+          };
 
-        const secondary = map(secondaryAggregates || [], ag => ({
-          name: upperCase(ag),
-          value: round(
-            parseFloat(get(res, `data.current.${dataFieldName}._${ag}`)) || 0,
-            2
-          )
-        }));
-        return { primary, secondary };
-      })
+          const secondary = map(secondaryAggregates || [], ag => ({
+            name: upperCase(ag),
+            value: round(
+              parseFloat(get(res, `data.current.${dataFieldName}._${ag}`)) || 0,
+              2
+            )
+          }));
+          return { primary, secondary };
+        })
+      )
       /* Parse and calculate percentage change for primary aggregations */
       .subscribe(({ primary, secondary }) => {
         const currentParsed = parseFloat(primary.current) || 0;

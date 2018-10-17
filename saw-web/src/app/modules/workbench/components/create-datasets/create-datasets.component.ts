@@ -4,7 +4,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import * as isUndefined from 'lodash/isUndefined';
 
 import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs';

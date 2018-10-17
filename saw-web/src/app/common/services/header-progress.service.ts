@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { Subject, timer } from 'rxjs';
 import { distinctUntilChanged, debounce } from 'rxjs/operators';
-import { timer } from 'rxjs';
 
 @Injectable()
 export class HeaderProgressService {

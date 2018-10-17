@@ -9,8 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { FilterService } from '../../../analyze/services/filter.service';

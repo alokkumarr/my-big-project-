@@ -3,11 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as moment from 'moment';
-import { Subscription } from 'rxjs/Subscription';
-import { combineLatest, timer } from 'rxjs';
+import {
+  Subscription,
+  Subject,
+  BehaviorSubject,
+  combineLatest,
+  timer
+} from 'rxjs';
 import { debounce } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as clone from 'lodash/clone';
 
 import {
