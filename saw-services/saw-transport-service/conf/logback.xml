@@ -27,6 +27,11 @@
   <logger name="com.synchronoss" level="INFO"/>
   <logger name="controllers" level="INFO"/>
   <logger name="sncr" level="INFO"/>
+  <logger name="sncr.datalake.handlers" level="INFO"/>
+  <logger name="executor" level="INFO"/>
+  <logger name="sncr.metadata.semantix" level="INFO"/>
+
+
 
   <root level="INFO">
     <appender-ref ref="STDOUT" /> 

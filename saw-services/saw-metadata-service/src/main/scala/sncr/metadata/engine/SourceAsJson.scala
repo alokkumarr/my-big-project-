@@ -19,7 +19,7 @@ trait SourceAsJson {
     val content = res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id))
     if (content != null && content.nonEmpty) {
       m_log trace s"Convert content of node to JSON: ${Bytes.toString(content)}"
-      (parse(Bytes.toString(content), false, false), content)
+      (parse(Bytes.toString(content), false), content)
     }
     else (JNothing, Array.emptyByteArray)
   }

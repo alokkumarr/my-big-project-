@@ -1,31 +1,33 @@
 package sncr.bda.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.*;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
-import org.ojai.joda.DateTime;
-import sncr.bda.base.MetadataBase;
-import sncr.bda.conf.Input;
-import sncr.bda.exceptions.BDAException;
-import sncr.bda.context.ContextMetadata;
-import sncr.bda.core.file.HFileOperations;
-import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.bda.datasets.conf.Dataset;
-import sncr.bda.metastore.DataSetStore;
-
+import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
+import static sncr.bda.base.MetadataBase.DEFAULT_CATALOG;
+import static sncr.bda.base.MetadataBase.PREDEF_DATA_SOURCE;
+import static sncr.bda.base.MetadataStore.delimiter;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
-import static sncr.bda.base.MetadataBase.PREDEF_DATA_SOURCE;
-import static sncr.bda.base.MetadataStore.delimiter;
-import static sncr.bda.base.MetadataBase.DEFAULT_CATALOG;
+import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
+import org.ojai.joda.DateTime;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import sncr.bda.base.MetadataBase;
+import sncr.bda.conf.Input;
+import sncr.bda.context.ContextMetadata;
+import sncr.bda.core.file.HFileOperations;
+import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.bda.datasets.conf.Dataset;
+import sncr.bda.exceptions.BDAException;
+import sncr.bda.metastore.DataSetStore;
 
 
 /**
@@ -297,7 +299,11 @@ public class DLDataSetService {
         StringBuilder sb = new StringBuilder(ctx.applicationID);
         sb.append(delimiter).append(o.get(DataSetProperties.Name.name()));
         logger.debug(String.format("Generated ID for dataset %s: %s ",o.get(DataSetProperties.Name.name()), sb.toString()));
-        return sb.toString();
+        String id = sb.toString();
+        if (StringUtils.isWhitespace((id))) {
+          id = StringUtils.deleteWhitespace(id);
+        }
+        return id;
     }
 
     public Map<String, JsonElement> loadExistingDataSets(ContextMetadata ctx, Map<String, Map<String, Object>> inputDataSets) throws Exception {

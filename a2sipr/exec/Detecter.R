@@ -57,6 +57,7 @@ library(dplyr, lib.loc = r_lib_home)
 library(sparklyr, lib.loc = r_lib_home)
 library(a2sipr, lib.loc = r_lib_home)
 library(a2munge, lib.loc = r_lib_home)
+library(lubridate, lib.loc = r_lib_home)
 
 conf_json <- jsonlite::fromJSON(readLines(conf_file))
 
@@ -228,7 +229,7 @@ if (is.na(.group_vars) || .group_vars == "") {
 
 # Run Detecter functionality & assign result to data frame
 
-rcomp_spk_df <- input_spk_df %>%
+rcomp_r_df <- input_spk_df %>%
   a2munge::converter(
     .,
     measure_vars = .index_var,
@@ -248,7 +249,7 @@ rcomp_spk_df <- input_spk_df %>%
              measure_vars = .measure_vars,
              fun = .fun_var) %>%
   #arrange(., desc(!!as.name(.index_var))) %>%
-  #collect %>%
+  collect %>%
   a2munge::detecter(
     .,
     index_var = paste(.index_var, "CONV_CEI", sep = "_"),
@@ -266,14 +267,10 @@ rcomp_spk_df <- input_spk_df %>%
     trend_window = .trendWindow
   ) %>%
   mutate(., expected = value - resid) %>%
-  a2munge::formatter(., 
-    measure_vars = paste(.index_var, "CONV_CEI", sep = "_"),
-    input_format = .field_format,
-    output_format = .field_format,
-    output_suffix = "FMT"
-  ) %>%
-  rename(., !!.index_var := paste(!!.index_var, "CONV_CEI_FMT", sep = "_")) %>%
+  rename(., !!.index_var := paste(!!.index_var, "CONV_CEI", sep = "_")) %>%
   select(., !!.index_var, measure, value, seasonal, trend, resid, lower, upper, anomaly, expected)
+
+rcomp_spk_df <- copy_to(sc, mutate_at(rcomp_r_df, .index_var, as.character), overwrite = TRUE)
 
 a2munge::writer(
   rcomp_spk_df,
