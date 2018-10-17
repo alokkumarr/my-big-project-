@@ -19,7 +19,7 @@ import synchronoss.handlers.charter.smartcare.CharterEventHandler
   * Created by srya0001 on 6/28/2016.
   */
 
-@Api(value = "SynchronossGenericEvent",
+@Api(value = "SIPGenericEvent",
   produces = "application/json",
   consumes = "application/octet-stream",
   protocols = "http,https")
@@ -33,9 +33,8 @@ class GenericHandler extends Controller {
   @ApiOperation(
     nickname = "SyncronossEventWithPayload",
     value = "Method registers a Synchronoss generic event with payload",
-    notes = "The interface is designed to accepts events in JSON format"
-    		+ "and sends them to streams (PI BDA platform)",
-    		
+    notes = "The interface is designed to accept events in JSON format and" +
+            "forwards it to the Synchronoss Insights Platform",
     httpMethod = "POST",
     tags = Array("event")
   )

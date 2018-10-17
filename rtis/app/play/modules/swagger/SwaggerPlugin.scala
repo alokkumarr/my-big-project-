@@ -81,7 +81,7 @@ class SwaggerPluginImpl @Inject()(lifecycle: ApplicationLifecycle, router: Route
 
   val licenseUrl = config.getString("swagger.api.info.licenseUrl") match {
     // licenceUrl needs to be a valid URL to validate against schema
-    case None => "http://licenseUrl"
+    case None => ""
     case Some(value)=> value
   }
 
@@ -93,14 +93,19 @@ class SwaggerPluginImpl @Inject()(lifecycle: ApplicationLifecycle, router: Route
   var swaggerConfig = new PlaySwaggerConfig()
 
   swaggerConfig.description = description
-  swaggerConfig.basePath = basePath
+   if(basePath != null && !basePath.equals("")){
+     swaggerConfig.basePath = basePath
+   }
   swaggerConfig.contact = contact
   swaggerConfig.version = apiVersion
   swaggerConfig.title = title
   swaggerConfig.host = host
   swaggerConfig.termsOfServiceUrl = termsOfServiceUrl
   swaggerConfig.license = license
-  swaggerConfig.licenseUrl = licenseUrl
+  if(licenseUrl != null && !licenseUrl.equals("")){
+    swaggerConfig.licenseUrl = licenseUrl
+  }
+  
 
   PlayConfigFactory.setConfig(swaggerConfig)
 

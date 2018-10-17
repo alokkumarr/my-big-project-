@@ -34,7 +34,6 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import play.api.http.HttpEntity._
 
-
 object ErrorResponse {
   val ERROR = 1
   val WARNING = 2
@@ -73,7 +72,7 @@ class ApiHelpController extends SwaggerBaseApiController {
   def getResources = Action {
     request =>
       implicit val requestHeader: RequestHeader = request
-      val host = requestHeader.host
+      val host = request.domain
       val resourceListing = getResourceListing(host)
 
 //      debugPrint(resourceListing)
@@ -88,7 +87,7 @@ class ApiHelpController extends SwaggerBaseApiController {
   def getResource(path: String) = Action {
     request =>
       implicit val requestHeader: RequestHeader = request
-      val host = requestHeader.host
+      val host = request.domain
       val apiListing = getApiListing(path, host)
       val responseStr = returnXml(request) match {
         case true => toXmlString(apiListing)
