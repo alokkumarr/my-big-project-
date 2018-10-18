@@ -118,9 +118,10 @@ export class SecurityGroupComponent {
       data
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
-      const path = `auth/deleteSecurityGroups?securityGroupName=${cellData.securityGroupName}`;
+      const securityGroupName = cellData.securityGroupName;
+      const path = `auth/deleteSecurityGroups`;
       if (result) {
-        this._userAssignmentService.deleteGroupOrAttribute(path, '').then(response => {
+        this._userAssignmentService.deleteGroupOrAttribute(path, securityGroupName).then(response => {
           this.loadGroupGridWithData(this.groupSelected);
         })
       }
