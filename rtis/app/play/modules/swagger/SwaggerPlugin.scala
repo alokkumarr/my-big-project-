@@ -93,9 +93,7 @@ class SwaggerPluginImpl @Inject()(lifecycle: ApplicationLifecycle, router: Route
   var swaggerConfig = new PlaySwaggerConfig()
 
   swaggerConfig.description = description
-   if(basePath != null && !basePath.equals("")){
-     swaggerConfig.basePath = basePath
-   }
+  swaggerConfig.basePath = basePath
   swaggerConfig.contact = contact
   swaggerConfig.version = apiVersion
   swaggerConfig.title = title
