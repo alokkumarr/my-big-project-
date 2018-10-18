@@ -110,6 +110,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         } else {
             execution = ImmutableDispatchBean.builder()
                     .description(analysis.getDescription())
+                    .fileType(analysis.getFileType())
                     .name(analysis.getAnalysisName())
                     .userFullName(analysis.getUserFullName())
                     .metricName(analysis.getMetricName())
