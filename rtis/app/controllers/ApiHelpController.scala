@@ -76,11 +76,13 @@ class ApiHelpController extends SwaggerBaseApiController {
       
       
       
-      val host = request.headers.get("Host").orNull
-       Logger("#### Host ###:").debug(host)
+      val host = request.headers.get("X-Forwarded-Host").orNull
+      
+        Logger("#### Host ###:").debug(host)
         Logger("#### Host ###:").info(host)
-      Logger("#### Host ###:").error(host)
+        Logger("#### Host ###:").error(host)
         printf("####Host###: %s",host)
+        
       val resourceListing = getResourceListing(host)
 
 //      debugPrint(resourceListing)
