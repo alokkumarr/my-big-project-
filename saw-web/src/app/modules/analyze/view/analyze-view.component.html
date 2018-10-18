@@ -8,11 +8,12 @@
 
   <div fxLayout="row" fxLayoutAlign="start center" fxFlex="40">
     <mat-radio-group [value]="viewMode" (change)="onViewChange($event.value)" class="switch-view">
-      <mat-radio-button [value]="LIST_VIEW" e2e="analyze-list-view">
-        <mat-icon fontIcon="icon-list-view" style="font-size: 22px;" i18n-matTooltip matTooltip="List view"></mat-icon>
+      <mat-radio-button [value]="LIST_VIEW">
+        <mat-icon fontIcon="icon-list-view" e2e="analyze-list-view" style="font-size: 22px;" i18n-matTooltip matTooltip="List view"></mat-icon>
       </mat-radio-button>
-      <mat-radio-button [value]="CARD_VIEW" e2e="analyze-card-view">
-        <mat-icon fontIcon="icon-tile-view-solid" style="font-size: 18px;" i18n-matTooltip matTooltip="Card view"></mat-icon>
+      <mat-radio-button [value]="CARD_VIEW">
+        <mat-icon fontIcon="icon-tile-view-solid" e2e="analyze-card-view" style="font-size: 18px;" i18n-matTooltip
+          matTooltip="Card view"></mat-icon>
       </mat-radio-button>
     </mat-radio-group>
 

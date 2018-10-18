@@ -49,6 +49,7 @@
 #' @importFrom scales percent
 #' @importFrom stats as.formula
 #' @importFrom utils modifyList
+#' @importFrom forcats fct_reorder
 #'
 #' @examples
 #' # Create a data set

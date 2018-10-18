@@ -361,7 +361,7 @@ module.exports = {
   analysisElems: {
     analysisWithType:(name,type) => element(by.xpath(`//*[@e2e="analysis-type:${type}"]/parent::*/descendant::a[@e2e="analysis-name" and contains(text(),"${name}")]`)),
     listView: element(by.css('[e2e="analyze-list-view"]')),
-    cardView: element(by.css('[fonticon="icon-card-view"]')),
+    cardView: element(by.css('[e2e="analyze-card-view"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
     addAnalysisBtn: element(by.css('[e2e="open-new-analysis-modal"]')),
     cardTitle: element(by.binding('::$ctrl.model.name')),
