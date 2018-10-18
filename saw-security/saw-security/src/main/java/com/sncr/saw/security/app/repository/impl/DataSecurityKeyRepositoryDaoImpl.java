@@ -228,19 +228,19 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Long attributeSysId = null;
         String fetchSql = "SELECT SEC_GROUP_DSK_ATTRIBUTE_SYS_ID FROM SEC_GROUP_DSK_ATTRIBUTE WHERE SEC_GROUP_SYS_ID = ? AND ATTRIBUTE_NAME = ?";
         try {
-            String fetchedAttributeSysId = jdbcTemplate.query(fetchSql,ps -> {
+            Long fetchedAttributeSysId = jdbcTemplate.query(fetchSql,ps -> {
                     ps.setLong(1,securityGroupSysId);
                     ps.setString(2,attributeName);
                 },
                 resultSet -> {
-                    String val = null;
+                    Long val = null;
                     if(resultSet.next())
                     {
-                        val = resultSet.getString("SEC_GROUP_DSK_ATTRIBUTE_SYS_ID");
+                        val = resultSet.getLong("SEC_GROUP_DSK_ATTRIBUTE_SYS_ID");
                     }
                     return val;
                 });
-            attributeSysId = Long.valueOf(fetchedAttributeSysId);
+            attributeSysId = fetchedAttributeSysId;
         }
         catch (Exception e) {
             logger.error(e.getMessage());
@@ -279,43 +279,60 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Boolean addSecurityGroupDskAttributeValues(AttributeValues attributeValues) {
-
+    public Valid addSecurityGroupDskAttributeValues(AttributeValues attributeValues) {
+        Valid valid = new Valid();
         Long groupSysId = this.getSecurityGroupSysId(attributeValues.getSecurityGroupName());
-
-        if(groupSysId != null)  {
-            String addSql = "INSERT INTO `sec_group_dsk_attribute` " +
-                "(`SEC_GROUP_SYS_ID`,`ATTRIBUTE_NAME`) "
-                + "VALUES (?,?)";
-            String addValueSql = "INSERT INTO `sec_group_dsk_value` " +
-                "(`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`,`DSK_VALUE`) "
-                + "VALUES (?,?)";;
-            try{
-                int addResult  = jdbcTemplate.update(addSql,ps -> {
-                    ps.setLong(1,groupSysId);
-                    ps.setString(2,attributeValues.getAttributeName());
-                });
-                logger.trace(addResult + " Attribute added to table SEC_GROUP_DSK_ATTRIBUTE.");
-
-                Long attributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,attributeValues.getAttributeName());
-                if ( attributeSysId != null)    {
-                    int addValResult = jdbcTemplate.update(addValueSql, ps -> {
-                        ps.setLong(1,attributeSysId);
-                        ps.setString(2,attributeValues.getValue());
+        Long groupAttrSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,attributeValues.getAttributeName());
+        /**
+         * Note : Here, we are checking whether the Attribute name exists for the respective Group, if So, we are responding with an error saying the attribute name already exists.
+         * In future this could be solved directly by adding constraint in Table definition and also here am keeping in my that the DB needs to Altered to add Customer relationship with DSK's.
+         */
+        if (groupAttrSysId == null) {
+            if(groupSysId != null)  {
+                String addSql = "INSERT INTO `sec_group_dsk_attribute` " +
+                    "(`SEC_GROUP_SYS_ID`,`ATTRIBUTE_NAME`) "
+                    + "VALUES (?,?)";
+                String addValueSql = "INSERT INTO `sec_group_dsk_value` " +
+                    "(`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`,`DSK_VALUE`) "
+                    + "VALUES (?,?)";;
+                try{
+                    int addResult  = jdbcTemplate.update(addSql,ps -> {
+                        ps.setLong(1,groupSysId);
+                        ps.setString(2,attributeValues.getAttributeName());
                     });
-                    logger.trace(addValResult + " Attribute value added to table SEC_GROUP_DSK_VALUE.");
+                    logger.trace(addResult + " Attribute added to table SEC_GROUP_DSK_ATTRIBUTE.");
+
+                    Long attributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,attributeValues.getAttributeName());
+                    if ( attributeSysId != null)    {
+                        int addValResult = jdbcTemplate.update(addValueSql, ps -> {
+                            ps.setLong(1,attributeSysId);
+                            ps.setString(2,attributeValues.getValue());
+                        });
+                        logger.trace(addValResult + " Attribute value added to table SEC_GROUP_DSK_VALUE.");
+                        valid.setValid(true);
+                        valid.setValidityMessage("Attribute-value added to table SEC_GROUP_DSK_VALUE.");
+                    }
+                    else { logger.error("attributeSysId is NULL"); }
                 }
-                else { logger.error("attributeSysId is NULL"); }
+                catch (Exception e) {
+                    logger.error(e.getMessage());
+                    valid.setValidityMessage("Error in Attribute value added to table SEC_GROUP_DSK_VALUE.");
+                    valid.setValid(false);
+                }
+                return valid;
             }
-            catch (Exception e) {
-                logger.error(e.getMessage());
-                return false;
+            else {
+                logger.error("Couldn't able to get Sys Id");
+                valid.setValidityMessage("Couldn't able to get Sys Id");
+                valid.setValid(false);
+                return valid;
             }
-            return true;
         }
-        else {
-            logger.error("Couldn't able to get Sys Id");
-            return false;
+        else    {
+            logger.error("AttributeName already Exists!!");
+            valid.setValid(false);
+            valid.setValidityMessage("AttributeName already Exists!!");
+            return valid;
         }
     }
 

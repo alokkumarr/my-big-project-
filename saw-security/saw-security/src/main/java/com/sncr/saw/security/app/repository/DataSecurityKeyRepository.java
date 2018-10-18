@@ -13,7 +13,7 @@ public interface DataSecurityKeyRepository {
     public Valid updateSecurityGroups(List<String> groupNames);
     public Boolean deleteSecurityGroups(String securityGroupName);
     public List<SecurityGroups> fetchSecurityGroupNames();
-    public Boolean addSecurityGroupDskAttributeValues(AttributeValues attributeValues);
+    public Valid addSecurityGroupDskAttributeValues(AttributeValues attributeValues);
     public List<String> fetchSecurityGroupDskAttributes(String securityGroupName);
     public Boolean deleteSecurityGroupDskAttributeValues(List<String> dskList);
     public List<DskDetails> fetchDskAllAttributeValues(String securityGroupName);
