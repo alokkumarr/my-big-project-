@@ -751,9 +751,8 @@ public class SecurityController {
      * @return Valid obj containing Boolean and suceess/failure msg
      */
     @RequestMapping(value = "/auth/deleteSecurityGroups",method = RequestMethod.POST)
-    public Valid deleteSecurityGroups(@RequestParam String securityGroupName)  {
+    public Valid deleteSecurityGroups(@RequestBody String securityGroupName)  {
 	    Valid valid = new Valid();
-
 	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupName))   {
 	        valid.setValid(true);
 	        valid.setValidityMessage("Successfully deleted security group");
@@ -772,16 +771,7 @@ public class SecurityController {
      */
     @RequestMapping (value = "/auth/addSecurityGroupDskAttributeValues", method = RequestMethod.POST)
     public Valid addSecurityGroupDskAttributeValues(@RequestBody AttributeValues attributeValues)  {
-        Valid valid = new Valid();
-	    if(dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(attributeValues))   {
-	        valid.setValid(true);
-	        valid.setValidityMessage("Adding Attribute-Values is succesfull");
-        }
-        else {
-	        valid.setValid(false);
-	        valid.setValidityMessage("Error in Adding Attribute-Values");
-        }
-	    return valid;
+	    return dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(attributeValues);
     }
 
     /**
