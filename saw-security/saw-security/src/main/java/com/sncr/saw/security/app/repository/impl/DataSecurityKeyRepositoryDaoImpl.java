@@ -426,7 +426,30 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
     @Override
     public List<UserAssignment> getAlluserAssignments() {
-        String fetchSql = "SELECT u.USER_ID as LoginID," +
+        String fetchSql = "Select distinct" +
+            " fi.LoginID as LoginID," +
+            " fi.Role as Role," +
+            " fi.FirstName as FirstName," +
+            " fi.LastName as LastName," +
+            " fi.Email as Email," +
+            " fi.Status as Status," +
+            " sg.SEC_GROUP_NAME as GroupName" +
+            " from" +
+                " ( SELECT u.USER_ID as LoginID," +
+                " r.role_Name as Role," +
+                " u.FIRST_NAME as FirstName," +
+                " u.LAST_NAME as LastName," +
+                " u.email as Email," +
+                " CASE when u.ACTIVE_STATUS_IND = 0 Then 'INACTIVE' ELSE 'ACTIVE' END as Status," +
+                " u.sec_group_sys_id as sec_grp_sys_id" +
+                    " FROM" +
+                 " USERS u, Roles r" +
+                 " where" +
+                " u.ROLE_SYS_ID = r.ROLE_SYS_ID" +
+            " ) fi" +
+            " left outer join SEC_GROUP sg" +
+            " on (fi.sec_grp_sys_id = sg.sec_group_sys_id) ";
+           /** "SELECT u.USER_ID as LoginID," +
             " r.role_Name as Role," +
             " u.FIRST_NAME as FirstName," +
             " u.LAST_NAME as LastName, u.email as Email," +
@@ -434,7 +457,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             " CASE when u.ACTIVE_STATUS_IND = 0 Then 'INACTIVE' ELSE 'ACTIVE' END as Status" +
             " FROM " +
             "USERS u, Roles r, SEC_GROUP sg " +
-            "where u.ROLE_SYS_ID = r.ROLE_SYS_ID AND u.sec_group_sys_id = sg.sec_group_sys_id";
+            "where u.ROLE_SYS_ID = r.ROLE_SYS_ID AND u.sec_group_sys_id = sg.sec_group_sys_id"; **/
+
 
         List<UserAssignment> userAssignmentsList = new ArrayList<>();
         try{

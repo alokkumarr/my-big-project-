@@ -751,7 +751,7 @@ public class SecurityController {
      * @return Valid obj containing Boolean and suceess/failure msg
      */
     @RequestMapping(value = "/auth/deleteSecurityGroups",method = RequestMethod.POST)
-    public Valid deleteSecurityGroups(@RequestBody String securityGroupName)  {
+    public Valid deleteSecurityGroups(@RequestParam String securityGroupName)  {
 	    Valid valid = new Valid();
 
 	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupName))   {
@@ -808,8 +808,8 @@ public class SecurityController {
      * @param securityGroupName Group names
      * @return List of Group names
      */
-    @RequestMapping (value = "/auth/getSecurityGroupDskAttributes", method = RequestMethod.POST)
-    public List<String> fetchSecurityGroupDskAttributes(@RequestBody String securityGroupName)   {
+    @RequestMapping (value = "/auth/getSecurityGroupDskAttributes", method = RequestMethod.GET)
+    public List<String> fetchSecurityGroupDskAttributes(@RequestParam String securityGroupName)   {
 	    return dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupName);
 
     }
