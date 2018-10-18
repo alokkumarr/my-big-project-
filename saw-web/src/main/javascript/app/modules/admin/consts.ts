@@ -264,7 +264,7 @@ export const CategoriesTableHeader = [
 export const UserAssignmentsTableHeader = [
   {
     caption: 'LOGIN ID',
-    dataField: 'masterLoginId',
+    dataField: 'loginId',
     allowSorting: true,
     alignment: 'left',
     width: '20%',
@@ -272,7 +272,7 @@ export const UserAssignmentsTableHeader = [
   },
   {
     caption: 'ROLE',
-    dataField: 'roleName',
+    dataField: 'role',
     allowSorting: true,
     alignment: 'left',
     width: '10%',
@@ -304,7 +304,7 @@ export const UserAssignmentsTableHeader = [
   },
   {
     caption: 'STATUS',
-    dataField: 'activeStatusInd',
+    dataField: 'status',
     allowSorting: true,
     alignment: 'left',
     width: '8%',
@@ -312,6 +312,7 @@ export const UserAssignmentsTableHeader = [
   },
   {
     caption: 'Data Security Group',
+    dataField: 'groupName',
     width: '12%',
     allowSorting: true,
     alignment: 'left',

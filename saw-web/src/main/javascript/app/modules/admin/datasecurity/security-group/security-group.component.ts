@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { JwtService } from '../../../../../login/services/jwt.service';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AddSecurityDialogComponent } from './../add-security-dialog/add-security-dialog.component';
@@ -8,7 +8,8 @@ import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attri
 import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 import { UserAssignmentService } from './../userassignment.service';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
-import { isEmpty } from 'rxjs/operators';
+import { LocalSearchService } from '../../../../common/services/local-search.service';
+import { ToastService } from '../../../../common/services/toastMessage.service';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
@@ -18,6 +19,7 @@ let self;
   selector: 'security-group',
   template
 })
+
 export class SecurityGroupComponent {
   listeners: Subscription[] = [];
   ticket: { custID: string; custCode: string; masterLoginId?: string };
@@ -36,7 +38,9 @@ export class SecurityGroupComponent {
     private _jwtService: JwtService,
     private _dialog: MatDialog,
     private _dxDataGridService: dxDataGridService,
-    private _userAssignmentService: UserAssignmentService
+    private _userAssignmentService: UserAssignmentService,
+    private _localSearch: LocalSearchService,
+    private _toastMessage: ToastService
   ) {
     const navigationListener = this._router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -114,12 +118,9 @@ export class SecurityGroupComponent {
       data
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
-      const path = 'auth/deleteSecurityGroups';
-      const requestBody = {
-        securityGroupName : cellData.securityGroupName
-      }
+      const path = `auth/deleteSecurityGroups?securityGroupName=${cellData.securityGroupName}`;
       if (result) {
-        this._userAssignmentService.deleteGroupOrAttribute(path, requestBody).then(response => {
+        this._userAssignmentService.deleteGroupOrAttribute(path, '').then(response => {
           this.loadGroupGridWithData(this.groupSelected);
         })
       }
@@ -133,6 +134,27 @@ export class SecurityGroupComponent {
     case 'attribute' :
       return AddAttributeDialogComponent;
     }
+  }
+
+  applySearchFilter(value) {
+    const USERGROUP_SEARCH_CONFIG = [
+      { keyword: 'Group Name', fieldName: 'securityGroupName' }
+    ];
+    this.filterObj.searchTerm = value;
+    const searchCriteria = this._localSearch.parseSearchTerm(
+      this.filterObj.searchTerm
+    ) as any;
+    this.filterObj.searchTermValue = searchCriteria.trimmedTerm;
+    this._localSearch
+      .doSearch(searchCriteria, this.data, USERGROUP_SEARCH_CONFIG)
+      .then(
+        (data: any[]) => {
+          this.data = data;
+        },
+        err => {
+          this._toastMessage.error(err.message);
+        }
+      );
   }
 
   getConfig() {

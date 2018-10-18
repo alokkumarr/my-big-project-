@@ -63,6 +63,10 @@ export class UserAssignmentService {
     return this.postRequest(path, request);
   }
 
+  assignGroupToUser(requestBody) {
+    return this.postRequest('auth/updateUser', requestBody);
+  }
+
   getRequest(path) {
     return this._http.get(`${loginUrl}/${path}`).toPromise();
   }

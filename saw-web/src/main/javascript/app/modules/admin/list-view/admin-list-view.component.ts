@@ -20,15 +20,11 @@ export class AdminListViewComponent {
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
   @Output() rowClick: EventEmitter<any> = new EventEmitter();
 
-  securityGroups= {};
-  // securityGroups = [
-  //   {value: 'group1', viewValue: 'Group 1'},
-  //   {value: 'group2', viewValue: 'Group 2'},
-  //   {value: 'group3', viewValue: 'Group 3'}
-  // ];
-
+  securityGroups= [];
   config: any;
   groupValue: any;
+  groupAssignSuccess: any;
+  userGroupID: any;
 
   constructor(
     private _dxDataGridService: dxDataGridService,
@@ -38,7 +34,6 @@ export class AdminListViewComponent {
   ngOnInit() {
     this.config = this.getConfig();
     this._userAssignmentService.getSecurityGroups().then(response => {
-      console.log(response);
       this.securityGroups = response;
     })
   }
@@ -47,8 +42,15 @@ export class AdminListViewComponent {
     return 'View Privileges';
   }
 
-  assignGrouptoUser(groupName) {
-    console.log(groupName.value);
+  assignGrouptoUser(groupName, cell) {
+    const request = {
+      groupName : groupName.value,
+      userId: cell.data.loginId
+    }
+    this._userAssignmentService.assignGroupToUser(request).then(response => {
+      this.groupAssignSuccess = response.valid ? 'checkmark' : 'close';
+      this.userGroupID = cell.data.loginId;
+    });
   }
 
   getConfig() {

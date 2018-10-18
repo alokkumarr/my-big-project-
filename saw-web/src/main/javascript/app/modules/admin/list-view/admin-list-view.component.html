@@ -55,14 +55,14 @@
   <div *dxTemplate="let cell of 'groupAssignCellTemplate'">
     <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container group-select">
       <mat-form-field>
-        <mat-select placeholder="Select Group" (selectionChange)="assignGrouptoUser($event)" class="group-select-dropdown">
+        <mat-select placeholder="Select Group" (selectionChange)="assignGrouptoUser($event, cell)" [(ngModel)]="cell.data.groupName" class="group-select-dropdown">
           <mat-option *ngFor="let group of securityGroups" [value]="group.securityGroupName">
             {{group.securityGroupName}}
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-icon *ngIf="true" fontIcon="icon-checkmark"></mat-icon>
-      <mat-icon *ngIf="true" fontIcon="icon-close"></mat-icon>
+      <mat-icon *ngIf="groupAssignSuccess === 'checkmark' && cell.data.loginId === userGroupID" fontIcon="icon-checkmark"></mat-icon>
+      <mat-icon *ngIf="groupAssignSuccess === 'close' && cell.data.loginId === userGroupID" fontIcon="icon-close"></mat-icon>
     </div>
   </div>
 
