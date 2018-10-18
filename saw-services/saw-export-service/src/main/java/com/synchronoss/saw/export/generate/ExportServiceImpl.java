@@ -161,9 +161,7 @@ public class ExportServiceImpl implements ExportService{
       ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
         ExportBean exportBean = new ExportBean();
-        exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
         String dir = UUID.randomUUID().toString();
-        MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
         exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
             dispatchBean).get("name")) + "." + exportBean.getFileType());
@@ -186,7 +184,7 @@ public class ExportServiceImpl implements ExportService{
           logger.trace("Recipients: " +recipients);
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
             +emailExportSize+"&analysisType="+ analysisType;
-
+            MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
         ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
             requestEntity, DataResponse.class);
         String finalRecipients = recipients;
@@ -195,13 +193,6 @@ public class ExportServiceImpl implements ExportService{
           public void onSuccess(ResponseEntity<DataResponse> entity) {
             logger.debug("Email async success");
             logger.debug("[Success] Response :" + entity.getStatusCode());
-
-            if(fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty())    {
-                IFileExporter iFileExporter = new CSVReportDataExporter();
-            }
-            else {
-                IFileExporter iFileExporter = new XlsxExporter();
-            }
 
             try {
               // create a directory with unique name in published location to avoid file conflict for dispatch.
@@ -249,13 +240,6 @@ public class ExportServiceImpl implements ExportService{
         // Do the background work beforehand
         String finalFtp = ftp;
         String finalJobGroup = jobGroup;
-        exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-        String strFile = exportBean.getFileType();
-
-        exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-        exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-        exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-        exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
 
         long limitPerPage = Long.parseLong(exportChunkSize);
         long page = 0; // just to keep hold of last not processed data in for loop
