@@ -380,7 +380,6 @@ export class AdminMainViewComponent implements OnDestroy {
       mode
     };
     const component = this.getModalComponent() as any;
-    console.log(component);
     return this._dialog.open(component, {
       width: 'auto',
       height: 'auto',

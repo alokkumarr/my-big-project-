@@ -15,7 +15,7 @@ require('./field-attribute-view.component.scss');
 })
 export class FieldAttributeViewComponent {
   config: any;
-  data: any;
+  data: {};
   emptyState: boolean;
 
   @Input() groupSelected;
@@ -27,55 +27,21 @@ export class FieldAttributeViewComponent {
 
   ngOnInit() {
     this.config = this.getConfig();
+    this.emptyState = true;
   }
 
   ngOnChanges() {
-    console.log(this.groupSelected); // logs undefined
-    if(!isEmpty(this.groupSelected)) {
-      this.loadAttributesGrid();
-    }
+    this.loadAttributesGrid();
   }
 
   loadAttributesGrid() {
-    const request = {
-      securityGroupName: this.groupSelected
-    }
-    this._userAssignmentService.getSecurityAttributes(request).then(response => {
-      console.log(response);
+    this._userAssignmentService.getSecurityAttributes(this.groupSelected).then(response => {
       this.data = response;
-      // this.data = [
-      //   {
-      //     attributeName: "sampleOne",
-      //     securityGroupName: this.groupSelected,
-      //     created_by: "string",
-      //     created_date: "string",
-      //     value: 1
-      //   }, {
-      //     attributeName: "samplene",
-      //     securityGroupName: this.groupSelected,
-      //     created_by: "string",
-      //     created_date: "string",
-      //     value: 2
-      //   }, {
-      //     attributeName: "sampletne",
-      //     securityGroupName: this.groupSelected,
-      //     created_by: "string",
-      //     created_date: "string",
-      //     value: 3
-      //   }
-      // ];
-      console.log(this.data);
-      if (isEmpty(this.data)) {
-        this.emptyState = true;
-      } else {
-        this.emptyState = false;
-      }
-      //this.groupSelected = this.data[0].securityGroupName;
+      this.emptyState = this.data.length === 0 ? true : false;
     });
   }
 
   editAttribute(cell) {
-    console.log(cell);
     let mode = 'edit';
     const data = {
       mode,
@@ -104,7 +70,6 @@ export class FieldAttributeViewComponent {
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
     }
-    console.log(data);
     return this._dialog.open(DeleteDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -112,11 +77,11 @@ export class FieldAttributeViewComponent {
       data
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
-      const path = 'auth/deleteSecurityGroupDskAttributeValues';
-      const requestBody = [this.groupSelected, cellData.attributeName]
       if (result) {
+        const path = 'auth/deleteSecurityGroupDskAttributeValues';
+        const requestBody = [this.groupSelected, cellData.attributeName];
         this._userAssignmentService.deleteGroupOrAttribute(path, requestBody).then(response => {
-          console.log(response);
+          this.loadAttributesGrid();
         })
       }
     });

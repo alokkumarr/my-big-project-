@@ -11,6 +11,8 @@ require('./add-attribute-dialog.component.scss');
 })
 export class AddAttributeDialogComponent {
   public attribute = {};
+  errorState: boolean;
+  errorMessage;
   constructor(
     private _dialogRef: MatDialogRef<AddAttributeDialogComponent>,
     private _userAssignmentService: UserAssignmentService,
@@ -20,20 +22,18 @@ export class AddAttributeDialogComponent {
   ) {}
 
   submit() {
-    console.log(this.data);
-    console.log(this.attribute);
     const request = {
       attributeName: this.data.attributeName.trim(),
       value: this.data.value,
       securityGroupName: this.data.groupSelected
     }
     this._userAssignmentService.addAttributetoGroup(request, this.data.mode).then(response => {
-      console.log(response);
       if (response.valid) {
         this._dialogRef.close(response.valid);
       } else {
         this.errorState = !response.valid;
         this.errorMessage = response.validityMessage;
+      }
     });
   }
 }

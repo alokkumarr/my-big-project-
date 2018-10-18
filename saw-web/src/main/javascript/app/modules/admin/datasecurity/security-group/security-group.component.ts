@@ -49,38 +49,23 @@ export class SecurityGroupComponent {
 
   ngOnInit() {
     this.config = this.getConfig();
-    this.loadGroupGridWithData();
+    this.loadGroupGridWithData(this.groupSelected);
     this.emptyState = true;
   }
 
   initialise() {
     const token = this._jwtService.getTokenObj();
     this.ticket = token.ticket;
-    //const customerId = parseInt(this.ticket.custID, 10);
   }
 
-  loadGroupGridWithData() {
-    // this.data = [
-    //   {
-    //     securityGroupName: "sampleOne",
-    //     description: "jkanskjjasdn"
-    //   }, {
-    //     securityGroupName: "sample5ne",
-    //     description: "jkanskjjasdn"
-    //   }, {
-    //     securityGroupName: "sampletne",
-    //     description: "jkanskjjasdn"
-    //   }
-    // ];
-    //this.groupSelected = this.data[0].securityGroupName;
-    this.groupSelected = '';
-    this._userAssignmentService.getSecurityGroups().then(response => {console.log(response);
+  loadGroupGridWithData(groupSelected) {
+    this._userAssignmentService.getSecurityGroups().then(response => {
       this.data = response;
       if (this.data.length === 0) {
         this.emptyState = true;
       } else {
         this.emptyState = false;
-        this.groupSelected = this.data[0].securityGroupName;
+        this.groupSelected =  (groupSelected === '') ? this.data[0].securityGroupName : groupSelected;
       }
     });
   }
@@ -104,13 +89,13 @@ export class SecurityGroupComponent {
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
       if (result) {
-        this.loadGroupGridWithData();
+        this.groupSelected = '';
+        this.loadGroupGridWithData(data.groupSelected);
       }
     });
   }
 
   editGroupData(data) {
-    console.log(data);
     this.columnData = data;
     this.addPropperty('securityGroup','edit')
   }
@@ -122,7 +107,6 @@ export class SecurityGroupComponent {
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
     }
-    console.log(data);
     return this._dialog.open(DeleteDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -130,13 +114,13 @@ export class SecurityGroupComponent {
       data
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
-      const path = 'auth/deleteSecurityGroupDskAttributeValues';
+      const path = 'auth/deleteSecurityGroups';
       const requestBody = {
         securityGroupName : cellData.securityGroupName
       }
       if (result) {
         this._userAssignmentService.deleteGroupOrAttribute(path, requestBody).then(response => {
-          console.log(response);
+          this.loadGroupGridWithData(this.groupSelected);
         })
       }
     });

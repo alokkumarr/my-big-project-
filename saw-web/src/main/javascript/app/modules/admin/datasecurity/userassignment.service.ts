@@ -3,7 +3,7 @@ import { JwtService } from '../../../../login/services/jwt.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../../../appConfig';
 
-const apiUrl = AppConfig.api.url;
+const loginUrl = AppConfig.login.url;
 
 @Injectable()
 export class UserAssignmentService {
@@ -15,14 +15,13 @@ export class UserAssignmentService {
 
   getList(customerId) {
     console.log(customerId);
-    return this.getRequest('auth/getlluserAssignments');
+    return this.getRequest('auth/getAlluserAssignments');
   }
 
   //Add a new security group detail.
   addSecurityGroup(data) {
     let requestBody = {};
     let path;
-    console.log(data);
     switch (data.mode) {
     case 'create':
       requestBody = {
@@ -39,16 +38,6 @@ export class UserAssignmentService {
     return this.postRequest(path, requestBody);
   }
 
-  ////edit an exiting security group detail.
-  // editSecurityGroup(securityGroup) {
-  //   const requestBody = {
-  //     ...securityGroup,
-  //     createdBy: this._jwtService.getUserName(),
-  //     userId: this._jwtService.getUserId()
-  //   }
-  //   return this.postRequest(`auth/addSecurityGroups`, requestBody);
-  // }
-
   addAttributetoGroup(attribute, mode) {
     let path;
     switch (mode) {
@@ -63,7 +52,7 @@ export class UserAssignmentService {
   }
 
   getSecurityAttributes(request) {
-    return this.postRequest(`auth/fetchDskAllAttributeValues`, request)
+    return this.getRequest(`auth/fetchDskAllAttributeValues?securityGroupName=${request}`);
   }
 
   getSecurityGroups() {
@@ -71,16 +60,11 @@ export class UserAssignmentService {
   }
 
   deleteGroupOrAttribute(path, request) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json'
-      })
-    };
-    return this._http.post(`http://34.229.20.66/saw/security/${path}`, request, httpOptions).toPromise();
+    return this.postRequest(path, request);
   }
 
   getRequest(path) {
-    return this._http.get(`http://34.229.20.66/saw/security/${path}`).toPromise();
+    return this._http.get(`${loginUrl}/${path}`).toPromise();
   }
 
   postRequest(path: string, params: Object) {
@@ -89,7 +73,6 @@ export class UserAssignmentService {
         'Content-Type':  'application/json'
       })
     };
-    return this._http.post(`http://34.229.20.66/saw/security/${path}`, params, httpOptions).toPromise();
-    //return this._http.post(`${apiUrl}/${path}`, params, httpOptions).toPromise();
+    return this._http.post(`${loginUrl}/${path}`, params, httpOptions).toPromise();
   }
 }
