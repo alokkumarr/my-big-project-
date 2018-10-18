@@ -50,20 +50,7 @@
         ],
         plugins: [
           SwaggerUIBundle.plugins.DownloadUrl
-        ],  requestInterceptor: (req) => {
-        	
-        	
-        	
-            if (! req.loadSpec) {
-            	
-            	console.log("URL before" + req.url);
-            	req.url = req.url.replace("https","http");
-            	
-            	console.log("URL after" + req.url);
-               
-            }
-            return req;
-          },
+        ],
         layout: "StandaloneLayout",
         
       })
