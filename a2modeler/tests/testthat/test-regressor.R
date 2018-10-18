@@ -19,7 +19,8 @@ context("regressor unit tests")
 #   as.data.frame() %>%
 #   dplyr::filter(spark == "2.3.0") %>%
 #   dplyr::pull(dir)
-sc <- spark_connect(master = "local")
+sc <- spark_connect(master = "local", version = "2.3.0")
+
 
 # Copy data to spark
 df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
