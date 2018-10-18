@@ -72,7 +72,15 @@ class ApiHelpController extends SwaggerBaseApiController {
   def getResources = Action {
     request =>
       implicit val requestHeader: RequestHeader = request
-      val host = request.domain
+      
+      
+      
+      
+      val host = request.headers.get("Host").orNull
+       Logger("#### Host ###:").debug(host)
+        Logger("#### Host ###:").info(host)
+      Logger("#### Host ###:").error(host)
+        printf("####Host###: %s",host)
       val resourceListing = getResourceListing(host)
 
 //      debugPrint(resourceListing)
@@ -87,7 +95,8 @@ class ApiHelpController extends SwaggerBaseApiController {
   def getResource(path: String) = Action {
     request =>
       implicit val requestHeader: RequestHeader = request
-      val host = request.domain
+      val host = request.headers.get("Host").orNull
+       Logger("#### Host ###:").debug(host)
       val apiListing = getApiListing(path, host)
       val responseStr = returnXml(request) match {
         case true => toXmlString(apiListing)
