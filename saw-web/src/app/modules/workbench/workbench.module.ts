@@ -14,15 +14,6 @@ import { routes } from './routes';
 
 import { WorkbenchService } from './services/workbench.service';
 
-import {
-  MenuService,
-  ToastService,
-  SideNavService,
-  LocalSearchService,
-  DxDataGridService,
-  JwtService
-} from '../../common/services';
-
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
 import { SelectRawdataComponent } from './components/create-datasets/select-rawdata/select-rawdata.component';
@@ -83,15 +74,7 @@ const COMPONENTS = [
 
 const GUARDS = [DefaultWorkbenchPageGuard];
 
-const SERVICES = [
-  JwtService,
-  WorkbenchService,
-  MenuService,
-  ToastService,
-  SideNavService,
-  LocalSearchService,
-  DxDataGridService
-];
+const SERVICES = [WorkbenchService];
 @NgModule({
   imports: [
     AngularCommonModule,

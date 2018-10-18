@@ -29,13 +29,7 @@ import {
   PrivilegeEditorComponent,
   PrivilegeRowComponent
 } from './privilege';
-import { JwtService } from '../../common/services';
 import { SidenavMenuService } from '../../common/components/sidenav';
-import {
-  DxDataGridService,
-  ToastService,
-  LocalSearchService
-} from '../../common/services';
 
 import { isAdminGuard, GoToDefaultAdminPageGuard } from './guards';
 
@@ -63,10 +57,6 @@ const SERVICES = [
   SidenavMenuService,
   AdminService,
   UserService,
-  JwtService,
-  DxDataGridService,
-  LocalSearchService,
-  ToastService,
   RoleService,
   PrivilegeService,
   ExportService,
