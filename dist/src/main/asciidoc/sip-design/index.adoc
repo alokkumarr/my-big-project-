@@ -110,6 +110,21 @@ multiple redundant instances of them on separate nodes.  If one node
 fails and makes the service running on that node unavailable, the
 service instance on the other node can keep serving requests.
 
+:quartz_doc: http://www.quartz-scheduler.org/documentation/
+:quartz_cluster: quartz-2.x/configuration/ConfigJDBCJobStoreClustering.html
+
+The Scheduler Service additionally runs the Quartz scheduler in
+{quartz_doc}/{quartz_cluster}[clustered mode], which ensures that
+scheduled tasks continue to be executed even if one of the Scheduler
+Service instances becomes unavailable.  The clustered mode setting
+ensures that each scheduled task is executed by only one of the
+instances.  The Quartz scheduler is configured to use MariaDB as its
+job store, which itself is highly available through the use of a
+MariaDB Galera cluster setup.
+
+.High availability for Scheduler Service
+plantuml::sip-design/figure-ha-scheduler.pum[format=svg]
+
 === High availability for stateful services
 
 Services that store some kind of state, such as a database, require

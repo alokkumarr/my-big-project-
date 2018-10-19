@@ -308,8 +308,27 @@ print.forecast_model <- function(mobj, ...){
 #' @rdname get_coefs
 #' @export
 get_coefs.forecast_model <- function(mobj){
-  coef(mobj$fit)
+  coefs <- coef(mobj$fit)
+  var_imp <- tibble(feature  = names(coefs), 
+                    estimate = as.numeric(coefs))
+  if(! is.null(mobj$fit$var.coef)) {
+    stderr <- mobj$fit$var.coef %>% 
+      diag %>% 
+      sqrt
+    
+    degrees <- length(mobj$fit$fitted) - length(coefs)
+    
+    var_imp <- var_imp %>% 
+      dplyr::mutate(stderr = stderr,
+                    t_stat = estimate / stderr,
+                    p_values = 2 * pt(abs(t_stat), degrees, lower.tail = FALSE))
+  }
+  
+  var_imp
 }
 
 
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.forecast_model <- get_coefs.forecast_model
 

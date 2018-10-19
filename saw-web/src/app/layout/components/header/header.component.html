@@ -1,0 +1,41 @@
+<header>
+  <mat-toolbar class="app-toolbar">
+    <div class="lh-toolbar" fxLayout="row" fxLayoutAlign="space-between center">
+      <div fxLayout="row">
+        <app-sidenav style="position: fixed;" id="left-side-nav" class="left-side-nav" flex="none"></app-sidenav>
+        <div class="company-logo"></div>
+      </div>
+
+      <div layout="row" class="lh-links">
+        <div *ngFor="let module of modules" class="link"
+             [routerLink]="module.path"
+             [routerLinkActive]="'m-active'"
+        >
+          {{module.label}}
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <a href="help_docs/HELP_SAW_User_Guide.htm" e2e="account-settings-help-guide" target="_blank">
+          <mat-icon fontIcon="icon-help" class="mat-icon-help" matTooltip="HELP"></mat-icon>
+        </a>
+
+        <div class="user-avatar" matTooltip="{{UserDetails.ticket.userFullName | uppercase}}" [ngStyle]="{'background': userBGColor.backgroundColor}"
+          [matMenuTriggerFor]="menu" e2e="account-settings-menu-btn">{{userInitials}}</div>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="changePwd()" e2e="account-settings-selector-change-password">
+            <ng-container i18n>Change Password</ng-container>
+          </button>
+          <button mat-menu-item *ngIf="showAdmin" routerLink="admin" e2e="account-settings-selector-admin">
+            <ng-container i18n>Admin</ng-container>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()" e2e="account-settings-selector-logout">
+            <ng-container i18n>Log Out</ng-container>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+    <mat-progress-bar *ngIf="showProgress" mode="indeterminate" value="40"></mat-progress-bar>
+  </mat-toolbar>
+</header>

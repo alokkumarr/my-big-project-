@@ -1,0 +1,12 @@
+@import "src/themes/base/colors";
+
+.toolbar__container {
+  height: 100%;
+  padding: 10px;
+
+  button {
+    line-height: 24px;
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+}

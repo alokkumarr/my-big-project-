@@ -1,0 +1,20 @@
+@import "src/themes/base/colors";
+
+.mat-toolbar {
+  background-color: transparent;
+
+  .admin-title {
+    color: $grey-text-color;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .customer-name {
+    color: $grey-text-color;
+  }
+}
+
+.admin-list-container {
+  height: calc(100vh - 64px - 51px - 63px);
+  padding: 0 20px;
+}

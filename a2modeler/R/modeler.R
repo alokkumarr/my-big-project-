@@ -347,6 +347,7 @@ a2_load <- function(path, sc = NULL) {
 
 
 
+
 # Modeler Class Generics --------------------------------------------------
 
 
@@ -428,6 +429,26 @@ get_target <- function(obj) {
 }
 
 
+#' Refit Modeler Object with New Data
+#'
+#' Refits a modeler's final model to new data. Option to append new data to
+#' existing data and fit on combined data or fit on just new data
+#'
+#' Requires newdata have similar schema to existing modeler data
+#'
+#' @param obj modeler object
+#' @param df new dataframe
+#' @param append logical option to append new dataframe to exisiting modeler
+#'   data
+#' @param ... additional arguments to pass to refit function. Not currently
+#'   implemented
+#'
+#' @return updated modeler object with new final model
+#' @export
+refit <- function(obj, df, append = TRUE, ...) {
+  UseMethod("refit", obj)
+  checkmate::assert_class(obj, "modeler")
+}
 
 # Modeler Class Methods ---------------------------------------------------
 
@@ -489,6 +510,7 @@ train_models.modeler <- function(obj, uids = NULL, ...) {
                                      execution_strategy = obj$execution_strategy,
                                      level = obj$conf_levels,
                                      seed = obj$seed)
+    obj$models[[uid]]$features <- setdiff(colnames(train_data), c(obj$target, obj$index_var))
     obj$models[[uid]]$status <- "trained"
     obj$models[[uid]]$last_updated <- Sys.time()
     obj$performance <- dplyr::bind_rows(
@@ -573,7 +595,54 @@ set_final_model.modeler <- function(obj,
 }
 
 
-
+#' @rdname refit
+#' @export
+refit.modeler <- function(obj, df, append = TRUE, ...) {
+  checkmate::assert_class(obj, "modeler")
+  
+  if(! any(class(df) %in% class(obj$data))) { 
+    stop(c("new dataframe class not consistent with expected data class\n",
+          "expecting class: ", paste(class(obj$data), collapse=", "), "\n", 
+          "dataframe class: ", paste(class(df), collapse=", "), "\n"  ))
+  }
+  
+  if(is.null(obj$final_model)) {
+    stop("final model not set")
+  }
+  
+  # Schema Check
+  schema_compare <- a2munge::get_schema(df) %>% 
+    a2munge::schema_check(obj$schema)
+  
+  # Append Option
+  pipe_uid <- obj$final_model$pipe
+  if(append) {
+    bind_fun <- ifelse("tbl_spark" %in% class(df), 
+                       get("sdf_bind_rows", asNamespace("sparklyr")),
+                       get("bind_rows", asNamespace("dplyr")))
+    obj$data <- bind_fun(obj$data, df)
+    obj$pipelines[[pipe_uid]] <- execute(obj$data, obj$pipelines[[pipe_uid]])
+    data <- obj$pipelines[[pipe_uid]]$output
+  } else {
+    data <- flow(df, obj$pipelines[[pipe_uid]])
+  }
+  
+  # Samples
+  refit_sample <- add_default_samples(data)
+  
+  obj$final_model <- train_model(
+    mobj = obj$final_model,
+    data = data,
+    measure = obj$measure,
+    samples = refit_sample,
+    save_submodels = FALSE,
+    execution_strategy = obj$execution_strategy,
+    level = obj$conf_levels,
+    seed = obj$seed
+  )
+  
+  obj
+}
 
 
 #' @export
