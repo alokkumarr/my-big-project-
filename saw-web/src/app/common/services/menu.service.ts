@@ -15,8 +15,6 @@ export const SAW_MODULES = {
 
 @Injectable()
 export class MenuService {
-  _menuCache: Object = {};
-
   constructor(
     public _jwtService: JwtService,
     public _sidenavMenuService: SidenavMenuService
@@ -28,12 +26,6 @@ export class MenuService {
 
   getMenu(moduleName) {
     const token = this._jwtService.getTokenObj();
-
-    const cachedMenu = this._menuCache[moduleName];
-
-    if (cachedMenu) {
-      return cachedMenu;
-    }
 
     const menuPromise = new Promise((resolve, reject) => {
       const error = (desc = 'Error occurred while getting menu.') => {
@@ -93,7 +85,6 @@ export class MenuService {
       );
     });
 
-    this._menuCache[moduleName] = menuPromise;
     return menuPromise;
   }
 }
