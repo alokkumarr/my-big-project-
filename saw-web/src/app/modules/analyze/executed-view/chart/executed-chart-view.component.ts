@@ -9,9 +9,7 @@ import * as forEach from 'lodash/forEach';
 import * as moment from 'moment';
 
 import { ChartService } from '../../services/chart.service';
-import { AnalysisChart, Sort } from '../../types';
-
-const DEFAULT_PAGE_SIZE = 25;
+import { AnalysisChart } from '../../types';
 
 @Component({
   selector: 'executed-chart-view',
