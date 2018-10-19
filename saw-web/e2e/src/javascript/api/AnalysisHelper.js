@@ -194,7 +194,7 @@ class AnalysisHelper {
             'context': 'Semantic'
             }
         };
-        let response = apiCall.post(url + 'services/md', payload, token);
+        let response = apiCall.get(url + 'services/internal/semantic/md?projectId=workbench', token);
         const semanticList = response.contents[0].ANALYZE;
         return this.getValueFromListByKeyValue(semanticList, 'metricName', dataSetName, 'id');
     }
