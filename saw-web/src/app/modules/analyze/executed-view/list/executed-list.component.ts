@@ -33,9 +33,10 @@ export class ExecutedListComponent {
 
   goToExecution(executedAnalysis) {
     this._router.navigate(
-      ['analyze', 'analysis', this.analysis.id, 'executed'], {
+      ['analyze', 'analysis', this.analysis.id, 'executed'],
+      {
         queryParams: {
-          executedAnalysis,
+          executionId: executedAnalysis.id,
           awaitingExecution: false,
           loadLastExecution: false
         }
