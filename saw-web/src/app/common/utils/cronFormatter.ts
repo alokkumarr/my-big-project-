@@ -11,37 +11,49 @@ export function convertToUtc(hourValue, minutes) {
   const date = new Date();
   date.setHours(hourValue);
   date.setMinutes(minutes);
-  return moment(date).utc().format('mm HH');
+  return moment(date)
+    .utc()
+    .format('mm HH');
 }
 
 export function convertToLocal(cronUTC) {
   const splitArray = cronUTC.split(' ');
   const date = new Date();
   date.setUTCHours(splitArray[2], splitArray[1]);
-  const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
+  const UtcTime = moment
+    .utc(date)
+    .local()
+    .format('mm HH')
+    .split(' ');
   splitArray[1] = UtcTime[0];
   splitArray[2] = UtcTime[1];
   return splitArray.join(' ');
-
 }
 
 export function getLocalMinute(minute) {
   const date = new Date();
   const hour = parseInt(moment().format('HH'), 10);
   date.setUTCHours(hour, minute);
-  const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
+  const UtcTime = moment
+    .utc(date)
+    .local()
+    .format('mm HH')
+    .split(' ');
   return parseInt(UtcTime[0], 10);
 }
 
 export function hourToCron(hour, hourType, minutes) {
   const intHour = parseInt(hour, 10);
-  const hourValue = hourType === 'AM' ? (intHour === 12 ? 0 : intHour) : (intHour === 12 ? 12 : intHour + 12);
-  const minuteHourUTC = this.convertToUtc(hourValue, minutes);
+  const hourValue =
+    hourType === 'AM'
+      ? intHour === 12 ? 0 : intHour
+      : intHour === 12 ? 12 : intHour + 12;
+  const minuteHourUTC = convertToUtc(hourValue, minutes);
   return minuteHourUTC;
 }
 
 export function generateHourlyCron(hours, minutes) {
-  const fetchUTCMinute = this.convertToUtc(moment().format('HH'), minutes);
+  const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
   const UTCMinute = fetchUTCMinute.split(' ');
   if (parseInt(hours, 10) === 0) {
     return `0 0/${minutes} * 1/1 * ? *`;
@@ -52,30 +64,55 @@ export function generateHourlyCron(hours, minutes) {
 
 export function generateDailyCron(cronDaily, dateSelects) {
   if (cronDaily.dailyType === 'everyDay') {
-    return `0 ${this.hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute)} 1/${cronDaily.days} * ? *`;
+    return `0 ${hourToCron(
+      dateSelects.hour,
+      dateSelects.hourType,
+      dateSelects.minute
+    )} 1/${cronDaily.days} * ? *`;
   }
-  return `0 ${this.hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute)} ? * MON-FRI *`;
+  return `0 ${hourToCron(
+    dateSelects.hour,
+    dateSelects.hourType,
+    dateSelects.minute
+  )} ? * MON-FRI *`;
 }
 
 export function generateWeeklyCron(cronWeek, dateSelects) {
-  return this.CronExpression = `0 ${this.hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute)} ? * ${cronWeek} *`;
+  return `0 ${hourToCron(
+    dateSelects.hour,
+    dateSelects.hourType,
+    dateSelects.minute
+  )} ? * ${cronWeek} *`;
 }
 
 export function generateMonthlyCron(cronMonth, dateSelects) {
-  const hourCron = this.hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute);
+  const hourCron = hourToCron(
+    dateSelects.hour,
+    dateSelects.hourType,
+    dateSelects.minute
+  );
   if (cronMonth.monthlyType === 'monthlyDay') {
-    return `0 ${cronMonth} ${cronMonth.specificDay} 1/${cronMonth.specificMonth} ? *`;
+    return `0 ${cronMonth} ${cronMonth.specificDay} 1/${
+      cronMonth.specificMonth
+    } ? *`;
   }
-  return `0 ${cronMonth} ? 1/${cronMonth.specificWeekDayMonthWeek} ${cronMonth.specificWeekDayDay}${cronMonth.specificWeekDayMonth} *`;
+  return `0 ${cronMonth} ? 1/${cronMonth.specificWeekDayMonthWeek} ${
+    cronMonth.specificWeekDayDay
+  }${cronMonth.specificWeekDayMonth} *`;
 }
 
 export function generateYearlyCron(cronYear, dateSelects) {
-  const hourCron = this.hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute);
+  const hourCron = hourToCron(
+    dateSelects.hour,
+    dateSelects.hourType,
+    dateSelects.minute
+  );
   if (cronYear.yearlyType === 'yearlyMonth') {
-    return `0 ${hourCron} ${cronYear.specificMonthDayDay} ${cronYear.specificMonthDayMonth} ? *`;
+    return `0 ${hourCron} ${cronYear.specificMonthDayDay} ${
+      cronYear.specificMonthDayMonth
+    } ? *`;
   }
-  return `0 ${hourCron} ? ${cronYear.specificMonthWeekMonth} ${cronYear.specificMonthWeekDay}${cronYear.specificMonthWeekMonthWeek} *`;
+  return `0 ${hourCron} ? ${cronYear.specificMonthWeekMonth} ${
+    cronYear.specificMonthWeekDay
+  }${cronYear.specificMonthWeekMonthWeek} *`;
 }
-
-
-

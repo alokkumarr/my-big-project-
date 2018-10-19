@@ -23,7 +23,7 @@ input.cron-scheduler__input:focus {
   outline: none;
 }
 
-mat-tab-group mat-tab-header div div div .mat-tab-label {
+::ng-deep mat-tab-group mat-tab-header div div div .mat-tab-label {
   min-width: 80px !important;
 }
 
@@ -50,12 +50,12 @@ mat-radio-group.to-date {
   }
 }
 
-.mat-select-value {
+::ng-deep .mat-select-value {
   width: 90% !important;
   padding: 8px 15px;
 }
 
-.mat-select {
+::ng-deep .mat-select {
   position: relative !important;
   width: 100px !important;
   margin-left: 10px;
