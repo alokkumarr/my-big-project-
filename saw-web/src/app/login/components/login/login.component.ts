@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { JwtService, UserService } from '../../../common/services';
+import {
+  JwtService,
+  UserService,
+  ConfigService
+} from '../../../common/services';
 
 @Component({
   selector: 'login-form',
@@ -11,6 +15,7 @@ export class LoginComponent implements OnInit {
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
+    public _configService: ConfigService,
     public _router: Router,
     public _route: ActivatedRoute
   ) {}
@@ -39,7 +44,14 @@ export class LoginComponent implements OnInit {
     };
     this._UserService.attemptAuth(params).then(data => {
       if (this._JwtService.isValid(data)) {
-        this._router.navigate(['']);
+        this._configService.getConfig().subscribe(
+          () => {
+            this._router.navigate(['']);
+          },
+          () => {
+            this._router.navigate(['']);
+          }
+        );
       } else {
         this.states.error = this._JwtService.getValidityReason(data);
       }
