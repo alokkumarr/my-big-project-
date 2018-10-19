@@ -1054,227 +1054,271 @@ class RequestModel {
               'name': analysisName,
               'description': analysisDesc,
               'scheduled': null,
+              'statusMessage': 'Entity has retrieved successfully',
               'id': id,
-              'dataSecurityKey': '',
-              'module': 'ANALYZE',
-              'metric': 'sample-spark',
+              'createdBy': 'sipadmin@synchronoss.com',
               'customerCode': customerCode,
-              'disabled': 'false',
-              'checked': 'false',
+              'projectCode': 'workbench',
+              'saved': true,
+              'username': 'sipadmin@synchronoss.com',
+              'module': 'ANALYZE',
               'artifacts': [
                 {
                   'artifactName': 'SALES',
                   'columns': [
                     {
-                      'name': 'string',
-                      'type': 'string',
+                      'aliasName': '',
                       'columnName': 'string',
                       'displayName': 'String',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': true,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': true,
+                      'name': 'string',
+                      'table': 'sales',
+                      'type': 'string',
                       'visibleIndex': 0
                     },
                     {
-                      'name': 'long',
-                      'type': 'long',
+                      'aliasName': '',
                       'columnName': 'long',
                       'displayName': 'Long',
-                      'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': false,
+                      'name': 'long',
+                      'table': 'sample',
+                      'type': 'long',
                       'visibleIndex': 1
                     },
                     {
-                      'name': 'float',
-                      'type': 'float',
+                      'aliasName': '',
                       'columnName': 'float',
                       'displayName': 'Float',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': false,
+                      'name': 'float',
+                      'table': 'sales',
+                      'type': 'float',
                       'format': {
                         'precision': 2
                       },
-                      'visibleIndex': 2
-                    },
-                    {
-                      'name': 'date',
-                      'type': 'date',
-                      'columnName': 'date',
-                      'displayName': 'Date',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
-                      'filterEligible': true,
-                      'checked': true,
-                      'format': 'yyyy-MM-dd',
                       'visibleIndex': 3
                     },
                     {
-                      'name': 'integer',
-                      'type': 'integer',
-                      'columnName': 'integer',
-                      'displayName': 'Integer',
                       'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
+                      'columnName': 'date',
+                      'displayName': 'Date',
                       'filterEligible': true,
-                      'checked': true,
-                      'visibleIndex': 4
+                      'joinEligible': false,
+                      'name': 'date',
+                      'table': 'sales',
+                      'type': 'date',
+                      'format': 'yyyy-MM-dd',
+                      'visibleIndex': 5
                     },
                     {
-                      'name': 'double',
-                      'type': 'double',
+                      'aliasName': '',
+                      'columnName': 'integer',
+                      'displayName': 'Integer',
+                      'filterEligible': true,
+                      'joinEligible': false,
+                      'name': 'integer',
+                      'table': 'sample',
+                      'type': 'integer',
+                      'visibleIndex': 2
+                    },
+                    {
+                      'aliasName': '',
                       'columnName': 'double',
                       'displayName': 'Double',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': false,
+                      'name': 'double',
+                      'table': 'sales',
+                      'type': 'double',
                       'format': {
                         'precision': 2
                       },
-                      'visibleIndex': 5
+                      'visibleIndex': 4
                     }
                   ],
-                  'artifactPosition': [
-                    8,
-                    20
-                  ]
+                  'artifactPosition': [19, 8]
                 },
                 {
                   'artifactName': 'PRODUCT',
                   'columns': [
                     {
-                      'name': 'string_2',
-                      'type': 'string',
+                      'aliasName': '',
                       'columnName': 'string_2',
                       'displayName': 'String_2',
-                      'aliasName': '',
-                      'table': 'product',
-                      'joinEligible': true,
                       'filterEligible': true,
-                      'checked': false,
-                      'visibleIndex': 5
+                      'joinEligible': true,
+                      'name': 'string_2',
+                      'table': 'product',
+                      'type': 'string'
                     },
                     {
-                      'name': 'long_2',
-                      'type': 'long',
+                      'aliasName': '',
                       'columnName': 'long_2',
                       'displayName': 'Long_2',
-                      'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'visibleIndex': 1
+                      'joinEligible': false,
+                      'name': 'long_2',
+                      'table': 'sample',
+                      'type': 'long'
                     },
                     {
-                      'name': 'float_2',
-                      'type': 'float',
+                      'aliasName': '',
                       'columnName': 'float_2',
                       'displayName': 'Float_2',
-                      'aliasName': '',
-                      'table': 'product',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'format': {
-                        'precision': 2
-                      },
-                      'visibleIndex': 2
+                      'joinEligible': false,
+                      'name': 'float_2',
+                      'table': 'product',
+                      'type': 'float'
                     },
                     {
-                      'name': 'date_2',
-                      'type': 'date',
+                      'aliasName': '',
                       'columnName': 'date_2',
                       'displayName': 'Date_2',
-                      'aliasName': '',
-                      'table': 'product',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'format': 'yyyy-MM-dd',
-                      'visibleIndex': 4
+                      'joinEligible': false,
+                      'name': 'date_2',
+                      'table': 'product',
+                      'type': 'date'
                     },
                     {
-                      'name': 'integer_2',
-                      'type': 'integer',
+                      'aliasName': '',
                       'columnName': 'integer_2',
                       'displayName': 'Integer_2',
-                      'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'visibleIndex': 6
+                      'joinEligible': false,
+                      'name': 'integer_2',
+                      'table': 'sample',
+                      'type': 'integer'
                     },
                     {
-                      'name': 'double_2',
-                      'type': 'double',
+                      'aliasName': '',
                       'columnName': 'double_2',
                       'displayName': 'Double_2',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'format': {
-                        'precision': 2
-                      },
-                      'visibleIndex': 7
+                      'joinEligible': false,
+                      'name': 'double_2',
+                      'table': 'sales',
+                      'type': 'double'
                     }
                   ],
-                  'artifactPosition': [
-                    420,
-                    20
-                  ]
+                  'artifactPosition': [420, 0]
                 }
               ],
-              'repository': {
-                'storageType': 'DL',
-                'objects': [
-                  {
-                    'EnrichedDataObjectId': 'SALES::json::1530537450786',
-                    'displayName': 'Sample Metric',
-                    'EnrichedDataObjectName': 'SALES',
-                    'description': 'Sample Metric',
-                    'lastUpdatedTimestamp': 'undefined'
-                  },
-                  {
-                    'EnrichedDataObjectId': 'PRODUCT::json::1530537460684',
-                    'displayName': 'Product',
-                    'EnrichedDataObjectName': 'PRODUCT',
-                    'description': 'Product',
-                    'lastUpdatedTimestamp': 'undefined'
-                  }
-                ],
-                '_number_of_elements': 2
-              },
+              'repository': [
+                {
+                  'format': 'ndjson',
+                  'name': 'SALES',
+                  'physicalLocation': '/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson'
+                },
+                {
+                  'format': 'ndjson',
+                  'name': 'PRODUCT',
+                  'physicalLocation': '/var/sip/services/saw-analyze-samples/sample-spark/data-product.ndjson'
+                }
+              ],
+              'parentDataSetIds': [
+                'SALES::json::1539937726998',
+                'PRODUCT::json::1539937737836'
+              ],
+              'modifiedTime': currentTimeStamp,
+              'createdTime': currentTimeStamp,
+              'parentDataSetNames': ['SALES', 'PRODUCT'],
               'createdTimestamp': currentTimeStamp,
               'userId': userId,
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': filters ? filters :[],
-                'orderByColumns': [
-
+                'filters': filters ? filters : [],
+                'orderByColumns': [],
+                'dataFields': [
+                  {
+                    'tableName': 'SALES',
+                    'columns': [
+                      {
+                        'aliasName': '',
+                        'columnName': 'string',
+                        'displayName': 'String',
+                        'filterEligible': true,
+                        'joinEligible': true,
+                        'name': 'string',
+                        'table': 'sales',
+                        'type': 'string',
+                        'visibleIndex': 0
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'long',
+                        'displayName': 'Long',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'long',
+                        'table': 'sample',
+                        'type': 'long',
+                        'visibleIndex': 1
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'float',
+                        'displayName': 'Float',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'float',
+                        'table': 'sales',
+                        'type': 'float',
+                        'format': {
+                          'precision': 2
+                        },
+                        'visibleIndex': 3
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'date',
+                        'displayName': 'Date',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'date',
+                        'table': 'sales',
+                        'type': 'date',
+                        'format': 'yyyy-MM-dd',
+                        'visibleIndex': 5
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'integer',
+                        'displayName': 'Integer',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'integer',
+                        'table': 'sample',
+                        'type': 'integer',
+                        'visibleIndex': 2
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'double',
+                        'displayName': 'Double',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'double',
+                        'table': 'sales',
+                        'type': 'double',
+                        'format': {
+                          'precision': 2
+                        },
+                        'visibleIndex': 4
+                      }
+                    ]
+                  }
                 ],
-                'joins': [
-
-                ]
+                'joins': []
               },
               'edit': false,
-              'categoryId': subCategoryId,
-              'saved': true
+              'categoryId': subCategoryId
             }
           ]
         }
@@ -1291,9 +1335,9 @@ class RequestModel {
             }
           ],
           'action': action,
-          "executedBy": loginId,
+          'executedBy': loginId,
           'page': 1,
-          'pageSize': 10,
+          'pageSize': 25,
           'analyze': [
             {
               'type': analysisType,
@@ -1302,233 +1346,273 @@ class RequestModel {
               'name': analysisName,
               'description': analysisDesc,
               'scheduled': null,
+              'statusMessage': 'Entity has retrieved successfully',
               'id': id,
-              'dataSecurityKey': '',
-              'module': 'ANALYZE',
-              'metric': 'sample-spark',
+              'createdBy': 'sipadmin@synchronoss.com',
               'customerCode': customerCode,
-              'disabled': 'false',
-              'checked': 'false',
+              'projectCode': 'workbench',
+              'saved': false,
+              'username': 'sipadmin@synchronoss.com',
+              'module': 'ANALYZE',
               'artifacts': [
                 {
                   'artifactName': 'SALES',
                   'columns': [
                     {
-                      'name': 'string',
-                      'type': 'string',
+                      'aliasName': '',
                       'columnName': 'string',
                       'displayName': 'String',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': true,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': true,
+                      'name': 'string',
+                      'table': 'sales',
+                      'type': 'string',
                       'visibleIndex': 0
                     },
                     {
-                      'name': 'long',
-                      'type': 'long',
+                      'aliasName': '',
                       'columnName': 'long',
                       'displayName': 'Long',
-                      'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': false,
+                      'name': 'long',
+                      'table': 'sample',
+                      'type': 'long',
                       'visibleIndex': 1
                     },
                     {
-                      'name': 'float',
-                      'type': 'float',
+                      'aliasName': '',
                       'columnName': 'float',
                       'displayName': 'Float',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': false,
+                      'name': 'float',
+                      'table': 'sales',
+                      'type': 'float',
                       'format': {
                         'precision': 2
                       },
-                      'visibleIndex': 2
-                    },
-                    {
-                      'name': 'date',
-                      'type': 'date',
-                      'columnName': 'date',
-                      'displayName': 'Date',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
-                      'filterEligible': true,
-                      'checked': true,
-                      'format': 'yyyy-MM-dd',
                       'visibleIndex': 3
                     },
                     {
-                      'name': 'integer',
-                      'type': 'integer',
-                      'columnName': 'integer',
-                      'displayName': 'Integer',
                       'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
+                      'columnName': 'date',
+                      'displayName': 'Date',
                       'filterEligible': true,
-                      'checked': true,
-                      'visibleIndex': 4
+                      'joinEligible': false,
+                      'name': 'date',
+                      'table': 'sales',
+                      'type': 'date',
+                      'format': 'yyyy-MM-dd',
+                      'visibleIndex': 5
                     },
                     {
-                      'name': 'double',
-                      'type': 'double',
+                      'aliasName': '',
+                      'columnName': 'integer',
+                      'displayName': 'Integer',
+                      'filterEligible': true,
+                      'joinEligible': false,
+                      'name': 'integer',
+                      'table': 'sample',
+                      'type': 'integer',
+                      'visibleIndex': 2
+                    },
+                    {
+                      'aliasName': '',
                       'columnName': 'double',
                       'displayName': 'Double',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': true,
+                      'joinEligible': false,
+                      'name': 'double',
+                      'table': 'sales',
+                      'type': 'double',
                       'format': {
                         'precision': 2
                       },
-                      'visibleIndex': 5
+                      'visibleIndex': 4
                     }
                   ],
-                  'artifactPosition': [
-                    8,
-                    20
-                  ]
+                  'artifactPosition': [19, 8]
                 },
                 {
                   'artifactName': 'PRODUCT',
                   'columns': [
                     {
-                      'name': 'string_2',
-                      'type': 'string',
+                      'aliasName': '',
                       'columnName': 'string_2',
                       'displayName': 'String_2',
-                      'aliasName': '',
-                      'table': 'product',
-                      'joinEligible': true,
                       'filterEligible': true,
-                      'checked': false,
-                      'visibleIndex': 5
+                      'joinEligible': true,
+                      'name': 'string_2',
+                      'table': 'product',
+                      'type': 'string'
                     },
                     {
-                      'name': 'long_2',
-                      'type': 'long',
+                      'aliasName': '',
                       'columnName': 'long_2',
                       'displayName': 'Long_2',
-                      'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'visibleIndex': 1
+                      'joinEligible': false,
+                      'name': 'long_2',
+                      'table': 'sample',
+                      'type': 'long'
                     },
                     {
-                      'name': 'float_2',
-                      'type': 'float',
+                      'aliasName': '',
                       'columnName': 'float_2',
                       'displayName': 'Float_2',
-                      'aliasName': '',
-                      'table': 'product',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'format': {
-                        'precision': 2
-                      },
-                      'visibleIndex': 2
+                      'joinEligible': false,
+                      'name': 'float_2',
+                      'table': 'product',
+                      'type': 'float'
                     },
                     {
-                      'name': 'date_2',
-                      'type': 'date',
+                      'aliasName': '',
                       'columnName': 'date_2',
                       'displayName': 'Date_2',
-                      'aliasName': '',
-                      'table': 'product',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'format': 'yyyy-MM-dd',
-                      'visibleIndex': 4
+                      'joinEligible': false,
+                      'name': 'date_2',
+                      'table': 'product',
+                      'type': 'date'
                     },
                     {
-                      'name': 'integer_2',
-                      'type': 'integer',
+                      'aliasName': '',
                       'columnName': 'integer_2',
                       'displayName': 'Integer_2',
-                      'aliasName': '',
-                      'table': 'sample',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'visibleIndex': 6
+                      'joinEligible': false,
+                      'name': 'integer_2',
+                      'table': 'sample',
+                      'type': 'integer'
                     },
                     {
-                      'name': 'double_2',
-                      'type': 'double',
+                      'aliasName': '',
                       'columnName': 'double_2',
                       'displayName': 'Double_2',
-                      'aliasName': '',
-                      'table': 'sales',
-                      'joinEligible': false,
                       'filterEligible': true,
-                      'checked': false,
-                      'format': {
-                        'precision': 2
-                      },
-                      'visibleIndex': 7
+                      'joinEligible': false,
+                      'name': 'double_2',
+                      'table': 'sales',
+                      'type': 'double'
                     }
                   ],
-                  'artifactPosition': [
-                    420,
-                    20
-                  ]
+                  'artifactPosition': [420, 0]
                 }
               ],
-              'repository': {
-                'storageType': 'DL',
-                'objects': [
-                  {
-                    'EnrichedDataObjectId': 'SALES::json::1530537450786',
-                    'displayName': 'Sample Metric',
-                    'EnrichedDataObjectName': 'SALES',
-                    'description': 'Sample Metric',
-                    'lastUpdatedTimestamp': 'undefined'
-                  },
-                  {
-                    'EnrichedDataObjectId': 'PRODUCT::json::1530537460684',
-                    'displayName': 'Product',
-                    'EnrichedDataObjectName': 'PRODUCT',
-                    'description': 'Product',
-                    'lastUpdatedTimestamp': 'undefined'
-                  }
-                ],
-                '_number_of_elements': 2
-              },
+              'repository': [
+                {
+                  'format': 'ndjson',
+                  'name': 'SALES',
+                  'physicalLocation': '/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson'
+                },
+                {
+                  'format': 'ndjson',
+                  'name': 'PRODUCT',
+                  'physicalLocation': '/var/sip/services/saw-analyze-samples/sample-spark/data-product.ndjson'
+                }
+              ],
+              'parentDataSetIds': [
+                'SALES::json::1539937726998',
+                'PRODUCT::json::1539937737836'
+              ],
+              'modifiedTime': currentTimeStamp,
+              'createdTime': currentTimeStamp,
+              'parentDataSetNames': ['SALES', 'PRODUCT'],
               'createdTimestamp': currentTimeStamp,
               'userId': userId,
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': filters ? filters :[],
-                'orderByColumns': [
-
+                'filters': filters ? filters : [],
+                'orderByColumns': [],
+                'dataFields': [
+                  {
+                    'tableName': 'SALES',
+                    'columns': [
+                      {
+                        'aliasName': '',
+                        'columnName': 'string',
+                        'displayName': 'String',
+                        'filterEligible': true,
+                        'joinEligible': true,
+                        'name': 'string',
+                        'table': 'sales',
+                        'type': 'string',
+                        'visibleIndex': 0
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'long',
+                        'displayName': 'Long',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'long',
+                        'table': 'sample',
+                        'type': 'long',
+                        'visibleIndex': 1
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'float',
+                        'displayName': 'Float',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'float',
+                        'table': 'sales',
+                        'type': 'float',
+                        'format': {
+                          'precision': 2
+                        },
+                        'visibleIndex': 3
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'date',
+                        'displayName': 'Date',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'date',
+                        'table': 'sales',
+                        'type': 'date',
+                        'format': 'yyyy-MM-dd',
+                        'visibleIndex': 5
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'integer',
+                        'displayName': 'Integer',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'integer',
+                        'table': 'sample',
+                        'type': 'integer',
+                        'visibleIndex': 2
+                      },
+                      {
+                        'aliasName': '',
+                        'columnName': 'double',
+                        'displayName': 'Double',
+                        'filterEligible': true,
+                        'joinEligible': false,
+                        'name': 'double',
+                        'table': 'sales',
+                        'type': 'double',
+                        'format': {
+                          'precision': 2
+                        },
+                        'visibleIndex': 4
+                      }
+                    ]
+                  }
                 ],
-                'joins': [
-
-                ]
+                'joins': []
               },
               'edit': false,
-              'executionType': 'regularExecution',
               'categoryId': subCategoryId,
-              'saved': true,
               'query': 'SELECT SALES.string, SALES.long, SALES.float, SALES.date, SALES.integer, SALES.double FROM SALES',
-              'outputFile': {
-                'outputFormat': 'json',
-                'outputFileName': 'test.json'
-              }
+              'executionType': 'publish'
             }
           ]
         }
