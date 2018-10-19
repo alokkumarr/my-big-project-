@@ -1,6 +1,7 @@
 @import "src/themes/base/colors";
 
 :host {
+  display: block;
   max-width: 500px;
   width: 700px;
 }
