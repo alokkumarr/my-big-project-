@@ -1,12 +1,10 @@
-@import 'themes/base/colors';
+@import 'src/themes/base/colors';
 
-createsource-dialog {
-  mat-card {
-    height: calc(100% - 48px);
+::ng-deep .createsource-dialog {
+  height: calc(100% - 48px);
 
-    .mat-card-content {
-      height: calc(100% - 36px);
-    }
+  .mat-card-content {
+    height: calc(100% - 36px);
   }
 
   .mat-stepper-horizontal {

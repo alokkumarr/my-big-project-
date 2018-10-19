@@ -10,13 +10,11 @@ import { CreateSourceDialogComponent } from './createSource-dialog/createSource-
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 
 import { SAMPLE_SOURCE_DATA } from '../../sample-data';
-const template = require('./datasource-page.component.html');
-require('./datasource-page.component.scss');
 
 @Component({
   selector: 'datasource-page',
-  template,
-  styles: []
+  templateUrl: './datasource-page.component.html',
+  styleUrls: ['./datasource-page.component.scss']
 })
 export class DatasourceComponent implements OnInit, OnDestroy {
   private sourceData: any = SAMPLE_SOURCE_DATA;

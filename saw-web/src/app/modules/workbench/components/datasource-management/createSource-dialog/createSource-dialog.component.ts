@@ -5,13 +5,11 @@ import { MatSnackBar } from '@angular/material';
 
 import { sourceTypes } from '../../../wb-comp-configs';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
-const template = require('./createSource-dialog.component.html');
-require('./createSource-dialog.component.scss');
 
 @Component({
   selector: 'createsource-dialog',
-  template,
-  styles: []
+  templateUrl: './createSource-dialog.component.html',
+  styleUrls: ['./createSource-dialog.component.scss']
 })
 export class CreateSourceDialogComponent {
   selectedSource: string = '';
@@ -51,10 +49,13 @@ export class CreateSourceDialogComponent {
 
   testConnection() {
     this.dialogRef.updatePosition({ top: '30px' });
-    const snackBarRef = this.snackBar.openFromComponent(TestConnectivityComponent, {
-      horizontalPosition: 'center',
-      panelClass: ['mat-elevation-z9', 'testConnectivityClass']
-    });
+    const snackBarRef = this.snackBar.openFromComponent(
+      TestConnectivityComponent,
+      {
+        horizontalPosition: 'center',
+        panelClass: ['mat-elevation-z9', 'testConnectivityClass']
+      }
+    );
 
     snackBarRef.afterDismissed().subscribe(() => {
       this.dialogRef.updatePosition({ top: '' });

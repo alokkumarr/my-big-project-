@@ -1,13 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBarRef } from '@angular/material';
 
-const template = require('./test-connectivity.component.html');
-require('./test-connectivity.component.scss');
-
 @Component({
   selector: 'test-connectivity',
-  template,
-  styles: []
+  templateUrl: './test-connectivity.component.html',
+  styleUrls: ['./test-connectivity.component.scss']
 })
 export class TestConnectivityComponent implements OnInit {
   private text = [

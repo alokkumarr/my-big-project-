@@ -1,17 +1,14 @@
-@import 'themes/base/colors';
+@import 'src/themes/base/colors';
 
-test-connectivity {
-  .container {
-    display: block !important;
-  }
-
+.test-connectivity {
+  display: block !important;
   color: greenyellow;
 
   .console-header {
     height: 30px;
-    background-color: #3B3B3B;
+    background-color: #3b3b3b;
     padding: 0 3px 0 12px;
-    color: #D7D7D7;
+    color: #d7d7d7;
     border-radius: 7px 7px 0 0;
   }
 
