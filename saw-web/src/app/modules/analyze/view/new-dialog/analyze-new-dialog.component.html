@@ -1,0 +1,41 @@
+<h2 mat-dialog-title i18n>New Analysis</h2>
+<mat-divider></mat-divider>
+<mat-dialog-content>
+  <div class="section">
+    <label i18n>What would you like to analyze?</label>
+    <mat-radio-group (change)="onMetricSelected($event.value)" fxLayout="row wrap" class="container">
+      <mat-radio-button *ngFor="let metric of data.metrics; trackBy: trackByIndex"
+                        [attr.e2e]="'metric-name-' + metric.metricName"
+                        [value]="metric"
+                        fxFlex="33"
+      >
+        {{metric.metricName}}
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+  <div class="section">
+    <label i18n>How would you like to analyze?</label>
+    <div class="container">
+      <div *ngFor="let category of methodCategories; trackBy: trackByIndex">
+        <div class="md-body-1" flex>{{category.label}}</div>
+        <choice-group-u (change)="onMethodSelected($event)"
+                        [items]="category.children"
+                        [value]="selectedMethod"
+        ></choice-group-u>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-divider></mat-divider>
+<div fxLayout="row" fxLayoutAlign="space-between center" class="dialog-actions">
+  <button (click)="createAnalysis()"
+          [disabled]="createButtonDisabled()"
+          e2e="create-analysis-btn"
+          color="primary"
+          mat-raised-button i18n
+  >Create Analysis</button>
+  <button (click)="_dialogRef.close()"
+          mat-button
+          mat-dialog-close i18n
+  >Cancel</button>
+</div>
