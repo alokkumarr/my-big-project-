@@ -596,6 +596,10 @@ test_that("compare output of both data R and Spark Dataframes", {
     as.character(R_df_collapser_min_end$dates_sec_CONV_COLAPSER),
     as.character(Convert_R_dtTime$end_min)
   )
+   expect_equal(
+    as.character(R_df_collapser_min_end$dates_sec_CONV1_COLAPSER),
+    as.character(Convert_R_dtTime$end_min+duration(30, "days"))
+  )
   # expect_equal(
   # spk_df_collapser_min_end %>%
   # collect() %>%

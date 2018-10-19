@@ -14,7 +14,7 @@ context("regressor unit tests")
 # Basic Tests -------------------------------------------------------------
 
 
-# Create Spark Connection
+# # Create Spark Connection
 # spark_home_dir <- sparklyr::spark_installed_versions() %>%
 #   as.data.frame() %>%
 #   dplyr::filter(spark == "2.3.0") %>%
@@ -62,4 +62,15 @@ test_that("Regressor Selects Best Model", {
   expect_error(predict(r1, data = select(df, wt)))
 })
 
+
+test_that("Refit Option works as Expected", {
+  
+  r2 <- refit(r1, df2, append = TRUE)
+  
+  expect_gte(sdf_nrow(r2$data), sdf_nrow(r1$data))
+  expect_equivalent(r1$final_model$fit$stages[[2]]$param_map,
+                    r2$final_model$fit$stages[[2]]$param_map)
+  expect_equivalent(r1$final_model$uid, r2$final_model$uid)
+})
+ 
 
