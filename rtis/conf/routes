@@ -6,7 +6,7 @@ GET     /i               controllers.Application.i
 POST    /i               controllers.Application.iPost
 
 ## Renamed /i as per standards 
-GET     /countlyevent               controllers.Application.i
+GET     /countlyevents             controllers.Application.i
 POST    /crashreport               controllers.Application.iPost
 
 
@@ -14,7 +14,7 @@ POST    /crashreport               controllers.Application.iPost
 POST    /publishevent    controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String])
 
 # Renamed generic event handler as per standards
-POST    /event			 controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String])
+POST    /events			 controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String])
 
 # Swagger - Root Resources Listing
 GET     /api-docs        controllers.ApiHelpController.getResources

@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
-// @DATE:Fri Oct 12 15:19:21 EDT 2018
+// @DATE:Fri Oct 19 16:37:52 EDT 2018
 
 package router
 
@@ -62,10 +62,10 @@ class Routes(
     ("""GET""", this.prefix, """controllers.Application.index"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """i""", """controllers.Application.i"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """i""", """controllers.Application.iPost"""),
-    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """countlyevent""", """controllers.Application.i"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """countlyevents""", """controllers.Application.i"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """crashreport""", """controllers.Application.iPost"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """publishevent""", """controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String])"""),
-    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """event""", """controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String])"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """events""", """controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String])"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """api-docs""", """controllers.ApiHelpController.getResources"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """docs""", """controllers.ApiHelpController.viewSwaggerUI"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """docs/""" + "$" + """file<.+>""", """controllers.Assets.at(path:String = "/public/swagger-ui", file:String)"""),
@@ -136,7 +136,7 @@ class Routes(
 
   // @LINE:9
   private[this] lazy val controllers_Application_i3_route = Route("GET",
-    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("countlyevent")))
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("countlyevents")))
   )
   private[this] lazy val controllers_Application_i3_invoker = createInvoker(
     Application_5.i,
@@ -147,7 +147,7 @@ class Routes(
       Nil,
       "GET",
       """# Renamed /i as per standards """,
-      this.prefix + """countlyevent"""
+      this.prefix + """countlyevents"""
     )
   )
 
@@ -187,7 +187,7 @@ class Routes(
 
   // @LINE:17
   private[this] lazy val controllers_GenericHandler_event6_route = Route("POST",
-    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("event")))
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("events")))
   )
   private[this] lazy val controllers_GenericHandler_event6_invoker = createInvoker(
     GenericHandler_1.event(fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[Option[String]]),
@@ -198,7 +198,7 @@ class Routes(
       Seq(classOf[String], classOf[String], classOf[String], classOf[String], classOf[String], classOf[Option[String]]),
       "POST",
       """ Renamed generic event handler as per standards""",
-      this.prefix + """event"""
+      this.prefix + """events"""
     )
   )
 

@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
-// @DATE:Fri Oct 12 15:19:21 EDT 2018
+// @DATE:Fri Oct 19 16:37:52 EDT 2018
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }

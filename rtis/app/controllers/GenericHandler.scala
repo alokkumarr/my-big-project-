@@ -36,7 +36,7 @@ class GenericHandler extends Controller {
     notes = "The interface is designed to accept events in JSON format and" +
             "forwards it to the Synchronoss Insights Platform",
     httpMethod = "POST",
-    tags = Array("event")
+    tags = Array("events")
   )
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "RTI internal exceptions"),
