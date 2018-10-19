@@ -10,6 +10,7 @@ filter-chips-u {
   padding: 10px 0 10px 10px;
 }
 
+
 .back-button-icon.mat-icon {
   font-size: $back-button-size;
   line-height: $back-button-size;
@@ -82,14 +83,4 @@ filter-chips-u {
   text-align: left !important;
 }
 
-.toggle-icons {
-  text-align: right;
-  height: 25px;
-  margin-right: 5%;
-  font-size: 15px;
-}
-
-.mat-icon.active {
-  color: $primary-blue-b2;
-}
 
