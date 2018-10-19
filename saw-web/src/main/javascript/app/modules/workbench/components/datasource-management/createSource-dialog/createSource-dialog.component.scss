@@ -27,7 +27,10 @@ createsource-dialog {
   }
 
   .source-container {
-    height: 80%;
+    height: 85%;
+    overflow: auto;
+    background-color: $background-color;
+    padding-top: 15px;
   }
 
   .source-list {

@@ -24,7 +24,7 @@ export const RAW_SAMPLE = {
 export const parser_preview = {
   lineSeparator: '\n',
   delimiter: ',',
-  quoteChar: '\'',
+  quoteChar: '"',
   quoteEscapeChar: '\\',
   headerSize: 1,
   fieldNamesLine: 1,
@@ -190,12 +190,8 @@ export const SAMPLE_SOURCE_DATA = [
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
         sourceLocation: '/data/Messaging',
         filePattern: '*.csv',
-        unCompressionReq: true,
         destinationLocation: '/var/sip/incoming',
-        recursiveExtraction: false,
-        archivalReq: true,
-        createDestinationFolder: true,
-        validators: 'zero size, Duplicate'
+        recursiveExtraction: false
       },
       {
         id: 5,
@@ -206,12 +202,8 @@ export const SAMPLE_SOURCE_DATA = [
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
         sourceLocation: '/data/Messaging',
         filePattern: '*.csv',
-        unCompressionReq: true,
         destinationLocation: '/var/sip/incoming',
-        recursiveExtraction: true,
-        archivalReq: true,
-        createDestinationFolder: true,
-        validators: 'zero size, Duplicate'
+        recursiveExtraction: true
       },
       {
         id: 5,
@@ -222,12 +214,8 @@ export const SAMPLE_SOURCE_DATA = [
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
         sourceLocation: '/data/Messaging',
         filePattern: '*.csv',
-        unCompressionReq: true,
         destinationLocation: '/var/sip/incoming',
-        recursiveExtraction: false,
-        archivalReq: true,
-        createDestinationFolder: true,
-        validators: 'zero size, Duplicate'
+        recursiveExtraction: false
       }
     ]
   },
@@ -254,12 +242,8 @@ export const SAMPLE_SOURCE_DATA = [
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
         sourceLocation: '/data/ratings',
         filePattern: '*.csv',
-        unCompressionReq: true,
         destinationLocation: '/var/sip/incoming',
-        recursiveExtraction: true,
-        archivalReq: true,
-        createDestinationFolder: true,
-        validators: 'zero size, Duplicate'
+        recursiveExtraction: true
       },
       {
         id: 5,
@@ -270,12 +254,8 @@ export const SAMPLE_SOURCE_DATA = [
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
         sourceLocation: '/data/ratings',
         filePattern: '*.csv',
-        unCompressionReq: true,
         destinationLocation: '/var/sip/incoming',
-        recursiveExtraction: false,
-        archivalReq: true,
-        createDestinationFolder: true,
-        validators: 'zero size, Duplicate'
+        recursiveExtraction: false
       },
       {
         id: 5,
@@ -286,12 +266,8 @@ export const SAMPLE_SOURCE_DATA = [
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
         sourceLocation: '/data/ratings',
         filePattern: '*.csv',
-        unCompressionReq: true,
         destinationLocation: '/var/sip/incoming',
-        recursiveExtraction: false,
-        archivalReq: true,
-        createDestinationFolder: true,
-        validators: 'zero size, Duplicate'
+        recursiveExtraction: false
       },
       {
         id: 5,
@@ -302,12 +278,8 @@ export const SAMPLE_SOURCE_DATA = [
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
         sourceLocation: '/data/ratings',
         filePattern: '*.csv',
-        unCompressionReq: true,
         destinationLocation: '/var/sip/incoming',
-        recursiveExtraction: false,
-        archivalReq: true,
-        createDestinationFolder: true,
-        validators: 'zero size, Duplicate'
+        recursiveExtraction: false
       }
     ]
   }

@@ -1,4 +1,4 @@
-<div class="dataSets-view" fxLayout="column" fxFlex fxFill>
+<div class="datasource-view" fxLayout="column" fxFlex fxFill>
   <mat-toolbar class="toolbar-white">
     <mat-toolbar-row>
       <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
@@ -15,7 +15,7 @@
   <div class="body-container" fxLayout="column">
     <div fxFlex="1 1 100px" fxLayout="row" fxLayoutAlign="space-around start">
       <div [attr.aria-label]="source.name" class="mat-elevation-z3 source-row" fxLayoutAlign="center center"
-        [class.selected]="selectedSource === source.uid" *ngFor="let source of sources" (click)="sourceSelected(source.uid)"
+        [class.selected]="selectedSourceType === source.uid" *ngFor="let source of sources" (click)="sourceSelectedType(source.uid)"
         matBadge="8" matBadgePosition="after" matBadgeColor="accent" [matTooltip]="source.name">
         <img [src]="source.imgsrc" [attr.alt]="source.name" />
       </div>
@@ -23,7 +23,7 @@
 
     <div fxFlex fxLayout="row" fxLayoutGap="5px">
       <dx-data-grid fxFlex="25" class="mat-elevation-z3 sources-grid" [dataSource]="sourceData" [showBorders]="false"
-        [columnAutoWidth]="flase" [showColumnLines]="false" [showRowLines]="true" (onToolbarPreparing)="onToolbarPreparing($event)"
+        [columnAutoWidth]="flase" [showColumnLines]="false" [showRowLines]="true" (onToolbarPreparing)="onToolbarPreparing($event)" (onContentReady)="defaultSelectHandler($event)"
         keyExpr="id" [rowAlternationEnabled]="flase" (onSelectionChanged)="onSourceSelectionChanged($event)">
         <dxo-selection mode="single"></dxo-selection>
         <dxo-filter-row [visible]="false" [applyFilter]="auto"></dxo-filter-row>
@@ -32,7 +32,7 @@
         <dxi-column caption="Source Name" dataField="sourceName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
         <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
         <div *dxTemplate="let data of 'sourceTypeTemplate'">
-          <div class="master-detail-caption">{{selectedSource | uppercase}}</div>
+          <div class="master-detail-caption">{{selectedSourceType | uppercase}}</div>
         </div>
         <div *dxTemplate="let data of 'nameTemplate'">
           <div class="s-name">{{data.value}}</div>
@@ -42,8 +42,7 @@
       <mat-card fxFlex class="routes-card" fxLayout="column">
         <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="9px" fxLayoutAlign="space-around center">
           <div class="mat-body-1">
-            <span class="item-name">Source Name: &nbsp;</span>
-            <span class="item-value">{{selectedSourceData?.sourceName | uppercase}}</span>
+            <span class="details-title mat-subheading-2">{{selectedSourceData?.sourceName | uppercase}}</span>
           </div>
           <span fxFlex></span>
           <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="testConnection()" matTooltip="Test Connectivity">
@@ -62,65 +61,57 @@
         <div style="padding-top: 5px;">
           <mat-divider></mat-divider>
         </div>
-        <div>
-          <div class="mat-body-2">
-            <span class="item-name">Host Name: &nbsp;</span>
-            <span class="item-value">{{selectedSourceData?.hostName}}</span>
+        <div class="routes-card-body">
+          <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+              <span class="prop-name">Host Name : </span>
+              <span>{{selectedSourceData?.hostName}}</span>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+              <span class="prop-name">Port No : </span>
+              <span>{{selectedSourceData?.portNo}}</span>
+            </div>
           </div>
+          <mat-divider></mat-divider>
+          <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+              <span class="prop-name">Access Type : </span>
+              <span>{{selectedSourceData?.accessType}}</span>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+              <span class="prop-name">Created By : </span>
+              <span>{{selectedSourceData?.createdBy}}</span>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+              <span class="prop-name">User Name : </span>
+              <span>{{selectedSourceData?.userName}}</span>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+              <span class="prop-name">Password : </span>
+              <span>{{selectedSourceData?.password}}</span>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <dx-data-grid class="routes-grid" [dataSource]="selectedSourceData?.routes" [showBorders]="false"
+            [columnAutoWidth]="flase" [showColumnLines]="false" (onToolbarPreparing)="onRoutesToolbarPreparing($event)"
+            [rowAlternationEnabled]="true">
+            <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+            <dxo-search-panel [visible]="true" [width]="240" placeholder="Search..."></dxo-search-panel>
+            <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+
+            <div *dxTemplate="let data of 'nameTemplate'">
+              <div class="details-title mat-subheading-2">Availalble Routes</div>
+            </div>
+
+          </dx-data-grid>
         </div>
       </mat-card>
     </div>
-
-
-
-
-
-    <!-- <dx-data-grid #dsGrid fxFlex [dataSource]="gridData" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
-      [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="false" [masterDetail]="{ enabled: true, template: 'routes' }">
-      <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
-      <dxo-search-panel [visible]="false" [width]="240" placeholder="Search..."></dxo-search-panel>
-      <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
-
-      <dxi-column caption="Source Type" dataField="sourceType"></dxi-column>
-      <dxi-column caption="Source Name" dataField="sourceName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
-      <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
-      <dxi-column caption="Created By" dataField="createdBy" alignment="left"></dxi-column>
-      <dxi-column caption="Created TS" dataField="createdTS" alignment="left" dataType="date" cellTemplate="dateTemplate"></dxi-column>
-      <dxi-column caption="Actions" dataField="id" alignment="center" cellTemplate="actionsTemplate" [allowFiltering]="false"
-        [allowSorting]="false"></dxi-column>
-      <div *dxTemplate="let data of 'nameTemplate'">
-        <a [innerHTML]="data.value"></a>
-      </div>
-      <div *dxTemplate="let data of 'dateTemplate'">
-        <span [innerHTML]="data.value * 1000 | date: 'short'"></span>
-      </div>
-      <div *dxTemplate="let data of 'actionsTemplate'">
-        <button mat-icon-button color="primary" (click)="testConnection()">
-          <mat-icon fontIcon="icon-query-mode"></mat-icon>
-        </button>
-        <button mat-icon-button color="primary" (click)="testConnection()">
-          <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="testConnection()">
-          <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
-        </button>
-      </div>
-
-      <div *dxTemplate="let route of 'routes'">
-        <dx-data-grid class="mat-elevation-z1 routes-grid" [dataSource]="route.data.routes" [showBorders]="false"
-          [columnAutoWidth]="flase" [showColumnLines]="false" (onToolbarPreparing)="onToolbarPreparing($event)"
-          [rowAlternationEnabled]="true">
-          <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
-          <dxo-search-panel [visible]="false" [width]="240" placeholder="Search..."></dxo-search-panel>
-          <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
-
-          <div *dxTemplate="let data of 'sourceNameTemplate'">
-            <div class="master-detail-caption">{{route.data.sourceName}}</div>
-          </div>
-
-        </dx-data-grid>
-      </div>
-
-    </dx-data-grid> -->
   </div>
 </div>

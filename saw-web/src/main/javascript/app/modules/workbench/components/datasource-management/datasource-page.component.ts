@@ -21,7 +21,7 @@ require('./datasource-page.component.scss');
 export class DatasourceComponent implements OnInit, OnDestroy {
   private sourceData: any = SAMPLE_SOURCE_DATA;
   sources = sourceTypes;
-  selectedSource: string = 'sftp';
+  selectedSourceType: string = 'sftp';
   selectedSourceData: any;
 
   constructor(
@@ -35,8 +35,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {}
 
-  sourceSelected(source) {
-    this.selectedSource = source;
+  sourceSelectedType(source) {
+    this.selectedSourceType = source;
   }
 
   createSource() {
@@ -45,12 +45,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       autoFocus: false,
       closeOnNavigation: true,
       disableClose: true,
-      height: '50%',
+      height: '60%',
       width: '70%',
       minWidth: '600px',
-      minHeight: '500px',
+      minHeight: '600px',
       maxWidth: '900px',
-      maxHeight: '700px',
       panelClass: 'sourceDialogClass'
     });
 
@@ -68,10 +67,22 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     this.selectedSourceData = event.selectedRowsData[0];
   }
 
+  defaultSelectHandler(e) {
+    // Selects the first visible row
+    e.component.selectRowsByIndexes([0]);
+  }
+
   onToolbarPreparing(e) {
     e.toolbarOptions.items.unshift({
       location: 'before',
       template: 'sourceTypeTemplate'
+    });
+  }
+
+  onRoutesToolbarPreparing(e) {
+    e.toolbarOptions.items.unshift({
+      location: 'before',
+      template: 'nameTemplate'
     });
   }
 }

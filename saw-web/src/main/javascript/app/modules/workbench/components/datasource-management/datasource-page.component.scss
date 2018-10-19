@@ -79,13 +79,38 @@ datasource-page {
     padding: 3px;
     border-radius: 5px;
 
+    .routes-card-body {
+      .mat-divider {
+        border-color: rgba(0, 0, 0, 0.05) !important;
+      }
+    }
+
     .mat-mini-fab {
       height: 36px !important;
       width: 36px !important;
     }
 
-    .item-name {
+    .details-title {
+      text-align: left;
       color: $primary-grey-g3;
+      padding-left: 10px;
+      margin: 0;
+    }
+
+    .details-content {
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 3;
+      padding: 0 9px;
+    }
+
+    .prop-name {
+      color: #727272;
+      width: 136px;
+    }
+
+    .routes-grid {
+      padding-top: 3px;
     }
   }
 
