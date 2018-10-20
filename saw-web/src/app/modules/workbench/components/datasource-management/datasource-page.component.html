@@ -23,10 +23,10 @@
 
     <div fxFlex fxLayout="row" fxLayoutGap="5px">
       <dx-data-grid fxFlex="25" class="mat-elevation-z3 sources-grid" [dataSource]="sourceData" [showBorders]="false"
-        [columnAutoWidth]="flase" [showColumnLines]="false" [showRowLines]="true" (onToolbarPreparing)="onToolbarPreparing($event)" (onContentReady)="defaultSelectHandler($event)"
-        keyExpr="id" [rowAlternationEnabled]="flase" (onSelectionChanged)="onSourceSelectionChanged($event)">
+        [columnAutoWidth]="false" [showColumnLines]="false" [showRowLines]="true" (onToolbarPreparing)="onToolbarPreparing($event)" (onContentReady)="defaultSelectHandler($event)"
+        keyExpr="id" [rowAlternationEnabled]="false" (onSelectionChanged)="onSourceSelectionChanged($event)">
         <dxo-selection mode="single"></dxo-selection>
-        <dxo-filter-row [visible]="false" [applyFilter]="auto"></dxo-filter-row>
+        <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
         <dxo-search-panel [visible]="true" [width]="220" placeholder="Search..."></dxo-search-panel>
         <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
         <dxi-column caption="Source Name" dataField="sourceName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
@@ -99,9 +99,9 @@
           </div>
           <mat-divider></mat-divider>
           <dx-data-grid class="routes-grid" [dataSource]="selectedSourceData?.routes" [showBorders]="false"
-            [columnAutoWidth]="flase" [showColumnLines]="false" (onToolbarPreparing)="onRoutesToolbarPreparing($event)"
+            [columnAutoWidth]="false" [showColumnLines]="false" (onToolbarPreparing)="onRoutesToolbarPreparing($event)"
             [rowAlternationEnabled]="true">
-            <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+            <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
             <dxo-search-panel [visible]="true" [width]="240" placeholder="Search..."></dxo-search-panel>
             <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
 

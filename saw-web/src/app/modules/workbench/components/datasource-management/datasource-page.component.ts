@@ -17,7 +17,7 @@ import { SAMPLE_SOURCE_DATA } from '../../sample-data';
   styleUrls: ['./datasource-page.component.scss']
 })
 export class DatasourceComponent implements OnInit, OnDestroy {
-  private sourceData: any = SAMPLE_SOURCE_DATA;
+  sourceData: any = SAMPLE_SOURCE_DATA;
   sources = sourceTypes;
   selectedSourceType: string = 'sftp';
   selectedSourceData: any;
@@ -83,4 +83,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       template: 'nameTemplate'
     });
   }
+
+  editSource() {}
+
+  createRoute() {}
 }
