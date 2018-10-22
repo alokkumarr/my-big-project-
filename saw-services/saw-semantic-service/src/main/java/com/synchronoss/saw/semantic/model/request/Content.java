@@ -22,7 +22,7 @@ public class Content {
   }
 
   @JsonProperty("ANALYZE")
-  public void setContents(List<Object> analyze) {
+  public void setAnalyze(List<Object> analyze) {
     this.analyze = analyze;
   }
 

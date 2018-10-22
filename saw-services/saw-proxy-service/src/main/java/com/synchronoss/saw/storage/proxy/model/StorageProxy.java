@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModelProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -36,6 +37,8 @@ public class StorageProxy {
      */
     @JsonProperty("storage")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "it holds the storage type i.e. ES & METADATA", required = true, 
+    allowEmptyValue= false, example = "ES", allowableValues="ES,METADATA")
     private StorageProxy.Storage storage = StorageProxy.Storage.fromValue("ES");
     /**
      * The Storage Schema
@@ -46,6 +49,8 @@ public class StorageProxy {
      */
     @JsonProperty("action")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "it holds the action type i.e. ES & METADATA", required = true, 
+    allowEmptyValue= false, example = "search", allowableValues="search,validate,aggregate,count")
     private StorageProxy.Action action = StorageProxy.Action.fromValue("search");
     /**
      * It holds the query
@@ -54,10 +59,14 @@ public class StorageProxy {
      * 
      */
     @JsonProperty("_id")
+    @ApiModelProperty(hidden = true)
     private String _id;
 
     @JsonProperty("query")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "it holds the query send to the server to execute", required = true, 
+    allowEmptyValue= false)
+
     private String query;
     /**
      * It holds the query
@@ -73,22 +82,18 @@ public class StorageProxy {
      */
     @JsonProperty("name")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "it holds the name of the query or dataset", required = true, 
+    allowEmptyValue= false)
     private String name;
     
     @JsonProperty("content")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private String content;
 
-    /**
-     * It holds the query
-     * <p>
-     * An explanation about the purpose of this instance.
-     * 
-     */
-
-    
     @JsonProperty("entityId")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private String entityId;
     /**
      * It holds the query
@@ -98,6 +103,7 @@ public class StorageProxy {
      */
     @JsonProperty("pageNum")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "This attributes are used associated when consumer needs to paginate the dataset")
     private float pageNum;
     /**
      * It holds the size
@@ -108,6 +114,7 @@ public class StorageProxy {
 
     @JsonProperty("size")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "This attributes are used associated when consumer needs to paginate the dataset")
     private String size;
     /**
      * It holds the indexRelativePath
@@ -118,6 +125,7 @@ public class StorageProxy {
 
     @JsonProperty("indexRelativePath")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private String indexRelativePath;
 
     /**
@@ -129,6 +137,7 @@ public class StorageProxy {
 
     @JsonProperty("count")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "This attributes gives the count of the rows")
     private String count;
     /**
      * It holds the query
@@ -140,6 +149,7 @@ public class StorageProxy {
     
     @JsonProperty("pageSize")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "This attributes are used associated when consumer needs to paginate the dataset")
     private int pageSize;
     /**
      * It holds the statusMessage
@@ -149,6 +159,7 @@ public class StorageProxy {
      */
     @JsonProperty("statusMessage")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "This attributes are used to send status message")
     private String statusMessage;
     /**
      * It holds the user requested by
@@ -159,6 +170,8 @@ public class StorageProxy {
      */
     @JsonProperty("requestBy")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "API requester name", required = true, 
+    allowEmptyValue= false)
     private String requestBy = "admin@synchronoss.com";
     /**
      * It holds the objectType
@@ -168,6 +181,7 @@ public class StorageProxy {
      */
     @JsonProperty("objectType")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "If requestor using storage type of ES, it needs to be used along with it")
     private String objectType;
     /**
      * It holds the indexName
@@ -177,6 +191,7 @@ public class StorageProxy {
      */
     @JsonProperty("indexName")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "If requestor using storage type of ES, it needs to be used along with it")
     private String indexName;
     /**
      * It holds the tableName
@@ -186,6 +201,7 @@ public class StorageProxy {
      */
     @JsonProperty("tableName")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private String tableName;
     /**
      * It holds the objectName
@@ -195,6 +211,7 @@ public class StorageProxy {
      */
     @JsonProperty("objectName")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private String objectName;
     /**
      * It holds the user requested time
@@ -205,6 +222,7 @@ public class StorageProxy {
      */
     @JsonProperty("requestedTime")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private String requestedTime;
     /**
      * It holds the user requested time
@@ -214,6 +232,7 @@ public class StorageProxy {
      */
     @JsonProperty("responseTime")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private String responseTime;
     /**
      * The Productcode Schema
@@ -224,6 +243,8 @@ public class StorageProxy {
      */
     @JsonProperty("productCode")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "product code i.e which product is trying to access", allowEmptyValue=false,
+    required = true)
     private String productCode;
     /**
      * The Modulename Schema
@@ -234,6 +255,8 @@ public class StorageProxy {
      */
     @JsonProperty("moduleName")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "module code i.e which module in a product is trying to access", allowEmptyValue=false,
+    required = true)
     private String moduleName;
     /**
      * The Modulename Schema
@@ -244,9 +267,11 @@ public class StorageProxy {
      */
     @JsonProperty("aggregationData")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(hidden = true)
     private Object aggregationData;
 
     @JsonProperty("dataSecurityKey")
+    @ApiModelProperty(hidden = true)
     private List<Object> dataSecurityKey = null;
     /**
      * The Resultformat Schema
@@ -257,10 +282,15 @@ public class StorageProxy {
      */
     @JsonProperty("resultFormat")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    @ApiModelProperty(notes = "resultFormat which format requestor needs the data", allowEmptyValue=false,
+    required = true, allowableValues = "json,tabular",example = "json")
     private StorageProxy.ResultFormat resultFormat = StorageProxy.ResultFormat.fromValue("json");
+    
     @JsonProperty("data")
     private List<Object> data = null;
+   
     @JsonProperty("sqlBuilder")
+    @ApiModelProperty(hidden = true)
     private SqlBuilder sqlBuilder;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();

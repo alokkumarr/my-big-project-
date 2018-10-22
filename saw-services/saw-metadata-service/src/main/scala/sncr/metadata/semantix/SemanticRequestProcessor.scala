@@ -121,7 +121,7 @@ class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = tr
     */
   private def actionHandler(action: String, semantic_definition : JValue, module_name: String ) : JValue =
   {
-    m_log debug s"Execute: $action select content: $select"
+    m_log trace s"Execute: $action select content: $select"
     val sNode = new SemanticNode(semantic_definition, select)
     val response = action match {
       case "create" => build(sNode.create)

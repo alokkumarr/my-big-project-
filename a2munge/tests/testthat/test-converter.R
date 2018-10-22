@@ -222,6 +222,8 @@ test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(spk_typ, "TimestampType")
 })
 
+# Test 6:Different Date formats dd/MM/yyyy-------------------------------------------
+
 date_format1 <- dat
 
 date_format1$date <- format(as.Date(date_format1$date), "%d/%m/%Y")
@@ -234,7 +236,7 @@ Date1_R_format_dtTime_formatter <-
     date_format1,
     measure_vars = "date",
     input_format = "dd/MM/yyyy",
-    output_format="dd-MM-yyyy HH:mm:ss",
+    output_format = "dd-MM-yyyy HH:mm:ss",
     output_suffix = "FORM"
   )
 
@@ -244,7 +246,7 @@ Date1_spk_format_dttime_formatter <-
     dat_tbl_format,
     measure_vars = "date",
     input_format = "dd/MM/yyyy",
-    output_format="dd-MM-yyyy HH:mm:ss",
+    output_format = "dd-MM-yyyy HH:mm:ss",
     output_suffix = "FORM"
   )
 
@@ -308,7 +310,7 @@ Date1_R_format_dtTime_formatter <-
     date_format2,
     measure_vars = "date",
     input_format = "MM/dd/yyyy",
-    output_format="MM/dd/yyyy HH:mm:ss",
+    output_format = "MM/dd/yyyy HH:mm:ss",
     output_suffix = "FORM"
   )
 
@@ -317,7 +319,7 @@ Date1_spk_format_dttime_formatter <-
     dat_tbl_format_2,
     measure_vars = "date",
     input_format = "MM/dd/yyyy",
-    output_format="MM/dd/yyyy HH:mm:ss",
+    output_format = "MM/dd/yyyy HH:mm:ss",
     output_suffix = "FORM"
   )
 
@@ -379,7 +381,7 @@ Date1_R_format_dtTime_formatter <-
     date_format3,
     measure_vars = "date",
     input_format = "yyyy/MM/dd",
-    output_format="yyyy/MM/dd HH:mm:ss",
+    output_format = "yyyy/MM/dd HH:mm:ss",
     output_suffix = "FORM"
   )
 
@@ -388,7 +390,7 @@ Date1_spk_format_dttime_formatter <-
     dat_tbl_format_3,
     measure_vars = "date",
     input_format = "yyyy/MM/dd",
-    output_format="yyyy/MM/dd HH:mm:ss",
+    output_format = "yyyy/MM/dd HH:mm:ss",
     output_suffix = "FORM"
   )
 
@@ -450,7 +452,7 @@ Date1_R_format_dtTime <-
   converter(
     date_format6,
     measure_vars = "date",
-    input_format = "MM/dd/yyyy HH:mm:ss",
+    input_format = "dd/MM/yyyy HH:mm:ss",
     output_type = "datetime",
     time_zone = "PST",
     output_suffix = "CONV"
@@ -460,7 +462,7 @@ Date1_spk_format_dttime <-
   converter(
     dat_tbl_format_6,
     measure_vars = "date",
-    input_format = "MM/dd/yyyy HH:mm:ss",
+    input_format = "dd/MM/yyyy HH:mm:ss",
     output_type = "datetime",
     time_zone = "PST",
     output_suffix = "CONV"
@@ -472,53 +474,30 @@ test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(colnames(Date1_R_format_dtTime),
                colnames(Date1_spk_format_dttime))
 
-  expect_equal(class(Date1_R_format_dtTime$date_CONV),
-               c("POSIXct", "POSIXt"))
-  expect_equal(spk_typ, "TimestampType")
-})
+  List <- as.list(as.character(is.na(Date1_R_format_dtTime$date_CONV)))
 
+  cunt1 <- length(List)
 
-# Test 9:Negative scenario -give different date format than expected-------------------------------------------
+  for (i in 1:cunt1)
+  {
+    expect_equal(as.character(List[i]), "TRUE")
+  }
 
-date_format6 <- dat
+  Rdf <- collect(Date1_spk_format_dttime)
 
-date_format6$date <-
-  format(as.POSIXct(date_format6$date), "%m/%d/%Y %H:%M:%S")
+  List1 <- as.list(as.character(is.na(Rdf$date_CONV)))
 
-dat_tbl_format_6 <-
-  copy_to(sc, date_format6 %>% mutate(date = as.character(date)), overwrite = TRUE)
+  cunt2 <- length(List1)
 
-Date1_R_format_dtTime <-
-  converter(
-    date_format6,
-    measure_vars = "date",
-    input_format = "MM/dd/yyyy HH:mm:ss",
-    output_type = "datetime",
-    time_zone = "PST",
-    output_suffix = "CONV"
-  )
-
-Date1_spk_format_dttime <-
-  converter(
-    dat_tbl_format_6,
-    measure_vars = "date",
-    input_format = "MM/dd/yyyy HH:mm:ss",
-    output_type = "datetime",
-    time_zone = "PST",
-    output_suffix = "CONV"
-  )
-
-spk_typ <- sdf_schema(Date1_spk_format_dttime)$date_CONV$type
-
-test_that("compare output of both data R and Spark Dataframes", {
-  expect_equal(colnames(Date1_R_format_dtTime),
-               colnames(Date1_spk_format_dttime))
+  for (x in 1:cunt2)
+  {
+    expect_equal(as.character(List[x]), "TRUE")
+  }
 
   expect_equal(class(Date1_R_format_dtTime$date_CONV),
                c("POSIXct", "POSIXt"))
   expect_equal(spk_typ, "TimestampType")
 })
-
 
 # Test 10:Multiple measure variables for conversion-------------------------------------------
 
@@ -526,12 +505,19 @@ date_format7 <- dat
 
 date_format7 <- date_format7 %>%
   mutate(., date_tmp = date) %>%
-  mutate(., date = format(as.POSIXct(date_tmp), "%m/%d/%Y %H:%M:%S"),
-         date1 = format(as.POSIXct(date_tmp) + duration(30, 'days'), "%m/%d/%Y %H:%M:%S")
+  mutate(
+    .,
+    date = format(as.POSIXct(date_tmp), "%m/%d/%Y %H:%M:%S"),
+    date1 = format(
+      as.POSIXct(date_tmp) + duration(30, 'days'),
+      "%m/%d/%Y %H:%M:%S"
+    )
   )
 
 dat_tbl_format_7 <-
-  copy_to(sc, date_format7 %>% mutate(date = as.character(date), date1 = as.character(date1)), overwrite = TRUE)
+  copy_to(sc,
+          date_format7 %>% mutate(date = as.character(date), date1 = as.character(date1)),
+          overwrite = TRUE)
 
 Date1_R_format_dtTime <-
   converter(

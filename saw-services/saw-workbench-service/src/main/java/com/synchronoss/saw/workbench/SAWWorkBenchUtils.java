@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +19,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.workbench.model.DataSet;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
@@ -134,6 +139,22 @@ public class SAWWorkBenchUtils {
     listOfMetadata.add(metaDataStoreStructure);
     return listOfMetadata;
   }
-
   
+  public static Map<String, Object> removeJSONNodeFromTree(Object jsonString,
+      String attributedToBeRemoved) throws JsonProcessingException, IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode node = objectMapper.readTree(objectMapper.writeValueAsString(jsonString));
+    ObjectNode rootNode = (ObjectNode) node;
+    Map<String, Object> results = new HashMap<String, Object>();
+    Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
+    while (fields.hasNext()) {
+      Map.Entry<String, JsonNode> next = fields.next();
+      if (!next.getKey().equals(attributedToBeRemoved)) {
+        results.put(next.getKey(), objectMapper.treeToValue(next.getValue(), String.class));
+      }
+    }
+    return results;
+  }
 }

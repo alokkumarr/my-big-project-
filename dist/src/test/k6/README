@@ -1,0 +1,70 @@
+K6 for SIP PAC testing.
+
+Pre-requisite : To run the load test successfully from local machine, following are the list of tools/softwares that needs to be installed. 
+i.)	K-6 : K-6 provides support for different machine/OS. K-6 can be downloaded from here. Once K-6 is installed you can check whether installation is done correctly by typing ‘k6’ in your command/terminal window. 
+
+ii.)	InfluxDB : K-6 provides the ability to store the result in a database. It the compatibility with InfluxDB to store the result. One can download InfluxDB from here and follow the instructions.
+
+iii.)	Grafana : K-6 provides the functionality to visualize the output for better analysis so that performance of the app can be improved. K-6 uses Grafana to present the output in form of chart. One can download Grafana from here and follow the instructions.
+
+Steps to run the load test : 
+i.)	Open the command prompt/terminal window and navigate to the directory which has contains ‘index.js’ file. Let say it root directory. 
+
+
+ii.)	Type the following command  k6 run index.js. This will initiate the process of running the load tests and result can be seen in command prompt/terminal window once execution is finished.
+
+
+Storing the result to InfluxDB :  To Store the result to InfluxDB, below steps needs to be followed.
+i.)	Open another command prompt/terminal window .Navigate to directory which has influxd file present in downloaded InfluxDB directory.
+
+
+ii.)	Run influxd command to run InfluxDB. You should see InfluxDB is up and running. Default port for InfluxDB is 8086. 
+
+
+Displaying the result using Grafana : Once the InfluxDB is up and running, we need to run Grafana-server to visualize the output. To run Grafana below steps needs to be taken care of.
+
+i.)	Open another command prompt/terminal window .Navigate to directory which has Grafana-server file present in downloaded Grafana directory.
+
+
+ii.)	Run grafana-server command to run Grafana. You should see Grafana is up and running. Default port for Grafana is 8080. 
+
+  Creating first Data Source : Next step is to create the Data Source to store the output of load tests. Steps are as follows.
+i.)	Open web browser. Type ‘localhost:8080’ (8080 is port number on which Grafana is running. It may vary in your case.)
+
+
+ii.)	Login with credentials (If any). The default username is ‘admin’ and password is ‘admin’.
+
+
+iii.)	Navigate to Configuration -> DataSource. Click on ‘+ Add data source’ button
+
+
+iv.)	Give the database name. Select type to InfluxDB. Select the options (If any) and click ‘Save & Test’ button. Now you have active database to store the output od load tests.
+
+Run the command to store the result : Run the following command to store the result to influxDB. 
+
+k6 run --out influxdb=http://localhost:[InfluxDb_port_goes_here]/[database_name_goes_here] index.js
+Change the content between [] with respective values. The above command will store the result to database.
+
+Visualize the Result : Once the result is stored, we are able to visualize the data inf form of Charts. Follow the steps to check the result.
+i.)	Open web browser. Type ‘localhost:8080’ (8080 is port number on which Grafana is running. It may vary in your case.)
+
+
+ii.)	Navigate to + -> Dashboard. Click on Add, click on Graph.
+
+
+iii.)	Click Panel Title, click Edit.
+
+
+iv.)	Click on Metrics tab (below blank graph template). Select your database.
+
+
+v.)	Click on Query tab to modify/add queries. 
+
+
+References :  
+
+https://docs.k6.io/docs
+http://blog.loadimpact.com/how-to-control-a-live-k6-test
+https://support.loadimpact.com/4.0/how-to-tutorials/
+https://github.com/loadimpact/k6
+

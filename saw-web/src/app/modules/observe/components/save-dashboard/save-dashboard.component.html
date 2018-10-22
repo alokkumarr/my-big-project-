@@ -1,0 +1,70 @@
+<div mat-dialog-title class="dialog__header">
+  <strong>
+    Save Dashboard
+  </strong>
+  <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
+</div>
+<div mat-dialog-content class="dialog__content">
+  <form [formGroup]="dashboardForm" class="save-dashboard-form">
+    <mat-form-field class="full-form-field">
+      <input matInput name="dashboardName"
+                      e2e="dashboard-save-name-input"
+                      placeholder="Dashboard Name"
+                      formControlName="name" />
+    </mat-form-field>
+    <mat-form-field class="full-form-field">
+      <textarea matInput matTextareaAutosize
+                         [matAutosizeMaxRows]="6"
+                         e2e="dashboard-save-description-input"
+                         name="dashboardDesc"
+                         placeholder="Description"
+                         formControlName="description">
+      </textarea>
+    </mat-form-field>
+
+    <mat-form-field class="select-form-field full-form-field" appearance="outline">
+      <mat-label>Category</mat-label>
+      <mat-select e2e="dashboard-save-category-select"
+                  name="dashboardCat"
+                  formControlName="categoryId"
+      >
+        <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+          <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
+            {{ subCategory.name }}
+          </mat-option>
+        </mat-optgroup>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-checkbox e2e="dashboard-save-auto-refresh-toggle"
+                  name="dashboardAutoRefresh"
+                  formControlName="autoRefreshEnabled"
+                  style="margin-left: 10px;"
+    >
+      Refresh Automatically
+    </mat-checkbox>
+
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label>Refresh Interval</mat-label>
+      <mat-select e2e="dashboard-save-refresh-interval-select"
+                  formControlName="refreshIntervalSeconds"
+      >
+        <mat-option *ngFor="let intvl of refreshIntervals" [value]="intvl.seconds">
+          {{intvl.label}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </form>
+</div>
+<div mat-dialog-actions class="dialog__actions">
+  <button mat-raised-button color="primary" (click)="saveDashboard()"
+    e2e="dashboard-save-save-button"
+    [disabled]="dashboardForm.invalid">
+    Save
+  </button>
+  <button mat-button color="primary" (click)="closeDashboard(null)"
+    e2e="dashboard-save-cancel-button">
+    Cancel
+  </button>
+</div>
