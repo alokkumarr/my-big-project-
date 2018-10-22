@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import com.google.gson.Gson;
 import org.apache.hadoop.fs.Path;
+import org.joda.time.DateTime;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +140,9 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
     log.info("Component Config = " + config);
 
-    NGContextServices contextServices = new NGContextServices(root, config, project, component, "batch1");
+    String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
+
+    NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
     contextServices.initContext();
 
     contextServices.registerOutputDataSet();

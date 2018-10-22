@@ -51,7 +51,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
                     ngctx.batchID,
                     ngctx.componentName,
                     null, null);
-        logger.debug("tempDir : " +tempDir);
+        logger.info("tempDir : " +tempDir);
         executor.start(tempDir);
     } catch (Exception e) {
         error = "SQL Executor runtime exception: " + e.getMessage();
@@ -75,6 +75,9 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
     @Override
     protected int move(){
 
+        //TODO: Remove the below line
+        logger.warn("######### Moving data");
+
         if (executor.getResultDataSets() == null ||
             executor.getResultDataSets().size() == 0 )
         {
@@ -83,11 +86,18 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
         }
 
         Map<String, SQLDescriptor> resultDataDesc = executor.getResultDataSets();
+
+        logger.warn("Move descriptors " + resultDataDesc);
+        logger.warn("Output datasets" + ngctx.outputDataSets);
+
+
         ngctx.outputDataSets.forEach(
             (on, obDesc) ->
             {
                 List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
-                String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
+                String partKeys = on + ": ";
+                for (String s : kl)
+                    partKeys += s + " ";
 
                 MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(
                         resultDataDesc.get(on),        // SQLDescriptor
@@ -101,6 +111,8 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
 
             }
         );
+
+        logger.warn("Result desc = " + ctx.resultDataDesc);
         return super.move();
     }
 

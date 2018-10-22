@@ -244,7 +244,7 @@ public interface WithDLBatchWriter {
             String name = (String) outputDS.get(DataSetProperties.Name.name());
 
             String loc = location + Path.SEPARATOR + name;
-            logger.warn("output write file location : " + loc);
+            logger.info("Output write location : " + loc);
 
             format = (String) outputDS.get(DataSetProperties.Format.name());
             numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
@@ -315,6 +315,7 @@ public interface WithDLBatchWriter {
 
             createOrCleanUpDestDir(dest, objectName);
 
+            WithDLBatchWriterHelper.logger.info("Moving files from " + source + " to " + dest);
 
             //get list of files to be processed
             FileStatus[] files = fs.listStatus(new Path(source));
