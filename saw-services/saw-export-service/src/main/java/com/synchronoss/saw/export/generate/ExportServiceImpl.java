@@ -15,9 +15,6 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -157,14 +154,14 @@ public class ExportServiceImpl implements ExportService{
 
     // presetting the variables, as their presence will determine which URLs to process
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
-      recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
-      ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
-      jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
+        if(((LinkedHashMap) dispatchBean).get("emailList") !=null )
+        recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
+        if(((LinkedHashMap) dispatchBean).get("ftp") !=null )
+        ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
+        jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
         ExportBean exportBean = new ExportBean();
         String dir = UUID.randomUUID().toString();
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-        exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-            dispatchBean).get("name")) + "." + exportBean.getFileType());
         exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
         exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
         exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
