@@ -14,6 +14,7 @@ export class CreateRouteDialogComponent implements OnInit {
   public detailsFormGroup: FormGroup;
   currentDate: Date = new Date();
   scheduleData: Schedule[];
+  crondetails: any = {};
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -56,5 +57,9 @@ export class CreateRouteDialogComponent implements OnInit {
     snackBarRef.afterDismissed().subscribe(() => {
       this.dialogRef.updatePosition({ top: '' });
     });
+  }
+
+  onCronChanged(cronexpression) {
+    this.crondetails = cronexpression;
   }
 }

@@ -5,12 +5,11 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
-import { DxSchedulerModule } from 'devextreme-angular/ui/scheduler';
+import { DxDateBoxModule } from 'devextreme-angular/ui/date-box';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
 import { RouterModule } from '@angular/router';
-
 import { routes } from './routes';
 
 import { WorkbenchService } from './services/workbench.service';
@@ -59,6 +58,7 @@ import {
   TestConnectivityComponent,
   CreateRouteDialogComponent
 } from './components/datasource-management/index';
+// import { CronJobSchedularComponent } from '../analyze/publish/cron-job-schedular/cron-job-schedular.component';
 
 import { DefaultWorkbenchPageGuard } from './guards';
 
@@ -116,7 +116,7 @@ const SERVICES = [
     RouterModule.forChild(routes),
     DxDataGridModule,
     DxTemplateModule,
-    DxSchedulerModule,
+    DxDateBoxModule,
     FlexLayoutModule,
     TreeModule,
     AceEditorModule,
