@@ -510,6 +510,7 @@ train_models.modeler <- function(obj, uids = NULL, ...) {
                                      execution_strategy = obj$execution_strategy,
                                      level = obj$conf_levels,
                                      seed = obj$seed)
+    obj$models[[uid]]$features <- setdiff(colnames(train_data), c(obj$target, obj$index_var))
     obj$models[[uid]]$status <- "trained"
     obj$models[[uid]]$last_updated <- Sys.time()
     obj$performance <- dplyr::bind_rows(
