@@ -1,13 +1,15 @@
 @import "src/themes/base/colors";
 
 :host {
+  display: block;
   max-width: 860px;
   width: 860px;
 }
 
 .base-dialog__content {
-  padding: 10px !important;
+  margin: 10px !important;
   max-height: 450px;
+  overflow: scroll;
 
   .mat-form-field {
     width: 100%;

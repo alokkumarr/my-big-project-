@@ -48,12 +48,12 @@ export function hourToCron(hour, hourType, minutes) {
     hourType === 'AM'
       ? intHour === 12 ? 0 : intHour
       : intHour === 12 ? 12 : intHour + 12;
-  const minuteHourUTC = this.convertToUtc(hourValue, minutes);
+  const minuteHourUTC = convertToUtc(hourValue, minutes);
   return minuteHourUTC;
 }
 
 export function generateHourlyCron(hours, minutes) {
-  const fetchUTCMinute = this.convertToUtc(moment().format('HH'), minutes);
+  const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
   const UTCMinute = fetchUTCMinute.split(' ');
   if (parseInt(hours, 10) === 0) {
     return `0 0/${minutes} * 1/1 * ? *`;
@@ -64,13 +64,13 @@ export function generateHourlyCron(hours, minutes) {
 
 export function generateDailyCron(cronDaily, dateSelects) {
   if (cronDaily.dailyType === 'everyDay') {
-    return `0 ${this.hourToCron(
+    return `0 ${hourToCron(
       dateSelects.hour,
       dateSelects.hourType,
       dateSelects.minute
     )} 1/${cronDaily.days} * ? *`;
   }
-  return `0 ${this.hourToCron(
+  return `0 ${hourToCron(
     dateSelects.hour,
     dateSelects.hourType,
     dateSelects.minute
@@ -78,15 +78,19 @@ export function generateDailyCron(cronDaily, dateSelects) {
 }
 
 export function generateWeeklyCron(cronWeek, dateSelects) {
-  return (this.CronExpression = `0 ${this.hourToCron(
+  return `0 ${hourToCron(
     dateSelects.hour,
     dateSelects.hourType,
     dateSelects.minute
-  )} ? * ${cronWeek} *`);
+  )} ? * ${cronWeek} *`;
 }
 
 export function generateMonthlyCron(cronMonth, dateSelects) {
-  // const hourCron = this.hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute);
+  // const hourCron = hourToCron(
+  //   dateSelects.hour,
+  //   dateSelects.hourType,
+  //   dateSelects.minute
+  // );
   if (cronMonth.monthlyType === 'monthlyDay') {
     return `0 ${cronMonth} ${cronMonth.specificDay} 1/${
       cronMonth.specificMonth
@@ -98,7 +102,7 @@ export function generateMonthlyCron(cronMonth, dateSelects) {
 }
 
 export function generateYearlyCron(cronYear, dateSelects) {
-  const hourCron = this.hourToCron(
+  const hourCron = hourToCron(
     dateSelects.hour,
     dateSelects.hourType,
     dateSelects.minute
