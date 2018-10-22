@@ -37,25 +37,14 @@ test_that("Regressor Constructer", {
 })
 
 
-<<<<<<< HEAD
-test_pipe <- pipeline(expr = identity)
-=======
+
 test_pipe <- pipeline(expr = function(df) {
   select(df, Petal_Width, Sepal_Length, Petal_Length)
 }, uid = "test-pipe")
->>>>>>> a7995b66735194594885346cdd01cb204b9be779
 
 r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
   add_holdout_samples(splits = c(.5, .5)) %>%
   add_model(pipe = test_pipe,
-<<<<<<< HEAD
-            method = "ml_linear_regression") %>%
-  add_model(pipe = test_pipe,
-            method = "ml_decision_tree_regressor") %>%
-  train_models() %>%
-  set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
-=======
             method = "ml_linear_regression",
             uid = "lm") %>%
   add_model(pipe = test_pipe,
@@ -64,8 +53,6 @@ r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
   train_models() %>%
   set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-
->>>>>>> a7995b66735194594885346cdd01cb204b9be779
 test_that("Regressor Selects Best Model", {
 
   expect_subset("spark_model", class(r1$final_model))
@@ -85,11 +72,8 @@ test_that("Regressor Selects Best Model", {
 })
 
 
-<<<<<<< HEAD
-test_that("Refit Option works as Expected", {
-=======
 test_that("Refit Option works as expected", {
->>>>>>> a7995b66735194594885346cdd01cb204b9be779
+
 
   r2 <- refit(r1, df2, append = TRUE)
 
@@ -98,8 +82,6 @@ test_that("Refit Option works as expected", {
                     r2$final_model$fit$stages[[2]]$param_map)
   expect_equivalent(r1$final_model$uid, r2$final_model$uid)
 })
-<<<<<<< HEAD
-=======
 
 
 test_that("get_variable_importance method works as expected", {
@@ -116,4 +98,3 @@ test_that("get_variable_importance method works as expected", {
                     types = c("character", "double"),
                     nrows = ncol(r1$pipelines$`test-pipe`$output) - 1)
 })
->>>>>>> a7995b66735194594885346cdd01cb204b9be779
