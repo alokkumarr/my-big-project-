@@ -1,6 +1,7 @@
 package com.synchronoss.saw.storage.proxy.service;
 
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxyNode;
 
@@ -18,6 +19,9 @@ public interface StorageProxyMetaDataService {
   default String generateId()  {
     String id = UUID.randomUUID().toString() + delimiter + StoragaProxyDataSet + delimiter
         + System.currentTimeMillis();
+    if (StringUtils.containsWhitespace(id)) {
+      id = StringUtils.deleteWhitespace(id);
+    }
     return id;
   }
 

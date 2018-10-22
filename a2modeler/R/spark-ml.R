@@ -51,7 +51,157 @@ predict.spark_model_regression <- function(mobj,
 }
 
 
+#' Get Model Coefficients
+#'
+#' Extracts coefficient summary from Spark-ML linear regression model
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_model_linear_regression <- function(mobj) {
+  
+  intercept <- mobj$model$param_map$fit_intercept
+  if(intercept) {
+    features <- c("Intercept", mobj$.features)
+    estimates <- c(mobj$model$intercept, mobj$model$coefficients)
+  }else {
+    features <- mobj$.features
+    estimates <- as.numeric(mobj$model$coefficients)
+  }
+  
+  tibble(feature  = features,
+         estimate = estimates,
+         stderr   = mobj$summary$coefficient_standard_errors(),
+         t_stat   = mobj$summary$t_values,
+         p_values = mobj$summary$p_values)
+}
+
+
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_linear_regression_model <- function(mobj, features) {
+  
+  intercept <- mobj$param_map$fit_intercept
+  if(intercept) {
+    features <- c("Intercept", features)
+    estimates <- c(mobj$intercept, mobj$coefficients)
+  }else {
+    estimates <- as.numeric(mobj$coefficients)
+  }
+  
+  tibble(feature  = features,
+         estimate = estimates,
+         stderr   = mobj$summary$coefficient_standard_errors(),
+         t_stat   = mobj$summary$t_values,
+         p_values = mobj$summary$p_values)
+}
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_linear_regression_model <- get_coefs.ml_linear_regression_model
 
 
 
+#' Get Model Coefficients
+#'
+#' Extracts coefficient summary from Spark-ML logistic regression model
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_model_logistic_regression <- function(mobj) {
+  
+  intercept <- mobj$model$param_map$fit_intercept
+  if(intercept) {
+    features <- c("Intercept", mobj$.features)
+    estimates <- c(mobj$model$intercept, mobj$model$coefficients)
+  }else {
+    features <- mobj$.features
+    estimates <- as.numeric(mobj$model$coefficients)
+  }
+  
+  tibble(feature  = features,
+         estimate = estimates)
+}
 
+
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_logistic_regression_model <- function(mobj, features) {
+  
+  intercept <- mobj$param_map$fit_intercept
+  if(intercept) {
+    features <- c("Intercept", features)
+    estimates <- c(mobj$intercept, mobj$coefficients)
+  }else {
+    estimates <- as.numeric(mobj$coefficients)
+  }
+  
+  tibble(feature = features,
+         estimate = estimates)
+}
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_logistic_regression_model <- get_coefs.ml_logistic_regression_model
+
+
+#' Get Model Coefficients
+#'
+#' Extracts coefficient summary from Spark-ML generalized regression model
+#' @rdname get_coefs
+#' @export
+get_coefs.ml_model_generalized_linear_regression <- function(mobj) {
+  
+  intercept <- mobj$model$param_map$fit_intercept
+  if(intercept) {
+    features <- c("Intercept", mobj$.features)
+    estimates <- c(mobj$model$intercept, mobj$model$coefficients)
+  }else {
+    features <- mobj$.features
+    estimates <- as.numeric(mobj$model$coefficients)
+  }
+  
+  tibble(feature  = features,
+         estimate = estimates,
+         stderr   = mobj$summary$coefficient_standard_errors(),
+         t_stat   = mobj$summary$t_values(),
+         p_values = mobj$summary$p_values())
+}
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_decision_tree_regression_model <- function(mobj, features) {
+  
+  tibble(feature    = features,
+         importance = mobj$feature_importances())
+}
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_decision_tree_classification_model <- 
+  get_variable_importance.ml_decision_tree_regression_model
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_random_forest_regression_model <- 
+  get_variable_importance.ml_decision_tree_regression_model
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_random_forest_classification_model <- 
+  get_variable_importance.ml_decision_tree_regression_model
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_gbt_regression_model <- 
+  get_variable_importance.ml_decision_tree_regression_model
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.ml_gbt_classification_model <- 
+  get_variable_importance.ml_decision_tree_regression_model

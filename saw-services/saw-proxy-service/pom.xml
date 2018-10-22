@@ -26,6 +26,8 @@
 		<metadata.api>${revision}</metadata.api>
 		<mapr.db.version>6.0.1-mapr</mapr.db.version>
 		<es.version>6.3.0</es.version>
+		<surefire-api>2.19.1</surefire-api>
+		<surefire.rerunFailingTestsCount>5</surefire.rerunFailingTestsCount>
 	</properties>
 
 	<dependencies>
@@ -178,6 +180,15 @@
 
 	</dependencies>
 	<build>
+	<pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.surefire</groupId>
+				<artifactId>surefire-api</artifactId>
+				<version>${surefire-api}</version>
+			</plugin>
+		</plugins>
+	</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
