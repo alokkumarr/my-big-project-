@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.Response;
 import java.util.UUID;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
@@ -24,7 +22,6 @@ public class WorkbenchIT extends BaseIT {
       "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
   private static final int WAIT_RETRIES = 30;
   private static final int WAIT_SLEEP_SECONDS = 5;
-  private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
   /**
    * Parse a CSV file into dataset with given name using Workbench
