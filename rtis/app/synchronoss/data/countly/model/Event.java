@@ -10,7 +10,7 @@ import java.util.IllegalFormatException;
 /**
  * Created by srya0001 on 4/28/2016.
  */
-@ApiModel(value = "Event Data", description = "Class composes several parts of event to store all flavors of incoming events")
+/*@ApiModel(value = "Event Data", description = "Class composes several parts of event to store all flavors of incoming events")*/
 public class Event extends  BaseEvent{
 
     public static byte Signature = 'E';
