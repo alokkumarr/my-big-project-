@@ -20,7 +20,7 @@ if(! "2.3.0" %in% spk_versions$spark) {
   sparklyr::spark_install(version = "2.3.0")
 }
 
-sc <- spark_connect(master = "local")
+sc <- spark_connect(master = "local", version = "2.3.0")
 
 
 # Basic Tests -------------------------------------------------------------
