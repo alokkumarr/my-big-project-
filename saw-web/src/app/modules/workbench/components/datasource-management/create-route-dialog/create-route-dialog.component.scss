@@ -1,6 +1,6 @@
 @import 'src/themes/base/colors';
 
-::ng-deep .createsource-dialog {
+::ng-deep .createroute-dialog {
   height: calc(100% - 48px);
 
   .mat-card-content {
@@ -24,16 +24,16 @@
     height: 0 !important;
   }
 
-  .source-container {
-    height: 85%;
-    overflow: auto;
-  }
-
   .details-title {
     text-align: left;
     color: $primary-grey-g3;
     padding-left: 10px;
     margin: 0;
+  }
+
+  .details-container {
+    height: 85%;
+    overflow: auto;
   }
 
   .source-list {

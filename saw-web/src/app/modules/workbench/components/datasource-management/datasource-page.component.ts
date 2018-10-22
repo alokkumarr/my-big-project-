@@ -7,6 +7,7 @@ import { sourceTypes } from '../../wb-comp-configs';
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
+import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 
 import { SAMPLE_SOURCE_DATA } from '../../sample-data';
@@ -86,5 +87,20 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   editSource() {}
 
-  createRoute() {}
+  createRoute() {
+    const dateDialogRef = this.dialog.open(CreateRouteDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      disableClose: true,
+      height: '60%',
+      width: '70%',
+      minWidth: '600px',
+      minHeight: '600px',
+      maxWidth: '900px',
+      panelClass: 'sourceDialogClass'
+    });
+
+    dateDialogRef.afterClosed().subscribe(data => {});
+  }
 }

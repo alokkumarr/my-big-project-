@@ -5,6 +5,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
+import { DxSchedulerModule } from 'devextreme-angular/ui/scheduler';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
@@ -55,7 +56,8 @@ import {
 import {
   DatasourceComponent,
   CreateSourceDialogComponent,
-  TestConnectivityComponent
+  TestConnectivityComponent,
+  CreateRouteDialogComponent
 } from './components/datasource-management/index';
 
 import { DefaultWorkbenchPageGuard } from './guards';
@@ -89,7 +91,8 @@ const COMPONENTS = [
   DatapodActionsComponent,
   DatasourceComponent,
   CreateSourceDialogComponent,
-  TestConnectivityComponent
+  TestConnectivityComponent,
+  CreateRouteDialogComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard];
@@ -113,6 +116,7 @@ const SERVICES = [
     RouterModule.forChild(routes),
     DxDataGridModule,
     DxTemplateModule,
+    DxSchedulerModule,
     FlexLayoutModule,
     TreeModule,
     AceEditorModule,

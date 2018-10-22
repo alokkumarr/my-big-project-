@@ -1,49 +1,46 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
-
-import { sourceTypes } from '../../../wb-comp-configs';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
+import { Schedule } from '../../../models/workbench.interface';
 
 @Component({
-  selector: 'createsource-dialog',
-  templateUrl: './createSource-dialog.component.html',
-  styleUrls: ['./createSource-dialog.component.scss']
+  selector: 'create-route-dialog',
+  templateUrl: './create-route-dialog.component.html',
+  styleUrls: ['./create-route-dialog.component.scss']
 })
-export class CreateSourceDialogComponent {
-  selectedSource: string = '';
-  form: FormGroup;
-  sources = sourceTypes;
-  firstStep: FormGroup;
+export class CreateRouteDialogComponent implements OnInit {
   public detailsFormGroup: FormGroup;
+  currentDate: Date = new Date();
+  scheduleData: Schedule[];
 
   constructor(
     private _formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<CreateSourceDialogComponent>,
+    private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
     private snackBar: MatSnackBar
-  ) {}
-
-  ngOnInit() {
-    this.firstStep = this._formBuilder.group({
-      firstStepCtrl: ['', Validators.required]
-    });
-
-    this.detailsFormGroup = this._formBuilder.group({
-      hostNameCtrl: ['', Validators.required],
-      portNoCtrl: ['', Validators.required],
-      userNameCtrl: ['', Validators.required],
-      passwordCtrl: ['', Validators.required]
-    });
+  ) {
+    this.scheduleData = [];
   }
 
-  sourceSelected(source) {
-    this.selectedSource = source;
-    this.firstStep.controls.firstStepCtrl.reset(source);
+  ngOnInit() {
+    this.detailsFormGroup = this._formBuilder.group({
+      routeNameCtrl: ['', Validators.required],
+      sourceLocationCtrl: ['', Validators.required],
+      destinationLocationCtrl: ['', Validators.required],
+      filePatternCtrl: ['', Validators.required],
+      descriptionCtrl: [''],
+      startDateCtrl: ['', Validators.required],
+      endDateCtrl: ['', Validators.required]
+    });
   }
 
   onCancelClick(): void {
     this.dialogRef.close();
+  }
+
+  onAppointmentFormCreated(data) {
+    const formData = data;
   }
 
   testConnection() {

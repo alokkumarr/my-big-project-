@@ -1,0 +1,76 @@
+<mat-card class="createroute-dialog">
+  <mat-card-header>
+    <mat-card-title class="details-title">Create Route</mat-card-title>
+    <div fxFlex></div>
+    <button mat-icon-button color="warn" (click)="onCancelClick()">
+      <mat-icon fontIcon="icon-close"></mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content>
+    <mat-horizontal-stepper linear>
+      <ng-template matStepperIcon="edit">
+        <mat-icon fontIcon="icon-checkmark"></mat-icon>
+      </ng-template>
+      <ng-template matStepperIcon="done">
+        <mat-icon fontIcon="icon-checkmark"></mat-icon>
+      </ng-template>
+      <mat-step label="Route Details">
+        <form fxFlex fxLayout="row wrap" class="details-container" #sourceDetails novalidate [formGroup]="detailsFormGroup"
+          autocomplete="false">
+          <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+            <mat-form-field appearance="outline">
+              <mat-label>Route Name</mat-label>
+              <input matInput name="routeName" formControlName="routeNameCtrl" required />
+              <mat-error *ngIf="detailsFormGroup.controls.routeNameCtrl.hasError('required')">
+                Route Name is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>File Pattern</mat-label>
+              <input matInput name="filePattern" formControlName="filePatternCtrl" required />
+            </mat-form-field>
+          </section>
+          <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+            <mat-form-field appearance="outline">
+              <mat-label>Source Location</mat-label>
+              <input matInput name="sourceLocation" formControlName="sourceLocationCtrl" required />
+              <mat-error *ngIf="detailsFormGroup.controls.sourceLocationCtrl.hasError('required')">
+                Source Location is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Destination Location</mat-label>
+              <input matInput name="destinationLocation" formControlName="sourceLocationCtrl" required />
+              <mat-error *ngIf="detailsFormGroup.controls.destinationLocationCtrl.hasError('required')">
+                Destination Location is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </section>
+          <section fxFlex fxLayout="column" fxLayoutAlign="center center">
+            <mat-form-field style="width: 90%;" appearance="outline">
+              <mat-label>Description about the route</mat-label>
+              <textarea matInput formControlName="descriptionCtrl"></textarea>
+            </mat-form-field>
+          </section>
+        </form>
+        <mat-divider></mat-divider>
+        <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
+          <button mat-raised-button color="primary" matStepperPrevious>Previous</button>
+          <button mat-stroked-button color="primary" (click)="testConnection()">
+            <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
+          </button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="!detailsFormGroup.valid">Create</button>
+        </div>
+      </mat-step>
+      <mat-step label="Schedule">
+        <dx-scheduler [dataSource]="scheduleData" [views]='["month"]' currentView="month"
+          [currentDate]="currentDate" height="80%" (onAppointmentFormCreated)="onAppointmentFormCreated($event)">
+        </dx-scheduler>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </mat-card-content>
+</mat-card>
