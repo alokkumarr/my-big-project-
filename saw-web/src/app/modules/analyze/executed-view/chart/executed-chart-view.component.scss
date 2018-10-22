@@ -1,0 +1,25 @@
+@import "src/themes/base/colors";
+$header-padding-top: 12px;
+$header-padding-bottom: 12px;
+$header-font-size: 18px;
+$report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size});
+
+.chart.report-title {
+  margin: 0;
+  padding: $header-padding-top 0 $header-padding-bottom;
+  text-align: center;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  font-size: $header-font-size;
+}
+
+.toggle-icons {
+  text-align: right;
+  height: 25px;
+  margin-right: 5%;
+  font-size: 15px;
+}
+
+.mat-icon.active {
+  color: $primary-blue-b2;
+}

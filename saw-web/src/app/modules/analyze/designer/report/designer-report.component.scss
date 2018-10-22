@@ -1,0 +1,34 @@
+@import "src/themes/base/colors";
+
+:host {
+  height: calc(100% - 20px);
+  width: calc(100% - 20px);
+}
+
+.non-ideal-state__container {
+  padding-top: 10px;
+}
+
+filter-chips-u {
+  padding: 10px 0 5px 10px;
+}
+
+.non-ideal-state__message {
+  color: $primary-grey-g3;
+  font-size: 26px;
+}
+
+.non-ideal-state__icon {
+  color: $primary-grey-g2;
+  margin-top: 50px;
+  display: table;
+  font-size: 200px;
+  width: auto;
+}
+
+.data-count-limit {
+  padding: 5px 0;
+  font-size: 14px;
+  float: right;
+  color: $primary-grey-g3;
+}

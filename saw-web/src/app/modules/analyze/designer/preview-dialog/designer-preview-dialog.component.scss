@@ -1,0 +1,40 @@
+@import "src/themes/base/colors";
+
+:host {
+  width: 100vw;
+  height: 100vh;
+}
+
+.mat-dialog-title {
+  margin: 0;
+}
+
+.mat-button {
+  line-height: 32px;
+}
+
+.mat-icon-button {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.header-name {
+  color: $primary-blue-b2;
+}
+
+.header-description {
+  font-size: 14px;
+  padding-left: 15px;
+  color: $primary-grey-g3;
+
+  .mat-icon {
+    font-size: 14px;
+    height: 14px;
+    width: 14px;
+  }
+}
+
+.preview-container {
+  padding: 10px;
+}

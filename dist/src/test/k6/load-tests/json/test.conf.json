@@ -1,0 +1,297 @@
+{
+    "baseURL" : "http://saw-rd601.ana.dev.vaste.sncrcorp.net",
+    "auth" : {
+      "login" : {
+        "endPoint" : "/security/doAuthenticate/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody" : {
+          "masterLoginId":"sawadmin@synchronoss.com",
+          "password":"Sawsyncnewuser1!"
+        }
+      },
+      
+      "logout" : {
+        "endPoint" : "/auth/doLogout/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody": {
+          "ticketID" : "Dummy_ID"
+        }
+      },
+      
+      "changePassword" : {
+        "endPoint" : "/auth/changePassword/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody": {
+          "masterLoginId": "master_login_id",
+          "oldPassword": "old_password",
+          "newPassword": "new_password",
+          "cnfNewPassword": "confirm_new_password"
+        }
+      },
+      
+      "refreshAccessToken" : {
+        "endPoint" : "/getNewAccessToken/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody": {
+          "refreshToken" : "Refresh token gors here"
+        }
+      },
+      
+      "redirect" : {
+        "endPoint" : "/auth/redirect/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody": {
+          "baseURL" : "URL where application needs to be redirected"
+        }
+      },
+      
+      "verifyPassword" : {
+        "endPoint" : "/vfyRstPwd/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody": {
+          "hashCode" : "Hash code"
+        }
+      },
+      
+      "resetChangePassword" : {
+        "endPoint" : "/rstChangePassword/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody": {
+          "masterLoginId": "User name goes here",
+          "newPassword": "new password goes here",
+          "cnfNewPassword": "confirm new password goes here"
+        }
+      }
+    },
+    
+    "analyze" : {
+      "jobScheduler" : {
+        "endPoint" : "/saw/services/scheduler/jobs",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        },
+        "requestBody" :{
+          "categoryId" : "4",
+          "groupkey" : "SYNCHRONOSS"
+        }
+      },
+      
+      "getAnalysisList" : {
+        "endPoint" : "/saw/services/analysis",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        },
+        "requestBody" : {
+          "contents":{
+            "keys" : [{"customerCode":"SYNCHRONOSS","module":"ANALYZE","categoryId":"4"}],
+            "action":"search"
+          }
+        }
+      },
+      
+      "addNewAnalysis" : {
+        "endPoint" : "/saw/services/md",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        },
+        "requestBody" : {"contents":{"keys":[{"customerCode":"SYNCHRONOSS","module":"ANALYZE"}],"action":"search","select":"headers","context":"Semantic"}}
+      },
+
+      "createNewAnalysis" : {
+        "endPoint" : "/saw/services/analysis",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        },
+        "requestBody" : {"contents":{"keys":[{"customerCode":"SYNCHRONOSS","module":"ANALYZE","id":"","analysisType":"report"}],"action":"create"}}
+      },
+
+      "executeAnalysis" : {
+        "endPoint" : "/saw/services/analysis/",
+        "method" : "GET",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        }
+      },
+      
+      "executionsAnalysisDataRequest" : {
+        "endPoint" : "saw/services/analysis/Selected Analysis Id Goes Here /executions",
+        "method" : "GET",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        }
+      },
+
+      "fetchSchedulerJob" : {
+        "endPoint" : "/saw/services/scheduler/fetchJob",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        },
+        "requestBody" :{"jobName":"","categoryId":4,"groupName":"SYNCHRONOSS"}
+      },
+
+      "exportAnalysis" : {
+        "endPoint" : "/saw/services/exports/",
+        "method" : "GET",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        }
+      }
+    },
+    
+    "workbench" : {
+      "getListOfDataSets" : {
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/datasets/",
+        "method" : "GET",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        }
+      },
+      
+      "dataSetPreviewSummary" : {
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/previews/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody" : {
+          "name" : "Data Set Name Goes Here"
+        }
+      }, 
+      
+      "dataSetDataPreview" : {
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/previews/Data set id goes here",
+        "method" : "GET",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        }
+      },
+      
+      "getTheListOfDirectories"  : {
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/raw/directory/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody" : {
+          "path" : "/"
+        }
+      },
+      
+      "parsedPreviewData" : {
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/raw/directory/inspect/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody" : {
+          "file":"//Workbench1234/dummy-file_0642.txt"
+          ,"lineSeparator":"\n",
+          "delimiter":","
+          ,"quoteChar":"",
+          "quoteEscapeChar":"",
+          "headerSize":"1",
+          "fieldNamesLine":"1",
+          "dateFormats":[],
+          "rowsToInspect":100,
+          "delimiterType":"delimited",
+          "header":"yes"
+        }
+      },
+      
+      "rawPreviewData" : {
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/raw/directory/preview",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Authorization" : "Bearer "
+          }
+        },
+        "requestBody" : {
+          "path":"//Workbench1234/dummy-file_0642.txt"
+        }
+      }
+    }
+    
+  }
