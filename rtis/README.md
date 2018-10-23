@@ -92,9 +92,8 @@ and deply various RTIS services
  
  
  1.Make sure  RTIS configuration on dev server has same stream name, 
-  topic name as with which you are trying to publish.
-
-    You can verify at ```/opt/bda/rtis/conf/application.conf```
+  topic name as with which you are trying to publish.You can verify at
+  ```/opt/bda/rtis/conf/application.conf```
 
 
  2.Make sure subscribers on MapR nodes are configured with same stream name
