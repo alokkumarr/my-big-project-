@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Batch Ingestion Service
+Requires=saw-batch-ingestion.service
+After=saw-batch-ingestion.service
+Requires=saw-batch-ingestion-proxy.socket
+After=saw-batch-ingestion-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9903
+PrivateTmp=yes

@@ -1,0 +1,8 @@
+[Unit]
+Description=SAW Batch Ingestion Socket
+
+[Socket]
+ListenStream=127.0.0.1:9904
+
+[Install]
+WantedBy=sockets.target

@@ -295,6 +295,30 @@ storage type & other details. The below are salient feature for the service whic
 * Every incoming request to this story proxy service will be validated in gateway service layer.
 * It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to certain structure i.e request & response specification.
 
+=== SAW Batch Ingestion Service
+
+SAW Batch Ingestion Service will allow to pull data from remote source like *(SFTP, SCP, S3, JDBC etc).*
+Currently with it supports only SCP/SFTP.
+
+[%hardbreaks]
+The REST API of this service is HATEOS Complaint API. To get an overview of the self descriptive API, it can
+accessed using URL (http://hostname/saw/services/batch, http://hostname/saw/services/batch/profiles)
+
+.Figure: Executing an data query using the SAW Proxy Service via SIP Gateway Service
+plantuml::sip-design/figure-batch-sequence.pum[format=svg]
+
+The below are salient feature for the service which are as follows:
+
+[[goals]]
+[role="incremental"]
+* Ability to setup a channel and provide channel information
+* Ability to setup a route and provide route information
+* Test connectivity of both channel & source.
+* Tracking
+* Monitoring
+* Scheduling the data retrieval from the source
+* Supports various protocol to pull data
+
 === SAW Semantic Service
 
 The SAW Semantic Service enables the consumer to store the semantic metadata of SIP. The intention of this services

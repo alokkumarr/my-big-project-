@@ -58,6 +58,10 @@ proxy:
 datapod:
     service:
         host: http://localhost:9900
+batch:
+    service:
+        host: http://localhost:10000/batch
+        
 api:
   gateway:
         endpoints:
@@ -124,3 +128,18 @@ api:
         -   location: ${datapod.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
+        -   location: ${batch.service.host}
+            method: PUT
+            path: '[/]batch.*'
+        -   location: ${batch.service.host}
+            method: POST
+            path: '[/]batch.*'
+        -   location: ${batch.service.host}
+            method: GET
+            path: '[/]batch.*'
+        -   location: ${batch.service.host}
+            method: DELETE
+            path: '[/]batch.*'
+
+            
+            
