@@ -80,7 +80,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
         if (!recipients.equals("") && !ftpServers.equals("")) {
             execution = ImmutableDispatchBean.builder()
-                    .emailList(recipients).fileType("csv")
+                    .emailList(recipients).fileType(analysis.getFileType())
                     .description(analysis.getDescription())
                     .name(analysis.getAnalysisName())
                     .userFullName(analysis.getUserFullName())
@@ -90,7 +90,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .publishedTime(formatted).build();
         } else if (!recipients.equals("")) {
             execution = ImmutableDispatchBean.builder()
-                    .emailList(recipients).fileType("csv")
+                    .emailList(recipients).fileType(analysis.getFileType())
                     .description(analysis.getDescription())
                     .name(analysis.getAnalysisName())
                     .userFullName(analysis.getUserFullName())
@@ -100,6 +100,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         } else if (!ftpServers.equals("")) {
             execution = ImmutableDispatchBean.builder()
                     .description(analysis.getDescription())
+                    .fileType(analysis.getFileType())
                     .name(analysis.getAnalysisName())
                     .userFullName(analysis.getUserFullName())
                     .metricName(analysis.getMetricName())
@@ -109,6 +110,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         } else {
             execution = ImmutableDispatchBean.builder()
                     .description(analysis.getDescription())
+                    .fileType(analysis.getFileType())
                     .name(analysis.getAnalysisName())
                     .userFullName(analysis.getUserFullName())
                     .metricName(analysis.getMetricName())
