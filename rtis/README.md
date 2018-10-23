@@ -74,18 +74,20 @@ and deply various RTIS services
     controllers in app/controllers
  
  
- 7. Launch the application following “Run in Local” section and you can see changes reflected.
+ 7. Launch the application following “Run in Local” section and you can see 
+    changes reflected.
 
 
  
  ## Troubleshooting:
     
  Running in local makes sure that code is working till sending message. However 
- if we want to make sure message is properly sent and recieved by rtps and writing
- parquet/json format then below is useful information.
+ if we want to make sure message is properly sent and recieved by rtps and
+ writing parquet/json format, then below inormtion is useful to troubleshoot.
   
   
- We have one  Dev server  and multiple  Mapr nodes.  Environment details can be found at
+ We have one  Dev server  and multiple  Mapr nodes.  Environment details can be
+ found at
  [confluence](https://confluence.synchronoss.net:8443/pages/viewpage.action?pageId=177065278) 
  
  
@@ -95,16 +97,19 @@ and deply various RTIS services
   You can verify at ```/opt/bda/rtis/conf/application.conf```
 
 
- 2.Make sure subscribers on MapR nodes are configured with same stream name and topic 
-  names with which messages are published on RTIS.
+ 2.Make sure subscribers on MapR nodes are configured with same stream name
+  and topic  names with which messages are published on RTIS.
 
-   MapR node configuration can be found at
+   Topic subscriber configuration can be found at
    ```/dfs/opt/bda/apps/rta-iot_demo/conf/rta-iot_demo.conf```
 
- 3.Invoke /events Ex: using [swagger](https://realtime-rd-sip-vaste.sncrcorp.net/docs)
-  with valid  query params and payload
+ 3.Invoke /events Ex: using
+   [swagger](https://realtime-rd-sip-vaste.sncrcorp.net/docs) with valid  
+    query params and payload
 
- 4.Check RTIS log file messages are sent without any errors at /var/bda/rtis/log/app_\<date \>.log
+ 4.Check RTIS log file to make sure messages are sent without any errors at
+   ``` /var/bda/rtis/log/app_\<date \>.log```
 
- 5.If all configurations are as expected you can see a parquet/json file written
-  as per configuration. Ex: /dfs/data/bda/rta-iot_demo/raw/\<file\>  
+ 5.If all configurations are as expected, then you can see a parquet/json 
+   file written as per configuration.
+     Ex: /dfs/data/bda/rta-iot_demo/raw/\<file\>  
