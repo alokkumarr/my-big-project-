@@ -85,11 +85,10 @@ and deply various RTIS services
  parquet/json format then below is useful information.
  
 
+  We have one Dev server where RTIS is deployed at ```/opt/bda/rtis``` and
+  MapR nodes deployed with MapR cluster. RTIS is configured to point MapR cluster. 
   Environment details can be found at
   [confluence](https://confluence.synchronoss.net:8443/pages/viewpage.action?pageId=177065278) 
-    
-      i.We have one Dev server where RTIS is deployed at ```/opt/bda/rtis``` 
-      ii.MapR nodes deployed with MapR cluster. RTIS is configured to point MapR cluster
  
  
  1.Make sure  RTIS configuration on dev server has same stream name, 
