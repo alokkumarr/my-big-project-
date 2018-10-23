@@ -67,9 +67,8 @@
         </div>
       </mat-step>
       <mat-step label="Schedule">
-        <dx-scheduler [dataSource]="scheduleData" [views]='["month"]' currentView="month"
-          [currentDate]="currentDate" height="80%" (onAppointmentFormCreated)="onAppointmentFormCreated($event)">
-        </dx-scheduler>
+          <cron-job-schedular [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
+
       </mat-step>
     </mat-horizontal-stepper>
   </mat-card-content>
