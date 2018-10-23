@@ -32,7 +32,7 @@ import ro.fortsoft.pf4j.PluginWrapper;
 
 @EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 @SpringBootApplication
-@ComponentScan("com.synchronoss")
+@ComponentScan("com.synchronoss.saw")
 public class SawBatchServiceApplication implements ApplicationRunner {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 

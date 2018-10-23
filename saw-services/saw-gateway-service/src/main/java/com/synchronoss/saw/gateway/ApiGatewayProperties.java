@@ -14,8 +14,17 @@ public class ApiGatewayProperties {
     private String path;
     private RequestMethod method;
     private String location;
+    private String contextPath;
 
-    public Endpoint() {
+    public String getContextPath() {
+		return contextPath;
+	}
+
+	public void setContextPath(String contextPath) {
+		this.contextPath = contextPath;
+	}
+
+	public Endpoint() {
     }
 
     public Endpoint(String location) {
@@ -46,6 +55,8 @@ public class ApiGatewayProperties {
       this.location = location;
     }
   }
+  
+  
 
   public List<Endpoint> getEndpoints() {
     return endpoints;

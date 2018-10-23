@@ -34,7 +34,7 @@ logging:
 
 server:
   address: localhost
-  port: 9999
+  port: 9642
   servlet:
     context-path: /ingestion/batch
   maxHttpHeaderSize: 65536
