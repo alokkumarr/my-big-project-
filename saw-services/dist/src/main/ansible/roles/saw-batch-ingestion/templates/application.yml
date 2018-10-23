@@ -34,7 +34,7 @@ logging:
 
 server:
   address: localhost
-  port: 9904
+  port: 9999
   servlet:
     context-path: /batch
   maxHttpHeaderSize: 65536
