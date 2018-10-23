@@ -46,7 +46,7 @@ public class SawBisController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public Object encrypt(
-      @ApiParam(value = "Storage object that needs to be added/updated/deleted to the store",
+      @ApiParam(value = "String to encrypt",
           required = true) @Valid @RequestBody String requestBody)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     logger.debug("Request Body:{}", requestBody);
@@ -61,6 +61,6 @@ public class SawBisController {
     Object encrypted  = objectMapper.readValue(data, Object.class);
     return encrypted;
   }
+ 
 }
-
 
