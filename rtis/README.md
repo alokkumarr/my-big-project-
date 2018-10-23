@@ -88,9 +88,8 @@ and deply various RTIS services
   Environment details can be found at
   [confluence](https://confluence.synchronoss.net:8443/pages/viewpage.action?pageId=177065278) 
     
-
-      i.We have one Dev server where RTIS is deployed. Deployment location /opt/bda/rtis. 
-     ii.MapR nodes deployed with MapR cluster. RTIS is configured to point MapR cluster
+      i.We have one Dev server where RTIS is deployed at ```/opt/bda/rtis``` 
+      ii.MapR nodes deployed with MapR cluster. RTIS is configured to point MapR cluster
  
  
  1.Make sure  RTIS configuration on dev server has same stream name, 
@@ -104,7 +103,7 @@ and deply various RTIS services
 
   On mapR node  ```/dfs/opt/bda/apps/rta-iot_demo/conf/rta-iot_demo.conf```
 
- 3.Invoke /events Ex: using [swagger] (https://realtime-rd-sip-vaste.sncrcorp.net/docs)
+ 3.Invoke /events Ex: using [swagger](https://realtime-rd-sip-vaste.sncrcorp.net/docs)
   with valid  query params and payload
 
  4.Check RTIS log file messages are sent without any errors at /var/bda/rtis/log/app_\<date \>.log
