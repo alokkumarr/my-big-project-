@@ -15,13 +15,13 @@ context("regressor unit tests")
 
 
 # # Create Spark Connection
-# spark_home_dir <- sparklyr::spark_installed_versions() %>%
-#   as.data.frame() %>%
-#   dplyr::filter(spark == "2.3.0") %>%
-#   dplyr::pull(dir)
-sc <- spark_connect(master = "local")
+sc <- spark_connect(master = "local", version = "2.3.0")
+
 
 # Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+# Create Spark datasets 
 df1 <- iris %>%
   sample_frac(size = .5) %>%
   copy_to(sc, ., name = "df1", overwrite = TRUE)
@@ -35,6 +35,7 @@ test_that("Regressor Constructer", {
   r1 <- regressor(df = df1, target = "Petal_Width", name = "test")
   expect_class(r1, "regressor")
 })
+
 
 
 test_pipe <- pipeline(expr = function(df) {
@@ -51,7 +52,6 @@ r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
             uid = "tree") %>%
   train_models() %>%
   set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
 
 test_that("Regressor Selects Best Model", {
 
@@ -73,6 +73,7 @@ test_that("Regressor Selects Best Model", {
 
 
 test_that("Refit Option works as expected", {
+
 
   r2 <- refit(r1, df2, append = TRUE)
 

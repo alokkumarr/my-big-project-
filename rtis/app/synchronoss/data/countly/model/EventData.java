@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by srya0001 on 4/28/2016.
  */
 
-@ApiModel(value = "Extended Event Data", description = "JSON array containing event objects. Each event object can have below properties")
+/*@ApiModel(value = "Extended Event Data", description = "JSON array containing event objects. Each event object can have below properties")*/
 public class EventData {
 
 
