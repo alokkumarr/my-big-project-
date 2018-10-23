@@ -8,11 +8,12 @@ module.exports = {
   scheduleMenuOption: element(by.css('button[e2e="actions-menu-selector-publish"]')),
   exportMenuOption: element(by.css('button[e2e="actions-menu-selector-export"]')),
   deleteMenuOption: element(by.css('button[e2e="actions-menu-selector-delete"]')),
+  detailsOption: element(by.css('button[e2e="actions-menu-selector-details"]')),
   deleteConfirmButton: element(by.xpath('//button[text()="Delete"]')),
   listView: {
     analysisByName: name => element(by.xpath[`//a[text()='${name}']`]),
-    actionMenu: element(by.css[`[e2e="actions-menu-toggle"]`]),
-  }, 
+    actionMenu: element(by.css[`[e2e="actions-menu-toggle"]`])
+  },
   analysisAction: name => element(by.xpath(`(//a[text()="${name}"]/following::button[@e2e='actions-menu-toggle'])[position()=1]`)),
   chartTypes: {
     column: element(by.xpath('//*[contains(@class,"highcharts-column-series")]'))
@@ -23,5 +24,8 @@ module.exports = {
     title: element(by.binding('$ctrl.analysis.name')),
     description: element(by.binding('$ctrl.analysis.description')),
     analysisDetailsCard: element(by.xpath(`//*[text()="Analysis Details"]/parent::*/parent::mat-expansion-panel-header`))
+  },
+  detailsNav: {
+    analysisDetailLabel: element(by.xpath('//*[contains(text(),"Analysis Details")]'))
   }
 };

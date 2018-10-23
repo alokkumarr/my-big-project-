@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
-// @DATE:Wed Oct 03 15:10:59 EDT 2018
+// @DATE:Fri Oct 19 16:37:52 EDT 2018
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -15,7 +15,7 @@ import _root_.play.libs.F
 package controllers.javascript {
   import ReverseRouteContext.empty
 
-  // @LINE:15
+  // @LINE:23
   class ReverseAssets(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -23,7 +23,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:15
+    // @LINE:23
     def at: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.Assets.at",
       """
@@ -35,7 +35,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:22
+  // @LINE:30
   class ReverseRTISControl(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -43,17 +43,21 @@ package controllers.javascript {
     }
 
   
-    // @LINE:24
+    // @LINE:32
     def sr: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.RTISControl.sr",
       """
         function(parameters0) {
-          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "sr" + _qS([(""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("parameters", parameters0)])})
+        
+          if (true) {
+            return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "sr" + _qS([(""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("parameters", parameters0)])})
+          }
+        
         }
       """
     )
   
-    // @LINE:22
+    // @LINE:30
     def executeCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.RTISControl.executeCmd",
       """
@@ -63,7 +67,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:23
+    // @LINE:31
     def executeExtendedCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.RTISControl.executeExtendedCmd",
       """
@@ -75,7 +79,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:28
+  // @LINE:39
   class ReverseGenericLog(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -83,7 +87,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:28
+    // @LINE:39
     def doPost: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.GenericLog.doPost",
       """
@@ -95,7 +99,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:9
+  // @LINE:14
   class ReverseGenericHandler(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -103,19 +107,23 @@ package controllers.javascript {
     }
 
   
-    // @LINE:9
+    // @LINE:14
     def event: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.GenericHandler.event",
       """
-        function(APP_KEY0,APP_VERSION1,APP_MODULE2,EVENT_ID3,EVENT_DATE4,EVENT_TYPE5,payload6) {
-          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "publishevent" + _qS([(""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("APP_KEY", APP_KEY0), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("APP_VERSION", APP_VERSION1), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("APP_MODULE", APP_MODULE2), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("EVENT_ID", EVENT_ID3), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("EVENT_DATE", EVENT_DATE4), (""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("EVENT_TYPE", EVENT_TYPE5), (""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("payload", payload6)])})
+        function(APP_KEY0,APP_VERSION1,APP_MODULE2,EVENT_ID3,EVENT_DATE4,EVENT_TYPE5) {
+        
+          if (true) {
+            return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "publishevent" + _qS([(""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("APP_KEY", APP_KEY0), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("APP_VERSION", APP_VERSION1), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("APP_MODULE", APP_MODULE2), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("EVENT_ID", EVENT_ID3), (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("EVENT_DATE", EVENT_DATE4), (""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("EVENT_TYPE", EVENT_TYPE5)])})
+          }
+        
         }
       """
     )
   
   }
 
-  // @LINE:12
+  // @LINE:20
   class ReverseApiHelpController(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -123,7 +131,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:14
+    // @LINE:22
     def viewSwaggerUI: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.ApiHelpController.viewSwaggerUI",
       """
@@ -133,7 +141,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:12
+    // @LINE:20
     def getResources: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.ApiHelpController.getResources",
       """
@@ -158,7 +166,11 @@ package controllers.javascript {
       "controllers.Application.iPost",
       """
         function() {
-          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "i"})
+        
+          if (true) {
+            return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "i"})
+          }
+        
         }
       """
     )
@@ -168,7 +180,11 @@ package controllers.javascript {
       "controllers.Application.i",
       """
         function() {
-          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "i"})
+        
+          if (true) {
+            return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "i"})
+          }
+        
         }
       """
     )

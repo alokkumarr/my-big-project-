@@ -10,6 +10,7 @@ filter-chips-u {
   padding: 10px 0 10px 10px;
 }
 
+
 .back-button-icon.mat-icon {
   font-size: $back-button-size;
   line-height: $back-button-size;
@@ -43,6 +44,20 @@ filter-chips-u {
 
   .analysis__subheader {
     font-size: 16px;
+  }
+}
+
+::ng-deep mat-sidenav-container.analysis-details-container {
+  height: 100%;
+
+  ::ng-deep mat-sidenav {
+    width: 400px;
+  }
+
+  ::ng-deep .mat-drawer-backdrop:not(.mat-drawer-shown) ~ mat-sidenav {
+    * {
+      display: none;
+    }
   }
 }
 
@@ -82,14 +97,4 @@ filter-chips-u {
   text-align: left !important;
 }
 
-.toggle-icons {
-  text-align: right;
-  height: 25px;
-  margin-right: 5%;
-  font-size: 15px;
-}
-
-.mat-icon.active {
-  color: $primary-blue-b2;
-}
 

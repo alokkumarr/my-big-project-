@@ -15,7 +15,8 @@ const DEFAULT_PAGE_SIZE = 25;
 
 @Component({
   selector: 'executed-chart-view',
-  templateUrl: 'executed-chart-view.component.html'
+  templateUrl: 'executed-chart-view.component.html',
+  styleUrls: ['./executed-chart-view.component.scss']
 })
 export class ExecutedChartViewComponent {
   @Input() updater: BehaviorSubject<Object[]>;
