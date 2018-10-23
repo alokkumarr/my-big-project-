@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
@@ -14,13 +14,14 @@ import * as clone from 'lodash/clone';
   selector: 'analyze-actions-menu-u',
   templateUrl: 'analyze-actions-menu.component.html'
 })
-export class AnalyzeActionsMenuComponent {
+export class AnalyzeActionsMenuComponent implements OnInit {
   @Output() afterEdit: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   @Output() afterExport: EventEmitter<null> = new EventEmitter();
   @Output() afterExecute: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterDelete: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterPublish: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterSchedule: EventEmitter<Analysis> = new EventEmitter();
+  @Output() detailsRequested: EventEmitter<boolean> = new EventEmitter();
   @Input() analysis: Analysis;
   @Input() exclude: string;
   @Input('actionsToDisable')
@@ -39,6 +40,13 @@ export class AnalyzeActionsMenuComponent {
   public actionsToDisable = {};
 
   actions = [
+    {
+      label: 'Details',
+      value: 'details',
+      fn: () => {
+        this.detailsRequested.emit(true);
+      }
+    },
     {
       label: 'Execute',
       value: 'execute',
@@ -83,12 +91,13 @@ export class AnalyzeActionsMenuComponent {
   ) {}
 
   ngOnInit() {
+    const privilegeMap = { print: 'export', details: 'access' };
     const actionsToExclude = isString(this.exclude)
       ? this.exclude.split('-')
       : [];
     this.actions = filter(this.actions, ({ value }) => {
       const notExcluded = !actionsToExclude.includes(value);
-      const privilegeName = upperCase(value === 'print' ? 'export' : value);
+      const privilegeName = upperCase(privilegeMap[value] || value);
       const hasPriviledge = this._jwt.hasPrivilege(privilegeName, {
         subCategoryId: this.analysis.categoryId,
         creatorId: this.analysis.userId
@@ -136,10 +145,12 @@ export class AnalyzeActionsMenuComponent {
 
   publish(type) {
     const analysis = clone(this.analysis);
-    this._analyzeActionsService.publish(analysis, type).then(analysis => {
-      this.analysis = analysis;
-      this.afterPublish.emit(analysis);
-    });
+    this._analyzeActionsService
+      .publish(analysis, type)
+      .then(publishedAnalysis => {
+        this.analysis = publishedAnalysis;
+        this.afterPublish.emit(publishedAnalysis);
+      });
   }
 
   export() {
