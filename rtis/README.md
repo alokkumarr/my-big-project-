@@ -83,13 +83,10 @@ and deply various RTIS services
  Running in local makes sure that code is working till sending message. However 
  if we want to make sure message is properly sent and recieved by rtps and writing
  parquet/json format then below is useful information.
- 
-
-  We have one Dev server where RTIS is deployed. Deployment locatio is ```/opt/bda/rtis```
-  and multiple MapR nodes deployed with MapR cluster. RTIS is configured to point MapR cluster. 
   
-  Dev server , Mapr environment details can be found at
-  [confluence](https://confluence.synchronoss.net:8443/pages/viewpage.action?pageId=177065278) 
+  
+ We have one  Dev server  and multiple  Mapr nodes.  Environment details can be found at
+ [confluence](https://confluence.synchronoss.net:8443/pages/viewpage.action?pageId=177065278) 
  
  
  1.Make sure  RTIS configuration on dev server has same stream name, 
