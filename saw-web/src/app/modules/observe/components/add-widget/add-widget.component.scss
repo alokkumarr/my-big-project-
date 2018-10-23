@@ -1,0 +1,40 @@
+@import 'src/themes/base/colors';
+
+:host {
+  background-color: whitesmoke;
+  display: block;
+  min-height: 100%;
+  max-width: 400px;
+}
+
+mat-horizontal-stepper.mat-stepper-horizontal {
+  background-color: transparent;
+
+  ::ng-deep .mat-horizontal-stepper-header-container {
+    display: none;
+  }
+}
+
+::ng-deep widget-category,
+::ng-deep widget-metric {
+  mat-expansion-panel.mat-expansion-panel {
+    background-color: transparent;
+    border-bottom: 1px solid $primary-grey-g1;
+
+    mat-expansion-panel-header.mat-expansion-panel-header {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid $primary-grey-g1;
+    }
+
+    &:not([class*='mat-elevation-z']) {
+      box-shadow: none;
+    }
+  }
+
+  button.choose-category,
+  button.choose-metric {
+    width: 100%;
+    text-align: left;
+  }
+}

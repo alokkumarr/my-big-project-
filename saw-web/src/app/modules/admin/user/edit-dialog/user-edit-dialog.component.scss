@@ -1,0 +1,14 @@
+@import "src/themes/base/colors";
+
+:host {
+  max-width: 500px;
+}
+
+.base-dialog__content {
+  padding: 10px 50px !important;
+  width: 400px;
+
+  .mat-form-field {
+    width: 100%;
+  }
+}

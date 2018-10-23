@@ -24,7 +24,6 @@ dat1 <- data.frame(index = 1:n,
 #   as.data.frame() %>%
 #   dplyr::filter(spark == "2.3.0") %>%
 #   dplyr::pull(dir)
-
 sc <- spark_connect(master = "local")
 
 
@@ -277,7 +276,7 @@ test_that("Auto-Forecaster with Spark test case", {
                 dat1 %>% mutate(group = "B"))
   
   # Load data into Spark
- # dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
+  dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
   
   r_f1 <- auto_forecaster(dat3,
                           index_var = "index",
@@ -290,28 +289,28 @@ test_that("Auto-Forecaster with Spark test case", {
                             list(method = "auto.arima"),
                             list(method = "ets")))
   
-  # spk_f1 <- auto_forecaster(dat3_tbl,
-  #                           index_var = "index",
-  #                           group_vars = "group",
-  #                           measure_vars = c("y"),
-  #                           periods = 10,
-  #                           unit = NULL,
-  #                           pipe = NULL,
-  #                           models = list(
-  #                             list(method = "auto.arima"),
-  #                             list(method = "ets")))
-  # 
-  # expect_equal(
-  #   spk_f1 %>%
-  #     arrange(group, measure, index) %>%
-  #     select_if(is.numeric) %>%
-  #     collect() %>%
-  #     round(5) ,
-  #   r_f1 %>%
-  #     arrange(group, measure, index) %>%
-  #     select_if(is.numeric) %>%
-  #     round(5)
-  # )
+  spk_f1 <- auto_forecaster(dat3_tbl,
+                            index_var = "index",
+                            group_vars = "group",
+                            measure_vars = c("y"),
+                            periods = 10,
+                            unit = NULL,
+                            pipe = NULL,
+                            models = list(
+                              list(method = "auto.arima"),
+                              list(method = "ets")))
+   
+  expect_equal(
+    spk_f1 %>%
+      arrange(group, measure, index) %>%
+      select_if(is.numeric) %>%
+      collect() %>%
+      round(5) ,
+    r_f1 %>%
+      arrange(group, measure, index) %>%
+      select_if(is.numeric) %>%
+      round(5)
+  )
   
 })
 
@@ -350,19 +349,18 @@ test_that("Deploy Function works as expected", {
     train_models(.) %>%
     set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
   
-  temp_path <- paste(tempdir(), "test.rds", sep="/")
+  temp_path <- paste(tempdir(), "deploy-test", sep="/")
   deploy(f12, path = temp_path)
-  expect_file_exists(temp_path)
+  expect_directory_exists(temp_path)
+  temp_file_path <-  paste0(temp_path, '/',
+                            paste(f12$name, f12$version, sep="-"), '/', 
+                            f12$name, "-", f12$version, '.rds')
+  expect_file_exists(temp_file_path)
   
-  f13 <- readRDS(temp_path)
+  f13 <- readRDS(temp_file_path)
   expect_equal(f12$created_on, f13$created_on)
   expect_equal(f12$name, f13$name)
   expect_equal(f12$final_model$uid, f13$final_model$uid)
-  
-  deploy(f12, path = temp_path, lighten = TRUE)
-  f13 <- readRDS(temp_path)
-  expect_null(f13$models[[1]]$fit)
-  expect_null(f13$models[[2]]$fit)
   
   p13 <- predict(f13, periods = 7)
   expect_class(p13, "predictions")

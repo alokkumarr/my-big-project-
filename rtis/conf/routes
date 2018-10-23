@@ -5,8 +5,16 @@ GET     /                controllers.Application.index
 GET     /i               controllers.Application.i
 POST    /i               controllers.Application.iPost
 
+## Renamed /i as per standards 
+GET     /countlyevents             controllers.Application.i
+POST    /crashreport               controllers.Application.iPost
+
+
 #Generic event handler
-POST    /publishevent    controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String], payload:Option[String])
+POST    /publishevent    controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String])
+
+# Renamed generic event handler as per standards
+POST    /events			 controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String])
 
 # Swagger - Root Resources Listing
 GET     /api-docs        controllers.ApiHelpController.getResources
@@ -22,6 +30,9 @@ GET   /docs/*file        controllers.Assets.at(path="/public/swagger-ui",file)
 GET     /control        controllers.RTISControl.executeCmd(CMD:String, PARAMETERS:Option[String])
 POST    /control        controllers.RTISControl.executeExtendedCmd(CMD:String)
 GET     /sr             controllers.RTISControl.sr( parameters:Option[String])
+
+# Renamed /sr as per standards
+GET     /statusreport             controllers.RTISControl.sr( parameters:Option[String])
 
 # log files and ...
 

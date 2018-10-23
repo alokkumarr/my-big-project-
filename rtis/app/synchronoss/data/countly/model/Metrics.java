@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by srya0001 on 4/28/2016.
  */
-@ApiModel(value = "Metric Data", discriminator = "type", description = "JSON object containing key, value pairs. metrics can only be sent together with begin_session")
+/*@ApiModel(value = "Metric Data", discriminator = "type", description = "JSON object containing key, value pairs. metrics can only be sent together with begin_session")*/
 public class Metrics {
 
     @ApiModelProperty(

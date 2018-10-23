@@ -83,7 +83,7 @@ train_model.spark_model <- function(mobj,
     if (samples$validation_method == "holdout") {
       validator_args <- list(train_ratio = samples$validation_args$split)
     } else {
-      validator_args <- list(train_ratio = 1.0)
+      validator_args <- list(train_ratio = 0.99)
     }
   }
   
@@ -191,15 +191,38 @@ evaluate_model.spark_model <- function(mobj,
 
 
 #' Summary Method for Spark Model Object
-#' @export
 #' @rdname summary
+#' @export
 summary.spark_model <- function(mobj, ...){
   print(mobj$fit)
 }
 
 
-#' @export
 #' @rdname print
+#' @export
 print.spark_model <- function(mobj, ...){
   print(mobj$fit)
 }
+
+
+#' @rdname get_coefs
+#' @export
+get_coefs.spark_model <- function(mobj) {
+  
+  checkmate::assert_integer(length(mobj$fit$stages), lower=2, upper=2)
+  
+  get_coefs(mobj$fit$stages[[2]], mobj$features)
+}
+
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.spark_model <- function(mobj) {
+  
+  checkmate::assert_integer(length(mobj$fit$stages), lower=2, upper=2)
+  
+  get_variable_importance(mobj$fit$stages[[2]], mobj$features)
+}
+
+
+
