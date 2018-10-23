@@ -96,9 +96,10 @@ and deply various RTIS services
 
 
  2.Make sure subscribers on MapR nodes are configured with same stream name and topic 
-  names with which messages are published on RTIS
+  names with which messages are published on RTIS.
 
-  On mapR node  ```/dfs/opt/bda/apps/rta-iot_demo/conf/rta-iot_demo.conf```
+   MapR node configuration can be found at
+   ```/dfs/opt/bda/apps/rta-iot_demo/conf/rta-iot_demo.conf```
 
  3.Invoke /events Ex: using [swagger](https://realtime-rd-sip-vaste.sncrcorp.net/docs)
   with valid  query params and payload
