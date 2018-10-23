@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by srya0001 on 4/28/2016.
  */
- @ApiModel(value = "User Data", description = "All values are optional and currently you can pass this information about user")
+ /*@ApiModel(value = "User Data", description = "All values are optional and currently you can pass this information about user")*/
 public class UserDetails {
 
     @ApiModelProperty( value = "name",

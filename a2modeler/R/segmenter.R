@@ -61,7 +61,7 @@ predict.segmenter <- function(obj,
   
   # Schema Check
   schema_compare <- obj$schema %>% 
-    a2munge::schema_check(., get_schema(data))
+    a2munge::schema_check(., a2munge::get_schema(data))
   
   pipe <- obj$pipelines[[final_model$pipe]] %>% 
     execute(data, .) 

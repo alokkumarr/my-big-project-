@@ -60,9 +60,7 @@ export class JwtService {
    */
   hasCustomConfig(configName) {
     const customConfig = get(this.getTokenObj(), 'ticket.customConfig') || [];
-    return isArray(customConfig) ?
-      customConfig.includes(configName) :
-      false;
+    return isArray(customConfig) ? customConfig.includes(configName) : false;
   }
 
   getAccessToken() {

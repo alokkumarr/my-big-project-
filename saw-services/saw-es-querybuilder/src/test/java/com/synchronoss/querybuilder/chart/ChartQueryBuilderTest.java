@@ -63,7 +63,7 @@ public class ChartQueryBuilderTest {
         .withIndex(INDEX_NAME, IndexSettings.builder()
         .withType(TYPE_NAME, mappingStream)
          .withSettings(settingStream)
-        .build()).withStartTimeout(1, TimeUnit.MINUTES)
+        .build()).withStartTimeout(5, TimeUnit.MINUTES)
         .build().start();
     client = RestClient.builder(new HttpHost("localhost", 9351, "http"))
         .setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
