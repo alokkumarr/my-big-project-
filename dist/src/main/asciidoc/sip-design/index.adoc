@@ -260,11 +260,26 @@ The SAW Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
 semantic metadata configuration REST APU & data wrangling related REST API.
 
+The Workbench Service provides a REST API on top of which the various
+Workbench operations in the Web user interface are implemented.  The
+Workbench Service internally uses the Metadata Library to list and
+work with dataset information in MapR-DB.  Additionally it uses a
+queuing mechanism for executing dataset transformations through the
+Workbench Executor component.
+
 .SIP Workbench Components
 plantuml::sip-design/figure-components.pum[format=svg]
 
 .SIP Workbench Executor
 plantuml::sip-design/figure-executor.pum[format=svg]
+
+Workbench transformations are implemented using XDF components.
+Invoking an XDF component involves input and output to the data lake,
+or another location such as Elasticsearch.  The Workbench Service
+invokes XDF-NG components using the XDF-NG component interface.
+Datasets are internally stored as JSON documents in MapR-DB. The
+entries are created by XDF components as part of execution and
+accessed using the BDA Metadata library.
 
 === SAW Storage Proxy Service
 

@@ -12,6 +12,17 @@ context("Collapser unit tests")
 
 n = 20
 
+
+# Create Spark Connection 
+spk_versions <- sparklyr::spark_installed_versions() 
+
+if(! "2.3.0" %in% spk_versions$spark) {
+  sparklyr::spark_install(version = "2.3.0")
+}
+
+sc <- spark_connect(master = "local", version = "2.3.0")
+
+
 # Basic Tests -------------------------------------------------------------
 set.seed(n)
 id_vars <- seq(1, n, by = 1)
@@ -54,11 +65,7 @@ for (id in id_vars) {
 
 dat$dates_day <- format(as.Date(dat$dates_day), "%Y-%m-%d %H:%M:%S")
 
-# Create Spark Connection and read in some data
-sc <- spark_connect(master = "local")
-
 # Load data into Spark
-
 dat_tbl <-
   copy_to(sc, dat %>% mutate(dates_min = as.character(dates_min), overwrite = TRUE))
 

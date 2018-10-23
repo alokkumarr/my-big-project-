@@ -6,15 +6,19 @@ const ERROR_TITLE_LENGTH = 50;
 
 @Injectable()
 export class ErrorDetailService {
+  getDetail(error) {
+    return JSON.stringify(error);
+  }
+
   getTitle(error, defaultMessage = 'Error') {
-    const title = get(error, 'data.error.message') ||
-          get(error, 'data.message', '');
+    const title =
+      get(error, 'error.error.message') ||
+      get(error, 'error.message') ||
+      get(error, 'message', '') ||
+      get(error, 'error', '');
+    /* prettier-ignore */
     return title ? truncate(title, {
       length: ERROR_TITLE_LENGTH
     }) : defaultMessage;
-  }
-
-  getDetail(error) {
-    return JSON.stringify(error);
   }
 }
