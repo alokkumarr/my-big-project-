@@ -14,7 +14,7 @@ import {
 import { RoleService } from '../role/role.service';
 import { CategoryService } from '../category/category.service';
 import { PrivilegeService } from '../privilege/privilege.service';
-import { UserAssignmentService } from '../datasecurity/userassignment.service'
+import { UserAssignmentService } from '../datasecurity/userassignment.service';
 import { JwtService } from '../../../common/services';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
@@ -71,7 +71,7 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
 })
 export class AdminMainViewComponent implements OnDestroy {
   columns: any[] = [];
-  section: 'user' | 'role' | 'privilege' | 'category';
+  section: 'user' | 'role' | 'privilege' | 'category' | 'user assignments';
   data$: Promise<any[]>;
   roles$: any;
   data: any[];

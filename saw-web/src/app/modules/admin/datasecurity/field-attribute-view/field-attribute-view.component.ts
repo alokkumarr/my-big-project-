@@ -6,12 +6,11 @@ import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attri
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
 import * as isEmpty from 'lodash/isEmpty';
 
-const template = require('./field-attribute-view.component.html');
 require('./field-attribute-view.component.scss');
 
 @Component({
   selector: 'field-attribute-view',
-  template
+  template: './field-attribute-view.component.html'
 })
 export class FieldAttributeViewComponent {
   config: any;
@@ -37,19 +36,19 @@ export class FieldAttributeViewComponent {
   loadAttributesGrid() {
     this._userAssignmentService.getSecurityAttributes(this.groupSelected).then(response => {
       this.data = response;
-      this.emptyState = this.data.length === 0 ? true : false;
+      this.emptyState = isEmpty(this.data) ? true : false;
     });
   }
 
   editAttribute(cell) {
-    let mode = 'edit';
+    const mode = 'edit';
     const data = {
       mode,
       attributeName: cell.data.attributeName,
       groupSelected: this.groupSelected,
       value: cell.data.value
     };
-    let component = AddAttributeDialogComponent;
+    const component = AddAttributeDialogComponent;
     return this._dialog.open(component, {
       width: 'auto',
       height: 'auto',
@@ -69,7 +68,7 @@ export class FieldAttributeViewComponent {
       content: `Attribute Name: ${cellData.attributeName}`,
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
-    }
+    };
     return this._dialog.open(DeleteDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -82,7 +81,7 @@ export class FieldAttributeViewComponent {
         const requestBody = [this.groupSelected, cellData.attributeName];
         this._userAssignmentService.deleteGroupOrAttribute(path, requestBody).then(response => {
           this.loadAttributesGrid();
-        })
+        });
       }
     });
   }
@@ -114,7 +113,6 @@ export class FieldAttributeViewComponent {
       width: '20%'
     }, {
       caption: '',
-      //dataField: 'analysis.name',
       allowSorting: true,
       alignment: 'left',
       width: '10%',

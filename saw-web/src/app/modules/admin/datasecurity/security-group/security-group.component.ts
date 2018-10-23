@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { Router, NavigationEnd } from '@angular/router';
 import { JwtService } from '../../../../common/services/jwt.service';
@@ -11,13 +11,11 @@ import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.componen
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
-const template = require('./security-group.component.html');
 require('./security-group.component.scss');
-let self;
 
 @Component({
   selector: 'security-group',
-  template
+  template: './security-group.component.html'
 })
 
 export class SecurityGroupComponent {
@@ -30,7 +28,8 @@ export class SecurityGroupComponent {
 
   config: any;
   data: any;
-  groupSelected: any = '';columnData: {};
+  groupSelected: any = '';
+  columnData: {};
   emptyState: boolean;
 
   constructor(
@@ -110,7 +109,7 @@ export class SecurityGroupComponent {
       content: `Group Name: ${cellData.securityGroupName}`,
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
-    }
+    };
     return this._dialog.open(DeleteDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -123,7 +122,7 @@ export class SecurityGroupComponent {
       if (result) {
         this._userAssignmentService.deleteGroupOrAttribute(path, securityGroupName).then(response => {
           this.loadGroupGridWithData(this.groupSelected);
-        })
+        });
       }
     });
   }
@@ -168,7 +167,6 @@ export class SecurityGroupComponent {
       width: '60%'
     }, {
       caption: '',
-      //dataField: 'analysis.name',
       allowSorting: true,
       alignment: 'left',
       width: '30%',
@@ -183,6 +181,9 @@ export class SecurityGroupComponent {
       height: '100%',
       paging: {
         pageSize: 10
+      },
+      selection: {
+        mode: 'single'
       },
       pager: {
         showPageSizeSelector: true,

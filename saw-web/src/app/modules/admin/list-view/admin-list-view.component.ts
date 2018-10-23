@@ -2,6 +2,8 @@ require('./admin-list-view.component.scss');
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { DxDataGridService } from '../../../common/services/dxDataGrid.service';
 import { UserAssignmentService } from './../datasecurity/userassignment.service';
+import * as clone from 'lodash/clone';
+import * as get from 'lodash/get';
 
 const template = require('./admin-list-view.component.html');
 @Component({
@@ -12,7 +14,7 @@ const template = require('./admin-list-view.component.html');
 export class AdminListViewComponent implements OnInit {
   @Input() data: any[];
   @Input() columns: any[];
-  @Input() section: 'user' | 'role' | 'privilege' | 'categories';
+  @Input() section: 'user' | 'role' | 'privilege' | 'categories' | 'user assignments';
   @Input() highlightTerm: string;
   @Output() editRow: EventEmitter<any> = new EventEmitter();
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
@@ -32,8 +34,8 @@ export class AdminListViewComponent implements OnInit {
   ngOnInit() {
     this.config = this.getConfig();
     this._userAssignmentService.getSecurityGroups().then(response => {
-      this.securityGroups = response;
-    })
+      this.securityGroups = clone(response);
+    });
   }
 
   getLinkTooltip() {
@@ -46,7 +48,7 @@ export class AdminListViewComponent implements OnInit {
       userId: cell.data.loginId
     }
     this._userAssignmentService.assignGroupToUser(request).then(response => {
-      this.groupAssignSuccess = response.valid ? 'checkmark' : 'close';
+      this.groupAssignSuccess = get(response, 'valid') ? 'checkmark' : 'close';
       this.userGroupID = cell.data.loginId;
     });
   }

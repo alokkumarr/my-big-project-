@@ -1,13 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { UserAssignmentService } from './../userassignment.service';
+import * as get from 'lodash/get';
 
-const template = require('./add-security-dialog.component.html');
 require('./add-security-dialog.component.scss');
 
 @Component({
   selector: 'add-secuirty-dialog',
-  template
+  template: './add-security-dialog.component.html'
 })
 export class AddSecurityDialogComponent {
   public securityGroup = {};
@@ -24,11 +24,11 @@ export class AddSecurityDialogComponent {
 
   submit() {
     this._userAssignmentService.addSecurityGroup(this.data).then(response => {
-      if (response.valid) {
-        this._dialogRef.close(response.valid);
+      if (get(response, 'valid')) {
+        this._dialogRef.close(get(response, 'valid'));
       } else {
-        this.errorState = !response.valid;
-        this.errorMessage = response.validityMessage;
+        this.errorState = !get(response, 'valid');
+        this.errorMessage = get(response, 'validityMessage');
       }
     });
   }

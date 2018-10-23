@@ -1,13 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { UserAssignmentService } from './../userassignment.service';
+import * as get from 'lodash/get';
 
-const template = require('./add-attribute-dialog.component.html');
 require('./add-attribute-dialog.component.scss');
 
 @Component({
   selector: 'add-attribute-dialog',
-  template
+  template: './add-attribute-dialog.component.html'
 })
 export class AddAttributeDialogComponent {
   public attribute = {};
@@ -17,7 +17,10 @@ export class AddAttributeDialogComponent {
     private _dialogRef: MatDialogRef<AddAttributeDialogComponent>,
     private _userAssignmentService: UserAssignmentService,
     @Inject(MAT_DIALOG_DATA) public data: {
-      mode: 'edit' | 'create'
+      mode: 'edit' | 'create',
+      attributeName,
+      value,
+      groupSelected
     }
   ) {}
 
@@ -26,13 +29,13 @@ export class AddAttributeDialogComponent {
       attributeName: this.data.attributeName.trim(),
       value: this.data.value,
       securityGroupName: this.data.groupSelected
-    }
+    };
     this._userAssignmentService.addAttributetoGroup(request, this.data.mode).then(response => {
-      if (response.valid) {
-        this._dialogRef.close(response.valid);
+      if (get(response, 'valid')) {
+        this._dialogRef.close(get(response, 'valid'));
       } else {
-        this.errorState = !response.valid;
-        this.errorMessage = response.validityMessage;
+        this.errorState = !get(response, 'valid');
+        this.errorMessage = get(response, 'validityMessage');
       }
     });
   }

@@ -2,12 +2,9 @@ import { Component, Inject } from '@angular/core';
 import { UserAssignmentService } from './../userassignment.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
-const template = require('./delete-dialog.component.html');
-//require('./security-group.component.scss');
-
 @Component({
   selector: 'delete-dialog',
-  template
+  template: './delete-dialog.component.html'
 })
 export class DeleteDialogComponent {
 
