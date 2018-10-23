@@ -103,8 +103,8 @@ and deply various RTIS services
    ```/dfs/opt/bda/apps/rta-iot_demo/conf/rta-iot_demo.conf```
 
  3.Invoke /events Ex: using
-   [swagger](https://realtime-rd-sip-vaste.sncrcorp.net/docs) with valid  
-    query params and payload
+   [swagger](https://realtime-rd-sip-vaste.sncrcorp.net/docs)
+   with valid query params and payload
 
  4.Check RTIS log file to make sure messages are sent without any errors at
    ``` /var/bda/rtis/log/app_\<date \>.log```
