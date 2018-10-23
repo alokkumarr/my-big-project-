@@ -395,7 +395,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     @Override
     public List<DskDetails> fetchDskAllAttributeValues(String secuityGroupName) {
         List<DskDetails> dskValueList = null;
-        String fetchSql = "SELECT sg.CREATED_BY as CREATED_BY, sg.CREATED_DATE as CREATED_DATE, sga.ATTRIBUTE_NAME as ATTRIBUTE_NAME, sgv.DSK_VALUE as VALUE FROM SEC_GROUP sg, sec_group_dsk_attribute sga, sec_group_dsk_value sgv WHERE sg.SEC_GROUP_NAME = ? AND sg.SEC_GROUP_SYS_ID = sga.SEC_GROUP_SYS_ID AND sga.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = sgv.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID ;";
+        String fetchSql = "SELECT sg.CREATED_BY as CREATED_BY, sg.CREATED_DATE as CREATED_DATE, sga.ATTRIBUTE_NAME as ATTRIBUTE_NAME, sgv.DSK_VALUE as VALUE FROM SEC_GROUP sg, sec_group_dsk_attribute sga, sec_group_dsk_value sgv WHERE sg.SEC_GROUP_NAME = ? AND sg.SEC_GROUP_SYS_ID = sga.SEC_GROUP_SYS_ID AND sga.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = sgv.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID ";
 
         try{
             dskValueList = jdbcTemplate.query(fetchSql, ps -> {
@@ -466,7 +466,12 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             " ) fi" +
             " left outer join SEC_GROUP sg" +
             " on (fi.sec_grp_sys_id = sg.sec_group_sys_id) ";
-           /** "SELECT u.USER_ID as LoginID," +
+
+        /** NOTE : The below commented code (sql) in replacement of above sql can lists out only user assignments who have associated security groups.
+                If in future, if there is a requirement like to list only user assignments who have associated security groups. we can directly replace this sql.
+         **/
+
+        /** "SELECT u.USER_ID as LoginID," +
             " r.role_Name as Role," +
             " u.FIRST_NAME as FirstName," +
             " u.LAST_NAME as LastName, u.email as Email," +
