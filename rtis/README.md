@@ -107,7 +107,7 @@ and deply various RTIS services
    with valid query params and payload
 
  4.Check RTIS log file to make sure messages are sent without any errors at
-   ``` /var/bda/rtis/log/app_\<date \>.log```
+   ``` /var/bda/rtis/log/app_<date>.log```
 
  5.If all configurations are as expected, then you can see a parquet/json 
    file written as per configuration.
