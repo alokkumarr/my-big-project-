@@ -114,6 +114,10 @@ MAIN_CLASS=${COMP_MC[$COMPONENT_NAME]}
 # validate XDF_DATA_ROOT
 hadoop fs -stat $XDF_DATA_ROOT >/dev/null || exit 1
 
+# read SPARK_DRIVER_MEMORY from config file
+SPARK_DRIVER_MEMORY="$(cat $CONFIG_FILE| jq -r '.parameters | .[] | select(.name == "spark.driver.memory")| .value ')"
+echo "SPARK DRIVER MEMORY:: $SPARK_DRIVER_MEMORY"
+
 # 'export SPARK_HOME' inside spark-env.sh
 ##?? not needed
 #source $SPARK_HOME/conf/spark-env.sh
@@ -151,6 +155,7 @@ CMD=(
 #    --driver-java-options "${JAVA_PROPS[@]}"
     --conf "spark.driver.extraJavaOptions=${JAVA_PROPS[*]}"
     --class $MAIN_CLASS
+    --driver-memory $SPARK_DRIVER_MEMORY
     $COMPONENT_JAR
     # main args
     -a $APPLICATION_ID
