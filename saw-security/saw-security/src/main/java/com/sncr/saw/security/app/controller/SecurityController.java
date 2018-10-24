@@ -805,7 +805,7 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping ( value = "/auth/admin/users/{userSysId}/security-group", method = RequestMethod.PUT)
-    public Valid updateUser(@PathVariable (name = "userSysId", required = true) Long userSysId, @RequestParam String securityGroupName)  {
+    public Valid updateUser(@PathVariable (name = "userSysId", required = true) Long userSysId, @RequestBody String securityGroupName)  {
 	    return (dataSecurityKeyRepository.updateUser(securityGroupName,userSysId));
     }
 
