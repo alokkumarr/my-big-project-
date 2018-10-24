@@ -33,7 +33,7 @@ import pl.allegro.tech.embeddedelasticsearch.IndexSettings;
 import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
 
 @RunWith(SAWRetryTestCasesRunner.class)
-public class ReportQueryBuilderTest {
+public class ReportQueryBuilderTestChangeLater {
 
   private  EmbeddedElastic embeddedElastic = null;
   private  URL esSettingsResource = null;
