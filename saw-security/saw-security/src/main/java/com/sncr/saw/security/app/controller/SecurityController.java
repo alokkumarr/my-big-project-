@@ -753,16 +753,7 @@ public class SecurityController {
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}",method = RequestMethod.DELETE)
     public Valid deleteSecurityGroups(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
-	    Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId))   {
-	        valid.setValid(true);
-	        valid.setValidityMessage("Successfully deleted security group");
-        }
-        else {
-            valid.setValid(false);
-            valid.setValidityMessage("Error in deleting security group");
-        }
-	    return valid;
+	    return (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId));
     }
 
     /**
@@ -782,16 +773,7 @@ public class SecurityController {
      */
     @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method =  RequestMethod.PUT)
     public Valid updateAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)    {
-	    Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues))   {
-	        valid.setValid(true);
-	        valid.setValidityMessage("DSK value Updated successfully");
-        }
-        else {
-	        valid.setValid(false);
-	        valid.setValidityMessage("Error in updating DSK value");
-        }
-        return valid;
+	    return  (dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues));
     }
 
     /**
@@ -802,7 +784,6 @@ public class SecurityController {
     @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attributes", method = RequestMethod.GET)
     public List<String> fetchSecurityGroupDskAttributes(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)   {
 	    return dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupId);
-
     }
 
     /**
@@ -812,19 +793,10 @@ public class SecurityController {
      */
     @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attributes/{attributeName}", method = RequestMethod.DELETE)
     public Valid deleteSecurityGroupDskAttribute(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId,@PathVariable(name = "attributeName", required = true) String attributeName)   {
-        Valid valid = new Valid();
         List<String> dskList = new ArrayList<>();
         dskList.add(0,securityGroupId.toString());
         dskList.add(1,attributeName);
-        if (dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList))   {
-            valid.setValid(true);
-            valid.setValidityMessage("Deleted Attribute values");
-        }
-        else {
-            valid.setValid(false);
-            valid.setValidityMessage("Error in deleting Attribute Values");
-        }
-        return valid;
+        return (dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList));
     }
 
     /**
@@ -834,17 +806,7 @@ public class SecurityController {
      */
     @RequestMapping ( value = "/auth/admin/users/{userSysId}/security-group", method = RequestMethod.PUT)
     public Valid updateUser(@PathVariable (name = "userSysId", required = true) Long userSysId, @RequestParam String securityGroupName)  {
-        String groupName = securityGroupName;
-        Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.updateUser(groupName,userSysId))    {
-	        valid.setValid(true);
-	        valid.setValidityMessage("Group Name successfully updated");
-        }
-        else {
-	        valid.setValid(false);
-	        valid.setValidityMessage("Error in updating Group Name");
-        }
-	    return valid;
+	    return (dataSecurityKeyRepository.updateUser(securityGroupName,userSysId));
     }
 
     /**
