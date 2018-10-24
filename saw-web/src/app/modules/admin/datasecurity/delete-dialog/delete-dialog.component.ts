@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'delete-dialog',
-  template: './delete-dialog.component.html'
+  templateUrl: './delete-dialog.component.html'
 })
 export class DeleteDialogComponent {
 

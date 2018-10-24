@@ -10,3 +10,22 @@
     height: 24px;
   }
 }
+
+.list-action__container.group-select {
+  place-content: start !important;
+
+  mat-form-field {
+    width: 80% !important;
+  }
+
+  .icon-close {
+    color: red;
+    padding-top: 6px;
+    padding-left: 12px;
+  }
+
+  .icon-checkmark {
+    color: green;
+    font-size: 20px;
+  }
+}

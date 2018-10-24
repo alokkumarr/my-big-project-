@@ -1,6 +1,6 @@
 @import "src/themes/base/colors";
 
-add-attribute-dialog {
+::ng-deep add-attribute-dialog {
   max-width: 860px;
   width: 860px;
 

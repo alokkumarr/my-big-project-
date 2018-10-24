@@ -6,11 +6,10 @@ import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attri
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
 import * as isEmpty from 'lodash/isEmpty';
 
-require('./field-attribute-view.component.scss');
-
 @Component({
   selector: 'field-attribute-view',
-  template: './field-attribute-view.component.html'
+  templateUrl: './field-attribute-view.component.html',
+  styleUrls: ['./field-attribute-view.component.scss']
 })
 export class FieldAttributeViewComponent {
   config: any;

@@ -1,6 +1,6 @@
 @import "src/themes/base/colors";
 
-field-attribute-view {
+::ng-deep field-attribute-view {
   .attribute-group-grid {
     width: 99% !important;
   }

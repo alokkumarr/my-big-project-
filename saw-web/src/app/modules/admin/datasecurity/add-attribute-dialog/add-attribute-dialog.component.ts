@@ -3,11 +3,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { UserAssignmentService } from './../userassignment.service';
 import * as get from 'lodash/get';
 
-require('./add-attribute-dialog.component.scss');
-
 @Component({
   selector: 'add-attribute-dialog',
-  template: './add-attribute-dialog.component.html'
+  templateUrl: './add-attribute-dialog.component.html',
+  styleUrls: ['./add-attribute-dialog.component.scss']
 })
 export class AddAttributeDialogComponent {
   public attribute = {};

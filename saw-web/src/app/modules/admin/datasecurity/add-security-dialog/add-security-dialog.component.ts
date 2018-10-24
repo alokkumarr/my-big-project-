@@ -3,12 +3,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { UserAssignmentService } from './../userassignment.service';
 import * as get from 'lodash/get';
 
-require('./add-security-dialog.component.scss');
-
 @Component({
   selector: 'add-secuirty-dialog',
-  template: './add-security-dialog.component.html'
+  templateUrl: './add-security-dialog.component.html',
+  styleUrls: ['./add-security-dialog.component.scss']
 })
+
 export class AddSecurityDialogComponent {
   public securityGroup = {};
   public errorState: boolean;

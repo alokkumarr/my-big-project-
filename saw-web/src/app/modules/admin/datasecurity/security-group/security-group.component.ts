@@ -11,11 +11,13 @@ import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.componen
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
+const template = require('./security-group.component.html');
 require('./security-group.component.scss');
 
 @Component({
   selector: 'security-group',
-  template: './security-group.component.html'
+  templateUrl: './security-group.component.html',
+  styleUrls: ['./security-group.component.scss']
 })
 
 export class SecurityGroupComponent {
@@ -181,9 +183,6 @@ export class SecurityGroupComponent {
       height: '100%',
       paging: {
         pageSize: 10
-      },
-      selection: {
-        mode: 'single'
       },
       pager: {
         showPageSizeSelector: true,
