@@ -271,6 +271,26 @@ export class WorkbenchService {
   }
 
   /**
+   * Creates a Source entry in Batch Ingestion Service
+   *
+   * @param {*} payload
+   * @returns
+   * @memberof WorkbenchService
+   */
+  createSource(payload) {
+    payload.customerCode = this.jwt.customerCode;
+    payload.createdBy = this.jwt.getUserName();
+    payload.projectCode = userProject;
+    payload.productCode = this.jwt.getProductName();
+
+    const endpoint = `${this.api}/ingestion/batch/channels`;
+
+    return this.http
+      .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
    * Handle Http operation that failed.
    * Let the app continue.
    * @param operation - name of the operation that failed

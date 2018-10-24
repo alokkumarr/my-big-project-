@@ -1,6 +1,8 @@
-export interface Schedule {
-  text: string;
-  startDate: Date;
-  endDate: Date;
-  allDay?: boolean;
+export interface SourceObject {
+  createdBy: string;
+  productCode: string;
+  projectCode: string;
+  customerCode: string;
+  channelType: string;
+  channelMetadata: string;
 }

@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 
 import { sourceTypes } from '../../wb-comp-configs';
+import { SourceObject } from '../../models/workbench.interface';
 
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
@@ -11,6 +12,7 @@ import { CreateRouteDialogComponent } from './create-route-dialog/create-route-d
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 
 import { SAMPLE_SOURCE_DATA } from '../../sample-data';
+import { isUndefined } from 'util';
 
 @Component({
   selector: 'datasource-page',
@@ -20,7 +22,7 @@ import { SAMPLE_SOURCE_DATA } from '../../sample-data';
 export class DatasourceComponent implements OnInit, OnDestroy {
   sourceData: any = SAMPLE_SOURCE_DATA;
   sources = sourceTypes;
-  selectedSourceType: string = 'sftp';
+  selectedSourceType = 'sftp';
   selectedSourceData: any;
 
   constructor(
@@ -52,7 +54,19 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       panelClass: 'sourceDialogClass'
     });
 
-    dateDialogRef.afterClosed().subscribe(data => {});
+    dateDialogRef.afterClosed().subscribe(data => {
+      if (!isUndefined(data)) {
+        const payload: SourceObject = {
+          createdBy: '',
+          productCode: '',
+          projectCode: '',
+          customerCode: '',
+          channelType: data.sourceType,
+          channelMetadata: JSON.stringify(data)
+        };
+        this.workBench.createSource(payload).subscribe(() => {});
+      }
+    });
   }
 
   testConnection() {

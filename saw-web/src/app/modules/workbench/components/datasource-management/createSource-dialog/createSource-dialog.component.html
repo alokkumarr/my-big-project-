@@ -36,6 +36,14 @@
           autocomplete="false">
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
             <mat-form-field appearance="outline">
+              <mat-label>Name Your Source</mat-label>
+              <input matInput name="sourceName" formControlName="sourceNameCtrl" maxlength="18" required />
+              <mat-error *ngIf="detailsFormGroup.controls.sourceNameCtrl.hasError('required')">
+                Host Name is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label>Hostname</mat-label>
               <input matInput placeholder="Host Name" name="hostName" formControlName="hostNameCtrl" required />
               <mat-error *ngIf="detailsFormGroup.controls.hostNameCtrl.hasError('required')">
@@ -52,15 +60,16 @@
                 <strong>required</strong>
               </mat-error>
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Access Type</mat-label>
-              <mat-select value="read">
-                <mat-option value="read">Read</mat-option>
-              </mat-select>
-            </mat-form-field>
           </section>
           <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+            <mat-form-field appearance="outline">
+              <mat-label>Access Type</mat-label>
+              <mat-select formControlName="accessTypeCtrl">
+                <mat-option value="R">Read</mat-option>
+                <mat-option value="RW">Read & Write</mat-option>
+              </mat-select>
+            </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Username</mat-label>
               <input type="text" matInput placeholder="Username" name="username" formControlName="userNameCtrl"
@@ -86,6 +95,12 @@
               </mat-error>
             </mat-form-field>
           </section>
+          <section fxFlex fxLayout="column" fxLayoutAlign="center center">
+            <mat-form-field style="width: 90%;" appearance="outline">
+              <mat-label>Description about the source</mat-label>
+              <textarea matInput formControlName="descriptionCtrl"></textarea>
+            </mat-form-field>
+          </section>
         </form>
         <mat-divider></mat-divider>
         <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
@@ -93,7 +108,8 @@
           <button mat-stroked-button color="primary" (click)="testConnection()">
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
-          <button mat-raised-button color="primary" matStepperNext [disabled]="!detailsFormGroup.valid">Create</button>
+          <button mat-raised-button color="primary" type="submit" matStepperNext [disabled]="!detailsFormGroup.valid"
+            (click)="createSource(detailsFormGroup.value)">Create</button>
         </div>
       </mat-step>
     </mat-horizontal-stepper>

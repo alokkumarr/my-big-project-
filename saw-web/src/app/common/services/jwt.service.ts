@@ -152,6 +152,10 @@ export class JwtService {
     return get(this.getTokenObj(), 'ticket.userFullName').toString();
   }
 
+  getProductName() {
+    return get(this.getTokenObj(), 'ticket.products[0].productCode').toString();
+  }
+
   _isRole(token, role) {
     const roleType = get(token, 'ticket.roleType');
     return roleType === role;

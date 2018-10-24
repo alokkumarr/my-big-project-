@@ -67,8 +67,17 @@
         </div>
       </mat-step>
       <mat-step label="Schedule">
+        <div style="height: 80%;">
           <cron-job-schedular [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
-
+        </div>
+        <mat-divider></mat-divider>
+        <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
+          <button mat-raised-button color="primary" matStepperPrevious>Previous</button>
+          <button mat-stroked-button color="primary" (click)="testConnection()">
+            <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
+          </button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="!detailsFormGroup.valid">Create</button>
+        </div>
       </mat-step>
     </mat-horizontal-stepper>
   </mat-card-content>
