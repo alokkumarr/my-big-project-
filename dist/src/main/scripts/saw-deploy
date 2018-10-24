@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Deploy SAW to an environment
 #
@@ -32,6 +32,9 @@ set -o pipefail
 if rpm -q ansible | grep -E "ansible-2.(2|3)" > /dev/null; then
     sed -i -e "s/^- import_playbook:/- include:/" $dir/site.yml
 fi
+
+# Log the deployment
+exec &> >(systemd-cat -t saw-deploy)
 
 echo "Starting deployment"
 ansible-playbook -i $config $dir/site.yml

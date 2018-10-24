@@ -217,7 +217,7 @@ get_fit <- function(mobj, ...) {
 #'
 #' @inheritParams get_fit
 #' @export
-get_coefs <- function(mobj) {
+get_coefs <- function(mobj, ...) {
   UseMethod("get_coefs", mobj)
 }
 
@@ -230,4 +230,30 @@ get_forecasts <- function(mobj) {
   UseMethod("get_forecasts", mobj)
 }
 
+#' Get Model Variable Importance Metrics
+#'
+#' Returns variable importance from tree based methods, coefficient summaries
+#' from linear based methods, and NULL for methods without inferential metrics
+#'
+#' @param mobj model object
+#' @export
+get_variable_importance <- function(mobj, ...) {
+  UseMethod("get_variable_importance", mobj)
+}
 
+
+
+# Class Methods -----------------------------------------------------------
+
+
+#' @rdname get_coefs
+#' @export
+get_coefs.default <- function(mobj, ...)  {
+  NULL
+}
+
+#' @rdname get_variable_importance
+#' @export
+get_variable_importance.default <- function(mobj, ...)  {
+  NULL
+}

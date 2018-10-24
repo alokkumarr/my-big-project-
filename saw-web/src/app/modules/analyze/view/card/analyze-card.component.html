@@ -1,0 +1,62 @@
+<mat-card e2e="analysis-card">
+
+  <mat-card-header fxLayout="row" fxLayoutAlign="end center">
+    <mat-chip class="tag-chip status-chip mat-basic-chip"
+              *ngIf="isExecuting"
+              i18n
+    >
+    EXECUTING
+    </mat-chip>
+    <mat-chip class="tag-chip mat-basic-chip"
+              [innerHtml]="getType(analysis.type) | highlight: highlightTerm"
+    ></mat-chip>
+  </mat-card-header>
+
+  <mat-card-content fxLayout="row"
+                    fxLayoutAlign="center center"
+                    [attr.e2e]="typeIdentifier"
+  >
+    <div class="saw-ac-placeholder"
+          [ngClass]="placeholderClass"
+          routerLink="../analysis/{{analysis.id}}/executed"
+    ></div>
+  </mat-card-content>
+  <mat-divider></mat-divider>
+  <mat-card-footer fxLayout="row" fxLayoutAlign="space-between start">
+    <div>
+      <mat-card-title>
+        <a [innerHtml]="analysis.name | highlight: highlightTerm"
+           routerLink="../analysis/{{analysis.id}}/executed"
+           e2e="analysis-name"
+        ></a>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <span [innerHtml]="(analysis.metrics || []).join(', ') | highlight: highlightTerm"></span>
+        <span>
+          <mat-icon fontIcon="icon-calendar"></mat-icon>
+          {{schedule || 'No Schedule Set'}}
+        </span>
+      </mat-card-subtitle>
+    </div>
+    <mat-card-actions fxLayout="row" fxLayoutAlign="center center">
+      <button mat-icon-button
+              (click)="fork(analysis)"
+              e2e="action-fork-btn"
+              *ngIf="canUserFork"
+              class="list-action-button"
+              i18n-matTooltip="Fork Analysis"
+              matTooltip="Fork Analysis"
+      >
+        <mat-icon fontIcon="icon-fork"></mat-icon>
+      </button>
+      <analyze-actions-menu-u [analysis]="analysis"
+                              exclude="fork-export-details"
+                              [actionsToDisable]="isExecuting ? 'execute' : ''"
+                              (afterDelete)="afterDelete($event)"
+                              (afterExecute)="afterExecute($event)"
+                              (afterPublish)="afterPublish($event)"
+                              (afterEdit)="afterEdit($event)"
+      ></analyze-actions-menu-u>
+    </mat-card-actions>
+  </mat-card-footer>
+</mat-card>

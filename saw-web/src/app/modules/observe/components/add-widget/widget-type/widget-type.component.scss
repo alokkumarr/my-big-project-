@@ -1,0 +1,44 @@
+button.choose-widget-type {
+  background-color: white;
+  margin: 5px 0;
+  width: 100%;
+  padding: 20px 16px;
+
+  &:first-child {
+    margin-top: 10px;
+  }
+
+  ::ng-deep .mat-button-wrapper {
+    display: flex;
+  }
+}
+
+.widget-icon {
+  width: 20%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.widget-desc {
+  width: 80%;
+  flex-grow: 1;
+  text-align: left;
+  padding-left: 15px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.analysis-widget {
+  background-image: url('/assets/img/widgets/existing-analysis.png');
+}
+
+.kpi-widget {
+  background-image: url('/assets/img/widgets/snapshot-kpi.png');
+}
+
+.custom-widget {
+  background-image: url('/assets/img/widgets/custom-widget.png');
+}
