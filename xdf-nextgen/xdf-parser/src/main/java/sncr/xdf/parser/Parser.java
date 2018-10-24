@@ -173,6 +173,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             if(headerSize >= 1) {
                 logger.debug("Header present");
                 FileStatus[] files = fs.globStatus(new Path(sourcePath));
+
+                logger.debug("Total number of files in the directory = " + files.length);
                 // Check if directory has been given
                 if(files.length == 1 && files[0].isDirectory()){
                     logger.debug("Files length = 1 and is a directory");
@@ -308,9 +310,25 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
         // Files
+
+//        Dataset<Row> outputDataset = null;
         for (FileStatus file : files) {
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
+//                if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
+
+//                Dataset<Row> newDs = parseSingleFile(file.getPath(), new Path(tempDir));
+//
+//                if (outputDataset == null) {
+//                    outputDataset = newDs;
+//                } else {
+//                    if (newDs != null) {
+//                        outputDataset.union(newDs);
+//                    }
+//                }
+
+
+
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
 
 //                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, outputDataSetMode, DLDataSetOperations.FORMAT_PARQUET, null));
@@ -319,6 +337,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 }
             }
         }
+
+//        writeDataset(outputDataset, outputFormat, tempDir);
+//        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, outputDsPartitionKeys));
         return 0;
     }
 
