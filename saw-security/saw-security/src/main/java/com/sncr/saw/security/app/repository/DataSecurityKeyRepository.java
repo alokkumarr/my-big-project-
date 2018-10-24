@@ -10,14 +10,14 @@ import java.util.List;
 
 public interface DataSecurityKeyRepository {
     public Valid addSecurityGroups(SecurityGroups securityGroups,String createdBy);
-    public Valid updateSecurityGroups(List<String> groupNames);
-    public Boolean deleteSecurityGroups(String securityGroupName);
+    public Valid updateSecurityGroups(Long securityGroupId,List<String> groupNames);
+    public Boolean deleteSecurityGroups(Long securityGroupId);
     public List<SecurityGroups> fetchSecurityGroupNames();
-    public Valid addSecurityGroupDskAttributeValues(AttributeValues attributeValues);
-    public List<String> fetchSecurityGroupDskAttributes(String securityGroupName);
+    public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues);
+    public List<String> fetchSecurityGroupDskAttributes(Long securityGroupId);
     public Boolean deleteSecurityGroupDskAttributeValues(List<String> dskList);
-    public List<DskDetails> fetchDskAllAttributeValues(String securityGroupName);
-    public Boolean updateUser(String securityGroupName,String userId);
-    public List<UserAssignment> getAlluserAssignments();
-    public Boolean updateAttributeValues(AttributeValues attributeValues);
+    public List<DskDetails> fetchDskAllAttributeValues(Long securityGroupId);
+    public Boolean updateUser(String securityGroupName,Long userSysId);
+    public List<UserAssignment> getAllUserAssignments();
+    public Boolean updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
 }

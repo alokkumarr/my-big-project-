@@ -11,6 +11,15 @@ public class UserAssignment implements Serializable {
     private String email;
     private String status;
     private String groupName;
+    private Long userSysId;
+
+    public Long getUserSysId() {
+        return userSysId;
+    }
+
+    public void setUserSysId(Long userSysId) {
+        this.userSysId = userSysId;
+    }
 
     public String getGroupName() {
         return groupName;
