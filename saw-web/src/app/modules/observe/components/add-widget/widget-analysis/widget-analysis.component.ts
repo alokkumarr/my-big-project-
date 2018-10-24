@@ -50,16 +50,22 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   }
 
   loadIcons() {
-    forEach(ANALYSIS_METHODS, method => {
-      forEach(method.children, analysisType => {
-        if (analysisType.supportedTypes && analysisType.supportedTypes.length) {
-          forEach(analysisType.supportedTypes, supType => {
-            this.icons[supType.split(':')[1]] = analysisType.icon.font;
-          });
-        } else {
-          this.icons[analysisType.type.split(':')[1]] = analysisType.icon.font;
-        }
-      });
+    forEach(ANALYSIS_METHODS[0].children, analysisType => {
+      if (analysisType.children) {
+        forEach(analysisType.children, analysisChild => {
+          this.icons[analysisChild.type.split(':')[1]] =
+            analysisChild.icon.font;
+        });
+        return;
+      }
+
+      if (analysisType.supportedTypes && analysisType.supportedTypes.length) {
+        forEach(analysisType.supportedTypes, supType => {
+          this.icons[supType.split(':')[1]] = analysisType.icon.font;
+        });
+      } else {
+        this.icons[analysisType.type.split(':')[1]] = analysisType.icon.font;
+      }
     });
   }
 
