@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class DskDetails implements Serializable {
     private static final long serialVersionUID = 7684700543215735559L;
-    private String securityGroupName;
+
     private String attributeName;
     private String Value;
     private String created_by;
@@ -24,14 +24,6 @@ public class DskDetails implements Serializable {
 
     public void setCreated_date(String created_date) {
         this.created_date = created_date;
-    }
-
-    public String getSecurityGroupName() {
-        return securityGroupName;
-    }
-
-    public void setSecurityGroupName(String securityGroupName) {
-        this.securityGroupName = securityGroupName;
     }
 
     public String getAttributeName() {

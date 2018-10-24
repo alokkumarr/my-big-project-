@@ -29,6 +29,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -725,9 +726,9 @@ public class SecurityController {
     /**
      * Adding newly security Group Name to SEC_GROUP.
      * @param securityGroups
-     * @return Valid obj containing Boolean, suceess/failure msg
+     * @return Valid obj containing Boolean, success/failure msg
      */
-    @RequestMapping(value = "/auth/admin/security-group",method = RequestMethod.POST)
+    @RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.POST)
     public Valid addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
@@ -738,22 +739,22 @@ public class SecurityController {
     /**
      * Updating existing Security Group name with new name
      * @param oldNewGroups 1st String resembles new security Group, second -> description of new security group name and third resembles existing.
-     * @return Valid obj containing Boolean, suceess/failure msg
+     * @return Valid obj containing Boolean, success/failure msg
      */
-    @RequestMapping(value = "/auth/admin/security-group",method = RequestMethod.PUT)
-    public Valid updateSecurityGroups(@RequestBody List<String> oldNewGroups) {
-        return (dataSecurityKeyRepository.updateSecurityGroups(oldNewGroups));
+    @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
+    public Valid updateSecurityGroups(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
+        return (dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups));
     }
 
     /**
      * Deleting security group
-     * @param securityGroupName Name of the Group and user id
-     * @return Valid obj containing Boolean and suceess/failure msg
+     * @param securityGroupId
+     * @return Valid obj containing Boolean and success/failure msg
      */
-    @RequestMapping(value = "/auth/admin/security-group/{securityGroupName}",method = RequestMethod.DELETE)
-    public Valid deleteSecurityGroups(@PathVariable(name = "securityGroupName", required = true) String securityGroupName)  {
+    @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}",method = RequestMethod.DELETE)
+    public Valid deleteSecurityGroups(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
 	    Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupName))   {
+	    if (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId))   {
 	        valid.setValid(true);
 	        valid.setValidityMessage("Successfully deleted security group");
         }
@@ -769,9 +770,9 @@ public class SecurityController {
      * @param attributeValues includes attribute names, dsk values, group name etc.
      * @return Valid obj containing Boolean, suceess/failure msg
      */
-    @RequestMapping (value = "/auth/admin/dsk-attribute-value", method = RequestMethod.POST)
-    public Valid addSecurityGroupDskAttributeValues(@RequestBody AttributeValues attributeValues)  {
-	    return dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(attributeValues);
+    @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.POST)
+    public Valid addSecurityGroupDskAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)  {
+	    return dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
     }
 
     /**
@@ -779,12 +780,12 @@ public class SecurityController {
      * @param attributeValues
      * @return Valid obj containing Boolean, suceess/failure msg
      */
-    @RequestMapping ( value = "/auth/admin/dsk-attribute-value", method =  RequestMethod.PUT)
-    public Valid updateAttributeValues(@RequestBody AttributeValues attributeValues)    {
+    @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method =  RequestMethod.PUT)
+    public Valid updateAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)    {
 	    Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.updateAttributeValues(attributeValues))   {
+	    if (dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues))   {
 	        valid.setValid(true);
-	        valid.setValidityMessage("DSK value Updated sucessfully");
+	        valid.setValidityMessage("DSK value Updated successfully");
         }
         else {
 	        valid.setValid(false);
@@ -795,12 +796,12 @@ public class SecurityController {
 
     /**
      * Getting attribute list.
-     * @param securityGroupName Group names
-     * @return List of Group names
+     * @param securityGroupId Group ID
+     * @return List of Attribute names associated with corresponding security-group.
      */
-    @RequestMapping (value = "/auth/admin/dsk-attributes/{securityGroupName}", method = RequestMethod.GET)
-    public List<String> fetchSecurityGroupDskAttributes(@PathVariable(name = "securityGroupName", required = true) String securityGroupName)   {
-	    return dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupName);
+    @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attributes", method = RequestMethod.GET)
+    public List<String> fetchSecurityGroupDskAttributes(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)   {
+	    return dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupId);
 
     }
 
@@ -809,11 +810,11 @@ public class SecurityController {
      * @param
      * @return Valid obj containing Boolean, suceess/failure msg
      */
-    @RequestMapping (value = "/auth/admin/dsk-attribute-value/{groupName}/{attributeName}", method = RequestMethod.DELETE)
-    public Valid deleteSecurityGroupDskAttributeValues(@PathVariable(name = "groupName", required = true) String groupName,@PathVariable(name = "attributeName", required = true) String attributeName)   {
+    @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attributes/{attributeName}", method = RequestMethod.DELETE)
+    public Valid deleteSecurityGroupDskAttribute(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId,@PathVariable(name = "attributeName", required = true) String attributeName)   {
         Valid valid = new Valid();
         List<String> dskList = new ArrayList<>();
-        dskList.add(0,groupName);
+        dskList.add(0,securityGroupId.toString());
         dskList.add(1,attributeName);
         if (dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList))   {
             valid.setValid(true);
@@ -829,14 +830,13 @@ public class SecurityController {
     /**
      * Updating Group reference in user tbl
      * @param
-     * @return Valid obj containing Boolean, suceess/failure msg
+     * @return Valid obj containing Boolean, success/failure msg
      */
-    @RequestMapping ( value = "/auth/admin/assign-group-user", method = RequestMethod.PUT)
-    public Valid updateUser(@RequestBody UpdateUserGroup updateUserGroup)  {
-        String userId = updateUserGroup.getUserId();
-        String groupName = updateUserGroup.getGroupName();
+    @RequestMapping ( value = "/auth/admin/users/{userSysId}/security-group", method = RequestMethod.PUT)
+    public Valid updateUser(@PathVariable (name = "userSysId", required = true) Long userSysId, @RequestParam String securityGroupName)  {
+        String groupName = securityGroupName;
         Valid valid = new Valid();
-	    if (dataSecurityKeyRepository.updateUser(groupName,userId))    {
+	    if (dataSecurityKeyRepository.updateUser(groupName,userSysId))    {
 	        valid.setValid(true);
 	        valid.setValidityMessage("Group Name successfully updated");
         }
@@ -849,12 +849,12 @@ public class SecurityController {
 
     /**
      * Fetching all Dsk attribute values.
-     * @param securityGroupName
+     * @param securityGroupId
      * @return List of Attribute-values
      */
-    @RequestMapping ( value = "/auth/admin/dsk-attribute-values/{securityGroupName}", method = RequestMethod.GET)
-    public List<DskDetails> fetchDskAllAttributeValues(@PathVariable(name = "securityGroupName", required = true)String securityGroupName)    {
-        return dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupName);
+    @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.GET)
+    public List<DskDetails> fetchDskAllAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)    {
+        return dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupId);
     }
 
     /**
@@ -862,8 +862,8 @@ public class SecurityController {
      * @return List of all user Assignments
      */
     @RequestMapping ( value = "/auth/admin/user-assignments", method = RequestMethod.GET)
-    public List<UserAssignment> getAlluserAssignments()  {
-	    return dataSecurityKeyRepository.getAlluserAssignments();
+    public List<UserAssignment> getAllUserAssignments()  {
+	    return dataSecurityKeyRepository.getAllUserAssignments();
     }
 
 
