@@ -77,13 +77,13 @@ public class StorageProxyTest {
     esSettingsResource = classLoader.getResource("es_index_settings.json");
     InputStream mappingStream = new FileInputStream(indexMappingResource.getFile());
     InputStream settingStream = new FileInputStream(esSettingsResource.getFile());
-    embeddedElastic = EmbeddedElastic.builder().withElasticVersion("5.4.0")
+    embeddedElastic = EmbeddedElastic.builder().withElasticVersion("6.2.0")
         .withSetting(PopularProperties.TRANSPORT_TCP_PORT, 9350)
         .withSetting(PopularProperties.HTTP_PORT, 9351)
         .withSetting(PopularProperties.CLUSTER_NAME, CLUSTER_NAME)
         .withIndex(INDEX_NAME, IndexSettings.builder().withType(TYPE_NAME, mappingStream)
             .withSettings(settingStream).build())
-        .withStartTimeout(1, TimeUnit.MINUTES).build().start();
+        .withStartTimeout(5, TimeUnit.MINUTES).build().start();
     Settings settings = Settings.builder().put("cluster.name", CLUSTER_NAME).build();
     client = new PreBuiltTransportClient(settings).addTransportAddress(
         new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9350));

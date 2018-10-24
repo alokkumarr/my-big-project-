@@ -42,11 +42,11 @@
 <div *ngIf="scheduleType === 'weeklybasis'" [ngClass]="{'active': scheduleType === 'weeklybasis'}" class="tabcontent">
   <div *ngFor="let day of dayStrings">
     <div class="daysOfWeek">
-      <input class="checkbox" type="checkbox" [(ngModel)]="weekly[day]" (change)="regenerateCron(weeklybasisDate)" /> {{day | i18nPlural: DayMapping}}  
+      <input class="checkbox" type="checkbox" [(ngModel)]="weekly[day]" (change)="regenerateCron(weeklybasisDate)" /> {{day | i18nPlural: DayMapping}}
     </div>
   </div>
   <br/>
-  
+
   <div class="week-datePicker">
     Start Time
     <cron-date-picker [model]="weeklybasisDate" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/>
@@ -146,3 +146,4 @@
   </label>
   <span class="clear" (click)="selectedMoments = []">Clear</span><br/>
 </div>
+
