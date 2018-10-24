@@ -18,7 +18,7 @@
     </mat-form-field>
     <div fxLayout="row" fxLayoutAlign="center start">
       <mat-form-field>
-        <input matInput [(ngModel)]="data.attributeName" placeholder="Field Name" maxlength="20" [disabled]="data.mode === 'edit'" required/>
+        <input matInput [(ngModel)]="data.attributeName" placeholder="Field Name" maxlength="20" pattern="/^\S*$/" [disabled]="data.mode === 'edit'" required/>
       </mat-form-field>
 
       <span class="seperator">=</span>

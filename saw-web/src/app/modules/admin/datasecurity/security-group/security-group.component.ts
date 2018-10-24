@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { Router, NavigationEnd } from '@angular/router';
 import { JwtService } from '../../../../common/services/jwt.service';
@@ -20,7 +20,7 @@ require('./security-group.component.scss');
   styleUrls: ['./security-group.component.scss']
 })
 
-export class SecurityGroupComponent {
+export class SecurityGroupComponent implements OnInit {
   listeners: Subscription[] = [];
   ticket: { custID: string; custCode: string; masterLoginId?: string };
   filterObj = {
@@ -102,7 +102,7 @@ export class SecurityGroupComponent {
 
   editGroupData(data) {
     this.columnData = data;
-    this.addPropperty('securityGroup','edit')
+    this.addPropperty('securityGroup', 'edit');
   }
 
   deleteGroup(cellData) {

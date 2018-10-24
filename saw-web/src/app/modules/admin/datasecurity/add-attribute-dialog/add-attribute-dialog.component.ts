@@ -23,7 +23,16 @@ export class AddAttributeDialogComponent {
     }
   ) {}
 
+  hasWhiteSpace(s) {
+    return /\s/g.test(s);
+  }
+
   submit() {
+    if (this.hasWhiteSpace(this.data.attributeName)) {
+      this.errorState = true;
+      this.errorMessage = 'Field Name cannot contain spaces';
+      return false;
+    }
     const request = {
       attributeName: this.data.attributeName.trim(),
       value: this.data.value,
@@ -31,6 +40,7 @@ export class AddAttributeDialogComponent {
     };
     this._userAssignmentService.addAttributetoGroup(request, this.data.mode).then(response => {
       if (get(response, 'valid')) {
+        this.errorState = false;
         this._dialogRef.close(get(response, 'valid'));
       } else {
         this.errorState = !get(response, 'valid');

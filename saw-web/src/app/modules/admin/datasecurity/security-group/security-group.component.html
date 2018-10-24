@@ -17,9 +17,11 @@
             color="primary" style="margin-right:10px;">
       + <span i18n>Security Group</span>
     </button>
+
     <button (click)="addPropperty('attribute','create')"
             mat-raised-button
-            color="primary">
+            color="primary"
+            [disabled]="!groupSelected">
       + <span i18n>Attribute</span>
     </button>
   </div>

@@ -18,7 +18,9 @@ export class AddSecurityDialogComponent {
     private _dialogRef: MatDialogRef<AddSecurityDialogComponent>,
     private _userAssignmentService: UserAssignmentService,
     @Inject(MAT_DIALOG_DATA) public data: {
-      mode: 'edit' | 'create'
+      mode: 'edit' | 'create',
+      securityGroupName,
+      description
     }
   ) {}
 
