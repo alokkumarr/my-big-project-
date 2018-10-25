@@ -29,6 +29,8 @@ export class FieldAttributeViewComponent {
   }
 
   ngOnChanges() {
+    console.log("inside");
+    console.log(this.groupSelected);
     this.loadAttributesGrid();
   }
 
@@ -63,7 +65,7 @@ export class FieldAttributeViewComponent {
 
   deleteAtttribute(cellData) {
     const data = {
-      title: `Are you sure you want to delete this attribute for group ${this.groupSelected}?`,
+      title: `Are you sure you want to delete this attribute for group ${this.groupSelected.securityGroupName}?`,
       content: `Attribute Name: ${cellData.attributeName}`,
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
@@ -76,9 +78,8 @@ export class FieldAttributeViewComponent {
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
       if (result) {
-        const path = 'auth/deleteSecurityGroupDskAttributeValues';
-        const requestBody = [this.groupSelected, cellData.attributeName];
-        this._userAssignmentService.deleteGroupOrAttribute(path, requestBody).then(response => {
+        const path = `auth/admin/security-groups/${this.groupSelected.secGroupSysId}/dsk-attributes/${cellData.attributeName}`;
+        this._userAssignmentService.deleteGroupOrAttribute(path).then(response => {
           this.loadAttributesGrid();
         });
       }

@@ -36,7 +36,7 @@ export class AddAttributeDialogComponent {
     const request = {
       attributeName: this.data.attributeName.trim(),
       value: this.data.value,
-      securityGroupName: this.data.groupSelected
+      secGroupSysId: this.data.groupSelected.secGroupSysId
     };
     this._userAssignmentService.addAttributetoGroup(request, this.data.mode).then(response => {
       if (get(response, 'valid')) {

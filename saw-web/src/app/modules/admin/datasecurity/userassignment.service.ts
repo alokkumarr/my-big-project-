@@ -9,16 +9,15 @@ const loginUrl = AppConfig.login.url;
 export class UserAssignmentService {
 
   constructor(
-    private _http : HttpClient,
+    private _http: HttpClient,
     private _jwtService: JwtService
   ) {}
 
   getList(customerId) {
     console.log(customerId);
-    return this.getRequest('auth/getAlluserAssignments');
+    return this.getRequest('auth/admin/user-assignments');
   }
 
-  //Add a new security group detail.
   addSecurityGroup(data) {
     let requestBody = {};
     let path;
@@ -27,22 +26,30 @@ export class UserAssignmentService {
       requestBody = {
         description: data.description,
         securityGroupName: data.securityGroupName
-      }
-      path = 'auth/addSecurityGroups';
-      break;
+      };
+      path = 'auth/admin/security-groups';
+      return this.postRequest(path, requestBody);
     case 'edit':
-      requestBody = [data.securityGroupName, data.description, data.groupSelected];
-      path = 'auth/updateSecurityGroups';
-      break;
+      path = `auth/admin/security-groups/${data.secGroupSysId}/name`;
+      requestBody = [data.securityGroupName, data.description];
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type':  'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+          'Access-Control-Allow-Method': 'PUT'
+        })
+      };
+      return this._http.put(`${loginUrl}/${path}`, requestBody, httpOptions).toPromise();
     }
-    return this.postRequest(path, requestBody);
   }
 
   addAttributetoGroup(attribute, mode) {
+    console.log(attribute);
     let path;
     switch (mode) {
     case 'create':
-      path = 'auth/addSecurityGroupDskAttributeValues';
+      path = `auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
       break;
     case 'edit':
       path = 'auth/updateAttributeValues';
@@ -52,15 +59,15 @@ export class UserAssignmentService {
   }
 
   getSecurityAttributes(request) {
-    return this.getRequest(`auth/fetchDskAllAttributeValues?securityGroupName=${request}`);
+    return this.getRequest(`auth/admin/security-groups/${request.secGroupSysId}/dsk-attribute-values`);
   }
 
   getSecurityGroups() {
-    return this.getRequest('auth/getSecurityGroups');
+    return this.getRequest('auth/admin/security-groups');
   }
 
-  deleteGroupOrAttribute(path, request) {
-    return this.postRequest(path, request);
+  deleteGroupOrAttribute(path) {
+    return this._http.delete(`${loginUrl}/${path}`).toPromise();
   }
 
   assignGroupToUser(requestBody) {

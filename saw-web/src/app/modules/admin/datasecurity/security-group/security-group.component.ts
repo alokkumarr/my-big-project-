@@ -10,6 +10,7 @@ import { UserAssignmentService } from './../userassignment.service';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
+import * as isEmpty from 'lodash/isEmpty';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
@@ -30,7 +31,8 @@ export class SecurityGroupComponent implements OnInit {
 
   config: any;
   data: any;
-  groupSelected: any = '';
+  groupSelected: any;
+  groupName: any;
   columnData: {};
   emptyState: boolean;
 
@@ -70,7 +72,7 @@ export class SecurityGroupComponent implements OnInit {
         this.emptyState = true;
       } else {
         this.emptyState = false;
-        this.groupSelected =  (groupSelected === '') ? this.data[0].securityGroupName : groupSelected;
+        this.groupSelected =  (isEmpty(groupSelected)) ? this.data[0] : groupSelected;
       }
     });
   }
@@ -94,8 +96,8 @@ export class SecurityGroupComponent implements OnInit {
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
       if (result) {
-        this.groupSelected = '';
-        this.loadGroupGridWithData(data.groupSelected);
+        this.groupSelected = {};
+        this.loadGroupGridWithData(this.groupSelected);
       }
     });
   }
@@ -119,10 +121,9 @@ export class SecurityGroupComponent implements OnInit {
       data
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
-      const securityGroupName = cellData.securityGroupName;
-      const path = `auth/deleteSecurityGroups`;
+      const path = `auth/admin/security-groups/${cellData.secGroupSysId}`;
       if (result) {
-        this._userAssignmentService.deleteGroupOrAttribute(path, securityGroupName).then(response => {
+        this._userAssignmentService.deleteGroupOrAttribute(path).then(response => {
           this.loadGroupGridWithData(this.groupSelected);
         });
       }
@@ -168,6 +169,10 @@ export class SecurityGroupComponent implements OnInit {
       alignment: 'left',
       width: '60%'
     }, {
+      caption: 'ID',
+      dataField: 'secGroupSysId',
+      width: '0%'
+    }, {
       caption: '',
       allowSorting: true,
       alignment: 'left',
@@ -176,7 +181,7 @@ export class SecurityGroupComponent implements OnInit {
     }];
     return this._dxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
-        this.groupSelected = row.data.securityGroupName;
+        this.groupSelected = row.data;
       },
       columns,
       width: '100%',
