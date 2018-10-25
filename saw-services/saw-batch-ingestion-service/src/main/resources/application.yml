@@ -24,17 +24,18 @@ spring:
     properties:
       hibernate:
         format_sql : true
-        
+  
 logging:
   level:
-    com.synchronoss.saw: INFO
+    com.synchronoss.saw: TRACE
+    org.springframework: INFO
     org.hibernate.type : INFO
     
 server:
   address: localhost
   port: 9642
   servlet:
-    context-path: /ingestion/batch
+    context-path: ''
   maxHttpHeaderSize: 65536
   compression:
     enabled: true

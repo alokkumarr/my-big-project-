@@ -2,21 +2,20 @@ package com.synchronoss.saw.entities;
 
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
-import java.util.Set;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
+
 import javax.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 
 @ApiModel("Channel Entity")
 @Entity
@@ -53,8 +52,10 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
   @Column(name = "CHANNEL_METADATA", nullable = false, length = 2147483647)
   private String channelMetadata;
   
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "bisChannelSysId", fetch = FetchType.LAZY)
-  private Set<BisRouteEntity> bisRouteCollection;
+  //@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
+  //@JoinColumn(name = "bisChannelSysId")
+  //@BatchSize(size = 20)
+  //private Set<BisRouteEntity> bisRouteCollection;
 
   public BisChannelEntity() {}
 
@@ -138,6 +139,7 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
     this.channelMetadata = channelMetadata;
   }
 
+  /*  
   public Set<BisRouteEntity> getBisRouteCollection() {
     return bisRouteCollection;
   }
@@ -145,7 +147,7 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
   public void setBisRouteCollection(Set<BisRouteEntity> bisRouteCollection) {
     this.bisRouteCollection = bisRouteCollection;
   }
-
+ */
   public String getChannelType() {
     return channelType;
   }
@@ -181,9 +183,9 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
         + ", modifiedBy:" + modifiedBy + ", createdDate:" + getCreatedDate() + ", createdBy:"
         + createdBy + ", productCode:" + productCode + ", projectCode:" + projectCode
         + ", customerCode:" + customerCode + ", channelMetadata:" + channelMetadata
-        + ", bisRouteCollection:" + bisRouteCollection + "}";
+        //   + ", bisRouteCollection:" + bisRouteCollection 
+        + "}";
   }
 
-
-
+  
 }

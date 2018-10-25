@@ -7,15 +7,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+
+
 
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
@@ -41,8 +45,6 @@ public class WebConfig extends WebMvcConfigurationSupport {
     jackson.setObjectMapper(om);
     return jackson;
   }
-
-
 
   @Override
   protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

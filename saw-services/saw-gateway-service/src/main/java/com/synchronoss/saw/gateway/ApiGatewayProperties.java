@@ -14,16 +14,7 @@ public class ApiGatewayProperties {
     private String path;
     private RequestMethod method;
     private String location;
-    private String contextPath;
-
-    public String getContextPath() {
-		return contextPath;
-	}
-
-	public void setContextPath(String contextPath) {
-		this.contextPath = contextPath;
-	}
-
+   
 	public Endpoint() {
     }
 

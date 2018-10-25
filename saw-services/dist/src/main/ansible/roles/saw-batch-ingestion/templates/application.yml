@@ -36,7 +36,7 @@ server:
   address: localhost
   port: 9642
   servlet:
-    context-path: /ingestion/batch
+    context-path: ''
   maxHttpHeaderSize: 65536
   compression:
     enabled: true

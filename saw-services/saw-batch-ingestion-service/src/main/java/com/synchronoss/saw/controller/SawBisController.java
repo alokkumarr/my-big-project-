@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(
     value = "The controller provides operations pertaining to batch ingestion service of "
         + "synchronoss analytics platform ")
+@RequestMapping("/ingestion/batch/internal")
 public class SawBisController {
 
   private static final Logger logger = LoggerFactory.getLogger(SawBisController.class);
@@ -37,12 +38,12 @@ public class SawBisController {
    */
   
   @ApiOperation(value = "Provides an access to functionalities of bis using commmon specification",
-      nickname = "actionBis", notes = "", response = Object.class)
+      nickname = "actionInternalBis", notes = "", response = Object.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
-  @RequestMapping(value = "/internal/encrypt", method = RequestMethod.POST,
+  @RequestMapping(value = "/encrypt", method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public Object encrypt(
@@ -61,6 +62,38 @@ public class SawBisController {
     Object encrypted  = objectMapper.readValue(data, Object.class);
     return encrypted;
   }
- 
+
+  /**
+   * This api provides to encrypt password. 
+   * @param requestBody String
+   * @return encrypted password String
+   */
+  
+  @ApiOperation(value = "Provides an access to functionalities of bis using commmon specification",
+      nickname = "actionInternalBis", notes = "", response = Object.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
+  @RequestMapping(value = "/decrypt", method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public Object decrypt(
+      @ApiParam(value = "String to decrypt",
+          required = true) @Valid @RequestBody String requestBody)
+      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
+    logger.debug("Request Body:{}", requestBody);
+
+    if (requestBody == null) {
+      throw new NullPointerException("json body is missing in request body");
+    }
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    String data = "{ \"data\" : \"" + Ccode.cdecode(requestBody) + "\"}";
+    Object decrypted  = objectMapper.readValue(data, Object.class);
+    return decrypted;
+  }
+  
 }
 

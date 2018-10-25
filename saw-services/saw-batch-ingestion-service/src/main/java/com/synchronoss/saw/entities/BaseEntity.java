@@ -1,42 +1,48 @@
 package com.synchronoss.saw.entities;
 
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(
+        value = {"createdDate", "modifiedDate"},
+        allowGetters = true
+)
 public abstract class BaseEntity {
 
   @LastModifiedDate
   @Column(name = "MODIFIED_DATE")
-  private LocalDateTime modifiedDate;
+  private Date modifiedDate;
 
   @CreatedDate
   @Basic(optional = false)
   @Column(name = "CREATED_DATE", nullable = true)
-  private LocalDateTime createdDate;
+  private Date createdDate;
 
-  public LocalDateTime getModifiedDate() {
+  public Date getModifiedDate() {
     return modifiedDate;
   }
 
-  public void setModifiedDate(LocalDateTime modifiedDate) {
+  public void setModifiedDate(Date modifiedDate) {
     this.modifiedDate = modifiedDate;
   }
 
-  public LocalDateTime getCreatedDate() {
+  public Date getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -45,14 +51,14 @@ public abstract class BaseEntity {
    */
   @PrePersist
   public void prePersist() {
-    LocalDateTime now = LocalDateTime.now();
+    Date now = new Date();
     this.createdDate = now;
     this.modifiedDate = now;
   }
 
   @PreUpdate
   public void preUpdate() {
-    this.modifiedDate = LocalDateTime.now();
+    this.modifiedDate = new Date();
   }
 
 }

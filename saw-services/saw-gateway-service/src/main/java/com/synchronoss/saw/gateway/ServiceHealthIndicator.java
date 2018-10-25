@@ -30,13 +30,8 @@ public class ServiceHealthIndicator implements HealthIndicator {
     String uri = null;
     for (ApiGatewayProperties.Endpoint endpoint
              : apiGatewayProperties.getEndpoints()) {
-    	if (endpoint.getContextPath()!=null && !"".equals(endpoint.getContextPath())) {
-    		uri	= endpoint.getLocation()+ "/" + endpoint.getContextPath() + "/actuator/health";
-    	}
-    	else {
     		uri	= endpoint.getLocation() +"/actuator/health";
-    	}
-       
+    	
       if (checked.contains(uri)) {
         /* Skip endpoints that already have been checked */
         continue;

@@ -56,7 +56,7 @@ datapod:
         host: http://localhost:9900
 batch:
     service:
-        host: http://localhost:9642
+        host: http://localhost:9641
 
 api:
   gateway:
@@ -125,18 +125,14 @@ api:
             method: PUT
             path: '[/]internal/semantic.*'
         -   location: ${batch.service.host}
-            contextPath : 'ingestion/batch'
             method: PUT
             path: '[/]ingestion/batch.*'
         -   location: ${batch.service.host}
-            contextPath : 'ingestion/batch'
             method: POST
             path: '[/]ingestion/batch.*'
         -   location: ${batch.service.host}
-            contextPath : 'ingestion/batch'
             method: GET
             path: '[/]ingestion/batch.*'
         -   location: ${batch.service.host}
-            contextPath : 'ingestion/batch'
             method: DELETE
             path: '[/]ingestion/batch.*'
