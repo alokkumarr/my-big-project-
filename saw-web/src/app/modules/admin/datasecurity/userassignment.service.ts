@@ -79,19 +79,18 @@ export class UserAssignmentService {
   }
 
   assignGroupToUser(requestBody) {
-    const request = {
-      securityGroupName: requestBody.securityGroupName
-    };
+
+    const securityGroupName = requestBody.securityGroupName
+
     const path = `auth/admin/users/${requestBody.userId}/security-group`;
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
         'Access-Control-Allow-Method': 'PUT'
       })
     };
-    return this._http.put(`${loginUrl}/${path}`, request, httpOptions).toPromise();
+    return this._http.put(`${loginUrl}/${path}`, securityGroupName, httpOptions).toPromise();
   }
 
   getRequest(path) {
