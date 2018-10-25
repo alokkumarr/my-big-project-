@@ -251,7 +251,7 @@ echo PreInstall done: ${app.nameVer}
           </preinstallScriptlet-->
           <requires>
 	          	<require>
-	          	  /usr/bin/jq
+	          	 jq
 	          	</require>
           </requires>
           <postinstallScriptlet>
