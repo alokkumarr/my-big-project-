@@ -35,10 +35,18 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         String addSql = "INSERT INTO `SEC_GROUP` " +
             "(`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
             + "VALUES (?,?,1,now(),?)";
+        securityGroups.setSecurityGroupName(securityGroups.getSecurityGroupName().trim());
+        securityGroups.setDescription(securityGroups.getDescription().trim());
 
-        if (this.isGroupNameExists(securityGroups.getSecurityGroupName())){
+        if (securityGroups.getSecurityGroupName().equalsIgnoreCase("null") || securityGroups.getSecurityGroupName().equalsIgnoreCase(""))   {
+            valid.setValid(false);
+            valid.setValidityMessage("Group name can't be empty or null");
+            return valid;
+        }
+        else if (this.isGroupNameExists(securityGroups.getSecurityGroupName())){
             valid.setValid(false);
             valid.setValidityMessage("Group Name already Exists !!");
+            return valid;
         }
         else {
             try{
@@ -50,15 +58,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 logger.trace(insertResult + " Security Group created successfully.");
                 valid.setValid(true);
                 valid.setValidityMessage("Security Group created successfully.");
+                return valid;
                 // Here we need not to assign default user to newly created Group name. By default it should be left unassigned.
             }
             catch (Exception e) {
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("Error in creating Security Group");
+                return valid;
             }
         }
-        return valid;
     }
 
     /**
@@ -103,49 +112,77 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public Valid updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups) {
         Valid valid = new Valid();
         String updateSql = "UPDATE SEC_GROUP SET SEC_GROUP_NAME = ?, DESCRIPTION = ? WHERE SEC_GROUP_SYS_ID = ?";
-        if (this.isGroupNameExists(oldNewGroups.get(0))){
+        if(oldNewGroups.get(0).trim().equalsIgnoreCase(null) || oldNewGroups.get(0).trim().equalsIgnoreCase("")
+            || oldNewGroups.get(1).trim().equalsIgnoreCase(null) || oldNewGroups.get(1).trim().equalsIgnoreCase("")
+            || securityGroupId == null || securityGroupId == 0 ) {
+            valid.setValid(false);
+            valid.setValidityMessage("Parameters can't be null or empty!!");
+            return valid;
+        }
+        else if (this.isGroupNameExists(oldNewGroups.get(0).trim())){
             valid.setValid(false);
             valid.setValidityMessage("Group Name already Exists !!");
+            return valid;
         }
         else {
             try{
                 int updateResult = jdbcTemplate.update(updateSql,ps-> {
-                    ps.setString(1,oldNewGroups.get(0));
-                    ps.setString(2,oldNewGroups.get(1));
+                    ps.setString(1,oldNewGroups.get(0).trim());
+                    ps.setString(2,oldNewGroups.get(1).trim());
                     ps.setLong(3, securityGroupId);
                 });
                 valid.setValid(true);
                 valid.setValidityMessage("Security Group updated successfully");
                 logger.trace(updateResult + "Security Group updated successfully");
+                return valid;
             }
             catch (Exception e) {
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("Error in Updating Group Name ");
+                return valid;
             }
         }
-
-        return valid;
     }
 
     @Override
-    public Boolean deleteSecurityGroups(Long securityGroupId) {
-
+    public Valid deleteSecurityGroups(Long securityGroupId) {
+        Valid valid = new Valid();
         String delSql = "DELETE FROM SEC_GROUP WHERE SEC_GROUP_SYS_ID = ?";
         /** NOTE: Deleting a row from SEC_GROUP will inturn deletes corresponding reference rows in child tables.
          * That is, SEC_GROUP_DSK_ATTRIBUTE and SEC_GROUP_DSK_VALUE. So, no need of deleting its references in other tables.
          **/
-        try{
-            int deleteResult = jdbcTemplate.update(delSql,ps -> {
-                ps.setLong(1,securityGroupId);
-            });
-            logger.trace(deleteResult + "Security Group deleted successfully");
-            return this.unAssignGroupFromUser(securityGroupId);
-            // Note : This is intentional here to update SEC_GROUP_SYS_ID as null in USERS, Whenever we delete a security group,
+        if ( securityGroupId == 0 || securityGroupId == null)   {
+            logger.error("security group Sys Id can't be null or empty!!");
+            valid.setValid(false);
+            valid.setValidityMessage("security group Sys Id can't be null or empty!!");
+            return valid;
         }
-        catch (Exception e) {
-            logger.error(e.getMessage());
-            return false;
+        else{
+            try{
+                int deleteResult = jdbcTemplate.update(delSql,ps -> {
+                    ps.setLong(1,securityGroupId);
+                });
+                if(unAssignGroupFromUser(securityGroupId))  {
+                    logger.trace(deleteResult + "Security Group deleted successfully");
+                    valid.setValidityMessage("Security Group deleted successfully");
+                    valid.setValid(true);
+                    return valid;
+                }
+                else {
+                    logger.error("Failed to un-assign Group from User");
+                    valid.setValidityMessage("Failed to un-assign Group from User");
+                    valid.setValid(false);
+                    return valid;
+                }
+                // Note : This is intentional here to update SEC_GROUP_SYS_ID as null in USERS, Whenever we delete a security group,
+            }
+            catch (Exception e) {
+                logger.error(e.getMessage());
+                valid.setValid(false);
+                valid.setValidityMessage(e.getMessage());
+                return valid;
+            }
         }
     }
 
@@ -156,16 +193,22 @@ public class DataSecurityKeyRepositoryDaoImpl implements
      */
     public Boolean unAssignGroupFromUser(Long secGroupSysId) {
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = null WHERE SEC_GROUP_SYS_ID = ? ";
-        try{
-            int updateRes = jdbcTemplate.update(updateSql, ps -> {
-                ps.setLong(1,secGroupSysId);
-            });
-            logger.trace(updateRes + "User Table updated ");
-            return true;
-        }
-        catch (Exception e){
-            logger.error(e.getMessage());
+        if ( secGroupSysId == 0 || secGroupSysId == null)   {
+            logger.error("security group Sys Id can't be null or empty!!");
             return false;
+        }
+        else {
+            try{
+                int updateRes = jdbcTemplate.update(updateSql, ps -> {
+                    ps.setLong(1,secGroupSysId);
+                });
+                logger.trace(updateRes + "User Table updated ");
+                return true;
+            }
+            catch (Exception e){
+                logger.error(e.getMessage());
+                return false;
+            }
         }
     }
 
@@ -281,7 +324,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     @Override
     public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
         Valid valid = new Valid();
-        Long groupAttrSysId = this.getSecurityGroupDskAttributeSysId(securityGroupId,attributeValues.getAttributeName());
+        Long groupAttrSysId = null;
+        if(securityGroupId == null || securityGroupId == 0 )    {
+            valid.setValid(false);
+            valid.setValidityMessage("securityGroupID can't be null or 0 ");
+            return valid;
+        }
+        else {
+             groupAttrSysId = this.getSecurityGroupDskAttributeSysId(securityGroupId,attributeValues.getAttributeName());
+             attributeValues.setAttributeName(attributeValues.getAttributeName().trim());
+        }
         /**
          * Note : Here, we are checking whether the Attribute name exists for the respective Group, if So, we are responding with an error saying the attribute name already exists.
          * In future this could be solved directly by adding constraint in Table definition and also here am keeping in my that the DB needs to Altered to add Customer relationship with DSK's.
@@ -363,10 +415,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Boolean deleteSecurityGroupDskAttributeValues(List<String> dskList) {
-        Long groupSysId = Long.parseLong(dskList.get(0));
-        Long groupAttributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,dskList.get(1));
-        if (groupSysId != null) {
+    public Valid deleteSecurityGroupDskAttributeValues(List<String> dskList) {
+        Valid valid =  new Valid();
+        Long groupSysId = Long.parseLong(dskList.get(0).trim());
+        Long groupAttributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,dskList.get(1).trim());
+        if (groupAttributeSysId == null || groupSysId == null)    {
+            valid.setValid(false);
+            valid.setValidityMessage("Field no longer exists!! Please refresh the page.");
+            return valid;
+        }
+        else if (groupSysId != null) {
             try{
                 String delSql = "DELETE FROM sec_group_dsk_attribute WHERE SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = ? ";
                 /**
@@ -376,17 +434,23 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 int delResult = jdbcTemplate.update(delSql, ps -> {
                     ps.setLong(1,groupAttributeSysId);
                 });
-                logger.trace(delResult + " Attribute " + dskList.get(1) + " sucessfully removed");
-                return true;
+                logger.trace(delResult + " Attribute " + dskList.get(1).trim() + " successfully removed");
+                valid.setValid(true);
+                valid.setValidityMessage(delResult + " Attribute " + dskList.get(1).trim() + " successfully removed");
+                return valid;
             }
             catch (Exception e) {
                 logger.error(e.getMessage());
-                return false;
+                valid.setValid(false);
+                valid.setValidityMessage(e.getMessage());
+                return valid;
             }
         }
         else {
-            logger.error("Couldn't able to get Group Sys Id");
-            return false;
+            logger.error("Error in deleting Attribute");
+            valid.setValid(false);
+            valid.setValidityMessage("Error in deleting Attribute");
+            return valid;
         }
     }
 
@@ -394,54 +458,70 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public List<DskDetails> fetchDskAllAttributeValues(Long securityGroupId) {
         List<DskDetails> dskValueList = null;
         String fetchSql = "SELECT sg.CREATED_BY as CREATED_BY, sg.CREATED_DATE as CREATED_DATE, sga.ATTRIBUTE_NAME as ATTRIBUTE_NAME, sgv.DSK_VALUE as VALUE FROM SEC_GROUP sg, sec_group_dsk_attribute sga, sec_group_dsk_value sgv WHERE sg.SEC_GROUP_SYS_ID = ? AND sg.SEC_GROUP_SYS_ID = sga.SEC_GROUP_SYS_ID AND sga.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = sgv.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID ";
+        if(securityGroupId != null || securityGroupId != 0) {
+            try{
+                dskValueList = jdbcTemplate.query(fetchSql, ps -> {
+                    ps.setLong(1,securityGroupId);
+                },resultSet -> {
+                    List<DskDetails> tempList = new ArrayList<>();
+                    while (resultSet.next())    {
+                        DskDetails dskDetails = new DskDetails();
+                        dskDetails.setCreated_by(resultSet.getString("CREATED_BY"));
+                        dskDetails.setCreated_date(resultSet.getString("CREATED_DATE"));
+                        dskDetails.setAttributeName(resultSet.getString("ATTRIBUTE_NAME"));
+                        dskDetails.setValue(resultSet.getString("VALUE"));
+                        tempList.add(dskDetails);
+                    }
+                    return tempList;
+                });
+            }
+            catch (Exception e){
+                logger.error(e.getMessage());
+            }
 
-        try{
-            dskValueList = jdbcTemplate.query(fetchSql, ps -> {
-                ps.setLong(1,securityGroupId);
-            },resultSet -> {
-                List<DskDetails> tempList = new ArrayList<>();
-                while (resultSet.next())    {
-                    DskDetails dskDetails = new DskDetails();
-                    dskDetails.setCreated_by(resultSet.getString("CREATED_BY"));
-                    dskDetails.setCreated_date(resultSet.getString("CREATED_DATE"));
-                    dskDetails.setAttributeName(resultSet.getString("ATTRIBUTE_NAME"));
-                    dskDetails.setValue(resultSet.getString("VALUE"));
-                    tempList.add(dskDetails);
-                }
-                return tempList;
-            });
+            return dskValueList;
         }
-        catch (Exception e){
-            logger.error(e.getMessage());
+        else {
+            return null;
         }
-
-        return dskValueList;
     }
 
 
 
     @Override
-    public Boolean updateUser(String securityGroupName, Long userSysId) {
+    public Valid updateUser(String securityGroupName, Long userSysId) {
+        Valid valid = new Valid();
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = ? WHERE USER_SYS_ID = ? ";
-        try{
-            int updateRes = jdbcTemplate.update(updateSql, ps -> {
-               ps.setLong(1,securityGroupSysId);
-               ps.setLong(2,userSysId);
-            });
-            logger.trace(updateRes + "User Table updated ");
-            return true;
+        if(securityGroupName.trim().equalsIgnoreCase("null") || securityGroupName.trim().equalsIgnoreCase("") || userSysId == 0 || userSysId == null)   {
+            valid.setValid(false);
+            valid.setValidityMessage("Parameters can't be empty or null");
+            return valid;
         }
-        catch (Exception e){
-            logger.error(e.getMessage());
-            return false;
+        else {
+            try{
+                int updateRes = jdbcTemplate.update(updateSql, ps -> {
+                    ps.setLong(1,securityGroupSysId);
+                    ps.setLong(2,userSysId);
+                });
+                logger.trace(updateRes + "User Table updated ");
+                valid.setValid(true);
+                valid.setValidityMessage("Group Name successfully updated");
+                return valid;
+            }
+            catch (Exception e){
+                logger.error(e.getMessage());
+                valid.setValid(false);
+                valid.setValidityMessage("error in updating group user");
+                return valid;
+            }
         }
     }
 
     @Override
     public List<UserAssignment> getAllUserAssignments() {
         String fetchSql = "Select distinct" +
-            "fi.UserSysId as UserSysId" +
+            " fi.UserSysId as UserSysId," +
             " fi.LoginID as LoginID," +
             " fi.Role as Role," +
             " fi.FirstName as FirstName," +
@@ -509,21 +589,38 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Boolean updateAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
-        String updateSql = "Update sec_group_dsk_value SET DSK_VALUE = ? where SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = ? ";
-        Long groupSysId = securityGroupId;
-        Long attributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,attributeValues.getAttributeName());
-        try{
-            int updateRes = jdbcTemplate.update(updateSql, ps -> {
-               ps.setString(1,attributeValues.getValue());
-               ps.setLong(2,attributeSysId);
-            });
-            logger.trace("Value Updated successfully");
+    public Valid updateAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
+        Valid valid =  new Valid();
+        attributeValues.setAttributeName(attributeValues.getAttributeName().trim());
+        attributeValues.setValue(attributeValues.getValue().trim());
+        if (securityGroupId == 0 || securityGroupId == null || attributeValues.getAttributeName().equalsIgnoreCase("")
+            || attributeValues.getAttributeName().equalsIgnoreCase("null")
+            || attributeValues.getValue().equalsIgnoreCase("") || attributeValues.getValue().equalsIgnoreCase("null"))  {
+            valid.setValid(false);
+            valid.setValidityMessage("Parameters cn't be empty!!");
+            return valid;
         }
-        catch (Exception e) {
-            logger.error(e.getMessage());
-            return false;
+        else {
+            String updateSql = "Update sec_group_dsk_value SET DSK_VALUE = ? where SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = ? ";
+            Long groupSysId = securityGroupId;
+            Long attributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,attributeValues.getAttributeName());
+            try{
+                int updateRes = jdbcTemplate.update(updateSql, ps -> {
+                    ps.setString(1,attributeValues.getValue());
+                    ps.setLong(2,attributeSysId);
+                });
+                logger.trace(updateRes + " Value Updated successfully");
+                valid.setValid(true);
+                valid.setValidityMessage("Value Updated successfully");
+                return valid;
+            }
+            catch (Exception e) {
+                logger.error(e.getMessage());
+                valid.setValid(false);
+                valid.setValidityMessage(e.getMessage());
+                return valid;
+            }
         }
-        return true;
     }
+
 }
