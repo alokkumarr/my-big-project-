@@ -47,15 +47,25 @@ export class UserAssignmentService {
   addAttributetoGroup(attribute, mode) {
     console.log(attribute);
     let path;
+    path = `/auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
     switch (mode) {
     case 'create':
-      path = `auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
-      break;
+      return this.postRequest(path, attribute);
     case 'edit':
-      path = 'auth/updateAttributeValues';
-      break;
+      const requestBody = {
+        attributeName: attribute.attributeName,
+        value: attribute.value
+      };
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type':  'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+          'Access-Control-Allow-Method': 'PUT'
+        })
+      };
+      return this._http.put(`${loginUrl}/${path}`, requestBody, httpOptions).toPromise();
     }
-    return this.postRequest(path, attribute);
   }
 
   getSecurityAttributes(request) {
@@ -71,7 +81,19 @@ export class UserAssignmentService {
   }
 
   assignGroupToUser(requestBody) {
-    return this.postRequest('auth/updateUser', requestBody);
+    const request = {
+      securityGroupName: requestBody.securityGroupName
+    };
+    const path = `auth/admin/users/${requestBody.userId}/security-group`;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        'Access-Control-Allow-Method': 'PUT'
+      })
+    };
+    return this._http.put(`${loginUrl}/${path}`, request, httpOptions).toPromise();
   }
 
   getRequest(path) {

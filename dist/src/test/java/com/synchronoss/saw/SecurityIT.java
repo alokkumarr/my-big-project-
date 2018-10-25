@@ -67,8 +67,8 @@ public class SecurityIT extends BaseIT {
       .body("valid", equalTo(true));
 
     Response response = given(authSpec)
-      .when().get("/auth/admin/security-groups")
-      .then().statusCode(200).extract().response();
+        .when().get("/auth/admin/security-groups")
+        .then().statusCode(200).extract().response();
     ArrayNode node = response.as(ArrayNode.class);
     JsonNode jsonNode = node.get(0);
     Long groupSysId = jsonNode.get("secGroupSysId").asLong();
@@ -99,7 +99,6 @@ public class SecurityIT extends BaseIT {
       .when().post("/security/auth/admin/security-groups")
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
-<<<<<<< HEAD
 
     Response response = given(authSpec)
         .when().get("/auth/admin/user-assignments")
@@ -107,27 +106,13 @@ public class SecurityIT extends BaseIT {
     ArrayNode node = response.as(ArrayNode.class);
     JsonNode jsonNode = node.get(0);
     Long userSysId = jsonNode.get("userSysId").asLong();
-=======
-
-    Response response = given(authSpec)
-      .when().get("/auth/admin/user-assignments")
-      .then().statusCode(200).extract().response();
-    ArrayNode node = response.as(ArrayNode.class);
-    JsonNode jsonNode = node.get(0);
-    Long userSysId = jsonNode.get("userSysId").asLong();
 
     given(authSpec)
-      .when().put("/security/auth/admin/users/" + userSysId +
-      "/security-group?securityGroupName=TestGroup2")
-      .then().assertThat().statusCode(200)
-      .body("valid", equalTo(true));
-  }
->>>>>>> 59570dab951273448680c60cac04b8bc1a93e34b
-
-    given(authSpec)
-      .when().put("/security/auth/admin/users/" + userSysId 
+      .when()
+      .put("/security/auth/admin/users/" + userSysId 
       + "/security-group?securityGroupName=TestGroup2")
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
   }
+
 }
