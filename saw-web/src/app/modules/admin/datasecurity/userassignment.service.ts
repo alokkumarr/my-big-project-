@@ -14,7 +14,6 @@ export class UserAssignmentService {
   ) {}
 
   getList(customerId) {
-    console.log(customerId);
     return this.getRequest('auth/admin/user-assignments');
   }
 
@@ -45,7 +44,6 @@ export class UserAssignmentService {
   }
 
   addAttributetoGroup(attribute, mode) {
-    console.log(attribute);
     let path;
     path = `/auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
     switch (mode) {

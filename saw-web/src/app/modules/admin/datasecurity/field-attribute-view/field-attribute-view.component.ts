@@ -29,8 +29,6 @@ export class FieldAttributeViewComponent {
   }
 
   ngOnChanges() {
-    console.log("inside");
-    console.log(this.groupSelected);
     this.loadAttributesGrid();
   }
 

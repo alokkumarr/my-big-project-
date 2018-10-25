@@ -45,7 +45,7 @@ export class AdminListViewComponent implements OnInit {
   assignGrouptoUser(groupName, cell) {
     const request = {
       securityGroupName : groupName.value,
-      userId: cell.data.loginId
+      userId: cell.data.userSysId
     };
     this._userAssignmentService.assignGroupToUser(request).then(response => {
       this.groupAssignSuccess = get(response, 'valid') ? 'checkmark' : 'close';
