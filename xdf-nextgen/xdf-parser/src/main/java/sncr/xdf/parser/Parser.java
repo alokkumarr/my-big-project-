@@ -311,35 +311,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private int parseFiles(FileStatus[] files, String mode){
         // Files
 
-//        Dataset<Row> outputDataset = null;
         for (FileStatus file : files) {
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
-//                if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-
-//                Dataset<Row> newDs = parseSingleFile(file.getPath(), new Path(tempDir));
-//
-//                if (outputDataset == null) {
-//                    outputDataset = newDs;
-//                } else {
-//                    if (newDs != null) {
-//                        outputDataset.union(newDs);
-//                    }
-//                }
 
 
 
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-
-//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, outputDataSetMode, DLDataSetOperations.FORMAT_PARQUET, null));
                     resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, outputDsPartitionKeys));
-
                 }
             }
         }
-
-//        writeDataset(outputDataset, outputFormat, tempDir);
-//        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, outputDsPartitionKeys));
         return 0;
     }
 
