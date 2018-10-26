@@ -31,15 +31,6 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
   @Column(name = "CREATED_BY", nullable = false, length = 255)
   private String createdBy;
   @Basic(optional = false)
-  @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
-  private String productCode;
-  @Basic(optional = false)
-  @Column(name = "PROJECT_CODE", nullable = false, length = 50)
-  private String projectCode;
-  @Basic(optional = false)
-  @Column(name = "CUSTOMER_CODE", nullable = false, length = 50)
-  private String customerCode;
-  @Basic(optional = false)
   @Lob
   @Column(name = "ROUTE_METADATA", nullable = false, length = 2147483647)
   private String routeMetadata;
@@ -65,18 +56,11 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
    * This is parameterized constructor.
    * @param bisRouteSysId Long
    * @param createdBy String
-   * @param productCode String
-   * @param projectCode String
-   * @param customerCode String
    * @param routeMetadata String
    */
-  public BisRouteEntity(Long bisRouteSysId, String createdBy, String productCode,
-      String projectCode, String customerCode, String routeMetadata) {
+  public BisRouteEntity(Long bisRouteSysId, String createdBy, String routeMetadata) {
     this.bisRouteSysId = bisRouteSysId;
     this.createdBy = createdBy;
-    this.productCode = productCode;
-    this.projectCode = projectCode;
-    this.customerCode = customerCode;
     this.routeMetadata = routeMetadata;
   }
 
@@ -102,30 +86,6 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
 
   public void setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
-  }
-
-  public String getProductCode() {
-    return productCode;
-  }
-
-  public void setProductCode(String productCode) {
-    this.productCode = productCode;
-  }
-
-  public String getProjectCode() {
-    return projectCode;
-  }
-
-  public void setProjectCode(String projectCode) {
-    this.projectCode = projectCode;
-  }
-
-  public String getCustomerCode() {
-    return customerCode;
-  }
-
-  public void setCustomerCode(String customerCode) {
-    this.customerCode = customerCode;
   }
 
   public String getRouteMetadata() {
@@ -169,8 +129,7 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
   public String toString() {
     return "{ bisRouteSysId:" + bisRouteSysId + ", modifiedDate:" + getModifiedDate()
         + ", modifiedBy:" + modifiedBy + ", createdDate:" + getCreatedDate() + ", createdBy:"
-        + createdBy + ", productCode:" + productCode + ", projectCode:" + projectCode
-        + ", customerCode:" + customerCode + ", routeMetadata:" + routeMetadata
+        + createdBy + ", routeMetadata:" + routeMetadata
         + ", bisChannelSysId:" + bisChannelSysId + "}";
   }
 
