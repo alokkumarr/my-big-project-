@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -718,8 +719,11 @@ public class SecurityController {
      * @return List of group names
      */
 	@RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.GET)
-        public List<SecurityGroups> getSecurityGroups() {
-        List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames();
+        public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,HttpServletResponse response) {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
+	    List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
 	    return groupNames;
     }
 
@@ -732,8 +736,9 @@ public class SecurityController {
     public Valid addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
         String createdBy = extractValuesFromToken[2];
-        return dataSecurityKeyRepository.addSecurityGroups(securityGroups,createdBy);
+        return dataSecurityKeyRepository.addSecurityGroups(securityGroups,createdBy,custId);
     }
 
     /**
@@ -742,8 +747,11 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
-    public Valid updateSecurityGroups(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
-        return (dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups));
+    public Valid updateSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
+        return (dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups,custId));
     }
 
     /**
@@ -805,8 +813,11 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping ( value = "/auth/admin/users/{userSysId}/security-group", method = RequestMethod.PUT)
-    public Valid updateUser(@PathVariable (name = "userSysId", required = true) Long userSysId, @RequestBody String securityGroupName)  {
-	    return (dataSecurityKeyRepository.updateUser(securityGroupName,userSysId));
+    public Valid updateUser(HttpServletRequest request, HttpServletResponse response, @PathVariable (name = "userSysId", required = true) Long userSysId, @RequestBody String securityGroupName)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
+        return (dataSecurityKeyRepository.updateUser(securityGroupName,userSysId,custId));
     }
 
     /**
@@ -824,8 +835,11 @@ public class SecurityController {
      * @return List of all user Assignments
      */
     @RequestMapping ( value = "/auth/admin/user-assignments", method = RequestMethod.GET)
-    public List<UserAssignment> getAllUserAssignments()  {
-	    return dataSecurityKeyRepository.getAllUserAssignments();
+    public List<UserAssignment> getAllUserAssignments(HttpServletRequest request, HttpServletResponse response)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
+	    return dataSecurityKeyRepository.getAllUserAssignments(custId);
     }
 
 

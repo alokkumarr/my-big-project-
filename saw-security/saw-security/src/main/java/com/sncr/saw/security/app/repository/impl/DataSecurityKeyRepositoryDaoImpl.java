@@ -30,20 +30,25 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Valid addSecurityGroups(SecurityGroups securityGroups,String createdBy) {
+    public Valid addSecurityGroups(SecurityGroups securityGroups,String createdBy,Long custId) {
         Valid valid = new Valid();
         String addSql = "INSERT INTO `SEC_GROUP` " +
-            "(`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
-            + "VALUES (?,?,1,now(),?)";
+            "(`CUSTOMER_SYS_ID`,`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
+            + "VALUES (?,?,?,1,now(),?)";
         securityGroups.setSecurityGroupName(securityGroups.getSecurityGroupName().trim());
         securityGroups.setDescription(securityGroups.getDescription().trim());
 
+        if (custId == null || custId == 0)  {
+            valid.setValid(false);
+            valid.setValidityMessage("Customer Id Can't be null or 0");
+            return  valid;
+        }
         if (securityGroups.getSecurityGroupName().equalsIgnoreCase("null") || securityGroups.getSecurityGroupName().equalsIgnoreCase(""))   {
             valid.setValid(false);
             valid.setValidityMessage("Group name can't be empty or null");
             return valid;
         }
-        else if (this.isGroupNameExists(securityGroups.getSecurityGroupName())){
+        else if (this.isGroupNameExists(securityGroups.getSecurityGroupName(),custId)){
             valid.setValid(false);
             valid.setValidityMessage("Group Name already Exists !!");
             return valid;
@@ -51,9 +56,10 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         else {
             try{
                 int insertResult = jdbcTemplate.update(addSql,ps -> {
-                    ps.setString(1,securityGroups.getSecurityGroupName());
-                    ps.setString(2,securityGroups.getDescription());
-                    ps.setString(3,createdBy);
+                    ps.setLong(1,custId);
+                    ps.setString(2,securityGroups.getSecurityGroupName());
+                    ps.setString(3,securityGroups.getDescription());
+                    ps.setString(4,createdBy);
                 });
                 logger.trace(insertResult + " Security Group created successfully.");
                 valid.setValid(true);
@@ -75,31 +81,28 @@ public class DataSecurityKeyRepositoryDaoImpl implements
      * @param groupName
      * @return
      */
-    public Boolean isGroupNameExists(String groupName)  {
-        List<String> groupNames = this.getAllGroupNameList();
-        Boolean flag = false ;
-
+    public Boolean isGroupNameExists(String groupName, Long custId)  {
+        List<String> groupNames = this.getAllGroupNameList(custId);
         for (String temp : groupNames)  {
             if(temp.equalsIgnoreCase(groupName))    {
-                flag = true;
+                return true;
             }
         }
-        return flag;
+        return false;
     }
 
     /**
      * Get List of GroupNames from SEC_GROUP
      * @return GroupName List
      */
-    public List<String> getAllGroupNameList()  {
-        String fetchSql = "SELECT SEC_GROUP_NAME FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1";
+    public List<String> getAllGroupNameList(Long custId)  {
+        String fetchSql = "SELECT SEC_GROUP_NAME FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1 AND CUSTOMER_SYS_ID = ? ";
 
         List<String> groupNames = jdbcTemplate.query(fetchSql,
-            preparedStatement -> {},
+            preparedStatement -> { preparedStatement.setLong(1,custId); },
             resultSet -> {
                 List<String> nameList = new ArrayList<>();
                 while (resultSet.next()) {
-                    SecurityGroups securityGroups = new SecurityGroups();
                     nameList.add(resultSet.getString("SEC_GROUP_NAME"));
                 }
                 return nameList;
@@ -109,7 +112,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Valid updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups) {
+    public Valid updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups,Long custId) {
         Valid valid = new Valid();
         String updateSql = "UPDATE SEC_GROUP SET SEC_GROUP_NAME = ?, DESCRIPTION = ? WHERE SEC_GROUP_SYS_ID = ?";
         if(oldNewGroups.get(0).trim().equalsIgnoreCase(null) || oldNewGroups.get(0).trim().equalsIgnoreCase("")
@@ -119,7 +122,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setValidityMessage("Parameters can't be null or empty!!");
             return valid;
         }
-        else if (this.isGroupNameExists(oldNewGroups.get(0).trim())){
+        else if (this.isGroupNameExists(oldNewGroups.get(0).trim(),custId)){
             valid.setValid(false);
             valid.setValidityMessage("Group Name already Exists !!");
             return valid;
@@ -213,11 +216,11 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public List<SecurityGroups> fetchSecurityGroupNames() {
-        String fetchSql = "SELECT SEC_GROUP_SYS_ID,SEC_GROUP_NAME,DESCRIPTION FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1";
+    public List<SecurityGroups> fetchSecurityGroupNames(Long custId) {
+        String fetchSql = "SELECT SEC_GROUP_SYS_ID,SEC_GROUP_NAME,DESCRIPTION FROM SEC_GROUP WHERE ACTIVE_STATUS_IND = 1 AND CUSTOMER_SYS_ID = ? ";
 
         List<SecurityGroups> groupNames = jdbcTemplate.query(fetchSql,
-            preparedStatement -> {},
+            preparedStatement -> { preparedStatement.setLong(1,custId); },
             resultSet -> {
             List<SecurityGroups> nameList = new ArrayList<>();
             while (resultSet.next()) {
@@ -238,12 +241,13 @@ public class DataSecurityKeyRepositoryDaoImpl implements
      * @param securityGroupName
      * @return
      */
-    public Long getSecurityGroupSysId(String securityGroupName) {
+    public Long getSecurityGroupSysId(String securityGroupName, Long custId) {
         Long groupSysId = null;
-        String fetchSql = "SELECT SEC_GROUP_SYS_ID FROM SEC_GROUP WHERE SEC_GROUP_NAME = ?";
+        String fetchSql = "SELECT SEC_GROUP_SYS_ID FROM SEC_GROUP WHERE SEC_GROUP_NAME = ? AND CUSTOMER_SYS_ID = ? ";
         try {
             String fetchedGroupSysId = jdbcTemplate.query(fetchSql,ps -> {
                     ps.setString(1,securityGroupName);
+                    ps.setLong(2,custId);
                 },
                 resultSet -> {
                     String val = null;
@@ -489,9 +493,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Valid updateUser(String securityGroupName, Long userSysId) {
+    public Valid updateUser(String securityGroupName, Long userSysId, Long custId) {
         Valid valid = new Valid();
-        Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
+        Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName,custId);
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = ? WHERE USER_SYS_ID = ? ";
         if(securityGroupName.trim().equalsIgnoreCase("null") || securityGroupName.trim().equalsIgnoreCase("") || userSysId == 0 || userSysId == null)   {
             valid.setValid(false);
@@ -519,7 +523,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public List<UserAssignment> getAllUserAssignments() {
+    public List<UserAssignment> getAllUserAssignments(Long custId) {
         String fetchSql = "Select distinct" +
             " fi.UserSysId as UserSysId," +
             " fi.LoginID as LoginID," +
@@ -544,7 +548,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 " u.ROLE_SYS_ID = r.ROLE_SYS_ID" +
             " ) fi" +
             " left outer join SEC_GROUP sg" +
-            " on (fi.sec_grp_sys_id = sg.sec_group_sys_id) ";
+            " on (fi.sec_grp_sys_id = sg.sec_group_sys_id) where sg.CUSTOMER_SYS_ID = ?";
 
         /** NOTE : The below commented code (sql) in replacement of above sql can lists out only user assignments who have associated security groups.
                 If in future, if there is a requirement like to list only user assignments who have associated security groups. we can directly replace this sql.
@@ -563,7 +567,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
         List<UserAssignment> userAssignmentsList = new ArrayList<>();
         try{
-            userAssignmentsList = jdbcTemplate.query(fetchSql, ps -> {}, reultSet -> {
+            userAssignmentsList = jdbcTemplate.query(fetchSql, ps -> { ps.setLong(1,custId );}, reultSet -> {
                 List<UserAssignment> tempList = new ArrayList<>();
                 while(reultSet.next())  {
                     UserAssignment userAssignment = new UserAssignment();
@@ -577,7 +581,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     userAssignment.setGroupName(reultSet.getString("GroupName"));
                     tempList.add(userAssignment);
                 }
-                logger.trace("Success in reading User Assginments");
+                logger.trace("Success in reading User Assignments");
                 return tempList;
             });
 
