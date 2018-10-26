@@ -493,7 +493,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid = new Valid();
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = ? WHERE USER_SYS_ID = ? ";
-        if(securityGroupName.trim().equalsIgnoreCase("null") || securityGroupName.trim().equalsIgnoreCase("") || userSysId == 0 || userSysId == null)   {
+        if( securityGroupName.trim().equalsIgnoreCase("") || userSysId == 0 || userSysId == null)   {
             valid.setValid(false);
             valid.setValidityMessage("Parameters can't be empty or null");
             return valid;

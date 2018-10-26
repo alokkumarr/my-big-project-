@@ -50,7 +50,7 @@ public class SecurityIT extends BaseIT {
       .body("valid", equalTo(true));
 
     given(authSpec)
-      .when().get("/auth/admin/security-groups")
+      .when().get("/security/auth/admin/security-groups")
       .then().assertThat().statusCode(200);
   }
 
@@ -67,7 +67,7 @@ public class SecurityIT extends BaseIT {
       .body("valid", equalTo(true));
 
     Response response = given(authSpec)
-        .when().get("/auth/admin/security-groups")
+        .when().get("/security/auth/admin/security-groups")
         .then().statusCode(200).extract().response();
     ArrayNode node = response.as(ArrayNode.class);
     JsonNode jsonNode = node.get(0);
@@ -79,12 +79,12 @@ public class SecurityIT extends BaseIT {
     given(authSpec)
       .contentType(ContentType.JSON)
       .body(root)
-      .when().post("/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+      .when().post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
 
     given(authSpec)
-      .when().get("/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+      .when().get("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
       .then().assertThat().statusCode(200);
   }
 
@@ -101,16 +101,16 @@ public class SecurityIT extends BaseIT {
       .body("valid", equalTo(true));
 
     Response response = given(authSpec)
-        .when().get("/auth/admin/user-assignments")
+        .when().get("/security/auth/admin/user-assignments")
         .then().statusCode(200).extract().response();
     ArrayNode node = response.as(ArrayNode.class);
     JsonNode jsonNode = node.get(0);
     Long userSysId = jsonNode.get("userSysId").asLong();
 
     given(authSpec)
+      .body("TestGroup2")
       .when()
-      .put("/security/auth/admin/users/" + userSysId 
-      + "/security-group?securityGroupName=TestGroup2")
+      .put("/security/auth/admin/users/" + userSysId + "/security-group")
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
   }
