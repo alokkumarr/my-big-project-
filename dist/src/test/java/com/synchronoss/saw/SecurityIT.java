@@ -108,9 +108,9 @@ public class SecurityIT extends BaseIT {
     Long userSysId = jsonNode.get("userSysId").asLong();
 
     given(authSpec)
+      .body("TestGroup2")
       .when()
-      .put("/security/auth/admin/users/" + userSysId 
-      + "/security-group?securityGroupName=TestGroup2")
+      .put("/security/auth/admin/users/" + userSysId + "/security-group")
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
   }
