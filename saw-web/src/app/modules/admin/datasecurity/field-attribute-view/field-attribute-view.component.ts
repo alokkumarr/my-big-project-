@@ -29,7 +29,9 @@ export class FieldAttributeViewComponent {
   }
 
   ngOnChanges() {
-    this.loadAttributesGrid();
+    if (!isEmpty(this.groupSelected)) {
+      this.loadAttributesGrid();
+    }
   }
 
   loadAttributesGrid() {

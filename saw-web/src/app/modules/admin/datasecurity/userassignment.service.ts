@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { JwtService } from '../../../common/services/jwt.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
+import * as isUndefined from 'lodash/isUndefined';
 
 const loginUrl = AppConfig.login.url;
 
@@ -45,7 +46,7 @@ export class UserAssignmentService {
 
   addAttributetoGroup(attribute, mode) {
     let path;
-    path = `/auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
+    path = `auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
     switch (mode) {
     case 'create':
       return this.postRequest(path, attribute);
@@ -80,7 +81,7 @@ export class UserAssignmentService {
 
   assignGroupToUser(requestBody) {
 
-    const securityGroupName = requestBody.securityGroupName
+    const securityGroupName = requestBody.securityGroupName;
 
     const path = `auth/admin/users/${requestBody.userId}/security-group`;
     const httpOptions = {

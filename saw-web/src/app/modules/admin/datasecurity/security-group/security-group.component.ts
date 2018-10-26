@@ -11,6 +11,7 @@ import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.componen
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
+import * as deepClone from 'lodash/cloneDeep';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
@@ -66,6 +67,7 @@ export class SecurityGroupComponent implements OnInit {
   }
 
   loadGroupGridWithData(groupSelected) {
+    this.groupSelected = {};
     this._userAssignmentService.getSecurityGroups().then(response => {
       this.data = response;
       if (this.data.length === 0) {
@@ -96,7 +98,6 @@ export class SecurityGroupComponent implements OnInit {
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
       if (result) {
-        this.groupSelected = {};
         this.loadGroupGridWithData(this.groupSelected);
       }
     });

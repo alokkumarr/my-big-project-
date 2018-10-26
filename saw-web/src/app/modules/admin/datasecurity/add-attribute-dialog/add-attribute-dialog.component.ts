@@ -23,8 +23,8 @@ export class AddAttributeDialogComponent {
     }
   ) {}
 
-  hasWhiteSpace(s) {
-    return /\s/g.test(s);
+  hasWhiteSpace(field) {
+    return /\s/g.test(field);
   }
 
   submit() {
