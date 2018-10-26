@@ -122,6 +122,10 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test(timeout = 300000)
   public void createRoute() throws JsonProcessingException {
+    given(authSpec)
+      .body(prepareChannelDataSet()).when()
+      .post(BATCH_CHANNEL_PATH)
+      .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
     log.info("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
@@ -137,6 +141,9 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test(timeout = 300000)
   public void readChannel() throws JsonProcessingException {
+    given(authSpec)
+    .body(prepareChannelDataSet()).when()
+    .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);  
     List<?> listOfChannel = given(authSpec).when().get(BATCH_CHANNEL_PATH).then().assertThat()
          .statusCode(200).extract().response().jsonPath().getJsonObject("content");
     log.info("readChannel :" + listOfChannel);
@@ -148,6 +155,10 @@ public class BatchIngestionIT extends BaseIT {
   */
   @Test(timeout = 300000)
   public void readRoute() throws JsonProcessingException {
+    given(authSpec)
+    .body(prepareChannelDataSet()).when()
+    .post(BATCH_CHANNEL_PATH)
+    .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     given(authSpec)
@@ -167,6 +178,9 @@ public class BatchIngestionIT extends BaseIT {
   */
   @Test(timeout = 300000)
   public void updateChannel() throws JsonProcessingException {
+    given(authSpec)
+    .body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
+    .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
     log.info("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
@@ -184,6 +198,10 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test(timeout = 300000)
   public void updateRoute() throws JsonProcessingException {
+    given(authSpec)
+    .body(prepareChannelDataSet()).when()
+    .post(BATCH_CHANNEL_PATH)
+    .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
     log.info("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
@@ -213,6 +231,10 @@ public class BatchIngestionIT extends BaseIT {
     */
   @Test(timeout = 300000)
   public void deleteRoute() throws JsonProcessingException {
+    given(authSpec)
+   .body(prepareChannelDataSet()).when()
+   .post(BATCH_CHANNEL_PATH)
+   .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
     log.info("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
@@ -238,6 +260,10 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test(timeout = 300000)
   public void deleteChannel() throws JsonProcessingException {
+    given(authSpec)
+    .body(prepareChannelDataSet()).when()
+    .post(BATCH_CHANNEL_PATH)
+    .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
     log.info("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
