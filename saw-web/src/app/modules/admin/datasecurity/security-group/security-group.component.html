@@ -56,7 +56,7 @@
               [height]="config.height"
               (onRowClick)="config.onRowClick($event)"
   >
-
+  <dxo-selection mode="single"></dxo-selection>
   <div *dxTemplate="let cell of 'actionCellTemplate'">
     <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
       <button mat-icon-button class="update-security-property"
