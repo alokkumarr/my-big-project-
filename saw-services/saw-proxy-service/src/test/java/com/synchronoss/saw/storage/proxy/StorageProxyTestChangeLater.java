@@ -17,6 +17,7 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -48,6 +49,7 @@ import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
 @RunWith(SAWStorageRetryTestCasesRunner.class)
 @TestPropertySource(locations = "application-test.properties")
 @WebMvcTest(value = StorageProxyController.class, secure = false)
+@Ignore("SIP-4852 --> SIP-5024, it will be moved to integration test cases in future sprint")
 public class StorageProxyTestChangeLater {
 
   private EmbeddedElastic embeddedElastic = null;

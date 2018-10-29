@@ -23,6 +23,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.synchronoss.SAWRetryTestCasesRunner;
@@ -33,6 +34,7 @@ import pl.allegro.tech.embeddedelasticsearch.IndexSettings;
 import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
 
 @RunWith(SAWRetryTestCasesRunner.class)
+@Ignore("SIP-4852 --> SIP-5024, it will be moved to integration test cases in future sprint")
 public class ChartQueryBuilderTestChangeLater {
 
   private  EmbeddedElastic embeddedElastic = null;
