@@ -11,6 +11,7 @@ const subCategories = require('../javascript/data/subCategories');
 const dataSets = require('../javascript/data/datasets');
 const designModePage = require('../javascript/pages/designModePage.po.js');
 const utils = require('../javascript/helpers/utils');
+const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -52,7 +53,13 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
        let chartName = `e2e ${description} ${(new Date()).toString()}-${utils.getRandomInt(5,7)}`;
        let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
-       homePage.createAnalysis(metricName, data.chartType);
+
+       let analyzePageV2 = new AnalyzePage();
+       analyzePageV2.clickOnAddAnalysisButton();
+       analyzePageV2.clickOnAnalysisType(data.chartType);
+       analyzePageV2.clickOnNextButton();
+       analyzePageV2.clickOnDataPods(metricName);
+       analyzePageV2.clickOnCreateButton();
        //Select fields
        commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
        // Dimension section.

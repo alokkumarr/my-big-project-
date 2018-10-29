@@ -10,6 +10,7 @@ const protractorConf = require('../../protractor.conf');
 const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
 const dataSets = require('../javascript/data/datasets');
+const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
 
 describe('Verify preview for charts: previewForCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -52,7 +53,12 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
         let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 
         // Create analysis
-        homePage.createAnalysis(metricName, data.chartType);
+        let analyzePageV2 = new AnalyzePage();
+        analyzePageV2.clickOnAddAnalysisButton();
+        analyzePageV2.clickOnAnalysisType(data.chartType);
+        analyzePageV2.clickOnNextButton();
+        analyzePageV2.clickOnDataPods(metricName);
+        analyzePageV2.clickOnCreateButton();
 
         //Select fields
         // Wait for field input box.
