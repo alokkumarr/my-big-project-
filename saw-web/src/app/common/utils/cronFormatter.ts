@@ -60,7 +60,7 @@ export function generateHourlyCron(hours, minutes) {
   if (parseInt(hours, 10) === 0) {
     cronExpression = `0 0/${minutes} * 1/1 * ? *`;
   } else {
-    cronExpression =`0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
+    cronExpression = `0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
   }
 
   return isValid(cronExpression) ? cronExpression : '';
@@ -84,7 +84,7 @@ export function generateDailyCron(cronDaily, dateSelects) {
 }
 
 export function generateWeeklyCron(cronWeek, dateSelects) {
-  cronExpression =  `0 ${hourToCron(
+  cronExpression = `0 ${hourToCron(
     dateSelects.hour,
     dateSelects.hourType,
     dateSelects.minute
@@ -93,7 +93,7 @@ export function generateWeeklyCron(cronWeek, dateSelects) {
 }
 
 export function generateMonthlyCron(cronMonth, dateSelects) {
-  cronExpression =  cronMonth.monthlyType === 'monthlyDay' ? `0 ${
+  cronExpression = cronMonth.monthlyType === 'monthlyDay' ? `0 ${
     hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute)} ${
     cronMonth.specificDay} 1/${cronMonth.specificMonth} ? *` : `0 ${
       hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute)} ? 1/${
@@ -109,11 +109,11 @@ export function generateYearlyCron(cronYear, dateSelects) {
     dateSelects.minute
   );
   if (cronYear.yearlyType === 'yearlyMonth') {
-    cronExpression =  `0 ${hourCron} ${cronYear.specificMonthDayDay} ${
+    cronExpression = `0 ${hourCron} ${cronYear.specificMonthDayDay} ${
       cronYear.specificMonthDayMonth
     } ? *`;
   } else {
-    cronExpression =  `0 ${hourCron} ? ${cronYear.specificMonthWeekMonth} ${
+    cronExpression = `0 ${hourCron} ? ${cronYear.specificMonthWeekMonth} ${
       cronYear.specificMonthWeekDay
     }${cronYear.specificMonthWeekMonthWeek} *`;
   }
