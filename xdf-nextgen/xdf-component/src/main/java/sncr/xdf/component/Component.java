@@ -159,6 +159,7 @@ public abstract class Component {
           }
 
           ctx.setStartTs();
+          logger.debug("Reading dataset details for " + outputDataSets.get(o.getDataSet()));
           JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()));
           if (ds == null) {
             error = "Could not create metadata for output dataset: " + o.getDataSet();
