@@ -48,7 +48,7 @@ import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
 @RunWith(SAWStorageRetryTestCasesRunner.class)
 @TestPropertySource(locations = "application-test.properties")
 @WebMvcTest(value = StorageProxyController.class, secure = false)
-public class StorageProxyTest {
+public class StorageProxyTestChangeLater {
 
   private EmbeddedElastic embeddedElastic = null;
   private URL esSettingsResource = null;
@@ -57,7 +57,7 @@ public class StorageProxyTest {
   private final String INDEX_NAME = "mct_index_today";
   private final String TYPE_NAME = "content_type";
   private final String CLUSTER_NAME = "test_cluster";
-  private static final Logger logger = LoggerFactory.getLogger(StorageProxyTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(StorageProxyTestChangeLater.class);
 
   @Autowired
   private MockMvc mockMvc;
