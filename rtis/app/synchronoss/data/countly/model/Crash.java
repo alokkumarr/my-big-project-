@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by srya0001 on 4/28/2016.
  */
 
-@ApiModel(value = "Crash Data", description =  "The class stores all crash report attributes including crash report itself as base64 string")
+/*@ApiModel(value = "Crash Data", description =  "The class stores all crash report attributes including crash report itself as base64 string")*/
 public class Crash extends BaseEvent {
 
     public static byte Signature = 'C';

@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
-// @DATE:Wed Oct 03 15:10:59 EDT 2018
+// @DATE:Fri Oct 19 16:37:52 EDT 2018
 
 package router
 
@@ -18,15 +18,15 @@ class Routes(
   override val errorHandler: play.api.http.HttpErrorHandler, 
   // @LINE:4
   Application_5: controllers.Application,
-  // @LINE:9
+  // @LINE:14
   GenericHandler_1: controllers.GenericHandler,
-  // @LINE:12
+  // @LINE:20
   ApiHelpController_4: controllers.ApiHelpController,
-  // @LINE:15
+  // @LINE:23
   Assets_3: controllers.Assets,
-  // @LINE:22
+  // @LINE:30
   RTISControl_2: controllers.RTISControl,
-  // @LINE:28
+  // @LINE:39
   GenericLog_0: controllers.GenericLog,
   val prefix: String
 ) extends GeneratedRouter {
@@ -35,15 +35,15 @@ class Routes(
    def this(errorHandler: play.api.http.HttpErrorHandler,
     // @LINE:4
     Application_5: controllers.Application,
-    // @LINE:9
+    // @LINE:14
     GenericHandler_1: controllers.GenericHandler,
-    // @LINE:12
+    // @LINE:20
     ApiHelpController_4: controllers.ApiHelpController,
-    // @LINE:15
+    // @LINE:23
     Assets_3: controllers.Assets,
-    // @LINE:22
+    // @LINE:30
     RTISControl_2: controllers.RTISControl,
-    // @LINE:28
+    // @LINE:39
     GenericLog_0: controllers.GenericLog
   ) = this(errorHandler, Application_5, GenericHandler_1, ApiHelpController_4, Assets_3, RTISControl_2, GenericLog_0, "/")
 
@@ -62,13 +62,17 @@ class Routes(
     ("""GET""", this.prefix, """controllers.Application.index"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """i""", """controllers.Application.i"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """i""", """controllers.Application.iPost"""),
-    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """publishevent""", """controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String], payload:Option[String])"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """countlyevents""", """controllers.Application.i"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """crashreport""", """controllers.Application.iPost"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """publishevent""", """controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String])"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """events""", """controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String, EVENT_TYPE:Option[String])"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """api-docs""", """controllers.ApiHelpController.getResources"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """docs""", """controllers.ApiHelpController.viewSwaggerUI"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """docs/""" + "$" + """file<.+>""", """controllers.Assets.at(path:String = "/public/swagger-ui", file:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """control""", """controllers.RTISControl.executeCmd(CMD:String, PARAMETERS:Option[String])"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """control""", """controllers.RTISControl.executeExtendedCmd(CMD:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """sr""", """controllers.RTISControl.sr(parameters:Option[String])"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """statusreport""", """controllers.RTISControl.sr(parameters:Option[String])"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """genericlog""", """controllers.GenericLog.doPost(CID:String, LOG_TYPE:String)"""),
     Nil
   ).foldLeft(List.empty[(String,String,String)]) { (s,e) => e.asInstanceOf[Any] match {
@@ -131,27 +135,78 @@ class Routes(
   )
 
   // @LINE:9
-  private[this] lazy val controllers_GenericHandler_event3_route = Route("POST",
+  private[this] lazy val controllers_Application_i3_route = Route("GET",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("countlyevents")))
+  )
+  private[this] lazy val controllers_Application_i3_invoker = createInvoker(
+    Application_5.i,
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.Application",
+      "i",
+      Nil,
+      "GET",
+      """# Renamed /i as per standards """,
+      this.prefix + """countlyevents"""
+    )
+  )
+
+  // @LINE:10
+  private[this] lazy val controllers_Application_iPost4_route = Route("POST",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("crashreport")))
+  )
+  private[this] lazy val controllers_Application_iPost4_invoker = createInvoker(
+    Application_5.iPost,
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.Application",
+      "iPost",
+      Nil,
+      "POST",
+      """""",
+      this.prefix + """crashreport"""
+    )
+  )
+
+  // @LINE:14
+  private[this] lazy val controllers_GenericHandler_event5_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("publishevent")))
   )
-  private[this] lazy val controllers_GenericHandler_event3_invoker = createInvoker(
-    GenericHandler_1.event(fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[Option[String]], fakeValue[Option[String]]),
+  private[this] lazy val controllers_GenericHandler_event5_invoker = createInvoker(
+    GenericHandler_1.event(fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.GenericHandler",
       "event",
-      Seq(classOf[String], classOf[String], classOf[String], classOf[String], classOf[String], classOf[Option[String]], classOf[Option[String]]),
+      Seq(classOf[String], classOf[String], classOf[String], classOf[String], classOf[String], classOf[Option[String]]),
       "POST",
       """Generic event handler""",
       this.prefix + """publishevent"""
     )
   )
 
-  // @LINE:12
-  private[this] lazy val controllers_ApiHelpController_getResources4_route = Route("GET",
+  // @LINE:17
+  private[this] lazy val controllers_GenericHandler_event6_route = Route("POST",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("events")))
+  )
+  private[this] lazy val controllers_GenericHandler_event6_invoker = createInvoker(
+    GenericHandler_1.event(fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[String], fakeValue[Option[String]]),
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.GenericHandler",
+      "event",
+      Seq(classOf[String], classOf[String], classOf[String], classOf[String], classOf[String], classOf[Option[String]]),
+      "POST",
+      """ Renamed generic event handler as per standards""",
+      this.prefix + """events"""
+    )
+  )
+
+  // @LINE:20
+  private[this] lazy val controllers_ApiHelpController_getResources7_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("api-docs")))
   )
-  private[this] lazy val controllers_ApiHelpController_getResources4_invoker = createInvoker(
+  private[this] lazy val controllers_ApiHelpController_getResources7_invoker = createInvoker(
     ApiHelpController_4.getResources,
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -164,11 +219,11 @@ class Routes(
     )
   )
 
-  // @LINE:14
-  private[this] lazy val controllers_ApiHelpController_viewSwaggerUI5_route = Route("GET",
+  // @LINE:22
+  private[this] lazy val controllers_ApiHelpController_viewSwaggerUI8_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("docs")))
   )
-  private[this] lazy val controllers_ApiHelpController_viewSwaggerUI5_invoker = createInvoker(
+  private[this] lazy val controllers_ApiHelpController_viewSwaggerUI8_invoker = createInvoker(
     ApiHelpController_4.viewSwaggerUI,
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -181,11 +236,11 @@ class Routes(
     )
   )
 
-  // @LINE:15
-  private[this] lazy val controllers_Assets_at6_route = Route("GET",
+  // @LINE:23
+  private[this] lazy val controllers_Assets_at9_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("docs/"), DynamicPart("file", """.+""",false)))
   )
-  private[this] lazy val controllers_Assets_at6_invoker = createInvoker(
+  private[this] lazy val controllers_Assets_at9_invoker = createInvoker(
     Assets_3.at(fakeValue[String], fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -198,11 +253,11 @@ class Routes(
     )
   )
 
-  // @LINE:22
-  private[this] lazy val controllers_RTISControl_executeCmd7_route = Route("GET",
+  // @LINE:30
+  private[this] lazy val controllers_RTISControl_executeCmd10_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("control")))
   )
-  private[this] lazy val controllers_RTISControl_executeCmd7_invoker = createInvoker(
+  private[this] lazy val controllers_RTISControl_executeCmd10_invoker = createInvoker(
     RTISControl_2.executeCmd(fakeValue[String], fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -215,11 +270,11 @@ class Routes(
     )
   )
 
-  // @LINE:23
-  private[this] lazy val controllers_RTISControl_executeExtendedCmd8_route = Route("POST",
+  // @LINE:31
+  private[this] lazy val controllers_RTISControl_executeExtendedCmd11_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("control")))
   )
-  private[this] lazy val controllers_RTISControl_executeExtendedCmd8_invoker = createInvoker(
+  private[this] lazy val controllers_RTISControl_executeExtendedCmd11_invoker = createInvoker(
     RTISControl_2.executeExtendedCmd(fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -232,11 +287,11 @@ class Routes(
     )
   )
 
-  // @LINE:24
-  private[this] lazy val controllers_RTISControl_sr9_route = Route("GET",
+  // @LINE:32
+  private[this] lazy val controllers_RTISControl_sr12_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("sr")))
   )
-  private[this] lazy val controllers_RTISControl_sr9_invoker = createInvoker(
+  private[this] lazy val controllers_RTISControl_sr12_invoker = createInvoker(
     RTISControl_2.sr(fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -249,11 +304,28 @@ class Routes(
     )
   )
 
-  // @LINE:28
-  private[this] lazy val controllers_GenericLog_doPost10_route = Route("POST",
+  // @LINE:35
+  private[this] lazy val controllers_RTISControl_sr13_route = Route("GET",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("statusreport")))
+  )
+  private[this] lazy val controllers_RTISControl_sr13_invoker = createInvoker(
+    RTISControl_2.sr(fakeValue[Option[String]]),
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.RTISControl",
+      "sr",
+      Seq(classOf[Option[String]]),
+      "GET",
+      """ Renamed /sr as per standards""",
+      this.prefix + """statusreport"""
+    )
+  )
+
+  // @LINE:39
+  private[this] lazy val controllers_GenericLog_doPost14_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("genericlog")))
   )
-  private[this] lazy val controllers_GenericLog_doPost10_invoker = createInvoker(
+  private[this] lazy val controllers_GenericLog_doPost14_invoker = createInvoker(
     GenericLog_0.doPost(fakeValue[String], fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -288,51 +360,75 @@ class Routes(
       }
   
     // @LINE:9
-    case controllers_GenericHandler_event3_route(params) =>
-      call(params.fromQuery[String]("APP_KEY", None), params.fromQuery[String]("APP_VERSION", None), params.fromQuery[String]("APP_MODULE", None), params.fromQuery[String]("EVENT_ID", None), params.fromQuery[String]("EVENT_DATE", None), params.fromQuery[Option[String]]("EVENT_TYPE", None), params.fromQuery[Option[String]]("payload", None)) { (APP_KEY, APP_VERSION, APP_MODULE, EVENT_ID, EVENT_DATE, EVENT_TYPE, payload) =>
-        controllers_GenericHandler_event3_invoker.call(GenericHandler_1.event(APP_KEY, APP_VERSION, APP_MODULE, EVENT_ID, EVENT_DATE, EVENT_TYPE, payload))
+    case controllers_Application_i3_route(params) =>
+      call { 
+        controllers_Application_i3_invoker.call(Application_5.i)
       }
   
-    // @LINE:12
-    case controllers_ApiHelpController_getResources4_route(params) =>
+    // @LINE:10
+    case controllers_Application_iPost4_route(params) =>
       call { 
-        controllers_ApiHelpController_getResources4_invoker.call(ApiHelpController_4.getResources)
+        controllers_Application_iPost4_invoker.call(Application_5.iPost)
       }
   
     // @LINE:14
-    case controllers_ApiHelpController_viewSwaggerUI5_route(params) =>
-      call { 
-        controllers_ApiHelpController_viewSwaggerUI5_invoker.call(ApiHelpController_4.viewSwaggerUI)
+    case controllers_GenericHandler_event5_route(params) =>
+      call(params.fromQuery[String]("APP_KEY", None), params.fromQuery[String]("APP_VERSION", None), params.fromQuery[String]("APP_MODULE", None), params.fromQuery[String]("EVENT_ID", None), params.fromQuery[String]("EVENT_DATE", None), params.fromQuery[Option[String]]("EVENT_TYPE", None)) { (APP_KEY, APP_VERSION, APP_MODULE, EVENT_ID, EVENT_DATE, EVENT_TYPE) =>
+        controllers_GenericHandler_event5_invoker.call(GenericHandler_1.event(APP_KEY, APP_VERSION, APP_MODULE, EVENT_ID, EVENT_DATE, EVENT_TYPE))
       }
   
-    // @LINE:15
-    case controllers_Assets_at6_route(params) =>
-      call(Param[String]("path", Right("/public/swagger-ui")), params.fromPath[String]("file", None)) { (path, file) =>
-        controllers_Assets_at6_invoker.call(Assets_3.at(path, file))
+    // @LINE:17
+    case controllers_GenericHandler_event6_route(params) =>
+      call(params.fromQuery[String]("APP_KEY", None), params.fromQuery[String]("APP_VERSION", None), params.fromQuery[String]("APP_MODULE", None), params.fromQuery[String]("EVENT_ID", None), params.fromQuery[String]("EVENT_DATE", None), params.fromQuery[Option[String]]("EVENT_TYPE", None)) { (APP_KEY, APP_VERSION, APP_MODULE, EVENT_ID, EVENT_DATE, EVENT_TYPE) =>
+        controllers_GenericHandler_event6_invoker.call(GenericHandler_1.event(APP_KEY, APP_VERSION, APP_MODULE, EVENT_ID, EVENT_DATE, EVENT_TYPE))
+      }
+  
+    // @LINE:20
+    case controllers_ApiHelpController_getResources7_route(params) =>
+      call { 
+        controllers_ApiHelpController_getResources7_invoker.call(ApiHelpController_4.getResources)
       }
   
     // @LINE:22
-    case controllers_RTISControl_executeCmd7_route(params) =>
-      call(params.fromQuery[String]("CMD", None), params.fromQuery[Option[String]]("PARAMETERS", None)) { (CMD, PARAMETERS) =>
-        controllers_RTISControl_executeCmd7_invoker.call(RTISControl_2.executeCmd(CMD, PARAMETERS))
+    case controllers_ApiHelpController_viewSwaggerUI8_route(params) =>
+      call { 
+        controllers_ApiHelpController_viewSwaggerUI8_invoker.call(ApiHelpController_4.viewSwaggerUI)
       }
   
     // @LINE:23
-    case controllers_RTISControl_executeExtendedCmd8_route(params) =>
+    case controllers_Assets_at9_route(params) =>
+      call(Param[String]("path", Right("/public/swagger-ui")), params.fromPath[String]("file", None)) { (path, file) =>
+        controllers_Assets_at9_invoker.call(Assets_3.at(path, file))
+      }
+  
+    // @LINE:30
+    case controllers_RTISControl_executeCmd10_route(params) =>
+      call(params.fromQuery[String]("CMD", None), params.fromQuery[Option[String]]("PARAMETERS", None)) { (CMD, PARAMETERS) =>
+        controllers_RTISControl_executeCmd10_invoker.call(RTISControl_2.executeCmd(CMD, PARAMETERS))
+      }
+  
+    // @LINE:31
+    case controllers_RTISControl_executeExtendedCmd11_route(params) =>
       call(params.fromQuery[String]("CMD", None)) { (CMD) =>
-        controllers_RTISControl_executeExtendedCmd8_invoker.call(RTISControl_2.executeExtendedCmd(CMD))
+        controllers_RTISControl_executeExtendedCmd11_invoker.call(RTISControl_2.executeExtendedCmd(CMD))
       }
   
-    // @LINE:24
-    case controllers_RTISControl_sr9_route(params) =>
+    // @LINE:32
+    case controllers_RTISControl_sr12_route(params) =>
       call(params.fromQuery[Option[String]]("parameters", None)) { (parameters) =>
-        controllers_RTISControl_sr9_invoker.call(RTISControl_2.sr(parameters))
+        controllers_RTISControl_sr12_invoker.call(RTISControl_2.sr(parameters))
       }
   
-    // @LINE:28
-    case controllers_GenericLog_doPost10_route(params) =>
+    // @LINE:35
+    case controllers_RTISControl_sr13_route(params) =>
+      call(params.fromQuery[Option[String]]("parameters", None)) { (parameters) =>
+        controllers_RTISControl_sr13_invoker.call(RTISControl_2.sr(parameters))
+      }
+  
+    // @LINE:39
+    case controllers_GenericLog_doPost14_route(params) =>
       call(params.fromQuery[String]("CID", None), params.fromQuery[String]("LOG_TYPE", None)) { (CID, LOG_TYPE) =>
-        controllers_GenericLog_doPost10_invoker.call(GenericLog_0.doPost(CID, LOG_TYPE))
+        controllers_GenericLog_doPost14_invoker.call(GenericLog_0.doPost(CID, LOG_TYPE))
       }
   }
 }
