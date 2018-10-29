@@ -53,11 +53,15 @@ export default function(data) {
     for (let i = 0; i <= randomNumber; i++) {
         index = Math.floor(Math.random() * executeLoadTest.length);
         if(executeAnalysisIDs.indexOf(executeLoadTest[index]) >= 0) {
-           num = conf.utlity.getRandomNumber(data.analysisList.contents.analyze);
-           batchArr.push(executeLoadTest[index](data.analysisList.contents.analyze[num].id));
+          if (data.analysisList.contents !== undefined) {
+            num = conf.utlity.getRandomNumber(data.analysisList.contents.analyze);
+            batchArr.push(executeLoadTest[index](data.analysisList.contents.analyze[num].id));
+          }
        } else if (createAnalysisIds.indexOf(executeLoadTest[index]) >= 0) {
-           num = conf.utlity.getRandomNumber(data.createAnalysisList.contents[0].ANALYZE);
-           batchArr.push(executeLoadTest[index](data.createAnalysisList.contents[0].ANALYZE[num].id));
+           if(data.createAnalysisList.contents !== undefined) {
+            num = conf.utlity.getRandomNumber(data.createAnalysisList.contents[0].ANALYZE);
+            batchArr.push(executeLoadTest[index](data.createAnalysisList.contents[0].ANALYZE[num].id));
+           }
        } else  {
            batchArr.push(executeLoadTest[index]());
        }
@@ -69,7 +73,7 @@ export default function(data) {
         return item !== value;
     });
       let responses = http.batch( batchArr);
-}
+} 
 
 export function teardown() {
     conf.GlobalData.token.setAccessToken('');
@@ -79,4 +83,3 @@ export function teardown() {
     executeAnalysisIDs = [];
     createAnalysisIds = [];
 }
-
