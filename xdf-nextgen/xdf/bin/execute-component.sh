@@ -114,6 +114,9 @@ MAIN_CLASS=${COMP_MC[$COMPONENT_NAME]}
 # validate XDF_DATA_ROOT
 hadoop fs -stat $XDF_DATA_ROOT >/dev/null || exit 1
 
+#To safely exit if an error during JQ piping in next command
+set -o pipefail
+
 # read SPARK_DRIVER_MEMORY param value from config JSON file
 SPARK_MEMORY_CONFIG="$(cat $CONFIG_FILE| jq -r '.parameters | .[] | select(.name == "spark.driver.memory")| .value ')"
 echo "SPARK DRIVER MEMORY:: $SPARK_MEMORY_CONFIG"
