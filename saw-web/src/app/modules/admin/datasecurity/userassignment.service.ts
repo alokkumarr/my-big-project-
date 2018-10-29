@@ -80,9 +80,7 @@ export class UserAssignmentService {
   }
 
   assignGroupToUser(requestBody) {
-
     const securityGroupName = requestBody.securityGroupName;
-
     const path = `auth/admin/users/${requestBody.userId}/security-group`;
     const httpOptions = {
       headers: new HttpHeaders({
@@ -91,7 +89,7 @@ export class UserAssignmentService {
         'Access-Control-Allow-Method': 'PUT'
       })
     };
-    return this._http.put(`${loginUrl}/${path}`, securityGroupName, httpOptions).toPromise();
+    return this._http.post(`${loginUrl}/${path}`, securityGroupName, httpOptions).toPromise();
   }
 
   getRequest(path) {

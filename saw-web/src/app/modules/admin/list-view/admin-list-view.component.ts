@@ -20,7 +20,7 @@ export class AdminListViewComponent implements OnInit {
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
   @Output() rowClick: EventEmitter<any> = new EventEmitter();
 
-  securityGroups= [];
+  securityGroups = [];
   config: any;
   groupValue: any;
   groupAssignSuccess: any;

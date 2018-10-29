@@ -36,6 +36,7 @@ export class SecurityGroupComponent implements OnInit {
   groupName: any;
   columnData: {};
   emptyState: boolean;
+  addAttribute: boolean;
 
   constructor(
     private _router: Router,
@@ -68,6 +69,7 @@ export class SecurityGroupComponent implements OnInit {
 
   loadGroupGridWithData(groupSelected) {
     this.groupSelected = {};
+    this.addAttribute = true;
     this._userAssignmentService.getSecurityGroups().then(response => {
       this.data = response;
       if (this.data.length === 0) {
@@ -76,6 +78,7 @@ export class SecurityGroupComponent implements OnInit {
         this.emptyState = false;
         this.groupSelected =  (isEmpty(groupSelected)) ? this.data[0] : groupSelected;
       }
+      this.addAttribute = (this.data.length === 0);
     });
   }
 
