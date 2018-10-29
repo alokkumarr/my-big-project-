@@ -531,7 +531,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 valid.setValid(true);
                 valid.setGroupId(groupSysId);
                 valid.setAttributeId(groupAttributeSysId);
-                valid.setValidityMessage(delResult + " Attribute " + dskList.get(1).trim() + " successfully removed");
+                valid.setValidityMessage(" Attribute " + dskList.get(1).trim() + " successfully removed");
                 return valid;
             }
             catch (Exception e) {
