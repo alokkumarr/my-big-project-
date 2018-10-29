@@ -395,6 +395,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         else if ( attributeValues.getValue().trim().length() > 45 ) {
             valid.setValid(false);
             valid.setValidityMessage("Value too long !!");
+            return valid;
         }
         else {
              groupAttrSysId = this.getSecurityGroupDskAttributeSysId(securityGroupId,attributeValues.getAttributeName());
@@ -430,14 +431,14 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                         valid.setGroupId(securityGroupId);
                         valid.setAttributeId(attributeSysId);
                         valid.setAttributeName(attributeValues.getAttributeName());
-                        valid.setValidityMessage("Attribute-value added to table SEC_GROUP_DSK_VALUE.");
+                        valid.setValidityMessage("Attribute-value added Successfully.");
                         return valid;
                     }
                     else { logger.error("attributeSysId is NULL"); }
                 }
                 catch (Exception e) {
                     logger.error(e.getMessage());
-                    valid.setValidityMessage("Error in Attribute value added to table SEC_GROUP_DSK_VALUE.");
+                    valid.setValidityMessage("Error in adding Attribute value.");
                     valid.setValid(false);
                 }
                 return valid;
@@ -528,7 +529,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 valid.setValid(true);
                 valid.setGroupId(groupSysId);
                 valid.setAttributeId(groupAttributeSysId);
-                valid.setValidityMessage(delResult + " Attribute " + dskList.get(1).trim() + " successfully removed");
+                valid.setValidityMessage(" Attribute " + dskList.get(1).trim() + " successfully removed");
                 return valid;
             }
             catch (Exception e) {
@@ -592,7 +593,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         }
         else if (securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
             try{
-                // If Group name is removed from User. We neeed to set sec_group_sys_id as null in users table.
+                // If Group name is removed from User. We need to set sec_group_sys_id as null in users table.
                 int updateRes = jdbcTemplate.update(updateSql, ps -> {
                     ps.setObject(1, null);
                     ps.setLong(2,userSysId);
