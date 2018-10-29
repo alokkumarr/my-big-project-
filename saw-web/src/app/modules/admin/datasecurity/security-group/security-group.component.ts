@@ -101,6 +101,13 @@ export class SecurityGroupComponent implements OnInit {
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
       if (result) {
+        if (property === 'securityGroup') {
+          this.groupSelected = {
+            secGroupSysId: result.groupId,
+            securityGroupName: result.groupName,
+            description: result.description
+          };
+        }
         this.loadGroupGridWithData(this.groupSelected);
       }
     });

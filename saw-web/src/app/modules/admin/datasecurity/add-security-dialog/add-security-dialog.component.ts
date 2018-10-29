@@ -27,7 +27,7 @@ export class AddSecurityDialogComponent {
   submit() {
     this._userAssignmentService.addSecurityGroup(this.data).then(response => {
       if (get(response, 'valid')) {
-        this._dialogRef.close(get(response, 'valid'));
+        this._dialogRef.close(response);
       } else {
         this.errorState = !get(response, 'valid');
         this.errorMessage = get(response, 'validityMessage');
