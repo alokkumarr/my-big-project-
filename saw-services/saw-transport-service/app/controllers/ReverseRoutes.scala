@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:saw-services/saw-transport-service/conf/routes
-// @DATE:Mon Oct 01 11:25:16 EDT 2018
+// @DATE:Tue Oct 16 17:30:43 IST 2018
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }
@@ -194,6 +194,12 @@ package controllers {
       
       }
     
+    }
+  
+    // @LINE:25
+    def getLatestExecutionData(analysisId:String, page:Int = 1, pageSize:Int = 10, analysisType:String = "report", executionType:String = null ): Call = {
+      import ReverseRouteContext.empty
+      Call("GET", _prefix + { _defaultPrefix } + "analysis/" + implicitly[PathBindable[String]].unbind("analysisId", dynamicString(analysisId)) + "/executions/data" + queryString(List(if(page == 1) None else Some(implicitly[QueryStringBindable[Int]].unbind("page", page)), if(pageSize == 10) None else Some(implicitly[QueryStringBindable[Int]].unbind("pageSize", pageSize)), if(analysisType == "report") None else Some(implicitly[QueryStringBindable[String]].unbind("analysisType", analysisType)), if(executionType == null ) None else Some(implicitly[QueryStringBindable[String]].unbind("executionType", executionType)))))
     }
   
     // @LINE:24
