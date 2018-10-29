@@ -55,7 +55,8 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
         // Create analysis
         let analyzePageV2 = new AnalyzePage();
         analyzePageV2.clickOnAddAnalysisButton();
-        analyzePageV2.clickOnAnalysisType(data.chartType);
+        analyzePageV2.clickOnAnalysisType('');
+        analyzePageV2.clickOnChartType(data.chartType);
         analyzePageV2.clickOnNextButton();
         analyzePageV2.clickOnDataPods(metricName);
         analyzePageV2.clickOnCreateButton();

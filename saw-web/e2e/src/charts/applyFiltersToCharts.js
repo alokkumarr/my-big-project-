@@ -18,7 +18,8 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const filterValue = '123';
   const groupName = 'Date';
   const metricName = dataSets.pivotChart;
-  const analysisType = 'chart:column';
+  const chartType = 'chart:column';
+  const analysisType = '';
 
   beforeAll(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
@@ -46,6 +47,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
         let analyzePageV2 = new AnalyzePage();
         analyzePageV2.clickOnAddAnalysisButton();
         analyzePageV2.clickOnAnalysisType(analysisType);
+        analyzePageV2.clickOnChartType(chartType);
         analyzePageV2.clickOnNextButton();
         analyzePageV2.clickOnDataPods(metricName);
         analyzePageV2.clickOnCreateButton();
