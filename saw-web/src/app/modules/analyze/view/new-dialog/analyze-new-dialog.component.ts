@@ -26,6 +26,7 @@ export class AnalyzeNewDialogComponent {
     }
   ];
   selectedMethod: IAnalysisMethod;
+  searchMetric: '';
   selectedMetric;
   private _sortOrder = 'asc';
 

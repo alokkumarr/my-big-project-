@@ -19,7 +19,7 @@
 
     <mat-step label="Select Analysis Type" [completed]="!!selectedMethod">
       <div class="container">
-        <div *ngFor="let category of methodCategories; trackBy: trackByIndex">
+        <div *ngFor="let category of methodCategories; trackBy: trackById">
           <div class="md-body-1" flex>{{category.label}}</div>
           <choice-group-u (change)="onMethodSelected($event)"
                           [items]="category.children"
@@ -32,7 +32,9 @@
     <mat-step label="Select Datapod" [completed]="!!selectedMetric">
       <mat-form-field appearance="outline">
         <mat-icon matPrefix fontIcon="icon-search"></mat-icon>
-        <input matInput [(ngModel)]="searchMetric" placeholder="Search">
+        <input matInput
+               [attr.e2e]="metric-search-input-field"
+               [(ngModel)]="searchMetric" placeholder="Search">
       </mat-form-field>
       <button mat-button
               matTooltip="Sort"
@@ -76,6 +78,7 @@
           mat-raised-button i18n
           >{{newAnalysisStepper.selectedIndex === 1 ? 'Create' : 'Next'}}</button>
   <button (click)="previousStep()"
+          e2e="create-analysis-back-button"
           *ngIf="stepper.selectedIndex > 0"
           mat-button
           i18n
