@@ -1,11 +1,7 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
-import com.sncr.saw.security.common.bean.Valid;
-import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
-import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
-import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
-import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
+import com.sncr.saw.security.common.bean.repo.dsk.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,22 +26,32 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Valid addSecurityGroups(SecurityGroups securityGroups,String createdBy) {
-        Valid valid = new Valid();
+    public DskValidity addSecurityGroups(SecurityGroups securityGroups, String createdBy) {
+        DskValidity valid = new DskValidity();
         String addSql = "INSERT INTO `SEC_GROUP` " +
             "(`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
             + "VALUES (?,?,1,now(),?)";
         securityGroups.setSecurityGroupName(securityGroups.getSecurityGroupName().trim());
         securityGroups.setDescription(securityGroups.getDescription().trim());
 
-        if (securityGroups.getSecurityGroupName().equalsIgnoreCase("null") || securityGroups.getSecurityGroupName().equalsIgnoreCase(""))   {
+        if (securityGroups.getSecurityGroupName().equals(null) || securityGroups.getSecurityGroupName().isEmpty())   {
             valid.setValid(false);
             valid.setValidityMessage("Group name can't be empty or null");
             return valid;
         }
-        else if (this.isGroupNameExists(securityGroups.getSecurityGroupName())){
+        else if (this.isGroupNameExists(securityGroups.getSecurityGroupName()) ) {
             valid.setValid(false);
-            valid.setValidityMessage("Group Name already Exists !!");
+            valid.setValidityMessage("Group Name Already Exists !!");
+            return valid;
+        }
+        else if (securityGroups.getSecurityGroupName().length() > 255 ) {
+            valid.setValid(false);
+            valid.setValidityMessage("Group Name too long !!");
+            return valid;
+        }
+        else if ( securityGroups.getDescription().length() > 255 )  {
+            valid.setValid(false);
+            valid.setValidityMessage("Description too long !!");
             return valid;
         }
         else {
@@ -57,6 +63,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 });
                 logger.trace(insertResult + " Security Group created successfully.");
                 valid.setValid(true);
+                valid.setGroupId(this.getSecurityGroupSysId(securityGroups.getSecurityGroupName()));
+                valid.setGroupName(securityGroups.getSecurityGroupName());
+                valid.setDescription(securityGroups.getDescription());
                 valid.setValidityMessage("Security Group created successfully.");
                 return valid;
                 // Here we need not to assign default user to newly created Group name. By default it should be left unassigned.
@@ -64,7 +73,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             catch (Exception e) {
                 logger.error(e.getMessage());
                 valid.setValid(false);
-                valid.setValidityMessage("Error in creating Security Group");
+                valid.setValidityMessage("Error in creating Security Group !!");
                 return valid;
             }
         }
@@ -85,6 +94,25 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             }
         }
         return flag;
+    }
+
+    /**
+     * is Description Name exists in TABLE
+     * @param descName
+     * @return
+     */
+    public Boolean isDescExists(String groupName,String descName)  {
+        String fetchSql = "SELECT Description FROM SEC_GROUP WHERE SEC_GROUP_NAME = ?";
+        String desc = jdbcTemplate.query(fetchSql,
+            preparedStatement -> { preparedStatement.setString(1,groupName);},
+            resultSet -> {
+                String temp = null;
+                while (resultSet.next()) {
+                    temp = resultSet.getString("SEC_GROUP_NAME");
+                }
+                return temp;
+            });
+        return desc.equalsIgnoreCase(descName);
     }
 
     /**
@@ -109,8 +137,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Valid updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups) {
-        Valid valid = new Valid();
+    public DskValidity updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups) {
+        DskValidity valid = new DskValidity();
         String updateSql = "UPDATE SEC_GROUP SET SEC_GROUP_NAME = ?, DESCRIPTION = ? WHERE SEC_GROUP_SYS_ID = ?";
         if(oldNewGroups.get(0).trim().equalsIgnoreCase(null) || oldNewGroups.get(0).trim().equalsIgnoreCase("")
             || oldNewGroups.get(1).trim().equalsIgnoreCase(null) || oldNewGroups.get(1).trim().equalsIgnoreCase("")
@@ -119,9 +147,24 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setValidityMessage("Parameters can't be null or empty!!");
             return valid;
         }
-        else if (this.isGroupNameExists(oldNewGroups.get(0).trim())){
+        else if (this.isGroupNameExists(oldNewGroups.get(0).trim()) && this.isDescExists(oldNewGroups.get(0).trim(),oldNewGroups.get(1).trim())){
             valid.setValid(false);
-            valid.setValidityMessage("Group Name already Exists !!");
+            valid.setValidityMessage("Fields Already Exists !!");
+            return valid;
+        }
+        else if (this.isGroupNameExists(oldNewGroups.get(0).trim()))    {
+            valid.setValid(false);
+            valid.setValidityMessage("Group Name Already Exists !!");
+            return valid;
+        }
+        else if (oldNewGroups.get(0).trim().length() > 255) {
+            valid.setValid(false);
+            valid.setValidityMessage("Group Name too long !!");
+            return valid;
+        }
+        else if (oldNewGroups.get(1).trim().length() > 255) {
+            valid.setValid(false);
+            valid.setValidityMessage("Description too long !!");
             return valid;
         }
         else {
@@ -132,6 +175,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     ps.setLong(3, securityGroupId);
                 });
                 valid.setValid(true);
+                valid.setGroupId(this.getSecurityGroupSysId(oldNewGroups.get(0).trim()));
+                valid.setGroupName(oldNewGroups.get(0).trim());
+                valid.setDescription(oldNewGroups.get(1).trim());
                 valid.setValidityMessage("Security Group updated successfully");
                 logger.trace(updateResult + "Security Group updated successfully");
                 return valid;
@@ -146,8 +192,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Valid deleteSecurityGroups(Long securityGroupId) {
-        Valid valid = new Valid();
+    public DskValidity deleteSecurityGroups(Long securityGroupId) {
+        DskValidity valid = new DskValidity();
         String delSql = "DELETE FROM SEC_GROUP WHERE SEC_GROUP_SYS_ID = ?";
         /** NOTE: Deleting a row from SEC_GROUP will inturn deletes corresponding reference rows in child tables.
          * That is, SEC_GROUP_DSK_ATTRIBUTE and SEC_GROUP_DSK_VALUE. So, no need of deleting its references in other tables.
@@ -167,6 +213,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     logger.trace(deleteResult + "Security Group deleted successfully");
                     valid.setValidityMessage("Security Group deleted successfully");
                     valid.setValid(true);
+                    valid.setGroupId(securityGroupId);
                     return valid;
                 }
                 else {
@@ -180,7 +227,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             catch (Exception e) {
                 logger.error(e.getMessage());
                 valid.setValid(false);
-                valid.setValidityMessage(e.getMessage());
+                valid.setValidityMessage("Error in deleting Security Group !!");
                 return valid;
             }
         }
@@ -322,13 +369,32 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
-        Valid valid = new Valid();
+    public DskValidity addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
+        DskValidity valid = new DskValidity();
         Long groupAttrSysId = null;
         if(securityGroupId == null || securityGroupId == 0 )    {
             valid.setValid(false);
             valid.setValidityMessage("securityGroupID can't be null or 0 ");
             return valid;
+        }
+        else if ( attributeValues.getAttributeName().equals(null) || attributeValues.getAttributeName().equals(null) || attributeValues.getAttributeName().isEmpty())   {
+            valid.setValid(false);
+            valid.setValidityMessage("Attribute Name can't be null or empty !!");
+            return valid;
+        }
+        else if ( attributeValues.getValue().equals(null) || attributeValues.getValue().equalsIgnoreCase("null") || attributeValues.getValue().isEmpty())  {
+            valid.setValid(false);
+            valid.setValidityMessage("Value can't be null or empty !!");
+            return valid;
+        }
+        else if ( attributeValues.getAttributeName().trim().length() > 100 )    {
+            valid.setValid(false);
+            valid.setValidityMessage("Attribute Name too long !!");
+            return valid;
+        }
+        else if ( attributeValues.getValue().trim().length() > 45 ) {
+            valid.setValid(false);
+            valid.setValidityMessage("Value too long !!");
         }
         else {
              groupAttrSysId = this.getSecurityGroupDskAttributeSysId(securityGroupId,attributeValues.getAttributeName());
@@ -361,7 +427,11 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                         });
                         logger.trace(addValResult + " Attribute value added to table SEC_GROUP_DSK_VALUE.");
                         valid.setValid(true);
+                        valid.setGroupId(securityGroupId);
+                        valid.setAttributeId(attributeSysId);
+                        valid.setAttributeName(attributeValues.getAttributeName());
                         valid.setValidityMessage("Attribute-value added to table SEC_GROUP_DSK_VALUE.");
+                        return valid;
                     }
                     else { logger.error("attributeSysId is NULL"); }
                 }
@@ -415,11 +485,31 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Valid deleteSecurityGroupDskAttributeValues(List<String> dskList) {
-        Valid valid =  new Valid();
+    public DskValidity deleteSecurityGroupDskAttributeValues(List<String> dskList) {
+        DskValidity valid =  new DskValidity();
         Long groupSysId = Long.parseLong(dskList.get(0).trim());
         Long groupAttributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,dskList.get(1).trim());
-        if (groupAttributeSysId == null || groupSysId == null)    {
+        if (dskList.get(0).trim().isEmpty() || dskList.get(1).trim().equals(null))  {
+            valid.setValid(false);
+            valid.setValidityMessage("Group Name can't be null or empty !!");
+            return valid;
+        }
+        else if ( dskList.get(0).trim().length() > 255 )    {
+            valid.setValid(false);
+            valid.setValidityMessage("Group Name too long !! ");
+            return valid;
+        }
+        else if ( dskList.get(1).trim().isEmpty() || dskList.get(1).trim().equals(null) )   {
+            valid.setValid(false);
+            valid.setValidityMessage("Attribute Name can't be null or empty !!");
+            return valid;
+        }
+        else if ( dskList.get(1).trim().length() > 100 )    {
+            valid.setValid(false);
+            valid.setValidityMessage("Attribute Name too long !!");
+            return valid;
+        }
+        else if (groupAttributeSysId == null || groupSysId == null)    {
             valid.setValid(false);
             valid.setValidityMessage("Field no longer exists!! Please refresh the page.");
             return valid;
@@ -428,7 +518,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             try{
                 String delSql = "DELETE FROM sec_group_dsk_attribute WHERE SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = ? ";
                 /**
-                    Note : Deleting Atrribute row from sec_group_dsk_attribute inturn deletes corresponding value from sec_group_dsk_value,
+                    Note : Deleting Attribute row from sec_group_dsk_attribute inturn deletes corresponding value from sec_group_dsk_value,
                  Since we have defined a relation between the tables; So deleting other row from DSK_VALUE table is not required here.
                  **/
                 int delResult = jdbcTemplate.update(delSql, ps -> {
@@ -436,13 +526,15 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 });
                 logger.trace(delResult + " Attribute " + dskList.get(1).trim() + " successfully removed");
                 valid.setValid(true);
+                valid.setGroupId(groupSysId);
+                valid.setAttributeId(groupAttributeSysId);
                 valid.setValidityMessage(delResult + " Attribute " + dskList.get(1).trim() + " successfully removed");
                 return valid;
             }
             catch (Exception e) {
                 logger.error(e.getMessage());
                 valid.setValid(false);
-                valid.setValidityMessage(e.getMessage());
+                valid.setValidityMessage("Error in deleting Attribute !!");
                 return valid;
             }
         }
@@ -489,14 +581,34 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public Valid updateUser(String securityGroupName, Long userSysId) {
-        Valid valid = new Valid();
+    public DskValidity updateUser(String securityGroupName, Long userSysId) {
+        DskValidity valid = new DskValidity();
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = ? WHERE USER_SYS_ID = ? ";
-        if( securityGroupName.trim().equalsIgnoreCase("") || userSysId == 0 || userSysId == null)   {
+        if( securityGroupName.trim().isEmpty() || userSysId == 0 || userSysId == null)   {
             valid.setValid(false);
             valid.setValidityMessage("Parameters can't be empty or null");
             return valid;
+        }
+        else if (securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
+            try{
+                // If Group name is removed from User. We neeed to set sec_group_sys_id as null in users table.
+                int updateRes = jdbcTemplate.update(updateSql, ps -> {
+                    ps.setObject(1, null);
+                    ps.setLong(2,userSysId);
+                });
+                logger.trace(updateRes + "User Table updated ");
+                valid.setValid(true);
+                valid.setGroupId(securityGroupSysId);
+                valid.setValidityMessage("Group Name removed from user");
+                return valid;
+            }
+            catch (Exception e){
+                logger.error(e.getMessage());
+                valid.setValid(false);
+                valid.setValidityMessage("error in updating group user");
+                return valid;
+            }
         }
         else {
             try{
@@ -506,6 +618,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 });
                 logger.trace(updateRes + "User Table updated ");
                 valid.setValid(true);
+                valid.setGroupId(securityGroupSysId);
                 valid.setValidityMessage("Group Name successfully updated");
                 return valid;
             }
@@ -577,7 +690,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     userAssignment.setGroupName(reultSet.getString("GroupName"));
                     tempList.add(userAssignment);
                 }
-                logger.trace("Success in reading User Assginments");
+                logger.trace("Success in reading User Assignments");
                 return tempList;
             });
 
@@ -589,15 +702,15 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public Valid updateAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
-        Valid valid =  new Valid();
+    public DskValidity updateAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
+        DskValidity valid =  new DskValidity();
         attributeValues.setAttributeName(attributeValues.getAttributeName().trim());
         attributeValues.setValue(attributeValues.getValue().trim());
-        if (securityGroupId == 0 || securityGroupId == null || attributeValues.getAttributeName().equalsIgnoreCase("")
-            || attributeValues.getAttributeName().equalsIgnoreCase("null")
-            || attributeValues.getValue().equalsIgnoreCase("") || attributeValues.getValue().equalsIgnoreCase("null"))  {
+        if (securityGroupId == 0 || securityGroupId == null || attributeValues.getAttributeName().trim().isEmpty()
+            || attributeValues.getAttributeName().equals(null)
+            || attributeValues.getValue().trim().isEmpty() || attributeValues.getValue().equals(null))  {
             valid.setValid(false);
-            valid.setValidityMessage("Parameters cn't be empty!!");
+            valid.setValidityMessage("Parameters can't be NULL or Empty!!");
             return valid;
         }
         else {
@@ -611,13 +724,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 });
                 logger.trace(updateRes + " Value Updated successfully");
                 valid.setValid(true);
+                valid.setGroupId(securityGroupId);
+                valid.setAttributeId(attributeSysId);
+                valid.setAttributeName(attributeValues.getAttributeName());
                 valid.setValidityMessage("Value Updated successfully");
                 return valid;
             }
             catch (Exception e) {
                 logger.error(e.getMessage());
                 valid.setValid(false);
-                valid.setValidityMessage(e.getMessage());
+                valid.setValidityMessage("Error in updating value !!");
                 return valid;
             }
         }
