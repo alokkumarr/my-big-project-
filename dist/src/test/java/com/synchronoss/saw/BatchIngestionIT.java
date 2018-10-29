@@ -49,9 +49,6 @@ public class BatchIngestionIT extends BaseIT {
   private ObjectNode prepareRouteDataSet() throws JsonProcessingException {
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
-    root.put("productCode", "SIP");
-    root.put("customerCode", "SNCR");
-    root.put("projectCode", "workbench");
     root.put("routeMetadata",
          "{\"status\":\"active\",\"routeName\":\"route123\","
          + "\"startDate\":\"2013/02/15\",\"endDate\":\"2013/04/15\","
@@ -84,9 +81,6 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("modifiedBy", "dataAdmin@synchronoss.com");
-    root.put("productCode", "SIP");
-    root.put("customerCode", "ATT");
-    root.put("projectCode", "workbench");
     root.put("routeMetadata",
          "{\"status\":\"active\",\"routeName\":\"route456\",\"startDate\":\"2013/02/15\","
          + "\"endDate\":\"2013/04/15\","
