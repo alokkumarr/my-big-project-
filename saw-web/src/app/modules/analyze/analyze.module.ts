@@ -46,6 +46,8 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './designer';
 
+import { AnalyzeDialogService } from './services/analyze-dialog.service';
+
 import { AnalyzeFilterModule } from './designer/filter';
 
 import { AnalyzePageComponent } from './page';
@@ -82,6 +84,8 @@ const PIPES = [ArtifactColumns2PivotFieldsPipe];
 
 const GUARDS = [DefaultAnalyzeCategoryGuard];
 
+const SERVICES = [AnalyzeDialogService];
+
 @NgModule({
   imports: [
     CommonModuleAngular4,
@@ -105,7 +109,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   ],
   declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,
-  providers: [...GUARDS],
+  providers: [...SERVICES, ...GUARDS],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModule {}
