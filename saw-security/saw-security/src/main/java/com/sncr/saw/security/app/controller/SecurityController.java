@@ -737,7 +737,7 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String createdBy = extractValuesFromToken[2];
         String roleType = extractValuesFromToken[3];
-        if (roleType.equalsIgnoreCase(AdminRole)) {
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
             valid.setValid(false);
@@ -771,7 +771,7 @@ public class SecurityController {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
-        if (roleType.equalsIgnoreCase(AdminRole)) {
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
             valid.setValid(false);
@@ -803,7 +803,7 @@ public class SecurityController {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
-        if (roleType.equalsIgnoreCase(AdminRole)) {
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
             valid.setValid(false);
@@ -831,7 +831,7 @@ public class SecurityController {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
-        if (roleType.equalsIgnoreCase(AdminRole)) {
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
             valid.setValid(false);
@@ -860,7 +860,7 @@ public class SecurityController {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
-        if (roleType.equalsIgnoreCase(AdminRole)) {
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
             valid.setValid(false);
@@ -898,7 +898,7 @@ public class SecurityController {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
-        if (roleType.equalsIgnoreCase(AdminRole)) {
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
             valid.setValid(false);
@@ -929,7 +929,7 @@ public class SecurityController {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
-        if (roleType.equalsIgnoreCase(AdminRole)) {
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
             valid.setValid(false);
