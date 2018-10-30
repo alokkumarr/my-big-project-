@@ -14,9 +14,9 @@ const implicitlyWait = 1000; //should not be more than 5 seconds, this will incr
 
 /**
  * Explicit wait for element
- * 30 seconds in docker and 25 seconds
+ * 30 seconds in docker and 20 seconds in local
  */
-const fluentWait = new SuiteHelper().distRun() ? 30000 : 25000;
+const fluentWait = new SuiteHelper().distRun() ? 30000 : 20000;
 
 /**
  * Before performing any action, Protractor waits until there are no pending asynchronous tasks in your Angular
@@ -33,7 +33,7 @@ const allScriptsTimeout = new SuiteHelper().distRun() ? 300000 : 180000;
  * Max total time before throwing NO ACTIVE SESSION_ID
  * 60 min
  */
-const timeoutInterval = 3600000
+const timeoutInterval = 3600000;
 
 /**
  * number of retries in case of failure, executes all failed tests
@@ -69,7 +69,10 @@ exports.timeouts = {
 };
 
 exports.config = {
-  framework: 'jasmine2', allScriptsTimeout: allScriptsTimeout, customerCode: customerCode, useAllAngular2AppRoots: true,
+  framework: 'jasmine2',
+  allScriptsTimeout: allScriptsTimeout,
+  customerCode: customerCode,
+  useAllAngular2AppRoots: true,
   testData: new SuiteHelper().getTestData(),
   baseUrl: 'http://localhost:3000',
   capabilities: {
@@ -77,10 +80,16 @@ exports.config = {
     shardTestFiles: true,
     maxInstances: 10,
     chromeOptions: {
-      args: ['disable-extensions', 'disable-web-security', '--start-fullscreen', // enable for Mac OS
+      args: [
+        'disable-extensions',
+        'disable-web-security',
+        '--start-fullscreen', // enable for Mac OS
         '--headless', // start on background
-        '--disable-gpu', '--window-size=2880,1800']
-    }, 'moz:firefoxOptions': {
+        '--disable-gpu',
+        '--window-size=2880,1800'
+      ]
+    },
+    'moz:firefoxOptions': {
       args: ['--headless']
     }
   },
@@ -91,60 +100,116 @@ exports.config = {
     includeStackTrace: true,
     realtimeFailure: true,
     showColors: true
-  }, suites: {
+  },
+  suites: {
     /**
      * This suite will be run as part of main bamboo build plan.
      */
-    smoke: [testBaseDir + 'login.test.js'], /**
+    smoke: [testBaseDir + 'login.test.js'],
+    /**
      * This suite will be triggered from QA Test bamboo plan frequently for sanity check
-     */
-    sanity: [testBaseDir + 'login.test.js', testBaseDir + 'createReport.test.js', testBaseDir + 'charts/createAndDeleteCharts.test.js'],
+     */ sanity: [
+      testBaseDir + 'login.test.js',
+      testBaseDir + 'createReport.test.js',
+      testBaseDir + 'charts/createAndDeleteCharts.test.js'
+    ],
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
      */
-    critical: [// login logout tests
-      testBaseDir + 'login.test.js', testBaseDir + 'priviliges.test.js', testBaseDir + 'analyze.test.js', testBaseDir + 'createReport.test.js', // charts tests
-      testBaseDir + 'charts/applyFiltersToCharts.js', testBaseDir + 'charts/createAndDeleteCharts.test.js', testBaseDir + 'charts/previewForCharts.test.js', // chartEditFork tests
-      testBaseDir + 'charts/editAndDeleteCharts.test.js', testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js', // filters tests
-      testBaseDir + 'promptFilter/chartPromptFilters.test.js', testBaseDir + 'promptFilter/esReportPromptFilters.test.js', testBaseDir + 'promptFilter/pivotPromptFilters.test.js', testBaseDir + 'promptFilter/reportPromptFilters.test.js', // pivots tests
+    critical: [
+      // login logout tests
+      testBaseDir + 'login.test.js',
+      testBaseDir + 'priviliges.test.js',
+      testBaseDir + 'analyze.test.js',
+      testBaseDir + 'createReport.test.js', // charts tests
+      testBaseDir + 'charts/applyFiltersToCharts.js',
+      testBaseDir + 'charts/createAndDeleteCharts.test.js',
+      testBaseDir + 'charts/previewForCharts.test.js', // chartEditFork tests
+      testBaseDir + 'charts/editAndDeleteCharts.test.js',
+      testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js', // filters tests
+      testBaseDir + 'promptFilter/chartPromptFilters.test.js',
+      testBaseDir + 'promptFilter/esReportPromptFilters.test.js',
+      testBaseDir + 'promptFilter/pivotPromptFilters.test.js',
+      testBaseDir + 'promptFilter/reportPromptFilters.test.js', // pivots tests
       testBaseDir + 'pivots/pivotFilters.test.js', // Observe module test cases
-      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js', testBaseDir + 'observe/dashboardGlobalFilter.test.js', testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js', testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'],
-    regression: [// login logout tests
-      testBaseDir + 'login.test.js', testBaseDir + 'priviliges.test.js', testBaseDir + 'analyze.test.js', testBaseDir + 'createReport.test.js', // charts tests
-      testBaseDir + 'charts/applyFiltersToCharts.js', testBaseDir + 'charts/createAndDeleteCharts.test.js', testBaseDir + 'charts/previewForCharts.test.js', // chartEditFork tests
-      testBaseDir + 'charts/editAndDeleteCharts.test.js', testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js', // filters tests
-      testBaseDir + 'promptFilter/chartPromptFilters.test.js', testBaseDir + 'promptFilter/esReportPromptFilters.test.js', testBaseDir + 'promptFilter/pivotPromptFilters.test.js', testBaseDir + 'promptFilter/reportPromptFilters.test.js', // pivots tests
+      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+      testBaseDir +
+        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilter.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
+    ],
+    regression: [
+      // login logout tests
+      testBaseDir + 'login.test.js',
+      testBaseDir + 'priviliges.test.js',
+      testBaseDir + 'analyze.test.js',
+      testBaseDir + 'createReport.test.js', // charts tests
+      testBaseDir + 'charts/applyFiltersToCharts.js',
+      testBaseDir + 'charts/createAndDeleteCharts.test.js',
+      testBaseDir + 'charts/previewForCharts.test.js', // chartEditFork tests
+      testBaseDir + 'charts/editAndDeleteCharts.test.js',
+      testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js', // filters tests
+      testBaseDir + 'promptFilter/chartPromptFilters.test.js',
+      testBaseDir + 'promptFilter/esReportPromptFilters.test.js',
+      testBaseDir + 'promptFilter/pivotPromptFilters.test.js',
+      testBaseDir + 'promptFilter/reportPromptFilters.test.js', // pivots tests
       testBaseDir + 'pivots/pivotFilters.test.js', // Observe module test cases
-      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js', testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js', testBaseDir + 'observe/dashboardGlobalFilter.test.js', testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js', testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'],
+      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+      testBaseDir +
+        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilter.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
+    ],
     /**
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [testBaseDir + 'dev1.js', testBaseDir + 'dev2.js']
   },
-  onCleanUp: function (results) {
+  onCleanUp: function(results) {
     retry.onCleanUp(results);
   },
   onPrepare() {
     retry.onPrepare();
 
-    browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
-    browser.manage().timeouts().implicitlyWait(implicitlyWait);
+    browser
+      .manage()
+      .timeouts()
+      .pageLoadTimeout(pageLoadTimeout);
+    browser
+      .manage()
+      .timeouts()
+      .implicitlyWait(implicitlyWait);
 
     let jasmineReporters = require('jasmine-reporters');
     let junitReporter = new jasmineReporters.JUnitXmlReporter({
-      savePath: protractorPath, consolidateAll: true
+      savePath: protractorPath,
+      consolidateAll: true
     });
     jasmine.getEnv().addReporter(junitReporter);
 
     let AllureReporter = require('jasmine-allure-reporter');
-    jasmine.getEnv().addReporter(new AllureReporter({
-      resultsDir: 'target/allure-results'
-    }));
-    jasmine.getEnv().afterEach(function (done) {
-      browser.takeScreenshot().then(function (png) {
-        allure.createAttachment('Screenshot', function () {
-          return new Buffer(png, 'base64');
-        }, 'image/png')();
+    jasmine.getEnv().addReporter(
+      new AllureReporter({
+        resultsDir: 'target/allure-results'
+      })
+    );
+    jasmine.getEnv().afterEach(function(done) {
+      browser.takeScreenshot().then(function(png) {
+        allure.createAttachment(
+          'Screenshot',
+          function() {
+            return new Buffer(png, 'base64');
+          },
+          'image/png'
+        )();
         done();
       });
     });
@@ -157,7 +222,7 @@ exports.config = {
       });
     }, pageResolveTimeout);
   },
-  beforeLaunch: function () {
+  beforeLaunch: function() {
     //console.log('beforeLaunch....generating the testdata...')
     // Generate test data
     if (new SuiteHelper().getSawWebUrl()) {
@@ -168,7 +233,7 @@ exports.config = {
       process.exit(1);
     }
   },
-  afterLaunch: function () {
+  afterLaunch: function() {
     //console.log('afterLaunch....')
     if (fs.existsSync('target/e2eId.json')) {
       // delete and create new always
