@@ -1,5 +1,7 @@
 package model
 
+import java.util
+
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.slf4j.{Logger, LoggerFactory}
@@ -409,6 +411,39 @@ object QueryBuilder extends {
         name, expected, location))
   }
 
+  /**
+    * This method will validate whether Data security keys will be applicable for the
+    * analysis and return the list of Key which all are applicable.
+    * @param dataSecurityKey
+    * @return
+    */
+  def checkDSKApplicableAnalysis (dataSecurityKey : util.List[Object], json : JValue ): util.List[Object] = {
+    val artifacts = json \ "artifacts" match {
+      case artifacts: JArray => artifacts.arr
+      case JNothing => List()
+      case obj: JValue => unexpectedElement(obj, "array", "artifacts")
+    }
+    import scala.collection.JavaConverters._
+    var applicableDsk: util.List[Object] = new util.ArrayList[Object]
+    artifacts.flatMap((artifact: JValue) => {
+      val artifactName = (artifact \ "artifactName").extract[String]
+      val columns = extractArray(artifact, "columns")
+      columns.foreach((col: JValue) => {
+        val columnName = (col \ "columnName").extract[String]
+        for(dataSecurityKeyDef  <- dataSecurityKey.asScala){
+          dataSecurityKeyDef
+          match {
+            case key : DataSecurityKeyDef =>
+            if (key.getName().equalsIgnoreCase(columnName)
+              || key.getName.equalsIgnoreCase(artifactName + "." + columnName)) {
+              applicableDsk.add(dataSecurityKeyDef)
+            }}
+        }
+      })
+      columns
+    })
+    applicableDsk
+  }
 }
 
 
