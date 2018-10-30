@@ -156,7 +156,7 @@ public class AnalyzeIT extends BaseIT {
             .filter(document("list-metrics",
                 preprocessResponse(prettyPrint())))
             .when().get("/services/internal/semantic/md?projectId=workbench")
-            .then().assertThat().statusCode(202)
+            .then().assertThat().statusCode(200)
             .extract().response();
         try {
             String metricId = response.path(path);
