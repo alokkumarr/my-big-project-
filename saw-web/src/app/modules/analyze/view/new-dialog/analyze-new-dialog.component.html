@@ -53,9 +53,7 @@
                               [value]="metric"
                               fxFlex="30"
             >
-              <div class="category-icon">
-                <img src="/assets/img/category-icons/category-default-b-3.svg" />
-              </div>
+              <div class="category-icon"></div>
               <div class="category-detail">
                 {{metric.metricName}}
                 <span class="metric-created-time" *ngIf="metric.createdAt" [textContent]="'Created: ' + metric.createdAt"></span>

@@ -75,12 +75,18 @@ mat-radio-group {
     width: 100%;
     display: flex;
     color: $primary-grey-g4;
+    align-items: center;
     justify-content: space-around;
     flex-direction: row-reverse;
 
     .category-icon {
       display: flex;
       padding-right: 10px;
+      width: 20px;
+      height: 20px;
+      background-image: url("/assets/img/category-icons/category-default-b-3.svg");
+      background-repeat: no-repeat;
+      background-size: contain;
     }
 
     .category-detail {
@@ -102,6 +108,10 @@ mat-radio-group {
 
     ::ng-deep .mat-radio-label-content {
       color: white !important;
+
+      .category-icon {
+        background-image: url("/assets/img/category-icons/category-default.svg");
+      }
     }
 
     .metric-created-time {
