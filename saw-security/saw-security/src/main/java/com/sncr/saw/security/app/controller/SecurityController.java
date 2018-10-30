@@ -45,6 +45,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -73,6 +74,8 @@ public class SecurityController {
     DataSecurityKeyRepository dataSecurityKeyRepository;
 
 	private final ObjectMapper mapper = new ObjectMapper();
+
+	private final String AdminRole = "ADMIN";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -729,11 +732,33 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.POST)
-    public DskValidity addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
+    public Object addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String createdBy = extractValuesFromToken[2];
-        return dataSecurityKeyRepository.addSecurityGroups(securityGroups,createdBy);
+        String roleType = extractValuesFromToken[3];
+        if (roleType.equalsIgnoreCase(AdminRole)) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.ADD_GROUPS_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.ADD_GROUPS_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
+        DskValidity dskValidity = dataSecurityKeyRepository.addSecurityGroups(securityGroups,createdBy);
+        if ( dskValidity.getValid().booleanValue() == true )    {
+            return dskValidity;
+        }
+        else {
+            response.setStatus(400);
+            Valid valid = new Valid();
+            valid.setValidityMessage(dskValidity.getValidityMessage());
+            valid.setError(dskValidity.getError());
+            valid.setValid(dskValidity.getValid());
+            return valid;
+            // Here we are sending two different Objects, one in case of Success and another object is returned in case of
+            // Error. This change has to be retained else all other REST API has to unified since we are following this convention.
+        }
     }
 
     /**
@@ -742,8 +767,30 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
-    public DskValidity updateSecurityGroups(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
-        return (dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups));
+    public Object updateSecurityGroups(HttpServletRequest request,HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (roleType.equalsIgnoreCase(AdminRole)) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
+        DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups);
+        if (dskValidity.getValid().booleanValue() == true)  {
+            return dskValidity;
+        }
+        else {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(dskValidity.getValidityMessage());
+            valid.setError(dskValidity.getError());
+            return valid;
+        }
     }
 
     /**
@@ -752,8 +799,26 @@ public class SecurityController {
      * @return Valid obj containing Boolean and success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}",method = RequestMethod.DELETE)
-    public DskValidity deleteSecurityGroups(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
-	    return (dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId));
+    public Valid deleteSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (roleType.equalsIgnoreCase(AdminRole)) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
+        Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId);
+        if ( dskValidity.getValid().booleanValue() == true )    {
+            return dskValidity;
+        }
+        else {
+            response.setStatus(400);
+            return dskValidity;
+        }
     }
 
     /**
@@ -762,8 +827,27 @@ public class SecurityController {
      * @return Valid obj containing Boolean, suceess/failure msg
      */
     @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.POST)
-    public DskValidity addSecurityGroupDskAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)  {
-	    return dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
+    public Valid addSecurityGroupDskAttributeValues(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (roleType.equalsIgnoreCase(AdminRole)) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.ADD_ATTRIBUTES_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.ADD_ATTRIBUTES_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
+        Valid dskValidity = dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
+
+        if ( dskValidity.getValid().booleanValue() == true )    {
+            return dskValidity;
+        }
+        else {
+            response.setStatus(400);
+            return dskValidity;
+        }
     }
 
     /**
@@ -772,8 +856,26 @@ public class SecurityController {
      * @return Valid obj containing Boolean, suceess/failure msg
      */
     @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method =  RequestMethod.PUT)
-    public DskValidity updateAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)    {
-	    return  (dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues));
+    public Valid updateAttributeValues(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)    {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (roleType.equalsIgnoreCase(AdminRole)) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.MODIFY_ATTRIBUTES_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.MODIFY_ATTRIBUTES_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
+        Valid dskValidity = dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues);
+        if ( dskValidity.getValid().booleanValue() == true )    {
+            return dskValidity;
+        }
+        else {
+            response.setStatus(400);
+            return dskValidity;
+        }
     }
 
     /**
@@ -792,11 +894,29 @@ public class SecurityController {
      * @return Valid obj containing Boolean, suceess/failure msg
      */
     @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attributes/{attributeName}", method = RequestMethod.DELETE)
-    public DskValidity deleteSecurityGroupDskAttribute(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId,@PathVariable(name = "attributeName", required = true) String attributeName)   {
+    public Valid deleteSecurityGroupDskAttribute(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId,@PathVariable(name = "attributeName", required = true) String attributeName)   {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (roleType.equalsIgnoreCase(AdminRole)) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.DELETE_ATTRIBUTES_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.DELETE_ATTRIBUTES_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
         List<String> dskList = new ArrayList<>();
         dskList.add(0,securityGroupId.toString());
         dskList.add(1,attributeName);
-        return (dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList));
+        Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList);
+        if ( dskValidity.getValid().booleanValue() == true )    {
+            return dskValidity;
+        }
+        else {
+            response.setStatus(400);
+            return dskValidity;
+        }
     }
 
     /**
@@ -805,8 +925,26 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping ( value = "/auth/admin/users/{userSysId}/security-group", method = RequestMethod.PUT)
-    public DskValidity updateUser(@PathVariable (name = "userSysId", required = true) Long userSysId, @RequestBody String securityGroupName)  {
-	    return (dataSecurityKeyRepository.updateUser(securityGroupName,userSysId));
+    public Valid updateUser(HttpServletRequest request, HttpServletResponse response, @PathVariable (name = "userSysId", required = true) Long userSysId, @RequestBody String securityGroupName)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (roleType.equalsIgnoreCase(AdminRole)) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
+        Valid dskValidity = dataSecurityKeyRepository.updateUser(securityGroupName,userSysId);
+        if ( dskValidity.getValid().booleanValue() == true )    {
+            return dskValidity;
+        }
+        else {
+            response.setStatus(400);
+            return dskValidity;
+        }
     }
 
     /**
