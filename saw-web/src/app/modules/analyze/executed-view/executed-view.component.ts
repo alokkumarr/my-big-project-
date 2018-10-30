@@ -151,6 +151,17 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  onSidenavChange(isOpen: boolean) {
+    if (isOpen && !this.analyses) {
+      this.loadExecutedAnalyses(this.analysis.id).then(analyses => {
+        const lastExecutionId = get(analyses, '[0].id', null);
+        if (!this.executionId && lastExecutionId) {
+          this.executionId = lastExecutionId;
+        }
+      });
+    }
+  }
+
   onExecutionsEvent(e: IExecuteEventEmitter) {
     if (!e.subject.isStopped) {
       e.subject.subscribe(this.onExecutionEvent);
@@ -261,12 +272,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       analysisType,
       executeResponse
     );
-    this.loadExecutedAnalyses(analysisId).then(analyses => {
-      const lastExecutionId = get(analyses, '[0].id', null);
-      if (!executionId && lastExecutionId) {
-        this.executionId = lastExecutionId;
-      }
-    });
   }
 
   gotoLastPublished(analysis, { executionId }) {

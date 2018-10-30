@@ -1,5 +1,6 @@
 <mat-sidenav-container class="analysis-details-container" [autosize]="false">
   <mat-sidenav #detailsSidenav mode="over"
+               (openedChange)="onSidenavChange($event)"
                [opened]="false"
                position="end">
     <mat-card *ngIf="analysis">
