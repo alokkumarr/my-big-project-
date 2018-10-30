@@ -1,5 +1,4 @@
-import { FormControl, FormGroup, ValidationErrors } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { FormControl, ValidationErrors } from '@angular/forms';
 import * as trim from 'lodash/trim';
 
 /**

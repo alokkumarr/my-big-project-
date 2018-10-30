@@ -102,7 +102,7 @@
           </div>
         </div>
 
-        <div *ngIf="analysis && analyses && (analyses.length || onetimeExecution)" [ngSwitch]="analysis.type">
+        <div *ngIf="analysis" [ngSwitch]="analysis.type">
           <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                                 [analysis]="executedAnalysis"
                                 [dataLoader]="dataLoader"

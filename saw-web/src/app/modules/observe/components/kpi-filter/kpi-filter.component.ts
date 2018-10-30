@@ -72,6 +72,11 @@ export class KPIFilterComponent implements OnInit, OnDestroy {
         }
       }
     );
+    this.listeners = this.listeners.concat([
+      clearFiltersListener,
+      applyFiltersListener,
+      closeFiltersListener
+    ]);
   }
 
   ngOnDestroy() {

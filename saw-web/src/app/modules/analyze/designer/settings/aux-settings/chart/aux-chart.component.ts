@@ -9,19 +9,6 @@ import {
 import { ChartService } from '../../../../services/chart.service';
 import * as isEmpty from 'lodash/isEmpty';
 
-const INVERTING_OPTIONS = [
-  {
-    label: 'TOOLTIP_INVERTED',
-    type: true,
-    icon: { font: 'icon-hor-bar-chart' }
-  },
-  {
-    label: 'TOOLTIP_NOT_INVERTED',
-    type: false,
-    icon: { font: 'icon-vert-bar-chart' }
-  }
-];
-
 @Component({
   selector: 'designer-settings-aux-chart',
   templateUrl: './aux-chart.component.html',

@@ -100,6 +100,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
       this.setPrivileges(analysis);
 
+      /* If an execution is not already going on, create a new execution
+       * as applicable. */
       this.executeIfNotWaiting(
         analysis,
         /* awaitingExecution and loadLastExecution paramaters are supposed to be boolean,
@@ -128,23 +130,24 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     loadLastExecution,
     executionId
   ) {
-    if (!awaitingExecution) {
-      const isDataLakeReport = analysis.type === 'report';
-      if (
-        executionId ||
-        loadLastExecution ||
-        isDataLakeReport ||
-        !this.canAutoRefresh
-      ) {
-        this.loadExecutedAnalysesAndExecutionData(
-          analysis.id,
-          executionId,
-          analysis.type,
-          null
-        );
-      } else {
-        this.executeAnalysis(analysis, EXECUTION_MODES.LIVE);
-      }
+    if (awaitingExecution) {
+      return;
+    }
+    const isDataLakeReport = analysis.type === 'report';
+    if (
+      executionId ||
+      loadLastExecution ||
+      isDataLakeReport ||
+      !this.canAutoRefresh
+    ) {
+      this.loadExecutedAnalysesAndExecutionData(
+        analysis.id,
+        executionId,
+        analysis.type,
+        null
+      );
+    } else {
+      this.executeAnalysis(analysis, EXECUTION_MODES.LIVE);
     }
   }
 
@@ -228,19 +231,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  gotoLastPublished(analysis, { executionId }) {
-    return () => {
-      this._toastMessage.clear();
-      this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
-        queryParams: {
-          executionId,
-          awaitingExecution: false,
-          loadLastExecution: true
-        }
-      });
-    };
-  }
-
   executeAnalysis(analysis, mode) {
     this._analyzeActionsService
       .execute(analysis, mode)
@@ -264,30 +254,32 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     analysisType,
     executeResponse
   ) {
-    if (executionId) {
-      this.executionId = executionId;
-      this.loadExecutedAnalyses(analysisId);
-      this.loadDataOrSetDataLoader(
-        analysisId,
-        executionId,
-        analysisType,
-        executeResponse
-      );
-    } else {
-      // get the last execution id and load the data for that analysis
-      this.loadExecutedAnalyses(analysisId).then(analyses => {
-        const lastExecutionId = get(analyses, '[0].id', null);
+    this.executionId = executionId;
+    this.loadDataOrSetDataLoader(
+      analysisId,
+      executionId,
+      analysisType,
+      executeResponse
+    );
+    this.loadExecutedAnalyses(analysisId).then(analyses => {
+      const lastExecutionId = get(analyses, '[0].id', null);
+      if (!executionId && lastExecutionId) {
         this.executionId = lastExecutionId;
-        if (lastExecutionId) {
-          this.loadDataOrSetDataLoader(
-            analysisId,
-            lastExecutionId,
-            analysisType,
-            executeResponse
-          );
+      }
+    });
+  }
+
+  gotoLastPublished(analysis, { executionId }) {
+    return () => {
+      this._toastMessage.clear();
+      this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+        queryParams: {
+          executionId,
+          awaitingExecution: false,
+          loadLastExecution: true
         }
       });
-    }
+    };
   }
 
   setExecutedBy(executedBy) {
@@ -330,6 +322,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     return this._analyzeService.readAnalysis(analysisId).then(
       (analysis: Analysis) => {
         this.analysis = analysis;
+        // this._analyzeService
+        //   .getLastExecutionData(this.analysis.id, {
+        //     analysisType: this.analysis.type
+        //   })
+        //   .then(data => {
+        //     console.log(data);
+        //   });
         this.executedAnalysis = { ...this.analysis };
         return analysis;
       },
@@ -437,27 +436,28 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;
 
-    return this._analyzeService
-      .getExecutionData(analysisId, executionId, options)
-      .then(
-        ({ data, count, queryBuilder, executedBy }) => {
-          if (this.executedAnalysis && queryBuilder) {
-            this.executedAnalysis.sqlBuilder = queryBuilder;
-          }
-
-          const isReportType = ['report', 'esReport'].includes(analysisType);
-          if (isReportType) {
-            data = clone(flattenReportData(data, this.analysis));
-          }
-
-          this.setExecutedBy(executedBy);
-          this.setExecutedAt(executionId);
-          return { data: data, totalCount: count };
-        },
-        err => {
-          throw err;
+    return (executionId
+      ? this._analyzeService.getExecutionData(analysisId, executionId, options)
+      : this._analyzeService.getLastExecutionData(analysisId, options)
+    ).then(
+      ({ data, count, queryBuilder, executedBy }) => {
+        if (this.executedAnalysis && queryBuilder) {
+          this.executedAnalysis.sqlBuilder = queryBuilder;
         }
-      );
+
+        const isReportType = ['report', 'esReport'].includes(analysisType);
+        if (isReportType) {
+          data = clone(flattenReportData(data, this.analysis));
+        }
+
+        this.setExecutedBy(executedBy);
+        this.setExecutedAt(executionId);
+        return { data: data, totalCount: count };
+      },
+      err => {
+        throw err;
+      }
+    );
   }
 
   setPrivileges({ categoryId, userId }: Analysis) {

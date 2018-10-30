@@ -235,7 +235,6 @@ export class DesignerContainerComponent implements OnInit {
     }
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
     forEach(sqlBuilder.nodeFields, node => {
-      const identical = false;
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
           sortCol => node.columnName === sortCol.columnName
