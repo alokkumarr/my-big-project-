@@ -114,6 +114,20 @@ MAIN_CLASS=${COMP_MC[$COMPONENT_NAME]}
 # validate XDF_DATA_ROOT
 hadoop fs -stat $XDF_DATA_ROOT >/dev/null || exit 1
 
+#To safely exit if an error during JQ piping in next command
+set -o pipefail
+
+# read SPARK_DRIVER_MEMORY param value from config JSON file
+SPARK_MEMORY_CONFIG="$(cat $CONFIG_FILE| jq -r '.parameters | .[] | select(.name == "spark.driver.memory")| .value ')"
+echo "SPARK DRIVER MEMORY:: $SPARK_MEMORY_CONFIG"
+
+SPARK_DRIVER_MEMORY=
+if [ -n "${SPARK_MEMORY_CONFIG}" ]; then             # empty check for spark driver memory 
+   SPARK_DRIVER_MEMORY="--driver-memory ${SPARK_MEMORY_CONFIG}"
+fi
+
+
+
 # 'export SPARK_HOME' inside spark-env.sh
 ##?? not needed
 #source $SPARK_HOME/conf/spark-env.sh
@@ -130,8 +144,10 @@ Component               : $COMPONENT_NAME ($MAIN_CLASS)
 Batch ID                : $BATCH_ID
 Application             : $APPLICATION_ID
 Configuration file      : $CONFIG_FILE
+Spark driver memory     : $SPARK_MEMORY_CONFIG
 -------
 Log4j log file          : ${LOG4J_CONF}
+
 ----------------------------------------------------------------
 EEOOTT
 
@@ -144,13 +160,16 @@ JAVA_PROPS=(
 # TODO: conditionally add -Dxdf.json.subs.params=true option
 # JAVA_PROPS+=( -Dxdf.json.subs.params=true )
 # use: --conf "spark.driver.extraJavaOptions=${CONF_OPTS[*]}"
-
+ 
+    
+    
 CMD=(
     $SPARK_HOME/bin/spark-submit
     --verbose
 #    --driver-java-options "${JAVA_PROPS[@]}"
     --conf "spark.driver.extraJavaOptions=${JAVA_PROPS[*]}"
     --class $MAIN_CLASS
+    ${SPARK_DRIVER_MEMORY}
     $COMPONENT_JAR
     # main args
     -a $APPLICATION_ID

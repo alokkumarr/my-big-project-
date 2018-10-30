@@ -1,0 +1,19 @@
+<div fxLayout="row">
+  <div fxFlex fxShow.gt-md class="sidebar-hider"></div>
+
+  <div fxLayout.gt-md="column" class="app-container">
+    <div class="root-container">
+        <layout-header *ngIf="!isOnLoginPage"></layout-header>
+
+        <main class="main-content">
+          <div class="render-content">
+            <router-outlet></router-outlet>
+          </div>
+        </main>
+
+        <layout-footer></layout-footer>
+    </div>
+  </div>
+
+  <div fxFlex fxShow.gt-md class="sidebar-hider"></div>
+</div>

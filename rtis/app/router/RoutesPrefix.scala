@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
-// @DATE:Wed Oct 03 15:10:59 EDT 2018
+// @DATE:Fri Oct 19 16:37:52 EDT 2018
 
 
 package router {

@@ -23,4 +23,4 @@ precache='"testthat","dplyr","magrittr","tidyr","rlang","checkmate","ggplot2","f
 Rscript -e 'install.packages(c("devtools", '"$precache"')); if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
 
 # Install Local Spark 
-Rscript -e 'sparklyr::spark_install(version = "2.2.0")'
+Rscript -e 'sparklyr::spark_install(version = "2.3.0")'

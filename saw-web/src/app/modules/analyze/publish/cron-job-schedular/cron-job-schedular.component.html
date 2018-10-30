@@ -1,0 +1,149 @@
+<mat-tab-group (selectedTabChange)="openSchedule($event)" [selectedIndex]="selectedTab">
+  <div *ngFor="let schedule of schedules">
+    <mat-tab label="{{schedule.label}}"></mat-tab>
+  </div>
+</mat-tab-group>
+
+<div *ngIf="scheduleType === 'immediate'" [ngClass]="{'scheduleType': selectedItem === 'immediate'}" class="tabcontent immediate">
+  <mat-radio-group [(ngModel)]="immediate.immediatetype">
+    <mat-radio-button value="currenttime" (click)="generateImmediateSchedule(immediate.immediatetype);">Schedule Immediately </mat-radio-button>
+    <br/><br/><br/>
+  </mat-radio-group>
+</div>
+
+<div *ngIf="scheduleType === 'hourly'" [ngClass]="{'active': scheduleType === 'hourly'}" class="tabcontent">
+  Every <mat-select [(ngModel)]="hourly.hours" (selectionChange)="regenerateCron('')">
+      <mat-option *ngFor="let hour of hours" [value]="hour">
+        {{hour}}
+    </mat-option>
+  </mat-select> hour(s) on minute
+  <mat-select [(ngModel)]="hourly.minutes" (selectionChange)="regenerateCron('')">
+      <mat-option *ngFor="let minute of minutes" [value]="minute">
+        {{minute}}
+    </mat-option>
+  </mat-select>
+</div>
+
+<div *ngIf="scheduleType === 'daily'" [ngClass]="{'scheduleType': selectedItem === 'daily'}" class="tabcontent">
+  <mat-radio-group [(ngModel)]="daily.dailyType">
+    <mat-radio-button class="everyDay" value="everyDay" (click)="resetData();">Every </mat-radio-button>
+    <mat-select placeholder="Days" [(ngModel)]="daily.days" (selectionChange)="regenerateCron(dailyTypeDay)" [disabled]="daily.dailyType !== 'everyDay'">
+      <mat-option *ngFor="let day of days" [value]="day">
+        {{day}}
+      </mat-option>
+    </mat-select><br/>
+    Day(s) at
+    <cron-date-picker [model]="dailyTypeDay" (onDateChange)="onDateChange($event)" [hidden]="daily.dailyType !== 'everyDay'"></cron-date-picker><br/><br/><br/>
+    <mat-radio-button class="everyWeek" value="everyWeek" (click)="resetData();">Every weekday (Monday through Friday) at</mat-radio-button><br/>
+    <cron-date-picker [model]="dailyTypeWeek" (onDateChange)="onDateChange($event)" [hidden]="daily.dailyType !== 'everyWeek'"></cron-date-picker>
+  </mat-radio-group>
+</div>
+
+<div *ngIf="scheduleType === 'weeklybasis'" [ngClass]="{'active': scheduleType === 'weeklybasis'}" class="tabcontent">
+  <div *ngFor="let day of dayStrings">
+    <div class="daysOfWeek">
+      <input class="checkbox" type="checkbox" [(ngModel)]="weekly[day]" (change)="regenerateCron(weeklybasisDate)" /> {{day | i18nPlural: DayMapping}}
+    </div>
+  </div>
+  <br/>
+
+  <div class="week-datePicker">
+    Start Time
+    <cron-date-picker [model]="weeklybasisDate" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/>
+  </div>
+</div>
+
+<div *ngIf="scheduleType === 'monthly'" [ngClass]="{'active': scheduleType === 'monthly'}" class="tabcontent">
+  <mat-radio-group [(ngModel)]="monthly.monthlyType">
+    <mat-radio-button class="everyDay" value="monthlyDay" (click)="resetData();">On the </mat-radio-button>
+    <mat-select placeholder="Day" [(ngModel)]="monthly.specificDay" (selectionChange)="regenerateCron(specificDayMonth)" [disabled]="monthly.monthlyType !== 'monthlyDay'">
+      <mat-option *ngFor="let day of days" [value]="day">
+        {{day | i18nPlural: NumberMapping}}
+      </mat-option>
+    </mat-select> Day of every
+    <mat-select placeholder="Month" [(ngModel)]="monthly.specificMonth" (selectionChange)="regenerateCron(specificDayMonth)" [disabled]="monthly.monthlyType !== 'monthlyDay'">
+      <mat-option *ngFor="let month of months" [value]="month">
+        {{month}}
+      </mat-option>
+    </mat-select> month(s) at <br/>
+    <cron-date-picker [model]="specificDayMonth" (onDateChange)="onDateChange($event)" [hidden]="monthly.monthlyType !== 'monthlyDay'"></cron-date-picker><br/><br/><br/>
+
+    <mat-radio-button class="everyWeek" value="monthlyWeek" (click)="resetData();">On the</mat-radio-button>
+    <mat-select placeholder="Weeks" [(ngModel)]="monthly.specificWeekDayMonth" (selectionChange)="regenerateCron(specificWeekDayMonth)" [disabled]="monthly.monthlyType !== 'monthlyWeek'">
+      <mat-option *ngFor="let week of weeks" [value]="week.value">
+        {{week.label}}
+      </mat-option>
+    </mat-select>
+    <mat-select placeholder="Day" [(ngModel)]="monthly.specificWeekDayDay" (selectionChange)="regenerateCron(specificWeekDayMonth)" [disabled]="monthly.monthlyType !== 'monthlyWeek'">
+      <mat-option *ngFor="let dayString of dayStrings" [value]="dayString">
+        {{dayString}}
+      </mat-option>
+    </mat-select> of every
+    <mat-select placeholder="Month" [(ngModel)]="monthly.specificWeekDayMonthWeek" (selectionChange)="regenerateCron(specificWeekDayMonth)" [disabled]="monthly.monthlyType !== 'monthlyWeek'">
+      <mat-option *ngFor="let month of months" [value]="month">
+        {{month}}
+      </mat-option>
+    </mat-select> month(s) at <br/>
+    <cron-date-picker [model]="specificWeekDayMonth" (onDateChange)="onDateChange($event)" [hidden]="monthly.monthlyType !== 'monthlyWeek'"></cron-date-picker>
+  </mat-radio-group>
+</div>
+
+<div *ngIf="scheduleType === 'yearly'" [ngClass]="{'active': scheduleType === 'yearly'}" class="tabcontent">
+  <mat-radio-group [(ngModel)]="yearly.yearlyType">
+    <mat-radio-button class="everyDay" value="yearlyMonth" (click)="resetData();">Every </mat-radio-button>
+    <mat-select placeholder="Month" [(ngModel)]="yearly.specificMonthDayMonth" (selectionChange)="regenerateCron(specificMonthDayYear)" [disabled]="yearly.yearlyType !== 'yearlyMonth'">
+      <mat-option *ngFor="let monthString of monthStrings" [value]="monthString.value">
+        {{monthString.label}}
+      </mat-option>
+    </mat-select> on the
+    <mat-select placeholder="Days" [(ngModel)]="yearly.specificMonthDayDay" (selectionChange)="regenerateCron(specificMonthDayYear)" [disabled]="yearly.yearlyType !== 'yearlyMonth'">
+      <mat-option *ngFor="let day of days" [value]="day">
+        {{day | i18nPlural: NumberMapping}}
+      </mat-option>
+    </mat-select> Day at <br/>
+    <cron-date-picker [model]="specificMonthDayYear" (onDateChange)="onDateChange($event)" [hidden]="yearly.yearlyType !== 'yearlyMonth'"></cron-date-picker><br/><br/><br/>
+
+    <mat-radio-button class="everyWeek" value="yearlyDay" (click)="resetData();">On the</mat-radio-button>
+    <mat-select placeholder="Weeks" [(ngModel)]="yearly.specificMonthWeekMonthWeek" (selectionChange)="regenerateCron(specificMonthWeekYear)" [disabled]="yearly.yearlyType !== 'yearlyDay'">
+      <mat-option *ngFor="let week of weeks" [value]="week.value">
+        {{week.label}}
+      </mat-option>
+    </mat-select>
+    <mat-select placeholder="Day" [(ngModel)]="yearly.specificMonthWeekDay" (selectionChange)="regenerateCron(specificMonthWeekYear)" [disabled]="yearly.yearlyType !== 'yearlyDay'">
+      <mat-option *ngFor="let dayString of dayStrings" [value]="dayString">
+      {{dayString}}
+      </mat-option>
+    </mat-select>of
+    <mat-select placeholder="Month" [(ngModel)]="yearly.specificMonthWeekMonth" (selectionChange)="regenerateCron(specificMonthWeekYear)" [disabled]="yearly.yearlyType !== 'yearlyDay'">
+      <mat-option *ngFor="let monthString of monthStrings" [value]="monthString.value">
+        {{monthString.label}}
+      </mat-option>
+    </mat-select>at <br/>
+    <cron-date-picker [model]="specificMonthWeekYear" (onDateChange)="onDateChange($event)" [hidden]="yearly.yearlyType !== 'yearlyDay'"></cron-date-picker>
+  </mat-radio-group>
+</div>
+
+<div class="dateDetails" *ngIf="scheduleType !== 'immediate'">
+  <label>
+      Start Date:
+      <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12" [max]="selectedMoments[1]"
+             class="cron-scheduler__input"
+             [(ngModel)]="selectedMoments"
+             [selectMode]="'rangeFrom'"
+             #startDateInput
+             (ngModelChange)="cronChange()" />
+      <owl-date-time #dt12 (afterPickerClosed)="afterPickerClosed(startDateInput)" ></owl-date-time>
+  </label>
+  <label style="margin-left: 5px;">
+      End Date:
+      <input [owlDateTimeTrigger]="dt13" [owlDateTime]="dt13" [min]="selectedMoments[0]"
+             class="cron-scheduler__input"
+             [(ngModel)]="selectedMoments"
+             [selectMode]="'rangeTo'"
+             #endDateInput
+             (ngModelChange)="cronChange()" />
+      <owl-date-time #dt13 (afterPickerClosed)="afterPickerClosed(endDateInput)" ></owl-date-time>
+  </label>
+  <span class="clear" (click)="selectedMoments = []">Clear</span><br/>
+</div>
+

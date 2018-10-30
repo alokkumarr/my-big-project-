@@ -5,6 +5,7 @@ import java.util.NoSuchElementException
 import com.fasterxml.jackson.databind.node.ObjectNode
 import exceptions.{ErrorCodes, RTException}
 import io.swagger.annotations.{ApiResponses, _}
+
 import mapr.streaming.EventHandler
 import org.joda.time.DateTime
 import org.slf4j.{Logger, LoggerFactory}
@@ -13,34 +14,54 @@ import play.mvc.{Controller, Http, Result}
 import synchronoss.handlers.GenericEventHandler
 import synchronoss.handlers.charter.smartcare.CharterEventHandler
 
+
 /**
   * Created by srya0001 on 6/28/2016.
   */
 
-@Api(value = "SynchronossGenericEvent",
+@Api(value = "SIPGenericEvent",
   produces = "application/json",
   consumes = "application/octet-stream",
   protocols = "http,https")
 class GenericHandler extends Controller {
 
   EventHandler.buildEventHandlerList
-  val m_log: Logger = LoggerFactory.getLogger(classOf[GenericHandler].getName)
+  val m_log: Logger = LoggerFactory.getLogger(classOf[GenericHandler].
+		  getName)
 
 
   @ApiOperation(
     nickname = "SyncronossEventWithPayload",
     value = "Method registers a Synchronoss generic event with payload",
-    notes = "The interface is designed to accepts events in JSON format and sends them to streams (PI BDA platform)",
+    notes = "The interface is designed to accept events in JSON format and" +
+            "forwards it to the Synchronoss Insights Platform",
     httpMethod = "POST",
-    tags = Array("publishevent")
+    tags = Array("events")
   )
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "RTI internal exceptions"),
-    new ApiResponse(code = 400, message = "Bad request: interface accepts only event related data"),
+    new ApiResponse(code = 400, message = "Bad request: interface accepts "
+    		+ "only event related data"),
     new ApiResponse(code = 200, message = "Success")))
+  @ApiImplicitParams(Array(new ApiImplicitParam(value = "Example: \n"
+  		+ " ```  "
+  		+ "{\n {" + 
+		    		"	\"EVENT_TYPE\": \"temperature\",\n" + 
+		    		"	\"SENSOR_UUID\": \"uidxxxdsxx123\",\n" + 
+		    		"	\"UVINDEX\": \"78.0\",\n" + 
+		    		"	\"WIND\": \"55.0\",\n" + 
+		    		"	\"RADIATION_LEVEL\": \"34.3\",\n" + 
+		    		"	\"AMBIENT_TEMPERATURE\": \"34.0\",\n" + 
+		    		"	\"HUMIDITY\": \"81.65\",\n" + 
+		    		"	\"PHOTOSENSOR\": \"870.89\",\n" + 
+		    		"	\"TIMESTAMP\": \"538186875285”\n" + 
+  		
+  		"} ",  
+        paramType = "body", dataType = "object",
+        examples =  new Example(value = Array(new ExampleProperty(mediaType = "default" ,
+       value = "{}"))))))
   def event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String,
-            EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String],
-            payload:Option[String]): Result = {
+            EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String] ): Result = {
 
     m_log debug s"Start event processing  [ Event ID: ${EVENT_ID} ]"
 

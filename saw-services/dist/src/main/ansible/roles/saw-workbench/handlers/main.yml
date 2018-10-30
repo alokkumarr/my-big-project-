@@ -1,3 +1,8 @@
 - name: restart saw-workbench
   # Stop service, to trigger restart by socket activation
   systemd: name=saw-workbench state=stopped daemon_reload=true
+  # Workaround: Occasionally deployments will fail with "Job for
+  # saw-workbench.service canceled".  The root cause is not known, but
+  # retry as a workaround for now.
+  register: result
+  until: result is success
