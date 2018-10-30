@@ -1,4 +1,4 @@
-package com.synchronoss.querybuilder.pivot;
+package com.synchronoss.querybuilder.report;
 
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
@@ -23,6 +23,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.synchronoss.SAWRetryTestCasesRunner;
@@ -31,12 +32,14 @@ import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import pl.allegro.tech.embeddedelasticsearch.IndexSettings;
 import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
+
 @RunWith(SAWRetryTestCasesRunner.class)
-public class PivotQueryBuilderTest {
+@Ignore("SIP-4852 --> SIP-5024, it will be moved to integration test cases in future sprint")
+public class ReportQueryBuilderTestChangeLater {
 
   private  EmbeddedElastic embeddedElastic = null;
   private  URL esSettingsResource = null;
-  private  URL  pivotMappingResource = null;
+  private  URL  reportMappingResource = null;
   private  RestClient client = null;
   private  final String INDEX_NAME = "mct_index_today";
   private final String  TYPE_NAME = "content_type"; 
@@ -47,12 +50,12 @@ public class PivotQueryBuilderTest {
  @Before
   public void resourceInitialized() throws IOException, InterruptedException{
     ClassLoader classLoader = getClass().getClassLoader();
-    pivotMappingResource = classLoader.getResource("content_mappings.json");
+    reportMappingResource = classLoader.getResource("content_mappings.json");
     esSettingsResource = classLoader.getResource("es_index_settings.json");
-    InputStream mappingStream = new FileInputStream(pivotMappingResource.getFile());
+    InputStream mappingStream = new FileInputStream(reportMappingResource.getFile());
     InputStream settingStream = new FileInputStream(esSettingsResource.getFile());
-    schemaResource = classLoader.getResource("schema/pivot_querybuilder_schema.json");
-    System.setProperty("schema.pivot", schemaResource.getPath());
+    schemaResource = classLoader.getResource("schema/report_querybuilder_schema.json");
+    System.setProperty("schema.report", schemaResource.getPath());
    
     embeddedElastic = EmbeddedElastic.builder()
         .withElasticVersion("6.2.0")
@@ -77,6 +80,7 @@ public class PivotQueryBuilderTest {
   }
   
   
+  
   @After
   public void resourceReleased() throws IOException {
     try{
@@ -95,7 +99,7 @@ public class PivotQueryBuilderTest {
   @Test
   public void queryAllCriteria() throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
-    URL inputFile = classLoader.getResource("queries/pivot_type_all_data.json");
+    URL inputFile = classLoader.getResource("queries/report_type_all_data.json");
     InputStream inputStream;
     String jsonString = null;
     try {
@@ -105,7 +109,7 @@ public class PivotQueryBuilderTest {
       assertThat(e.getMessage(), is("IOException"));    
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
-    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,3);
+    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.ESREPORT, jsonString,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
     Response response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
@@ -113,32 +117,11 @@ public class PivotQueryBuilderTest {
     Assert.assertTrue(entity.getContent()!=null);
   }
 
-  // ISIN query
-  @Test
-  public void queryWith3RowFields() throws IOException {
-    ClassLoader classLoader = getClass().getClassLoader();
-    URL inputFile = classLoader.getResource("queries/pivot_type_3_RowFields_data.json");
-    InputStream inputStream;
-    String jsonString = null;
-    try {
-      inputStream = new FileInputStream(inputFile.getFile());
-      jsonString = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
-    } catch (IOException e) {
-      assertThat(e.getMessage(), is("IOException"));    
-    }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
-    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,3);
-    String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
-    HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
-    Response response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
-    HttpEntity entity = response.getEntity();
-    Assert.assertTrue(entity.getContent()!=null);
-  }
   
   @Test
-  public void queryWith3RowFieldsDataSecurityKey() throws IOException {
+  public void queryWithDataFieldsDataSecurityKey() throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
-    URL inputFile = classLoader.getResource("queries/pivot_type_3_RowFields_data.json");
+    URL inputFile = classLoader.getResource("queries/report_type_all_data.json");
     String dataSecurityKey = "{\"dataSecurityKey\":[{\"name\":\"ORDER_STATE.raw\",\"values\":[\"KA\",\"Alabama\",\"Hawaii\"]},{\"name\":\"TRANSACTION_ID\",\"values\":[\"015cd74a-08dc-494f-8b71-f1cbd546fc31\"]}]}";
     InputStream inputStream;
     String jsonString = null;
@@ -149,15 +132,13 @@ public class PivotQueryBuilderTest {
       assertThat(e.getMessage(), is("IOException"));    
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
-    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,dataSecurityKey,3);
+    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.ESREPORT, jsonString,dataSecurityKey,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
     Response response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
     HttpEntity entity = response.getEntity();
     Assert.assertTrue(entity.getContent()!=null);
   }
-
-  
 
 }
   
