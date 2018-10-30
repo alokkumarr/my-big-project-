@@ -23,8 +23,10 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import com.synchronoss.SAWRetryTestCasesRunner;
 import com.synchronoss.querybuilder.EntityType;
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder;
@@ -32,7 +34,8 @@ import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import pl.allegro.tech.embeddedelasticsearch.IndexSettings;
 import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
 @RunWith(SAWRetryTestCasesRunner.class)
-public class PivotQueryBuilderTest {
+@Ignore("SIP-4852 --> SIP-5024, it will be moved to integration test cases in future sprint")
+public class PivotQueryBuilderTestChangeLater {
 
   private  EmbeddedElastic embeddedElastic = null;
   private  URL esSettingsResource = null;
@@ -62,7 +65,7 @@ public class PivotQueryBuilderTest {
         .withIndex(INDEX_NAME, IndexSettings.builder()
         .withType(TYPE_NAME, mappingStream)
          .withSettings(settingStream)
-        .build()).withStartTimeout(1, TimeUnit.MINUTES)
+        .build()).withStartTimeout(5, TimeUnit.MINUTES)
         .build().start();
     client = RestClient.builder(new HttpHost("localhost", 9351, "http"))
         .setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {

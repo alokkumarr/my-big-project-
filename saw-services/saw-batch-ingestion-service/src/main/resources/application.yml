@@ -24,22 +24,26 @@ spring:
     properties:
       hibernate:
         format_sql : true
-        
+  
 logging:
   level:
-    com.synchronoss.saw: INFO
+    com.synchronoss.saw: TRACE
+    org.springframework: INFO
     org.hibernate.type : INFO
     
 server:
   address: localhost
-  port: 9999
+  port: 9642
   servlet:
-    context-path: /ingestion/batch
+    context-path: ''
   maxHttpHeaderSize: 65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-
+management:
+  endpoint:
+    health:
+      show-details: always
 application:
     async:
         core-pool-size: 10

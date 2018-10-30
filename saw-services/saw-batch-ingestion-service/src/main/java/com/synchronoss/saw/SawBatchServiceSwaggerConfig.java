@@ -15,7 +15,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-//@Import(SpringDataRestConfiguration.class)
 public class SawBatchServiceSwaggerConfig extends WebMvcConfigurationSupport {
   /**
    * Docket Bean.

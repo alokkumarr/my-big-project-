@@ -1,8 +1,5 @@
 package com.synchronoss.saw;
 
-import com.synchronoss.saw.entities.audit.AuditingDateTimeProvider;
-import com.synchronoss.saw.entities.audit.CurrentTimeDateTimeService;
-import com.synchronoss.saw.entities.audit.DateTimeService;
 import info.faljse.SDNotify.SDNotify;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +21,16 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import ro.fortsoft.pf4j.PluginManager;
 import ro.fortsoft.pf4j.PluginWrapper;
 
-@EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
+@EnableJpaAuditing
 @SpringBootApplication
-@ComponentScan("com.synchronoss")
+@EnableSpringDataWebSupport
+@ComponentScan("com.synchronoss.saw")
 public class SawBatchServiceApplication implements ApplicationRunner {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 
@@ -121,16 +119,5 @@ public class SawBatchServiceApplication implements ApplicationRunner {
     transactionManager.setEntityManagerFactory(entityManagerFactory);
     return transactionManager;
   }
-
-  @Bean
-  DateTimeService currentTimeDateTimeService() {
-    return new CurrentTimeDateTimeService();
-  } 
-
-  @Bean
-  DateTimeProvider dateTimeProvider(DateTimeService dateTimeService) {
-    return new AuditingDateTimeProvider(dateTimeService);
-  }
-
 
 }

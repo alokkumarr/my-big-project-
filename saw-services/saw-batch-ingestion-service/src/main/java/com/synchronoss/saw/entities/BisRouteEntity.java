@@ -6,20 +6,15 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-
-
 @ApiModel("Route Entity")
-@Entity
+@Entity(name = "routes")
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "BIS_ROUTE", catalog = "batch_ingestion", schema = "")
 public class BisRouteEntity extends BaseEntity implements Serializable {
@@ -36,22 +31,20 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
   @Column(name = "CREATED_BY", nullable = false, length = 255)
   private String createdBy;
   @Basic(optional = false)
-  @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
-  private String productCode;
-  @Basic(optional = false)
-  @Column(name = "PROJECT_CODE", nullable = false, length = 50)
-  private String projectCode;
-  @Basic(optional = false)
-  @Column(name = "CUSTOMER_CODE", nullable = false, length = 50)
-  private String customerCode;
-  @Basic(optional = false)
   @Lob
   @Column(name = "ROUTE_METADATA", nullable = false, length = 2147483647)
   private String routeMetadata;
-  @JoinColumn(name = "BIS_CHANNEL_SYS_ID", referencedColumnName = "BIS_CHANNEL_SYS_ID",
-      nullable = true)
-  @ManyToOne(optional = true, fetch = FetchType.LAZY)
-  private BisChannelEntity bisChannelSysId;
+  
+  //@ManyToOne(fetch = FetchType.LAZY, optional = false)
+  //@JoinColumn(name = "BIS_CHANNEL_SYS_ID", nullable = false)
+  //@OnDelete(action = OnDeleteAction.CASCADE)
+  //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+  //@JsonIdentityReference(alwaysAsId = true)
+  //@JsonProperty("BIS_CHANNEL_SYS_ID")  
+  @Basic(optional = false)
+  @Column(name = "BIS_CHANNEL_SYS_ID", nullable = false)
+  private Long bisChannelSysId;
+  //private BisChannelEntity bisChannelSysId;
 
   public BisRouteEntity() {}
 
@@ -63,18 +56,11 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
    * This is parameterized constructor.
    * @param bisRouteSysId Long
    * @param createdBy String
-   * @param productCode String
-   * @param projectCode String
-   * @param customerCode String
    * @param routeMetadata String
    */
-  public BisRouteEntity(Long bisRouteSysId, String createdBy, String productCode,
-      String projectCode, String customerCode, String routeMetadata) {
+  public BisRouteEntity(Long bisRouteSysId, String createdBy, String routeMetadata) {
     this.bisRouteSysId = bisRouteSysId;
     this.createdBy = createdBy;
-    this.productCode = productCode;
-    this.projectCode = projectCode;
-    this.customerCode = customerCode;
     this.routeMetadata = routeMetadata;
   }
 
@@ -102,30 +88,6 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
     this.createdBy = createdBy;
   }
 
-  public String getProductCode() {
-    return productCode;
-  }
-
-  public void setProductCode(String productCode) {
-    this.productCode = productCode;
-  }
-
-  public String getProjectCode() {
-    return projectCode;
-  }
-
-  public void setProjectCode(String projectCode) {
-    this.projectCode = projectCode;
-  }
-
-  public String getCustomerCode() {
-    return customerCode;
-  }
-
-  public void setCustomerCode(String customerCode) {
-    this.customerCode = customerCode;
-  }
-
   public String getRouteMetadata() {
     return routeMetadata;
   }
@@ -134,11 +96,11 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
     this.routeMetadata = routeMetadata;
   }
 
-  public BisChannelEntity getBisChannelSysId() {
+  public Long getBisChannelSysId() {
     return bisChannelSysId;
   }
 
-  public void setBisChannelSysId(BisChannelEntity bisChannelSysId) {
+  public void setBisChannelSysId(Long bisChannelSysId) {
     this.bisChannelSysId = bisChannelSysId;
   }
 
@@ -167,10 +129,8 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
   public String toString() {
     return "{ bisRouteSysId:" + bisRouteSysId + ", modifiedDate:" + getModifiedDate()
         + ", modifiedBy:" + modifiedBy + ", createdDate:" + getCreatedDate() + ", createdBy:"
-        + createdBy + ", productCode:" + productCode + ", projectCode:" + projectCode
-        + ", customerCode:" + customerCode + ", routeMetadata:" + routeMetadata
+        + createdBy + ", routeMetadata:" + routeMetadata
         + ", bisChannelSysId:" + bisChannelSysId + "}";
   }
-
 
 }

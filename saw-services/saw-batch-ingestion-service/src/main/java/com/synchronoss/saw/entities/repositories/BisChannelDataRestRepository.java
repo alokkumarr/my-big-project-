@@ -2,13 +2,14 @@ package com.synchronoss.saw.entities.repositories;
 
 import com.synchronoss.saw.entities.BisChannelEntity;
 import io.swagger.annotations.Api;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 @Api(value = "This end point provides a way to communicate with channel entity",
     tags = "Channel Enity")
-@RepositoryRestResource(path = "channels", collectionResourceRel = "channels")
+@Repository
 public interface BisChannelDataRestRepository extends
-    PagingAndSortingRepository<BisChannelEntity, Long> {
+    JpaRepository<BisChannelEntity, Long> {
 
 }
