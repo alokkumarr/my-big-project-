@@ -42,34 +42,34 @@ export class TestConnectivityComponent implements OnInit {
    * @memberof TestConnectivityComponent
    */
   typeMessage(text, screen) {
-    //You have to check for lines and if the screen is an element
+    // You have to check for lines and if the screen is an element
     if (!text || !text.length || !(screen instanceof Element)) {
       return;
     }
 
-    //if it is not a string, you will want to make it into one
+    // if it is not a string, you will want to make it into one
     if ('string' !== typeof text) {
       text = text.join('\n');
     }
 
-    //normalize newlines, and split it to have a nice array
+    // normalize newlines, and split it to have a nice array
     text = text.replace(/\r\n?/g, '\n').split('');
 
-    //the prompt is always the last child
-    let prompt = screen.lastChild as HTMLDivElement;
+    // the prompt is always the last child
+    const prompt = screen.lastChild as HTMLDivElement;
     prompt.className = 'typing';
 
-    let typer = () => {
-      let character = text.shift();
+    const typer = () => {
+      const character = text.shift();
       screen.insertBefore(
-        //newlines must be written as a `<br>`
+        // newlines must be written as a `<br>`
         character === '\n'
           ? document.createElement('br')
           : document.createTextNode(character),
         prompt
       );
 
-      //only run this again if there are letters
+      // only run this again if there are letters
       if (text.length) {
         setTimeout(typer, 10);
       } else {

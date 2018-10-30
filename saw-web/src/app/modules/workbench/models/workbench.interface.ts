@@ -1,4 +1,4 @@
-export interface SourceObject {
+export interface ChannelObject {
   createdBy: string;
   productCode: string;
   projectCode: string;

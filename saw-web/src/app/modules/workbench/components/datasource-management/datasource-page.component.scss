@@ -45,6 +45,10 @@
     border: 2px $primary-blue-b1 solid;
   }
 
+  .no-click {
+    cursor: not-allowed;
+  }
+
   .toolbar-white {
     background-color: $primary-white;
     height: 45px !important;

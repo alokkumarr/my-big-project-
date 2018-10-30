@@ -1,4 +1,4 @@
-import * as fpGet from 'lodash/fp/get';
+import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 import { Injectable } from '@angular/core';
@@ -16,7 +16,7 @@ const userProject = 'workbench';
 
 @Injectable()
 export class WorkbenchService {
-  public api = fpGet('api.url', APP_CONFIG);
+  public api = get(APP_CONFIG, 'api.url');
   public wbAPI = `${this.api}/internal/workbench/projects`;
 
   constructor(
@@ -267,26 +267,6 @@ export class WorkbenchService {
 
     return this.http
       .put(endpoint, payload)
-      .pipe(catchError(this.handleError('data', {})));
-  }
-
-  /**
-   * Creates a Source entry in Batch Ingestion Service
-   *
-   * @param {*} payload
-   * @returns
-   * @memberof WorkbenchService
-   */
-  createSource(payload) {
-    payload.customerCode = this.jwt.customerCode;
-    payload.createdBy = this.jwt.getUserName();
-    payload.projectCode = userProject;
-    payload.productCode = this.jwt.getProductName();
-
-    const endpoint = `${this.api}/ingestion/batch/channels`;
-
-    return this.http
-      .post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
 

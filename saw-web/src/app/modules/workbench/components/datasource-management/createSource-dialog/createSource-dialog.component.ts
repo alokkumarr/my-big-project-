@@ -3,7 +3,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
-import { sourceTypes } from '../../../wb-comp-configs';
+import { DatasourceService } from '../../../services/datasource.service';
+
+import { CHANNEL_TYPES } from '../../../wb-comp-configs';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 
 @Component({
@@ -11,52 +13,76 @@ import { TestConnectivityComponent } from '../test-connectivity/test-connectivit
   templateUrl: './createSource-dialog.component.html',
   styleUrls: ['./createSource-dialog.component.scss']
 })
-export class CreateSourceDialogComponent {
-  selectedSource: string = '';
+export class CreateSourceDialogComponent implements OnInit {
+  selectedSource = '';
   form: FormGroup;
-  sources = sourceTypes;
+  sources = CHANNEL_TYPES;
   firstStep: FormGroup;
   public detailsFormGroup: FormGroup;
+  opType = 'create';
 
   constructor(
     private _formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<CreateSourceDialogComponent>,
-    private snackBar: MatSnackBar
-  ) {}
+    private snackBar: MatSnackBar,
+    private datasourceService: DatasourceService,
+    @Inject(MAT_DIALOG_DATA) public channelData: any
+  ) {
+    this.createForm();
+  }
 
-  ngOnInit() {
+  createForm() {
     this.firstStep = this._formBuilder.group({
-      firstStepCtrl: ['', Validators.required]
+      channelType: ['', Validators.required]
     });
 
     this.detailsFormGroup = this._formBuilder.group({
-      sourceNameCtrl: ['', Validators.required],
-      hostNameCtrl: ['', Validators.required],
-      portNoCtrl: ['', Validators.required],
-      userNameCtrl: ['', Validators.required],
-      passwordCtrl: ['', Validators.required],
-      descriptionCtrl: [''],
-      accessTypeCtrl: ['R', Validators.required]
+      channelName: ['', Validators.required],
+      hostName: ['', Validators.required],
+      portNo: ['', Validators.required],
+      userName: ['', Validators.required],
+      password: ['', Validators.required],
+      description: [''],
+      accessType: ['R', Validators.required]
     });
   }
 
-  sourceSelected(source) {
-    this.selectedSource = source;
-    this.firstStep.controls.firstStepCtrl.reset(source);
+  ngOnInit() {
+    if (isUndefined(this.channelData.length)) {
+      this.opType = 'update';
+      this.selectedSource = this.channelData.channelType;
+      this.firstStep.patchValue(this.channelData);
+      this.detailsFormGroup.patchValue(this.channelData);
+    }
   }
 
-  createSource(data) {
+  sourceSelected(source) {
+    if (source.supported) {
+      this.selectedSource = source.uid;
+      this.firstStep.controls.channelType.reset(source.uid);
+    }
+  }
+
+  createSource(formData) {
+    this.datasourceService.encryptPWD(formData.password).subscribe(data => {
+      formData.password = data.data;
+      const sourceDetails = this.mapData(formData);
+      this.dialogRef.close({ sourceDetails, opType: this.opType });
+    });
+  }
+
+  mapData(data) {
     const sourceDetails = {
-      sourceName: data.sourceNameCtrl,
-      sourceType: this.selectedSource,
-      hostName: data.hostNameCtrl,
-      portNo: data.portNoCtrl,
-      accessType: data.accessTypeCtrl,
-      username: data.userNameCtrl,
-      password: data.passwordCtrl,
-      description: data.descriptionCtrl
+      channelName: data.channelName,
+      channelType: this.selectedSource,
+      hostName: data.hostName,
+      portNo: data.portNo,
+      accessType: data.accessType,
+      userName: data.userName,
+      password: data.password,
+      description: data.description
     };
-    this.dialogRef.close(sourceDetails);
+    return sourceDetails;
   }
 
   onCancelClick(): void {

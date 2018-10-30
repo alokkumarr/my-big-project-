@@ -1,6 +1,6 @@
 <mat-card class="createsource-dialog">
   <mat-card-header>
-    <mat-card-title class="details-title">Create Data Source</mat-card-title>
+    <mat-card-title class="details-title">Create Data Channel</mat-card-title>
     <div fxFlex></div>
     <button mat-icon-button color="warn" (click)="onCancelClick()">
       <mat-icon fontIcon="icon-close"></mat-icon>
@@ -19,7 +19,7 @@
         <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="source-container">
           <div fxFlex fxLayout="row wrap" fxLayoutAlign="space-around space-around" class="source-list">
             <mat-card class="mat-elevation-z3" [class.selected]="selectedSource === source.uid" *ngFor="let source of sources"
-              fxFlex="31" fxLayout="row" fxLayoutAlign="start center" (click)="sourceSelected(source.uid)">
+              fxFlex="31" fxLayout="row" fxLayoutAlign="start center" (click)="sourceSelected(source)" [class.no-click]="source.supported === false">
               <div>{{source.name}}</div>
               <div fxFlex></div>
               <img [src]="source.imgsrc" />
@@ -36,26 +36,25 @@
           autocomplete="false">
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
             <mat-form-field appearance="outline">
-              <mat-label>Name Your Source</mat-label>
-              <input matInput name="sourceName" formControlName="sourceNameCtrl" maxlength="18" required />
-              <mat-error *ngIf="detailsFormGroup.controls.sourceNameCtrl.hasError('required')">
-                Host Name is
+              <mat-label>Name Your Channel</mat-label>
+              <input matInput name="channelName" formControlName="channelName" maxlength="18" required />
+              <mat-error *ngIf="detailsFormGroup.controls.channelName.hasError('required')">
+                Channel Name is
                 <strong>required</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Hostname</mat-label>
-              <input matInput placeholder="Host Name" name="hostName" formControlName="hostNameCtrl" required />
-              <mat-error *ngIf="detailsFormGroup.controls.hostNameCtrl.hasError('required')">
+              <input matInput placeholder="Host Name" name="hostName" formControlName="hostName" required />
+              <mat-error *ngIf="detailsFormGroup.controls.hostName.hasError('required')">
                 Host Name is
                 <strong>required</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Port Number</mat-label>
-              <input type="number" matInput placeholder="Port Number" name="portNo" formControlName="portNoCtrl"
-                required />
-              <mat-error *ngIf="detailsFormGroup.controls.portNoCtrl.hasError('required')">
+              <input type="number" matInput placeholder="Port Number" name="portNo" formControlName="portNo" required />
+              <mat-error *ngIf="detailsFormGroup.controls.portNo.hasError('required')">
                 Port Number is
                 <strong>required</strong>
               </mat-error>
@@ -65,31 +64,30 @@
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
             <mat-form-field appearance="outline">
               <mat-label>Access Type</mat-label>
-              <mat-select formControlName="accessTypeCtrl">
+              <mat-select formControlName="accessType">
                 <mat-option value="R">Read</mat-option>
                 <mat-option value="RW">Read & Write</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Username</mat-label>
-              <input type="text" matInput placeholder="Username" name="username" formControlName="userNameCtrl"
-                required />
+              <input type="text" matInput placeholder="Username" name="username" formControlName="userName" required />
               <button mat-button matSuffix mat-icon-button>
                 <mat-icon fontIcon="icon-chat-bot"></mat-icon>
               </button>
-              <mat-error *ngIf="detailsFormGroup.controls.userNameCtrl.hasError('required')">
+              <mat-error *ngIf="detailsFormGroup.controls.userName.hasError('required')">
                 Username is
                 <strong>required</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Password</mat-label>
-              <input type="password" matInput placeholder="Password" name="password" formControlName="passwordCtrl"
+              <input type="password" matInput placeholder="Password" name="password" formControlName="password"
                 required autocomplete="new-password" />
               <button mat-button matSuffix mat-icon-button aria-label="show">
                 <mat-icon fontIcon="icon-show"></mat-icon>
               </button>
-              <mat-error *ngIf="detailsFormGroup.controls.passwordCtrl.hasError('required')">
+              <mat-error *ngIf="detailsFormGroup.controls.password.hasError('required')">
                 Password is
                 <strong>required</strong>
               </mat-error>
@@ -98,7 +96,7 @@
           <section fxFlex fxLayout="column" fxLayoutAlign="center center">
             <mat-form-field style="width: 90%;" appearance="outline">
               <mat-label>Description about the source</mat-label>
-              <textarea matInput formControlName="descriptionCtrl"></textarea>
+              <textarea matInput formControlName="description"></textarea>
             </mat-form-field>
           </section>
         </form>
@@ -108,8 +106,10 @@
           <button mat-stroked-button color="primary" (click)="testConnection()">
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
-          <button mat-raised-button color="primary" type="submit" matStepperNext [disabled]="!detailsFormGroup.valid"
+          <button mat-raised-button *ngIf="opType === 'create'" color="primary" type="submit" [disabled]="!detailsFormGroup.valid"
             (click)="createSource(detailsFormGroup.value)">Create</button>
+          <button mat-raised-button *ngIf="opType === 'update'" color="primary" type="submit" [disabled]="!detailsFormGroup.valid"
+            (click)="createSource(detailsFormGroup.value)">Update</button>
         </div>
       </mat-step>
     </mat-horizontal-stepper>
