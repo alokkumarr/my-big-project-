@@ -32,7 +32,7 @@ public class ServerResponseMessages {
     public static final String ATTRIBUTE_NULL_OR_EMPTY = "Attribute Name can't be null or empty";
     public static final String VALUE_NULL_OR_EMPTY = "Value can't be null or empty";
     public static final String GROUP_NULL_OR_EMPTY = "Group Name can't be null or empty";
-    public static final String GROUP_ID_NULL_EMPTY = "Group Id cn't be NULL or 0";
+    public static final String GROUP_ID_NULL_EMPTY = "Group Id can't be NULL, 0 or negative";
 
     public static final String ATTRIBUTE_ID_NULL = "Attribute Id is NULL";
     public static final String CANT_GET_GROUP_ID = "Couldn't able to get Sys Id";

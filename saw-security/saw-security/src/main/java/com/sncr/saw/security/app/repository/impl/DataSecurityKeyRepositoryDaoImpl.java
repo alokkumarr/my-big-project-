@@ -174,20 +174,20 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public DskValidity updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups) {
         DskValidity valid = new DskValidity();
         String updateSql = "UPDATE SEC_GROUP SET SEC_GROUP_NAME = ?, DESCRIPTION = ? WHERE SEC_GROUP_SYS_ID = ?";
-        if ( (securityGroupId == null || securityGroupId == 0)) {
+        if ( (securityGroupId == null || securityGroupId <= 0)) {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             return valid;
         }
-        if((oldNewGroups.get(0).trim() == null || oldNewGroups.get(0).trim().isEmpty())
-            && (oldNewGroups.get(1).trim() ==null || oldNewGroups.get(1).trim().isEmpty()) ) {
+        if((oldNewGroups.get(0) == null || oldNewGroups.get(0).trim().isEmpty())
+            && (oldNewGroups.get(1) ==null || oldNewGroups.get(1).trim().isEmpty()) ) {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             return valid;
         }
-        if (oldNewGroups.get(0).trim() == null || oldNewGroups.get(0).trim().isEmpty()) {
+        if (oldNewGroups.get(0) == null || oldNewGroups.get(0).trim().isEmpty()) {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
@@ -249,7 +249,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         /** NOTE: Deleting a row from SEC_GROUP will inturn deletes corresponding reference rows in child tables.
          * That is, SEC_GROUP_DSK_ATTRIBUTE and SEC_GROUP_DSK_VALUE. So, no need of deleting its references in other tables.
          **/
-        if ( securityGroupId == 0 || securityGroupId == null)   {
+        if ( securityGroupId <= 0 || securityGroupId == null)   {
             logger.error(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
@@ -293,7 +293,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
      */
     public Boolean unAssignGroupFromUser(Long secGroupSysId) {
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = null WHERE SEC_GROUP_SYS_ID = ? ";
-        if ( secGroupSysId == 0 || secGroupSysId == null)   {
+        if ( secGroupSysId <= 0 || secGroupSysId == null)   {
             logger.error(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             return false;
         }
@@ -425,7 +425,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
         Valid valid = new Valid();
         Long groupAttrSysId ;
-        if(securityGroupId == null || securityGroupId == 0 )    {
+        if(securityGroupId == null || securityGroupId <= 0 )    {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
@@ -564,13 +564,13 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid =  new Valid();
         Long groupSysId = Long.parseLong(dskList.get(0).trim());
         Long groupAttributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,dskList.get(1).trim());
-        if (dskList.get(0).trim().isEmpty() || dskList.get(0).trim() == null )  {
+        if (dskList.get(0).trim().isEmpty() || dskList.get(0) == null )  {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             return valid;
         }
-        if (  dskList.get(1).trim() == null || dskList.get(1).trim().isEmpty() )  {
+        if (  dskList.get(1) == null || dskList.get(1).trim().isEmpty() )  {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
@@ -582,7 +582,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setError(ServerResponseMessages.GROUP_NAME_LONG);
             return valid;
         }
-        else if ( dskList.get(1).trim().isEmpty() || dskList.get(1).trim() == null )   {
+        else if ( dskList.get(1).trim().isEmpty() || dskList.get(1) == null )   {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
@@ -671,13 +671,13 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid = new Valid();
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = ? WHERE USER_SYS_ID = ? ";
-        if( securityGroupName.trim().isEmpty() || userSysId == 0 || userSysId == null)   {
+        if( securityGroupName.trim().isEmpty() || userSysId <= 0 || userSysId == null)   {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             return valid;
         }
-        else if ( securityGroupName.trim() == null || securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
+        else if ( securityGroupName == null || securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
             try{
                 // If Group name is removed from User. We need to set sec_group_sys_id as null in users table.
                 int updateRes = jdbcTemplate.update(updateSql, ps -> {
@@ -793,7 +793,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid =  new Valid();
         attributeValues.setAttributeName(attributeValues.getAttributeName().trim());
         attributeValues.setValue(attributeValues.getValue().trim());
-        if ( securityGroupId == 0 || securityGroupId == null )  {
+        if ( securityGroupId <= 0 || securityGroupId == null )  {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
