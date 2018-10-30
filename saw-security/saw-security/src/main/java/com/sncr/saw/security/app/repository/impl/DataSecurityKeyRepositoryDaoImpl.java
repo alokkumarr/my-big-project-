@@ -35,8 +35,13 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             + "VALUES (?,?,1,now(),?)";
         securityGroups.setSecurityGroupName(securityGroups.getSecurityGroupName().trim());
         securityGroups.setDescription(securityGroups.getDescription().trim());
-
-        if (securityGroups.getSecurityGroupName().equals(null) || securityGroups.getSecurityGroupName().isEmpty())   {
+        if ((securityGroups.getSecurityGroupName() == null || securityGroups.getSecurityGroupName().isEmpty()) && (securityGroups.getDescription() == null || securityGroups.getDescription().isEmpty())  ) {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            return valid;
+        }
+        if (securityGroups.getSecurityGroupName() == null || securityGroups.getSecurityGroupName().isEmpty())   {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
@@ -169,12 +174,23 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public DskValidity updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups) {
         DskValidity valid = new DskValidity();
         String updateSql = "UPDATE SEC_GROUP SET SEC_GROUP_NAME = ?, DESCRIPTION = ? WHERE SEC_GROUP_SYS_ID = ?";
-        if(oldNewGroups.get(0).trim().equalsIgnoreCase(null) || oldNewGroups.get(0).trim().equalsIgnoreCase("")
-            || oldNewGroups.get(1).trim().equalsIgnoreCase(null) || oldNewGroups.get(1).trim().equalsIgnoreCase("")
-            || securityGroupId == null || securityGroupId == 0 ) {
+        if ( (securityGroupId == null || securityGroupId == 0)) {
             valid.setValid(false);
-            valid.setValidityMessage(ServerResponseMessages.FIELDS_EXISTS);
-            valid.setError(ServerResponseMessages.FIELDS_EXISTS);
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            return valid;
+        }
+        if((oldNewGroups.get(0).trim() == null || oldNewGroups.get(0).trim().isEmpty())
+            && (oldNewGroups.get(1).trim() ==null || oldNewGroups.get(1).trim().isEmpty()) ) {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            return valid;
+        }
+        if (oldNewGroups.get(0).trim() == null || oldNewGroups.get(0).trim().isEmpty()) {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
             return valid;
         }
         else if (this.isGroupNameExists(oldNewGroups.get(0).trim()) && this.isDescExists(oldNewGroups.get(0).trim(),oldNewGroups.get(1).trim())){
@@ -408,20 +424,36 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     @Override
     public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
         Valid valid = new Valid();
-        Long groupAttrSysId = null;
+        Long groupAttrSysId ;
         if(securityGroupId == null || securityGroupId == 0 )    {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             return valid;
         }
-        else if ( attributeValues.getAttributeName().equals(null) || attributeValues.getAttributeName().equals(null) || attributeValues.getAttributeName().isEmpty())   {
+        if ( attributeValues.getAttributeName() == null )   {
+            valid.setValid(false);
+            valid.setValidityMessage(" Attribute Name can't be null");
+            return valid;
+        }
+        if ( attributeValues.getValue() == null )   {
+            valid.setValid(false);
+            valid.setValidityMessage(" Value can't be null");
+            return valid;
+        }
+        else if ( (attributeValues.getAttributeName().isEmpty()) && (attributeValues.getValue().isEmpty()) )    {
+            valid.setValid(false);
+            valid.setValidityMessage(" Fields Can't be null or empty!! ");
+            valid.setError("Fields Can't be null or empty!!");
+            return valid;
+        }
+        else if ( attributeValues.getAttributeName() == null || attributeValues.getAttributeName().isEmpty() )   {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             return valid;
         }
-        else if ( attributeValues.getValue().equals(null) || attributeValues.getValue().equalsIgnoreCase("null") || attributeValues.getValue().isEmpty())  {
+        else if ( attributeValues.getValue() == null || attributeValues.getValue().isEmpty())  {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
@@ -532,10 +564,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid =  new Valid();
         Long groupSysId = Long.parseLong(dskList.get(0).trim());
         Long groupAttributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,dskList.get(1).trim());
-        if (dskList.get(0).trim().isEmpty() || dskList.get(1).trim().equals(null))  {
+        if (dskList.get(0).trim().isEmpty() || dskList.get(0).trim() == null )  {
             valid.setValid(false);
-            valid.setValidityMessage(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
-            valid.setError(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            return valid;
+        }
+        if (  dskList.get(1).trim() == null || dskList.get(1).trim().isEmpty() )  {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             return valid;
         }
         else if ( dskList.get(0).trim().length() > 255 )    {
@@ -544,7 +582,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setError(ServerResponseMessages.GROUP_NAME_LONG);
             return valid;
         }
-        else if ( dskList.get(1).trim().isEmpty() || dskList.get(1).trim().equals(null) )   {
+        else if ( dskList.get(1).trim().isEmpty() || dskList.get(1).trim() == null )   {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
@@ -639,7 +677,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             return valid;
         }
-        else if (securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
+        else if ( securityGroupName.trim() == null || securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
             try{
                 // If Group name is removed from User. We need to set sec_group_sys_id as null in users table.
                 int updateRes = jdbcTemplate.update(updateSql, ps -> {
@@ -667,7 +705,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 });
                 logger.trace(updateRes + "User Table updated ");
                 valid.setValid(true);
-                valid.setValidityMessage(ServerResponseMessages.SEC_GROUP_UPDATED);
+                valid.setValidityMessage(securityGroupName + " : " +ServerResponseMessages.SEC_GROUP_UPDATED);
                 return valid;
             }
             catch (Exception e){
@@ -755,12 +793,22 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid =  new Valid();
         attributeValues.setAttributeName(attributeValues.getAttributeName().trim());
         attributeValues.setValue(attributeValues.getValue().trim());
-        if (securityGroupId == 0 || securityGroupId == null || attributeValues.getAttributeName().trim().isEmpty()
-            || attributeValues.getAttributeName().equals(null)
-            || attributeValues.getValue().trim().isEmpty() || attributeValues.getValue().equals(null))  {
+        if ( securityGroupId == 0 || securityGroupId == null )  {
             valid.setValid(false);
-            valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
-            valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            return valid;
+        }
+        if ( (attributeValues.getAttributeName() == null || attributeValues.getAttributeName().isEmpty()) && (attributeValues.getValue().isEmpty() || attributeValues.getValue() == null))   {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            return valid;
+        }
+        if ( attributeValues.getValue() == null || attributeValues.getValue().isEmpty() )   {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
             return valid;
         }
         else {
