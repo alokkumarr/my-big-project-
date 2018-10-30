@@ -18,6 +18,7 @@ import { DefaultAnalyzeCategoryGuard } from './guards';
 import { CommonModuleTs } from '../../common';
 import { UChartModule } from '../../common/components/charts';
 import { AnalyzePublishDialogModule } from './publish';
+import { AnalyzeModuleGlobal } from './analyze.global.module';
 import {
   AnalyzeReportQueryComponent,
   DesignerDialogComponent,
@@ -45,8 +46,6 @@ import {
   MultiTableDesignerLayoutComponent,
   ArtifactColumns2PivotFieldsPipe
 } from './designer';
-
-import { AnalyzeDialogService } from './services/analyze-dialog.service';
 
 import { AnalyzeFilterModule } from './designer/filter';
 
@@ -84,8 +83,6 @@ const PIPES = [ArtifactColumns2PivotFieldsPipe];
 
 const GUARDS = [DefaultAnalyzeCategoryGuard];
 
-const SERVICES = [AnalyzeDialogService];
-
 @NgModule({
   imports: [
     CommonModuleAngular4,
@@ -93,6 +90,7 @@ const SERVICES = [AnalyzeDialogService];
       prefix: 'symmetra',
       storageType: 'localStorage'
     }),
+    AnalyzeModuleGlobal.forRoot(),
     RouterModule.forChild(routes),
     CommonModuleTs,
     MaterialModule,
@@ -109,7 +107,7 @@ const SERVICES = [AnalyzeDialogService];
   ],
   declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,
-  providers: [...SERVICES, ...GUARDS],
+  providers: [...GUARDS],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModule {}
