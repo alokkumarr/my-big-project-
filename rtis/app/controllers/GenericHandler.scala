@@ -21,7 +21,7 @@ import synchronoss.handlers.charter.smartcare.CharterEventHandler
 
 @Api(value = "SIPGenericEvent",
   produces = "application/json",
-  consumes = "application/octet-stream",
+  consumes = "application/json",
   protocols = "http,https")
 class GenericHandler extends Controller {
 
