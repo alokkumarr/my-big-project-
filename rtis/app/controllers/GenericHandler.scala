@@ -54,7 +54,7 @@ class GenericHandler extends Controller {
 		    		"	\"AMBIENT_TEMPERATURE\": \"34.0\",\n" + 
 		    		"	\"HUMIDITY\": \"81.65\",\n" + 
 		    		"	\"PHOTOSENSOR\": \"870.89\",\n" + 
-		    		"	\"TIMESTAMP\": \"538186875285”\n" + 
+		    			"	\"TIMESTAMP\": \"538186875285\"\n" +
   		
   		"} ",  
         paramType = "body", dataType = "object",
