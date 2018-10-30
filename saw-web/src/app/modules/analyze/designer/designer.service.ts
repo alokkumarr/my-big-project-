@@ -44,19 +44,25 @@ export class DesignerService {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 
-  generateRequestPayload(analysis) {
+  generateReportPayload(analysis) {
     forEach(analysis.artifacts, cols => {
       forEach(cols.columns, col => {
         delete col.checked;
       });
     });
+
+    /* Remove analysis queryManual if not being saved from query mode */
+    if (!analysis.edit) {
+      delete analysis.queryManual;
+    }
+
     return analysis;
   }
 
   getDataForAnalysis(analysis) {
     const analysisRequest =
       analysis.type === 'report'
-        ? this.generateRequestPayload(cloneDeep(analysis))
+        ? this.generateReportPayload(cloneDeep(analysis))
         : analysis;
     return this._analyzeService.getDataBySettings(analysisRequest);
   }
@@ -80,7 +86,7 @@ export class DesignerService {
   saveAnalysis(analysis) {
     const analysisRequest =
       analysis.type === 'report'
-        ? this.generateRequestPayload(cloneDeep(analysis))
+        ? this.generateReportPayload(cloneDeep(analysis))
         : analysis;
     return this._analyzeService.saveReport(analysisRequest);
   }
@@ -94,16 +100,14 @@ export class DesignerService {
       artifactColumn.checked = false;
     };
 
-    const onReorder = (artifactColumns: ArtifactColumns) => {
-      forEach(artifactColumns, (column, index) => {
+    const onReorder = (columns: ArtifactColumns) => {
+      forEach(columns, (column, index) => {
         column.areaIndex = index;
       });
     };
 
-    const areLessThenMaxFields = (
-      artifactColumns: ArtifactColumns
-    ): boolean => {
-      return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
+    const areLessThenMaxFields = (columns: ArtifactColumns): boolean => {
+      return columns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
     };
 
     const canAcceptNumberType = (
@@ -194,8 +198,8 @@ export class DesignerService {
       artifactColumn.checked = false;
     };
 
-    const onReorder = (artifactColumns: ArtifactColumns) => {
-      forEach(artifactColumns, (column, index) => {
+    const onReorder = (columns: ArtifactColumns) => {
+      forEach(columns, (column, index) => {
         column.areaIndex = index;
       });
     };
@@ -205,7 +209,9 @@ export class DesignerService {
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => ({ type }: ArtifactColumnChart) => {
       const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
-      if (groupAdapter.artifactColumns.length >= maxAllowed) { return false; }
+      if (groupAdapter.artifactColumns.length >= maxAllowed) {
+        return false;
+      }
       return NUMBER_TYPES.includes(type);
     };
 
@@ -214,7 +220,9 @@ export class DesignerService {
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => ({ type }: ArtifactColumnChart) => {
       const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
-      if (groupAdapter.artifactColumns.length >= maxAllowed) { return false; }
+      if (groupAdapter.artifactColumns.length >= maxAllowed) {
+        return false;
+      }
       return DATE_TYPES.includes(type);
     };
 
@@ -223,7 +231,9 @@ export class DesignerService {
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => () => {
       const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
-      if (groupAdapter.artifactColumns.length >= maxAllowed) { return false; }
+      if (groupAdapter.artifactColumns.length >= maxAllowed) {
+        return false;
+      }
       return true;
     };
 
