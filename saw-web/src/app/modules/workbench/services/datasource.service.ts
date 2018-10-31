@@ -155,7 +155,7 @@ export class DatasourceService {
     const endpoint = `${this.api}/ingestion/batch/internal/encrypt`;
 
     return this.http
-      .post(endpoint, payload)
+      .post(endpoint, JSON.stringify(payload))
       .pipe(catchError(this.handleError('data', {})));
   }
 
@@ -170,7 +170,7 @@ export class DatasourceService {
     const endpoint = `${this.api}/ingestion/batch/internal/decrypt`;
 
     return this.http
-      .post(endpoint, payload)
+      .post(endpoint, JSON.stringify(payload))
       .pipe(catchError(this.handleError('data', {})));
   }
 

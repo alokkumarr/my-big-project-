@@ -110,7 +110,13 @@
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
               <span class="prop-name">Password : </span>
-              <span>{{selectedSourceData?.password}}</span>
+              <span class="pwd-hide" [class.pwd-show]="show === true">{{selectedSourceData?.password}}</span>
+              <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                <mat-icon fontIcon="icon-show"></mat-icon>
+              </button>
+              <button *ngIf="show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                <mat-icon fontIcon="icon-hide"></mat-icon>
+              </button>
             </div>
           </div>
           <mat-divider></mat-divider>
@@ -139,13 +145,13 @@
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
-              <button mat-icon-button color="primary" (click)="testConnection()">
+              <button mat-icon-button class="grid-icon-btn" color="primary" (click)="testConnection()">
                 <mat-icon fontIcon="icon-query-mode"></mat-icon>
               </button>
-              <button mat-icon-button color="primary" (click)="createRoute(data.data)">
+              <button mat-icon-button class="grid-icon-btn" color="primary" (click)="createRoute(data.data)">
                 <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteRoute(data.data)">
+              <button mat-icon-button class="grid-icon-btn" color="warn" (click)="deleteRoute(data.data)">
                 <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
               </button>
             </div>

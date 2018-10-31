@@ -20,6 +20,7 @@ export class CreateSourceDialogComponent implements OnInit {
   firstStep: FormGroup;
   public detailsFormGroup: FormGroup;
   opType = 'create';
+  show = false;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -50,6 +51,9 @@ export class CreateSourceDialogComponent implements OnInit {
   ngOnInit() {
     if (isUndefined(this.channelData.length)) {
       this.opType = 'update';
+      if (!isUndefined(this.channelData.password)) {
+        this.decryptPWD(this.channelData.password);
+      }
       this.selectedSource = this.channelData.channelType;
       this.firstStep.patchValue(this.channelData);
       this.detailsFormGroup.patchValue(this.channelData);
@@ -87,6 +91,16 @@ export class CreateSourceDialogComponent implements OnInit {
 
   onCancelClick(): void {
     this.dialogRef.close();
+  }
+
+  togglePWD() {
+    this.show = !this.show;
+  }
+
+  decryptPWD(pwd) {
+    this.datasourceService.decryptPWD(pwd).subscribe(data => {
+      this.detailsFormGroup.controls.password.setValue(data.data);
+    });
   }
 
   testConnection() {

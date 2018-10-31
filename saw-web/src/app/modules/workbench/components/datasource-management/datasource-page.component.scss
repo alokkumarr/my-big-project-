@@ -17,7 +17,7 @@
     }
   }
 
-  .mat-icon-button {
+  .grid-icon-btn {
     line-height: normal !important;
     height: 25px !important;
   }
@@ -125,6 +125,14 @@
 
   .dx-virtual-row {
     height: 0 !important;
+  }
+
+  .pwd-show {
+    -webkit-text-security: none !important;
+  }
+
+  .pwd-hide {
+    -webkit-text-security: disc;
   }
 }
 

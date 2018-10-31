@@ -33,6 +33,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   sourceTypes = CHANNEL_TYPES;
   selectedSourceType: string;
   selectedSourceData: any;
+  show = false;
 
   @ViewChild('channelsGrid')
   channelsGrid: DxDataGridComponent;
@@ -96,6 +97,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       this.getRoutesForChannel(event.selectedRowKeys[0]);
     }
     this.selectedSourceData = event.selectedRowsData[0];
+    if (!isUndefined(this.selectedSourceData.password)) {
+      this.decryptPWD(this.selectedSourceData.password);
+    }
   }
 
   sourceSelectedType(sourceType, channelCount) {
@@ -248,5 +252,15 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     this.datasourceService.deleteRoute(channelID, routeID).subscribe(() => {
       this.getRoutesForChannel(channelID);
     });
+  }
+
+  decryptPWD(pwd) {
+    this.datasourceService.decryptPWD(pwd).subscribe(data => {
+      this.selectedSourceData.password = data.data;
+    });
+  }
+
+  togglePWD() {
+    this.show = !this.show;
   }
 }

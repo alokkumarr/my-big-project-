@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <div class="card-view" [style.max-height.px]="contentHeight" *ngIf="viewState == 'card'">
+    <div class="card-view" [style.height.px]="contentHeight" [style.max-height.px]="contentHeight" *ngIf="viewState == 'card'">
       <datasets-card-page [updater]="updater" [searchTerm]="states.searchTermValue"></datasets-card-page>
     </div>
   </div>
@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <div class="card-view" [style.max-height.px]="contentHeight" *ngIf="viewState == 'card'">
+    <div class="card-view" [style.height.px]="contentHeight" [style.max-height.px]="contentHeight" *ngIf="viewState == 'card'">
       <datapods-card-page [updater]="dpUpdater" [searchTerm]="states.searchTermValue">
       </datapods-card-page>
     </div>

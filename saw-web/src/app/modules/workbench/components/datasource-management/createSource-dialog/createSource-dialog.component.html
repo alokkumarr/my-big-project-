@@ -82,10 +82,13 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Password</mat-label>
-              <input type="password" matInput placeholder="Password" name="password" formControlName="password"
-                required autocomplete="new-password" />
-              <button mat-button matSuffix mat-icon-button aria-label="show">
+              <input [type]="show ? 'text' : 'password'" matInput placeholder="Password" name="password"
+                formControlName="password" required autocomplete="new-password" />
+              <button *ngIf="!show" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                 <mat-icon fontIcon="icon-show"></mat-icon>
+              </button>
+              <button *ngIf="show" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                <mat-icon fontIcon="icon-hide"></mat-icon>
               </button>
               <mat-error *ngIf="detailsFormGroup.controls.password.hasError('required')">
                 Password is
