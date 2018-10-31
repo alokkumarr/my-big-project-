@@ -101,7 +101,7 @@ public abstract class Component {
       logger.error("Could not generate/retrieve metadata phase!");
     }
 
-    // Run finalize only if all previous step are successful
+    // Run finalize only if all previous steps are successful
     if (ret == 0) {
         ret = finalize(ret);
     }
