@@ -3,9 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { DatasourceService } from './datasource.service';
 import { JwtService } from '../../../common/services';
-import { Observable } from 'rxjs/Observable';
 
-const mockService = {};
 const jwtMockService = {
   customerCode: 'Synchronoss',
 
