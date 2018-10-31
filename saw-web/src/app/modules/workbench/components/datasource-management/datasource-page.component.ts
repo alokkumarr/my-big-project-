@@ -40,7 +40,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private datasourceService: DatasourceService,
-    private _toastMessage: ToastService,
+    private notify: ToastService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -156,6 +156,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   deleteChannel(channelID) {
     this.datasourceService.deleteChannel(channelID).subscribe(() => {
+      this.notify.success('Channel deleted successfully');
       this.getSources();
     });
   }
