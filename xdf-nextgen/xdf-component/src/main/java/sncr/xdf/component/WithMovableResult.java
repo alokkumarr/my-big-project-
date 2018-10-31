@@ -32,17 +32,24 @@ public interface WithMovableResult {
             }
 
             int fileCounter = 0;
+            WithMovableResultHelper.logger.debug("Total movable files " + resultDataDesc.size());
+
+            Path oldPath = null;
             for (MoveDataDescriptor moveTask : resultDataDesc) {
+                WithMovableResultHelper.logger.debug("Move data descriptor " + moveTask);
 
                 if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
                     Path objOutputPath = new Path(moveTask.dest);
                     try {
-                        if (ctx.fs.exists(objOutputPath)) {
+                        if (ctx.fs.exists(objOutputPath) && oldPath != null && objOutputPath.toString().compareTo(oldPath.toString()) != 0) {
+                            WithMovableResultHelper.logger.info("Data exists. Clearing everything");
 
                             FileStatus[] list = ctx.fs.listStatus(objOutputPath);
                             for (int i = 0; i < list.length; i++) {
                                 ctx.fs.delete(list[i].getPath(), true);
                             }
+
+                            oldPath = objOutputPath;
 
                         } else {
                             WithMovableResultHelper.logger.warn("Output directory: " + objOutputPath + " for data object: " + moveTask.objectName + " does not Exists -- create it");
