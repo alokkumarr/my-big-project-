@@ -60,7 +60,7 @@
               <mat-option *ngFor="let group of securityGroups" [value]="group.securityGroupName">
                   {{group.securityGroupName}}
               </mat-option>
-              <mat-option *ngIf="validateClearOption(cell)" style="color:red;" value="null">Clear Group</mat-option>
+              <mat-option *ngIf="validateClearOption(cell)" style="color:red;" [value]="null">Clear Group</mat-option>
             </mat-select>
           </mat-form-field>
       <mat-icon *ngIf="groupAssignSuccess === 'checkmark' && cell.data.loginId === userGroupID" fontIcon="icon-checkmark"></mat-icon>

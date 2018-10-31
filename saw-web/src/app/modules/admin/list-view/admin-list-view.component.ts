@@ -50,7 +50,7 @@ export class AdminListViewComponent implements OnInit {
     this._userAssignmentService.assignGroupToUser(request).then(response => {
       this.groupAssignSuccess = get(response, 'valid') ? 'checkmark' : 'close';
       this.userGroupID = cell.data.loginId;
-      if (groupName.value === 'null') {
+      if (!groupName.value) {
         cell.data.groupName = '';
       }
     }).catch(err => {
