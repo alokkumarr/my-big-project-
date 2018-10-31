@@ -24,7 +24,7 @@ export class UserAssignmentService {
     switch (data.mode) {
     case 'create':
       requestBody = {
-        description: data.description,
+        description: isUndefined(data.description) ? '' : data.description,
         securityGroupName: data.securityGroupName
       };
       path = 'auth/admin/security-groups';
