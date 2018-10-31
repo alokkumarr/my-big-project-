@@ -22,14 +22,12 @@ HTTP POST parameters and event JSON structure.
 
 NB: current generators use global variables
     **`APP_KEY, APP_VERSION, APP_MODULE`**
-  They may be updated if required (esp **`APP_KEY`**)
+  They must be updated if required (esp **`APP_KEY`**).
 
-2. Opt: if you like to skip sending to RTIS, set shell env var
-
-`$ export SKIP_HTTP=1`
-
->   Messages and request queries will be generated and printed on stdout,
-   no **HTTP** request will be sent.
+2. Optional: if you like to skip sending to RTIS, set shell env var
+   `$ export SKIP_HTTP=Y`
+   Messages and request queries will be generated and printed on stdout,
+no **HTTP** request will be sent.
 
 3. Execute sh scipt:
 
