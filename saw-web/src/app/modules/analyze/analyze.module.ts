@@ -1,5 +1,5 @@
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -13,15 +13,12 @@ import { AceEditorModule } from 'ng2-ace-editor';
 
 import { routes } from './routes';
 
-import { FilterService } from './services/filter.service';
-import { ChartService } from './services/chart.service';
-
-import { AnalyzeActionsService } from './actions/analyze-actions.service';
 import { DefaultAnalyzeCategoryGuard } from './guards';
 
 import { CommonModuleTs } from '../../common';
 import { UChartModule } from '../../common/components/charts';
 import { AnalyzePublishDialogModule } from './publish';
+import { AnalyzeModuleGlobal } from './analyze.global.module';
 import {
   AnalyzeReportQueryComponent,
   DesignerDialogComponent,
@@ -47,15 +44,10 @@ import {
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayoutComponent,
   MultiTableDesignerLayoutComponent,
-  DesignerService,
   ArtifactColumns2PivotFieldsPipe
 } from './designer';
 
 import { AnalyzeFilterModule } from './designer/filter';
-
-import { AnalyzeService } from './services/analyze.service';
-
-import { AnalyzeDialogService } from './services/analyze-dialog.service';
 
 import { AnalyzePageComponent } from './page';
 
@@ -89,15 +81,6 @@ const COMPONENTS = [
 
 const PIPES = [ArtifactColumns2PivotFieldsPipe];
 
-const SERVICES = [
-  AnalyzeDialogService,
-  AnalyzeService,
-  DesignerService,
-  FilterService,
-  ChartService,
-  AnalyzeActionsService
-];
-
 const GUARDS = [DefaultAnalyzeCategoryGuard];
 
 @NgModule({
@@ -107,6 +90,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
       prefix: 'symmetra',
       storageType: 'localStorage'
     }),
+    AnalyzeModuleGlobal.forRoot(),
     RouterModule.forChild(routes),
     CommonModuleTs,
     MaterialModule,
@@ -123,7 +107,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   ],
   declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,
-  providers: [...SERVICES, ...GUARDS],
+  providers: [...GUARDS],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModule {}
