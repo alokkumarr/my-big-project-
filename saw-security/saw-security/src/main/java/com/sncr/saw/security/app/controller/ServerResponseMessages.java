@@ -26,7 +26,7 @@ public class ServerResponseMessages {
     public static final String GROUP_NAME_LONG = "Group Name too Long, Range(1-255)";
     public static final String ATTRIBUTE_NAME_LONG = "Attribute Name too Long, Range(1-100)";
     public static final String VALUE_TOO_LONG = "Value too Long, Range(1-45)";
-    public static final String DESCRIPTION_NAME_LONG = "Description Name too Long, Range(1-255)";
+    public static final String DESCRIPTION_NAME_LONG = "Description is too Long, It should be maximum 255 characters";
 
     public static final String FEILDS_NULL_OR_EMPTY = "Parameters can't be null or empty";
     public static final String ATTRIBUTE_NULL_OR_EMPTY = "Attribute Name can't be null or empty";
