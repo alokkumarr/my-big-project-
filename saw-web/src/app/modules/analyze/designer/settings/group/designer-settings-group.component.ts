@@ -41,7 +41,7 @@ export class DesignerSettingsGroupComponent implements OnInit {
     this.fieldsChange.emit();
   }.bind(this);
 
-  constructor(private _designerService: DesignerService) {}
+  constructor(public _designerService: DesignerService) {}
 
   ngOnInit() {
     this.allowDropFn = this.groupAdapter.canAcceptArtifactColumn(

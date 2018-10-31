@@ -1,6 +1,5 @@
-import { Component, Input, OnInit, Inject } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DOCUMENT } from '@angular/platform-browser';
 import * as isUndefined from 'lodash/isUndefined';
 import { SidenavComponent } from '../sidenav';
 import {
@@ -18,7 +17,6 @@ export class AccordionMenuLinkComponent implements OnInit {
   @Input() public metadata: any;
 
   constructor(
-    @Inject(DOCUMENT) private document: any,
     private configService: ConfigService,
     public leftSideNav: SidenavComponent,
     private router: Router

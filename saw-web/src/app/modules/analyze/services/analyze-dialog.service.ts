@@ -9,7 +9,6 @@ import {
   Sort,
   Filter,
   IToolbarActionData,
-  ArtifactColumns,
   Artifact,
   Format
 } from '../types';
@@ -70,7 +69,12 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterDialog(filters: Filter[], artifacts: Artifact[], booleanCriteria, supportsGlobalFilters = false) {
+  openFilterDialog(
+    filters: Filter[],
+    artifacts: Artifact[],
+    booleanCriteria,
+    supportsGlobalFilters = false
+  ) {
     const data: DesignerFilterDialogData = {
       filters,
       artifacts,
@@ -178,7 +182,8 @@ export class AnalyzeDialogService {
   openQueryConfirmationDialog() {
     const queryConfirmation = {
       title: 'Are you sure you want to proceed?',
-      content: 'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
+      content:
+        'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
       positiveActionLabel: 'Save',
       negativeActionLabel: 'Cancel'
     };
