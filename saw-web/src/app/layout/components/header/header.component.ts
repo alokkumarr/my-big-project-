@@ -8,21 +8,7 @@ import {
   DynamicModuleService
 } from '../../../common/services';
 
-import {
-  map,
-  filter,
-  forEach,
-  lowerCase,
-  startCase,
-  split,
-  get,
-} from 'lodash';
-
-import {
-  pipe as fpPipe,
-  map as fpMap,
-  filter as fpFilter
-} from 'lodash/fp';
+import { map, filter, forEach, lowerCase, startCase, split, get } from 'lodash';
 
 @Component({
   selector: 'layout-header',
@@ -61,19 +47,25 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  setModules (product) {
+  setModules(product) {
     const baseModules = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
-    const modules = map(product.productModules, ({productModName, moduleURL}) => ({
-      label: productModName,
-      path: lowerCase(productModName),
-      name: lowerCase(productModName),
-      moduleName: `${startCase(productModName)}Module`,
-      moduleURL
-    }));
+    const modules = map(
+      product.productModules,
+      ({ productModName, moduleURL }) => ({
+        label: productModName,
+        path: lowerCase(productModName),
+        name: lowerCase(productModName),
+        moduleName: `${startCase(productModName)}Module`,
+        moduleURL
+      })
+    );
 
-    this.modules = filter(modules, ({label}) => baseModules.includes(label));
+    this.modules = filter(modules, ({ label }) => baseModules.includes(label));
 
-    const externalModules = filter(this.modules, ({label}) => !baseModules.includes(label));
+    const externalModules = filter(
+      this.modules,
+      ({ label }) => !baseModules.includes(label)
+    );
     // hardcoded stuff
     // const externalModulesHard = [{
     //   path: 'plugin',
@@ -84,16 +76,16 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     // }];
 
     forEach(externalModules, externalModule => {
-      this._dynamicModuleService.loadModuleSystemJs(externalModule).then(success => {
-        if (success) {
-          this.modules = [
-            ...this.modules,
-            externalModule
-          ];
+      this._dynamicModuleService.loadModuleSystemJs(externalModule).then(
+        success => {
+          if (success) {
+            this.modules = [...this.modules, externalModule];
+          }
+        },
+        err => {
+          console.error(err);
         }
-      }, err => {
-        console.error(err);
-      });
+      );
     });
   }
 

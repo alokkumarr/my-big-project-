@@ -2,14 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { IsUserLoggedInGuard, DefaultModuleGuard } from './common/guards';
 import { MainPageComponent } from './layout';
-import { LoginModule } from './login';
-import { AnalyzeModule } from './modules/analyze/analyze.module';
-import { AdminModule } from './modules/admin';
-import { WorkbenchUpgradeModule } from './modules/workbench/workbench.module';
-import { routes as loginRoutes } from './login/routes';
-import { routes as AnalyzeRoutes } from './modules/analyze/routes';
-import { routes as WorkbenchRoutes } from './modules/workbench/routes';
-import { routes as AdminRoutes } from './modules/admin/routes';
 
 const routes: Routes = [
   {
@@ -19,14 +11,28 @@ const routes: Routes = [
     canActivateChild: [IsUserLoggedInGuard],
     // redirectTo: 'analyze',
     component: MainPageComponent,
-    pathMatch: 'full',
-    children: [...AnalyzeRoutes, ...WorkbenchRoutes, ...AdminRoutes]
+    pathMatch: 'full'
+  },
+  {
+    path: 'workbench',
+    loadChildren: './modules/workbench/workbench.module#WorkbenchModule'
+  },
+  {
+    path: 'admin',
+    loadChildren: './modules/admin/admin.module#AdminModule'
   },
   {
     path: 'observe',
     loadChildren: './modules/observe/observe.module#ObserveUpgradeModule'
   },
-  ...loginRoutes,
+  {
+    path: 'analyze',
+    loadChildren: './modules/analyze/analyze.module#AnalyzeModule'
+  },
+  {
+    path: 'login',
+    loadChildren: './login/login.module#LoginModule'
+  },
   {
     path: '**',
     redirectTo: ''
@@ -35,10 +41,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    LoginModule,
-    AnalyzeModule,
-    AdminModule,
-    WorkbenchUpgradeModule,
     RouterModule.forRoot(routes, {
       useHash: true,
       onSameUrlNavigation: 'reload'

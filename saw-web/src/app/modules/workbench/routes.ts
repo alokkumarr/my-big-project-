@@ -13,7 +13,7 @@ import { IsUserLoggedInGuard } from '../../common/guards';
 
 export const routes: Routes = [
   {
-    path: 'workbench',
+    path: '',
     canActivate: [IsUserLoggedInGuard],
     canActivateChild: [IsUserLoggedInGuard],
     component: WorkbenchPageComponent,

@@ -43,7 +43,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   public requester = new BehaviorSubject({});
   private listeners: Array<Subscription> = [];
   public hasAutoRefresh = false;
-  private shouldAutoRefresh = true;
+  public shouldAutoRefresh = true;
   private isDefault = false;
   public privileges = {
     create: false,

@@ -41,9 +41,6 @@ import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.comp
 
 import { flattenReportData } from '../../../common/utils/dataFlattener';
 
-const template = require('./report-grid.component.html');
-require('./report-grid.component.scss');
-
 interface ReportGridSort {
   order: 'asc' | 'desc';
   index: number;
@@ -68,8 +65,6 @@ interface ReportGridField {
 
 const DEFAULT_PAGE_SIZE = 25;
 const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
-
-let self; // needed to access component context from dx callbacks
 
 @Component({
   selector: 'report-grid-upgraded',
@@ -203,7 +198,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public isQueryMode;
 
   constructor(private _dialog: MatDialog, public _elemRef: ElementRef) {
-    self = this;
     this.onLoadPanelShowing = ({ component }) => {
       const instance = this.dataGrid.instance;
       if (instance) {

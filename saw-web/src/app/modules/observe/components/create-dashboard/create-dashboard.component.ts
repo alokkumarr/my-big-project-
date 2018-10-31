@@ -26,8 +26,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';
 import { GlobalFilterService } from '../../services/global-filter.service';
 
-const MARGIN_BETWEEN_TILES = 10;
-
 @Component({
   selector: 'create-dashboard',
   templateUrl: './create-dashboard.component.html',
