@@ -22,7 +22,7 @@ GET     /analysis/:analysisId/executions  controllers.AnalysisExecutions.list(an
 # Note: Keep for API backwards compatibility, remove in future
 GET     /analysis/:analysisId/results     controllers.AnalysisExecutions.list(analysisId: String)
 GET     /analysis/:analysisId/executions/:executionId/data  controllers.AnalysisExecutions.getExecutionData(analysisId: String, executionId: String, page: Int ?=1, pageSize: Int ?=10, analysisType: String ?="report", executionType :String ?=null )
-
+GET     /analysis/:analysisId/executions/data  controllers.AnalysisExecutions.getLatestExecutionData(analysisId: String, page: Int ?=1, pageSize: Int ?=10, analysisType: String ?="report", executionType :String ?=null )
 POST    /analysis/:analysisId/executions  controllers.AnalysisExecutions.execute(analysisId: String)
 
 # Semantic

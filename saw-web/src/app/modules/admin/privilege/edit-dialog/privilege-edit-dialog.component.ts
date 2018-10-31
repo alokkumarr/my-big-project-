@@ -1,4 +1,4 @@
-import { Component, Inject, HostBinding } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
@@ -174,24 +174,24 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       }
     });
 
-    productIdControl.valueChanges.subscribe(productId => {
-      this.modules$ = this.loadModules(productId);
+    productIdControl.valueChanges.subscribe(pId => {
+      this.modules$ = this.loadModules(pId);
     });
 
-    roleIdControl.valueChanges.subscribe(roleId => {
-      const { moduleId, productId, categoryCode } = this.formGroup.value;
-      this.loadSubCategories(moduleId, roleId, productId, categoryCode);
+    roleIdControl.valueChanges.subscribe(rId => {
+      const f = this.formGroup.value;
+      this.loadSubCategories(f.moduleId, rId, f.productId, f.categoryCode);
     });
 
-    moduleIdControl.valueChanges.subscribe(moduleId => {
-      this.loadCategories(moduleId);
+    moduleIdControl.valueChanges.subscribe(mId => {
+      this.loadCategories(mId);
       this.formGroup.controls.categoryCode.reset('');
       this.subCategories = [];
     });
 
-    categoryCodeControl.valueChanges.subscribe(categoryCode => {
-      const { moduleId, productId, roleId } = this.formGroup.value;
-      this.loadSubCategories(moduleId, roleId, productId, categoryCode);
+    categoryCodeControl.valueChanges.subscribe(cCode => {
+      const f = this.formGroup.value;
+      this.loadSubCategories(f.moduleId, f.roleId, f.productId, cCode);
     });
   }
 

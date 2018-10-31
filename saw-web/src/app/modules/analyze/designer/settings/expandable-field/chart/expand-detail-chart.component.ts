@@ -5,7 +5,6 @@ import { ArtifactColumnChart, Format } from '../../../types';
 import {
   DATE_INTERVALS,
   DATE_TYPES,
-  DEFAULT_DATE_FORMAT,
   CHART_DATE_FORMATS,
   CHART_DATE_FORMATS_OBJ
 } from '../../../../consts';

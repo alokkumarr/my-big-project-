@@ -1,5 +1,4 @@
 import * as toastr from 'toastr';
-import 'toastr/build/toastr.min.css';
 import { Injectable } from '@angular/core';
 import { ErrorDetailDialogService } from './error-detail-dialog.service';
 

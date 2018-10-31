@@ -10,7 +10,7 @@ import { LoginPageComponent } from './page';
 
 export const routes: Routes = [
   {
-    path: 'login',
+    path: '',
     component: LoginPageComponent,
     children: [
       {
