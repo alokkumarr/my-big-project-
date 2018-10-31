@@ -500,9 +500,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                             ps.setLong(1,attributeSysId);
                             ps.setString(2,attributeValues.getValue());
                         });
-                        logger.trace(addValResult + ServerResponseMessages.ATTRIBUTE_VALUE_UPDATED + " to  SEC_GROUP_DSK_VALUE.");
+                        logger.trace(addValResult + ServerResponseMessages.ATTRIBUTE_VALUE_ADDED + " to  SEC_GROUP_DSK_VALUE.");
                         valid.setValid(true);
-                        valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_UPDATED);
+                        valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_ADDED);
                         return valid;
                     }
                     else { logger.error(ServerResponseMessages.ATTRIBUTE_ID_NULL); }
@@ -671,15 +671,15 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid = new Valid();
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName);
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = ? WHERE USER_SYS_ID = ? ";
-        if( securityGroupName.trim().isEmpty() || userSysId <= 0 || userSysId == null)   {
+        if( securityGroupName == null || securityGroupName.isEmpty() || userSysId <= 0 || userSysId == null)   {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             return valid;
         }
-        else if ( securityGroupName == null || securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
+        else if ( securityGroupName.equalsIgnoreCase( "-1") )   {
             try{
-                // If Group name is removed from User. We need to set sec_group_sys_id as null in users table.
+                // If Group name is removed from User. We are identifying this action by accepting -1 as part of name,So We need to set sec_group_sys_id as null in users table.
                 int updateRes = jdbcTemplate.update(updateSql, ps -> {
                     ps.setObject(1, null);
                     ps.setLong(2,userSysId);
