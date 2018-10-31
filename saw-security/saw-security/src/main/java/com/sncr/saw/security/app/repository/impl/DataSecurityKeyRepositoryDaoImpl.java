@@ -1,6 +1,8 @@
 package com.sncr.saw.security.app.repository.impl;
 
+import com.sncr.saw.security.app.controller.ServerResponseMessages;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,24 +41,33 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setValidityMessage("Customer Id Can't be null or 0");
             return  valid;
         }
-        else if (securityGroups.getSecurityGroupName().equals(null) || securityGroups.getSecurityGroupName().isEmpty())   {
+        if ((securityGroups.getSecurityGroupName() == null || securityGroups.getSecurityGroupName().isEmpty()) && (securityGroups.getDescription() == null || securityGroups.getDescription().isEmpty())  ) {
             valid.setValid(false);
-            valid.setValidityMessage("Group name can't be empty or null");
+            valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            return valid;
+        }
+        if (securityGroups.getSecurityGroupName() == null || securityGroups.getSecurityGroupName().isEmpty())   {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
             return valid;
         }
         else if (this.isGroupNameExists(securityGroups.getSecurityGroupName(),custId)){
             valid.setValid(false);
-            valid.setValidityMessage("Group Name already Exists !!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NAME_EXISTS);
+            valid.setError(ServerResponseMessages.GROUP_NAME_EXISTS);
             return valid;
         }
         else if (securityGroups.getSecurityGroupName().length() > 255 ) {
             valid.setValid(false);
-            valid.setValidityMessage("Group Name too long !!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NAME_LONG);
+            valid.setError(ServerResponseMessages.GROUP_NAME_LONG);
             return valid;
         }
         else if ( securityGroups.getDescription().length() > 255 )  {
             valid.setValid(false);
-            valid.setValidityMessage("Description too long !!");
+            valid.setValidityMessage(ServerResponseMessages.DESCRIPTION_NAME_LONG);
             return valid;
         }
         else {
@@ -67,12 +78,12 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     ps.setString(3,securityGroups.getDescription());
                     ps.setString(4,createdBy);
                 });
-                logger.trace(insertResult + " Security Group created successfully.");
+                logger.trace(insertResult + " : " + ServerResponseMessages.SEC_GROUP_ADDED);
                 valid.setValid(true);
                 valid.setGroupId(this.getSecurityGroupSysId(securityGroups.getSecurityGroupName(),custId));
                 valid.setGroupName(securityGroups.getSecurityGroupName());
                 valid.setDescription(securityGroups.getDescription());
-                valid.setValidityMessage("Security Group created successfully.");
+                valid.setValidityMessage(ServerResponseMessages.SEC_GROUP_ADDED);
                 return valid;
                 // Here we need not to assign default user to newly created Group name. By default it should be left unassigned.
             }
@@ -80,6 +91,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("Error in creating Security Group");
+                valid.setError("Error in creating Security Group");
                 return valid;
             }
         }
@@ -101,6 +113,25 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     /**
+     * is Group Name exists in TABLE
+     * @param groupName
+     * @return
+     */
+    public String getGroupNameForGid (Long groupId,String groupName)  {
+        String fetchSql = "SELECT SEC_GROUP_NAME FROM SEC_GROUP WHERE SEC_GROUP_SYS_ID = ?";
+        String name = jdbcTemplate.query(fetchSql,
+            preparedStatement -> { preparedStatement.setLong(1,groupId);},
+            resultSet -> {
+                String temp = null;
+                while (resultSet.next()) {
+                    temp = resultSet.getString("SEC_GROUP_NAME");
+                }
+                return temp;
+            });
+        return name;
+    }
+
+    /**
      * is Description Name exists in TABLE
      * @param descName
      * @return
@@ -112,11 +143,15 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             resultSet -> {
                 String temp = null;
                 while (resultSet.next()) {
-                    temp = resultSet.getString("SEC_GROUP_NAME");
+                    temp = resultSet.getString("DESCRIPTION");
                 }
                 return temp;
             });
-        return desc.equalsIgnoreCase(descName);
+
+        if ( desc.equalsIgnoreCase(descName) )  {
+            return true;
+        }
+        else { return false; }
     }
 
     /**
@@ -143,31 +178,47 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public DskValidity updateSecurityGroups(Long securityGroupId, List<String> oldNewGroups,Long custId) {
         DskValidity valid = new DskValidity();
         String updateSql = "UPDATE SEC_GROUP SET SEC_GROUP_NAME = ?, DESCRIPTION = ? WHERE SEC_GROUP_SYS_ID = ?";
-        if(oldNewGroups.get(0).trim().equalsIgnoreCase(null) || oldNewGroups.get(0).trim().equalsIgnoreCase("")
-            || oldNewGroups.get(1).trim().equalsIgnoreCase(null) || oldNewGroups.get(1).trim().equalsIgnoreCase("")
-            || securityGroupId == null || securityGroupId == 0 ) {
+        if ( (securityGroupId == null || securityGroupId <= 0)) {
             valid.setValid(false);
-            valid.setValidityMessage("Parameters can't be null or empty!!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            return valid;
+        }
+        if((oldNewGroups.get(0) == null || oldNewGroups.get(0).trim().isEmpty())
+            && (oldNewGroups.get(1) ==null || oldNewGroups.get(1).trim().isEmpty()) ) {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            return valid;
+        }
+        if (oldNewGroups.get(0) == null || oldNewGroups.get(0).trim().isEmpty()) {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_NULL_OR_EMPTY);
             return valid;
         }
         else if (this.isGroupNameExists(oldNewGroups.get(0).trim(),custId) && this.isDescExists(oldNewGroups.get(0).trim(),oldNewGroups.get(1).trim())){
             valid.setValid(false);
-            valid.setValidityMessage("Fields already Exists !!");
+            valid.setValidityMessage(ServerResponseMessages.FIELDS_EXISTS);
+            valid.setError(ServerResponseMessages.FIELDS_EXISTS);
             return valid;
         }
-        else if (this.isGroupNameExists(oldNewGroups.get(0).trim(),custId))    {
+        else if ( !(this.getGroupNameForGid(securityGroupId,oldNewGroups.get(0).trim()).equalsIgnoreCase(oldNewGroups.get(0).trim())) && this.isGroupNameExists(oldNewGroups.get(0).trim(),custId) )    {
             valid.setValid(false);
-            valid.setValidityMessage("Group Name Already Exists !!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NAME_EXISTS);
+            valid.setError(ServerResponseMessages.GROUP_NAME_EXISTS);
             return valid;
         }
         else if (oldNewGroups.get(0).trim().length() > 255) {
             valid.setValid(false);
-            valid.setValidityMessage("Group Name too long !!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NAME_LONG);
+            valid.setError(ServerResponseMessages.GROUP_NAME_LONG);
             return valid;
         }
         else if (oldNewGroups.get(1).trim().length() > 255) {
             valid.setValid(false);
-            valid.setValidityMessage("Description too long !!");
+            valid.setValidityMessage(ServerResponseMessages.DESCRIPTION_NAME_LONG);
+            valid.setError(ServerResponseMessages.DESCRIPTION_NAME_LONG);
             return valid;
         }
         else {
@@ -181,8 +232,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 valid.setGroupId(this.getSecurityGroupSysId(oldNewGroups.get(0).trim(),custId));
                 valid.setGroupName(oldNewGroups.get(0).trim());
                 valid.setDescription(oldNewGroups.get(1).trim());
-                valid.setValidityMessage("Security Group updated successfully");
-                logger.trace(updateResult + "Security Group updated successfully");
+                valid.setValidityMessage(ServerResponseMessages.SEC_GROUP_UPDATED);
+                logger.trace(updateResult + ServerResponseMessages.SEC_GROUP_UPDATED);
                 return valid;
             }
             catch (Exception e) {
@@ -195,16 +246,17 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public DskValidity deleteSecurityGroups(Long securityGroupId) {
-        DskValidity valid = new DskValidity();
+    public Valid deleteSecurityGroups(Long securityGroupId) {
+        Valid valid = new Valid();
         String delSql = "DELETE FROM SEC_GROUP WHERE SEC_GROUP_SYS_ID = ?";
         /** NOTE: Deleting a row from SEC_GROUP will inturn deletes corresponding reference rows in child tables.
          * That is, SEC_GROUP_DSK_ATTRIBUTE and SEC_GROUP_DSK_VALUE. So, no need of deleting its references in other tables.
          **/
-        if ( securityGroupId == 0 || securityGroupId == null)   {
-            logger.error("security group Sys Id can't be null or empty!!");
+        if ( securityGroupId <= 0 || securityGroupId == null)   {
+            logger.error(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             valid.setValid(false);
-            valid.setValidityMessage("security group Sys Id can't be null or empty!!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             return valid;
         }
         else{
@@ -213,14 +265,14 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     ps.setLong(1,securityGroupId);
                 });
                 if(unAssignGroupFromUser(securityGroupId))  {
-                    logger.trace(deleteResult + "Security Group deleted successfully");
-                    valid.setValidityMessage("Security Group deleted successfully");
+                    logger.trace(deleteResult + ServerResponseMessages.SEC_GROUP_DELETED);
+                    valid.setValidityMessage(ServerResponseMessages.SEC_GROUP_DELETED);
                     valid.setValid(true);
                     return valid;
                 }
                 else {
-                    logger.error("Failed to un-assign Group from User");
-                    valid.setValidityMessage("Failed to un-assign Group from User");
+                    logger.error(ServerResponseMessages.UNASSIGN_GROUP_FROM_USER);
+                    valid.setValidityMessage(ServerResponseMessages.UNASSIGN_GROUP_FROM_USER);
                     valid.setValid(false);
                     return valid;
                 }
@@ -230,6 +282,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("Error in deleting Security Group !!");
+                valid.setError(ServerResponseMessages.UNASSIGN_GROUP_FROM_USER);
                 return valid;
             }
         }
@@ -242,7 +295,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
      */
     public Boolean unAssignGroupFromUser(Long secGroupSysId) {
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = null WHERE SEC_GROUP_SYS_ID = ? ";
-        if ( secGroupSysId == 0 || secGroupSysId == null)   {
+        if ( secGroupSysId <= 0 || secGroupSysId == null)   {
             logger.error("security group Sys Id can't be null or empty!!");
             return false;
         }
@@ -372,32 +425,54 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public DskValidity addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
-        DskValidity valid = new DskValidity();
-        Long groupAttrSysId = null;
-        if(securityGroupId == null || securityGroupId == 0 )    {
+    public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
+        Valid valid = new Valid();
+        Long groupAttrSysId ;
+        if(securityGroupId == null || securityGroupId <= 0 )    {
             valid.setValid(false);
-            valid.setValidityMessage("securityGroupID can't be null or 0 ");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
             return valid;
         }
-        else if ( attributeValues.getAttributeName().equals(null) || attributeValues.getAttributeName().equals(null) || attributeValues.getAttributeName().isEmpty())   {
+        else if ( attributeValues.getAttributeName() == null)   {
             valid.setValid(false);
-            valid.setValidityMessage("Attribute Name can't be null or empty !!");
+            valid.setValidityMessage("Attribute Name can't be null");
             return valid;
         }
-        else if ( attributeValues.getValue().equals(null) || attributeValues.getValue().equalsIgnoreCase("null") || attributeValues.getValue().isEmpty())  {
+        else if ( attributeValues.getValue() == null)  {
             valid.setValid(false);
-            valid.setValidityMessage("Value can't be null or empty !!");
+            valid.setValidityMessage("Value can't be null");
+            return valid;
+        }
+        else if ( (attributeValues.getAttributeName().isEmpty()) && (attributeValues.getValue().isEmpty()) )    {
+            valid.setValid(false);
+            valid.setValidityMessage(" Fields Can't be null or empty!! ");
+            valid.setError("Fields Can't be null or empty!!");
+            return valid;
+        }
+        else if ( attributeValues.getAttributeName() == null || attributeValues.getAttributeName().isEmpty() )   {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            return valid;
+        }
+        else if ( attributeValues.getValue() == null || attributeValues.getValue().isEmpty())  {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
             return valid;
         }
         else if ( attributeValues.getAttributeName().trim().length() > 100 )    {
             valid.setValid(false);
-            valid.setValidityMessage("Attribute Name too long !!");
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NAME_LONG);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NAME_LONG);
             return valid;
         }
         else if ( attributeValues.getValue().trim().length() > 45 ) {
             valid.setValid(false);
-            valid.setValidityMessage("Value too long !!");
+            valid.setValidityMessage(ServerResponseMessages.VALUE_TOO_LONG);
+            valid.setError(ServerResponseMessages.VALUE_TOO_LONG);
+            return valid;
         }
         else {
              groupAttrSysId = this.getSecurityGroupDskAttributeSysId(securityGroupId,attributeValues.getAttributeName());
@@ -430,32 +505,32 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                         });
                         logger.trace(addValResult + " Attribute value added to table SEC_GROUP_DSK_VALUE.");
                         valid.setValid(true);
-                        valid.setGroupId(securityGroupId);
-                        valid.setAttributeId(attributeSysId);
-                        valid.setAttributeName(attributeValues.getAttributeName());
-                        valid.setValidityMessage("Attribute-value added successfully.");
+                        valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_ADDED);
                         return valid;
                     }
-                    else { logger.error("attributeSysId is NULL"); }
+                    else { logger.error(ServerResponseMessages.ATTRIBUTE_ID_NULL); }
                 }
                 catch (Exception e) {
                     logger.error(e.getMessage());
                     valid.setValidityMessage("Error in adding Attribute value");
+                    valid.setError("Error in adding Attribute value");
                     valid.setValid(false);
                 }
                 return valid;
             }
             else {
-                logger.error("Couldn't able to get Sys Id");
-                valid.setValidityMessage("Couldn't able to get Sys Id");
+                logger.error(ServerResponseMessages.CANT_GET_GROUP_ID);
+                valid.setValidityMessage(ServerResponseMessages.CANT_GET_GROUP_ID);
+                valid.setError(ServerResponseMessages.CANT_GET_GROUP_ID);
                 valid.setValid(false);
                 return valid;
             }
         }
         else    {
-            logger.error("AttributeName already Exists!!");
+            logger.error(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
             valid.setValid(false);
-            valid.setValidityMessage("AttributeName already Exists!!");
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
             return valid;
         }
     }
@@ -482,39 +557,50 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             }
         }
         else {
-            logger.error("secGroupSysId is null");
+            logger.error(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
         }
         return attributeNames;
     }
 
     @Override
-    public DskValidity deleteSecurityGroupDskAttributeValues(List<String> dskList) {
-        DskValidity valid =  new DskValidity();
+    public Valid deleteSecurityGroupDskAttributeValues(List<String> dskList) {
+        Valid valid =  new Valid();
         Long groupSysId = Long.parseLong(dskList.get(0).trim());
         Long groupAttributeSysId = this.getSecurityGroupDskAttributeSysId(groupSysId,dskList.get(1).trim());
-        if (dskList.get(0).trim().isEmpty() || dskList.get(1).trim().equals(null))  {
+        if (dskList.get(0).trim().isEmpty() || dskList.get(0) == null )  {
             valid.setValid(false);
-            valid.setValidityMessage("Group Name can't be null or empty !!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            return valid;
+        }
+        if (  dskList.get(1) == null || dskList.get(1).trim().isEmpty() )  {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             return valid;
         }
         else if ( dskList.get(0).trim().length() > 255 )    {
             valid.setValid(false);
-            valid.setValidityMessage("Group Name too long !! ");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_NAME_LONG);
+            valid.setError(ServerResponseMessages.GROUP_NAME_LONG);
             return valid;
         }
-        else if ( dskList.get(1).trim().isEmpty() || dskList.get(1).trim().equals(null) )   {
+        else if ( dskList.get(1).trim().isEmpty() || dskList.get(1) == null )   {
             valid.setValid(false);
-            valid.setValidityMessage("Attribute Name can't be null or empty !!");
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
             return valid;
         }
         else if ( dskList.get(1).trim().length() > 100 )    {
             valid.setValid(false);
-            valid.setValidityMessage("Attribute Name too long !!");
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NAME_LONG);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NAME_LONG);
             return valid;
         }
         else if (groupAttributeSysId == null || groupSysId == null)    {
             valid.setValid(false);
             valid.setValidityMessage("Field no longer exists!! Please refresh the page.");
+            valid.setError("Field no longer exists!! Please refresh the page");
             return valid;
         }
         else if (groupSysId != null) {
@@ -529,8 +615,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 });
                 logger.trace(delResult + " Attribute " + dskList.get(1).trim() + " successfully removed");
                 valid.setValid(true);
-                valid.setGroupId(groupSysId);
-                valid.setAttributeId(groupAttributeSysId);
                 valid.setValidityMessage(" Attribute " + dskList.get(1).trim() + " successfully removed");
                 return valid;
             }
@@ -538,6 +622,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("Error in deleting Attribute !!");
+                valid.setError("Error in deleting Attribute");
                 return valid;
             }
         }
@@ -545,6 +630,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             logger.error("Error in deleting Attribute");
             valid.setValid(false);
             valid.setValidityMessage("Error in deleting Attribute");
+            valid.setError("Error in deleting Attribute");
             return valid;
         }
     }
@@ -584,32 +670,33 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
 
     @Override
-    public DskValidity updateUser(String securityGroupName, Long userSysId, Long custId) {
-        DskValidity valid = new DskValidity();
+    public Valid updateUser(String securityGroupName, Long userSysId, Long custId) {
+        Valid valid = new Valid();
         Long securityGroupSysId = this.getSecurityGroupSysId(securityGroupName,custId);
         String updateSql = "UPDATE USERS SET SEC_GROUP_SYS_ID = ? WHERE USER_SYS_ID = ? ";
-        if( securityGroupName.trim().isEmpty() || userSysId == 0 || userSysId == null )   {
+        if( securityGroupName == null || securityGroupName.isEmpty() || userSysId <= 0 || userSysId == null)   {
             valid.setValid(false);
-            valid.setValidityMessage("Parameters can't be empty or null");
+            valid.setValidityMessage(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.FEILDS_NULL_OR_EMPTY);
             return valid;
         }
-        else if (securityGroupName.equalsIgnoreCase(null) || securityGroupName.equalsIgnoreCase("null")) {
+        else if ( securityGroupName.equalsIgnoreCase( "-1") )   {
             try{
-                // If Group name is removed from User. We neeed to set sec_group_sys_id as null in users table.
+                // If Group name is removed from User. We are identifying this action by accepting -1 as part of name,So We need to set sec_group_sys_id as null in users table.
                 int updateRes = jdbcTemplate.update(updateSql, ps -> {
                     ps.setObject(1, null);
                     ps.setLong(2,userSysId);
                 });
                 logger.trace(updateRes + "User Table updated ");
                 valid.setValid(true);
-                valid.setGroupId(securityGroupSysId);
-                valid.setValidityMessage("Group Name removed from user");
+                valid.setValidityMessage(ServerResponseMessages.SEC_GROUP_REMOVED);
                 return valid;
             }
             catch (Exception e){
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("error in updating group user");
+                valid.setError("error in updating group user");
                 return valid;
             }
         }
@@ -621,13 +708,14 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 });
                 logger.trace(updateRes + "User Table updated ");
                 valid.setValid(true);
-                valid.setValidityMessage("Group Name successfully updated");
+                valid.setValidityMessage(securityGroupName + " : " +ServerResponseMessages.SEC_GROUP_UPDATED);
                 return valid;
             }
             catch (Exception e){
                 logger.error(e.getMessage());
                 valid.setValid(false);
-                valid.setValidityMessage("error in updating group user");
+                valid.setValidityMessage("Error in updating group user");
+                valid.setError("Error in updating group user");
                 return valid;
             }
         }
@@ -704,15 +792,26 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public DskValidity updateAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
-        DskValidity valid =  new DskValidity();
+    public Valid updateAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
+        Valid valid =  new Valid();
         attributeValues.setAttributeName(attributeValues.getAttributeName().trim());
         attributeValues.setValue(attributeValues.getValue().trim());
-        if (securityGroupId == 0 || securityGroupId == null || attributeValues.getAttributeName().trim().isEmpty()
-            || attributeValues.getAttributeName().equals(null)
-            || attributeValues.getValue().trim().isEmpty() || attributeValues.getValue().equals(null))  {
+        if ( securityGroupId <= 0 || securityGroupId == null )  {
             valid.setValid(false);
-            valid.setValidityMessage("Parameters cn't be empty!!");
+            valid.setValidityMessage(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            valid.setError(ServerResponseMessages.GROUP_ID_NULL_EMPTY);
+            return valid;
+        }
+        if ( (attributeValues.getAttributeName() == null || attributeValues.getAttributeName().isEmpty()) && (attributeValues.getValue().isEmpty() || attributeValues.getValue() == null))   {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
+            return valid;
+        }
+        if ( attributeValues.getValue() == null || attributeValues.getValue().isEmpty() )   {
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
+            valid.setError(ServerResponseMessages.VALUE_NULL_OR_EMPTY);
             return valid;
         }
         else {
@@ -724,18 +823,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     ps.setString(1,attributeValues.getValue());
                     ps.setLong(2,attributeSysId);
                 });
-                logger.trace(updateRes + " Value Updated successfully");
+                logger.trace(updateRes + ServerResponseMessages.ATTRIBUTE_VALUE_UPDATED);
                 valid.setValid(true);
-                valid.setGroupId(securityGroupId);
-                valid.setAttributeId(attributeSysId);
-                valid.setAttributeName(attributeValues.getAttributeName());
-                valid.setValidityMessage("Value Updated successfully");
+                valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_UPDATED);
                 return valid;
             }
             catch (Exception e) {
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("Error in updating value !!");
+                valid.setError("Error in updating value");
                 return valid;
             }
         }
