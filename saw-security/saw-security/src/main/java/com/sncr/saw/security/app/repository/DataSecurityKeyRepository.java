@@ -8,13 +8,13 @@ import java.util.List;
 public interface DataSecurityKeyRepository {
     public DskValidity addSecurityGroups(SecurityGroups securityGroups, String createdBy, Long custId);
     public DskValidity updateSecurityGroups(Long securityGroupId,List<String> groupNames,Long custId);
-    public DskValidity deleteSecurityGroups(Long securityGroupId);
+    public Valid deleteSecurityGroups(Long securityGroupId);
     public List<SecurityGroups> fetchSecurityGroupNames(Long custId);
-    public DskValidity addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues);
+    public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues);
     public List<String> fetchSecurityGroupDskAttributes(Long securityGroupId);
-    public DskValidity deleteSecurityGroupDskAttributeValues(List<String> dskList);
+    public Valid deleteSecurityGroupDskAttributeValues(List<String> dskList);
     public List<DskDetails> fetchDskAllAttributeValues(Long securityGroupId);
-    public DskValidity updateUser(String securityGroupName,Long userSysId, Long custId);
+    public Valid updateUser(String securityGroupName,Long userSysId, Long custId);
     public List<UserAssignment> getAllUserAssignments(Long custId);
-    public DskValidity updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
+    public Valid updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
 }
