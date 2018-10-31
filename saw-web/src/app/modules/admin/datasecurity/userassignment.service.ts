@@ -89,6 +89,8 @@ export class UserAssignmentService {
         'Access-Control-Allow-Method': 'PUT'
       })
     };
+    console.log(requestBody);
+    console.log(typeof(securityGroupName) + "-------"  + securityGroupName);
     return this._http.put(`${loginUrl}/${path}`, securityGroupName, httpOptions).toPromise();
   }
 
