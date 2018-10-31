@@ -34,7 +34,7 @@ describe('User Assignment Service', () => {
     expect(userAssignmentService.getList()).not.toBeNull();
   });
 
-  it('executeKPI should exist and return an Observable', inject(
+  it('addSecurityGroup should exist and return an Observable', inject(
     [UserAssignmentService],
     (observe: UserAssignmentService) => {
       expect(observe.addSecurityGroup({}) instanceof Observable).toEqual(false);
