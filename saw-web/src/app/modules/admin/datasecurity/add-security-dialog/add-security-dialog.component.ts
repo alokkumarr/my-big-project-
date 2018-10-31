@@ -28,9 +28,11 @@ export class AddSecurityDialogComponent {
     this._userAssignmentService.addSecurityGroup(this.data).then(response => {
       if (get(response, 'valid')) {
         this._dialogRef.close(response);
-      } else {
-        this.errorState = !get(response, 'valid');
-        this.errorMessage = get(response, 'validityMessage');
+      }
+    }).catch(err => {
+      if (!get(err.error, 'valid')) {
+        this.errorState = !get(err.error, 'valid');
+        this.errorMessage = get(err.error, 'validityMessage');
       }
     });
   }

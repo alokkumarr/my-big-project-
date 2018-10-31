@@ -53,6 +53,8 @@ export class AdminListViewComponent implements OnInit {
       if (groupName.value === 'null') {
         cell.data.groupName = '';
       }
+    }).catch(err => {
+      this.groupAssignSuccess = 'close';
     });
   }
 
