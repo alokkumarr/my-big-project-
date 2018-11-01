@@ -27,6 +27,15 @@ mat-form-field {
     padding: 1em 0 0.5em 0;
     border: none;
   }
+
+  ::ng-deep .mat-form-field-suffix, ::ng-deep .mat-form-field-prefix {
+    top: 0em;
+  }
+
+  ::ng-deep .mat-form-field-suffix {
+    font-size: 10px;
+    cursor: pointer;
+  }
 }
 
 mat-horizontal-stepper {

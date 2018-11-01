@@ -64,6 +64,7 @@ export class AnalyzeNewDialogComponent {
       fpOrderBy(['metricName'], [this._sortOrder])
     )(this.data.metrics);
     this.selectedMetric = null;
+    this.searchMetric = '';
   }
 
   nextButtonDisabled() {
