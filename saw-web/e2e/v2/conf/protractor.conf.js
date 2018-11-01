@@ -171,7 +171,7 @@ exports.config = {
     /**
      * This suite is for development environment and always all dev tests will be executed.
      */
-    development: [testBaseDir + 'dev1.js', testBaseDir + 'dev2.js']
+    development: [testBaseDir + 'dev1.js']
   },
   onCleanUp: function(results) {
     retry.onCleanUp(results);
@@ -183,6 +183,7 @@ exports.config = {
       .manage()
       .timeouts()
       .pageLoadTimeout(pageLoadTimeout);
+
     browser
       .manage()
       .timeouts()
@@ -193,6 +194,7 @@ exports.config = {
       savePath: protractorPath,
       consolidateAll: true
     });
+
     jasmine.getEnv().addReporter(junitReporter);
 
     let AllureReporter = require('jasmine-allure-reporter');
@@ -201,7 +203,14 @@ exports.config = {
         resultsDir: 'target/allure-results'
       })
     );
+    // Add screenshot to allure report. screenshot are taken after each test
     jasmine.getEnv().afterEach(function(done) {
+      this.specDone = function(result) {
+        console.log('result---' + JSON.stringify(result));
+        if (result.failedExpectations.length > 0) {
+          // Test FAILURE ACTION GOES HERE
+        }
+      };
       browser.takeScreenshot().then(function(png) {
         allure.createAttachment(
           'Screenshot',
@@ -223,24 +232,27 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function() {
-    //console.log('beforeLaunch....generating the testdata...')
-    // Generate test data
-    if (new SuiteHelper().getSawWebUrl()) {
-      const generate = require('../helpers/data-generation/generateTestData');
-      token = generate.token(new SuiteHelper().getSawWebUrl());
-      generate.usersRolesPrivilegesCategories(token);
-    } else {
-      process.exit(1);
-    }
-  },
-  afterLaunch: function() {
-    //console.log('afterLaunch....')
     if (fs.existsSync('target/e2eId.json')) {
-      // delete and create new always
-      //console.log('deleting e2e id json file....')
       fs.unlinkSync('target/e2eId.json');
     }
-
+    // Generate test data
+    // let appUrl = new SuiteHelper().getSawWebUrl();
+    // if (appUrl) {
+    //   console.log('Generating test data');
+    //   let APICommonHelpers = require('../helpers/api/APICommonHelpers');
+    //   let apiCommonHelpers = new APICommonHelpers();
+    //   let apiBaseUrl = apiCommonHelpers.getAPIURL(appUrl);
+    //   let token = apiCommonHelpers.getToken(apiBaseUrl);
+    //   let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
+    //   new TestDataGenerator().generateUsersRolesPrivilegesCategories(
+    //     apiBaseUrl,
+    //     token
+    //   );
+    // } else {
+    //   process.exit(1);
+    // }
+  },
+  afterLaunch: function() {
     var retryCounter = 1;
     if (argv.retry) {
       retryCounter = ++argv.retry;

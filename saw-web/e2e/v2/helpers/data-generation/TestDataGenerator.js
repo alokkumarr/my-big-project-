@@ -14,7 +14,7 @@ const productId = 1; // shared for all users
 let AdminHelper = require('../api/actions/AdminHelper');
 let APICommonHelpers = require('../api/APICommonHelpers');
 let AnalysisHelper = require('../api/actions/AnalysisHelper');
-let Constants = require('../api/Constants');
+let Constants = require('../Constants');
 
 class TestDataGenerator {
   generateUsersRolesPrivilegesCategories(url, token) {

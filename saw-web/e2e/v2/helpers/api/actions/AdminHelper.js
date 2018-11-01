@@ -4,7 +4,7 @@ const categories = require('../../data-generation/categories');
 const dataSets = require('../../data-generation/datasets');
 const customerCode = 'SYNCHRONOSS'; // shared for all users
 let RequestModel = require('../model/RequestModel');
-const Constants = require('../Constants')
+const Constants = require('../../Constants')
 let Utils = require('../../Utils');
 const moduleId = 1; // shared for all users
 

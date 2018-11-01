@@ -1,8 +1,8 @@
 'use strict';
 
-const ES_REPORT = 'esReport';
+const ES_REPORT = 'esReport';// ES
 const PIVOT = 'pivot';
-const REPORT = 'report';//DL
+const REPORT = 'report';// DL
 const CHART = 'chart';
 const API_ROUTES = {
   AUTH: '/saw/security/doAuthenticate',
