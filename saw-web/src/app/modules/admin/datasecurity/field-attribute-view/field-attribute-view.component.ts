@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnChanges} from '@angular/core';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { UserAssignmentService } from './../userassignment.service';
 import { MatDialog, MatDialogConfig } from '@angular/material';
@@ -11,7 +11,8 @@ import * as isEmpty from 'lodash/isEmpty';
   templateUrl: './field-attribute-view.component.html',
   styleUrls: ['./field-attribute-view.component.scss']
 })
-export class FieldAttributeViewComponent {
+
+export class FieldAttributeViewComponent implements OnInit, OnChanges {
   config: any;
   data: {};
   emptyState: boolean;
