@@ -152,6 +152,7 @@
 		<module>saw-scheduler-service</module>
 		<module>saw-proxy-service</module>
 		<module>saw-semantic-service</module>
+		<module>saw-log-service</module>
 		<module>dist</module>
 	</modules>
 </project>
