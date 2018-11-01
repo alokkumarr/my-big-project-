@@ -67,3 +67,20 @@ RQS: /publishevent?APP_KEY=rtis-samp-client&APP_MODULE=DV&APP_VERSION=1.0&EVENT_
 EVT: {"APP_VERSION":"1.0","EVENT_ID":"48d8be57-2897-42f5-8f30-6c0cc2b59152","EVENT_TYPE":"SALT","@timestamp":"2018-10-19T22:16:23.361Z","path":".|o*8I.C5%L'eu,tDsyhaM,tx8fpp1dZsIhnlx3c1x4","payload":["e621","","1f783e80-962b-416a-8db7-f26919430c21","","8505","2bpy","RGlhO*vY","zkRTF0R","DtQu","ad90ae"]}
 RQS: /publishevent?APP_KEY=rtis-samp-client&APP_MODULE=DV&APP_VERSION=1.0&EVENT_ID=48d8be57-2897-42f5-8f30-6c0cc2b59152&EVENT_DATE=2018-10-19T22%3A16%3A23.361Z&EVENT_TYPE=SALT
 ```
+
+#### Sample run to pump 10000 events
+```
+$ for i in $(seq 10); do echo $i; (./generate-and-send.sh 1000 &); done
+```
+
+Checking DL files on MAPR box:
+
+```
+[mapr@mapr01 raw]$ pwd
+/dfs/data/bda/rta-loadtest1/raw
+[mapr@mapr01 raw]$ wc -l rta-iot_demo20181101-2246*/*
+   4449 rta-iot_demo20181101-224620/part-00000
+   5533 rta-iot_demo20181101-224630/part-00000
+     18 rta-iot_demo20181101-224640/part-00000
+  10000 total
+```
