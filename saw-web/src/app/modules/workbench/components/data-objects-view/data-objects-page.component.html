@@ -4,13 +4,13 @@
       <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" e2e="data-mode-group" class="data-mode">
         <mat-button-toggle-group [(ngModel)]="dataView" [value]="dataView" (change)="onDataObjectViewChange()"
           #viewType="matButtonToggleGroup">
-          <mat-button-toggle e2e="data-sets-view" i18n value="sets">
+          <mat-button-toggle e2e="data-sets-view" value="sets">
             <mat-icon fontIcon="icon-exchange"></mat-icon>
-            <span>Data Sets</span>
+            <span i18n>Data Sets</span>
           </mat-button-toggle>
-          <mat-button-toggle e2e="data-pods-view" i18n value="pods">
+          <mat-button-toggle e2e="data-pods-view" value="pods">
             <mat-icon fontIcon="icon-portal-libraries"></mat-icon>
-            <span>Data Pods</span>
+            <span i18n>Data Pods</span>
           </mat-button-toggle>
         </mat-button-toggle-group>
         <search-box placeholder="Search" [value]="states.searchTerm" (searchTermChange)="applySearchFilter($event)"
@@ -28,10 +28,10 @@
       </div>
       <span fxFlex></span>
       <div class="action-buttons" fxLayout="row" fxLayoutGap="10px">
-        <mat-slide-toggle *ngIf="dataView == 'sets'" checked="false" (change)="togglePoll()">Auto Refresh</mat-slide-toggle>
+        <mat-slide-toggle *ngIf="dataView == 'sets'" checked="false" (change)="togglePoll()" i18n>Auto Refresh</mat-slide-toggle>
 
-        <button mat-raised-button e2e="add-new-data-sets" color="primary" i18n (click)="addDataSet()">
-          <span>+ Dataset</span>
+        <button mat-raised-button e2e="add-new-data-sets" color="primary" (click)="addDataSet()">
+          <span i18n>+ Dataset</span>
         </button>
 
       </div>

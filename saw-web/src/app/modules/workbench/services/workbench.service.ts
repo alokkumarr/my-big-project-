@@ -14,7 +14,9 @@ import APP_CONFIG from '../../../../../appConfig';
 
 const userProject = 'workbench';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class WorkbenchService {
   public api = get(APP_CONFIG, 'api.url');
   public wbAPI = `${this.api}/internal/workbench/projects`;

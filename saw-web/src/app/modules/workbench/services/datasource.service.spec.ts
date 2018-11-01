@@ -22,10 +22,7 @@ describe('DatasourceService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        DatasourceService,
-        { provide: JwtService, useValue: jwtMockService }
-      ]
+      providers: [{ provide: JwtService, useValue: jwtMockService }]
     });
     datasourceService = TestBed.get(DatasourceService);
   });

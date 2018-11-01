@@ -11,8 +11,6 @@ import { AngularSplitModule } from 'angular-split';
 import { RouterModule } from '@angular/router';
 import { routes } from './routes';
 
-import { WorkbenchService } from './services/workbench.service';
-
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
 import { SelectRawdataComponent } from './components/create-datasets/select-rawdata/select-rawdata.component';
@@ -84,8 +82,6 @@ const COMPONENTS = [
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard];
-
-const SERVICES = [WorkbenchService];
 @NgModule({
   imports: [
     AngularCommonModule,
@@ -103,6 +99,6 @@ const SERVICES = [WorkbenchService];
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [...SERVICES, ...GUARDS]
+  providers: [GUARDS]
 })
 export class WorkbenchModule {}

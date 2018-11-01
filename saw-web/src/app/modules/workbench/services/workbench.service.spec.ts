@@ -22,7 +22,6 @@ describe('Workbench Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        WorkbenchService,
         { provide: JwtService, useValue: jwtMockService },
         { provide: Router, useValue: mockService }
       ]

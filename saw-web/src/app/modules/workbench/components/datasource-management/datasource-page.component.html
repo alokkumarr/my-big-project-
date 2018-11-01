@@ -2,12 +2,12 @@
   <mat-toolbar class="toolbar-white">
     <mat-toolbar-row>
       <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
-        <span>Data Sources</span>
+        <span i18n>Data Sources</span>
       </div>
       <span fxFlex></span>
       <div class="action-buttons" fxLayout="row" fxLayoutGap="10px">
         <button mat-raised-button color="primary" (click)="createSource(undefined)">
-          <span>+ Source</span>
+          <span i18n>+ Source</span>
         </button>
       </div>
     </mat-toolbar-row>
@@ -47,19 +47,20 @@
             <span class="details-title mat-subheading-2">{{selectedSourceData?.channelName | uppercase}}</span>
           </div>
           <span fxFlex></span>
-          <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="testConnection()" matTooltip="Test Connectivity">
+          <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="testConnection()" i18n-matTooltip
+            matTooltip="Test Connectivity">
             <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
           <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="createSource(selectedSourceData)"
-            matTooltip="Edit Source">
+            matTooltip="Edit Source" i18n-matTooltip>
             <mat-icon fontIcon="icon-edit-solid"></mat-icon>
           </button>
           <button mat-mini-fab class="mat-elevation-z3" color="warn" (click)="deleteChannel(selectedSourceData?.bisChannelSysId)"
-            matTooltip="Delete Source">
+            matTooltip="Delete Source" i18n-matTooltip>
             <mat-icon fontIcon="icon-delete-solid"></mat-icon>
           </button>
           <button mat-raised-button color="primary" (click)="createRoute( selectedSourceData?.bisChannelSysId)">
-            <span>+ Route</span>
+            <span i18n>+ Route</span>
           </button>
         </div>
         <div style="padding-top: 5px;">
@@ -68,48 +69,48 @@
         <div class="routes-card-body">
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">Host Name : </span>
+              <span class="prop-name" i18n>Host Name : </span>
               <span>{{selectedSourceData?.hostName}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">Port No : </span>
+              <span class="prop-name" i18n>Port No : </span>
               <span>{{selectedSourceData?.portNo}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">Access Type : </span>
+              <span class="prop-name" i18n>Access Type : </span>
               <span>{{selectedSourceData?.accessType}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">Description : </span>
+              <span class="prop-name" i18n>Description : </span>
               <span>{{selectedSourceData?.description}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">Created By : </span>
+              <span class="prop-name" i18n>Created By : </span>
               <span>{{selectedSourceData?.createdBy}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">Created Date : </span>
+              <span class="prop-name" i18n>Created Date : </span>
               <span>{{selectedSourceData?.createdDate | date: 'short'}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">User Name : </span>
+              <span class="prop-name" i18n>User Name : </span>
               <span>{{selectedSourceData?.userName}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name">Password : </span>
+              <span class="prop-name" i18n>Password : </span>
               <span class="pwd-hide" [class.pwd-show]="show === true">{{selectedSourceData?.password}}</span>
               <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                 <mat-icon fontIcon="icon-show"></mat-icon>
@@ -145,13 +146,16 @@
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
-              <button mat-icon-button class="grid-icon-btn" color="primary" (click)="testConnection()">
+              <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Connectivity"
+                (click)="testConnection()">
                 <mat-icon fontIcon="icon-query-mode"></mat-icon>
               </button>
-              <button mat-icon-button class="grid-icon-btn" color="primary" (click)="createRoute(data.data)">
+              <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Edit Route"
+                (click)="createRoute(data.data)">
                 <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
               </button>
-              <button mat-icon-button class="grid-icon-btn" color="warn" (click)="deleteRoute(data.data)">
+              <button mat-icon-button class="grid-icon-btn" color="warn" (click)="deleteRoute(data.data)"
+                i18n-matTooltip matTooltip="Delete Route">
                 <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
               </button>
             </div>
