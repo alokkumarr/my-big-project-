@@ -23,7 +23,7 @@
 
 
 <div *ngIf="!toggleToGrid">
-  <sip-chart [updater]="updater" [options]="chartOptions" [isStockChart]="isStockChart" [enableExport]="true"
+  <chart [updater]="updater" [options]="chartOptions" [isStockChart]="isStockChart" [enableExport]="true"
     [attr.e2e]="'chart-type:' + analysis.chartType">
-  </sip-chart>
+  </chart>
 </div>

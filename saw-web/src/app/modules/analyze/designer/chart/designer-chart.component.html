@@ -27,6 +27,6 @@
     </span>
   </div>
 
-  <sip-chart [updater]="updateChart" *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA" e2e="{{'chart-type:' + chartType}}"
-    [options]="chartOptions" [isStockChart]="isStockChart"></sip-chart>
+  <chart [updater]="updateChart" *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA" e2e="{{'chart-type:' + chartType}}"
+    [options]="chartOptions" [isStockChart]="isStockChart"></chart>
 </div>

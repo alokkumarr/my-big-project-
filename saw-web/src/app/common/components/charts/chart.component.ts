@@ -39,7 +39,8 @@ export const CHART_SETTINGS_OBJ = [
 ];
 
 @Component({
-  selector: 'sip-chart',
+  // tslint:disable-next-line:component-selector
+  selector: 'chart',
   template: `<div #container></div>`
 })
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
