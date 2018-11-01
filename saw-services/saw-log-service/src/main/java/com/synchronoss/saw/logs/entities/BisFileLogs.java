@@ -8,151 +8,151 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(schema = "BIS_FILE_LOGS" , name = "BIS_FILE_LOGS")
+@Table(schema = "SAW_LOGS", name = "BIS_FILE_LOGS")
 public class BisFileLogs {
-	
-	@Id
-	@Column(name = "MFL_PID")
-	String pid;
 
-	@Column(name = "BIS_ROUTE_SYS_ID")
-	long routeSysId;
+    @Id
+    @Column(name = "MFL_PID")
+    String pid;
 
-	@Column(name = "BIS_CHANNEL_SYS_ID")
-	long channelSysId;
+    @Column(name = "BIS_ROUTE_SYS_ID")
+    long routeSysId;
 
-	@Column(name = "BIS_CHANNEL_TYPE")
-	String channelType;
+    @Column(name = "BIS_CHANNEL_SYS_ID")
+    long channelSysId;
 
-	@Column(name = "BIS_FILE_PATTERN")
-	String filePattern;
+    @Column(name = "BIS_CHANNEL_TYPE")
+    String channelType;
 
-	@Column(name = "BIS_FILE_NAME")
-	String fileName;
+    @Column(name = "BIS_FILE_PATTERN")
+    String filePattern;
 
-	@Column(name = "BIS_ACTUAL_FILE_RCV_DATE")
-	Date actualFileRecDate;
+    @Column(name = "BIS_FILE_NAME")
+    String fileName;
 
-	@Column(name = "BIS_RECD_FILE_NAME")
-	String recdFileName;
+    @Column(name = "BIS_ACTUAL_FILE_RCV_DATE")
+    Date actualFileRecDate;
 
-	@Column(name = "BIS_RECD_FILE_SIZE_BYTES")
-	Double recdFileSize;
+    @Column(name = "BIS_RECD_FILE_NAME")
+    String recdFileName;
 
-	@Column(name = "MFL_FILE_VALID_STATUS")
-	String mflFileStatus;
+    @Column(name = "BIS_RECD_FILE_SIZE_BYTES")
+    Double recdFileSize;
 
-	@Column(name = "DATE_OF_ENTRY")
-	Date dateOfEntry;
+    @Column(name = "MFL_FILE_VALID_STATUS")
+    String mflFileStatus;
 
-	@Column(name = "DATE_OF_CHANGE")
-	Date dateOfChange;
+    @Column(name = "DATE_OF_ENTRY")
+    Date dateOfEntry;
 
-	@Column(name = "MFLD_PROCESS_STATE")
-	String mfldProcessDate;
+    @Column(name = "DATE_OF_CHANGE")
+    Date dateOfChange;
 
-	public String getPid() {
-		return pid;
-	}
+    @Column(name = "MFLD_PROCESS_STATE")
+    String mfldProcessDate;
 
-	public void setPid(String pid) {
-		this.pid = pid;
-	}
+    public String getPid() {
+        return pid;
+    }
 
-	public long getRouteSysId() {
-		return routeSysId;
-	}
+    public void setPid(String pid) {
+        this.pid = pid;
+    }
 
-	public void setRouteSysId(long routeSysId) {
-		this.routeSysId = routeSysId;
-	}
+    public long getRouteSysId() {
+        return routeSysId;
+    }
 
-	public long getBisChannelSysId() {
-		return channelSysId;
-	}
+    public void setRouteSysId(long routeSysId) {
+        this.routeSysId = routeSysId;
+    }
 
-	public void setBisChannelSysId(long bisChannelSysId) {
-		this.channelSysId = bisChannelSysId;
-	}
+    public long getBisChannelSysId() {
+        return channelSysId;
+    }
 
-	public String getBisChannelType() {
-		return channelType;
-	}
+    public void setBisChannelSysId(long bisChannelSysId) {
+        this.channelSysId = bisChannelSysId;
+    }
 
-	public void setBisChannelType(String bisChannelType) {
-		this.channelType = bisChannelType;
-	}
+    public String getBisChannelType() {
+        return channelType;
+    }
 
-	public String getFilePattern() {
-		return filePattern;
-	}
+    public void setBisChannelType(String bisChannelType) {
+        this.channelType = bisChannelType;
+    }
 
-	public void setFilePattern(String filePattern) {
-		this.filePattern = filePattern;
-	}
+    public String getFilePattern() {
+        return filePattern;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public void setFilePattern(String filePattern) {
+        this.filePattern = filePattern;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public Date getActualFileRecDate() {
-		return actualFileRecDate;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public void setActualFileRecDate(Date actualFileRecDate) {
-		this.actualFileRecDate = actualFileRecDate;
-	}
+    public Date getActualFileRecDate() {
+        return actualFileRecDate;
+    }
 
-	public String getRecdFileName() {
-		return recdFileName;
-	}
+    public void setActualFileRecDate(Date actualFileRecDate) {
+        this.actualFileRecDate = actualFileRecDate;
+    }
 
-	public void setRecdFileName(String recdFileName) {
-		this.recdFileName = recdFileName;
-	}
+    public String getRecdFileName() {
+        return recdFileName;
+    }
 
-	public Double getRecdFileSize() {
-		return recdFileSize;
-	}
+    public void setRecdFileName(String recdFileName) {
+        this.recdFileName = recdFileName;
+    }
 
-	public void setRecdFileSize(Double recdFileSize) {
-		this.recdFileSize = recdFileSize;
-	}
+    public Double getRecdFileSize() {
+        return recdFileSize;
+    }
 
-	public String getMflFileStatus() {
-		return mflFileStatus;
-	}
+    public void setRecdFileSize(Double recdFileSize) {
+        this.recdFileSize = recdFileSize;
+    }
 
-	public void setMflFileStatus(String mflFileStatus) {
-		this.mflFileStatus = mflFileStatus;
-	}
+    public String getMflFileStatus() {
+        return mflFileStatus;
+    }
 
-	public Date getDateOfEntry() {
-		return dateOfEntry;
-	}
+    public void setMflFileStatus(String mflFileStatus) {
+        this.mflFileStatus = mflFileStatus;
+    }
 
-	public void setDateOfEntry(Date dateOfEntry) {
-		this.dateOfEntry = dateOfEntry;
-	}
+    public Date getDateOfEntry() {
+        return dateOfEntry;
+    }
 
-	public Date getDateOfChange() {
-		return dateOfChange;
-	}
+    public void setDateOfEntry(Date dateOfEntry) {
+        this.dateOfEntry = dateOfEntry;
+    }
 
-	public void setDateOfChange(Date dateOfChange) {
-		this.dateOfChange = dateOfChange;
-	}
+    public Date getDateOfChange() {
+        return dateOfChange;
+    }
 
-	public String getMfldProcessDate() {
-		return mfldProcessDate;
-	}
+    public void setDateOfChange(Date dateOfChange) {
+        this.dateOfChange = dateOfChange;
+    }
 
-	public void setMfldProcessDate(String mfldProcessDate) {
-		this.mfldProcessDate = mfldProcessDate;
-	}
+    public String getMfldProcessDate() {
+        return mfldProcessDate;
+    }
+
+    public void setMfldProcessDate(String mfldProcessDate) {
+        this.mfldProcessDate = mfldProcessDate;
+    }
 
 }
