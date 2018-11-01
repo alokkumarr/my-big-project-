@@ -9,7 +9,6 @@ import {
 import { MatHorizontalStepper } from '@angular/material/stepper';
 import { MatSidenav } from '@angular/material/sidenav';
 import * as clone from 'lodash/clone';
-import { ObserveService } from '../../services/observe.service';
 
 import {
   widgetTypes as wTypes,
@@ -38,7 +37,7 @@ export class AddWidgetComponent implements OnInit {
   @Output() onWidgetAction = new EventEmitter();
   @ViewChild('widgetStepper') widgetStepper: MatHorizontalStepper;
 
-  constructor(private observe: ObserveService) {}
+  constructor() {}
 
   ngOnInit() {}
 

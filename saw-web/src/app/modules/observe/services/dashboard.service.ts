@@ -1,10 +1,4 @@
-import {
-  Observable,
-  BehaviorSubject,
-  Subject,
-  Subscription,
-  interval
-} from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, interval } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Dashboard } from '../models/dashboard.interface';
 
