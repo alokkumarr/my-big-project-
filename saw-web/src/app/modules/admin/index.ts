@@ -13,6 +13,8 @@ import { ExportService } from './export/export.service';
 import { ImportService } from './import/import.service';
 import { UserAssignmentService } from './datasecurity/userassignment.service';
 import { routes } from './routes';
+import { FormsModule } from '@angular/forms';
+
 import {
   AdminExportViewComponent,
   AdminExportListComponent
@@ -114,6 +116,7 @@ const SERVICES = [
 @NgModule({
   imports: [
     CommonModuleTs,
+    FormsModule,
     RouterModule.forChild(routes)
   ],
   declarations: COMPONENTS,

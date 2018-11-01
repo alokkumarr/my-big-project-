@@ -11,6 +11,7 @@ import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.componen
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
+import * as deepClone from 'lodash/cloneDeep';
 
 const template = require('./security-group.component.html');
 require('./security-group.component.scss');
@@ -35,6 +36,7 @@ export class SecurityGroupComponent implements OnInit {
   groupName: any;
   columnData: {};
   emptyState: boolean;
+  addAttribute: boolean;
 
   constructor(
     private _router: Router,
@@ -66,6 +68,8 @@ export class SecurityGroupComponent implements OnInit {
   }
 
   loadGroupGridWithData(groupSelected) {
+    this.groupSelected = {};
+    this.addAttribute = true;
     this._userAssignmentService.getSecurityGroups().then(response => {
       this.data = response;
       if (this.data.length === 0) {
@@ -74,6 +78,7 @@ export class SecurityGroupComponent implements OnInit {
         this.emptyState = false;
         this.groupSelected =  (isEmpty(groupSelected)) ? this.data[0] : groupSelected;
       }
+      this.addAttribute = (this.data.length === 0);
     });
   }
 
@@ -96,7 +101,13 @@ export class SecurityGroupComponent implements OnInit {
     } as MatDialogConfig)
     .afterClosed().subscribe((result) => {
       if (result) {
-        this.groupSelected = {};
+        if (property === 'securityGroup') {
+          this.groupSelected = {
+            secGroupSysId: result.groupId,
+            securityGroupName: result.groupName,
+            description: result.description
+          };
+        }
         this.loadGroupGridWithData(this.groupSelected);
       }
     });

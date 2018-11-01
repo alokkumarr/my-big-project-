@@ -21,7 +21,7 @@
     <button (click)="addPropperty('attribute','create')"
             mat-raised-button
             color="primary"
-            [disabled]="!groupSelected">
+            [disabled]="addAttribute">
       + <span i18n>Attribute</span>
     </button>
   </div>
@@ -34,6 +34,7 @@
 </div>
 <div *ngIf="!emptyState" style="float: left;">
   <dx-data-grid class="security-group-grid" [customizeColumns]="config.customizeColumns"
+              [selectionFilter]="['securityGroupName', '=', groupSelected.securityGroupName]"
               [columnAutoWidth]="config.columnAutoWidth"
               [columnMinWidth]="config.columnMinWidth"
               [columnResizingMode]="config.columnResizingMode"
@@ -56,7 +57,7 @@
               [height]="config.height"
               (onRowClick)="config.onRowClick($event)"
   >
-
+  <dxo-selection mode="single" [deferred]="true"></dxo-selection>
   <div *dxTemplate="let cell of 'actionCellTemplate'">
     <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
       <button mat-icon-button class="update-security-property"

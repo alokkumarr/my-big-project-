@@ -25,21 +25,6 @@ public class DskValidity extends Valid {
         this.groupName = groupName;
     }
 
-    public Long getAttributeId() {
-        return attributeId;
-    }
-
-    public void setAttributeId(Long attributeId) {
-        this.attributeId = attributeId;
-    }
-
-    public String getAttributeName() {
-        return attributeName;
-    }
-
-    public void setAttributeName(String attributeName) {
-        this.attributeName = attributeName;
-    }
 
     public String getDescription() {
         return description;

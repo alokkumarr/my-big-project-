@@ -78,6 +78,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     ps.setString(3,securityGroups.getDescription());
                     ps.setString(4,createdBy);
                 });
+
                 logger.trace(insertResult + " : " + ServerResponseMessages.SEC_GROUP_ADDED);
                 valid.setValid(true);
                 valid.setGroupId(this.getSecurityGroupSysId(securityGroups.getSecurityGroupName(),custId));
@@ -153,6 +154,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         }
         else { return false; }
     }
+
 
     /**
      * Get List of GroupNames from SEC_GROUP
@@ -240,6 +242,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 logger.error(e.getMessage());
                 valid.setValid(false);
                 valid.setValidityMessage("Error in Updating Group Name ");
+                valid.setError("Error in Updating Group Name");
                 return valid;
             }
         }
@@ -273,6 +276,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 else {
                     logger.error(ServerResponseMessages.UNASSIGN_GROUP_FROM_USER);
                     valid.setValidityMessage(ServerResponseMessages.UNASSIGN_GROUP_FROM_USER);
+                    valid.setError(ServerResponseMessages.UNASSIGN_GROUP_FROM_USER);
                     valid.setValid(false);
                     return valid;
                 }
@@ -503,7 +507,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                             ps.setLong(1,attributeSysId);
                             ps.setString(2,attributeValues.getValue());
                         });
-                        logger.trace(addValResult + " Attribute value added to table SEC_GROUP_DSK_VALUE.");
+                        logger.trace(addValResult + ServerResponseMessages.ATTRIBUTE_VALUE_ADDED + " to  SEC_GROUP_DSK_VALUE.");
                         valid.setValid(true);
                         valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_ADDED);
                         return valid;
@@ -607,7 +611,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             try{
                 String delSql = "DELETE FROM sec_group_dsk_attribute WHERE SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = ? ";
                 /**
-                    Note : Deleting Atrribute row from sec_group_dsk_attribute inturn deletes corresponding value from sec_group_dsk_value,
+                    Note : Deleting Attribute row from sec_group_dsk_attribute inturn deletes corresponding value from sec_group_dsk_value,
                  Since we have defined a relation between the tables; So deleting other row from DSK_VALUE table is not required here.
                  **/
                 int delResult = jdbcTemplate.update(delSql, ps -> {

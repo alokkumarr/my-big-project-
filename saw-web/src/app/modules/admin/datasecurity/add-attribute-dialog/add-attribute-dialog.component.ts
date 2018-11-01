@@ -23,8 +23,8 @@ export class AddAttributeDialogComponent {
     }
   ) {}
 
-  hasWhiteSpace(s) {
-    return /\s/g.test(s);
+  hasWhiteSpace(field) {
+    return /\s/g.test(field);
   }
 
   submit() {
@@ -42,9 +42,11 @@ export class AddAttributeDialogComponent {
       if (get(response, 'valid')) {
         this.errorState = false;
         this._dialogRef.close(get(response, 'valid'));
-      } else {
-        this.errorState = !get(response, 'valid');
-        this.errorMessage = get(response, 'validityMessage');
+      }
+    }).catch(err => {
+      if (!get(err.error, 'valid')) {
+        this.errorState = !get(err.error, 'valid');
+        this.errorMessage = get(err.error, 'validityMessage');
       }
     });
   }

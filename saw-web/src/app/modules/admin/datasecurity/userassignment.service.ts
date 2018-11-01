@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { JwtService } from '../../../common/services/jwt.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
+import * as isUndefined from 'lodash/isUndefined';
 
 const loginUrl = AppConfig.login.url;
 
@@ -14,7 +15,6 @@ export class UserAssignmentService {
   ) {}
 
   getList(customerId) {
-    console.log(customerId);
     return this.getRequest('auth/admin/user-assignments');
   }
 
@@ -24,7 +24,7 @@ export class UserAssignmentService {
     switch (data.mode) {
     case 'create':
       requestBody = {
-        description: data.description,
+        description: isUndefined(data.description) ? '' : data.description,
         securityGroupName: data.securityGroupName
       };
       path = 'auth/admin/security-groups';
@@ -45,9 +45,8 @@ export class UserAssignmentService {
   }
 
   addAttributetoGroup(attribute, mode) {
-    console.log(attribute);
     let path;
-    path = `/auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
+    path = `auth/admin/security-groups/${attribute.secGroupSysId}/dsk-attribute-values`;
     switch (mode) {
     case 'create':
       return this.postRequest(path, attribute);
@@ -81,19 +80,16 @@ export class UserAssignmentService {
   }
 
   assignGroupToUser(requestBody) {
-    const request = {
-      securityGroupName: requestBody.securityGroupName
-    };
+    const securityGroupName = requestBody.securityGroupName;
     const path = `auth/admin/users/${requestBody.userId}/security-group`;
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
         'Access-Control-Allow-Method': 'PUT'
       })
     };
-    return this._http.put(`${loginUrl}/${path}`, request, httpOptions).toPromise();
+    return this._http.put(`${loginUrl}/${path}`, securityGroupName, httpOptions).toPromise();
   }
 
   getRequest(path) {

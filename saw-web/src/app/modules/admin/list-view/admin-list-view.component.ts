@@ -20,7 +20,7 @@ export class AdminListViewComponent implements OnInit {
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
   @Output() rowClick: EventEmitter<any> = new EventEmitter();
 
-  securityGroups= [];
+  securityGroups = [];
   config: any;
   groupValue: any;
   groupAssignSuccess: any;
@@ -45,12 +45,21 @@ export class AdminListViewComponent implements OnInit {
   assignGrouptoUser(groupName, cell) {
     const request = {
       securityGroupName : groupName.value,
-      userId: cell.data.loginId
+      userId: cell.data.userSysId
     };
     this._userAssignmentService.assignGroupToUser(request).then(response => {
       this.groupAssignSuccess = get(response, 'valid') ? 'checkmark' : 'close';
       this.userGroupID = cell.data.loginId;
+      if (groupName.value === -1) {
+        cell.data.groupName = '';
+      }
+    }).catch(err => {
+      this.groupAssignSuccess = 'close';
     });
+  }
+
+  validateClearOption(cell) {
+    return (cell.data.groupName !== null);
   }
 
   getConfig() {
