@@ -1,8 +1,6 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import * as forEach from 'lodash/forEach';
 import * as get from 'lodash/get';
-import * as flatMap from 'lodash/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -60,10 +58,6 @@ export class AnalyzeNewDialogComponent {
     this.supportedMetricCategories[0].metrics = fpPipe(
       fpFilter(metric => {
         const isEsMetric = get(metric, 'esRepository.storageType') === 'ES';
-        const supports = flatMap(
-          metric.supports,
-          category => category.children
-        );
 
         return isEsMetric || method.type === 'table:report';
       }),

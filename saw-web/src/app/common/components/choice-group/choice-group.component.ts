@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import * as find from 'lodash/find';
 
 interface IChoiceGroupItem {
   label: string;
