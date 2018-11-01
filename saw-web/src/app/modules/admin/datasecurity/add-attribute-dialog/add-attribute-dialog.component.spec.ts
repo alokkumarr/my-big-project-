@@ -12,7 +12,7 @@ import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from '@angu
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const UserAssignmentServiceStub = {
-  addAttributetoGroup: () => {
+  attributetoGroup: () => {
     return new Promise(res => res({ data: {} }));
   }
 };

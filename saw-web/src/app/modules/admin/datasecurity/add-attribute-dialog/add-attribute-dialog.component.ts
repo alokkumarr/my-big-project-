@@ -8,6 +8,7 @@ import * as get from 'lodash/get';
   templateUrl: './add-attribute-dialog.component.html',
   styleUrls: ['./add-attribute-dialog.component.scss']
 })
+
 export class AddAttributeDialogComponent {
   public attribute = {};
   errorState: boolean;
@@ -33,12 +34,7 @@ export class AddAttributeDialogComponent {
       this.errorMessage = 'Field Name cannot contain spaces';
       return false;
     }
-    const request = {
-      attributeName: this.data.attributeName.trim(),
-      value: this.data.value,
-      secGroupSysId: this.data.groupSelected.secGroupSysId
-    };
-    this._userAssignmentService.addAttributetoGroup(request, this.data.mode).then(response => {
+    this._userAssignmentService.attributetoGroup(this.data).then(response => {
       if (get(response, 'valid')) {
         this.errorState = false;
         this._dialogRef.close(get(response, 'valid'));
