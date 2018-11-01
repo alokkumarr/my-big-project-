@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * Created by srya0001 on 4/28/2016.
  */
 
-@ApiModel(value = "Base Event Data", subTypes = {Crash.class, Event.class}, discriminator = "type", description = "Base event class descibes common properties used in final classes: Event and Crash" )
+/*@ApiModel(value = "Base Event Data", subTypes = {Crash.class, Event.class}, discriminator = "type", description = "Base event class descibes common properties used in final classes: Event and Crash" )*/
 public abstract class BaseEvent {
 
     @ApiModelProperty( value = "app_key",
@@ -26,6 +26,7 @@ public abstract class BaseEvent {
             notes = " Your generated or device specific unique device ID to identify user",
             required = true,
             access = "public",
+            hidden = true,
             dataType = "string")
     public String  device_id;
 
