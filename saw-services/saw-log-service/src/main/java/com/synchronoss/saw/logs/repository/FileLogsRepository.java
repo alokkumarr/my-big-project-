@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface FileLogsRepository extends JpaRepository<BisFileLogs, Integer> {
+public interface FileLogsRepository extends JpaRepository<BisFileLogs, String> {
 
   BisFileLogs findByPid(String pid);
 
