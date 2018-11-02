@@ -21,7 +21,7 @@ import synchronoss.handlers.charter.smartcare.CharterEventHandler
 
 @Api(value = "SIPGenericEvent",
   produces = "application/json",
-  consumes = "application/octet-stream",
+  consumes = "application/json",
   protocols = "http,https")
 class GenericHandler extends Controller {
 
@@ -54,7 +54,7 @@ class GenericHandler extends Controller {
 		    		"	\"AMBIENT_TEMPERATURE\": \"34.0\",\n" + 
 		    		"	\"HUMIDITY\": \"81.65\",\n" + 
 		    		"	\"PHOTOSENSOR\": \"870.89\",\n" + 
-		    		"	\"TIMESTAMP\": \"538186875285”\n" + 
+		    			"	\"TIMESTAMP\": \"538186875285\"\n" +
   		
   		"} ",  
         paramType = "body", dataType = "object",

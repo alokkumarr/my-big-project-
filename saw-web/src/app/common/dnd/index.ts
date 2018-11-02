@@ -1,12 +1,10 @@
-
 import { NgModule } from '@angular/core';
-import {DndDraggableDirective} from './draggable.directive';
-import {DndDroppableDirective} from './droppable.directive';
-import {DndSortableDirective} from './sortable.directive';
-import {DndSortableContainerDirective} from './sortable-container.directive';
-import {DragnDropService} from './dnd.service';
+import { DndDraggableDirective } from './draggable.directive';
+import { DndDroppableDirective } from './droppable.directive';
+import { DndSortableDirective } from './sortable.directive';
+import { DndSortableContainerDirective } from './sortable-container.directive';
+import { DragnDropService } from './dnd.service';
 
-declare var require: any;
 @NgModule({
   declarations: [
     DndDraggableDirective,
@@ -22,6 +20,4 @@ declare var require: any;
     DndSortableContainerDirective
   ]
 })
-export class DndModule {
-
-}
+export class DndModule {}

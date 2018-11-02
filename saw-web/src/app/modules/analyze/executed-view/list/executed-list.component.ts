@@ -38,7 +38,7 @@ export class ExecutedListComponent {
       ['analyze', 'analysis', this.analysis.id, 'executed'],
       {
         queryParams: {
-          executedAnalysis,
+          executionId: executedAnalysis.id,
           awaitingExecution: false,
           loadLastExecution: false
         }

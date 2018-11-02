@@ -26,7 +26,7 @@ const mockService = {};
 class AddGroupDialogStubComponent {}
 
 describe('Create AddGroupDialogStubComponent', () => {
-  let fixture: ComponentFixture<AddSecurityDialogComponent>, el: HTMLElement;
+  let fixture: ComponentFixture<AddSecurityDialogComponent>;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule,
@@ -43,8 +43,6 @@ describe('Create AddGroupDialogStubComponent', () => {
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(AddSecurityDialogComponent);
-        el = fixture.nativeElement;
-        const comp = fixture.componentInstance;
         fixture.detectChanges();
       });
   }));

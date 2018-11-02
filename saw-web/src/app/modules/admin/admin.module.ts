@@ -1,7 +1,7 @@
 
 import { NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RouterModule }  from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { CommonModuleTs } from '../../common';
 import { AdminListViewComponent } from './list-view';
 import { AdminMainViewComponent } from './main-view';

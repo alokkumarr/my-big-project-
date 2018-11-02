@@ -28,7 +28,7 @@ const UserAssignmentServiceStub = {
 class FieldAttributeStubComponent {}
 
 describe('field attribute component', () => {
-  let fixture: ComponentFixture<FieldAttributeViewComponent>, el: HTMLElement;
+  let fixture: ComponentFixture<FieldAttributeViewComponent>;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, DxDataGridModule, DxTemplateModule],
@@ -40,7 +40,6 @@ describe('field attribute component', () => {
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(FieldAttributeViewComponent);
-        el = fixture.nativeElement;
         fixture.detectChanges();
       });
   }));

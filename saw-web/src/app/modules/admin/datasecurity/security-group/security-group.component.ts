@@ -11,10 +11,6 @@ import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.componen
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
-import * as deepClone from 'lodash/cloneDeep';
-
-const template = require('./security-group.component.html');
-require('./security-group.component.scss');
 
 @Component({
   selector: 'security-group',

@@ -8,7 +8,7 @@ import { DxDataGridService } from '../../../../common/services/dxDataGrid.servic
 import { JwtService } from '../../../../common/services/jwt.service';
 import { ErrorDetailDialogService } from '../../../../common/services/error-detail-dialog.service';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
-import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import {
   DxDataGridModule
@@ -52,7 +52,7 @@ const ticketStub = { custID: '', custCode: '', masterLoginId: '' };
 class SecurityGroupStubComponent {}
 
 describe('security-group component', () => {
-  let fixture: ComponentFixture<SecurityGroupComponent>, el: HTMLElement;
+  let fixture: ComponentFixture<SecurityGroupComponent>;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, DxDataGridModule, DxTemplateModule],
@@ -68,7 +68,6 @@ describe('security-group component', () => {
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(SecurityGroupComponent);
-        el = fixture.nativeElement;
         const comp = fixture.componentInstance;
         comp.ticket = ticketStub;
         fixture.detectChanges();

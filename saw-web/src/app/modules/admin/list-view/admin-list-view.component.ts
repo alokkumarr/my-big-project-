@@ -5,7 +5,6 @@ import { UserAssignmentService } from './../datasecurity/userassignment.service'
 import * as clone from 'lodash/clone';
 import * as get from 'lodash/get';
 
-const template = require('./admin-list-view.component.html');
 @Component({
   selector: 'admin-list-view',
   templateUrl: './admin-list-view.component.html',

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import * as get from 'lodash/get';
 import * as fpPick from 'lodash/fp/pick';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
@@ -34,7 +33,7 @@ export class AnalyzeExportService {
       .then(data => {
         let fields = this.getCheckedFieldsForExport(analysis, data);
         fields = this.checkColumnName(fields);
-        const keys = map(fields, 'columnName');
+        const columnNames = map(fields, 'columnName');
         const exportOptions = {
           trimHeaderFields: false,
           emptyFieldValue: '',
@@ -43,7 +42,7 @@ export class AnalyzeExportService {
             wrap: '"',
             eol: '\r\n'
           },
-          keys
+          columnNames
         };
         json2csv(
           data,
