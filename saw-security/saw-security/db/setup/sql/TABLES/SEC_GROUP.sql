@@ -2,8 +2,8 @@ DROP TABLE IF EXISTS SEC_GROUP;
 
 CREATE TABLE SEC_GROUP (
   SEC_GROUP_SYS_ID bigint(20) NOT NULL ,
-  SEC_GROUP_NAME varchar(255) COLLATE utf8_unicode_ci NOT NULL ,
-  DESCRIPTION varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  SEC_GROUP_NAME varchar(255) NOT NULL ,
+  DESCRIPTION varchar(255) DEFAULT NULL,
   ACTIVE_STATUS_IND tinyint(4) NOT NULL,
   CREATED_DATE datetime NOT NULL,
   CREATED_BY varchar(255) NOT NULL,
@@ -12,4 +12,4 @@ CREATE TABLE SEC_GROUP (
   MODIFIED_DATE datetime DEFAULT NULL,
   MODIFIED_BY varchar(255) DEFAULT NULL
 )
-ENGINE=InnoDB COMMENT='Purpose : SEC_GROUP table provides feature for Filter analyses using the data security key (row-level security) at a user level. When a user has a DSK associated with their account, only rows allowed by the user''s DSK are included in the analysis result.';
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Purpose : SEC_GROUP table provides feature for Filter analyses using the data security key (row-level security) at a user level. When a user has a DSK associated with their account, only rows allowed by the user''s DSK are included in the analysis result.';
