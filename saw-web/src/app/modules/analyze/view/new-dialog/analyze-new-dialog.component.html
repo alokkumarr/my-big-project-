@@ -46,7 +46,7 @@
       <mat-tab-group>
         <mat-tab *ngFor="let metricCategory of supportedMetricCategories"
                  (selectedTabChange)="onMetricCategoryChange($event)"
-                 label="{{metricCategory.label + ' (' + metricCategory.metrics.length + ')'}}">
+                 label="{{metricCategory.label + ' (' + searchCount(metricCategory.metrics) + ')'}}">
           <mat-radio-group (change)="onMetricSelected($event.value)" fxLayout="row wrap" class="container" [value]="selectedMetric">
             <mat-radio-button *ngFor="let metric of metricCategory.metrics | filter:'metricName':searchMetric; trackBy: trackById"
                               class="metric-radio-button"
