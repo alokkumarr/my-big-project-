@@ -20,12 +20,12 @@ public class BisFileLogsController {
   @Autowired
   private FileLogsRepository bisLogsRepository;
 
-  @RequestMapping(value ="",method = RequestMethod.GET)
+  @RequestMapping(value = "",method = RequestMethod.GET)
   public List<BisFileLogs> retrieveAllLogs() {
     return this.bisLogsRepository.findAll();
   }
   
-  @RequestMapping(value ="/{id}",method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}",method = RequestMethod.GET)
   public BisFileLogs retriveLogById(@PathVariable String id) {
 
     return this.bisLogsRepository.findByPid(id);
