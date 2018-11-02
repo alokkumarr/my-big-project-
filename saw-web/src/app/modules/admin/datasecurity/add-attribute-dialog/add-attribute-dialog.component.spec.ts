@@ -27,7 +27,7 @@ const dataStub = { securityGroupName: '' };
 class AddAttributeDialogStubComponent {}
 
 describe('Create AddAttributeDialogStubComponent', () => {
-  let fixture: ComponentFixture<AddAttributeDialogComponent>, el: HTMLElement;
+  let fixture: ComponentFixture<AddAttributeDialogComponent>;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule,
@@ -44,7 +44,6 @@ describe('Create AddAttributeDialogStubComponent', () => {
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(AddAttributeDialogComponent);
-        el = fixture.nativeElement;
         const comp = fixture.componentInstance;
         comp.data.groupSelected = dataStub;
         fixture.detectChanges();

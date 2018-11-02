@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { JwtService } from '../../../common/services/jwt.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
 import * as isUndefined from 'lodash/isUndefined';
@@ -10,8 +9,7 @@ const loginUrl = AppConfig.login.url;
 export class UserAssignmentService {
 
   constructor(
-    private _http: HttpClient,
-    private _jwtService: JwtService
+    private _http: HttpClient
   ) {}
 
   getList(customerId) {

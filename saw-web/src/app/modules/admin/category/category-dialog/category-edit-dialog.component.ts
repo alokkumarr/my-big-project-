@@ -135,7 +135,6 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
   }
 
   createForm(formModel) {
-    const mode = this.data.mode;
     const {
       subCategoryInd = false,
       productId = '',

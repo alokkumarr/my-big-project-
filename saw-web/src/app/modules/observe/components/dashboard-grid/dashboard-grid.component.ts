@@ -24,7 +24,6 @@ import * as find from 'lodash/find';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
-import * as sortBy from 'lodash/sortBy';
 import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';

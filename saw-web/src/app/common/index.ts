@@ -60,14 +60,18 @@ import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { ClickToCopyDirective, E2eDirective } from './directives';
 
 import {
+  DxDataGridService,
   ErrorDetailService,
   ErrorDetailDialogService,
   MenuService,
+  LocalSearchService,
   ToastService,
   UserService,
   JwtService,
   ConfigService,
+  SideNavService,
   WindowService,
+  HeaderProgressService,
   DynamicModuleService
 } from './services';
 
@@ -120,17 +124,21 @@ const DIRECTIVES = [
 ];
 
 const SERVICES = [
-  SidenavMenuService,
-  ErrorDetailService,
-  ErrorDetailDialogService,
-  ToastService,
-  ConfigService,
   ChartService,
-  WindowService,
+  ConfigService,
+  DxDataGridService,
+  DynamicModuleService,
+  ErrorDetailDialogService,
+  ErrorDetailService,
+  HeaderProgressService,
   JwtService,
-  UserService,
+  LocalSearchService,
   MenuService,
-  DynamicModuleService
+  SideNavService,
+  SidenavMenuService,
+  ToastService,
+  UserService,
+  WindowService
 ];
 
 const INTERCEPTORS = [

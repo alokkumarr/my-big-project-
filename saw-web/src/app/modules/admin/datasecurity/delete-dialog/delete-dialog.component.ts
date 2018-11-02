@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { UserAssignmentService } from './../userassignment.service';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'delete-dialog',
@@ -9,8 +8,6 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export class DeleteDialogComponent {
 
   constructor(
-    private _dialogRef: MatDialogRef<DeleteDialogComponent>,
-    private _userAssignmentService: UserAssignmentService,
     @Inject(MAT_DIALOG_DATA) public data
   ) {}
 }

@@ -16,7 +16,7 @@ import {
 export const routes: Routes = [
   {
     // name: 'admin',
-    path: 'admin',
+    path: '',
     component: AdminPageComponent,
     canActivate: [isAdminGuard],
     canActivateChild: [isAdminGuard],
