@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+		<relativePath></relativePath>
+	</parent>
+	<groupId>com.synchronoss.saw</groupId>
+	<artifactId>saw-plugin-interfaces</artifactId>
+	<version>${revision}</version>
+	<name>saw-plugin-interfaces</name>
+  <properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	<json.validate>2.2.6</json.validate>
+		<java.version>1.8</java.version>
+		<jackson-coreutils>1.8</jackson-coreutils>
+		<json-core>1.2.5</json-core>
+		<snotify>1.1</snotify>
+		<wire.mock>2.7.1</wire.mock>
+		<spring.swagger>2.8.0</spring.swagger>
+		<guava>19.0</guava>
+        <commons-lang.version>2.6</commons-lang.version>
+        <fastjson.version>1.2.38</fastjson.version>
+		<compress>1.18</compress>        
+  </properties>
+	<dependencies>
+	<dependency>
+	       <groupId>org.pf4j</groupId>
+	        <artifactId>pf4j</artifactId>
+	        <version>2.3.0</version>
+	</dependency>
+	
+	<!-- Dependencies for logging service -->
+    <!-- Dependencies for scheduler service -->
+    <!-- Dependencies for Spring Boot without the tomcat -->
+       	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+       	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>${wire.mock}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path-assert</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons-lang.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-integration</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${spring.swagger}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${spring.swagger}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+    	<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<scope>provided</scope>
+			<version>${compress}</version>
+		</dependency>
+    
+    </dependencies>
+    <repositories>
+		<repository>
+			<id>synchronoss</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+		</repository>
+		<repository>
+			<id>synchronoss-snapshots</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
+		</repository>
+	</repositories>
+</project>
