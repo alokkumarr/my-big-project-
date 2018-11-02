@@ -6,9 +6,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.ValidatableResponse;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.FixMethodOrder;
@@ -31,36 +34,53 @@ public class BatchIngestionIT extends BaseIT {
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
   private ObjectNode prepareChannelDataSet() throws JsonProcessingException {
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("channelName", "Messaging");
+    childNode.put("channelType", "SCP");
+    childNode.put("hostName", "saw01.ana.demo.vaste.sncrcorp.net");
+    childNode.put("portNo", 22);
+    childNode.put("accessType", "read");
+    childNode.put("userName", "sawadmin@sncr.com");
+    childNode.put("password", "AbcX1245yfgskl");
+    childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
     root.put("channelType", "SFTP");
-    root.put("channelMetadata",
-        "{\"sourceName\":\"Messaging\",\"sourceType\":\"SFTP\",\"hostName\":"
-        + "\"saw01.ana.demo.vaste.sncrcorp.net\",\"portNo\":8300,\"accessType\":\"RW\","
-        + "\"userName\":\"sip-user\","
-        + "\"password\":\"****************\""
-        + ",\"description\":\"SoftBank SFTP source\"}");
+    root.put("channelMetadata",new ObjectMapper().writeValueAsString(childNode));;
     return root;
   }
 
   private ObjectNode prepareRouteDataSet() throws JsonProcessingException {
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("status", "active");
+    childNode.put("routeName", "route123");
+    childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
+    childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
+    childNode.put("sourceLocation", "/tmp");
+    childNode.put("destinationLocation", "/dest/tmp");
+    childNode.put("filePattern", "*.csv");
+    childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
+    childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
-    root.put("routeMetadata",
-         "{\"status\":\"active\",\"routeName\":\"route123\","
-         + "\"startDate\":\"2013/02/15\",\"endDate\":\"2013/04/15\","
-         + "\"recurrenceRule\":\"FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10\","
-         + "\"sourceLocation\":\"/data/Messaging\",\"filePattern\":\"*.csv\","
-         + "\"unCompressionReq\":true,\"destinationLocation\":\"/var/sip/incoming\","
-         + "\"recursiveExtraction\":false,\"archivalReq\":true,"
-         + "\"createDestinationFolder\":true,\"validators\":\"zero size, Duplicate\"}");
+    root.put("routeMetadata",new ObjectMapper().writeValueAsString(childNode));
     return root;
   }
   
   private ObjectNode prepareUpdateChannelDataSet() throws JsonProcessingException {
+
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("channelName", "Messaging");
+    childNode.put("channelType", "SCP");
+    childNode.put("hostName", "saw01.ana.demo.vaste.sncrcorp.net");
+    childNode.put("portNo", 22);
+    childNode.put("accessType", "write");
+    childNode.put("userName", "sawadmin@sncr.com");
+    childNode.put("password", "AbcX1245yfgskl");
+    childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("modifiedBy", "sncr@synchronoss.com");
@@ -68,27 +88,25 @@ public class BatchIngestionIT extends BaseIT {
     root.put("customerCode", "SAW");
     root.put("projectCode", "workbench");
     root.put("channelType", "SFTP");
-    root.put("channelMetadata",
-         "{\"sourceName\":\"Messaging\",\"sourceType\":\"SFTP\","
-          + "\"hostName\":\"saw01.ana.demo.vaste.sncrcorp.net\","
-          + "\"portNo\":8300,\"accessType\":\"RW\","
-          + "\"userName\":\"sip-user\","
-          + "\"password\":\"****************\",\"description\":\"SoftBank SFTP source\"}");
+    root.put("channelMetadata",new ObjectMapper().writeValueAsString(childNode));;
     return root;
   }
 
   private ObjectNode prepareUpdateRouteDataSet() throws JsonProcessingException {
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("status", "active");
+    childNode.put("routeName", "route456");
+    childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
+    childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
+    childNode.put("sourceLocation", "/tmp");
+    childNode.put("destinationLocation", "/dest/tmp");
+    childNode.put("filePattern", "*.csv");
+    childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
+    childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("modifiedBy", "dataAdmin@synchronoss.com");
-    root.put("routeMetadata",
-         "{\"status\":\"active\",\"routeName\":\"route456\",\"startDate\":\"2013/02/15\","
-         + "\"endDate\":\"2013/04/15\","
-         + "\"recurrenceRule\":\"FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10\","
-         + "\"sourceLocation\":\"/data/Messaging\",\"filePattern\":\"*.csv\","
-         + "\"unCompressionReq\":true,\"destinationLocation\":\"/var/sip/incoming\","
-         + "\"recursiveExtraction\":false,\"archivalReq\":true,"
-         + "\"createDestinationFolder\":true,\"validators\":\"zero size, Duplicate\"}");
+    root.put("routeMetadata",new ObjectMapper().writeValueAsString(childNode));
     return root;
   }
   
@@ -121,7 +139,7 @@ public class BatchIngestionIT extends BaseIT {
       .post(BATCH_CHANNEL_PATH)
       .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
-    log.info("bisChannelSysId : " + bisChannelSysId);
+    log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     ValidatableResponse response = given(authSpec)
@@ -140,7 +158,7 @@ public class BatchIngestionIT extends BaseIT {
     .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);  
     List<?> listOfChannel = given(authSpec).when().get(BATCH_CHANNEL_PATH).then().assertThat()
          .statusCode(200).extract().response().jsonPath().getJsonObject("content");
-    log.info("readChannel :" + listOfChannel);
+    log.debug("readChannel :" + listOfChannel);
     assertTrue(listOfChannel.size() > 0);
   }
 
@@ -158,12 +176,12 @@ public class BatchIngestionIT extends BaseIT {
     given(authSpec)
         .body(prepareRouteDataSet())
         .when().post(routeUri).then().assertThat().statusCode(200);
-    log.info("bisChannelSysId : " + bisChannelSysId);
+    log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     List<?> listOfRoutes = given(authSpec).when().get(routeUri)
          .then().assertThat().statusCode(200)
          .extract().response().jsonPath().getJsonObject("content");
-    log.info("readRoute :" + listOfRoutes);
+    log.debug("readRoute :" + listOfRoutes);
     assertTrue(listOfRoutes.size() > 0);
   }
 
@@ -176,14 +194,14 @@ public class BatchIngestionIT extends BaseIT {
     .body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
     .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
-    log.info("bisChannelSysId : " + bisChannelSysId);
+    log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
-    log.info("updateChannel urlForThetoUpdate : " + urlForThatoUpdate);
+    log.debug("updateChannel urlForThetoUpdate : " + urlForThatoUpdate);
     String modifiedBy = given(authSpec).body(prepareUpdateChannelDataSet())
         .when().put(urlForThatoUpdate).then().assertThat().statusCode(200).extract().response()
         .body().jsonPath().getJsonObject("modifiedBy");
-    log.info("updateChannel :" + modifiedBy);
+    log.debug("updateChannel :" + modifiedBy);
     assertNotNull(modifiedBy);
   }
 
@@ -197,18 +215,18 @@ public class BatchIngestionIT extends BaseIT {
     .post(BATCH_CHANNEL_PATH)
     .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
-    log.info("bisChannelSysId : " + bisChannelSysId);
+    log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     given(authSpec)
             .body(prepareRouteDataSet())
             .when().post(urlForThatRouteUpdate).then().assertThat().statusCode(200);
-    log.info("updateRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
+    log.debug("updateRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
     List<HashMap<Object,Object>> bisRouteSysId = given(authSpec)
         .when().get(urlForThatRouteUpdate).then()
         .assertThat().statusCode(200).extract().response().jsonPath().getJsonObject("content");
     Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
-    log.info(" updateRoute bisRouteSysId : " + routeId);
+    log.debug(" updateRoute bisRouteSysId : " + routeId);
     String urlForThatRouteUpdateById = BATCH_CHANNEL_PATH + "/" 
         + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
     String modifiedBy = given(authSpec).body(prepareUpdateRouteDataSet())
@@ -216,7 +234,7 @@ public class BatchIngestionIT extends BaseIT {
         .assertThat().statusCode(200).extract().response()
         .body().jsonPath()
         .getJsonObject("modifiedBy");
-    log.info("updateRoute :" + modifiedBy);
+    log.debug("updateRoute :" + modifiedBy);
     assertNotNull(modifiedBy);
   }
 
@@ -230,18 +248,18 @@ public class BatchIngestionIT extends BaseIT {
    .post(BATCH_CHANNEL_PATH)
    .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
-    log.info("bisChannelSysId : " + bisChannelSysId);
+    log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     given(authSpec)
             .body(prepareRouteDataSet())
             .when().post(urlForThatRouteUpdate).then().assertThat().statusCode(200);
-    log.info("deleteRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
+    log.debug("deleteRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
     List<HashMap<Object,Object>> bisRouteSysId = given(authSpec)
             .when().get(urlForThatRouteUpdate).then()
             .assertThat().statusCode(200).extract().response().jsonPath().getJsonObject("content");
     Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
-    log.info(" deleteRoute bisRouteSysId : " + routeId);
+    log.debug(" deleteRoute bisRouteSysId : " + routeId);
     String urlForThatRouteUpdateById = BATCH_CHANNEL_PATH + "/" 
             + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
     given(authSpec)
@@ -259,10 +277,10 @@ public class BatchIngestionIT extends BaseIT {
     .post(BATCH_CHANNEL_PATH)
     .then().assertThat().statusCode(200);  
     Long bisChannelSysId = getChannelId();
-    log.info("bisChannelSysId : " + bisChannelSysId);
+    log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
-    log.info("deleteChannel urlForThetoUpdate : " + urlForThatoUpdate);
+    log.debug("deleteChannel urlForThetoUpdate : " + urlForThatoUpdate);
     given(authSpec).when().delete(urlForThatoUpdate).then()
    .assertThat().statusCode(200);
   }
