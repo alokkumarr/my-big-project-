@@ -158,6 +158,7 @@ class ReportExecutorQueue(val executorType: String) {
     try {
       log.debug("Executing analysis {}, result {}", analysisId, resultId: Any)
       val analysis = new Analysis(analysisId)
+     // analysis.executeAndWait(executionType, query, resultId,limit)
       analysis.executeAndWait(executionType, query, resultId,limit)
     } catch {
       case e: Exception =>

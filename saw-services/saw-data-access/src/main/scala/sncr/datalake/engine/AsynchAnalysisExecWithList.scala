@@ -23,7 +23,7 @@ class AsynchAnalysisExecWithList(an: AnalysisNode, execType : ExecutionType)
         startExecution()
         if (status == ExecutionStatus.COMPLETED){
           m_log debug "Execution completed successfully"
-          getAllData
+          throw new RuntimeException("getData: No longer supported to prevent out of memory issues")
         }
         else {
           m_log debug s"Execution status: ${status.toString}"

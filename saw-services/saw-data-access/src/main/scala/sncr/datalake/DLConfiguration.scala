@@ -37,8 +37,6 @@ object DLConfiguration {
   protected var ctx : SparkContext = null
   protected var sparkConf : SparkConf = null
 
-
-
   logger debug "Configure MAPR: "
   protected val config = new Configuration
   config.set("fs.defaultFS", "maprfs:///")
