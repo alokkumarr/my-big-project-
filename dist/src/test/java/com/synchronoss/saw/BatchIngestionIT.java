@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_CHANNEL = "channels";
   private static final String BATCH_ROUTE = "routes";
@@ -120,7 +119,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to create a channel in batch Ingestion.
    */
-  @Test(timeout = 300000)
+  @Test
   public void createChannel() throws JsonProcessingException {
     ValidatableResponse response = given(authSpec)
         .body(prepareChannelDataSet()).when()
@@ -132,7 +131,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to create a route in batch Ingestion.
    */
-  @Test(timeout = 300000)
+  @Test
   public void createRoute() throws JsonProcessingException {
     given(authSpec)
       .body(prepareChannelDataSet()).when()
@@ -149,9 +148,9 @@ public class BatchIngestionIT extends BaseIT {
   }
 
   /**
-   * The test case is to read a route in batch Ingestion.
+   * The test case is to read a channel in batch Ingestion.
    */
-  @Test(timeout = 300000)
+  @Test
   public void readChannel() throws JsonProcessingException {
     given(authSpec)
     .body(prepareChannelDataSet()).when()
@@ -165,7 +164,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to read a route in batch Ingestion.
   */
-  @Test(timeout = 300000)
+  @Test
   public void readRoute() throws JsonProcessingException {
     given(authSpec)
     .body(prepareChannelDataSet()).when()
@@ -186,9 +185,9 @@ public class BatchIngestionIT extends BaseIT {
   }
 
   /**
-   * The test case is to update a route in batch Ingestion.
+   * The test case is to update a channel in batch Ingestion.
   */
-  @Test(timeout = 300000)
+  @Test
   public void updateChannel() throws JsonProcessingException {
     given(authSpec)
     .body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
@@ -208,7 +207,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to update a route in batch Ingestion.
    */
-  @Test(timeout = 300000)
+  @Test
   public void updateRoute() throws JsonProcessingException {
     given(authSpec)
     .body(prepareChannelDataSet()).when()
@@ -241,7 +240,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
     * The test case is to delete a route in batch Ingestion.
     */
-  @Test(timeout = 300000)
+  @Test
   public void deleteRoute() throws JsonProcessingException {
     given(authSpec)
    .body(prepareChannelDataSet()).when()
@@ -268,9 +267,9 @@ public class BatchIngestionIT extends BaseIT {
   }
 
   /**
-   * The test case is to update a route in batch Ingestion.
+   * The test case is to delete a route in batch Ingestion.
    */
-  @Test(timeout = 300000)
+  @Test
   public void deleteChannel() throws JsonProcessingException {
     given(authSpec)
     .body(prepareChannelDataSet()).when()
