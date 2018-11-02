@@ -108,6 +108,11 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     executionCode = ProcessingResult.Success.id
   }
 
+  /**
+    * This method added to re-use the spark-session across multiple query execution.
+    * @param sqlRuntime
+    * @param limit
+    */
   def executeDLAnalysis( sqlRuntime: String = null,
                   limit: Integer = DLConfiguration.rowLimit): Unit = {
     val viewName = "AN_" + System.currentTimeMillis()
@@ -136,13 +141,11 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           DLExecutionObject.dlSessions.execute(viewName, sqlRuntime, limit)
           m_log.trace("Location : " + outputLocation)
           DLExecutionObject.dlSessions.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
-          analysisNodeExecution.createAnalysisResultForOneTime(resultId)
         }
         case ExecutionType.preview => {
           DLExecutionObject.dlSessions.execute(viewName, sqlRuntime, limit)
           m_log.trace("Location : " + outputLocation)
           DLExecutionObject.dlSessions.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
-          analysisNodeExecution.createAnalysisResultForOneTime(resultId)
         }
         case ExecutionType.regularExecution => {
           if (DLConfiguration.publishRowLimit > 0)
@@ -151,7 +154,6 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
             DLExecutionObject.dlSessions.execute(viewName, sqlRuntime)
           m_log.trace("Location : " + outputLocation)
           DLExecutionObject.dlSessions.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
-          analysisNodeExecution.createAnalysisResultForOneTime(resultId)
         }
         case ExecutionType.publish => {
           if (DLConfiguration.publishRowLimit > 0)

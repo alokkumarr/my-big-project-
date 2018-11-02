@@ -181,7 +181,6 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   def createAnalysisResult(resId: String = null, out: OutputStream = null, executionType :String): Unit = {
 
     createAnalysisResultHeader(resId)
-   // saveData(analysisKey, outputLocation, outputType)
     finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
       JField("execution_finish_ts", JInt(finishedTS)),
@@ -208,28 +207,12 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   }
 
   /**
-    * The method creates AnalysisResult for one time/preview execution:
-    * 1. Creates result of SQL execution
-    * 2. write the output with preview identifier to differentiate from actual execution history,
-    *  these location can be cleaned up on periodic basis, since execution results are for one time use.
-    */
-  def createAnalysisResultForOneTime(resId: String): Unit = {
-    val previewLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(initOutputLocation)+
-      File.separator+ "preview-"+resId
-    //saveData(analysisKey,previewLocation , outputType)
-    finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
-    m_log debug("finishedTS:"+ finishedTS)
-  }
-
-
-  /**
     * The method creates AnalysisResult node:
     * 1. Creates node from result of SQL execution
     * 2. if out parameter is not null - appends it this ResultNode represented in JSON format.
     *
     */
   def completeAnalysisResult: Unit = {
-    saveData(analysisKey, outputLocation, outputType)
     finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
       JField("execution_finish_ts", JInt(finishedTS)),
