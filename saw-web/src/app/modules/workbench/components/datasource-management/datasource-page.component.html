@@ -7,7 +7,7 @@
       <span fxFlex></span>
       <div class="action-buttons" fxLayout="row" fxLayoutGap="10px">
         <button mat-raised-button color="primary" (click)="createSource(undefined)">
-          <span i18n>+ Source</span>
+          <span i18n>+ Channel</span>
         </button>
       </div>
     </mat-toolbar-row>
@@ -31,7 +31,7 @@
         <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
         <dxo-search-panel [visible]="true" [width]="220" placeholder="Search..."></dxo-search-panel>
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
-        <dxi-column caption="Source Name" dataField="channelName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
+        <dxi-column caption="Channel Name" dataField="channelName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
         <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
         <div *dxTemplate="let data of 'sourceTypeTemplate'">
           <div class="master-detail-caption">{{selectedSourceType | uppercase}}</div>
@@ -52,11 +52,11 @@
             <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
           <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="createSource(selectedSourceData)"
-            matTooltip="Edit Source" i18n-matTooltip>
+            matTooltip="Edit Channel" i18n-matTooltip>
             <mat-icon fontIcon="icon-edit-solid"></mat-icon>
           </button>
           <button mat-mini-fab class="mat-elevation-z3" color="warn" (click)="deleteChannel(selectedSourceData?.bisChannelSysId)"
-            matTooltip="Delete Source" i18n-matTooltip>
+            matTooltip="Delete Channel" i18n-matTooltip>
             <mat-icon fontIcon="icon-delete-solid"></mat-icon>
           </button>
           <button mat-raised-button color="primary" (click)="createRoute( selectedSourceData?.bisChannelSysId)">

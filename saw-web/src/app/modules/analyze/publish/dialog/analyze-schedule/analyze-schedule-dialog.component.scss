@@ -2,7 +2,6 @@
 
 :host {
   display: block;
-  padding: 10px;
   color: $primary-grey-g4;
 }
 
@@ -16,7 +15,6 @@ header {
 
 .dialog__content {
   width: 700px;
-  max-height: 550px;
 
   .label-inline-with-select {
     text-align: center;

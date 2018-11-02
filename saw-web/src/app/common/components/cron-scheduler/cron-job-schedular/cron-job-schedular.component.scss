@@ -6,8 +6,7 @@
 }
 
 .schedule-container {
-  height: calc(100% - 5px);
-  // border: 2px solid $background-color;
+  height: 300px;
   border-radius: 5px;
   background-color: $background-color;
 
@@ -49,6 +48,14 @@
     ::ng-deep .mat-form-field-infix {
       padding: 0.7em 0;
       border-top: 0;
+    }
+  }
+
+  .monthly-select {
+    max-width: 65px !important;
+
+    ::ng-deep .mat-select-value {
+      max-width: fit-content;
     }
   }
 
