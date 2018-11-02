@@ -11,12 +11,20 @@
 h2.mat-dialog-title {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: start;
+  margin: 0;
+
+  ::ng-deep span.mat-button-wrapper {
+    position: relative;
+    top: -10px;
+  }
 }
 
 .mat-dialog-content {
   padding: 0 20px;
+  overflow: hidden;
   flex-grow: 1;
+  max-height: unset;
 }
 
 mat-form-field {
@@ -26,6 +34,10 @@ mat-form-field {
   ::ng-deep .mat-form-field-infix {
     padding: 1em 0 0.5em 0;
     border: none;
+
+    input {
+      line-height: 21px;
+    }
   }
 
   ::ng-deep .mat-form-field-suffix, ::ng-deep .mat-form-field-prefix {
@@ -34,6 +46,7 @@ mat-form-field {
 
   ::ng-deep .mat-form-field-suffix {
     font-size: 10px;
+    top: -2px;
     cursor: pointer;
   }
 }
@@ -61,13 +74,17 @@ mat-tab-group {
 }
 
 mat-radio-group {
-  justify-content: center;
+  overflow: scroll;
+  height: 335px;
+  align-content: start;
 }
 
 .metric-radio-button {
   border: 1px solid $primary-grey-g1;
   border-radius: 5px;
-  margin: 0 5px 5px;
+  margin: 0 2px 5px;
+  width: 32%;
+  max-height: 64px;
 
   ::ng-deep label.mat-radio-label {
     height: 60px;
@@ -101,7 +118,7 @@ mat-radio-group {
     .category-detail {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      padding-left: 6px;
       flex-grow: 1;
     }
   }
