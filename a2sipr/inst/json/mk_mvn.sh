@@ -20,7 +20,12 @@ if (( $# )) ; then
             shift
     else
         # skip '-' arg
-        [[ $arg = '-' ]] && shift
+		if [[ $arg == 'offline' ]] ; then
+		    installtype=$arg
+			shift
+		else
+		    [[ $arg = '-' ]] && shift
+		fi
     fi
 else
     # default arguments
@@ -62,17 +67,30 @@ wnum=
 # Download R packages as tarball files from 
 # Central repository to packages folder
 
-while IFS='|' read -r -a input; do
- url="${input[2]}"/"${input[0]}"_"${input[1]}".tar.gz
- file_name=../pkgs/"${input[0]}"_"${input[1]}".tar.gz
- curl $url --output $file_name
-done < pkgs.txt
+CMD_DIR=$(cd $(dirname $0); pwd )
+PKG_DIR=${CMD_DIR/json/pkgs}
+
+if (( ${installtype} == "offline" )); then
+    while IFS='|' read -r -a input; do
+	  url="${input[2]}"/"${input[0]}"_"${input[1]}".tar.gz
+	  file_name=$PKG_DIR/"${input[0]}"_"${input[1]}".tar.gz
+	  curl $url --output $file_name
+	                            
+	  file_size=$(du -k "$file_name" | cut -f1)
+
+	  if (( $file_size <= 4 )); then
+	    echo ERROR:Package Download Failure
+	    exit 1
+	  fi
+	  
+	done < pkgs.txt
+fi
 
 # RPM release number:
 # ( b<BAMBOO_BUILD> / c<COMMIT_COUNT> / u999 )_g<HEAD_HASH>[ _w<DAY_OF_YEAR>.<MIN_OF_DAY> ]
 rpm_release=${btyp}${bnum}_g${git_head}${wnum:-}
 
-mvn_cmd=( mvn -Dprod.release=${rpm_release} "$@" )
+mvn_cmd=( mvn -Dprod.release=${rpm_release} -Dpkg.inst.type=${installtype} "$@" )
 
 echo '########################'
 echo 'EXECUTE MAVEN'
@@ -141,13 +159,7 @@ exit
 ./mk_mvn.sh ${bamboo.buildNumber}
 
 ########
-# To build XDF with custom name:
+# To build a2 modules with custom name:
 ########
-./mk_mvn.sh -Dprod.name=xdf-sv clean package
-# NB: no underscore in custom name
-
-########
-# To build xda-genapp with custom name:
-########
-./mk_mvn.sh -Dprod.shortName=my-own-app clean package
+./mk_mvn.sh -DartifactId=a2modules clean package
 # NB: no underscore in custom name
