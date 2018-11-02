@@ -43,7 +43,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("userName", "sawadmin@sncr.com");
     childNode.put("password", "AbcX1245yfgskl");
     childNode.put("description", "file");
-	ObjectNode root = mapper.createObjectNode();
+    ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
@@ -54,16 +54,16 @@ public class BatchIngestionIT extends BaseIT {
   }
 
   private ObjectNode prepareRouteDataSet() throws JsonProcessingException {
-     ObjectNode childNode = mapper.createObjectNode();
-	 childNode.put("status", "active");
-	 childNode.put("routeName", "route123");
-	 childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-	 childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-	 childNode.put("sourceLocation", "/tmp");
-	 childNode.put("destinationLocation", "/dest/tmp");
-	 childNode.put("filePattern", "*.csv");
-	 childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
-	 childNode.put("description", "file");
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("status", "active");
+    childNode.put("routeName", "route123");
+    childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
+    childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
+    childNode.put("sourceLocation", "/tmp");
+    childNode.put("destinationLocation", "/dest/tmp");
+    childNode.put("filePattern", "*.csv");
+    childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
+    childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("routeMetadata",new ObjectMapper().writeValueAsString(childNode));
@@ -73,15 +73,15 @@ public class BatchIngestionIT extends BaseIT {
   private ObjectNode prepareUpdateChannelDataSet() throws JsonProcessingException {
 
     ObjectNode childNode = mapper.createObjectNode();
-	childNode.put("channelName", "Messaging");
-	childNode.put("channelType", "SCP");
-	childNode.put("hostName", "saw01.ana.demo.vaste.sncrcorp.net");
-	childNode.put("portNo", 22);
-	childNode.put("accessType", "write");
-	childNode.put("userName", "sawadmin@sncr.com");
-	childNode.put("password", "AbcX1245yfgskl");
-	childNode.put("description", "file");
-	ObjectNode root = mapper.createObjectNode();
+    childNode.put("channelName", "Messaging");
+    childNode.put("channelType", "SCP");
+    childNode.put("hostName", "saw01.ana.demo.vaste.sncrcorp.net");
+    childNode.put("portNo", 22);
+    childNode.put("accessType", "write");
+    childNode.put("userName", "sawadmin@sncr.com");
+    childNode.put("password", "AbcX1245yfgskl");
+    childNode.put("description", "file");
+    ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("modifiedBy", "sncr@synchronoss.com");
     root.put("productCode", "SIP");
@@ -103,7 +103,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("filePattern", "*.csv");
     childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
     childNode.put("description", "file");
-	ObjectNode root = mapper.createObjectNode();
+    ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("modifiedBy", "dataAdmin@synchronoss.com");
     root.put("routeMetadata",new ObjectMapper().writeValueAsString(childNode));
