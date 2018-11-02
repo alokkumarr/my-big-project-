@@ -56,7 +56,7 @@ datapod:
         host: http://localhost:9900
 batch:
     service:
-        host: http://localhost:9641
+        host: http://localhost:9950
 
 api:
   gateway:
