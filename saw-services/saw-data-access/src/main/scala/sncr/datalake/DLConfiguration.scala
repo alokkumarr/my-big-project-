@@ -56,6 +56,8 @@ object DLConfiguration {
 
   val rowLimit = if (cfg.hasPath("sql-executor.preview-rows-limit")) cfg.getInt("sql-executor.preview-rows-limit") else 100
   val publishRowLimit = if (cfg.hasPath("sql-executor.publish-rows-limit")) cfg.getInt("sql-executor.publish-rows-limit") else -1
+  val executorRestartThreshold = if (cfg.hasPath("sql-executor.executor-restart-threshold"))
+    cfg.getInt("sql-executor.executor-restart-threshold") else 100
   val jarLocation = cfg.getString ("sql-executor.jar-location")
   val commonLocation = cfg.getString ("sql-executor.output-location")
   val semanticLayerTempLocation = cfg.getString ("sql-executor.semantic-layer-tmp-location")
