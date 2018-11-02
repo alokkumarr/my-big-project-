@@ -54,9 +54,9 @@
 
   <div *dxTemplate="let cell of 'groupAssignCellTemplate'">
     <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container group-select">
-
         <mat-form-field class="select-form-field assignments-grid" appearance="outline" style="margin-bottom: 0px;">
             <mat-select [(ngModel)]="cell.data.groupName" (selectionChange)="assignGrouptoUser($event, cell)">
+              <mat-option *ngIf="securityGroups.length === 0" value="-2">No group available</mat-option>
               <mat-option *ngFor="let group of securityGroups" [value]="group.securityGroupName">
                   {{group.securityGroupName}}
               </mat-option>
