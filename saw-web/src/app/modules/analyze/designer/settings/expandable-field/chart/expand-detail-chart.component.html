@@ -6,7 +6,11 @@
     </mat-radio-group>
     <br/>
     <mat-form-field style="width:35%;">
-        <input matInput type="number" [(ngModel)]="limitValue" min="0" placeholder="Value"/>
+        <input matInput type="number"
+                        [(ngModel)]="limitValue"
+                        autocomplete="off"
+                        min="0"
+                        placeholder="Value"/>
     </mat-form-field>
     <button mat-button color="primary" class="mat-raised-button mat-primary chart-title-button" (click)="onLimitDataChange()" style="float: right;">Apply Limit</button>
   </div>

@@ -3,6 +3,7 @@
       <input matInput type="text"
              placeholder="Alias"
              (input)="onAliasChange($event.target.value)"
+             autocomplete="off"
              [value]="artifactColumn.aliasName || ''"/>
   </mat-form-field>
 
