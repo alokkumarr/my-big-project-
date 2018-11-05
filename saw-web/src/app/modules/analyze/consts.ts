@@ -169,7 +169,7 @@ export const ANALYSIS_METHODS = [
     category: 'analysis',
     children: [
       {
-        label: 'Charts',
+        label: 'Chart',
         icon: { font: 'icon-vert-bar-chart' },
         type: '',
         children: [
