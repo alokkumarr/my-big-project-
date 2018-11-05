@@ -14,9 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -283,4 +281,6 @@ public class BatchIngestionIT extends BaseIT {
     given(authSpec).when().delete(urlForThatoUpdate).then()
    .assertThat().statusCode(200);
   }
+  
+  
 }

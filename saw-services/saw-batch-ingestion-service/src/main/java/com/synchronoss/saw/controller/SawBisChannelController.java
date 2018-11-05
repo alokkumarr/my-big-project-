@@ -49,8 +49,6 @@ public class SawBisChannelController {
   
   /**
    * This API provides an ability to add a source. 
-   * @param requestBody String
-   * @return encrypted password String
    */
   @ApiOperation(value = "Add a new channel",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
@@ -81,7 +79,6 @@ public class SawBisChannelController {
 
   /**
    * This API provides an ability to read a source with pagination. 
-   * @return encrypted password String
    */
   
   @ApiOperation(value = "Reading list of channels & paginate",
@@ -116,7 +113,6 @@ public class SawBisChannelController {
 
   /**
    * This API provides an ability to read a source by id. 
-   * @return encrypted password String
    */
   
   @ApiOperation(value = "Reading channel by id",
@@ -145,8 +141,6 @@ public class SawBisChannelController {
 
   /**
    * This API provides an ability to update a source. 
-   * @param requestBody String
-   * @return encrypted password String
    */
   @ApiOperation(value = "Updating an existing channel",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
@@ -183,7 +177,6 @@ public class SawBisChannelController {
 
   /**
    * This API provides an ability to delete a source. 
-   * @return encrypted password String
    */
   @ApiOperation(value = "Deleting an existing channel",
       nickname = "actionBis", notes = "", response = Object.class)
