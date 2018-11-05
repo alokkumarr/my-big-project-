@@ -231,6 +231,29 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTPS versions.
 
+==== Configuring
+
+RTPS must be configured to keep memory consumption within the limits
+provided by the Spark configuration.  The memory consumption of RTPS
+depends on the number of records in each batch and the size of each
+record.  The number of records included into each batch can be
+configured in the RTPS configuration file `appl.conf` as shown below:
+
+        spark {
+          streaming.kafka.maxRatePerPartition = 1000
+        }
+
+The `maxRatePerPartition` parameter sets an upper limit on the number
+of records fetched per second per MapR stream partition.  If the limit
+is lowered, the upper bound of RTPS memory consumption is also
+decreased.
+
+NOTE: If the RTPS has been down for an extended period of time, a
+large backlog of messages might have been built up.  To prevent the
+RTPS from running into memory errors while processing a large backlog
+of messages, ensure it has been properly configured to limit memory
+consumption.
+
 === RTIS
 
 ==== Installing
