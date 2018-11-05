@@ -27,13 +27,12 @@ export class ExportService {
   ) {}
 
   getMetricList() {
-    const params = this.getRequestParams([
-      ['contents.action', 'search'],
-      ['contents.select', 'headers'],
-      ['contents.context', 'Semantic']
-    ]);
+    const projectId = 'workbench';
     return this._adminService
-      .request<MetricResponse>('md', params, { forWhat: 'export' })
+      .getRequest<MetricResponse>(
+        `internal/semantic/md?projectId=${projectId}`,
+        { forWhat: 'export' }
+      )
       .pipe(mapObservable(fpGet(`contents.[0].${MODULE_NAME}`)))
       .toPromise();
   }
