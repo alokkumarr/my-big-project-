@@ -169,17 +169,6 @@ export const ANALYSIS_METHODS = [
     category: 'analysis',
     children: [
       {
-        label: 'Report',
-        icon: { font: 'icon-report' },
-        type: 'table:report',
-        supportedTypes: ['table:report', 'table:esReport']
-      },
-      {
-        label: 'Pivot',
-        icon: { font: 'icon-pivot' },
-        type: 'table:pivot'
-      },
-      {
         label: 'Charts',
         icon: { font: 'icon-vert-bar-chart' },
         type: '',
@@ -242,6 +231,17 @@ export const ANALYSIS_METHODS = [
             typeOnBackEnd: 'chart:tsareaspline'
           }
         ]
+      },
+      {
+        label: 'Pivot',
+        icon: { font: 'icon-pivot' },
+        type: 'table:pivot'
+      },
+      {
+        label: 'Report',
+        icon: { font: 'icon-report' },
+        type: 'table:report',
+        supportedTypes: ['table:report', 'table:esReport']
       }
     ]
   }
