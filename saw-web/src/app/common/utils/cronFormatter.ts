@@ -86,11 +86,11 @@ export function generateWeeklyCron(cronWeek, dateSelects) {
 }
 
 export function generateMonthlyCron(cronMonth, dateSelects) {
-  const hourCron = hourToCron(
-    dateSelects.hour,
-    dateSelects.hourType,
-    dateSelects.minute
-  );
+  // const hourCron = hourToCron(
+  //   dateSelects.hour,
+  //   dateSelects.hourType,
+  //   dateSelects.minute
+  // );
   if (cronMonth.monthlyType === 'monthlyDay') {
     return `0 ${cronMonth} ${cronMonth.specificDay} 1/${
       cronMonth.specificMonth

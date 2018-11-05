@@ -236,7 +236,6 @@ export class DesignerContainerComponent implements OnInit {
     }
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
     forEach(sqlBuilder.nodeFields, node => {
-      const identical = false;
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
           sortCol => node.columnName === sortCol.columnName
@@ -379,11 +378,12 @@ export class DesignerContainerComponent implements OnInit {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
-        }
+          if (this.analysis.type === 'report' && response.designerQuery) {
+            (this.analysis as AnalysisReport).queryManual =
+              response.designerQuery;
 
-        if (this.analysis.type === 'report' && response.designerQuery) {
-          (this.analysis as AnalysisReport).queryManual =
-            response.designerQuery;
+            (this.analysis as AnalysisReport).query = response.designerQuery;
+          }
         }
       },
       err => {
@@ -453,7 +453,7 @@ export class DesignerContainerComponent implements OnInit {
           this.onSave.emit({
             requestExecution: shouldClose,
             analysis: result.analysis.type === 'report' ?
-              this._designerService.generateRequestPayload(cloneDeep(result.analysis)) :
+              this._designerService.generateReportPayload(cloneDeep(result.analysis)) :
               result.analysis
           });
           if (!shouldClose) {

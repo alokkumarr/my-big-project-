@@ -9,6 +9,7 @@ const protractorConf = require('../../protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const utils = require('../javascript/helpers/utils');
 const dataSets = require('../javascript/data/datasets');
+const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
 
 describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
@@ -17,7 +18,8 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const filterValue = '123';
   const groupName = 'Date';
   const metricName = dataSets.pivotChart;
-  const analysisType = 'chart:column';
+  const chartType = 'chart:column';
+  const analysisType = '';
 
   beforeAll(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
@@ -42,7 +44,13 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
         login.loginAs(data.user);
 
         // Create analysis
-        homePage.createAnalysis(metricName, analysisType);
+        let analyzePageV2 = new AnalyzePage();
+        analyzePageV2.clickOnAddAnalysisButton();
+        analyzePageV2.clickOnAnalysisType(analysisType);
+        analyzePageV2.clickOnChartType(chartType);
+        analyzePageV2.clickOnNextButton();
+        analyzePageV2.clickOnDataPods(metricName);
+        analyzePageV2.clickOnCreateButton();
 
         // Select axis and grouping and refresh
         const refreshBtn = chartDesigner.refreshBtn;

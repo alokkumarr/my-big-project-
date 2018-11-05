@@ -1,248 +1,314 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <!-- CHANGEME: Application version -->
-  <version>0.2.0</version>
-  <artifactId>a2sipr</artifactId>
-  <groupId>com.synchronoss</groupId>
-  <packaging>rpm</packaging>
-  <!-- -->
-  <properties>
-    <!-- CHANGEME: Application short name -->
-    <prod.shortName>a2sipr</prod.shortName>
-    <!--
-      default value here,
-      can be specified outside with -Dprod.release=RRR
-    -->
-    <prod.release>0_g0000_wip</prod.release>
-
-    <!-- Application/package name -->
-    <app.name>${prod.shortName}</app.name>
-    <!-- use prod.release property -->
-    <project.release>${prod.release}</project.release>
-
-    <!-- RPM properties -->
-    <!-- RPM file name -->
-    <rpm.name>bda-${app.name}</rpm.name>
-    <rpm.version>${project.version}</rpm.version>
-    <rpm.release>${project.release}</rpm.release>
-
-    <!-- XDF version (prefix) -->
-    <xdf.version>3.</xdf.version>
-    <!-- Application properties -->
-    <app.version>${rpm.version}</app.version>
-    <app.release>${rpm.release}</app.release>
-    <app.nameVer>${app.name}-${app.version}</app.nameVer>
-    <app.optParDir>/dfs/opt/bda/apps</app.optParDir>
-    <app.optDir>${app.optParDir}/${app.nameVer}</app.optDir>
-    <r.home>/dfs/opt/aa-r-fw</r.home>
-    <r.lib.home>/dfs/opt/aa-r-fw/libraries</r.lib.home>
-    <pkg.inst.switch>zip</pkg.inst.switch>
-    <app.user>mapr</app.user>
-    <app.group>mapr</app.group>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <build>
-    <defaultGoal>package</defaultGoal>
-    <plugins>
-      <!-- RPM plugin -->
-      <plugin>
-        <extensions>true</extensions>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rpm-maven-plugin</artifactId>
-        <version>2.1.5</version>
-        <configuration>
-          <license>Synchronoss proprietary product</license>
-          <distribution>AA distribution</distribution>
-          <needarch>false</needarch>
-          <targetOS>i386-linux</targetOS>
-          <group>AA Platform</group>
-          <packager>AA</packager>
-          <!-- RPM file name -->
-          <name>${rpm.name}</name>
-          <defineStatements>
-            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-          </defineStatements>
-          <defaultUsername>${app.user}</defaultUsername>
-          <defaultGroupname>${app.group}</defaultGroupname>
-          <defaultDirmode>0755</defaultDirmode>
-          <defaultFilemode>0444</defaultFilemode>
-          <mappings>
-            <!-- R standard a2 path -->
-            <mapping><directory>${r.home}</directory></mapping>
-            <!-- R standard library path -->
-            <mapping><directory>${r.lib.home}</directory></mapping>
-            <!-- Component R scripts & other R executables -->
-            <mapping><directory>${r.home}/exec</directory></mapping>
-            <!-- Configuration JSON, Packages files & shell executables -->
-            <mapping><directory>${r.home}/inst</directory></mapping>
-            <!-- a2sipr Documentation files -->
-            <mapping><directory>${app.optDir}/man</directory></mapping>
-            <!-- a2sipr R executables -->
-            <mapping><directory>${app.optDir}/R</directory></mapping>
-            <!-- ln -s <location><destination>-->
-            <!-- soft links created/removed in postinstall/preremove -->
-            <!-- app home soft link -->
-            <!-- app data soft link -->
-            <!-- executable files -->
-            <mapping>
-              <directoryIncluded>false</directoryIncluded>
-              <directory>${r.home}/exec</directory>
-              <filemode>0755</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>../../exec</location>
-                </source>
-              </sources>
-            </mapping>
-            <!-- Configuration files -->
-            <mapping>
-              <directory>${r.home}/inst</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>0644</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>../../inst</location>
-                </source>
-              </sources>
-            </mapping>
-            <!-- a2sipr Documentation files -->
-            <mapping>
-              <directory>${app.optDir}/man</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>0644</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>../../man</location>
-                </source>
-              </sources>
-            </mapping>
-            <!-- a2sipr R Executables -->
-            <mapping>
-              <directory>${app.optDir}/R</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>0755</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>../../R</location>
-                </source>
-              </sources>
-            </mapping>
-            <!-- a2sipr Project files -->
-            <mapping>
-              <directory>${app.optDir}</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>0644</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>../../</location>
-                  <includes>
-                    <include>.Rbuildignore</include>
-                    <include>a2sipr.Rproj</include>
-                    <include>DESCRIPTION</include>
-                    <include>LICENSE</include>
-                    <include>NAMESPACE</include>
-                  </includes>
-                </source>
-              </sources>
-            </mapping>
-          </mappings>
-          <preinstallScriptlet>
-            <script>
-echo begin pre-install: ${app.nameVer}
-#
-echo check ${app.user}:${app.group} user exists
-getent group ${app.group} &gt;/dev/null || {
-    echo error: no such group: ${app.group}
-    echo use sudo groupadd -g GID ${app.group}
-    exit 1
-}
-getent passwd ${app.user} &gt;/dev/null || {
-    echo error: no such user: ${app.user}
-    echo use sudo useradd -g GID -u UID ${app.user}
-    exit 1
-}
-#
-echo check /dfs/opt directory exists
-( cd /dfs/opt ) || exit
-echo check hdfs:///opt directory exists
-hadoop fs -stat hdfs:///opt &gt;/dev/null || exit
-#
-echo end pre-install: ${app.nameVer}
-#
-            </script>
-          </preinstallScriptlet>
-          <postinstallScriptlet>
-            <script>
-echo begin post-install: ${app.nameVer}
-#
-echo Create soft links
-( cd ${app.optParDir}; ln -s ${app.nameVer} ${app.name} )
-ls -l ${app.optParDir}/${app.name}
-#
-#
-echo '###############################'
-echo '# Install a2sipr package'
-echo '###############################'
-a2sipr_cmd='Rscript ${r.home}/exec/a2sipr-package-install.R ${app.optDir} ${r.lib.home}'
-$a2sipr_cmd || {
-  echo '################################'
-  echo '# a2sipr package installation failed'
-  echo '###############################'
-}
-echo '###############################'
-echo '# a2sipr package installation succeeded'
-echo '###############################'
-#
-#
-echo '###############################'
-echo '# Install required R packages'
-echo '###############################'
-r_inst_cmd=''
-if [[ ${pkg.inst.switch} -eq "zip" ]]; then
-  #r_inst_cmd='Rscript package-zip-install.R ${r.lib.home}/inst/pkgs ${r.lib.home}'
-  for z in ${r.home}/inst/pkgs/*.tar.gz; do dqt='"'; bash -c "R -e 'install.packages(pkgs=${dqt}$z${dqt},lib.loc=${dqt}${r.lib.home}${dqt},repos=NULL)'"; done
-  #for z in ${r.home}/inst/pkgs/*.tar.gz; do 'Rscript package-repo-install.R -p $z -l ${r.lib.home} -r NULL'; done
-else
-  r_inst_cmd='Rscript package-repo-install.R ${r.home}/inst/json/r-package-dependencies.json ${r.lib.home}'
-  $r_inst_cmd || {
-    echo '################################'
-	echo '# Package Installation failed'
-	echo '###############################'
-  }
-fi
-#
-#
-echo end post-install: ${app.nameVer}
-#
-            </script>
-          </postinstallScriptlet>
-          <preremoveScriptlet>
-            <script>echo start pre-remove: ${app.nameVer}
-#
-echo Remove soft links:
-( set -x; rm -f ${app.optParDir}/${app.name} )
-#
-echo Remove files in bin/:
-( set -x; rm -rf ${app.optDir} )
-            </script>
-          </preremoveScriptlet>
-          <postremoveScriptlet>
-            <script>
-            </script>
-          </postremoveScriptlet>
-        </configuration>
-      </plugin>
-      <!-- RPM plugin : end -->
-    </plugins>
-  </build>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.synchronoss.saw</groupId>
+   <artifactId>a2modules</artifactId>
+   <version>${revision}</version>
+   <description />
+   <properties>
+      <pkg.inst.type>online</pkg.inst.type>
+      <r.home>/dfs/opt/aa-r-fw</r.home>
+      <r.lib.home>/dfs/opt/aa-r-fw/libraries</r.lib.home>
+      <app.dir>/dfs/opt/bda/apps/${project.artifactId}_${project.version}</app.dir>
+      <app.user>mapr</app.user>
+      <app.group>mapr</app.group>
+   </properties>
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>de.dentrassi.maven</groupId>
+            <artifactId>rpm</artifactId>
+            <version>0.10.0</version>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>rpm</goal>
+                  </goals>
+                  <configuration>
+                     <packageName>a2modules</packageName>
+                     <version>0.2.0</version>
+                     <rulesets>
+                        <ruleset>
+                           <id>app-default</id>
+                           <rules>
+                              <rule>
+                                 <when>
+                                    <type>directory</type>
+                                 </when>
+                                 <mode>0644</mode>
+                                 <user>${app.user}</user>
+                                 <group>${app.group}</group>
+                              </rule>
+                              <rule>
+                                 <when>
+                                    <type>file</type>
+                                 </when>
+                                 <mode>0644</mode>
+                                 <user>${app.user}</user>
+                                 <group>${app.group}</group>
+                              </rule>
+                           </rules>
+                        </ruleset>
+                     </rulesets>
+                     <entries>
+                        <entry>
+                           <name>${r.home}</name>
+                           <directory>true</directory>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}</name>
+                           <directory>true</directory>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr</name>
+                           <directory>true</directory>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge</name>
+                           <directory>true</directory>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler</name>
+                           <directory>true</directory>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2charter</name>
+                           <directory>true</directory>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/json</name>
+                           <directory>true</directory>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/exec</name>
+                           <collect>
+                              <from>${project.basedir}/../../exec</from>
+                           </collect>
+                           <mode>0755</mode>
+						   <user>${app.user}</user>
+						   <group>${app.group}</group>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/json/corr-data.jconf.template</name>
+                           <file>corr-data.jconf.template</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/json/detect-data.jconf.template</name>
+                           <file>detect-data.jconf.template</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/json/rscript-conf-template.jconf.template</name>
+                           <file>rscript-conf-template.jconf.template</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/json/r-package-dependencies.json</name>
+                           <file>r-package-dependencies.json</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/json/r-package-test.json</name>
+                           <file>r-package-test.json</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/json/pkgs.txt</name>
+                           <file>pkgs.txt</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${r.home}/inst/sh</name>
+                           <collect>
+                              <from>${project.basedir}/../../inst/sh</from>
+                           </collect>
+						   <user>${app.user}</user>
+						   <group>${app.group}</group>
+                           <mode>0755</mode>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/pkgs</name>
+                           <collect>
+                              <from>${project.basedir}/../../inst/pkgs</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr/man</name>
+                           <collect>
+                              <from>${project.basedir}/../../man</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr/R</name>
+                           <collect>
+                              <from>${project.basedir}/../../R</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr/a2sipr.Rproj</name>
+                           <file>${project.basedir}/../../a2sipr.Rproj</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr/.Rbuildignore</name>
+                           <file>${project.basedir}/../../.Rbuildignore</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr/DESCRIPTION</name>
+                           <file>${project.basedir}/../../DESCRIPTION</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr/LICENSE</name>
+                           <file>${project.basedir}/../../LICENSE</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2sipr/NAMESPACE</name>
+                           <file>${project.basedir}/../../NAMESPACE</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge/man</name>
+                           <collect>
+                              <from>${project.basedir}/../../../a2munge/man</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge/R</name>
+                           <collect>
+                              <from>${project.basedir}/../../../a2munge/R</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge/a2munge.Rproj</name>
+                           <file>${project.basedir}/../../../a2munge/a2munge.Rproj</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge/.Rbuildignore</name>
+                           <file>${project.basedir}/../../../a2munge/.Rbuildignore</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge/DESCRIPTION</name>
+                           <file>${project.basedir}/../../../a2munge/DESCRIPTION</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge/LICENSE</name>
+                           <file>${project.basedir}/../../../a2munge/LICENSE</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2munge/NAMESPACE</name>
+                           <file>${project.basedir}/../../../a2munge/NAMESPACE</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler/man</name>
+                           <collect>
+                              <from>${project.basedir}/../../../a2modeler/man</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler/R</name>
+                           <collect>
+                              <from>${project.basedir}/../../../a2modeler/R</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler/a2modeler.Rproj</name>
+                           <file>${project.basedir}/../../../a2modeler/a2modeler.Rproj</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler/.Rbuildignore</name>
+                           <file>${project.basedir}/../../../a2modeler/.Rbuildignore</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler/DESCRIPTION</name>
+                           <file>${project.basedir}/../../../a2modeler/DESCRIPTION</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler/LICENSE</name>
+                           <file>${project.basedir}/../../../a2modeler/LICENSE</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2modeler/NAMESPACE</name>
+                           <file>${project.basedir}/../../../a2modeler/NAMESPACE</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2charter/man</name>
+                           <collect>
+                              <from>${project.basedir}/../../../a2charter/man</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2charter/R</name>
+                           <collect>
+                              <from>${project.basedir}/../../../a2charter/R</from>
+                           </collect>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2charter/a2charter.Rproj</name>
+                           <file>${project.basedir}/../../../a2charter/a2charter.Rproj</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2charter/.Rbuildignore</name>
+                           <file>${project.basedir}/../../../a2charter/.Rbuildignore</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2charter/DESCRIPTION</name>
+                           <file>${project.basedir}/../../../a2charter/DESCRIPTION</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                        <entry>
+                           <name>${app.dir}/a2charter/NAMESPACE</name>
+                           <file>${project.basedir}/../../../a2charter/NAMESPACE</file>
+						   <ruleset>app-default</ruleset>
+                        </entry>
+                     </entries>
+                     <afterInstallation>
+                        <script>Rscript ${r.home}/exec/a2modules-package-install.R ${app.dir} ${r.lib.home} ${r.home}/inst/json/pkgs.txt ${pkg.inst.type}</script>
+                     </afterInstallation>
+                     <signature>
+                        <skip>true</skip>
+                     </signature>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+   <repositories>
+      <repository>
+         <id>synchronoss</id>
+         <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+      </repository>
+   </repositories>
 </project>
