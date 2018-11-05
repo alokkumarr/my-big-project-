@@ -42,7 +42,7 @@ describe('Cron Formatter', () => {
     convertToUtc(10, 30);
   });
 
-  it('should convert time to Local timezone', () => {
+  it('should convert time saved inside cron expression to Local timezone', () => {
     convertToLocal('0 0 * ? * 1/3 *');
     expect(convertToLocal('0 0 * ? * 1/3 *')).not.toBeNull();
     convertToLocal('0 0 * ? * 1/3 *');
