@@ -20,7 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @ApiModel("Channel Entity")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "BIS_CHANNEL", catalog = "batch_ingestion", schema = "")
+@Table(name = "BIS_CHANNEL", catalog = "sip_batch_ingestion", schema = "")
 public class BisChannelEntity  extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;

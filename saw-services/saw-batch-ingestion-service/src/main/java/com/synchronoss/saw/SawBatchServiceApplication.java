@@ -56,7 +56,7 @@ public class SawBatchServiceApplication implements ApplicationRunner {
 
     Map<String, SIPExtensionPoint> map = context.getBeansOfType(SIPExtensionPoint.class);
     for (String key : map.keySet()) {
-      System.err.println(map.get(key));
+      LOG.error("Error :" + map.get(key));
     }
     List<PluginWrapper> list = pluginManager.getPlugins();
     for (PluginWrapper pluginWrapper : list) {
@@ -69,7 +69,7 @@ public class SawBatchServiceApplication implements ApplicationRunner {
       List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
       for (PluginWrapper plugin : startedPlugins) {
         String pluginId = plugin.getDescriptor().getPluginId();
-        System.out.println(
+        LOG.info(
             String.format("Extensions instances added by plugin '%s' for extension point '%s':",
                 pluginId, SIPExtensionPoint.class.getName()));
         List<?> extensionsPoints = pluginManager.getExtensions(pluginId);

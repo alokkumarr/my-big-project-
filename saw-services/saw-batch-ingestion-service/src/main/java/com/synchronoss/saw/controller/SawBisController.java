@@ -66,7 +66,7 @@ public class SawBisController {
   /**
    * This api provides to encrypt password. 
    * @param requestBody String
-   * @return encrypted password String
+   * @return decrypted password String
    */
   
   @ApiOperation(value = "Provides an access to functionalities of bis using commmon specification",
@@ -85,7 +85,7 @@ public class SawBisController {
     logger.debug("Request Body:{}", requestBody);
 
     if (requestBody == null) {
-      throw new NullPointerException("json body is missing in request body");
+      throw new NullPointerException("request body is missing in request body");
     }
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);

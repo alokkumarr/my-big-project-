@@ -53,8 +53,6 @@ public class SawBisRouteController {
   
   /**
    * This API provides an ability to add a source. 
-   * @param requestBody String
-   * @return encrypted password String
    */
   @ApiOperation(value = "Adding a new Route",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
@@ -90,7 +88,6 @@ public class SawBisRouteController {
 
   /**
    * This API provides an ability to read a routes with pagination by channelId. 
-   * @return encrypted password String
    */
   
   @ApiOperation(value = "Reading list of routes & paginate by channel id",
@@ -128,8 +125,6 @@ public class SawBisRouteController {
 
   /**
    * This API provides an ability to update a source. 
-   * @param requestBody String
-   * @return encrypted password String
    */
   @ApiOperation(value = "Updating an existing routes by channel id",
       nickname = "actionBis", notes = "", response = BisRouteEntity.class)
@@ -172,7 +167,6 @@ public class SawBisRouteController {
 
   /**
    * This API provides an ability to delete a source. 
-   * @return encrypted password String
    */
   @ApiOperation(value = "Deleting an existing route",
       nickname = "actionBis", notes = "", response = Object.class)
