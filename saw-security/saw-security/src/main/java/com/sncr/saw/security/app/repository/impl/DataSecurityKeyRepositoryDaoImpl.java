@@ -727,7 +727,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
     @Override
     public List<UserAssignment> getAllUserAssignments(Long custId) {
-        String fetchSql = "Select distinct" +
+        String fetchSql1 = "Select distinct" +
             " fi.UserSysId as UserSysId," +
             " fi.LoginID as LoginID," +
             " fi.Role as Role," +
@@ -752,6 +752,21 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             " ) fi" +
             " left outer join SEC_GROUP sg" +
             " on (fi.sec_grp_sys_id = sg.sec_group_sys_id) where sg.CUSTOMER_SYS_ID = ?";
+        String fetchSql = " Select distinct u.USER_ID as LoginID," +
+                            " u.USER_SYS_ID as UserSysId," +
+                            " r.role_Name as Role," +
+                            " u.FIRST_NAME as FirstName," +
+                            " u.LAST_NAME as LastName," +
+                            " u.email as Email," +
+                            " CASE when u.ACTIVE_STATUS_IND = 0 Then 'INACTIVE' ELSE 'ACTIVE' END as Status," +
+                            " sg.sec_group_name as Group_name " +
+                            " From USERS u" +
+                            " inner join " +
+                            " ROLES r " +
+                            " on (u.ROLE_SYS_ID = r.ROLE_SYS_ID  AND u.customer_sys_id = r.customer_sys_id )" +
+                            " left outer join" +
+                            " (select * from SEC_GROUP where customer_sys_id = 1) sg " +
+                            " on (u.customer_sys_id = sg.customer_sys_id AND u.sec_group_sys_id = sg.sec_group_sys_id)";
 
         /** NOTE : The below commented code (sql) in replacement of above sql can lists out only user assignments who have associated security groups.
                 If in future, if there is a requirement like to list only user assignments who have associated security groups. we can directly replace this sql.
