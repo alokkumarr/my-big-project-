@@ -10,32 +10,32 @@ class CreateAnalysisModel {
     this._createButton = this._nextButton;
     this._dataPods = (name) => element(by.css(`[e2e="metric-name-${name}"]`));
     this._chartType = (chartType) => element(by.css(`[e2e="choice-group-item-subtype-${chartType}"]`));
-
-
+    this._backButton = element(by.css('[e2e="create-analysis-back-button"]'));
   }
 
   clickOnAnalysisType(type){
-    commonFunctions.waitFor.elementToBeVisible(this._analysisType(type));
+    commonFunctions.waitFor.elementToBeClickable(this._analysisType(type));
     this._analysisType(type).click();
   }
 
   clickOnNextButton(){
-    commonFunctions.waitFor.elementToBeVisible(this._nextButton);
+    commonFunctions.waitFor.elementToBeClickable(this._nextButton);
     this._nextButton.click();
   }
 
   clickOnDataPods(name){
-    commonFunctions.waitFor.elementToBeVisible(this._dataPods(name));
+    commonFunctions.waitFor.elementToBeClickable(this._backButton);
+    commonFunctions.waitFor.elementToBeClickable(this._dataPods(name));
     this._dataPods(name).click();
   }
 
   clickOnCreateButton(){
-    commonFunctions.waitFor.elementToBeVisible(this._createButton);
+    commonFunctions.waitFor.elementToBeClickable(this._createButton);
     this._createButton.click();
   }
 
   clickOnChartType(type){
-    commonFunctions.waitFor.elementToBeVisible(this._chartType(type));
+    commonFunctions.waitFor.elementToBeClickable(this._chartType(type));
     this._chartType(type).click();
   }
 
