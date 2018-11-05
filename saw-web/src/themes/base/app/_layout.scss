@@ -48,6 +48,7 @@ $header-bar-height: 64px;
   position: relative;
   display: flex;
   min-height: 100vh;
+  max-height: 100vh;
   flex-direction: column;
 
   & > .main-content {
