@@ -727,31 +727,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
     @Override
     public List<UserAssignment> getAllUserAssignments(Long custId) {
-        String fetchSql1 = "Select distinct" +
-            " fi.UserSysId as UserSysId," +
-            " fi.LoginID as LoginID," +
-            " fi.Role as Role," +
-            " fi.FirstName as FirstName," +
-            " fi.LastName as LastName," +
-            " fi.Email as Email," +
-            " fi.Status as Status," +
-            " sg.SEC_GROUP_NAME as GroupName" +
-            " from" +
-                " ( SELECT u.USER_ID as LoginID," +
-                " u.USER_SYS_ID as UserSysId," +
-                " r.role_Name as Role," +
-                " u.FIRST_NAME as FirstName," +
-                " u.LAST_NAME as LastName," +
-                " u.email as Email," +
-                " CASE when u.ACTIVE_STATUS_IND = 0 Then 'INACTIVE' ELSE 'ACTIVE' END as Status," +
-                " u.sec_group_sys_id as sec_grp_sys_id" +
-                    " FROM" +
-                 " USERS u, Roles r" +
-                 " where" +
-                " u.ROLE_SYS_ID = r.ROLE_SYS_ID" +
-            " ) fi" +
-            " left outer join SEC_GROUP sg" +
-            " on (fi.sec_grp_sys_id = sg.sec_group_sys_id) where sg.CUSTOMER_SYS_ID = ?";
         String fetchSql = " Select distinct u.USER_ID as LoginID," +
                             " u.USER_SYS_ID as UserSysId," +
                             " r.role_Name as Role," +
