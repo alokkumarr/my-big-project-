@@ -10,6 +10,7 @@ import { UpdateSemanticComponent } from './components/semantic-management/update
 import { DatasourceComponent } from './components/datasource-management/datasource-page.component';
 
 import { IsUserLoggedInGuard } from '../../common/guards';
+import { IsAdminGuard } from '../admin/guards';
 
 export const routes: Routes = [
   {
@@ -49,7 +50,8 @@ export const routes: Routes = [
       },
       {
         path: 'datasource/create',
-        component: DatasourceComponent
+        component: DatasourceComponent,
+        canActivate: [IsAdminGuard]
       },
       {
         path: '',

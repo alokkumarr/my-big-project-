@@ -39,6 +39,7 @@ export class CreateRouteDialogComponent implements OnInit {
     if (isUndefined(this.routeData.length)) {
       this.opType = 'update';
       this.detailsFormGroup.patchValue(this.routeData);
+      this.crondetails = this.routeData.schedulerExpression;
     }
   }
 

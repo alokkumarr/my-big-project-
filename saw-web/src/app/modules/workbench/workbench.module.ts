@@ -47,6 +47,7 @@ import {
 } from './components/datasource-management/index';
 
 import { DefaultWorkbenchPageGuard } from './guards';
+import { IsAdminGuard } from '../admin/guards';
 
 import { CommonModuleTs } from '../../common';
 
@@ -81,7 +82,7 @@ const COMPONENTS = [
   CreateRouteDialogComponent
 ];
 
-const GUARDS = [DefaultWorkbenchPageGuard];
+const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
 @NgModule({
   imports: [
     AngularCommonModule,
