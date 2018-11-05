@@ -42,6 +42,9 @@ export class AdminListViewComponent implements OnInit {
   }
 
   assignGrouptoUser(groupName, cell) {
+    if (groupName.value === '-2') {
+      return false;
+    }
     const request = {
       securityGroupName : groupName.value,
       userId: cell.data.userSysId
@@ -58,7 +61,8 @@ export class AdminListViewComponent implements OnInit {
   }
 
   validateClearOption(cell) {
-    return (cell.data.groupName !== null);
+    console.log(cell.data.groupName);
+    return (cell.data.groupName !== null && cell.data.groupName !== '-2' && cell.data.groupName !== '');
   }
 
   getConfig() {

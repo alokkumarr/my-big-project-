@@ -291,7 +291,7 @@ export const UserAssignmentsTableHeader = [
     dataField: 'lastName',
     allowSorting: true,
     alignment: 'left',
-    width: '15%',
+    width: '12%',
     cellTemplate: 'highlightCellTemplate'
   },
   {
@@ -313,9 +313,9 @@ export const UserAssignmentsTableHeader = [
   {
     caption: 'Data Security Group',
     dataField: 'groupName',
-    width: '12%',
+    width: '15%',
     allowSorting: true,
     alignment: 'left',
     cellTemplate: 'groupAssignCellTemplate'
   }
-];;
+];
