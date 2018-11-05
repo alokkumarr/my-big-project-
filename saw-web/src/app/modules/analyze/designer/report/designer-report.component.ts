@@ -11,15 +11,31 @@ import { DesignerStates } from '../consts';
 export class DesignerReportComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
-  @Input() data;
-  @Input() dataCount: number;
   @Input() sorts: Sort[];
   @Input() analysis;
   @Input() isInQueryMode;
   @Input() filters: Filter[];
   @Input() designerState: DesignerStates;
+  @Input('data')
+  set _data(val) {
+    this.data = val;
+    this.currentDataCount = Math.min(this.totalDataCount, (val || []).length);
+  }
+
+  @Input('dataCount')
+  set dataCount(count) {
+    this.totalDataCount = count || 0;
+    this.currentDataCount = Math.min(
+      this.totalDataCount,
+      (this.data || []).length
+    );
+  }
+
+  public data;
   public DesignerStates = DesignerStates;
-  isEmpty = isEmpty;
+  public isEmpty = isEmpty;
+  public totalDataCount: number;
+  public currentDataCount: number;
 
   onReportGridChange(event) {
     this.change.emit(event);
