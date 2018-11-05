@@ -1,12 +1,7 @@
 import { requireIf } from './required-if.validator';
-import {
-  FormGroup,
-  FormControl,
-  FormBuilder,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 describe('Required if Validator', () => {
   let form: FormGroup;
