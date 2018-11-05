@@ -33,6 +33,7 @@
       <mat-form-field appearance="outline">
         <mat-icon matPrefix fontIcon="icon-search"></mat-icon>
         <input matInput
+               autocomplete="off"
                [attr.e2e]="'metric-search-input-field'"
                [(ngModel)]="searchMetric" placeholder="Search">
         <mat-icon matSuffix (click)="searchMetric = ''" *ngIf="searchMetric" fontIcon="icon-close"></mat-icon>
