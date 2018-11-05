@@ -62,7 +62,6 @@ export function generateHourlyCron(hours, minutes) {
   } else {
     cronExpression = `0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
   }
-
   return isValid(cronExpression) ? cronExpression : '';
 }
 
@@ -98,7 +97,6 @@ export function generateMonthlyCron(cronMonth, dateSelects) {
     cronMonth.specificDay} 1/${cronMonth.specificMonth} ? *` : `0 ${
       hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute)} ? 1/${
       cronMonth.specificWeekDayMonthWeek} ${cronMonth.specificWeekDayDay}${cronMonth.specificWeekDayMonth} *`;
-
   return isValid(cronExpression) ? cronExpression : '';
 }
 

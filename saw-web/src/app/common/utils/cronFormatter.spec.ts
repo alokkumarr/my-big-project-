@@ -9,6 +9,12 @@ import { isValid,
          generateMonthlyCron,
          generateYearlyCron } from './cronFormatter';
 
+const cronTime = {hour: 2, minute: '02', second: '', hourType: 'AM'};
+
+const dailyOption = {dailyType: 'everyDay', days: 3};
+const monthlyOptions = {monthlyType: 'monthlyDay', specificDay: 3, specificMonth: 3};
+const yearlyOptions = {yearlyType: 'yearlyMonth', specificMonthDayMonth: 3, specificMonthDayDay: 3};
+
 describe('Cron Formatter', () => {
   it('should exist', () => {
     expect(isValid).not.toBeNull();
@@ -31,50 +37,30 @@ describe('Cron Formatter', () => {
   });
 
   it('should check if a given expression is valid cron expression', () => {
-    isValid('0 0 * ? * 1/3 *');
     expect(isValid('0 0 * ? * 1/3 *')).toBeTruthy();
-    isValid('0 0 * ? * 1/3 *');
   });
 
   it('should convert time to UTC timezone', () => {
-    convertToUtc(10, 30);
-    expect(convertToUtc(10, 30)).not.toBeNull();
-    convertToUtc(10, 30);
-  });
-
-  it('should convert time saved inside cron expression to Local timezone', () => {
-    convertToLocal('0 0 * ? * 1/3 *');
-    expect(convertToLocal('0 0 * ? * 1/3 *')).not.toBeNull();
-    convertToLocal('0 0 * ? * 1/3 *');
+    expect(convertToUtc(17, 2)).toEqual('32 11');
   });
 
   it('should generate cron for hourly basis', () => {
-    generateHourlyCron(10, 30);
-    expect(generateHourlyCron(10, 30)).not.toBeNull();
-    generateHourlyCron(10, 30);
+    expect(generateHourlyCron(17, 2)).toEqual('0 32 0/17 1/1 * ? *');
   });
 
   it('should generate cron for daily basis', () => {
-    generateDailyCron(10, 30);
-    expect(generateDailyCron(10, 30)).not.toBeNull();
-    generateDailyCron(10, 30);
+    expect(generateDailyCron(dailyOption, cronTime)).toEqual('0 32 20 1/3 * ? *');
   });
 
   it('should generate cron for weekly basis', () => {
-    generateWeeklyCron(10, 30);
-    expect(generateWeeklyCron(10, 30)).not.toBeNull();
-    generateWeeklyCron(10, 30);
+    expect(generateWeeklyCron('MON,TUE', cronTime)).toEqual('0 32 20 ? * MON,TUE *');
   });
 
   it('should generate cron for monthly basis', () => {
-    generateMonthlyCron(10, 30);
-    expect(generateMonthlyCron(10, 30)).not.toBeNull();
-    generateMonthlyCron(10, 30);
+    expect(generateMonthlyCron(monthlyOptions, cronTime)).toEqual('0 32 20 3 1/3 ? *');
   });
 
   it('should generate cron for monthly basis', () => {
-    generateYearlyCron(10, 30);
-    expect(generateYearlyCron(10, 30)).not.toBeNull();
-    generateYearlyCron(10, 30);
+    expect(generateYearlyCron(yearlyOptions, cronTime)).toEqual('0 32 20 3 3 ? *');
   });
 });

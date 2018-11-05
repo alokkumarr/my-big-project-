@@ -221,7 +221,7 @@ export class CronJobSchedularComponent implements OnInit {
   }
 
   openSchedule(scheduleType) {
-    //this.resetData();
+    // this.resetData();
     if (scheduleType.tab.textLabel.toLowerCase() === 'weekly') {
       this.scheduleType = 'weeklybasis';
     } else {
