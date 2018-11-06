@@ -118,6 +118,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     val viewName = "AN_" + System.currentTimeMillis()
     val outputLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(DLConfiguration.commonLocation) +
       File.separator + "preview-" + resultId
+    val dlSession = DLExecutionObject.dlSessions
     logWithTime(m_log, "Execute Spark SQL query", {
       analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime, false, resultId)
       analysisNodeExecution.loadObjects()
@@ -132,35 +133,35 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       analysisNodeExecution.lastSQLExecRes = 0
       execType match {
         case ExecutionType.scheduled => {
-          DLExecutionObject.dlSessions.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+          dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
           m_log.trace("Location : " + outputLocation)
-          DLExecutionObject.dlSessions.saveData(viewName, analysisNodeExecution.outputLocation, "json")
+          dlSession.saveData(viewName, analysisNodeExecution.outputLocation, "json")
           analysisNodeExecution.createAnalysisResult(resultId, null, ExecutionType.scheduled.toString)
         }
         case ExecutionType.onetime => {
-          DLExecutionObject.dlSessions.execute(viewName, sqlRuntime, limit)
+          dlSession.execute(viewName, sqlRuntime, limit)
           m_log.trace("Location : " + outputLocation)
-          DLExecutionObject.dlSessions.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
+          dlSession.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
         }
         case ExecutionType.preview => {
-          DLExecutionObject.dlSessions.execute(viewName, sqlRuntime, limit)
+          dlSession.execute(viewName, sqlRuntime, limit)
           m_log.trace("Location : " + outputLocation)
-          DLExecutionObject.dlSessions.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
+          dlSession.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
         }
         case ExecutionType.regularExecution => {
           if (DLConfiguration.publishRowLimit > 0)
-            DLExecutionObject.dlSessions.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+            dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
           else
-            DLExecutionObject.dlSessions.execute(viewName, sqlRuntime)
+            dlSession.execute(viewName, sqlRuntime)
           m_log.trace("Location : " + outputLocation)
-          DLExecutionObject.dlSessions.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
+          dlSession.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
         }
         case ExecutionType.publish => {
           if (DLConfiguration.publishRowLimit > 0)
-            DLExecutionObject.dlSessions.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+            dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
           else
-            DLExecutionObject.dlSessions.execute(viewName, sqlRuntime)
-          DLExecutionObject.dlSessions.saveData(viewName, analysisNodeExecution.outputLocation, analysisNodeExecution.outputType)
+            dlSession.execute(viewName, sqlRuntime)
+          dlSession.saveData(viewName, analysisNodeExecution.outputLocation, analysisNodeExecution.outputType)
           analysisNodeExecution.createAnalysisResult(resultId, null, ExecutionType.publish.toString)
         }
       }
