@@ -738,24 +738,34 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                             " From USERS u" +
                             " inner join " +
                             " ROLES r " +
-                            " on (u.ROLE_SYS_ID = r.ROLE_SYS_ID  AND u.customer_sys_id = r.customer_sys_id )" +
+                            " on (u.ROLE_SYS_ID = r.ROLE_SYS_ID AND u.customer_sys_id = r.customer_sys_id AND u.customer_sys_id = ?) " +
+                            " inner join customers c " +
+                            " on (u.customer_sys_id = c.customer_sys_id AND r.customer_sys_id = c.customer_sys_id AND c.ACTIVE_STATUS_IND = 1) " +
                             " left outer join" +
-                            " (select * from SEC_GROUP where customer_sys_id = 1) sg " +
+                            " SEC_GROUP sg " +
                             " on (u.customer_sys_id = sg.customer_sys_id AND u.sec_group_sys_id = sg.sec_group_sys_id)";
 
         /** NOTE : The below commented code (sql) in replacement of above sql can lists out only user assignments who have associated security groups.
                 If in future, if there is a requirement like to list only user assignments who have associated security groups. we can directly replace this sql.
          **/
 
-        /** "SELECT u.USER_ID as LoginID," +
-            " r.role_Name as Role," +
-            " u.FIRST_NAME as FirstName," +
-            " u.LAST_NAME as LastName, u.email as Email," +
-            " sg.SEC_GROUP_Name as GroupName," +
-            " CASE when u.ACTIVE_STATUS_IND = 0 Then 'INACTIVE' ELSE 'ACTIVE' END as Status" +
-            " FROM " +
-            "USERS u, Roles r, SEC_GROUP sg " +
-            "where u.ROLE_SYS_ID = r.ROLE_SYS_ID AND u.sec_group_sys_id = sg.sec_group_sys_id"; **/
+        /** " Select distinct u.USER_ID as LoginID," +
+         " u.USER_SYS_ID as UserSysId," +
+         " r.role_Name as Role," +
+         " u.FIRST_NAME as FirstName," +
+         " u.LAST_NAME as LastName," +
+         " u.email as Email," +
+         " CASE when u.ACTIVE_STATUS_IND = 0 Then 'INACTIVE' ELSE 'ACTIVE' END as Status," +
+         " sg.sec_group_name as Group_name " +
+         " From USERS u" +
+         " inner join " +
+         " ROLES r " +
+         " on (u.ROLE_SYS_ID = r.ROLE_SYS_ID AND u.customer_sys_id = r.customer_sys_id AND u.customer_sys_id = ?) " +
+         " inner join customers c " +
+         " on (u.customer_sys_id = c.customer_sys_id AND r.customer_sys_id = c.customer_sys_id AND c.ACTIVE_STATUS_IND = 1) " +
+         " inner join" +
+         " SEC_GROUP sg " +
+         " on (u.customer_sys_id = sg.customer_sys_id AND u.sec_group_sys_id = sg.sec_group_sys_id)"; **/
 
 
         List<UserAssignment> userAssignmentsList = new ArrayList<>();
@@ -771,7 +781,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     userAssignment.setLastName(reultSet.getString("LastName"));
                     userAssignment.setEmail(reultSet.getString("Email"));
                     userAssignment.setStatus(reultSet.getString("Status"));
-                    userAssignment.setGroupName(reultSet.getString("GroupName"));
+                    userAssignment.setGroupName(reultSet.getString("Group_name"));
                     tempList.add(userAssignment);
                 }
                 logger.trace("Success in reading User Assignments");
