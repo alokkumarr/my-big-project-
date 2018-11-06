@@ -1,6 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
 import com.synchronoss.saw.scheduler.config.PersistableCronTriggerFactoryBean;
+import com.synchronoss.saw.scheduler.modal.BISSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -44,6 +45,38 @@ class JobUtil {
         
 	    return factoryBean.getObject();
 	}
+	
+	
+	
+	/**
+     * Create Quartz Job.
+     * 
+     * @param jobClass Class whose executeInternal() method needs to be called. 
+     * @param isDurable Job needs to be persisted even after completion. if true, job will be persisted, not otherwise. 
+     * @param context Spring application context.
+     * @param job job data.
+     * @param jobGroup Job group.
+     * 
+     * @return JobDetail object
+     */
+    protected static JobDetail createBatchIngestionJob(Class<? extends QuartzJobBean> jobClass, boolean isDurable,
+                                         ApplicationContext context, BISSchedulerJobDetails job, String jobGroup){
+        JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
+        factoryBean.setJobClass(jobClass);
+        factoryBean.setDurability(isDurable);
+        factoryBean.setApplicationContext(context);
+        factoryBean.setName(job.getJobName());
+        factoryBean.setGroup(jobGroup);
+        
+        // set job data map
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put(JOB_DATA_MAP_ID,job);
+        factoryBean.setJobDataMap(jobDataMap);
+        factoryBean.afterPropertiesSet();
+        
+        return factoryBean.getObject();
+    }
+
 
 	/**
 	 * Create cron trigger. 

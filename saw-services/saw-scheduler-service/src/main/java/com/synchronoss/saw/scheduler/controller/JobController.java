@@ -24,7 +24,7 @@ public class JobController {
 	private static final Logger logger = LoggerFactory.getLogger(JobController.class);
 	@Autowired
 	@Lazy
-	JobService jobService;
+	JobService<SchedulerJobDetail> jobService;
 
 	@RequestMapping(value ="schedule",method = RequestMethod.POST)
 	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail){
