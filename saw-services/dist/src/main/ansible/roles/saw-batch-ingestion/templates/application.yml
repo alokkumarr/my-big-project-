@@ -3,16 +3,13 @@ info:
 spring:
   application:
     name: saw-batch-ingestion-service
-  output:
-    ansi:
-      enabled: always
   pf4j:
     enabled: true
     plugins-root: plugins
   flyway:
     baseline-on-migrate: true
   datasource:
-    url: jdbc:mariadb://localhost:3306/batch_ingestion
+    url: jdbc:mariadb://localhost:3306/sip_batch_ingestion
     username: batch_user
     password: {{ saw_batch_ingestion_db_password }}
     driver-class-name: org.mariadb.jdbc.Driver
@@ -34,7 +31,7 @@ logging:
 
 server:
   address: localhost
-  port: 9642
+  port: 9651
   servlet:
     context-path: ''
   maxHttpHeaderSize: 65536

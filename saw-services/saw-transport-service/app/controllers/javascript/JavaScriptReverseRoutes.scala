@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:saw-services/saw-transport-service/conf/routes
-// @DATE:Mon Oct 01 11:25:16 EDT 2018
+// @DATE:Tue Oct 16 17:30:43 IST 2018
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -263,6 +263,16 @@ package controllers.javascript {
             return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions"})
           }
         
+        }
+      """
+    )
+  
+    // @LINE:25
+    def getLatestExecutionData: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.AnalysisExecutions.getLatestExecutionData",
+      """
+        function(analysisId0,page1,pageSize2,analysisType3,executionType4) {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions/data" + _qS([(page1 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("page", page1)), (pageSize2 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("pageSize", pageSize2)), (analysisType3 == null ? null : (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("analysisType", analysisType3)), (executionType4 == null ? null : (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("executionType", executionType4))])})
         }
       """
     )

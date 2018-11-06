@@ -1,101 +1,91 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
-  border: 1px solid #CCC;
+  width: 100%;
+  height: 100%;
 }
 
-.dateDetails {
-  float: left;
-  margin: 12px;
+.schedule-container {
+  height: 300px;
+  border-radius: 5px;
+  background-color: $background-color;
 
-  label {
-    margin-right: 20px;
+  ::ng-deep .mat-tab-body-wrapper {
+    height: calc(100% - 50px);
+    min-height: 220px;
   }
 
-  .clear {
-    color: #0096D5;
-    cursor: pointer;
-    font-size: 14px;
-  }
-}
-
-input.cron-scheduler__input:focus {
-  outline: none;
-}
-
-::ng-deep mat-tab-group mat-tab-header div div div .mat-tab-label {
-  min-width: 80px !important;
-}
-
-mat-form-field {
-  width: 115px !important;
-  padding: 5px;
-}
-
-mat-select {
-  padding: 0;
-}
-
-mat-radio-group.to-date {
-  padding-left: 90px;
-
-  .end-date {
-    padding-left: 45px;
+  ::ng-deep .mat-tab-label-active {
+    color: $primary-blue-b2;
   }
 
-  div mat-form-field {
-    width: 115px !important;
-    float: right;
-    margin-top: -68px;
-  }
-}
-
-::ng-deep .mat-select-value {
-  width: 90% !important;
-  padding: 8px 15px;
-}
-
-::ng-deep .mat-select {
-  position: relative !important;
-  width: 100px !important;
-  margin-left: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  margin-bottom: 10px;
-}
-
-.tab {
-  overflow: hidden;
-  border: 1px solid #CCC;
-  background-color: #F1F1F1;
-}
-
-/* Style the tab content */
-.tabcontent {
-  padding: 6px 12px;
-
-  div .daysOfWeek {
-    float: left;
-    margin: 5px 65px 0 -44px;
+  ::ng-deep .mat-tab-body-content {
+    padding: 30px 30px 0;
+    height: calc(100% - 30px);
   }
 
-  .week-datePicker {
-    float: left;
+  .text-content {
+    white-space: nowrap;
+  }
+
+  .form-select {
+    max-width: 75px;
+    font-size: 11px;
+
+    ::ng-deep .mat-select-value-text {
+      font-size: 16px;
+    }
+
+    ::ng-deep .mat-select-placeholder {
+      font-size: 14px;
+      line-height: 1.36;
+    }
+
+    ::ng-deep .mat-select-arrow-wrapper {
+      vertical-align: bottom;
+    }
+
+    ::ng-deep .mat-form-field-infix {
+      padding: 0.7em 0;
+      border-top: 0;
+    }
+  }
+
+  .monthly-select {
+    max-width: 65px !important;
+
+    ::ng-deep .mat-select-value {
+      max-width: fit-content;
+    }
+  }
+
+  .align-select {
+    margin-top: -6px;
   }
 }
 
-.checkbox {
-  text-align: center;
-  margin: 0 5px 15px 42px;
+.date-group {
+  padding: 0 30px 5px 30px;
+
+  .date-input {
+    line-height: 2;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.12);
+    width: 100%;
+    padding: 7px;
+  }
 }
 
-.owl-dt-calendar-table .owl-dt-calendar-cell-selected {
+::ng-deep .owl-dt-calendar-table .owl-dt-calendar-cell-selected {
   background-color: $primary-blue-b2;
 }
 
-.owl-dt-control-button-content {
+::ng-deep .owl-dt-container-buttons {
   color: $primary-blue-b2 !important;
+  height: 36px;
 }
 
-.owl-dt-container-info .owl-dt-container-info-active {
+::ng-deep .owl-dt-container-info .owl-dt-container-info-active {
   color: $primary-blue-b2 !important;
 }

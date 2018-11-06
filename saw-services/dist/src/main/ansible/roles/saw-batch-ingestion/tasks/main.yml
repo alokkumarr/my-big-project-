@@ -5,19 +5,12 @@
   yum: name=/tmp/saw-batch-ingestion.rpm state=present
   notify:
     - restart saw-batch-ingestion
-- name: Migrate Batch Ingestion Service database password from old location
-  fetch:
-    src: /etc/bda/saw-batch-ingestion-db-password
-    dest: "{{ inventory_dir + '/sip-batch-ingestion-db-password' }}"
-    flat: yes
-    fail_on_missing: no
-  when: "groups['saw-services'].index(inventory_hostname) == 0"
 - name: Look up Batch Ingestion Service database password
   set_fact:
     saw_batch_ingestion_db_password: >-
       {{ lookup('password', inventory_dir
         + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
-- name: Install SAW scheduler Service configuration file
+- name: Install SAW Batch Ingestion Service configuration file
   template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
   notify:
     - restart saw-batch-ingestion
@@ -40,8 +33,6 @@
 - name: Enable SAW Batch Ingestion Service
   systemd: name=saw-batch-ingestion-proxy.socket enabled=true state=started
 # Note: In difference to other socket-activates services, the
-# Scheduler Service is by default also enabled itself to ensure that
-# scheduled tasks are executed even without traffic to activate the
-# service
+# Batch Service is by default also enabled itself to ensure that
 - name: Enable SAW Batch Ingestion Service
   systemd: name=saw-batch-ingestion enabled=true

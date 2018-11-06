@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
+import * as isUndefined from 'lodash/isUndefined';
+
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
-import { Schedule } from '../../../models/workbench.interface';
 
 @Component({
   selector: 'create-route-dialog',
@@ -12,36 +13,38 @@ import { Schedule } from '../../../models/workbench.interface';
 })
 export class CreateRouteDialogComponent implements OnInit {
   public detailsFormGroup: FormGroup;
-  currentDate: Date = new Date();
-  scheduleData: Schedule[];
   crondetails: any = {};
+  opType = 'create';
 
   constructor(
     private _formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) public routeData: any
   ) {
-    this.scheduleData = [];
+    this.createForm();
+  }
+
+  createForm() {
+    this.detailsFormGroup = this._formBuilder.group({
+      routeName: ['', Validators.required],
+      sourceLocation: ['', Validators.required],
+      destinationLocation: ['', Validators.required],
+      filePattern: ['', Validators.required],
+      description: ['']
+    });
   }
 
   ngOnInit() {
-    this.detailsFormGroup = this._formBuilder.group({
-      routeNameCtrl: ['', Validators.required],
-      sourceLocationCtrl: ['', Validators.required],
-      destinationLocationCtrl: ['', Validators.required],
-      filePatternCtrl: ['', Validators.required],
-      descriptionCtrl: [''],
-      startDateCtrl: ['', Validators.required],
-      endDateCtrl: ['', Validators.required]
-    });
+    if (isUndefined(this.routeData.length)) {
+      this.opType = 'update';
+      this.detailsFormGroup.patchValue(this.routeData);
+      this.crondetails = this.routeData.schedulerExpression;
+    }
   }
 
   onCancelClick(): void {
     this.dialogRef.close();
-  }
-
-  onAppointmentFormCreated(data) {
-    const formData = data;
   }
 
   testConnection() {
@@ -61,5 +64,22 @@ export class CreateRouteDialogComponent implements OnInit {
 
   onCronChanged(cronexpression) {
     this.crondetails = cronexpression;
+  }
+
+  createRoute(data) {
+    const routeDetails = this.mapData(data);
+    this.dialogRef.close({ routeDetails, opType: this.opType });
+  }
+
+  mapData(data) {
+    const routeDetails = {
+      routeName: data.routeName,
+      sourceLocation: data.sourceLocation,
+      destinationLocation: data.destinationLocation,
+      filePattern: data.filePattern,
+      schedulerExpression: this.crondetails,
+      description: data.description
+    };
+    return routeDetails;
   }
 }

@@ -6,5 +6,5 @@ Requires=saw-batch-ingestion-proxy.socket
 After=saw-batch-ingestion-proxy.socket
 
 [Service]
-ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9642
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9651
 PrivateTmp=yes

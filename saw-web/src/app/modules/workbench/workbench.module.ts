@@ -5,24 +5,11 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
-import { DxDateBoxModule } from 'devextreme-angular/ui/date-box';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
 import { RouterModule } from '@angular/router';
 import { routes } from './routes';
-
-import { WorkbenchService } from './services/workbench.service';
-
-import {
-  MenuService,
-  HeaderProgressService,
-  ToastService,
-  SideNavService,
-  LocalSearchService,
-  DxDataGridService,
-  JwtService
-} from '../../common/services';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
@@ -58,9 +45,9 @@ import {
   TestConnectivityComponent,
   CreateRouteDialogComponent
 } from './components/datasource-management/index';
-// import { CronJobSchedularComponent } from '../analyze/publish/cron-job-schedular/cron-job-schedular.component';
 
 import { DefaultWorkbenchPageGuard } from './guards';
+import { IsAdminGuard } from '../admin/guards';
 
 import { CommonModuleTs } from '../../common';
 
@@ -95,18 +82,7 @@ const COMPONENTS = [
   CreateRouteDialogComponent
 ];
 
-const GUARDS = [DefaultWorkbenchPageGuard];
-
-const SERVICES = [
-  JwtService,
-  WorkbenchService,
-  MenuService,
-  HeaderProgressService,
-  ToastService,
-  SideNavService,
-  LocalSearchService,
-  DxDataGridService
-];
+const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
 @NgModule({
   imports: [
     AngularCommonModule,
@@ -116,7 +92,6 @@ const SERVICES = [
     RouterModule.forChild(routes),
     DxDataGridModule,
     DxTemplateModule,
-    DxDateBoxModule,
     FlexLayoutModule,
     TreeModule,
     AceEditorModule,
@@ -125,6 +100,6 @@ const SERVICES = [
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [...SERVICES, ...GUARDS]
+  providers: [GUARDS]
 })
-export class WorkbenchUpgradeModule {}
+export class WorkbenchModule {}

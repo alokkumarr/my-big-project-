@@ -9,14 +9,14 @@
                     (mouseenter)= "onFocus()"
                     (mouseleave)= "onBlur()"
     >
-      <mat-label i18n>
+      <mat-label>
         <ng-container *ngIf="selectedMetrics.length === 0">
           {{isMetricSelectorFocused ? 'Metric' : 'Select a metric'}}
         </ng-container>
-        <ng-container *ngIf="selectedMetrics.length === 1">
+        <ng-container i18n *ngIf="selectedMetrics.length === 1">
           Metric
         </ng-container>
-        <ng-container *ngIf="selectedMetrics.length > 1">
+        <ng-container i18n *ngIf="selectedMetrics.length > 1">
           Metrics
         </ng-container>
 

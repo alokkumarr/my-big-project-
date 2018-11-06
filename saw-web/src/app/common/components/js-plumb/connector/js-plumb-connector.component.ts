@@ -22,11 +22,6 @@ import {
 } from '../types';
 import { JsPlumbJoinLabelComponent } from '../join-label';
 
-const ENDPOINT_ANCHORS = {
-  left: 'LeftMiddle',
-  right: 'RightMiddle'
-};
-
 @Component({
   selector: 'js-plumb-connector-u',
   template: `
@@ -39,11 +34,12 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
   @Input() index: number;
   @Input() plumbInstance: any;
 
-  @ViewChild('target', {read: ViewContainerRef}) _container: ViewContainerRef;
+  @ViewChild('target', { read: ViewContainerRef })
+  _container: ViewContainerRef;
 
   public _connection: any;
 
-  constructor (
+  constructor(
     public _injector: Injector,
     public _resolver: ComponentFactoryResolver
   ) {}
@@ -76,10 +72,7 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
       // this happens when opening a new analysis with joins
       if (!this._connection) {
         this._connection = this.plumbInstance.connect({
-          uuids: [
-            this.getIdentifier(source),
-            this.getIdentifier(target)
-          ]
+          uuids: [this.getIdentifier(source), this.getIdentifier(target)]
         });
       }
 
@@ -93,7 +86,9 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
   }
 
   addJoinlabel() {
-    const componentFactory = this._resolver.resolveComponentFactory(JsPlumbJoinLabelComponent);
+    const componentFactory = this._resolver.resolveComponentFactory(
+      JsPlumbJoinLabelComponent
+    );
     const component = componentFactory.create(this._injector);
     this._container.insert(component.hostView);
     component.instance.join = this.join;
@@ -102,12 +97,15 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
     const elem = <HTMLElement>component.location.nativeElement;
     elem.remove();
 
-    this._connection.addOverlay(['Custom', {
-      create: () => {
-        return elem;
-      },
-      location: 0.5
-    }]);
+    this._connection.addOverlay([
+      'Custom',
+      {
+        create: () => {
+          return elem;
+        },
+        location: 0.5
+      }
+    ]);
   }
 
   onJoinChange(event: JoinChangeEvent) {
@@ -121,16 +119,22 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
     return `${tableName}:${columnName}:${side}`;
   }
 
-  findConnection (source: JoinCriterion, target: JoinCriterion) {
+  findConnection(source: JoinCriterion, target: JoinCriterion) {
     const connections = this.plumbInstance.getConnections();
     return find(connections, connection => {
       const [sourceEndpoint, targetEndpoint] = connection.endpoints;
-      const sourcePayload = <EndpointPayload> sourceEndpoint.getParameter('endpointPayload');
-      const targetPayload = <EndpointPayload> targetEndpoint.getParameter('endpointPayload');
-      return sourcePayload.column.columnName === source.columnName &&
+      const sourcePayload = <EndpointPayload>sourceEndpoint.getParameter(
+        'endpointPayload'
+      );
+      const targetPayload = <EndpointPayload>targetEndpoint.getParameter(
+        'endpointPayload'
+      );
+      return (
+        sourcePayload.column.columnName === source.columnName &&
         sourcePayload.artifactName === source.tableName &&
         targetPayload.column.columnName === target.columnName &&
-        targetPayload.artifactName === target.tableName;
+        targetPayload.artifactName === target.tableName
+      );
     });
   }
 }

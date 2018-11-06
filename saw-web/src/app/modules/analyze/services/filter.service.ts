@@ -12,13 +12,16 @@ import * as find from 'lodash/find';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
 
-export const BOOLEAN_CRITERIA = [{
-  label: 'ALL',
-  value: 'AND'
-}, {
-  label: 'ANY',
-  value: 'OR'
-}];
+export const BOOLEAN_CRITERIA = [
+  {
+    label: 'ALL',
+    value: 'AND'
+  },
+  {
+    label: 'ANY',
+    value: 'OR'
+  }
+];
 
 const FILTER_TYPES = {
   STRING: 'string',
@@ -50,29 +53,31 @@ export class FilterService {
     return FILTER_TYPES.UNKNOWN;
   }
 
+  // tslint:disable-next-line:no-shadowed-variable
   isFilterEmpty(filter) {
     if (!filter) {
       return true;
     }
 
-    const filterType = this.getType(filter.type || get(filter, 'column.type', FILTER_TYPES.UNKNOWN));
+    const filterType = this.getType(
+      filter.type || get(filter, 'column.type', FILTER_TYPES.UNKNOWN)
+    );
 
     switch (filterType) {
+      case FILTER_TYPES.STRING:
+        return isEmpty(get(filter, 'model.modelValues', []));
 
-    case FILTER_TYPES.STRING:
-      return isEmpty(get(filter, 'model.modelValues', []));
+      case FILTER_TYPES.NUMBER:
+        return isEmpty(filter.model);
 
-    case FILTER_TYPES.NUMBER:
-      return isEmpty(filter.model);
+      case FILTER_TYPES.DATE:
+        return isEmpty(filter.model);
 
-    case FILTER_TYPES.DATE:
-      return isEmpty(filter.model);
+      case FILTER_TYPES.TIMESTAMP:
+        return isEmpty(filter.model);
 
-    case FILTER_TYPES.TIMESTAMP:
-      return isEmpty(filter.model);
-
-    default:
-      return true;
+      default:
+        return true;
     }
   }
 
@@ -88,7 +93,10 @@ export class FilterService {
         isGlobalFilter: frontendFilter.isGlobalFilter,
         model: undefined
       };
-      if (!(frontendFilter.isRuntimeFilter || frontendFilter.isGlobalFilter) || frontendFilter.model) {
+      if (
+        !(frontendFilter.isRuntimeFilter || frontendFilter.isGlobalFilter) ||
+        frontendFilter.model
+      ) {
         result.model = frontendFilter.model;
       }
 
@@ -102,13 +110,18 @@ export class FilterService {
       // and the target artifact cannot be found
       // this is a temporary solution for pivot and chart types
       // TODO undo this modification after consulting with backend
-      const artifact = artifacts.length > 1 ?
-        find(artifacts,
-          ({artifactName}) => artifactName === backendFilter.tableName) :
-        artifacts[0];
+      const artifact =
+        artifacts.length > 1
+          ? find(
+              artifacts,
+              ({ artifactName }) => artifactName === backendFilter.tableName
+            )
+          : artifacts[0];
 
-      const column = find(artifact.columns,
-        ({columnName}) => columnName === backendFilter.columnName);
+      const column = find(
+        artifact.columns,
+        ({ columnName }) => columnName === backendFilter.columnName
+      );
 
       return {
         column,
@@ -139,19 +152,23 @@ export class FilterService {
 
   /**
    * reduce the array of evaluated filters and their booleanCriteria( AND | OR )
-  */
+   */
   getEvaluatedFilterReducer() {
-    return (evaluatedFilters => {
+    return evaluatedFilters => {
       // we need to know the first elements booleanCriteria to get the identity element
       // so that we don't influence the result
-      const accumulator = isEmpty(evaluatedFilters) ? true : this.getIdentityElement(evaluatedFilters[0].booleanCriteria);
+      const accumulator = isEmpty(evaluatedFilters)
+        ? true
+        : this.getIdentityElement(evaluatedFilters[0].booleanCriteria);
 
       return reduce((accum, evaluatedFilter) => {
-
-        return this.evaluateBoolean(accum, evaluatedFilter.booleanCriteria, evaluatedFilter.value);
-
+        return this.evaluateBoolean(
+          accum,
+          evaluatedFilter.booleanCriteria,
+          evaluatedFilter.value
+        );
       }, accumulator)(evaluatedFilters);
-    });
+    };
   }
 
   getIdentityElement(booleanCriteria) {
@@ -180,25 +197,31 @@ export class FilterService {
 
   openRuntimeModal(analysis, filters = []) {
     return new Promise(resolve => {
-      this._dialog.openFilterPromptDialog(filters, analysis).afterClosed().subscribe((result) => {
-        if (!result) {
-          return resolve();
-        }
-        const nonRuntimeFilters = filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters);
-        analysis.sqlBuilder.filters = fpPipe(
-          // block optional runtime filters that have no model
-          filter(({isRuntimeFilter, isOptional, model}) => !(isRuntimeFilter && isOptional && !model)),
-          runtimeFilters => [
-            ...runtimeFilters,
-            ...nonRuntimeFilters
-          ]
-        )(result.filters);
-        // analysis.sqlBuilder.filters = result.filters.concat(
-        //   filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
-        // );
+      this._dialog
+        .openFilterPromptDialog(filters, analysis)
+        .afterClosed()
+        .subscribe(result => {
+          if (!result) {
+            return resolve();
+          }
+          const nonRuntimeFilters = filter(
+            f => !(f.isRuntimeFilter || f.isGlobalFilter),
+            analysis.sqlBuilder.filters
+          );
+          analysis.sqlBuilder.filters = fpPipe(
+            // block optional runtime filters that have no model
+            filter(
+              ({ isRuntimeFilter, isOptional, model }) =>
+                !(isRuntimeFilter && isOptional && !model)
+            ),
+            runtimeFilters => [...runtimeFilters, ...nonRuntimeFilters]
+          )(result.filters);
+          // analysis.sqlBuilder.filters = result.filters.concat(
+          //   filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
+          // );
 
-        resolve(analysis);
-      });
+          resolve(analysis);
+        });
     });
   }
 
@@ -208,9 +231,15 @@ export class FilterService {
         return Promise.reject(new Error('Cancelled'));
       }
 
-      const filterPayload = map(this.frontend2BackendFilter.bind(this)(), result.filters);
+      const filterPayload = map(
+        this.frontend2BackendFilter.bind(this)(),
+        result.filters
+      );
       analysis.sqlBuilder.filters = filterPayload.concat(
-        filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
+        filter(
+          f => !(f.isRuntimeFilter || f.isGlobalFilter),
+          analysis.sqlBuilder.filters
+        )
       );
 
       return analysis;

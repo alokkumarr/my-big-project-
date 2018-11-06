@@ -10,14 +10,10 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
-import * as forEach from 'lodash/forEach';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as mapKeys from 'lodash/mapKeys';
 import * as fpSplit from 'lodash/fp/split';
-import * as trimEnd from 'lodash/trimEnd';
-import * as fpMap from 'lodash/fp/map';
-import * as get from 'lodash/get';
 
 export function flattenPivotData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);

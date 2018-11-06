@@ -24,9 +24,17 @@
     height: 0 !important;
   }
 
+  .mat-form-field {
+    min-width: 75% !important;
+  }
+
   .source-container {
     height: 85%;
     overflow: auto;
+  }
+
+  .no-click {
+    cursor: not-allowed;
   }
 
   .details-title {

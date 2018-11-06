@@ -42,7 +42,7 @@ public class SawBatchServiceApplication {
   /**
    * TomcatServletWebServerFactory has been overridden.
    */
-  
+
   @Bean
   public TomcatServletWebServerFactory tomcatEmbedded() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
@@ -71,7 +71,7 @@ public class SawBatchServiceApplication {
    * @param entityManagerFactory entity manager.
    * @return {@link JpaTransactionManager}.
    */
-  
+
   @Bean
   JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
     JpaTransactionManager transactionManager = new JpaTransactionManager();

@@ -98,7 +98,7 @@
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-sftp</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>info.faljse</groupId>
 			<artifactId>SDNotify</artifactId>
@@ -121,7 +121,6 @@
 			<artifactId>springfox-swagger2</artifactId>
 			<version>${spring.swagger}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -156,7 +155,7 @@
 			<artifactId>saw-bis-plugin-sftp</artifactId>
 			<version>${revision}</version>
 		</dependency>
-		
+
 		<!-- This is automated migration plugin -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
@@ -203,7 +202,6 @@
 							<configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<violationSeverity>warning</violationSeverity>
-							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*</excludes>
 						</configuration>
 						<goals>
 							<goal>check</goal>

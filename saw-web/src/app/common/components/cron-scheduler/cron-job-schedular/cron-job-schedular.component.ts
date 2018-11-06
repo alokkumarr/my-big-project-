@@ -5,6 +5,8 @@ import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as isFunction from 'lodash/isFunction';
+import * as range from 'lodash/range';
+
 import * as moment from 'moment';
 
 import {
@@ -26,9 +28,12 @@ import { SCHEDULE_TYPES } from '../../../../common/consts';
   styleUrls: ['./cron-job-schedular.component.scss']
 })
 export class CronJobSchedularComponent implements OnInit {
-  @Input() public model: any;
-  @Input() public crondetails: any;
-  @Output() onCronChanged: EventEmitter<any> = new EventEmitter();
+  @Input()
+  public model: any;
+  @Input()
+  public crondetails: any;
+  @Output()
+  onCronChanged: EventEmitter<any> = new EventEmitter();
   public startAt = new Date();
   NumberMapping: any = { '=1': '#st', '=2': '#nd', '=3': '#rd', other: '#th' };
   DayMapping: any = {
@@ -99,11 +104,10 @@ export class CronJobSchedularComponent implements OnInit {
           .format()
       )
     );
-
-    this.hours = this.range(0, 23);
-    this.minutes = this.range(0, 59);
-    this.days = this.range(1, 31);
-    this.months = this.range(1, 12);
+    this.hours = range(0, 13);
+    this.minutes = range(0, 60);
+    this.days = range(1, 32);
+    this.months = range(1, 13);
     this.weeks = [
       {
         value: '#1',
@@ -186,12 +190,6 @@ export class CronJobSchedularComponent implements OnInit {
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
-    // this.startDate = new Date();
-  }
-
-  public range(start: number, end: number): number[] {
-    const length = end - start + 1;
-    return Array.apply(undefined, Array(length)).map((_, i) => i + start);
   }
 
   resetData() {

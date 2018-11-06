@@ -23,25 +23,8 @@ touch $marker
 # extended pattern matching operators
 shopt -s extglob
 
-# Set database password
-db_password_file=/etc/bda/saw-batch-ingestion-db-password
-
-# Generate database passwords
-generate_password() {
-    local password_file=$1
-    if [ -e $password_file ]; then
-        return
-    fi
-    local password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
-    echo $password > $password_file
-    chmod go-rwx $password_file
-}
-generate_password $db_password_file
-
-# Generate DB passwords ends here.
-
 ## Initialize SAW Batch Ingestion database
-create_database="CREATE DATABASE batch_ingestion"
+create_database="CREATE DATABASE sip_batch_ingestion"
 
 password=$(< /etc/bda/saw-batch-ingestion-db-password)
 root_password_f=/etc/bda/mariadb-root-password
@@ -53,7 +36,7 @@ if [ -f $root_password_f ] ; then
    root_password=$(< /etc/bda/mariadb-root-password)
    mysql -u root -p$root_password -e "$create_database"
    mysql -u root -p$root_password -e "$create_user IDENTIFIED BY '$password'"
-   mysql -u root -p$root_password -e "GRANT ALL ON batch_ingestion.* TO 'batch_user'@'localhost'"
+   mysql -u root -p$root_password -e "GRANT ALL ON sip_batch_ingestion.* TO 'batch_user'@'localhost'"
  else
    mysql -u root -e "$create_database"
    mysql -u root -e "$create_user IDENTIFIED BY '$password'"

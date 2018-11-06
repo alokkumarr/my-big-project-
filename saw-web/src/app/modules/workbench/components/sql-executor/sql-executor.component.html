@@ -33,9 +33,9 @@
         </button>
       </div> -->
       <div class="create-btn">
-        <button mat-raised-button color="primary" i18n (click)="openSaveDialog()">
+        <button mat-raised-button color="primary" (click)="openSaveDialog()">
           <!-- <mat-icon fontIcon="icon-save"></mat-icon> -->
-          <span>Create</span>
+          <span i18n>Create</span>
         </button>
       </div>
     </div>
@@ -51,8 +51,8 @@
           <split-area size="25" class="fields-pane">
             <mat-card class="details-grid" fxFlex>
               <div fxFill>
-                <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'99%'" [width]="'100%'"
-                  [showBorders]="false" style="position:absolute;top:0;bottom:0;left:0;bottom:0;">
+                <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'99%'"
+                  [width]="'100%'" [showBorders]="false" style="position:absolute;top:0;bottom:0;left:0;bottom:0;">
                   <dxi-column caption="Field Name" dataField="name"></dxi-column>
                   <dxi-column caption="Data Type" dataField="type"></dxi-column>
                   <dxo-scrolling mode="infinite"></dxo-scrolling>
