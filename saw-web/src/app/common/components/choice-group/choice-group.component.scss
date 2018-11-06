@@ -1,6 +1,6 @@
 @import "src/themes/base/colors";
 
-.choice-group {
+.choice-group, .choice-subgroup {
   .choice-group__item {
     padding: 8px 0;
     flex: 0 0 25%;
@@ -50,5 +50,13 @@
         color: #FFF;
       }
     }
+  }
+}
+
+.choice-subgroup {
+  margin-top: 20px;
+
+  span.subgroup-title {
+    width: 100%;
   }
 }
