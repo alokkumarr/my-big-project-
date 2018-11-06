@@ -43,7 +43,8 @@ import {
   DatasourceComponent,
   CreateSourceDialogComponent,
   TestConnectivityComponent,
-  CreateRouteDialogComponent
+  CreateRouteDialogComponent,
+  ConfirmActionDialogComponent
 } from './components/datasource-management/index';
 
 import { DefaultWorkbenchPageGuard } from './guards';
@@ -79,7 +80,8 @@ const COMPONENTS = [
   DatasourceComponent,
   CreateSourceDialogComponent,
   TestConnectivityComponent,
-  CreateRouteDialogComponent
+  CreateRouteDialogComponent,
+  ConfirmActionDialogComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];

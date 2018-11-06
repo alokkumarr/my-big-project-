@@ -47,19 +47,20 @@
             <span class="details-title mat-subheading-2">{{selectedSourceData?.channelName | uppercase}}</span>
           </div>
           <span fxFlex></span>
-          <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="testConnection()" i18n-matTooltip
-            matTooltip="Test Connectivity">
+          <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="selectedSourceData?.bisChannelSysId !== undefined"
+            (click)="testConnection()" i18n-matTooltip matTooltip="Test Connectivity">
             <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
-          <button mat-mini-fab class="mat-elevation-z2" color="primary" (click)="createSource(selectedSourceData)"
-            matTooltip="Edit Channel" i18n-matTooltip>
+          <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="selectedSourceData?.bisChannelSysId !== undefined"
+            (click)="createSource(selectedSourceData)" matTooltip="Edit Channel" i18n-matTooltip>
             <mat-icon fontIcon="icon-edit-solid"></mat-icon>
           </button>
-          <button mat-mini-fab class="mat-elevation-z3" color="warn" (click)="deleteChannel(selectedSourceData?.bisChannelSysId)"
-            matTooltip="Delete Channel" i18n-matTooltip>
+          <button mat-mini-fab class="mat-elevation-z3" color="warn" [disabled]="selectedSourceData?.bisChannelSysId !== undefined"
+            (click)="deleteChannel(selectedSourceData?.bisChannelSysId)" matTooltip="Delete Channel" i18n-matTooltip>
             <mat-icon fontIcon="icon-delete-solid"></mat-icon>
           </button>
-          <button mat-raised-button color="primary" (click)="createRoute( selectedSourceData?.bisChannelSysId)">
+          <button mat-raised-button color="primary" [disabled]="selectedSourceData?.bisChannelSysId !== undefined"
+            (click)="createRoute( selectedSourceData?.bisChannelSysId)">
             <span i18n>+ Route</span>
           </button>
         </div>
