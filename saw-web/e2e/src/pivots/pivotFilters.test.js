@@ -8,6 +8,7 @@ const protractorConf = require('../../protractor.conf')
 const designModePage = require('../javascript/pages/designModePage.po.js');
 const Filter = require('../javascript/data/filter');
 const dataSets = require('../javascript/data/datasets');
+const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
 
 describe('Check whether filters throw an error on pivots: pivotFilters.test.js', () => {
   const metricName = dataSets.pivotChart;
@@ -42,7 +43,12 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
         homePage.cardViewButton.click();
 
         // Create Pivot
-        homePage.createAnalysis(metricName, analysisType);
+        let analyzePageV2 = new AnalyzePage();
+        analyzePageV2.clickOnAddAnalysisButton();
+        analyzePageV2.clickOnAnalysisType(analysisType);
+        analyzePageV2.clickOnNextButton();
+        analyzePageV2.clickOnDataPods(metricName);
+        analyzePageV2.clickOnCreateButton();
 
         // Add fields (string, date, number)
         commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.addFieldButton(dateFieldName));
