@@ -17,6 +17,7 @@
   <mat-form-field fxFlex>
       <input matInput type="text"
              placeholder="Alias"
+             autocomplete="off"
              (input)="onAliasChange($event.target.value)"
              [value]="artifactColumn.aliasName || ''"/>
   </mat-form-field>
@@ -29,6 +30,7 @@
               type="text"
               placeholder="Format"
               disabled
+              autocomplete="off"
               style="cursor: pointer;"
               [value]="DATE_FORMATS_OBJ[artifactColumn.dateFormat] ? DATE_FORMATS_OBJ[artifactColumn.dateFormat].label : ''"/>
       </mat-form-field>

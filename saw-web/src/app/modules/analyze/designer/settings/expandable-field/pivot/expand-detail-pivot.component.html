@@ -27,6 +27,7 @@
         <input matInput
               type="text"
               placeholder="Format"
+              autocomplete="off"
               disabled
               style="cursor: pointer;"
               [value]="DATE_FORMATS_OBJ[artifactColumn.format] ? DATE_FORMATS_OBJ[artifactColumn.format].label : ''"/>
@@ -45,6 +46,7 @@
       <input matInput
              type="text"
              placeholder="Format"
+             autocomplete="off"
              disabled
              style="cursor: pointer;"
              [value]="numberSample"/>
