@@ -250,7 +250,7 @@ export const ANALYSIS_METHODS = [
 export const CHART_TYPES_OBJ = fpPipe(
   fpGroupBy('type'),
   fpMapValues(v => v[0])
-)(ANALYSIS_METHODS[0].children[2].children);
+)(ANALYSIS_METHODS[0].children[0].children);
 
 export const AREA_TYPES = [
   {
