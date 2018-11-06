@@ -8,36 +8,22 @@ const protractorConf = require('../protractor.conf');
 const commonFunctions = require('./javascript/helpers/commonFunctions.js');
 const dataSets = require('./javascript/data/datasets');
 const designModePage = require('./javascript/pages/designModePage.po.js');
+const AnalyzePage = require('./javascript/v2/pages/AnalyzePage');
 
 describe('Create report type analysis: createReport.test.js', () => {
   const reportDesigner = analyzePage.designerDialog.report;
   const reportName = `e2e report ${(new Date()).toString()}`;
   const reportDescription = 'e2e report description';
   const tables = [{
-    name: 'SALES',
-    fields: [
-      'Integer',
-      'String',
-      'Date'
-    ]
-  }/*, {
-    name: 'MCT_CONTENT_SUMMARY',
-    fields: [
-      'Available Items'
-    ]
-  }*/];
-  /*const join = {
-    tableA: tables[0].name,
-    fieldA: 'Session Id',
-    tableB: tables[1].name,
-    fieldB: 'Session Id'
-  };*/
+    name: 'SALES', fields: ['Integer', 'String', 'Date']
+  }];
+
   const filterOperator = 'Equal to';
   const filterValue = '123';
   const metricName = dataSets.report;
   const analysisType = 'table:report';
 
-  beforeAll(function() {
+  beforeAll(function () {
     // This test may take some time. Such timeout fixes jasmine DEFAULT_TIMEOUT_INTERVAL interval error
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
@@ -45,22 +31,23 @@ describe('Create report type analysis: createReport.test.js', () => {
     browser.manage().timeouts().implicitlyWait(protractorConf.timeouts.extendedImplicitlyWait);
   });
 
-  beforeEach(function(done) {
-    setTimeout(function() {
+  beforeEach(function (done) {
+    setTimeout(function () {
       //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function(done) {
-    setTimeout(function() {
+  afterEach(function (done) {
+    setTimeout(function () {
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['CREATEREPORT']['createReportDataProvider'], function(data, description) {
-    it('Should apply filter to Report '+description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'CREATEREPORT', dp:'createReportDataProvider'}), () => {
+  using(testDataReader.testData['CREATEREPORT']['createReportDataProvider'], function (data, description) {
+    it('Should apply filter to Report ' + description + ' testDataMetaInfo: ' + JSON.stringify(
+      {test: description, feature: 'CREATEREPORT', dp: 'createReportDataProvider'}), () => {
       loginPage.loginAs(data.user);
 
       // Switch to Card View
@@ -68,13 +55,14 @@ describe('Create report type analysis: createReport.test.js', () => {
       analyzePage.analysisElems.cardView.click();
 
       // Create Report
-      homePage.createAnalysis(metricName, analysisType);
+      //homePage.createAnalysis(metricName, analysisType);
 
-      //browser.waitForAngularEnabled(false);
-      /*element(by.xpath(`//md-checkbox/div/span[text()='Source OS']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
-      element(by.xpath(`//md-checkbox/div/span[text()='Available (MB)']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
-      element(by.xpath(`//md-checkbox/div/span[text()='Source Model']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
-      browser.waitForAngularEnabled(true);*/
+      let analyzePageV2 = new AnalyzePage();
+      analyzePageV2.clickOnAddAnalysisButton();
+      analyzePageV2.clickOnAnalysisType(analysisType);
+      analyzePageV2.clickOnNextButton();
+      analyzePageV2.clickOnDataPods(metricName);
+      analyzePageV2.clickOnCreateButton();
 
       // Select fields and refresh
       tables.forEach(table => {
@@ -84,22 +72,6 @@ describe('Create report type analysis: createReport.test.js', () => {
           reportDesigner.getReportFieldCheckbox(table.name, field).click();
         });
       });
-
-      /*expect(
-        reportDesigner
-          .getJoinlabel(join.tableA, join.fieldA, join.tableB, join.fieldB, 'inner')
-          .isPresent()
-      ).toBe(false);
-
-      const endpointA = reportDesigner.getReportFieldEndPoint(join.tableA, join.fieldA, 'right');
-      const endpointB = reportDesigner.getReportFieldEndPoint(join.tableB, join.fieldB, 'left');
-      browser.actions().dragAndDrop(endpointA, endpointB).perform();
-
-      expect(
-        reportDesigner
-          .getJoinlabel(join.tableA, join.fieldA, join.tableB, join.fieldB, 'inner')
-          .isPresent()
-      ).toBe(true);*/
 
       commonFunctions.waitFor.elementToBeClickable(reportDesigner.refreshBtn);
       reportDesigner.refreshBtn.click();
@@ -120,7 +92,8 @@ describe('Create report type analysis: createReport.test.js', () => {
       filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
       commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.number.operator);
       designModePage.filterWindow.number.operator.click();
-      commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.number.operatorDropDownItem(filterOperator));
+      commonFunctions.waitFor.elementToBeClickable(
+        designModePage.filterWindow.number.operatorDropDownItem(filterOperator));
       designModePage.filterWindow.number.operatorDropDownItem(filterOperator).click();
       filterInput.clear();
       filterInput.sendKeys(filterValue);
@@ -155,21 +128,20 @@ describe('Create report type analysis: createReport.test.js', () => {
 
       const createdAnalysis = analyzePage.main.getCardTitle(reportName);
 
-      commonFunctions.waitFor.elementToBePresent(createdAnalysis)
-        .then(() => expect(createdAnalysis.isPresent()).toBe(true));
+      commonFunctions.waitFor.elementToBePresent(createdAnalysis).
+        then(() => expect(createdAnalysis.isPresent()).toBe(true));
 
       // Delete
       const main = analyzePage.main;
       const cards = main.getAnalysisCards(reportName);
-      main.getAnalysisCards(reportName).count()
-        .then(count => {
-          main.doAnalysisAction(reportName, 'delete');
-          commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
-          main.confirmDeleteBtn.click();
-        });
+      main.getAnalysisCards(reportName).count().then(count => {
+        main.doAnalysisAction(reportName, 'delete');
+        commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
+        main.confirmDeleteBtn.click();
+      });
     });
 
-    var scrollIntoView = function(element) {
+    var scrollIntoView = function (element) {
       arguments[0].scrollIntoView();
     };
   });
