@@ -16,9 +16,22 @@ export class ChoiceGroupComponent {
   @Input() items: IChoiceGroupItem[];
   @Input() value;
 
+  selectedItem;
+  selectedSubItem;
+
   constructor() {}
 
   onItemSelected(value) {
+    this.selectedItem = value;
+    this.selectedSubItem = null;
+    if (value.disabled) {
+      return;
+    }
+    this.change.emit(value);
+  }
+
+  onSubItemSelected(value) {
+    this.selectedSubItem = value;
     if (value.disabled) {
       return;
     }

@@ -1,11 +1,14 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import * as forEach from 'lodash/forEach';
 import * as get from 'lodash/get';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpOrderBy from 'lodash/fp/orderBy';
+import * as fpPipe from 'lodash/fp/pipe';
 
 import { ANALYSIS_METHODS } from '../../consts';
 import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
+import { MatHorizontalStepper } from '@angular/material/stepper';
 
 @Component({
   selector: 'analyze-new-dialog',
@@ -14,8 +17,18 @@ import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 })
 export class AnalyzeNewDialogComponent {
   methodCategories = ANALYSIS_METHODS;
+  supportedMetricCategories: Array<any> = [
+    {
+      label: 'All',
+      metrics: []
+    }
+  ];
   selectedMethod: IAnalysisMethod;
+  searchMetric: '';
   selectedMetric;
+  private _sortOrder = 'asc';
+
+  @ViewChild('newAnalysisStepper') stepper: MatHorizontalStepper;
 
   constructor(
     public _analyzeDialogService: AnalyzeDialogService,
@@ -29,34 +42,58 @@ export class AnalyzeNewDialogComponent {
 
   onMetricSelected(metric) {
     this.selectedMetric = metric;
-    this.setSupportedMethods(metric);
   }
 
   onMethodSelected(method) {
-    this.selectedMethod = method;
+    this.selectedMethod = method.type ? method : null;
+    this.setSupportedMetrics(method);
   }
 
-  trackByIndex(index) {
-    return index;
+  trackById(index, metric) {
+    return metric.id;
   }
 
-  setSupportedMethods(metric) {
-    const metricType = get(metric, 'esRepository.storageType');
-    const isEsMetric = metricType === 'ES';
+  setSupportedMetrics(method) {
+    this._sortOrder = 'asc';
+    this.supportedMetricCategories[0].metrics = fpPipe(
+      fpFilter(metric => {
+        const isEsMetric = get(metric, 'esRepository.storageType') === 'ES';
 
-    forEach(this.methodCategories, category => {
-      forEach(category.children, method => {
-        const enableMethod = isEsMetric ? true : method.type === 'table:report';
-
-        method.disabled = !enableMethod;
-      });
-    });
-
-    this.selectedMethod = null;
+        return isEsMetric || method.type === 'table:report';
+      }),
+      fpOrderBy(['metricName'], [this._sortOrder])
+    )(this.data.metrics);
+    this.selectedMetric = null;
+    this.searchMetric = '';
   }
 
-  createButtonDisabled() {
-    return !this.selectedMethod || !this.selectedMetric;
+  nextButtonDisabled() {
+    if (this.stepper.selectedIndex === 0) {
+      return !this.selectedMethod;
+    } else if (this.stepper.selectedIndex === 1) {
+      return !this.selectedMethod || !this.selectedMetric;
+    }
+  }
+
+  toggleSort() {
+    this._sortOrder = this._sortOrder === 'asc' ? 'desc' : 'asc';
+    this.supportedMetricCategories[0].metrics = fpOrderBy(
+      ['metricName'],
+      [this._sortOrder],
+      this.supportedMetricCategories[0].metrics
+    );
+  }
+
+  previousStep() {
+    this.stepper.previous();
+  }
+
+  nextStep() {
+    if (this.stepper.selectedIndex === 0) {
+      this.stepper.next();
+    } else if (!this.nextButtonDisabled()) {
+      this.createAnalysis();
+    }
   }
 
   getAnalysisType(method, metric) {
