@@ -14,7 +14,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
 import org.junit.Test;
+import org.mockftpserver.fake.FakeFtpServer;
+import org.mockftpserver.fake.UserAccount;
+import org.mockftpserver.fake.filesystem.DirectoryEntry;
+import org.mockftpserver.fake.filesystem.FileSystem;
+import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +33,8 @@ public class BatchIngestionIT extends BaseIT {
   
   private static final String BATCH_CHANNEL_PATH = 
       "/services/ingestion/batch/" + BATCH_CHANNEL;
+
+  private static final String BATCH_PATH = "/services/ingestion/batch";
   
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -34,11 +42,11 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("channelName", "Messaging");
     childNode.put("channelType", "SCP");
-    childNode.put("hostName", "saw01.ana.demo.vaste.sncrcorp.net");
-    childNode.put("portNo", 22);
+    childNode.put("hostName", "localhost");
+    childNode.put("portNo", 21);
     childNode.put("accessType", "read");
-    childNode.put("userName", "sawadmin@sncr.com");
-    childNode.put("password", "AbcX1245yfgskl");
+    childNode.put("userName", "user");
+    childNode.put("password", "oKIQbg3Q0C7wfsPUoXjN4g==");
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -56,8 +64,8 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("routeName", "route123");
     childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
     childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-    childNode.put("sourceLocation", "/tmp");
-    childNode.put("destinationLocation", "/dest/tmp");
+    childNode.put("sourceLocation", "/data");
+    childNode.put("destinationLocation", "/tmp");
     childNode.put("filePattern", "*.csv");
     childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
     childNode.put("description", "file");
@@ -106,6 +114,19 @@ public class BatchIngestionIT extends BaseIT {
     root.put("routeMetadata",new ObjectMapper().writeValueAsString(childNode));
     return root;
   }
+  
+  private FakeFtpServer createFileOnFakeFtp(String username, String password, 
+		  String homeDirectory, String filename) {
+    FakeFtpServer aFakeFtpServer = new FakeFtpServer();
+    aFakeFtpServer.setServerControlPort(0);
+    aFakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
+    FileSystem aFileSystem = new UnixFakeFileSystem();
+    aFileSystem.add(new DirectoryEntry("/data"));
+    aFakeFtpServer.setFileSystem(aFileSystem);
+    aFakeFtpServer.start();
+    return aFakeFtpServer;
+  }
+  
   
   private Long getChannelId() {
     List<HashMap<Object,Object>> bisChannelSysId = given(authSpec).when().get(BATCH_CHANNEL_PATH)
@@ -281,6 +302,53 @@ public class BatchIngestionIT extends BaseIT {
     given(authSpec).when().delete(urlForThatoUpdate).then()
    .assertThat().statusCode(200);
   }
-  
-  
+
+  /**
+   * The test case is to test connectivity a route in batch Ingestion.
+  */
+  @Test
+  public void connectRoute() throws JsonProcessingException {
+    given(authSpec)
+    .body(prepareChannelDataSet()).when()
+    .post(BATCH_CHANNEL_PATH)
+    .then().assertThat().statusCode(200);
+    Long bisChannelSysId = getChannelId();
+    log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
+    String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
+    given(authSpec)
+    .body(prepareRouteDataSet()).when()
+    .post(routeUri)
+    .then().assertThat().statusCode(200);  
+    List<HashMap<Object,Object>> bisRouteSysId = given(authSpec)
+            .when().get(routeUri).then()
+            .assertThat().statusCode(200).extract().response().jsonPath().getJsonObject("content");
+    Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
+    log.debug("connectRoute bisRouteSysId : " + routeId);
+    String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_ROUTE
+    + "/connect/" + routeId;
+    given(authSpec).when().get(connectRouteUri).then()
+   .assertThat().statusCode(200);
+  }
+
+  /**
+   * The test case is to test a connectivity route in batch Ingestion.
+  */
+  @Test
+  public void connectChannel() throws JsonProcessingException {
+    String username = "user";
+    String password = "password";
+    String homeDirectory = "/";
+    String filename = "report.csv";
+    createFileOnFakeFtp(username, password, homeDirectory, filename);
+    given(authSpec)
+    .body(prepareChannelDataSet()).when()
+    .post(BATCH_CHANNEL_PATH)
+    .then().assertThat().statusCode(200);
+    Long bisChannelSysId = getChannelId();
+    log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
+    String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_CHANNEL
+    + "/connect/" + bisChannelSysId;
+    given(authSpec).when().get(connectRouteUri).then()
+   .assertThat().statusCode(200);
+  }
 }

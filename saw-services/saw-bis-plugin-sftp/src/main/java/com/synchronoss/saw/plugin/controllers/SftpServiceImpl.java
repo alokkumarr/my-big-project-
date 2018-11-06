@@ -13,6 +13,7 @@ import com.synchronoss.saw.exception.SftpProcessorException;
 import com.synchronoss.saw.extensions.SipPluginContract;
 import com.synchronoss.saw.model.BisIngestionPayload;
 import com.synchronoss.saw.model.ChannelType;
+import com.synchronoss.saw.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.sftp.integration.SipFileFilterOnLastModifiedTime;
 import com.synchronoss.saw.sftp.integration.SipSftpFilter;
 
@@ -33,12 +34,11 @@ import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.dsl.context.IntegrationFlowRegistration;
 import org.springframework.integration.file.filters.ChainFileListFilter;
 import org.springframework.integration.file.remote.gateway.AbstractRemoteFileOutboundGateway;
-import org.springframework.integration.file.remote.session.DelegatingSessionFactory;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.sftp.dsl.Sftp;
-import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpSession;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +50,7 @@ public class SftpServiceImpl extends SipPluginContract {
   private static final Logger logger = LoggerFactory.getLogger(SftpPluginController.class);
   
   @Autowired
-  private DelegatingSessionFactory<?> delegatingSessionFactory;
+  private RuntimeSessionFactoryLocator delegatingSessionFactory;
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
@@ -58,7 +58,8 @@ public class SftpServiceImpl extends SipPluginContract {
   @Autowired
   private IntegrationFlowContext flowContext;
   
-  
+  @Autowired
+  MessageChannel outboundSftpChannel;
   
   // TODO: It has to be enhanced to stream the logs to user interface
   //TODO: SIP-4613
@@ -75,8 +76,7 @@ public class SftpServiceImpl extends SipPluginContract {
     if (bisRouteEntity.isPresent()) {
       BisRouteEntity entity = bisRouteEntity.get();
       try {
-        nodeEntity = objectMapper.readTree(objectMapper
-        .writeValueAsString(entity.getRouteMetadata()));
+        nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
         String destinationLocation = rootNode.get("destinationLocation").asText();
         File destinationPath = new File(destinationLocation);
@@ -110,17 +110,15 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.info("checking connectivity for the source id :" + entityId);
     HttpStatus  status = null;
     try {
-      delegatingSessionFactory.setThreadKey(entityId);
-      DefaultSftpSessionFactory session =  (DefaultSftpSessionFactory) 
-          delegatingSessionFactory.getSession(entityId);
-      SftpSession  sftp = session.getSession();
-      if (sftp.isOpen()) {
+      if (delegatingSessionFactory.getSessionFactory(entityId).getSession().isOpen()) {
         logger.info("connected successfully " + entityId);
         status = HttpStatus.OK;
+        delegatingSessionFactory.getSessionFactory(entityId).getSession().close();
       } else {
         status = HttpStatus.BAD_REQUEST;
       }
     } catch (Exception ex) {
+      logger.info("Exception :", ex);
       status = HttpStatus.BAD_REQUEST;
     }
     return status;
@@ -128,6 +126,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   //TODO : This transfer data has to be enhanced while integrating with Scheduler
   //TODO : to download a batch of files instead all files then initiate the downstream the process
+  //TODO: Transfer needs some more work & and the same entity Id will not work. 
   @Override
  public HttpStatus transferData(BisIngestionPayload input) throws JsonProcessingException {
     logger.info("transferring file from remote channel starts here");
@@ -138,40 +137,34 @@ public class SftpServiceImpl extends SipPluginContract {
     HttpStatus  status = null;
     SftpSession  sftp = null;
     try {
-      // Creating a dynamic Sftp Session using spring integration
-      delegatingSessionFactory.setThreadKey(input.getEntityId());
-      DefaultSftpSessionFactory session = (DefaultSftpSessionFactory) delegatingSessionFactory
-                            .getSession(input.getEntityId());
-      sftp = session.getSession();
-      if (sftp.isOpen()) {
-        if (connectChannel(input.getEntityId()).equals(HttpStatus.OK) 
+      if (connectChannel(input.getEntityId()).equals(HttpStatus.OK) 
             && connectRoute(input.getEntityId()).equals(HttpStatus.OK)) {
-          logger.trace("connected successfully " + input.getEntityId());
-          // getting channel details
-          Optional<BisRouteEntity> entity = bisRouteDataRestRepository
+        logger.trace("connected successfully " + input.getEntityId());
+        // getting channel details
+        Optional<BisRouteEntity> entity = bisRouteDataRestRepository
               .findById(input.getEntityId());
-          if (entity.isPresent()) {
-            JsonNode nodeEntity = null;
-            ObjectNode rootNode = null;
-            nodeEntity = objectMapper.readTree(objectMapper
-            .writeValueAsString(entity.get().getRouteMetadata()));
-            rootNode = (ObjectNode) nodeEntity;
-            String filePattern = rootNode.get("filePattern").asText();
+        if (entity.isPresent()) {
+          JsonNode nodeEntity = null;
+          ObjectNode rootNode = null;
+          nodeEntity = objectMapper.readTree(entity.get().getRouteMetadata());
+          rootNode = (ObjectNode) nodeEntity;
+          String filePattern = rootNode.get("filePattern").asText();
 
-            // Creating chain file list
-            ChainFileListFilter<LsEntry> list = new ChainFileListFilter<LsEntry>();
-            SipSftpFilter sftpFilter = new SipSftpFilter();
-            sftpFilter.setFilePatterns(filePattern);
-            list.addFilter(sftpFilter);
-            SipFileFilterOnLastModifiedTime  lastModifiedTime = 
+          // Creating chain file list
+          ChainFileListFilter<LsEntry> list = new ChainFileListFilter<LsEntry>();
+          SipSftpFilter sftpFilter = new SipSftpFilter();
+          sftpFilter.setFilePatterns(filePattern);
+          list.addFilter(sftpFilter);
+          SipFileFilterOnLastModifiedTime  lastModifiedTime = 
                 new SipFileFilterOnLastModifiedTime();
-            lastModifiedTime.setTimeDifference(10000L);
-            list.addFilter(lastModifiedTime);
-            // Creating an integration using DSL
-            QueueChannel out = new QueueChannel();
-            String destinationLocation = rootNode.get("destinationLocation").asText();          
-            IntegrationFlow flow = f -> f
-                .handle(Sftp.outboundGateway(session, 
+          lastModifiedTime.setTimeDifference(10000L);
+          list.addFilter(lastModifiedTime);
+          // Creating an integration using DSL
+          QueueChannel out = new QueueChannel();
+          String destinationLocation = rootNode.get("destinationLocation").asText();          
+          IntegrationFlow flow = f -> f
+              .handle(Sftp.outboundGateway(delegatingSessionFactory
+              .getSessionFactory(input.getEntityId()), 
                 AbstractRemoteFileOutboundGateway.Command.MGET,
                 "payload")
                 .options(AbstractRemoteFileOutboundGateway.Option.RECURSIVE, 
@@ -188,28 +181,28 @@ public class SftpServiceImpl extends SipPluginContract {
                 + "+'.'+T(org.apache.commons.io.FilenameUtils).getExtension(#remoteFileName)"))
                 .channel(out).log(LoggingHandler.Level.INFO.name())
                 .channel(MessageChannels.direct("dynamicSftpLoggingChannel"));
-            String sourceLocation = rootNode.get("sourceLocation").asText();          
-            IntegrationFlowRegistration registration = this.flowContext
+          String sourceLocation = rootNode.get("sourceLocation").asText();          
+          IntegrationFlowRegistration registration = this.flowContext
                 .registration(flow).register();
-            registration.getInputChannel().send(new GenericMessage<>(sourceLocation + "*"));   
-            Message<?> result = out.receive(10_000); // will wait for 10 seconds\
-            input.setMessageSource(result);
-            registration.destroy();
+          registration.getInputChannel().send(new GenericMessage<>(sourceLocation + "*"));   
+          Message<?> result = out.receive(10_000); // will wait for 10 seconds\
+          input.setMessageSource(result);
+          registration.destroy();
         
-            input.setChannelType(ChannelType.SFTP);
-            pullContent(input);
-            status = HttpStatus.OK;
-          } else {
-            status = HttpStatus.BAD_REQUEST;
-            throw new SftpProcessorException("There is a problem connecting either "
-            + "channel or route. "
- + "Please check with system administration about the connectivity."); 
-          }
+          input.setChannelType(ChannelType.SFTP);
+          pullContent(input);
+          status = HttpStatus.OK;
         } else {
           status = HttpStatus.BAD_REQUEST;
-          throw new SftpProcessorException("Entity does not exist");
+          throw new SftpProcessorException("There is a problem connecting either "
+            + "channel or route. "
+ + "Please check with system administration about the connectivity."); 
         }
+      } else {
+        status = HttpStatus.BAD_REQUEST;
+        throw new SftpProcessorException("Entity does not exist");
       }
+    // } // end of first if
     } catch (Exception ex) {
       logger.error("Exception occured while transferring file or there are no files available", ex);
       status = HttpStatus.BAD_REQUEST;

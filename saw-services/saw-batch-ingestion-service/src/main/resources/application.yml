@@ -3,13 +3,13 @@ spring:
     name: saw-batch-ingestion-service
   output:
     ansi:
-      enabled: always
+      enabled: never
   flyway:
     baseline-on-migrate: true
   datasource:
-    url: jdbc:mariadb://localhost:3306/batch_ingestion
-    username: batch
-    password: batch
+    url: jdbc:mariadb://localhost:3306/sip_batch_ingestion
+    username: root
+    password: root
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     show-sql: true
@@ -22,7 +22,7 @@ spring:
   
 logging:
   level:
-    com.synchronoss.saw: TRACE
+    com.synchronoss.saw: INFO
     org.springframework: INFO
     org.hibernate.type : INFO
     
@@ -39,11 +39,6 @@ management:
   endpoint:
     health:
       show-details: always
-application:
-    async:
-        core-pool-size: 10
-        max-pool-size: 50
-        queue-capacity: 10000
 sip:
   service:
     index: 0    

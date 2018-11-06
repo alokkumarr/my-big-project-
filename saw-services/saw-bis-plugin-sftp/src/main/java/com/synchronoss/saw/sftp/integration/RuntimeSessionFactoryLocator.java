@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactory;
@@ -56,19 +58,22 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
       JsonNode nodeEntity = null;
       ObjectNode rootNode = null;
       try {
-        nodeEntity = objectMapper.readTree(objectMapper
-        .writeValueAsString(bisChannelEntity.getChannelMetadata()));
+        nodeEntity = objectMapper.readTree(bisChannelEntity.getChannelMetadata());
         rootNode = (ObjectNode) nodeEntity;
         String hostname = rootNode.get("hostName").asText();
         String portNumber = rootNode.get("portNo").asText();
+        defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
         String userName = rootNode.get("userName").asText();
         String password = Ccode.cdecode(rootNode.get("password").asText());
-        DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
-        factory.setHost(hostname);
-        factory.setPort(Integer.valueOf(portNumber));
-        factory.setUser(userName);
-        factory.setPassword(password);
-        factory.setAllowUnknownKeys(true);
+        defaultSftpSessionFactory.setHost(hostname);
+        defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
+        defaultSftpSessionFactory.setUser(userName);
+        defaultSftpSessionFactory.setPassword(password);
+        defaultSftpSessionFactory.setAllowUnknownKeys(true);
+        Properties prop = new Properties();
+        prop.setProperty("StrictHostKeyChecking", "no");
+        //prop.setProperty("PreferredAuthentications", "password");
+        defaultSftpSessionFactory.setSessionConfig(prop);
       } catch (IOException e) {
         throw new SftpProcessorException("for the given id + " + key + ""
       + " details does not exist");

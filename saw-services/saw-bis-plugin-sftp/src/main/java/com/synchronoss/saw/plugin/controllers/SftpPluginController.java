@@ -33,7 +33,6 @@ public class SftpPluginController {
   
   /**
    * This endpoint to test connectivity for route.
-   * @return
    */
   @ApiOperation(value = "To test connectivity for route",
       nickname = "sftpActionBis", notes = "", response = HttpStatus.class)
@@ -41,7 +40,7 @@ public class SftpPluginController {
       message = "Request has been accepted without any error"),
       @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
       @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator") })
-  @RequestMapping(value = "/route/connect/{id}", method = RequestMethod.GET, 
+  @RequestMapping(value = "/routes/connect/{id}", method = RequestMethod.GET, 
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public HttpStatus connectRoute(@ApiParam(value = "Route id to test connectivity",
@@ -51,7 +50,6 @@ public class SftpPluginController {
 
   /**
    * This endpoint to test connectivity for route.
-   * @return
    */
   @ApiOperation(value = "To test connectivity for source",
       nickname = "sftpActionBis", notes = "", response = HttpStatus.class)
@@ -59,7 +57,7 @@ public class SftpPluginController {
       message = "Request has been accepted without any error"),
       @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
       @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator") })
-  @RequestMapping(value = "/channel/connect/{id}", method = RequestMethod.GET, 
+  @RequestMapping(value = "/channels/connect/{id}", method = RequestMethod.GET, 
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public HttpStatus connectSource(@ApiParam(value = "Source id to test connectivity",
@@ -67,8 +65,7 @@ public class SftpPluginController {
     return sftpServiceImpl.connectChannel(id);
   }
   /**
-   * This endpoint to test connectivity for route.
-   * @return
+   * This endpoint to transfer data from remote channel.
    */
   
   @ApiOperation(value = "To pull data from remote channel",
@@ -77,8 +74,8 @@ public class SftpPluginController {
       message = "Request has been accepted without any error"),
       @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
       @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator") })
-  @RequestMapping(value = "/channel/transfer", method = RequestMethod.POST, 
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  //  @RequestMapping(value = "/channel/transfer", method = RequestMethod.POST, 
+  //   produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public Object pullData(@ApiParam(value = "Payload structure which to be used to "
       + "initiate the transfer",
