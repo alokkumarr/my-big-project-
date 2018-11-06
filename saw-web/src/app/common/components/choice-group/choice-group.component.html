@@ -16,7 +16,7 @@
   <div fxLayout="row wrap" fxLayoutAlign="start center"
        *ngIf="selectedItem && selectedItem.children && selectedItem.children.length"
        class="choice-subgroup">
-      <span class="subgroup-title"> Selected {{selectedItem.label}} type </span>
+      <span class="subgroup-title"> Select {{selectedItem.label}} type </span>
       <div *ngFor="let item of selectedItem.children; trackBy: trackByIndex"
               (click)="onSubItemSelected(item)"
               fxLayout="column" fxLayoutAlign="center center"
