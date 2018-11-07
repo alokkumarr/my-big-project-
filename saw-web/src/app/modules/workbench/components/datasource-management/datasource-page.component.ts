@@ -34,6 +34,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   selectedSourceType: string;
   selectedSourceData: any;
   show = false;
+  channelEditable = false;
 
   @ViewChild('channelsGrid')
   channelsGrid: DxDataGridComponent;
@@ -95,10 +96,13 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       event.selectedRowKeys.length > 0
     ) {
       this.getRoutesForChannel(event.selectedRowKeys[0]);
-    }
-    this.selectedSourceData = event.selectedRowsData[0];
-    if (!isUndefined(this.selectedSourceData.password)) {
+    } else if (event.selectedRowKeys.length > 0) {
+      this.channelEditable = true;
+      this.selectedSourceData = event.selectedRowsData[0];
       this.decryptPWD(this.selectedSourceData.password);
+    } else {
+      this.channelEditable = false;
+      this.selectedSourceData = [];
     }
   }
 
