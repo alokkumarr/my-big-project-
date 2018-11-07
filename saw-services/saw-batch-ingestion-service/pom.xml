@@ -18,7 +18,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<start-class>com.synchronoss.saw.SAWBatchServiceApplication</start-class>
+		<start-class>com.synchronoss.saw.batch.SawBatchServiceApplication</start-class>
 		<json.validate>2.2.6</json.validate>
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
@@ -46,17 +46,14 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -98,13 +95,12 @@
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-sftp</artifactId>
 		</dependency>
-
+		<!-- Spring integration related service -->
 		<dependency>
 			<groupId>info.faljse</groupId>
 			<artifactId>SDNotify</artifactId>
 			<version>${snotify}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
 			<artifactId>wiremock</artifactId>
@@ -236,32 +232,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>appassembler-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>create-bundle</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>de.dentrassi.maven</groupId>
 				<artifactId>rpm</artifactId>
 				<version>0.10.0</version>
@@ -283,11 +253,6 @@
 									<directory>true</directory>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-batch-ingestion-service/plugins</name>
-									<directory>true</directory>
-								</entry>
-
-								<entry>
 									<name>/opt/bda/saw-batch-ingestion-service/saw-batch-ingestion.jar</name>
 									<file>target/saw-batch-ingestion-service-${revision}-exec.jar</file>
 								</entry>
@@ -308,7 +273,6 @@
 									<file>src/db-setup/init</file>
 									<mode>0755</mode>
 								</entry>
-
 							</entries>
 							<afterInstallation>
 								<script>systemctl daemon-reload</script>

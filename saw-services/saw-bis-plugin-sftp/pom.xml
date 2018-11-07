@@ -13,10 +13,11 @@
 	<groupId>com.synchronoss.saw</groupId>
 	<artifactId>saw-bis-plugin-sftp</artifactId>
 	<name>saw-bis-plugin-sftp</name>
+	<packaging>jar</packaging>
 	<version>${revision}</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<start-class>com.synchronoss.saw.SpringTestPluginSftpApplication</start-class>
+		<start-class>com.synchronoss.saw.batch.SpringTestPluginSftpApplication</start-class>
 		<json.validate>2.2.6</json.validate>
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
@@ -196,13 +197,14 @@
 
 	<build>
 		<plugins>
+			<!-- 
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<dependencies>
 					<dependency>
 						<groupId>org.springframework.boot.experimental</groupId>
-						<artifactId>spring-boot-thin-layout</artifactId>
+						<artifactId>spring-boot-thin-maven-plugin</artifactId>
 						<version>1.0.17.RELEASE</version>
 					</dependency>
 				</dependencies>
@@ -210,7 +212,7 @@
 					<executable>true</executable>
 				</configuration>
 			</plugin>
-
+		 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>

@@ -116,15 +116,15 @@ public class BatchIngestionIT extends BaseIT {
   }
   
   private FakeFtpServer createFileOnFakeFtp(String username, String password, 
-		  String homeDirectory, String filename) {
-    FakeFtpServer aFakeFtpServer = new FakeFtpServer();
-    aFakeFtpServer.setServerControlPort(0);
-    aFakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
-    FileSystem aFileSystem = new UnixFakeFileSystem();
-    aFileSystem.add(new DirectoryEntry("/data"));
-    aFakeFtpServer.setFileSystem(aFileSystem);
-    aFakeFtpServer.start();
-    return aFakeFtpServer;
+      String homeDirectory, String filename) {
+    FakeFtpServer fakeFtpServer = new FakeFtpServer();
+    fakeFtpServer.setServerControlPort(0);
+    fakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
+    FileSystem fileSystem = new UnixFakeFileSystem();
+    fileSystem.add(new DirectoryEntry("/data"));
+    fakeFtpServer.setFileSystem(fileSystem);
+    fakeFtpServer.start();
+    return fakeFtpServer;
   }
   
   
@@ -325,7 +325,7 @@ public class BatchIngestionIT extends BaseIT {
     Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
     log.debug("connectRoute bisRouteSysId : " + routeId);
     String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_ROUTE
-    + "/connect/" + routeId;
+        + "/connect/" + routeId;
     given(authSpec).when().get(connectRouteUri).then()
    .assertThat().statusCode(200);
   }
@@ -347,7 +347,7 @@ public class BatchIngestionIT extends BaseIT {
     Long bisChannelSysId = getChannelId();
     log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
     String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_CHANNEL
-    + "/connect/" + bisChannelSysId;
+        + "/connect/" + bisChannelSysId;
     given(authSpec).when().get(connectRouteUri).then()
    .assertThat().statusCode(200);
   }
