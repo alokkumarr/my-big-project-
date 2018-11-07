@@ -1,31 +1,19 @@
 package com.synchronoss.saw.scheduler.controller;
 
-import static org.junit.Assert.assertEquals;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -33,17 +21,16 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.synchronoss.saw.scheduler.SAWSchedulerServiceApplication;
-import com.synchronoss.saw.scheduler.job.BisCronJob;
 import com.synchronoss.saw.scheduler.modal.BISSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.service.BisServiceImplTest;
 import com.synchronoss.saw.scheduler.service.JobService;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
+
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BisServiceImplTest.class)
 @ContextConfiguration(classes = SAWSchedulerServiceApplication.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-//@WebMvcTest(value = BISJobController.class, secure = false)
-//@TestPropertySource(locations = "application-test.properties")
 public class BISJobControllerTest {
 
 	//@Autowired
@@ -184,6 +171,7 @@ public class BISJobControllerTest {
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 		MockHttpServletResponse response = result.getResponse();
 		Assert.assertEquals(response.getStatus(),200);
+		Assert.assertEquals(response.getContentAsString(), "{\"statusCode\":200,\"data\":\"SCHEDULED\"}");
 		
 	}
 	

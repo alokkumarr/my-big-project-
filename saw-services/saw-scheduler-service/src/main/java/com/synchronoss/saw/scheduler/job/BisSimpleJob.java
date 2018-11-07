@@ -8,12 +8,9 @@ import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
-import com.synchronoss.saw.scheduler.service.AnalysisService;
-import com.synchronoss.saw.scheduler.service.JobService;
+import com.synchronoss.saw.scheduler.modal.BISSchedulerJobDetails;
 
 public class BisSimpleJob extends QuartzJobBean implements InterruptableJob{
 
@@ -33,7 +30,7 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob{
         logger.info("Simple Job started with key :" + key.getName() + ", Group :"+key.getGroup()
                 + " , Thread Name :"+Thread.currentThread().getName());
 
-        SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
+        BISSchedulerJobDetails job = (BISSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
        
 
