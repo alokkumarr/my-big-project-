@@ -95,7 +95,10 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       !isUndefined(event.currentDeselectedRowKeys[0]) &&
       event.selectedRowKeys.length > 0
     ) {
+      this.channelEditable = true;
+      this.selectedSourceData = event.selectedRowsData[0];
       this.getRoutesForChannel(event.selectedRowKeys[0]);
+      this.decryptPWD(this.selectedSourceData.password);
     } else if (event.selectedRowKeys.length > 0) {
       this.channelEditable = true;
       this.selectedSourceData = event.selectedRowsData[0];
@@ -103,6 +106,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     } else {
       this.channelEditable = false;
       this.selectedSourceData = [];
+      this.routesData = [];
     }
   }
 
