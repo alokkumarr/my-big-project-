@@ -36,6 +36,9 @@ rm -f /lib/systemd/system/anaconda.target.wants/*;
 VOLUME ["/sys/fs/cgroup"]
 CMD ["/usr/sbin/init"]
 
+# Enable memory accounting for analyzing memory consumption
+RUN echo "DefaultMemoryAccounting=yes" >> /etc/systemd/system.conf
+
 # Enable installing documentation for packages
 RUN sed -i -e '/^tsflags=nodocs$/d' /etc/yum.conf
 
