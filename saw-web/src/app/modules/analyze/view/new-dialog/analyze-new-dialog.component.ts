@@ -1,6 +1,8 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as get from 'lodash/get';
+import * as values from 'lodash/values';
+import * as fpForEach from 'lodash/fp/forEach';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -9,20 +11,17 @@ import { ANALYSIS_METHODS } from '../../consts';
 import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { MatHorizontalStepper } from '@angular/material/stepper';
+import { FilterPipe } from '../../../../common/pipes/filter.pipe';
 
 @Component({
   selector: 'analyze-new-dialog',
   templateUrl: './analyze-new-dialog.component.html',
-  styleUrls: ['./analyze-new-dialog.component.scss']
+  styleUrls: ['./analyze-new-dialog.component.scss'],
+  providers: [FilterPipe]
 })
 export class AnalyzeNewDialogComponent {
   methodCategories = ANALYSIS_METHODS;
-  supportedMetricCategories: Array<any> = [
-    {
-      label: 'All',
-      metrics: []
-    }
-  ];
+  supportedMetricCategories: Array<any> = [];
   selectedMethod: IAnalysisMethod;
   searchMetric: '';
   selectedMetric;
@@ -33,6 +32,7 @@ export class AnalyzeNewDialogComponent {
   constructor(
     public _analyzeDialogService: AnalyzeDialogService,
     public _dialogRef: MatDialogRef<AnalyzeNewDialogComponent>,
+    private filterPipe: FilterPipe,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       metrics: any[];
@@ -53,16 +53,51 @@ export class AnalyzeNewDialogComponent {
     return metric.id;
   }
 
+  /**
+   * searchCount
+   * Returns the number of metrics matching the search criteria
+   *
+   * @param metrics
+   * @returns {number}
+   */
+  searchCount(metrics): number {
+    return this.filterPipe.transform(metrics, 'metricName', this.searchMetric)
+      .length;
+  }
+
+  /**
+   * Adds metric to a category or default category if none is
+   * present
+   */
+  categoriseMetric(
+    metric,
+    categories: { [key: string]: { label: string; metrics: Array<any> } }
+  ) {
+    const category = metric.category || 'Default';
+    categories[category] = categories[category] || {
+      label: category,
+      metrics: []
+    };
+    categories[category].metrics.push(metric);
+    return categories;
+  }
+
   setSupportedMetrics(method) {
     this._sortOrder = 'asc';
-    this.supportedMetricCategories[0].metrics = fpPipe(
+    let supportedMetrics = {};
+
+    fpPipe(
       fpFilter(metric => {
         const isEsMetric = get(metric, 'esRepository.storageType') === 'ES';
-
         return isEsMetric || method.type === 'table:report';
       }),
-      fpOrderBy(['metricName'], [this._sortOrder])
+      fpOrderBy(['metricName'], [this._sortOrder]),
+      fpForEach(metric => {
+        supportedMetrics = this.categoriseMetric(metric, supportedMetrics);
+      })
     )(this.data.metrics);
+
+    this.supportedMetricCategories = values(supportedMetrics);
     this.selectedMetric = null;
     this.searchMetric = '';
   }
