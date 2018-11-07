@@ -41,6 +41,9 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
     public static final String DM_SIMPLE = "simple";
     public static final String DM_SIMPLE_JSON = "simple-json";
 
+    private static final String RT_USER = "mapr";
+    private static final String RT_GROUP = "mapr";
+
     public static void main(String[] args){
         EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
         driver.run(args[0]);
@@ -276,7 +279,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
     if (!fs.exists(fsPath)) {
       logger.info("Creating directory: " + path);
       fs.mkdirs(fsPath);
-      fs.setOwner(fsPath, "mapr", "mapr");
+      fs.setOwner(fsPath, RT_USER, RT_GROUP);
     }
   }
 }
