@@ -15,7 +15,7 @@
       <ng-template matStepperIcon="done">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
-      <mat-step label="Route Details">
+      <mat-step label="Route Details" [stepControl]="detailsFormGroup">
         <form fxFlex fxLayout="row wrap" class="details-container" #sourceDetails novalidate [formGroup]="detailsFormGroup"
           autocomplete="false">
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">

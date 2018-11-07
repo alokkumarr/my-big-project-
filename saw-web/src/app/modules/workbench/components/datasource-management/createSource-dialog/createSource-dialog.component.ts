@@ -41,7 +41,13 @@ export class CreateSourceDialogComponent implements OnInit {
     this.detailsFormGroup = this._formBuilder.group({
       channelName: ['', Validators.required],
       hostName: ['', Validators.required],
-      portNo: ['', Validators.required],
+      portNo: [
+        '',
+        Validators.compose([
+          Validators.required,
+          Validators.pattern('^[0-9]*$')
+        ])
+      ],
       userName: ['', Validators.required],
       password: ['', Validators.required],
       description: [''],

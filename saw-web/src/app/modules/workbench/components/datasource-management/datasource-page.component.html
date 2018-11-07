@@ -34,7 +34,7 @@
         <dxi-column caption="Channel Name" dataField="channelName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
         <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
         <div *dxTemplate="let data of 'sourceTypeTemplate'">
-          <div class="master-detail-caption">{{selectedSourceType | uppercase}}</div>
+          <div fxHide.lt-lg="true" class="master-detail-caption">{{selectedSourceType | uppercase}}</div>
         </div>
         <div *dxTemplate="let data of 'nameTemplate'">
           <div class="s-name">{{data.value}}</div>
@@ -146,18 +146,39 @@
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
-              <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Connectivity"
-                (click)="testConnection()">
-                <mat-icon fontIcon="icon-query-mode"></mat-icon>
+              <div fxHide.lt-lg="true">
+                <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Connectivity"
+                  (click)="testConnection()">
+                  <mat-icon fontIcon="icon-query-mode"></mat-icon>
+                </button>
+                <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Edit Route"
+                  (click)="createRoute(data.data)">
+                  <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
+                </button>
+                <button mat-icon-button class="grid-icon-btn" color="warn" (click)="deleteRoute(data.data)"
+                  i18n-matTooltip matTooltip="Delete Route">
+                  <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
+                </button>
+              </div>
+
+
+              <button fxHide.gt-md="true" mat-icon-button class="triggerbtn" [matMenuTriggerFor]="datapodmenu">
+                <mat-icon fontIcon="icon-action-solid"></mat-icon>
               </button>
-              <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Edit Route"
-                (click)="createRoute(data.data)">
-                <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
-              </button>
-              <button mat-icon-button class="grid-icon-btn" color="warn" (click)="deleteRoute(data.data)"
-                i18n-matTooltip matTooltip="Delete Route">
-                <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
-              </button>
+              <mat-menu #datapodmenu="matMenu">
+                <button mat-menu-item (click)="testConnection()">
+                  <mat-icon class="menu-btn-icon" fontIcon="icon-query-mode"></mat-icon>
+                  <span>Test Connectivity</span>
+                </button>
+                <button mat-menu-item (click)="createRoute(data.data)">
+                  <mat-icon class="menu-btn-icon" fontIcon="icon-edit"></mat-icon>
+                  <span>Edit Route</span>
+                </button>
+                <button color="warn" mat-menu-item (click)="deleteRoute(data.data)">
+                  <mat-icon color="warn" class="menu-btn-icon" fontIcon="icon-delete"></mat-icon>
+                  <span>Delete Route</span>
+                </button>
+              </mat-menu>
             </div>
           </dx-data-grid>
         </div>
