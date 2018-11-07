@@ -5,7 +5,9 @@
        fxLayoutAlign="space-between center">
     <mat-form-field class="settings__artifacts__filter__field">
       <input matInput type="text"
+              autocomplete="off"
               placeholder="Filter"
+              name="filter-settings"
               (input)="onTextFilterChange($event.target.value)"
               [value]="filterObj.keyword"/>
       <button mat-button *ngIf="filterObj.keyword"

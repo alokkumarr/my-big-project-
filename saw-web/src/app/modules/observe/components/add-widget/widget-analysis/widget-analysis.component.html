@@ -4,7 +4,7 @@
   <span matPrefix>
     <mat-icon fontIcon="icon-search"></mat-icon>
   </span>
-  <input matInput e2e="dashboard-add-analysis-search" placeholder="Search" [(ngModel)]="searchTerm" />
+  <input matInput autocomplete="off" e2e="dashboard-add-analysis-search" placeholder="Search" [(ngModel)]="searchTerm" />
 </mat-form-field>
 
 <div [hidden]="showProgress">
