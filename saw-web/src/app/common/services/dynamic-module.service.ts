@@ -19,7 +19,6 @@ import * as AngularSplit from 'angular-split';
 import * as AngularCountTo from 'angular2-counto';
 import * as CoreJs from 'core-js';
 import * as DevextremeAngular from 'devextreme-angular';
-import moment from 'moment';
 import * as Ng2Nouslider from 'ng2-nouislider';
 import * as Nouslider from 'nouislider';
 import * as RxJsCompat from 'rxjs-compat';
@@ -48,7 +47,6 @@ const dependencies = {
   'angular2-counto': AngularCountTo,
   'core-js': CoreJs,
   'devextreme-angular': DevextremeAngular,
-  'moment': moment,
   'ng2-nouislider': Ng2Nouslider,
   'nouislider': Nouslider,
   'rxjs-compat': RxJsCompat,
