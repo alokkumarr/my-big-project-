@@ -5,7 +5,8 @@ import { UserService } from '../../../common/services';
 
 @Component({
   selector: 'password-reset',
-  templateUrl: 'password-reset.component.html'
+  templateUrl: 'password-reset.component.html',
+  styleUrls: ['./password-reset.component.scss']
 })
 export class PasswordResetComponent implements OnInit {
   constructor(
@@ -21,6 +22,7 @@ export class PasswordResetComponent implements OnInit {
   public newPwd;
 
   ngOnInit() {
+    this.errorMsg = '';
     this._route.queryParams.subscribe(({ rhc }) => {
       const params = { rhc };
       this._UserService.verify(params).then((res: any) => {
@@ -46,6 +48,7 @@ export class PasswordResetComponent implements OnInit {
   }
 
   login() {
-    this._router.navigate(['login']);
+    // this._router.navigate(['login']);
+    window.location.href = '/#/login';
   }
 }
