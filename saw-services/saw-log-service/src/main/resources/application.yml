@@ -5,10 +5,10 @@ spring:
     name: saw-log-service
   #mariaDB (metadata) DB details
   datasource:
-    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
-    username: sa
-    password: sa
-    driver-class-name: org.h2.Driver
+    url: jdbc:mariadb://localhost/SIP_LOGS
+    username: root
+    password: 
+    driver-class-name:  org.mariadb.jdbc.Driver
     max-active: 25
     testOnBorrow: true
     testOnConnect: true
@@ -16,14 +16,14 @@ spring:
     validationQuery: SELECT 1
     testWhileIdle: true
     logValidationErrors: true
-    jpa:
+  jpa:
       properties:
         hibernate:
            dialect:org.hibernate.dialect.MariaDB53Dialect
 
 server:
   address: localhost
-  port: 9600
+  port: 9200
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:

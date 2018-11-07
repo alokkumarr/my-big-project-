@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(schema = "SAW_LOGS", name = "BIS_FILE_LOGS")
+@Table(schema = "SIP_LOGS", name = "BIS_FILE_LOGS")
 public class BisFileLogs {
 
   @Id
