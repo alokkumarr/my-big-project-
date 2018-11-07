@@ -24,6 +24,7 @@ interface Privilege {
 }
 
 @Component({
+  // tslint:disable-next-line
   selector: 'tr[privilege-row]',
   templateUrl: './privilege-row.component.html',
   styleUrls: ['./privilege-row.component.scss']
