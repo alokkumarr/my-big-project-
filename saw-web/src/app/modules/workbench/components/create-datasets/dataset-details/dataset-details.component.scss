@@ -6,6 +6,8 @@
 
 .data-details {
   padding: 3px;
+  height: calc(100% - 47px);
+  background-color: $background-color;
 }
 
 .toolbar-spacer {

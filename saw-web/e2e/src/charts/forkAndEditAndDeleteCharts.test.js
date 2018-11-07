@@ -58,9 +58,8 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
     it('should fork, edit and delete ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'FORKDELETECHARTS', dp:'forkDeleteChartsDataProvider'}), () => {
         try {
           let currentTime = new Date().getTime();
-          let user = data.user;
           let type = data.chartType.split(":")[1];
-          let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
+          let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime+'-'+utils.getRandomInt(5,7);
           let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
 
           //Create new analysis.
@@ -171,10 +170,8 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
             }
           }));
 
-          //Verify chart type on home page
-          analyzePage.main.getCardTypeByName(forkedName).then(actualChartType =>
-            expect(actualChartType).toEqual(data.chartType,
-              "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
+          //Verify analysis with chart type on home page
+          commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.analysisWithType(forkedName, data.chartType), 10000);
 
           const forkedAnalysis = analyzePage.main.getCardTitle(forkedName);
           //Change to Card View
@@ -192,20 +189,13 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
           //Verify updated details.
           expect(savedAlaysisPage.analysisViewPageElements.text(forkedName).getText()).toBe(forkedName);
 
-          commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
-          commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
-          commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
+          commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
+          savedAlaysisPage.actionsMenuBtn.click();
+          commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.detailsOption);
+          savedAlaysisPage.detailsOption.click();
 
-          element(utils.hasClass(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard, 'mat-expanded').then(function(isPresent) {
-            if(!isPresent) {
-              savedAlaysisPage.analysisViewPageElements.analysisDetailsCard.click();
-              commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.text(forkedDescription));
-              expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
-            } else {
-              commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.text(forkedDescription));
-              expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
-            }
-          }));
+          commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.detailsNav.analysisDetailLabel);
+          expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
         }catch (e) {
           console.log(e);
         }

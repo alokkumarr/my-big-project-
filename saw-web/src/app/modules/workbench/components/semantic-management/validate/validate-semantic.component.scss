@@ -1,19 +1,15 @@
 @import 'src/themes/base/colors';
 
 :host {
-  class: 'validate-semantic'
+  width: 100%;
 }
 
-validate-semantic {
+.container {
   width: 100%;
   height: calc(100% - 3px);
   background-color: $background-color;
   padding: 0 3px 3px;
   overflow: auto;
-
-  .container {
-    height: 100%;
-  }
 
   .header {
     color: rgba(0, 0, 0, 0.54);
@@ -35,7 +31,7 @@ validate-semantic {
   }
 
   .body {
-    background-color: #FFF;
+    background-color: #fff;
     height: calc(100% - 50px);
     max-height: calc(100% - 50px) !important;
 
@@ -50,6 +46,22 @@ validate-semantic {
 
         .mat-tab-group {
           height: 100%;
+        }
+
+        ::ng-deep .mat-tab-label-active {
+          color: $primary-blue-b2;
+        }
+
+        ::ng-deep .mat-tab-body-wrapper {
+          height: 100%;
+
+          .mat-tab-body {
+            overflow: hidden !important;
+
+            .mat-tab-body-content {
+              overflow: hidden !important;
+            }
+          }
         }
       }
     }

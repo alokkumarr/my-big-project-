@@ -29,7 +29,7 @@
 
   mat-radio-button {
     margin: 0;
-    padding-right: 3px;
+    padding-right: 7px;
 
     mat-icon {
       font-size: 14px;
@@ -42,11 +42,11 @@
       }
     }
 
-    .mat-radio-container {
+    ::ng-deep .mat-radio-container {
       display: none;
     }
 
-    .mat-radio-label {
+    ::ng-deep .mat-radio-label {
       margin: 0;
 
       mat-icon {

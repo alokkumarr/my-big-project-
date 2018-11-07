@@ -8,21 +8,7 @@ import {
   DynamicModuleService
 } from '../../../common/services';
 
-import {
-  map,
-  filter,
-  forEach,
-  lowerCase,
-  startCase,
-  split,
-  get,
-} from 'lodash';
-
-import {
-  pipe as fpPipe,
-  map as fpMap,
-  filter as fpFilter
-} from 'lodash/fp';
+import { map, filter, forEach, lowerCase, startCase, split, get } from 'lodash';
 
 @Component({
   selector: 'layout-header',
@@ -55,25 +41,33 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     const product = get(token, 'ticket.products.[0]');
     this.UserDetails = token;
     this.userInitials = this.getInitials(this.UserDetails.ticket.userFullName);
-    this.setModules(product);
+    if (this.user.isLoggedIn()) {
+      this.setModules(product);
+    }
     if (this.jwt.isAdmin()) {
       this.showAdmin = true;
     }
   }
 
-  setModules (product) {
+  setModules(product) {
     const baseModules = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
-    const modules = map(product.productModules, ({productModName, moduleURL}) => ({
-      label: productModName,
-      path: lowerCase(productModName),
-      name: lowerCase(productModName),
-      moduleName: `${startCase(productModName)}Module`,
-      moduleURL
-    }));
+    const modules = map(
+      product.productModules,
+      ({ productModName, moduleURL }) => ({
+        label: productModName,
+        path: lowerCase(productModName),
+        name: lowerCase(productModName),
+        moduleName: `${startCase(productModName)}Module`,
+        moduleURL
+      })
+    );
 
-    this.modules = filter(modules, ({label}) => baseModules.includes(label));
+    this.modules = filter(modules, ({ label }) => baseModules.includes(label));
 
-    const externalModules = filter(this.modules, ({label}) => !baseModules.includes(label));
+    // const externalModules = filter(
+    //   this.modules,
+    //   ({ label }) => !baseModules.includes(label)
+    // );
     // hardcoded stuff
     const externalModulesHard = [{
       path: 'insights',
@@ -92,16 +86,16 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     // }];
 
     forEach(externalModulesHard, externalModule => {
-      this._dynamicModuleService.loadModuleSystemJs(externalModule).then(success => {
-        if (success) {
-          this.modules = [
-            ...this.modules,
-            externalModule
-          ];
+      this._dynamicModuleService.loadModuleSystemJs(externalModule).then(
+        success => {
+          if (success) {
+            this.modules = [...this.modules, externalModule];
+          }
+        },
+        err => {
+          console.error(err);
         }
-      }, err => {
-        console.error(err);
-      });
+      );
     });
   }
 

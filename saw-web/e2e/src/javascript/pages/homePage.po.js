@@ -105,29 +105,12 @@ const createAnalysis = (metricName, analysisType) => {
  */
 const clickOnMetricRadioAndOnAnalysisType = (metricName, analysisType, i) => {
   const newDialog = analyzePage.newDialog;
-  const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
+  const metricElement = (analysisType === 'table:report' ? newDialog.getMetricRadioButtonElementForReportByName(metricName) : newDialog.getMetricRadioButtonElementByName(metricName));
   const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
-  commonFunctions.waitFor.elementToBeVisible(metricElement);
+
   commonFunctions.waitFor.elementToBeClickable(metricElement);
   metricElement.click();
 
-  // Check if metric selected
-  browser.wait(EC.presenceOf(newDialog.getMetricSelectedRadioButtonElementByName(metricName)), 1000).then(
-    function () {
-      commonFunctions.waitFor.elementToBeVisible(analysisTypeElement);
-      commonFunctions.waitFor.elementToBeClickable(analysisTypeElement);
-      analysisTypeElement.click();
-    }, function (err) {
-      if (err) {
-        console.log("AnalysisType is not clickable. Retrying click on Metric Radio Button. Tempts done: " + (i + 1));
-        i++;
-        browser.sleep(1000);
-        if (i < protractorConf.timeouts.tempts) {
-          clickOnMetricRadioAndOnAnalysisType(metricName, analysisType, i);
-        } else {
-          throw new Error("AnalysisType is not clickable after " +
-            protractorConf.timeouts.tempts + " tries. Error: " + err);
-        }
-      }
-    });
+  commonFunctions.waitFor.elementToBeClickable(analysisTypeElement);
+  analysisTypeElement.click()
 };

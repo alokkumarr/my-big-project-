@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
 import { Analysis, ArtifactColumn, Sort } from '../../types';

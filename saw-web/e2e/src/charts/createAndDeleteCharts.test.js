@@ -11,6 +11,7 @@ const subCategories = require('../javascript/data/subCategories');
 const dataSets = require('../javascript/data/datasets');
 const designModePage = require('../javascript/pages/designModePage.po.js');
 const utils = require('../javascript/helpers/utils');
+const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -50,14 +51,17 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
        homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
 
-       let chartName = `e2e ${description} ${(new Date()).toString()}`;
+       let chartName = `e2e ${description} ${(new Date()).toString()}-${utils.getRandomInt(5,7)}`;
        let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 
-       // Create analysis
-       homePage.createAnalysis(metricName, data.chartType);
-
+       let analyzePageV2 = new AnalyzePage();
+       analyzePageV2.clickOnAddAnalysisButton();
+       analyzePageV2.clickOnAnalysisType('');
+       analyzePageV2.clickOnChartType(data.chartType);
+       analyzePageV2.clickOnNextButton();
+       analyzePageV2.clickOnDataPods(metricName);
+       analyzePageV2.clickOnCreateButton();
        //Select fields
-       // Wait for field input box.
        commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
        // Dimension section.
        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
@@ -122,10 +126,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
        /*commonFunctions.waitFor.elementToBePresent(createdAnalysis)
          .then(() => expect(createdAnalysis.isPresent()).toBe(true));*/
        //Verify chart type on home page
-       analyzePage.main.getCardTypeByName(chartName).then(actualChartType =>
-         expect(actualChartType).toEqual(data.chartType,
-           "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
-
+       commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.analysisWithType(chartName, data.chartType), 10000);
        //Delete created chart
        const main = analyzePage.main;
        const cards = main.getAnalysisCards(chartName);

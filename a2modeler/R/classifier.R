@@ -28,11 +28,16 @@ classifier <- function(df,
   
   # Target Check
   target_dims <- df %>%
-    dplyr::distinct_(target) %>%
-    sparklyr::sdf_nrow()
+    dplyr::distinct(!!rlang::sym(target)) %>%
+    dplyr::collect() %>%
+    pull(!!rlang::sym(target))
   
-  if(target_dims != 2) {
+  if(length(target_dims) != 2) {
     stop(paste("target not a binary distribution.\n  Has", target_dims, "unique values"))
+  }
+  
+  if(! all(c(0,1) %in% target_dims)) {
+    stop("binary target distribution not encoded as 0-1.\nPlease update to numeric with 0/1 values")
   }
   
   mobj <- modeler(df,

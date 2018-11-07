@@ -10,7 +10,7 @@ cd $dir
 
 # Copy the R packages to build into a TAR archive for inclusion in the
 # Docker image
-modules="a2charter a2modeler a2munge a2sipr"
+modules="a2munge a2charter a2modeler a2sipr"
 tar -cf a2modules.tar -C .. $modules
 
 # Build the Docker image for building R packages

@@ -8,7 +8,7 @@ button.choose-widget-type {
     margin-top: 10px;
   }
 
-  .mat-button-wrapper {
+  ::ng-deep .mat-button-wrapper {
     display: flex;
   }
 }

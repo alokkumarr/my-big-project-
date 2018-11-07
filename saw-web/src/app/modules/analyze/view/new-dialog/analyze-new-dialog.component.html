@@ -1,41 +1,84 @@
-<h2 mat-dialog-title i18n>New Analysis</h2>
+<h2 mat-dialog-title i18n>
+  Create New Analysis
+  <button mat-icon-button
+          (click)="_dialogRef.close()">
+    <mat-icon fontIcon="icon-close"></mat-icon>
+  </button>
+</h2>
 <mat-divider></mat-divider>
 <mat-dialog-content>
-  <div class="section">
-    <label i18n>What would you like to analyze?</label>
-    <mat-radio-group (change)="onMetricSelected($event.value)" fxLayout="row wrap" class="container">
-      <mat-radio-button *ngFor="let metric of data.metrics; trackBy: trackByIndex"
-                        [attr.e2e]="'metric-name-' + metric.metricName"
-                        [value]="metric"
-                        fxFlex="33"
-      >
-        {{metric.metricName}}
-      </mat-radio-button>
-    </mat-radio-group>
-  </div>
-  <div class="section">
-    <label i18n>How would you like to analyze?</label>
-    <div class="container">
-      <div *ngFor="let category of methodCategories; trackBy: trackByIndex">
-        <div class="md-body-1" flex>{{category.label}}</div>
-        <choice-group-u (change)="onMethodSelected($event)"
-                        [items]="category.children"
-                        [value]="selectedMethod"
-        ></choice-group-u>
+
+  <mat-horizontal-stepper linear="true" #newAnalysisStepper>
+
+    <ng-template matStepperIcon="done">
+      <mat-icon fontIcon="icon-checkmark"></mat-icon>
+    </ng-template>
+    <ng-template matStepperIcon="edit">
+      <mat-icon fontIcon="icon-checkmark"></mat-icon>
+    </ng-template>
+
+    <mat-step label="Select Analysis Type" [completed]="!!selectedMethod">
+      <div class="container">
+        <div *ngFor="let category of methodCategories; trackBy: trackById">
+          <div class="md-body-1" flex>{{category.label}}</div>
+          <choice-group-u (change)="onMethodSelected($event)"
+                          [items]="category.children"
+                          [value]="selectedMethod"
+          ></choice-group-u>
+        </div>
       </div>
-    </div>
-  </div>
+    </mat-step>
+
+    <mat-step label="Select Datapod" [completed]="!!selectedMetric">
+      <mat-form-field appearance="outline">
+        <mat-icon matPrefix fontIcon="icon-search"></mat-icon>
+        <input matInput
+               [attr.e2e]="'metric-search-input-field'"
+               [(ngModel)]="searchMetric" placeholder="Search">
+        <mat-icon matSuffix (click)="searchMetric = ''" *ngIf="searchMetric" fontIcon="icon-close"></mat-icon>
+      </mat-form-field>
+      <button mat-button
+              matTooltip="Sort"
+              (click)="toggleSort()">
+        <mat-icon style="vertical-align: baseline" fontIcon="icon-sort2"></mat-icon>
+        Sort
+      </button>
+      <mat-tab-group>
+        <mat-tab *ngFor="let metricCategory of supportedMetricCategories"
+                 (selectedTabChange)="onMetricCategoryChange($event)"
+                 label="{{metricCategory.label + ' (' + metricCategory.metrics.length + ')'}}">
+          <mat-radio-group (change)="onMetricSelected($event.value)" fxLayout="row wrap" class="container" [value]="selectedMetric">
+            <mat-radio-button *ngFor="let metric of metricCategory.metrics | filter:'metricName':searchMetric; trackBy: trackById"
+                              class="metric-radio-button"
+                              [attr.e2e]="'metric-name-' + metric.metricName"
+                              [value]="metric"
+            >
+              <div class="category-icon"></div>
+              <div class="category-detail">
+                {{metric.metricName}}
+                <span class="metric-created-time" *ngIf="metric.createdAt" [textContent]="'Created: ' + metric.createdAt"></span>
+                <span class="metric-created-time" *ngIf="metric.updatedAt" [textContent]="'Updated: ' + metric.updatedAt"></span>
+              </div>
+            </mat-radio-button>
+          </mat-radio-group>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-step>
+
+  </mat-horizontal-stepper>
 </mat-dialog-content>
 <mat-divider></mat-divider>
-<div fxLayout="row" fxLayoutAlign="space-between center" class="dialog-actions">
-  <button (click)="createAnalysis()"
-          [disabled]="createButtonDisabled()"
+<div fxLayout="row-reverse" fxLayoutAlign="space-between center" class="dialog-actions">
+  <button (click)="nextStep()"
+          [disabled]="nextButtonDisabled()"
           e2e="create-analysis-btn"
           color="primary"
           mat-raised-button i18n
-  >Create Analysis</button>
-  <button (click)="_dialogRef.close()"
+          >{{newAnalysisStepper.selectedIndex === 1 ? 'Create' : 'Next'}}</button>
+  <button (click)="previousStep()"
+          e2e="create-analysis-back-button"
+          *ngIf="stepper.selectedIndex > 0"
           mat-button
-          mat-dialog-close i18n
-  >Cancel</button>
+          i18n
+  >Back</button>
 </div>

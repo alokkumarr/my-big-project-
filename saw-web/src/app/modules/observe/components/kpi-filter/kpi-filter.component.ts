@@ -15,9 +15,9 @@ import {
 } from '../../consts';
 
 import { GlobalFilterService } from '../../services/global-filter.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import * as moment from 'moment';
-import 'rxjs/add/operator/debounceTime';
+import { debounceTime } from 'rxjs/operators';
 
 interface KPIFilterType {
   preset: string;
@@ -72,6 +72,11 @@ export class KPIFilterComponent implements OnInit, OnDestroy {
         }
       }
     );
+    this.listeners = this.listeners.concat([
+      clearFiltersListener,
+      applyFiltersListener,
+      closeFiltersListener
+    ]);
   }
 
   ngOnDestroy() {
@@ -127,7 +132,7 @@ export class KPIFilterComponent implements OnInit, OnDestroy {
     this.listeners.push(datePresetSubscription);
 
     const kpiFilterSubscription = this.kpiFilterForm.valueChanges
-      .debounceTime(500)
+      .pipe(debounceTime(500))
       .subscribe(data => {
         this.kpiFilterForm.valid &&
           this.onModelChange.emit(this.getFilterModel());

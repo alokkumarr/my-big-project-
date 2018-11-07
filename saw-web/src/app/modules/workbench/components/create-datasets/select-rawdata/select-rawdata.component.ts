@@ -24,6 +24,8 @@ import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialo
 import { WorkbenchService } from '../../../services/workbench.service';
 import { STAGING_TREE } from '../../../wb-comp-configs';
 
+import { debounceTime } from 'rxjs/operators';
+
 @Component({
   selector: 'select-rawdata',
   templateUrl: './select-rawdata.component.html',
@@ -34,7 +36,6 @@ export class SelectRawdataComponent
   public treeConfig: any; // tslint:disable-line
   public treeNodes: Array<any>; // tslint:disable-line
   public treeOptions: ITreeOptions;
-  public maskHelper: any; // tslint:disable-line
   public gridConfig: Array<any>;
   public selFiles: Array<any> = [];
   public filePath: string;
@@ -58,7 +59,6 @@ export class SelectRawdataComponent
     this.treeNodes = cloneDeep(STAGING_TREE);
     this.gridConfig = this.getGridConfig();
     this.treeConfig = this.getTreeConfig();
-    this.maskHelper = 'INFO_TEXT';
   }
 
   ngAfterViewInit() {
@@ -69,7 +69,7 @@ export class SelectRawdataComponent
     stagingNode.setIsActive(true);
     this.nodeID = stagingNode.id;
     this.fileMaskControl.valueChanges
-      .debounceTime(1000)
+      .pipe(debounceTime(1000))
       .subscribe(mask => this.maskSearch(mask));
   }
 
@@ -182,12 +182,12 @@ export class SelectRawdataComponent
         applyFilter: 'auto'
       },
       headerFilter: {
-        visible: true
+        visible: false
       },
       showRowLines: false,
       showBorders: false,
       rowAlternationEnabled: true,
-      showColumnLines: true,
+      showColumnLines: false,
       selection: {
         mode: 'single'
       },

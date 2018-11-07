@@ -10,7 +10,7 @@ import * as get from 'lodash/get';
 import * as floor from 'lodash/floor';
 import * as moment from 'moment';
 
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';

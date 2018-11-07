@@ -11,7 +11,6 @@ import * as forEach from 'lodash/forEach';
 
 import { DashboardService } from '../../../services/dashboard.service';
 import { AnalyzeService } from '../../../../analyze/services/analyze.service';
-import { HeaderProgressService } from '../../../../../common/services';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
@@ -26,7 +25,6 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   @Output() onAnalysisAction = new EventEmitter();
   analyses: Array<any> = [];
   showProgress = false;
-  progressSub;
   searchTerm: string;
   widgetLog = {};
   dashboardWidgetSubscription;
@@ -34,12 +32,8 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
 
   constructor(
     public analyze: AnalyzeService,
-    public dashboard: DashboardService,
-    public _headerProgress: HeaderProgressService
+    public dashboard: DashboardService
   ) {
-    this.progressSub = _headerProgress.subscribe(showProgress => {
-      this.showProgress = showProgress;
-    });
     this.loadIcons();
   }
 
@@ -53,32 +47,44 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.dashboardWidgetSubscription.unsubscribe();
-    this.progressSub.unsubscribe();
   }
 
   loadIcons() {
-    forEach(ANALYSIS_METHODS, method => {
-      forEach(method.children, analysisType => {
-        if (analysisType.supportedTypes && analysisType.supportedTypes.length) {
-          forEach(analysisType.supportedTypes, supType => {
-            this.icons[supType.split(':')[1]] = analysisType.icon.font;
-          });
-        } else {
-          this.icons[analysisType.type.split(':')[1]] = analysisType.icon.font;
-        }
-      });
+    forEach(ANALYSIS_METHODS[0].children, analysisType => {
+      if (analysisType.children) {
+        forEach(analysisType.children, analysisChild => {
+          this.icons[analysisChild.type.split(':')[1]] =
+            analysisChild.icon.font;
+        });
+        return;
+      }
+
+      if (analysisType.supportedTypes && analysisType.supportedTypes.length) {
+        forEach(analysisType.supportedTypes, supType => {
+          this.icons[supType.split(':')[1]] = analysisType.icon.font;
+        });
+      } else {
+        this.icons[analysisType.type.split(':')[1]] = analysisType.icon.font;
+      }
     });
   }
 
   @Input()
   set category(id: number | string) {
     this.searchTerm = '';
-    this.analyze.getAnalysesFor(id.toString()).then(result => {
-      this.analyses = filter(
-        result,
-        analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
-      );
-    });
+    this.showProgress = true;
+    this.analyze.getAnalysesFor(id.toString()).then(
+      result => {
+        this.showProgress = false;
+        this.analyses = filter(
+          result,
+          analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
+        );
+      },
+      () => {
+        this.showProgress = false;
+      }
+    );
   }
 
   sendAnalysisAction(action, analysis) {

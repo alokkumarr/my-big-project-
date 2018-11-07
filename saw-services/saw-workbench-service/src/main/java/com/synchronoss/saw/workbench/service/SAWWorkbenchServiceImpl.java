@@ -66,9 +66,9 @@ import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
-  
+
   private static final Logger logger = LoggerFactory.getLogger(SAWWorkbenchServiceImpl.class);
-  
+
   private static final String[] METADATA_TABLES = {
       "auditlog", "datapods", "datasegments", "datasets", "projects",
       "transformations"
@@ -81,11 +81,11 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @Value("${workbench.project-path}")
   @NotNull
   private String defaultProjectPath;
-  
+
   @Value("${workbench.project-root}")
   @NotNull
   private String defaultProjectRoot;
-  
+
   @Value("${workbench.preview-limit}")
   @NotNull
   private String defaultPreviewLimit;
@@ -106,7 +106,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   @Autowired
   private WorkbenchExecutionService workbenchExecutionService;
-  
+
   @PostConstruct
   private void init() throws Exception {
     if (defaultProjectRoot.startsWith(prefix)) {
@@ -129,12 +129,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       }
     }
 
-    
+
     HFileOperations.createDir(defaultProjectRoot);
     for (String table : METADATA_TABLES) {
         createMetadataTable(table);
     }
-    
+
     ProjectStore ps = new ProjectStore(defaultProjectRoot);
     try {
         ps.readProjectData(defaultProjectId);
@@ -144,7 +144,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
 
     if (defaultProjectRoot.startsWith(prefix)) {
-     logger.trace("Initializing defaultProjectRoot {}", defaultProjectRoot); 
+     logger.trace("Initializing defaultProjectRoot {}", defaultProjectRoot);
     this.mdt = new DLMetadata(defaultProjectRoot);
     this.mdtStore = new DataSetStore(basePath);}
     this.tmpDir = System.getProperty("java.io.tmpdir");
@@ -196,8 +196,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     logger.trace("response structure {}", objectMapper.writeValueAsString(project));
     return project;
   }
-  
-  
+
+
   @Override
   public Project createDirectoryProjectId(Project project) throws Exception {
     logger.trace("Creating the data directory {}", project.getPath());
@@ -255,8 +255,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     logger.trace("response structure {}", objectMapper.writeValueAsString(project));
     return project;
   }
-  
-  
+
+
   @Override
   @Async(AsyncConfiguration.TASK_EXECUTOR_SERVICE)
   public Project uploadFilesDirectoryProjectIdAsync(Project project, MultipartFile[] uploadfiles) throws Exception {
@@ -336,7 +336,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         resultJSON = sawDelimitedInspector.toJson();
       logger.trace("resutlJSON from inspect service {}", resultJSON);
       inspect = objectMapper.readValue(resultJSON, Inspect.class);
-      
+
     }
     else {
       filePath = defaultProjectRoot + defaultProjectPath + File.separator + inspect.getFile();
@@ -346,7 +346,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         resultJSON = sawDelimitedInspector.toJson();
       logger.trace("resutlJSON from inspect service {}", resultJSON);
       inspect = objectMapper.readValue(resultJSON, Inspect.class);
-      
+
     }
     logger.trace("response structure {}", objectMapper.writeValueAsString(inspect));
     return inspect; }
@@ -445,7 +445,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       ObjectNode node = JsonNodeFactory.instance.objectNode();
       node.put("_id", id);
       ObjectNode system = node.putObject(DataSetProperties.System.toString());
-      system.put(DataSetProperties.Name.toString(), name); 
+      system.put(DataSetProperties.Name.toString(), name);
       system.put(DataSetProperties.Catalog.toString(), MetadataBase.DEFAULT_CATALOG);
       system.put("project", "workbench");
       system.put(DataSetProperties.Format.toString(), "json");
@@ -464,7 +464,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         fields.addPOJO(obj);
       } // end of internal for loop to read storeField
       schema.putArray("fields").addAll(fields);
-      esDataSet = objectMapper.readValue(objectMapper.writeValueAsString(node), DataSet.class); 
+      esDataSet = objectMapper.readValue(objectMapper.writeValueAsString(node), DataSet.class);
       esDataSet.setStorageType(StorageType.ES.name());
       esDataSet.setJoinEligible(false);
       esDataSet.setRecordCount(Long.parseLong(perAliasResponse.getBody().getCount()));
@@ -481,9 +481,10 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonElement dataset = mdtStore.read(dataSetId);
-    return objectMapper.readValue(dataset.toString(), DataSet.class);
+    DataSet returnData = objectMapper.readValue(dataset.toString(), DataSet.class);
+    return returnData;
   }
-  
+
   //TODO: This method needs re-factoring in future once SIP-4218 & SIP-4217 is resolved
   @Override
   public DataSet createDataSet(DataSet dataSet, String project) throws Exception {
@@ -581,6 +582,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     sets.add(objectMapper.readValue(row1, DataSet.class));
     sets.add(objectMapper.readValue(row2, DataSet.class));
     System.out.println(objectMapper.writeValueAsString(sets));
+    DataSet dataset = sets.get(0);
+    System.out.println("Dataset : " +dataset.getSystem());
     System.out.println(DataSetProperties.UserData.toString());
   }
 

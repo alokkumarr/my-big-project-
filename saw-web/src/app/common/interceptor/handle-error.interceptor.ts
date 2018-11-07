@@ -6,7 +6,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import 'rxjs/add/operator/catch';
+import { catchError } from 'rxjs/operators';
 
 import * as get from 'lodash/get';
 import * as truncate from 'lodash/truncate';
@@ -23,18 +23,18 @@ export class HandleErrorInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     // send the newly created request
-    return next.handle(req).catch((error, caught) => {
-      this.toast.error(this.getTitle(error));
+    return next.handle(req).pipe(catchError((error, caught) => {
+      this.toast.error(this.getTitle(error), '', { error });
       return throwError(error);
-    }) as any;
+    }) as any);
   }
 
   getTitle(error, defaultMessage = 'Error') {
     const title =
       get(error, 'error.error.message') ||
       get(error, 'error.message') ||
-      get(error, 'error', '') ||
-      get(error, 'message', '');
+      get(error, 'message', '') ||
+      get(error, 'error', '');
     /* prettier-ignore */
     return title ? truncate(title, {
       length: ERROR_TITLE_LENGTH

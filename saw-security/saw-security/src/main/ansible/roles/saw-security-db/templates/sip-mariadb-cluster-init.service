@@ -1,0 +1,10 @@
+[Unit]
+Description=SIP MariaDB cluster init
+
+[Service]
+Type=oneshot
+ExecStart=/root/sip-mariadb-cluster-init
+SyslogIdentifier=sip-mariadb-cluster-init
+
+[Install]
+WantedBy=default.target

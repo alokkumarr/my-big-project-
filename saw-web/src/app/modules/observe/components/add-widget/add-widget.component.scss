@@ -10,13 +10,13 @@
 mat-horizontal-stepper.mat-stepper-horizontal {
   background-color: transparent;
 
-  .mat-horizontal-stepper-header-container {
+  ::ng-deep .mat-horizontal-stepper-header-container {
     display: none;
   }
 }
 
-widget-category,
-widget-metric {
+::ng-deep widget-category,
+::ng-deep widget-metric {
   mat-expansion-panel.mat-expansion-panel {
     background-color: transparent;
     border-bottom: 1px solid $primary-grey-g1;

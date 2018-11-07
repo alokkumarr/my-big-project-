@@ -780,7 +780,9 @@ public class PlayReader {
     }
 
     private void appendModels(Type type) {
-        final Map<String, Model> models = ModelConverters.getInstance().readAll(type);
+    	ModelConverters modelConverters = ModelConverters.getInstance();
+    	modelConverters.addPackageToSkip("play.mvc");
+        final Map<String, Model> models = modelConverters.readAll(type);
         for (Map.Entry<String, Model> entry : models.entrySet()) {
             getSwagger().model(entry.getKey(), entry.getValue());
         }

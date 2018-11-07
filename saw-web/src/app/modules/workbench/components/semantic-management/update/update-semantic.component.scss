@@ -1,19 +1,14 @@
 @import 'src/themes/base/colors';
 
 :host {
-  class: 'update-semantic'
+  width: 100%;
 }
 
-update-semantic {
+.container {
   width: 100%;
-  height: calc(100% - 3px);
+  height: 100%;
   background-color: $background-color;
-  padding: 0 3px 3px;
   overflow: auto;
-
-  .container {
-    height: 100%;
-  }
 
   .header {
     color: rgba(0, 0, 0, 0.54);
@@ -35,7 +30,7 @@ update-semantic {
   }
 
   .body {
-    background-color: #FFF;
+    background-color: #fff;
     height: calc(100% - 50px);
     max-height: calc(100% - 50px) !important;
 
@@ -52,6 +47,22 @@ update-semantic {
           height: 100% !important;
           max-height: 100% !important;
           overflow: auto;
+        }
+
+        ::ng-deep .mat-tab-label-active {
+          color: $primary-blue-b2;
+        }
+
+        ::ng-deep .mat-tab-body-wrapper {
+          height: 100%;
+
+          .mat-tab-body {
+            overflow: hidden !important;
+
+            .mat-tab-body-content {
+              overflow: hidden !important;
+            }
+          }
         }
 
         .results {

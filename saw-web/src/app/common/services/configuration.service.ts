@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import AppConfig from '../../../../appConfig';
-import { Observable } from 'rxjs/Observable';
-import { tap, flatMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 
@@ -71,7 +71,9 @@ export class ConfigService {
         AppConfig.login.url
       }/auth/admin/user/preferences/delete?inactiveAll=${allUsers}`,
       payload
-    ) as Observable<Configuration>).pipe(tap(this.removeCache.bind(this)));
+    ) as Observable<Configuration>).pipe(
+      tap(this.removeConfigFromCache.bind(this))
+    );
   }
 
   private cacheConfig(config: Configuration) {
@@ -80,12 +82,12 @@ export class ConfigService {
   }
 
   /**
-   * removeCache - Removes supplied preferences from cache
+   * removeConfigFromCache - Removes supplied preferences from cache
    *
    * @param {Configuration} config
    * @returns {undefined}
    */
-  private removeCache(config: Configuration) {
+  private removeConfigFromCache(config: Configuration) {
     const rawConfig = window.localStorage.getItem(CONFIG_KEY);
     const cachedConfig: Configuration = rawConfig
       ? JSON.parse(rawConfig)
@@ -101,12 +103,18 @@ export class ConfigService {
     this.cacheConfig(cachedConfig);
   }
 
+  private removeCache() {
+    window.localStorage.removeItem(CONFIG_KEY);
+    this.cache = null;
+  }
+
   /**
    * getConfig Loads config from backend and caches it
    *
    * @returns {Configuration}
    */
   getConfig(): Observable<Configuration> {
+    this.removeCache();
     return this.loadConfig().pipe(tap(this.cacheConfig.bind(this)));
   }
 
@@ -122,7 +130,9 @@ export class ConfigService {
       this.cache = rawConfig ? JSON.parse(rawConfig) : null;
     }
 
-    if (!this.cache) return null;
+    if (!this.cache) {
+      return null;
+    }
 
     const pref = find(
       this.cache.preferences,

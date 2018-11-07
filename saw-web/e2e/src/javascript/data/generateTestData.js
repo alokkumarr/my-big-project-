@@ -464,7 +464,8 @@ function getSemanticId(dataSetName, token) {
       'context': 'Semantic'
     }
   };
-  let response = apiCall.post(url + 'services/md', payload, token);
+  //Discussed & The BE API is written to cater in-case if we have multiple projects in future. But as of now it’s hardcoded to workbench
+  let response = apiCall.get(url + 'services/internal/semantic/md?projectId=workbench', token);
   const semanticList = response.contents[0].ANALYZE;
   return getValueFromListByKeyValue(semanticList, 'metricName', dataSetName, 'id');
 }

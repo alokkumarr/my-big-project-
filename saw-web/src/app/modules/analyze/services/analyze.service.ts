@@ -14,10 +14,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Analysis } from '../../../models';
 
 import { JwtService } from '../../../common/services';
-import {
-  ToastService,
-  MenuService
-} from '../../../common/services';
+import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
 
 const apiUrl = AppConfig.api.url;
@@ -52,7 +49,6 @@ const MODULE_NAME = 'ANALYZE';
 
 @Injectable()
 export class AnalyzeService {
-
   _executingAnalyses: Object = {};
   _executions: Object = {};
 
@@ -99,12 +95,22 @@ export class AnalyzeService {
     return reqParams;
   }
 
-  getExportData(analysisId, executionId, analysisType, executionType = EXECUTION_DATA_MODES.NORMAL) {
-    const onetimeExecution = executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
-    return this.getRequest(`exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`);
+  getExportData(
+    analysisId,
+    executionId,
+    analysisType,
+    executionType = EXECUTION_DATA_MODES.NORMAL
+  ) {
+    const onetimeExecution =
+      executionType === EXECUTION_DATA_MODES.ONETIME
+        ? '&executionType=onetime'
+        : '';
+    return this.getRequest(
+      `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
+    );
   }
 
-  getAnalysesFor(subCategoryId/* , opts = {} */) {
+  getAnalysesFor(subCategoryId /* , opts = {} */) {
     const payload = this.getRequestParams([
       ['contents.action', 'search'],
       ['contents.keys.[0].categoryId', subCategoryId]
@@ -128,20 +134,61 @@ export class AnalyzeService {
     return data.slice(options.skip, options.skip + options.take);
   }
 
-  getExecutionData(analysisId, executionId, options: ExecutionRequestOptions = {}) {
+  getLastExecutionData(analysisId, options: ExecutionRequestOptions = {}) {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
-    const onetimeExecution = options.executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
+    const path = `analysis/${analysisId}/executions/data`;
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }`;
+
+    return this.getRequest(`${path}?${queryParams}`).then(resp => {
+      const data = fpGet(`data`, resp);
+      const queryBuilder = fpGet(`queryBuilder`, resp);
+      const executedBy = fpGet(`executedBy`, resp);
+      const count = fpGet(`totalRows`, resp) || data.length;
+      return {
+        data: options.forcePaginate
+          ? this.forcePagination(data, options)
+          : data,
+        queryBuilder,
+        executedBy,
+        count
+      };
+    });
+  }
+
+  getExecutionData(
+    analysisId,
+    executionId,
+    options: ExecutionRequestOptions = {}
+  ) {
+    options.skip = options.skip || 0;
+    options.take = options.take || 10;
+    const page = floor(options.skip / options.take) + 1;
+    const onetimeExecution =
+      options.executionType === EXECUTION_DATA_MODES.ONETIME
+        ? '&executionType=onetime'
+        : '';
     const path = `analysis/${analysisId}/executions/${executionId}/data`;
-    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`;
+    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }${onetimeExecution}`;
     const url = `${path}${queryParams}`;
     return this.getRequest(url).then(resp => {
       const data = fpGet(`data`, resp);
       const queryBuilder = fpGet(`queryBuilder`, resp);
       const executedBy = fpGet(`executedBy`, resp);
       const count = fpGet(`totalRows`, resp) || data.length;
-      return {data: options.forcePaginate ? this.forcePagination(data, options) : data, queryBuilder, executedBy, count};
+      return {
+        data: options.forcePaginate
+          ? this.forcePagination(data, options)
+          : data,
+        queryBuilder,
+        executedBy,
+        count
+      };
     });
   }
 
@@ -150,7 +197,9 @@ export class AnalyzeService {
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
+    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(
+      fpGet(`contents.analyze.[0]`)
+    );
   }
 
   previewExecution(model, options = {}) {
@@ -160,20 +209,40 @@ export class AnalyzeService {
   executeAnalysis(model, execType = EXECUTION_MODES.LIVE) {
     const promise = new Promise((resolve, reject) => {
       if (this.isExecuting(model.id)) {
-        const msg = 'Analysis is executing already. Please try again in some time.';
+        const msg =
+          'Analysis is executing already. Please try again in some time.';
         this._toastMessage.error(msg);
         reject(msg);
       } else {
         this._executions[model.id] = promise;
 
         this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-        this.applyAnalysis(model, execType).then(({data, executionId, executedBy, executedAt, queryBuilder, executionType, count}) => {
-          this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
-          resolve({data, executionId, executionType, count, executedBy, executedAt, queryBuilder});
-        }, err => {
-          this._executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
-          reject(err);
-        });
+        this.applyAnalysis(model, execType).then(
+          ({
+            data,
+            executionId,
+            executedBy,
+            executedAt,
+            queryBuilder,
+            executionType,
+            count
+          }) => {
+            this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
+            resolve({
+              data,
+              executionId,
+              executionType,
+              count,
+              executedBy,
+              executedAt,
+              queryBuilder
+            });
+          },
+          err => {
+            this._executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
+            reject(err);
+          }
+        );
       }
     });
 
@@ -184,13 +253,13 @@ export class AnalyzeService {
     const schedule = analysis.schedule;
     const scheduleState = schedule.scheduleState;
     switch (scheduleState) {
-    case 'new':
-      return this.postRequest(`scheduler/schedule`, schedule);
-    case 'exist':
-      return this.postRequest(`scheduler/update`, schedule);
-    case 'delete':
-      return this.postRequest(`scheduler/delete`, schedule);
-    default:
+      case 'new':
+        return this.postRequest(`scheduler/schedule`, schedule);
+      case 'exist':
+        return this.postRequest(`scheduler/update`, schedule);
+      case 'delete':
+        return this.postRequest(`scheduler/delete`, schedule);
+      default:
     }
   }
 
@@ -207,10 +276,12 @@ export class AnalyzeService {
   }
 
   deleteAnalysis(model) {
-    if (!this._jwtService.hasPrivilege('DELETE', {
-      subCategoryId: model.categoryId,
-      creatorId: model.userId
-    })) {
+    if (
+      !this._jwtService.hasPrivilege('DELETE', {
+        subCategoryId: model.categoryId,
+        creatorId: model.userId
+      })
+    ) {
       return Promise.reject(new Error('Access denied.'));
     }
     const payload = this.getRequestParams([
@@ -230,7 +301,9 @@ export class AnalyzeService {
       const menuClone = cloneDeep(menu);
       forEach(menuClone, menuFeature => {
         menuFeature.children = filter(menuFeature.children, menuSubFeature => {
-          return this._jwtService.hasPrivilege(privilege, {subCategoryId: menuSubFeature.id});
+          return this._jwtService.hasPrivilege(privilege, {
+            subCategoryId: menuSubFeature.id
+          });
         });
       });
       return menuClone;
@@ -259,10 +332,16 @@ export class AnalyzeService {
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
+    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(
+      fpGet(`contents.analyze.[0]`)
+    );
   }
 
-  applyAnalysis(model, mode = EXECUTION_MODES.LIVE, options: ExecutionRequestOptions = {}) {
+  applyAnalysis(
+    model,
+    mode = EXECUTION_MODES.LIVE,
+    options: ExecutionRequestOptions = {}
+  ) {
     delete model.isScheduled;
 
     model.executionType = mode;
@@ -288,25 +367,15 @@ export class AnalyzeService {
         executedBy: this._jwtService.getLoginId(),
         executedAt: Date.now(),
         designerQuery: fpGet(`query`, resp),
-        queryBuilder: {...model.sqlBuilder},
+        queryBuilder: { ...model.sqlBuilder },
         count: fpGet(`contents.analyze.[0].totalRows`, resp)
       };
     });
   }
 
   getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW, options = {}) {
-    return this.applyAnalysis(analysis, mode, options).then(({
-      data,
-      executionId,
-      executedBy,
-      executedAt,
-      queryBuilder,
-      executionType,
-      designerQuery,
-      count
-    }) => {
-      return {
-        analysis,
+    return this.applyAnalysis(analysis, mode, options).then(
+      ({
         data,
         executionId,
         executedBy,
@@ -315,8 +384,20 @@ export class AnalyzeService {
         executionType,
         designerQuery,
         count
-      };
-    });
+      }) => {
+        return {
+          analysis,
+          data,
+          executionId,
+          executedBy,
+          executedAt,
+          queryBuilder,
+          executionType,
+          designerQuery,
+          count
+        };
+      }
+    );
   }
 
   generateQuery(payload) {
@@ -330,21 +411,24 @@ export class AnalyzeService {
   }
 
   getSemanticLayerData() {
-    const params = this.getRequestParams([
-      ['contents.action', 'search'],
-      ['contents.select', 'headers'],
-      ['contents.context', 'Semantic']
-    ]);
-    return this.postRequest(`md`, params).then(fpGet(`contents.[0].${MODULE_NAME}`));
+    const userProject = 'workbench';
+    return this.getRequest(
+      `internal/semantic/md?projectId=${userProject}`
+    ).then(fpGet(`contents.[0].${MODULE_NAME}`));
   }
 
   createAnalysis(metricId, type): Promise<Analysis> {
     const params = this.getRequestParams([
       ['contents.action', 'create'],
-      ['contents.keys.[0].id', metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'],
+      [
+        'contents.keys.[0].id',
+        metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'
+      ],
       ['contents.keys.[0].analysisType', type]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, params).then(fpGet('contents.analyze.[0]'));
+    return <Promise<Analysis>>this.postRequest(`analysis`, params).then(
+      fpGet('contents.analyze.[0]')
+    );
   }
 
   getRequest(path) {
@@ -354,10 +438,11 @@ export class AnalyzeService {
   postRequest(path: string, params: Object) {
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json'
+        'Content-Type': 'application/json'
       })
     };
-    return this._http.post(`${apiUrl}/${path}`, params, httpOptions).toPromise();
+    return this._http
+      .post(`${apiUrl}/${path}`, params, httpOptions)
+      .toPromise();
   }
-
 }

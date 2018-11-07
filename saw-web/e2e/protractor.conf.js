@@ -18,7 +18,7 @@ const generate = require('./src/javascript/data/generateTestData');
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 500000;
+const pageLoadTimeout = webpackHelper.distRun() ? 300000 : 150000;
 
 /**
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
@@ -31,7 +31,7 @@ const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 30000;//30000 /
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 40000 : 30000;
+const fluentWait = webpackHelper.distRun() ? 30000 : 20000;
 const extendedFluentWait = webpackHelper.distRun() ? 60000 : 40000;
 
 /**
@@ -143,6 +143,36 @@ exports.config = {
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
      */
+    critical: [
+      // login logout tests
+      testBaseDir + 'login.test.js',
+      testBaseDir + 'priviliges.test.js',
+      testBaseDir + 'analyze.test.js',
+      testBaseDir + 'createReport.test.js',
+      // charts tests
+      testBaseDir + 'charts/applyFiltersToCharts.js',
+      testBaseDir + 'charts/createAndDeleteCharts.test.js',
+      testBaseDir + 'charts/previewForCharts.test.js',
+      // chartEditFork tests
+      testBaseDir + 'charts/editAndDeleteCharts.test.js',
+      testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js',
+      // filters tests
+      testBaseDir + 'promptFilter/chartPromptFilters.test.js',
+      testBaseDir + 'promptFilter/esReportPromptFilters.test.js',
+      testBaseDir + 'promptFilter/pivotPromptFilters.test.js',
+      testBaseDir + 'promptFilter/reportPromptFilters.test.js',
+      // pivots tests
+      testBaseDir + 'pivots/pivotFilters.test.js',
+      // Observe module test cases
+      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilter.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
+    ],
     regression: [
       // login logout tests
       testBaseDir + 'login.test.js',
@@ -205,7 +235,7 @@ exports.config = {
 
 
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
-    browser.manage().timeouts().implicitlyWait(implicitlyWait);
+    browser.manage().timeouts().implicitlyWait(2000);
 
     let jasmineReporters = require('jasmine-reporters');
     let junitReporter = new jasmineReporters.JUnitXmlReporter({
@@ -250,6 +280,14 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
+    //clean up any residual/leftover from a previous run. Ensure we have clean
+    //files for both locking and merging.
+    if (fs.existsSync('jasmine-results.json.lock')) {
+      fs.unlinkSync('jasmine-results.json.lock');
+    }
+    if (fs.existsSync('jasmine-results.json')) {
+      fs.unlink('jasmine-results.json');
+    }
     //console.log('beforeLaunch....generating the testdata...')
     // Generate test data
     if(webpackHelper.getSawWebUrl()) {
@@ -257,7 +295,6 @@ exports.config = {
       token = generate.token(webpackHelper.getSawWebUrl());
       generate.usersRolesPrivilegesCategories(token);
     } else {
-      throw new Error('saw web url can not be null');
       process.exit(1);
     }
   },

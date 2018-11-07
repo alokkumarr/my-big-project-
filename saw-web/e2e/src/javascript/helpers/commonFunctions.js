@@ -10,8 +10,8 @@ module.exports = {
     elementToBeClickable: element => {
       return browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
     },
-    elementToBeVisible: element => {
-      return browser.wait(EC.visibilityOf(element), fluentWait, "Element \"" + element.locator() + "\" is not visible");
+    elementToBeVisible: (element, wait) => {
+      return browser.wait(EC.visibilityOf(element),  wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not visible");
     },
     elementToBePresent: element => {
       return browser.wait(EC.presenceOf(element), fluentWait, "Element \"" + element.locator() + "\" is not present");

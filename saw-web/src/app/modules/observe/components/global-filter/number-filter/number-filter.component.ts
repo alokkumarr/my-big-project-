@@ -9,9 +9,8 @@ import {
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';
 
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import * as get from 'lodash/get';
-import * as isUndefined from 'lodash/isUndefined';
 
 @Component({
   selector: 'g-number-filter',

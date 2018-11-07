@@ -19,9 +19,7 @@ import { ObserveService } from '../../services/observe.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
 
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription, BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'observe-kpi-bullet',

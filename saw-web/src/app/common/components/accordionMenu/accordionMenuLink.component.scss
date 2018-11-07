@@ -67,11 +67,11 @@ mat-expansion-panel.sidenav-mainmenu {
   background-color: $primary-blue-b2 !important;
   color: white !important;
 
-  .mat-expansion-indicator::after {
+  ::ng-deep .mat-expansion-indicator::after {
     color: white;
   }
 
-  .mat-expansion-panel-body {
+  ::ng-deep .mat-expansion-panel-body {
     padding: 0 0 24px 16px !important;
   }
 }

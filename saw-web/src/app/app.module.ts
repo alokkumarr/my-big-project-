@@ -10,13 +10,9 @@ import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { CommonModuleTs, CommonModuleGlobal } from './common';
+import { AnalyzeModuleGlobal } from './modules/analyze/analyze.global.module';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
-
-import { AnalyzeModule } from './modules/analyze/analyze.module';
-import { AdminModule } from './modules/admin';
-import { WorkbenchUpgradeModule } from './modules/workbench';
-import { LoginModule } from './login';
 
 import {
   LayoutContentComponent,
@@ -41,12 +37,9 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     NgIdleModule.forRoot(),
     CommonModuleTs,
     CommonModuleGlobal.forRoot(),
+    AnalyzeModuleGlobal.forRoot(),
     FlexLayoutModule,
-    MaterialModule,
-    LoginModule,
-    AnalyzeModule,
-    WorkbenchUpgradeModule,
-    AdminModule
+    MaterialModule
   ],
   exports: [FlexLayoutModule],
   providers: [...SERVICES],

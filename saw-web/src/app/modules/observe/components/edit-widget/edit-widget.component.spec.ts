@@ -1,10 +1,4 @@
-import {
-  TestBed,
-  inject,
-  ComponentFixture,
-  fakeAsync,
-  tick
-} from '@angular/core/testing';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import 'hammerjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../../material.module';

@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { UserEditDialogComponent, UserService } from '../user';
 import { RoleEditDialogComponent } from '../role';

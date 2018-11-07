@@ -7,7 +7,7 @@ import {
   EventEmitter
 } from '@angular/core';
 import { GlobalFilterService } from '../../services/global-filter.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import * as isArray from 'lodash/isArray';
 import * as map from 'lodash/map';

@@ -1,13 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatSidenav } from '@angular/material';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as moment from 'moment';
-import { Subscription } from 'rxjs/Subscription';
-import { combineLatest, timer } from 'rxjs';
+import {
+  Subscription,
+  Subject,
+  BehaviorSubject,
+  combineLatest,
+  timer
+} from 'rxjs';
 import { debounce } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as clone from 'lodash/clone';
 
 import {
@@ -59,6 +63,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
 
+  @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
+
   constructor(
     public _executeService: ExecuteService,
     public _analyzeService: AnalyzeService,
@@ -91,13 +97,17 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
     this.executionId = executionId;
 
-    this.loadAnalysisById(analysisId).then(analysis => {
+    this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
       this.setPrivileges(analysis);
 
+      /* If an execution is not already going on, create a new execution
+       * as applicable. */
       this.executeIfNotWaiting(
         analysis,
-        awaitingExecution,
-        loadLastExecution,
+        /* awaitingExecution and loadLastExecution paramaters are supposed to be boolean,
+         * but all query params come as strings. So typecast them properly */
+        awaitingExecution === 'true',
+        loadLastExecution === 'true',
         executionId
       );
     });
@@ -120,23 +130,35 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     loadLastExecution,
     executionId
   ) {
-    if (!awaitingExecution) {
-      const isDataLakeReport = analysis.type === 'report';
-      if (
-        executionId ||
-        loadLastExecution ||
-        isDataLakeReport ||
-        !this.canAutoRefresh
-      ) {
-        this.loadExecutedAnalysesAndExecutionData(
-          analysis.id,
-          executionId,
-          analysis.type,
-          null
-        );
-      } else {
-        this.executeAnalysis(analysis, EXECUTION_MODES.LIVE);
-      }
+    if (awaitingExecution) {
+      return;
+    }
+    const isDataLakeReport = analysis.type === 'report';
+    if (
+      executionId ||
+      loadLastExecution ||
+      isDataLakeReport ||
+      !this.canAutoRefresh
+    ) {
+      this.loadExecutedAnalysesAndExecutionData(
+        analysis.id,
+        executionId,
+        analysis.type,
+        null
+      );
+    } else {
+      this.executeAnalysis(analysis, EXECUTION_MODES.LIVE);
+    }
+  }
+
+  onSidenavChange(isOpen: boolean) {
+    if (isOpen && !this.analyses) {
+      this.loadExecutedAnalyses(this.analysis.id).then(analyses => {
+        const lastExecutionId = get(analyses, '[0].id', null);
+        if (!this.executionId && lastExecutionId) {
+          this.executionId = lastExecutionId;
+        }
+      });
     }
   }
 
@@ -202,17 +224,22 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  gotoLastPublished(analysis, { executionId }) {
-    return () => {
-      this._toastMessage.clear();
-      this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+  onSelectExecution(executionId) {
+    if (!executionId) {
+      return;
+    }
+    this.detailsSidenav && this.detailsSidenav.close();
+    window['siden'] = this.detailsSidenav;
+    this._router.navigate(
+      ['analyze', 'analysis', this.analysis.id, 'executed'],
+      {
         queryParams: {
           executionId,
           awaitingExecution: false,
-          loadLastExecution: true
+          loadLastExecution: false
         }
-      });
-    };
+      }
+    );
   }
 
   executeAnalysis(analysis, mode) {
@@ -238,30 +265,26 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     analysisType,
     executeResponse
   ) {
-    if (executionId) {
-      this.executionId = executionId;
-      this.loadExecutedAnalyses(analysisId);
-      this.loadDataOrSetDataLoader(
-        analysisId,
-        executionId,
-        analysisType,
-        executeResponse
-      );
-    } else {
-      // get the last execution id and load the data for that analysis
-      this.loadExecutedAnalyses(analysisId).then(analyses => {
-        const lastExecutionId = get(analyses, '[0].id', null);
-        this.executionId = lastExecutionId;
-        if (lastExecutionId) {
-          this.loadDataOrSetDataLoader(
-            analysisId,
-            lastExecutionId,
-            analysisType,
-            executeResponse
-          );
+    this.executionId = executionId;
+    this.loadDataOrSetDataLoader(
+      analysisId,
+      executionId,
+      analysisType,
+      executeResponse
+    );
+  }
+
+  gotoLastPublished(analysis, { executionId }) {
+    return () => {
+      this._toastMessage.clear();
+      this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+        queryParams: {
+          executionId,
+          awaitingExecution: false,
+          loadLastExecution: true
         }
       });
-    }
+    };
   }
 
   setExecutedBy(executedBy) {
@@ -289,7 +312,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     return this._analyzeService
       .getPublishedAnalysesByAnalysisId(analysisId)
       .then(
-        analyses => {
+        (analyses: Analysis[]) => {
           this.analyses = analyses;
           this.setExecutedAt(this.executionId);
           return analyses;
@@ -302,8 +325,15 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   loadAnalysisById(analysisId) {
     return this._analyzeService.readAnalysis(analysisId).then(
-      analysis => {
+      (analysis: Analysis) => {
         this.analysis = analysis;
+        // this._analyzeService
+        //   .getLastExecutionData(this.analysis.id, {
+        //     analysisType: this.analysis.type
+        //   })
+        //   .then(data => {
+        //     console.log(data);
+        //   });
         this.executedAnalysis = { ...this.analysis };
         return analysis;
       },
@@ -411,27 +441,28 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;
 
-    return this._analyzeService
-      .getExecutionData(analysisId, executionId, options)
-      .then(
-        ({ data, count, queryBuilder, executedBy }) => {
-          if (this.executedAnalysis && queryBuilder) {
-            this.executedAnalysis.sqlBuilder = queryBuilder;
-          }
-
-          const isReportType = ['report', 'esReport'].includes(analysisType);
-          if (isReportType) {
-            data = clone(flattenReportData(data, this.analysis));
-          }
-
-          this.setExecutedBy(executedBy);
-          this.setExecutedAt(executionId);
-          return { data: data, totalCount: count };
-        },
-        err => {
-          throw err;
+    return (executionId
+      ? this._analyzeService.getExecutionData(analysisId, executionId, options)
+      : this._analyzeService.getLastExecutionData(analysisId, options)
+    ).then(
+      ({ data, count, queryBuilder, executedBy }) => {
+        if (this.executedAnalysis && queryBuilder) {
+          this.executedAnalysis.sqlBuilder = queryBuilder;
         }
-      );
+
+        const isReportType = ['report', 'esReport'].includes(analysisType);
+        if (isReportType) {
+          data = clone(flattenReportData(data, this.analysis));
+        }
+
+        this.setExecutedBy(executedBy);
+        this.setExecutedAt(executionId);
+        return { data: data, totalCount: count };
+      },
+      err => {
+        throw err;
+      }
+    );
   }
 
   setPrivileges({ categoryId, userId }: Analysis) {

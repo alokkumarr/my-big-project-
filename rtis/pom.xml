@@ -462,6 +462,20 @@
         <defaultGoal>package</defaultGoal>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
         <testSourceDirectory>${project.basedir}/test</testSourceDirectory>
+	<resources>
+		<resource>
+			<directory>public</directory>
+			<targetPath>public</targetPath>
+			<filtering>false</filtering>
+		</resource>
+		<resource>
+			<directory>conf</directory>
+			<targetPath>temp</targetPath>
+			<filtering>true</filtering>
+			
+		</resource>
+		
+	</resources>
         <!-- To define the plugin version in your parent POM -->
         <pluginManagement>
             <plugins>
@@ -482,6 +496,7 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                   
                 </configuration>
             </plugin>
             <plugin>
@@ -583,7 +598,7 @@
                             <filemode>644</filemode>
                             <sources>
                                 <source>
-                                    <location>conf/templates</location>
+                                    <location>target/classes/temp/templates</location>
                                     <includes>
                                         <include>application.conf.template</include>
                                         <include>cluster.vars.changeme</include>

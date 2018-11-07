@@ -10,6 +10,8 @@ import play.mvc.Result
 import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.semantix.SemanticNode
 import sncr.saw.common.config.SAWServiceConfig
+import sncr.service.InternalServiceClient
+import sncr.service.model.SemanticNodeObject
 
 class KPIBuilder extends BaseController {
 
@@ -26,7 +28,6 @@ class KPIBuilder extends BaseController {
         (ticket.userId, ticket.userFullName)
     }
     val action = (json \ "action").extract[String].toLowerCase;
-
     action match {
         case "fetch" => {
           val semanticId = extractKey(json,"semanticId")
@@ -47,11 +48,17 @@ class KPIBuilder extends BaseController {
   }
 
     private def readSemanticNode(semanticId: String): JObject = {
-      val semanticNode = SemanticNode(semanticId, SelectModels.relation.id)
-      semanticNode.getCachedData("content") match {
-        case content: JObject => content
-        case _ => throw new ClientException("no match")
-      }
+    // The below has been commented because HBase Binary Store has been deprecated
+    // val semanticNode = SemanticNode(semanticId, SelectModels.relation.id)
+      //semanticNode.getCachedData("content") match {
+       // case content: JObject => content
+       // case _ => throw new ClientException("no match")
+      //}
+       val semanticHost = SAWServiceConfig.semanticService.getString("host")
+       val semanticEndpoint = SAWServiceConfig.semanticService.getString("endpoint")
+       val semanticJsonMetaDataStore = parse(new InternalServiceClient(semanticHost + semanticEndpoint + semanticId)
+        .retrieveObject(new SemanticNodeObject())).asInstanceOf[JObject];
+      semanticJsonMetaDataStore
     }
 
   private def checkSemanticwithKPIfieldsPresent(semanticNodeJson : JObject) =

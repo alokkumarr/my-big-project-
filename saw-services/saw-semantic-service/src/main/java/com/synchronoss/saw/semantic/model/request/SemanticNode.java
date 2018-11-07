@@ -28,30 +28,34 @@ public class SemanticNode {
   private String createdBy;
   @JsonProperty("updatedBy")
   private String updatedBy;
+  @JsonProperty("parentDataSetNames")
+  private List<String> parentDataSetNames;
+  @JsonProperty("parentDataSetIds")
+  private List<String> parentDataSetIds;
 
 
   /**
    * The Customercode Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("customerCode")
   private String customerCode;
   /**
    * The Projectcode Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("projectCode")
   private String projectCode;
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("dataSetId")
   private List<Object> dataSetId = null;
@@ -68,67 +72,67 @@ public class SemanticNode {
   /**
    * The Username Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("username")
   private String username;
   /**
    * The Datasecuritykey Schema
    * <p>
-   * 
-   * 
+   *
+   *
    */
   @JsonProperty("dataSecurityKey")
   private String dataSecurityKey;
   /**
    * The Module Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("module")
   private SemanticNode.Module module = SemanticNode.Module.fromValue("ANALYZE");
   /**
    * The Metricname Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("metricName")
   private String metricName;
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("supports")
   private List<Object> supports = null;
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("artifacts")
   private List<Object> artifacts = null;
   /**
    * The Esrepository Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("esRepository")
   private Object esRepository;
   /**
    * The Repository Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("repository")
   private Object repository;
@@ -164,8 +168,8 @@ public class SemanticNode {
   public void setSaved(Boolean saved) {
     this.saved = saved;
   }
-  
-  
+
+
   @JsonProperty("id")
   public String getId() {
     return id;
@@ -178,9 +182,9 @@ public class SemanticNode {
   /**
    * The Customercode Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("customerCode")
   public String getCustomerCode() {
@@ -210,9 +214,9 @@ public class SemanticNode {
   /**
    * The Customercode Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("customerCode")
   public void setCustomerCode(String customerCode) {
@@ -222,9 +226,9 @@ public class SemanticNode {
   /**
    * The Projectcode Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("projectCode")
   public String getProjectCode() {
@@ -234,9 +238,9 @@ public class SemanticNode {
   /**
    * The Projectcode Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("projectCode")
   public void setProjectCode(String projectCode) {
@@ -244,9 +248,9 @@ public class SemanticNode {
   }
 
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("dataSetId")
   public List<Object> getDataSetId() {
@@ -254,9 +258,9 @@ public class SemanticNode {
   }
 
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("dataSetId")
   public void setDataSetId(List<Object> dataSetId) {
@@ -266,9 +270,9 @@ public class SemanticNode {
   /**
    * The Username Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("username")
   public String getUsername() {
@@ -278,9 +282,9 @@ public class SemanticNode {
   /**
    * The Username Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("username")
   public void setUsername(String username) {
@@ -290,8 +294,8 @@ public class SemanticNode {
   /**
    * The Datasecuritykey Schema
    * <p>
-   * 
-   * 
+   *
+   *
    */
   @JsonProperty("dataSecurityKey")
   public String getDataSecurityKey() {
@@ -301,8 +305,8 @@ public class SemanticNode {
   /**
    * The Datasecuritykey Schema
    * <p>
-   * 
-   * 
+   *
+   *
    */
   @JsonProperty("dataSecurityKey")
   public void setDataSecurityKey(String dataSecurityKey) {
@@ -312,9 +316,9 @@ public class SemanticNode {
   /**
    * The Module Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("module")
   public SemanticNode.Module getModule() {
@@ -324,9 +328,9 @@ public class SemanticNode {
   /**
    * The Module Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("module")
   public void setModule(SemanticNode.Module module) {
@@ -336,9 +340,9 @@ public class SemanticNode {
   /**
    * The Metricname Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("metricName")
   public String getMetricName() {
@@ -348,9 +352,9 @@ public class SemanticNode {
   /**
    * The Metricname Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("metricName")
   public void setMetricName(String metricName) {
@@ -358,9 +362,9 @@ public class SemanticNode {
   }
 
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("supports")
   public List<Object> getSupports() {
@@ -368,9 +372,9 @@ public class SemanticNode {
   }
 
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("supports")
   public void setSupports(List<Object> supports) {
@@ -378,9 +382,9 @@ public class SemanticNode {
   }
 
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("artifacts")
   public List<Object> getArtifacts() {
@@ -388,9 +392,9 @@ public class SemanticNode {
   }
 
   /**
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("artifacts")
   public void setArtifacts(List<Object> artifacts) {
@@ -400,9 +404,9 @@ public class SemanticNode {
   /**
    * The Esrepository Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("esRepository")
   public Object getEsRepository() {
@@ -412,9 +416,9 @@ public class SemanticNode {
   /**
    * The Esrepository Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("esRepository")
   public void setEsRepository(Object esRepository) {
@@ -424,9 +428,9 @@ public class SemanticNode {
   /**
    * The Repository Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("repository")
   public Object getRepository() {
@@ -436,13 +440,36 @@ public class SemanticNode {
   /**
    * The Repository Schema
    * <p>
-   * 
+   *
    * (Required)
-   * 
+   *
    */
   @JsonProperty("repository")
   public void setRepository(Object repository) {
     this.repository = repository;
+  }
+
+
+  @JsonProperty("parentDataSetNames")
+  public List<String> getParentDataSetNames() {
+    return parentDataSetNames;
+  }
+  @JsonProperty("parentDataSetNames")
+  public void setParentDataSetNames(List<String> parentDataSetNames) {
+    this.parentDataSetNames = parentDataSetNames;
+  }
+
+  @JsonProperty("parentDataSetIds")
+  public List<String> getParentDataSetIds() {
+    return parentDataSetIds;
+  }
+  @JsonProperty("parentDataSetIds")
+  public void setParentDataSetIds(List<String> parentDataSetIds) {
+    this.parentDataSetIds = parentDataSetIds;
+  }
+
+  public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+    this.additionalProperties = additionalProperties;
   }
 
   @JsonAnyGetter

@@ -2,9 +2,10 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { timer } from 'rxjs';
 import * as get from 'lodash/get';
+import * as orderBy from 'lodash/orderBy';
 
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
@@ -75,7 +76,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
 
   getDatasets(): void {
     this.workBench.getDatasets().subscribe((data: any[]) => {
-      this.availableSets = data;
+      this.availableSets = orderBy(data, 'system.modifiedTime', 'desc');
       this.updateData(this.availableSets);
     });
   }
@@ -195,6 +196,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
    * @memberof DataobjectsComponent
    */
   onDataObjectViewChange() {
+    this.stopPolling();
     this.states.searchTerm === '';
 
     // Have to directly interact with search component to clear and close it while switching views

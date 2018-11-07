@@ -31,17 +31,17 @@ export class DesignerSettingsGroupComponent implements OnInit {
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
 
-  public removeFromCallback(payload, index, container) {
+  public removeFromCallback = function(payload, index, container) {
     this._designerService.removeArtifactColumnFromGroup(payload, container);
     this.fieldsChange.emit();
-  }
+  }.bind(this);
 
-  public addToCallback(payload, index, container) {
+  public addToCallback = function(payload, index, container) {
     this._designerService.addArtifactColumnIntoGroup(payload, container, index);
     this.fieldsChange.emit();
-  }
+  }.bind(this);
 
-  constructor(private _designerService: DesignerService) {}
+  constructor(public _designerService: DesignerService) {}
 
   ngOnInit() {
     this.allowDropFn = this.groupAdapter.canAcceptArtifactColumn(

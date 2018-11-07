@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
+import * as get from 'lodash/get';
 
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { Analysis } from '../../types';
@@ -22,6 +23,7 @@ export class ExecutedListComponent {
     this.config = this.getGridConfig();
   }
   @Input() analysis: Analysis;
+  @Output() selectExecution: EventEmitter<string> = new EventEmitter();
 
   config: any;
   analyses: Analysis[];
@@ -33,9 +35,10 @@ export class ExecutedListComponent {
 
   goToExecution(executedAnalysis) {
     this._router.navigate(
-      ['analyze', 'analysis', this.analysis.id, 'executed'], {
+      ['analyze', 'analysis', this.analysis.id, 'executed'],
+      {
         queryParams: {
-          executedAnalysis,
+          executionId: executedAnalysis.id,
           awaitingExecution: false,
           loadLastExecution: false
         }
@@ -45,20 +48,6 @@ export class ExecutedListComponent {
 
   getGridConfig() {
     const columns = [
-      {
-        caption: 'ID',
-        dataField: 'id',
-        allowSorting: true,
-        alignment: 'left',
-        width: '40%'
-      },
-      {
-        caption: 'TYPE',
-        dataField: 'executionType',
-        allowSorting: true,
-        alignment: 'left',
-        width: '20%'
-      },
       {
         caption: 'DATE',
         dataField: 'finished',
@@ -73,19 +62,31 @@ export class ExecutedListComponent {
         },
         allowSorting: true,
         alignment: 'left',
-        width: '20%'
+        width: '40%'
+      },
+      {
+        caption: 'TYPE',
+        dataField: 'executionType',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
       },
       {
         caption: 'STATUS',
         dataField: 'status',
         allowSorting: true,
-        alignment: 'left',
-        width: '20%'
+        alignment: 'center',
+        encodeHtml: false,
+        width: '30%',
+        calculateCellValue: data =>
+          !data.status || data.status.toLowerCase() === 'success'
+            ? '<i class="icon-checkmark" style="font-size: 16px; color: green; margin-left: 10px"></i>'
+            : '<i class="icon-close" style="font-size: 10px; color: red; margin-left: 10px"></i>'
       }
     ];
     return this._DxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
-        this.goToExecution(row.data);
+        this.selectExecution.emit(get(row, 'data.id'));
       },
       columns,
       paging: {

@@ -65,7 +65,7 @@
   margin-top: 10px;
   width: 100%;
 
-  .mat-form-field-prefix {
+  ::ng-deep .mat-form-field-prefix {
     mat-icon {
       font-size: 14px;
       width: 1.4em;

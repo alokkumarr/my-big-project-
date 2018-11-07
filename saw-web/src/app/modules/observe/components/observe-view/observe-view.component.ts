@@ -17,18 +17,11 @@ import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService, ConfigService } from '../../../../common/services';
-import {
-  PREFERENCES
-} from '../../../../common/services/configuration.service';
+import { PREFERENCES } from '../../../../common/services/configuration.service';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { flatMap } from 'rxjs/operators';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
+import { map, catchError, flatMap } from 'rxjs/operators';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 
@@ -50,7 +43,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   public requester = new BehaviorSubject({});
   private listeners: Array<Subscription> = [];
   public hasAutoRefresh = false;
-  private shouldAutoRefresh = true;
+  public shouldAutoRefresh = true;
   private isDefault = false;
   public privileges = {
     create: false,
@@ -218,7 +211,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
               true
             );
           } else {
-            return Observable.of(true);
+            return of(true);
           }
         })
       )
@@ -313,17 +306,17 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   loadDashboard(): Observable<Dashboard> {
-    return this.observe
-      .getDashboard(this.dashboardId)
-      .map((data: Dashboard) => {
+    return this.observe.getDashboard(this.dashboardId).pipe(
+      map((data: Dashboard) => {
         this.dashboard = data;
         this.loadPrivileges();
         this.checkForKPIs();
         return data;
+      }),
+      catchError(error => {
+        return of(error);
       })
-      .catch(error => {
-        return Observable.of(error);
-      });
+    );
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 import { Artifact, ArtifactColumnPivot } from '../types';
 import { DesignerStates } from '../consts';
