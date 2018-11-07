@@ -3,15 +3,8 @@ import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
-import * as startsWith from 'lodash/startsWith';
 import { JwtService } from './jwt.service';
 import { SidenavMenuService } from '../components/sidenav/sidenav-menu.service';
-
-export const SAW_MODULES = {
-  OBSERVE: { name: 'OBSERVE', codePrefix: 'OBSR' },
-  ANALYZE: { name: 'ANALYZE', codePrefix: 'ANLYS' },
-  WORKBENCH: { name: 'WORKBENCH', codePrefix: 'WRK' }
-};
 
 @Injectable()
 export class MenuService {
@@ -49,9 +42,7 @@ export class MenuService {
         return error('Module name for menu not found!');
       }
 
-      const features = filter(targetModule.prodModFeature, category =>
-        startsWith(category.prodModCode, SAW_MODULES[moduleName].codePrefix)
-      );
+      const features = filter(targetModule.prodModFeature, ({prodModCode}) => prodModCode === targetModule.productModCode);
 
       resolve(
         map(features, feature => {

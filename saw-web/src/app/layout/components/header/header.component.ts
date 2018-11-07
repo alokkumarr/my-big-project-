@@ -53,39 +53,26 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     const baseModules = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
     const modules = map(
       product.productModules,
-      ({ productModName, moduleURL }) => ({
-        label: productModName,
-        path: lowerCase(productModName),
-        name: lowerCase(productModName),
-        moduleName: `${startCase(productModName)}Module`,
-        moduleURL
-      })
+      ({ productModName, moduleURL }) => {
+        const lowerCaseName = lowerCase(productModName);
+        return {
+          label: productModName,
+          path: lowerCaseName,
+          name: lowerCaseName,
+          moduleName: `${startCase(lowerCaseName)}Module`,
+          moduleURL
+        };
+      }
     );
 
     this.modules = filter(modules, ({ label }) => baseModules.includes(label));
 
-    // const externalModules = filter(
-    //   this.modules,
-    //   ({ label }) => !baseModules.includes(label)
-    // );
-    // hardcoded stuff
-    const externalModulesHard = [{
-      path: 'insights',
-      label: 'ISIGHTS',
-      name: 'insights',
-      moduleName: 'InsightsModule',
-      moduleURL: 'http://localhost:4200/assets/insights.umd.js'
-    }];
+    const externalModules = filter(
+      modules,
+      ({ label }) => !baseModules.includes(label)
+    );
 
-    // const externalModulesHard = [{
-    //   path: 'plugin',
-    //   label: 'PLUGIN',
-    //   name: 'plugin',
-    //   moduleName: 'PluginModule',
-    //   moduleURL: 'http://localhost:4200/assets/plugin.module.umd.js'
-    // }];
-
-    forEach(externalModulesHard, externalModule => {
+    forEach(externalModules, externalModule => {
       this._dynamicModuleService.loadModuleSystemJs(externalModule).then(
         success => {
           if (success) {
