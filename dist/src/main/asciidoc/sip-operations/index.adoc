@@ -256,29 +256,17 @@ consumption.
 
 ==== Installing
 
-Execute the following steps to install RTIS:
+RTIS is installed as part of SIP.  Ensure the SIP environment
+configuration (`saw-config`) has an entry for RTIS:
 
-. Get the RTIS release package (named `bda-rtis-*.rpm`)
+        [sip-rtis]
+        host
 
-. Create and prepare a RTIS vars configuration file in  /etc/bda/cluster.vars
-  location, as described below
+RTIS will get installed at the location `/opt/bda/sip-rtis` on the
+given host.
 
-     app.key             =  sip-rtis
-     streams_1.topic     =  data
-     streams_1.queue     =  bda/data/streams/sip-rtis
-     streams_2.topic     =  data
-     streams_2.queue     =  bda/data/streams/sip-rtis
-     app.class           =  synchronoss.handlers.charter.smartcare.CharterEventHandler
-     key.serializer      =  org.apache.kafka.common.serialization.StringSerializer
-     value.serializer    =  org.apache.kafka.common.serialization.StringSerializer
-
-.  Execute the RPM package installation command as below to install the RTIS package
-
-        rpm -ivh bda-rtis-*.rpm
-
-    RTIS will get installed in location `/opt/bda/rtis/`
-
-.  Run /opt/bda/rtis-*/sbin/rtis_runner.sh & to start RTIS.
+See the SIP environment configuration (`saw-config`) for how to set
+RTIS configuration parameters.
 
 ==== Upgrading
 

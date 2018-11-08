@@ -107,6 +107,17 @@
     </dependency>
     <dependency>
       <groupId>com.synchronoss</groupId>
+      <artifactId>bda-rtis</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss</groupId>
       <artifactId>rtps</artifactId>
       <version>${project.version}</version>
       <exclusions>
