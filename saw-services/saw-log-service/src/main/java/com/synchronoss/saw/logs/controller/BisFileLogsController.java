@@ -1,7 +1,7 @@
 package com.synchronoss.saw.logs.controller;
 
-import com.synchronoss.saw.logs.entities.BisFileLogs;
-import com.synchronoss.saw.logs.repository.FileLogsRepository;
+import com.synchronoss.saw.logs.entities.BisFileLog;
+import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class BisFileLogsController {
 
   @Autowired
-  private FileLogsRepository bisLogsRepository;
+  private BisFileLogsRepository bisLogsRepository;
 
   @RequestMapping(value = "",method = RequestMethod.GET)
-  public List<BisFileLogs> retrieveAllLogs() {
+  public List<BisFileLog> retrieveAllLogs() {
     return this.bisLogsRepository.findAll();
   }
   
   @RequestMapping(value = "/{id}",method = RequestMethod.GET)
-  public BisFileLogs retriveLogById(@PathVariable String id) {
+  public BisFileLog retriveLogById(@PathVariable String id) {
 
     return this.bisLogsRepository.findByPid(id);
   }

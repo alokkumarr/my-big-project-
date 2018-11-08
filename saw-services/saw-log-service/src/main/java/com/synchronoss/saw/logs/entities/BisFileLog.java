@@ -8,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(schema = "SIP_LOGS", name = "BIS_FILE_LOGS")
-public class BisFileLogs {
+@Table(schema = "SIP_BATCH_INGESTION", name = "BIS_FILE_LOG")
+public class BisFileLog {
 
   @Id
   @Column(name = "MFL_PID")

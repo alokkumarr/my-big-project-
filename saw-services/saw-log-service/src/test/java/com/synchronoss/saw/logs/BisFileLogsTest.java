@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.synchronoss.saw.logs.repository.FileLogsRepository;
+import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -18,7 +18,7 @@ import com.synchronoss.saw.logs.repository.FileLogsRepository;
 @ActiveProfiles("test")
 public class BisFileLogsTest {
     @Autowired
-    private FileLogsRepository bisLogsRepository;
+    private BisFileLogsRepository bisLogsRepository;
 
     /**
      * Tests findAll method from repository

@@ -1,6 +1,6 @@
 package com.synchronoss.saw.logs.repository;
 
-import com.synchronoss.saw.logs.entities.BisFileLogs;
+import com.synchronoss.saw.logs.entities.BisFileLog;
 import javax.persistence.NamedQuery;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface FileLogsRepository extends JpaRepository<BisFileLogs, String> {
+public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String> {
 
-  BisFileLogs findByPid(String pid);
+  BisFileLog findByPid(String pid);
 
-  @Query("SELECT COUNT(pid)>0 from BisFileLogs Logs where Logs.fileName = :fileName ")
+  @Query("SELECT COUNT(pid)>0 from BisFileLog Logs where Logs.fileName = :fileName ")
   boolean isFileNameExists(@Param("fileName") String fileName);
 
 }

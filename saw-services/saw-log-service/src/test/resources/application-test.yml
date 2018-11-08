@@ -4,7 +4,7 @@ spring:
   application:
     name: saw-log-service
   datasource:
-    url:  jdbc:hsqldb:hsql//localhost/SIP_LOGS
+    url:  jdbc:hsqldb:hsql//localhost/SIP_BATCH_INGESTION
     username: root
     password: null
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
@@ -20,7 +20,7 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        default_schema: SIP_LOGS
+        default_schema: SIP_BATCH_INGESTION
     database-platform: org.hibernate.dialect.HSQLDialect
 server:
   address: localhost

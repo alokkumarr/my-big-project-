@@ -5,7 +5,7 @@ spring:
     name: saw-log-service
   #mariaDB (metadata) DB details
   datasource:
-    url: jdbc:mariadb://localhost/SIP_LOGS
+    url: jdbc:mariadb://localhost/SIP_BATCH_INGESTION
     username: root
     password: 
     driver-class-name:  org.mariadb.jdbc.Driver
