@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Run initial database setup
+#
+set -eu
+
+dir=$(dirname $0)
+
+# Use a marker file to ensure database setup is only run once.
+marker=/etc/bda/saw-batch-ingestion-initial-setup
+if [ -f $marker ]; then
+    echo "Initial database setup has already been run, so not running again"
+    echo "(Marker file: $marker)"
+    #change DB password in configuration
+    password=$(< /etc/bda/saw-batch-ingestion-db-password)
+    sed -i "s/<db-password>/${password}/" /opt/bda/saw-batch-ingestion-service/conf/application.yml
+    echo "db-password update successfully"
+    exit
+fi
+touch $marker
+
+# create saw-batch-ingestion db password.
+# extended pattern matching operators
+shopt -s extglob
+
+## Initialize SAW Batch Ingestion database
+create_database="CREATE DATABASE sip_batch_ingestion"
+
+password=$(< /etc/bda/saw-batch-ingestion-db-password)
+root_password_f=/etc/bda/mariadb-root-password
+create_user="CREATE USER 'batch_user'@'localhost'"
+#root password might be already initialized run the conditional statement
+# to make sure its work for both cases.
+if [ -f $root_password_f ] ; then
+   # root password
+   root_password=$(< /etc/bda/mariadb-root-password)
+   mysql -u root -p$root_password -e "$create_database"
+   mysql -u root -p$root_password -e "$create_user IDENTIFIED BY '$password'"
+   mysql -u root -p$root_password -e "GRANT ALL ON sip_batch_ingestion.* TO 'batch_user'@'localhost'"
+ else
+   mysql -u root -e "$create_database"
+   mysql -u root -e "$create_user IDENTIFIED BY '$password'"
+   mysql -u root -e "GRANT ALL ON batch_user.* TO 'batch_user'@'localhost'"
+fi

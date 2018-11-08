@@ -6,6 +6,7 @@ import * as get from 'lodash/get';
 import * as isNumber from 'lodash/isNumber';
 import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
+import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -235,7 +236,6 @@ export class DesignerContainerComponent implements OnInit {
     }
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
     forEach(sqlBuilder.nodeFields, node => {
-      const identical = false;
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
           sortCol => node.columnName === sortCol.columnName
@@ -304,6 +304,35 @@ export class DesignerContainerComponent implements OnInit {
     this.data = cloneDeep(this.data);
   }
 
+  /**
+   * setEmptyData - In case of no data returned from refresh,
+   * this returns a sane default emtpy data object based on
+   * analysis type.
+   *
+   * @returns {Array<any>}
+   */
+  setEmptyData(): Array<any> {
+    const emptyReportData = () => {
+      const columnMap = this.data[0] || {};
+
+      forOwn(columnMap, (val, key) => {
+        columnMap[key] = '';
+      });
+
+      return [columnMap];
+    };
+
+    switch (this.analysis.type) {
+      case 'pivot':
+      case 'chart':
+        return [];
+
+      case 'report':
+      case 'esReport':
+        return emptyReportData();
+    }
+  }
+
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
@@ -343,14 +372,17 @@ export class DesignerContainerComponent implements OnInit {
           )
         ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-          this.data = [];
+          this.dataCount = 0;
+          this.data = this.setEmptyData();
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
-          if (this.analysis.type === 'report') {
+          if (this.analysis.type === 'report' && response.designerQuery) {
             (this.analysis as AnalysisReport).queryManual =
               response.designerQuery;
+
+            (this.analysis as AnalysisReport).query = response.designerQuery;
           }
         }
       },
@@ -421,7 +453,7 @@ export class DesignerContainerComponent implements OnInit {
           this.onSave.emit({
             requestExecution: shouldClose,
             analysis: result.analysis.type === 'report' ?
-              this._designerService.generateRequestPayload(cloneDeep(result.analysis)) :
+              this._designerService.generateReportPayload(cloneDeep(result.analysis)) :
               result.analysis
           });
           if (!shouldClose) {

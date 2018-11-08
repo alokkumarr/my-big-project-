@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import * as moment from 'moment';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
@@ -31,10 +31,11 @@ export const isValid = (model: FilterModel): boolean => {
   templateUrl: './designer-date-filter.component.html',
   providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }]
 })
-export class DesignerDateFilterComponent {
+export class DesignerDateFilterComponent implements OnInit {
   @Output()
   public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
-  @Input() public filterModel: FilterModel;
+  @Input()
+  public filterModel: FilterModel;
 
   lteFC = new FormControl({ value: null, disabled: true });
   gteFC = new FormControl({ value: null, disabled: true });

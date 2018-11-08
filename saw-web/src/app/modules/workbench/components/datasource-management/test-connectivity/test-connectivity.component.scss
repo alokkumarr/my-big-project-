@@ -1,0 +1,64 @@
+@import 'src/themes/base/colors';
+
+.test-connectivity {
+  display: block !important;
+  color: greenyellow;
+
+  .console-header {
+    height: 30px;
+    background-color: #3b3b3b;
+    padding: 0 3px 0 12px;
+    color: #d7d7d7;
+    border-radius: 7px 7px 0 0;
+  }
+
+  .console-body {
+    padding: 0 9px;
+  }
+
+  #prompt {
+    font-style: unset;
+    font-size: 1em;
+  }
+
+  #prompt.idle {
+    animation: blink 1100ms linear infinite;
+    -webkit-animation: blink 1100ms linear infinite;
+  }
+
+  @keyframes blink {
+    49% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
+
+    89% {
+      opacity: 0;
+    }
+
+    90% {
+      opacity: 1;
+    }
+  }
+
+  @-webkit-keyframes blink {
+    49% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
+
+    89% {
+      opacity: 0;
+    }
+
+    90% {
+      opacity: 1;
+    }
+  }
+}

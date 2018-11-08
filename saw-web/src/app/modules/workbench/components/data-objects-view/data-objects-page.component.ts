@@ -171,7 +171,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
       DATA = this.availableDP;
     }
 
-    const searchCriteria = this.LocalSearch.parseSearchTerm(
+    const searchCriteria: any = this.LocalSearch.parseSearchTerm(
       this.states.searchTerm
     );
     this.states.searchTermValue = searchCriteria.trimmedTerm;

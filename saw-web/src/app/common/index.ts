@@ -22,6 +22,8 @@ import {
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+
 import { DndModule } from './dnd';
 import {
   AddTokenInterceptor,
@@ -58,16 +60,22 @@ import { DateFormatDialogComponent } from './components/date-format-dialog';
 import { ChoiceGroupComponent } from './components/choice-group';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { ClickToCopyDirective, E2eDirective } from './directives';
+import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-schedular';
+import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
 
 import {
+  DxDataGridService,
   ErrorDetailService,
   ErrorDetailDialogService,
   MenuService,
+  LocalSearchService,
   ToastService,
   UserService,
   JwtService,
   ConfigService,
+  SideNavService,
   WindowService,
+  HeaderProgressService,
   DynamicModuleService
 } from './services';
 
@@ -84,7 +92,9 @@ const MODULES = [
   DxPivotGridModule,
   DxDataGridModule,
   CommonPipesModule,
-  HttpClientModule
+  HttpClientModule,
+  OwlDateTimeModule,
+  OwlNativeDateTimeModule
 ];
 
 const COMPONENTS = [
@@ -108,7 +118,9 @@ const COMPONENTS = [
   AggregateChooserComponent,
   ChoiceGroupComponent,
   SearchBoxComponent,
-  FieldDetailsComponent
+  FieldDetailsComponent,
+  CronDatePickerComponent,
+  CronJobSchedularComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
@@ -120,17 +132,21 @@ const DIRECTIVES = [
 ];
 
 const SERVICES = [
-  SidenavMenuService,
-  ErrorDetailService,
-  ErrorDetailDialogService,
-  ToastService,
-  ConfigService,
   ChartService,
-  WindowService,
+  ConfigService,
+  DxDataGridService,
+  DynamicModuleService,
+  ErrorDetailDialogService,
+  ErrorDetailService,
+  HeaderProgressService,
   JwtService,
-  UserService,
+  LocalSearchService,
   MenuService,
-  DynamicModuleService
+  SideNavService,
+  SidenavMenuService,
+  ToastService,
+  UserService,
+  WindowService
 ];
 
 const INTERCEPTORS = [

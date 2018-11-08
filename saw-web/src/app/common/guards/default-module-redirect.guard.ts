@@ -1,10 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  CanActivate,
-  RouterStateSnapshot,
-  Router
-} from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 
 import { CONFIG_KEY, PREFERENCES } from '../services/configuration.service';
 

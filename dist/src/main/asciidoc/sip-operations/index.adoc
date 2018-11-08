@@ -209,16 +209,14 @@ Execute the following steps to install XDF-NG:
 
 ==== Installing
 
-Execute the following steps to install RTPS:
+RTPS is installed as part of SIP.  Ensure the SIP environment
+configuration (`saw-config`) has an entry for RTPS:
 
-. Get the RTPS release package (named `bda-rtps-*.rpm`)
+        [sip-rtps]
+        host
 
-.  Execute the RPM package in one of the MAPR Node as below to install the RTPS package
-
-        rpm -ivh bda-rtps-*.rpm
-
-   RTPS will get installed and symbolic link will get created for location
-   in `/dfs/opt/bda/rtps-current`
+RTPS will get installed at the location `/opt/bda/sip-rtps` on the
+given host.
 
 ==== Upgrading
 
@@ -230,6 +228,29 @@ NOTE: Downgrading to an older RTPS version is not supported.  If
 needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTPS versions.
+
+==== Configuring
+
+RTPS must be configured to keep memory consumption within the limits
+provided by the Spark configuration.  The memory consumption of RTPS
+depends on the number of records in each batch and the size of each
+record.  The number of records included into each batch can be
+configured in the RTPS configuration file `appl.conf` as shown below:
+
+        spark {
+          streaming.kafka.maxRatePerPartition = 1000
+        }
+
+The `maxRatePerPartition` parameter sets an upper limit on the number
+of records fetched per second per MapR stream partition.  If the limit
+is lowered, the upper bound of RTPS memory consumption is also
+decreased.
+
+NOTE: If the RTPS has been down for an extended period of time, a
+large backlog of messages might have been built up.  To prevent the
+RTPS from running into memory errors while processing a large backlog
+of messages, ensure it has been properly configured to limit memory
+consumption.
 
 === RTIS
 

@@ -2,12 +2,148 @@
 
 :host {
   z-index: 80;
-  display: block;
-  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  width: 700px;
+  height: 620px;
+}
+
+h2.mat-dialog-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin: 0;
+
+  ::ng-deep span.mat-button-wrapper {
+    position: relative;
+    top: -10px;
+  }
 }
 
 .mat-dialog-content {
   padding: 0 20px;
+  overflow: hidden;
+  flex-grow: 1;
+  max-height: unset;
+}
+
+mat-form-field {
+  width: 50%;
+  margin-left: 5px;
+
+  ::ng-deep .mat-form-field-infix {
+    padding: 1em 0 0.5em 0;
+    border: none;
+
+    input {
+      line-height: 21px;
+    }
+  }
+
+  ::ng-deep .mat-form-field-suffix, ::ng-deep .mat-form-field-prefix {
+    top: 0em;
+  }
+
+  ::ng-deep .mat-form-field-suffix {
+    font-size: 10px;
+    top: -2px;
+    cursor: pointer;
+  }
+}
+
+mat-horizontal-stepper {
+  ::ng-deep .mat-horizontal-stepper-header-container {
+    width: 70%;
+    margin: 0 auto;
+  }
+}
+
+mat-tab-group {
+  ::ng-deep .mat-tab-body-wrapper {
+    padding-top: 5px;
+  }
+
+  ::ng-deep .mat-tab-label {
+    min-width: 100px;
+    height: 30px;
+  }
+
+  ::ng-deep mat-ink-bar {
+    width: 100px;
+  }
+}
+
+mat-radio-group {
+  overflow: auto;
+  height: 335px;
+  align-content: start;
+}
+
+.metric-radio-button {
+  border: 1px solid $primary-grey-g1;
+  border-radius: 5px;
+  margin: 0 2px 5px;
+  width: 32%;
+  max-height: 64px;
+
+  ::ng-deep label.mat-radio-label {
+    height: 60px;
+    width: 100%;
+  }
+
+  ::ng-deep .mat-radio-container {
+    display: none;
+  }
+
+  ::ng-deep .mat-radio-label-content {
+    padding: 0;
+    font-weight: bold;
+    width: 100%;
+    display: flex;
+    color: $primary-grey-g4;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: row-reverse;
+
+    .category-icon {
+      display: flex;
+      padding-right: 10px;
+      width: 20px;
+      height: 20px;
+      background-image: url("/assets/img/category-icons/category-default-b-3.svg");
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+
+    .category-detail {
+      display: flex;
+      flex-direction: column;
+      padding-left: 6px;
+      flex-grow: 1;
+    }
+  }
+
+  .metric-created-time {
+    font-weight: normal;
+    font-size: 12px;
+    color: $primary-grey-g2;
+  }
+
+  ::ng-deep &.mat-radio-checked {
+    background: $primary-blue-b2;
+
+    ::ng-deep .mat-radio-label-content {
+      color: white !important;
+
+      .category-icon {
+        background-image: url("/assets/img/category-icons/category-default.svg");
+      }
+    }
+
+    .metric-created-time {
+      color: white !important;
+    }
+  }
 }
 
 .section {
@@ -44,5 +180,5 @@
 }
 
 .dialog-actions {
-  padding: 10px 0;
+  padding: 5px 0;
 }

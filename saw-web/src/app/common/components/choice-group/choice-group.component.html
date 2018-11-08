@@ -1,14 +1,33 @@
-<div fxLayout="row wrap" fxLayoutAlign="start center" class="choice-group">
-  <div *ngFor="let item of items; trackBy: trackByIndex"
-          (click)="onItemSelected(item)"
-          fxLayout="column" fxLayoutAlign="center center"
-          class="choice-group__item"
-          [class.selected]="value === item"
-          [class.disabled]="item.disabled"
-          [attr.e2e]="'choice-group-item-type-' + item.type"
-          mat-button
-  >
-    <mat-icon [fontIcon]="item.icon.font"></mat-icon>
-    <label>{{item.label}}</label>
-</div>
+<div fxLayout="column">
+  <div fxLayout="row wrap" fxLayoutAlign="start center" class="choice-group">
+    <div *ngFor="let item of items; trackBy: trackByIndex"
+            (click)="onItemSelected(item)"
+            fxLayout="column" fxLayoutAlign="center center"
+            class="choice-group__item"
+            [class.selected]="item === selectedItem"
+            [class.disabled]="item.disabled"
+            [attr.e2e]="'choice-group-item-type-' + item.type"
+            mat-button
+    >
+      <mat-icon [fontIcon]="item.icon.font"></mat-icon>
+      <label>{{item.label}}</label>
+  </div>
+
+  <div fxLayout="row wrap" fxLayoutAlign="start center"
+       *ngIf="selectedItem && selectedItem.children && selectedItem.children.length"
+       class="choice-subgroup">
+      <span class="subgroup-title"> Select {{selectedItem.label}} type </span>
+      <div *ngFor="let item of selectedItem.children; trackBy: trackByIndex"
+              (click)="onSubItemSelected(item)"
+              fxLayout="column" fxLayoutAlign="center center"
+              class="choice-group__item"
+              [class.selected]="item === selectedSubItem"
+              [class.disabled]="item.disabled"
+              [attr.e2e]="'choice-group-item-subtype-' + item.type"
+              mat-button
+      >
+        <mat-icon [fontIcon]="item.icon.font"></mat-icon>
+        <label>{{item.label}}</label>
+      </div>
+  </div>
 </div>
