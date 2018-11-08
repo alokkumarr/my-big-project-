@@ -100,73 +100,73 @@ export class JwtService {
 
     // TODO remove hardcoded insightsModule when the ticket is successfully tested
     // tslint:disable
-    const insightsModule = {
-      "prodCode":"SAWD0000012131",
-      "productModName":"INSIGHTS",
-      "productModDesc":"Insights Module",
-      "productModCode":"INSIGH00001",
-      "productModID":"1324244",
-      "moduleURL":"http://localhost:4200/assets/insights.umd.js",
-      "defaultMod":"1",
-      "privilegeCode":128,
-      "prodModFeature": [{
-        prodModFeatureName: 'SubModules',
-        prodModCode: 'INSIGH00001',
-        productModuleSubFeatures: [{
-        //   prodModFeatureName: 'IOT',
-        //   prodModFeatureDesc: 'Iot',
-        //   defaultURL: 'iot',
-        //   prodModFeatureID: 'iot',
-        //   prodModFeatrCode: 'iot',
-        //   prodModCode: 'INSIGH00001',
-        //   roleId: 1
-        // }, {
-          prodModFeatureName: 'REVIEW',
-          prodModFeatureDesc: 'Review',
-          defaultURL: 'review',
-          prodModFeatureID: 'review',
-          prodModFeatrCode: 'review',
-          roleId: 1
-        }, {
-          prodModFeatureName: 'DETECTOR',
-          prodModFeatureDesc: 'Detector',
-          defaultURL: 'detector',
-          prodModFeatureID: 'detector',
-          prodModFeatrCode: 'detector',
-          roleId: 1
-        }, {
-          prodModFeatureName: 'FORECAST',
-          prodModFeatureDesc: 'Forecast',
-          defaultURL: 'forecast',
-          prodModFeatureID: 'forecast',
-          prodModFeatrCode: 'forecast',
-          roleId: 1
-        }, {
-          prodModFeatureName: 'REALTIME',
-          prodModFeatureDesc: 'Realtime',
-          defaultURL: 'realtime',
-          prodModFeatureID: 'realtime',
-          prodModFeatrCode: 'realtime',
-          roleId: 1
-        }, {
-          prodModFeatureName: 'CORRELATOR',
-          prodModFeatureDesc: 'Correlator',
-          defaultURL: 'correlator',
-          prodModFeatureID: 'correlator',
-          prodModFeatrCode: 'correlator',
-          roleId: 1
-        }, {
-          prodModFeatureName: 'UNBILLED_USAGE',
-          prodModFeatureDesc: 'UnbilledUsage',
-          defaultURL: 'unbilledUsage',
-          prodModFeatureID: 'unbilledUsage',
-          prodModFeatrCode: 'unbilledUsage',
-          roleId: 1
-        }]
-      }]
-    }
-    // tslint:enable
-    parsedJwt.ticket.products[0].productModules.push(insightsModule);
+    // const insightsModule = {
+    //   "prodCode":"SAWD0000012131",
+    //   "productModName":"INSIGHTS",
+    //   "productModDesc":"Insights Module",
+    //   "productModCode":"INSIGH00001",
+    //   "productModID":"1324244",
+    //   "moduleURL":"http://localhost:4200/assets/insights.umd.js",
+    //   "defaultMod":"1",
+    //   "privilegeCode":128,
+    //   "prodModFeature": [{
+    //     prodModFeatureName: 'SubModules',
+    //     prodModCode: 'INSIGH00001',
+    //     productModuleSubFeatures: [{
+    //     //   prodModFeatureName: 'IOT',
+    //     //   prodModFeatureDesc: 'Iot',
+    //     //   defaultURL: 'iot',
+    //     //   prodModFeatureID: 'iot',
+    //     //   prodModFeatrCode: 'iot',
+    //     //   prodModCode: 'INSIGH00001',
+    //     //   roleId: 1
+    //     // }, {
+    //       prodModFeatureName: 'REVIEW',
+    //       prodModFeatureDesc: 'Review',
+    //       defaultURL: 'review',
+    //       prodModFeatureID: 'review',
+    //       prodModFeatrCode: 'review',
+    //       roleId: 1
+    //     }, {
+    //       prodModFeatureName: 'DETECTOR',
+    //       prodModFeatureDesc: 'Detector',
+    //       defaultURL: 'detector',
+    //       prodModFeatureID: 'detector',
+    //       prodModFeatrCode: 'detector',
+    //       roleId: 1
+    //     }, {
+    //       prodModFeatureName: 'FORECAST',
+    //       prodModFeatureDesc: 'Forecast',
+    //       defaultURL: 'forecast',
+    //       prodModFeatureID: 'forecast',
+    //       prodModFeatrCode: 'forecast',
+    //       roleId: 1
+    //     }, {
+    //       prodModFeatureName: 'REALTIME',
+    //       prodModFeatureDesc: 'Realtime',
+    //       defaultURL: 'realtime',
+    //       prodModFeatureID: 'realtime',
+    //       prodModFeatrCode: 'realtime',
+    //       roleId: 1
+    //     }, {
+    //       prodModFeatureName: 'CORRELATOR',
+    //       prodModFeatureDesc: 'Correlator',
+    //       defaultURL: 'correlator',
+    //       prodModFeatureID: 'correlator',
+    //       prodModFeatrCode: 'correlator',
+    //       roleId: 1
+    //     }, {
+    //       prodModFeatureName: 'UNBILLED_USAGE',
+    //       prodModFeatureDesc: 'UnbilledUsage',
+    //       defaultURL: 'unbilledUsage',
+    //       prodModFeatureID: 'unbilledUsage',
+    //       prodModFeatrCode: 'unbilledUsage',
+    //       roleId: 1
+    //     }]
+    //   }]
+    // }
+    // // tslint:enable
+    // parsedJwt.ticket.products[0].productModules.push(insightsModule);
     return parsedJwt;
   }
 
