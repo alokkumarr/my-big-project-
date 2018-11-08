@@ -6,6 +6,7 @@
   <mat-form-field>
     <input matInput
            (input)="onAliasChange($event.target.value)"
+           autocomplete="off"
            [value]="alias"
            placeholder="Alias"/>
   </mat-form-field>

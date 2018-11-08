@@ -8,6 +8,7 @@
   <input #searchInput
          (click)="states.focused = true"
          (input)="onChangeDebounced($event.target.value)"
+         autocomplete="off"
          [value]="value"
          [placeholder]="placeholder"
          type="text" id="search-box-autofocus" />
