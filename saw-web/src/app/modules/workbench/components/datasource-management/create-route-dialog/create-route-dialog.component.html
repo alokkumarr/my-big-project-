@@ -1,6 +1,6 @@
 <mat-card class="createroute-dialog">
   <mat-card-header>
-    <mat-card-title class="details-title" i18n>Create Route</mat-card-title>
+    <mat-card-title class="details-title">{{dialogTitle}}</mat-card-title>
     <div fxFlex></div>
     <button mat-icon-button color="warn" (click)="onCancelClick()">
       <mat-icon fontIcon="icon-close"></mat-icon>
@@ -15,7 +15,7 @@
       <ng-template matStepperIcon="done">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
-      <mat-step label="Route Details">
+      <mat-step label="Route Details" [stepControl]="detailsFormGroup">
         <form fxFlex fxLayout="row wrap" class="details-container" #sourceDetails novalidate [formGroup]="detailsFormGroup"
           autocomplete="false">
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">

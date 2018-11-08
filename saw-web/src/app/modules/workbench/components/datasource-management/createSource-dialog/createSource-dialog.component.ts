@@ -21,6 +21,7 @@ export class CreateSourceDialogComponent implements OnInit {
   public detailsFormGroup: FormGroup;
   opType = 'create';
   show = false;
+  dialogTitle = 'Create Data Channel';
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -40,7 +41,13 @@ export class CreateSourceDialogComponent implements OnInit {
     this.detailsFormGroup = this._formBuilder.group({
       channelName: ['', Validators.required],
       hostName: ['', Validators.required],
-      portNo: ['', Validators.required],
+      portNo: [
+        '',
+        Validators.compose([
+          Validators.required,
+          Validators.pattern('^[0-9]*$')
+        ])
+      ],
       userName: ['', Validators.required],
       password: ['', Validators.required],
       description: [''],
@@ -51,6 +58,7 @@ export class CreateSourceDialogComponent implements OnInit {
   ngOnInit() {
     if (isUndefined(this.channelData.length)) {
       this.opType = 'update';
+      this.dialogTitle = 'Edit Data Channel';
       if (!isUndefined(this.channelData.password)) {
         this.decryptPWD(this.channelData.password);
       }

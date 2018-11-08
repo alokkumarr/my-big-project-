@@ -1,6 +1,6 @@
 <mat-card class="createsource-dialog">
   <mat-card-header>
-    <mat-card-title class="details-title" i18n>Create Data Channel</mat-card-title>
+    <mat-card-title class="details-title">{{dialogTitle}}</mat-card-title>
     <div fxFlex></div>
     <button mat-icon-button color="warn" (click)="onCancelClick()">
       <mat-icon fontIcon="icon-close"></mat-icon>
@@ -54,10 +54,14 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Port Number</mat-label>
-              <input type="number" matInput placeholder="Port Number" name="portNo" formControlName="portNo" required />
+              <input matInput placeholder="Port Number" name="portNo" formControlName="portNo" required />
               <mat-error *ngIf="detailsFormGroup.controls.portNo.hasError('required')" i18n>
                 Port Number is
                 <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="detailsFormGroup.controls.portNo.hasError('pattern')" i18n>
+                Port Number can consist of only
+                <strong>Numbers</strong>
               </mat-error>
             </mat-form-field>
           </section>
@@ -75,7 +79,7 @@
               <input type="text" matInput placeholder="Username" name="name-of-user" autocomplete="new-password"
                 formControlName="userName" required />
               <button mat-button matSuffix mat-icon-button>
-                <mat-icon fontIcon="icon-chat-bot"></mat-icon>
+                <mat-icon matTooltip="Username" fontIcon="icon-chat-bot"></mat-icon>
               </button>
               <mat-error *ngIf="detailsFormGroup.controls.userName.hasError('required')" i18n>
                 Username is
@@ -86,10 +90,12 @@
               <mat-label i18n>Password</mat-label>
               <input [type]="show ? 'text' : 'password'" matInput placeholder="Password" name="user-password"
                 formControlName="password" required autocomplete="new-password" />
-              <button *ngIf="!show" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+              <button matTooltip="Show Password" *ngIf="!show" mat-button matSuffix mat-icon-button aria-label="show"
+                (click)="togglePWD()">
                 <mat-icon fontIcon="icon-show"></mat-icon>
               </button>
-              <button *ngIf="show" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+              <button matTooltip="Hide Password" *ngIf="show" mat-button matSuffix mat-icon-button aria-label="show"
+                (click)="togglePWD()">
                 <mat-icon fontIcon="icon-hide"></mat-icon>
               </button>
               <mat-error *ngIf="detailsFormGroup.controls.password.hasError('required')" i18n>

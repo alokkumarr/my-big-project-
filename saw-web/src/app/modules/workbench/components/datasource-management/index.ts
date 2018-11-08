@@ -8,3 +8,6 @@ export { DatasourceComponent } from './datasource-page.component';
 export {
   TestConnectivityComponent
 } from './test-connectivity/test-connectivity.component';
+export {
+  ConfirmActionDialogComponent
+} from './confirm-action-dialog/confirm-action-dialog.component';

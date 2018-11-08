@@ -34,7 +34,7 @@
   }
 
   .no-click {
-    cursor: not-allowed;
+    cursor: not-allowed !important;
   }
 
   .details-title {
@@ -49,6 +49,7 @@
       margin: 9px 0;
       border-radius: 4px;
       padding: 9px 24px;
+      cursor: pointer;
     }
   }
 

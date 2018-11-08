@@ -11,7 +11,7 @@ import { ToastService } from '../../../../common/services/toastMessage.service';
 import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
-
+import { ConfirmActionDialogComponent } from './confirm-action-dialog/confirm-action-dialog.component';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
@@ -34,6 +34,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   selectedSourceType: string;
   selectedSourceData: any;
   show = false;
+  channelEditable = false;
 
   @ViewChild('channelsGrid')
   channelsGrid: DxDataGridComponent;
@@ -94,11 +95,18 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       !isUndefined(event.currentDeselectedRowKeys[0]) &&
       event.selectedRowKeys.length > 0
     ) {
+      this.channelEditable = true;
+      this.selectedSourceData = event.selectedRowsData[0];
       this.getRoutesForChannel(event.selectedRowKeys[0]);
-    }
-    this.selectedSourceData = event.selectedRowsData[0];
-    if (!isUndefined(this.selectedSourceData.password)) {
       this.decryptPWD(this.selectedSourceData.password);
+    } else if (event.selectedRowKeys.length > 0) {
+      this.channelEditable = true;
+      this.selectedSourceData = event.selectedRowsData[0];
+      this.decryptPWD(this.selectedSourceData.password);
+    } else {
+      this.channelEditable = false;
+      this.selectedSourceData = [];
+      this.routesData = [];
     }
   }
 
@@ -159,9 +167,17 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   deleteChannel(channelID) {
-    this.datasourceService.deleteChannel(channelID).subscribe(() => {
-      this.notify.success('Channel deleted successfully');
-      this.getSources();
+    const dialogRef = this.dialog.open(ConfirmActionDialogComponent, {
+      width: '350px'
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.datasourceService.deleteChannel(channelID).subscribe(() => {
+          this.notify.success('Channel deleted successfully');
+          this.getSources();
+        });
+      }
     });
   }
 
@@ -246,11 +262,19 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   deleteRoute(routeData) {
-    const channelID = routeData.bisChannelSysId;
-    const routeID = routeData.bisRouteSysId;
+    const dialogRef = this.dialog.open(ConfirmActionDialogComponent, {
+      width: '350px'
+    });
 
-    this.datasourceService.deleteRoute(channelID, routeID).subscribe(() => {
-      this.getRoutesForChannel(channelID);
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        const channelID = routeData.bisChannelSysId;
+        const routeID = routeData.bisRouteSysId;
+
+        this.datasourceService.deleteRoute(channelID, routeID).subscribe(() => {
+          this.getRoutesForChannel(channelID);
+        });
+      }
     });
   }
 

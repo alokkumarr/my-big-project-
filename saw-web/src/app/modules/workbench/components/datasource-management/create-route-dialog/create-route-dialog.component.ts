@@ -15,6 +15,7 @@ export class CreateRouteDialogComponent implements OnInit {
   public detailsFormGroup: FormGroup;
   crondetails: any = {};
   opType = 'create';
+  dialogTitle = 'Create Route';
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -38,6 +39,7 @@ export class CreateRouteDialogComponent implements OnInit {
   ngOnInit() {
     if (isUndefined(this.routeData.length)) {
       this.opType = 'update';
+      this.dialogTitle = 'Update Route';
       this.detailsFormGroup.patchValue(this.routeData);
       this.crondetails = this.routeData.schedulerExpression;
     }
