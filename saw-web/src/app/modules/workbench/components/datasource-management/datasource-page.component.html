@@ -47,7 +47,7 @@
             <span class="details-title mat-subheading-2">{{selectedSourceData?.channelName | uppercase}}</span>
           </div>
           <span fxFlex></span>
-          <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="testConnection()"
+          <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="testChannel(selectedSourceData?.bisChannelSysId)"
             i18n-matTooltip matTooltip="Test Connectivity">
             <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
@@ -111,7 +111,7 @@
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
               <span class="prop-name" i18n>Password : </span>
-              <span class="pwd-hide" [class.pwd-show]="show === true">{{selectedSourceData?.password}}</span>
+              <span class="pwd-hide" [class.pwd-show]="show === true">{{decryptedPWD}}</span>
               <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                 <mat-icon fontIcon="icon-show"></mat-icon>
               </button>

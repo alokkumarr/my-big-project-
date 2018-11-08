@@ -22,6 +22,8 @@ export class CreateSourceDialogComponent implements OnInit {
   opType = 'create';
   show = false;
   dialogTitle = 'Create Data Channel';
+  selectedStepIndex = 0;
+  isTypeEditable = true;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -58,7 +60,9 @@ export class CreateSourceDialogComponent implements OnInit {
   ngOnInit() {
     if (isUndefined(this.channelData.length)) {
       this.opType = 'update';
+      this.isTypeEditable = false;
       this.dialogTitle = 'Edit Data Channel';
+      this.selectedStepIndex = 1;
       if (!isUndefined(this.channelData.password)) {
         this.decryptPWD(this.channelData.password);
       }

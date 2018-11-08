@@ -175,6 +175,32 @@ export class DatasourceService {
   }
 
   /**
+   * Test connectivity for a channel
+   *
+   * @param {*} channelID
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testChannel(channelID): Observable<any> {
+    return this.http
+      .get(`${this.api}/ingestion/batch/sftp/channels/connect/${channelID}`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Test connectivity for a route
+   *
+   * @param {*} routeID
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testRoute(routeID): Observable<any> {
+    return this.http
+      .get(`${this.api}/ingestion/batch/sftp/routes/connect/${routeID}`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
    * Handle Http operation that failed.
    * Let the app continue.
    * @param operation - name of the operation that failed

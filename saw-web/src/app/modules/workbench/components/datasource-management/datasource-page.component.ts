@@ -35,6 +35,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   selectedSourceData: any;
   show = false;
   channelEditable = false;
+  decryptedPWD: string;
 
   @ViewChild('channelsGrid')
   channelsGrid: DxDataGridComponent;
@@ -181,8 +182,15 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
   }
 
-  testConnection() {
+  testChannel(channelID) {
+    this.datasourceService.testChannel(channelID).subscribe(data => {
+      this.showConnectivityLog(data);
+    });
+  }
+
+  showConnectivityLog(logData) {
     this.snackBar.openFromComponent(TestConnectivityComponent, {
+      data: logData,
       horizontalPosition: 'center',
       panelClass: ['mat-elevation-z9', 'testConnectivityClass']
     });
@@ -280,7 +288,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   decryptPWD(pwd) {
     this.datasourceService.decryptPWD(pwd).subscribe(data => {
-      this.selectedSourceData.password = data.data;
+      this.decryptedPWD = data.data;
     });
   }
 

@@ -8,14 +8,14 @@
   </mat-card-header>
   <mat-divider></mat-divider>
   <mat-card-content>
-    <mat-horizontal-stepper linear>
+    <mat-horizontal-stepper linear [selectedIndex]="selectedStepIndex">
       <ng-template matStepperIcon="edit">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
       <ng-template matStepperIcon="done">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
-      <mat-step label="Select Source Type" [stepControl]="firstStep">
+      <mat-step label="Select Channel Type" [stepControl]="firstStep" [editable]="isTypeEditable">
         <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="source-container">
           <div fxFlex fxLayout="row wrap" fxLayoutAlign="space-around space-around" class="source-list">
             <mat-card class="mat-elevation-z3" [class.selected]="selectedSource === source.uid" *ngFor="let source of sources"
