@@ -29,6 +29,17 @@ export class AdminService {
     };
   }
 
+  getRequest<T>(path, options: RequestOptions = {}) {
+    const { toast, forWhat } = options;
+    return this.http
+      .get<T>(
+        `${this.getBaseUrl(forWhat)}/${this.getIntermediaryPath(
+          forWhat
+        )}${path}`
+      )
+      .pipe(tap(this.showToastMessageIfNeeded(toast)));
+  }
+
   request<T>(path, params, options: RequestOptions = {}) {
     const { toast, forWhat } = options;
     return this.http

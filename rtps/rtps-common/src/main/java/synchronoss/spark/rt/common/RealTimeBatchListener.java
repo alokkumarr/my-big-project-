@@ -35,7 +35,9 @@ public class RealTimeBatchListener implements StreamingListener {
             DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ");
             logger.info("Batch Time: " + formatter.format(new Date(batch.batchTime().milliseconds()))
                     + ", Number of events processed: " + batch.numRecords());
-
+            long memoryUsed = Runtime.getRuntime().totalMemory()
+                - Runtime.getRuntime().freeMemory();
+            logger.info("Memory used: " + memoryUsed);
         } else {
             // Count number of empty batches to set idle status
             numberOfEmptyBatches++;

@@ -44,19 +44,25 @@ export class DesignerService {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 
-  generateRequestPayload(analysis) {
+  generateReportPayload(analysis) {
     forEach(analysis.artifacts, cols => {
       forEach(cols.columns, col => {
         delete col.checked;
       });
     });
+
+    /* Remove analysis queryManual if not being saved from query mode */
+    if (!analysis.edit) {
+      delete analysis.queryManual;
+    }
+
     return analysis;
   }
 
   getDataForAnalysis(analysis) {
     const analysisRequest =
       analysis.type === 'report'
-        ? this.generateRequestPayload(cloneDeep(analysis))
+        ? this.generateReportPayload(cloneDeep(analysis))
         : analysis;
     return this._analyzeService.getDataBySettings(analysisRequest);
   }
@@ -80,7 +86,7 @@ export class DesignerService {
   saveAnalysis(analysis) {
     const analysisRequest =
       analysis.type === 'report'
-        ? this.generateRequestPayload(cloneDeep(analysis))
+        ? this.generateReportPayload(cloneDeep(analysis))
         : analysis;
     return this._analyzeService.saveReport(analysisRequest);
   }
