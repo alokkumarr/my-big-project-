@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../common/services';
 import { Router } from '@angular/router';
 
@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   templateUrl: 'password-pre-reset.component.html',
   styleUrls: ['./password-pre-reset.component.scss']
 })
-export class PasswordPreResetComponent {
+export class PasswordPreResetComponent implements OnInit {
   constructor(private _UserService: UserService, public _router: Router) {}
 
   public dataHolder = {
@@ -15,6 +15,10 @@ export class PasswordPreResetComponent {
   };
 
   public errorMsg;
+
+  ngOnInit() {
+    this.errorMsg = '';
+  }
 
   resetPwd() {
     this._UserService.preResetPwd(this.dataHolder).then((res: any) => {

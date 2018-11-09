@@ -30,6 +30,7 @@ export class LoginComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.states.error = '';
     this._route.queryParams.subscribe(({ changePassMsg }) => {
       if (changePassMsg) {
         this.states.error = changePassMsg;
