@@ -128,6 +128,8 @@ export class AnalyzeActionsService {
             .open(AnalyzeScheduleDialogComponent, {
               width: 'auto',
               height: 'auto',
+              minWidth: '750px',
+              autoFocus: false,
               data: { analysis }
             } as MatDialogConfig)
             .afterClosed()

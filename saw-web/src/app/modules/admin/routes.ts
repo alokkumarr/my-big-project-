@@ -4,7 +4,7 @@ import { AdminMainViewComponent } from './main-view';
 import { AdminExportViewComponent } from './export';
 import { AdminImportViewComponent } from './import';
 import { SecurityGroupComponent } from './datasecurity/security-group/security-group.component';
-import { isAdminGuard } from './guards';
+import { IsAdminGuard } from './guards';
 import {
   UsersTableHeader,
   RolesTableHeader,
@@ -18,8 +18,8 @@ export const routes: Routes = [
     // name: 'admin',
     path: '',
     component: AdminPageComponent,
-    canActivate: [isAdminGuard],
-    canActivateChild: [isAdminGuard],
+    canActivate: [IsAdminGuard],
+    canActivateChild: [IsAdminGuard],
     runGuardsAndResolvers: 'paramsOrQueryParamsChange',
     children: [
       {

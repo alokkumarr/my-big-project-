@@ -169,18 +169,7 @@ export const ANALYSIS_METHODS = [
     category: 'analysis',
     children: [
       {
-        label: 'Report',
-        icon: { font: 'icon-report' },
-        type: 'table:report',
-        supportedTypes: ['table:report', 'table:esReport']
-      },
-      {
-        label: 'Pivot',
-        icon: { font: 'icon-pivot' },
-        type: 'table:pivot'
-      },
-      {
-        label: 'Charts',
+        label: 'Chart',
         icon: { font: 'icon-vert-bar-chart' },
         type: '',
         children: [
@@ -242,6 +231,17 @@ export const ANALYSIS_METHODS = [
             typeOnBackEnd: 'chart:tsareaspline'
           }
         ]
+      },
+      {
+        label: 'Pivot',
+        icon: { font: 'icon-pivot' },
+        type: 'table:pivot'
+      },
+      {
+        label: 'Report',
+        icon: { font: 'icon-report' },
+        type: 'table:report',
+        supportedTypes: ['table:report', 'table:esReport']
       }
     ]
   }
@@ -250,7 +250,7 @@ export const ANALYSIS_METHODS = [
 export const CHART_TYPES_OBJ = fpPipe(
   fpGroupBy('type'),
   fpMapValues(v => v[0])
-)(ANALYSIS_METHODS[0].children[2].children);
+)(ANALYSIS_METHODS[0].children[0].children);
 
 export const AREA_TYPES = [
   {

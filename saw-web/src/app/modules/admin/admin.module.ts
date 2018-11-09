@@ -56,8 +56,7 @@ import {
 } from '../../common/interceptor';
 import { SidenavMenuService } from '../../common/components/sidenav';
 import { DxDataGridService, ToastService, LocalSearchService } from '../../common/services';
-
-import { isAdminGuard, GoToDefaultAdminPageGuard} from './guards';
+import { IsAdminGuard, GoToDefaultAdminPageGuard } from './guards';
 
 const COMPONENTS = [
   AdminPageComponent,
@@ -95,8 +94,7 @@ const INTERCEPTORS = [
     multi: true
   }
 ];
-
-const GUARDS = [isAdminGuard, GoToDefaultAdminPageGuard];
+const GUARDS = [IsAdminGuard, GoToDefaultAdminPageGuard];
 
 const SERVICES = [
   SidenavMenuService,
