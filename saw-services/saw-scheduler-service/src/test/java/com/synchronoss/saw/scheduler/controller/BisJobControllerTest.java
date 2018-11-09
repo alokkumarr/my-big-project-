@@ -1,15 +1,15 @@
 package com.synchronoss.saw.scheduler.controller;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,6 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.scheduler.SAWSchedulerServiceApplication;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.service.JobService;
@@ -44,21 +47,39 @@ public class BisJobControllerTest {
 	  
     @Before
     public  void setup() throws Exception {
-    	 incomingRequest = "{\"entityId\": \"123\",\"description\":"
-    			+ " \"dd\",\"cronExpression\": \"0 0 12 * * ?\","
-    			+ "\"emailList\":[ \"Ford\", \"BMW\", \"Fiat\" ],"
-    			+ "\"fileType\": \"xml\",\"jobGroup\": \"test\","
-    			+ "\"jobName\": \"test\",\"jobScheduleTime\": "
-    			+ "\"2018-11-29T05:06\",\"channelType\": \"test\","
-    			+ "\"userFullName\": \"naresh\",\"endDate\": "
-    			+ "\"2018-11-30T06:06\"}";
+      ObjectMapper mapper = new ObjectMapper();
+      ObjectNode requestObject = mapper.createObjectNode();
+      requestObject.put("entityId", "123");
+      requestObject.put("description", "abcd");
+      requestObject.put("cronExpression", "0 0 12 * * ?");
+      requestObject.put("fileType", "xml");
+      requestObject.put("jobGroup", "test");
+      requestObject.put("jobName", "test");
+      requestObject.put("channelType", "test");
+      requestObject.put("userFullName", "guest");
+      SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+      Calendar calendar = Calendar.getInstance();
+      requestObject.put("jobScheduleTime", simpleDateFormat.format(new Date()));
+      calendar.add(Calendar.DAY_OF_MONTH, 1);
+      ArrayNode  emailNode = mapper.createArrayNode();
+      emailNode.add("guest@guest.com");
+      requestObject.put("emailList", emailNode);
+      requestObject.put("endDate", simpleDateFormat.format(calendar.getTime()));
+      
+        
+      incomingRequest = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestObject);
+      
+      ObjectNode keysObject = mapper.createObjectNode();
+      keysObject.put("jobName", "test");
+      keysObject.put("JobKey", "test");
+      keysObject.put("groupName", "test");
+      keysObject.put("categoryId", "test");
+      scheduleKeysRequest = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(keysObject);	
     	
-    	 scheduleKeysRequest = "{\"jobName\": \"test\",\"JobKey\":\"test\",\"groupName\":"
-    			+ " \"test\",\"categoryId\": \"test\"}";
     	 
-    	 mockMvc = standaloneSetup(bisJobController).build();
+      mockMvc = standaloneSetup(bisJobController).build();
     	 
-    	 this.scheduleTest();
+      this.scheduleTest();
 
     }
 	
