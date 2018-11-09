@@ -12,7 +12,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.restassured.response.Response;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -286,8 +289,11 @@ public class WorkbenchIT extends BaseIT {
 
   @Test
   public void testParseDataset() throws IOException {
+    /* Create CSV file to be parsed */
     String name = "test-parse-" + testId();
-    parseDataset(name, "test_1.csv");
+    String filename = name + ".csv";
+    uploadFile(filename, sampleCsvContents());
+    parseDataset(name, filename);
     /* Workaround: Until the dataset creation API provides the
      * dataset ID, construct it manually here. */
     String id = "workbench::" + name;
@@ -318,7 +324,9 @@ public class WorkbenchIT extends BaseIT {
     /* Use only characters suitable for a SQL table name */
     inputName = inputName.replace("-", "_");
     /* Create dataset to be used for testing viewing dataset */
-    parseDataset(inputName, "test_2.csv");
+    String filename = inputName + ".csv";
+    uploadFile(filename, sampleCsvContents());
+    parseDataset(inputName, filename);
     /* Workaround: Until the dataset creation API provides the
      * dataset ID, construct it manually here. */
     String inputId = "workbench::" + inputName;
@@ -385,8 +393,10 @@ public class WorkbenchIT extends BaseIT {
   @Test
   public void testPreviewDataset() throws IOException {
     String name = "test-preview-" + testId();
+    String filename = name + ".csv";
+    uploadFile(filename, sampleCsvContents());
     /* Create dataset to be used for testing viewing dataset */
-    parseDataset(name, "test_3.csv");
+    parseDataset(name, filename);
     /* Workaround: Until the dataset creation API provides the
      * dataset ID, construct it manually here. */
     String id = "workbench::" + name;
@@ -440,6 +450,30 @@ public class WorkbenchIT extends BaseIT {
       log.debug("Interrupted");
     }
     waitForPreview(id, retries - 1);
+  }
+
+  /**
+   * Generate sample three-line CSV file with string, integer and date
+   * columns.
+   */
+  private String sampleCsvContents() {
+    StringBuilder contents = new StringBuilder();
+    contents.append("foo,1,2018-01-01\n");
+    contents.append("bar,2,2018-01-02\n");
+    contents.append("baz,3,2018-01-03\n");
+    return contents.toString();
+  }
+
+  /**
+   * Upload a file to the Workbench raw directory.
+   */
+  private void uploadFile(String name, String contents) {
+    InputStream input = new ByteArrayInputStream(
+        contents.getBytes(StandardCharsets.UTF_8));
+    given(authSpec)
+        .multiPart("files", name, input)
+        .when().post(WORKBENCH_PATH + "/raw/directory/upload/files")
+        .then().assertThat().statusCode(200);
   }
 
   /**
