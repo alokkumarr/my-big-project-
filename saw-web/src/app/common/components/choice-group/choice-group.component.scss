@@ -1,0 +1,62 @@
+@import "src/themes/base/colors";
+
+.choice-group, .choice-subgroup {
+  .choice-group__item {
+    padding: 8px 0;
+    flex: 0 0 25%;
+    border: 1px solid #B0BFC8;
+    border-radius: 0;
+    font-size: 16px;
+    color: #596574;
+    text-align: center;
+
+    label {
+      padding-top: 10px;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+      color: #596574;
+    }
+
+    &:first-child {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    &:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    &.disabled {
+      background-color: transparent;
+      color: rgba(#596574, 0.7);
+
+      mat-icon {
+        color: rgba(#596574, 0.7);
+      }
+    }
+
+    &.selected {
+      background-color: $primary-blue-b2;
+      color: rgb(255, 255, 255);
+
+      mat-icon {
+        color: #FFF;
+      }
+    }
+  }
+}
+
+.choice-subgroup {
+  margin-top: 20px;
+
+  span.subgroup-title {
+    width: 100%;
+  }
+}

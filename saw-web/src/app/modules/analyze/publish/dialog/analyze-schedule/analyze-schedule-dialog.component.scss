@@ -1,0 +1,85 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  color: $primary-grey-g4;
+}
+
+header {
+  text-align: left;
+  color: $primary-grey-g3;
+  padding-left: 10px;
+  margin: 0;
+  font-size: 16px;
+}
+
+.dialog__content {
+  width: 700px;
+
+  .label-inline-with-select {
+    text-align: center;
+    line-height: 38px;
+  }
+
+  .form-container {
+    padding-top: 16px;
+
+    label {
+      font-weight: bold;
+      padding-bottom: 10px;
+    }
+
+    mat-input-container {
+      margin: 0;
+    }
+  }
+
+  .schedule-container {
+    margin: 10px;
+  }
+
+  .days-of-week-checkboxes {
+    padding-top: 6px;
+  }
+
+  .end-criteria-radio {
+    line-height: 32px;
+  }
+
+  mat-chips input {
+    width: 250px;
+    font-size: 14px;
+    padding: 10px;
+    margin: -2px;
+  }
+
+  .errorTextMsg {
+    color: $secondary-red;
+  }
+
+  .errorMsg {
+    color: $primary-white;
+    background-color: $secondary-orange;
+    border-radius: 14px;
+    float: left;
+    height: 26px;
+    width: 24px;
+    text-align: center;
+    font-size: larger;
+    margin-top: 3px;
+    margin-right: 2px;
+  }
+
+  .ftp-select {
+    left: 459px !important;
+  }
+}
+
+.base-dialog__actions {
+  padding: 10px 1px 10px 0;
+  border-top: 1px solid #999;
+
+  .form-buttons button {
+    margin-right: 10px;
+  }
+}

@@ -1,0 +1,31 @@
+<mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
+  <div fxLayout="row" fxFlex="40">
+    <div class="admin-title" e2e="category-title">{{section | changeCase:'title'}} Management</div>
+    <search-box placeholder="Search"
+                [value]="filterObj.searchTerm"
+                (searchTermChange)="applySearchFilter($event)"
+                [delay]="1000">
+    </search-box>
+  </div>
+
+  <div fxLayout="row" class="customer-name" fxLayoutAlign="start center" fxFlex="40">
+    Customer: {{ticket.custCode}}
+  </div>
+  <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
+    <button (click)="createRow()"
+            mat-raised-button
+            color="primary">
+      + <span>{{section | uppercase}}</span>
+    </button>
+  </div>
+</mat-toolbar>
+<div *ngIf="data" class="admin-list-container">
+  <admin-list-view (editRow)="editRow($event)"
+                   (deleteRow)="deleteRow($event)"
+                   (rowClick)="onRowClick($event)"
+                   [data]="filteredData"
+                   [columns]="columns"
+                   [section]="section"
+                   [highlightTerm]="filterObj.searchTermValue">
+  </admin-list-view>
+</div>

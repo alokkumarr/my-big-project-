@@ -1,0 +1,56 @@
+<div class="container">
+    <div class="header" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+        <button mat-button class="bck-btn">
+            <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
+        </button>
+        <div fxFlex>Update Datapod </div>
+        <button mat-raised-button color="primary" [disabled]="!isSelected" (click)="updateSemantic()">
+            <span i18n>Update</span>
+        </button>
+    </div>
+    <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
+        <mat-card fxFlex="25" *ngIf="!dpID">
+            <mat-card-content>
+                <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDP" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
+                    keyExpr="id" [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDPSelectionChanged($event.currentSelectedRowKeys[0])">
+                    <dxo-selection mode="single"></dxo-selection>
+                    <dxi-column caption="Datapod Name" dataField="metricName"></dxi-column>
+                    <dxi-column caption="Created By" dataField="createdBy"></dxi-column>
+                    <dxi-column caption="Updated Time" dataField="createdAt" dataType="date"></dxi-column>
+                    <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+                    <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                </dx-data-grid>
+            </mat-card-content>
+        </mat-card>
+        <mat-card fxFlex>
+            <mat-card-content fxLayout="row" fxLayoutAlign="center stretch">
+                <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="!selectedDPData?.length">
+                    <span>Select Datapod from left pane to update</span>
+                </div>
+                <mat-tab-group *ngIf="selectedDPData?.length" fxFlex>
+                    <mat-tab *ngFor="let dp of selectedDPData; let index = index" [label]="dp?.artifactName">
+                        <dx-data-grid #dsGrid [dataSource]="dp?.columns" [showBorders]="true" [height]="'100%'" [width]="'100%'" [rowAlternationEnabled]="true"
+                            [showColumnLines]="false" style="position:absolute;top:0;bottom:0;left:0;bottom:0;">
+                            <dxo-editing mode="cell" [allowUpdating]="true">
+                            </dxo-editing>
+                            <dxi-column [width]="80" caption="Include" dataField="include" dataType="boolean"></dxi-column>
+                            <dxi-column caption="Display Name" dataField="displayName">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxi-validation-rule type="stringLength" [max]="30">
+                                </dxi-validation-rule>
+                            </dxi-column>
+                            <dxi-column caption="Column Name" [allowEditing]="false" dataField="columnName"></dxi-column>
+                            <dxi-column [width]="150" caption="Data Type" [allowEditing]="false" dataField="type"></dxi-column>
+                            <dxi-column [width]="100" caption="Filter Eligible" dataField="filterEligible" dataType="boolean"></dxi-column>
+                            <dxi-column [width]="80" caption="KPI Eligible" dataField="kpiEligible" dataType="boolean"></dxi-column>
+                            <dxi-column [width]="80" *ngIf="isJoinEligible" caption="Join Eligible" dataField="joinEligible" dataType="boolean"></dxi-column>
+                            <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+                            <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                            <dxo-header-filter [visible]="false"></dxo-header-filter>
+                        </dx-data-grid>
+                    </mat-tab>
+                </mat-tab-group>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

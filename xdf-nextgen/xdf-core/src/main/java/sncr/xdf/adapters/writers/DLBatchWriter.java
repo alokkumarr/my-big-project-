@@ -98,64 +98,65 @@ public class DLBatchWriter {
 
         // This can be an empty collection in case FLAT partition
         // is requested or key definitions omited in configuration file
-        scala.collection.immutable.Seq<String> scalaList = null;
+        scala.collection.immutable.Seq<String> partitionKeysList = null;
         if (keys != null)
-            scalaList = scala.collection.JavaConversions.asScalaBuffer(keys).toList();
-
-        // Collect number of records
-        // (This may require review - may be we need caching)
-        long recordCount = DS.count();
-        logger.debug("Processing " + recordCount + " records.");
+            partitionKeysList = scala.collection.JavaConversions.asScalaBuffer(keys).toList();
 
         logger.debug("Requested number of files per partition is " + numberOfFiles + ".");
-        if(scalaList != null && scalaList.size() > 0)
+        logger.debug("Partition keys = "+ partitionKeysList);
+
+        if(partitionKeysList != null && partitionKeysList.size() > 0) {
+            logger.debug("Partition keys provided");
             // Setup proper number of output files and write partitions
-        switch (format){
-            case "parquet":
-                DS.coalesce(numberOfFiles).write().partitionBy(scalaList).parquet(dataLocation);
-                break;
-            case "json" :
-                DS.coalesce(numberOfFiles).write().partitionBy(scalaList).json(dataLocation);
-                break;
-            case "csv" :
-                DS.coalesce(numberOfFiles).write().partitionBy(scalaList).csv(dataLocation);
-                break;
-            default:
-                DS.coalesce(numberOfFiles).write().partitionBy(scalaList).parquet(dataLocation);
-                break;
+            switch (format) {
+                case "parquet":
+                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).parquet(dataLocation);
+                    break;
+                case "json":
+                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).json(dataLocation);
+                    break;
+                case "csv":
+                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).csv(dataLocation);
+                    break;
+                default:
+                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).parquet(dataLocation);
+                    break;
+            }
         }
         else {
+            logger.debug("Partition keys not provided");
             // Create flat structure/compact files - no key file definitions provided
             switch (format){
                 case "parquet":
-                    DS.coalesce(numberOfFiles).write().parquet(dataLocation);
+                    DS.repartition(numberOfFiles).write().parquet(dataLocation);
                     break;
                 case "json" :
-                    DS.coalesce(numberOfFiles).write().json(dataLocation);
+                    DS.repartition(numberOfFiles).write().json(dataLocation);
                     break;
                 case "csv" :
-                    DS.coalesce(numberOfFiles).write().csv(dataLocation);
+                    DS.repartition(numberOfFiles).write().csv(dataLocation);
                     break;
                 default:
-                    DS.coalesce(numberOfFiles).write().parquet(dataLocation);
+                    DS.repartition(numberOfFiles).write().parquet(dataLocation);
                     break;
             }
         }
 
-        if (produceSample)
-        switch (format){
-            case "parquet":
-                DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
-                break;
-            case "json" :
-                DS.coalesce(1).sample(false, 0.1).write().json(sampleLocation);
-                break;
-            case "csv" :
-                DS.coalesce(1).sample(false, 0.1).write().csv(sampleLocation);
-                break;
-            default:
-                DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
-                break;
+        if (produceSample) {
+            switch (format){
+                case "parquet":
+                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    break;
+                case "json" :
+                    DS.repartition(1).sample(false, 0.1).write().json(sampleLocation);
+                    break;
+                case "csv" :
+                    DS.repartition(1).sample(false, 0.1).write().csv(sampleLocation);
+                    break;
+                default:
+                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    break;
+            }
         }
     }
 

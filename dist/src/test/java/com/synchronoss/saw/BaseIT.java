@@ -21,13 +21,27 @@ import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
 public class BaseIT {
   @Rule
+  public TestWatcher watcher = new TestWatcher() {
+      @Override
+      public void starting(final Description method) {
+        log.debug("Test: {}", method.getMethodName());
+      }
+    };
+
+  @Rule
   public final JUnitRestDocumentation restDocumentation =
       new JUnitRestDocumentation();
+
+  protected final Logger log = LoggerFactory.getLogger(getClass().getName());
 
   protected RequestSpecification spec;
   protected RequestSpecification authSpec;

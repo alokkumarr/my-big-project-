@@ -73,14 +73,14 @@ stream.file.location=/var/bda/rtis/run/stream.${http.port}.dump
 # Waiting time on send call to Kafka/MapR Streams client 
 stream.send.timeout = 60
 
-api.version="1.2"
-swagger.api.info.title="Syncronoss Real Time Ingestion Service API 1.0"
-swagger.api.info.description="Syncronoss RTI is designed to accept events and crash reports in countly formats, please see  http://count.ly"
-swagger.api.info.termsOfServiceUrl="http://termsOfServiceUrl"
+api.version="${revision}"
+swagger.api.info.title="Synchronoss Insights Platform (SIP ) Real Time Ingestion Service API"
+swagger.api.info.description="SIP Real Time Ingestion Service is designed to accept events from client systems using a generic construct and JSON as the payload"
+swagger.api.info.termsOfServiceUrl=""
 swagger.api.info.contact="Suren.Nathan@synchronoss.com"
-swagger.api.info.license="TBD"
-swagger.api.info.licenseUrl="TBD"
-swagger.api.basepath="/"
+#swagger.api.info.license=""
+#swagger.api.info.licenseUrl=""
+swagger.api.basepath=""
 swagger.api.host="TBS"
 
 # example swagger authorisation filter

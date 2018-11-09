@@ -1,0 +1,79 @@
+<header class="base-dialog__header">
+  <strong [ngSwitch]="data.mode">
+    <ng-container *ngSwitchCase="'create'" i18n>
+      Add New User
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Edit User
+    </ng-container>
+  </strong>
+</header>
+<div class="base-dialog__content">
+  <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="start center">
+
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label>Role</mat-label>
+      <mat-select required formControlName="roleId">
+        <mat-option *ngFor="let role of data.formDeps.roles$ | async" [value]="role.roleId">
+          {{role.roleName}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput required type="text" autocomplete="off" formControlName="firstName" placeholder="First name"/>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="text" autocomplete="off" formControlName="middleName" placeholder="Middle name"/>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput required type="text" autocomplete="off" formControlName="lastName" placeholder="Last name"/>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput required type="text" autocomplete="off" formControlName="masterLoginId" placeholder="Login Id"/>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput
+             [required]="data.mode === 'create'"
+             type="password"
+             (focus)="onPasswordFocus($event)"
+             (blur)="onPasswordBlur($event)"
+             formControlName="password"
+             placeholder="Password"
+      />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput required type="email" formControlName="email" placeholder="Email"/>
+    </mat-form-field>
+
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select required formControlName="activeStatusInd">
+        <mat-option *ngFor="let status of statuses" [value]="status.id">
+          {{status.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </form>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
+  <button (click)="create()"
+          [disabled]="!formIsValid"
+          e2e="create-analysis-btn"
+          color="primary"
+          [ngSwitch]="data.mode"
+          mat-raised-button
+  >
+    <ng-container *ngSwitchCase="'create'" i18n>
+      Create User
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Save
+    </ng-container>
+  </button>
+  <button mat-button
+          mat-dialog-close i18n
+  >Cancel</button>
+</div>

@@ -1,0 +1,74 @@
+<div style="height: calc(100vh - 51px - 70px - 65px);">
+  <dx-data-grid [customizeColumns]="config.customizeColumns"
+                [columnAutoWidth]="config.columnAutoWidth"
+                [columnMinWidth]="config.columnMinWidth"
+                [columnResizingMode]="config.columnResizingMode"
+                [allowColumnReordering]="config.allowColumnReordering"
+                [allowColumnResizing]="config.allowColumnResizing"
+                [showColumnHeaders]="config.showColumnHeaders"
+                [showColumnLines]="config.showColumnLines"
+                [showRowLines]="config.showRowLines"
+                [showBorders]="config.showBorders"
+                [rowAlternationEnabled]="config.rowAlternationEnabled"
+                [hoverStateEnabled]="config.hoverStateEnabled"
+                [wordWrapEnabled]="config.wordWrapEnabled"
+                [scrolling]="config.scrolling"
+                [sorting]="config.sorting"
+                [dataSource]="analyses"
+                [columns]="config.columns"
+                [pager]="config.pager"
+                [paging]="config.paging"
+                [width]="config.width"
+                [height]="config.height"
+    >
+    <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+
+    <div *dxTemplate="let cell of 'linkCellTemplate'">
+      <a [innerHtml]="cell.text | highlight: searchTerm"
+         routerLink="../analysis/{{cell.data.id}}/executed"
+      >
+      </a>
+
+      <mat-chip class="tag-chip status-chip mat-basic-chip"
+                *ngIf="executions[cell.data.id] === executingState"
+                i18n>
+        EXECUTING
+      </mat-chip>
+    </div>
+
+    <div *dxTemplate="let cell of 'typeCellTemplate'"
+         [innerHtml]="cell.text | highlight: searchTerm">
+    </div>
+
+    <div *dxTemplate="let cell of 'highlightCellTemplate'"
+         [innerHtml]="cell.text | highlight: searchTerm">
+    </div>
+
+    <div *dxTemplate="let cell of 'dateCellTemplate'">
+      {{cell.text | date: 'dd/MMM/yy'}}
+    </div>
+
+    <div *dxTemplate="let cell of 'actionCellTemplate'">
+      <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
+        <button mat-icon-button
+                *ngIf="canUserFork"
+                (click)="fork(cell.data)"
+                class="list-action__button"
+                i18n-matTooltip="Fork Analysis"
+                matTooltip="Fork Analysis"
+        >
+          <mat-icon fontIcon="icon-fork"></mat-icon>
+        </button>
+        <analyze-actions-menu-u [analysis]="cell.data"
+                                [actionsToDisable]="executions[cell.data.id] === executingState ? 'execute' : ''"
+                                exclude="fork-export-details"
+                                (afterDelete)="afterDelete($event)"
+                                (afterExecute)="afterExecute($event)"
+                                (afterPublish)="afterPublish($event)"
+                                (afterEdit)="afterEdit($event)"
+        ></analyze-actions-menu-u>
+      </div>
+    </div>
+
+  </dx-data-grid>
+</div>

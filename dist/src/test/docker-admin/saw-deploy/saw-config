@@ -81,6 +81,7 @@ saw_preview_rows_limit=10000
 # Publish row limit is optional parameter and only get considered if it has been
 # set greater than 0 values if it not set then no limit will be applied for publishing the report.
 saw_publish_rows_limit=10000
+saw_executor_restart_threshold=50
 
 # FTP JSON config
 # ##########################################
@@ -90,7 +91,8 @@ saw_publish_rows_limit=10000
 #
 #
 # ##########################################
-# ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
+## FTP host should be setup in docker instance itself but for timing being we are setting the external FTP enviroment for testing.
+ftp_json_config='{"ftpList":[{"customerName":"SYNCHRONOSS","alias":"ftp_Test","host":"ftp.razorsight.com","port":22,"username":"ftp_saasadmin","password":"RhW4ndePN23","location":"/abc","type":"sftp"}]}'
 
 #
 # Email and FTP export size definition
@@ -114,3 +116,6 @@ saw_security_email_host=sip-admin
 
 [saw-security-arbitrator]
 sip-app3
+
+[sip-rtps]
+sip-app1

@@ -1,0 +1,15 @@
+== Authentication ==
+
+Client -> "SAW Security Service": Authentication request
+"SAW Security Service" --> Client: Authentication response
+
+== Execution ==
+
+Client -> "SAW Gateway Service": Execution request
+"SAW Gateway Service" -> "SAW Batch Ingestion Service": Execution request
+
+"SAW Batch Ingestion Service" -> "JSON Schema Validation": Verify JSON Schema
+"JSON Schema Validation" -> "RDBMS": Execute Query
+"RDBMS" --> "SAW Batch Ingestion Service" : Response
+"SAW Batch Ingestion Service" --> "SAW Gateway Service" : Execution response
+"SAW Gateway Service" --> Client: Execution response

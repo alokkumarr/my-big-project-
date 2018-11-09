@@ -249,6 +249,11 @@
 echo PreInstall done: ${app.nameVer}
             </script>
           </preinstallScriptlet-->
+          <requires>
+	          	<require>
+	          	 jq
+	          	</require>
+          </requires>
           <postinstallScriptlet>
             <script>
 echo PostInstall started: ${app.nameVer}

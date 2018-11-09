@@ -1,0 +1,24 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "types": [
+      "highcharts",
+      "node"
+    ]
+  },
+  "files": [
+    "main.ts",
+    "polyfills.ts",
+    "app/modules/observe/observe.module.ts",
+    "app/modules/analyze/analyze.module.ts",
+    "app/modules/workbench/workbench.module.ts",
+    "app/modules/admin/admin.module.ts",
+    "app/login/login.module.ts"
+  ],
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts",
+    "**/app/**"
+  ]
+}

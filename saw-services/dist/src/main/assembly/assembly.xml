@@ -21,6 +21,7 @@
         <include>${project.groupId}:saw-scheduler-service</include>
         <include>${project.groupId}:saw-storage-proxy-service</include>
         <include>${project.groupId}:saw-semantic-service</include>
+        <include>${project.groupId}:saw-batch-ingestion-service</include>
       </includes>
       <binaries>
         <attachmentClassifier>rpm</attachmentClassifier>

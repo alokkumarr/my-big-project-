@@ -110,6 +110,21 @@ multiple redundant instances of them on separate nodes.  If one node
 fails and makes the service running on that node unavailable, the
 service instance on the other node can keep serving requests.
 
+:quartz_doc: http://www.quartz-scheduler.org/documentation/
+:quartz_cluster: quartz-2.x/configuration/ConfigJDBCJobStoreClustering.html
+
+The Scheduler Service additionally runs the Quartz scheduler in
+{quartz_doc}/{quartz_cluster}[clustered mode], which ensures that
+scheduled tasks continue to be executed even if one of the Scheduler
+Service instances becomes unavailable.  The clustered mode setting
+ensures that each scheduled task is executed by only one of the
+instances.  The Quartz scheduler is configured to use MariaDB as its
+job store, which itself is highly available through the use of a
+MariaDB Galera cluster setup.
+
+.High availability for Scheduler Service
+plantuml::sip-design/figure-ha-scheduler.pum[format=svg]
+
 === High availability for stateful services
 
 Services that store some kind of state, such as a database, require
@@ -245,15 +260,30 @@ The SAW Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
 semantic metadata configuration REST APU & data wrangling related REST API.
 
+The Workbench Service provides a REST API on top of which the various
+Workbench operations in the Web user interface are implemented.  The
+Workbench Service internally uses the Metadata Library to list and
+work with dataset information in MapR-DB.  Additionally it uses a
+queuing mechanism for executing dataset transformations through the
+Workbench Executor component.
+
 .SIP Workbench Components
 plantuml::sip-design/figure-components.pum[format=svg]
 
 .SIP Workbench Executor
 plantuml::sip-design/figure-executor.pum[format=svg]
 
+Workbench transformations are implemented using XDF components.
+Invoking an XDF component involves input and output to the data lake,
+or another location such as Elasticsearch.  The Workbench Service
+invokes XDF-NG components using the XDF-NG component interface.
+Datasets are internally stored as JSON documents in MapR-DB. The
+entries are created by XDF components as part of execution and
+accessed using the BDA Metadata library.
+
 === SAW Storage Proxy Service
 
-he SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
+SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
 The intention of this services to provide access behind our gateway for our polyglot persistence
 layer *(ElasticSearch, Datalake, RDMS & MapRDB).*
 
@@ -279,6 +309,49 @@ storage type & other details. The below are salient feature for the service whic
 * Implicit ES Query validation.
 * Every incoming request to this story proxy service will be validated in gateway service layer.
 * It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to certain structure i.e request & response specification.
+
+=== SAW Batch Ingestion Service
+
+SAW Batch Ingestion Service allows to pull batch of data at uniform interval (can be defined by user) of time.
+It will facilitates to pull data from remote source like *(SFTP, SCP, S3, JDBC etc).*
+Currently with it supports only SCP/SFTP.
+
+[%hardbreaks]
+The REST API of this service is HATEOS Complaint API. To get an overview of the self descriptive API, it can
+accessed using URL (http://hostname/saw/services/batch, http://hostname/saw/services/batch/profiles)
+
+.Figure: Saw Batch ingestion request & response flow
+plantuml::sip-design/figure-batch-sequence.pum[format=svg]
+
+Below are the salient feature which are as follows:
+
+[[goals]]
+[role="incremental"]
+* Ability to setup a channel and provide channel information
+* Ability to setup a route and provide route information
+* Test connectivity of both channel & source.
+* Tracking from source to drop.
+* Monitoring.
+* Scheduling the data retrieval from the source.
+* Supports various protocol to pull data.
+
+.Figure: SAW Batch Ingestion ER Diagram
+image::sip/bis-er-diagram.png[entities,400,400]
+
+The above entities are used to hold the base of Batch Ingestion module.
+Entity BIS_ROUTE is used to hold the details of route i.e it holds the details of destination, frequency etc etc.
+Entity BIS_CHANNEL is used to hold the details of channel i.e it holds the details of data channel.
+Entity BIS_FILE_LOGS is used to log details related to the files or data retrieved from the custom.
+
+.Figure: SAW Batch Ingestion Component Diagram
+image::sip/bis-component-diagram.png[component,400,400]
+
+ingestion-registration-service: The internal service will handle all the request for registration of channel & route
+ingestion-provenance-service: The internal service will handle all the scheduled jobs.
+ingestion-notification-service: Not yet started.
+
+.Figure: SAW Batch Ingestion Flow Diagram
+image::sip/bis-flow-diagram.png[flowChart,400,400]
 
 === SAW Semantic Service
 
