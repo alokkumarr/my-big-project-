@@ -49,11 +49,17 @@
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput required type="text" formControlName="categoryName" [placeholder]="formGroup.controls.subCategoryInd.value ? 'Sub-Category Name' : 'Category Name'" />
+        <input matInput required type="text"
+               formControlName="categoryName"
+               autocomplete="off"
+               [placeholder]="formGroup.controls.subCategoryInd.value ? 'Sub-Category Name' : 'Category Name'" />
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput type="text" formControlName="categoryDesc" placeholder="Description" />
+        <input matInput type="text"
+               formControlName="categoryDesc"
+               autocomplete="off"
+               placeholder="Description" />
       </mat-form-field>
 
       <mat-form-field class="select-form-field" appearance="outline">
@@ -90,11 +96,20 @@
           style="width: 100%;"
           formGroupName="categoryFormGroup">
         <mat-form-field>
-          <input matInput required type="text" formControlName="subCategoryName" placeholder="Sub-Category Name" />
+          <input matInput
+                 required
+                 type="text"
+                 autocomplete="off"
+                 formControlName="subCategoryName"
+                 placeholder="Sub-Category Name" />
         </mat-form-field>
 
         <mat-form-field>
-          <input matInput type="text" formControlName="subCategoryDesc" placeholder="Description" />
+          <input matInput
+                 type="text"
+                 autocomplete="off"
+                 formControlName="subCategoryDesc"
+                 placeholder="Description" />
         </mat-form-field>
 
         <mat-form-field class="select-form-field" appearance="outline">

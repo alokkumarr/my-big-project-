@@ -72,8 +72,7 @@ export class DatasetsGridPageComponent
       },
       {
         caption: 'Size',
-        dataField: 'system.numberOfFiles',
-        dataType: 'number',
+        dataField: 'size',
         width: '10%'
       },
       {

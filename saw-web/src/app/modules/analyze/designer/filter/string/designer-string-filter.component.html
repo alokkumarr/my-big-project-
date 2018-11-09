@@ -14,6 +14,7 @@
   <mat-form-field style="margin-left: 10px;"
                   *ngIf="filterModel.operator === 'EQ' || filterModel.operator === 'NEQ' || filterModel.operator === 'CONTAINS' || filterModel.operator === 'SW' || filterModel.operator === 'EW'" >
     <input matInput (input)="onValueChange($event.target.value)"
+            autocomplete="off"
             [value]="tempValue"/>
   </mat-form-field>
   <mat-form-field *ngIf="filterModel.operator === 'ISIN' || filterModel.operator === 'ISNOTIN'" style="margin-left: 10px;">
@@ -27,6 +28,7 @@
              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
              matChipInputAddOnBlur="true"
              (matChipInputTokenEnd)="add($event)"
+             autocomplete="off"
              e2e="designer-filter-string-input"/>
     </mat-chip-list>
   </mat-form-field>

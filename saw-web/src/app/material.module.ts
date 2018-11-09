@@ -28,6 +28,8 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -63,7 +65,9 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatToolbarModule,
     MatSlideToggleModule,
     MatDividerModule,
-    NouisliderModule
+    NouisliderModule,
+    MatSnackBarModule,
+    MatBadgeModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -96,7 +100,9 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatToolbarModule,
     MatSlideToggleModule,
     MatDividerModule,
-    NouisliderModule
+    NouisliderModule,
+    MatSnackBarModule,
+    MatBadgeModule
   ]
 })
 export class MaterialModule {}

@@ -12,11 +12,11 @@
   <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="center start">
 
     <mat-form-field>
-      <input matInput required type="text" formControlName="roleName" placeholder="Role name"/>
+      <input matInput autocomplete="off" required type="text" formControlName="roleName" placeholder="Role name"/>
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput type="text" formControlName="roleDesc" placeholder="Description"/>
+      <input matInput autocomplete="off" type="text" formControlName="roleDesc" placeholder="Description"/>
     </mat-form-field>
 
     <mat-form-field class="select-form-field" appearance="outline">

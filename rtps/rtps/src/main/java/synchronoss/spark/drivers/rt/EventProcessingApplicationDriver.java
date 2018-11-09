@@ -2,7 +2,9 @@ package synchronoss.spark.drivers.rt;
 
 
 import com.mapr.db.Admin;
+import com.mapr.db.exceptions.TableExistsException;
 import com.mapr.streams.Streams;
+import com.mapr.streams.StreamDescriptor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -38,6 +40,9 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
     public static final String DM_COUNTLY = "countly";
     public static final String DM_SIMPLE = "simple";
     public static final String DM_SIMPLE_JSON = "simple-json";
+
+    private static final String RT_USER = "mapr";
+    private static final String RT_GROUP = "mapr";
 
     public static void main(String[] args){
         EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
@@ -226,6 +231,27 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             if(t.length != 2){
                 logger.error("Invalid stream/topic configuration value, please correct configuration file. Must be defined as <stream path>:<topic> .");
             } else {
+              /* Ensure that the "/apps/spark" directory exists, as
+               * required by the spark-submit tool used for running
+               * RTPS */
+              createDirectoryIfNotExists("/apps/spark");
+              Configuration conf = new Configuration();
+              com.mapr.streams.Admin streamAdmin = Streams.newAdmin(conf);
+              StreamDescriptor desc = Streams.newStreamDescriptor();
+              String path = t[0];
+              String topic = t[1];
+              createDirectoryIfNotExists(new Path(path).getParent().toString());
+              if (!streamAdmin.streamExists(path)) {
+                try {
+                  streamAdmin.createStream(path, desc);
+                  logger.info("Stream created: " + path);
+                  streamAdmin.createTopic(path, topic);
+                  logger.info("Topic created: " + topic);
+                } catch (TableExistsException e) {
+                  logger.debug("Stream already exists, so not creating: " + path);
+                }
+              }
+
                 DocumentStore ds = Streams.getMessageStore(t[0], t[1]);
                 if (ds == null) {
                     logger.error("getMessageStore(<stream path>, <topic>) returned NULL.");
@@ -239,4 +265,21 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         }
         return retval ;
     }
+
+  /**
+   * Create the given directory in MapR-FS, if it does not already
+   * exist
+   */
+  private void createDirectoryIfNotExists(String path) throws Exception {
+    String defaultFS = "maprfs:///";
+    Configuration config = new Configuration();
+    config.set("fs.defaultFS", defaultFS);
+    Path fsPath = new Path(path);
+    FileSystem fs = FileSystem.get(config);
+    if (!fs.exists(fsPath)) {
+      logger.info("Creating directory: " + path);
+      fs.mkdirs(fsPath);
+      fs.setOwner(fsPath, RT_USER, RT_GROUP);
+    }
+  }
 }

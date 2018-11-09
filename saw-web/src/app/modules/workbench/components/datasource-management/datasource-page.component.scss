@@ -1,0 +1,159 @@
+@import 'src/themes/base/colors';
+
+:host {
+  width: 100%;
+  height: 100%;
+}
+
+.datasource-view {
+  width: 100%;
+  background-color: $background-color;
+  height: 100%;
+
+  .action-buttons {
+    .mat-raised-button {
+      line-height: 32px !important;
+      vertical-align: middle;
+    }
+  }
+
+  .grid-icon-btn {
+    line-height: normal !important;
+    height: 25px !important;
+  }
+
+  .icon-search {
+    font-size: 26px !important;
+  }
+
+  .source-row {
+    border-radius: 50%;
+    background-color: white;
+    width: 70px;
+    height: 70px;
+    margin: 20px 10px;
+    cursor: pointer;
+
+    & > img {
+      height: 45px;
+      width: 45px;
+      border-radius: 20%;
+    }
+  }
+
+  .selected {
+    border: 2px $primary-blue-b1 solid;
+  }
+
+  .no-click {
+    cursor: not-allowed;
+  }
+
+  .toolbar-white {
+    background-color: $primary-white;
+    height: 45px !important;
+    min-height: 45px !important;
+  }
+
+  .body-container {
+    height: calc(100% - 52px);
+    margin: 3px;
+    padding: 5px 3px 0;
+  }
+
+  .master-detail-caption {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $primary-blue-b1;
+  }
+
+  .sources-grid {
+    padding: 3px 3px 3px 0;
+    border-radius: 5px;
+
+    ::ng-deep .dx-datagrid-headers .dx-header-row {
+      background-color: $background-color !important;
+      border-bottom: 1px solid $primary-grey-g1;
+    }
+
+    .s-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: $primary-blue-b1;
+    }
+  }
+
+  .routes-card {
+    padding: 3px;
+    border-radius: 5px;
+
+    .routes-card-body {
+      .mat-divider {
+        border-color: rgba(0, 0, 0, 0.05) !important;
+      }
+    }
+
+    .mat-mini-fab {
+      height: 36px !important;
+      width: 36px !important;
+    }
+
+    .details-title {
+      text-align: left;
+      color: $primary-grey-g3;
+      padding-left: 10px;
+      margin: 0;
+    }
+
+    .details-content {
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 3;
+      padding: 0 9px;
+    }
+
+    .prop-name {
+      color: #727272;
+      width: 136px;
+    }
+
+    .routes-grid {
+      padding-top: 3px;
+    }
+
+    .menu-btn-icon {
+      margin-right: 0px;
+      vertical-align: baseline;
+    }
+  }
+
+  .dx-virtual-row {
+    height: 0 !important;
+  }
+
+  .pwd-show {
+    -webkit-text-security: none !important;
+  }
+
+  .pwd-hide {
+    -webkit-text-security: disc;
+  }
+}
+
+::ng-deep .sourceDialogClass {
+  padding: 0;
+
+  ::ng-deep .mat-dialog-container {
+    padding: 0 !important;
+  }
+}
+
+::ng-deep .testConnectivityClass {
+  height: 222px !important;
+  width: 768px !important;
+  min-width: 768px !important;
+  padding: 0 !important;
+  background-color: black;
+  border-radius: 7px 7px 0 0 !important;
+}

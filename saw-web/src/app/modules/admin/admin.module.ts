@@ -30,7 +30,7 @@ import {
 } from './privilege';
 import { SidenavMenuService } from '../../common/components/sidenav';
 
-import { isAdminGuard, GoToDefaultAdminPageGuard } from './guards';
+import { IsAdminGuard, GoToDefaultAdminPageGuard } from './guards';
 
 const COMPONENTS = [
   AdminPageComponent,
@@ -50,7 +50,7 @@ const COMPONENTS = [
   AdminImportFileListComponent
 ];
 
-const GUARDS = [isAdminGuard, GoToDefaultAdminPageGuard];
+const GUARDS = [IsAdminGuard, GoToDefaultAdminPageGuard];
 
 const SERVICES = [
   SidenavMenuService,

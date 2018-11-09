@@ -1,0 +1,1811 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="7722a92a1fc887570b4f4d8a7bb916f067f32028" datatype="html">
+        <source>Format</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/data-format-dialog/data-format-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/date-format-dialog/date-format-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5d00caa1d8249baf2847adbf9e1777594558440a" datatype="html">
+        <source>
+    Show Comma Separators
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/data-format-dialog/data-format-dialog.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8e26f083c9769db6b5f706844b34886310cb08b3" datatype="html">
+        <source>
+      Show as Currency
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/data-format-dialog/data-format-dialog.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a9078376dc1f3841fe9266d9d24c9051dd99c0bf" datatype="html">
+        <source>Currency Code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/data-format-dialog/data-format-dialog.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="89b715d4adb6d5a5b62d8d772711f939735170b5" datatype="html">
+        <source>
+      Format
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/data-format-dialog/data-format-dialog.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d7b35c384aecd25a516200d6921836374613dfe7" datatype="html">
+        <source>Cancel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/data-format-dialog/data-format-dialog.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/date-format-dialog/date-format-dialog.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/alias-rename-dialog/alias-rename-dialog.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/js-plumb/join-dialog/join-dialog.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/dialog/designer-filter-dialog.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-publish/analyze-publish-dialog.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/new-dialog/analyze-new-dialog.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/createFolder-dialog/createfolder-dialog.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/semantic-management/semantic-details-dialog/semantic-details-dialog.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/user/edit-dialog/user-edit-dialog.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/role/role-dialog/role-edit-dialog.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-delete-dialog/category-delete-dialog.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/components/password-change/password-change.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c137e0618ea61a9e51e41f9230c9234518c678d3" datatype="html">
+        <source>
+        Format
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/date-format-dialog/date-format-dialog.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b270f412ff63754bc1024f6f7ff5290aa0101a33" datatype="html">
+        <source>Rename Column</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/alias-rename-dialog/alias-rename-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="764f2ef8f3a72f1788a7bc85cfd5ea56def3550a" datatype="html">
+        <source>
+      Rename
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/alias-rename-dialog/alias-rename-dialog.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2ced1bebe0eeda32c795d9a0ef4b262ee54f78df" datatype="html">
+        <source>
+    <x id="INTERPOLATION" equiv-text="{{data.negativeActionLabel}}"/>
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/confirm-dialog/confirm-dialog.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c8c6983b284dc0b606844794a186a0f19029d46a" datatype="html">
+        <source>
+    <x id="INTERPOLATION" equiv-text="{{data.positiveActionLabel}}"/>
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/confirm-dialog/confirm-dialog.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="db5cc0c8d9d80c653f1b78ce2bfb1b41bc84ceeb" datatype="html">
+        <source>Join</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/js-plumb/join-dialog/join-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2740a1d6601bd980d48c4fa8f4fdd807dea6e4fd" datatype="html">
+        <source>Inner Join</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/js-plumb/join-dialog/join-dialog.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="59331eac002b59366b547b8a35d4aa331ec5afe4" datatype="html">
+        <source>Left Join</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/js-plumb/join-dialog/join-dialog.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cd5b9e5cac6267d4eb5e60a70a50f4f1bbd12bb9" datatype="html">
+        <source>Right Join</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/js-plumb/join-dialog/join-dialog.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2a62a59d9424e9e869061ebf3e8f8b8f95411571" datatype="html">
+        <source>
+      Save
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/js-plumb/join-dialog/join-dialog.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/user/edit-dialog/user-edit-dialog.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/role/role-dialog/role-edit-dialog.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ba55d4411813e1c40ed59477c8bb1ac73d8a49df" datatype="html">
+        <source>
+      <x id="START_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;mat-icon&gt;"/><x id="CLOSE_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;/mat-icon&gt;"/>
+      Delete Link
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/common/components/js-plumb/join-dialog/join-dialog.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5edf054f14aa57bc25a28cb7db01956fee53dac8" datatype="html">
+        <source>Change Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/layout/components/header/header.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="408cb6073e60c5d966296a3207fc596adca75e01" datatype="html">
+        <source>Admin</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/layout/components/header/header.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d0227a069d21cc5c6951d829cbf135be5b5bc767" datatype="html">
+        <source>Log Out</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/layout/components/header/header.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5d43539fc358c3a548b9d487be821db73e2702ff" datatype="html">
+        <source>Sort</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar/designer-toolbar.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eec715de352a6b114713b30b640d319fa78207a0" datatype="html">
+        <source>Description</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar/designer-toolbar.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="52c9a103b812f258bcddc3d90a6e3f46871d25fe" datatype="html">
+        <source>Save</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="53606dab73a5dc150966f764648986088cd0e912" datatype="html">
+        <source>
+          Apply Sort
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b7cd5578a9bf0a8ff7dd47de0e4951919a0dd625" datatype="html">
+        <source>
+          Save Description
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4392ba651ce7ca0ed24a8b8bc702d865f77420df" datatype="html">
+        <source>
+          Save &amp; Close
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="368b817b7cc89a1705d9ac752da4ddda15d42ae8" datatype="html">
+        <source>
+          Save
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar-action-dialog/toolbar-action-dialog.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="524e82322961225f60b2c9b2ca970fe6cb1e1c11" datatype="html">
+        <source>
+      Global
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/row/designer-filter-row.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="aaf261cdf1358902d69c21f7a501285789b458ed" datatype="html">
+        <source>
+      Prompt
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/row/designer-filter-row.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b852c10b1057fc7339af42be4116e7ce70c3b6bb" datatype="html">
+        <source>
+      Optional
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/row/designer-filter-row.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5ca707824ab93066c7d9b44e1b8bf216725c2c22" datatype="html">
+        <source>Filter</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/dialog/designer-filter-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar/designer-toolbar.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6f38d53bf6192c4d83d21fc84478cf97c2bc81c2" datatype="html">
+        <source>
+        All
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/dialog/designer-filter-dialog.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b829d8b07e5ed4d4301811e3808168210e2f0a19" datatype="html">
+        <source>
+        Any
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/dialog/designer-filter-dialog.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="86a0e4dcdaafb29081749ea3d97c5cf1b0d4f41c" datatype="html">
+        <source>of the filters are true</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/dialog/designer-filter-dialog.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="df0a0f7f26a3c3dd2867029762ee014daa524a70" datatype="html">
+        <source>
+      Apply Filters
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/dialog/designer-filter-dialog.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="738bfe04af18294be09a992783feea832d1ccf2b" datatype="html">
+        <source><x id="ICU" equiv-text="{filters.length, plural, =1 {...} other {...}}"/> Applied</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/chips-u/filter-chips.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c6fce086fa995d7d2e841cf902f57e7729702344" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {1 Filter} other {<x id="INTERPOLATION" equiv-text="{{filters.length}}"/> Filters} }</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/chips-u/filter-chips.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3cece8feb186bbc0f3282773a682302853dbb0ef" datatype="html">
+        <source>
+      Clear all
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/filter/chips-u/filter-chips.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="13e6737437303c1b99eafbe91b21f5bcad0a1d75" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{analysis.metricName}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/preview-dialog/designer-preview-dialog.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="86022280b7836d1aff7fdc0182415b041ae3625c" datatype="html">
+        <source>Draft</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="424091d9548c0a80d68f2b9993372874e12be99b" datatype="html">
+        <source>Designer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d9f726c70aeba7fa6d3d68bff718abe78b1e50ac" datatype="html">
+        <source>Query</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c32700dc008d1054d1e7db5ade4dd8a5916ec58d" datatype="html">
+        <source>Refresh Data</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3e2a583f531f7dd9f089f68a6968e444c372c3e8" datatype="html">
+        <source>Preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/header/designer-header.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/toolbar/designer-toolbar.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4726a93992a02ce28d86464c02c974f39217dbcf" datatype="html">
+        <source>
+      Add some fields to visualize, by dragging, or using the add button
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/pivot/designer-pivot.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/chart/designer-chart.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d44deb5b0dc02f1a00e9a4a961774720ef0ba9d0" datatype="html">
+        <source>
+        At least one data field needs to be selected
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/pivot/designer-pivot.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1dcb22f1a8c6576b51ecec3a226668b4794e4f97" datatype="html">
+        <source>
+      There is no data for the fields selected
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/pivot/designer-pivot.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/chart/designer-chart.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/report/designer-report.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3e66473d827c51133ed175a27cb6e100439dc2a2" datatype="html">
+        <source>
+      At least one data field needs to be selected
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/chart/designer-chart.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9ca48da4c1028af97a3027abc6beb88e75d53d4b" datatype="html">
+        <source>
+      Selects some fields and click refresh data
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/report/designer-report.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2dd4691c8992c63cd7883bacfcc5caaac3a5498f" datatype="html">
+        <source>
+          Click refresh data
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/report/designer-report.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="564bebb214ffbf03d33f5183399929d578ecd401" datatype="html">
+        <source>
+          There are no fields for this criteria
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/settings/single/designer-settings-single-table.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8ab27db707932ffe53d827ec73fa668b55d7c7aa" datatype="html">
+        <source>
+      Available fields
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/sort/designer-sort.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d8063f9749f13c3232918269145e81805ce48fe0" datatype="html">
+        <source>
+      Sorted fields
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/sort/designer-sort.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="75a62761bd05415ac769b5713f2e14046fc3ed8e" datatype="html">
+        <source>
+          Add fields to sort, by dragging, or using the add button
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/designer/sort/designer-sort.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f56418ab5f0e51dba8b1cf2e2df4c35504d8152e" datatype="html">
+        <source>Publish Analysis</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-publish/analyze-publish-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2bffb1c3c6ed2448aeb3a54d50550425707390b2" datatype="html">
+        <source>Publish to</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-publish/analyze-publish-dialog.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8d6ffe14e44d998d5af4c6e9524e6b21d6ae7fb5" datatype="html">
+        <source>
+      Publish
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-publish/analyze-publish-dialog.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4844be64a6d68fe3e2c733cf412ae233cca77a89" datatype="html">
+        <source>Schedule Analysis</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5670ffef2180c4d3777ec8d1ab0bf1305f7e2343" datatype="html">
+        <source>Output Format</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9828629b91849f03d644c11c43e37135477b9f01" datatype="html">
+        <source>Publish to Email</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81bd4b635826153cb0e1bc39a967e2c18c3e2b6d" datatype="html">
+        <source>Publish to FTP</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81ef51065d764c21e8604a15937a948ee6772915" datatype="html">
+        <source>Invalid Email-Id Found: Please provide valid Email-Id&apos;s
+        in list</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a06efbe0405430631b8b77d96f5155ff236bb450" datatype="html">
+        <source>Please enter valid Email ids or Select option for Publish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="799f3fbd40cce020b9fddd0135237d5350bfdebe" datatype="html">
+        <source>Please Select a valid Schedule</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="84cdacc2071b0e7b64b650bb61290f3ae9821788" datatype="html">
+        <source>Remove
+      Schedule</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f8a36c715d1e19c99b49bd2b12887f2c79c77d54" datatype="html">
+        <source>
+      Schedule
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/publish/dialog/analyze-schedule/analyze-schedule-dialog.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="92a8c12169ee399b24e5ac9bcd8e279220976d3a" datatype="html">
+        <source>New Analysis</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/new-dialog/analyze-new-dialog.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7c0a2d194e1f855a3059617e6a1c77d339061eda" datatype="html">
+        <source>What would you like to analyze?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/new-dialog/analyze-new-dialog.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b32372819737150f0564601c3ac0c4c00483a805" datatype="html">
+        <source>How would you like to analyze?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/new-dialog/analyze-new-dialog.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e0fba9e320c4ff977b631a5cbfcc0fd7dfb1e5b5" datatype="html">
+        <source>Create Analysis</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/new-dialog/analyze-new-dialog.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="29d73d20dd2a3f56d37590c43c80474ed223eea9" datatype="html">
+        <source>List view</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/analyze-view.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0254cc33f598d69eb733f83d8af7ab79c87792b9" datatype="html">
+        <source>Card view</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/analyze-view.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c450e5f5cccd8e68df8f2ff21b5662eb034bbcc0" datatype="html">
+        <source>ANALYSIS</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/analyze-view.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="747c49e3562e29e290384e25c50f3b1fbbb31336" datatype="html">
+        <source>Analysis Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/executed-view/executed-view.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="459447e5ecdc35e5a709da77d4df67637b94096c" datatype="html">
+        <source>Previous Versions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/executed-view/executed-view.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f54b6f09b390d5ade0e354f6c7d4743c10a315cc" datatype="html">
+        <source>Executing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/executed-view/executed-view.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="28f86ffd419b869711aa13f5e5ff54be6d70731c" datatype="html">
+        <source>Edit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/executed-view/executed-view.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="11e8d640bae242b91d2b49e0cebf335ea7b6d64e" datatype="html">
+        <source>Fork &amp; Edit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/executed-view/executed-view.component.html</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4d43e63e19e8ddece9359c2d1f03416433996bf1" datatype="html">
+        <source>This analysis hasn&apos;t been been executed yet. Execute it now?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/executed-view/executed-view.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c6c0f4ef382d79c31c6b5acda2bac8a6a95b62bd" datatype="html">
+        <source>
+              Execute
+            </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/executed-view/executed-view.component.html</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="71614ed5cfd3c189fbe278cfd17b491b3c691c09" datatype="html">
+        <source>No matching results</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/card-view/analyze-card-view.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="68f32cb58305b3b2c517ad598b33e5bf35539a2a" datatype="html">
+        <source>There are no Analyses of selected type.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/card-view/analyze-card-view.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="35c348bb9cd52c3ce0b5447859378dc266b463a6" datatype="html">
+        <source>There are no Analyses for this category.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/card-view/analyze-card-view.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d9e8bec643f2cab92c4a48164857994f74e2e6a0" datatype="html">
+        <source>
+        EXECUTING
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/list-view/analyze-list-view.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3ac986edda11d05d02f9fab5b2f92732670f5435" datatype="html">
+        <source>Fork Analysis</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/list-view/analyze-list-view.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/card/analyze-card.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <note priority="1" from="description">Fork Analysis</note>
+      </trans-unit>
+      <trans-unit id="798ade44414b0c3349a4cc52684ad001bff066ce" datatype="html">
+        <source>
+    EXECUTING
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/analyze/view/card/analyze-card.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f8cf612cd4417e9830bd4dfb57bf030c35b6f908" datatype="html">
+        <source>Data Sets</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/data-objects-view/data-objects-page.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="941487f5178465b9eb768ca8d3f147e7f67b837d" datatype="html">
+        <source>Data Pods</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/data-objects-view/data-objects-page.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cc37d33eafc9af872009fa20c74e728a3e1a1e98" datatype="html">
+        <source>Auto Refresh</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/data-objects-view/data-objects-page.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7f6ac2bedf507ae6a57052aa651c0699aeac3beb" datatype="html">
+        <source>+ Dataset</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/data-objects-view/data-objects-page.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3e22adcbc14ce0a4a83623dc2e0bad57f81b4a2e" datatype="html">
+        <source>NO MATCHING RESULTS</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/data-objects-view/datasets-card/datasets-card-page.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/data-objects-view/datapods-card/datapods-card-page.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f732c304c7433e5a83ffcd862c3dce709a0f4982" datatype="html">
+        <source>Next</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="680d5c75b7fd8d37961083608b9fcdc4167b4c43" datatype="html">
+        <source>Previous</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4367b88723af3f4e0f3cd402b47902b5515a25b2" datatype="html">
+        <source> Next</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f67a7a8bf9554eba45d26c2b3635a3d20f3de147" datatype="html">
+        <source>Selected Files</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/select-rawdata/select-rawdata.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d4dc044b3ee4d8c2bc9abe3a5ed0b80b9f02ec8a" datatype="html">
+        <source>Describe Your Dataset</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="31bc8eebf83676a9b6dab256a7bae2b20030399d" datatype="html">
+        <source>
+                      Dataset Name is
+                      <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+                    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fd89543ba6c84cd16360eb5072ba7e1c9872dc3b" datatype="html">
+        <source>
+                      <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/> Only alphabets, numbers are allowed
+                      <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+                    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1e273ce379943dc02ac62efba623811f75ee711b" datatype="html">
+        <source>
+                      Dataset description is
+                      <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+                    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="001259df70882a32c734f9a15c04ded19de835cc" datatype="html">
+        <source>ADD</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/create-datasets.component.html</context>
+          <context context-type="linenumber">145</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6b74467987623883f8365d202c2173d9e0271458" datatype="html">
+        <source>New Folder</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/createFolder-dialog/createfolder-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="46de2f3a7d2a86523068f6a83e9e772c2a7ec348" datatype="html">
+        <source>
+        Folder Name is
+        <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/createFolder-dialog/createfolder-dialog.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b02782eccebcc15a75c06a70fa22abc5c8bd3610" datatype="html">
+        <source>
+        <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/> Only alphabets, numbers are allowed
+        <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/createFolder-dialog/createfolder-dialog.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7e6c975ebea8b5f8b120905ca7acf9f8edf59d8e" datatype="html">
+        <source>OK</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/createFolder-dialog/createfolder-dialog.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/semantic-management/semantic-details-dialog/semantic-details-dialog.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0c173873bb05697300d2b8f72f28b0a6577756d8" datatype="html">
+        <source>Staging Area</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/select-rawdata/select-rawdata.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="20bfb927a41594dfb6b29588ba17981f10eec9f8" datatype="html">
+        <source>Upload File</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/select-rawdata/select-rawdata.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="63e50309b740a7ea5daf20f3998c17bcb9df586b" datatype="html">
+        <source>
+        <x id="START_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;mat-icon&gt;"/><x id="CLOSE_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;/mat-icon&gt;"/>
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/create-datasets/select-rawdata/select-rawdata.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1f9bf4de286de25ec5c220a7e47d117719d00308" datatype="html">
+        <source>
+          <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/> Only alphabets, numbers are allowed
+          <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/sql-executor/dataset-details-dialog/details-dialog.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="70a67e04629f6d412db0a12d51820b480788d795" datatype="html">
+        <source>Create</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/sql-executor/sql-executor.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/semantic-management/validate/validate-semantic.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f5aca8a3e18339a90cae10e6bd937afff777659c" datatype="html">
+        <source>VALIDATE</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/semantic-management/create/create-semantic.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="62170dd0c2bc5e3e67753770487fb8dbfdde0337" datatype="html">
+        <source>Enter Datapod Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/semantic-management/semantic-details-dialog/semantic-details-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d6213db19252fe6e89f9a24df667ecbdffe329d7" datatype="html">
+        <source>
+                Datapod Name is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+            </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/semantic-management/semantic-details-dialog/semantic-details-dialog.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="047f50bc5b5d17b5bec0196355953e1a5c590ddb" datatype="html">
+        <source>Update</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/semantic-management/update/update-semantic.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bed4ec9e61da858feee46cac369054eb2cb52ddb" datatype="html">
+        <source>Create Data Channel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6a553b17535eba6c4a943c942474a71a05e28e65" datatype="html">
+        <source>Name Your Channel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a0bfd486ac9a14f254bf4d3668ce2268f84ef718" datatype="html">
+        <source>
+                Channel Name is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9a541ec1a4319fffc16ad3b3ab2c2b6d251a829d" datatype="html">
+        <source>Hostname</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e3cfa9ccf053aa7f7a4629a8a800bc6856965630" datatype="html">
+        <source>
+                Host Name is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eb7096be937ec74616991ccb4e156f395afbf1cd" datatype="html">
+        <source>Port Number</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9f51c4a4b2986b5b1fb7571fe750d70d1832789c" datatype="html">
+        <source>
+                Port Number is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8f969c655b3fbe4fba7e277caf4cd2c459f9fca5" datatype="html">
+        <source>Access Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9b1d5e95f6bdcfb4b737413f5fa157e0dcb103d5" datatype="html">
+        <source>Read</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5708fc1774d24895748ed76b44f32090a4b8693d" datatype="html">
+        <source>Read &amp; Write</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="08c74dc9762957593b91f6eb5d65efdfc975bf48" datatype="html">
+        <source>Username</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b3fccaf36ddec0e045727046b79454afac84657f" datatype="html">
+        <source>
+                Username is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c32ef07f8803a223a83ed17024b38e8d82292407" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="818821342547ed04a25559120aff48c863a89c5a" datatype="html">
+        <source>
+                Password is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dff2f2d12626728b897a453b87a1a2974afc25d2" datatype="html">
+        <source>Description about the source</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a8c05427590518f0089bc717d8e79c751a9dff74" datatype="html">
+        <source>
+            <x id="START_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;mat-icon&gt;"/><x id="CLOSE_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;/mat-icon&gt;"/> Test Connectivity
+          </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/createSource-dialog/createSource-dialog.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bf470a1ca8dc08bb7f5431aec422ef511d9f6578" datatype="html">
+        <source>Create Route</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="64ee4e929f9aa09246bded198eaecac25afa7f40" datatype="html">
+        <source>Route Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="117fac896ba49ed92755e2f3a391eed86f8e32d1" datatype="html">
+        <source>
+                Route Name is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f45b6aa202377bdd8bc6eea0f309df5abd2a1040" datatype="html">
+        <source>File Pattern</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f0573820a71919412d08e5db49df955f63d28155" datatype="html">
+        <source>
+                File Pattern is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="93c950a90c049e030a25a1ca7aff9de9e5db38cc" datatype="html">
+        <source>Source Location</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cfc520d3c518e98f7175242141f355ffe4c81848" datatype="html">
+        <source>
+                Source Location is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="42744b193cff72fe8539ca2102169e12af44c1a5" datatype="html">
+        <source>Destination Location</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eefef57f3a1c647a644031674110a251574d2d53" datatype="html">
+        <source>
+                Destination Location is
+                <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>required<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+              </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dbd7cc0cf97f5ac501c50f62226a6ecc50ef482e" datatype="html">
+        <source>Description about the route</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/create-route-dialog/create-route-dialog.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="18c18c5d61f92ef5c3caa37df00fc514fef3d90c" datatype="html">
+        <source>Data Sources</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6229a4bfd2322e027a071e01f9963808a02a5f7d" datatype="html">
+        <source>+ Source</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9571e83a2226f412e9f773ebacf792554930b785" datatype="html">
+        <source>Test Connectivity</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">149</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6bc5ceff63b7ed870c9ab3ba411e85127981de84" datatype="html">
+        <source>Edit Source</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3842cb36ecc86e5cf3dacf95844cae29a60d8b39" datatype="html">
+        <source>Delete Source</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1dd353a63f16e4fcb602c3a840d8c1a12e966803" datatype="html">
+        <source>+ Route</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="30a3b4f6951e1f6ff000b0f71ed983a028950080" datatype="html">
+        <source>Host Name : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0769837c351dcdbeb5dc209f5043e70b67a49b90" datatype="html">
+        <source>Port No : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b6556e0dfe072371a6bd41167d62c69b8f0cd073" datatype="html">
+        <source>Access Type : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2008fdc8aed65bec1842b92ecde5f8d7cabb5bee" datatype="html">
+        <source>Description : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="513bf64c496ea317cdc4532a7ca74ffc240e6612" datatype="html">
+        <source>Created By : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="86eccf074eef0d8fbcf4261ca5daa7739de05bcc" datatype="html">
+        <source>Created Date : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="adf09dccdebf532bc03b3618371366d95d32079b" datatype="html">
+        <source>User Name : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="183e0355bdf21fdc12eeedfb6cca9d98f0694b8c" datatype="html">
+        <source>Password : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9e4dde4feeda283ed8eed7b2e0e1e2cde0de4996" datatype="html">
+        <source>Edit Route</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0ffabc2217e1228500008713a71a8f85f6d9aebf" datatype="html">
+        <source>Delete Route</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/workbench/components/datasource-management/datasource-page.component.html</context>
+          <context context-type="linenumber">158</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0c31e13b1d17508475e3d55a865b4403fc563fad" datatype="html">
+        <source>
+      Add New User
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/user/edit-dialog/user-edit-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cfc8471c3db83d7924cbd816e3202f48593f7b2a" datatype="html">
+        <source>
+      Edit User
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/user/edit-dialog/user-edit-dialog.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="599c3962e1e4e03c5c3b34a46fb1a43ddc2eb924" datatype="html">
+        <source>
+      Create User
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/user/edit-dialog/user-edit-dialog.component.html</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4dc1cffbe6d7770b9dfad393035eb625487ff837" datatype="html">
+        <source>
+      Add New Role
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/role/role-dialog/role-edit-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ebdad154bdfbf0ab40b3f36e3286ddd0efb40bf3" datatype="html">
+        <source>
+      Edit Role
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/role/role-dialog/role-edit-dialog.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81b97b8ea996ad1e4f9fca8415021850214884b1" datatype="html">
+        <source>Status</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/role/role-dialog/role-edit-dialog.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="de979d383858b21c26a307008ca4f4de629836d2" datatype="html">
+        <source>Role Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/role/role-dialog/role-edit-dialog.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ad5c815be6410c211557caf4711ed1b4f8806541" datatype="html">
+        <source>
+      Create Role
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/role/role-dialog/role-edit-dialog.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="046b9bf74b712d1f93db493b773b78f690d20fe4" datatype="html">
+        <source>
+      Add New Privilege
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="469f1b5c5e2162751c6bbfc6d2c96de405284747" datatype="html">
+        <source>
+      Edit Privilege
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d3cbff754f1c148f3fec696edd246993aea35b01" datatype="html">
+        <source>Product</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c36a66f2107e8da5371ebc9d15c2008dff567f46" datatype="html">
+        <source>Role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c10deee5463bd5458eca86cc2e4a2b87daf41bf1" datatype="html">
+        <source>Module</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="607de17c2a755f65775881c19e276e7c933bcf94" datatype="html">
+        <source>Category</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="69da6987f0f6e659223c8e510d00220e4f1da822" datatype="html">
+        <source>
+      Create Privilege
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/edit-dialog/privilege-edit-dialog.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b7239271c6b044be8c5947ee8b68a46386d8c8a3" datatype="html">
+        <source>Sub-Categories</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/privilege-editor/privilege-editor.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fa5002e6d44382622a9752e361de52c3e81b9093" datatype="html">
+        <source>Access</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/privilege-editor/privilege-editor.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e6deb306d99c3da64ee4436557039fbcbc45fea2" datatype="html">
+        <source>Privileges</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/privilege-editor/privilege-editor.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dfc3c34e182ea73c5d784ff7c8135f087992dac1" datatype="html">
+        <source>All</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/privilege/privilege-row/privilege-row.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8d7a3e57c65aa75c9a50096b971c1ce09caa29bd" datatype="html">
+        <source>
+      Add New Category or Sub-Category
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c2fada41df0506b0a07bad9b06ad0163b30fe673" datatype="html">
+        <source>
+      Edit Category
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ce8004377718c876ffc6d957aa234f129aeb3803" datatype="html">
+        <source>Select one of the sub-categories to edit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="69cc05b2d73876291080467a38ff8d5e8aab3aaf" datatype="html">
+        <source>
+      Create Category
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-dialog/category-edit-dialog.component.html</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="28d4a427fdaf59b4a4def720994e3bab387d4984" datatype="html">
+        <source>
+    Delete Category
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-delete-dialog/category-delete-dialog.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="372c32773c92c7103c06ec18b2bbe2da879555c3" datatype="html">
+        <source>
+    Please delete the below sub-categories before deleting the category.
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-delete-dialog/category-delete-dialog.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e7453693c812241b8c76e10d7e630981720a999a" datatype="html">
+        <source>
+    This Category cannot be deleted.
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-delete-dialog/category-delete-dialog.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b861ed5da3dd3eb5d9c310853179eafc152d7b68" datatype="html">
+        <source>
+    Delete
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/category/category-delete-dialog/category-delete-dialog.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="21f198357e5a839f03bf3c2360c8f3fa7c3ef7d0" datatype="html">
+        <source>
+          Metric
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/export/admin-export-view.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d6becd6d26383f49441a35fb6d7d94fe686249ff" datatype="html">
+        <source>
+          Metrics
+        </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/export/admin-export-view.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3ae765437953198054773ed4460b88bd8ec1bafe" datatype="html">
+        <source>
+    Export
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/export/admin-export-view.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="39a77b3ffa1cb122acdf1cccb11e52dde3f02e68" datatype="html">
+        <source>
+      All
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/export/list/admin-export-list.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/list/admin-import-list.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1eabe3d0957d5aae343cc35050eb0d33602cefaf" datatype="html">
+        <source>Import Analysis</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c69f5649e6991b29df58ae496446b5495e5e7fe3" datatype="html">
+        <source>
+        Select package file(s)
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ad07148ed6fda3bfd227b1febefe28b69842523e" datatype="html">
+        <source>
+        Browse
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="90ce34a61f892f5417d9079b48424fb65a4643b0" datatype="html">
+        <source>
+        to import into
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e70f1edbda2661115f9d5e093f78985ca34f951b" datatype="html">
+        <source>
+    Package file(s) details
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cbae3517bf4b22d813c175d34edc8c9b401e0ea2" datatype="html">
+        <source>
+      Analyses to import
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ed231fa9758a92d76348cd85773d97296eba4df5" datatype="html">
+        <source>
+        Import
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1909501a342847f8b8455cfc4dd74a229ef6b1a1" datatype="html">
+        <source>
+        Export Error Logs
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/admin-import-view.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1db5fe04e67b02b313565810629f7a59e8f65de1" datatype="html">
+        <source>
+    [OVERWRITE]
+    </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/list/admin-import-list.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b87e7abf15926adeca15e38e887a4c21121c9587" datatype="html">
+        <source>Remove file</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/modules/admin/import/file-list/admin-import-file-list.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">Remove file</note>
+      </trans-unit>
+      <trans-unit id="b4831585c61e1e1884570f3125c527cc567b4f8e" datatype="html">
+        <source>
+        Change
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/components/password-change/password-change.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

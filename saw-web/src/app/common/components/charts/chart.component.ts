@@ -1,4 +1,12 @@
-import { Component, ElementRef, Input, ViewChild, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+  OnInit,
+  AfterViewInit,
+  OnDestroy
+} from '@angular/core';
 
 import * as Highcharts from 'highcharts/highcharts';
 import * as Highstock from 'highcharts/highstock';
@@ -31,14 +39,19 @@ export const CHART_SETTINGS_OBJ = [
 ];
 
 @Component({
+  // tslint:disable-next-line:component-selector
   selector: 'chart',
   template: `<div #container></div>`
 })
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() updater: any;
-  @Input() isStockChart: boolean;
-  @Input() enableExport: boolean;
-  @ViewChild('container') container: ElementRef;
+  @Input()
+  updater: any;
+  @Input()
+  isStockChart: boolean;
+  @Input()
+  enableExport: boolean;
+  @ViewChild('container')
+  container: ElementRef;
 
   public highcharts: any = Highcharts;
   public highstocks: any = Highstock;
@@ -76,7 +89,9 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateOptions(options) {
-    if (!options) { return; }
+    if (!options) {
+      return;
+    }
     // set the appropriate config based on chart type
     this.cType = this.isStockChart ? 'highStock' : options.chart.type;
     this.config = defaultsDeep(
@@ -169,7 +184,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         'xAxis.0.title.text',
         get(this.config, 'xAxis.title.text')
       ); // Highstocks adding a default xAxis settings objects with title & categories.
-       // So have to populate them inorder the title to display.
+      // So have to populate them inorder the title to display.
       set(
         this.config,
         'xAxis.0.categories',
