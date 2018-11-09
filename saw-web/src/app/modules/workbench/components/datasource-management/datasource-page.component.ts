@@ -188,6 +188,13 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
   }
 
+  testRoute(routeData) {
+    const routeID = routeData.bisRouteSysId;
+    this.datasourceService.testRoute(routeID).subscribe(data => {
+      this.showConnectivityLog(data);
+    });
+  }
+
   showConnectivityLog(logData) {
     this.snackBar.openFromComponent(TestConnectivityComponent, {
       data: logData,

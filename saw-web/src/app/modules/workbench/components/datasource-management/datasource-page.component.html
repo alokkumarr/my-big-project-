@@ -148,7 +148,7 @@
             <div *dxTemplate="let data of 'actionsTemplate'">
               <div fxHide.lt-lg="true">
                 <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Connectivity"
-                  (click)="testConnection()">
+                  (click)="testRoute(data.data)">
                   <mat-icon fontIcon="icon-query-mode"></mat-icon>
                 </button>
                 <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Edit Route"
@@ -166,7 +166,7 @@
                 <mat-icon fontIcon="icon-action-solid"></mat-icon>
               </button>
               <mat-menu #datapodmenu="matMenu">
-                <button mat-menu-item (click)="testConnection()">
+                <button mat-menu-item (click)="testRoute(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-query-mode"></mat-icon>
                   <span>Test Connectivity</span>
                 </button>
