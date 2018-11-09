@@ -68,7 +68,11 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   val sqlDefinition = (definition \ "query").extractOrElse[String]("")
   val sqlManual = (definition \ "queryManual").extractOrElse[String]("")
   val metricName = (definition \ "metricName").extractOrElse[String]("")
-  val analysisKey = "AN_" + System.currentTimeMillis()
+  var analysisKey :String ="AN_" + System.currentTimeMillis()
+   def setAnalysisKey (analysisKey : String): Unit =
+  {
+    this.analysisKey = analysisKey;
+  }
 
   val sql = if (sqlRuntime != null && !sqlRuntime.isEmpty) sqlRuntime  else if (sqlManual != "") sqlManual else sqlDefinition
 
@@ -126,17 +130,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   }
   var lastSQLExecMessage : String = null
 
-  /**
-    * Wrapper for base method to execute SQL statement and load (materialize) limited amount of data
-    *
-    * @param limit - number of rows to materialize, it should be less or equal value configured in application configuration file.
-    * @return
-    */
-  def executeSQL(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
-    val (llastSQLExecRes, llastSQLExecMessage) = executeAndGetData(analysisKey, sql, limit)
-    lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
-    (lastSQLExecRes, lastSQLExecMessage)
-  }
+
 
   /**
     * Wrapper for base method to execute SQL statement, the method does not materialized data
@@ -164,55 +158,19 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
 
   def getExecutionData :java.util.List[java.util.Map[String, (String, Object)]] = getData(analysisKey)
 
-
-  def getAllData : Unit =  materializeDataToList(analysisKey)
-  def getIterator : Unit =  materializeDataToIterator(analysisKey)
-
-  def getPreview(limit: Int = DLConfiguration.rowLimit) : Unit =  materializeDataToList(analysisKey, limit )
-
-  /**
-    * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
-    *
-    * @param rl - rows limit , it should be less or equal value configured in application configuration file.
-    * @param out - Hadoop output stream is used to print AnalysisResult descriptor into it.
-    *            can be used for debugging
-    */
-  def executeAndSave(out: OutputStream, rl: Int) : Unit = _executeAndSave(out, rl)
-
-
-  /**
-    * Base method to execute SQl statement, print AnalysisResult to output stream.
-    *
-    * @param out
-    * @param rowLim
-    */
-  private def _executeAndSave(out: OutputStream = null, rowLim: Int = DLConfiguration.rowLimit) : Unit =
-  {
-    loadObjects
-    if (!isDataLoaded) {
-      m_log error "Could not load data, see underlying exception"
-      return
-    }
-    executeSQL(rowLim)
-    createAnalysisResult(resId, out,null)
-  }
-
   def getDataIterator : java.util.Iterator[java.util.HashMap[String, (String, Object)]] = dataIterator(analysisKey)
 
 
   def printSample(out: OutputStream) : Unit =
   {
-
     if (!isDataLoaded) {
       m_log error "Could print sample, data were not loaded"
       return
     }
-
     val sample = getDataSampleAsString(analysisKey)
     if (out != null && sample != null)
       out.write(sample.getBytes)
   }
-
 
   /**
     * The method creates AnalysisResult node:
@@ -223,7 +181,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   def createAnalysisResult(resId: String = null, out: OutputStream = null, executionType :String): Unit = {
 
     createAnalysisResultHeader(resId)
-    saveData(analysisKey, outputLocation, outputType)
+   // saveData(analysisKey, outputLocation, outputType)
     finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
       JField("execution_finish_ts", JInt(finishedTS)),
@@ -233,7 +191,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     ))
     resultNode.setDescriptor(compact(render(newDescriptor)))
 
-    resultNode.addObject("dataLocation", outputLocation, getSchema(analysisKey))
+    resultNode.addObject("dataLocation", outputLocation, "")
     resultNode.update()
 
     if (out != null) {
@@ -258,11 +216,10 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   def createAnalysisResultForOneTime(resId: String): Unit = {
     val previewLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(initOutputLocation)+
       File.separator+ "preview-"+resId
-    saveData(analysisKey,previewLocation , outputType)
+    saveData(analysisKey, previewLocation, outputType)
     finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     m_log debug("finishedTS:"+ finishedTS)
   }
-
 
   /**
     * The method creates AnalysisResult node:
@@ -271,7 +228,6 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     *
     */
   def completeAnalysisResult: Unit = {
-    saveData(analysisKey, outputLocation, outputType)
     finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
       JField("execution_finish_ts", JInt(finishedTS)),
@@ -308,7 +264,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
       return (lastSQLExecRes, m)
     }
 
-    if (getDataset(analysisKey) == null) throw new DAException( ErrorCodes.NoResultToSave, analysisKey)
+   // if (getDataset(analysisKey) == null) throw new DAException( ErrorCodes.NoResultToSave, analysisKey)
 
     var nodeExists = false
     try {
@@ -348,7 +304,6 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     m_log debug s"Analysis result creation: $res ==> $msg"
     (res, msg)
   }
-
 }
 
 object AnalysisNodeExecutionHelper{
@@ -422,5 +377,4 @@ object AnalysisNodeExecutionHelper{
     else
       throw  new Exception("Incorrect call the method should be called only for ES data")
   }
-
 }
