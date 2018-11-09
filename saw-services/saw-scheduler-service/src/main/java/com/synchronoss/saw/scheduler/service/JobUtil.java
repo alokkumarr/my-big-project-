@@ -1,7 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
 import com.synchronoss.saw.scheduler.config.PersistableCronTriggerFactoryBean;
-import com.synchronoss.saw.scheduler.modal.BISSchedulerJobDetails;
+import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -60,7 +60,7 @@ class JobUtil {
      * @return JobDetail object
      */
     protected static JobDetail createBatchIngestionJob(Class<? extends QuartzJobBean> jobClass, boolean isDurable,
-                                         ApplicationContext context, BISSchedulerJobDetails job, String jobGroup){
+                                         ApplicationContext context, BisSchedulerJobDetails job, String jobGroup){
         JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
         factoryBean.setJobClass(jobClass);
         factoryBean.setDurability(isDurable);

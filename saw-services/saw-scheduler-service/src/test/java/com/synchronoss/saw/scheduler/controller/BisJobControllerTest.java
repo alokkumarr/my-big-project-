@@ -1,7 +1,6 @@
 package com.synchronoss.saw.scheduler.controller;
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,29 +18,27 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
 import com.synchronoss.saw.scheduler.SAWSchedulerServiceApplication;
-import com.synchronoss.saw.scheduler.modal.BISSchedulerJobDetails;
-import com.synchronoss.saw.scheduler.service.BisServiceImplTest;
+import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.service.JobService;
 
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BisServiceImplTest.class)
+@SpringBootTest(classes = BisJobControllerTest.class)
 @ContextConfiguration(classes = SAWSchedulerServiceApplication.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class BISJobControllerTest {
+public class BisJobControllerTest {
 
 	//@Autowired
 	private MockMvc mockMvc;
 	@Autowired
-	JobService<BISSchedulerJobDetails> bisService;
+	JobService<BisSchedulerJobDetails> bisService;
 	
 	 String incomingRequest;
 	 String scheduleKeysRequest;
 	 @Autowired
-	     BISJobController bisJobController;
+	     BisJobController bisJobController;
 	  
     @Before
     public  void setup() throws Exception {

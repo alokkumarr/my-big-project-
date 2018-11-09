@@ -30,7 +30,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import com.synchronoss.saw.scheduler.job.BisCronJob;
 import com.synchronoss.saw.scheduler.job.BisSimpleJob;
-import com.synchronoss.saw.scheduler.modal.BISSchedulerJobDetails;
+import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 
 
@@ -38,7 +38,7 @@ public class BisServiceImplTest {
 
 	private BisJobServiceImpl bisJobService;
 	
-	private BISSchedulerJobDetails schJobDetail ;
+	private BisSchedulerJobDetails schJobDetail ;
 	private ScheduleKeys scheduleKeys;
 	private JobKey jobKey;
 	private JobDetail jobDetail;
@@ -52,7 +52,7 @@ public class BisServiceImplTest {
 		/**
 		 * Prepare request object
 		 */
-		schJobDetail = new BISSchedulerJobDetails();
+		schJobDetail = new BisSchedulerJobDetails();
 		schJobDetail.setChannelType("Test");
 		schJobDetail.setCronExpression("0 0 12 * * ?");
 		schJobDetail.setDescription("");

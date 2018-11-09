@@ -2,7 +2,6 @@ package com.synchronoss.saw.scheduler.job;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -12,8 +11,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
-
-import com.synchronoss.saw.scheduler.modal.BISSchedulerJobDetails;
+import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 
 public class BisSimpleJobTest {
 
@@ -25,7 +23,7 @@ public class BisSimpleJobTest {
 		JobDetail jobDetail = Mockito.mock(JobDetail.class);
 		JobKey jobKey = new JobKey("test");
 		JobDataMap jobDataMap = Mockito.mock(JobDataMap.class);
-		BISSchedulerJobDetails bisJobDetails = Mockito.mock(BISSchedulerJobDetails.class);
+		BisSchedulerJobDetails bisJobDetails = Mockito.mock(BisSchedulerJobDetails.class);
 		
 		
 		
