@@ -10,3 +10,4 @@
     - saw-scheduler
     - saw-storage-proxy
     - saw-semantic
+    - saw-batch-ingestion

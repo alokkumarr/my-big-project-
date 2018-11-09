@@ -209,16 +209,14 @@ Execute the following steps to install XDF-NG:
 
 ==== Installing
 
-Execute the following steps to install RTPS:
+RTPS is installed as part of SIP.  Ensure the SIP environment
+configuration (`saw-config`) has an entry for RTPS:
 
-. Get the RTPS release package (named `bda-rtps-*.rpm`)
+        [sip-rtps]
+        host
 
-.  Execute the RPM package in one of the MAPR Node as below to install the RTPS package
-
-        rpm -ivh bda-rtps-*.rpm
-
-   RTPS will get installed and symbolic link will get created for location
-   in `/dfs/opt/bda/rtps-current`
+RTPS will get installed at the location `/opt/bda/sip-rtps` on the
+given host.
 
 ==== Upgrading
 

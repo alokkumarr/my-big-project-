@@ -8,6 +8,13 @@
     </parent>
     <artifactId>rtps-common</artifactId>
 
+    <dependencies>
+      <dependency>
+        <groupId>info.faljse</groupId>
+        <artifactId>SDNotify</artifactId>
+        <version>1.1</version>
+      </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
