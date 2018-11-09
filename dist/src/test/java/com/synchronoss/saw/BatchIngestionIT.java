@@ -22,6 +22,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
  */
+/**
+ * BatchIngestion integration tests temporarily ignored 
+ * due to build integration issues. This will be renabled
+ * with SIP - 5182  task.
+ * https://jira.synchronoss.net:8443/jira/browse/SIP-5182
+ * 
+ */
 @Ignore
 public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_CHANNEL = "channels";
