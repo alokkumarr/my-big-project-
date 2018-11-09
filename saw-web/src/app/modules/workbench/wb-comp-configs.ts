@@ -64,3 +64,66 @@ export const TYPE_CONVERSION = {
   decimal: 'double',
   timestamp: 'date'
 };
+
+export const CHANNEL_TYPES: any[] = [
+  {
+    name: 'SFTP',
+    uid: 'sftp',
+    imgsrc: 'assets/img/sftp.png',
+    supported: true
+  },
+  {
+    name: 'Amazon S3',
+    uid: 's3',
+    imgsrc: 'assets/img/s3.png',
+    supported: false
+  },
+  {
+    name: 'MAPR',
+    uid: 'mapr',
+    imgsrc: 'assets/svg/mapr.svg',
+    supported: false
+  },
+  {
+    name: 'Elastic Search',
+    uid: 'es',
+    imgsrc: 'assets/svg/elastic.svg',
+    supported: false
+  },
+  {
+    name: 'MariaDB',
+    uid: 'maridb',
+    imgsrc: 'assets/img/mariadb.jpg',
+    supported: false
+  },
+  {
+    name: 'HDFS',
+    uid: 'hdfs',
+    imgsrc: 'assets/img/hadoop.jpg',
+    supported: false
+  },
+  {
+    name: 'MySQL',
+    uid: 'mysql',
+    imgsrc: 'assets/svg/mysql.svg',
+    supported: false
+  },
+  {
+    name: 'SQL Server',
+    uid: 'sqlserver',
+    imgsrc: 'assets/img/sqlserver.png',
+    supported: false
+  },
+  {
+    name: 'MongoDB',
+    uid: 'mongodb',
+    imgsrc: 'assets/img/mongodb.png',
+    supported: false
+  },
+  {
+    name: 'JDBC',
+    uid: 'jdbc',
+    imgsrc: 'assets/img/jdbc.png',
+    supported: false
+  }
+];

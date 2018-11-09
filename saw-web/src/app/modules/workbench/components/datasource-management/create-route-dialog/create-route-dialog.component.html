@@ -1,0 +1,92 @@
+<mat-card class="createroute-dialog">
+  <mat-card-header>
+    <mat-card-title class="details-title">{{dialogTitle}}</mat-card-title>
+    <div fxFlex></div>
+    <button mat-icon-button color="warn" (click)="onCancelClick()">
+      <mat-icon fontIcon="icon-close"></mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content>
+    <mat-horizontal-stepper linear>
+      <ng-template matStepperIcon="edit">
+        <mat-icon fontIcon="icon-checkmark"></mat-icon>
+      </ng-template>
+      <ng-template matStepperIcon="done">
+        <mat-icon fontIcon="icon-checkmark"></mat-icon>
+      </ng-template>
+      <mat-step label="Route Details" [stepControl]="detailsFormGroup">
+        <form fxFlex fxLayout="row wrap" class="details-container" #sourceDetails novalidate [formGroup]="detailsFormGroup"
+          autocomplete="false">
+          <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+            <mat-form-field appearance="outline">
+              <mat-label i18n>Route Name</mat-label>
+              <input matInput name="routeName" formControlName="routeName" required />
+              <mat-error *ngIf="detailsFormGroup.controls.routeName.hasError('required')" i18n>
+                Route Name is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label i18n>File Pattern</mat-label>
+              <input matInput name="filePattern" formControlName="filePattern" required />
+              <mat-error *ngIf="detailsFormGroup.controls.filePattern.hasError('required')" i18n>
+                File Pattern is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </section>
+          <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
+          <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+            <mat-form-field appearance="outline">
+              <mat-label i18n>Source Location</mat-label>
+              <input matInput name="sourceLocation" formControlName="sourceLocation" required />
+              <mat-error *ngIf="detailsFormGroup.controls.sourceLocation.hasError('required')" i18n>
+                Source Location is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label i18n>Destination Location</mat-label>
+              <input matInput name="destinationLocation" formControlName="destinationLocation" required />
+              <mat-error *ngIf="detailsFormGroup.controls.destinationLocation.hasError('required')" i18n>
+                Destination Location is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </section>
+          <section fxFlex fxLayout="column" fxLayoutAlign="center center">
+            <mat-form-field style="width: 90%;" appearance="outline">
+              <mat-label i18n>Description about the route</mat-label>
+              <textarea matInput formControlName="description"></textarea>
+            </mat-form-field>
+          </section>
+        </form>
+        <mat-divider></mat-divider>
+        <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
+          <button mat-stroked-button color="primary" color="warn" (click)="onCancelClick()" i18n>Cancel</button>
+          <button mat-stroked-button color="primary" (click)="testConnection()" i18n>
+            <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
+          </button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="!detailsFormGroup.valid" i18n>Next</button>
+        </div>
+      </mat-step>
+      <mat-step label="Schedule">
+        <div style="height: 80%;">
+          <cron-job-schedular [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
+        </div>
+        <mat-divider></mat-divider>
+        <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
+          <button mat-raised-button color="primary" matStepperPrevious i18n>Previous</button>
+          <button mat-stroked-button color="primary" (click)="testConnection()" i18n>
+            <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
+          </button>
+          <button mat-raised-button color="primary" *ngIf="opType === 'create'" [disabled]="!detailsFormGroup.valid"
+            (click)="createRoute(detailsFormGroup.value)" i18n>Create</button>
+          <button mat-raised-button color="primary" *ngIf="opType === 'update'" [disabled]="!detailsFormGroup.valid"
+            (click)="createRoute(detailsFormGroup.value)" i18n>Update</button>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </mat-card-content>
+</mat-card>

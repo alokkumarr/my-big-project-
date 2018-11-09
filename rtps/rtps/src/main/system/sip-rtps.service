@@ -1,0 +1,15 @@
+[Unit]
+Description=SIP Real-time Processing Service
+
+[Service]
+Type=notify
+NotifyAccess=all
+ExecStart=/opt/bda/sip-rtps/bin/execute_rtps.sh \
+  /opt/bda/sip-rtps/conf/appl.conf
+Environment=rtps_wait=1
+SyslogIdentifier=sip-rtps
+User=mapr
+Restart=on-failure
+# Consider Java exiting from SIGTERM using exit status 143 to be
+# successful
+SuccessExitStatus=143

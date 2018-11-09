@@ -1,6 +1,7 @@
 package synchronoss.spark.drivers.rt;
 
 import com.typesafe.config.ConfigFactory;
+import info.faljse.SDNotify.SDNotify;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function0;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -94,6 +95,7 @@ public class RealTimeApplicationDriver {
                            String instanceName, String controlFilePath) throws Exception {
         logger.info("Staring application loop...");
         logger.info("Control file will be created created: " + controlFilePath);
+        notifyStartup();
         while (!jssc.awaitTerminationOrTimeout(timeout)) {
             // Check if shutdown request has been placed
             if(AppMonitoringInfo.checkForShutdown(controlFilePath, instanceName)){
@@ -102,6 +104,11 @@ public class RealTimeApplicationDriver {
                 System.exit(0);
             }
         }
+    }
+
+    private void notifyStartup() {
+        logger.info("Notifying service manager about start-up completion");
+        SDNotify.sendNotify();
     }
 
     private boolean checkConfiguration(com.typesafe.config.Config appConfig){

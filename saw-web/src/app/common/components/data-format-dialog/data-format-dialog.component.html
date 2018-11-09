@@ -39,6 +39,7 @@
                type="number"
                max="99"
                min="0"
+               autocomplete="off"
                placeholder="Decimal Precision"
                (ngModelChange)="onPrecisionChange($event)"
                [ngModel]="format.precision"/>
@@ -50,6 +51,7 @@
         <input matInput
                placeholder="Format"
                type="text"
+               autocomplete="off"
                disabled
                [value]="sample"/>
       </mat-form-field>
