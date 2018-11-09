@@ -5,10 +5,10 @@ spring:
     name: saw-sechduler-service
   #mariaDB (metadata) DB details
   datasource:
-    url: jdbc:mariadb://localhost:3306/saw_scheduler
-  username: root
-  password: 
-  driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:h2:mem:saw_scheduler
+  username: sa
+  password: sa
+  driver-class-name: org.h2.Driver
   max-active: 25
   testOnBorrow: true
   testOnConnect: true

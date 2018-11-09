@@ -39,7 +39,7 @@ public class BisJobController {
    */
   @RequestMapping(value = "schedule", method = RequestMethod.POST)
   public SchedulerResponse schedule(@RequestBody BisSchedulerJobDetails jobDetail) {
-    logger.info("JobController schedule() start here.");
+    logger.debug("JobController schedule() start here.");
 
     // Job Name is mandatory
     if (jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")) {
@@ -49,12 +49,12 @@ public class BisJobController {
     scheduleKeys.setGroupName(jobDetail.getJobGroup());
     scheduleKeys.setJobName(jobDetail.getJobName());
     // scheduleKeys.setCategoryId(jobDetail.getCategoryID());
-    logger.info("Check if job Name is unique");
+    logger.debug("Check if job Name is unique");
     if (!bisService.isJobWithNamePresent(scheduleKeys)) {
 
       if (jobDetail.getCronExpression() == null
           || jobDetail.getCronExpression().trim().equals("")) {
-        logger.info("Simple job ");
+        logger.debug("Simple job ");
         boolean status = bisService.scheduleOneTimeJob(jobDetail, BisSimpleJob.class);
         if (status) {
           return getServerResponse(ServerResponseCode.SUCCESS,
@@ -64,7 +64,7 @@ public class BisJobController {
         }
 
       } else {
-        logger.info("Cron Trigger ");
+        logger.debug("Cron Trigger ");
         boolean status = bisService.scheduleCronJob(jobDetail, BisCronJob.class);
         if (status) {
           return getServerResponse(ServerResponseCode.SUCCESS,
@@ -85,7 +85,7 @@ public class BisJobController {
   
   @RequestMapping(value = "unschedule", method = RequestMethod.POST)
   public void unschedule(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController unschedule() method");
+    logger.debug("JobController unschedule() method");
     bisService.unScheduleJob(schedule);
   }
   
@@ -97,7 +97,7 @@ public class BisJobController {
    */
   @RequestMapping(value = "delete", method = RequestMethod.POST)
   public SchedulerResponse delete(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController delete() method");
+    logger.debug("JobController delete() method");
 
     if (bisService.isJobWithNamePresent(schedule)) {
       boolean isJobRunning = bisService.isJobRunning(schedule);
@@ -126,7 +126,7 @@ public class BisJobController {
    */
   @RequestMapping(value = "pause", method = RequestMethod.POST)
   public SchedulerResponse pause(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController pause() method");
+    logger.debug("JobController pause() method");
 
     if (bisService.isJobWithNamePresent(schedule)) {
 
@@ -157,28 +157,28 @@ public class BisJobController {
    */
   @RequestMapping(value = "resume", method = RequestMethod.POST)
   public SchedulerResponse resume(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController resume() method");
+    logger.debug("JobController resume() method");
 
     if (bisService.isJobWithNamePresent(schedule)) {
       String jobState = bisService.getJobState(schedule);
 
       if (jobState.equals("PAUSED")) {
-        logger.info("Job current state is PAUSED, Resuming job...");
+        logger.debug("Job current state is PAUSED, Resuming job...");
         boolean status = bisService.resumeJob(schedule);
 
         if (status) {
           return getServerResponse(ServerResponseCode.SUCCESS, true);
         } else {
-          logger.info("Error occurred while resuming the job ");
+          logger.debug("Error occurred while resuming the job ");
           return getServerResponse(ServerResponseCode.ERROR, false);
         }
       } else {
-        logger.info("Job is not in PAUSED state");
+        logger.debug("Job is not in PAUSED state");
         return getServerResponse(ServerResponseCode.JOB_NOT_IN_PAUSED_STATE, false);
       }
 
     } else {
-      logger.info("Job doesn't exist");
+      logger.debug("Job doesn't exist");
       return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }
   }
@@ -191,7 +191,7 @@ public class BisJobController {
    */
   @RequestMapping(value = "update", method = RequestMethod.POST)
   public SchedulerResponse updateJob(@RequestBody BisSchedulerJobDetails jobDetail) {
-    logger.info("JobController updateJob() method ");
+    logger.debug("JobController updateJob() method ");
 
     // Job Name is mandatory
     if (jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")) {
@@ -238,9 +238,9 @@ public class BisJobController {
    * @param schedule schedule key
    * @return
    */
-  @RequestMapping(value = "jobs", method = RequestMethod.POST)
+  @RequestMapping(value = "jobs", method = RequestMethod.GET)
   public SchedulerResponse getAllJobs(@RequestBody FetchByCategoryBean schedule) {
-    logger.info("JobController getAllJobs() method");
+    logger.debug("JobController getAllJobs() method");
 
     List<Map<String, Object>> list =
         bisService.getAllJobs(schedule.getGroupkey(), schedule.getCategoryId());
@@ -255,7 +255,7 @@ public class BisJobController {
    */
   @RequestMapping(value = "fetchJob", method = RequestMethod.POST)
   public SchedulerResponse getJobDetails(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController getJobDetails() method");
+    logger.debug("JobController getJobDetails() method");
 
     // Job Name is mandatory
     if (schedule.getJobName() == null || schedule.getJobName().trim().equals("")) {
@@ -274,7 +274,7 @@ public class BisJobController {
    */
   @RequestMapping(value = "isJobRunning", method = RequestMethod.POST)
   public SchedulerResponse isJobRunning(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController isJobRunning() method");
+    logger.debug("JobController isJobRunning() method");
 
     boolean status = bisService.isJobRunning(schedule);
     return getServerResponse(ServerResponseCode.SUCCESS, status);
@@ -288,7 +288,7 @@ public class BisJobController {
    */
   @RequestMapping(value = "jobState", method = RequestMethod.POST)
   public SchedulerResponse getJobState(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController getJobState() method");
+    logger.debug("JobController getJobState() method");
 
     String jobState = bisService.getJobState(schedule);
     return getServerResponse(ServerResponseCode.SUCCESS, jobState);
@@ -302,7 +302,7 @@ public class BisJobController {
   
   @RequestMapping(value = "stop", method = RequestMethod.POST)
   public SchedulerResponse stopJob(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController stopJob() method");
+    logger.debug("JobController stopJob() method");
 
     if (bisService.isJobWithNamePresent(schedule)) {
 
@@ -334,7 +334,7 @@ public class BisJobController {
   
   @RequestMapping(value = "start", method = RequestMethod.POST)
   public SchedulerResponse startJobNow(@RequestBody ScheduleKeys schedule) {
-    logger.info("JobController startJobNow() method");
+    logger.debug("JobController startJobNow() method");
 
     if (bisService.isJobWithNamePresent(schedule)) {
 

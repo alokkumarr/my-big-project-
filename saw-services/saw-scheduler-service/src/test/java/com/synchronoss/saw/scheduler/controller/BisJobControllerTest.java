@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.controller;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 import org.junit.After;
 import org.junit.Assert;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,7 +29,7 @@ import com.synchronoss.saw.scheduler.service.JobService;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BisJobControllerTest.class)
 @ContextConfiguration(classes = SAWSchedulerServiceApplication.class)
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+//@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class BisJobControllerTest {
 
 	//@Autowired
@@ -128,9 +130,9 @@ public class BisJobControllerTest {
 	
 	@Test
 	public void getAllJobsTest() throws Exception {
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/bisscheduler/jobs")
-				.accept(MediaType.APPLICATION_JSON).content(scheduleKeysRequest).contentType(MediaType.APPLICATION_JSON);
-		// .header(HttpHeaders.LOCATION, "http://localhost/observe/dashboards/create");
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/bisscheduler/jobs")
+				.accept(MediaType.APPLICATION_JSON).content(scheduleKeysRequest).contentType(MediaType.APPLICATION_JSON)
+		 .header(HttpHeaders.LOCATION, "http://localhost/observe/dashboards/create");
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 		MockHttpServletResponse response = result.getResponse();
 		Assert.assertEquals(response.getStatus(),200);
