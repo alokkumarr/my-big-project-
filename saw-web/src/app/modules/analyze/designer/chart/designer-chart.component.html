@@ -38,7 +38,7 @@
 
   <chart [updater]="updateChart"
          *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA"
-         e2e="{{'chart-type:' + chartType}}"
+         [attr.e2e]="'chart-type:' + chartType"
          [options]="chartOptions"
          [isStockChart]="isStockChart"></chart>
 </div>

@@ -3,7 +3,8 @@ import { Analysis, Artifact } from '../../types';
 
 @Component({
   selector: 'executed-report-view',
-  templateUrl: 'executed-report-view.component.html'
+  templateUrl: 'executed-report-view.component.html',
+  styleUrls: ['./executed-report-view.component.scss']
 })
 export class ExecutedReportViewComponent {
   @Input('analysis')

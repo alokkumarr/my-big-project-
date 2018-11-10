@@ -2,6 +2,7 @@
   <mat-form-field>
     <input matInput
           placeholder="KPI Name"
+          autocomplete="off"
           formControlName="name"
           maxlength="25"
           e2e="dashboard-add-kpi-name-input"
@@ -97,12 +98,14 @@
       <mat-form-field>
         <input matInput e2e="dashboard-add-kpi-bullet-measure1-input"
                         type="number"
+                        autocomplete="off"
                         placeholder="Measure 1"
                         formControlName="measure1" />
       </mat-form-field>
       <mat-form-field>
         <input matInput e2e="dashboard-add-kpi-bullet-measure2-input"
                         type="number"
+                        autocomplete="off"
                         placeholder="Measure 2"
                         formControlName="measure2" />
       </mat-form-field>
@@ -110,6 +113,7 @@
     <mat-form-field class="target">
       <input matInput e2e="dashboard-add-kpi-bullet-target-input"
                       type="number"
+                      autocomplete="off"
                       placeholder="Metric Target"
                       formControlName="target" />
     </mat-form-field>

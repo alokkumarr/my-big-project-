@@ -38,7 +38,8 @@ class ReportExecutor {
       /* Process one message and let the executor exit so that the system
        * service restarts it to create a fresh new instance to process
        * the next message */
-      queue.receive
+      (1 to DLConfiguration.executorRestartThreshold).foreach(_ => {queue.receive
+        log.info("Finished")})
     } catch {
       case e: Exception => log.error("Exception", e)
     }

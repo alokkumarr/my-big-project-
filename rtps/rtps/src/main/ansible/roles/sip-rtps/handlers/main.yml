@@ -1,0 +1,2 @@
+- name: restart sip-rtps
+  systemd: name=sip-rtps state=restarted daemon_reload=true

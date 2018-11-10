@@ -283,7 +283,7 @@ accessed using the BDA Metadata library.
 
 === SAW Storage Proxy Service
 
-he SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
+SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
 The intention of this services to provide access behind our gateway for our polyglot persistence
 layer *(ElasticSearch, Datalake, RDMS & MapRDB).*
 
@@ -312,27 +312,46 @@ storage type & other details. The below are salient feature for the service whic
 
 === SAW Batch Ingestion Service
 
-SAW Batch Ingestion Service will allow to pull data from remote source like *(SFTP, SCP, S3, JDBC etc).*
+SAW Batch Ingestion Service allows to pull batch of data at uniform interval (can be defined by user) of time.
+It will facilitates to pull data from remote source like *(SFTP, SCP, S3, JDBC etc).*
 Currently with it supports only SCP/SFTP.
 
 [%hardbreaks]
 The REST API of this service is HATEOS Complaint API. To get an overview of the self descriptive API, it can
 accessed using URL (http://hostname/saw/services/batch, http://hostname/saw/services/batch/profiles)
 
-.Figure: Executing an data query using the SAW Proxy Service via SIP Gateway Service
+.Figure: Saw Batch ingestion request & response flow
 plantuml::sip-design/figure-batch-sequence.pum[format=svg]
 
-The below are salient feature for the service which are as follows:
+Below are the salient feature which are as follows:
 
 [[goals]]
 [role="incremental"]
 * Ability to setup a channel and provide channel information
 * Ability to setup a route and provide route information
 * Test connectivity of both channel & source.
-* Tracking
-* Monitoring
-* Scheduling the data retrieval from the source
-* Supports various protocol to pull data
+* Tracking from source to drop.
+* Monitoring.
+* Scheduling the data retrieval from the source.
+* Supports various protocol to pull data.
+
+.Figure: SAW Batch Ingestion ER Diagram
+image::sip/bis-er-diagram.png[entities,400,400]
+
+The above entities are used to hold the base of Batch Ingestion module.
+Entity BIS_ROUTE is used to hold the details of route i.e it holds the details of destination, frequency etc etc.
+Entity BIS_CHANNEL is used to hold the details of channel i.e it holds the details of data channel.
+Entity BIS_FILE_LOGS is used to log details related to the files or data retrieved from the custom.
+
+.Figure: SAW Batch Ingestion Component Diagram
+image::sip/bis-component-diagram.png[component,400,400]
+
+ingestion-registration-service: The internal service will handle all the request for registration of channel & route
+ingestion-provenance-service: The internal service will handle all the scheduled jobs.
+ingestion-notification-service: Not yet started.
+
+.Figure: SAW Batch Ingestion Flow Diagram
+image::sip/bis-flow-diagram.png[flowChart,400,400]
 
 === SAW Semantic Service
 

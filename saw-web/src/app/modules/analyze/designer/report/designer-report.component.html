@@ -30,14 +30,6 @@
     <mat-icon class="non-ideal-state__icon" fontIcon="icon-report"></mat-icon>
   </div>
 
-  <div *ngSwitchCase="DesignerStates.SELECTION_WITH_NO_DATA"
-       fxLayout="column"
-       fxLayoutAlign="space-between center"
-       class="non-ideal-state__container">
-    <span class="non-ideal-state__message" i18n>
-      There is no data for the fields selected
-    </span>
-  </div>
   <div *ngSwitchDefault style="height: calc(100% -42px); width: 100%;">
     <div *ngIf="!isEmpty(data); else elseBlock" style="height: 100%; width: 100%;">
       <div style="height: calc(100% - 30px); width: 100%;">
@@ -51,8 +43,11 @@
                               [isEditable]="true">
         </report-grid-upgraded>
       </div>
-      <div *ngIf="dataCount > 0" class="data-count-limit">
-        Showing {{data.length}} out of {{dataCount}} rows. Click on 'Preview' to see more.
+      <div class="data-count-limit">
+        Showing {{currentDataCount}} out of {{totalDataCount}} rows.
+        <ng-container *ngIf="totalDataCount > currentDataCount">
+          Click on 'Preview' to see more.
+        </ng-container>
       </div>
     </div>
 
