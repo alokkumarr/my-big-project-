@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class SchedulerIT extends BaseIT {
 
+  private static final String SERVICE_PATH = "/services/bisscheduler/";
 
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -78,21 +79,21 @@ public class SchedulerIT extends BaseIT {
   @Test
   public void scheduleJobTest() throws Exception {
 
-    given(authSpec).body(prepareSchedulerRequest()).when().post("/bisscheduler/schedule").then()
+    given(authSpec).body(prepareSchedulerRequest()).when().post(SERVICE_PATH + "schedule").then()
         .assertThat().statusCode(200);
 
   }
 
   @Test
   public void updateJobTest() throws Exception {
-    given(authSpec).body(prepareSchedulerRequest()).when().post("/bisscheduler/update").then()
+    given(authSpec).body(prepareSchedulerRequest()).when().post(SERVICE_PATH + "update").then()
         .assertThat().statusCode(200);
 
   }
 
   @Test
   public void unscheduleJobTest() throws Exception {
-    given(authSpec).body(prepareSchedulerRequest()).when().post("/bisscheduler/unschedule").then()
+    given(authSpec).body(prepareSchedulerRequest()).when().post(SERVICE_PATH + "unschedule").then()
         .assertThat().statusCode(200);
 
 
@@ -100,7 +101,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void deleteJobTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/delete").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "delete").then()
         .assertThat().statusCode(200);
 
 
@@ -111,7 +112,7 @@ public class SchedulerIT extends BaseIT {
   public void pauseJobTest() throws Exception {
 
 
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/delete").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "delete").then()
         .assertThat().statusCode(200);
 
 
@@ -120,7 +121,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void resumeJobTest() throws Exception {
-    given(authSpec).body(prepareJobRequest()).when().post("/bisscheduler/delete").then()
+    given(authSpec).body(prepareJobRequest()).when().post(SERVICE_PATH + "delete").then()
         .assertThat().statusCode(200);
 
 
@@ -130,7 +131,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void getAllJobsTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/jobs").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "jobs").then()
         .assertThat().statusCode(200);
 
   }
@@ -138,7 +139,7 @@ public class SchedulerIT extends BaseIT {
   @Test
   public void getJobDetailsTest() throws Exception {
 
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/fetchJob").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "fetchJob").then()
         .assertThat().statusCode(200);
 
 
@@ -147,7 +148,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void isJobRunningTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/isJobRunning")
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "isJobRunning")
         .then().assertThat().statusCode(200);
 
 
@@ -157,7 +158,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void getJobStateTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/jobState").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "jobState").then()
         .assertThat().statusCode(200).extract().response().body().jsonPath().getJsonObject("data")
         .equals("SCHEDULED");
 
@@ -168,7 +169,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void stopJobTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/stop").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "stop").then()
         .assertThat().statusCode(200);
 
 
@@ -176,7 +177,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void startJobNowTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/start").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "start").then()
         .assertThat().statusCode(200);
 
   }
