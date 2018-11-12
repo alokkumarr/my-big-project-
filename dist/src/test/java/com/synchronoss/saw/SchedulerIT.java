@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class SchedulerIT extends BaseIT {
 
-  private static final String SERVICE_PATH = "/services/bisscheduler/";
+  private static final String SERVICE_PATH = "/services/scheduler/bisscheduler/";
 
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
