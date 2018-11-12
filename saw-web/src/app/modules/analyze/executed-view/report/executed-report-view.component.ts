@@ -3,7 +3,8 @@ import { Analysis, Artifact } from '../../types';
 
 @Component({
   selector: 'executed-report-view',
-  templateUrl: 'executed-report-view.component.html'
+  templateUrl: 'executed-report-view.component.html',
+  styleUrls: ['./executed-report-view.component.scss']
 })
 export class ExecutedReportViewComponent {
   @Input('analysis')
@@ -18,19 +19,22 @@ export class ExecutedReportViewComponent {
     if (isInQueryMode) {
       this.artifacts = null;
     } else if (isEsReport) {
-      const containsArtifacts = <any>(dataFields[0]).tableName;
+      const containsArtifacts = <any>dataFields[0].tableName;
       if (containsArtifacts) {
         this.artifacts = dataFields;
       } else {
         // for backward compatibility we have to check if we have the artifacts, or artifact columns
-        this.artifacts = <Artifact[]>[{columns: dataFields, artifactName: ''}];
+        this.artifacts = <Artifact[]>[
+          { columns: dataFields, artifactName: '' }
+        ];
       }
     } else {
       // DL report
       this.artifacts = dataFields;
     }
-  };
-  @Input() dataLoader: Function;
+  }
+  @Input()
+  dataLoader: Function;
 
   analysis: Analysis;
   artifacts: Artifact[];

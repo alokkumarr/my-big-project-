@@ -33,7 +33,7 @@
           <div fxFlex="65
                     " fxLayout="column" fxLayoutAlign="center end">Last updated:
             <div fxLayout="row" style="align-items: baseline;">
-              <span [innerHTML]="pod?.createdAt * 1000 | date: 'short' | highlight: searchTerm"> </span>
+              <span [innerHTML]="pod?.modifiedTime * 1000 | date: 'short' | highlight: searchTerm"> </span>
             </div>
           </div>
         </div>

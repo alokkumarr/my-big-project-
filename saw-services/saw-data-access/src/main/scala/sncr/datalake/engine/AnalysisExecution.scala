@@ -15,13 +15,14 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 
-
 import org.apache.hadoop.fs.FileStatus
+import sncr.datalake.TimeLogger.logWithTime
 
 import scala.collection.JavaConverters._
-import sncr.datalake.DLConfiguration
+import sncr.datalake.{DLConfiguration, DLExecutionObject}
 
 import scala.concurrent.Future
+import scala.reflect.io.File
 
 /**
   * Created by srya0001 on 6/8/2017.
@@ -47,6 +48,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
 
+  @deprecated
   def startExecution(sqlRuntime: String = null, limit: Integer= DLConfiguration.rowLimit): Unit =
   {
     try {
@@ -106,8 +108,67 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     executionCode = ProcessingResult.Success.id
   }
 
-
-
+  /**
+    * This method added to re-use the spark-session across multiple query execution.
+    * @param sqlRuntime
+    * @param limit
+    */
+  def executeDLAnalysis( sqlRuntime: String = null,
+                  limit: Integer = DLConfiguration.rowLimit): Unit = {
+    val viewName = "AN_" + System.currentTimeMillis()
+    val outputLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(DLConfiguration.commonLocation) +
+      File.separator + "preview-" + resultId
+    val dlSession = DLExecutionObject.dlSessions
+    logWithTime(m_log, "Execute Spark SQL query", {
+      analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime, false, resultId)
+      analysisNodeExecution.loadObjects()
+      analysisNodeExecution.setAnalysisKey(viewName)
+      var status: ExecutionStatus = ExecutionStatus.INIT
+      analysisNodeExecution.loadObjects()
+      analysisNodeExecution.setStartTime
+      startTS = analysisNodeExecution.getStartTS
+      m_log debug s"Loaded objects, Started TS: $startTS"
+      status = ExecutionStatus.IN_PROGRESS
+      analysisNodeExecution.lastSQLExecMessage = "success"
+      analysisNodeExecution.lastSQLExecRes = 0
+      execType match {
+        case ExecutionType.scheduled => {
+          dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+          m_log.trace("Location : " + outputLocation)
+          dlSession.saveData(viewName, analysisNodeExecution.outputLocation, "json")
+          analysisNodeExecution.createAnalysisResult(resultId, null, ExecutionType.scheduled.toString)
+        }
+        case ExecutionType.onetime => {
+          dlSession.execute(viewName, sqlRuntime, limit)
+          m_log.trace("Location : " + outputLocation)
+          dlSession.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
+        }
+        case ExecutionType.preview => {
+          dlSession.execute(viewName, sqlRuntime, limit)
+          m_log.trace("Location : " + outputLocation)
+          dlSession.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
+        }
+        case ExecutionType.regularExecution => {
+          if (DLConfiguration.publishRowLimit > 0)
+            dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+          else
+            dlSession.execute(viewName, sqlRuntime)
+          m_log.trace("Location : " + outputLocation)
+          dlSession.saveData(viewName, outputLocation, analysisNodeExecution.outputType)
+        }
+        case ExecutionType.publish => {
+          if (DLConfiguration.publishRowLimit > 0)
+            dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+          else
+            dlSession.execute(viewName, sqlRuntime)
+          dlSession.saveData(viewName, analysisNodeExecution.outputLocation, analysisNodeExecution.outputType)
+          analysisNodeExecution.createAnalysisResult(resultId, null, ExecutionType.publish.toString)
+        }
+      }
+      startTS = getStartedTimestamp
+      finishTS = getFinishedTimestamp
+    })
+  }
 
   /**
     * Returns an identifier for the analysis execution
@@ -151,28 +212,6 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       Future {
         analysisNodeExecution.getExecutionData
       }
-  }
-
-  /**
-    * Returns all rows of execution result
-    *
-    * @return List<Map<…>> data structure
-    */
-  def getAllData : java.util.List[java.util.Map[String, (String, Object)]] = {
-    throw new RuntimeException("getAllData: No longer supported to prevent out of memory issues")
-    analysisNodeExecution.getAllData
-    analysisNodeExecution.getExecutionData
-  }
-
-  /**
-    * Returns all rows of execution result
-    *
-    * @return List<Map<…>> data structure
-    */
-  def getPreview(limit:Int) : java.util.List[java.util.Map[String, (String, Object)]] = {
-    throw new RuntimeException("getPreview: No longer supported to prevent out of memory issues")
-    analysisNodeExecution.getPreview(limit)
-    analysisNodeExecution.getExecutionData
   }
 
   /**
