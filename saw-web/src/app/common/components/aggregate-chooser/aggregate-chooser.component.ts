@@ -16,7 +16,7 @@ import { AnalysisType } from '../../types';
 export class AggregateChooserComponent implements OnInit {
   @Output() public change: EventEmitter<string> = new EventEmitter();
   @Input() public aggregate: string;
-  @Input() public type: string;
+  @Input() public columnType: string;
   @Input() public analysisType: AnalysisType;
 
   public AGGREGATE_TYPES = AGGREGATE_TYPES;
@@ -25,7 +25,7 @@ export class AggregateChooserComponent implements OnInit {
   public aggregates;
 
   ngOnInit() {
-    if (NUMBER_TYPES.includes(this.type)) {
+    if (NUMBER_TYPES.includes(this.columnType)) {
       this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, type => {
