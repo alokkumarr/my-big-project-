@@ -16,8 +16,8 @@ import { AnalysisType } from '../../types';
 export class AggregateChooserComponent implements OnInit {
   @Output() public change: EventEmitter<string> = new EventEmitter();
   @Input() public aggregate: string;
-  @Input() public type: AnalysisType;
-  @Input() public analysisType;
+  @Input() public type: string;
+  @Input() public analysisType: AnalysisType;
 
   public AGGREGATE_TYPES = AGGREGATE_TYPES;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
