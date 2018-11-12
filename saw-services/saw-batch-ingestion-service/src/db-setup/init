@@ -40,5 +40,5 @@ if [ -f $root_password_f ] ; then
  else
    mysql -u root -e "$create_database"
    mysql -u root -e "$create_user IDENTIFIED BY '$password'"
-   mysql -u root -e "GRANT ALL ON batch_user.* TO 'batch_user'@'localhost'"
+   mysql -u root -e "GRANT ALL ON sip_batch_ingestion.* TO 'batch_user'@'localhost'"
 fi
