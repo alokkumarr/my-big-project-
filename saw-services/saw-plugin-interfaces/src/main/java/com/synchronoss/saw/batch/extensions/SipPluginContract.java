@@ -2,8 +2,9 @@ package com.synchronoss.saw.batch.extensions;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
+import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
+import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisIngestionPayload;
 
 /**
@@ -36,6 +39,32 @@ public abstract class SipPluginContract
 	 * @throws SipNestedRuntimeException
 	 */
 	public abstract HttpStatus connectChannel(Long entityId) throws SipNestedRuntimeException;
+	/**
+	 * This method is to test connect the route
+	 * @param entityId
+	 * @return
+	 * @throws SipNestedRuntimeException
+	 */
+	public abstract HttpStatus immediateConnectRoute(BisConnectionTestPayload payload) throws SipNestedRuntimeException; 
+	/**
+	 * 	 * This method is to test connect the source
+	 * @param entityId
+	 * @return
+	 * @throws SipNestedRuntimeException
+	 */
+	public abstract HttpStatus immediateConnectChannel(BisConnectionTestPayload payload) throws SipNestedRuntimeException;
+
+	/**
+	 * 	 * This method is to test connect the source
+	 * @param entityId
+	 * @return
+	 * @throws SipNestedRuntimeException
+	 */
+	public List<BisDataMetaInfo> immediateTransfer(BisConnectionTestPayload payload) throws SipNestedRuntimeException 
+	{
+		logger.info("It has been left empty intentionally because it will be overriden on the respective plugin module if required");
+		return new ArrayList<>();
+	}
 	
 	/**
 	 * This method are the requires to complete the transfer.
@@ -99,9 +128,8 @@ public abstract class SipPluginContract
 	 * @return String
 	 */
 	protected String getBatchId() {	
-		DateFormat dtFormat = new SimpleDateFormat("MMddyyyyHHmmss");
-		Date currentDate = Calendar.getInstance().getTime();        
-		return dtFormat.format(currentDate);
+		DateFormat dtFormat = new SimpleDateFormat("MMddyyyyhhmmss");
+		return dtFormat.format(new Date());
 	}
 	
 }

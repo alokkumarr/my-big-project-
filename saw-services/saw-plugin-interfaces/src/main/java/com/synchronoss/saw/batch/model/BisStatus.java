@@ -13,10 +13,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
 "status"
 })
-public class Status {
+public class BisStatus {
 
 @JsonProperty("status")
 private String status;
+
 @JsonIgnore
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

@@ -7,20 +7,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
-public enum ChannelType {
+public enum BisChannelType {
     SFTP("sftp"),
     SCP("scp"),
     JDBC("jdbc");
     private final String value;
-    private final static Map<String, ChannelType> CONSTANTS = new HashMap<String, ChannelType>();
+    private final static Map<String, BisChannelType> CONSTANTS = new HashMap<String, BisChannelType>();
 
     static {
-        for (ChannelType c: values()) {
+        for (BisChannelType c: values()) {
             CONSTANTS.put(c.value, c);
         }
     }
 
-    private ChannelType(String value) {
+    private BisChannelType(String value) {
         this.value = value;
     }
 
@@ -35,8 +35,8 @@ public enum ChannelType {
     }
 
     @JsonCreator
-    public static ChannelType fromValue(String value) {
-    	ChannelType constant = CONSTANTS.get(value);
+    public static BisChannelType fromValue(String value) {
+    	BisChannelType constant = CONSTANTS.get(value);
         if (constant == null) {
             throw new IllegalArgumentException(value);
         } else {

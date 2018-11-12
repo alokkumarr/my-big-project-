@@ -29,7 +29,7 @@ public final class IntegrationUtils {
 
 	}
 
-	public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-HH-mm-ss";
+	public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-hh-mm-ss";
 	public static final String TAR_GZIP_FILE_EXTENSION = "gz";
 	public static final String ZIP_FILE_EXTENSION = "zip";
 	public static final String TAR_FILE_EXTENSION = "tar";
@@ -39,8 +39,7 @@ public final class IntegrationUtils {
 	public static final String PATTERN_TO_ATTACHED_WHILE_EXTRACTION = ".*\\.";
 	public static final String ERROR_EXTENSION = "error";
 	public static final String VALIDATION_ERROR_EXTENSION = "validationFailed";
-
-
+	
 	public static String getRenameDateFormat() {
 		return RENAME_DATE_FORMAT;
 	}
@@ -155,5 +154,4 @@ public final class IntegrationUtils {
 		}
 
 	}
-
 }

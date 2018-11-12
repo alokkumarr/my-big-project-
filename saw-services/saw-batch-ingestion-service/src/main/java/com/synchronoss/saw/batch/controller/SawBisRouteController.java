@@ -57,7 +57,7 @@ public class SawBisRouteController {
   @ApiOperation(value = "Adding a new Route",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
@@ -93,7 +93,7 @@ public class SawBisRouteController {
   @ApiOperation(value = "Reading list of routes & paginate by channel id",
       nickname = "actionBis", notes = "", response = BisRouteEntity.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
@@ -129,7 +129,7 @@ public class SawBisRouteController {
   @ApiOperation(value = "Updating an existing routes by channel id",
       nickname = "actionBis", notes = "", response = BisRouteEntity.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
@@ -171,7 +171,7 @@ public class SawBisRouteController {
   @ApiOperation(value = "Deleting an existing route",
       nickname = "actionBis", notes = "", response = Object.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),

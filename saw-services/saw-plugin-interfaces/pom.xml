@@ -26,15 +26,9 @@
 		<guava>19.0</guava>
         <commons-lang.version>2.6</commons-lang.version>
         <fastjson.version>1.2.38</fastjson.version>
-		<compress>1.18</compress>        
+		<compress>1.18</compress>
   </properties>
 	<dependencies>
-	<dependency>
-	       <groupId>org.pf4j</groupId>
-	        <artifactId>pf4j</artifactId>
-	        <version>2.3.0</version>
-	</dependency>
-	
 	<!-- Dependencies for logging service -->
     <!-- Dependencies for scheduler service -->
     <!-- Dependencies for Spring Boot without the tomcat -->

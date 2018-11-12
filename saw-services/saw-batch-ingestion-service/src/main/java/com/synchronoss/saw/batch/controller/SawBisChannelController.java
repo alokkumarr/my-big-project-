@@ -53,7 +53,7 @@ public class SawBisChannelController {
   @ApiOperation(value = "Add a new channel",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
@@ -84,7 +84,7 @@ public class SawBisChannelController {
   @ApiOperation(value = "Reading list of channels & paginate",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
@@ -118,7 +118,7 @@ public class SawBisChannelController {
   @ApiOperation(value = "Reading channel by id",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
@@ -145,7 +145,7 @@ public class SawBisChannelController {
   @ApiOperation(value = "Updating an existing channel",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
@@ -181,7 +181,7 @@ public class SawBisChannelController {
   @ApiOperation(value = "Deleting an existing channel",
       nickname = "actionBis", notes = "", response = Object.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been accepted without any error"),
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),

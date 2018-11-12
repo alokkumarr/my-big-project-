@@ -32,7 +32,7 @@ private Object transfer;
 private Message<?>  messageSource;
 
 @JsonProperty("channelType")
-private ChannelType channelType = ChannelType.SFTP;
+private BisChannelType channelType = BisChannelType.SFTP;
 
 @JsonProperty("log")
 public Boolean getLog() {
@@ -67,11 +67,11 @@ public void setMessageSource(Message<?> messageSource) {
 }
 
 @JsonProperty("channelType")
-public ChannelType getChannelType() {
+public BisChannelType getChannelType() {
 	return channelType;
 }
 @JsonProperty("channelType")
-public void setChannelType(ChannelType channelType) {
+public void setChannelType(BisChannelType channelType) {
 	this.channelType = channelType;
 }
 

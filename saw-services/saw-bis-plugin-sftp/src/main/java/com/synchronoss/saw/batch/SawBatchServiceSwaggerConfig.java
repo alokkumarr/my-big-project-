@@ -26,7 +26,7 @@ public class SawBatchServiceSwaggerConfig extends WebMvcConfigurationSupport {
     return new Docket(DocumentationType.SWAGGER_2)
     .groupName("sftp")
     .apiInfo(getApiInfo()).select()
-        .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.plugin.controllers"))
+        .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.batch.plugin.controllers"))
         .paths(PathSelectors.any()).build();
 
   }
