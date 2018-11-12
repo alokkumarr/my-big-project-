@@ -72,10 +72,11 @@ public class SchedulerIT extends BaseIT {
   @Before
   public  void setup() throws Exception {
     
-    this.scheduleTest();
+    this.scheduleJobTest();
   }
+  
   @Test
-  public void scheduleTest() throws Exception {
+  public void scheduleJobTest() throws Exception {
 
     given(authSpec).body(prepareSchedulerRequest()).when().post("/bisscheduler/schedule").then()
         .assertThat().statusCode(200);
@@ -83,14 +84,14 @@ public class SchedulerIT extends BaseIT {
   }
 
   @Test
-  public void updateTest() throws Exception {
+  public void updateJobTest() throws Exception {
     given(authSpec).body(prepareSchedulerRequest()).when().post("/bisscheduler/update").then()
         .assertThat().statusCode(200);
 
   }
 
   @Test
-  public void unscheduleTest() throws Exception {
+  public void unscheduleJobTest() throws Exception {
     given(authSpec).body(prepareSchedulerRequest()).when().post("/bisscheduler/unschedule").then()
         .assertThat().statusCode(200);
 
@@ -98,7 +99,7 @@ public class SchedulerIT extends BaseIT {
   }
 
   @Test
-  public void deleteTest() throws Exception {
+  public void deleteJobTest() throws Exception {
     given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/delete").then()
         .assertThat().statusCode(200);
 
@@ -107,7 +108,7 @@ public class SchedulerIT extends BaseIT {
   }
 
   @Test
-  public void pauseTest() throws Exception {
+  public void pauseJobTest() throws Exception {
 
 
     given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/delete").then()
@@ -118,7 +119,7 @@ public class SchedulerIT extends BaseIT {
   }
 
   @Test
-  public void resumeTest() throws Exception {
+  public void resumeJobTest() throws Exception {
     given(authSpec).body(prepareJobRequest()).when().post("/bisscheduler/delete").then()
         .assertThat().statusCode(200);
 
@@ -180,13 +181,14 @@ public class SchedulerIT extends BaseIT {
 
   }
   
+  /*
+   * Delete schedule after 
+   * completing test.
+   */
   @After
-  public  void tearDown() {
-       try {
-          this.deleteTest();
-      } catch (Exception exception) {
-        log.error(exception.getMessage());
-      }
+  public  void tearDown() throws Exception {
+    this.deleteJobTest();
   }
+  
 
 }
