@@ -1,5 +1,7 @@
 package sncr.xdf.sql.ng;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sncr.bda.CliHandler;
@@ -45,6 +47,14 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
     public AsynchNGSQLComponent() {  super(); }
 
     protected int execute(){
+        /* Workaround: If executed through Apache Livy the logging
+         * level will be WARN by default and at the moment no way to
+         * change that level through configuration files has been
+         * found, so set it programmatically to at least INFO to help
+         * troubleshooting */
+        if (!LogManager.getRootLogger().isInfoEnabled()) {
+            LogManager.getRootLogger().setLevel(Level.INFO);
+        }
         try {
             executor = new NGJobExecutor(this);
             String tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
