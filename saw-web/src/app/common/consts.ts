@@ -77,34 +77,34 @@ export const AGGREGATE_TYPES = [{
   label: 'Total',
   value: 'sum',
   icon: 'icon-Sum',
-  valid: ['chart', 'pivot', 'report']
+  valid: ['chart', 'pivot', 'report', 'esReport']
 }, {
   label: 'Average',
   value: 'avg',
   icon: 'icon-AVG',
-  valid: ['chart', 'pivot', 'report']
+  valid: ['chart', 'pivot', 'report', 'esReport']
 }, {
   label: 'Mininum',
   value: 'min',
   icon: 'icon-MIN',
-  valid: ['chart', 'pivot', 'report']
+  valid: ['chart', 'pivot', 'report', 'esReport']
 }, {
   label: 'Maximum',
   value: 'max',
   icon: 'icon-MAX',
-  valid: ['chart', 'pivot', 'report']
+  valid: ['chart', 'pivot', 'report', 'esReport']
 }, {
   label: 'Count',
   value: 'count',
   icon: 'icon-Count',
   type: 'long',
-  valid: ['chart', 'pivot', 'report']
+  valid: ['chart', 'pivot', 'report', 'esReport']
 }, {
   label: 'Percentage',
   value: 'percentage',
   icon: 'icon-Percentage',
   type: 'float',
-  valid: ['pivot', 'report']
+  valid: ['pivot', 'report', 'esReport']
 }, {
   label: 'Percentage By Row',
   value: 'percentageByRow',
