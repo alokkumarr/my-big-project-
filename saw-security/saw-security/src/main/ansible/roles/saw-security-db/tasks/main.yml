@@ -26,22 +26,6 @@
     regexp: '^return \$extcode$'
 - name: Install MariaDB configuration additions
   template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.cnf
-- name: Migrate MariaDB root password from old location
-  fetch:
-    src: /etc/bda/mariadb-root-password
-    dest: "{{ inventory_dir + '/mariadb-root-password' }}"
-    flat: yes
-    fail_on_missing: no
-  when: "groups['saw-services'].index(inventory_hostname) == 0"
-- name: Look up MariaDB root database password
-  set_fact:
-    mariadb_root_password: >-
-      {{ lookup('password', inventory_dir
-        + '/mariadb-root-password chars=ascii_letters,digits') }}
-- name: Store the MariaDB root password
-  copy:
-    content: "{{ mariadb_root_password }}"
-    dest: /etc/bda/mariadb-root-password
 # Workaround: The MariaDB Galera cluster initialization below invokes
 # "systemctl start" (instead of "systemctl restart").  Trigger
 # handlers here to ensure that the MariaDB service is stopped after a
@@ -88,3 +72,20 @@
 - name: Run MariaDB databases upgrade
   shell: "mysql_upgrade --password=$(< /etc/bda/mariadb-root-password)"
   when: "groups['saw-security'].index(inventory_hostname) == 0"
+- name: Migrate MariaDB root password from old location
+  fetch:
+    src: /etc/bda/mariadb-root-password
+    dest: "{{ inventory_dir + '/mariadb-root-password' }}"
+    flat: yes
+    fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+- name: Look up MariaDB root database password
+  set_fact:
+    mariadb_root_password: >-
+      {{ lookup('password', inventory_dir
+        + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Store the MariaDB root password
+  copy:
+    content: "{{ mariadb_root_password }}"
+    dest: /etc/bda/mariadb-root-password
+    mode: u=rw,g=,o=
