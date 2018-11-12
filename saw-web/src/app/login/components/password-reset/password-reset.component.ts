@@ -48,7 +48,6 @@ export class PasswordResetComponent implements OnInit {
   }
 
   login() {
-    // this._router.navigate(['login']);
-    window.location.href = '/#/login';
+    this._router.navigate(['/#/login']);
   }
 }

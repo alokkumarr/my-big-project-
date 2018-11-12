@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import * as isEmpty from 'lodash/isEmpty';
 import {
   JwtService,
   UserService,
@@ -39,11 +40,16 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    if (isEmpty(this.dataHolder.username) || isEmpty(this.dataHolder.password)) {
+      this.states.error = 'Please enter a vaild Usernaeme and Password';
+      return false;
+    }
     const params = {
       masterLoginId: this.dataHolder.username,
       authpwd: this.dataHolder.password
     };
     this._UserService.attemptAuth(params).then(data => {
+      this.states.error = '';
       if (this._JwtService.isValid(data)) {
         this._configService.getConfig().subscribe(
           () => {

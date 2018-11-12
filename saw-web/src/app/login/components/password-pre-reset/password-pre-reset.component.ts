@@ -27,6 +27,6 @@ export class PasswordPreResetComponent implements OnInit {
   }
 
   login() {
-    this._router.navigate(['login']);
+    this._router.navigate(['/#/login']);
   }
 }
