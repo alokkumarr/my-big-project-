@@ -17,6 +17,7 @@ export class AggregateChooserComponent implements OnInit {
   @Output() public change: EventEmitter<string> = new EventEmitter();
   @Input() public aggregate: string;
   @Input() public type: AnalysisType;
+  @Input() public analysisType;
 
   public AGGREGATE_TYPES = AGGREGATE_TYPES;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
@@ -25,7 +26,7 @@ export class AggregateChooserComponent implements OnInit {
 
   ngOnInit() {
     if (NUMBER_TYPES.includes(this.type)) {
-      this.aggregates = AGGREGATE_TYPES;
+      this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, type => {
         return type.value === 'count';
@@ -39,5 +40,13 @@ export class AggregateChooserComponent implements OnInit {
 
   onAggregateChange(value) {
     this.change.emit(value);
+  }
+
+  isAggregateEligible() {
+    return filter(AGGREGATE_TYPES, aggregate => {
+      if (aggregate.valid.includes(this.analysisType)) {
+        return true;
+      }
+    });
   }
 }
