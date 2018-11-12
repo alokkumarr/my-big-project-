@@ -110,9 +110,7 @@ mat-radio-group {
       padding-right: 10px;
       width: 20px;
       height: 20px;
-      background-image: url("/assets/img/category-icons/category-default-b-3.svg");
-      background-repeat: no-repeat;
-      background-size: contain;
+      color: $primary-blue-b2;
     }
 
     .category-detail {
@@ -136,7 +134,7 @@ mat-radio-group {
       color: white !important;
 
       .category-icon {
-        background-image: url("/assets/img/category-icons/category-default.svg");
+        color: white;
       }
     }
 

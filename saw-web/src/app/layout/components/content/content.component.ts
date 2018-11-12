@@ -36,14 +36,15 @@ export class LayoutContentComponent implements OnInit {
   title: string;
   isOnLoginPage = false;
   constructor(
-    public _user: UserService,
-    public _headerProgress: HeaderProgressService,
-    public _router: Router,
-    public _title: Title,
-    public _sidenav: SidenavMenuService,
-    public _menu: MenuService,
-    public _idle: Idle
-  ) {}
+    private _user: UserService,
+    private _headerProgress: HeaderProgressService,
+    private _router: Router,
+    private _title: Title,
+    private _sidenav: SidenavMenuService,
+    private _menu: MenuService,
+    private _idle: Idle
+  ) {
+  }
 
   ngOnInit() {
     this._router.events.subscribe((event: Event) => {

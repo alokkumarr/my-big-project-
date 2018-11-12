@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModuleTs } from '../../../common';
+import { CustomIconService } from '../../../common/services';
 import { AnalyzeActionsModule } from '../actions';
 import { AnalyzeViewComponent } from './analyze-view.component';
 import { AnalyzeCardComponent } from './card';
@@ -27,6 +28,7 @@ const COMPONENTS = [
     ...COMPONENTS,
     AnalysesFilterPipe
   ],
+  providers: [CustomIconService],
   entryComponents: COMPONENTS,
   exports: [AnalyzeViewComponent]
 })

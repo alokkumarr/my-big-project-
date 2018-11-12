@@ -7,6 +7,26 @@ import {
   Validators
 } from '@angular/forms';
 
+// const categories = [{
+//   name: 'default',
+//   icon: 'category-'
+// }, {
+//   name: 'errors',
+//   icon: ''
+// }, {
+//   name: 'orders',
+//   icon: ''
+// }, {
+//   name: 'sessions',
+//   icon: ''
+// }, {
+//   name: 'subscribers',
+//   icon: ''
+// }, {
+//   name: 'usage',
+//   icon: ''
+// }];
+
 @Component({
   selector: 'createfolder-dialog',
   templateUrl: './semantic-details-dialog.component.html',
