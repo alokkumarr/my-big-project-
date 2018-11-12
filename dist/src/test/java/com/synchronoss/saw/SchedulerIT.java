@@ -168,7 +168,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void stopJobTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post("\"/bisscheduler/stop\"").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post("/bisscheduler/stop").then()
         .assertThat().statusCode(200);
 
 
