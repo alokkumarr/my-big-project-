@@ -61,8 +61,6 @@ library(lubridate, lib.loc = r_lib_home)
 
 conf_json <- jsonlite::fromJSON(readLines(conf_file))
 
-rcomp_conf_df <- as.data.frame(conf_json$detecter)
-
 # Configure Spark connection ----------------------------------------
 # Get Spark configuration parameters using the main
 # config file & configure spark connection
@@ -103,7 +101,8 @@ spk_conn_flag <- as.character((spark_conn_df[spark_conn_df$name == "spark.conn.f
 if (spk_conn_flag == "TRUE") {
   conf <- spark_config()
   
-  spark_master <- as.character((spark_conn_df[spark_conn_df$name == "spark.master", "value"]))
+  spark_master <-
+    as.character((spark_conn_df[spark_conn_df$name == "spark.master", "value"]))
   
   for (name in spark_conn_df$name) {
     n <- name
@@ -168,13 +167,13 @@ output_data_format <- as.character(outputs_df$format)
 output_repart_numb <- as.numeric(outputs_df$numberOfFiles)
 output_partit_by <- as.character(outputs_df[row, "partitionKeys"])
 
-if (is.na(output_partit_by) || output_partit_by == "" || identical(output_partit_by, character(0))) {
+if (is.na(output_partit_by) ||
+    output_partit_by == "" ||
+    identical(output_partit_by, character(0))) {
   output_partit_by <- NULL
 }
 
-output_schema <- list(
-  list(name = "ID", type = "string")
-)
+output_schema <- list(list(name = "ID", type = "string"))
 
 sip_add_dataset(
   output_format = output_data_format,
@@ -201,76 +200,57 @@ output_dataset_folder <- output_dataset_details$system$physicalLocation
 
 # Read Detecter Component parameter values
 
-.index_var <- as.character(rcomp_conf_df$indexField)
-.group_vars <- as.character(rcomp_conf_df$groupField)
-.measure_vars <- as.character(rcomp_conf_df$measureField)
-.fun_var <- as.character(rcomp_conf_df$functionName)
-.frequency <- as.numeric(rcomp_conf_df$frequency)
-.direction <- as.character(rcomp_conf_df$direction)
-.alpha <- as.numeric(rcomp_conf_df$alpha)
-.maxAnoms <- as.numeric(rcomp_conf_df$maxAnoms)
-.trendWindow <- as.numeric(rcomp_conf_df$trendWindow)
-.unit <- as.character(rcomp_conf_df$dataUnit)
-.side <- as.character(rcomp_conf_df$collapseSide)
-.field_format <- as.character(rcomp_conf_df$fieldFormat)
-.field_type <- as.character(rcomp_conf_df$fieldType)
+rcomp_conf_df <- as.data.frame(conf_json$detecter)
 
-# Group variables is not mandatory parameter for Detecter. Hence, logic
-#    is required to handle Null scenario
+# Read Detecter configuration & load R data frame with results
 
-if (is.na(.group_vars) || .group_vars == "") {
-  .summ_group_vars <- paste(paste(.index_var, "CONV", sep = "_")
-                            , "CEI", sep = "_")
-} else {
-  .summ_group_vars <- c(paste(paste(.index_var, "CONV", sep = "_")
-                              , "CEI", sep = "_"),
-                        .group_vars)
+i <- 1
+for (row in 1:nrow(rcomp_conf_df)) {
+  .index_var <- as.character(rcomp_conf_df[row, "indexField"])
+  .group_vars <- as.character(rcomp_conf_df[row, "groupField"])
+  .measure_vars <- as.vector(rcomp_conf_df[row, "measureField"])
+  .frequency <- as.numeric(rcomp_conf_df[row, "frequency"])
+  .direction <- as.character(rcomp_conf_df[row, "direction"])
+  .alpha <- as.numeric(rcomp_conf_df[row, "alpha"])
+  .maxAnoms <- as.numeric(rcomp_conf_df[row, "maxAnoms"])
+  .trendWindow <- as.numeric(rcomp_conf_df[row, "trendWindow"])
+  
+  if (is.na(.group_vars) || .group_vars == "") {
+    .group_vars <- NULL
+  }
+  
+  X <- input_spk_df %>%
+    collect %>%
+    a2munge::detecter(
+      .,
+      index_var = .index_var,
+      group_vars = .group_vars,
+      measure_vars = .measure_vars,
+      frequency = .frequency,
+      direction = .direction,
+      alpha = .alpha,
+      max_anoms = .maxAnoms,
+      trend_window = .trendWindow
+    )
+  
+  if (i == 1) {
+    rcomp_r_df <- X
+  } else {
+    rcomp_r_df <- rbind(rcomp_r_df, X)
+  }
+  
+  rm(X)
+  
+  i <- i + 1
+  
 }
 
-# Run Detecter functionality & assign result to data frame
+# Copy R data frame results to Spark data frame with date column
+# converted to string due to ES loader constraints
 
-rcomp_r_df <- input_spk_df %>%
-  a2munge::converter(
-    .,
-    measure_vars = .index_var,
-    input_format = .field_format,
-    output_type = .field_type,
-    output_suffix = "CONV"
-  ) %>%
-  a2munge::collapser(
-    .,
-    measure_vars = paste(.index_var, "CONV", sep = "_"),
-    unit = .unit,
-    side = .side,
-    output_suffix = "CEI"
-  ) %>%
-  a2munge::summariser(.,
-             group_vars = .summ_group_vars,
-             measure_vars = .measure_vars,
-             fun = .fun_var) %>%
-  #arrange(., desc(!!as.name(.index_var))) %>%
-  collect %>%
-  a2munge::detecter(
-    .,
-    index_var = paste(.index_var, "CONV_CEI", sep = "_"),
-    group_vars = if (is.na(.group_vars) ||
-                     .group_vars == "") {
-                                          NULL
-                                        } else {
-                                          .group_vars
-                                        },
-    measure_vars = paste(.measure_vars, .fun_var, sep = "_"),
-    frequency = .frequency,
-    direction = .direction,
-    alpha = .alpha,
-    max_anoms = .maxAnoms,
-    trend_window = .trendWindow
-  ) %>%
-  mutate(., expected = value - resid) %>%
-  rename(., !!.index_var := paste(!!.index_var, "CONV_CEI", sep = "_")) %>%
-  select(., !!.index_var, measure, value, seasonal, trend, resid, lower, upper, anomaly, expected)
-
-rcomp_spk_df <- copy_to(sc, mutate_at(rcomp_r_df, .index_var, as.character), overwrite = TRUE)
+rcomp_spk_df <- copy_to(sc,
+                        mutate_at(rcomp_r_df, .index_var, as.character),
+                        overwrite = TRUE)
 
 a2munge::writer(
   rcomp_spk_df,
