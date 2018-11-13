@@ -23,7 +23,7 @@ public class MigrationConfig {
 
   private final Logger log = LoggerFactory.getLogger(MigrationConfig.class);
 
-  @Value("1")
+  @Value("${sip.service.index}")
   @NotNull
   private Integer serviceIndex;
 
