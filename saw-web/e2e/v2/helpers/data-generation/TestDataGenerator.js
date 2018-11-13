@@ -20,8 +20,7 @@ class TestDataGenerator {
   generateUsersRolesPrivilegesCategories(url, token) {
     let analysisHelper = new AnalysisHelper();
     let adminHelper = new AdminHelper();
-    let apiCommonHelpers = new APICommonHelpers();
-    let apiUrl = apiCommonHelpers.getAPIURL(url);
+    let apiUrl = APICommonHelpers.getApiUrl(url);
 
     // Generate roles
     const rolesListWithAdmin = adminHelper.generateRole(

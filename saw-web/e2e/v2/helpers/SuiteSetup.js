@@ -12,7 +12,7 @@ class SuiteSetup {
  * server), as opposed to a local saw-web front-end development
  * server
  * */
-  distRun() {
+  static distRun() {
     return process.env.PWD.endsWith('/dist');
   }
 
@@ -20,7 +20,44 @@ class SuiteSetup {
     return path.join(process.cwd(), ...args);
   }
 
-  generateFailedTests(dir) {
+  failedTestData(testInfo) {
+    let failedTestsData = {};
+    if (!fs.existsSync('target')) {
+      fs.mkdirSync('target');
+    }
+    if (fs.existsSync('./target/failedTestData.json')) {
+      let existingFailures = JSON.parse(fs.readFileSync('target/failedTestData.json', 'utf8'));
+      // There are already failed tests so add to existing list
+      console.log('existingFailures---'+JSON.stringify(existingFailures));
+      // add new content to file
+      if (!existingFailures[testInfo.feature]) {
+        existingFailures[testInfo.feature] = {};
+      }
+      if (!existingFailures[[testInfo.feature]][[testInfo.dataProvider]]) {
+        existingFailures[[testInfo.feature]][[testInfo.dataProvider]] = {};
+      }
+      if (!existingFailures[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]]) {
+        existingFailures[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]] = testInfo.data;
+        fs.writeFileSync('target/failedTestData.json', JSON.stringify(existingFailures), {encoding: 'utf8'});
+      }
+
+    } else {
+      // Write new failed test list json file
+     // failedTestsData[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]] = testInfo.data;
+      if (!failedTestsData[testInfo.feature]) {
+        failedTestsData[testInfo.feature] = {};
+      }
+      if (!failedTestsData[[testInfo.feature]][[testInfo.dataProvider]]) {
+        failedTestsData[[testInfo.feature]][[testInfo.dataProvider]] = {};
+      }
+      if (!failedTestsData[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]]) {
+        failedTestsData[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]] = testInfo.data;
+        fs.writeFileSync('target/failedTestData.json', JSON.stringify(failedTestsData), {encoding: 'utf8'});
+      }
+    }
+  }
+
+  static generateFailedTests(dir) {
     let subset = {};
     if (!fs.existsSync('target')) {
       fs.mkdirSync('target');
@@ -141,7 +178,7 @@ class SuiteSetup {
     }
   }
 
-  getSawWebUrl() {
+  static getSawWebUrl() {
     let url;
 
     if (!fs.existsSync('target')) {
@@ -167,7 +204,7 @@ class SuiteSetup {
     return url;
   }
 
-  getTestData() {
+  static getTestData() {
     if (fs.existsSync('target/testData/failed/failedTests.json')) {
       //console.log('executing failed--tests');
       let data = JSON.parse(fs.readFileSync('target/testData/failed/failedTests.json', 'utf8'));

@@ -5,9 +5,9 @@ var appRoot = require('app-root-path');
 var fs = require('fs');
 
 
-  describe('DEV1 test from dev1.js', () => {
+  describe('DEV2 test from dev2.js', () => {
 
-    using(testDataReader.testData['DEV1']['dp'], function(data, id) {
+    using(testDataReader.testData['DEV3']['dp'], function(data, id) {
 
     it(`${id}:${data.description}`, function() {
       console.log('I am in test');
@@ -15,12 +15,12 @@ var fs = require('fs');
       console.log(JSON.stringify(data));
       expect(true).toBe(false);
 
-    }).result.testInfo = {testId: id, data: data, feature:'DEV1', dataProvider:'dp'};
+    }).result.testInfo = {testId: id, data: data, feature:'DEV3', dataProvider:'dp'};
   });
 });
 
-using(testDataReader.testData['DEV2']['dp'], function(data, id) {
-  describe('DEV2 test from dev1.js', () => {
+using(testDataReader.testData['DEV4']['dp'], function(data, id) {
+  describe('DEV4 test from dev2.js', () => {
 
 
     it(`${id}:${data.description}`, function() {
@@ -33,6 +33,6 @@ using(testDataReader.testData['DEV2']['dp'], function(data, id) {
         expect(true).toBe(false);
       }
 
-    }).result.testInfo = {testId: id, data: data, feature:'DEV2', dataProvider:'dp'};
+    }).result.testInfo = {testId: id, data: data, feature:'DEV4', dataProvider:'dp'};
   });
 });

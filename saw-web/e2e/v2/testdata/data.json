@@ -1,21 +1,49 @@
 {
   "DEV1": {
     "dp": {
-      "ByAdmin": {
-        "user": "admin"
+      "TC01": {
+        "user": "admin",
+        "description": "test by admin"
       },
-      "ByUser": {
-        "user": "userOne"
+      "TC02": {
+        "user": "userOne",
+        "description": "test by user"
       }
     }
   },
   "DEV2": {
     "dp": {
-      "ByAdmin": {
-        "user": "admin"
+      "TC03": {
+        "user": "admin",
+        "description": "test by admin tc03"
       },
-      "ByUser": {
-        "user": "userOne"
+      "TC04": {
+        "user": "userOne",
+        "description": "test by user tc04"
+      }
+    }
+  },
+  "DEV3": {
+    "dp": {
+      "TC05": {
+        "user": "admin",
+        "description": "test by admin tc05"
+      },
+      "TC06": {
+        "user": "userOne",
+        "description": "test by user tc06"
+      }
+    }
+  },
+  "DEV4": {
+    "dp": {
+      "TC07": {
+        "user": "admin",
+        "description": "test by admin tc07"
+      },
+      "TC08": {
+        "user": "userOne",
+        "description": "test by user tc08"
       }
     }
   },

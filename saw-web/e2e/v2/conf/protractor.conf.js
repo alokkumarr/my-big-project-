@@ -2,7 +2,7 @@ var appRoot = require('app-root-path');
 var retry = require('protractor-retry').retry;
 var fs = require('fs');
 var argv = require('yargs').argv;
-const SuiteHelper = require('../helpers/SuiteSetup');
+const SuiteSetup = require('../helpers/SuiteSetup');
 
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
@@ -16,7 +16,7 @@ const implicitlyWait = 1000; //should not be more than 5 seconds, this will incr
  * Explicit wait for element
  * 30 seconds in docker and 20 seconds in local
  */
-const fluentWait = new SuiteHelper().distRun() ? 30000 : 20000;
+const fluentWait = SuiteSetup.distRun() ? 30000 : 20000;
 
 /**
  * Before performing any action, Protractor waits until there are no pending asynchronous tasks in your Angular
@@ -25,7 +25,7 @@ const fluentWait = new SuiteHelper().distRun() ? 30000 : 20000;
  * https://github.com/angular/protractor/blob/master/lib/config.ts
  * 5 min in docker and 3 min in local -- All http/https calls should be completed
  */
-const allScriptsTimeout = new SuiteHelper().distRun() ? 300000 : 180000;
+const allScriptsTimeout = SuiteSetup.distRun() ? 300000 : 180000;
 
 /**
  *  https://github.com/angular/protractor/blob/master/docs/timeouts.md
@@ -38,7 +38,7 @@ const timeoutInterval = 3600000;
 /**
  * number of retries in case of failure, executes all failed tests
  */
-let maxRetryForFailedTests = new SuiteHelper().distRun() ? 3 : 2;
+let maxRetryForFailedTests = SuiteSetup.distRun() ? 3 : 2;
 
 /**
  * Waits ms after page is loaded
@@ -73,7 +73,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
-  testData: new SuiteHelper().getTestData(),
+  testData: SuiteSetup.getTestData(),
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
@@ -171,13 +171,15 @@ exports.config = {
     /**
      * This suite is for development environment and always all dev tests will be executed.
      */
-    development: [testBaseDir + 'dev1.js']
+    development: [
+      testBaseDir + 'dev1.js',
+      testBaseDir + 'dev2.js']
   },
   onCleanUp: function(results) {
-    retry.onCleanUp(results);
+    //retry.onCleanUp(results);
   },
   onPrepare() {
-    retry.onPrepare();
+    //retry.onPrepare();
 
     browser
       .manage()
@@ -205,12 +207,6 @@ exports.config = {
     );
     // Add screenshot to allure report. screenshot are taken after each test
     jasmine.getEnv().afterEach(function(done) {
-      this.specDone = function(result) {
-        console.log('result---' + JSON.stringify(result));
-        if (result.failedExpectations.length > 0) {
-          // Test FAILURE ACTION GOES HERE
-        }
-      };
       browser.takeScreenshot().then(function(png) {
         allure.createAttachment(
           'Screenshot',
@@ -223,26 +219,36 @@ exports.config = {
       });
     });
 
+    jasmine.getEnv().addReporter(new function() {
+      this.specDone = function(result) {
+        if (result.status !== 'passed') {
+          //console.log(`Failed test...${JSON.stringify(result)}`)
+          // write failed test to json file.
+          new SuiteSetup().failedTestData(result.testInfo)
+        }
+      };
+    });
+
     //browser.driver.manage().window().maximize(); // disable for Mac OS
-    browser.get(browser.baseUrl);
+    browser.get('http://juliemr.github.io/protractor-demo/');
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
-        return /login/.test(url);
+        return true;
       });
     }, pageResolveTimeout);
   },
   beforeLaunch: function() {
-    if (fs.existsSync('target/e2eId.json')) {
-      fs.unlinkSync('target/e2eId.json');
-    }
+    // Delete old e2e unique id.
+    // if (fs.existsSync('target/e2eId.json')) {
+    //   fs.unlinkSync('target/e2eId.json');
+    // }
     // Generate test data
-    // let appUrl = new SuiteHelper().getSawWebUrl();
+    let appUrl = SuiteSetup.getSawWebUrl();
     // if (appUrl) {
     //   console.log('Generating test data');
     //   let APICommonHelpers = require('../helpers/api/APICommonHelpers');
-    //   let apiCommonHelpers = new APICommonHelpers();
-    //   let apiBaseUrl = apiCommonHelpers.getAPIURL(appUrl);
-    //   let token = apiCommonHelpers.getToken(apiBaseUrl);
+    //   let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+    //   let token = APICommonHelpers.generateToken(apiBaseUrl);
     //   let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
     //   new TestDataGenerator().generateUsersRolesPrivilegesCategories(
     //     apiBaseUrl,
@@ -257,11 +263,14 @@ exports.config = {
     if (argv.retry) {
       retryCounter = ++argv.retry;
     }
-    if (retryCounter <= maxRetryForFailedTests) {
-      // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
-      new SuiteHelper().generateFailedTests('target/allure-results');
-    }
+    /**
+     * get a copy of old
+     */
+    // if (retryCounter <= maxRetryForFailedTests) {
+    //   // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
+    //   SuiteSetup.generateFailedTests('target/allure-results');
+    // }
 
-    return retry.afterLaunch(maxRetryForFailedTests);
+    //return retry.afterLaunch(maxRetryForFailedTests);
   }
 };
