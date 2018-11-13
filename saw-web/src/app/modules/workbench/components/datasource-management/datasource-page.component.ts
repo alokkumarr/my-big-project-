@@ -240,7 +240,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       minHeight: '600px',
       maxWidth: '900px',
       panelClass: 'sourceDialogClass',
-      data: {routeMetadata, }
+      data: { routeMetadata, channelID: this.selectedSourceData.bisChannelSysId }
     });
 
     dateDialogRef.afterClosed().subscribe(data => {
