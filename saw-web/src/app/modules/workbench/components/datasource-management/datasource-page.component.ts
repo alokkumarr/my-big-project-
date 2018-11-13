@@ -35,7 +35,6 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   selectedSourceData: any;
   show = false;
   channelEditable = false;
-  decryptedPWD: string;
 
   @ViewChild('channelsGrid')
   channelsGrid: DxDataGridComponent;
@@ -99,11 +98,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       this.channelEditable = true;
       this.selectedSourceData = event.selectedRowsData[0];
       this.getRoutesForChannel(event.selectedRowKeys[0]);
-      this.decryptPWD(this.selectedSourceData.password);
     } else if (event.selectedRowKeys.length > 0) {
       this.channelEditable = true;
       this.selectedSourceData = event.selectedRowsData[0];
-      this.decryptPWD(this.selectedSourceData.password);
     } else {
       this.channelEditable = false;
       this.selectedSourceData = [];
@@ -243,7 +240,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       minHeight: '600px',
       maxWidth: '900px',
       panelClass: 'sourceDialogClass',
-      data: routeMetadata
+      data: {routeMetadata, }
     });
 
     dateDialogRef.afterClosed().subscribe(data => {
@@ -290,12 +287,6 @@ export class DatasourceComponent implements OnInit, OnDestroy {
           this.getRoutesForChannel(channelID);
         });
       }
-    });
-  }
-
-  decryptPWD(pwd) {
-    this.datasourceService.decryptPWD(pwd).subscribe(data => {
-      this.decryptedPWD = data.data;
     });
   }
 
