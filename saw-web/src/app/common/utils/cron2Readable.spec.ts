@@ -1,4 +1,5 @@
 import { generateSchedule } from './cron2Readable';
+import * as moment from 'moment';
 
 const hourlyCron = {
   cronExpression: '0 02 0/1 1/1 * ? *',
@@ -20,12 +21,27 @@ describe('Cron to Readable (cron2Readable.ts)', () => {
   });
 
   it('should generate hourly schedule', () => {
-    const {cronExpression, activeTab} = hourlyCron;
-    expect(generateSchedule(cronExpression, activeTab)).toEqual('At 02 minutes past the hour');
+    const { cronExpression, activeTab } = hourlyCron;
+    expect(generateSchedule(cronExpression, activeTab)).toEqual(
+      'At 02 minutes past the hour'
+    );
   });
 
-  it('should generate non-hourly schedule', () => {
-    const {cronExpression, activeTab} = nonHourlyCron;
-    expect(generateSchedule(cronExpression, activeTab)).toEqual('At 01:30 AM, only on Monday');
+  it('should generate non-hourly schedule for local time', () => {
+    // the time format used by cronstrue library
+    const timeFormat = 'hh:mm A';
+    const { cronExpression, activeTab } = nonHourlyCron;
+    const [, minutes, hours] = cronExpression.split(' ');
+    const momentInput = {
+      hours: parseInt(hours, 10),
+      minutes: parseInt(minutes, 10)
+    };
+    const localTime = moment
+      .utc(momentInput)
+      .local()
+      .format(timeFormat);
+    expect(generateSchedule(cronExpression, activeTab)).toEqual(
+      `At ${localTime}, only on Monday`
+    );
   });
 });
