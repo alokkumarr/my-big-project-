@@ -1,8 +1,12 @@
 import cronstrue from 'cronstrue';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isString from 'lodash/isString';
 import * as moment from 'moment';
 
 export function generateSchedule(cronExpression, activeTab) {
+  if (!isString(cronExpression)) {
+    throw new Error(`generateSchedule expects a string as a first parameter, not: ${typeof cronExpression}`);
+  }
   if (isEmpty(cronExpression)) {
     return '';
   }
