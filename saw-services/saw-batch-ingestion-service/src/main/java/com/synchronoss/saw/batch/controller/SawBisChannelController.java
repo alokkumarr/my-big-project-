@@ -56,8 +56,7 @@ public class SawBisChannelController {
   
   /**
    * This API provides an ability to add a source. 
- * @throws Exception 
-   */
+  */
   @ApiOperation(value = "Add a new channel",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
   @ApiResponses(
@@ -82,7 +81,6 @@ public class SawBisChannelController {
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
-    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -90,6 +88,7 @@ public class SawBisChannelController {
     ObjectNode rootNode = null;
     nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
     rootNode = (ObjectNode) nodeEntity;
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
     String secretPhrase = rootNode.get("password").asText();
     secretPhrase = obfuscator.encrypt(secretPhrase);
     rootNode.put("password", secretPhrase);
