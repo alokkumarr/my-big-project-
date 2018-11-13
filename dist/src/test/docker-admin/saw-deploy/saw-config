@@ -81,6 +81,7 @@ saw_preview_rows_limit=10000
 # Publish row limit is optional parameter and only get considered if it has been
 # set greater than 0 values if it not set then no limit will be applied for publishing the report.
 saw_publish_rows_limit=10000
+saw_executor_restart_threshold=50
 
 # FTP JSON config
 # ##########################################
@@ -115,3 +116,6 @@ saw_security_email_host=sip-admin
 
 [saw-security-arbitrator]
 sip-app3
+
+[sip-rtps]
+sip-app1

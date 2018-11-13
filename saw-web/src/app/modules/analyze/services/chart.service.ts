@@ -93,11 +93,6 @@ const stackConfig = config => {
   return config;
 };
 
-const donutConfig = config => {
-  set(config, 'chart.type', 'pie');
-  return pieConfig(config);
-};
-
 const pieConfig = config => {
   delete config.xAxis;
   delete config.yAxis;
@@ -110,6 +105,11 @@ const pieConfig = config => {
   ]);
   set(config, 'plotOptions.pie.showInLegend', false);
   return config;
+};
+
+const donutConfig = config => {
+  set(config, 'chart.type', 'pie');
+  return pieConfig(config);
 };
 
 const configCustomizer = {
@@ -156,7 +156,9 @@ export class ChartService {
     const initialLegendPosition =
       analysis.chartType === 'combo'
         ? 'top'
-        : analysis.chartType.substring(0, 2) === 'ts' ? 'bottom' : 'right';
+        : analysis.chartType.substring(0, 2) === 'ts'
+          ? 'bottom'
+          : 'right';
     const initialLegendLayout =
       analysis.chartType === 'combo' ||
       analysis.chartType.substring(0, 2) === 'ts'
@@ -544,8 +546,7 @@ export class ChartService {
       (accumulator, field) => {
         accumulator[
           typeof field.checked === 'string' ? field.checked : field.area
-        ] =
-          field.columnName;
+        ] = field.columnName;
         return accumulator;
       },
       {}
@@ -994,8 +995,16 @@ export class ChartService {
       // number -> restrict the number to 2 decimals
       // date -> just show the date
       const xStringValue = point
-        ? xIsString ? point.key : xIsNumber ? round(point.x, 2) : point.x
-        : xIsString ? 'point.key' : xIsNumber ? 'point.x:,.2f' : 'point.x';
+        ? xIsString
+          ? point.key
+          : xIsNumber
+            ? round(point.x, 2)
+            : point.x
+        : xIsString
+          ? 'point.key'
+          : xIsNumber
+            ? 'point.x:,.2f'
+            : 'point.x';
 
       const xString = `<tr>
         <th>${fields.x.alias ||

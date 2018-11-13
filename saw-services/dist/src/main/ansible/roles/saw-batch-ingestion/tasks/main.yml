@@ -1,0 +1,38 @@
+- name: Copy SAW Batch Ingestion Service package
+  copy: src="{{ item }}" dest=/tmp/saw-batch-ingestion.rpm
+  with_fileglob: ["../rpms/saw-batch-*.rpm"]
+- name: Install SAW Batch Ingestion package
+  yum: name=/tmp/saw-batch-ingestion.rpm state=present
+  notify:
+    - restart saw-batch-ingestion
+- name: Look up Batch Ingestion Service database password
+  set_fact:
+    saw_batch_ingestion_db_password: >-
+      {{ lookup('password', inventory_dir
+        + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
+- name: Install SAW Batch Ingestion Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
+  notify:
+    - restart saw-batch-ingestion
+- name: Set the SAW Batch Ingestion Service database password
+  copy:
+    content: "{{ saw_batch_ingestion_db_password }}"
+    dest: /etc/bda/saw-batch-ingestion-db-password
+# name: Run SAW Batch Ingestion initial database setup
+# command: /opt/bda/saw-batch-ingestion-service/db-setup/init
+  # Note: Run database initialization only on one of the nodes
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+# Workaround: The service restart handler will run only after all
+# tasks have completed.  This causes the service to remain running
+# using the old port when the new socket activation proxy starts up,
+# resulting in a port already in use error.  So trigger the restart
+# handler already here, to force the service to pick up the new port
+# setting before starting the socket activation proxy.  Can be removed
+# as no longer needed after the next SAW release.
+- meta: flush_handlers
+# name: Enable SAW Batch Ingestion Service
+#  systemd: name=saw-batch-ingestion-proxy.socket enabled=true state=started
+# Note: In difference to other socket-activates services, the
+# Batch Service is by default also enabled itself to ensure that
+# name: Enable SAW Batch Ingestion Service
+# systemd: name=saw-batch-ingestion enabled=true

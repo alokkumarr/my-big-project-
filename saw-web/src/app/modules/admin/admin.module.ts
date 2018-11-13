@@ -57,7 +57,11 @@ import {
 import { SidenavMenuService } from '../../common/components/sidenav';
 import { DxDataGridService, ToastService, LocalSearchService } from '../../common/services';
 
+<<<<<<< HEAD
 import { isAdminGuard, GoToDefaultAdminPageGuard} from './guards';
+=======
+import { IsAdminGuard, GoToDefaultAdminPageGuard } from './guards';
+>>>>>>> 78c559796236f7d401bae56e29b5744980ab3736
 
 const COMPONENTS = [
   AdminPageComponent,
@@ -82,6 +86,7 @@ const COMPONENTS = [
   AdminImportFileListComponent
 ];
 
+<<<<<<< HEAD
 const INTERCEPTORS = [
   { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
   {
@@ -97,6 +102,9 @@ const INTERCEPTORS = [
 ];
 
 const GUARDS = [isAdminGuard, GoToDefaultAdminPageGuard];
+=======
+const GUARDS = [IsAdminGuard, GoToDefaultAdminPageGuard];
+>>>>>>> 78c559796236f7d401bae56e29b5744980ab3736
 
 const SERVICES = [
   SidenavMenuService,

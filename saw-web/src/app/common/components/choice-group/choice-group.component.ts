@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 interface IChoiceGroupItem {
   label: string;
@@ -11,7 +11,7 @@ interface IChoiceGroupItem {
   templateUrl: './choice-group.component.html',
   styleUrls: ['./choice-group.component.scss']
 })
-export class ChoiceGroupComponent {
+export class ChoiceGroupComponent implements OnInit {
   @Output() change: EventEmitter<IChoiceGroupItem> = new EventEmitter();
   @Input() items: IChoiceGroupItem[];
   @Input() value;
@@ -20,6 +20,10 @@ export class ChoiceGroupComponent {
   selectedSubItem;
 
   constructor() {}
+
+  ngOnInit() {
+    this.selectedItem = this.items[0];
+  }
 
   onItemSelected(value) {
     this.selectedItem = value;

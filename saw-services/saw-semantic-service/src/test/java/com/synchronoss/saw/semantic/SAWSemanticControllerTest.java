@@ -89,7 +89,7 @@ public class SAWSemanticControllerTest {
             "http://localhost/internal/semantic/workbench/filter?username=sawadmin@synchronoss.com&module=ANALYZE");
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
     MockHttpServletResponse response = result.getResponse();
-    assertEquals(HttpStatus.ACCEPTED.value(), response.getStatus());
+    assertEquals(HttpStatus.OK.value(), response.getStatus());
   }
 
   public SemanticNode getSemantic(String semanticJSONString) {

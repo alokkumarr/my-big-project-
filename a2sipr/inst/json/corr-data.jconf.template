@@ -99,11 +99,17 @@
             "value":"${:saw.host.name:}"
         }
     ],
-    "correlater": {
-                                "targetField": "MESSAGE_SIZE",
+    "correlater": [{
+                                "targetField": "METRIC1",
                                 "transform": "normalize",
                                 "outputColNames": ["PRIMARY_VARIABLE", "SECONDARY_VARIABLE", "CORRELATION"],
                                 "removeDiag": "FALSE",
                                 "collect": "false"
-        }
+        },{
+                                "targetField": "METRIC2",
+                                "transform": "standardize",
+                                "outputColNames": ["PRIMARY_VARIABLE", "SECONDARY_VARIABLE", "CORRELATION"],
+                                "removeDiag": "FALSE",
+                                "collect": "false"
+        }]
 }
