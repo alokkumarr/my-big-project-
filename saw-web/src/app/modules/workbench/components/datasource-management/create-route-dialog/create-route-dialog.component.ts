@@ -39,11 +39,11 @@ export class CreateRouteDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (isUndefined(this.routeData.length)) {
+    if (isUndefined(this.routeData.routeMetadata.length)) {
       this.opType = 'update';
       this.dialogTitle = 'Update Route';
-      this.detailsFormGroup.patchValue(this.routeData);
-      this.crondetails = this.routeData.schedulerExpression;
+      this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
+      this.crondetails = this.routeData.routeMetadata.schedulerExpression;
     }
   }
 
@@ -51,16 +51,13 @@ export class CreateRouteDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-
   testRoute(formData) {
-    const routeData = {
+    const routeInfo = {
       channelType: 'sftp',
-      channelId: formData.hostName,
-      password: formData.password,
-      portNo: formData.portNo,
-      userName: formData.userName
+      channelId: this.routeData.channelID,
+      destinationLocation: formData.destinationLocation
     };
-    this.datasourceService.testChannelWithBody(routeData).subscribe(data => {
+    this.datasourceService.testRouteWithBody(routeInfo).subscribe(data => {
       this.showConnectivityLog(data);
     });
   }
