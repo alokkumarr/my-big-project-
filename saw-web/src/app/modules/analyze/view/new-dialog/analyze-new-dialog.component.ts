@@ -1,13 +1,14 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as get from 'lodash/get';
+import * as lowerCase from 'lodash/lowerCase';
 import * as values from 'lodash/values';
 import * as fpForEach from 'lodash/fp/forEach';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
 
-import { ANALYSIS_METHODS } from '../../consts';
+import { ANALYSIS_METHODS, DATAPOD_CATEGORIES_OBJ } from '../../consts';
 import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { MatHorizontalStepper } from '@angular/material/stepper';
@@ -175,5 +176,17 @@ export class AnalyzeNewDialogComponent {
           this._dialogRef.close(successfullySaved);
         }
       });
+  }
+
+  getCategoryIcon(metricCategory) {
+    const name = lowerCase(metricCategory.label);
+    const icon = get(DATAPOD_CATEGORIES_OBJ[name], 'icon');
+    return icon || '';
+  }
+
+  getMetricCategoryLabel(metricCategory) {
+    const metricCount = this.searchCount(metricCategory.metrics);
+    const label = metricCategory.label;
+    return `${label} (${metricCount})`;
   }
 }

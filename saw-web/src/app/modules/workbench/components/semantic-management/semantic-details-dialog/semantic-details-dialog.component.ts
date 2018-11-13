@@ -6,35 +6,7 @@ import {
   FormBuilder,
   Validators
 } from '@angular/forms';
-
-const categories = [{
-  name: 'default',
-  icon: 'category-default'
-}, {
-  name: 'errors',
-  icon: 'category-errors'
-}, {
-  name: 'orders',
-  icon: 'category-orders'
-}, {
-  name: 'sessions',
-  icon: 'category-sessions'
-}, {
-  name: 'subscribers',
-  icon: 'category-subscribers'
-}, {
-  name: 'usage',
-  icon: 'category-usage'
-}, {
-  name: 'events',
-  icon: 'calendar-events'
-}, {
-  name: 'retention',
-  icon: 'calendar-retention'
-}, {
-  name: 'funnel',
-  icon: 'calendar-funnel'
-}];
+import { DATAPOD_CATEGORIES } from '../../../consts';
 
 @Component({
   selector: 'semantic-details-dialog',
@@ -43,7 +15,7 @@ const categories = [{
 })
 export class SemanticDetailsDialogComponent implements OnInit {
   form: FormGroup;
-  categories = categories;
+  dataPodCategories = DATAPOD_CATEGORIES;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -52,7 +24,7 @@ export class SemanticDetailsDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const defaultCategory = categories[0].name;
+    const defaultCategory = DATAPOD_CATEGORIES[0].name;
     this.form = new FormGroup({
       name: new FormControl('', [
         Validators.required,

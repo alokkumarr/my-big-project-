@@ -71,6 +71,12 @@ mat-tab-group {
   ::ng-deep mat-ink-bar {
     width: 100px;
   }
+
+  .tab-icon {
+    padding-right: 5px;
+    width: 14px;
+    height: 14px;
+  }
 }
 
 mat-radio-group {

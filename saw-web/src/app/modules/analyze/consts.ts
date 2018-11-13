@@ -23,6 +23,8 @@ import {
   DEFAULT_PRECISION
 } from '../../common/consts';
 
+export { DATAPOD_CATEGORIES_OBJ } from '../../common/consts';
+
 export {
   NUMBER_TYPES,
   FLOAT_TYPES,

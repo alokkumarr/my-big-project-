@@ -147,3 +147,37 @@ export const SCHEDULE_TYPES = [{
   label: 'Yearly',
   value: 'yearly'
 }];
+
+export const DATAPOD_CATEGORIES = [{
+  name: 'default',
+  icon: 'category-default'
+}, {
+  name: 'errors',
+  icon: 'category-errors'
+}, {
+  name: 'orders',
+  icon: 'category-orders'
+}, {
+  name: 'sessions',
+  icon: 'category-sessions'
+}, {
+  name: 'subscribers',
+  icon: 'category-subscribers'
+}, {
+  name: 'usage',
+  icon: 'category-usage'
+}, {
+  name: 'events',
+  icon: 'calendar-events'
+}, {
+  name: 'retention',
+  icon: 'calendar-retention'
+}, {
+  name: 'funnel',
+  icon: 'calendar-funnel'
+}];
+
+export const DATAPOD_CATEGORIES_OBJ = fpPipe(
+  fpGroupBy('name'),
+  fpMapValues(v => v[0])
+)(DATAPOD_CATEGORIES);

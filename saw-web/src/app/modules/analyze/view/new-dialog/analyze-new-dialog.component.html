@@ -45,16 +45,18 @@
         Sort
       </button>
       <mat-tab-group>
-        <mat-tab *ngFor="let metricCategory of supportedMetricCategories"
-                 (selectedTabChange)="onMetricCategoryChange($event)"
-                 label="{{metricCategory.label + ' (' + searchCount(metricCategory.metrics) + ')'}}">
+        <mat-tab *ngFor="let metricCategory of supportedMetricCategories">
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon" [svgIcon]="getCategoryIcon(metricCategory)"></mat-icon>
+            {{getMetricCategoryLabel(metricCategory)}}
+          </ng-template>
           <mat-radio-group (change)="onMetricSelected($event.value)" fxLayout="row wrap" class="container" [value]="selectedMetric">
             <mat-radio-button *ngFor="let metric of metricCategory.metrics | filter:'metricName':searchMetric; trackBy: trackById"
                               class="metric-radio-button"
                               [attr.e2e]="'metric-name-' + metric.metricName"
                               [value]="metric"
             >
-              <mat-icon class="category-icon" svgIcon="category-default"></mat-icon>
+              <mat-icon class="category-icon" [svgIcon]="getCategoryIcon(metricCategory)"></mat-icon>
               <div class="category-detail">
                 {{metric.metricName}}
                 <span class="metric-created-time" *ngIf="metric.createdAt" [textContent]="'Created: ' + metric.createdAt"></span>

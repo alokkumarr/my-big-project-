@@ -13,7 +13,7 @@
     <mat-form-field appearance="outline" class="form-select">
       <mat-label>Category</mat-label>
       <mat-select formControlName="category">
-        <mat-option *ngFor="let category of categories" [value]="category.name">
+        <mat-option *ngFor="let category of dataPodCategories" [value]="category.name">
           <div fxLayout="row" fxLayoutAlign="space-between center">
             {{category.name | changeCase:'title'}}
             <mat-icon [svgIcon]="category.icon"></mat-icon>
