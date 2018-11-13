@@ -151,6 +151,11 @@
 			<artifactId>saw-bis-plugin-sftp</artifactId>
 			<version>${revision}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-log-service</artifactId>
+			<version>${revision}</version>
+		</dependency>
 
 		<!-- This is automated migration plugin -->
 		<dependency>

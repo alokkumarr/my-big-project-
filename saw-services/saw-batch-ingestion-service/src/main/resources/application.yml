@@ -42,6 +42,10 @@ management:
 sip:
   service:
     index: 0    
-    
+bis:
+  transfer-batch-size: 10
+  partial-file-timeDifference: 1000
+  default-data-drop-location: /Users/spau0004/Desktop/workbench
+     
 
     

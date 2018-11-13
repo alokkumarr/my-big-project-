@@ -14,6 +14,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
@@ -39,6 +42,8 @@ public final class IntegrationUtils {
 	public static final String PATTERN_TO_ATTACHED_WHILE_EXTRACTION = ".*\\.";
 	public static final String ERROR_EXTENSION = "error";
 	public static final String VALIDATION_ERROR_EXTENSION = "validationFailed";
+	public static final String KEY = "Saw12345Saw12345";
+	public static final SecretKey secretKey = new SecretKeySpec(KEY.getBytes(), "AES");
 	
 	public static String getRenameDateFormat() {
 		return RENAME_DATE_FORMAT;

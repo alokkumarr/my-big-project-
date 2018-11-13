@@ -42,3 +42,8 @@ management:
 sip:
   service:
     index: {{ groups['saw-services'].index(inventory_hostname) }}
+
+bis:
+  transfer-batch-size: 10
+  partial-file-timeDifference: 1000
+  default-data-drop-location: "{{ saw_workbench_project_path | default('/workbench') }}"

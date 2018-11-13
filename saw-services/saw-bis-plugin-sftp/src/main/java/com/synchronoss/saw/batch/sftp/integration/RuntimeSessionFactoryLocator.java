@@ -9,6 +9,8 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
+import com.synchronoss.saw.batch.utils.IntegrationUtils;
+import com.synchronoss.saw.batch.utils.SipObfuscation;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,6 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactory;
@@ -29,6 +33,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
+  private static final Logger logger = 
+      LoggerFactory.getLogger(RuntimeSessionFactoryLocator.class);
   private final Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
 
   @Autowired
@@ -40,13 +46,17 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
     Long id = Long.valueOf(key.toString());
     DefaultSftpSessionFactory sessionFactory = sessionFactoryMap.get(id);
     if (sessionFactory == null) {
-      sessionFactory = generateSessionFactory(id);
+      try {
+        sessionFactory = generateSessionFactory(id);
+      } catch (Exception e) {
+        logger.error("Exception occurred while generating the session", e);
+      }
       sessionFactoryMap.put(id, sessionFactory);
     }
     return new CachingSessionFactory<LsEntry>(sessionFactory);
   }
 
-  private DefaultSftpSessionFactory generateSessionFactory(Long key) {
+  private DefaultSftpSessionFactory generateSessionFactory(Long key) throws Exception {
     Optional<BisChannelEntity> entity = bisChannelDataRestRepository.findById(key);
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
     if (entity.isPresent()) {
@@ -63,7 +73,8 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String portNumber = rootNode.get("portNo").asText();
         defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
         String userName = rootNode.get("userName").asText();
-        String password = rootNode.get("password").asText();
+        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+        String password = obfuscator.decrypt(rootNode.get("password").asText());
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         defaultSftpSessionFactory.setUser(userName);

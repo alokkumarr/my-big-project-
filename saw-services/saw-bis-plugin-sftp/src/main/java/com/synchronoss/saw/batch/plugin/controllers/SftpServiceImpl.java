@@ -26,17 +26,23 @@ import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -62,7 +68,7 @@ import org.springframework.util.StreamUtils;
 @Service("sftpService")
 public class SftpServiceImpl extends SipPluginContract {
 
-  private static final Logger logger = LoggerFactory.getLogger(SftpPluginController.class);
+  private static final Logger logger = LoggerFactory.getLogger(SawBisSftpPluginController.class);
   
   @Autowired
   private RuntimeSessionFactoryLocator delegatingSessionFactory;
@@ -73,7 +79,17 @@ public class SftpServiceImpl extends SipPluginContract {
   @Autowired
   private IntegrationFlowContext flowContext;
   
-  private Long timeDifference = 1000L;
+  @Value("${bis.partial-file-timeDifference}")
+  @NotNull
+  private Long timeDifference;
+  
+  @Value("${bis.transfer-batch-size}")
+  @NotNull
+  private Integer batchSize;
+
+  @Value("${bis.default-data-drop-location}")
+  @NotNull
+  private String defaultDestinationLocation;
   
   // TODO: It has to be enhanced to stream the logs to user interface
   //TODO: SIP-4613
@@ -92,17 +108,25 @@ public class SftpServiceImpl extends SipPluginContract {
       try {
         nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
-        String destinationLocation = rootNode.get("destinationLocation").asText();
+        String destinationLocation = (rootNode.get("destinationLocation").asText() != null
+            ? rootNode.get("destinationLocation").asText() : defaultDestinationLocation);
         File destinationPath = new File(destinationLocation);
-        Paths.get(destinationLocation);
         if (destinationPath.exists()) {
           if ((destinationPath.canRead() && destinationPath.canWrite()) 
               && destinationPath.canExecute()) {
-            status = HttpStatus.OK;
+            String sourceLocation = (rootNode.get("sourceLocation").asText());
+            if (delegatingSessionFactory.getSessionFactory(
+                  entity.getBisChannelSysId()).getSession().exists(sourceLocation)) {
+              status = HttpStatus.OK;
+            } else {
+              status = HttpStatus.BAD_REQUEST;
+              throw new SftpProcessorException("either path at destination "
+              + "or source does not exists");
+            }
           }
         } else {
-          status = HttpStatus.BAD_REQUEST;
-          throw new SftpProcessorException("destination path does not exists");
+          Files.createDirectories(Paths.get(destinationLocation));
+          status = HttpStatus.OK;
         }
       } catch (IOException e) {
         status = HttpStatus.BAD_REQUEST;
@@ -139,11 +163,12 @@ public class SftpServiceImpl extends SipPluginContract {
     return status;
   }
 
-  //TODO : This transfer data has to be enhanced while integrating with Scheduler
-  //TODO : to download a batch of files instead all files then initiate the downstream the process
-  //TODO: Transfer needs some more work & and the same entity Id will not work. 
-  @Override
- public HttpStatus transferData(BisIngestionPayload input) throws JsonProcessingException {
+  /**
+   * TODO : This transfer data has to be enhanced while integrating with Scheduler
+   * TODO : to download a batch of files instead all files then initiate the downstream the process
+   * TODO: Transfer needs some more work & and the same entity Id will not work. 
+  */
+  public HttpStatus transferDataFlow(BisIngestionPayload input) throws JsonProcessingException {
     logger.trace("transferring file from remote channel starts here");
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -236,16 +261,25 @@ public class SftpServiceImpl extends SipPluginContract {
       throws SipNestedRuntimeException {
     logger.trace("Test connection to route starts here");
     HttpStatus status = null;
-    File destinationPath = new File(payload.getDestinationLocation());
-    Paths.get(payload.getDestinationLocation());
+    String dataPath = payload.getDestinationLocation() != null
+            ? payload.getDestinationLocation() : defaultDestinationLocation; 
+    File destinationPath = new File(dataPath);
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite()) 
           && destinationPath.canExecute()) {
+        delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession().isOpen();  
         status = HttpStatus.OK;
+        delegatingSessionFactory.invalidateSessionFactoryMap();
       }
     } else {
-      status = HttpStatus.BAD_REQUEST;
-      throw new SftpProcessorException("destination path does not exists");
+      try {
+        Files.createDirectories(Paths.get(dataPath));
+      } catch (Exception ex) {
+        status = HttpStatus.BAD_REQUEST;
+        throw new SftpProcessorException("Excpetion occurred while creating the directory "
+        + "for destination", ex);
+      }
+      status = HttpStatus.OK;
     }
     logger.trace("Test connection to route ends here");
     return status;
@@ -262,9 +296,9 @@ public class SftpServiceImpl extends SipPluginContract {
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
     try {
       defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
-      defaultSftpSessionFactory.setHost(payload.getHost());
-      defaultSftpSessionFactory.setPort(payload.getPort());
-      defaultSftpSessionFactory.setUser(payload.getUsername());
+      defaultSftpSessionFactory.setHost(payload.getHostName());
+      defaultSftpSessionFactory.setPort(payload.getPortNo());
+      defaultSftpSessionFactory.setUser(payload.getUserName());
       defaultSftpSessionFactory.setAllowUnknownKeys(true);
       Properties prop = new Properties();
       prop.setProperty("StrictHostKeyChecking", "no");
@@ -292,9 +326,9 @@ public class SftpServiceImpl extends SipPluginContract {
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
     try {
       defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
-      defaultSftpSessionFactory.setHost(payload.getHost());
-      defaultSftpSessionFactory.setPort(payload.getPort());
-      defaultSftpSessionFactory.setUser(payload.getUsername());
+      defaultSftpSessionFactory.setHost(payload.getHostName());
+      defaultSftpSessionFactory.setPort(payload.getPortNo());
+      defaultSftpSessionFactory.setUser(payload.getUserName());
       defaultSftpSessionFactory.setPassword(payload.getPassword());
       defaultSftpSessionFactory.setAllowUnknownKeys(true);
       Properties prop = new Properties();
@@ -302,8 +336,8 @@ public class SftpServiceImpl extends SipPluginContract {
       defaultSftpSessionFactory.setSessionConfig(prop);
       if (defaultSftpSessionFactory.getSession().isOpen()) {
         SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
-        transferredFiles = listOfAll(template, payload.getSourceLocation(), 
-                payload.getPattern(), payload);
+        transferredFiles = immediatelistOfAll(template, payload.getSourceLocation(), 
+                payload.getFilePattern(), payload);
         defaultSftpSessionFactory.getSession().close();
       }
     } catch (Exception ex) {
@@ -317,13 +351,9 @@ public class SftpServiceImpl extends SipPluginContract {
     return transferredFiles;
   }
   
-  private List<BisDataMetaInfo>  listOfAll(SftpRemoteFileTemplate template, String location, 
-      String pattern, BisConnectionTestPayload payload) throws IOException {
-    File localDirectory = new File(payload.getDestinationLocation() 
-             + File.separator + getBatchId() + File.separator);
-    if (!localDirectory.exists()) {
-      localDirectory.mkdirs();
-    }
+  private List<BisDataMetaInfo>  immediatelistOfAll(
+      SftpRemoteFileTemplate template, String location, 
+      String pattern, BisConnectionTestPayload payload) throws IOException, ParseException {
     List<BisDataMetaInfo> list = new ArrayList<>(payload.getBatchSize());
     LsEntry [] files = template.list(location + File.separator + pattern);
     BisDataMetaInfo bisDataMetaInfo = null;
@@ -332,9 +362,17 @@ public class SftpServiceImpl extends SipPluginContract {
       long currentTime = System.currentTimeMillis();
       if ((currentTime - lastModified) > timeDifference) {
         if (entry.getAttrs().isDir()) {
-          listOfAll(template, location + File.separator + entry.getFilename(), pattern, payload);
+          immediatelistOfAll(template, location + File.separator 
+              + entry.getFilename(), pattern, payload);
         } else {
-          if (list.size() <= payload.getBatchSize()) {
+          if (list.size() <= batchSize && entry.getAttrs().getSize() != 0) {
+            String destination = payload.getDestinationLocation() != null 
+                ? payload.getDestinationLocation() : defaultDestinationLocation;
+            File localDirectory = new File(destination
+                + File.separator + getBatchId() + File.separator);
+            if (!localDirectory.exists()) {
+              localDirectory.mkdirs();
+            }
             File localFile = new File(localDirectory.getPath()
                 + File.separator + FilenameUtils.getBaseName(entry.getFilename()) + "."
                 + IntegrationUtils.renameFileAppender() + "." 
@@ -355,9 +393,122 @@ public class SftpServiceImpl extends SipPluginContract {
             bisDataMetaInfo.setReceivedDataName(localFile.getPath());
             bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
             bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
+            bisDataMetaInfo.setActualReceiveDate(new Date(((long)
+                entry.getAttrs().getATime()) * 1000L));
             list.add(bisDataMetaInfo); 
           } else {
             break;
+          }
+        }
+      }
+    }
+    return list;
+  }
+  
+  @Override
+  public List<BisDataMetaInfo> transferData(Long channelId, Long routeId) 
+      throws SipNestedRuntimeException {
+    logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
+    List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
+    try {
+      if (delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
+        logger.info("connected successfully " + channelId);
+        Optional<BisRouteEntity> channelEntity = bisRouteDataRestRepository.findById(routeId);
+        if (channelEntity.isPresent()) {
+          ObjectMapper objectMapper = new ObjectMapper();
+          objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+          objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+          BisRouteEntity bisChannelEntity = channelEntity.get();
+          JsonNode nodeEntity = null;
+          ObjectNode rootNode = null;
+          nodeEntity = objectMapper.readTree(bisChannelEntity.getRouteMetadata());
+          rootNode = (ObjectNode) nodeEntity;
+          String sourceLocation = rootNode.get("sourceLocation").asText();
+          String destinationLocation = rootNode.get("destinationLocation").asText();
+          String filePattern = rootNode.get("filePattern").asText();
+          SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(
+              delegatingSessionFactory.getSessionFactory(channelId));
+          listOfFiles = transferDataFromChannel(template, sourceLocation, filePattern, 
+              destinationLocation, channelId, routeId);
+          delegatingSessionFactory.getSessionFactory(channelId).getSession().close();
+          delegatingSessionFactory.invalidateSessionFactoryMap();
+        } else {
+          throw new SftpProcessorException("Exception occurred while connecting to channel");
+        }
+      }
+    } catch (Exception ex) {
+      logger.info("Exception occurred while connecting to channel :", ex);
+      throw new SftpProcessorException("Exception occurred while connecting to channel",ex);
+    } finally {
+      if (delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
+        delegatingSessionFactory.getSessionFactory(channelId).getSession().close();
+        delegatingSessionFactory.invalidateSessionFactoryMap();
+      }
+    }
+    logger.trace("Transfer ends here with an channel" + channelId + "and routeId " + routeId);
+    return listOfFiles;
+  }
+
+  private List<BisDataMetaInfo>  transferDataFromChannel(
+      SftpRemoteFileTemplate template, String sourcelocation, String pattern, 
+      String destinationLocation, Long channelId, Long routeId) throws IOException, ParseException {
+    List<BisDataMetaInfo> list = new ArrayList<>(batchSize);
+    LsEntry [] files = template.list(sourcelocation + File.separator + pattern);
+    BisDataMetaInfo bisDataMetaInfo = null;
+    for (LsEntry entry : files) {
+      long lastModified = entry.getAttrs().getMTime();
+      long currentTime = System.currentTimeMillis();
+      if ((currentTime - lastModified) > timeDifference) {
+        if (entry.getAttrs().isDir()) {
+          transferDataFromChannel(template, sourcelocation + File.separator 
+              + entry.getFilename(), pattern, destinationLocation, channelId, routeId);
+        } else {
+          try {
+            if ((list.size() <= batchSize && entry.getAttrs().getSize() != 0) 
+                && !checkDuplicateFile(entry.getFilename())) {
+              destinationLocation = destinationLocation != null ? destinationLocation
+                : defaultDestinationLocation;
+              File localDirectory = new File(destinationLocation 
+                  + File.separator + getBatchId() + File.separator);
+              if (!localDirectory.exists()) {
+                localDirectory.mkdirs();
+              }
+              File localFile = new File(localDirectory.getPath()
+                  + File.separator + FilenameUtils.getBaseName(entry.getFilename()) + "."
+                  + IntegrationUtils.renameFileAppender() + "." 
+                  + FilenameUtils.getExtension(entry.getFilename()));
+              bisDataMetaInfo = new BisDataMetaInfo();
+              bisDataMetaInfo.setProcessId(new UUIDGenerator()
+                  .generateId(bisDataMetaInfo).toString());
+              bisDataMetaInfo.setReceivedDataName(localFile.getPath());
+              bisDataMetaInfo.setDataSizeInBytes(new Long(entry.getAttrs()
+                   .getSize()).doubleValue());
+              bisDataMetaInfo.setActualDataName(sourcelocation + File.separator 
+                  + entry.getFilename());
+              bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+              bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
+              bisDataMetaInfo.setActualReceiveDate(new Date(((long)
+                  entry.getAttrs().getATime()) * 1000L));
+              bisDataMetaInfo.setChannelId(channelId);
+              bisDataMetaInfo.setRouteId(channelId);
+              logDataUpsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+              template.get(sourcelocation + File.separator 
+                  + entry.getFilename(), new InputStreamCallback() {
+                    @Override
+                    public void doWithInputStream(InputStream stream) throws IOException {
+                      FileCopyUtils.copy(StreamUtils.copyToByteArray(stream), localFile);
+                    } 
+                  });
+              bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
+              logDataUpsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+              list.add(bisDataMetaInfo); 
+            } else {
+              break;
+            }
+          } catch (Exception ex) {
+            logger.error("Exception occurred while transferring the file from channel", ex);
+            bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
+            logDataUpsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
           }
         }
       }

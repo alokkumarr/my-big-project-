@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch.model;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,17 +14,18 @@ import io.swagger.annotations.ApiModelProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BisDataMetaInfo {
+	
 	@ApiModelProperty(hidden=true)
 	@JsonProperty("processId")
 	private String processId;
 	
 	@ApiModelProperty(hidden=true)
 	@JsonProperty("routeId")
-	private String routeId;
+	private Long routeId;
 	
 	@ApiModelProperty(hidden=true)
 	@JsonProperty("channelId")
-	private String channelId;
+	private Long channelId;
 	
 	@JsonProperty("channelType")
 	private BisChannelType channelType = BisChannelType.SFTP;
@@ -37,12 +39,32 @@ public class BisDataMetaInfo {
 	@JsonProperty("dataSizeInBytes")
 	private Double dataSizeInBytes;
 	
-	@ApiModelProperty(hidden=true)
-	@JsonProperty("dataValidStatus")
-	private String dataValidStatus;
-	
 	@JsonProperty("processState")
 	private String processState;
+	
+	@JsonProperty("pattern")
+	private String pattern;
+
+	@JsonProperty("actualReceiveDate")
+	private Date actualReceiveDate;
+	
+	@JsonProperty("actualReceiveDate")
+	public Date getActualReceiveDate() {
+		return actualReceiveDate;
+	}
+	@JsonProperty("actualReceiveDate")	
+	public void setActualReceiveDate(Date actualReceiveDate) {
+		this.actualReceiveDate = actualReceiveDate;
+	}
+	@JsonProperty("pattern")
+	public String getPattern() {
+		return pattern;
+	}
+	@JsonProperty("pattern")
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
+	}
+
 	
 	@JsonProperty("processId")
 	public String getProcessId() {
@@ -53,19 +75,19 @@ public class BisDataMetaInfo {
 		this.processId = processId;
 	}
 	@JsonProperty("routeId")
-	public String getRouteId() {
+	public Long getRouteId() {
 		return routeId;
 	}
 	@JsonProperty("routeId")
-	public void setRouteId(String routeId) {
+	public void setRouteId(Long routeId) {
 		this.routeId = routeId;
 	}
 	@JsonProperty("channelId")
-	public String getChannelId() {
+	public Long getChannelId() {
 		return channelId;
 	}
 	@JsonProperty("channelId")
-	public void setChannelId(String channelId) {
+	public void setChannelId(Long channelId) {
 		this.channelId = channelId;
 	}
 	@JsonProperty("channelType")
@@ -99,14 +121,6 @@ public class BisDataMetaInfo {
 	@JsonProperty("dataSizeInBytes")
 	public void setDataSizeInBytes(Double dataSizeInBytes) {
 		this.dataSizeInBytes = dataSizeInBytes;
-	}
-	@JsonProperty("dataValidStatus")
-	public String getDataValidStatus() {
-		return dataValidStatus;
-	}
-	@JsonProperty("dataValidStatus")
-	public void setDataValidStatus(String dataValidStatus) {
-		this.dataValidStatus = dataValidStatus;
 	}
 	@JsonProperty("processState")
 	public String getProcessState() {
