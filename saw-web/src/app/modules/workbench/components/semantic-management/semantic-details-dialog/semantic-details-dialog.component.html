@@ -1,17 +1,31 @@
-<form [formGroup]="form" (ngSubmit)="submit(form)">
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="submit(form)">
     <div mat-dialog-title i18n>Enter Datapod Details</div>
-    <mat-dialog-content style="height:100px;">
-        <mat-form-field class="inpElement">
-            <input matInput formControlName="nameControl" autocomplete="off" placeholder="Enter Datapod Name" required maxlength="25"/>
-            <mat-error *ngIf="form.controls.nameControl.hasError('required')" i18n>
-                Datapod Name is
-                <strong>required</strong>
-            </mat-error>
-        </mat-form-field>
-    </mat-dialog-content>
-    <mat-dialog-actions>
-        <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid" i18n>OK</button>
-        <span fxFlex></span>
-        <button mat-button type="button" style="color: #E5524C;" mat-dialog-close i18n>Cancel</button>
-    </mat-dialog-actions>
-</form>
+
+    <mat-form-field class="inpElement" style="margin-bottom: 5px;">
+        <input matInput formControlName="name" autocomplete="off" placeholder="Enter Datapod Name" required maxlength="25"/>
+        <mat-error *ngIf="form.controls.name.hasError('required')" i18n>
+            Datapod Name is
+            <strong>required</strong>
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-select">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="category">
+        <mat-option *ngFor="let category of categories" [value]="category.name">
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            {{category.name | changeCase:'title'}}
+            <mat-icon [svgIcon]="category.icon"></mat-icon>
+          </div>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid" (click)="submit()" i18n>OK</button>
+  <span fxFlex></span>
+  <button mat-button type="button" style="color: #E5524C;" mat-dialog-close i18n>Cancel</button>
+</mat-dialog-actions>
+

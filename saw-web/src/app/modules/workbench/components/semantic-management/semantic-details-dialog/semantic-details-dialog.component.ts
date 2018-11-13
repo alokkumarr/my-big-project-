@@ -7,33 +7,43 @@ import {
   Validators
 } from '@angular/forms';
 
-// const categories = [{
-//   name: 'default',
-//   icon: 'category-'
-// }, {
-//   name: 'errors',
-//   icon: ''
-// }, {
-//   name: 'orders',
-//   icon: ''
-// }, {
-//   name: 'sessions',
-//   icon: ''
-// }, {
-//   name: 'subscribers',
-//   icon: ''
-// }, {
-//   name: 'usage',
-//   icon: ''
-// }];
+const categories = [{
+  name: 'default',
+  icon: 'category-default'
+}, {
+  name: 'errors',
+  icon: 'category-errors'
+}, {
+  name: 'orders',
+  icon: 'category-orders'
+}, {
+  name: 'sessions',
+  icon: 'category-sessions'
+}, {
+  name: 'subscribers',
+  icon: 'category-subscribers'
+}, {
+  name: 'usage',
+  icon: 'category-usage'
+}, {
+  name: 'events',
+  icon: 'calendar-events'
+}, {
+  name: 'retention',
+  icon: 'calendar-retention'
+}, {
+  name: 'funnel',
+  icon: 'calendar-funnel'
+}];
 
 @Component({
-  selector: 'createfolder-dialog',
+  selector: 'semantic-details-dialog',
   templateUrl: './semantic-details-dialog.component.html',
   styleUrls: ['./semantic-details-dialog.component.scss']
 })
 export class SemanticDetailsDialogComponent implements OnInit {
   form: FormGroup;
+  categories = categories;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -42,15 +52,18 @@ export class SemanticDetailsDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const defaultCategory = categories[0].name;
     this.form = new FormGroup({
-      nameControl: new FormControl('', [
+      name: new FormControl('', [
         Validators.required,
         Validators.maxLength(25)
-      ])
+      ]),
+      category: new FormControl(defaultCategory)
     });
   }
 
-  submit(form) {
-    this.dialogRef.close(`${this.form.value.nameControl}`);
+  submit() {
+    const {name, category} = this.form.value;
+    this.dialogRef.close({name, category});
   }
 }

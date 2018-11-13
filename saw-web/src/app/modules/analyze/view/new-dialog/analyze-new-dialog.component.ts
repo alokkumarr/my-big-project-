@@ -12,7 +12,6 @@ import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { MatHorizontalStepper } from '@angular/material/stepper';
 import { FilterPipe } from '../../../../common/pipes/filter.pipe';
-import { CustomIconService } from '../../../../common/services';
 
 @Component({
   selector: 'analyze-new-dialog',
@@ -34,15 +33,12 @@ export class AnalyzeNewDialogComponent {
     public _analyzeDialogService: AnalyzeDialogService,
     public _dialogRef: MatDialogRef<AnalyzeNewDialogComponent>,
     private filterPipe: FilterPipe,
-    private _customIconService: CustomIconService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       metrics: any[];
       id: string;
     }
-  ) {
-    this._customIconService.init();
-  }
+  ) {}
 
   onMetricSelected(metric) {
     this.selectedMetric = metric;
