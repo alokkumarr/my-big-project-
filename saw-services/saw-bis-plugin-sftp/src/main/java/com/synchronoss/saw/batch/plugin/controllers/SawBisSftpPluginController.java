@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/ingestion/batch/sftp")
-public class SftpPluginController {
+public class SawBisSftpPluginController {
 
   @Autowired
   @Qualifier("sftpService")
@@ -104,10 +104,11 @@ public class SftpPluginController {
   }
 
   /**
-   * This end-point to transfer data from remote channel.
+   * This end-point to transfer data from remote channel without logging.
+   * i.e. immediate transfer while in design phase.
    */
   
-  @ApiOperation(value = "To pull data from remote channel",
+  @ApiOperation(value = "To pull data from remote channel on demand without logging",
       nickname = "sftpActionBis", notes = "", response = List.class)
   @ApiResponses(value = { @ApiResponse(code = 200, 
       message = "Request has been succeeded without any error"),
@@ -116,7 +117,8 @@ public class SftpPluginController {
   @RequestMapping(value = "/channel/transfer", method = RequestMethod.POST, 
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public List<BisDataMetaInfo> pullData(@ApiParam(value = "Payload structure which to be used to "
+  public List<BisDataMetaInfo> immediateTransfer(@ApiParam(value = "Payload structure which "
+      + "to be used to "
       + "initiate the transfer",
           required = true) @Valid @RequestBody(required = true) 
       BisConnectionTestPayload requestBody) {
@@ -128,4 +130,33 @@ public class SftpPluginController {
     }
     return response;
   }
+  /**
+   * This end-point to transfer data from remote channel without logging.
+   * i.e. immediate transfer while in design phase.
+   */
+  
+  @ApiOperation(value = "To pull data from remote channel using channel Id & route Id",
+      nickname = "sftpActionBis", notes = "", response = List.class)
+  @ApiResponses(value = { @ApiResponse(code = 200, 
+      message = "Request has been succeeded without any error"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator") })
+  @RequestMapping(value = "/channel/transfer/{channelId}/route/{routeId}", 
+      method = RequestMethod.GET, 
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public List<BisDataMetaInfo> pullData(@ApiParam(value = "Payload structure which to be used to "
+      + "initiate the transfer",
+          required = true) @PathVariable (required = true, name = "channelId") 
+      Long channelId, @PathVariable (required = true, name = "routeId") 
+      Long routeId) {
+    List<BisDataMetaInfo> response = null;
+    try {
+      response = sftpServiceImpl.transferData(channelId, routeId);
+    } catch (Exception e) {
+      throw new SftpProcessorException("Exception occured while transferring the file", e);
+    }
+    return response;
+  }
+  
 }

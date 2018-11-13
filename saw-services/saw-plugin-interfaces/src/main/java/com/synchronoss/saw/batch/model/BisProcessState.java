@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum BisProcessState {
     SUCCESS("SUCCESS"),
     FAILED("FAILED"),
+    DUPLICATE("DUPLICATE"),
     INPROGRESS("INPROGRESS");
     private final String value;
     private final static Map<String, BisProcessState> CONSTANTS = new HashMap<String, BisProcessState>();

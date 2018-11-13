@@ -22,14 +22,14 @@ public class SftpFilesProcessor {
   public void transferFiles(SftpPayloadProcessor processor) {
     ChainFileListFilter<LsEntry> list = new ChainFileListFilter<LsEntry>();
     SipSftpFilter sftpFilter = new SipSftpFilter();
-    sftpFilter.setFilePatterns(processor.getPayload().getPattern());
+    sftpFilter.setFilePatterns(processor.getPayload().getFilePattern());
     list.addFilter(sftpFilter);
     SipFileFilterOnLastModifiedTime  lastModifiedTime = 
               new SipFileFilterOnLastModifiedTime();
     lastModifiedTime.setTimeDifference(10000L);
     list.addFilter(lastModifiedTime);
     SftpOutboundGateway sftpOutboundGateway = new SftpOutboundGateway(
-        processor.getSessionFactoryPayload(),"mget", processor.getPayload().getPattern());
+        processor.getSessionFactoryPayload(),"mget", processor.getPayload().getFilePattern());
     sftpOutboundGateway.setAutoCreateLocalDirectory(true);
     sftpOutboundGateway.setLoggingEnabled(true);
     sftpOutboundGateway.setRequiresReply(true);

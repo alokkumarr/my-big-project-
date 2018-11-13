@@ -28,3 +28,7 @@ logging:
     com.synchronoss.saw: INFO
     org.springframework.web : INFO
     
+bis:
+  transfer-batch-size: 10
+  partial-file-timeDifference: 1000
+  default-data-drop-location: /workbench  

@@ -3,8 +3,6 @@ package com.synchronoss.saw.batch.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,36 +17,40 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 "port"
 })
 public class BisConnectionTestPayload {
-@NotNull
-@JsonProperty("host")
-private String host;
-@NotNull
-@JsonProperty("username")
-private String username;
-@NotNull
+
+@JsonProperty("hostName")
+private String hostName;
+
+@JsonProperty("userName")
+private String userName;
+
 @JsonProperty("password")
 private String password;
 
 @JsonProperty("url")
 private String url;
-@NotNull
-@JsonProperty("port")
-private Integer port = 21;
+
+@JsonProperty("portNo")
+private Integer portNo = 21;
 
 @JsonProperty("batchSize")
 private Integer batchSize = 10;
-@NotNull
+
+
 @JsonProperty("destinationLocation")
 private String destinationLocation;
 
 @JsonProperty("sourceLocation")
 private String sourceLocation;
 
-@JsonProperty("pattern")
-private String pattern;
+@JsonProperty("channelId")
+private String channelId;
 
 @JsonProperty("isLogging")
 private Boolean isLogging = false;
+
+@JsonProperty("filePattern")
+private String filePattern;
 
 @JsonProperty("channelType")
 private BisChannelType channelType = BisChannelType.SFTP;
@@ -70,13 +72,13 @@ public Boolean isLogging() {
 public void setIsLogging(Boolean isLogging) {
 	this.isLogging = isLogging;
 }
-@JsonProperty("username")
-public String getUsername() {
-	return username;
+@JsonProperty("userName")
+public String getUserName() {
+	return userName;
 }
-@JsonProperty("username")
-public void setUsername(String username) {
-	this.username = username;
+@JsonProperty("userName")
+public void setUserName(String userName) {
+	this.userName = userName;
 }
 @JsonProperty("password")
 public String getPassword() {
@@ -94,13 +96,13 @@ public String getUrl() {
 public void setUrl(String url) {
 	this.url = url;
 }
-@JsonProperty("port")
-public Integer getPort() {
-	return port;
+@JsonProperty("portNo")
+public Integer getPortNo() {
+	return portNo;
 }
-@JsonProperty("port")
-public void setPort(Integer port) {
-	this.port = port;
+@JsonProperty("portNo")
+public void setPortNo(Integer portNo) {
+	this.portNo = portNo;
 }
 @JsonProperty("destinationLocation")
 public String getDestinationLocation() {
@@ -111,13 +113,13 @@ public String getDestinationLocation() {
 public void setDestinationLocation(String destinationLocation) {
 	this.destinationLocation = destinationLocation;
 }
-@JsonProperty("host")
-public String getHost() {
-	return host;
+@JsonProperty("hostName")
+public String getHostName() {
+	return hostName;
 }
-@JsonProperty("host")
-public void setHost(String host) {
-	this.host = host;
+@JsonProperty("hostName")
+public void setHostName(String hostName) {
+	this.hostName = hostName;
 }
 @JsonProperty("sourceLocation")
 public String getSourceLocation() {
@@ -130,13 +132,13 @@ public void setSourceLocation(String sourceLocation) {
 public void setAdditionalProperties(Map<String, Object> additionalProperties) {
 	this.additionalProperties = additionalProperties;
 }
-@JsonProperty("pattern")
-public String getPattern() {
-	return pattern;
+@JsonProperty("filePattern")
+public String getFilePattern() {
+	return filePattern;
 }
-@JsonProperty("pattern")
-public void setPattern(String pattern) {
-	this.pattern = pattern;
+@JsonProperty("filePattern")
+public void setFilePattern(String filePattern) {
+	this.filePattern = filePattern;
 }
 @JsonProperty("batchSize")
 public Integer getBatchSize() {
@@ -145,6 +147,14 @@ public Integer getBatchSize() {
 @JsonProperty("batchSize")
 public void setBatchSize(Integer batchSize) {
 	this.batchSize = batchSize;
+}
+@JsonProperty("channelId")
+public String getChannelId() {
+	return channelId;
+}
+@JsonProperty("channelId")
+public void setChannelId(String channelId) {
+	this.channelId = channelId;
 }
 
 @JsonIgnore

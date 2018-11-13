@@ -175,6 +175,11 @@
 			<artifactId>saw-plugin-interfaces</artifactId>
 			<version>${revision}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-log-service</artifactId>
+			<version>${revision}</version>
+		</dependency>
 		<!-- This is for mariadb -->
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
@@ -203,22 +208,6 @@
 
 	<build>
 		<plugins>
-			<!-- 
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework.boot.experimental</groupId>
-						<artifactId>spring-boot-thin-maven-plugin</artifactId>
-						<version>1.0.17.RELEASE</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<executable>true</executable>
-				</configuration>
-			</plugin>
-		 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>

@@ -119,6 +119,13 @@
 			<scope>provided</scope>
 			<version>${compress}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-log-service</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+		
     
     </dependencies>
     <repositories>

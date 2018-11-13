@@ -1,10 +1,17 @@
 package com.synchronoss.saw.batch.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.utils.IntegrationUtils;
+import com.synchronoss.saw.batch.utils.SipObfuscation;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +56,7 @@ public class SawBisChannelController {
   
   /**
    * This API provides an ability to add a source. 
+ * @throws Exception 
    */
   @ApiOperation(value = "Add a new channel",
       nickname = "actionBis", notes = "", response = BisChannelEntity.class)
@@ -68,12 +76,24 @@ public class SawBisChannelController {
   public ResponseEntity<@Valid BisChannelEntity> createChannel(
       @ApiParam(value = "Channel related information to store",
           required = true) @Valid @RequestBody BisChannelEntity requestBody)
-      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
+      throws Exception {
     logger.trace("Request Body:{}", requestBody);
 
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode nodeEntity = null;
+    ObjectNode rootNode = null;
+    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+    rootNode = (ObjectNode) nodeEntity;
+    String secretPhrase = rootNode.get("password").asText();
+    secretPhrase = obfuscator.encrypt(secretPhrase);
+    rootNode.put("password", secretPhrase);
+    requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     return ResponseEntity.ok(bisChannelDataRestRepository.save(requestBody));
   }
 
