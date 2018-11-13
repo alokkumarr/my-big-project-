@@ -18,8 +18,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/scheduler/")
-public class JobController {
+public class JobController extends BaseJobController{
 
 	private static final Logger logger = LoggerFactory.getLogger(JobController.class);
 	@Autowired

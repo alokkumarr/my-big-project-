@@ -131,7 +131,7 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void getAllJobsTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "jobs").then()
+    given(authSpec).body(prepareScheduleKeysRequest()).when().get(SERVICE_PATH + "jobs").then()
         .assertThat().statusCode(200);
 
   }

@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api
 @RestController
-@RequestMapping("/bisscheduler/")
-public class BisJobController {
+public class BisJobController extends BaseJobController {
 
   private static final Logger logger = LoggerFactory.getLogger(JobController.class);
 
@@ -37,7 +35,7 @@ public class BisJobController {
    * @param jobDetail details of a job.
    * @return scheduleder response data.
    */
-  @RequestMapping(value = "schedule", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/schedule", method = RequestMethod.POST)
   public SchedulerResponse schedule(@RequestBody BisSchedulerJobDetails jobDetail) {
     logger.debug("JobController schedule() start here.");
 
@@ -83,7 +81,7 @@ public class BisJobController {
    * @param schedule key, job key..etc
    */
   
-  @RequestMapping(value = "unschedule", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/unschedule", method = RequestMethod.POST)
   public void unschedule(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController unschedule() method");
     bisService.unScheduleJob(schedule);
@@ -95,7 +93,7 @@ public class BisJobController {
    * @param schedule schedule key
    * @return SchedulerResponse
    */
-  @RequestMapping(value = "delete", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/delete", method = RequestMethod.POST)
   public SchedulerResponse delete(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController delete() method");
 
@@ -124,7 +122,7 @@ public class BisJobController {
    * @param schedule schedule key
    * @return SchedulerResponse.
    */
-  @RequestMapping(value = "pause", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/pause", method = RequestMethod.POST)
   public SchedulerResponse pause(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController pause() method");
 
@@ -155,7 +153,7 @@ public class BisJobController {
    * @param schedule schedule key
    * @return SchedulerResponse.
    */
-  @RequestMapping(value = "resume", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/resume", method = RequestMethod.POST)
   public SchedulerResponse resume(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController resume() method");
 
@@ -189,7 +187,7 @@ public class BisJobController {
    * @param jobDetail Job details
    * @return SchedulerResponse.
    */
-  @RequestMapping(value = "update", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/update", method = RequestMethod.POST)
   public SchedulerResponse updateJob(@RequestBody BisSchedulerJobDetails jobDetail) {
     logger.debug("JobController updateJob() method ");
 
@@ -238,7 +236,7 @@ public class BisJobController {
    * @param schedule schedule key
    * @return
    */
-  @RequestMapping(value = "jobs", method = RequestMethod.GET)
+  @RequestMapping(value = "bisscheduler/jobs", method = RequestMethod.GET)
   public SchedulerResponse getAllJobs(@RequestBody FetchByCategoryBean schedule) {
     logger.debug("JobController getAllJobs() method");
 
@@ -253,7 +251,7 @@ public class BisJobController {
    * @param schedule schedule key
    * @return SchedulerResponse.
    */
-  @RequestMapping(value = "fetchJob", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/fetchJob", method = RequestMethod.POST)
   public SchedulerResponse getJobDetails(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController getJobDetails() method");
 
@@ -272,7 +270,7 @@ public class BisJobController {
    * @param schedule schedule key
    * @return SchedulerResponse
    */
-  @RequestMapping(value = "isJobRunning", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/isJobRunning", method = RequestMethod.POST)
   public SchedulerResponse isJobRunning(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController isJobRunning() method");
 
@@ -286,7 +284,7 @@ public class BisJobController {
    * @param schedule Details of schedule such as schedule key..etcc
    * @return state of job
    */
-  @RequestMapping(value = "jobState", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/jobState", method = RequestMethod.POST)
   public SchedulerResponse getJobState(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController getJobState() method");
 
@@ -300,7 +298,7 @@ public class BisJobController {
    * @return scheduler response.
    */
   
-  @RequestMapping(value = "stop", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/stop", method = RequestMethod.POST)
   public SchedulerResponse stopJob(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController stopJob() method");
 
@@ -332,7 +330,7 @@ public class BisJobController {
    * @return SchedulerResponse
    */
   
-  @RequestMapping(value = "start", method = RequestMethod.POST)
+  @RequestMapping(value = "bisscheduler/start", method = RequestMethod.POST)
   public SchedulerResponse startJobNow(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController startJobNow() method");
 
