@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
+import { DatasourceService } from '../../../services/datasource.service';
 
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 
@@ -21,6 +22,7 @@ export class CreateRouteDialogComponent implements OnInit {
     private _formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
     private snackBar: MatSnackBar,
+    private datasourceService: DatasourceService,
     @Inject(MAT_DIALOG_DATA) public routeData: any
   ) {
     this.createForm();
@@ -49,11 +51,26 @@ export class CreateRouteDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  testConnection() {
+
+  testRoute(formData) {
+    const routeData = {
+      channelType: 'sftp',
+      channelId: formData.hostName,
+      password: formData.password,
+      portNo: formData.portNo,
+      userName: formData.userName
+    };
+    this.datasourceService.testChannelWithBody(routeData).subscribe(data => {
+      this.showConnectivityLog(data);
+    });
+  }
+
+  showConnectivityLog(logData) {
     this.dialogRef.updatePosition({ top: '30px' });
     const snackBarRef = this.snackBar.openFromComponent(
       TestConnectivityComponent,
       {
+        data: logData,
         horizontalPosition: 'center',
         panelClass: ['mat-elevation-z9', 'testConnectivityClass']
       }

@@ -111,7 +111,7 @@
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
               <span class="prop-name" i18n>Password : </span>
-              <span class="pwd-hide" [class.pwd-show]="show === true">{{decryptedPWD}}</span>
+              <span class="pwd-hide" [class.pwd-show]="show === true">{{selectedSourceData?.password}}</span>
               <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                 <mat-icon fontIcon="icon-show"></mat-icon>
               </button>

@@ -201,6 +201,36 @@ export class DatasourceService {
   }
 
   /**
+   * Check channel connection using config
+   *
+   * @param {*} payload
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testChannelWithBody(payload): Observable<any> {
+    const endpoint = `${this.api}/ingestion/batch/sftp/channels/connect/test`;
+
+    return this.http
+      .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Check route connection using config
+   *
+   * @param {*} payload
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testRouteWithBody(payload): Observable<any> {
+    const endpoint = `${this.api}/ingestion/batch/sftp/routes/connect/test`;
+
+    return this.http
+      .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
    * Handle Http operation that failed.
    * Let the app continue.
    * @param operation - name of the operation that failed
