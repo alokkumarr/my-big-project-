@@ -123,8 +123,14 @@ export class AnalyzeListViewComponent implements OnInit {
       },
       {
         caption: 'SCHEDULED',
-        calculateCellValue: rowData =>
-          generateSchedule(this.cronJobs[rowData.id]),
+        calculateCellValue: rowData => {
+          const cron = this.cronJobs[rowData.id];
+          if (!cron) {
+            return '';
+          }
+          const {cronExpression, activeaTab} = cron.jobDetails;
+          return generateSchedule(cronExpression, activeaTab);
+        },
         width: '12%'
       },
       {

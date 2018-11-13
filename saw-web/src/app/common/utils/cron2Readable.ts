@@ -2,21 +2,16 @@ import cronstrue from 'cronstrue';
 import * as isEmpty from 'lodash/isEmpty';
 import * as moment from 'moment';
 
-export function generateSchedule(cron) {
-  if (!cron) {
+export function generateSchedule(cronExpression, activeTab) {
+  if (isEmpty(cronExpression)) {
     return '';
   }
-  const jobDetails = cron.jobDetails;
-  const expression = jobDetails.cronExpression;
-  if (isEmpty(expression)) {
-    return '';
-  }
-  if (jobDetails.activeTab === 'hourly') {
+  if (activeTab === 'hourly') {
     // there is no time stamp in hourly cron hence converting to utc and local is not required.
-    const localMinuteCron = extractMinute(expression);
+    const localMinuteCron = extractMinute(cronExpression);
     return cronstrue.toString(localMinuteCron);
   }
-  const localCron = convertToLocal(expression);
+  const localCron = convertToLocal(cronExpression);
   return cronstrue.toString(localCron);
 }
 

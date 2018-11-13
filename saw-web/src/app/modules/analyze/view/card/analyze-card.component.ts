@@ -24,7 +24,12 @@ export class AnalyzeCardComponent implements OnInit {
   @Input()
   set cronJobs(cronJobs: any) {
     const cron = cronJobs[this.analysis.id];
-    this.schedule = generateSchedule(cron);
+    if (!cron) {
+      this.schedule = '';
+      return;
+    }
+    const {cronExpression, activeaTab} = cron.jobDetails;
+    this.schedule = generateSchedule(cronExpression, activeaTab);
   }
 
   placeholderClass: string;
