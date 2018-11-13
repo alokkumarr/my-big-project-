@@ -55,6 +55,7 @@ export class CreateRouteDialogComponent implements OnInit {
     const routeInfo = {
       channelType: 'sftp',
       channelId: this.routeData.channelID,
+      sourceLocation: formData.sourceLocation,
       destinationLocation: formData.destinationLocation
     };
     this.datasourceService.testRouteWithBody(routeInfo).subscribe(data => {

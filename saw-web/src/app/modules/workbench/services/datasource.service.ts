@@ -13,7 +13,6 @@ const userProject = 'workbench';
 })
 export class DatasourceService {
   public api = get(APP_CONFIG, 'api.url');
-
   constructor(public http: HttpClient, public jwt: JwtService) {}
 
   /**
@@ -183,7 +182,7 @@ export class DatasourceService {
    */
   testChannel(channelID): Observable<any> {
     return this.http
-      .get(`${this.api}/ingestion/batch/sftp/channels/connect/${channelID}`)
+      .get(`${this.api}/ingestion/batch/sftp/channels/${channelID}/status`)
       .pipe(catchError(this.handleError('data', {})));
   }
 
@@ -196,7 +195,7 @@ export class DatasourceService {
    */
   testRoute(routeID): Observable<any> {
     return this.http
-      .get(`${this.api}/ingestion/batch/sftp/routes/connect/${routeID}`)
+      .get(`${this.api}/ingestion/batch/sftp/routes/${routeID}/status`)
       .pipe(catchError(this.handleError('data', {})));
   }
 
@@ -208,7 +207,7 @@ export class DatasourceService {
    * @memberof DatasourceService
    */
   testChannelWithBody(payload): Observable<any> {
-    const endpoint = `${this.api}/ingestion/batch/sftp/channels/connect/test`;
+    const endpoint = `${this.api}/ingestion/batch/sftp/channels/test`;
 
     return this.http
       .post(endpoint, payload)
@@ -223,7 +222,7 @@ export class DatasourceService {
    * @memberof DatasourceService
    */
   testRouteWithBody(payload): Observable<any> {
-    const endpoint = `${this.api}/ingestion/batch/sftp/routes/connect/test`;
+    const endpoint = `${this.api}/ingestion/batch/sftp/routes/test`;
 
     return this.http
       .post(endpoint, payload)
