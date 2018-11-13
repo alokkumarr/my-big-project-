@@ -65,7 +65,7 @@
         <mat-divider></mat-divider>
         <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
           <button mat-stroked-button color="primary" color="warn" (click)="onCancelClick()" i18n>Cancel</button>
-          <button mat-stroked-button color="primary" (click)="testConnection()" i18n>
+          <button mat-stroked-button color="primary" (click)="testRoute(detailsFormGroup.value)" [disabled]="!detailsFormGroup.valid"  i18n>
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
           <button mat-raised-button color="primary" matStepperNext [disabled]="!detailsFormGroup.valid" i18n>Next</button>
@@ -78,7 +78,7 @@
         <mat-divider></mat-divider>
         <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
           <button mat-raised-button color="primary" matStepperPrevious i18n>Previous</button>
-          <button mat-stroked-button color="primary" (click)="testConnection()" i18n>
+          <button mat-stroked-button color="primary" (click)="testRoute(detailsFormGroup.value)" [disabled]="!detailsFormGroup.valid" i18n>
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
           <button mat-raised-button color="primary" *ngIf="opType === 'create'" [disabled]="!detailsFormGroup.valid"
