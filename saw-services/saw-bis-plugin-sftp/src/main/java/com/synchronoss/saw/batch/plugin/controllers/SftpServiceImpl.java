@@ -465,7 +465,8 @@ public class SftpServiceImpl extends SipPluginContract {
         } else {
           try {
             if ((list.size() <= batchSize && entry.getAttrs().getSize() != 0) 
-                && !checkDuplicateFile(entry.getFilename())) {
+                && !checkDuplicateFile(sourcelocation + File.separator 
+                        + entry.getFilename())) {
               destinationLocation = destinationLocation != null ? destinationLocation
                 : defaultDestinationLocation;
               File localDirectory = new File(destinationLocation 
@@ -503,7 +504,29 @@ public class SftpServiceImpl extends SipPluginContract {
               logDataUpsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
               list.add(bisDataMetaInfo); 
             } else {
-              break;
+              if (list.size() == batchSize) {
+                break;
+              } else {
+                if (checkDuplicateFile(sourcelocation + File.separator 
+                        + entry.getFilename())) {
+                  bisDataMetaInfo = new BisDataMetaInfo();
+                  bisDataMetaInfo.setProcessId(new UUIDGenerator()
+                        .generateId(bisDataMetaInfo).toString());
+                  bisDataMetaInfo.setDataSizeInBytes(new Long(entry.getAttrs()
+                         .getSize()).doubleValue());
+                  bisDataMetaInfo.setActualDataName(sourcelocation + File.separator 
+                        + entry.getFilename());
+                  bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+                  bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
+                  bisDataMetaInfo.setActualReceiveDate(new Date(((long)
+                        entry.getAttrs().getATime()) * 1000L));
+                  bisDataMetaInfo.setChannelId(channelId);
+                  bisDataMetaInfo.setRouteId(channelId);
+                  bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
+                  bisDataMetaInfo.setReasonCode(BisProcessState.DUPLICATE.value());
+                  list.add(bisDataMetaInfo); 
+                }
+              }
             }
           } catch (Exception ex) {
             logger.error("Exception occurred while transferring the file from channel", ex);

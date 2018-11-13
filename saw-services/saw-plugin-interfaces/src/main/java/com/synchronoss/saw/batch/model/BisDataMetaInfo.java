@@ -41,6 +41,9 @@ public class BisDataMetaInfo {
 	
 	@JsonProperty("processState")
 	private String processState;
+
+	@JsonProperty("reasonCode")
+	private String reasonCode;
 	
 	@JsonProperty("pattern")
 	private String pattern;
@@ -65,7 +68,14 @@ public class BisDataMetaInfo {
 		this.pattern = pattern;
 	}
 
-	
+	@JsonProperty("reasonCode")
+	public String getReasonCode() {
+		return reasonCode;
+	}
+	@JsonProperty("reasonCode")
+	public void setReasonCode(String reasonCode) {
+		this.reasonCode = reasonCode;
+	}
 	@JsonProperty("processId")
 	public String getProcessId() {
 		return processId;
