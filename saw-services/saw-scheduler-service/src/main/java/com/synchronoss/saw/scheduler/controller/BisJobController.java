@@ -7,9 +7,9 @@ import com.synchronoss.saw.scheduler.modal.FetchByCategoryBean;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 import com.synchronoss.saw.scheduler.service.JobService;
-import io.swagger.annotations.Api;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 public class BisJobController extends BaseJobController {
@@ -237,7 +238,7 @@ public class BisJobController extends BaseJobController {
    * @return
    */
   @RequestMapping(value = "bisscheduler/jobs", method = RequestMethod.GET)
-  public SchedulerResponse getAllJobs(@RequestBody FetchByCategoryBean schedule) {
+  public SchedulerResponse getAllJobs(@Valid  FetchByCategoryBean schedule) {
     logger.debug("JobController getAllJobs() method");
 
     List<Map<String, Object>> list =

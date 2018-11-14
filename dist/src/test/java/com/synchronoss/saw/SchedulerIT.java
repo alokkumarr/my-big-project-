@@ -93,8 +93,8 @@ public class SchedulerIT extends BaseIT {
 
   @Test
   public void unscheduleJobTest() throws Exception {
-    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "unschedule").then()
-        .assertThat().statusCode(200);
+    given(authSpec).body(prepareScheduleKeysRequest()).when().post(SERVICE_PATH + "unschedule")
+    .then().assertThat().statusCode(200);
 
 
   }
