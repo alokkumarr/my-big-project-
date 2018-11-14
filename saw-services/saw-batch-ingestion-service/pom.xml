@@ -143,17 +143,17 @@
 		<!-- This is the SIP Batch plug-ins -->
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-plugin-interfaces</artifactId>
+			<artifactId>saw-batch-plugin-interfaces</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-bis-plugin-sftp</artifactId>
+			<artifactId>saw-batch-plugin-sftp</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-log-service</artifactId>
+			<artifactId>saw-batch-plugin-logging-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
 
@@ -168,6 +168,12 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+		    <version>1.18</version>
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>
