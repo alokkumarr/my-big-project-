@@ -45,8 +45,8 @@ public class BisDataMetaInfo {
 	@JsonProperty("reasonCode")
 	private String reasonCode;
 	
-	@JsonProperty("pattern")
-	private String pattern;
+	@JsonProperty("filePattern")
+	private String filePattern;
 
 	@JsonProperty("actualReceiveDate")
 	private Date actualReceiveDate;
@@ -59,13 +59,13 @@ public class BisDataMetaInfo {
 	public void setActualReceiveDate(Date actualReceiveDate) {
 		this.actualReceiveDate = actualReceiveDate;
 	}
-	@JsonProperty("pattern")
-	public String getPattern() {
-		return pattern;
+	@JsonProperty("filePattern")
+	public String getFilePattern() {
+		return filePattern;
 	}
-	@JsonProperty("pattern")
-	public void setPattern(String pattern) {
-		this.pattern = pattern;
+	@JsonProperty("filePattern")
+	public void setFilePattern(String pattern) {
+		this.filePattern = pattern;
 	}
 
 	@JsonProperty("reasonCode")

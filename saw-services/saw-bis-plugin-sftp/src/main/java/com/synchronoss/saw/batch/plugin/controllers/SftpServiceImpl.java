@@ -22,6 +22,7 @@ import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipFileFilterOnLastModifiedTime;
 import com.synchronoss.saw.batch.sftp.integration.SipSftpFilter;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
+import com.synchronoss.saw.logs.service.SipLogService;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,6 +76,9 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+
+  @Autowired
+  private SipLogService sipLogService;
 
   @Autowired
   private IntegrationFlowContext flowContext;
@@ -258,7 +262,7 @@ public class SftpServiceImpl extends SipPluginContract {
   // TODO: SIP-4613
   @Override
   public HttpStatus immediateConnectRoute(BisConnectionTestPayload payload) 
-      throws SipNestedRuntimeException {
+      throws SipNestedRuntimeException, IOException {
     logger.trace("Test connection to route starts here");
     HttpStatus status = null;
     String dataPath = payload.getDestinationLocation() != null
@@ -267,7 +271,9 @@ public class SftpServiceImpl extends SipPluginContract {
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite()) 
           && destinationPath.canExecute()) {
-        delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession().isOpen();  
+        delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession().isOpen();
+        delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession()
+        .exists(payload.getSourceLocation());
         status = HttpStatus.OK;
         delegatingSessionFactory.invalidateSessionFactoryMap();
       }
@@ -465,7 +471,7 @@ public class SftpServiceImpl extends SipPluginContract {
         } else {
           try {
             if ((list.size() <= batchSize && entry.getAttrs().getSize() != 0) 
-                && !checkDuplicateFile(sourcelocation + File.separator 
+                && !sipLogService.checkDuplicateFile(sourcelocation + File.separator 
                         + entry.getFilename())) {
               destinationLocation = destinationLocation != null ? destinationLocation
                 : defaultDestinationLocation;
@@ -492,7 +498,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   entry.getAttrs().getATime()) * 1000L));
               bisDataMetaInfo.setChannelId(channelId);
               bisDataMetaInfo.setRouteId(channelId);
-              logDataUpsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+              sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
               template.get(sourcelocation + File.separator 
                   + entry.getFilename(), new InputStreamCallback() {
                     @Override
@@ -501,13 +507,13 @@ public class SftpServiceImpl extends SipPluginContract {
                     } 
                   });
               bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
-              logDataUpsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+              sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
               list.add(bisDataMetaInfo); 
             } else {
               if (list.size() == batchSize) {
                 break;
               } else {
-                if (checkDuplicateFile(sourcelocation + File.separator 
+                if (sipLogService.checkDuplicateFile(sourcelocation + File.separator 
                         + entry.getFilename())) {
                   bisDataMetaInfo = new BisDataMetaInfo();
                   bisDataMetaInfo.setProcessId(new UUIDGenerator()
@@ -531,7 +537,7 @@ public class SftpServiceImpl extends SipPluginContract {
           } catch (Exception ex) {
             logger.error("Exception occurred while transferring the file from channel", ex);
             bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
-            logDataUpsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+            sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
           }
         }
       }

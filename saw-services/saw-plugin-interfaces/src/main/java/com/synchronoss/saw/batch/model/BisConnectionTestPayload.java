@@ -36,6 +36,8 @@ private Integer portNo = 21;
 @JsonProperty("batchSize")
 private Integer batchSize = 10;
 
+@JsonProperty("routeId")
+private String routeId;
 
 @JsonProperty("destinationLocation")
 private String destinationLocation;
@@ -155,6 +157,14 @@ public String getChannelId() {
 @JsonProperty("channelId")
 public void setChannelId(String channelId) {
 	this.channelId = channelId;
+}
+@JsonProperty("routeId")
+public String getRouteId() {
+	return routeId;
+}
+@JsonProperty("routeId")
+public void setRouteId(String routeId) {
+	this.routeId = routeId;
 }
 
 @JsonIgnore

@@ -112,22 +112,33 @@
             <artifactId>jackson-databind</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 			<scope>provided</scope>
 			<version>${compress}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-log-service</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-    
     </dependencies>
+    	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<compilerArgument>-Xlint:-processing</compilerArgument>
+					<testCompilerArgument>-Xlint:all</testCompilerArgument>
+					<testCompilerArgument>-Xlint:-processing</testCompilerArgument>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
     <repositories>
 		<repository>
 			<id>synchronoss</id>

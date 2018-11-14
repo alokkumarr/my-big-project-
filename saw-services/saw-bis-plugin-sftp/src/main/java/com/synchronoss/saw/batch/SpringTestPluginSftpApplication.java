@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.config.EnableIntegration;
 
-@ComponentScan(basePackages = {"com.extensions", "com.synchronoss.saw"})
+@ComponentScan(basePackages = {"com.synchronoss.saw"})
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @EnableIntegration
 @IntegrationComponentScan

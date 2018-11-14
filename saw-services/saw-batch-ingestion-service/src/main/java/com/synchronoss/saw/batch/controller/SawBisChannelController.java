@@ -20,7 +20,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
-
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@CrossOrigin(origins = "*")
 @RestController
 @Api(
     value = "The controller provides operations related Channel Entity "
@@ -126,8 +126,28 @@ public class SawBisChannelController {
           required = false) @RequestParam(name = "column", defaultValue = "createdDate") 
       String column) throws NullPointerException, JsonParseException, 
       JsonMappingException, IOException {
-    return ResponseEntity.ok(bisChannelDataRestRepository.findAll(PageRequest.of(page, size, 
-    Direction.DESC, column)));
+    Page<BisChannelEntity> entities = bisChannelDataRestRepository
+        .findAll(PageRequest.of(page, size, Direction.DESC, column));
+    entities.forEach(entity -> {
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      JsonNode nodeEntity = null;
+      ObjectNode rootNode = null;
+      try {
+        nodeEntity = objectMapper.readTree(entity.getChannelMetadata());
+        rootNode = (ObjectNode) nodeEntity;
+        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+        String secretPhrase = rootNode.get("password").asText();
+        secretPhrase = obfuscator.decrypt(secretPhrase);
+        rootNode.put("password", secretPhrase);
+        entity.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+      } catch (Exception e) {
+        throw new ResourceNotFoundException("Exception occurred while "
+        + "reading the list of channels");
+      }
+    });
+    return ResponseEntity.ok(entities);
   }
 
   /**
@@ -150,10 +170,25 @@ public class SawBisChannelController {
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<BisChannelEntity> readChannelById(
       @PathVariable(name = "id",required = true) 
-      Long id) throws NullPointerException, JsonParseException, 
-      JsonMappingException, IOException {
+      Long id) throws Exception {
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       logger.trace("Channel retrieved :" + channel);
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      JsonNode nodeEntity = null;
+      ObjectNode rootNode = null;
+      try {
+        nodeEntity = objectMapper.readTree(channel.getChannelMetadata());
+        rootNode = (ObjectNode) nodeEntity;
+        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+        String secretPhrase = rootNode.get("password").asText();
+        secretPhrase = obfuscator.decrypt(secretPhrase);
+        rootNode.put("password", secretPhrase);
+        channel.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+      } catch (Exception e) {
+        throw new ResourceNotFoundException("channelId " + id + " not found"); 
+      }
       return channel;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
   }
@@ -182,11 +217,23 @@ public class SawBisChannelController {
           required = true)@PathVariable Long id,
       @ApiParam(value = "Channel related information to update",
           required = true) @Valid @RequestBody BisChannelEntity requestBody)
-      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
+      throws Exception {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode nodeEntity = null;
+    ObjectNode rootNode = null;
+    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+    rootNode = (ObjectNode) nodeEntity;
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    String secretPhrase = rootNode.get("password").asText();
+    secretPhrase = obfuscator.encrypt(secretPhrase);
+    rootNode.put("password", secretPhrase);
+    requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       logger.trace("Channel updated :" + channel);
       BeanUtils.copyProperties(requestBody, channel, "bisChannelSysId");

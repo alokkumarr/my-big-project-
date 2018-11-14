@@ -325,7 +325,7 @@ public class BatchIngestionIT extends BaseIT {
     Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
     log.debug("connectRoute bisRouteSysId : " + routeId);
     String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_ROUTE
-        + "/connect/" + routeId;
+        + routeId + "/status/";
     given(authSpec).when().get(connectRouteUri).then()
    .assertThat().statusCode(200);
   }
@@ -347,7 +347,7 @@ public class BatchIngestionIT extends BaseIT {
     Long bisChannelSysId = getChannelId();
     log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
     String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_CHANNEL
-        + "/connect/" + bisChannelSysId;
+        + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then()
    .assertThat().statusCode(200);
   }
