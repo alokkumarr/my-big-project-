@@ -1,86 +1,118 @@
 <mat-sidenav-container class="filter-container" [autosize]="false">
-  <mat-sidenav #filterSidenav
+  <mat-sidenav
+    #filterSidenav
     mode="over"
     (openedChange)="filterSidenavStateChange($event)"
     [opened]="false"
-    position="end">
-    <global-filter [showKPIFilter]="hasKPIs" (onApplyFilter)="onApplyGlobalFilter($event)"></global-filter>
+    position="end"
+  >
+    <global-filter
+      [showKPIFilter]="hasKPIs"
+      (onApplyFilter)="onApplyGlobalFilter($event)"
+    ></global-filter>
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="page-header-toolbar">
       <h2>
-        {{(dashboard ? dashboard.name : '') || 'Observe'}}
-        <button mat-icon-button e2e="dashboard-default-button"
-                    *ngIf="dashboard"
-                    class="dashboard-default-button"
-                    [ngClass]="{'default-selected': isDefault}"
-                    (click)="toggleDefault()"
-                    [matTooltip]="isDefault ? 'Remove Default' : 'Set as Default'"
-                    i18n-matTooltip>
-          <mat-icon [fontIcon]="isDefault ? 'icon-star-solid' : 'icon-star'"></mat-icon>
+        {{ (dashboard ? dashboard.name : '') || 'Observe' | truncate: 18 }}
+        <button
+          mat-icon-button
+          e2e="dashboard-default-button"
+          *ngIf="dashboard"
+          class="dashboard-default-button"
+          [ngClass]="{ 'default-selected': isDefault }"
+          (click)="toggleDefault()"
+          [matTooltip]="isDefault ? 'Remove Default' : 'Set as Default'"
+          i18n-matTooltip
+        >
+          <mat-icon
+            [fontIcon]="isDefault ? 'icon-star-solid' : 'icon-star'"
+          ></mat-icon>
         </button>
       </h2>
       <div class="page-header-actions">
-
         <mat-slide-toggle
-            *ngIf="dashboard && hasAutoRefresh"
-            color="primary"
-            e2e="dashboard-auto-refresh-toggle"
-            [checked]="shouldAutoRefresh"
-            (change)="modifyAutoRefresh($event)">
+          *ngIf="dashboard && hasAutoRefresh"
+          color="primary"
+          e2e="dashboard-auto-refresh-toggle"
+          [checked]="shouldAutoRefresh"
+          (change)="modifyAutoRefresh($event)"
+        >
           Auto Refresh
         </mat-slide-toggle>
 
-        <button mat-button
-                e2e="dashboard-manual-refresh-button"
-                *ngIf="dashboard && !hasAutoRefresh"
-                (click)="refreshDashboard()">
+        <button
+          mat-button
+          class="dashboard-action-button"
+          e2e="dashboard-manual-refresh-button"
+          *ngIf="dashboard && !hasAutoRefresh"
+          (click)="refreshDashboard()"
+        >
           Refresh
         </button>
 
-        <button mat-button
-                color="warn"
-                e2e="dashboard-delete-dashboard-button"
-                *ngIf="dashboard && privileges.delete"
-                (click)="confirmDelete()">
+        <button
+          mat-button
+          color="warn"
+          class="dashboard-action-button"
+          e2e="dashboard-delete-dashboard-button"
+          *ngIf="dashboard && privileges.delete"
+          (click)="confirmDelete()"
+        >
           Delete
         </button>
 
-        <button mat-button
-                e2e="dashboard-download-dashboard-button"
-                *ngIf="dashboard"
-                (click)="downloadDashboard()">
+        <button
+          mat-button
+          class="dashboard-action-button"
+          e2e="dashboard-download-dashboard-button"
+          *ngIf="dashboard"
+          (click)="downloadDashboard()"
+        >
           Download
         </button>
 
-        <button mat-button
-                e2e="dashboard-edit-dashboard-button"
-                *ngIf="dashboard && privileges.edit"
-                (click)="editDashboard()">
+        <button
+          mat-button
+          e2e="dashboard-edit-dashboard-button"
+          *ngIf="dashboard && privileges.edit"
+          class="dashboard-action-button"
+          (click)="editDashboard()"
+        >
           Edit
         </button>
 
-        <button mat-button
-                e2e="dashboard-open-global-filters-button"
-                *ngIf="dashboard"
-                (click)="filterSidenav.toggle()">
+        <button
+          mat-button
+          e2e="dashboard-open-global-filters-button"
+          *ngIf="dashboard"
+          class="dashboard-action-button"
+          (click)="filterSidenav.toggle()"
+        >
           Filter
         </button>
 
-        <button mat-raised-button
-                e2e="dashboard-new-dashboard-button"
-                color="primary"
-                (click)="createDashboard()">
+        <button
+          mat-raised-button
+          e2e="dashboard-new-dashboard-button"
+          color="primary"
+          (click)="createDashboard()"
+        >
           + DASHBOARD
         </button>
       </div>
     </div>
 
     <div class="page-content" #downloadContainer>
-      <dashboard-grid [model]="dashboard" [requester]="requester" mode="view" *ngIf="dashboard"></dashboard-grid>
-      <span class="no-dashboard-notice" *ngIf="!dashboard">No dashboards available.</span>
+      <dashboard-grid
+        [model]="dashboard"
+        [requester]="requester"
+        mode="view"
+        *ngIf="dashboard"
+      ></dashboard-grid>
+      <span class="no-dashboard-notice" *ngIf="!dashboard"
+        >No dashboards available.</span
+      >
     </div>
   </mat-sidenav-content>
-
 </mat-sidenav-container>
-
