@@ -1,0 +1,21 @@
+<div mat-dialog-title>
+    {{data.title}}
+  </div>
+
+  <div mat-dialog-content>
+    {{data.content}}
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-button i18n
+            mat-dialog-close
+            e2e="confirm-dialog-close-btn">
+      {{data.negativeActionLabel}}
+    </button>
+    <button mat-button i18n color="primary"
+            [mat-dialog-close]="true"
+            e2e="confirm-dialog-ok-btn"
+            cdkFocusInitial>
+      {{data.positiveActionLabel}}
+    </button>
+  </div>
