@@ -9,14 +9,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface JobService {
+public interface JobService<T> {
 
-	boolean scheduleOneTimeJob(SchedulerJobDetail job, Class<? extends QuartzJobBean> jobClass);
+	boolean scheduleOneTimeJob(T job, Class<? extends QuartzJobBean> jobClass);
 
-	boolean scheduleCronJob(SchedulerJobDetail job, Class<? extends QuartzJobBean> jobClass);
+	boolean scheduleCronJob(T job, Class<? extends QuartzJobBean> jobClass);
 
-    boolean updateOneTimeJob(SchedulerJobDetail schedulerJobDetail);
-	boolean updateCronJob(SchedulerJobDetail schedulerJobDetail);
+    boolean updateOneTimeJob(T schedulerJobDetail);
+	boolean updateCronJob(T schedulerJobDetail);
 	
 	boolean unScheduleJob(ScheduleKeys jobName);
 	boolean deleteJob(ScheduleKeys scheduleKeys);
