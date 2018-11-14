@@ -1,6 +1,7 @@
 package com.synchronoss.saw.batch;
 
 import info.faljse.SDNotify.SDNotify;
+
 import javax.persistence.EntityManagerFactory;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
@@ -20,12 +21,10 @@ import org.springframework.integration.config.EnableIntegration;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
 
-
-
 @EnableJpaAuditing
 @EnableIntegration
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.synchronoss.saw", "com.synchronoss.saw.batch"})
+@ComponentScan("com.synchronoss.saw")
 public class SawBatchServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 
@@ -79,5 +78,5 @@ public class SawBatchServiceApplication {
     transactionManager.setEntityManagerFactory(entityManagerFactory);
     return transactionManager;
   }
-  
+
 }

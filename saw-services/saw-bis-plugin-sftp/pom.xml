@@ -10,26 +10,27 @@
 		<version>2.0.5.RELEASE</version>
 		<relativePath></relativePath>
 	</parent>
-
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-batch-ingestion-service</artifactId>
+	<artifactId>saw-bis-plugin-sftp</artifactId>
+	<name>saw-bis-plugin-sftp</name>
+	<packaging>jar</packaging>
 	<version>${revision}</version>
-	<name>saw-batch-ingestion-service</name>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<start-class>com.synchronoss.saw.batch.SawBatchServiceApplication</start-class>
+		<start-class>com.synchronoss.saw.batch.SpringTestPluginSftpApplication</start-class>
 		<json.validate>2.2.6</json.validate>
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
+		<snotify>1.1</snotify>
 		<wire.mock>2.7.1</wire.mock>
 		<spring.swagger>2.8.0</spring.swagger>
 		<guava>19.0</guava>
-		<flyway.db>5.2.0</flyway.db>
-		<mariadb>2.3.0</mariadb>
-		<snotify>1.1</snotify>
+		<commons-lang.version>2.6</commons-lang.version>
+		<fastjson.version>1.2.38</fastjson.version>
 		<common.io>2.6</common.io>
+		<sshd.core>1.4.0</sshd.core>
+		<compress>1.18</compress>
 	</properties>
 	<repositories>
 		<repository>
@@ -40,11 +41,31 @@
 			<id>synchronoss-snapshots</id>
 			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
 		</repository>
+
 	</repositories>
 	<dependencies>
 		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commons-lang.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${fastjson.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -54,6 +75,27 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-integration</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-sftp</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-file</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -76,6 +118,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -83,23 +126,10 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<!-- Spring integration related service -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-integration</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-sftp</artifactId>
-		</dependency>
-		<!-- Spring integration related service -->
-		<dependency>
 			<groupId>info.faljse</groupId>
 			<artifactId>SDNotify</artifactId>
 			<version>${snotify}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
@@ -117,6 +147,7 @@
 			<artifactId>springfox-swagger2</artifactId>
 			<version>${spring.swagger}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -139,8 +170,6 @@
 			<artifactId>commons-io</artifactId>
 			<version>${common.io}</version>
 		</dependency>
-
-		<!-- This is the SIP Batch plug-ins -->
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
 			<artifactId>saw-plugin-interfaces</artifactId>
@@ -148,43 +177,37 @@
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-bis-plugin-sftp</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.synchronoss.saw</groupId>
 			<artifactId>saw-log-service</artifactId>
 			<version>${revision}</version>
-		</dependency>
-
-		<!-- This is automated migration plugin -->
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>${flyway.db}</version>
 		</dependency>
 		<!-- This is for mariadb -->
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.sshd</groupId>
+			<artifactId>sshd-core</artifactId>
+			<version>${sshd.core}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+		    <scope>provided</scope>
+		    <version>${compress}</version>
+		</dependency>
+		
 	</dependencies>
+
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<compilerArgument>-Xlint:all</compilerArgument>
-					<compilerArgument>-Xlint:-processing</compilerArgument>
-					<testCompilerArgument>-Xlint:all</testCompilerArgument>
-					<testCompilerArgument>-Xlint:-processing</testCompilerArgument>
-					<showDeprecation>true</showDeprecation>
-					<showWarnings>true</showWarnings>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
@@ -203,6 +226,7 @@
 							<configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<violationSeverity>warning</violationSeverity>
+							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*</excludes>
 						</configuration>
 						<goals>
 							<goal>check</goal>
@@ -210,87 +234,23 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<classifier>exec</classifier>
-				</configuration>
-			</plugin>
+
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>create-bundle</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-						</configuration>
-					</execution>
-				</executions>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<compilerArgument>-Xlint:-processing</compilerArgument>
+					<testCompilerArgument>-Xlint:all</testCompilerArgument>
+					<testCompilerArgument>-Xlint:-processing</testCompilerArgument>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>de.dentrassi.maven</groupId>
-				<artifactId>rpm</artifactId>
-				<version>0.10.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>rpm</goal>
-						</goals>
-						<configuration>
-							<packageName>saw-batch-ingestion</packageName>
-							<version>${revision.nodash}</version>
-							<entries>
-								<entry>
-									<name>/opt/bda/saw-batch-ingestion-service</name>
-									<directory>true</directory>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-batch-ingestion-service/conf</name>
-									<directory>true</directory>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-batch-ingestion-service/saw-batch-ingestion.jar</name>
-									<file>target/saw-batch-ingestion-service-${revision}-exec.jar</file>
-								</entry>
-								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion.service</name>
-									<file>src/main/system/saw-batch-ingestion.service</file>
-								</entry>
-								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion-proxy.service</name>
-									<file>src/main/system/saw-batch-ingestion-proxy.service</file>
-								</entry>
-								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion-proxy.socket</name>
-									<file>src/main/system/saw-batch-ingestion-proxy.socket</file>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-batch-ingestion-service/db-setup/init</name>
-									<file>src/db-setup/init</file>
-									<mode>0755</mode>
-								</entry>
-							</entries>
-							<afterInstallation>
-								<script>systemctl daemon-reload</script>
-							</afterInstallation>
-							<afterRemoval>
-								<script>systemctl daemon-reload</script>
-							</afterRemoval>
-							<signature>
-								<skip>true</skip>
-							</signature>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+
 		</plugins>
 	</build>
 </project>
