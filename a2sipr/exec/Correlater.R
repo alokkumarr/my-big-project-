@@ -60,10 +60,6 @@ library(a2munge, lib.loc = r_lib_home)
 
 conf_json <- jsonlite::fromJSON(readLines(conf_file))
 
-# Read R Script Component parameter values ---------------------------
-
-rcomp_conf_df <- as.data.frame(conf_json$correlater)
-
 # Configure Spark connection ----------------------------------------
 # Get Spark configuration parameters using the main
 # config file & configure spark connection
@@ -200,41 +196,56 @@ output_dataset_details <- sip_get_dataset_details(output_dataset_ms, project, sa
 
 output_dataset_folder <- output_dataset_details$system$physicalLocation
 
-.target_var <- as.character(rcomp_conf_df$targetField[1])
-.transform <- as.character(rcomp_conf_df$transform[1])
-.output_col_names <- as.vector(rcomp_conf_df$outputColNames)
-.remove_diag <- as.logical(rcomp_conf_df$removeDiag[1])
-.collect <- as.logical(rcomp_conf_df$collect[1])
+# Read Correlater Component parameter values ---------------------------
 
-if (is.na(.output_col_names) ||
-    .output_col_names == "") {
-  .output_col_names <- NULL
+rcomp_conf_df <- as.data.frame(conf_json$correlater)
+
+i <- 1
+for (row in 1:nrow(rcomp_conf_df)) {
+  
+  .target_var <- as.character(rcomp_conf_df[row, "targetField"])
+  .transform <- as.character(rcomp_conf_df[row, "transform"])
+  .output_col_names <- rcomp_conf_df[row, "outputColNames"][[1]]
+  .remove_diag <- as.logical(rcomp_conf_df[row, "removeDiag"])
+  .collect <- as.logical(rcomp_conf_df[row, "collect"])
+  
+  if (is.na(.output_col_names) || .output_col_names == "") {
+    .output_col_names <- NULL
+  }
+  
+  if (is.na(.remove_diag) || .remove_diag == "") {
+    .remove_diag <- NULL
+  }
+  
+  if (is.na(.transform) || .transform == "") {
+    .transform <- NULL
+  }
+  
+  if (is.na(.collect) || .collect == "") {
+    .collect <- NULL
+  }
+  
+  X <- input_spk_df %>%
+    correlater(
+      .,
+      target_var = .target_var,
+      transform = .transform,
+      output_col_names = .output_col_names,
+      remove_diag = .remove_diag,
+      collect = .collect
+    )
+  
+  if (i == 1) {
+    rcomp_spk_df <- X
+  } else {
+    rcomp_spk_df <- rbind(rcomp_spk_df, X)
+  }
+  
+  rm(X)
+  
+  i <- i + 1
+  
 }
-
-if (is.na(.remove_diag) ||
-    .remove_diag == "") {
-  .remove_diag <- NULL
-}
-
-if (is.na(.transform) ||
-    .transform == "") {
-  .transform <- NULL
-}
-
-if (is.na(.collect) ||
-    .collect == "") {
-  .collect <- NULL
-}
-
-rcomp_spk_df <- input_spk_df %>%
-  a2munge::correlater(
-    .,
-    target_var = .target_var,
-    transform = .transform,
-    output_col_names = .output_col_names,
-    remove_diag = .remove_diag,
-    collect = .collect
-  )
 
 a2munge::writer(
   rcomp_spk_df,

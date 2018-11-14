@@ -7,6 +7,7 @@ import static sncr.bda.base.MetadataStore.delimiter;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -139,16 +140,70 @@ public class DLDataSetService {
             if (!o.containsKey(DataSetProperties.Id.toString()))
                 o.put(DataSetProperties.Id.toString(), id);
             JsonElement ds = dsStore.read(id);
+            JsonElement je = createDSDescriptor(id, ctx, o);
             if (ds == null) {
-                JsonElement je = createDSDescriptor(id, ctx, o);
                 dsStore.create(id, je);
                 return je;
-            } else
+            } else {
+                logger.debug("Metadata found");
+                JsonObject datasetObject = ds.getAsJsonObject();
+                JsonObject oldSystem = ds.getAsJsonObject()
+                    .get(DataSetProperties.System.toString()).getAsJsonObject();
+                JsonObject newSystem = je.getAsJsonObject()
+                    .get(DataSetProperties.System.toString()).getAsJsonObject();
+
+                oldSystem = checkAndUpdateSystemParams(id, oldSystem, newSystem);
+
+                if (oldSystem != null) {
+                    ds.getAsJsonObject().add(DataSetProperties.System.toString(), oldSystem);
+
+                    dsStore.update(id, ds);
+                }
+
+
                 return ds;
+            }
         } catch (Exception e) {
             logger.error("Could not read or create Data set: ", e);
             return null;
         }
+    }
+
+    private JsonObject checkAndUpdateSystemParams(String id, JsonObject oldSystem, JsonObject newSystem) throws Exception {
+        boolean status = false;
+
+        for (Map.Entry<String, JsonElement> entry : newSystem.entrySet()) {
+            String key = entry.getKey();
+
+            newSystem.addProperty(DataSetProperties.CreatedTime.toString(), oldSystem.get(DataSetProperties.CreatedTime.toString()).getAsLong());
+            newSystem.addProperty(DataSetProperties.ModifiedTime.toString(), oldSystem.get(DataSetProperties.ModifiedTime.toString()).getAsLong());
+
+            logger.debug("Key = " + key);
+
+            JsonPrimitive newValue = entry.getValue().getAsJsonPrimitive();
+
+            JsonPrimitive oldValue = oldSystem.getAsJsonPrimitive(key);
+
+            logger.debug("Old value = " + oldValue + ". New value = " + newValue);
+
+            if(oldValue != null && !oldValue.getAsString().equalsIgnoreCase(newValue.getAsString())) {
+                logger.debug("Value updated for " + key);
+
+                oldSystem.add(key, newValue);
+
+                status = true;
+            }
+        }
+
+        if (status) {
+            logger.debug("Property values changed");
+
+            oldSystem.addProperty(DataSetProperties.ModifiedTime.toString(), new DateTime().getMillis());
+        } else {
+            oldSystem = null;
+        }
+
+        return oldSystem;
     }
 
     /**
