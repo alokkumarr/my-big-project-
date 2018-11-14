@@ -6,6 +6,7 @@ After=default.target
 Type=oneshot
 ExecStart=/root/saw-deploy
 Environment=container=docker
+Environment=service=1
 SyslogIdentifier=saw-deploy
 
 [Install]
