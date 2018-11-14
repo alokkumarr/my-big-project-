@@ -1,10 +1,8 @@
 package com.synchronoss.saw.logs.repository;
 
 import com.synchronoss.saw.logs.entities.BisFileLog;
-import javax.persistence.NamedQuery;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
