@@ -9,7 +9,7 @@ import java.util.List;
 public class NGSQLMoveDataDescriptor extends MoveDataDescriptor {
 
     public NGSQLMoveDataDescriptor(SQLDescriptor descriptor, String destDir, List<String> keys) {
-        super(descriptor.targetTransactionalLocation,
+        super(descriptor.targetTransactionalLocation + descriptor.targetObjectName + "/data",
               descriptor.location,
               descriptor.targetObjectName,
               descriptor.tableDescriptor.mode.toLowerCase(),
