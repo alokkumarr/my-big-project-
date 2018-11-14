@@ -1,4 +1,4 @@
-package com.synchronoss.saw.batch.plugin.controllers;
+package com.synchronoss.saw.batch.controller;
 
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;

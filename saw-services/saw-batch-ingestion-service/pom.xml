@@ -153,7 +153,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-batch-logging-service</artifactId>
+			<artifactId>saw-batch-log-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
 

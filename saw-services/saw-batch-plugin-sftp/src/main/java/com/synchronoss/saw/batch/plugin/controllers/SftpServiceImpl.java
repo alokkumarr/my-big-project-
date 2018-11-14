@@ -68,7 +68,7 @@ import org.springframework.util.StreamUtils;
 @Service("sftpService")
 public class SftpServiceImpl extends SipPluginContract {
 
-  private static final Logger logger = LoggerFactory.getLogger(SawBisSftpPluginController.class);
+  private static final Logger logger = LoggerFactory.getLogger(SftpServiceImpl.class);
   
   @Autowired
   private RuntimeSessionFactoryLocator delegatingSessionFactory;
