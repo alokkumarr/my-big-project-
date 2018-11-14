@@ -186,10 +186,10 @@
 		<module>saw-scheduler-service</module>
 		<module>saw-proxy-service</module>
 		<module>saw-semantic-service</module>
-		<module>saw-log-service</module>
+		<module>saw-batch-logging-service</module>
 		<module>saw-batch-ingestion-service</module>
-		<module>saw-plugin-interfaces</module>
-		<module>saw-bis-plugin-sftp</module>
+		<module>saw-batch-plugin-interfaces</module>
+		<module>saw-batch-plugin-sftp</module>
 		<module>dist</module>
 	</modules>
 </project>

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/bisfilelogs")
-public class BisFileLogsController {
+public class SawBisFileLogsController {
 
   @Autowired
   private BisFileLogsRepository bisLogsRepository;

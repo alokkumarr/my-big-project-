@@ -20,10 +20,9 @@ import com.synchronoss.saw.batch.model.BisIngestionPayload;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipFileFilterOnLastModifiedTime;
+import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.sftp.integration.SipSftpFilter;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
-import com.synchronoss.saw.logs.service.SipLogService;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,7 +77,7 @@ public class SftpServiceImpl extends SipPluginContract {
   private BisRouteDataRestRepository bisRouteDataRestRepository;
 
   @Autowired
-  private SipLogService sipLogService;
+  private SipLogging sipLogService;
 
   @Autowired
   private IntegrationFlowContext flowContext;

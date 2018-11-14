@@ -143,17 +143,17 @@
 		<!-- This is the SIP Batch plug-ins -->
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-plugin-interfaces</artifactId>
+			<artifactId>saw-batch-plugin-interfaces</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-bis-plugin-sftp</artifactId>
+			<artifactId>saw-batch-plugin-sftp</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-log-service</artifactId>
+			<artifactId>saw-batch-logging-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
 

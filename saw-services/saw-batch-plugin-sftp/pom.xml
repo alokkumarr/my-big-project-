@@ -11,8 +11,8 @@
 		<relativePath></relativePath>
 	</parent>
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-bis-plugin-sftp</artifactId>
-	<name>saw-bis-plugin-sftp</name>
+	<artifactId>saw-batch-plugin-sftp</artifactId>
+	<name>saw-batch-plugin-sftp</name>
 	<packaging>jar</packaging>
 	<version>${revision}</version>
 	<properties>
@@ -78,58 +78,63 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
-			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-sftp</artifactId>
-			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-file</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-validator</artifactId>
 			<version>${json.validate}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.github.fge</groupId>
 			<artifactId>jackson-coreutils</artifactId>
 			<version>${jackson-coreutils}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-core</artifactId>
 			<version>${json-core}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+
 		<dependency>
 			<groupId>info.faljse</groupId>
 			<artifactId>SDNotify</artifactId>
 			<version>${snotify}</version>
-			<scope>provided</scope>
+
 		</dependency>
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
@@ -142,6 +147,7 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>${spring.swagger}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -153,6 +159,7 @@
 			<artifactId>guava</artifactId>
 			<version>${guava}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
@@ -172,12 +179,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-plugin-interfaces</artifactId>
+			<artifactId>saw-batch-plugin-interfaces</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-log-service</artifactId>
+			<artifactId>saw-batch-logging-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<!-- This is for mariadb -->
@@ -200,11 +207,9 @@
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-compress</artifactId>
-		    <scope>provided</scope>
 		    <version>${compress}</version>
 		</dependency>
-		
-	</dependencies>
+  </dependencies>
 
 	<build>
 		<plugins>

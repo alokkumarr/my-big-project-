@@ -11,9 +11,9 @@
 		<relativePath></relativePath>
 	</parent>
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-plugin-interfaces</artifactId>
+	<artifactId>saw-batch-plugin-interfaces</artifactId>
 	<version>${revision}</version>
-	<name>saw-plugin-interfaces</name>
+	<name>saw-batch-plugin-interfaces</name>
   <properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<json.validate>2.2.6</json.validate>
@@ -40,7 +40,6 @@
        	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -58,65 +57,52 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path-assert</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons-lang.version}</version>
-			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
-			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>${spring.swagger}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
 			<version>${spring.swagger}</version>
-			<scope>provided</scope>
 		</dependency>
-		
     	<dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <scope>provided</scope>
         </dependency>
-
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<scope>provided</scope>
 			<version>${compress}</version>
 		</dependency>
     </dependencies>
