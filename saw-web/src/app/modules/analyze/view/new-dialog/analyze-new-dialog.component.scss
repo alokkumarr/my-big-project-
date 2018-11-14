@@ -53,7 +53,6 @@ mat-form-field {
 
 mat-horizontal-stepper {
   ::ng-deep .mat-horizontal-stepper-header-container {
-    width: 70%;
     margin: 0 auto;
   }
 }
@@ -61,6 +60,10 @@ mat-horizontal-stepper {
 mat-tab-group {
   ::ng-deep .mat-tab-body-wrapper {
     padding-top: 5px;
+  }
+
+  ::ng-deep .mat-tab-label-active {
+    color: $primary-blue-b2;
   }
 
   ::ng-deep .mat-tab-label {
