@@ -83,9 +83,15 @@ public class BisJobController extends BaseJobController {
    */
   
   @RequestMapping(value = "bisscheduler/unschedule", method = RequestMethod.POST)
-  public void unschedule(@RequestBody ScheduleKeys schedule) {
+  public SchedulerResponse unschedule(@RequestBody ScheduleKeys schedule) {
     logger.debug("JobController unschedule() method");
-    bisService.unScheduleJob(schedule);
+    boolean status =    bisService.unScheduleJob(schedule);
+    
+    if (status) {
+      return getServerResponse(ServerResponseCode.SUCCESS, true);
+    } else {
+      return getServerResponse(ServerResponseCode.ERROR, false);
+    }
   }
   
   /**

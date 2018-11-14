@@ -209,11 +209,8 @@ public class GatewayController {
 
   private HttpHeaders makeResponseHeaders(HttpResponse response) {
     HttpHeaders result = new HttpHeaders();
-    if(response != null && response.getAllHeaders().length > 0) {
-      Header h = response.getFirstHeader("Content-Type");
-      result.set(h.getName(), h.getValue());
-    }
-    
+    Header h = response.getFirstHeader("Content-Type");
+    result.set(h.getName(), h.getValue());
     return result;
   }
 
