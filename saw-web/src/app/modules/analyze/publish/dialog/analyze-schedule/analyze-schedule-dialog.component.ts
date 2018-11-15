@@ -86,7 +86,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   ngOnInit() {
     this.scheduleState = 'new';
-    this.fileType = 'csv';
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {
       this.categories = response;
