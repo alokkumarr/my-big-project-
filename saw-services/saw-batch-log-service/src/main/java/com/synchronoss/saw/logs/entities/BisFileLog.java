@@ -14,7 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "BIS_FILE_LOGS", catalog = "sip_batch_ingestion", schema = "")
-public class BisFileLog extends BaseLogEntity implements Serializable {
+public class BisFileLog extends LogEntity implements Serializable {
 
   private static final long serialVersionUID = 26663931172032006L;
 
