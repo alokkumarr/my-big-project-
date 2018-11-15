@@ -32,6 +32,9 @@ public class BisDataMetaInfo {
 	
 	@JsonProperty("actualDataName")
 	private String actualDataName;
+
+	@JsonProperty("componentState")
+	private String componentState;
 	
 	@JsonProperty("receivedDataName")
 	private String receivedDataName;
@@ -140,7 +143,15 @@ public class BisDataMetaInfo {
 	public void setProcessState(String processState) {
 		this.processState = processState;
 	}
-	
+	@JsonProperty("componentState")
+	public String getComponentState() {
+		return componentState;
+	}
+	@JsonProperty("componentState")
+	public void setComponentState(String componentState) {
+		this.componentState = componentState;
+	}
+
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

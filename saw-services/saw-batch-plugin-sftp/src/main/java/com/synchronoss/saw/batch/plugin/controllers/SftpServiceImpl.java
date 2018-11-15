@@ -14,6 +14,7 @@ import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisChannelType;
+import com.synchronoss.saw.batch.model.BisComponentState;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisIngestionPayload;
@@ -468,6 +469,7 @@ public class SftpServiceImpl extends SipPluginContract {
           transferDataFromChannel(template, sourcelocation + File.separator 
               + entry.getFilename(), pattern, destinationLocation, channelId, routeId);
         } else {
+          File fileTobeDeleted = null;
           try {
             if ((list.size() <= batchSize && entry.getAttrs().getSize() != 0) 
                 && !sipLogService.checkDuplicateFile(sourcelocation + File.separator 
@@ -483,6 +485,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   + File.separator + FilenameUtils.getBaseName(entry.getFilename()) + "."
                   + IntegrationUtils.renameFileAppender() + "." 
                   + FilenameUtils.getExtension(entry.getFilename()));
+              fileTobeDeleted = localFile;
               bisDataMetaInfo = new BisDataMetaInfo();
               bisDataMetaInfo.setProcessId(new UUIDGenerator()
                   .generateId(bisDataMetaInfo).toString());
@@ -506,6 +509,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     } 
                   });
               bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
+              bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
               sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
               list.add(bisDataMetaInfo); 
             } else {
@@ -535,6 +539,10 @@ public class SftpServiceImpl extends SipPluginContract {
             }
           } catch (Exception ex) {
             logger.error("Exception occurred while transferring the file from channel", ex);
+            if (fileTobeDeleted.exists()) {
+              fileTobeDeleted.delete();
+            }
+            bisDataMetaInfo.setComponentState(BisComponentState.DATA_REMOVED.value());
             bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
             sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
           }

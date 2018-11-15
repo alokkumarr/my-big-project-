@@ -35,12 +35,11 @@ public class SipLogging {
     bisLog.setFilePattern(entity.getFilePattern());
     bisLog.setFileName(entity.getActualDataName());
     bisLog.setRecdFileSize(entity.getDataSizeInBytes());
-    bisLog.setMfldProcessDate(new SimpleDateFormat(IntegrationUtils
-        .getRenameDateFormat()).format(new Date()));
     bisLog.setRecdFileName(entity.getReceivedDataName());
     bisLog.setBisChannelType(entity.getChannelType().value());
     bisLog.setMflFileStatus(entity.getProcessState());
     bisLog.setActualFileRecDate(entity.getActualReceiveDate());
+    bisLog.setBisProcessState(entity.getComponentState());
     if (bisFileLogsRepository.existsById(pid)) {
       bisFileLogsRepository.deleteById(pid);
       bisFileLogsRepository.save(bisLog);

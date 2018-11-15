@@ -124,7 +124,7 @@ api:
         -   location: ${datapod.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
-       -   location: ${batch.service.host}
+        -   location: ${batch.service.host}
             method: PUT
             path: '[/]ingestion/batch.*'
         -   location: ${batch.service.host}

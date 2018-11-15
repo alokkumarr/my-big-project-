@@ -22,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public abstract class BaseEntity {
 
   @LastModifiedDate
-  @Column(name = "MODIFIED_DATE")
+  @Column(name = "MODIFIED_DATE", nullable=true, insertable=false)
   private Date modifiedDate;
 
   @CreatedDate

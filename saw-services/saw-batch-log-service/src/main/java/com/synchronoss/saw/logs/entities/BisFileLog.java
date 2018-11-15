@@ -1,18 +1,25 @@
 package com.synchronoss.saw.logs.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity
-@Table(schema = "SIP_BATCH_INGESTION", name = "BIS_FILE_LOG")
-public class BisFileLog {
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-  @Id
-  @Column(name = "MFL_PID")
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "BIS_FILE_LOGS", catalog = "sip_batch_ingestion", schema = "")
+public class BisFileLog extends BaseLogEntity implements Serializable {
+
+  private static final long serialVersionUID = 26663931172032006L;
+
+@Id
+  @Column(name = "BIS_PID")
   String pid;
 
   @Column(name = "BIS_ROUTE_SYS_ID")
@@ -39,17 +46,11 @@ public class BisFileLog {
   @Column(name = "BIS_RECD_FILE_SIZE_BYTES")
   Double recdFileSize;
 
-  @Column(name = "MFL_FILE_VALID_STATUS")
+  @Column(name = "BIS_FILE_VALID_STATUS")
   String mflFileStatus;
 
-  @Column(name = "DATE_OF_ENTRY")
-  Date dateOfEntry;
-
-  @Column(name = "DATE_OF_CHANGE")
-  Date dateOfChange;
-
-  @Column(name = "MFLD_PROCESS_STATE")
-  String mfldProcessDate;
+  @Column(name = "BIS_PROCESS_STATE")
+  String bisProcessState;
 
   public String getPid() {
     return pid;
@@ -131,28 +132,13 @@ public class BisFileLog {
     this.mflFileStatus = mflFileStatus;
   }
 
-  public Date getDateOfEntry() {
-    return dateOfEntry;
+
+  public String getBisProcessState() {
+    return bisProcessState;
   }
 
-  public void setDateOfEntry(Date dateOfEntry) {
-    this.dateOfEntry = dateOfEntry;
-  }
-
-  public Date getDateOfChange() {
-    return dateOfChange;
-  }
-
-  public void setDateOfChange(Date dateOfChange) {
-    this.dateOfChange = dateOfChange;
-  }
-
-  public String getMfldProcessDate() {
-    return mfldProcessDate;
-  }
-
-  public void setMfldProcessDate(String mfldProcessDate) {
-    this.mfldProcessDate = mfldProcessDate;
+  public void setBisProcessState(String bisProcessState) {
+    this.bisProcessState = bisProcessState;
   }
 
 }
