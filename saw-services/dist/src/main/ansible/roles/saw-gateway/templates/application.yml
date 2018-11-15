@@ -55,7 +55,7 @@ datapod:
     service:
         host: http://localhost:9900
 batch:
-    service:
+   service:
         host: http://localhost:9952
 
 api:
@@ -124,7 +124,7 @@ api:
         -   location: ${datapod.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
-        -   location: ${batch.service.host}
+       -   location: ${batch.service.host}
             method: PUT
             path: '[/]ingestion/batch.*'
         -   location: ${batch.service.host}
