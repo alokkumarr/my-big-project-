@@ -1,8 +1,19 @@
+'use strict';
 var appRoot = require('app-root-path');
 var retry = require('protractor-retry').retry;
 var fs = require('fs');
 var argv = require('yargs').argv;
 const SuiteSetup = require('../helpers/SuiteSetup');
+/**
+ * @description This code is used for logger.
+ */
+const log4js = require('log4js');
+log4js.configure({
+  appenders: { protractor: { type: 'file', filename: 'target/protractor.log' } },
+  categories: { default: { appenders: ['protractor'], level: 'debug' } }
+});
+
+const logger = log4js.getLogger('protractor');
 
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
@@ -176,11 +187,11 @@ exports.config = {
       testBaseDir + 'dev2.js']
   },
   onCleanUp: function(results) {
-    //retry.onCleanUp(results);
+    retry.onCleanUp(results);
   },
   onPrepare() {
-    //retry.onPrepare();
-
+    retry.onPrepare();
+    browser.logger = logger;
     browser
       .manage()
       .timeouts()
@@ -242,14 +253,15 @@ exports.config = {
     // if (fs.existsSync('target/e2eId.json')) {
     //   fs.unlinkSync('target/e2eId.json');
     // }
-    // Generate test data
-    let appUrl = SuiteSetup.getSawWebUrl();
+    // // Generate test data
+    // let appUrl = SuiteSetup.getSawWebUrl();
     // if (appUrl) {
     //   console.log('Generating test data');
     //   let APICommonHelpers = require('../helpers/api/APICommonHelpers');
     //   let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
     //   let token = APICommonHelpers.generateToken(apiBaseUrl);
     //   let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
+    //   browser.logger.info('generating data--TestDataGenerator');
     //   new TestDataGenerator().generateUsersRolesPrivilegesCategories(
     //     apiBaseUrl,
     //     token
@@ -263,14 +275,12 @@ exports.config = {
     if (argv.retry) {
       retryCounter = ++argv.retry;
     }
-    /**
-     * get a copy of old
-     */
-    // if (retryCounter <= maxRetryForFailedTests) {
-    //   // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
-    //   SuiteSetup.generateFailedTests('target/allure-results');
-    // }
+    // Rename failedFailedTests.json to
+    if (retryCounter <= maxRetryForFailedTests) {
+      // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
+      SuiteSetup.failedTestDataForRetry();
 
-    //return retry.afterLaunch(maxRetryForFailedTests);
+    }
+    return retry.afterLaunch(maxRetryForFailedTests);
   }
 };
