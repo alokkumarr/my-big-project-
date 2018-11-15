@@ -96,6 +96,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
     this.isReport = ['report', 'esReport'].includes(
       get(this.data.analysis, 'type'));
+
+    this.fileType = get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
   }
 
   trackByIndex(index) {
