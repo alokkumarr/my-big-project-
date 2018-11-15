@@ -71,6 +71,19 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
 
   var lastSQLExecMessage : String = null
 
+  /**
+    * Base method to execute SQL statement
+    *
+    * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
+    * @return
+    */
+  def executeSQL(sql : String, limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
+    m_log debug s"Execute SQL: $sql for metric: $metric"
+    val ( llastSQLExecRes, llastSQLExecMessage) = executeAndGetData(metric, sql, limit)
+    lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
+    ( lastSQLExecRes, lastSQLExecMessage)
+  }
+
   def getData : java.util.List[java.util.Map[String, (String, Object)]] = getData(metric)
 
 }
@@ -81,6 +94,7 @@ object SemanticNodeExecutionHelper{
   def getUserSpecificPath(outputLocation: String): String = {
     DLConfiguration.semanticLayerTempLocation + Path.SEPARATOR + outputLocation
   }
+
 
   def apply( rowId: String, cacheIt: Boolean = false) : SemanticNodeExecutionHelper = { val an = SemanticNode(rowId); new SemanticNodeExecutionHelper(an,cacheIt) }
 }

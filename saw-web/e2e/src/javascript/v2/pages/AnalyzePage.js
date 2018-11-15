@@ -13,7 +13,7 @@ class AnalyzePage extends CreateAnalysisModel{
   }
 
   clickOnAddAnalysisButton() {
-    commonFunctions.waitFor.elementToBeVisible(this._addAnalysisButton);
+    commonFunctions.waitFor.elementToBeClickable(this._addAnalysisButton);
     this._addAnalysisButton.click();
   }
 }
