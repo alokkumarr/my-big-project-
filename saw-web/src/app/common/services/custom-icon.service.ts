@@ -2,7 +2,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { Injectable } from '@angular/core';
 
-const basePath = '../../../../assets/img/category-icons/';
+const basePath = 'assets/img/category-icons/';
 
 @Injectable()
 export class CustomIconService {
