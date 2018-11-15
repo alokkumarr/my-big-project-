@@ -3,12 +3,8 @@ import { Routes } from '@angular/router';
 import { AdminMainViewComponent } from './main-view';
 import { AdminExportViewComponent } from './export';
 import { AdminImportViewComponent } from './import';
-<<<<<<< HEAD
 import { SecurityGroupComponent } from './datasecurity/security-group/security-group.component';
-import { isAdminGuard } from './guards';
-=======
 import { IsAdminGuard } from './guards';
->>>>>>> 78c559796236f7d401bae56e29b5744980ab3736
 import {
   UsersTableHeader,
   RolesTableHeader,
