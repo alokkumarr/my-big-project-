@@ -8,7 +8,7 @@ bootcmd:
   # Schedule the shutdown in "bootcmd", instead of "runcmd", to ensure
   # it is run on every instance start and not just after initial
   # provisioning.
-  - shutdown +480
+  - shutdown +240
   # Workaround: If epel-release is installed in same command in the
   # packages section below, the smem package will not be available
   # yet.  So install it earlier here.
