@@ -14,7 +14,9 @@
   <mat-sidenav-content>
     <div class="page-header-toolbar">
       <h2>
-        {{ (dashboard ? dashboard.name : '') || 'Observe' | truncate: 18 }}
+        <span [matTooltip]="(dashboard ? dashboard.name : '') || 'Observe'">
+          {{ (dashboard ? dashboard.name : '') || 'Observe' | truncate: 18 }}
+        </span>
         <button
           mat-icon-button
           e2e="dashboard-default-button"
