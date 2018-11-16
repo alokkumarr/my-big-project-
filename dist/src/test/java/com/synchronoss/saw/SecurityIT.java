@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Integration test that test the Security Service.
  */
+@Ignore("SIP-5245 --> This is creating problem to e2e test(SIP-5178) because dsk is applied to saw-admin and creating problem to executions, will enable this later")
 public class SecurityIT extends BaseIT {
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
