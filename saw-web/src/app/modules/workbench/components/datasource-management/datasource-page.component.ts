@@ -217,7 +217,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   getRoutesForChannel(channelID) {
     this.routesData = [];
     this.datasourceService.getRoutesList(channelID).subscribe(data => {
-      forEach(data.content, value => {
+      forEach(data, value => {
         // routes metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
         const tempVar = merge(value, JSON.parse(value.routeMetadata));
         this.routesData.push(tempVar);
