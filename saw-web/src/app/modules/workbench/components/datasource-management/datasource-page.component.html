@@ -131,6 +131,7 @@
             <dxi-column caption="Created By" dataField="createdBy" alignment="left"></dxi-column>
             <dxi-column caption="Created Date" dataField="createdDate" alignment="left" cellTemplate="dateTemplate"></dxi-column>
             <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
+            <dxi-column caption="Schedule" dataField="schedulerExpression" alignment="left" [calculateCellValue]="calculateScheduleCellValue"></dxi-column>
             <dxi-column caption="Source Location" dataField="sourceLocation" alignment="left"></dxi-column>
             <dxi-column caption="Destination Location" dataField="destinationLocation" alignment="left"></dxi-column>
             <dxi-column caption="Description" dataField="description" alignment="left"></dxi-column>
