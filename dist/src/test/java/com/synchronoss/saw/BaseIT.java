@@ -56,7 +56,7 @@ public class BaseIT {
     if (port == null) {
       throw new RuntimeException("Property saw.docker.port unset");
     }
-    RestAssured.baseURI = "http://" + host + ":" + port + "/saw";
+    RestAssured.baseURI = "http://" + host + ":" + port + "/";
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
   }
 
