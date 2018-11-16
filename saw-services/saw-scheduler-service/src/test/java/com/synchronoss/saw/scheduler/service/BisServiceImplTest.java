@@ -14,6 +14,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -27,13 +28,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.synchronoss.saw.scheduler.job.BisCronJob;
 import com.synchronoss.saw.scheduler.job.BisSimpleJob;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 
-
+@RunWith(SpringRunner.class)
 public class BisServiceImplTest {
 
 	private BisJobServiceImpl bisJobService;
@@ -68,6 +70,7 @@ public class BisServiceImplTest {
 		schJobDetail.setEndDate(calendar.getTime());
 		schJobDetail.setJobScheduleTime(new Date());
 		schJobDetail.setUserFullName("DDDD");
+		schJobDetail.setChannelId("123");
 
 		
 		scheduleKeys = new ScheduleKeys();
@@ -235,7 +238,7 @@ public class BisServiceImplTest {
 		mockTriggers();
 		
 		
-		List<Map<String, Object>> value = bisJobService.getAllJobs("test","Test");
+		List<Map<String, Object>> value = bisJobService.getAllJobs("test","123");
 		Assert.assertEquals(value.size(), 1);
 		Map<String, Object> resultMap = value.get(0);
 		Assert.assertEquals(resultMap.size(), 5);

@@ -361,7 +361,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
    * Retrive all jobs.
    */
   @Override
-  public List<Map<String, Object>> getAllJobs(String groupkey, String categoryId) {
+  public List<Map<String, Object>> getAllJobs(String groupkey, String channelId) { 
     List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
     try {
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -373,9 +373,10 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             BisSchedulerJobDetails job =
                 (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
-            if (job.getChannelType().equalsIgnoreCase(categoryId)
-                && !(job.getCronExpression() == null || job.getCronExpression().trim().equals(""))
-                && isActiveSchedule(job.getJobScheduleTime(), job.getEndDate())) {
+              
+            if (job.getChannelId().equalsIgnoreCase(channelId) 
+                && !(job.getCronExpression() == null 
+                || job.getCronExpression().trim().equals(""))) {
               // get job's trigger
               List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
               Date scheduleTime = triggers.get(0).getStartTime();

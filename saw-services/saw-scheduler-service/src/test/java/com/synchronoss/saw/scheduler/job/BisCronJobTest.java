@@ -2,29 +2,56 @@ package com.synchronoss.saw.scheduler.job;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
-import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
+import org.springframework.http.HttpEntity;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestTemplate;
 
+import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
+import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
+
+@RunWith(SpringRunner.class)
 public class BisCronJobTest {
+
+	@Mock
+    RestTemplate restTemplate;
+    @InjectMocks
+    @Spy
+    BisCronJob bisCronJob;
+	
+	
 	
 	@Test
-	public void testExecuteInternal(){
-		BisCronJob cronJob = new BisCronJob();
+	public void testExecuteInternal() throws URISyntaxException{
+		//BisCronJob BisCronJob = new BisCronJob();
 		JobExecutionContext context = Mockito.mock(JobExecutionContext.class);
 		JobDetail jobDetail = Mockito.mock(JobDetail.class);
 		JobKey jobKey = new JobKey("test");
 		JobDataMap jobDataMap = Mockito.mock(JobDataMap.class);
-		BisSchedulerJobDetails bisJobDetails = Mockito.mock(BisSchedulerJobDetails.class);
+		BisSchedulerJobDetails bisJobDetails = new BisSchedulerJobDetails();
+		bisJobDetails.setJobName("TEST");
 		
-		
+		Mockito.when(restTemplate.postForLocation(
+                Mockito.anyString(),
+                Mockito.any(BisSchedulerJobDetails.class))).thenReturn(new URI(""));
 		
 		when(context.getJobDetail()).thenReturn(jobDetail);
 		when(jobDetail.getKey()).thenReturn(jobKey);
@@ -32,8 +59,14 @@ public class BisCronJobTest {
 		when(jobDataMap.get("JOB_DATA_MAP")).thenReturn(bisJobDetails);
 		when(context.getMergedJobDataMap()).thenReturn(jobDataMap);
 		when(jobDataMap.getString("myKey")).thenReturn("test");
+		//ReflectionTestUtils.setField(BisCronJob.class, "bis-transfer-url", "http://foo");
+		ReflectionTestUtils.setField(bisCronJob, "bisTransferUrl", "http://testcron");
+		SchedulerResponse serverResponse = new SchedulerResponse();
+	    serverResponse.setStatusCode(200);
+	    URI response = new URI("http://test.com");
+		
 		try {
-			cronJob.executeInternal(context);
+			bisCronJob.executeInternal(context);
 			
 			verify(context).getJobDetail();
 			verify(jobDetail).getKey();
@@ -41,6 +74,9 @@ public class BisCronJobTest {
 			verify(jobDataMap).get("JOB_DATA_MAP");
 			verify(context).getMergedJobDataMap();
 			verify(jobDataMap).getString("myKey");
+			Mockito.verify(restTemplate).postForLocation(
+				Mockito.eq("http://testcron"),
+					Mockito.any(BisSchedulerJobDetails.class));
 		} catch (JobExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

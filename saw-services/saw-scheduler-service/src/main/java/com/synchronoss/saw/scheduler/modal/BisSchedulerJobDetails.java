@@ -24,6 +24,10 @@ public class BisSchedulerJobDetails implements Serializable {
    */
   private static final long serialVersionUID = 5064023705368082645L;
 
+  private String channelId;
+  private String routeId;
+
+
   private String entityId;
   private String description;
   private String userFullName;
@@ -184,4 +188,21 @@ public class BisSchedulerJobDetails implements Serializable {
   public void setChannelType(String channelType) {
     this.channelType = channelType;
   }
+  
+  
+  public String getRouteId() {
+	return routeId;
+  }
+
+  public void setRouteId(String routeId) {
+	this.routeId = routeId;
+  }
+
+public String getChannelId() {
+	return channelId;
+}
+
+public void setChannelId(String channelId) {
+	this.channelId = channelId;
+}
 }
