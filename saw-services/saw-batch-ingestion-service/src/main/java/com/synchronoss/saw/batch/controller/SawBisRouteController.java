@@ -1,26 +1,33 @@
 package com.synchronoss.saw.batch.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.model.BisChannelType;
+import com.synchronoss.saw.batch.model.BisSchedulerRequest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import java.io.IOException;
-
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -35,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -50,6 +58,9 @@ public class SawBisRouteController {
   private BisChannelDataRestRepository bisChannelDataRestRepository; 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository; 
+  
+  @Value("${bis.scheduler-url}")
+  private String bisSchedulerUrl;
 
   
   /**
@@ -80,9 +91,51 @@ public class SawBisRouteController {
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
+    String routeMetaData = requestBody.getRouteMetadata();
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode routeData = objectMapper.readTree(routeMetaData);
+    
+    String schedulerDetails = routeData.get("schedulerExpression").toString();
+    
+    
+    
+    BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
+    schedulerRequest.setChannelId(String.valueOf(id.toString()));
+    schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
+    schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId() 
+        + requestBody.getBisRouteSysId().toString());
+    schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
+    JsonNode schedulerData = objectMapper.readTree(schedulerDetails);
+    
+    // If schedule the route while creating
+    if (!schedulerData.toString().equals("")) {
+      JsonNode cronExp =  schedulerData.get("cronexp");
+      JsonNode startDate =  schedulerData.get("startDate");
+      JsonNode endDate =  schedulerData.get("endDate");
+      if (cronExp != null) {
+        schedulerRequest.setCronExpression(cronExp.toString());
+      }
+      if (startDate != null) {
+        schedulerRequest.setCronExpression(startDate.toString());
+      }
+      if (endDate != null) {
+        schedulerRequest.setCronExpression(endDate.toString());
+      }
+      
+    }
+         
+    
+    RestTemplate restTemplate = new RestTemplate();
+    restTemplate.postForLocation(bisSchedulerUrl, schedulerRequest);
+    
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       logger.trace("Channel retrieved :" + channel);
-      requestBody.setBisChannelSysId(id);
+      requestBody.setBisChannelSysId(id);   
+      
+      
+     
       return bisRouteDataRestRepository.save(requestBody);
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
   }
