@@ -19,20 +19,89 @@ knitr::opts_chunk$set(
 
 ## Overview
 
+a2munge is an R package to help create _Big Data_ Advanced Analytic data pipelines. The package contains a suite of Spark^[Spark Data Processing Engine[via](https://spark.apache.org/)] compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preperation. The a2munge package is design to efficiently create such pipelines. 
+ 
+ 
+### Features
 
-A2munge was built to address the following 
+* Data transformation functions support Spark and in-memory R data set classes 
+* Functions are compatible with dplyr^[dplyr R package [via](https://dplyr.tidyverse.org/)] and tidyr^[tidyr R package [via](https://tidyr.tidyverse.org/)] verbs
+* Individual functions can be combined to create flexible, complex data pipelines
+* Programmatic function interface support application and solution templates
+* Combines with a2modeler R package to allow Advanced Analytics application development to be done with a single programming language (vs traditional sql / statistical software split) 
+* Statistical Anomaly Detection for time series data
+ 
 
-* add missing spark based data processing functionality
-* create programatic interface using standard evaluation^[dplyr standard evaluation intro [via](https://dplyr.tidyverse.org/articles/programming.html)] to dplyr verbs^[dplyr intro [dplyr](https://dplyr.tidyverse.org/)]
-* simplify combine many dplyr verbs into single function for ease of use
-* create consistent outputs
+### Design
+
+a2munge leverages the R S3^[R S3 OO [via](http://adv-r.had.co.nz/S3.html)] Object Oriented system to create generic functions with R data.frame and Spark class methods. This design creates a similiar set of functions and arguments for the user that can be applied on local R data.frames, local Spark data objects, or even distributed Spark objects. 
+
+
+a2munge uses standard evaluation ^[dplyr standard evaluation intro [via](https://dplyr.tidyverse.org/articles/programming.html)] to evaluate function arguments. This allows for function arguments to be assigned programmatically which is beneficial for re-usable template and component development. 
+
+
+a2munge functions standarize the output naming convention and schema which creates consistency aiding in application development.
+
+
+a2munge spark compatibility relies on the great sparklyr^[sparklyr R package [via](https://spark.rstudio.com/)] R package which enables a R API for working with Spark objets. 
 
 
 ## Functions
 
+In the following sections each of the a2munge functions are explained with examples. In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. 
+
+
+```{r, message=FALSE, warning=FALSE}
+
+# R packages
+library(tidyverse)
+library(lubridate)
+library(sparklyr)
+
+# Create Simulated Dataset:
+set.seed(319)
+n <- 100                           # Records per ID
+id_vars <- seq(101, 200, by=1)     # Unique IDs
+dates <- today() - days(1:90)      # Date Range
+cat1 <- LETTERS[1:2]               # Category Var 1
+cat2 <- LETTERS[c(22:26)]          # Category Var 2
+
+df <- tibble()
+for(id in id_vars){
+  d <- tibble(id = id,
+              date = as.character(sample(dates, n, replace = T)),
+              cat1 = sample(cat1, n, replace = T, prob = c(.75, .25)),
+              cat2 = sample(cat2, n, replace = T, prob = c(.4, .3, .2, .075, .025)),
+              metric1 = sample(1:5, n, replace = T),
+              metric2 = rnorm(n, mean=50, sd = 5))
+  df <- rbind(df, d)
+}
+
+
+# Create Spark Connection
+sc <- spark_connect(master = "local")
+
+# Copy Data to Spark
+sdf <- copy_to(sc, df, "df", overwrite = TRUE)
+```
+
+
+```{r}
+# R Dataset
+df
+
+# Spark Dataset
+sdf
+```
+
+
 ### Manipulaters
 
+The first set of functions are data manipulater: functions to aggregate or add new columns as functions of other columns
+
 #### Summariser
+
+The summariser function 
 
 
 #### Summariser Map
