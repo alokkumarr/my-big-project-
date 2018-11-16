@@ -182,6 +182,12 @@ public class BuilderUtil
         dynamicConvertor.setLte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
         dynamicConvertor.setGte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
         break;
+      case "Today": {
+        LocalDateTime today = now;
+        dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+        dynamicConvertor.setGte(today.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+        break;
+      }
       case "YTD": {
         LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
         dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
@@ -280,7 +286,13 @@ public class BuilderUtil
                 dynamicConvertor.setLte(dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
-
+            case "Today": {
+                LocalDateTime today = now;
+                LocalDateTime yestday = now.minusDays(1);
+                dynamicConvertor.setLte(yestday.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(yestday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                break;
+            }
             case "YTD": {
                 LocalDateTime firstDayOfYear = now.with(TemporalAdjusters.firstDayOfYear());
                 int calculatedDayDifference  = now.getDayOfYear()-firstDayOfYear.getDayOfYear();
