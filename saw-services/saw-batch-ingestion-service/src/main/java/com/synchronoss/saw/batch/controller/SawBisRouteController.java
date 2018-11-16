@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -64,8 +63,7 @@ public class SawBisRouteController {
 
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
-
-
+  
   /**
    * This API provides an ability to add a source.
    */
@@ -99,7 +97,7 @@ public class SawBisRouteController {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode routeData = objectMapper.readTree(routeMetaData);
-    String schedulerDetails = routeData.get("schedulerExpression").toString();
+    String schedulerDetails = routeData.get("schedulerExpression").asText();
     BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
     schedulerRequest.setChannelId(String.valueOf(id.toString()));
     schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
@@ -113,13 +111,13 @@ public class SawBisRouteController {
       JsonNode startDate =  schedulerData.get("startDate");
       JsonNode endDate =  schedulerData.get("endDate");
       if (cronExp != null) {
-        schedulerRequest.setCronExpression(cronExp.toString());
+        schedulerRequest.setCronExpression(cronExp.asText());
       }
       if (startDate != null) {
-        schedulerRequest.setCronExpression(startDate.toString());
+        schedulerRequest.setCronExpression(startDate.asText());
       }
       if (endDate != null) {
-        schedulerRequest.setCronExpression(endDate.toString());
+        schedulerRequest.setCronExpression(endDate.asText());
       }
     }
     RestTemplate restTemplate = new RestTemplate();

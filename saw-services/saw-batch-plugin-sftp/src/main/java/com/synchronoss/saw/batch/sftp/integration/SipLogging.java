@@ -2,12 +2,8 @@ package com.synchronoss.saw.batch.sftp.integration;
 
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
-import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
