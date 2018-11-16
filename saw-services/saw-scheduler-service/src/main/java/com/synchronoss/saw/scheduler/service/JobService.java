@@ -1,11 +1,9 @@
 package com.synchronoss.saw.scheduler.service;
 
-import com.synchronoss.saw.scheduler.modal.FetchByCategoryBean;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
-import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

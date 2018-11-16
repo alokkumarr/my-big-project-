@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -64,8 +63,7 @@ public class SawBisRouteController {
 
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
-
-
+  
   /**
    * This API provides an ability to add a source.
    */
@@ -94,8 +92,6 @@ public class SawBisRouteController {
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
-  
-   
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
