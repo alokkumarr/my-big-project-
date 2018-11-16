@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Integration test that test the Security Service.
  */
-@Ignore("SIP-5245 --> This is creating problem to e2e test(SIP-5178) because dsk is applied to saw-admin and creating problem to executions, will enable this later")
 public class SecurityIT extends BaseIT {
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -89,6 +89,7 @@ public class SecurityIT extends BaseIT {
       .then().assertThat().statusCode(200);
   }
 
+  @Ignore("SIP-5245: DSK causes interference with other tests (SIP-5178) so disable until fixed")
   @Test
   public void testAssignGroupUser() {
     ObjectNode secGroup = mapper.createObjectNode();
