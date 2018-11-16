@@ -2,8 +2,8 @@ package com.synchronoss.saw.batch.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
+import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
@@ -15,13 +15,14 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,7 @@ public class SawBisRouteController {
    * This API provides an ability to add a source. 
    */
   @ApiOperation(value = "Adding a new Route",
-      nickname = "actionBis", notes = "", response = BisChannelEntity.class)
+      nickname = "actionBis", notes = "", response = BisRouteDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -70,20 +71,24 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{id}/routes", method = RequestMethod.POST,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<@Valid BisRouteEntity> createRoute(
+  public ResponseEntity<@Valid BisRouteDto> createRoute(
       @ApiParam(value = "Channel Id",
       required = true) @PathVariable Long id,
       @ApiParam(value = "Route related information to store",
-          required = true) @Valid @RequestBody BisRouteEntity requestBody)
+          required = true) @Valid @RequestBody BisRouteDto requestBody)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     logger.trace("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
+      BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
       requestBody.setBisChannelSysId(id);
-      return bisRouteDataRestRepository.save(requestBody);
+      BeanUtils.copyProperties(requestBody, routeEntity);
+      routeEntity = bisRouteDataRestRepository.save(routeEntity);
+      BeanUtils.copyProperties(routeEntity, requestBody);
+      return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
   }
 
@@ -92,7 +97,7 @@ public class SawBisRouteController {
    */
   
   @ApiOperation(value = "Reading list of routes & paginate by channel id",
-      nickname = "actionBis", notes = "", response = BisRouteEntity.class)
+      nickname = "actionBis", notes = "", response = BisRouteDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -106,7 +111,7 @@ public class SawBisRouteController {
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<Page<BisRouteEntity>> readRoutes(@ApiParam(value = "id",
+  public ResponseEntity<List<BisRouteDto>> readRoutes(@ApiParam(value = "id",
       required = true)  @PathVariable(name = "id", required = true) Long id,
       @ApiParam(value = "page number",
       required = false)  @RequestParam(name = "page", defaultValue = "0") int page, 
@@ -118,9 +123,16 @@ public class SawBisRouteController {
           required = false) @RequestParam(name = "column", defaultValue = "createdDate") 
       String column) throws NullPointerException, JsonParseException, 
       JsonMappingException, IOException {
-    return ResponseEntity.ok(bisRouteDataRestRepository
-    .findByBisChannelSysId(id,PageRequest.of(page, size, 
-    Direction.DESC, column)));
+	List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
+		    .findByBisChannelSysId(id, PageRequest.of(page, size, 
+		    	    Direction.DESC, column)).getContent();
+	List<BisRouteDto> routeDtos = new ArrayList<>();
+	routeEntities.forEach(route ->{
+		BisRouteDto routeDto = new BisRouteDto();
+		BeanUtils.copyProperties(route, routeDto);
+		routeDtos.add(routeDto);
+	});
+    return ResponseEntity.ok(routeDtos);
   }
 
 
@@ -128,7 +140,7 @@ public class SawBisRouteController {
    * This API provides an ability to update a source. 
    */
   @ApiOperation(value = "Updating an existing routes by channel id",
-      nickname = "actionBis", notes = "", response = BisRouteEntity.class)
+      nickname = "actionBis", notes = "", response = BisRouteDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -143,14 +155,14 @@ public class SawBisRouteController {
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<BisRouteEntity> updateRoutes(@ApiParam
+  public ResponseEntity<BisRouteDto> updateRoutes(@ApiParam
        (value = "Channel id",
           required = true)@PathVariable(name = "channelId", required = true) Long channelId,
        @ApiParam
           (value = "Route id",
           required = true)@PathVariable(name = "routeId", required = true) Long routeId,       
       @ApiParam(value = "Routes related information to update",
-          required = true) @Valid @RequestBody BisRouteEntity requestBody)
+          required = true) @Valid @RequestBody BisRouteDto requestBody)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
@@ -161,8 +173,11 @@ public class SawBisRouteController {
     }
     return ResponseEntity.ok(bisRouteDataRestRepository.findById(routeId).map(route -> {
       logger.trace("Route updated :" + route);
-      BeanUtils.copyProperties(requestBody, route, "bisChannelSysId", "bisRouteSysId");
-      return bisRouteDataRestRepository.save(route);
+      BisRouteEntity routeEntity = new BisRouteEntity();
+      BeanUtils.copyProperties(requestBody, routeEntity);
+      routeEntity = bisRouteDataRestRepository.save(routeEntity);
+      BeanUtils.copyProperties(routeEntity, requestBody, "bisChannelSysId", "bisRouteSysId");
+      return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
   }
 
