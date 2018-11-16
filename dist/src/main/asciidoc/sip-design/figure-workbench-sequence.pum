@@ -8,6 +8,9 @@ Client -> "SAW Security Service": Authentication request
 Client -> "SAW Gateway Service": Execution request
 "SAW Gateway Service" -> "SAW Workbench Service": Execution request
 
+"SAW Workbench Service" -> "Metadata Service": Register dataset
+"Metadata Service" --> "SAW Workbench Service": Return dataset ID
+
 "SAW Workbench Service" -> "Apache Spark": Execute Spark SQL
 "Apache Spark" -> "MapR-FS": Write results
 "MapR-FS" --> "SAW Execution Service": Read results
