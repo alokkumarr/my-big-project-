@@ -77,8 +77,8 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             f onSuccess { case _ => m_log info "Request was successfully processed"; if (f.value.get.get != null ) res.put( "data", processResult(f.value.get.get))}
             f onFailure { case _ => m_log error "Could not process request: " + f.value }
     */
-            throw new RuntimeException("getData: No longer supported to prevent out of memory issues")
-           /* val resultData = execution.getAllData
+
+            val resultData = execution.getAllData
             if (resultData != null)
               res.put("data", processResult(resultData))
             else
@@ -88,7 +88,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             res.put("result", execution.getExecCode)
             res.put("reason", execution.getExecMessage)
             res.put("start" , execution.getStartedTimestamp)
-            res.put("finished" , execution.getFinishedTimestamp)*/
+            res.put("finished" , execution.getFinishedTimestamp)
           }
           else if (semanticId != null) {
 
@@ -102,8 +102,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             m_log debug s"Execute query: $q"
             val sm = SemanticNode(semanticId, SelectModels.everything.id)
             val snh = new SemanticNodeExecutionHelper(sm, true)
-            throw new RuntimeException("getData: No longer supported to prevent out of memory issues")
-           /* snh.executeSQL(q, numOfRec)
+            snh.executeSQL(q, numOfRec)
             val data = snh.getData
 
             if (data != null)
@@ -113,7 +112,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
 
             m_log debug s"Exec-code: ${snh.lastSQLExecRes}, message: ${snh.lastSQLExecMessage}"
             res.put("result", snh.lastSQLExecRes)
-            res.put("reason", snh.lastSQLExecMessage)*/
+            res.put("reason", snh.lastSQLExecMessage)
           }
         }
         case "show" => {
@@ -147,8 +146,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
           }
           val analysis = new Analysis(analysisId)
           val execution = analysis.executeAndWait(ExecutionType.onetime)
-          throw new RuntimeException("getData: No longer supported to prevent out of memory issues")
-        /*  val resultData = null
+          val resultData = execution.getAllData
           if (resultData != null){
             res.put("data", processResult(resultData))
           }
@@ -159,7 +157,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
           res.put("result", execution.getExecCode)
           res.put("reason", execution.getExecMessage)
           res.put("start" , analysis.getStartTS )
-          res.put("finished" , analysis.getFinishedTS )*/
+          res.put("finished" , analysis.getFinishedTS )
         }
         case "exec-save" => {
           if (analysisId == null) {

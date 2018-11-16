@@ -12,7 +12,7 @@
     Customer: {{ticket.custCode}}
   </div>
   <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
-    <button (click)="createRow()"
+    <button *ngIf="showAddButton" (click)="createRow()"
             mat-raised-button
             color="primary">
       + <span>{{section | uppercase}}</span>
