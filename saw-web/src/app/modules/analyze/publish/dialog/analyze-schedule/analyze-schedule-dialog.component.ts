@@ -72,7 +72,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   loadCron = false;
   emailValidateFlag = false;
   isReport: boolean;
-  fileType: any;
+  fileType: string;
 
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
