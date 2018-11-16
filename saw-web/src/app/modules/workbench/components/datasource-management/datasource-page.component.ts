@@ -55,7 +55,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   getSources() {
     this.unFilteredSourceData = [];
     this.datasourceService.getSourceList().subscribe(data => {
-      forEach(data.content, value => {
+      forEach(data, value => {
         // Channel metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
         const tempVar = merge(value, JSON.parse(value.channelMetadata));
         this.unFilteredSourceData.push(tempVar);

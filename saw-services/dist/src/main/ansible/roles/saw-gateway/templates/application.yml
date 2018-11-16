@@ -55,7 +55,7 @@ datapod:
     service:
         host: http://localhost:9900
 batch:
-    service:
+   service:
         host: http://localhost:9952
 
 api:

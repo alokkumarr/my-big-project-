@@ -12,6 +12,7 @@ import sncr.datalake.DLConfiguration
 import sncr.datalake.TimeLogger._
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
+import sncr.metadata.engine.ProcessingResult
 import sncr.saw.common.config.SAWServiceConfig
 
 import scala.reflect.io.File
@@ -34,6 +35,8 @@ class Analysis(val analysisId : String) {
   def getStatus = status
   def getStartTS = startTS
   def getFinishedTS = finishedTS
+
+
 
   /**
     * Start execution of analysis through MapR Streams queue, instead
@@ -91,12 +94,13 @@ class Analysis(val analysisId : String) {
     m_log debug s"Execute analysis as ${execType.toString}"
     val analysisExecution = new AnalysisExecution(an, execType, resultId)
     logWithTime(m_log, "Execute Spark SQL query", {
-      analysisExecution.executeDLAnalysis(sqlRuntime,limit)
+      analysisExecution.startExecution(sqlRuntime,limit)
     })
     startTS = analysisExecution.getStartedTimestamp
     finishedTS = analysisExecution.getFinishedTimestamp
     analysisExecution
   }
+
 
   var exec :AsynchAnalysisExecWithList = null
   def execute(execType: ExecutionType) : Future[util.List[util.Map[String, (String, Object)]]] =
@@ -108,6 +112,7 @@ class Analysis(val analysisId : String) {
     status = exec.getStatus.toString
     task
   }
+
   /**
     * Returns the list of executions for that analysis
     */

@@ -20,6 +20,7 @@ import static java.lang.System.out;
  */
 public class ExecutionRunner {
 
+
     public static void main(String[] args) throws Exception {
 
         CommandLineHandler cli = new CommandLineHandler();
@@ -39,7 +40,7 @@ public class ExecutionRunner {
                 System.out.println("Execute: \nAnalysis node id: " + analysis_id);
                 AnalysisNode an = AnalysisNode.apply(analysis_id);
                 AnalysisNodeExecutionHelper ane = new AnalysisNodeExecutionHelper(an, null, true, execResId);
-              //  ane.executeAndSave(outStream, rowLimit);
+                ane.executeAndSave(outStream, rowLimit);
                 ane.printSample(outStream);
             }else
             if (semantic_id != null && !semantic_id.isEmpty()) {
@@ -52,7 +53,7 @@ public class ExecutionRunner {
                 SemanticNode sn = SemanticNode.apply(semantic_id, SelectModels.everything().id());
                 sncr.datalake.handlers.SemanticNodeExecutionHelper sne = new sncr.datalake.handlers.SemanticNodeExecutionHelper(sn, true);
                 sne.loadObjects();
-               /* Tuple2<Integer, String> res = sne.executeSQL(sql, rowLimit);
+                Tuple2<Integer, String> res = sne.executeSQL(sql, rowLimit);
                 if ( res._1() == 0) {
                     String result = sne.getDataSampleAsString(sne.metric());
                     if (outStream != null)
@@ -60,7 +61,7 @@ public class ExecutionRunner {
                 }
                 else{
                     System.err.println("ERROR: Could not execute SQL " + sql);
-                }*/
+                }
 
             }
             if (outStream != null ) {

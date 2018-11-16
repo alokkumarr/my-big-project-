@@ -46,7 +46,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("portNo", 21);
     childNode.put("accessType", "read");
     childNode.put("userName", "user");
-    childNode.put("password", "oKIQbg3Q0C7wfsPUoXjN4g==");
+    childNode.put("password", "saw123");
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -84,7 +84,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("portNo", 22);
     childNode.put("accessType", "write");
     childNode.put("userName", "sawadmin@sncr.com");
-    childNode.put("password", "AbcX1245yfgskl");
+    childNode.put("password", "saw123");
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -104,7 +104,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
     childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
     childNode.put("sourceLocation", "/tmp");
-    childNode.put("destinationLocation", "/dest/tmp");
+    childNode.put("destinationLocation", "/tmp");
     childNode.put("filePattern", "*.csv");
     childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
     childNode.put("description", "file");
@@ -129,10 +129,16 @@ public class BatchIngestionIT extends BaseIT {
   
   
   private Long getChannelId() {
-    List<HashMap<Object,Object>> bisChannelSysId = given(authSpec).when().get(BATCH_CHANNEL_PATH)
+    //List<HashMap<Object,Object>> bisChannelSysId = given(authSpec).when().get(BATCH_CHANNEL_PATH)
+    //   .then().assertThat()
+    //   .statusCode(200).
+    //   extract().response().jsonPath().getJsonObject("content");
+    Long bisChannelSysId = given(authSpec).when().get(BATCH_CHANNEL_PATH)
         .then().assertThat()
-        .statusCode(200).extract().response().jsonPath().getJsonObject("content");
-    return Long.valueOf(bisChannelSysId.get(0).get("bisChannelSysId").toString());
+        .statusCode(200)
+        .extract().response().jsonPath().getLong("bisChannelSysId[0]");
+    //Long.valueOf(bisChannelSysId.get(0).get("bisChannelSysId").toString());
+    return bisChannelSysId;
   }
 
   /**
@@ -304,33 +310,6 @@ public class BatchIngestionIT extends BaseIT {
   }
 
   /**
-   * The test case is to test connectivity a route in batch Ingestion.
-  */
-  @Test
-  public void connectRoute() throws JsonProcessingException {
-    given(authSpec)
-    .body(prepareChannelDataSet()).when()
-    .post(BATCH_CHANNEL_PATH)
-    .then().assertThat().statusCode(200);
-    Long bisChannelSysId = getChannelId();
-    log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
-    String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
-    given(authSpec)
-    .body(prepareRouteDataSet()).when()
-    .post(routeUri)
-    .then().assertThat().statusCode(200);  
-    List<HashMap<Object,Object>> bisRouteSysId = given(authSpec)
-            .when().get(routeUri).then()
-            .assertThat().statusCode(200).extract().response().jsonPath().getJsonObject("content");
-    Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
-    log.debug("connectRoute bisRouteSysId : " + routeId);
-    String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_ROUTE
-        + routeId + "/status/";
-    given(authSpec).when().get(connectRouteUri).then()
-   .assertThat().statusCode(200);
-  }
-
-  /**
    * The test case is to test a connectivity route in batch Ingestion.
   */
   @Test
@@ -346,7 +325,7 @@ public class BatchIngestionIT extends BaseIT {
     .then().assertThat().statusCode(200);
     Long bisChannelSysId = getChannelId();
     log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
-    String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_CHANNEL
+    String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/"
         + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then()
    .assertThat().statusCode(200);

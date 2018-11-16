@@ -38,6 +38,22 @@ export const AdminMenuData = [
         url: ['/admin/import']
       }
     ]
+  },
+  {
+    id: '',
+    name: 'Data Security',
+    children: [
+      {
+        id: '',
+        name: 'Manage Security Groups',
+        url: ['/admin/securitygroups']
+      },
+      {
+        id: '',
+        name: 'Manage User Assignments',
+        url: ['/admin/userassignments']
+      }
+    ]
   }
 ];
 
@@ -242,5 +258,64 @@ export const CategoriesTableHeader = [
     caption: '',
     width: '8%',
     cellTemplate: 'actionCellTemplate'
+  }
+];
+
+export const UserAssignmentsTableHeader = [
+  {
+    caption: 'LOGIN ID',
+    dataField: 'loginId',
+    allowSorting: true,
+    alignment: 'left',
+    width: '20%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'ROLE',
+    dataField: 'role',
+    allowSorting: true,
+    alignment: 'left',
+    width: '10%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'FIRST NAME',
+    dataField: 'firstName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '15%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'LAST NAME',
+    dataField: 'lastName',
+    allowSorting: true,
+    alignment: 'left',
+    width: '12%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'EMAIL',
+    dataField: 'email',
+    allowSorting: true,
+    alignment: 'left',
+    width: '20%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'STATUS',
+    dataField: 'status',
+    allowSorting: true,
+    alignment: 'left',
+    width: '8%',
+    cellTemplate: 'highlightCellTemplate'
+  },
+  {
+    caption: 'Data Security Group',
+    dataField: 'groupName',
+    width: '15%',
+    allowSorting: true,
+    alignment: 'left',
+    cellTemplate: 'groupAssignCellTemplate'
   }
 ];

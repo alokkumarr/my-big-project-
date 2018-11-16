@@ -32,7 +32,3 @@
 - meta: flush_handlers
 - name: Enable SAW Batch Ingestion Service
   systemd: name=saw-batch-ingestion-proxy.socket enabled=true state=started
-# Note: In difference to other socket-activates services, the
-# Batch Service is by default also enabled itself to ensure that
-- name: Enable SAW Batch Ingestion Service
-  systemd: name=saw-batch-ingestion enabled=true
