@@ -1,28 +1,37 @@
 package com.synchronoss.saw.batch.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.model.BisChannelType;
+import com.synchronoss.saw.batch.model.BisSchedulerRequest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
@@ -36,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -46,15 +56,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class SawBisRouteController {
 
   private static final Logger logger = LoggerFactory.getLogger(SawBisRouteController.class);
-  
-  @Autowired
-  private BisChannelDataRestRepository bisChannelDataRestRepository; 
-  @Autowired
-  private BisRouteDataRestRepository bisRouteDataRestRepository; 
 
-  
+  @Autowired
+  private BisChannelDataRestRepository bisChannelDataRestRepository;
+  @Autowired
+  private BisRouteDataRestRepository bisRouteDataRestRepository;
+
+  @Value("${bis.scheduler-url}")
+  private String bisSchedulerUrl;
+
+
   /**
-   * This API provides an ability to add a source. 
+   * This API provides an ability to add a source.
    */
   @ApiOperation(value = "Adding a new Route",
       nickname = "actionBis", notes = "", response = BisRouteDto.class)
@@ -81,6 +94,36 @@ public class SawBisRouteController {
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
+    String routeMetaData = requestBody.getRouteMetadata();
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode routeData = objectMapper.readTree(routeMetaData);
+    String schedulerDetails = routeData.get("schedulerExpression").toString();
+    BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
+    schedulerRequest.setChannelId(String.valueOf(id.toString()));
+    schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
+    schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
+        + requestBody.getBisRouteSysId().toString());
+    schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
+    JsonNode schedulerData = objectMapper.readTree(schedulerDetails);
+    // If schedule the route while creating
+    if (!schedulerData.toString().equals("")) {
+      JsonNode cronExp =  schedulerData.get("cronexp");
+      JsonNode startDate =  schedulerData.get("startDate");
+      JsonNode endDate =  schedulerData.get("endDate");
+      if (cronExp != null) {
+        schedulerRequest.setCronExpression(cronExp.toString());
+      }
+      if (startDate != null) {
+        schedulerRequest.setCronExpression(startDate.toString());
+      }
+      if (endDate != null) {
+        schedulerRequest.setCronExpression(endDate.toString());
+      }
+    }
+    RestTemplate restTemplate = new RestTemplate();
+    restTemplate.postForLocation(bisSchedulerUrl, schedulerRequest);
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
@@ -93,9 +136,9 @@ public class SawBisRouteController {
   }
 
   /**
-   * This API provides an ability to read a routes with pagination by channelId. 
+   * This API provides an ability to read a routes with pagination by channelId.
    */
-  
+
   @ApiOperation(value = "Reading list of routes & paginate by channel id",
       nickname = "actionBis", notes = "", response = BisRouteDto.class)
   @ApiResponses(
@@ -114,17 +157,17 @@ public class SawBisRouteController {
   public ResponseEntity<List<BisRouteDto>> readRoutes(@ApiParam(value = "id",
       required = true)  @PathVariable(name = "id", required = true) Long id,
       @ApiParam(value = "page number",
-      required = false)  @RequestParam(name = "page", defaultValue = "0") int page, 
+      required = false)  @RequestParam(name = "page", defaultValue = "0") int page,
       @ApiParam(value = "number of objects per page",
           required = false) @RequestParam(name = "size", defaultValue = "10") int size,
           @ApiParam(value = "sort order",
-          required = false) @RequestParam(name = "sort", defaultValue = "desc") String sort, 
+          required = false) @RequestParam(name = "sort", defaultValue = "desc") String sort,
           @ApiParam(value = "column name to be sorted",
-          required = false) @RequestParam(name = "column", defaultValue = "createdDate") 
-      String column) throws NullPointerException, JsonParseException, 
+          required = false) @RequestParam(name = "column", defaultValue = "createdDate")
+      String column) throws NullPointerException, JsonParseException,
       JsonMappingException, IOException {
 	List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
-		    .findByBisChannelSysId(id, PageRequest.of(page, size, 
+		    .findByBisChannelSysId(id, PageRequest.of(page, size,
 		    	    Direction.DESC, column)).getContent();
 	List<BisRouteDto> routeDtos = new ArrayList<>();
 	routeEntities.forEach(route ->{
@@ -137,7 +180,7 @@ public class SawBisRouteController {
 
 
   /**
-   * This API provides an ability to update a source. 
+   * This API provides an ability to update a source.
    */
   @ApiOperation(value = "Updating an existing routes by channel id",
       nickname = "actionBis", notes = "", response = BisRouteDto.class)
@@ -160,7 +203,7 @@ public class SawBisRouteController {
           required = true)@PathVariable(name = "channelId", required = true) Long channelId,
        @ApiParam
           (value = "Route id",
-          required = true)@PathVariable(name = "routeId", required = true) Long routeId,       
+          required = true)@PathVariable(name = "routeId", required = true) Long routeId,
       @ApiParam(value = "Routes related information to update",
           required = true) @Valid @RequestBody BisRouteDto requestBody)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
@@ -182,7 +225,7 @@ public class SawBisRouteController {
   }
 
   /**
-   * This API provides an ability to delete a source. 
+   * This API provides an ability to delete a source.
    */
   @ApiOperation(value = "Deleting an existing route",
       nickname = "actionBis", notes = "", response = Object.class)
@@ -216,4 +259,3 @@ public class SawBisRouteController {
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
   }
 }
-
