@@ -11,10 +11,10 @@ import java.util.Calendar;
 import java.util.Date;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 
 public class SchedulerIT extends BaseIT {
@@ -32,6 +32,8 @@ public class SchedulerIT extends BaseIT {
     requestObject.put("jobGroup", "test");
     requestObject.put("jobName", "test");
     requestObject.put("channelType", "test");
+    requestObject.put("channelId", "test");
+    requestObject.put("entityId", "test");
     requestObject.put("userFullName", "guest");
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
     Calendar calendar = Calendar.getInstance();

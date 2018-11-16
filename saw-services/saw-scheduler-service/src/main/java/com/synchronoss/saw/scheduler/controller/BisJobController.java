@@ -57,7 +57,7 @@ public class BisJobController extends BaseJobController {
         boolean status = bisService.scheduleOneTimeJob(jobDetail, BisSimpleJob.class);
         if (status) {
           return getServerResponse(ServerResponseCode.SUCCESS,
-              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getEntityId()));
+              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getChannelId()));
         } else {
           return getServerResponse(ServerResponseCode.ERROR, false);
         }
@@ -67,7 +67,7 @@ public class BisJobController extends BaseJobController {
         boolean status = bisService.scheduleCronJob(jobDetail, BisCronJob.class);
         if (status) {
           return getServerResponse(ServerResponseCode.SUCCESS,
-              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getEntityId()));
+              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getChannelId()));
         } else {
           return getServerResponse(ServerResponseCode.ERROR, false);
         }
