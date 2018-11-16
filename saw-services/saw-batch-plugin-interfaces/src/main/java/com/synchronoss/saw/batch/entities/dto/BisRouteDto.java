@@ -12,20 +12,20 @@ import io.swagger.annotations.ApiModelProperty;
 public class BisRouteDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	@ApiModelProperty(hidden = true)
+	
+	@ApiModelProperty(value ="This property is unique identifier for route resource")
 	@JsonProperty("bisRouteSysId")
 	private Long bisRouteSysId;
-	
-	
+	@ApiModelProperty(value= "This property used by consumer while updating the route resource")
 	@JsonProperty("modifiedBy")
 	private String modifiedBy;
+	@ApiModelProperty(value= "This property used by consumer while creating the route resource")
 	@JsonProperty("createdBy")
 	private String createdBy;
-	@ApiModelProperty(required= true)
+	@ApiModelProperty(required= true, value ="It holds json string, it needs to escaped")
 	@JsonProperty("routeMetadata")
 	private String routeMetadata;
-	
+	@ApiModelProperty(value ="This property is unique identifier for channel resource")
 	@JsonProperty("bisChannelSysId")
 	private Long bisChannelSysId;
 

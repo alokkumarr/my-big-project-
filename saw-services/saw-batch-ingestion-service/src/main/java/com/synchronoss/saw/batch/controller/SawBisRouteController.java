@@ -166,15 +166,15 @@ public class SawBisRouteController {
           required = false) @RequestParam(name = "column", defaultValue = "createdDate")
       String column) throws NullPointerException, JsonParseException,
       JsonMappingException, IOException {
-	List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
-		    .findByBisChannelSysId(id, PageRequest.of(page, size,
-		    	    Direction.DESC, column)).getContent();
-	List<BisRouteDto> routeDtos = new ArrayList<>();
-	routeEntities.forEach(route ->{
-		BisRouteDto routeDto = new BisRouteDto();
-		BeanUtils.copyProperties(route, routeDto);
-		routeDtos.add(routeDto);
-	});
+    List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
+        .findByBisChannelSysId(id, PageRequest.of(page, size,
+              Direction.DESC, column)).getContent();
+    List<BisRouteDto> routeDtos = new ArrayList<>();
+    routeEntities.forEach(route -> {
+      BisRouteDto routeDto = new BisRouteDto();
+      BeanUtils.copyProperties(route, routeDto);
+      routeDtos.add(routeDto);
+    });
     return ResponseEntity.ok(routeDtos);
   }
 

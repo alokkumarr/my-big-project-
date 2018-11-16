@@ -10,28 +10,28 @@ public class BisChannelDto implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(hidden=true)
+  @ApiModelProperty(value ="This property is unique identifier for channel resource")
   @JsonProperty("bisChannelSysId")
   private Long bisChannelSysId;
-  
+  @ApiModelProperty(value= "This property used by consumer while updating the channel resource")
   @JsonProperty("modifiedBy")
   private String modifiedBy;
-  
+  @ApiModelProperty(value= "This property used by consumer while creating the channel resource")
   @JsonProperty("createdBy")
   private String createdBy;
-  
+  @ApiModelProperty(value= "This property used by consumer to set the product code for that application", example = "SAWD000001")
   @JsonProperty("productCode")
-  private String productCode;
-  
+  private String productCode = "SAWD000001";
+  @ApiModelProperty(value= "This property used by consumer to set the project code for that application", example ="workbench")
   @JsonProperty("projectCode")
-  private String projectCode;
-
+  private String projectCode = "workbench";
+  @ApiModelProperty(value= "This property used by consumer to set the customer code for that application", example ="SYNCHRONOSS")
   @JsonProperty("customerCode")
-  private String customerCode;
-  
+  private String customerCode = "SYNCHRONOSS";
+  @ApiModelProperty(value= "This property used by consumer to set the channel type ", example ="sftp")
   @JsonProperty("channelType")
-  private String channelType;
-  
+  private String channelType = "sftp";
+  @ApiModelProperty(value= "This property used by consumer to set the channel related metadata ")
   @JsonProperty("channelMetadata")
   private String channelMetadata;
   
