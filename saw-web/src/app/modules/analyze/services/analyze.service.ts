@@ -109,7 +109,6 @@ export class AnalyzeService {
     const requestURL = isUndefined(executionId) ?
       `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
       : `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`;
-    console.log(requestURL);
     return this.getRequest(requestURL);
   }
 
