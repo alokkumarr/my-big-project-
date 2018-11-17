@@ -54,9 +54,9 @@ proxy:
 datapod:
     service:
         host: http://localhost:9900
-#batch:
-#   service:
-#        host: http://localhost:9952
+batch:
+   service:
+        host: http://localhost:9952
 
 api:
   gateway:
@@ -124,15 +124,15 @@ api:
         -   location: ${datapod.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
-#        -   location: ${batch.service.host}
-#            method: PUT
-#            path: '[/]ingestion/batch.*'
-#        -   location: ${batch.service.host}
-#            method: POST
-#            path: '[/]ingestion/batch.*'
-#        -   location: ${batch.service.host}
-#            method: GET
-#            path: '[/]ingestion/batch.*'
-#        -   location: ${batch.service.host}
-#            method: DELETE
-#            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: PUT
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: POST
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: GET
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: DELETE
+            path: '[/]ingestion/batch.*'

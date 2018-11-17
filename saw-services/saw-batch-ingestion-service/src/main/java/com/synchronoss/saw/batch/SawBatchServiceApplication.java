@@ -24,7 +24,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 @EnableJpaAuditing
 @EnableIntegration
 @SpringBootApplication
-@ComponentScan("com.synchronoss.saw")
+@ComponentScan(basePackages = {"com.synchronoss.saw.batch"})
 public class SawBatchServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 

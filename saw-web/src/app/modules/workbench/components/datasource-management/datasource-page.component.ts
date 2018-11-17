@@ -7,6 +7,7 @@ import { CHANNEL_TYPES } from '../../wb-comp-configs';
 import { ChannelObject } from '../../models/workbench.interface';
 
 import { DatasourceService } from '../../services/datasource.service';
+import { generateSchedule } from '../../../../common/utils/cron2Readable';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
@@ -55,7 +56,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   getSources() {
     this.unFilteredSourceData = [];
     this.datasourceService.getSourceList().subscribe(data => {
-      forEach(data.content, value => {
+      forEach(data, value => {
         // Channel metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
         const tempVar = merge(value, JSON.parse(value.channelMetadata));
         this.unFilteredSourceData.push(tempVar);
@@ -217,7 +218,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   getRoutesForChannel(channelID) {
     this.routesData = [];
     this.datasourceService.getRoutesList(channelID).subscribe(data => {
-      forEach(data.content, value => {
+      forEach(data, value => {
         // routes metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
         const tempVar = merge(value, JSON.parse(value.routeMetadata));
         this.routesData.push(tempVar);
@@ -291,6 +292,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  calculateScheduleCellValue(rowData) {
+    const {cronexp, activeTab} = rowData.schedulerExpression;
+    return generateSchedule(cronexp, activeTab);
   }
 
   togglePWD() {

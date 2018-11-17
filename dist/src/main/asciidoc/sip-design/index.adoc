@@ -336,7 +336,7 @@ Below are the salient feature which are as follows:
 * Supports various protocol to pull data.
 
 .Figure: SAW Batch Ingestion ER Diagram
-image::sip/bis-er-diagram.png[entities,400,400]
+plantuml::sip-design/figure-batch-er-diagram.pum[format=svg]
 
 The above entities are used to hold the base of Batch Ingestion module.
 Entity BIS_ROUTE is used to hold the details of route i.e it holds the details of destination, frequency etc etc.
@@ -344,14 +344,10 @@ Entity BIS_CHANNEL is used to hold the details of channel i.e it holds the detai
 Entity BIS_FILE_LOGS is used to log details related to the files or data retrieved from the custom.
 
 .Figure: SAW Batch Ingestion Component Diagram
-image::sip/bis-component-diagram.png[component,400,400]
-
-ingestion-registration-service: The internal service will handle all the request for registration of channel & route
-ingestion-provenance-service: The internal service will handle all the scheduled jobs.
-ingestion-notification-service: Not yet started.
+plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
 
 .Figure: SAW Batch Ingestion Flow Diagram
-image::sip/bis-flow-diagram.png[flowChart,400,400]
+image::sip-design/bis-flow-diagram.png[flowChart,400,400]
 
 === SAW Semantic Service
 

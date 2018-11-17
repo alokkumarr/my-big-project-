@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
+import com.synchronoss.saw.batch.entities.dto.BisChannelDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
@@ -20,18 +21,20 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@CrossOrigin(origins = "*")
 @RestController
 @Api(
     value = "The controller provides operations related Channel Entity "
@@ -58,7 +61,7 @@ public class SawBisChannelController {
    * This API provides an ability to add a source. 
   */
   @ApiOperation(value = "Add a new channel",
-      nickname = "actionBis", notes = "", response = BisChannelEntity.class)
+      nickname = "actionBis", notes = "", response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -72,9 +75,9 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels", method = RequestMethod.POST,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<@Valid BisChannelEntity> createChannel(
+  public ResponseEntity<@Valid BisChannelDto> createChannel(
       @ApiParam(value = "Channel related information to store",
-          required = true) @Valid @RequestBody BisChannelEntity requestBody)
+          required = true) @Valid @RequestBody BisChannelDto requestBody)
       throws Exception {
     logger.trace("Request Body:{}", requestBody);
 
@@ -90,10 +93,14 @@ public class SawBisChannelController {
     rootNode = (ObjectNode) nodeEntity;
     SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
     String secretPhrase = rootNode.get("password").asText();
-    secretPhrase = obfuscator.encrypt(secretPhrase);
-    rootNode.put("password", secretPhrase);
+    String passwordPhrase = obfuscator.encrypt(secretPhrase);
+    rootNode.put("password", passwordPhrase);
     requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-    return ResponseEntity.ok(bisChannelDataRestRepository.save(requestBody));
+    BisChannelEntity channelEntity = new BisChannelEntity();
+    BeanUtils.copyProperties(requestBody, channelEntity);
+    channelEntity = bisChannelDataRestRepository.save(channelEntity);
+    BeanUtils.copyProperties(channelEntity, requestBody);
+    return ResponseEntity.ok(requestBody);
   }
 
   /**
@@ -101,7 +108,7 @@ public class SawBisChannelController {
    */
   
   @ApiOperation(value = "Reading list of channels & paginate",
-      nickname = "actionBis", notes = "", response = BisChannelEntity.class)
+      nickname = "actionBis", notes = "", response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -115,7 +122,7 @@ public class SawBisChannelController {
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<Page<BisChannelEntity>> readChannel(
+  public ResponseEntity<List<BisChannelDto>> readChannel(
       @ApiParam(value = "page number",
       required = false)  @RequestParam(name = "page", defaultValue = "0") int page, 
       @ApiParam(value = "number of objects per page",
@@ -126,8 +133,34 @@ public class SawBisChannelController {
           required = false) @RequestParam(name = "column", defaultValue = "createdDate") 
       String column) throws NullPointerException, JsonParseException, 
       JsonMappingException, IOException {
-    return ResponseEntity.ok(bisChannelDataRestRepository.findAll(PageRequest.of(page, size, 
-    Direction.DESC, column)));
+    List<BisChannelEntity> entities = bisChannelDataRestRepository
+        .findAll(PageRequest.of(page, size, Direction.DESC, column)).getContent();
+    List<BisChannelDto> channelDtos = new ArrayList<>();
+    entities.forEach(entity -> {
+      BisChannelDto bisChannelDto = null;
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      JsonNode nodeEntity = null;
+      ObjectNode rootNode = null;
+      try {
+        nodeEntity = objectMapper.readTree(entity.getChannelMetadata());
+        rootNode = (ObjectNode) nodeEntity;
+        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+        String secretPhrase = rootNode.get("password").asText();
+        secretPhrase = obfuscator.decrypt(secretPhrase);
+        rootNode.put("password", secretPhrase);
+        bisChannelDto = new BisChannelDto();
+        BeanUtils.copyProperties(entity, bisChannelDto);
+        bisChannelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+        channelDtos.add(bisChannelDto);
+      } catch (Exception e) {
+        logger.error("Exception while reading the list :", e);
+        throw new ResourceNotFoundException("Exception occurred while "
+        + "reading the list of channels");
+      }
+    });
+    return ResponseEntity.ok(channelDtos);
   }
 
   /**
@@ -135,7 +168,7 @@ public class SawBisChannelController {
    */
   
   @ApiOperation(value = "Reading channel by id",
-      nickname = "actionBis", notes = "", response = BisChannelEntity.class)
+      nickname = "actionBis", notes = "", response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -148,13 +181,30 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels/{id}", method = RequestMethod.GET,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<BisChannelEntity> readChannelById(
+  public ResponseEntity<BisChannelDto> readChannelById(
       @PathVariable(name = "id",required = true) 
-      Long id) throws NullPointerException, JsonParseException, 
-      JsonMappingException, IOException {
+      Long id) throws Exception {
+    BisChannelDto channelDto = new BisChannelDto();  
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       logger.trace("Channel retrieved :" + channel);
-      return channel;
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      JsonNode nodeEntity = null;
+      ObjectNode rootNode = null;
+      try {
+        nodeEntity = objectMapper.readTree(channel.getChannelMetadata());
+        rootNode = (ObjectNode) nodeEntity;
+        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+        String secretPhrase = rootNode.get("password").asText();
+        secretPhrase = obfuscator.decrypt(secretPhrase);
+        rootNode.put("password", secretPhrase);
+        BeanUtils.copyProperties(channel, channelDto);
+        channelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+      } catch (Exception e) {
+        throw new ResourceNotFoundException("channelId " + id + " not found"); 
+      }
+      return channelDto;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
   }
 
@@ -162,7 +212,7 @@ public class SawBisChannelController {
    * This API provides an ability to update a source. 
    */
   @ApiOperation(value = "Updating an existing channel",
-      nickname = "actionBis", notes = "", response = BisChannelEntity.class)
+      nickname = "actionBis", notes = "", response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -177,20 +227,34 @@ public class SawBisChannelController {
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<@Valid BisChannelEntity> updateChannel(@ApiParam
+  public ResponseEntity<@Valid BisChannelDto> updateChannel(@ApiParam
        (value = "Entity id needs to be updated",
           required = true)@PathVariable Long id,
       @ApiParam(value = "Channel related information to update",
-          required = true) @Valid @RequestBody BisChannelEntity requestBody)
-      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
+          required = true) @Valid @RequestBody BisChannelDto requestBody)
+      throws Exception {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode nodeEntity = null;
+    ObjectNode rootNode = null;
+    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+    rootNode = (ObjectNode) nodeEntity;
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    String secretPhrase = rootNode.get("password").asText();
+    secretPhrase = obfuscator.encrypt(secretPhrase);
+    rootNode.put("password", secretPhrase);
+    requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       logger.trace("Channel updated :" + channel);
       BeanUtils.copyProperties(requestBody, channel, "bisChannelSysId");
-      return bisChannelDataRestRepository.save(channel);
+      channel = bisChannelDataRestRepository.save(channel);
+      BeanUtils.copyProperties(channel, requestBody);
+      return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
   }
 

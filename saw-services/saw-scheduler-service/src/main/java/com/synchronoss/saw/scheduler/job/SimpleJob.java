@@ -9,9 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import java.util.List;
-import java.util.Map;
-
 public class SimpleJob extends QuartzJobBean implements InterruptableJob{
 
 	private static final Logger logger = LoggerFactory.getLogger(SimpleJob.class);
