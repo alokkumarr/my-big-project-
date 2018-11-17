@@ -67,7 +67,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("sourceLocation", "/data");
     childNode.put("destinationLocation", "/tmp");
     childNode.put("filePattern", "*.csv");
-    childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
+    childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -97,8 +97,16 @@ public class BatchIngestionIT extends BaseIT {
     return root;
   }
 
+  private ObjectNode prepareSchedulerNode() {
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("cronexp", "0 01 0/1 1/1 * ? *");
+    childNode.put("activeTab", "hourly");
+    return childNode;
+  }
+  
   private ObjectNode prepareUpdateRouteDataSet() throws JsonProcessingException {
     ObjectNode childNode = mapper.createObjectNode();
+    
     childNode.put("status", "active");
     childNode.put("routeName", "route456");
     childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
@@ -106,7 +114,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("sourceLocation", "/tmp");
     childNode.put("destinationLocation", "/tmp");
     childNode.put("filePattern", "*.csv");
-    childNode.put("schedulerExpression", "0 0 12 1/1 * ? * *");
+    childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -129,15 +137,10 @@ public class BatchIngestionIT extends BaseIT {
   
   
   private Long getChannelId() {
-    //List<HashMap<Object,Object>> bisChannelSysId = given(authSpec).when().get(BATCH_CHANNEL_PATH)
-    //   .then().assertThat()
-    //   .statusCode(200).
-    //   extract().response().jsonPath().getJsonObject("content");
     Long bisChannelSysId = given(authSpec).when().get(BATCH_CHANNEL_PATH)
         .then().assertThat()
         .statusCode(200)
         .extract().response().jsonPath().getLong("bisChannelSysId[0]");
-    //Long.valueOf(bisChannelSysId.get(0).get("bisChannelSysId").toString());
     return bisChannelSysId;
   }
 

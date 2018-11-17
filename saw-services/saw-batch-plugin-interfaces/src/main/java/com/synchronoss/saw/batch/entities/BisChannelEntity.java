@@ -3,17 +3,13 @@ package com.synchronoss.saw.batch.entities;
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
 import javax.persistence.Basic;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
 import javax.persistence.Lob;
-
 import javax.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -21,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "BIS_CHANNEL", catalog = "sip_batch_ingestion", schema = "")
-public class BisChannelEntity  extends BaseEntity implements Serializable {
+public class BisChannelEntity extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   @Id
@@ -46,16 +42,16 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
   private String customerCode;
   @Column(name = "CHANNEL_TYPE", nullable = false, length = 50)
   private String channelType;
-  
+
   @Basic(optional = false)
   @Lob
   @Column(name = "CHANNEL_METADATA", nullable = false, length = 2147483647)
   private String channelMetadata;
-  
-  //@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
-  //@JoinColumn(name = "bisChannelSysId")
-  //@BatchSize(size = 20)
-  //private Set<BisRouteEntity> bisRouteCollection;
+
+  // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
+  // @JoinColumn(name = "bisChannelSysId")
+  // @BatchSize(size = 20)
+  // private Set<BisRouteEntity> bisRouteCollection;
 
   public BisChannelEntity() {}
 
@@ -65,6 +61,7 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
 
   /**
    * This is parameterized constructor.
+   * 
    * @param bisChannelSysId Long
    * @param createdBy String
    * @param productCode String
@@ -139,15 +136,12 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
     this.channelMetadata = channelMetadata;
   }
 
-  /*  
-  public Set<BisRouteEntity> getBisRouteCollection() {
-    return bisRouteCollection;
-  }
-
-  public void setBisRouteCollection(Set<BisRouteEntity> bisRouteCollection) {
-    this.bisRouteCollection = bisRouteCollection;
-  }
- */
+  /*
+   * public Set<BisRouteEntity> getBisRouteCollection() { return bisRouteCollection; }
+   * 
+   * public void setBisRouteCollection(Set<BisRouteEntity> bisRouteCollection) {
+   * this.bisRouteCollection = bisRouteCollection; }
+   */
   public String getChannelType() {
     return channelType;
   }
@@ -183,9 +177,9 @@ public class BisChannelEntity  extends BaseEntity implements Serializable {
         + ", modifiedBy:" + modifiedBy + ", createdDate:" + getCreatedDate() + ", createdBy:"
         + createdBy + ", productCode:" + productCode + ", projectCode:" + projectCode
         + ", customerCode:" + customerCode + ", channelMetadata:" + channelMetadata
-        //   + ", bisRouteCollection:" + bisRouteCollection 
+        // + ", bisRouteCollection:" + bisRouteCollection
         + "}";
   }
 
-  
+
 }

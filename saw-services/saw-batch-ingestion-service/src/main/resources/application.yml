@@ -46,7 +46,7 @@ bis:
   transfer-batch-size: 10
   partial-file-timeDifference: 1000
   default-data-drop-location: /Users/spau0004/Desktop/workbench
-  scheduler-url: http://localhost:9600/scheduler/bisscheduler/schedule
+  scheduler-url: http://localhost:9600/scheduler/bisscheduler
      
 
     

@@ -1,41 +1,48 @@
 package com.synchronoss.saw.batch.entities.dto;
 
-import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 
 @ApiModel("This model payload holds the details to create a channel in the system")
 public class BisChannelDto implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value ="This property is unique identifier for channel resource")
+  @ApiModelProperty(value = "This property is unique identifier for channel resource")
   @JsonProperty("bisChannelSysId")
   private Long bisChannelSysId;
-  @ApiModelProperty(value= "This property used by consumer while updating the channel resource")
+  @ApiModelProperty(value = "This property used by consumer while updating the channel resource")
   @JsonProperty("modifiedBy")
   private String modifiedBy;
-  @ApiModelProperty(value= "This property used by consumer while creating the channel resource")
+  @ApiModelProperty(value = "This property used by consumer while creating the channel resource")
   @JsonProperty("createdBy")
   private String createdBy;
-  @ApiModelProperty(value= "This property used by consumer to set the product code for that application", example = "SAWD000001")
+  @ApiModelProperty(
+      value = "This property used by consumer to set the product code for that application",
+      example = "SAWD000001")
   @JsonProperty("productCode")
   private String productCode = "SAWD000001";
-  @ApiModelProperty(value= "This property used by consumer to set the project code for that application", example ="workbench")
+  @ApiModelProperty(
+      value = "This property used by consumer to set the project code for that application",
+      example = "workbench")
   @JsonProperty("projectCode")
   private String projectCode = "workbench";
-  @ApiModelProperty(value= "This property used by consumer to set the customer code for that application", example ="SYNCHRONOSS")
+  @ApiModelProperty(
+      value = "This property used by consumer to set the customer code for that application",
+      example = "SYNCHRONOSS")
   @JsonProperty("customerCode")
   private String customerCode = "SYNCHRONOSS";
-  @ApiModelProperty(value= "This property used by consumer to set the channel type ", example ="sftp")
+  @ApiModelProperty(value = "This property used by consumer to set the channel type ",
+      example = "sftp")
   @JsonProperty("channelType")
   private String channelType = "sftp";
-  @ApiModelProperty(value= "This property used by consumer to set the channel related metadata ")
+  @ApiModelProperty(value = "This property used by consumer to set the channel related metadata ")
   @JsonProperty("channelMetadata")
   private String channelMetadata;
-  
-  
+
+
   @JsonProperty("bisChannelSysId")
   public Long getBisChannelSysId() {
     return bisChannelSysId;
@@ -45,26 +52,32 @@ public class BisChannelDto implements Serializable {
   public void setBisChannelSysId(Long bisChannelSysId) {
     this.bisChannelSysId = bisChannelSysId;
   }
+
   @JsonProperty("modifiedBy")
   public String getModifiedBy() {
     return modifiedBy;
   }
+
   @JsonProperty("modifiedBy")
   public void setModifiedBy(String modifiedBy) {
     this.modifiedBy = modifiedBy;
   }
+
   @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
+
   @JsonProperty("createdBy")
   public void setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
   }
+
   @JsonProperty("productCode")
   public String getProductCode() {
     return productCode;
   }
+
   @JsonProperty("productCode")
   public void setProductCode(String productCode) {
     this.productCode = productCode;
@@ -79,26 +92,32 @@ public class BisChannelDto implements Serializable {
   public void setProjectCode(String projectCode) {
     this.projectCode = projectCode;
   }
+
   @JsonProperty("customerCode")
   public String getCustomerCode() {
     return customerCode;
   }
+
   @JsonProperty("customerCode")
   public void setCustomerCode(String customerCode) {
     this.customerCode = customerCode;
   }
+
   @JsonProperty("channelMetadata")
   public String getChannelMetadata() {
     return channelMetadata;
   }
+
   @JsonProperty("channelMetadata")
   public void setChannelMetadata(String channelMetadata) {
     this.channelMetadata = channelMetadata;
   }
+
   @JsonProperty("channelType")
-    public String getChannelType() {
+  public String getChannelType() {
     return channelType;
   }
+
   @JsonProperty("channelType")
   public void setChannelType(String channelType) {
     this.channelType = channelType;

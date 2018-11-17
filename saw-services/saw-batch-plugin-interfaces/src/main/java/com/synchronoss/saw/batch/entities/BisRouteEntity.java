@@ -34,17 +34,17 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
   @Lob
   @Column(name = "ROUTE_METADATA", nullable = false, length = 2147483647)
   private String routeMetadata;
-  
-  //@ManyToOne(fetch = FetchType.LAZY, optional = false)
-  //@JoinColumn(name = "BIS_CHANNEL_SYS_ID", nullable = false)
-  //@OnDelete(action = OnDeleteAction.CASCADE)
-  //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-  //@JsonIdentityReference(alwaysAsId = true)
-  //@JsonProperty("BIS_CHANNEL_SYS_ID")  
+
+  // @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  // @JoinColumn(name = "BIS_CHANNEL_SYS_ID", nullable = false)
+  // @OnDelete(action = OnDeleteAction.CASCADE)
+  // @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+  // @JsonIdentityReference(alwaysAsId = true)
+  // @JsonProperty("BIS_CHANNEL_SYS_ID")
   @Basic(optional = false)
   @Column(name = "BIS_CHANNEL_SYS_ID", nullable = false)
   private Long bisChannelSysId;
-  //private BisChannelEntity bisChannelSysId;
+  // private BisChannelEntity bisChannelSysId;
 
   public BisRouteEntity() {}
 
@@ -54,6 +54,7 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
 
   /**
    * This is parameterized constructor.
+   * 
    * @param bisRouteSysId Long
    * @param createdBy String
    * @param routeMetadata String
@@ -129,8 +130,8 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
   public String toString() {
     return "{ bisRouteSysId:" + bisRouteSysId + ", modifiedDate:" + getModifiedDate()
         + ", modifiedBy:" + modifiedBy + ", createdDate:" + getCreatedDate() + ", createdBy:"
-        + createdBy + ", routeMetadata:" + routeMetadata
-        + ", bisChannelSysId:" + bisChannelSysId + "}";
+        + createdBy + ", routeMetadata:" + routeMetadata + ", bisChannelSysId:" + bisChannelSysId
+        + "}";
   }
 
 }

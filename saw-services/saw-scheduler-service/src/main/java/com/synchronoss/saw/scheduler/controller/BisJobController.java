@@ -205,7 +205,7 @@ public class BisJobController extends BaseJobController {
     ScheduleKeys scheduleKeys = new ScheduleKeys();
     scheduleKeys.setGroupName(jobDetail.getJobGroup());
     scheduleKeys.setJobName(jobDetail.getJobName());
-    scheduleKeys.setCategoryId(jobDetail.getEntityId());
+    //scheduleKeys.setCategoryId(jobDetail.getEntityId());
 
     // Edit Job
     if (bisService.isJobWithNamePresent(scheduleKeys)) {
@@ -216,7 +216,7 @@ public class BisJobController extends BaseJobController {
         boolean status = bisService.updateOneTimeJob(jobDetail);
         if (status) {
           return getServerResponse(ServerResponseCode.SUCCESS,
-              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getEntityId()));
+              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getChannelId()));
         } else {
           return getServerResponse(ServerResponseCode.ERROR, false);
         }
@@ -226,7 +226,7 @@ public class BisJobController extends BaseJobController {
         boolean status = bisService.updateCronJob(jobDetail);
         if (status) {
           return getServerResponse(ServerResponseCode.SUCCESS,
-              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getEntityId()));
+              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getChannelId()));
         } else {
           return getServerResponse(ServerResponseCode.ERROR, false);
         }

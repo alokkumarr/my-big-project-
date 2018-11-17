@@ -3,7 +3,6 @@ package com.synchronoss.saw.batch.entities.repositories;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.batch.model.BisJson;
-
 import java.io.IOException;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

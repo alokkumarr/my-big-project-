@@ -16,6 +16,6 @@ public class BisJson {
   public String toString() {
     return "BisJson [jsonObject=" + jsonObject + "]";
   }
-  
-  
+
+
 }

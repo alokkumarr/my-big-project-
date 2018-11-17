@@ -6,15 +6,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,9 +22,7 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -48,9 +45,8 @@ import org.springframework.web.client.RestTemplate;
 
 @CrossOrigin(origins = "*")
 @RestController
-@Api(
-    value = "The controller provides operations related Route Entity "
-        + "synchronoss analytics platform ")
+@Api(value = "The controller provides operations related Route Entity "
+    + "synchronoss analytics platform ")
 @RequestMapping("/ingestion/batch")
 public class SawBisRouteController {
 
@@ -63,28 +59,28 @@ public class SawBisRouteController {
 
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
-  
+
+  private String insertUrl = "/schedule";
+  private String updateUrl = "/update";
+
   /**
    * This API provides an ability to add a source.
    */
-  @ApiOperation(value = "Adding a new Route",
-      nickname = "actionBis", notes = "", response = BisRouteDto.class)
+  @ApiOperation(value = "Adding a new Route", nickname = "actionBis", notes = "",
+      response = BisRouteDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
           @ApiResponse(code = 201, message = "Created"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
-  @RequestMapping(value = "/channels/{id}/routes", method = RequestMethod.POST,
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
+  @RequestMapping(value = "/channels/{routeId}/routes", method = RequestMethod.POST,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<@Valid BisRouteDto> createRoute(
-      @ApiParam(value = "Channel Id",
-      required = true) @PathVariable Long id,
+      @ApiParam(value = "Channel Id", required = true) @PathVariable Long routeId,
       @ApiParam(value = "Route related information to store",
           required = true) @Valid @RequestBody BisRouteDto requestBody)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
@@ -92,14 +88,13 @@ public class SawBisRouteController {
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
-    return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
+    return ResponseEntity.ok(bisChannelDataRestRepository.findById(routeId).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
-      requestBody.setBisChannelSysId(id);
+      requestBody.setBisChannelSysId(routeId);
       BeanUtils.copyProperties(requestBody, routeEntity);
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
       BeanUtils.copyProperties(routeEntity, requestBody);
-      
       String routeMetaData = requestBody.getRouteMetadata();
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -108,80 +103,78 @@ public class SawBisRouteController {
       try {
         routeData = objectMapper.readTree(routeMetaData);
       } catch (IOException e) {
-        logger.error(e.getMessage());
+        logger.error("Exception occurred while reading routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
       }
-      String schedulerDetails = routeData.get("schedulerExpression").toString();
-      
-      
-      BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
-      schedulerRequest.setChannelId(String.valueOf(id.toString()));
-      schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
-      schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
-          + requestBody.getBisRouteSysId().toString());
-      schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
-      JsonNode schedulerData = null;
-      try {
-        schedulerData = objectMapper.readTree(schedulerDetails);
-      } catch (IOException e) {
-        logger.error(e.getMessage());
+      if (routeData.get("schedulerExpression") != null
+          && !routeData.get("schedulerExpression").toString().equals("")) {
+        String schedulerDetails = routeData.get("schedulerExpression").toString();
+        BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
+        schedulerRequest.setChannelId(String.valueOf(routeId.toString()));
+        schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
+        schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
+            + requestBody.getBisRouteSysId().toString());
+        schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
+        JsonNode schedulerData = null;
+        try {
+          schedulerData = objectMapper.readTree(schedulerDetails);
+        } catch (IOException e) {
+          logger.error("Exception occurred while reading schedulerExpression ", e);
+          throw new SftpProcessorException("Exception occurred while reading schedulerExpression ",
+              e);
+        }
+        // If schedule the route while creating
+        if (!schedulerData.toString().equals("")) {
+          JsonNode cronExp = schedulerData.get("cronexp");
+          JsonNode startDate = schedulerData.get("startDate");
+          JsonNode endDate = schedulerData.get("endDate");
+          if (cronExp != null) {
+            schedulerRequest.setCronExpression(cronExp.toString());
+          }
+          if (startDate != null) {
+            schedulerRequest.setCronExpression(startDate.toString());
+          }
+          if (endDate != null) {
+            schedulerRequest.setCronExpression(endDate.toString());
+          }
+        }
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
       }
-      // If schedule the route while creating
-      if (!schedulerData.toString().equals("")) {
-        JsonNode cronExp =  schedulerData.get("cronexp");
-        JsonNode startDate =  schedulerData.get("startDate");
-        JsonNode endDate =  schedulerData.get("endDate");
-        if (cronExp != null) {
-          schedulerRequest.setCronExpression(cronExp.toString());
-        }
-        if (startDate != null) {
-          schedulerRequest.setCronExpression(startDate.toString());
-        }
-        if (endDate != null) {
-          schedulerRequest.setCronExpression(endDate.toString());
-        }
-      }
-      RestTemplate restTemplate = new RestTemplate();
-      restTemplate.postForLocation(bisSchedulerUrl, schedulerRequest);
-      
-      
       return requestBody;
-    }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
+    }).orElseThrow(() -> new ResourceNotFoundException("channelId " + routeId + " not found")));
   }
 
   /**
    * This API provides an ability to read a routes with pagination by channelId.
    */
 
-  @ApiOperation(value = "Reading list of routes & paginate by channel id",
-      nickname = "actionBis", notes = "", response = BisRouteDto.class)
+  @ApiOperation(value = "Reading list of routes & paginate by channel id", nickname = "actionBis",
+      notes = "", response = BisRouteDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels/{id}/routes", method = RequestMethod.GET,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<List<BisRouteDto>> readRoutes(@ApiParam(value = "id",
-      required = true)  @PathVariable(name = "id", required = true) Long id,
-      @ApiParam(value = "page number",
-      required = false)  @RequestParam(name = "page", defaultValue = "0") int page,
-      @ApiParam(value = "number of objects per page",
-          required = false) @RequestParam(name = "size", defaultValue = "10") int size,
-          @ApiParam(value = "sort order",
-          required = false) @RequestParam(name = "sort", defaultValue = "desc") String sort,
-          @ApiParam(value = "column name to be sorted",
-          required = false) @RequestParam(name = "column", defaultValue = "createdDate")
-      String column) throws NullPointerException, JsonParseException,
-      JsonMappingException, IOException {
+  public ResponseEntity<List<BisRouteDto>> readRoutes(
+      @ApiParam(value = "id", required = true) @PathVariable(name = "id", required = true) Long id,
+      @ApiParam(value = "page number", required = false) @RequestParam(name = "page",
+          defaultValue = "0") int page,
+      @ApiParam(value = "number of objects per page", required = false) @RequestParam(name = "size",
+          defaultValue = "10") int size,
+      @ApiParam(value = "sort order", required = false) @RequestParam(name = "sort",
+          defaultValue = "desc") String sort,
+      @ApiParam(value = "column name to be sorted", required = false) @RequestParam(name = "column",
+          defaultValue = "createdDate") String column)
+      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
-        .findByBisChannelSysId(id, PageRequest.of(page, size,
-              Direction.DESC, column)).getContent();
+        .findByBisChannelSysId(id, PageRequest.of(page, size, Direction.DESC, column)).getContent();
     List<BisRouteDto> routeDtos = new ArrayList<>();
     routeEntities.forEach(route -> {
       BisRouteDto routeDto = new BisRouteDto();
@@ -195,28 +188,25 @@ public class SawBisRouteController {
   /**
    * This API provides an ability to update a source.
    */
-  @ApiOperation(value = "Updating an existing routes by channel id",
-      nickname = "actionBis", notes = "", response = BisRouteDto.class)
+  @ApiOperation(value = "Updating an existing routes by channel id", nickname = "actionBis",
+      notes = "", response = BisRouteDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
           @ApiResponse(code = 201, message = "Updated"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}", method = RequestMethod.PUT,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<BisRouteDto> updateRoutes(@ApiParam
-       (value = "Channel id",
-          required = true)@PathVariable(name = "channelId", required = true) Long channelId,
-       @ApiParam
-          (value = "Route id",
-          required = true)@PathVariable(name = "routeId", required = true) Long routeId,
+  public ResponseEntity<BisRouteDto> updateRoutes(
+      @ApiParam(value = "Channel id", required = true) @PathVariable(name = "channelId",
+          required = true) Long channelId,
+      @ApiParam(value = "Route id", required = true) @PathVariable(name = "routeId",
+          required = true) Long routeId,
       @ApiParam(value = "Routes related information to update",
           required = true) @Valid @RequestBody BisRouteDto requestBody)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
@@ -232,6 +222,58 @@ public class SawBisRouteController {
       BisRouteEntity routeEntity = new BisRouteEntity();
       BeanUtils.copyProperties(requestBody, routeEntity);
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
+
+      String routeMetaData = requestBody.getRouteMetadata();
+      String routeMetaDataFromStore = routeEntity.getRouteMetadata();
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      JsonNode routeData = null;
+      JsonNode routeDataFromStore = null;
+      try {
+        routeData = objectMapper.readTree(routeMetaData);
+        routeDataFromStore = objectMapper.readTree(routeMetaDataFromStore);
+      } catch (IOException e) {
+        logger.error("Exception occurred while updating routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
+      }
+      String schedulerDetails = routeData.get("schedulerExpression").toString();
+      String schedulerDetailsFromStore = routeDataFromStore.get("schedulerExpression").toString();
+      if ((routeData.get("schedulerExpression") != null
+          && !routeData.get("schedulerExpression").toString().equals(""))
+          || (!schedulerDetails.equals(schedulerDetailsFromStore))) {
+        BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
+        schedulerRequest.setChannelId(String.valueOf(routeId.toString()));
+        schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
+        schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
+            + requestBody.getBisRouteSysId().toString());
+        schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
+        JsonNode schedulerData = null;
+        try {
+          schedulerData = objectMapper.readTree(schedulerDetailsFromStore);
+        } catch (IOException e) {
+          logger.error("Exception occurred while updating schedulerExpression ", e);
+          throw new SftpProcessorException("Exception occurred while updating schedulerExpression ",
+              e);
+        }
+        // If schedule the route while creating
+        if (!schedulerData.toString().equals("")) {
+          JsonNode cronExp = schedulerData.get("cronexp");
+          JsonNode startDate = schedulerData.get("startDate");
+          JsonNode endDate = schedulerData.get("endDate");
+          if (cronExp != null) {
+            schedulerRequest.setCronExpression(cronExp.toString());
+          }
+          if (startDate != null) {
+            schedulerRequest.setCronExpression(startDate.toString());
+          }
+          if (endDate != null) {
+            schedulerRequest.setCronExpression(endDate.toString());
+          }
+        }
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
+      }
       BeanUtils.copyProperties(routeEntity, requestBody, "bisChannelSysId", "bisRouteSysId");
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
@@ -240,27 +282,25 @@ public class SawBisRouteController {
   /**
    * This API provides an ability to delete a source.
    */
-  @ApiOperation(value = "Deleting an existing route",
-      nickname = "actionBis", notes = "", response = Object.class)
+  @ApiOperation(value = "Deleting an existing route", nickname = "actionBis", notes = "",
+      response = Object.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
           @ApiResponse(code = 201, message = "Deleted"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}", method = RequestMethod.DELETE,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<ResponseEntity<Object>> deleteRoutes(@ApiParam(value = "Channel id",
-      required = true)@PathVariable(name = "channelId", required = true) Long channelId,
-      @ApiParam
-      (value = "Route id",
-      required = true)@PathVariable(name = "routeId", required = true) Long routeId)
+  public ResponseEntity<ResponseEntity<Object>> deleteRoutes(
+      @ApiParam(value = "Channel id", required = true) @PathVariable(name = "channelId",
+          required = true) Long channelId,
+      @ApiParam(value = "Route id", required = true) @PathVariable(name = "routeId",
+          required = true) Long routeId)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     if (!bisChannelDataRestRepository.existsById(channelId)) {
       throw new ResourceNotFoundException("channelId " + channelId + " not found");
