@@ -12,7 +12,6 @@ import io.restassured.response.ValidatableResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
@@ -98,8 +97,8 @@ public class BatchIngestionIT extends BaseIT {
 
   private ObjectNode prepareSchedulerNode() {
     ObjectNode childNode = mapper.createObjectNode();
-    childNode.put("cronexp", "0 01 0/1 1/1 * ? *");
-    childNode.put("activeTab", "hourly");
+    childNode.put("cronexp", "0 0 12 1 * ?");
+    childNode.put("activeTab", "monthly");
     return childNode;
   }
   
@@ -160,11 +159,10 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void createRoute() throws JsonProcessingException {
-    given(authSpec)
+    Long bisChannelSysId = given(authSpec)
       .body(prepareChannelDataSet()).when()
       .post(BATCH_CHANNEL_PATH)
-      .then().assertThat().statusCode(200);  
-    Long bisChannelSysId = getChannelId();
+      .then().assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisChannelSysId");  
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
@@ -183,7 +181,7 @@ public class BatchIngestionIT extends BaseIT {
     .body(prepareChannelDataSet()).when()
     .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);  
     List<?> listOfChannel = given(authSpec).when().get(BATCH_CHANNEL_PATH).then().assertThat()
-         .statusCode(200).extract().response().jsonPath().getJsonObject("content");
+         .statusCode(200).extract().response().jsonPath().getList("$");
     log.debug("readChannel :" + listOfChannel);
     assertTrue(listOfChannel.size() > 0);
   }
@@ -193,11 +191,10 @@ public class BatchIngestionIT extends BaseIT {
   */
   @Test
   public void readRoute() throws JsonProcessingException {
-    given(authSpec)
+    Long bisChannelSysId = given(authSpec)
     .body(prepareChannelDataSet()).when()
     .post(BATCH_CHANNEL_PATH)
-    .then().assertThat().statusCode(200);  
-    Long bisChannelSysId = getChannelId();
+    .then().assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisChannelSysId");  
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     given(authSpec)
         .body(prepareRouteDataSet())
@@ -206,7 +203,7 @@ public class BatchIngestionIT extends BaseIT {
     assertFalse(bisChannelSysId <= 0);
     List<?> listOfRoutes = given(authSpec).when().get(routeUri)
          .then().assertThat().statusCode(200)
-         .extract().response().jsonPath().getJsonObject("content");
+         .extract().response().jsonPath().getList("$");
     log.debug("readRoute :" + listOfRoutes);
     assertTrue(listOfRoutes.size() > 0);
   }
@@ -216,10 +213,9 @@ public class BatchIngestionIT extends BaseIT {
   */
   @Test
   public void updateChannel() throws JsonProcessingException {
-    given(authSpec)
+    Long bisChannelSysId = given(authSpec)
     .body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
-    .then().assertThat().statusCode(200);  
-    Long bisChannelSysId = getChannelId();
+    .then().assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisChannelSysId");  
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
@@ -236,11 +232,10 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void updateRoute() throws JsonProcessingException {
-    given(authSpec)
+    Long bisChannelSysId= given(authSpec)
     .body(prepareChannelDataSet()).when()
     .post(BATCH_CHANNEL_PATH)
-    .then().assertThat().statusCode(200);  
-    Long bisChannelSysId = getChannelId();
+    .then().assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisChannelSysId");  
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
@@ -248,10 +243,10 @@ public class BatchIngestionIT extends BaseIT {
             .body(prepareRouteDataSet())
             .when().post(urlForThatRouteUpdate).then().assertThat().statusCode(200);
     log.debug("updateRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
-    List<HashMap<Object,Object>> bisRouteSysId = given(authSpec)
+    Long routeId = given(authSpec)
         .when().get(urlForThatRouteUpdate).then()
-        .assertThat().statusCode(200).extract().response().jsonPath().getJsonObject("content");
-    Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
+        .assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisRouteSysId");
+    //Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
     log.debug(" updateRoute bisRouteSysId : " + routeId);
     String urlForThatRouteUpdateById = BATCH_CHANNEL_PATH + "/" 
         + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
@@ -269,11 +264,10 @@ public class BatchIngestionIT extends BaseIT {
     */
   @Test
   public void deleteRoute() throws JsonProcessingException {
-    given(authSpec)
+    Long bisChannelSysId = given(authSpec)
    .body(prepareChannelDataSet()).when()
    .post(BATCH_CHANNEL_PATH)
-   .then().assertThat().statusCode(200);  
-    Long bisChannelSysId = getChannelId();
+   .then().assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisChannelSysId");  
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
@@ -281,10 +275,10 @@ public class BatchIngestionIT extends BaseIT {
             .body(prepareRouteDataSet())
             .when().post(urlForThatRouteUpdate).then().assertThat().statusCode(200);
     log.debug("deleteRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
-    List<HashMap<Object,Object>> bisRouteSysId = given(authSpec)
+    Long routeId = given(authSpec)
             .when().get(urlForThatRouteUpdate).then()
-            .assertThat().statusCode(200).extract().response().jsonPath().getJsonObject("content");
-    Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
+            .assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisRouteSysId");
+    //Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
     log.debug(" deleteRoute bisRouteSysId : " + routeId);
     String urlForThatRouteUpdateById = BATCH_CHANNEL_PATH + "/" 
             + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
@@ -298,11 +292,10 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void deleteChannel() throws JsonProcessingException {
-    given(authSpec)
+    Long bisChannelSysId = given(authSpec)
     .body(prepareChannelDataSet()).when()
     .post(BATCH_CHANNEL_PATH)
-    .then().assertThat().statusCode(200);  
-    Long bisChannelSysId = getChannelId();
+    .then().assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisChannelSysId");  
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
@@ -313,7 +306,7 @@ public class BatchIngestionIT extends BaseIT {
 
   /**
    * The test case is to test a connectivity route in batch Ingestion.
-  */
+   */
   @Test
   public void connectChannel() throws JsonProcessingException {
     String username = "user";
@@ -321,11 +314,10 @@ public class BatchIngestionIT extends BaseIT {
     String homeDirectory = "/";
     String filename = "report.csv";
     createFileOnFakeFtp(username, password, homeDirectory, filename);
-    given(authSpec)
+    Long bisChannelSysId = given(authSpec)
     .body(prepareChannelDataSet()).when()
     .post(BATCH_CHANNEL_PATH)
-    .then().assertThat().statusCode(200);
-    Long bisChannelSysId = getChannelId();
+    .then().assertThat().statusCode(200).extract().response().jsonPath().getLong("$.bisChannelSysId");
     log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
     String connectRouteUri = BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/"
         + bisChannelSysId + "/status";
