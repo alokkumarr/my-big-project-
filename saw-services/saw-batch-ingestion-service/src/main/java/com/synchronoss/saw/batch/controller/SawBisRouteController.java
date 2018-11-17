@@ -92,36 +92,6 @@ public class SawBisRouteController {
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
-    String routeMetaData = requestBody.getRouteMetadata();
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonNode routeData = objectMapper.readTree(routeMetaData);
-    String schedulerDetails = routeData.get("schedulerExpression").asText();
-    BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
-    schedulerRequest.setChannelId(String.valueOf(id.toString()));
-    schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
-    schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
-        + requestBody.getBisRouteSysId().toString());
-    schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
-    JsonNode schedulerData = objectMapper.readTree(schedulerDetails);
-    // If schedule the route while creating
-    if (!schedulerData.toString().equals("")) {
-      JsonNode cronExp =  schedulerData.get("cronexp");
-      JsonNode startDate =  schedulerData.get("startDate");
-      JsonNode endDate =  schedulerData.get("endDate");
-      if (cronExp != null) {
-        schedulerRequest.setCronExpression(cronExp.asText());
-      }
-      if (startDate != null) {
-        schedulerRequest.setCronExpression(startDate.asText());
-      }
-      if (endDate != null) {
-        schedulerRequest.setCronExpression(endDate.asText());
-      }
-    }
-    RestTemplate restTemplate = new RestTemplate();
-    restTemplate.postForLocation(bisSchedulerUrl, schedulerRequest);
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
@@ -129,6 +99,51 @@ public class SawBisRouteController {
       BeanUtils.copyProperties(requestBody, routeEntity);
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
       BeanUtils.copyProperties(routeEntity, requestBody);
+      
+      String routeMetaData = requestBody.getRouteMetadata();
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      JsonNode routeData = null;
+      try {
+        routeData = objectMapper.readTree(routeMetaData);
+      } catch (IOException e) {
+        logger.error(e.getMessage());
+      }
+      String schedulerDetails = routeData.get("schedulerExpression").toString();
+      
+      
+      BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
+      schedulerRequest.setChannelId(String.valueOf(id.toString()));
+      schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
+      schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
+          + requestBody.getBisRouteSysId().toString());
+      schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
+      JsonNode schedulerData = null;
+      try {
+        schedulerData = objectMapper.readTree(schedulerDetails);
+      } catch (IOException e) {
+        logger.error(e.getMessage());
+      }
+      // If schedule the route while creating
+      if (!schedulerData.toString().equals("")) {
+        JsonNode cronExp =  schedulerData.get("cronexp");
+        JsonNode startDate =  schedulerData.get("startDate");
+        JsonNode endDate =  schedulerData.get("endDate");
+        if (cronExp != null) {
+          schedulerRequest.setCronExpression(cronExp.toString());
+        }
+        if (startDate != null) {
+          schedulerRequest.setCronExpression(startDate.toString());
+        }
+        if (endDate != null) {
+          schedulerRequest.setCronExpression(endDate.toString());
+        }
+      }
+      RestTemplate restTemplate = new RestTemplate();
+      restTemplate.postForLocation(bisSchedulerUrl, schedulerRequest);
+      
+      
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
   }

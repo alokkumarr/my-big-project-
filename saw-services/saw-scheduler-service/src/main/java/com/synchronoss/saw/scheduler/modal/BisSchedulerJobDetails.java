@@ -130,7 +130,7 @@ public class BisSchedulerJobDetails implements Serializable {
    * @throws IOException io exception
    */
   private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-
+	out.writeObject(channelId);
     out.writeObject(channelType);
     out.writeObject(cronExpression);
     out.writeObject(description);
@@ -154,6 +154,7 @@ public class BisSchedulerJobDetails implements Serializable {
    * @throws ClassNotFoundException exception
    */
   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+	channelId =  (String) in.readObject();
     channelType = (String) in.readObject();
     cronExpression = (String) in.readObject();
     description = (String) in.readObject();
