@@ -76,11 +76,11 @@ public class SawBisRouteController {
           @ApiResponse(code = 201, message = "Created"),
           @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
               message = "Unsupported Type. " + "Representation not supported for the resource")})
-  @RequestMapping(value = "/channels/{routeId}/routes", method = RequestMethod.POST,
+  @RequestMapping(value = "/channels/{channelId}/routes", method = RequestMethod.POST,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<@Valid BisRouteDto> createRoute(
-      @ApiParam(value = "Channel Id", required = true) @PathVariable Long routeId,
+      @ApiParam(value = "Channel Id", required = true) @PathVariable Long channelId,
       @ApiParam(value = "Route related information to store",
           required = true) @Valid @RequestBody BisRouteDto requestBody)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
@@ -88,10 +88,10 @@ public class SawBisRouteController {
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
     }
-    return ResponseEntity.ok(bisChannelDataRestRepository.findById(routeId).map(channel -> {
+    return ResponseEntity.ok(bisChannelDataRestRepository.findById(channelId).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
-      requestBody.setBisChannelSysId(routeId);
+      requestBody.setBisChannelSysId(channelId);
       BeanUtils.copyProperties(requestBody, routeEntity);
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
       BeanUtils.copyProperties(routeEntity, requestBody);
@@ -110,7 +110,7 @@ public class SawBisRouteController {
           && !routeData.get("schedulerExpression").toString().equals("")) {
         String schedulerDetails = routeData.get("schedulerExpression").toString();
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
-        schedulerRequest.setChannelId(String.valueOf(routeId.toString()));
+        schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
         schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
         schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
             + requestBody.getBisRouteSysId().toString());
@@ -140,9 +140,10 @@ public class SawBisRouteController {
         }
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
+        logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
       }
       return requestBody;
-    }).orElseThrow(() -> new ResourceNotFoundException("channelId " + routeId + " not found")));
+    }).orElseThrow(() -> new ResourceNotFoundException("channelId " + channelId + " not found")));
   }
 
   /**
@@ -220,10 +221,7 @@ public class SawBisRouteController {
     return ResponseEntity.ok(bisRouteDataRestRepository.findById(routeId).map(route -> {
       logger.trace("Route updated :" + route);
       BisRouteEntity routeEntity = new BisRouteEntity();
-      BeanUtils.copyProperties(requestBody, routeEntity);
-      routeEntity.setBisChannelSysId(channelId);
-      routeEntity.setBisRouteSysId(routeId);
-      routeEntity = bisRouteDataRestRepository.save(routeEntity);
+      routeEntity = bisRouteDataRestRepository.getOne(routeId);
       String routeMetaData = requestBody.getRouteMetadata();
       String routeMetaDataFromStore = routeEntity.getRouteMetadata();
       ObjectMapper objectMapper = new ObjectMapper();
@@ -244,14 +242,14 @@ public class SawBisRouteController {
           && !routeData.get("schedulerExpression").toString().equals(""))
           || (!schedulerDetails.equals(schedulerDetailsFromStore))) {
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
-        schedulerRequest.setChannelId(String.valueOf(routeId.toString()));
-        schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
-        schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
-            + requestBody.getBisRouteSysId().toString());
-        schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
+        schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
+        schedulerRequest.setRouteId(String.valueOf(routeId.toString()));
+        schedulerRequest.setJobName(BisChannelType.SFTP.name() + channelId
+            + routeId);
+        schedulerRequest.setJobGroup(String.valueOf(routeId));
         JsonNode schedulerData = null;
         try {
-          schedulerData = objectMapper.readTree(schedulerDetailsFromStore);
+          schedulerData = objectMapper.readTree(schedulerDetails);
         } catch (IOException e) {
           logger.error("Exception occurred while updating schedulerExpression ", e);
           throw new SftpProcessorException("Exception occurred while updating schedulerExpression ",
@@ -272,8 +270,13 @@ public class SawBisRouteController {
             schedulerRequest.setCronExpression(endDate.toString());
           }
         }
+        BeanUtils.copyProperties(requestBody, routeEntity);
+        routeEntity.setBisChannelSysId(channelId);
+        routeEntity.setBisRouteSysId(routeId);
+        routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
+        logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
       }
       BeanUtils.copyProperties(routeEntity, requestBody, "bisChannelSysId", "bisRouteSysId");
       return requestBody;
