@@ -221,8 +221,9 @@ public class SawBisRouteController {
       logger.trace("Route updated :" + route);
       BisRouteEntity routeEntity = new BisRouteEntity();
       BeanUtils.copyProperties(requestBody, routeEntity);
+      routeEntity.setBisChannelSysId(channelId);
+      routeEntity.setBisRouteSysId(routeId);
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
-
       String routeMetaData = requestBody.getRouteMetadata();
       String routeMetaDataFromStore = routeEntity.getRouteMetadata();
       ObjectMapper objectMapper = new ObjectMapper();
