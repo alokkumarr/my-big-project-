@@ -4,22 +4,13 @@ var retry = require('protractor-retry').retry;
 var fs = require('fs');
 var argv = require('yargs').argv;
 const SuiteSetup = require('../helpers/SuiteSetup');
-/**
- * @description This code is used for logger.
- */
-const log4js = require('log4js');
-log4js.configure({
-  appenders: { protractor: { type: 'file', filename: 'target/protractor.log' } },
-  categories: { default: { appenders: ['protractor'], level: 'debug' } }
-});
 
-const logger = log4js.getLogger('protractor');
-
+const logger = require('./logger')(__filename);
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = 30000;
+const pageLoadTimeout = 30000;  //-- !!!DON'T CHANGE
 
 const implicitlyWait = 1000; //should not be more than 5 seconds, this will increase over all execution time
 
@@ -27,16 +18,16 @@ const implicitlyWait = 1000; //should not be more than 5 seconds, this will incr
  * Explicit wait for element
  * 30 seconds in docker and 20 seconds in local
  */
-const fluentWait = SuiteSetup.distRun() ? 30000 : 20000;
+const fluentWait = SuiteSetup.distRun() ? 30000 : 20000;  //-- !!!DON'T CHANGE
 
 /**
  * Before performing any action, Protractor waits until there are no pending asynchronous tasks in your Angular
  * application. This means that all timeouts and http requests are finished.
  * https://github.com/angular/protractor/blob/master/docs/timeouts.md
  * https://github.com/angular/protractor/blob/master/lib/config.ts
- * 5 min in docker and 3 min in local -- All http/https calls should be completed
+ * 3 min -- All http/https calls should be completed -- !!!DON'T CHANGE
  */
-const allScriptsTimeout = SuiteSetup.distRun() ? 300000 : 180000;
+const allScriptsTimeout =  180000;
 
 /**
  *  https://github.com/angular/protractor/blob/master/docs/timeouts.md
@@ -86,6 +77,7 @@ exports.config = {
   useAllAngular2AppRoots: true,
   testData: SuiteSetup.getTestData(),
   baseUrl: 'http://localhost:3000',
+  logger:logger,
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
@@ -191,25 +183,10 @@ exports.config = {
   },
   onPrepare() {
     retry.onPrepare();
-    browser.logger = logger;
-    browser
-      .manage()
-      .timeouts()
-      .pageLoadTimeout(pageLoadTimeout);
+    browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
 
-    browser
-      .manage()
-      .timeouts()
-      .implicitlyWait(implicitlyWait);
-
-    let jasmineReporters = require('jasmine-reporters');
-    let junitReporter = new jasmineReporters.JUnitXmlReporter({
-      savePath: protractorPath,
-      consolidateAll: true
-    });
-
-    jasmine.getEnv().addReporter(junitReporter);
-
+    browser.manage().timeouts().implicitlyWait(implicitlyWait);
+    // Allure reporter start
     let AllureReporter = require('jasmine-allure-reporter');
     jasmine.getEnv().addReporter(
       new AllureReporter({
@@ -229,6 +206,7 @@ exports.config = {
         done();
       });
     });
+    // Allure reporter done
 
     jasmine.getEnv().addReporter(new function() {
       this.specDone = function(result) {
@@ -241,34 +219,37 @@ exports.config = {
     });
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
-    browser.get('http://juliemr.github.io/protractor-demo/');
+    browser.get(browser.baseUrl);
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
-        return true;
+        return /login/.test(url);
       });
     }, pageResolveTimeout);
   },
   beforeLaunch: function() {
-    // Delete old e2e unique id.
-    // if (fs.existsSync('target/e2eId.json')) {
-    //   fs.unlinkSync('target/e2eId.json');
-    // }
-    // // Generate test data
-    // let appUrl = SuiteSetup.getSawWebUrl();
-    // if (appUrl) {
-    //   console.log('Generating test data');
-    //   let APICommonHelpers = require('../helpers/api/APICommonHelpers');
-    //   let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
-    //   let token = APICommonHelpers.generateToken(apiBaseUrl);
-    //   let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
-    //   browser.logger.info('generating data--TestDataGenerator');
-    //   new TestDataGenerator().generateUsersRolesPrivilegesCategories(
-    //     apiBaseUrl,
-    //     token
-    //   );
-    // } else {
-    //   process.exit(1);
-    // }
+    //Delete old e2e unique id.
+    logger.info('Doing cleanup and setting up test data for e2e tests....');
+    if (fs.existsSync('target/e2eId.json')) {
+      fs.unlinkSync('target/e2eId.json');
+    }
+    // Generate test data
+    let appUrl = SuiteSetup.getSawWebUrl();
+    if (appUrl) {
+      try {
+        logger.info('Generating test for this run...');
+        let APICommonHelpers = require('../helpers/api/APICommonHelpers');
+        let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+        let token = APICommonHelpers.generateToken(apiBaseUrl);
+        let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
+        new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
+      }catch (e) {
+        logger.error('There is some error during cleanup and setting up test data for e2e tests....'+e);
+        process.exit(1);
+      }
+    } else {
+      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl);
+      process.exit(1);
+    }
   },
   afterLaunch: function() {
     var retryCounter = 1;

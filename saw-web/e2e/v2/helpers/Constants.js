@@ -13,8 +13,17 @@ const API_ROUTES = {
   USERS: '/saw/security/auth/admin/cust/manage/users/add',
   ADD_CATEGORIES: '/saw/security/auth/admin/cust/manage/categories/add',
   PRIVILEGES: '/saw/security/auth/admin/cust/manage/privileges/upsert'
-}
+};
+
+const LOG_LEVELS = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  verbose: 3,
+  debug: 4,
+  silly: 5
+};
 
 module.exports = {
-  ES_REPORT, PIVOT, REPORT, CHART, API_ROUTES
+  ES_REPORT, PIVOT, REPORT, CHART, API_ROUTES,LOG_LEVELS
 };

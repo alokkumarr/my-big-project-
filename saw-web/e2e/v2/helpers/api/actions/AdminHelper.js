@@ -1,13 +1,8 @@
 'use strict';
-let RestClient = require('../RestClient');
-const categories = require('../../data-generation/categories');
-const dataSets = require('../../data-generation/datasets');
-const customerCode = 'SYNCHRONOSS'; // shared for all users
-let RequestModel = require('../model/RequestModel');
+let RestClient = require('../RestClient');;
 const Constants = require('../../Constants')
 let Utils = require('../../Utils');
 const moduleId = 1; // shared for all users
-
 class AdminHelper {
 
   generateRole(url, role, token, custSysId, activeStatusInd, customerCode, masterLoginId) {
@@ -19,8 +14,7 @@ class AdminHelper {
       roleName: role.roleName,
       roleDesc: role.roleDesc
     };
-
-    return new RestClient().post(url + Constants.API_ROUTES.ROLES, payload, token).roles;
+    return new RestClient().post(url + Constants.API_ROUTES.ROLES+"w", payload, token).roles;
   }
 
   generateUser(url, user, roleId, token, activeStatusInd, customerId, email, password) {

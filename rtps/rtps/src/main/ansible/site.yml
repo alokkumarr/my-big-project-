@@ -1,0 +1,5 @@
+- name: RTPS
+  hosts: sip-rtps
+  become: true
+  roles:
+    - sip-rtps
