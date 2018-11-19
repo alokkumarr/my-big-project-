@@ -62,13 +62,12 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
             logger.trace("Script to execute:\n" +  script);
             executor.analyze(script);
             String tempDir = generateTempLocation(new WithDataSetService.DataSetServiceAux(ctx, md),  null, null);
-            executor.start(tempDir);
+            return executor.start(tempDir);
         } catch (Exception e) {
             error = "SQL Executor runtime exception: " + e.getMessage();
             logger.error(e);
             return -1;
         }
-        return 0;
     }
 
     protected int archive(){

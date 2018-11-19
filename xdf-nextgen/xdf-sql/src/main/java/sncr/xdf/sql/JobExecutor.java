@@ -58,9 +58,9 @@ public class JobExecutor {
         this.script = script;
     }
 
-    public Long start(String tempDir) throws XDFException {
+    public int start(String tempDir) throws XDFException {
 
-        Long rc = 0L;
+        int rc = 0;
         try {
 
             logger.debug(String.format("Temp dir: %s %n", tempDir ));
@@ -92,7 +92,7 @@ public class JobExecutor {
                         descriptor.result =(rc != 0)?"failed":"success";
                         if (rc != 0){
                             logger.error("Could not execute SQL statement: " + i );
-                            return -1L;
+                            return -1;
                         }
                         report.add(descriptor);
 
@@ -101,7 +101,7 @@ public class JobExecutor {
                         logger.error("Remove temporary directory and cancel batch processing.");
                         descriptor.result = "failed";
                         HFileOperations.deleteEnt(tempDir);
-                        return -1L;
+                        return -1;
                     }
                 }
 
@@ -136,7 +136,7 @@ public class JobExecutor {
                         logger.error("DROP TABLE statement cannot be executed: source data location for table: " + descriptor.tableDescriptor.tableName + " is Empty or null");
                         descriptor.result = "failed";
                         HFileOperations.deleteEnt(tempDir);
-                        return -1L;
+                        return -1;
                     }
                 }
                 logger.debug("SQL statement was successfully processed: " + descriptor.tableDescriptor.toString());
