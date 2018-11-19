@@ -135,8 +135,9 @@ public class SftpServiceImpl extends SipPluginContract {
         }
       } catch (AccessDeniedException e) {
         status = HttpStatus.UNAUTHORIZED;
-        throw new SftpProcessorException("Path does not exist or access denied for the entity" + entityId, e);}
-        catch (IOException e) {
+        throw new SftpProcessorException(
+            "Path does not exist or access denied for the entity" + entityId, e);
+      } catch (IOException e) {
         status = HttpStatus.BAD_REQUEST;
         throw new SftpProcessorException("Exception occurred during " + entityId, e);
       } catch (InvalidPathException | NullPointerException ex) {
