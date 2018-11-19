@@ -5,11 +5,18 @@
   yum: name=/tmp/saw-batch-ingestion.rpm state=present
   notify:
     - restart saw-batch-ingestion
+- name: Migrate Batch Service database password from old location
+  fetch:
+    src: /etc/bda/saw-batch-ingestion-db-password
+    dest: "{{ inventory_dir + '/sip-batch-ingestion-db-password' }}"
+    flat: yes
+    fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
 - name: Look up Batch Ingestion Service database password
   set_fact:
     saw_batch_ingestion_db_password: >-
       {{ lookup('password', inventory_dir
-        + '/saw-batch-ingestion-db-password chars=ascii_letters,digits') }}
+        + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
 - name: Install SAW Batch Ingestion Service configuration file
   template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
   notify:
