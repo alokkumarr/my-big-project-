@@ -4,8 +4,13 @@ import * as isString from 'lodash/isString';
 import * as moment from 'moment';
 
 export function generateSchedule(cronExpression, activeTab) {
-  if (!isString(cronExpression)) {
-    throw new Error(`generateSchedule expects a string as a first parameter, not: ${typeof cronExpression}`);
+  if (activeTab === 'immediate') {
+    // cronExpression won't be present if it's an immediate scheduled entity.
+    return '';
+  } else if (!isString(cronExpression)) {
+    throw new Error(
+      `generateSchedule expects a string as a first parameter, not: ${typeof cronExpression}`
+    );
   }
   if (isEmpty(cronExpression)) {
     return '';
@@ -24,7 +29,11 @@ function extractMinute(CronUTC) {
   const date = new Date();
   const hour = parseInt(moment().format('HH'), 10);
   date.setUTCHours(hour, splitArray[1]);
-  const UtcTime = moment.utc(date).local().format('mm').split(' ');
+  const UtcTime = moment
+    .utc(date)
+    .local()
+    .format('mm')
+    .split(' ');
   splitArray[1] = UtcTime[0];
   if (UtcTime[0] === 'Invalid') {
     return CronUTC;
@@ -37,7 +46,11 @@ function convertToLocal(CronUTC) {
   const splitArray = CronUTC.split(' ');
   const date = new Date();
   date.setUTCHours(splitArray[2], splitArray[1]);
-  const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
+  const UtcTime = moment
+    .utc(date)
+    .local()
+    .format('mm HH')
+    .split(' ');
   splitArray[1] = UtcTime[0];
   splitArray[2] = UtcTime[1];
   return splitArray.join(' ');
