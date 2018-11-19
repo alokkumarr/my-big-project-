@@ -13,13 +13,11 @@ import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestReposit
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,33 +45,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*")
 @RestController
-@Api(
-    value = "The controller provides operations related Channel Entity "
-        + "synchronoss analytics platform ")
+@Api(value = "The controller provides operations related Channel Entity "
+    + "synchronoss analytics platform ")
 @RequestMapping("/ingestion/batch")
 public class SawBisChannelController {
 
   private static final Logger logger = LoggerFactory.getLogger(SawBisChannelController.class);
-  
-  @Autowired
-  private BisChannelDataRestRepository bisChannelDataRestRepository; 
 
-  
+  @Autowired
+  private BisChannelDataRestRepository bisChannelDataRestRepository;
+
+
   /**
-   * This API provides an ability to add a source. 
-  */
-  @ApiOperation(value = "Add a new channel",
-      nickname = "actionBis", notes = "", response = BisChannelDto.class)
+   * This API provides an ability to add a source.
+   */
+  @ApiOperation(value = "Add a new channel", nickname = "actionBis", notes = "",
+      response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
           @ApiResponse(code = 201, message = "Created"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels", method = RequestMethod.POST,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
@@ -109,35 +104,32 @@ public class SawBisChannelController {
   }
 
   /**
-   * This API provides an ability to read a source with pagination. 
+   * This API provides an ability to read a source with pagination.
    */
-  
-  @ApiOperation(value = "Reading list of channels & paginate",
-      nickname = "actionBis", notes = "", response = BisChannelDto.class)
+
+  @ApiOperation(value = "Reading list of channels & paginate", nickname = "actionBis", notes = "",
+      response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels", method = RequestMethod.GET,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
   public ResponseEntity<List<BisChannelDto>> readChannel(
-      @ApiParam(value = "page number",
-      required = false)  @RequestParam(name = "page", defaultValue = "0") int page, 
-      @ApiParam(value = "number of objects per page",
-          required = false) @RequestParam(name = "size", defaultValue = "10") int size,
-          @ApiParam(value = "sort order",
-          required = false) @RequestParam(name = "sort", defaultValue = "desc") String sort, 
-          @ApiParam(value = "column name to be sorted",
-          required = false) @RequestParam(name = "column", defaultValue = "createdDate") 
-      String column) throws NullPointerException, JsonParseException, 
-      JsonMappingException, IOException {
+      @ApiParam(value = "page number", required = false) @RequestParam(name = "page",
+          defaultValue = "0") int page,
+      @ApiParam(value = "number of objects per page", required = false) @RequestParam(name = "size",
+          defaultValue = "10") int size,
+      @ApiParam(value = "sort order", required = false) @RequestParam(name = "sort",
+          defaultValue = "desc") String sort,
+      @ApiParam(value = "column name to be sorted", required = false) @RequestParam(name = "column",
+          defaultValue = "createdDate") String column)
+      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     List<BisChannelEntity> entities = bisChannelDataRestRepository
         .findAll(PageRequest.of(page, size, Direction.DESC, column)).getContent();
     List<BisChannelDto> channelDtos = new ArrayList<>();
@@ -161,35 +153,32 @@ public class SawBisChannelController {
         channelDtos.add(bisChannelDto);
       } catch (Exception e) {
         logger.error("Exception while reading the list :", e);
-        throw new ResourceNotFoundException("Exception occurred while "
-        + "reading the list of channels");
+        throw new ResourceNotFoundException(
+            "Exception occurred while " + "reading the list of channels");
       }
     });
     return ResponseEntity.ok(channelDtos);
   }
 
   /**
-   * This API provides an ability to read a source by id. 
+   * This API provides an ability to read a source by id.
    */
-  
-  @ApiOperation(value = "Reading channel by id",
-      nickname = "actionBis", notes = "", response = BisChannelDto.class)
+
+  @ApiOperation(value = "Reading channel by id", nickname = "actionBis", notes = "",
+      response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels/{id}", method = RequestMethod.GET,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<BisChannelDto> readChannelById(
-      @PathVariable(name = "id",required = true) 
-      Long id) throws Exception {
-    BisChannelDto channelDto = new BisChannelDto();  
+      @PathVariable(name = "id", required = true) Long id) throws Exception {
+    BisChannelDto channelDto = new BisChannelDto();
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       logger.trace("Channel retrieved :" + channel);
       ObjectMapper objectMapper = new ObjectMapper();
@@ -207,34 +196,32 @@ public class SawBisChannelController {
         BeanUtils.copyProperties(channel, channelDto);
         channelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
       } catch (Exception e) {
-        throw new ResourceNotFoundException("channelId " + id + " not found"); 
+        throw new ResourceNotFoundException("channelId " + id + " not found");
       }
       return channelDto;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
   }
 
   /**
-   * This API provides an ability to update a source. 
+   * This API provides an ability to update a source.
    */
-  @ApiOperation(value = "Updating an existing channel",
-      nickname = "actionBis", notes = "", response = BisChannelDto.class)
+  @ApiOperation(value = "Updating an existing channel", nickname = "actionBis", notes = "",
+      response = BisChannelDto.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
           @ApiResponse(code = 201, message = "Updated"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels/{channelId}", method = RequestMethod.PUT,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<@Valid BisChannelDto> updateChannel(@ApiParam
-       (value = "Entity id needs to be updated",
-          required = true)@PathVariable Long channelId,
+  public ResponseEntity<@Valid BisChannelDto> updateChannel(
+      @ApiParam(value = "Entity id needs to be updated",
+          required = true) @PathVariable Long channelId,
       @ApiParam(value = "Channel related information to update",
           required = true) @Valid @RequestBody BisChannelDto requestBody)
       throws Exception {
@@ -268,33 +255,31 @@ public class SawBisChannelController {
           .format(channel.getCreatedDate()));
       requestBody.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
           .format(channel.getModifiedDate()));
-    }else {
-     throw new ResourceNotFoundException("channelId " + channelId + " not found");}
-      return ResponseEntity.ok(requestBody);
+    } else {
+      throw new ResourceNotFoundException("channelId " + channelId + " not found");
+    }
+    return ResponseEntity.ok(requestBody);
   }
 
   /**
-   * This API provides an ability to delete a source. 
+   * This API provides an ability to delete a source.
    */
-  @ApiOperation(value = "Deleting an existing channel",
-      nickname = "actionBis", notes = "", response = Object.class)
+  @ApiOperation(value = "Deleting an existing channel", nickname = "actionBis", notes = "",
+      response = Object.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
           @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
           @ApiResponse(code = 400, message = "Bad request"),
           @ApiResponse(code = 201, message = "Deleted"),
-          @ApiResponse(code = 401, message = "Unauthorized"),
-          @ApiResponse(code = 415, message = "Unsupported Type. "
-       + "Representation not supported for the resource")
-      })
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels/{id}", method = RequestMethod.DELETE,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<Object> deleteChannel(@ApiParam
-       (value = "Entity id needs to be deleted",
-          required = true)@PathVariable Long id)
+  public ResponseEntity<Object> deleteChannel(
+      @ApiParam(value = "Entity id needs to be deleted", required = true) @PathVariable Long id)
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
       bisChannelDataRestRepository.deleteById(id);
