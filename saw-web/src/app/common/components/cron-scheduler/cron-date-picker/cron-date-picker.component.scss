@@ -1,0 +1,28 @@
+:host {
+  width: 100%;
+  height: 100%;
+}
+
+.form-select {
+  max-width: 75px;
+  font-size: 11px;
+  margin: 0;
+
+  ::ng-deep .mat-select-value-text,
+  ::ng-deep .mat-select-placeholder {
+    font-size: 16px;
+  }
+
+  ::ng-deep .mat-select-arrow-wrapper {
+    vertical-align: bottom;
+  }
+
+  ::ng-deep .mat-form-field-infix {
+    padding: 0.7em 0;
+    border-top: 0;
+  }
+
+  ::ng-deep .mat-form-field-label-wrapper {
+    top: -0.27em;
+  }
+}

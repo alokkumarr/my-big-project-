@@ -34,7 +34,7 @@
     <app.release>${rpm.release}</app.release>
     <app.nameVer>${app.name}-${app.version}</app.nameVer>
     <!-- Directories on the target box -->
-    <app.optParDir>/dfs/opt/bda</app.optParDir>
+    <app.optParDir>/opt/bda</app.optParDir>
     <!--
       Application 'home' directory
       is under XDF (framework) home directory

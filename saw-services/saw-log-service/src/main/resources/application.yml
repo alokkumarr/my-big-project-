@@ -1,0 +1,38 @@
+info:
+  component: Synchronoss log Service
+spring:
+  application:
+    name: saw-log-service
+  #mariaDB (metadata) DB details
+  datasource:
+    url: jdbc:mariadb://localhost/SIP_BATCH_INGESTION
+    username: root
+    password: 
+    driver-class-name:  org.mariadb.jdbc.Driver
+    max-active: 25
+    testOnBorrow: true
+    testOnConnect: true
+    testOnReturn: true
+    validationQuery: SELECT 1
+    testWhileIdle: true
+    logValidationErrors: true
+  jpa:
+      properties:
+        hibernate:
+           dialect:org.hibernate.dialect.MariaDB53Dialect
+
+server:
+  address: localhost
+  port: 9200
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+logging:
+  level:
+    com.synchronoss.saw.logs: DEBUG
+    org.springframework: INFO
+   
+       

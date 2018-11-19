@@ -100,7 +100,11 @@ public abstract class Component {
     } else {
       logger.error("Could not generate/retrieve metadata phase!");
     }
-    ret = finalize(ret);
+
+    // Run finalize only if all previous steps are successful
+    if (ret == 0) {
+        ret = finalize(ret);
+    }
     return ret;
   }
 
@@ -159,6 +163,7 @@ public abstract class Component {
           }
 
           ctx.setStartTs();
+          logger.debug("Reading dataset details for " + outputDataSets.get(o.getDataSet()));
           JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()));
           if (ds == null) {
             error = "Could not create metadata for output dataset: " + o.getDataSet();
@@ -213,7 +218,7 @@ public abstract class Component {
    * @return - 0 - Success, -1 - fail
    */
 
-  public final int collectCommandLineParameters(String[] args) {
+  public final int collectCommandLineParameters(String[] args) throws Exception {
     CliHandler cli = new CliHandler();
     try {
       HFileOperations.init();
@@ -247,15 +252,14 @@ public abstract class Component {
       return init(configAsStr, appId, batchId, xdfDataRootSys);
     } catch (ParseException e) {
       error = "Could not parse CMD line: " + e.getMessage();
-      logger.error(ExceptionUtils.getStackTrace(e));
-      return -1;
+
+      throw e;
     } catch (XDFException e) {
-      logger.error(ExceptionUtils.getStackTrace(e));
-      return -1;
+      throw e;
     } catch (Exception e) {
       error = "Exception at component initialization " + e.getMessage();
-      logger.error(ExceptionUtils.getStackTrace(e));
-      return -1;
+
+      throw e;
     }
   }
 
@@ -286,12 +290,14 @@ public abstract class Component {
     } catch (Exception e) {
       error = "Configuration is not valid, reason : " + e.getMessage();
       logger.error(e);
-      return -1;
+
+      throw e;
     }
     if (cfg == null) {
       error = "Internal error: validation procedure returns null";
       logger.error(error);
-      return -1;
+
+      throw new Exception("Invalid configuration");
     }
     
     logger.debug("Getting project metadata");

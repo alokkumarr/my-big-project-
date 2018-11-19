@@ -118,7 +118,7 @@ public class SAWSemanticController {
    */
   @RequestMapping(value = "/{projectId}/{Id}", method = RequestMethod.PUT,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @PathVariable(name = "Id", required = true) String Id, @RequestBody SemanticNode requestBody) throws JSONMissingSAWException {
@@ -148,7 +148,7 @@ public class SAWSemanticController {
    */
   @RequestMapping(value = "/{projectId}/{Id}", method = RequestMethod.DELETE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public SemanticNode deleteSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @PathVariable(name = "Id", required = true) String Id) throws JSONMissingSAWException {
@@ -179,7 +179,7 @@ public class SAWSemanticController {
    */
   @RequestMapping(value = "/{projectId}/filter", method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public SemanticNodes searchSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @RequestParam Map<String, String> queryMap) throws JSONMissingSAWException {
@@ -211,7 +211,7 @@ public class SAWSemanticController {
    */
   @RequestMapping(value = "/md", method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public BackCompatibleStructure searchSemanticWithOutArtifacts(
       @RequestParam Map<String, String> queryMap) throws JSONMissingSAWException {
     BackCompatibleStructure responseObjectFuture = null;

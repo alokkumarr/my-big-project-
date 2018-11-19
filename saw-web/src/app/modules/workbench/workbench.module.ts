@@ -9,10 +9,7 @@ import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
 import { RouterModule } from '@angular/router';
-
 import { routes } from './routes';
-
-import { WorkbenchService } from './services/workbench.service';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
@@ -27,10 +24,12 @@ import { SqlScriptComponent } from './components/sql-executor/query/sql-script.c
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
 import { DetailsDialogComponent } from './components/sql-executor/dataset-details-dialog/details-dialog.component';
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
-import { CreateSemanticComponent } from './components/semantic-management/create/create-semantic.component';
-import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
-import { SemanticDetailsDialogComponent } from './components/semantic-management/semantic-details-dialog/semantic-details-dialog.component';
-import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
+import {
+  CreateSemanticComponent,
+  ValidateSemanticComponent,
+  SemanticDetailsDialogComponent,
+  UpdateSemanticComponent
+} from './components/semantic-management/index';
 import {
   DataobjectsComponent,
   DatapodsCardPageComponent,
@@ -40,8 +39,16 @@ import {
   DatasetActionsComponent,
   DatapodActionsComponent
 } from './components/data-objects-view/index';
+import {
+  DatasourceComponent,
+  CreateSourceDialogComponent,
+  TestConnectivityComponent,
+  CreateRouteDialogComponent,
+  ConfirmActionDialogComponent
+} from './components/datasource-management/index';
 
 import { DefaultWorkbenchPageGuard } from './guards';
+import { IsAdminGuard } from '../admin/guards';
 
 import { CommonModuleTs } from '../../common';
 
@@ -69,12 +76,15 @@ const COMPONENTS = [
   UpdateSemanticComponent,
   DatapodsCardPageComponent,
   DatapodsGridPageComponent,
-  DatapodActionsComponent
+  DatapodActionsComponent,
+  DatasourceComponent,
+  CreateSourceDialogComponent,
+  TestConnectivityComponent,
+  CreateRouteDialogComponent,
+  ConfirmActionDialogComponent
 ];
 
-const GUARDS = [DefaultWorkbenchPageGuard];
-
-const SERVICES = [WorkbenchService];
+const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
 @NgModule({
   imports: [
     AngularCommonModule,
@@ -92,6 +102,6 @@ const SERVICES = [WorkbenchService];
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [...SERVICES, ...GUARDS]
+  providers: [GUARDS]
 })
 export class WorkbenchModule {}

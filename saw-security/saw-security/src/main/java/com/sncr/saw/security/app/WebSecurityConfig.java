@@ -30,7 +30,7 @@ public class WebSecurityConfig extends
     .headers()
       .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Origin", "*"))
       .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"))
-      .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, OPTIONS"));    
+      .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, OPTIONS"));    
     	
   
     http.csrf().disable();

@@ -24,7 +24,7 @@ interface Privilege {
 }
 
 @Component({
-  // tslint:disable-next-line
+  // tslint:disable-next-line:component-selector
   selector: 'tr[privilege-row]',
   templateUrl: './privilege-row.component.html',
   styleUrls: ['./privilege-row.component.scss']
@@ -63,3 +63,4 @@ export class PrivilegeRowComponent implements OnChanges {
     this.categoryChange.emit(privilege);
   }
 }
+
