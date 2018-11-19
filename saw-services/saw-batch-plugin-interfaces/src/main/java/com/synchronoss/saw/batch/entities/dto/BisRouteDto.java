@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 
+
 @ApiModel("This model payload holds the details to create a route in the system")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BisRouteDto implements Serializable {
@@ -27,6 +28,32 @@ public class BisRouteDto implements Serializable {
   @ApiModelProperty(value = "This property is unique identifier for channel resource")
   @JsonProperty("bisChannelSysId")
   private Long bisChannelSysId;
+
+  @JsonProperty("modifiedDate")
+  private String modifiedDate;
+
+  @JsonProperty("createdDate")
+  private String createdDate;
+  
+  @JsonProperty("modifiedDate")
+  public String getModifiedDate() {
+    return modifiedDate;
+  }
+  
+  @JsonProperty("modifiedDate")
+  public void setModifiedDate(String modifiedDate) {
+    this.modifiedDate = modifiedDate;
+  }
+  
+  @JsonProperty("createdDate")
+  public String getCreatedDate() {
+    return createdDate;
+  }
+  
+  @JsonProperty("createdDate")
+  public void setCreatedDate(String createdDate) {
+    this.createdDate = createdDate;
+  }
 
   @JsonProperty("bisRouteSysId")
   public Long getBisRouteSysId() {

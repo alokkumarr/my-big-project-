@@ -2,23 +2,21 @@ package com.synchronoss.saw.logs.entities;
 
 import java.io.Serializable;
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "BIS_FILE_LOGS", catalog = "sip_batch_ingestion", schema = "")
-public class BisFileLog extends LogEntity implements Serializable {
+public class BisFileLog implements Serializable {
 
   private static final long serialVersionUID = 26663931172032006L;
 
-@Id
+  @Id
   @Column(name = "BIS_PID")
   String pid;
 
@@ -51,6 +49,13 @@ public class BisFileLog extends LogEntity implements Serializable {
 
   @Column(name = "BIS_PROCESS_STATE")
   String bisProcessState;
+  
+  @Column(name = "MODIFIED_DATE")
+  private Date modifiedDate;
+
+  @Column(name = "CREATED_DATE")
+  private Date createdDate;
+
 
   public String getPid() {
     return pid;
@@ -140,5 +145,23 @@ public class BisFileLog extends LogEntity implements Serializable {
   public void setBisProcessState(String bisProcessState) {
     this.bisProcessState = bisProcessState;
   }
+
+  public Date getModifiedDate() {
+    return modifiedDate;
+  }
+
+
+  public Date getCreatedDate() {
+    return createdDate;
+  }
+  
+  public void setModifiedDate(Date modifiedDate) {
+    this.modifiedDate = modifiedDate;
+  }
+
+  public void setCreatedDate(Date createdDate) {
+    this.createdDate = createdDate;
+  }
+  
 
 }

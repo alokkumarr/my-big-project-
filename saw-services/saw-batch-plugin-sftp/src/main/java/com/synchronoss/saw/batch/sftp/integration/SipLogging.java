@@ -4,7 +4,7 @@ import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
-
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,13 @@ public class SipLogging {
     bisLog.setActualFileRecDate(entity.getActualReceiveDate());
     bisLog.setBisProcessState(entity.getComponentState());
     if (bisFileLogsRepository.existsById(pid)) {
+      BisFileLog log = bisFileLogsRepository.getOne(pid);
       bisFileLogsRepository.deleteById(pid);
+      bisLog.setCreatedDate(log.getCreatedDate());
+      bisLog.setModifiedDate(new Date());
       bisFileLogsRepository.save(bisLog);
     } else {
+      bisLog.setCreatedDate(new Date());
       bisFileLogsRepository.save(bisLog);
     }
     logger.trace("Integrate with logging API to update with a status ends here : " 

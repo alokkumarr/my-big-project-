@@ -14,13 +14,16 @@ import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
+import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -93,6 +96,7 @@ public class SawBisRouteController {
       logger.trace("Channel retrieved :" + channel);
       requestBody.setBisChannelSysId(channelId);
       BeanUtils.copyProperties(requestBody, routeEntity);
+      routeEntity.setCreatedDate(new Date());
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
       BeanUtils.copyProperties(routeEntity, requestBody);
       String routeMetaData = requestBody.getRouteMetadata();
@@ -129,7 +133,7 @@ public class SawBisRouteController {
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
           if (cronExp != null) {
-            schedulerRequest.setCronExpression(cronExp.toString());
+            schedulerRequest.setCronExpression(cronExp.asText());
           }
           if (startDate != null) {
             schedulerRequest.setCronExpression(startDate.toString());
@@ -142,6 +146,8 @@ public class SawBisRouteController {
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
         logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
       }
+      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+          .format(routeEntity.getCreatedDate()));
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + channelId + " not found")));
   }
@@ -270,15 +276,20 @@ public class SawBisRouteController {
             schedulerRequest.setCronExpression(endDate.toString());
           }
         }
-        BeanUtils.copyProperties(requestBody, routeEntity);
+        BeanUtils.copyProperties(requestBody, routeEntity, "modifiedDate", "createdDate");
         routeEntity.setBisChannelSysId(channelId);
         routeEntity.setBisRouteSysId(routeId);
+        routeEntity.setModifiedDate(new Date());
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
-        logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
+        logger.trace("scheduler uri: " + bisSchedulerUrl + updateUrl);
       }
-      BeanUtils.copyProperties(routeEntity, requestBody, "bisChannelSysId", "bisRouteSysId");
+      BeanUtils.copyProperties(routeEntity, requestBody);
+      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+          .format(routeEntity.getCreatedDate()));
+      requestBody.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+          .format(routeEntity.getModifiedDate()));
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
   }

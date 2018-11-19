@@ -27,6 +27,7 @@ import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -132,7 +133,10 @@ public class SftpServiceImpl extends SipPluginContract {
           Files.createDirectories(Paths.get(destinationLocation));
           status = HttpStatus.OK;
         }
-      } catch (IOException e) {
+      } catch (AccessDeniedException e) {
+        status = HttpStatus.UNAUTHORIZED;
+        throw new SftpProcessorException("Path does not exist or access denied for the entity" + entityId, e);}
+        catch (IOException e) {
         status = HttpStatus.BAD_REQUEST;
         throw new SftpProcessorException("Exception occurred during " + entityId, e);
       } catch (InvalidPathException | NullPointerException ex) {

@@ -21,9 +21,11 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
+import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,8 +100,11 @@ public class SawBisChannelController {
     requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     BisChannelEntity channelEntity = new BisChannelEntity();
     BeanUtils.copyProperties(requestBody, channelEntity);
+    channelEntity.setCreatedDate(new Date());
     channelEntity = bisChannelDataRestRepository.save(channelEntity);
     BeanUtils.copyProperties(channelEntity, requestBody);
+    requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+        .format(channelEntity.getCreatedDate()));
     return ResponseEntity.ok(requestBody);
   }
 
@@ -223,13 +228,13 @@ public class SawBisChannelController {
           @ApiResponse(code = 415, message = "Unsupported Type. "
        + "Representation not supported for the resource")
       })
-  @RequestMapping(value = "/channels/{id}", method = RequestMethod.PUT,
+  @RequestMapping(value = "/channels/{channelId}", method = RequestMethod.PUT,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
   public ResponseEntity<@Valid BisChannelDto> updateChannel(@ApiParam
        (value = "Entity id needs to be updated",
-          required = true)@PathVariable Long id,
+          required = true)@PathVariable Long channelId,
       @ApiParam(value = "Channel related information to update",
           required = true) @Valid @RequestBody BisChannelDto requestBody)
       throws Exception {
@@ -249,13 +254,23 @@ public class SawBisChannelController {
     secretPhrase = obfuscator.encrypt(secretPhrase);
     rootNode.put("password", secretPhrase);
     requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-    return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
+    Optional<BisChannelEntity> optionalChannel = bisChannelDataRestRepository.findById(channelId);
+    if (optionalChannel.isPresent()) {
+      BisChannelEntity channel = optionalChannel.get();
       logger.trace("Channel updated :" + channel);
-      BeanUtils.copyProperties(requestBody, channel, "bisChannelSysId");
+      requestBody.setBisChannelSysId(channelId);
+      BeanUtils.copyProperties(requestBody, channel, "modifiedDate", "createdDate");
+      channel.setModifiedDate(new Date());
       channel = bisChannelDataRestRepository.save(channel);
+      channel = bisChannelDataRestRepository.findById(channelId).get();
       BeanUtils.copyProperties(channel, requestBody);
-      return requestBody;
-    }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
+      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+          .format(channel.getCreatedDate()));
+      requestBody.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+          .format(channel.getModifiedDate()));
+    }else {
+     throw new ResourceNotFoundException("channelId " + channelId + " not found");}
+      return ResponseEntity.ok(requestBody);
   }
 
   /**

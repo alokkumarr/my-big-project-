@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 
+
 @ApiModel("This model payload holds the details to create a channel in the system")
 public class BisChannelDto implements Serializable {
 
@@ -42,6 +43,31 @@ public class BisChannelDto implements Serializable {
   @JsonProperty("channelMetadata")
   private String channelMetadata;
 
+  @JsonProperty("modifiedDate")
+  private String modifiedDate;
+
+  @JsonProperty("createdDate")
+  private String createdDate;
+
+  @JsonProperty("modifiedDate")
+  public String getModifiedDate() {
+    return modifiedDate;
+  }
+
+  @JsonProperty("modifiedDate")
+  public void setModifiedDate(String modifiedDate) {
+    this.modifiedDate = modifiedDate;
+  }
+
+  @JsonProperty("createdDate")
+  public String getCreatedDate() {
+    return createdDate;
+  }
+
+  @JsonProperty("createdDate")
+  public void setCreatedDate(String createdDate) {
+    this.createdDate = createdDate;
+  }
 
   @JsonProperty("bisChannelSysId")
   public Long getBisChannelSysId() {

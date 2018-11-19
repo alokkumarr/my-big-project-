@@ -6,6 +6,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public abstract class BaseEntity {
 
   @LastModifiedDate
-  @Column(name = "MODIFIED_DATE", nullable = true, insertable = false)
+  @Column(name = "MODIFIED_DATE", nullable = true)
   private Date modifiedDate;
 
   @CreatedDate
@@ -54,6 +55,11 @@ public abstract class BaseEntity {
 
   @PreUpdate
   public void preUpdate() {
+    this.modifiedDate = new Date();
+  }
+
+  @PostUpdate
+  public void postUpdate() {
     this.modifiedDate = new Date();
   }
 

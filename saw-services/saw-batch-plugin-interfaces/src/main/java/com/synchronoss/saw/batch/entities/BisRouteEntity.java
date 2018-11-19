@@ -2,6 +2,7 @@ package com.synchronoss.saw.batch.entities;
 
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +18,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity(name = "routes")
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "BIS_ROUTE", catalog = "sip_batch_ingestion", schema = "")
-public class BisRouteEntity extends BaseEntity implements Serializable {
+public class BisRouteEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   @Id
@@ -45,6 +46,12 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
   @Column(name = "BIS_CHANNEL_SYS_ID", nullable = false)
   private Long bisChannelSysId;
   // private BisChannelEntity bisChannelSysId;
+
+  @Column(name = "MODIFIED_DATE")
+  private Date modifiedDate;
+
+  @Column(name = "CREATED_DATE")
+  private Date createdDate;
 
   public BisRouteEntity() {}
 
@@ -103,6 +110,23 @@ public class BisRouteEntity extends BaseEntity implements Serializable {
 
   public void setBisChannelSysId(Long bisChannelSysId) {
     this.bisChannelSysId = bisChannelSysId;
+  }
+
+  public Date getModifiedDate() {
+    return modifiedDate;
+  }
+
+
+  public Date getCreatedDate() {
+    return createdDate;
+  }
+
+  public void setModifiedDate(Date modifiedDate) {
+    this.modifiedDate = modifiedDate;
+  }
+
+  public void setCreatedDate(Date createdDate) {
+    this.createdDate = createdDate;
   }
 
   @Override
