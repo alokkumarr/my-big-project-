@@ -54,6 +54,14 @@ public class TestBuilderUtil {
     }
 
     @Test
+    public void getToday() {
+        LocalDateTime today = now;
+        dynamicConvertor = BuilderUtil.dynamicDecipher("Today");
+        assertEquals(dynamicConvertor.getLte(), today.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+        assertEquals(dynamicConvertor.getGte(), today.format(dateTimeFormatter) + SPACE + DATE_FORMAT_GTE);
+    }
+
+    @Test
     public void getYTD() {
         LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
         dynamicConvertor = BuilderUtil.dynamicDecipher("YTD");
@@ -148,6 +156,14 @@ public class TestBuilderUtil {
         dynamicConvertor = BuilderUtil.dynamicDecipherForPrior("Yesterday");
         assertEquals(dynamicConvertor.getLte(),dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
         assertEquals(dynamicConvertor.getGte(),dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+    }
+
+    @Test
+    public void getPriorToday() {
+        LocalDateTime yesterday = now.minusDays(1);
+        dynamicConvertor = BuilderUtil.dynamicDecipherForPrior("Today");
+        assertEquals(dynamicConvertor.getLte(),yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+        assertEquals(dynamicConvertor.getGte(),yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
     }
 
     @Test

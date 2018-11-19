@@ -184,7 +184,7 @@ public class BuilderUtil
         break;
       case "Today": {
         LocalDateTime today = now;
-        dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+        dynamicConvertor.setLte(today.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
         dynamicConvertor.setGte(today.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
         break;
       }
@@ -287,7 +287,6 @@ public class BuilderUtil
                 dynamicConvertor.setGte(dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             case "Today": {
-                LocalDateTime today = now;
                 LocalDateTime yestday = now.minusDays(1);
                 dynamicConvertor.setLte(yestday.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(yestday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
