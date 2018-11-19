@@ -114,8 +114,12 @@ public class ExportServiceImpl implements ExportService{
     String sizOfExport;
     String url;
       sizOfExport = ((sizOfExport = request.getParameter("pageSize"))!=null) ? sizOfExport : uiExportSize;
-    if (executionType!=null && !executionType.isEmpty() && executionType.equalsIgnoreCase("onetime"))
-       url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType+"&executionType=onetime";
+    if (executionType!=null && !executionType.isEmpty() && executionType.equalsIgnoreCase("onetime") && executionId == null)
+       url = apiExportOtherProperties+"/" + analysisId + "/executions/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType+"&executionType=onetime";
+    else if (executionType!=null && !executionType.isEmpty() && executionType.equalsIgnoreCase("onetime"))
+        url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType+"&executionType=onetime";
+    else if (executionId == null)
+        url = apiExportOtherProperties+"/" + analysisId +"/executions/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType;
     else
         url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType;
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
