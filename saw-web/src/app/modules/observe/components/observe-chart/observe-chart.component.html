@@ -20,6 +20,6 @@
     </dx-data-grid>
   </div>
   <div *ngIf="!toggleToGrid">
-    <chart [updater]="chartUpdater" [options]="chartOptions" [isStockChart]="isStockChart" [enableExport]="enableChartDownload"></chart>
+    <chart [updater]="chartUpdater" [options]="chartOptions" [chartType]="analysis.chartType" [enableExport]="enableChartDownload"></chart>
   </div>
 </div>

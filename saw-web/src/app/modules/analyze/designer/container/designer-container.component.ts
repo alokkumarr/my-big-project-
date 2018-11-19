@@ -177,7 +177,6 @@ export class DesignerContainerComponent implements OnInit {
       this._chartService.updateAnalysisModel(this.analysis);
       if (this.designerMode === 'new') {
         (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
-        (<any>this.analysis).isStockChart = (<any>this.analysis).chartType.substring(0, 2) === 'ts';
       }
       this.chartTitle = this.analysis.chartTitle || this.analysis.name;
 

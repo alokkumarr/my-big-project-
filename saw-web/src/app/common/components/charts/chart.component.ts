@@ -47,7 +47,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   updater: any;
   @Input()
-  isStockChart: boolean;
+  chartType: string;
   @Input()
   enableExport: boolean;
   @ViewChild('container')
@@ -88,12 +88,17 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  isStockChart(chartType) {
+    const isStockChart = chartType.substring(0, 2) === 'ts';
+    return isStockChart;
+  }
+
   updateOptions(options) {
     if (!options) {
       return;
     }
     // set the appropriate config based on chart type
-    this.cType = this.isStockChart ? 'highStock' : options.chart.type;
+    this.cType = this.isStockChart(this.chartType) ? 'highStock' : options.chart.type;
     this.config = defaultsDeep(
       options,
       this.config,
@@ -178,7 +183,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Not using chart.update due to a bug with navigation
     // update and bar styles.
-    if (this.isStockChart) {
+    if (this.isStockChart(this.chartType)) {
       set(
         this.config,
         'xAxis.0.title.text',

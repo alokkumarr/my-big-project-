@@ -34,7 +34,6 @@ export class ExecutedChartViewComponent {
   }
 
   analysis: AnalysisChart;
-  isStockChart: boolean;
   chartOptions: Object;
   toggleToGrid: false;
   chartToggleData: any;
@@ -60,7 +59,6 @@ export class ExecutedChartViewComponent {
       analysis.chartType,
       { chart, legend }
     );
-    this.isStockChart = analysis.isStockChart;
   }
 
   isFloat(n) {

@@ -23,7 +23,7 @@
 
 
 <div *ngIf="!toggleToGrid">
-  <chart [updater]="updater" [options]="chartOptions" [isStockChart]="isStockChart" [enableExport]="true"
+  <chart [updater]="updater" [options]="chartOptions" [chartType]="analysis.chartType" [enableExport]="true"
     [attr.e2e]="'chart-type:' + analysis.chartType">
   </chart>
 </div>

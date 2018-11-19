@@ -57,7 +57,6 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
   public gridData: Array<any>;
   public sorts: Array<any>;
   public filters: Array<any>;
-  public isStockChart: boolean;
   public chartToggleData: any;
   public toggleToGrid: boolean;
 
@@ -74,9 +73,6 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
       this.analysis.chartType,
       { legend: this.legend }
     );
-    this.isStockChart = isUndefined(this.analysis.isStockChart)
-      ? false
-      : this.analysis.isStockChart;
     this.subscribeToRequester();
     this.toggleToGrid = false;
   }
