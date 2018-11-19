@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -142,12 +143,20 @@ public class SawBisRouteController {
           if (cronExp != null) {
             schedulerRequest.setCronExpression(cronExp.asText());
           }
+          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           if (startDate != null) {
-            schedulerRequest.setCronExpression(startDate.toString());
+
+            System.out.println(startDate.asText());
+            try {
+              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              if (endDate != null) {
+                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              }
+            } catch (ParseException e) {
+              logger.error(e.getMessage());
+            }
           }
-          if (endDate != null) {
-            schedulerRequest.setCronExpression(endDate.toString());
-          }
+          
         }
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
