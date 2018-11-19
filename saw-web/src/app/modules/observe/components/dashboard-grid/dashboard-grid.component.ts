@@ -356,6 +356,8 @@ export class DashboardGridComponent
         tileLoaded();
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         this.refreshTile(tile);
+      }, err => {
+        tileLoaded();
       });
     });
 
