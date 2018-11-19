@@ -13,6 +13,7 @@ import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestReposit
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
+import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
@@ -21,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -99,7 +101,6 @@ public class SawBisRouteController {
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(channelId).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
-      BeanUtils.copyProperties(routeEntity, requestBody);
       String routeMetaData = requestBody.getRouteMetadata();
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -110,7 +111,7 @@ public class SawBisRouteController {
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
         destinationLocation = routeData.get("destinationLocation").asText() != null
             && !routeData.get("destinationLocation").asText().equals("")
-                ? routeData.get("destinationLocation").asText()
+                ? dropLocation + File.separator + routeData.get("destinationLocation").asText()
                 : dropLocation;
         routeData.put("destinationLocation", destinationLocation);
         routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
@@ -145,8 +146,6 @@ public class SawBisRouteController {
           }
           SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           if (startDate != null) {
-
-            System.out.println(startDate.asText());
             try {
               schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
               if (endDate != null) {
@@ -154,9 +153,10 @@ public class SawBisRouteController {
               }
             } catch (ParseException e) {
               logger.error(e.getMessage());
+              throw new SipNestedRuntimeException("Parse exception while scheduling" + e);
             }
           }
-          
+
         }
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
@@ -164,6 +164,7 @@ public class SawBisRouteController {
       }
       requestBody.setBisChannelSysId(channelId);
       BeanUtils.copyProperties(requestBody, routeEntity);
+      routeEntity.setCreatedDate(new Date());
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
       requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
           .format(routeEntity.getCreatedDate()));
