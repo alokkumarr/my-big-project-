@@ -37,7 +37,7 @@ public class SQLExecutor implements Serializable {
         return descriptor.SQL;
     }
 
-    public Long run(SQLScriptDescriptor scriptDescriptor) throws Exception {
+    public int run(SQLScriptDescriptor scriptDescriptor) throws Exception {
         jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 
@@ -70,13 +70,13 @@ public class SQLExecutor implements Serializable {
                     else
                     {
                         logger.error("Could not get data location from table descriptor, cancel processing");
-                        return -1L;
+                        return -1;
                     }
 
                     if (location == null || location.isEmpty())
                     {
                         logger.error("Data location is Empty, cancel processing");
-                        return -1L;
+                        return -1;
                     }
 
                     if (jobDataFrames.get(tn) != null){
@@ -150,16 +150,16 @@ public class SQLExecutor implements Serializable {
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);
                 logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt-st)/1000, (lt-st)/1000, (exet -lt)/1000, (wt-exet)/1000));
-                return 0L;
+                return 0;
             case DROP_TABLE:
 //                logger.error("NOT SUPPORTED ANY MORE, quitting " + descriptor.SQL);
                 HFileOperations.deleteEnt(descriptor.tableDescriptor.getLocation());
                 logger.error("Removed data set: " + descriptor.SQL);
 
-                return 0L;
+                return 0;
             default:
         }
-        return 0L;
+        return 0;
     }
 
 
