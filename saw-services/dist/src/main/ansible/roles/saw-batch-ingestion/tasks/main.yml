@@ -9,7 +9,7 @@
   set_fact:
     saw_batch_ingestion_db_password: >-
       {{ lookup('password', inventory_dir
-        + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
+        + '/saw-batch-ingestion-db-password chars=ascii_letters,digits') }}
 - name: Install SAW Batch Ingestion Service configuration file
   template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
   notify:

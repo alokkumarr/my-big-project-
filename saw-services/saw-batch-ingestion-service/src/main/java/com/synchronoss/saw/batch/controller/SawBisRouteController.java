@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -66,6 +67,9 @@ public class SawBisRouteController {
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
 
+  @Value("${bis.default-data-drop-location}")
+  private String dropLocation;
+
   /**
    * This API provides an ability to add a source.
    */
@@ -94,18 +98,21 @@ public class SawBisRouteController {
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(channelId).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
-      requestBody.setBisChannelSysId(channelId);
-      BeanUtils.copyProperties(requestBody, routeEntity);
-      routeEntity.setCreatedDate(new Date());
-      routeEntity = bisRouteDataRestRepository.save(routeEntity);
       BeanUtils.copyProperties(routeEntity, requestBody);
       String routeMetaData = requestBody.getRouteMetadata();
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      JsonNode routeData = null;
+      ObjectNode routeData = null;
+      String destinationLocation = null;
       try {
-        routeData = objectMapper.readTree(routeMetaData);
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        destinationLocation = routeData.get("destinationLocation").asText() != null
+            && !routeData.get("destinationLocation").asText().equals("")
+                ? routeData.get("destinationLocation").asText()
+                : dropLocation;
+        routeData.put("destinationLocation", destinationLocation);
+        routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while reading routeMetaData ", e);
         throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
@@ -146,6 +153,9 @@ public class SawBisRouteController {
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
         logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
       }
+      requestBody.setBisChannelSysId(channelId);
+      BeanUtils.copyProperties(requestBody, routeEntity);
+      routeEntity = bisRouteDataRestRepository.save(routeEntity);
       requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
           .format(routeEntity.getCreatedDate()));
       return requestBody;
@@ -186,6 +196,10 @@ public class SawBisRouteController {
     routeEntities.forEach(route -> {
       BisRouteDto routeDto = new BisRouteDto();
       BeanUtils.copyProperties(route, routeDto);
+      routeDto.setCreatedDate(
+          new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT).format(route.getCreatedDate()));
+      routeDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+          .format(route.getModifiedDate()));
       routeDtos.add(routeDto);
     });
     return ResponseEntity.ok(routeDtos);
@@ -250,8 +264,7 @@ public class SawBisRouteController {
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
         schedulerRequest.setRouteId(String.valueOf(routeId.toString()));
-        schedulerRequest.setJobName(BisChannelType.SFTP.name() + channelId
-            + routeId);
+        schedulerRequest.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
         schedulerRequest.setJobGroup(String.valueOf(routeId));
         JsonNode schedulerData = null;
         try {
