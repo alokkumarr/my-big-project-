@@ -4,6 +4,7 @@ import { AdminService } from '../main-view/admin.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { map, tap } from 'rxjs/operators';
 import { IAdminDataService } from '../admin-data-service.interface';
+import { getPrivilegeDescription } from './privilege-code-transformer';
 
 interface PrivilegeResponse {
   privileges: any[];
@@ -45,7 +46,20 @@ export class PrivilegeService implements IAdminDataService {
   getList(customerId) {
     return this._adminService
       .request<PrivilegeResponse>('privileges/fetch', customerId)
-      .pipe(map(resp => resp.privileges))
+      .pipe(
+        map(resp => resp.privileges),
+
+        /* Stored privilege description can get outdated, and may be wrong due
+         * to previous bugs for some privileges.
+         * Calculate and show descriptions on the fly instead of showing stored ones.
+         */
+        map(privileges =>
+          (privileges || []).map(privilege => ({
+            ...privilege,
+            privilegeDesc: getPrivilegeDescription(privilege.privilegeCode)
+          }))
+        )
+      )
       .toPromise();
   }
 
