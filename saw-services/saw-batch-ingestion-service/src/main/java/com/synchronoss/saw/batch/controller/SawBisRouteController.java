@@ -99,7 +99,7 @@ public class SawBisRouteController {
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(channelId).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
-      BeanUtils.copyProperties(routeEntity, requestBody);
+      BeanUtils.copyProperties(requestBody, routeEntity);
       String routeMetaData = requestBody.getRouteMetadata();
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
