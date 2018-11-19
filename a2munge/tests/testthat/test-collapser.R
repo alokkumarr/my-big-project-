@@ -13,14 +13,10 @@ context("Collapser unit tests")
 n = 20
 
 
-# Create Spark Connection 
-spk_versions <- sparklyr::spark_installed_versions() 
+# Create Spark Connection
+spk_versions <- sparklyr::spark_installed_versions()
 
-if(! "2.3.0" %in% spk_versions$spark) {
-  sparklyr::spark_install(version = "2.3.0")
-}
-
-sc <- spark_connect(master = "local", version = "2.3.0")
+sc <- spark_connect(master = "local")
 
 
 # Basic Tests -------------------------------------------------------------
