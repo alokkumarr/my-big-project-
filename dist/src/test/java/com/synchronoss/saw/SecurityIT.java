@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +89,7 @@ public class SecurityIT extends BaseIT {
       .then().assertThat().statusCode(200);
   }
 
+  @Ignore("SIP-5245: DSK causes interference with other tests (SIP-5178) so disable until fixed")
   @Test
   public void testAssignGroupUser() {
     ObjectNode secGroup = mapper.createObjectNode();
