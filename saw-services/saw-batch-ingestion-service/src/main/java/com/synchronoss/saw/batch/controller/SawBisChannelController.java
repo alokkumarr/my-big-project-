@@ -150,10 +150,14 @@ public class SawBisChannelController {
         bisChannelDto = new BisChannelDto();
         BeanUtils.copyProperties(entity, bisChannelDto);
         bisChannelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-        bisChannelDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-            .format(entity.getCreatedDate()));
-        bisChannelDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-            .format(entity.getModifiedDate()));
+        if (entity.getCreatedDate() != null) {
+          bisChannelDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+              .format(entity.getCreatedDate()));
+        }
+        if (entity.getModifiedDate() != null) {
+          bisChannelDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+              .format(entity.getModifiedDate()));
+        }
         channelDtos.add(bisChannelDto);
       } catch (Exception e) {
         logger.error("Exception while reading the list :", e);
@@ -199,10 +203,14 @@ public class SawBisChannelController {
         rootNode.put("password", secretPhrase);
         BeanUtils.copyProperties(channel, channelDto);
         channelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-        channelDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-            .format(channel.getCreatedDate()));
-        channelDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-            .format(channel.getModifiedDate()));
+        if (channel.getCreatedDate() != null) {
+          channelDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+              .format(channel.getCreatedDate()));
+        }
+        if (channel.getModifiedDate() != null) {
+          channelDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+              .format(channel.getModifiedDate()));
+        }
       } catch (Exception e) {
         throw new ResourceNotFoundException("channelId " + id + " not found");
       }

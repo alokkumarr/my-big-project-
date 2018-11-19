@@ -196,10 +196,14 @@ public class SawBisRouteController {
     routeEntities.forEach(route -> {
       BisRouteDto routeDto = new BisRouteDto();
       BeanUtils.copyProperties(route, routeDto);
-      routeDto.setCreatedDate(
-          new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT).format(route.getCreatedDate()));
-      routeDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(route.getModifiedDate()));
+      if (route.getCreatedDate() != null) {
+        routeDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+            .format(route.getCreatedDate()));
+      }
+      if (route.getModifiedDate() != null) {
+        routeDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+            .format(route.getModifiedDate()));
+      }
       routeDtos.add(routeDto);
     });
     return ResponseEntity.ok(routeDtos);
