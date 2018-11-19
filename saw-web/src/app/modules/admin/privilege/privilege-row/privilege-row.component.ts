@@ -63,3 +63,4 @@ export class PrivilegeRowComponent implements OnChanges {
     this.categoryChange.emit(privilege);
   }
 }
+
