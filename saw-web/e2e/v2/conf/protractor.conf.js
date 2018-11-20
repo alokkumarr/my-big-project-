@@ -243,11 +243,13 @@ exports.config = {
         let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
         new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
       }catch (e) {
-        logger.error('There is some error during cleanup and setting up test data for e2e tests....'+e);
+        logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
+          'hence exiting test suite and failing it....'+e);
         process.exit(1);
       }
     } else {
-      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl);
+      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl
+        + ', hence exiting test suite and failing it...');
       process.exit(1);
     }
   },

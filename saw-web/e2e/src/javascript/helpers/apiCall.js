@@ -7,9 +7,9 @@ const logger = require('../../../v2/conf/logger')(__filename);
 module.exports = {
   post: (url, payload, token) => {
 
-    logger.info('Api call url :'+url);
-    logger.warn('Api call payload :'+JSON.stringify(payload));
-    logger.debug('Api call token :'+token);
+    logger.info('making post call to url :'+url);
+    logger.debug('post call payload :'+JSON.stringify(payload));
+    logger.debug('post call token :'+token);
     let headers = {};
     if (token) {
       headers['Authorization'] = token;
@@ -28,8 +28,8 @@ module.exports = {
   },
   get: (url, token) => {
 
-    logger.info('Api call url :'+url);
-    logger.debug('Api call token :'+token);
+    logger.info('making get call to url :'+url);
+    logger.debug('get call token :'+token);
     let response = request('GET', url, {
       headers: { Authorization: token }
     });
@@ -43,8 +43,8 @@ module.exports = {
   },
   delete: (url, token) => {
 
-    logger.info('Api call url :'+url);
-    logger.debug('Api call token :'+token);
+    logger.info('making delete call to url :'+url);
+    logger.debug('delete call token :'+token);
     let response = request('DELETE', url, {
       headers: { Authorization: token }
     });

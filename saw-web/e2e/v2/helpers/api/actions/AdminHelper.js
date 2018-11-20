@@ -14,7 +14,7 @@ class AdminHelper {
       roleName: role.roleName,
       roleDesc: role.roleDesc
     };
-    return new RestClient().post(url + Constants.API_ROUTES.ROLES+"w", payload, token).roles;
+    return new RestClient().post(url + Constants.API_ROUTES.ROLES, payload, token).roles;
   }
 
   generateUser(url, user, roleId, token, activeStatusInd, customerId, email, password) {

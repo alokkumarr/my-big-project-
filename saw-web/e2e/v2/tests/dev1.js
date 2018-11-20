@@ -1,10 +1,7 @@
 var testDataReader = require('../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../conf/protractor.conf');
-var appRoot = require('app-root-path');
-
-
-
+const logger = require('../conf/logger')(__filename);
 
   describe('DEV1 test from dev1.js', () => {
     browser.logger.info('Hello this is from logger')
@@ -15,7 +12,7 @@ var appRoot = require('app-root-path');
       console.log(JSON.stringify(id));
       console.log(JSON.stringify(data));
       expect(true).toBe(false);
-      browser.logger.info(id+'Hello this is from logger');
+      logger.warn(id+'Hello this is from logger');
     }).result.testInfo = {testId: id, data: data, feature:'DEV1', dataProvider:'dp'};
   });
 });
@@ -33,7 +30,7 @@ using(testDataReader.testData['DEV2']['dp'], function(data, id) {
       } else {
         expect(true).toBe(false);
       }
-      browser.logger.info(id+'Hello this is from logger');
+      logger.warn(id+'Hello this is from logger');
     }).result.testInfo = {testId: id, data: data, feature:'DEV2', dataProvider:'dp'};
   });
 });

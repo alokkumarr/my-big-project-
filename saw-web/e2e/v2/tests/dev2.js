@@ -1,9 +1,6 @@
 var testDataReader = require('../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../conf/protractor.conf');
-var appRoot = require('app-root-path');
-var fs = require('fs');
-
+const logger = require('../conf/logger')(__filename);
 
   describe('DEV2 test from dev2.js', () => {
 
