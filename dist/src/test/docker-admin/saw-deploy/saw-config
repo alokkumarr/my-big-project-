@@ -7,11 +7,11 @@ sip-proxy
 
 [saw-web]
 sip-app1
-sip-app2
+#sip-app2
 
 [saw-services]
 sip-app1
-sip-app2
+#sip-app2
 
 [saw-services:vars]
 #
@@ -109,7 +109,7 @@ saw_email_host=sip-admin
 
 [saw-security]
 sip-app1
-sip-app2
+#sip-app2
 
 [saw-security:vars]
 saw_security_email_host=sip-admin
