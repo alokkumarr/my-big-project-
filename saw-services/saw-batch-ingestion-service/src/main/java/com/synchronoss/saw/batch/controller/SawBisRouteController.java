@@ -16,7 +16,6 @@ import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
-import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -107,11 +106,16 @@ public class SawBisRouteController {
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       ObjectNode routeData = null;
       String destinationLocation = null;
+      String sentDestinationLocation = null;
       try {
         requestBody.setBisChannelSysId(channelId);
         BeanUtils.copyProperties(requestBody, routeEntity);
         routeEntity.setCreatedDate(new Date());
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        sentDestinationLocation = routeData.get("destinationLocation").asText() != null
+            && !routeData.get("destinationLocation").asText().equals("")
+                ? routeData.get("destinationLocation").asText()
+                : dropLocation;
         destinationLocation = routeData.get("destinationLocation").asText() != null
             && !routeData.get("destinationLocation").asText().equals("")
                 ? dropLocation + File.separator + routeData.get("destinationLocation").asText()
@@ -119,15 +123,13 @@ public class SawBisRouteController {
         routeData.put("destinationLocation", destinationLocation);
         routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
-        logger.error("Exception occurred while reading routeMetaData ", e);
-        throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
+        logger.error("Exception occurred while creating routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while creating routeMetaData ", e);
       }
       // below block to store the route details
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
       requestBody.setBisRouteSysId(routeEntity.getBisRouteSysId());
-      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(routeEntity.getCreatedDate()));
-
+      requestBody.setCreatedDate(routeEntity.getCreatedDate().getTime());
       if (routeData.get("schedulerExpression") != null
           && !routeData.get("schedulerExpression").toString().equals("")) {
         String schedulerDetails = routeData.get("schedulerExpression").toString();
@@ -168,8 +170,18 @@ public class SawBisRouteController {
 
         }
         RestTemplate restTemplate = new RestTemplate();
+        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
-        logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
+        logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl + insertUrl);
+      }
+      try {
+        routeData = (ObjectNode) objectMapper.readTree(routeEntity.getRouteMetadata());
+        routeData.put("destinationLocation", sentDestinationLocation);
+        routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
+      } catch (IOException e) {
+        logger.error("Exception occurred while writing back routeMetaData to request entity ", e);
+        throw new SftpProcessorException(
+            "Exception occurred while writing back routeMetaData to request entity ", e);
       }
       BeanUtils.copyProperties(routeEntity, requestBody);
       return requestBody;
@@ -210,13 +222,32 @@ public class SawBisRouteController {
     routeEntities.forEach(route -> {
       BisRouteDto routeDto = new BisRouteDto();
       BeanUtils.copyProperties(route, routeDto);
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      ObjectNode routeData = null;
+      String sentDestinationLocation = null;
+      String destinationLocation = null;
+      try {
+        routeData = (ObjectNode) objectMapper.readTree(routeDto.getRouteMetadata());
+        destinationLocation = routeData.get("destinationLocation").asText();
+        int locationLength = dropLocation.length();
+        sentDestinationLocation = destinationLocation.startsWith(dropLocation)
+            ? destinationLocation.substring(locationLength)
+            : destinationLocation;
+        sentDestinationLocation =
+            sentDestinationLocation.equals("") ? dropLocation : sentDestinationLocation;
+        routeData.put("destinationLocation", sentDestinationLocation);
+        routeDto.setRouteMetadata(objectMapper.writeValueAsString(routeData));
+      } catch (IOException e) {
+        logger.error("Exception occurred while reading routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
+      }
       if (route.getCreatedDate() != null) {
-        routeDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-            .format(route.getCreatedDate()));
+        routeDto.setCreatedDate(route.getCreatedDate().getTime());
       }
       if (route.getModifiedDate() != null) {
-        routeDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-            .format(route.getModifiedDate()));
+        routeDto.setModifiedDate(route.getModifiedDate().getTime());
       }
       routeDtos.add(routeDto);
     });
@@ -265,11 +296,15 @@ public class SawBisRouteController {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      JsonNode routeData = null;
-      JsonNode routeDataFromStore = null;
+      ObjectNode routeData = null;
+      ObjectNode routeDataFromStore = null;
+      String destinationLocation = null;
       try {
-        routeData = objectMapper.readTree(routeMetaData);
-        routeDataFromStore = objectMapper.readTree(routeMetaDataFromStore);
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        routeDataFromStore = (ObjectNode) objectMapper.readTree(routeMetaDataFromStore);
+        destinationLocation = routeData.get("destinationLocation").asText();
+        routeData.put("destinationLocation", dropLocation + destinationLocation);
+        requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while updating routeMetaData ", e);
         throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
@@ -319,14 +354,25 @@ public class SawBisRouteController {
         routeEntity.setModifiedDate(new Date());
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
+        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + updateUrl);
         restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
-        logger.trace("scheduler uri: " + bisSchedulerUrl + updateUrl);
+        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl + updateUrl);
       }
-      BeanUtils.copyProperties(routeEntity, requestBody);
-      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(routeEntity.getCreatedDate()));
-      requestBody.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(routeEntity.getModifiedDate()));
+      BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
+      try {
+        routeData = (ObjectNode) objectMapper.readTree(requestBody.getRouteMetadata());
+        routeData.put("destinationLocation", destinationLocation);
+        requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
+      } catch (IOException e) {
+        logger.error("Exception occurred while updating routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
+      }
+      if (routeEntity.getCreatedDate() != null) {
+        requestBody.setCreatedDate(routeEntity.getCreatedDate().getTime());
+      }
+      if (routeEntity.getModifiedDate() != null) {
+        requestBody.setModifiedDate(routeEntity.getModifiedDate().getTime());
+      }
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
   }

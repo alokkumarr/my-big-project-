@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -98,8 +97,7 @@ public class SawBisChannelController {
     channelEntity.setCreatedDate(new Date());
     channelEntity = bisChannelDataRestRepository.save(channelEntity);
     BeanUtils.copyProperties(channelEntity, requestBody);
-    requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-        .format(channelEntity.getCreatedDate()));
+    requestBody.setCreatedDate(channelEntity.getCreatedDate().getTime());
     return ResponseEntity.ok(requestBody);
   }
 
@@ -151,12 +149,10 @@ public class SawBisChannelController {
         BeanUtils.copyProperties(entity, bisChannelDto);
         bisChannelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
         if (entity.getCreatedDate() != null) {
-          bisChannelDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-              .format(entity.getCreatedDate()));
+          bisChannelDto.setCreatedDate(entity.getCreatedDate().getTime());
         }
         if (entity.getModifiedDate() != null) {
-          bisChannelDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-              .format(entity.getModifiedDate()));
+          bisChannelDto.setModifiedDate(entity.getModifiedDate().getTime());
         }
         channelDtos.add(bisChannelDto);
       } catch (Exception e) {
@@ -204,12 +200,10 @@ public class SawBisChannelController {
         BeanUtils.copyProperties(channel, channelDto);
         channelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
         if (channel.getCreatedDate() != null) {
-          channelDto.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-              .format(channel.getCreatedDate()));
+          channelDto.setCreatedDate(channel.getCreatedDate().getTime());
         }
         if (channel.getModifiedDate() != null) {
-          channelDto.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-              .format(channel.getModifiedDate()));
+          channelDto.setModifiedDate(channel.getModifiedDate().getTime());
         }
       } catch (Exception e) {
         throw new ResourceNotFoundException("channelId " + id + " not found");
@@ -267,10 +261,8 @@ public class SawBisChannelController {
       channel = bisChannelDataRestRepository.save(channel);
       channel = bisChannelDataRestRepository.findById(channelId).get();
       BeanUtils.copyProperties(channel, requestBody);
-      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(channel.getCreatedDate()));
-      requestBody.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(channel.getModifiedDate()));
+      requestBody.setCreatedDate(channel.getCreatedDate().getTime());
+      requestBody.setModifiedDate(channel.getModifiedDate().getTime());
     } else {
       throw new ResourceNotFoundException("channelId " + channelId + " not found");
     }

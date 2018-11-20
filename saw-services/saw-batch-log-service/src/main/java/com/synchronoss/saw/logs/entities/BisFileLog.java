@@ -42,7 +42,7 @@ public class BisFileLog implements Serializable {
   String recdFileName;
 
   @Column(name = "BIS_RECD_FILE_SIZE_BYTES")
-  Double recdFileSize;
+  Long recdFileSize;
 
   @Column(name = "BIS_FILE_VALID_STATUS")
   String mflFileStatus;
@@ -121,11 +121,11 @@ public class BisFileLog implements Serializable {
     this.recdFileName = recdFileName;
   }
 
-  public Double getRecdFileSize() {
+  public Long getRecdFileSize() {
     return recdFileSize;
   }
 
-  public void setRecdFileSize(Double recdFileSize) {
+  public void setRecdFileSize(Long recdFileSize) {
     this.recdFileSize = recdFileSize;
   }
 

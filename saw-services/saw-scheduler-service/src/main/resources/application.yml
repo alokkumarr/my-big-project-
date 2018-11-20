@@ -5,9 +5,9 @@ spring:
     name: saw-sechduler-service
   #mariaDB (metadata) DB details
   datasource:
-    url: jdbc:mariadb://10.49.0.169:3306/saw_scheduler
-    username: saw_scheduler
-    password: saw_scheduler
+    url: jdbc:mariadb://localhost:3306/saw_scheduler
+    username: root
+    password: root
     driver-class-name: org.mariadb.jdbc.Driver
     max-active: 25
     testOnBorrow: true
@@ -19,7 +19,7 @@ spring:
 flyway.baselineOnMigrate: true
 server:
   address: localhost
-  port: 9600
+  port: 9601
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
