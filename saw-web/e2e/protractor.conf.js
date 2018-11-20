@@ -5,7 +5,7 @@ var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var argv = require('yargs').argv;
 const webpackHelper = require('./webpack.helper');
-const generate = require('./src/javascript/data/generateTestData');
+const logger = require('../e2e/v2/conf/logger')(__filename);
 
 /**
  * Note about intervals:
