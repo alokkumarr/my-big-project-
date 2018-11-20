@@ -37,10 +37,9 @@ public class SipLogging {
     bisLog.setActualFileRecDate(entity.getActualReceiveDate());
     bisLog.setBisProcessState(entity.getComponentState());
     if (bisFileLogsRepository.existsById(pid)) {
-      BisFileLog log = bisFileLogsRepository.getOne(pid);
-      bisFileLogsRepository.deleteById(pid);
-      bisLog.setCreatedDate(log.getCreatedDate());
+      bisLog.setCreatedDate(new Date());
       bisLog.setModifiedDate(new Date());
+      bisFileLogsRepository.deleteById(pid);
       bisFileLogsRepository.save(bisLog);
     } else {
       bisLog.setCreatedDate(new Date());

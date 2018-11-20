@@ -66,9 +66,10 @@ public class BisJobController extends BaseJobController {
         logger.debug("Cron Trigger ");
         boolean status = bisService.scheduleCronJob(jobDetail, BisCronJob.class);
         if (status) {
-          return getServerResponse(ServerResponseCode.SUCCESS,
-              bisService.getAllJobs(jobDetail.getJobGroup(), jobDetail.getChannelId()));
+          logger.debug("Job scheduled  successfully");
+          return getServerResponse(ServerResponseCode.SUCCESS, true);
         } else {
+          logger.debug("Failed to schedule job");
           return getServerResponse(ServerResponseCode.ERROR, false);
         }
       }

@@ -44,28 +44,28 @@ public class BisChannelDto implements Serializable {
   private String channelMetadata;
 
   @JsonProperty("modifiedDate")
-  private String modifiedDate;
+  private Long modifiedDate;
 
   @JsonProperty("createdDate")
-  private String createdDate;
+  private Long createdDate;
 
   @JsonProperty("modifiedDate")
-  public String getModifiedDate() {
+  public Long getModifiedDate() {
     return modifiedDate;
   }
 
   @JsonProperty("modifiedDate")
-  public void setModifiedDate(String modifiedDate) {
+  public void setModifiedDate(Long modifiedDate) {
     this.modifiedDate = modifiedDate;
   }
 
   @JsonProperty("createdDate")
-  public String getCreatedDate() {
+  public Long getCreatedDate() {
     return createdDate;
   }
 
   @JsonProperty("createdDate")
-  public void setCreatedDate(String createdDate) {
+  public void setCreatedDate(Long createdDate) {
     this.createdDate = createdDate;
   }
 

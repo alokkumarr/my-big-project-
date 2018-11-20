@@ -6,21 +6,23 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
+import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
-import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,6 +68,9 @@ public class SawBisRouteController {
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
 
+  @Value("${bis.default-data-drop-location}")
+  private String dropLocation;
+
   /**
    * This API provides an ability to add a source.
    */
@@ -94,30 +99,48 @@ public class SawBisRouteController {
     return ResponseEntity.ok(bisChannelDataRestRepository.findById(channelId).map(channel -> {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
-      requestBody.setBisChannelSysId(channelId);
-      BeanUtils.copyProperties(requestBody, routeEntity);
-      routeEntity.setCreatedDate(new Date());
-      routeEntity = bisRouteDataRestRepository.save(routeEntity);
-      BeanUtils.copyProperties(routeEntity, requestBody);
       String routeMetaData = requestBody.getRouteMetadata();
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      JsonNode routeData = null;
+      ObjectNode routeData = null;
+      //String destinationLocation = null;
+      //String sentDestinationLocation = null;
       try {
-        routeData = objectMapper.readTree(routeMetaData);
+        requestBody.setBisChannelSysId(channelId);
+        BeanUtils.copyProperties(requestBody, routeEntity);
+        routeEntity.setCreatedDate(new Date());
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        /*sentDestinationLocation = routeData.get("destinationLocation").asText() != null
+            && !routeData.get("destinationLocation").asText().equals("")
+                ? routeData.get("destinationLocation").asText()
+                : dropLocation;
+        destinationLocation = routeData.get("destinationLocation").asText() != null
+            && !routeData.get("destinationLocation").asText().equals("")
+                ? dropLocation + File.separator + routeData.get("destinationLocation").asText()
+                : dropLocation;
+        routeData.put("destinationLocation", destinationLocation);*/
+        routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
-        logger.error("Exception occurred while reading routeMetaData ", e);
-        throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
+        logger.error("Exception occurred while creating routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while creating routeMetaData ", e);
       }
-      if (routeData.get("schedulerExpression") != null
-          && !routeData.get("schedulerExpression").toString().equals("")) {
+      // below block to store the route details
+      routeEntity = bisRouteDataRestRepository.save(routeEntity);
+      requestBody.setBisRouteSysId(routeEntity.getBisRouteSysId());
+      requestBody.setCreatedDate(routeEntity.getCreatedDate().getTime());
+      
+      JsonNode schedulerExpn = routeData.get("schedulerExpression");
+      
+      
+      if (schedulerExpn != null && !schedulerExpn.toString().equals("") 
+          && !schedulerExpn.toString().equals("{}")) {
         String schedulerDetails = routeData.get("schedulerExpression").toString();
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
-        schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
-        schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
-            + requestBody.getBisRouteSysId().toString());
+        schedulerRequest.setRouteId(String.valueOf(routeEntity.getBisRouteSysId()));
+        schedulerRequest.setJobName(BisChannelType.SFTP.name() + routeEntity.getBisChannelSysId()
+            + routeEntity.getBisRouteSysId().toString());
         schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
         JsonNode schedulerData = null;
         try {
@@ -132,22 +155,52 @@ public class SawBisRouteController {
           JsonNode cronExp = schedulerData.get("cronexp");
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
-          if (cronExp != null) {
-            schedulerRequest.setCronExpression(cronExp.asText());
-          }
-          if (startDate != null) {
-            schedulerRequest.setCronExpression(startDate.toString());
-          }
-          if (endDate != null) {
-            schedulerRequest.setCronExpression(endDate.toString());
-          }
+          
+          
+          
+          
+          //If activeTab is immediate the its immediate job.
+          //irrespecitve of request set expression to empty 
+          //so that scheduler treats as immediate
+          JsonNode activeTab = schedulerData.get("activeTab");
+          if (activeTab != null && activeTab.asText().equals("immediate")) {
+            schedulerRequest.setCronExpression("");
+          } else {
+              
+            if (cronExp != null) {
+              schedulerRequest.setCronExpression(cronExp.asText());
+            }
+              
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+              if (startDate != null) {
+                schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              }
+             
+              if (endDate != null) {
+                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              }
+            } catch (ParseException e) {
+              logger.error(e.getMessage());
+            }
+          } 
+          
         }
         RestTemplate restTemplate = new RestTemplate();
+        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
-        logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
+        logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl + insertUrl);
       }
-      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(routeEntity.getCreatedDate()));
+      /*try {
+        routeData = (ObjectNode) objectMapper.readTree(routeEntity.getRouteMetadata());
+        routeData.put("destinationLocation", sentDestinationLocation);
+        routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
+      } catch (IOException e) {
+        logger.error("Exception occurred while writing back routeMetaData to request entity ", e);
+        throw new SftpProcessorException(
+            "Exception occurred while writing back routeMetaData to request entity ", e);
+      }*/
+      BeanUtils.copyProperties(routeEntity, requestBody);
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + channelId + " not found")));
   }
@@ -186,6 +239,33 @@ public class SawBisRouteController {
     routeEntities.forEach(route -> {
       BisRouteDto routeDto = new BisRouteDto();
       BeanUtils.copyProperties(route, routeDto);
+      /*ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      ObjectNode routeData = null;
+      String sentDestinationLocation = null;
+      String destinationLocation = null;
+      try {
+        routeData = (ObjectNode) objectMapper.readTree(routeDto.getRouteMetadata());
+        destinationLocation = routeData.get("destinationLocation").asText();
+        int locationLength = dropLocation.length();
+        sentDestinationLocation = destinationLocation.startsWith(dropLocation)
+            ? destinationLocation.substring(locationLength)
+            : destinationLocation;
+        sentDestinationLocation =
+            sentDestinationLocation.equals("") ? dropLocation : sentDestinationLocation;
+        routeData.put("destinationLocation", sentDestinationLocation);
+        routeDto.setRouteMetadata(objectMapper.writeValueAsString(routeData));
+      } catch (IOException e) {
+        logger.error("Exception occurred while reading routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
+      }*/
+      if (route.getCreatedDate() != null) {
+        routeDto.setCreatedDate(route.getCreatedDate().getTime());
+      }
+      if (route.getModifiedDate() != null) {
+        routeDto.setModifiedDate(route.getModifiedDate().getTime());
+      }
       routeDtos.add(routeDto);
     });
     return ResponseEntity.ok(routeDtos);
@@ -233,25 +313,30 @@ public class SawBisRouteController {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      JsonNode routeData = null;
-      JsonNode routeDataFromStore = null;
+      ObjectNode routeData = null;
+      ObjectNode routeDataFromStore = null;
+      //String destinationLocation = null;
       try {
-        routeData = objectMapper.readTree(routeMetaData);
-        routeDataFromStore = objectMapper.readTree(routeMetaDataFromStore);
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        routeDataFromStore = (ObjectNode) objectMapper.readTree(routeMetaDataFromStore);
+        //destinationLocation = routeData.get("destinationLocation").asText();
+        //routeData.put("destinationLocation", dropLocation + destinationLocation);
+        requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while updating routeMetaData ", e);
         throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
       }
       String schedulerDetails = routeData.get("schedulerExpression").toString();
       String schedulerDetailsFromStore = routeDataFromStore.get("schedulerExpression").toString();
-      if ((routeData.get("schedulerExpression") != null
-          && !routeData.get("schedulerExpression").toString().equals(""))
+      JsonNode schedulerExpn = routeData.get("schedulerExpression");
+      
+      if ((schedulerExpn != null && !schedulerExpn.toString().equals("")
+              && !schedulerExpn.toString().equals("{}"))
           || (!schedulerDetails.equals(schedulerDetailsFromStore))) {
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
         schedulerRequest.setRouteId(String.valueOf(routeId.toString()));
-        schedulerRequest.setJobName(BisChannelType.SFTP.name() + channelId
-            + routeId);
+        schedulerRequest.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
         schedulerRequest.setJobGroup(String.valueOf(routeId));
         JsonNode schedulerData = null;
         try {
@@ -266,15 +351,34 @@ public class SawBisRouteController {
           JsonNode cronExp = schedulerData.get("cronexp");
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
-          if (cronExp != null) {
-            schedulerRequest.setCronExpression(cronExp.toString());
-          }
-          if (startDate != null) {
-            schedulerRequest.setCronExpression(startDate.toString());
-          }
-          if (endDate != null) {
-            schedulerRequest.setCronExpression(endDate.toString());
-          }
+          
+          
+          //If activeTab is immediate the its immediate job.
+          //irrespecitve of request set expression to empty 
+          //so that scheduler treats as immediate
+          JsonNode activeTab = schedulerData.get("activeTab");
+          if (activeTab != null && activeTab.asText().equals("immediate")) {
+            schedulerRequest.setCronExpression("");
+          } else {
+              
+            if (cronExp != null) {
+              schedulerRequest.setCronExpression(cronExp.asText());
+            }
+              
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+              if (startDate != null) {
+                schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              }
+             
+              if (endDate != null) {
+                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              }
+            } catch (ParseException e) {
+              logger.error(e.getMessage());
+            }
+          } 
+        
         }
         BeanUtils.copyProperties(requestBody, routeEntity, "modifiedDate", "createdDate");
         routeEntity.setBisChannelSysId(channelId);
@@ -282,14 +386,25 @@ public class SawBisRouteController {
         routeEntity.setModifiedDate(new Date());
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
+        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + updateUrl);
         restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
-        logger.trace("scheduler uri: " + bisSchedulerUrl + updateUrl);
+        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl + updateUrl);
       }
-      BeanUtils.copyProperties(routeEntity, requestBody);
-      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(routeEntity.getCreatedDate()));
-      requestBody.setModifiedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(routeEntity.getModifiedDate()));
+      BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
+      try {
+        routeData = (ObjectNode) objectMapper.readTree(requestBody.getRouteMetadata());
+        //routeData.put("destinationLocation", destinationLocation);
+        requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
+      } catch (IOException e) {
+        logger.error("Exception occurred while updating routeMetaData ", e);
+        throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
+      }
+      if (routeEntity.getCreatedDate() != null) {
+        requestBody.setCreatedDate(routeEntity.getCreatedDate().getTime());
+      }
+      if (routeEntity.getModifiedDate() != null) {
+        requestBody.setModifiedDate(routeEntity.getModifiedDate().getTime());
+      }
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
   }

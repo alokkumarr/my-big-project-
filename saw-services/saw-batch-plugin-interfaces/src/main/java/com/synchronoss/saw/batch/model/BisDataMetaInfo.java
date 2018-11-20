@@ -38,7 +38,7 @@ public class BisDataMetaInfo {
   private String receivedDataName;
 
   @JsonProperty("dataSizeInBytes")
-  private Double dataSizeInBytes;
+  private Long dataSizeInBytes;
 
   @JsonProperty("processState")
   private String processState;
@@ -143,12 +143,12 @@ public class BisDataMetaInfo {
   }
 
   @JsonProperty("dataSizeInBytes")
-  public Double getDataSizeInBytes() {
+  public Long getDataSizeInBytes() {
     return dataSizeInBytes;
   }
 
   @JsonProperty("dataSizeInBytes")
-  public void setDataSizeInBytes(Double dataSizeInBytes) {
+  public void setDataSizeInBytes(Long dataSizeInBytes) {
     this.dataSizeInBytes = dataSizeInBytes;
   }
 
