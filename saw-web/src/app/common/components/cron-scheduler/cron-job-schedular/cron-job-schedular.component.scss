@@ -64,6 +64,10 @@
   }
 }
 
+.no-click {
+  pointer-events: none;
+}
+
 .date-group {
   padding: 0 30px 5px 30px;
 
