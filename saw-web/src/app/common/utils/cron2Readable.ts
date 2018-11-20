@@ -1,10 +1,13 @@
 import cronstrue from 'cronstrue';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isUndefined from 'lodash/isUndefined';
 import * as isString from 'lodash/isString';
 import * as moment from 'moment';
 
 export function generateSchedule(cronExpression, activeTab) {
-  if (activeTab === 'immediate') {
+  if (isUndefined(cronExpression) && isUndefined(activeTab)) {
+    return '';
+  } else if (activeTab === 'immediate') {
     // cronExpression won't be present if it's an immediate scheduled entity.
     return '';
   } else if (!isString(cronExpression)) {
