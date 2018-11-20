@@ -21,7 +21,7 @@ class AnalysisHelper {
     //analysisType chart
     createPivotChart(url, token,name, description, type) {
         let semanticId = this.getSemanticId(url,dataSets.pivotChart, token); // Get semanticId (dataset ID)
-        return this.generateChart(url,semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.createAnalysis, token,name, description, type);
+        return this.(url,semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.createAnalysis, token,name, description, type);
     }
      /**
      * @description Deletes analysis based on id for given customer
@@ -221,7 +221,7 @@ class AnalysisHelper {
 
 
       generateChart(url,semanticId, dataSetName, user, subCategory, token, name, description, analysisType, subType) {
-
+        let _self = this;
         let subCategoryId;
         let subCatList = _self.getSubCategoriesByCatgeoryName(url,token, categories.analyses.name);
         if(subCategories) {
