@@ -241,7 +241,7 @@
                build instead.  When SIP 3.1 is release, use that
                instead. -->
           <!--<url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-882/artifact/shared/SIP-Package/saw-3.0.0.tgz</url>-->
-          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-955/artifact/shared/SIP-Package/saw-3.0.0-744-g402624624.tgz</url>
+          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-1084/artifact/shared/SIP-Package/saw-3.0.0-1721-g2f766e3fa.tgz</url>
           <outputDirectory>${project.build.directory}/docker/sip-admin/${revision}/build/maven/sip-old</outputDirectory>
           <skip>${sip.upgrade.skip}</skip>
         </configuration>
