@@ -36,7 +36,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithActualVsT
     setTimeout(function() {
       //delete dashboard if ui failed.
       let oh = new ObserveHelper();
-      if(dashboardId !== null || dashboardId !== 'undefined') {
+      if(dashboardId) {
         oh.deleteDashboard(host, token, dashboardId);
       }
       commonFunctions.logOutByClearingLocalStorage();

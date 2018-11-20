@@ -48,7 +48,9 @@ describe('Global filters in dashboard with pivot tests: dashboardGlobalFilterWit
 
       //delete dashboard if ui failed.
       let oh = new ObserveHelper();
-      oh.deleteDashboard(host, token, dashboardId);
+      if(dashboardId) {
+        oh.deleteDashboard(host, token, dashboardId);
+      }
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
