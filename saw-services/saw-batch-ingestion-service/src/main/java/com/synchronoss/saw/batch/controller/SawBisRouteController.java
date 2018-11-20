@@ -377,7 +377,8 @@ public class SawBisRouteController {
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
         logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + updateUrl);
-        logger.trace("Sending the content to " + bisSchedulerUrl + updateUrl + " : " + schedulerRequest);
+        logger.trace("Sending the content to " + bisSchedulerUrl + updateUrl 
+            + " : " + schedulerRequest);
         restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
         logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl + updateUrl);
       }
