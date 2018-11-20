@@ -155,19 +155,19 @@ public class SawBisRouteController {
           if (cronExp != null) {
             schedulerRequest.setCronExpression(cronExp.asText());
           }
+          
           SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-          if (startDate != null) {
-            try {
+          try {
+            if (startDate != null) {
               schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
-              if (endDate != null) {
-                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
-              }
-            } catch (ParseException e) {
-              logger.error(e.getMessage());
-              throw new SipNestedRuntimeException("Parse exception while scheduling" + e);
             }
+             
+            if (endDate != null) {
+              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            }
+          } catch (ParseException e) {
+            logger.error(e.getMessage());
           }
-
         }
         RestTemplate restTemplate = new RestTemplate();
         logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + insertUrl);
@@ -336,17 +336,18 @@ public class SawBisRouteController {
             schedulerRequest.setCronExpression(cronExp.asText());
           }
           SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-          if (startDate != null) {
-
-            try {
+          try {
+            if (startDate != null) {
               schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
-              if (endDate != null) {
-                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
-              }
-            } catch (ParseException e) {
-              logger.error(e.getMessage());
             }
+             
+            if (endDate != null) {
+              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            }
+          } catch (ParseException e) {
+            logger.error(e.getMessage());
           }
+        
         }
         BeanUtils.copyProperties(requestBody, routeEntity, "modifiedDate", "createdDate");
         routeEntity.setBisChannelSysId(channelId);
