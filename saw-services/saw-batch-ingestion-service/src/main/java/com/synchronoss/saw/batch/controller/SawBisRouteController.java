@@ -108,6 +108,9 @@ public class SawBisRouteController {
       ObjectNode routeData = null;
       String destinationLocation = null;
       try {
+        requestBody.setBisChannelSysId(channelId);
+        BeanUtils.copyProperties(requestBody, routeEntity);
+        routeEntity.setCreatedDate(new Date());
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
         destinationLocation = routeData.get("destinationLocation").asText() != null
             && !routeData.get("destinationLocation").asText().equals("")
@@ -119,14 +122,20 @@ public class SawBisRouteController {
         logger.error("Exception occurred while reading routeMetaData ", e);
         throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
       }
+      // below block to store the route details
+      routeEntity = bisRouteDataRestRepository.save(routeEntity);
+      requestBody.setBisRouteSysId(routeEntity.getBisRouteSysId());
+      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
+          .format(routeEntity.getCreatedDate()));
+
       if (routeData.get("schedulerExpression") != null
           && !routeData.get("schedulerExpression").toString().equals("")) {
         String schedulerDetails = routeData.get("schedulerExpression").toString();
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
-        schedulerRequest.setRouteId(String.valueOf(requestBody.getBisRouteSysId()));
-        schedulerRequest.setJobName(BisChannelType.SFTP.name() + requestBody.getBisChannelSysId()
-            + requestBody.getBisRouteSysId().toString());
+        schedulerRequest.setRouteId(String.valueOf(routeEntity.getBisRouteSysId()));
+        schedulerRequest.setJobName(BisChannelType.SFTP.name() + routeEntity.getBisChannelSysId()
+            + routeEntity.getBisRouteSysId().toString());
         schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
         JsonNode schedulerData = null;
         try {
@@ -162,12 +171,7 @@ public class SawBisRouteController {
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
         logger.trace("scheduler uri: " + bisSchedulerUrl + insertUrl);
       }
-      requestBody.setBisChannelSysId(channelId);
-      BeanUtils.copyProperties(requestBody, routeEntity);
-      routeEntity.setCreatedDate(new Date());
-      routeEntity = bisRouteDataRestRepository.save(routeEntity);
-      requestBody.setCreatedDate(new SimpleDateFormat(IntegrationUtils.RENAME_DATE_FORMAT)
-          .format(routeEntity.getCreatedDate()));
+      BeanUtils.copyProperties(routeEntity, requestBody);
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + channelId + " not found")));
   }
