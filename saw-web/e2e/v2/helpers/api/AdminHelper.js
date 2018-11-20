@@ -1,7 +1,7 @@
 'use strict';
-let RestClient = require('../RestClient');;
-const Constants = require('../../Constants')
-let Utils = require('../../Utils');
+let RestClient = require('./RestClient');;
+const Constants = require('../Constants')
+let Utils = require('../Utils');
 const moduleId = 1; // shared for all users
 class AdminHelper {
 

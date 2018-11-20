@@ -32,7 +32,7 @@ class SuiteSetup {
     if (fs.existsSync('target/failedTestData.json')) {
       let existingFailures = JSON.parse(fs.readFileSync('target/failedTestData.json', 'utf8'));
       // There are already failed tests so add to existing list
-      logger.debug('existingFailures---'+JSON.stringify(existingFailures));
+      logger.debug('existingFailures---' + JSON.stringify(existingFailures));
       // add new failures to existing
       this.writeToJsonFile(existingFailures, testInfo);
 
@@ -43,7 +43,7 @@ class SuiteSetup {
     }
   }
 
-  writeToJsonFile(testDataObject, testInfo){
+  writeToJsonFile(testDataObject, testInfo) {
 
     if (!testDataObject[testInfo.feature]) {
       testDataObject[testInfo.feature] = {};
@@ -53,15 +53,42 @@ class SuiteSetup {
     }
     if (!testDataObject[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]]) {
       testDataObject[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]] = testInfo.data;
-      fs.writeFileSync('target/failedTestData.json', JSON.stringify(testDataObject), {encoding: 'utf8'});
+      fs.writeFileSync('target/failedTestData.json', JSON.stringify(testDataObject), { encoding: 'utf8' });
     }
   }
 
-  static failedTestDataForRetry() {
-    logger.info('Generate failed test data set for next retry from failures');
+  static readAllData(dir = null) {
+    let completeTestData = {};
+    let location;
+    if (dir) {
+      location = dir;
+    } else {
+      location = '../saw-web/e2e/v2/testdata/all-tests';
+    }
+    const dirCont = fs.readdirSync(location);
+    const files = dirCont.filter((elm) => /.*\.(json)/gi.test(elm));
+    files.forEach(function (file) {
+      logger.info('Reading file for executing test suite: '+file);
+      let data = JSON.parse(fs.readFileSync(location + '/' + file, 'utf8'));
+      completeTestData = Object.assign(data, completeTestData)
+    });
+    return completeTestData;
+  }
 
-    fs.renameSync('target/failedTestData.json','target/failedTestDataForRetry.json');
-    // Delete the old file so that it can be again re-rewritten and used by another set of failures in next retry
+  static failedTestDataForRetry() {
+    logger.info('Generating failed test data set for next retry from failures');
+
+    if (fs.existsSync('target/failedTestDataForRetry.json')) {
+      fs.unlinkSync('target/failedTestDataForRetry.json');
+    }
+    if (fs.existsSync('target/failedTestData.json')) {
+      fs.renameSync('target/failedTestData.json', 'target/failedTestDataForRetry.json');
+      logger.debug('Old failures json file is deleted and converted to failure data set ' +
+        'i.e. target/failedTestData.json converted to target/failedTestDataForRetry.jsons');
+    } else {
+      logger.info('Yahooo....!!! There are no failures!');
+    }
+      // Delete the old file so that it can be again re-rewritten and used by another set of failures in next retry
     if (fs.existsSync('target/failedTestData.json')) {
       fs.unlinkSync('target/failedTestData.json');
       logger.debug('Old failures json file is deleted and converted to failure data set');
@@ -91,14 +118,14 @@ class SuiteSetup {
         }
       });
     }
-    logger.info('Application url used for running e2e: '+url);
+    logger.info('Application url used for running e2e: ' + url);
     return url;
   }
 
   static getTestData() {
-    if (fs.existsSync('target/failedTestData.json')) {
-      let data = JSON.parse(fs.readFileSync('target/failedTestData.json', 'utf8'));
-      logger.info('This is not a fresh execution hence using failed data set from  target/failedTestData.json: data--->'+JSON.stringify(data));
+    if (fs.existsSync('target/failedTestDataForRetry.json')) {
+      let data = JSON.parse(fs.readFileSync('target/failedTestDataForRetry.json', 'utf8'));
+      logger.warn('This is retry execution!! Executing with failed test data set, because failedTestDataForRetry found in  target/failedTestDataForRetry.json: data--->' + JSON.stringify(data));
       return data;
     } else {
       let suiteName;
@@ -123,12 +150,13 @@ class SuiteSetup {
         });
       }
       if (suiteName !== undefined && suiteName === 'critical') {
-        logger.info('Executing critical suite.....');
+        logger.warn('Executing with critical suite test data set.....');
         let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.critical.json', 'utf8'));
         return data;
       } else {
-        logger.info('Executing full suite.....');
-        let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.json', 'utf8'));
+        logger.warn('Executing with full suite test data set....');
+        //let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.json', 'utf8'));
+        let data = SuiteSetup.readAllData();
         return data;
       }
     }

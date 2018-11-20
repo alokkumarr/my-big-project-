@@ -40,7 +40,7 @@ const timeoutInterval = 3600000;
 /**
  * number of retries in case of failure, executes all failed tests
  */
-let maxRetryForFailedTests = SuiteSetup.distRun() ? 3 : 2;
+let maxRetryForFailedTests = SuiteSetup.distRun() ? 1 : 1;
 
 /**
  * Waits ms after page is loaded
@@ -57,7 +57,6 @@ const testBaseDir = appRoot + '/e2e/v2/tests/';
  * Output path for the junit reports. Folder should be created in advance
  */
 const protractorPath = 'target/protractor-reports';
-
 /**
  * All tests are running for customer
  */
@@ -75,7 +74,6 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
-  testData: SuiteSetup.getTestData(),
   baseUrl: 'http://localhost:3000',
   logger:logger,
   capabilities: {
@@ -183,6 +181,7 @@ exports.config = {
   },
   onPrepare() {
     retry.onPrepare();
+
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
 
     browser.manage().timeouts().implicitlyWait(implicitlyWait);
@@ -208,6 +207,7 @@ exports.config = {
     });
     // Allure reporter done
 
+    // Get failed test data
     jasmine.getEnv().addReporter(new function() {
       this.specDone = function(result) {
         if (result.status !== 'passed') {
@@ -217,7 +217,6 @@ exports.config = {
         }
       };
     });
-
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
     return browser.wait(() => {
@@ -234,24 +233,25 @@ exports.config = {
     }
     // Generate test data
     let appUrl = SuiteSetup.getSawWebUrl();
-    if (appUrl) {
-      try {
-        logger.info('Generating test for this run...');
-        let APICommonHelpers = require('../helpers/api/APICommonHelpers');
-        let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
-        let token = APICommonHelpers.generateToken(apiBaseUrl);
-        let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
-        new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
-      }catch (e) {
-        logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
-          'hence exiting test suite and failing it....'+e);
-        process.exit(1);
-      }
-    } else {
-      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl
-        + ', hence exiting test suite and failing it...');
-      process.exit(1);
-    }
+
+    // if (appUrl) {
+    //   try {
+    //     logger.info('Generating test for this run...');
+    //     let APICommonHelpers = require('../helpers/api/APICommonHelpers');
+    //     let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+    //     let token = APICommonHelpers.generateToken(apiBaseUrl);
+    //     let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
+    //     new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
+    //   }catch (e) {
+    //     logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
+    //       'hence exiting test suite and failing it....'+e);
+    //     process.exit(1);
+    //   }
+    // } else {
+    //   logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl
+    //     + ', hence exiting test suite and failing it...');
+    //   process.exit(1);
+    // }
   },
   afterLaunch: function() {
     var retryCounter = 1;

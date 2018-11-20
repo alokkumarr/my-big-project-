@@ -1,13 +1,13 @@
 'use strict';
-let RestClient = require('../RestClient');
-const users = require('../../data-generation/users');
-const categories = require('../../data-generation/categories');
-const subCategories = require('../../data-generation/subCategories');
-const dataSets = require('../../data-generation/datasets');
+let RestClient = require('./RestClient');
+const users = require('../data-generation/users');
+const categories = require('../data-generation/categories');
+const subCategories = require('../data-generation/subCategories');
+const dataSets = require('../data-generation/datasets');
 const customerCode = 'SYNCHRONOSS'; // shared for all users
-let RequestModel = require('../model/RequestModel');
-const Constants = require('../../Constants');
-let Utils = require('../../Utils');
+let RequestModel = require('./model/RequestModel');
+const Constants = require('../Constants');
+let Utils = require('../Utils');
 let AdminHelper = require('./AdminHelper');
 
 class AnalysisHelper {

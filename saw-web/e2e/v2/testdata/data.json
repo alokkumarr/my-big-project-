@@ -4,10 +4,6 @@
       "TC01": {
         "user": "admin",
         "description": "test by admin"
-      },
-      "TC02": {
-        "user": "userOne",
-        "description": "test by user"
       }
     }
   },
@@ -21,29 +17,15 @@
         "user": "userOne",
         "description": "test by user tc04"
       }
-    }
-  },
-  "DEV3": {
-    "dp": {
+    },
+    "dp1": {
       "TC05": {
         "user": "admin",
-        "description": "test by admin tc05"
+        "description": "test by admin tc03"
       },
       "TC06": {
         "user": "userOne",
-        "description": "test by user tc06"
-      }
-    }
-  },
-  "DEV4": {
-    "dp": {
-      "TC07": {
-        "user": "admin",
-        "description": "test by admin tc07"
-      },
-      "TC08": {
-        "user": "userOne",
-        "description": "test by user tc08"
+        "description": "test by user tc04"
       }
     }
   },

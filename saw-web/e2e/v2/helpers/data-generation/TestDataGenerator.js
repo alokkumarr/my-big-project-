@@ -11,9 +11,9 @@ const custSysId = 1; // shared for all users
 const customerId = 1; // shared for all users
 const customerCode = 'SYNCHRONOSS'; // shared for all users
 const productId = 1; // shared for all users
-let AdminHelper = require('../api/actions/AdminHelper');
+let AdminHelper = require('../api/AdminHelper');
 let APICommonHelpers = require('../api/APICommonHelpers');
-let AnalysisHelper = require('../api/actions/AnalysisHelper');
+let AnalysisHelper = require('../api/AnalysisHelper');
 let Constants = require('../Constants');
 
 class TestDataGenerator {

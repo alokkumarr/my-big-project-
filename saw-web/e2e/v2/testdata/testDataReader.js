@@ -1,7 +1,6 @@
 'use strict';
 
-const protractorConf = require('../conf/protractor.conf');
-
+const SuiteSetup = require('../helpers/SuiteSetup');
 module.exports = {
-  testData:protractorConf.config.testData
+  testData: SuiteSetup.getTestData(),
 }
