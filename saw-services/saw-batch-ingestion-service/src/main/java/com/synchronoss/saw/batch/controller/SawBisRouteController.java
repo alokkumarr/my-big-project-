@@ -21,7 +21,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -105,14 +104,14 @@ public class SawBisRouteController {
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       ObjectNode routeData = null;
-      String destinationLocation = null;
-      String sentDestinationLocation = null;
+      //String destinationLocation = null;
+      //String sentDestinationLocation = null;
       try {
         requestBody.setBisChannelSysId(channelId);
         BeanUtils.copyProperties(requestBody, routeEntity);
         routeEntity.setCreatedDate(new Date());
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
-        sentDestinationLocation = routeData.get("destinationLocation").asText() != null
+        /*sentDestinationLocation = routeData.get("destinationLocation").asText() != null
             && !routeData.get("destinationLocation").asText().equals("")
                 ? routeData.get("destinationLocation").asText()
                 : dropLocation;
@@ -120,7 +119,7 @@ public class SawBisRouteController {
             && !routeData.get("destinationLocation").asText().equals("")
                 ? dropLocation + File.separator + routeData.get("destinationLocation").asText()
                 : dropLocation;
-        routeData.put("destinationLocation", destinationLocation);
+        routeData.put("destinationLocation", destinationLocation);*/
         routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while creating routeMetaData ", e);
@@ -174,7 +173,7 @@ public class SawBisRouteController {
         restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
         logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl + insertUrl);
       }
-      try {
+      /*try {
         routeData = (ObjectNode) objectMapper.readTree(routeEntity.getRouteMetadata());
         routeData.put("destinationLocation", sentDestinationLocation);
         routeEntity.setRouteMetadata(objectMapper.writeValueAsString(routeData));
@@ -182,7 +181,7 @@ public class SawBisRouteController {
         logger.error("Exception occurred while writing back routeMetaData to request entity ", e);
         throw new SftpProcessorException(
             "Exception occurred while writing back routeMetaData to request entity ", e);
-      }
+      }*/
       BeanUtils.copyProperties(routeEntity, requestBody);
       return requestBody;
     }).orElseThrow(() -> new ResourceNotFoundException("channelId " + channelId + " not found")));
@@ -222,7 +221,7 @@ public class SawBisRouteController {
     routeEntities.forEach(route -> {
       BisRouteDto routeDto = new BisRouteDto();
       BeanUtils.copyProperties(route, routeDto);
-      ObjectMapper objectMapper = new ObjectMapper();
+      /*ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       ObjectNode routeData = null;
@@ -242,7 +241,7 @@ public class SawBisRouteController {
       } catch (IOException e) {
         logger.error("Exception occurred while reading routeMetaData ", e);
         throw new SftpProcessorException("Exception occurred while reading routeMetaData ", e);
-      }
+      }*/
       if (route.getCreatedDate() != null) {
         routeDto.setCreatedDate(route.getCreatedDate().getTime());
       }
@@ -298,12 +297,12 @@ public class SawBisRouteController {
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       ObjectNode routeData = null;
       ObjectNode routeDataFromStore = null;
-      String destinationLocation = null;
+      //String destinationLocation = null;
       try {
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
         routeDataFromStore = (ObjectNode) objectMapper.readTree(routeMetaDataFromStore);
-        destinationLocation = routeData.get("destinationLocation").asText();
-        routeData.put("destinationLocation", dropLocation + destinationLocation);
+        //destinationLocation = routeData.get("destinationLocation").asText();
+        //routeData.put("destinationLocation", dropLocation + destinationLocation);
         requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while updating routeMetaData ", e);
@@ -361,7 +360,7 @@ public class SawBisRouteController {
       BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
       try {
         routeData = (ObjectNode) objectMapper.readTree(requestBody.getRouteMetadata());
-        routeData.put("destinationLocation", destinationLocation);
+        //routeData.put("destinationLocation", destinationLocation);
         requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while updating routeMetaData ", e);
