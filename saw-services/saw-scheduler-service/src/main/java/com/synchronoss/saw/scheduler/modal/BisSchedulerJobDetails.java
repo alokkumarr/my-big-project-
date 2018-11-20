@@ -123,65 +123,7 @@ public class BisSchedulerJobDetails implements Serializable {
     this.jobGroup = jobGroup;
   }
 
-  /**
-   * Customiation during Serialization write process.
-   *
-   * @param out outputstream
-   * @throws IOException io exception
-   */
-  private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-	out.writeObject(channelId);
-    out.writeObject(channelType);
-    out.writeObject(cronExpression);
-    out.writeObject(description);
-    out.writeObject(emailList);
-    if (endDate != null) {
-      out.writeObject(endDate);
-    }
-    out.writeObject(entityId);
-    out.writeObject(fileType);
-    out.writeObject(jobGroup);
-    out.writeObject(jobName);
-    out.writeObject(jobScheduleTime);
-    out.writeObject(userFullName);
-  }
-
-  /**
-   *Customization during seralization read process.
-   *
-   * @param in inputstream
-   * @throws IOException exception
-   * @throws ClassNotFoundException exception
-   */
-  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-	channelId =  (String) in.readObject();
-    channelType = (String) in.readObject();
-    cronExpression = (String) in.readObject();
-    description = (String) in.readObject();
-    emailList = (List<String>) in.readObject();
-    try {
-      /*
-       * End date is optional data field and it will contains null value for existing schedules
-       * generated prior to sip v2.6.0 , handle the Optional Data Exception explicitly to identify
-       * the end of stream
-       */
-      Object endDt = in.readObject();
-      if (endDt instanceof Date) {
-        endDate = (Date) endDt;
-      }
-
-    } catch (OptionalDataException e) {
-      /* catch block to avoid serialization for newly added fields. */ 
-    }
-    entityId = (String) in.readObject();
-    fileType = (String) in.readObject();
-    jobGroup = (String) in.readObject();
-    jobName = (String) in.readObject();
-    jobScheduleTime = (Date) in.readObject();
-    userFullName = (String) in.readObject();
-
-  }
-
+  
   public String getChannelType() {
     return channelType;
   }

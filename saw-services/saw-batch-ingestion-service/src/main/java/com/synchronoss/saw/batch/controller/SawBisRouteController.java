@@ -298,13 +298,19 @@ public class SawBisRouteController {
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
           if (cronExp != null) {
-            schedulerRequest.setCronExpression(cronExp.toString());
+            schedulerRequest.setCronExpression(cronExp.asText());
           }
+          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           if (startDate != null) {
-            schedulerRequest.setCronExpression(startDate.toString());
-          }
-          if (endDate != null) {
-            schedulerRequest.setCronExpression(endDate.toString());
+
+            try {
+              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              if (endDate != null) {
+                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              }
+            } catch (ParseException e) {
+              logger.error(e.getMessage());
+            }
           }
         }
         BeanUtils.copyProperties(requestBody, routeEntity, "modifiedDate", "createdDate");
