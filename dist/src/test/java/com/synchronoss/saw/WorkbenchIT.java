@@ -217,7 +217,8 @@ public class WorkbenchIT extends BaseIT {
     given(authSpec)
         .body(root)
         .when().post(WORKBENCH_PATH + "/datasets")
-        .then().assertThat().statusCode(200);
+        .then().assertThat().statusCode(200)
+        .body("outputDatasetIds", hasSize(1));
   }
 
   /**

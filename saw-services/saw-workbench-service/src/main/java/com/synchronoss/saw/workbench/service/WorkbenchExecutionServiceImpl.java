@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
@@ -152,6 +153,10 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
     client.submit(new WorkbenchExecuteJob(workBenchcontext));
     ObjectNode root = mapper.createObjectNode();
+    ArrayNode ids = root.putArray("outputDatasetIds");
+    for (String id: workBenchcontext.registeredOutputDSIds) {
+      ids.add(id);
+    }
     log.info("Executing dataset transformation ends here ");
     return root;
   }
