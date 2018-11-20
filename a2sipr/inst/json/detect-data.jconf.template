@@ -99,19 +99,25 @@
             "value":"${:saw.host.name:}"
         }
     ],
-    "detecter": {
-                                "indexField": "EVENT_TIMESTAMP",
+    "detecter": [{
+                                "indexField": "DATE_COLUMN",
                                 "groupField": "",
-                                "measureField": "MESSAGE_SIZE",
-                                "functionName": "sum",
-                                "frequency": 4,
+                                "measureField": "METRIC1",
+                                "frequency": 7,
                                 "direction": "pos",
                                 "alpha": 0.05,
                                 "maxAnoms": 0.01,
-                                "trendWindow": 0.75,
-                                "dataUnit": "day",
-                                "collapseSide": "start",
-                                "fieldFormat": "yyyy-MM-dd HH:mm:ss",
-                                "fieldType": "datetime"
+                                "trendWindow": 0.75
+        },
+        {
+                                "indexField": "DATE_COLUMN",
+                                "groupField": "",
+                                "measureField": "METRIC2",
+                                "frequency": 7,
+                                "direction": "both",
+                                "alpha": 0.05,
+                                "maxAnoms": 0.01,
+                                "trendWindow": 0.75
         }
+    ]
 }

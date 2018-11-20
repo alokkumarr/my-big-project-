@@ -62,7 +62,7 @@
     <rpm.release>${project.release}</rpm.release>
     <!-- XDF application -->
     <app.name>${prod.name}</app.name>
-    <app.version>${rpm.version}</app.version>
+    <app.version>${revision}</app.version>
     <app.release>${rpm.release}</app.release>
     <app.nameVer>${app.name}-${app.version}</app.nameVer>
     <!-- Directories on the target box -->

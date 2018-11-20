@@ -16,7 +16,7 @@ export interface Schedule {
   description?: string;
   emailList?: string[];
   ftp?: string[];
-  fileType?: 'csv';
+  fileType?: string;
   endDate?: string;
   metricName?: string;
   type?: string;
