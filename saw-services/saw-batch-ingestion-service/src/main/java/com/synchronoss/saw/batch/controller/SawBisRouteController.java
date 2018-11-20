@@ -130,8 +130,12 @@ public class SawBisRouteController {
       routeEntity = bisRouteDataRestRepository.save(routeEntity);
       requestBody.setBisRouteSysId(routeEntity.getBisRouteSysId());
       requestBody.setCreatedDate(routeEntity.getCreatedDate().getTime());
-      if (routeData.get("schedulerExpression") != null
-          && !routeData.get("schedulerExpression").toString().equals("")) {
+      
+      JsonNode schedulerExpn = routeData.get("schedulerExpression");
+      
+      
+      if (schedulerExpn != null && !schedulerExpn.toString().equals("") 
+          && !schedulerExpn.toString().equals("{}")) {
         String schedulerDetails = routeData.get("schedulerExpression").toString();
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
@@ -152,22 +156,36 @@ public class SawBisRouteController {
           JsonNode cronExp = schedulerData.get("cronexp");
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
-          if (cronExp != null) {
-            schedulerRequest.setCronExpression(cronExp.asText());
-          }
           
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-          try {
-            if (startDate != null) {
-              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+          
+          
+          
+          //If activeTab is immediate the its immediate job.
+          //irrespecitve of request set expression to empty 
+          //so that scheduler treats as immediate
+          JsonNode activeTab = schedulerData.get("activeTab");
+          if (activeTab != null && activeTab.asText().equals("immediate")) {
+            schedulerRequest.setCronExpression("");
+          } else {
+              
+            if (cronExp != null) {
+              schedulerRequest.setCronExpression(cronExp.asText());
             }
+              
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+              if (startDate != null) {
+                schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              }
              
-            if (endDate != null) {
-              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              if (endDate != null) {
+                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              }
+            } catch (ParseException e) {
+              logger.error(e.getMessage());
             }
-          } catch (ParseException e) {
-            logger.error(e.getMessage());
-          }
+          } 
+          
         }
         RestTemplate restTemplate = new RestTemplate();
         logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + insertUrl);
@@ -311,8 +329,10 @@ public class SawBisRouteController {
       }
       String schedulerDetails = routeData.get("schedulerExpression").toString();
       String schedulerDetailsFromStore = routeDataFromStore.get("schedulerExpression").toString();
-      if ((routeData.get("schedulerExpression") != null
-          && !routeData.get("schedulerExpression").toString().equals(""))
+      JsonNode schedulerExpn = routeData.get("schedulerExpression");
+      
+      if ((schedulerExpn != null && !schedulerExpn.toString().equals("")
+              && !schedulerExpn.toString().equals("{}"))
           || (!schedulerDetails.equals(schedulerDetailsFromStore))) {
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
@@ -332,21 +352,33 @@ public class SawBisRouteController {
           JsonNode cronExp = schedulerData.get("cronexp");
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
-          if (cronExp != null) {
-            schedulerRequest.setCronExpression(cronExp.asText());
-          }
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-          try {
-            if (startDate != null) {
-              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+          
+          
+          //If activeTab is immediate the its immediate job.
+          //irrespecitve of request set expression to empty 
+          //so that scheduler treats as immediate
+          JsonNode activeTab = schedulerData.get("activeTab");
+          if (activeTab != null && activeTab.asText().equals("immediate")) {
+            schedulerRequest.setCronExpression("");
+          } else {
+              
+            if (cronExp != null) {
+              schedulerRequest.setCronExpression(cronExp.asText());
             }
+              
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+              if (startDate != null) {
+                schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              }
              
-            if (endDate != null) {
-              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              if (endDate != null) {
+                schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+              }
+            } catch (ParseException e) {
+              logger.error(e.getMessage());
             }
-          } catch (ParseException e) {
-            logger.error(e.getMessage());
-          }
+          } 
         
         }
         BeanUtils.copyProperties(requestBody, routeEntity, "modifiedDate", "createdDate");
