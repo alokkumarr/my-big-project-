@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { first } from 'rxjs/operators';
+// import { first } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
@@ -80,10 +80,10 @@ export class AnalyzeActionsService {
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
       return this._analyzeDialogService
-        .openEditAnalysisDialog(analysis, mode)
-        .afterClosed()
-        .pipe(first())
-        .toPromise();
+        .openEditAnalysisDialog(analysis, mode);
+        // .afterClosed()
+        // .pipe(first())
+        // .toPromise();
     default:
     }
   }

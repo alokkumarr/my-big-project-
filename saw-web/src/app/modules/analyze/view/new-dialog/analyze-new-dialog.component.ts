@@ -167,13 +167,15 @@ export class AnalyzeNewDialogComponent {
       description: '',
       scheduled: null
     };
-    this._analyzeDialogService
-      .openNewAnalysisDialog(model)
-      .afterClosed()
-      .subscribe(successfullySaved => {
-        if (successfullySaved) {
-          this._dialogRef.close(successfullySaved);
-        }
-      });
+    this._dialogRef.afterClosed().subscribe(() => {
+      this._analyzeDialogService.openNewAnalysisDialog(model);
+    });
+    this._dialogRef.close();
+    // .afterClosed()
+    // .subscribe(successfullySaved => {
+    //   if (successfullySaved) {
+    //     this._dialogRef.close(successfullySaved);
+    //   }
+    // });
   }
 }

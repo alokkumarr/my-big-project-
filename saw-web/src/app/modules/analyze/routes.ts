@@ -15,11 +15,6 @@ export const routes: Routes = [
     component: AnalyzePageComponent,
     children: [
       {
-        // name: 'analyze.view',
-        path: ':id',
-        component: AnalyzeViewComponent
-      },
-      {
         // name: 'analyze.executedDetail',
         path: 'analysis/:analysisId/executed',
         component: ExecutedViewComponent
@@ -33,6 +28,11 @@ export const routes: Routes = [
       {
         path: 'designer',
         component: DesignerPageComponent
+      },
+      {
+        // name: 'analyze.view',
+        path: ':id',
+        component: AnalyzeViewComponent
       }
     ]
   }
