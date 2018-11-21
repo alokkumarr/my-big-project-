@@ -45,5 +45,6 @@ ensure_role() {
         exit 1
     fi
 }
+ensure_role sip-admin
 ensure_role sip-rtis
 ensure_role saw-security-arbitrator

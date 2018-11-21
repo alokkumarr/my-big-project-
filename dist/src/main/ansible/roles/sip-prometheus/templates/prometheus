@@ -1,0 +1,2 @@
+# Set route prefix to path in external URL as exposed through HAProxy
+PROMETHEUS_OPTS=--web.external-url=/prometheus/

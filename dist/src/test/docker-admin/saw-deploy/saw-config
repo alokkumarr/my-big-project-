@@ -16,6 +16,9 @@ sip_epel_yum_provided=true
 # for CORS
 sip_cors_allow_origin=http://localhost:3000
 
+[sip-admin]
+sip-admin
+
 [saw-proxy]
 sip-proxy
 

@@ -5,6 +5,12 @@
   become: true
   roles:
     - saw-host
+    - sip-prometheus-node
+- name: Admin
+  hosts: sip-admin
+  become: true
+  roles:
+    - sip-prometheus
 - import_playbook: modules/saw-security/ansible/site.yml
 - import_playbook: modules/saw-services/ansible/site.yml
 - import_playbook: modules/saw-web/ansible/site.yml

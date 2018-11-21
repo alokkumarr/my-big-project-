@@ -1,0 +1,54 @@
+- name: Install Prometheus for monitoring
+  yum: name=prometheus
+- name: Install Prometheus environment file
+  template: src=prometheus dest=/etc/default/prometheus
+  notify:
+    - restart prometheus
+- name: Install Prometheus configuration file
+  template: src=prometheus.yml dest=/etc/prometheus
+  notify:
+    - restart prometheus
+- name: Enable Prometheus service
+  systemd: name=prometheus enabled=true
+- name: Install Prometheus console files
+  copy:
+    src: "{{ item }}"
+    dest: /usr/share/prometheus/consoles
+  with_fileglob:
+    - prometheus-consoles/*
+- name: Install Grafana package repository
+  yum_repository:
+    name: mariadb
+    description: Grafana repository
+    baseurl: "{{ sip_grafana_yum_url | default('https://packages.grafana.com/oss/rpm') }}"
+    gpgcheck: no
+- name: Install Grafana for monitoring visualization
+  yum: name=grafana
+- name: Enable Grafana service
+  systemd: name=grafana-server enabled=true
+- name: Install Grafana configuration file
+  template: src=grafana.ini dest=/etc/grafana
+  notify:
+    - restart grafana
+- name: Install Grafana Prometheus datasource
+  template:
+    src: grafana-prometheus.yml
+    dest: /etc/grafana/provisioning/datasources/prometheus.yml
+  notify:
+    - restart grafana
+- name: Install Grafana dashboard configuration
+  template:
+    src: grafana-dashboards.yml
+    dest: /etc/grafana/provisioning/dashboards/all.yml
+  notify:
+    - restart grafana
+- name: Create the Grafana dashboards directory
+  file:
+    path: /var/lib/grafana/dashboards
+    state: directory
+- name: Install Grafana dashboards
+  copy:
+    src: "{{ item }}"
+    dest: /var/lib/grafana/dashboards
+  with_fileglob:
+    - grafana-dashboards/*
