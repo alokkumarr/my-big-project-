@@ -6,6 +6,16 @@ export const CUSTOM_DATE_PRESET_VALUE = 'NA';
 
 export const DATE_PRESETS = [
   {
+    value: 'Yesterday',
+    keyword: 'YESTERDAY',
+    label: 'Yesterday'
+  },
+  {
+    value: 'Today',
+    keyword: 'TODAY',
+    label: 'Today'
+  },
+  {
     value: 'TW',
     keyword: 'THIS_WEEK',
     label: 'This Week'
