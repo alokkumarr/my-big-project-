@@ -51,8 +51,8 @@ provided in the environment:
 
 . Configure SAW server to use UTC timezone in all places where date and timezones are involved.
 
-. On all saw nodes volumes has to be mounted & saw-services needs to running using mapr user name.
-  This is required by ingestion service.
+. On all saw nodes, volumes i.e. MapRFS using NFS gateway service
+  has to be mounted. This is required by ingestion service.
 
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system

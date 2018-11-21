@@ -470,20 +470,22 @@ public class SftpServiceImpl extends SipPluginContract {
           nodeEntity = objectMapper.readTree(bisChannelEntity.getRouteMetadata());
           rootNode = (ObjectNode) nodeEntity;
           String sourceLocation = rootNode.get("sourceLocation").asText();
+          logger.trace("sourceLocation from routeId " + routeId + " location " + sourceLocation);
           String destinationLocation = rootNode.get("destinationLocation").asText();
+          logger.trace(
+              "destinationLocation from routeId " + routeId + " location " + destinationLocation);
           String filePattern = rootNode.get("filePattern").asText();
+          logger.trace("filePattern from routeId " + routeId + " filePattern " + filePattern);
           SftpRemoteFileTemplate template =
               new SftpRemoteFileTemplate(delegatingSessionFactory.getSessionFactory(channelId));
-          logger.trace(
-              "invocation of method transferData when "
-              + "directory is availble in destination with location starts here "
-                  + sourceLocation + " & file pattern " + filePattern);
+          logger.trace("invocation of method transferData when "
+              + "directory is availble in destination with location starts here " + sourceLocation
+              + " & file pattern " + filePattern);
           listOfFiles = transferDataFromChannel(template, sourceLocation, filePattern,
               destinationLocation, channelId, routeId);
-          logger.trace(
-              "invocation of method transferData when "
-              + "directory is availble in destination with location ends here "
-                  + sourceLocation + " & file pattern " + filePattern);
+          logger.trace("invocation of method transferData when "
+              + "directory is availble in destination with location ends here " + sourceLocation
+              + " & file pattern " + filePattern);
           delegatingSessionFactory.getSessionFactory(channelId).getSession().close();
           delegatingSessionFactory.invalidateSessionFactoryMap();
           logger.trace("session opened closes here ");
@@ -533,13 +535,10 @@ public class SftpServiceImpl extends SipPluginContract {
                 .checkDuplicateFile(sourcelocation + File.separator + entry.getFilename())) {
               logger.trace("file duplication completed " + sourcelocation + File.separator
                   + entry.getFilename() + " batchSize " + batchSize);
-              destinationLocation =
-                  destinationLocation != null ? defaultDestinationLocation + destinationLocation
-                      : defaultDestinationLocation;
               logger.trace(
                   "file from the source is downnloaded in the location :" + destinationLocation);
-              File localDirectory =
-                  new File(destinationLocation + File.separator + getBatchId() + File.separator);
+              File localDirectory = new File(defaultDestinationLocation + destinationLocation
+                  + File.separator + getBatchId() + File.separator);
               logger.trace("directory where the file will be downnloaded  :"
                   + localDirectory.getAbsolutePath());
               if (!localDirectory.exists()) {
@@ -584,10 +583,12 @@ public class SftpServiceImpl extends SipPluginContract {
                   entry.getAttrs() != null && ((entry.getAttrs().getPermissions() & 00200) != 0)
                       && entry.getAttrs().getUId() != 0;
               if (userHasPermissionsToWriteFile) {
-                logger.trace("the current user session have privileges to write on the location :");
+                logger.trace("the current user session have privileges to write on the location :"
+                    + userHasPermissionsToWriteFile);
               } else {
                 logger.trace(
-                    "the current user session does not have privileges to write on the location :");
+                    "the current user session does not have privileges to write on the location :"
+                        + userHasPermissionsToWriteFile);
               }
               bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
               bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
