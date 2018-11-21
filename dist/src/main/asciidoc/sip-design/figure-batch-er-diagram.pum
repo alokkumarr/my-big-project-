@@ -1,15 +1,6 @@
 @startuml
 
 object BIS_CHANNEL {
-  channelId : LONG
-  customerCode : TINYTEXT
-  projectCode : TINYTEXT
-  productCode : TINYTEXT
-  createdBy : TINYTEXT
-  createDate : Date
-  modifiedBy : TINYTEXT
-  modifiedDate : Date
-  channelMetaData : JSON
 }
 
 @enduml
@@ -17,12 +8,6 @@ object BIS_CHANNEL {
 @startuml
 
 object BIS_ROUTE {
-  routeId : LONG
-  createdBy : TINYTEXT
-  createDate : Date
-  modifiedBy : TINYTEXT
-  modifiedDate : Date
-  routeMetaData = JSON
 }
 
 @enduml
@@ -30,21 +15,10 @@ object BIS_ROUTE {
 @startuml
 
 object BIS_LOGS {
-  pid : TEXT
-  bis_route_sys_id : TINYTEXT
-  bis_channel_sys_id : Date
-  bis_channel_type : TINYTEXT
-  bis_file_pattern : Date
-  bis_files_name : JSON
-  bis_actual_file_rcv_date : Date
-  bis_recd_file_name : TEXT
-  bis_recd_file_size_bytes : Double
-  bis_file_valid_status : string
-  bis_process_state : TEXT
-  createDate : Date
-  modifiedDate : Date
 }
 
 @enduml
 
 BIS_CHANNEL o-- "n" BIS_ROUTE : "1..n"
+BIS_LOGS *-- BIS_CHANNEL
+BIS_LOGS *-- BIS_ROUTE
