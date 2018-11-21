@@ -30,10 +30,12 @@ import { DesignerDescriptionComponent } from './description';
 import { DesignerPreviewDialogComponent } from './preview-dialog';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
+import {DesignerPageComponent} from './page/page.component';
 
 export {
   AnalyzeReportQueryComponent,
   DesignerDialogComponent,
+  DesignerPageComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
   DesignerToolbarComponent,
