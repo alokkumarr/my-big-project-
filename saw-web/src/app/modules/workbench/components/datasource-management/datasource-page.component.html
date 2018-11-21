@@ -48,7 +48,7 @@
           </div>
           <span fxFlex></span>
           <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="testChannel(selectedSourceData?.bisChannelSysId)"
-            i18n-matTooltip matTooltip="Test Connectivity">
+            i18n-matTooltip matTooltip="Test Channel Connectivity">
             <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
           <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="createSource(selectedSourceData)"
@@ -148,7 +148,7 @@
 
             <div *dxTemplate="let data of 'actionsTemplate'">
               <div fxHide.lt-lg="true">
-                <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Connectivity"
+                <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Route Connectivity"
                   (click)="testRoute(data.data)">
                   <mat-icon fontIcon="icon-query-mode"></mat-icon>
                 </button>
@@ -169,7 +169,7 @@
               <mat-menu #datapodmenu="matMenu">
                 <button mat-menu-item (click)="testRoute(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-query-mode"></mat-icon>
-                  <span>Test Connectivity</span>
+                  <span>Test Route Connectivity</span>
                 </button>
                 <button mat-menu-item (click)="createRoute(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-edit"></mat-icon>

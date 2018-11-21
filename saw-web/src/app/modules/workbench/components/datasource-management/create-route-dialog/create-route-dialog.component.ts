@@ -41,7 +41,7 @@ export class CreateRouteDialogComponent implements OnInit {
   ngOnInit() {
     if (isUndefined(this.routeData.routeMetadata.length)) {
       this.opType = 'update';
-      this.dialogTitle = 'Update Route';
+      this.dialogTitle = `Editing route ${this.routeData.channelName}`;
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
       this.crondetails = this.routeData.routeMetadata.schedulerExpression;
     }

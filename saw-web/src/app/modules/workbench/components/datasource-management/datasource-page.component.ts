@@ -243,7 +243,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       panelClass: 'sourceDialogClass',
       data: {
         routeMetadata,
-        channelID: this.selectedSourceData.bisChannelSysId
+        channelID: this.selectedSourceData.bisChannelSysId,
+        channelName: this.selectedSourceData.channelName
       }
     });
 
@@ -295,7 +296,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   calculateScheduleCellValue(rowData) {
-    const {cronexp, activeTab} = rowData.schedulerExpression;
+    const { cronexp, activeTab } = rowData.schedulerExpression;
     return generateSchedule(cronexp, activeTab);
   }
 

@@ -61,7 +61,7 @@ export class CreateSourceDialogComponent implements OnInit {
     if (isUndefined(this.channelData.length)) {
       this.opType = 'update';
       this.isTypeEditable = false;
-      this.dialogTitle = 'Edit Data Channel';
+      this.dialogTitle = 'Edit Channel';
       this.selectedStepIndex = 1;
       this.selectedSource = this.channelData.channelType;
       this.firstStep.patchValue(this.channelData);
