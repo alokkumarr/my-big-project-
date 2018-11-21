@@ -33,7 +33,9 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
 
   afterEach(function(done) {
     setTimeout(function() {
-      new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+      if(analysisId){
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+      }
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
