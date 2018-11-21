@@ -2,6 +2,7 @@ package com.synchronoss.saw.batch.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -347,10 +348,10 @@ public class SawBisRouteController {
         // so that scheduler treats as immediate
         JsonNode activeTab = schedulerData.get("activeTab");
         if (activeTab != null && activeTab.asText().equals("immediate")) {
-          logger.trace("schedulerData on activeTab", activeTab);
+          logger.trace("schedulerData on activeTab :", activeTab);
           schedulerRequest.setCronExpression("");
         } else {
-          logger.trace("schedulerData on cronTab", schedulerData);
+          logger.trace("schedulerData on cronTab :", schedulerData);
           JsonNode cronExp = schedulerData.get("cronexp");
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
@@ -377,8 +378,13 @@ public class SawBisRouteController {
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
         logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + updateUrl);
-        logger.trace("Sending the content to " + bisSchedulerUrl + updateUrl 
-            + " : " + schedulerRequest);
+        try {
+          logger.trace("Sending the content to " + bisSchedulerUrl + updateUrl 
+              + " : " + objectMapper.writeValueAsString(schedulerRequest));
+        } catch (JsonProcessingException e) {
+          throw new SftpProcessorException("excpetion occurred while writing to"
+              + " schedulerRequest ",e);
+        }
         restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
         logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl + updateUrl);
       }
