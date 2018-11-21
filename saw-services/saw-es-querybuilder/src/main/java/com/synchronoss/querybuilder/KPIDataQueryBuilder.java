@@ -1,6 +1,9 @@
 package com.synchronoss.querybuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
@@ -8,6 +11,7 @@ import com.synchronoss.querybuilder.model.kpi.*;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +28,19 @@ public class KPIDataQueryBuilder {
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
 
     String jsonString;
+    String dataSecurityString;
 
     public KPIDataQueryBuilder(String jsonString) {
         super();
         this.jsonString = jsonString;
     }
+
+    public KPIDataQueryBuilder(String jsonString, String dataSecurityKey) {
+        super();
+        this.jsonString = jsonString;
+        this.dataSecurityString= dataSecurityKey;
+    }
+
     public String getJsonString() {
         return jsonString;
     }
@@ -44,10 +56,10 @@ public class KPIDataQueryBuilder {
     public KPIExecutionObject buildQuery() throws IOException, ProcessingException {
 
         KPIBuilder kpiBuilder = BuilderUtil.getNodeTreeKPIBuilder(getJsonString());
-            if (kpiBuilder.getKpi().getFilters() == null) {
-                throw new NullPointerException(
-                    "Please add filter[] block.It can be empty but these blocks are important.");
-            }
+        if (kpiBuilder.getKpi().getFilters() == null) {
+            throw new NullPointerException(
+                "Please add filter[] block.It can be empty but these blocks are important.");
+        }
         KPIExecutionObject kpiExecutionObject = new KPIExecutionObject();
         kpiExecutionObject.setCurrentSearchSourceBuilder(buildKPIQuery(kpiBuilder,true));
         kpiExecutionObject.setPriorSearchSourceBuilder(buildKPIQuery(kpiBuilder,false));
@@ -62,8 +74,7 @@ public class KPIDataQueryBuilder {
      * @param current
      * @return
      */
-    private SearchSourceBuilder buildKPIQuery(KPIBuilder kpiBuilder, boolean current)
-    {
+    private SearchSourceBuilder buildKPIQuery(KPIBuilder kpiBuilder, boolean current) throws IOException {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.size(0);
         List<com.synchronoss.querybuilder.model.kpi.Filter> filters = kpiBuilder.getKpi().getFilters();
@@ -77,7 +88,7 @@ public class KPIDataQueryBuilder {
                 {
                     logger.info("Build KPI value with preset value : "+item.getModel().getPreset().value());
                     if(current)
-                     dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+                        dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
                     else
                         dynamicConvertor = BuilderUtil.dynamicDecipherForPrior(item.getModel().getPreset().value());
                     RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
@@ -105,11 +116,25 @@ public class KPIDataQueryBuilder {
                         if (item.getType().value().equals(Filter.Type.DATE.value())) {
                             rangeQueryBuilder.format(DATE_FORMAT);
                         }
-                         dynamicConvertor  = calculatePriorDateCustomRange(item.getModel());
+                        dynamicConvertor  = calculatePriorDateCustomRange(item.getModel());
                         rangeQueryBuilder.lte(dynamicConvertor.getLte());
                         rangeQueryBuilder.gte(dynamicConvertor.getGte());
                         builder.add(rangeQueryBuilder);
                     }
+                }
+            }
+            DataSecurityKey dataSecurityKeyNode = null;
+            ObjectMapper objectMapper = null;
+            if (dataSecurityString!=null && !dataSecurityString.trim().equals("")){
+                objectMapper= new ObjectMapper();
+                objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+                JsonNode objectNode = objectMapper.readTree(dataSecurityString);
+                dataSecurityKeyNode = objectMapper.treeToValue(objectNode, DataSecurityKey.class);
+            }
+            if (dataSecurityKeyNode!=null) {
+                for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
+                    TermsQueryBuilder dataSecurityBuilder = new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
+                    builder.add(dataSecurityBuilder);
                 }
             }
             // make the query based on the filter given
@@ -132,7 +157,7 @@ public class KPIDataQueryBuilder {
             searchSourceBuilder = QueryBuilderUtil.aggregationBuilderDataFieldKPI(
                 dataField, searchSourceBuilder);
         }
-     return searchSourceBuilder;
+        return searchSourceBuilder;
     }
 
     /**
