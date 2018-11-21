@@ -317,8 +317,11 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
 
 
-                if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
+                int retVal = parseSingleFile(file.getPath(), new Path(tempPath));
+                if (retVal == 0) {
                     resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, outputDsPartitionKeys));
+                } else {
+                    return retVal;
                 }
             }
         }
@@ -348,7 +351,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
         logger.debug("Dest dir for file " + file + " = " + destDir);
-        writeDataset(df, outputFormat, destDir.toString());
+
+        boolean status = writeDataset(df, outputFormat, destDir.toString());
+
+        logger.debug("Write dataset status = " + status);
+
+        if (!status) {
+            return -1;
+        }
 
         collectRejectedData(parseRdd, outputRdd);
 
