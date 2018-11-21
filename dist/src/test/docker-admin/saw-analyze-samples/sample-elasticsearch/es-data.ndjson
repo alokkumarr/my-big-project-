@@ -996,5 +996,18 @@
 {"string": "string 498", "long": 1497, "float": 1004.98, "date": "2016-08-04 00:00:00", "integer": 597, "double": 99999.98}
 { "index" :{}}
 {"string": "string 499", "long": 1498, "float": 1004.99, "date": "2016-08-03 00:00:00", "integer": 598, "double": 99999.99}
+{ "index" :{}}
+{"string": "string 500", "long": 1499, "float": 1005.00, "date": "2018-11-21 00:00:00", "integer": 599, "double": 100000.0}
+{ "index" :{}}
+{"string": "string 501", "long": 1500, "float": 1005.01, "date": "2018-11-20 00:00:00", "integer": 600, "double": 100000.01}
+{ "index" :{}}
+{"string": "string 502", "long": 1501, "float": 1005.02, "date": "2018-11-19 00:00:00", "integer": 601, "double": 100000.02}
+{ "index" :{}}
+{"string": "string 503", "long": 1502, "float": 1005.03, "date": "2018-11-18 00:00:00", "integer": 602, "double": 100000.03}
+{ "index" :{}}
+{"string": "string 504", "long": 1503, "float": 1005.04, "date": "2018-11-17 00:00:00", "integer": 603, "double": 100000.04}
+{ "index" :{}}
+{"string": "string 505", "long": 1504, "float": 1005.05, "date": "2018-11-16 00:00:00", "integer": 604, "double": 100000.05}
+
 
 
