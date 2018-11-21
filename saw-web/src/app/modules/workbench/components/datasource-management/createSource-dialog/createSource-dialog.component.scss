@@ -1,0 +1,66 @@
+@import 'src/themes/base/colors';
+
+::ng-deep .createsource-dialog {
+  height: calc(100% - 48px);
+
+  .mat-card-content {
+    height: calc(100% - 36px);
+  }
+
+  .mat-stepper-horizontal {
+    height: 100%;
+  }
+
+  .mat-horizontal-content-container {
+    height: calc(100% - 55px);
+    padding: 0;
+
+    .mat-horizontal-stepper-content {
+      height: 98%;
+    }
+  }
+
+  .mat-horizontal-stepper-content[aria-expanded='false'] {
+    height: 0 !important;
+  }
+
+  .mat-form-field {
+    min-width: 75% !important;
+  }
+
+  .source-container {
+    height: 85%;
+    overflow: auto;
+  }
+
+  .no-click {
+    cursor: not-allowed !important;
+  }
+
+  .details-title {
+    text-align: left;
+    color: $primary-grey-g3;
+    padding-left: 10px;
+    margin: 0;
+  }
+
+  .source-list {
+    & > mat-card {
+      margin: 9px 0;
+      border-radius: 4px;
+      padding: 9px 24px;
+      cursor: pointer;
+    }
+  }
+
+  mat-card {
+    & > img {
+      height: 60px;
+      max-width: 70px;
+    }
+  }
+
+  .selected {
+    border: 3px $primary-blue-b1 solid;
+  }
+}

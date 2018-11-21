@@ -6,13 +6,18 @@
     </mat-radio-group>
     <br/>
     <mat-form-field style="width:35%;">
-        <input matInput type="number" [(ngModel)]="limitValue" min="0" placeholder="Value"/>
+        <input matInput type="number"
+                        [(ngModel)]="limitValue"
+                        autocomplete="off"
+                        min="0"
+                        placeholder="Value"/>
     </mat-form-field>
     <button mat-button color="primary" class="mat-raised-button mat-primary chart-title-button" (click)="onLimitDataChange()" style="float: right;">Apply Limit</button>
   </div>
   <mat-form-field fxFlex>
       <input matInput type="text"
              placeholder="Alias"
+             autocomplete="off"
              (input)="onAliasChange($event.target.value)"
              [value]="artifactColumn.aliasName || ''"/>
   </mat-form-field>
@@ -25,6 +30,7 @@
               type="text"
               placeholder="Format"
               disabled
+              autocomplete="off"
               style="cursor: pointer;"
               [value]="DATE_FORMATS_OBJ[artifactColumn.dateFormat] ? DATE_FORMATS_OBJ[artifactColumn.dateFormat].label : ''"/>
       </mat-form-field>

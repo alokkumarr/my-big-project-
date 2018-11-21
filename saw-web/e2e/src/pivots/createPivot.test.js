@@ -5,6 +5,7 @@ const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../javascript/helpers/utils');
 const protractorConf = require('../../protractor.conf');
+const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
 
 describe('Create pivot type analysis: createPivot.test.js', () => {
   const pivotDesigner = analyzePage.designerDialog.pivot;
@@ -46,7 +47,12 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     analyzePage.analysisElems.cardView.click();
 
     // Create Pivot
-    homePage.createAnalysis(metricName, analysisType);
+    let analyzePageV2 = new AnalyzePage();
+    analyzePageV2.clickOnAddAnalysisButton();
+    analyzePageV2.clickOnAnalysisType(analysisType);
+    analyzePageV2.clickOnNextButton();
+    analyzePageV2.clickOnDataPods(metricName);
+    analyzePageV2.clickOnCreateButton();
 
     // Apply filters
     const filters = analyzePage.filtersDialog;

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
 import { MatDialog, MatDialogConfig } from '@angular/material';
@@ -14,6 +14,7 @@ import {
 import { RoleService } from '../role/role.service';
 import { CategoryService } from '../category/category.service';
 import { PrivilegeService } from '../privilege/privilege.service';
+import { UserAssignmentService } from '../datasecurity/userassignment.service';
 import { JwtService } from '../../../common/services';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
@@ -70,7 +71,7 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
 })
 export class AdminMainViewComponent implements OnDestroy {
   columns: any[] = [];
-  section: 'user' | 'role' | 'privilege' | 'category';
+  section: 'user' | 'role' | 'privilege' | 'category' | 'user assignments';
   data$: Promise<any[]>;
   roles$: any;
   data: any[];
@@ -84,6 +85,8 @@ export class AdminMainViewComponent implements OnDestroy {
 
   ticket: { custID: string; custCode: string; masterLoginId?: string };
 
+  showAddButton: boolean;
+
   constructor(
     public _privilegeService: PrivilegeService,
     public _categoryService: CategoryService,
@@ -91,6 +94,7 @@ export class AdminMainViewComponent implements OnDestroy {
     public _roleService: RoleService,
     public _jwtService: JwtService,
     public _localSearch: LocalSearchService,
+    private _userassignmentsService: UserAssignmentService,
     public _toastMessage: ToastService,
     public _dialog: MatDialog,
     public _router: Router,
@@ -109,6 +113,7 @@ export class AdminMainViewComponent implements OnDestroy {
   }
 
   initialise() {
+    this.showAddButton = true;
     const token = this._jwtService.getTokenObj();
     this.ticket = token.ticket;
     const customerId = parseInt(this.ticket.custID, 10);
@@ -162,6 +167,8 @@ export class AdminMainViewComponent implements OnDestroy {
       return CATEGORY_SEARCH_CONFIG;
     case 'privilege':
       return PRIVILEGE_SEARCH_CONFIG;
+    case 'user assignments':
+      return USER_SEARCH_CONFIG;
     }
   }
 
@@ -198,6 +205,9 @@ export class AdminMainViewComponent implements OnDestroy {
       return this._categoryService;
     case 'privilege':
       return this._privilegeService;
+    case 'user assignments':
+      this.showAddButton = false;
+      return this._userassignmentsService;
     default:
       break;
     }

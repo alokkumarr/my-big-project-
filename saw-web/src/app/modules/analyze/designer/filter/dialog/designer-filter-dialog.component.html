@@ -22,9 +22,9 @@
       <button mat-icon-button
               *ngIf="!data.isInRuntimeMode"
               [attr.e2e]="'filter-add-btn-' + artifact.artifactName"
+              (click)="addFilter(artifact.artifactName)"
       >
-        <mat-icon fontIcon="icon-plus"
-                  (click)="addFilter(artifact.artifactName)"></mat-icon>
+        <mat-icon fontIcon="icon-plus"></mat-icon>
       </button>
     </div>
   </div>

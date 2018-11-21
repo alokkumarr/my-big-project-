@@ -173,6 +173,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             if(headerSize >= 1) {
                 logger.debug("Header present");
                 FileStatus[] files = fs.globStatus(new Path(sourcePath));
+
+                logger.debug("Total number of files in the directory = " + files.length);
                 // Check if directory has been given
                 if(files.length == 1 && files[0].isDirectory()){
                     logger.debug("Files length = 1 and is a directory");
@@ -308,14 +310,18 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
         // Files
+
         for (FileStatus file : files) {
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
-                if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
 
-//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, outputDataSetMode, DLDataSetOperations.FORMAT_PARQUET, null));
+
+
+                int retVal = parseSingleFile(file.getPath(), new Path(tempPath));
+                if (retVal == 0) {
                     resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, outputDsPartitionKeys));
-
+                } else {
+                    return retVal;
                 }
             }
         }
@@ -345,7 +351,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
         logger.debug("Dest dir for file " + file + " = " + destDir);
-        writeDataset(df, outputFormat, destDir.toString());
+
+        boolean status = writeDataset(df, outputFormat, destDir.toString());
+
+        logger.debug("Write dataset status = " + status);
+
+        if (!status) {
+            return -1;
+        }
 
         collectRejectedData(parseRdd, outputRdd);
 

@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
@@ -19,17 +19,10 @@ import { AnalyzeService } from '../analyze/services/analyze.service';
 import { FilterService } from '../analyze/services/filter.service';
 import {
   MenuService,
-  HeaderProgressService,
   ToastService,
   SideNavService
 } from '../../common/services';
 import { ObserveService } from './services/observe.service';
-
-import {
-  AddTokenInterceptor,
-  HandleErrorInterceptor,
-  RefreshTokenInterceptor
-} from '../../common/interceptor';
 
 import { UChartModule } from '../../common/components/charts';
 
@@ -96,24 +89,12 @@ const components = [
   entryComponents: components,
   exports: [DxDataGridModule, DxDataGridComponent, DxTemplateModule],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HandleErrorInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RefreshTokenInterceptor,
-      multi: true
-    },
     DashboardService,
     ObserveService,
     JwtService,
     UserService,
     AnalyzeService,
     MenuService,
-    HeaderProgressService,
     ToastService,
     SideNavService,
     FilterService

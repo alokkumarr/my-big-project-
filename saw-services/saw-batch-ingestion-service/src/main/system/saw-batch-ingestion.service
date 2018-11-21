@@ -1,0 +1,11 @@
+[Unit]
+Description=SAW Batch Ingestion
+
+[Service]
+Type=notify
+ExecStart=/bin/sh -c "exec java -Xmx1G -jar /opt/bda/saw-batch-ingestion-service/saw-batch-ingestion.jar --spring.config.location=/opt/bda/saw-batch-ingestion-service/conf/application.yml"
+SyslogIdentifier=saw-batch-ingestion
+User=mapr
+Restart=on-failure
+# Allow service to exit on SIGTERM, if socket-activated
+SuccessExitStatus=143

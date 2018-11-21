@@ -3,21 +3,23 @@ import { Routes } from '@angular/router';
 import { AdminMainViewComponent } from './main-view';
 import { AdminExportViewComponent } from './export';
 import { AdminImportViewComponent } from './import';
-import { isAdminGuard } from './guards';
+import { SecurityGroupComponent } from './datasecurity/security-group/security-group.component';
+import { IsAdminGuard } from './guards';
 import {
   UsersTableHeader,
   RolesTableHeader,
   PrivilegesTableHeader,
-  CategoriesTableHeader
+  CategoriesTableHeader,
+  UserAssignmentsTableHeader
 } from './consts';
 
 export const routes: Routes = [
   {
     // name: 'admin',
-    path: 'admin',
+    path: '',
     component: AdminPageComponent,
-    canActivate: [isAdminGuard],
-    canActivateChild: [isAdminGuard],
+    canActivate: [IsAdminGuard],
+    canActivateChild: [IsAdminGuard],
     runGuardsAndResolvers: 'paramsOrQueryParamsChange',
     children: [
       {
@@ -65,6 +67,19 @@ export const routes: Routes = [
         // name: 'admin.import',
         path: 'import',
         component: AdminImportViewComponent
+      },
+      {
+        // name: 'admin.import',
+        path: 'securitygroups',
+        component: SecurityGroupComponent
+      },
+      {
+        path: 'userassignments',
+        component: AdminMainViewComponent,
+        data: {
+          columns: UserAssignmentsTableHeader,
+          section: 'user assignments'
+        }
       },
       {
         path: '',

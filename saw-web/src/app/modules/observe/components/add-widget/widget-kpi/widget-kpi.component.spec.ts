@@ -11,7 +11,7 @@ import { WidgetKPIComponent } from './widget-kpi.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('KPI Form Widget', () => {
-  let fixture: ComponentFixture<WidgetKPIComponent>, el: HTMLElement;
+  let fixture: ComponentFixture<WidgetKPIComponent>;
   beforeEach(() => {
     return TestBed.configureTestingModule({
       imports: [
@@ -25,8 +25,6 @@ describe('KPI Form Widget', () => {
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(WidgetKPIComponent);
-
-        el = fixture.nativeElement;
 
         fixture.detectChanges();
       });
