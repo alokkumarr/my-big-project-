@@ -66,14 +66,14 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     JobDetail jobDetail = JobUtil.createBatchIngestionJob(jobClass, false, context, job, groupKey);
 
-    logger.debug("creating trigger for key :" + jobKey + " at date :" + job.getJobScheduleTime());
+    logger.info("creating trigger for key :" + jobKey + " at date :" + job.getJobScheduleTime());
     Trigger cronTriggerBean = JobUtil.createSingleTrigger(triggerKey, job.getJobScheduleTime(),
         SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
     try {
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
       Date dt = scheduler.scheduleJob(jobDetail, cronTriggerBean);
-      logger.debug("Job with key jobKey :" + jobKey + " and group :" + groupKey
+      logger.info("Job with key jobKey :" + jobKey + " and group :" + groupKey
           + " scheduled successfully for date :" + dt);
       return true;
     } catch (SchedulerException e) {
@@ -103,14 +103,14 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     JobDetail jobDetail = JobUtil.createBatchIngestionJob(jobClass, false, context, job, groupKey);
 
-    logger.debug("creating trigger for key :" + jobKey + " at date :" + job.getJobScheduleTime());
+    logger.info("creating trigger for key :" + jobKey + " at date :" + job.getJobScheduleTime());
     Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),
         job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
     try {
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
       Date dt = scheduler.scheduleJob(jobDetail, cronTriggerBean);
-      logger.debug("Job with key jobKey :" + jobKey + " and group :" + groupKey
+      logger.info("Job with key jobKey :" + jobKey + " and group :" + groupKey
           + " scheduled successfully for date :" + dt);
       return true;
     } catch (SchedulerException e) {
@@ -136,7 +136,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     Scheduler scheduler = schedulerFactoryBean.getScheduler();
     JobKey jobKey = new JobKey(jobName, schedulerJobDetail.getJobGroup());
 
-    logger.debug("Parameters received for updating one time job : jobKey :" + jobKey + ", date: "
+    logger.info("Parameters received for updating one time job : jobKey :" + jobKey + ", date: "
         + schedulerJobDetail.getJobScheduleTime());
     try {
       Trigger newTrigger = JobUtil.createSingleTrigger(jobName,
@@ -146,7 +146,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
       scheduler.addJob(jobDetail, true, true);
       Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobName),
           newTrigger);
-      logger.debug("Trigger associated with jobKey :" + jobName
+      logger.info("Trigger associated with jobKey :" + jobName
           + " rescheduled successfully for date :" + dt);
       return true;
     } catch (Exception e) {
@@ -169,7 +169,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String jobName = schedulerJobDetail.getJobName();
     Scheduler scheduler = schedulerFactoryBean.getScheduler();
     JobKey jobKey = new JobKey(jobName, schedulerJobDetail.getJobGroup());
-    logger.debug("Parameters received for updating cron job : jobKey :" + jobKey + ", date: "
+    logger.info("Parameters received for updating cron job : jobKey :" + jobKey + ", date: "
         + schedulerJobDetail.getJobScheduleTime());
     try {
       Trigger newTrigger = JobUtil.createCronTrigger(jobName,
@@ -179,7 +179,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
       jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID, schedulerJobDetail);
       scheduler.addJob(jobDetail, true, true);
       Date dt = scheduler.rescheduleJob(TriggerKey.triggerKey(jobName), newTrigger);
-      logger.debug("Trigger associated with jobKey :" + jobName
+      logger.info("Trigger associated with jobKey :" + jobName
           + " rescheduled successfully for date :" + dt);
       return true;
     } catch (Exception e) {
@@ -203,10 +203,10 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String jobKey = scheduleKeys.getJobName();
 
     TriggerKey tkey = new TriggerKey(jobKey);
-    logger.debug("Parameters received for unscheduling job : tkey :" + jobKey);
+    logger.info("Parameters received for unscheduling job : tkey :" + jobKey);
     try {
       boolean status = schedulerFactoryBean.getScheduler().unscheduleJob(tkey);
-      logger.debug(
+      logger.info(
           "Trigger associated with jobKey :" + jobKey + " unscheduled with status :" + status);
       return status;
     } catch (SchedulerException e) {
@@ -231,11 +231,11 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String groupKey = scheduleKeys.getGroupName();
 
     JobKey jkey = new JobKey(jobKey, groupKey);
-    logger.debug("Parameters received for deleting job : jobKey :" + jobKey);
+    logger.info("Parameters received for deleting job : jobKey :" + jobKey);
 
     try {
       boolean status = schedulerFactoryBean.getScheduler().deleteJob(jkey);
-      logger.debug("Job with jobKey :" + jobKey + " deleted with status :" + status);
+      logger.info("Job with jobKey :" + jobKey + " deleted with status :" + status);
       return status;
     } catch (SchedulerException e) {
       logger.error("SchedulerException while deleting job with key :" + jobKey + " message :"
@@ -257,12 +257,12 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String jobKey = scheduleKeys.getJobName();
     String groupKey = scheduleKeys.getGroupName();
     JobKey jkey = new JobKey(jobKey, groupKey);
-    logger.debug(
+    logger.info(
         "Parameters received for pausing job : jobKey :" + jobKey + ", groupKey :" + groupKey);
 
     try {
       schedulerFactoryBean.getScheduler().pauseJob(jkey);
-      logger.debug("Job with jobKey :" + jobKey + " paused succesfully.");
+      logger.info("Job with jobKey :" + jobKey + " paused succesfully.");
       return true;
     } catch (SchedulerException e) {
       logger.error("SchedulerException while pausing job with key :" + scheduleKeys + " message :"
@@ -284,10 +284,10 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String groupKey = scheduleKeys.getGroupName();
 
     JobKey key = new JobKey(jobKey, groupKey);
-    logger.debug("Parameters received for resuming job : jobKey :" + jobKey);
+    logger.info("Parameters received for resuming job : jobKey :" + jobKey);
     try {
       schedulerFactoryBean.getScheduler().resumeJob(key);
-      logger.debug("Job with jobKey :" + jobKey + " resumed succesfully.");
+      logger.info("Job with jobKey :" + jobKey + " resumed succesfully.");
       return true;
     } catch (SchedulerException e) {
       logger.error("SchedulerException while resuming job with key :" + jobKey + " message :"
@@ -310,10 +310,10 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String groupKey = scheduleKeys.getGroupName();
 
     JobKey key = new JobKey(jobKey, groupKey);
-    logger.debug("Parameters received for starting job now : jobKey :" + jobKey);
+    logger.info("Parameters received for starting job now : jobKey :" + jobKey);
     try {
       schedulerFactoryBean.getScheduler().triggerJob(key);
-      logger.debug("Job with jobKey :" + jobKey + " started now succesfully.");
+      logger.info("Job with jobKey :" + jobKey + " started now succesfully.");
       return true;
     } catch (SchedulerException e) {
       logger.error("SchedulerException while starting job now with key :" + jobKey + " message :"
@@ -335,7 +335,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String jobKey = scheduleKeys.getJobName();
     String groupKey = scheduleKeys.getGroupName();
 
-    logger.debug("Parameters received for checking job is running now : jobKey :" + jobKey);
+    logger.info("Parameters received for checking job is running now : jobKey :" + jobKey);
     try {
 
       List<JobExecutionContext> currentJobs =
@@ -401,7 +401,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
               list.add(map);
               logger.info("Job details:");
-              logger.debug("Job Name:" + jobName + ", Group Name:" + groupName + ", Schedule Time:"
+              logger.info("Job Name:" + jobName + ", Group Name:" + groupName + ", Schedule Time:"
                   + scheduleTime);
             }
           }
@@ -450,7 +450,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
                   map.put("jobStatus", jobState);
                 }
                 logger.info("Job details:");
-                logger.debug("Job Name:" + scheduleKeys + ", Group Name:" + groupName
+                logger.info("Job Name:" + scheduleKeys + ", Group Name:" + groupName
                     + ", Schedule Time:" + scheduleTime);
               }
             }
@@ -476,7 +476,10 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     try {
       String groupKey = scheduleKeys.getGroupName();
       JobKey jobKey = new JobKey(scheduleKeys.getJobName(), groupKey);
+     
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
+      logger.info("Checking job with details" + jobKey + " exists?:  " 
+              + scheduler.checkExists(jobKey));
       if (scheduler.checkExists(jobKey)) {
         return true;
       }
