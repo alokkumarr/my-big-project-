@@ -20,7 +20,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactoryLocator;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
@@ -52,7 +51,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
       }
       sessionFactoryMap.put(id, sessionFactory);
     }
-    return new CachingSessionFactory<LsEntry>(sessionFactory);
+    return sessionFactory;
   }
 
   private DefaultSftpSessionFactory generateSessionFactory(Long key) throws Exception {
