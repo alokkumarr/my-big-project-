@@ -13,7 +13,6 @@ import {
   Artifact,
   Format
 } from '../types';
-import { DesignerStateService } from '../designer/designer-state.service';
 // import { DesignerDialogComponent } from '../designer/dialog';
 import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
 import {
@@ -28,11 +27,7 @@ import { ConfirmDialogData } from '../../../common/types';
 
 @Injectable()
 export class AnalyzeDialogService {
-  constructor(
-    public dialog: MatDialog,
-    private router: Router,
-    private designerStateService: DesignerStateService
-  ) {}
+  constructor(public dialog: MatDialog, private router: Router) {}
 
   openNewAnalysisDialog(analysisStarter: AnalysisStarter) {
     const data: AnalysisDialogData = {
@@ -51,10 +46,13 @@ export class AnalyzeDialogService {
   }
 
   openAnalysisDialog(data: AnalysisDialogData) {
-    this.designerStateService.analysis = data.analysis;
-    this.designerStateService.analysisStarter = data.analysisStarter;
-    this.designerStateService.designerMode = data.designerMode;
-    return this.router.navigate(['analyze/designer']);
+    const mode = data.designerMode || 'new';
+    const analysisStarter = data.analysisStarter || {};
+    const analysis = data.analysis ? { analysisId: data.analysis.id } : {};
+
+    return this.router.navigate(['analyze/designer'], {
+      queryParams: { ...analysisStarter, ...analysis, mode }
+    });
     // return this.dialog.open(DesignerDialogComponent, {
     //   panelClass: 'designer-dialog',
     //   width: '100vw',

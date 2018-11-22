@@ -1,6 +1,7 @@
 <designer-container [analysisStarter]="analysisStarter"
                     [analysis]="analysis"
                     [designerMode]="designerMode"
+                    *ngIf="analysis || analysisStarter"
                     (onBack)="onBack()"
                     (onSave)="onSave()">
 </designer-container>
