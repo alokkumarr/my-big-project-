@@ -68,48 +68,48 @@
         </div>
         <div class="routes-card-body">
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Host Name : </span>
               <span>{{selectedSourceData?.hostName}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Port No : </span>
               <span>{{selectedSourceData?.portNo}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Access Type : </span>
               <span>{{selectedSourceData?.accessType}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Description : </span>
               <span>{{selectedSourceData?.description}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Created By : </span>
               <span>{{selectedSourceData?.createdBy}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Created Date : </span>
               <span>{{selectedSourceData?.createdDate | date: 'short'}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>User Name : </span>
               <span>{{selectedSourceData?.userName}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Password : </span>
               <span class="pwd-hide" [class.pwd-show]="show === true">{{selectedSourceData?.password}}</span>
               <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">

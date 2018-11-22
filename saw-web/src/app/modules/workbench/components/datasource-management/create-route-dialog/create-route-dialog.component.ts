@@ -1,8 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl
+} from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
+import * as includes from 'lodash/includes';
 import { DatasourceService } from '../../../services/datasource.service';
 
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
@@ -16,7 +22,7 @@ export class CreateRouteDialogComponent implements OnInit {
   public detailsFormGroup: FormGroup;
   crondetails: any = {};
   opType = 'create';
-  dialogTitle = 'Create Route';
+  channelName = '';
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -33,15 +39,15 @@ export class CreateRouteDialogComponent implements OnInit {
       routeName: ['', Validators.required],
       sourceLocation: ['', Validators.required],
       destinationLocation: ['', Validators.required],
-      filePattern: ['', Validators.required],
+      filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: ['']
     });
   }
 
   ngOnInit() {
+    this.channelName = this.routeData.channelName;
     if (isUndefined(this.routeData.routeMetadata.length)) {
       this.opType = 'update';
-      this.dialogTitle = `Editing route ${this.routeData.channelName}`;
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
       this.crondetails = this.routeData.routeMetadata.schedulerExpression;
     }
@@ -49,6 +55,15 @@ export class CreateRouteDialogComponent implements OnInit {
 
   onCancelClick(): void {
     this.dialogRef.close();
+  }
+
+  validateFilePattern(
+    control: AbstractControl
+  ): { [key: string]: boolean } | null {
+    if (includes(control.value, '.*') || includes(control.value, ',')) {
+      return { inValidPattern: true };
+    }
+    return null;
   }
 
   testRoute(formData) {

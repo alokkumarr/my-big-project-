@@ -84,6 +84,9 @@
     border-radius: 5px;
 
     .routes-card-body {
+      overflow: auto;
+      height: calc(100% - 43px);
+      
       .mat-divider {
         border-color: rgba(0, 0, 0, 0.05) !important;
       }
