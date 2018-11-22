@@ -3,7 +3,7 @@ const using = require('jasmine-data-provider');
 const protractorConf = require('../protractor.conf');
 var appRoot = require('app-root-path');
 var fs = require('fs');
-describe('dev test1 dev1.js', () => {
+describe('dev test1 dummyDevelopmentTests1.js', () => {
 
   //Prerequisites: two users should exist with user types: admin and user
 

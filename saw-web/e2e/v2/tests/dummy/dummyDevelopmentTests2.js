@@ -1,8 +1,8 @@
-var testDataReader = require('../testdata/testDataReader.js');
+var testDataReader = require('../../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const logger = require('../conf/logger')(__filename);
+const logger = require('../../conf/logger')(__filename);
 
-  describe('DEV2 test from dev2.js', () => {
+  describe('DEV2 test from dummyDevelopmentTests2.js', () => {
 
     using(testDataReader.testData['DEV2']['dp'] ? testDataReader.testData['DEV2']['dp']:{}, function(data, id) {
     it(`${id}:${data.description}`, function() {

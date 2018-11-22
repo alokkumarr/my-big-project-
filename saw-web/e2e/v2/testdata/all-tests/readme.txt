@@ -37,7 +37,7 @@ Example test case format.
     const protractorConf = require('../conf/protractor.conf');
     const logger = require('../conf/logger')(__filename);
 
-      describe('DEV1 test from dev1.js', () => {
+      describe('DEV1 test from dummyDevelopmentTests1.js', () => {
         using(testDataReader.testData['featureName']['dataProvideName'] ? testDataReader.testData['featureName']['dataProvideName'] :{}, function(data, id) {
 
          ## Note:

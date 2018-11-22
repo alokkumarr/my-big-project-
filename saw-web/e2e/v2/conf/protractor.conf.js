@@ -4,31 +4,31 @@ var retry = require('protractor-retry').retry;
 var fs = require('fs');
 var argv = require('yargs').argv;
 const SuiteSetup = require('../helpers/SuiteSetup');
-
 const logger = require('./logger')(__filename);
+const testSuite = require('./testSuites');
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
+ * maximum time to wait for a page load i.e. when user refresh page/ first time open browser and type saw app url
+ */
+const pageLoadTimeout = 30000;  //-- !!!DON'T CHANGE because it will increase overall test execution time
+
+const implicitlyWait = 1000; //should not be more than 5 seconds, this will impact over all execution time
+
+/**
  * This is maximum time to wait for an element visible
  * if element is not visible within this time then protractor will throw timeout error & mark test as failure
  * and continue to execute other test.
- */
-const pageLoadTimeout = 30000;  //-- !!!DON'T CHANGE
-
-const implicitlyWait = 1000; //should not be more than 5 seconds, this will increase over all execution time
-
-/**
- * Explicit wait for element
  * 30 seconds in docker and 20 seconds in local
  */
-const fluentWait = SuiteSetup.distRun() ? 30000 : 20000;  //-- !!!DON'T CHANGE
+const fluentWait = SuiteSetup.distRun() ? 30000 : 20000;  //-- !!!DON'T CHANGE because it will impact overall test execution time
 
 /**
  * Before performing any action, Protractor waits until there are no pending asynchronous tasks in your Angular
  * application. This means that all timeouts and http requests are finished.
  * https://github.com/angular/protractor/blob/master/docs/timeouts.md
  * https://github.com/angular/protractor/blob/master/lib/config.ts
- * 3 min -- All http/https calls should be completed -- !!!DON'T CHANGE
+ * 3 min -- All http/https calls should be completed -- !!!DON'T CHANGE because it will impact overall test execution time
  */
 const allScriptsTimeout =  180000;
 
@@ -109,76 +109,28 @@ exports.config = {
     /**
      * This suite will be run as part of main bamboo build plan.
      */
-    smoke: [testBaseDir + 'login.test.js'],
+    smoke: testSuite.SMOKE,
     /**
-     * This suite will be triggered from QA Test bamboo plan frequently for sanity check
-     */ sanity: [
-      testBaseDir + 'login.test.js',
-      testBaseDir + 'createReport.test.js',
-      testBaseDir + 'charts/createAndDeleteCharts.test.js'
-    ],
-    /**
-     * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
+     * This suite will be triggered from main bamboo plan frequently for sanity check
      */
-    critical: [
-      // login logout tests
-      testBaseDir + 'login.test.js',
-      testBaseDir + 'priviliges.test.js',
-      testBaseDir + 'analyze.test.js',
-      testBaseDir + 'createReport.test.js', // charts tests
-      testBaseDir + 'charts/applyFiltersToCharts.js',
-      testBaseDir + 'charts/createAndDeleteCharts.test.js',
-      testBaseDir + 'charts/previewForCharts.test.js', // chartEditFork tests
-      testBaseDir + 'charts/editAndDeleteCharts.test.js',
-      testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js', // filters tests
-      testBaseDir + 'promptFilter/chartPromptFilters.test.js',
-      testBaseDir + 'promptFilter/esReportPromptFilters.test.js',
-      testBaseDir + 'promptFilter/pivotPromptFilters.test.js',
-      testBaseDir + 'promptFilter/reportPromptFilters.test.js', // pivots tests
-      testBaseDir + 'pivots/pivotFilters.test.js', // Observe module test cases
-      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
-      testBaseDir +
-        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilter.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
-    ],
-    regression: [
-      // login logout tests
-      testBaseDir + 'login.test.js',
-      testBaseDir + 'priviliges.test.js',
-      testBaseDir + 'analyze.test.js',
-      testBaseDir + 'createReport.test.js', // charts tests
-      testBaseDir + 'charts/applyFiltersToCharts.js',
-      testBaseDir + 'charts/createAndDeleteCharts.test.js',
-      testBaseDir + 'charts/previewForCharts.test.js', // chartEditFork tests
-      testBaseDir + 'charts/editAndDeleteCharts.test.js',
-      testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js', // filters tests
-      testBaseDir + 'promptFilter/chartPromptFilters.test.js',
-      testBaseDir + 'promptFilter/esReportPromptFilters.test.js',
-      testBaseDir + 'promptFilter/pivotPromptFilters.test.js',
-      testBaseDir + 'promptFilter/reportPromptFilters.test.js', // pivots tests
-      testBaseDir + 'pivots/pivotFilters.test.js', // Observe module test cases
-      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
-      testBaseDir +
-        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilter.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
-    ],
+    sanity: testSuite.SANITY,
     /**
-     * This suite is for development environment and always all dev tests will be executed.
+     * This suite will be triggered from main bamboo plan and runs on every commit
+     * Contains all feature with minimal data set
      */
-    development: [
-      testBaseDir + 'dev1.js',
-      testBaseDir + 'dev2.js']
-  },
+    critical:testSuite.CRITICAL,
+    /**
+     * This suite will be triggered from e2e bamboo plan and dev team has to run this plan manually to verify that their
+     * changes are not causing any issues to app.
+     * Bamboo plan url: https://bamboo.synchronoss.net:8443/browse/BDA-TSA
+     * Contains all feature with minimal data set
+     */
+    regression: testSuite.REGRESSION,
+    /**
+     * This suite is for developing new tests and quickly debug if something breaking
+     */
+    development:testSuite.DEVELOPMENT,
+
   onCleanUp: function(results) {
     retry.onCleanUp(results);
   },
@@ -237,24 +189,24 @@ exports.config = {
     // Generate test data
     let appUrl = SuiteSetup.getSawWebUrl();
 
-    // if (appUrl) {
-    //   try {
-    //     logger.info('Generating test for this run...');
-    //     let APICommonHelpers = require('../helpers/api/APICommonHelpers');
-    //     let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
-    //     let token = APICommonHelpers.generateToken(apiBaseUrl);
-    //     let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
-    //     new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
-    //   }catch (e) {
-    //     logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
-    //       'hence exiting test suite and failing it....'+e);
-    //     process.exit(1);
-    //   }
-    // } else {
-    //   logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl
-    //     + ', hence exiting test suite and failing it...');
-    //   process.exit(1);
-    // }
+    if (appUrl) {
+      try {
+        logger.info('Generating test for this run...');
+        let APICommonHelpers = require('../helpers/api/APICommonHelpers');
+        let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+        let token = APICommonHelpers.generateToken(apiBaseUrl);
+        let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
+        new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
+      }catch (e) {
+        logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
+          'hence exiting test suite and failing it....'+e);
+        process.exit(1);
+      }
+    } else {
+      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl
+        + ', hence exiting test suite and failing it...');
+      process.exit(1);
+    }
   },
   afterLaunch: function() {
     var retryCounter = 1;

@@ -1,9 +1,9 @@
-var testDataReader = require('../testdata/testDataReader.js');
+var testDataReader = require('../../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../conf/protractor.conf');
-const logger = require('../conf/logger')(__filename);
+const protractorConf = require('../../conf/protractor.conf');
+const logger = require('../../conf/logger')(__filename);
 
-  describe('DEV1 test from dev1.js', () => {
+  describe('DEV1 test from dummyDevelopmentTests1.js', () => {
     logger.info('Hello this is from logger')
     using(testDataReader.testData['DEV1']['dp'] ? testDataReader.testData['DEV1']['dp'] :{}, function(data, id) {
 
