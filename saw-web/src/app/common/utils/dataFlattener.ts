@@ -34,7 +34,7 @@ function getNodeFieldMapPivot(sqlBuilder) {
 
 function parseNodePivot(node, dataObj, nodeFieldMap, level) {
   if (!isUndefined(node.key)) {
-    // As per AC on 5215, if key is empty show undefined
+    // As per AC on 5216, if key is empty show undefined
     node.key = isEmpty(node.key) ? 'undefined' : node.key;
     const columnName = getColumnName(nodeFieldMap, level);
     dataObj[columnName] = node.key_as_string || node.key;
