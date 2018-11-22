@@ -2,6 +2,8 @@ package model
 
 import java.util
 
+import com.fasterxml.jackson.core.`type`.TypeReference
+import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.slf4j.{Logger, LoggerFactory}
@@ -425,17 +427,23 @@ object QueryBuilder extends {
     }
     import scala.collection.JavaConverters._
     var applicableDsk: util.List[Object] = new util.ArrayList[Object]
-    artifacts.flatMap((artifact: JValue) => {
+    val objectMapper = new ObjectMapper
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
+      artifacts.flatMap((artifact: JValue) => {
       val artifactName = (artifact \ "artifactName").extract[String]
       val columns = extractArray(artifact, "columns")
       columns.foreach((col: JValue) => {
         val columnName = (col \ "columnName").extract[String]
         for(dataSecurityKeyDef  <- dataSecurityKey.asScala){
-          dataSecurityKeyDef
+          val dsk : DataSecurityKeyDef = objectMapper.convertValue(dataSecurityKeyDef,
+            new TypeReference[DataSecurityKeyDef](){})
+          dsk
           match {
             case key : DataSecurityKeyDef =>
             if (key.getName().equalsIgnoreCase(columnName)
-              || key.getName.equalsIgnoreCase(artifactName + "." + columnName)) {
+              || key.getName.equalsIgnoreCase(artifactName + "." + columnName)
+              || key.getName.equalsIgnoreCase(columnName.split("\\.")(0))
+              || key.getName.equalsIgnoreCase(artifactName + "." + columnName.split("\\.")(0))) {
               applicableDsk.add(dataSecurityKeyDef)
             }}
         }
