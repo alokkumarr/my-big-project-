@@ -9,6 +9,9 @@ const logger = require('./logger')(__filename);
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
+ * This is maximum time to wait for an element visible
+ * if element is not visible within this time then protractor will throw timeout error & mark test as failure
+ * and continue to execute other test.
  */
 const pageLoadTimeout = 30000;  //-- !!!DON'T CHANGE
 
