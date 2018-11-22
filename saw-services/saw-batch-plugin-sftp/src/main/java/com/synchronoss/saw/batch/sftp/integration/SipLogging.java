@@ -54,5 +54,11 @@ public class SipLogging {
     logger.trace("Integrate with logging API & checking for the duplicate files : " + fileName);
     return bisFileLogsRepository.isFileNameExists(fileName);
   }
+
+  public void deleteLog(String pid) throws SipNestedRuntimeException {
+    logger.trace("Delete an entry with logging API :" + pid);
+    bisFileLogsRepository.deleteById(pid);
+  }
+
 }
 
