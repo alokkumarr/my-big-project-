@@ -13,7 +13,6 @@ import {
   Artifact,
   Format
 } from '../types';
-// import { DesignerDialogComponent } from '../designer/dialog';
 import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
 import {
   DesignerFilterDialogComponent,
@@ -53,13 +52,6 @@ export class AnalyzeDialogService {
     return this.router.navigate(['analyze/designer'], {
       queryParams: { ...analysisStarter, ...analysis, mode }
     });
-    // return this.dialog.open(DesignerDialogComponent, {
-    //   panelClass: 'designer-dialog',
-    //   width: '100vw',
-    //   maxWidth: '100vw',
-    //   height: '100vh',
-    //   data
-    // } as MatDialogConfig);
   }
 
   openSortDialog(sorts: Sort[], artifacts: Artifact[]) {

@@ -109,20 +109,10 @@ export class AnalyzeActionsMenuComponent implements OnInit {
 
   edit() {
     this._analyzeActionsService.edit(this.analysis);
-    // .then((result: DesignerSaveEvent) => {
-    //   if (result) {
-    //     this.afterEdit.emit(result);
-    //   }
-    // });
   }
 
   fork() {
     this._analyzeActionsService.fork(this.analysis);
-    // .then((result: DesignerSaveEvent) => {
-    //   if (result) {
-    //     this.afterEdit.emit(result);
-    //   }
-    // });
   }
 
   execute() {
