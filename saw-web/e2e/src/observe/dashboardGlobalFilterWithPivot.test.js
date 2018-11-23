@@ -4,13 +4,17 @@ const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const protractorConf = require('../../protractor.conf');
 const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
-let AnalysisHelper = require('../javascript/api/AnalysisHelper');
+let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
 let ApiUtils = require('../javascript/api/APiUtils');
 const Constants = require('../javascript/api/Constants');
 const globalVariables = require('../javascript/helpers/globalVariables');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../javascript/helpers/observe/DashboardFunctions');
-const ObserveHelper = require('../javascript/api/ObserveHelper');
+const ObserveHelper = require('../../v2/helpers/api/ObserveHelper');
+const chai = require('chai');
+const assert = chai.assert;
+const logger = require('../../v2/conf/logger')(__filename);
+let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
 
 describe('Global filters in dashboard with pivot tests: dashboardGlobalFilterWithPivot.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -25,8 +29,8 @@ describe('Global filters in dashboard with pivot tests: dashboardGlobalFilterWit
   let dashboardId;
 
   beforeAll(function() {
-    host = new ApiUtils().getHost(browser.baseUrl);
-    token = new AnalysisHelper().getToken(host);
+    host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
   });
@@ -49,9 +53,8 @@ describe('Global filters in dashboard with pivot tests: dashboardGlobalFilterWit
       analysesDetails = [];
 
       //delete dashboard if ui failed.
-      let oh = new ObserveHelper();
       if(dashboardId) {
-        oh.deleteDashboard(host, token, dashboardId);
+        new ObserveHelper().deleteDashboard(host, token, dashboardId);
       }
       commonFunctions.logOutByClearingLocalStorage();
       done();
@@ -61,7 +64,10 @@ describe('Global filters in dashboard with pivot tests: dashboardGlobalFilterWit
   using(testDataReader.testData['DASHBOARD_GLOBAL_FILTERS']['dashboardGlobalFiltersWithPivot'] ? testDataReader.testData['DASHBOARD_GLOBAL_FILTERS']['dashboardGlobalFiltersWithPivot'] : {}, function(data, description) {
     it('should able apply global filters in dashboard with pivot: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARD_GLOBAL_FILTERS', dp:'dashboardGlobalFiltersWithPivot'}), () => {
       try {
-
+        if(!token) {
+          logger.error('token cannot be null');
+          assert.isNotNull(token, 'token cannot be null');
+        }
         let currentTime = new Date().getTime();
         let user = data.user;
         let type = Constants.PIVOT;
@@ -71,6 +77,7 @@ describe('Global filters in dashboard with pivot tests: dashboardGlobalFilterWit
         let name = 'AT ' + Constants.PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
         let description = 'AT Description:' + Constants.PIVOT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
         let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, null,  data.filters);
+        assert.isNotNull(analysis, 'analysis cannot be null');
         analysesDetails.push(analysis);
 
         loginPage.loginAs(user);

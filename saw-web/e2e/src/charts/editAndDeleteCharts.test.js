@@ -10,11 +10,14 @@ const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
 const dataSets = require('../javascript/data/datasets');
 const designModePage = require('../javascript/pages/designModePage.po.js');
-let AnalysisHelper = require('../javascript/api/AnalysisHelper');
-let ApiUtils = require('../javascript/api/APiUtils');
 const globalVariables = require('../javascript/helpers/globalVariables');
 const Constants = require('../javascript/api/Constants');
 const utils = require('../javascript/helpers/utils');
+const chai = require('chai');
+const assert = chai.assert;
+let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
+let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
+const logger = require('../../v2/conf/logger')(__filename);
 
 describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -33,8 +36,8 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   let token;
 
   beforeAll(function () {
-    host = new ApiUtils().getHost(browser.baseUrl);
-    token = new AnalysisHelper().getToken(host);
+    host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
   });
@@ -58,6 +61,10 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   using(testDataReader.testData['EDITDELETECHARTS']['editDeleteChartsDataProvider'], function (data, description) {
     it('should edit and delete ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'EDITDELETECHARTS', dp:'editDeleteChartsDataProvider'}), () => {
         try {
+          if(!token) {
+            logger.error('token cannot be null');
+            assert.isNotNull(token, 'token cannot be null');
+          }
           let currentTime = new Date().getTime();
           let type = data.chartType.split(":")[1];
 
@@ -65,7 +72,8 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
           let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
 
           //Create new analysis.
-          new AnalysisHelper().createNewAnalysis(host, token, name, description, Constants.CHART, type);
+          let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, Constants.CHART, type);
+          assert.isNotNull(analysis, 'analysis should not be null');
           login.loginAs(data.user);
           browser.sleep(500);
           homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
@@ -165,7 +173,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
           expect(savedAlaysisPage.analysisViewPageElements.text(updatedDescription).getText()).toBe(updatedDescription);
 
         }catch (e) {
-          console.log(e);
+          logger.error(e);
         }
     });
   });

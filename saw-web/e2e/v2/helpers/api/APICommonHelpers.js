@@ -6,6 +6,7 @@ const Constants = require('../Constants');
 const logger = require('../../conf/logger')(__filename);
 
 class APICommonHelpers {
+
   static getApiUrl(baseUrl) {
     const q = urlParser.parse(baseUrl, true);
     let url = 'http://' + q.host; // API base url
