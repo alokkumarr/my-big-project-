@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
+import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { AnalyzeService } from '../../services/analyze.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -13,6 +14,7 @@ class AnalysisStubService {
 class ActivatedRouteStub {
   snapshot = { queryParams: {} };
 }
+class MatDialogStub {}
 
 describe('DesignerPageComponent', () => {
   let component: DesignerPageComponent;
@@ -26,7 +28,8 @@ describe('DesignerPageComponent', () => {
         providers: [
           { provide: Location, useValue: LocationStub },
           { provide: AnalyzeService, useValue: new AnalysisStubService() },
-          { provide: ActivatedRoute, useValue: new ActivatedRouteStub() }
+          { provide: ActivatedRoute, useValue: new ActivatedRouteStub() },
+          { provide: MatDialog, useValue: new MatDialogStub() }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       }).compileComponents();
