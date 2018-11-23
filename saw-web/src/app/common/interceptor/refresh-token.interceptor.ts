@@ -8,6 +8,7 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import 'rxjs/add/operator/mergeMap';
 
 import * as get from 'lodash/get';
 
