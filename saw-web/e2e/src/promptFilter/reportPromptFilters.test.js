@@ -60,7 +60,7 @@ describe('Report Prompt filter tests: reportPromptFilters.test.js', () => {
         let description = 'Description:' + Constants.REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
 
         let analysisType = Constants.REPORT;
-        let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, "ssss", null);
+        let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, null);
         expect(analysis).toBeTruthy();
         assert.isNotNull(analysis, 'analysis cannot be null');
         analysisId = analysis.contents.analyze[0].executionId.split('::')[0];
