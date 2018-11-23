@@ -2,6 +2,6 @@
                     [analysis]="analysis"
                     [designerMode]="designerMode"
                     *ngIf="analysis || analysisStarter"
-                    (onBack)="onBack()"
-                    (onSave)="onSave()">
+                    (onBack)="onBack($event)"
+                    (onSave)="onSave($event)">
 </designer-container>

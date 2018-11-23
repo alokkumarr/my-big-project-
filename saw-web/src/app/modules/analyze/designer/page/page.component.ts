@@ -2,7 +2,17 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AnalyzeService } from '../../services/analyze.service';
-import { DesignerMode } from '../../types';
+import { DesignerSaveEvent, DesignerMode } from '../types';
+import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
+import { ConfirmDialogData } from '../../../../common/types';
+import { MatDialog, MatDialogConfig } from '@angular/material';
+
+const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
+  title: 'There are unsaved changes',
+  content: 'Do you want to discard unsaved changes and go back?',
+  positiveActionLabel: 'Discard',
+  negativeActionLabel: 'Cancel'
+};
 
 interface NewDesignerQueryParams {
   mode: DesignerMode;
@@ -31,8 +41,9 @@ export class DesignerPageComponent implements OnInit {
   designerMode: string;
 
   constructor(
-    private location: Location,
+    private locationService: Location,
     private analyzeService: AnalyzeService,
+    private dialogService: MatDialog,
     private route: ActivatedRoute
   ) {}
 
@@ -41,12 +52,32 @@ export class DesignerPageComponent implements OnInit {
       .queryParams as DesignerQueryParams);
   }
 
-  onBack() {
-    this.location.back();
+  warnUser() {
+    return this.dialogService.open(ConfirmDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data: CONFIRM_DIALOG_DATA
+    } as MatDialogConfig);
   }
 
-  onSave() {
-    this.location.back();
+  onBack(isInDraftMode) {
+    if (isInDraftMode) {
+      this.warnUser()
+        .afterClosed()
+        .subscribe(shouldDiscard => {
+          if (shouldDiscard) {
+            this.locationService.back();
+          }
+        });
+    } else {
+      this.locationService.back();
+    }
+  }
+
+  onSave({ analysis, requestExecution }: DesignerSaveEvent) {
+    if (requestExecution) {
+      this.locationService.back();
+    }
   }
 
   convertParamsToData(params: DesignerQueryParams) {
