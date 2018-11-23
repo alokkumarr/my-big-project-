@@ -4,8 +4,8 @@ const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const protractorConf = require('../../protractor.conf');
 const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
-let AnalysisHelper = require('../javascript/api/AnalysisHelper');
-let ApiUtils = require('../javascript/api/APiUtils');
+let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
+
 const Constants = require('../javascript/api/Constants');
 const globalVariables = require('../javascript/helpers/globalVariables');
 const PromptFilterFunctions = require('../javascript/helpers/PromptFilterFunctions');
@@ -50,6 +50,7 @@ describe('Report Prompt filter tests: reportPromptFilters.test.js', () => {
       try {
         if(!token) {
           logger.error('token cannot be null');
+          expect(token).toBeTruthy();
           assert.isNotNull(token, 'token cannot be null');
         }
 
@@ -59,7 +60,8 @@ describe('Report Prompt filter tests: reportPromptFilters.test.js', () => {
         let description = 'Description:' + Constants.REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
 
         let analysisType = Constants.REPORT;
-        let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, null);
+        let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, "ssss", null);
+        expect(analysis).toBeTruthy();
         assert.isNotNull(analysis, 'analysis cannot be null');
         analysisId = analysis.contents.analyze[0].executionId.split('::')[0];
         let promptFilterFunctions = new PromptFilterFunctions();

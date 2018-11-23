@@ -64,6 +64,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.tes
       try {
         if(!token) {
           logger.error('token cannot be null');
+          expect(token).toBeTruthy();
           assert.isNotNull(token, 'token cannot be null');
         }
         let currentTime = new Date().getTime();
@@ -75,6 +76,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.tes
         let name = 'AT ' + Constants.PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
         let description = 'AT Description:' + Constants.PIVOT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
         let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, null);
+        expect(analysis).toBeTruthy();
         assert.isNotNull(analysis, 'analysis cannot be null');
         analysesDetails.push(analysis);
 

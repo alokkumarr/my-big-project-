@@ -66,6 +66,7 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
       try {
         if(!token) {
           logger.error('token cannot be null');
+          expect(token).toBeTruthy();
           assert.isNotNull(token, 'token cannot be null');
         }
         let currentTime = new Date().getTime();
@@ -77,6 +78,7 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
         let name = 'AT ' + Constants.ES_REPORT + ' ' + globalVariables.e2eId + '-' + currentTime;
         let description = 'AT Description:' + Constants.ES_REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
         let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, null, data.filters);
+        expect(analysis).toBeTruthy();
         assert.isNotNull(analysis, 'analysis cannot be null');
         analysesDetails.push(analysis);
 

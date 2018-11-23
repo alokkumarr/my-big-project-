@@ -50,6 +50,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithActualVsT
       try {
         if(!token) {
           logger.error('token cannot be null');
+          expect(token).toBeTruthy();
           assert.isNotNull(token, 'token cannot be null');
         }
         let currentTime = new Date().getTime();

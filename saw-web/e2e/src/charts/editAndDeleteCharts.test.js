@@ -63,6 +63,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         try {
           if(!token) {
             logger.error('token cannot be null');
+            expect(token).toBeTruthy();
             assert.isNotNull(token, 'token cannot be null');
           }
           let currentTime = new Date().getTime();
@@ -73,6 +74,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
 
           //Create new analysis.
           let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, Constants.CHART, type);
+          expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis should not be null');
           login.loginAs(data.user);
           browser.sleep(500);

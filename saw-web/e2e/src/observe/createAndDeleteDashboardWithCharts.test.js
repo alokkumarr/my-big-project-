@@ -65,6 +65,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
       try {
         if(!token) {
           logger.error('token cannot be null');
+          expect(token).toBeTruthy();
           assert.isNotNull(token, 'token cannot be null');
         }
         let currentTime = new Date().getTime();
@@ -77,6 +78,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
         let name = 'AT ' + data.chartType + ' ' + globalVariables.e2eId + '-' + currentTime;
         let description = 'AT Description:' + data.chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
         let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, subType);
+        expect(analysis).toBeTruthy();
         assert.isNotNull(analysis, 'analysis cannot be null');
         analysesDetails.push(analysis);
 

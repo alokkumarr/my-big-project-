@@ -49,6 +49,7 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
       try {
         if(!token) {
           logger.error('token cannot be null');
+          expect(token).toBeTruthy();
           assert.isNotNull(token, 'token cannot be null');
         }
         let currentTime = new Date().getTime();
@@ -57,6 +58,7 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
         let description = 'Description:' + Constants.ES_REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
         let analysisType = Constants.ES_REPORT;
         let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, null);
+        expect(analysis).toBeTruthy();
         assert.isNotNull(analysis, 'analysis cannot be null');
         analysisId = analysis.contents.analyze[0].executionId.split('::')[0];
         let promptFilterFunctions = new PromptFilterFunctions();
