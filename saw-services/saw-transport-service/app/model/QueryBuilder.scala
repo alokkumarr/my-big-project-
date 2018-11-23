@@ -12,8 +12,8 @@ object QueryBuilder extends {
   implicit val formats = DefaultFormats
   val query_logger = LoggerFactory.getLogger(this.getClass.getName);
 
- def build(json: JValue, runtime: Boolean = false, DSK: String): String = {
-    var whereClause : String =null
+  def build(json: JValue, runtime: Boolean = false, DSK: String): String = {
+    var whereClause: String = null
     val artifacts = json \ "artifacts" match {
       case artifacts: JArray => artifacts.arr
       case JNothing => List()
@@ -25,7 +25,7 @@ object QueryBuilder extends {
       case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
     }
 
-    if (DSK!=null && DSK.nonEmpty) {
+    if (DSK != null && DSK.nonEmpty) {
       whereClause = "%s %s %s %s %s".format(
         buildSelect(artifacts, sqlBuilder),
         buildFrom(artifacts, sqlBuilder),
@@ -47,17 +47,17 @@ object QueryBuilder extends {
     whereClause
   }
 
-  def buildSelectfromsqlBuilder(sqlBuilder: JObject)  = {
-    val dataFields : List [String] = extractArray(sqlBuilder, "dataFields") match {
-        case Nil => null
-        case dataFields: List[JValue] => {
-          dataFields.flatMap((fields: JValue) => {
-            val tableName = (fields \ "tableName").extract[String]
-            val columns = extractArray(fields, "columns")
-            columns.map(column(tableName, _))
-          })
-        }
+  def buildSelectfromsqlBuilder(sqlBuilder: JObject) = {
+    val dataFields: List[String] = extractArray(sqlBuilder, "dataFields") match {
+      case Nil => null
+      case dataFields: List[JValue] => {
+        dataFields.flatMap((fields: JValue) => {
+          val tableName = (fields \ "tableName").extract[String]
+          val columns = extractArray(fields, "columns")
+          columns.map(column(tableName, _))
+        })
       }
+    }
     dataFields
   }
 
@@ -65,15 +65,16 @@ object QueryBuilder extends {
     // Take the precedence of sqlBuilder dataFields to build select columns, if dataFields not found
     // in sql builder then look in the artifacts to support the backward compatibility.
     var selectColumn = buildSelectfromsqlBuilder(sqlBuilder)
-    if (selectColumn ==null || selectColumn.isEmpty)
+    if (selectColumn == null || selectColumn.isEmpty)
       selectColumn = buildSelectColumns(artifacts)
-     "SELECT " + selectColumn.map(
+    "SELECT " + selectColumn.map(
       columnAggregate(sqlBuilder, _)).mkString(", ")
   }
 
   /**
     * This method is no more used, this has been kept to maintain
     * the backward Compatibility.
+    *
     * @param sqlBuilder
     * @param column
     * @return
@@ -177,11 +178,11 @@ object QueryBuilder extends {
   }
 
   private def isArtifactChecked(artifact: JValue): Boolean = {
-      val columns: List[JValue] = artifact \ "columns" match {
-        case columns: JArray => columns.arr
-        case json: JValue => unexpectedElement(json, "array", "columns")
-      }
-      columns.filter(columnChecked(_)).length > 0
+    val columns: List[JValue] = artifact \ "columns" match {
+      case columns: JArray => columns.arr
+      case json: JValue => unexpectedElement(json, "array", "columns")
+    }
+    columns.filter(columnChecked(_)).length > 0
   }
 
   private def buildWhere(sqlBuilder: JObject, runtime: Boolean): String = {
@@ -191,9 +192,9 @@ object QueryBuilder extends {
       case JNothing => List()
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
-       query_logger.trace("isRuntimeFilter value on buildWhere : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
-       query_logger.trace("isRuntimeFilter value on buildWhere evaluation : {}", !(filter \ "isRuntimeFilter").extract[Boolean] || runtime);
-       query_logger.trace("Runtime parameter value : {}", runtime);
+      query_logger.trace("isRuntimeFilter value on buildWhere : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
+      query_logger.trace("isRuntimeFilter value on buildWhere evaluation : {}", !(filter \ "isRuntimeFilter").extract[Boolean] || runtime);
+      query_logger.trace("Runtime parameter value : {}", runtime);
       !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
@@ -205,14 +206,14 @@ object QueryBuilder extends {
         throw new RuntimeException(
           "Unrecognized boolean criteria: " + booleanCriteria)
       }
-       query_logger.trace("buildWhere query : {}", filters.mkString(" " + booleanCriteria.toUpperCase + " "))
-       "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ")
+      query_logger.trace("buildWhere query : {}", filters.mkString(" " + booleanCriteria.toUpperCase + " "))
+      "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ")
     }
 
   }
 
-  private def buildWhere(sqlBuilder: JObject, runtime: Boolean, DSK :String): String = {
-    var finalFilter : String = null
+  private def buildWhere(sqlBuilder: JObject, runtime: Boolean, DSK: String): String = {
+    var finalFilter: String = null
     val filters = ((sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
       case JNothing => List()
@@ -224,10 +225,10 @@ object QueryBuilder extends {
       !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
-      if(DSK!=null && DSK.nonEmpty){
+      if (DSK != null && DSK.nonEmpty) {
         finalFilter = "WHERE " + TransportUtils.buildDSK(DSK)
       } else {
-        finalFilter= ""
+        finalFilter = ""
       }
       finalFilter
     } else {
@@ -237,7 +238,7 @@ object QueryBuilder extends {
         throw new RuntimeException(
           "Unrecognized boolean criteria: " + booleanCriteria)
       }
-      if(DSK!=null && DSK.nonEmpty){
+      if (DSK != null && DSK.nonEmpty) {
         finalFilter = "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ") + " AND " + TransportUtils.buildDSK(DSK)
       }
       else {
@@ -251,16 +252,18 @@ object QueryBuilder extends {
     def property(name: String) = {
       (filter \ name).extract[String]
     }
+
     def subProperty(name: String, subname: String) = {
       (filter \ name \ subname).extract[String]
     }
+
     val condition = property("type") match {
       case "int" | "long" | "float" | "double" | "integer" => {
         val operator = subProperty("model", "operator").toLowerCase
         val value = subProperty("model", "value")
         if (operator == "btw") {
           val otherValue = subProperty("model", "otherValue")
-          "BETWEEN %s AND %s".format(otherValue,value)
+          "BETWEEN %s AND %s".format(otherValue, value)
         } else {
           val operatorSql = operator match {
             case "gt" => ">"
@@ -276,10 +279,10 @@ object QueryBuilder extends {
       }
       case "string" => {
         val operator = subProperty("model", "operator").toLowerCase
-         val modelValues = ((filter \ "model" \ "modelValues") match {
-           case array: JArray => array.arr
-           case obj => unexpectedElement(obj, "array", "modelValues")
-         }).map(_.extract[String].toUpperCase())
+        val modelValues = ((filter \ "model" \ "modelValues") match {
+          case array: JArray => array.arr
+          case obj => unexpectedElement(obj, "array", "modelValues")
+        }).map(_.extract[String].toUpperCase())
         val stringWhereClause = operator match {
           case "eq" => "= '" + modelValues(0) + "'"
           case "isin" => "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
@@ -292,10 +295,10 @@ object QueryBuilder extends {
         stringWhereClause
       }
       case "date" | "timestamp" => {
-        var lte :String = null
-        var gte : String = null
+        var lte: String = null
+        var gte: String = null
         val preset = subProperty("model", "preset")
-        if (preset !=null && !preset.equals("NA")){
+        if (preset != null && !preset.equals("NA")) {
           lte = TransportUtils.dynamicDecipher(preset).getLte();
           gte = TransportUtils.dynamicDecipher(preset).getGte();
         }
@@ -308,7 +311,7 @@ object QueryBuilder extends {
       }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }
-    if(property("type")=="string") {
+    if (property("type") == "string") {
       "upper(%s.%s) %s".format(property("tableName"), property("columnName"), condition)
     } else {
       "%s.%s %s".format(property("tableName"), property("columnName"), condition)
@@ -320,19 +323,19 @@ object QueryBuilder extends {
     val groupByColumns: List[String] = extractArray(sqlBuilder, "dataFields") match {
       case Nil => null
       case dataFields: List[JValue] => {
-        var aggregateFlag =false
+        var aggregateFlag = false
         dataFields.flatMap((fields: JValue) => {
           val tableName = (fields \ "tableName").extract[String]
           val columns = extractArray(fields, "columns")
           val aggregateColumns = columns.filter(col => {
             val aggregate = (col \ "aggregate")
-           !(aggregate ==JNothing || aggregate == None)
+            !(aggregate == JNothing || aggregate == None)
           })
           // In case of multiple artifacts join if one artifacts contains the
           // aggregate then another artifacts columns should be considered as
           // group by columns. initialise the flag to detect that.
           if (aggregateColumns.size > 0 && columns.size > aggregateColumns.size)
-            aggregateFlag=true;
+            aggregateFlag = true;
           if (aggregateFlag) {
             val groupByColumn = columns.filter(col => {
               val groupBy = (col \ "aggregate")
@@ -348,15 +351,16 @@ object QueryBuilder extends {
         })
       }
     }
-    if (groupByColumns!=null && groupByColumns != None && groupByColumns.size>0)
+    if (groupByColumns != null && groupByColumns != None && groupByColumns.size > 0)
       "GROUP BY " + (groupByColumns).mkString(", ")
     else ""
   }
 
-  private def buildGroupByElement(groupBy: JValue, tableName :String): String = {
+  private def buildGroupByElement(groupBy: JValue, tableName: String): String = {
     def property(name: String) = {
       (groupBy \ name).extract[String]
     }
+
     "%s.%s".format(
       tableName,
       property("columnName")
@@ -380,20 +384,21 @@ object QueryBuilder extends {
     def property(name: String) = {
       (orderBy \ name).extract[String]
     }
+
     val aggregate = (orderBy \ "aggregate")
-    if (aggregate!=null && aggregate!= JNothing) {
+    if (aggregate != null && aggregate != JNothing) {
       "%s(%s.%s) %s".format(
         property("aggregate"),
         property("tableName"),
         property("columnName"),
         property("order")
       )
-    }else {
-       "%s.%s %s".format(
+    } else {
+      "%s.%s %s".format(
         property("tableName"),
         property("columnName"),
         property("order")
-       )
+      )
     }
   }
 
@@ -406,7 +411,7 @@ object QueryBuilder extends {
   }
 
   def unexpectedElement(
-    json: JValue, expected: String, location: String): Nothing = {
+                         json: JValue, expected: String, location: String): Nothing = {
     val name = json.getClass.getSimpleName
     throw new ClientException(
       "Unexpected element: %s, expected %s, at %s".format(
@@ -416,10 +421,11 @@ object QueryBuilder extends {
   /**
     * This method will validate whether Data security keys will be applicable for the
     * analysis and return the list of Key which all are applicable.
+    *
     * @param dataSecurityKey
     * @return
     */
-  def checkDSKApplicableAnalysis (dataSecurityKey : util.List[Object], json : JValue ): util.List[Object] = {
+  def checkDSKApplicableAnalysis(dataSecurityKey: util.List[Object], json: JValue): util.List[Object] = {
     val artifacts = json \ "artifacts" match {
       case artifacts: JArray => artifacts.arr
       case JNothing => List()
@@ -428,29 +434,59 @@ object QueryBuilder extends {
     import scala.collection.JavaConverters._
     var applicableDsk: util.List[Object] = new util.ArrayList[Object]
     val objectMapper = new ObjectMapper
-      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
-      artifacts.flatMap((artifact: JValue) => {
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
+    artifacts.flatMap((artifact: JValue) => {
       val artifactName = (artifact \ "artifactName").extract[String]
+      val isArtifactApplicable= checkAplicableArtifact(json,artifactName)
       val columns = extractArray(artifact, "columns")
       columns.foreach((col: JValue) => {
         val columnName = (col \ "columnName").extract[String]
-        for(dataSecurityKeyDef  <- dataSecurityKey.asScala){
-          val dsk : DataSecurityKeyDef = objectMapper.convertValue(dataSecurityKeyDef,
-            new TypeReference[DataSecurityKeyDef](){})
+        for (dataSecurityKeyDef <- dataSecurityKey.asScala) {
+          val dsk: DataSecurityKeyDef = objectMapper.convertValue(dataSecurityKeyDef,
+            new TypeReference[DataSecurityKeyDef]() {})
           dsk
           match {
-            case key : DataSecurityKeyDef =>
-            if (key.getName().equalsIgnoreCase(columnName)
-              || key.getName.equalsIgnoreCase(artifactName + "." + columnName)
-              || key.getName.equalsIgnoreCase(columnName.split("\\.")(0))
-              || key.getName.equalsIgnoreCase(artifactName + "." + columnName.split("\\.")(0))) {
-              applicableDsk.add(dataSecurityKeyDef)
-            }}
+            case key: DataSecurityKeyDef =>
+              if (key.getName().equalsIgnoreCase(columnName)
+                || key.getName.equalsIgnoreCase(artifactName + "." + columnName)
+                || key.getName.equalsIgnoreCase(columnName.split("\\.")(0))
+                || key.getName.equalsIgnoreCase(artifactName + "." + columnName.split("\\.")(0))) {
+                if (isArtifactApplicable)
+                applicableDsk.add(dataSecurityKeyDef)
+              }
+          }
         }
       })
       columns
     })
     applicableDsk
+  }
+
+  /**
+    * Ths method will check whether DSK columns is available in selected artifacts.
+    * @param json
+    * @param table
+    * @return
+    */
+  private def checkAplicableArtifact(json: JValue, table: String): Boolean = {
+    val sqlBuilder = json \ "sqlBuilder" match {
+      case obj: JObject => obj
+      case JNothing => JObject()
+      case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
+    }
+    val isApplicable: Boolean = extractArray(sqlBuilder, "dataFields") match {
+      case Nil => false
+      case dataFields: List[JValue] => {
+        // var aggregateFlag =false
+        dataFields.foreach((fields: JValue) => {
+          val tableName = (fields \ "tableName").extract[String]
+          if (tableName.equalsIgnoreCase(table))
+            return true;
+        })
+        return false
+      }
+    }
+    isApplicable
   }
 }
 

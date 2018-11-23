@@ -284,6 +284,7 @@ class Analysis extends BaseController {
                 case _ => null
               }
             val applicableDSK = QueryBuilder.checkDSKApplicableAnalysis(dataSecurityKey,analysisDef)
+            if (applicableDSK.size()>0)
             dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(applicableDSK));
             m_log.trace("dskStr after processing in execute: {}", dskStr);
           }
