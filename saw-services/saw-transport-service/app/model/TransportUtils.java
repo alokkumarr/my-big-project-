@@ -70,12 +70,13 @@ public class TransportUtils {
         switch (dynamic) {
             case "Yesterday" :
                 LocalDateTime yesterday = now.minusDays(1);
-                dynamicConvertor.setLte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             case "Today": {
                 LocalDateTime today = now;
-                dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+                LocalDateTime tomorrow = today.plusDays(1);
+                dynamicConvertor.setLte(tomorrow.format(dateTimeFormatter) + SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(today.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -105,7 +106,7 @@ public class TransportUtils {
             }
             case "LY": {
                 LocalDateTime currentDayOflastYearDate = now.minusMonths(12);
-                dynamicConvertor.setLte(currentDayOflastYearDate.with(TemporalAdjusters.lastDayOfYear()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.with(TemporalAdjusters.firstDayOfYear()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(currentDayOflastYearDate.with(TemporalAdjusters.firstDayOfYear()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
