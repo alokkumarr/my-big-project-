@@ -76,6 +76,7 @@
     "@types/jasminewd2": "2.0.3",
     "@types/node": "8.9.4",
     "app-root-path": "2.1.0",
+    "chai": "4.2.0",
     "codelyzer": "4.3.0",
     "git-describe": "4.0.3",
     "jasmine-allure-reporter": "1.0.2",

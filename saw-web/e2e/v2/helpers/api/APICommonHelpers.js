@@ -20,6 +20,9 @@ class APICommonHelpers {
     };
     let apiUrl = `${this.getApiUrl(baseUrl)}${Constants.API_ROUTES.AUTH}`;
     let response = new RestClient().post(apiUrl, payload);
+    if(!response) {
+      return null;
+    }
     return 'Bearer '.concat(response.aToken);
   }
 }

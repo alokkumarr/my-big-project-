@@ -15,15 +15,17 @@ let AdminHelper = require('../api/AdminHelper');
 let APICommonHelpers = require('../api/APICommonHelpers');
 let AnalysisHelper = require('../api/AnalysisHelper');
 let Constants = require('../Constants');
+let Utils = require('../Utils');
+const logger = require('../../conf/logger')(__filename);
 
 class TestDataGenerator {
   generateUsersRolesPrivilegesCategories(url, token) {
     let analysisHelper = new AnalysisHelper();
     let adminHelper = new AdminHelper();
     let apiUrl = APICommonHelpers.getApiUrl(url);
-
+    let utils = new Utils();
     // Generate roles
-    const rolesListWithAdmin = adminHelper.generateRole(
+    const rolesListWithAdmin = utils.validApiCall(adminHelper.generateRole(
       apiUrl,
       roles.admin,
       token,
@@ -31,8 +33,9 @@ class TestDataGenerator {
       activeStatusInd,
       customerCode,
       users.anyUser.email
-    );
-    const rolesListWithUser = adminHelper.generateRole(
+    ),'generate roles for admin');
+
+    const rolesListWithUser =  utils.validApiCall(adminHelper.generateRole(
       apiUrl,
       roles.userOne,
       token,
@@ -40,7 +43,8 @@ class TestDataGenerator {
       activeStatusInd,
       customerCode,
       users.anyUser.email
-    );
+    ), 'generate roles for user');
+
     roles.admin.roleId = adminHelper.getRoleIdByRoleName(
       rolesListWithAdmin,
       roles.admin.roleName
@@ -51,7 +55,7 @@ class TestDataGenerator {
     );
 
     // Generate users
-    adminHelper.generateUser(
+    utils.validApiCall(adminHelper.generateUser(
       apiUrl,
       users.admin,
       roles.admin.roleId,
@@ -60,8 +64,9 @@ class TestDataGenerator {
       customerId,
       users.anyUser.email,
       users.anyUser.password
-    );
-    adminHelper.generateUser(
+    ),'generate user for admin');
+
+    utils.validApiCall(adminHelper.generateUser(
       apiUrl,
       users.userOne,
       roles.userOne.roleId,
@@ -70,10 +75,10 @@ class TestDataGenerator {
       customerId,
       users.anyUser.email,
       users.anyUser.password
-    );
+    ), 'generate user for userOne');
 
     // Generate categories
-    adminHelper.generateCategory(
+    utils.validApiCall(adminHelper.generateCategory(
       apiUrl,
       categories.privileges,
       token,
@@ -81,8 +86,9 @@ class TestDataGenerator {
       productId,
       customerId,
       users.anyUser.email
-    );
-    let categoriesList = adminHelper.generateCategory(
+    ), 'generate privileges for admin');
+
+    let categoriesList = utils.validApiCall(adminHelper.generateCategory(
       apiUrl,
       categories.analyses,
       token,
@@ -90,11 +96,11 @@ class TestDataGenerator {
       productId,
       customerId,
       users.anyUser.email
-    );
+    ),'generateCategory for analysis');
 
     // Generate sub-categories for all privileges categories
     for (let [name, subCategory] of Object.entries(subCategories)) {
-      adminHelper.generateSubCategory(
+      utils.validApiCall(adminHelper.generateSubCategory(
         apiUrl,
         categories.privileges,
         subCategory,
@@ -104,10 +110,10 @@ class TestDataGenerator {
         productId,
         customerId,
         users.anyUser.email
-      );
+      ),'generateSubCategory privileges:'+subCategory);
     }
     // Generate sub-category for create category
-    adminHelper.generateSubCategory(
+    utils.validApiCall(adminHelper.generateSubCategory(
       apiUrl,
       categories.analyses,
       createSubCategories.createAnalysis,
@@ -117,11 +123,11 @@ class TestDataGenerator {
       productId,
       customerId,
       users.anyUser.email
-    );
+    ),'generateSubCategory for createAnalysis');
 
     //Generate privileges for Admin
     for (let [name, privilege] of Object.entries(privileges)) {
-      adminHelper.generatePrivilege(
+      utils.validApiCall(adminHelper.generatePrivilege(
         apiUrl,
         privilege,
         roles.admin,
@@ -130,10 +136,10 @@ class TestDataGenerator {
         token,
         productId,
         users.anyUser.email
-      );
+      ),'generatePrivilege for '+JSON.stringify(subCategories[name]));
     }
     //Generate privileges for Admin to create analysis category
-    adminHelper.generatePrivilege(
+    utils.validApiCall(adminHelper.generatePrivilege(
       apiUrl,
       privileges.all,
       roles.admin,
@@ -142,11 +148,11 @@ class TestDataGenerator {
       token,
       productId,
       users.anyUser.email
-    );
+    ),'generatePrivilege for '+JSON.stringify(createSubCategories.createAnalysis));
 
     //Generate privileges for User
     for (let [name, privilege] of Object.entries(privileges)) {
-      adminHelper.generatePrivilege(
+      utils.validApiCall(adminHelper.generatePrivilege(
         apiUrl,
         privilege,
         roles.userOne,
@@ -155,10 +161,10 @@ class TestDataGenerator {
         token,
         productId,
         users.anyUser.email
-      );
+      ),'generatePrivilege userOne with '+JSON.stringify(subCategories[name]));
     }
     //Generate privileges for Admin to create analysis category
-    adminHelper.generatePrivilege(
+    utils.validApiCall(adminHelper.generatePrivilege(
       apiUrl,
       privileges.all,
       roles.userOne,
@@ -167,14 +173,15 @@ class TestDataGenerator {
       token,
       productId,
       users.anyUser.email
-    );
+    ),'generatePrivilege userOne with '+JSON.stringify(createSubCategories.createAnalysis));
 
     // Generate analyses
-    let semanticId = analysisHelper.getSemanticId(
+    // Get semanticId (dataset ID)
+    let semanticId = utils.validApiCall(analysisHelper.getSemanticId(
       apiUrl,
       dataSets.pivotChart,
       token
-    ); // Get semanticId (dataset ID)
+    ),'getSemanticId');
 
     let name = `Column Chart ${globalVariables.e2eId}`;
     let description = `Column Chart created by e2e under sub category: ${new Date()}`;
@@ -183,7 +190,7 @@ class TestDataGenerator {
 
     // Create charts for different sub categories
     for (let [name, subCategory] of Object.entries(subCategories)) {
-      analysisHelper.createAnalysis(
+      utils.validApiCall(analysisHelper.createAnalysis(
         apiUrl,
         token,
         name,
@@ -194,11 +201,11 @@ class TestDataGenerator {
         null,
         subCategory,
         semanticId
-      );
+      ),'createAnalysis: for '+subCategory);
     }
 
     // Generate chart for create analysis sub category
-    analysisHelper.createAnalysis(
+    utils.validApiCall(analysisHelper.createAnalysis(
       apiUrl,
       token,
       name,
@@ -209,10 +216,10 @@ class TestDataGenerator {
       null,
       createSubCategories.createAnalysis,
       semanticId
-    );
+    ),'createAnalysis for '+createSubCategories.createAnalysis);
 
     // Generate categories for observe module
-    let observeCategoriesList = adminHelper.generateCategory(
+    let observeCategoriesList = utils.validApiCall(adminHelper.generateCategory(
       apiUrl,
       categories.observe,
       token,
@@ -221,9 +228,9 @@ class TestDataGenerator {
       customerId,
       users.anyUser.email,
       2
-    );
+    ),'generateCategory for '+categories.observe);
 
-    adminHelper.generateSubCategory(
+    utils.validApiCall(adminHelper.generateSubCategory(
       apiUrl,
       categories.observe,
       createSubCategories.observeSubCategory,
@@ -234,9 +241,9 @@ class TestDataGenerator {
       customerId,
       users.anyUser.email,
       2
-    );
+    ),'generateSubCategory for '+createSubCategories.observeSubCategory);
 
-    adminHelper.generatePrivilege(
+    utils.validApiCall(adminHelper.generatePrivilege(
       apiUrl,
       privileges.all,
       roles.admin,
@@ -246,9 +253,9 @@ class TestDataGenerator {
       productId,
       users.anyUser.email,
       2
-    );
+    ),'generatePrivilege for admin with '+ createSubCategories.observeSubCategory);
 
-    adminHelper.generatePrivilege(
+    utils.validApiCall(adminHelper.generatePrivilege(
       apiUrl,
       privileges.all,
       roles.userOne,
@@ -258,7 +265,7 @@ class TestDataGenerator {
       productId,
       users.anyUser.email,
       2
-    );
+    ),'generatePrivilege for user with '+createSubCategories.observeSubCategory);
   }
 }
 

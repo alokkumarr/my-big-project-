@@ -30,7 +30,7 @@ const fluentWait = SuiteSetup.distRun() ? 30000 : 20000;  //-- !!!DON'T CHANGE b
  * https://github.com/angular/protractor/blob/master/lib/config.ts
  * 3 min -- All http/https calls should be completed -- !!!DON'T CHANGE because it will impact overall test execution time
  */
-const allScriptsTimeout =  180000;
+const allScriptsTimeout = 180000;
 
 /**
  *  https://github.com/angular/protractor/blob/master/docs/timeouts.md
@@ -78,7 +78,7 @@ exports.config = {
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
   baseUrl: 'http://localhost:3000',
-  logger:logger,
+  logger: logger,
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
@@ -109,29 +109,25 @@ exports.config = {
     /**
      * This suite will be run as part of main bamboo build plan.
      */
-    smoke: testSuite.SMOKE,
-    /**
+    smoke: testSuite.SMOKE, /**
      * This suite will be triggered from main bamboo plan frequently for sanity check
      */
-    sanity: testSuite.SANITY,
-    /**
+    sanity: testSuite.SANITY, /**
      * This suite will be triggered from main bamboo plan and runs on every commit
      * Contains all feature with minimal data set
      */
-    critical:testSuite.CRITICAL,
-    /**
+    critical: testSuite.CRITICAL, /**
      * This suite will be triggered from e2e bamboo plan and dev team has to run this plan manually to verify that their
      * changes are not causing any issues to app.
      * Bamboo plan url: https://bamboo.synchronoss.net:8443/browse/BDA-TSA
      * Contains all feature with minimal data set
      */
-    regression: testSuite.REGRESSION,
-    /**
+    regression: testSuite.REGRESSION, /**
      * This suite is for developing new tests and quickly debug if something breaking
      */
-    development:testSuite.DEVELOPMENT,
-
-  onCleanUp: function(results) {
+    development: testSuite.DEVELOPMENT
+  },
+  onCleanUp: function (results) {
     retry.onCleanUp(results);
   },
   onPrepare() {
@@ -148,11 +144,11 @@ exports.config = {
       })
     );
     // Add screenshot to allure report. screenshot are taken after each test
-    jasmine.getEnv().afterEach(function(done) {
-      browser.takeScreenshot().then(function(png) {
+    jasmine.getEnv().afterEach(function (done) {
+      browser.takeScreenshot().then(function (png) {
         allure.createAttachment(
           'Screenshot',
-          function() {
+          function () {
             return new Buffer(png, 'base64');
           },
           'image/png'
@@ -163,16 +159,13 @@ exports.config = {
     // Allure reporter done
 
     // Get failed test data
-    jasmine.getEnv().addReporter(new function() {
-      this.specDone = function(result) {
+    jasmine.getEnv().addReporter(new function () {
+      this.specDone = function (result) {
         if (result.status !== 'passed') {
-          //console.log(`Failed test...${JSON.stringify(result)}`)
-          // write failed test to json file.
           new SuiteSetup().failedTestData(result.testInfo)
         }
       };
     });
-    //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
@@ -180,7 +173,7 @@ exports.config = {
       });
     }, pageResolveTimeout);
   },
-  beforeLaunch: function() {
+  beforeLaunch: function () {
     //Delete old e2e unique id.
     logger.info('Doing cleanup and setting up test data for e2e tests....');
     if (fs.existsSync('target/e2eId.json')) {
@@ -189,26 +182,34 @@ exports.config = {
     // Generate test data
     let appUrl = SuiteSetup.getSawWebUrl();
 
-    if (appUrl) {
-      try {
-        logger.info('Generating test for this run...');
-        let APICommonHelpers = require('../helpers/api/APICommonHelpers');
-        let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
-        let token = APICommonHelpers.generateToken(apiBaseUrl);
-        let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
-        new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
-      }catch (e) {
-        logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
-          'hence exiting test suite and failing it....'+e);
-        process.exit(1);
-      }
-    } else {
-      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:'+appUrl
+    if (!appUrl) {
+      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' + appUrl
         + ', hence exiting test suite and failing it...');
       process.exit(1);
     }
+
+    try {
+      logger.info('Generating test for this run...');
+
+      let APICommonHelpers = require('../helpers/api/APICommonHelpers');
+
+      let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+      let token = APICommonHelpers.generateToken(apiBaseUrl);
+
+      if (!token) {
+        logger.error('cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.');
+        process.exit(1);
+      }
+      let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
+      new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
+
+    } catch (e) {
+      logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
+        'hence exiting test suite and failing it....' + e);
+      process.exit(1);
+    }
   },
-  afterLaunch: function() {
+  afterLaunch: function () {
     var retryCounter = 1;
     if (argv.retry) {
       retryCounter = ++argv.retry;

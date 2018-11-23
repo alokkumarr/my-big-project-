@@ -3,6 +3,7 @@ let RestClient = require('./RestClient');;
 const Constants = require('../Constants')
 let Utils = require('../Utils');
 const moduleId = 1; // shared for all users
+const logger = require('../../conf/logger')(__filename);
 class AdminHelper {
 
   generateRole(url, role, token, custSysId, activeStatusInd, customerCode, masterLoginId) {
@@ -14,7 +15,13 @@ class AdminHelper {
       roleName: role.roleName,
       roleDesc: role.roleDesc
     };
-    return new RestClient().post(url + Constants.API_ROUTES.ROLES, payload, token).roles;
+
+    let roleResponse = new RestClient().post(url + Constants.API_ROUTES.ROLES, payload, token)
+
+    if(!roleResponse) {
+      return null;
+    }
+    return roleResponse.roles;
   }
 
   generateUser(url, user, roleId, token, activeStatusInd, customerId, email, password) {
@@ -45,8 +52,11 @@ class AdminHelper {
       masterLoginId: email // all users will share same email
     };
     // get list of all categories
-    const categoriesList = new RestClient().post(url + Constants.API_ROUTES.ADD_CATEGORIES, payload,token).categories;
-
+    const categoriesListResponse = new RestClient().post(url + Constants.API_ROUTES.ADD_CATEGORIES, payload,token);
+    if(!categoriesListResponse) {
+        return null;
+    }
+    const categoriesList = categoriesListResponse.categories;
     category.id = this.getCategoryIdFromListByCategoryName(categoriesList, category);
 
     // return list of categories
@@ -72,12 +82,15 @@ class AdminHelper {
       masterLoginId: email
     };
     // get list of all categories
-    const categoriesListWithSubCategory = new RestClient().post(url + Constants.API_ROUTES.ADD_CATEGORIES, payload, token).categories;
+    const categoriesListWithSubCategoryResponse = new RestClient().post(url + Constants.API_ROUTES.ADD_CATEGORIES, payload, token);
+    if(!categoriesListWithSubCategoryResponse ) {
+      logger.error('There is some error while creating sub category..')
+      return null;
+    }
+    const categoriesListWithSubCategory=categoriesListWithSubCategoryResponse.categories;
     // get list of all sub-categories
     let subCategoriesList = this.getSubCategoryListByCategoryName(categoriesListWithSubCategory, parentCategory.name);
-
     subCategory.id = this.getSubCategoryIdBySubCategoryName(subCategoriesList, subCategory.name);
-
     return subCategory.id;
   }
 

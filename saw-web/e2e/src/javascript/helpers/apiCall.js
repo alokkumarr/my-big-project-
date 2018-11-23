@@ -6,10 +6,9 @@ const logger = require('../../../v2/conf/logger')(__filename);
  */
 module.exports = {
   post: (url, payload, token) => {
-
     logger.info('making post call to url :'+url);
     logger.debug('post call payload :'+JSON.stringify(payload));
-    logger.debug('post call token :'+token);
+    logger.debug('Api call token :'+token);
     let headers = {};
     if (token) {
       headers['Authorization'] = token;
@@ -19,15 +18,16 @@ module.exports = {
       json: payload
     });
     if (response.statusCode === 200) {
-      return JSON.parse(response.getBody());
+      let data = JSON.parse(response.getBody());
+      logger.debug('post call response-->'+JSON.stringify(data))
+      return data;
     } else {
-      logger.error('Api call failed with status code:'+response.statusCode+' url: '+url+' ,Hence exiting this process');
-      process.exit(1);
+      logger.error('post call failed with status code:'+response.statusCode+' url: '+url+' with response ->'+JSON.stringify(response)+',Hence returning null');
+      return null;
     }
 
   },
   get: (url, token) => {
-
     logger.info('making get call to url :'+url);
     logger.debug('get call token :'+token);
     let response = request('GET', url, {
@@ -35,14 +35,15 @@ module.exports = {
     });
 
     if (response.statusCode === 200 || response.statusCode === 202) {
-      return JSON.parse(response.getBody());
+      let data = JSON.parse(response.getBody());
+      logger.debug('get call response-->'+JSON.stringify(data))
+      return data;
     } else {
-      logger.error('Api call failed with status code:'+response.statusCode+' url: '+url+' ,Hence exiting this process');
-      process.exit(1);
+      logger.error('get call failed with status code:'+response.statusCode+' url: '+url+' with response ->'+JSON.stringify(response)+',Hence returning null');
+      return null;
     }
   },
   delete: (url, token) => {
-
     logger.info('making delete call to url :'+url);
     logger.debug('delete call token :'+token);
     let response = request('DELETE', url, {
@@ -50,10 +51,12 @@ module.exports = {
     });
 
     if (response.statusCode === 200) {
-      return JSON.parse(response.getBody());
+      let data = JSON.parse(response.getBody());
+      logger.debug('delete call response-->'+JSON.stringify(data))
+      return data;
     } else {
-      logger.error('Api call failed with status code:'+response.statusCode+' url: '+url+' ,Hence exiting this process');
-      process.exit(1);
+      logger.error('delete call failed with status code:'+response.statusCode+' url: '+url+' with response ->'+JSON.stringify(response)+',Hence returning null');
+      return null;
     }
   }
 };

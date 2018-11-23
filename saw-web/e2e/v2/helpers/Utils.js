@@ -1,4 +1,5 @@
 'use strict';
+const logger = require('../../v2/conf/logger')(__filename);
 class Utils {
 
   /* Returns object found in list by passed inputValue and inputKey.
@@ -11,7 +12,7 @@ class Utils {
  * Caution: inputValue should be unique because function takes returnValue from any matching inputKey-inputValue
  */
   getValueFromListByKeyValue(list, inputKey, inputValue, getValueOfKey) {
-    let returnValue;
+    let returnValue = null;
 
     for (let i = 0; i < list.length; i++) {
       const data = list[i];
@@ -20,14 +21,21 @@ class Utils {
       Object.keys(data).forEach(function (key) {
         if (key === inputKey && data[key] === inputValue) {
           returnValue = data[getValueOfKey];
-          //console.log('Found! ' + inputKey + ': \'' + data[key] + '\'');
         }
       });
     }
     if (returnValue == null) {
-      throw new Error('There is no ' + inputKey + ' in list with value ' + inputValue);
+      logger.error('There is no ' + inputKey + ' in list with value ' + inputValue);
     }
     return returnValue;
+  }
+
+  validApiCall(serverResponse, messageKey){
+    if(!serverResponse) {
+      logger.error(messageKey+ ' failed, hence marking test suite as failure & terminating the suite..Please refer logs for more details..');
+      process.exit(1);
+    }
+    return serverResponse;
   }
 
 }
