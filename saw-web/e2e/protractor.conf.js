@@ -300,7 +300,7 @@ exports.config = {
         logger.error('cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.');
         process.exit(1);
       }
-      let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
+      let TestDataGenerator = require('./v2/helpers/data-generation/TestDataGenerator');
       new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
 
     } catch (e) {

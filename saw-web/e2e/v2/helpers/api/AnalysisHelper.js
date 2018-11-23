@@ -2,7 +2,7 @@
 let RestClient = require('./RestClient');
 const users = require('../data-generation/users');
 const categories = require('../data-generation/categories');
-const subCategories = require('../data-generation/subCategories');
+const {createSubCategories}= require('../data-generation/subCategories');
 const dataSets = require('../data-generation/datasets');
 const customerCode = 'SYNCHRONOSS'; // shared for all users
 let RequestModel = require('./model/RequestModel');
@@ -37,6 +37,7 @@ class AnalysisHelper {
    * @param {*} analysisType
    */
   createNewAnalysis(url, token, name, description, analysisType, subType, filters = null) {
+
     switch(analysisType) {
       case Constants.ES_REPORT:
         return this.createEsReport(url, token, name, description, analysisType, subType, filters);
@@ -48,8 +49,7 @@ class AnalysisHelper {
         return this.createReport(url, token, name, description, analysisType, subType, filters);
       default:
         return null;
-
-    };
+    }
   }
 
   //TODO:
@@ -120,10 +120,10 @@ class AnalysisHelper {
       subCategoryId = subCategory.id;
     } else {
       let cubCatList = new AdminHelper().getSubCategoriesByCategoryName(url, token, categories.analyses.name);
-      if (subCategories) {
-        subCategoryId = new AdminHelper().getSubCategoryIdBySubCategoryName(cubCatList, subCategories.createAnalysis.name);
+      if (createSubCategories) {
+        subCategoryId = new AdminHelper().getSubCategoryIdBySubCategoryName(cubCatList, createSubCategories.createAnalysis.name);
       } else {
-        logger.error('There is subcategories found for categories' + categories.analyses.name);
+        logger.error('There are no subcategories found for categories');
         return null;
       }
     }
