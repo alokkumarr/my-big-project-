@@ -5,7 +5,7 @@ import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
 import * as filter from 'lodash/filter';
 
-import { DesignerStates, CHART_TYPES_OBJ } from '../consts';
+import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../services/chart.service';
 
@@ -18,7 +18,6 @@ export class DesignerChartComponent implements OnInit {
   _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
   _auxSettings: any = {};
-  DesignerStates = DesignerStates;
   CHART_TYPES_OBJ = CHART_TYPES_OBJ;
 
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
@@ -27,8 +26,6 @@ export class DesignerChartComponent implements OnInit {
   chartHgt = {
     height: 500
   };
-
-  @Input() designerState: DesignerStates;
 
   @Input() chartType: string;
 

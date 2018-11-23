@@ -3,7 +3,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import { Subject } from 'rxjs';
 
 import { Artifact, ArtifactColumnPivot } from '../types';
-import { DesignerStates } from '../consts';
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
 
 @Component({
@@ -20,10 +19,8 @@ export class DesignerPivotComponent {
   }
   @Input() data;
   @Input() sorts: any[];
-  @Input() designerState: DesignerStates;
 
   public artifactColumns: ArtifactColumnPivot[];
 
   public updater: Subject<IPivotGridUpdate> = new Subject();
-  public DesignerStates = DesignerStates;
 }
