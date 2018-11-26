@@ -284,10 +284,13 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
                 '\'', recCounter, errCounter));
+
+        logger.debug("Parsed rdd length = " + parsedRdd.count());
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
+        logger.debug("Output rdd length = " + outputRdd.count());
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
         boolean status = writeDataset(outputDataset, outputFormat, tempDir);
@@ -372,9 +375,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         try {
             // Get all entries which are rejected
             logger.debug("Collecting rejected data");
-            JavaRDD<Row> rejectedRdd = fullRdd.subtract(outputRdd)
-                .map(record ->
-                    RowFactory.create(record.get(0), record.get(record.length() - 1)));
+
+            JavaRDD<Row> rejectedRdd = getRejectedData(fullRdd);
+
+            logger.debug("Rejected rdd length = " + rejectedRdd.count());
 
             if (this.rejectedDataCollector == null) {
                 rejectedDataCollector = rejectedRdd;
@@ -571,6 +575,13 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         JavaRDD<Row> outputRdd = parsedData.filter(row -> (int)row.get(rejectedColumn) == 0);
 
         return outputRdd;
+    }
+
+    private JavaRDD<Row> getRejectedData (JavaRDD<Row> parsedData) {
+        int rejectedColumn = internalSchema.length() - 2;
+        JavaRDD<Row> rejectedRdd = parsedData.filter(row -> (int)row.get(rejectedColumn) == 1);
+
+        return rejectedRdd;
     }
 
     private static DataType convertXdfToSparkType(String xdfType){

@@ -3,6 +3,8 @@ package sncr.xdf.parser.spark;
 import com.univocity.parsers.common.processor.NoopRowProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import org.apache.commons.httpclient.util.ExceptionUtil;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Row;
@@ -88,7 +90,11 @@ public class ConvertToRow implements Function<String, Row> {
         Object[] record = new Object[schema.length() + 2];
         record[schema.length()] = 0;
 
-        String[] parsed = parser.parseLine(line);
+        logger.debug("Parsing line " + line);
+
+        String[] parsed = null;
+
+        parsed = parser.parseLine(line);
 
         if (parsed == null) {
             logger.info("Unable to parse the record");
