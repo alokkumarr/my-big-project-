@@ -16,6 +16,7 @@
         <include>com.synchronoss.saw:saw-services-dist</include>
         <include>com.synchronoss:bda-saw</include>
         <include>com.sncr:saw-security-parent</include>
+        <include>com.synchronoss:bda-rtis</include>
         <include>com.synchronoss:rtps</include>
       </includes>
       <binaries>
