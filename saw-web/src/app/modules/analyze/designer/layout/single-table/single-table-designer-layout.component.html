@@ -68,8 +68,15 @@
                         [sorts]="sorts"
                         [artifacts]="artifacts">
         </designer-pivot>
+        <designer-map-chart class="designer__content"
+                        *ngIf="analysisType ==='chart' && analysisSubtype === 'geo'"
+                        [chartType]="analysisSubtype"
+                        [auxSettings]="auxSettings"
+                        [data]="data"
+                        [sqlBuilder]="sqlBuilder">
+        </designer-map-chart>
         <designer-chart class="designer__content"
-                        *ngIf="analysisType ==='chart'"
+                        *ngIf="analysisType ==='chart' && analysisSubtype !== 'geo'"
                         [chartType]="analysisSubtype"
                         [sorts]="sorts"
                         [auxSettings]="auxSettings"

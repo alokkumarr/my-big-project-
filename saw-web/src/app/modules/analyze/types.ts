@@ -9,7 +9,8 @@ import {
   AnalysisType,
   Sort,
   Format,
-  FilterModel
+  FilterModel,
+  Region
 } from './models';
 
 export type ArtifactColumns =
@@ -32,7 +33,8 @@ export {
   Artifact,
   AnalysisType,
   AnalysisReport,
-  AnalysisChart
+  AnalysisChart,
+  Region
 };
 
 export type DesignerMode = 'edit' | 'fork' | 'new';

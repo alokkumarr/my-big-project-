@@ -1,4 +1,5 @@
 import { Format } from './format.model';
+import { Region } from './region.model';
 
 export interface ArtifactColumn {
   checked?: null | boolean | 'x';
@@ -24,6 +25,9 @@ export interface ArtifactColumnChart extends ArtifactColumn {
   limitType?: string;
   dateFormat?: string;
   dateInterval?: string;
+  geoType?: 'state' | 'country' | 'zip';
+  regionIdentifier?: 'name' | 'iso-a2' | 'iso-a3' | 'postal-code' | 'fips';
+  region?: Region;
 }
 
 export interface ArtifactColumnPivot extends ArtifactColumn {

@@ -9,6 +9,7 @@ import {
   FLOAT_TYPES,
   INT_TYPES,
   DATE_TYPES,
+  GEO_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
   DATE_FORMATS,
@@ -28,6 +29,7 @@ export {
   FLOAT_TYPES,
   INT_TYPES,
   DATE_TYPES,
+  GEO_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
   DATE_FORMATS,
@@ -63,7 +65,8 @@ export const TYPE_MAP = reduce(
   [
     ...map(NUMBER_TYPES, type => ({ type, generalType: 'number' })),
     ...map(DATE_TYPES, type => ({ type, generalType: 'date' })),
-    { type: 'string', generalType: 'string' }
+    { type: 'string', generalType: 'string' },
+    { type: 'geo', generalType: 'geo' }
   ],
   (typeMap, { type, generalType }) => {
     typeMap[type] = generalType;
@@ -84,6 +87,11 @@ export const TYPE_ICONS = [
     value: 'string'
   },
   {
+    icon: 'icon-geo-type',
+    label: 'Geo',
+    value: 'geo'
+  },
+  {
     icon: 'icon-calendar',
     label: 'Date',
     value: 'date'
@@ -94,7 +102,8 @@ export const TYPE_ICONS_OBJ = fpPipe(fpGroupBy('type'), fpMapValues(v => v[0]))(
   [
     ...map(NUMBER_TYPES, type => ({ type, icon: 'icon-number-type' })),
     ...map(DATE_TYPES, type => ({ type, icon: 'icon-calendar' })),
-    { type: 'string', icon: 'icon-string-type' }
+    { type: 'string', icon: 'icon-string-type' },
+    { type: 'geo', icon: 'icon-geo-type' }
   ]
 );
 
@@ -229,6 +238,12 @@ export const ANALYSIS_METHODS = [
             icon: { font: 'icon-Candlestick-icon' },
             type: 'chart:tsPane',
             typeOnBackEnd: 'chart:tsareaspline'
+          },
+          {
+            label: 'Geolocation',
+            icon: { font: 'icon-Candlestick-icon' },
+            type: 'chart:geo',
+            typeOnBackEnd: 'chart:geo'
           }
         ]
       },

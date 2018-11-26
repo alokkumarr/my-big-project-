@@ -6,6 +6,7 @@ import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
+import * as get from 'lodash/get';
 
 import { DesignerService } from '../../designer.service';
 import {
@@ -46,7 +47,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
-  public isEmpty = isEmpty;
+  public isEmpty: Function = isEmpty;
   public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
@@ -131,10 +132,10 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   getUnselectedArtifactColumns() {
     const { types, keyword } = this.filterObj;
     return fpPipe(
-      fpFilter(({ checked, type, alias, displayName }) => {
+      fpFilter(({ checked, type, alias, displayName, geoType }) => {
         return (
           !checked &&
-          this.hasType(type, types) &&
+          this.hasType(type, types, geoType) &&
           this.hasKeyword(alias || displayName, keyword)
         );
       }),
@@ -142,7 +143,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     )(this.artifactColumns);
   }
 
-  hasType(type, filterTypes) {
+  hasType(type, filterTypes, geoType) {
     /* prettier-ignore */
     switch (TYPE_MAP[type]) {
     case 'number':
@@ -150,10 +151,23 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     case 'date':
       return filterTypes.includes('date');
     case 'string':
-      return filterTypes.includes('string');
+      return geoType && filterTypes.includes('geo') ?
+        true : filterTypes.includes('string');
     default:
       return true;
     }
+  }
+
+  getArtifactColumnType(column) {
+    if (column.geoType && column.type === 'string') {
+      return 'geo';
+    }
+    return column.type;
+  }
+
+  getArtifactColumnTypeIcon(artifactColumn) {
+    const type = this.getArtifactColumnType(artifactColumn);
+    return get(TYPE_ICONS_OBJ, `${type}.icon`);
   }
 
   hasKeyword(name, keyword) {

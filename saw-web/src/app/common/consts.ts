@@ -8,6 +8,7 @@ export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;
 export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
+export const GEO_TYPES = ['state', 'country', 'zip'];
 
 export const BACKEND_TIMEZONE = 'America/New_York';
 

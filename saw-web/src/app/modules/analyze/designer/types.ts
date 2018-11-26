@@ -26,7 +26,8 @@ import {
   IToolbarActionResult,
   Artifact,
   Format,
-  AnalysisDialogData
+  AnalysisDialogData,
+  Region
 } from '../types';
 
 export {
@@ -55,7 +56,8 @@ export {
   Format,
   Join,
   JsPlumbCanvasChangeEvent,
-  AnalysisDialogData
+  AnalysisDialogData,
+  Region
 };
 
 export interface ArtifactColumnFilter {
@@ -109,7 +111,8 @@ export interface DesignerChangeEvent {
     | 'submitQuery'
     | 'chartTitle'
     | 'fetchLimit'
-    | 'changeQuery';
+    | 'changeQuery'
+    | 'region';
   column?: ArtifactColumn;
   data?: any;
 }

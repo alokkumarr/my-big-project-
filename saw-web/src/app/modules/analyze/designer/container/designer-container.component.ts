@@ -737,6 +737,10 @@ export class DesignerContainerComponent implements OnInit {
       this.analysis.sqlBuilder = this.getSqlBuilder();
       this.requestDataIfPossible();
       break;
+    case 'region':
+      this.updateAnalysis();
+      this.refreshDataObject();
+      break;
     }
   }
 

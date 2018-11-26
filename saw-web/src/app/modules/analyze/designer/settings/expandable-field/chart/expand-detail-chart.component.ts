@@ -1,7 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
-import { ArtifactColumnChart, Format } from '../../../types';
+import * as isString from 'lodash/isString';
+import {FormControl, FormBuilder, FormGroup} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+import { ArtifactColumnChart, Format, Region } from '../../../types';
 import {
   DATE_INTERVALS,
   DATE_TYPES,
@@ -13,6 +17,7 @@ import {
   formatNumber,
   isFormatted
 } from '../../../../../../common/utils/numberFormatter';
+import { mapDataIndex } from '../../../../../../common/components/charts/map-data-index';
 
 import { DesignerChangeEvent } from '../../../types';
 
@@ -38,8 +43,17 @@ export class ExpandDetailChartComponent implements OnInit {
   public isFloat: boolean;
   public limitType;
   public limitValue;
+  public mapDataIndex = mapDataIndex;
+  public stateForm: FormGroup = this.fb.group({
+    regionCtrl: '',
+  });
+  public regionCtrl = new FormControl();
+  filteredRegions: Observable<Region>;
 
-  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
+  constructor(
+    private _analyzeDialogService: AnalyzeDialogService,
+    private fb: FormBuilder
+    ) {}
 
   ngOnInit() {
     const type = this.artifactColumn.type;
@@ -52,6 +66,42 @@ export class ExpandDetailChartComponent implements OnInit {
     this.isDataField = ['y', 'z'].includes(this.artifactColumn.area);
     this.hasDateInterval = DATE_TYPES.includes(type);
     this.changeSample();
+
+    this.filteredRegions = this.stateForm.get('regionCtrl').valueChanges
+      .pipe(
+        startWith({name: ''}),
+        map(value => {
+          if (isString(value)) {
+            return this._filterRegions(value);
+          }
+          return this._filterRegions(value.name);
+        })
+      );
+  }
+
+  onRegionSelected(region) {
+    this.artifactColumn.region = region;
+    this.change.emit({ subject: 'region' });
+  }
+
+  displayWithRegion(option) {
+    return option.name;
+  }
+
+  private _filter = (array, name) => {
+    const filterValue = name.toLowerCase();
+
+    return array.filter(item => item.name.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private _filterRegions(value) {
+    if (value) {
+      return this.mapDataIndex
+        .map(group => ({name: group.name, children: this._filter(group.children, value)}))
+        .filter(group => group.children.length > 0);
+    }
+
+    return this.mapDataIndex;
   }
 
   onAliasChange(value) {

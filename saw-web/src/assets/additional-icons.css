@@ -31,6 +31,15 @@
   font-weight: bolder;
 }
 
+.icon-geo-type.mat-icon {
+  width: 30px;
+}
+
+.icon-geo-type::before {
+  content: 'geo';
+  font-weight: bolder;
+}
+
 .icon-number-type.mat-icon {
   width: 30px;
 }

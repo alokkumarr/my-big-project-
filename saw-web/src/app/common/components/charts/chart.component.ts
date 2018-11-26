@@ -60,7 +60,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   public config: any = {};
   public subscription: any;
   public clonedConfig: any = {};
-  public cType: string;
+  public chartSettingsType: string;
 
   constructor() {
     this.highcharts.setOptions(globalChartOptions);
@@ -88,9 +88,14 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  isStockChart(chartType) {
-    const isStockChart = chartType.substring(0, 2) === 'ts';
-    return isStockChart;
+  getChartSettingsType(chartType) {
+    if (chartType.substring(0, 2) === 'ts') {
+      return 'highStock';
+    }
+    if (chartType === 'bullet') {
+      return 'bullet';
+    }
+    return 'default';
   }
 
   updateOptions(options) {
@@ -98,12 +103,12 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     // set the appropriate config based on chart type
-    this.cType = this.isStockChart(this.chartType) ? 'highStock' : options.chart.type;
+    this.chartSettingsType = this.getChartSettingsType(this.chartType);
     this.config = defaultsDeep(
       options,
       this.config,
       get(
-        find(CHART_SETTINGS_OBJ, ['type', this.cType]),
+        find(CHART_SETTINGS_OBJ, ['type', this.chartSettingsType]),
         'config',
         chartOptions
       )
@@ -183,7 +188,9 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Not using chart.update due to a bug with navigation
     // update and bar styles.
-    if (this.isStockChart(this.chartType)) {
+    const chartSettingsType = this.getChartSettingsType(this.chartType);
+    switch (chartSettingsType) {
+    case 'highStock':
       set(
         this.config,
         'xAxis.0.title.text',
@@ -207,13 +214,15 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.config = clone(this.clonedConfig);
       this.addExportSize(this.config);
       this.clonedConfig = {};
-    } else {
+      break;
+    default:
       this.addExportConfig(this.config);
       this.chart = this.highcharts.chart(
         this.container.nativeElement,
         this.config
       );
       this.addExportSize(this.config);
+      break;
     }
 
     // This is causing more problems than it solves. Updating the defaultsDeep
