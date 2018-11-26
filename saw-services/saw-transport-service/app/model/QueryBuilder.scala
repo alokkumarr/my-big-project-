@@ -469,6 +469,13 @@ object QueryBuilder extends {
     * @return
     */
   private def checkAplicableArtifact(json: JValue, table: String): Boolean = {
+    val analysisType = (json \ "type");
+    val typeInfo = analysisType.extract[String];
+    // There are no multiple artifacts for Chart , Pivot, Es-report, So in below cases return default true.
+    if (typeInfo.equalsIgnoreCase("pivot") ||
+        typeInfo.equalsIgnoreCase("esReport") ||
+        typeInfo.equalsIgnoreCase("chart"))
+      return true
     val sqlBuilder = json \ "sqlBuilder" match {
       case obj: JObject => obj
       case JNothing => JObject()
