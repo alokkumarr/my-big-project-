@@ -28,18 +28,5 @@
 
   chart {
     height: 100%;
-
-
-    ::ng-deep div {
-      height: 100%;
-
-      ::ng-deep div {
-        height: 100% !important;
-
-        ::ng-deep svg {
-          max-height: 100% !important;
-        }
-      }
-    }
   }
 }

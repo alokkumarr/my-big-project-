@@ -1,13 +1,15 @@
 @import "src/themes/base/colors";
 
+$designer-header-height: 57px;
+
 :host {
   background-color: white;
   height: 100%;
   max-width: 100%;
   display: grid;
   grid-template:
-    "header" 80px
-    "content" calc(100% - 80px);
+    "header" $designer-header-height
+    "content" calc(100% - #{$designer-header-height});
 }
 
 .designer__header {
