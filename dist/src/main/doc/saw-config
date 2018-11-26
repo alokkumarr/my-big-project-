@@ -139,5 +139,12 @@ saw_security_email_from=noreply@example.com
 #
 saw_security_sso_secret=Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U
 
+[sip-rtis]
+localhost
+
+[sip-rtis:vars]
+# Event handler to use for processing incoming RTIS events
+sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
+
 [sip-rtps]
 localhost
