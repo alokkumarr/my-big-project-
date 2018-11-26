@@ -449,7 +449,7 @@
             </image>
             <!-- Second SIP application node: runs same services as
                  first node, to provide redundancy -->
-           <!-- <image>
+            <image>
               <name>sip-app:${project.version}</name>
               <alias>sip-app2</alias>
               <run>
@@ -467,7 +467,7 @@
                   <time>${sip.docker.wait.time}</time>
                 </wait>
               </run>
-            </image>-->
+            </image>
             <!-- Third SIP application node: only used for MariaDB
                  Galera cluster arbitrator node to resolve split brain
                  situations-->

@@ -34,7 +34,7 @@ public class MigrationConfig {
           flyway.migrate();
         } else {
           log.info("Letting migration run on first node");
-          waitForMigration(flyway, 20);
+          waitForMigration(flyway, 5);
         }
         log.info("Finished migration");
       }
