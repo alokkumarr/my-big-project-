@@ -3,13 +3,15 @@ const using = require('jasmine-data-provider');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const protractorConf = require('../../protractor.conf');
 const subCategories = require('../javascript/data/subCategories');
-let AnalysisHelper = require('../javascript/api/AnalysisHelper');
-let ApiUtils = require('../javascript/api/APiUtils');
 const globalVariables = require('../javascript/helpers/globalVariables');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../javascript/helpers/observe/DashboardFunctions');
-const ObserveHelper = require('../javascript/api/ObserveHelper');
 const dataSets = require('../javascript/data/datasets');
+const ObserveHelper = require('../../v2/helpers/api/ObserveHelper');
+const chai = require('chai');
+const assert = chai.assert;
+const logger = require('../../v2/conf/logger')(__filename);
+let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
 
 describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotKPI.test.js', () => {
   const subCategoryName = subCategories.observeSubCategory.name;
@@ -20,8 +22,8 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotK
   const metricName = dataSets.pivotChart;
 
   beforeAll(function() {
-    host = new ApiUtils().getHost(browser.baseUrl);
-    token = new AnalysisHelper().getToken(host);
+    host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
   });
@@ -35,9 +37,9 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotK
   afterEach(function(done) {
     setTimeout(function() {
       //delete dashboard if ui failed.
-      let oh = new ObserveHelper();
-      oh.deleteDashboard(host, token, dashboardId);
-
+      if(dashboardId) {
+        new ObserveHelper().deleteDashboard(host, token, dashboardId);
+      }
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -46,7 +48,11 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotK
   using(testDataReader.testData['DASHBOARDWITHSNAPSHOTKPI']['dashboardWithSnapshotKpiDataProvider'], function(data, description) {
     it('should able to create & delete dashboard for snapshot kpi ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARDWITHSNAPSHOTKPI', dp:'dashboardWithSnapshotKpiDataProvider'}), () => {
       try {
-
+        if(!token) {
+          logger.error('token cannot be null');
+          expect(token).toBeTruthy();
+          assert.isNotNull(token, 'token cannot be null');
+        }
         let currentTime = new Date().getTime();
         let user = data.user;
 
