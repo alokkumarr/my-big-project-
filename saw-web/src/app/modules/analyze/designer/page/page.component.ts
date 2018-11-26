@@ -103,7 +103,13 @@ export class DesignerPageComponent implements OnInit {
       this.analyzeService
         .readAnalysis(existingAnalysisParams.analysisId)
         .then(analysis => {
-          this.analysis = analysis;
+          this.analysis = {
+            ...analysis,
+            name:
+              this.designerMode === 'fork'
+                ? `${analysis.name} Copy`
+                : analysis.name
+          };
         });
     }
   }

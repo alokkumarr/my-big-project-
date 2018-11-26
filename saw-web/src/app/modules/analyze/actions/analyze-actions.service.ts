@@ -32,13 +32,11 @@ export class AnalyzeActionsService {
   }
 
   fork(analysis) {
-    const model = clone(analysis);
-    model.name += ' Copy';
-    return this.openEditModal(model, 'fork');
+    return this.openEditModal(analysis, 'fork');
   }
 
   edit(analysis) {
-    return this.openEditModal(clone(analysis), 'edit');
+    return this.openEditModal(analysis, 'edit');
   }
 
   publish(analysis, type) {
