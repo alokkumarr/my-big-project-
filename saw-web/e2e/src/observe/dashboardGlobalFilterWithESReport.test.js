@@ -4,13 +4,17 @@ const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const protractorConf = require('../../protractor.conf');
 const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
-let AnalysisHelper = require('../javascript/api/AnalysisHelper');
+let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
 let ApiUtils = require('../javascript/api/APiUtils');
 const Constants = require('../javascript/api/Constants');
 const globalVariables = require('../javascript/helpers/globalVariables');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../javascript/helpers/observe/DashboardFunctions');
-const ObserveHelper = require('../javascript/api/ObserveHelper');
+const ObserveHelper = require('../../v2/helpers/api/ObserveHelper');
+const chai = require('chai');
+const assert = chai.assert;
+const logger = require('../../v2/conf/logger')(__filename);
+let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
 
 describe('Global filters in dashboard with es report tests: dashboardGlobalFilterWithESReport.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -25,8 +29,8 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
   let dashboardId;
 
   beforeAll(function() {
-    host = new ApiUtils().getHost(browser.baseUrl);
-    token = new AnalysisHelper().getToken(host);
+    host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
   });
@@ -41,14 +45,17 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
     setTimeout(function() {
       //Delete analysis
       analysesDetails.forEach(function(currentAnalysis) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
+        if(currentAnalysis.analysisId){
+          new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
+        }
       });
       //reset the array
       analysesDetails = [];
 
       //delete dashboard if ui failed.
-      let oh = new ObserveHelper();
-      oh.deleteDashboard(host, token, dashboardId);
+      if(dashboardId) {
+        new ObserveHelper().deleteDashboard(host, token, dashboardId);
+      }
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -57,7 +64,11 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
   using(testDataReader.testData['DASHBOARD_GLOBAL_FILTERS']['dashboardGlobalFiltersWithESReport'] ? testDataReader.testData['DASHBOARD_GLOBAL_FILTERS']['dashboardGlobalFiltersWithESReport'] : {}, function(data, description) {
     it('should able apply global filters in dashboard with esReport: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARD_GLOBAL_FILTERS', dp:'dashboardGlobalFiltersWithESReport'}), () => {
       try {
-
+        if(!token) {
+          logger.error('token cannot be null');
+          expect(token).toBeTruthy();
+          assert.isNotNull(token, 'token cannot be null');
+        }
         let currentTime = new Date().getTime();
         let user = data.user;
         let type = Constants.ES_REPORT;
@@ -67,6 +78,8 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
         let name = 'AT ' + Constants.ES_REPORT + ' ' + globalVariables.e2eId + '-' + currentTime;
         let description = 'AT Description:' + Constants.ES_REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
         let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, null, data.filters);
+        expect(analysis).toBeTruthy();
+        assert.isNotNull(analysis, 'analysis cannot be null');
         analysesDetails.push(analysis);
 
         loginPage.loginAs(user);
@@ -81,7 +94,7 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
         browser.refresh();
         dashboardFunctions.deleteDashboard(dashboardName);
       } catch (e) {
-        console.log(e);
+       logger.error(e);
       }
     });
   });
