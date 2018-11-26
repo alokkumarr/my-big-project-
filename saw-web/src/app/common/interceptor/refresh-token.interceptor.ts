@@ -8,7 +8,6 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import 'rxjs/add/operator/mergeMap';
 
 import * as get from 'lodash/get';
 
@@ -61,7 +60,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
           );
 
           return observer;
-        }).flatMap(() => {
+        }).pipe(() => {
           const token = this.jwt.getTokenObj();
           if (token && this.jwt.isValid(token)) {
             const bearer = `Bearer ${this.jwt.getAccessToken()}`;
