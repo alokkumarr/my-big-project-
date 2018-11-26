@@ -21,11 +21,6 @@ export const DATE_PRESETS = [
     label: 'This Week'
   },
   {
-    value: 'Yesterday',
-    keyword: 'YESTERDAY',
-    label: 'Yesterday'
-  },
-  {
     value: 'MTD',
     keyword: 'MONTH_TO_DATE',
     label: 'MTD (Month to Date)'
