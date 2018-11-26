@@ -1,9 +1,9 @@
 const commonFunctions = require('../commonFunctions.js');
 const observePage = require('../../pages/observe/observePage.po');
 const homePage = require('../../pages/homePage.po.js');
-let AnalysisHelper = require('../../api/AnalysisHelper');
+let AnalysisHelper = require('../../../../v2/helpers/api/AnalysisHelper');
 const utils = require('../utils');
-
+const logger = require('../../../../v2/conf/logger')(__filename);
 class DashboardFunctions {
 
   goToObserve() {
@@ -13,7 +13,7 @@ class DashboardFunctions {
       commonFunctions.waitFor.elementToBeClickable(homePage.observeLink);
       homePage.observeLink.click();
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
 
   }
@@ -33,7 +33,7 @@ class DashboardFunctions {
       homePage.subCategory(subCategory).click();
       browser.sleep(1000);
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
 
   }
@@ -70,7 +70,7 @@ class DashboardFunctions {
       _self.addAnalysesToDashboard(analysisCat, analysisSubCat, analysesToAdd);
       dashboardId = _self.saveDashboard(dashboardName, dashboardDescription, observeSubCat);
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     } finally {
       return dashboardId;
     }
@@ -94,7 +94,7 @@ class DashboardFunctions {
       observePage.subCategory(subCat).click();
 
       // Add analyses
-      analysesToAdd.forEach(function(analysis) {
+      analysesToAdd.forEach(function (analysis) {
 
         commonFunctions.waitFor.elementToBePresent(observePage.addAnalysisById(analysis.analysisId));
         commonFunctions.waitFor.elementToBeVisible(observePage.addAnalysisById(analysis.analysisId));
@@ -114,7 +114,7 @@ class DashboardFunctions {
       observePage.saveButton.click();
 
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
   }
 
@@ -122,6 +122,9 @@ class DashboardFunctions {
 
     try {
       let createdAnalysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, subType, filters);
+      if (!createdAnalysis) {
+        return null;
+      }
       let analysisId = createdAnalysis.contents.analyze[0].executionId.split('::')[0];
 
       let analysis = {
@@ -130,7 +133,7 @@ class DashboardFunctions {
       };
       return analysis;
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
 
   }
@@ -167,14 +170,14 @@ class DashboardFunctions {
       expect(observePage.saveButton.isDisplayed).toBeTruthy();
 
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     } finally {
       commonFunctions.waitFor.elementToBePresent(observePage.dashboard.dashboardTitle(name));
       commonFunctions.waitFor.elementToBeVisible(observePage.dashboard.dashboardTitle(name));
       expect(observePage.dashboard.dashboardTitle(name).isDisplayed).toBeTruthy();
       //get dashboard id from current url
       browser.getCurrentUrl().then(url => {
-        let dashboardId =  url.split("=")[1];
+        let dashboardId = url.split("=")[1];
         return dashboardId;
       });
     }
@@ -204,8 +207,8 @@ class DashboardFunctions {
         _self.deleteDashboard(dashboardName);
       }
     } catch (e) {
-      console.log(e);
-    }finally {
+      logger.error(e);
+    } finally {
 
     }
 
@@ -228,7 +231,7 @@ class DashboardFunctions {
       expect(observePage.dashboard.dashboardTitle(dashboardName).isPresent()).toBeFalsy();
 
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
   }
 
@@ -271,17 +274,17 @@ class DashboardFunctions {
       // select kpi info
       _self.fillKPIInfoAndApply(kpiInfo, kpiName);
 
-       // Click on save button
-       commonFunctions.waitFor.elementToBePresent(observePage.saveButton);
-       commonFunctions.waitFor.elementToBeVisible(observePage.saveButton);
-       commonFunctions.waitFor.elementToBeClickable(observePage.saveButton);
-       expect(observePage.saveButton.isDisplayed).toBeTruthy();
-       observePage.saveButton.click();
+      // Click on save button
+      commonFunctions.waitFor.elementToBePresent(observePage.saveButton);
+      commonFunctions.waitFor.elementToBeVisible(observePage.saveButton);
+      commonFunctions.waitFor.elementToBeClickable(observePage.saveButton);
+      expect(observePage.saveButton.isDisplayed).toBeTruthy();
+      observePage.saveButton.click();
 
       dashboardId = _self.saveDashboard(dashboardName, dashboardDescription, subCategory);
 
     } catch (error) {
-      console.log(error)
+      logger.error(error)
     }
     finally {
       return dashboardId;
@@ -326,7 +329,7 @@ class DashboardFunctions {
       observePage.snapshotKPI.aggregationSelectValue(kpiInfo.primaryAggregation).click();
 
       //Secondary Aggregation
-      if(actualVsTarget) {
+      if (actualVsTarget) {
         // Applicable for actual vs target kpis
         commonFunctions.waitFor.elementToBePresent(observePage.actualVsTargetKPI.measure1Input);
         commonFunctions.waitFor.elementToBeVisible(observePage.actualVsTargetKPI.measure1Input);
@@ -352,8 +355,8 @@ class DashboardFunctions {
 
       } else {
         // Applicable for snapshot kpis
-        kpiInfo.secondaryAggregations.forEach(function(secondaryAggregation){
-          if(secondaryAggregation.toLowerCase() !== kpiInfo.primaryAggregation.toLowerCase()) {
+        kpiInfo.secondaryAggregations.forEach(function (secondaryAggregation) {
+          if (secondaryAggregation.toLowerCase() !== kpiInfo.primaryAggregation.toLowerCase()) {
             commonFunctions.waitFor.elementToBePresent(observePage.snapshotKPI.secondaryAggregateByName(secondaryAggregation));
             commonFunctions.waitFor.elementToBeVisible(observePage.snapshotKPI.secondaryAggregateByName(secondaryAggregation));
             commonFunctions.waitFor.elementToBeClickable(observePage.snapshotKPI.secondaryAggregateByName(secondaryAggregation));
@@ -374,7 +377,7 @@ class DashboardFunctions {
       observePage.snapshotKPI.applyKPIButton.click();
 
     } catch (error) {
-      console.log(error)
+      logger.error(error)
     }
   }
 
@@ -406,8 +409,8 @@ class DashboardFunctions {
         _self.deleteDashboard(dashboardName);
       }
     } catch (e) {
-      console.log(e);
-    }finally {
+      logger.error(e);
+    } finally {
 
     }
   }
@@ -464,7 +467,7 @@ class DashboardFunctions {
 
       dashboardId = _self.saveDashboard(dashboardName, dashboardDescription, subCategory);
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     } finally {
       return dashboardId;
     }
@@ -494,8 +497,8 @@ class DashboardFunctions {
         _self.deleteDashboard(dashboardName);
       }
     } catch (e) {
-      console.log(e);
-    }finally {
+      logger.error(e);
+    } finally {
 
     }
   }
@@ -507,9 +510,9 @@ class DashboardFunctions {
       commonFunctions.waitFor.elementToBeClickable(observePage.filterButton);
       observePage.filterButton.click();
 
-      dashboardGlobalFilters.forEach(function(currentFilter) {
+      dashboardGlobalFilters.forEach(function (currentFilter) {
 
-        if(currentFilter.name.toLowerCase() === 'string'){
+        if (currentFilter.name.toLowerCase() === 'string') {
           browser.sleep(2000);
           commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.stringFilter);
           observePage.globalFilters.stringFilter.clear();
@@ -518,7 +521,7 @@ class DashboardFunctions {
           commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.stringFilterValue(currentFilter.value));
           observePage.globalFilters.stringFilterValue(currentFilter.value).click();
 
-        } else if(currentFilter.name.toLowerCase() === 'date'){
+        } else if (currentFilter.name.toLowerCase() === 'date') {
           browser.sleep(2000);
           commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.dateFilterPreset);
           commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.dateFilterPreset);
@@ -527,10 +530,10 @@ class DashboardFunctions {
           commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.dateFilterPresetValue(currentFilter.preset));
           observePage.globalFilters.dateFilterPresetValue(currentFilter.preset).click();
 
-        } else if(currentFilter.name.toLowerCase() === 'long'
+        } else if (currentFilter.name.toLowerCase() === 'long'
           || currentFilter.name.toLowerCase() === 'integer'
           || currentFilter.name.toLowerCase() === 'float'
-          || currentFilter.name.toLowerCase() === 'double'){
+          || currentFilter.name.toLowerCase() === 'double') {
           browser.sleep(2000);
           commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.numberSlider);
           commonFunctions.slideHorizontally(observePage.globalFilters.numberSlider, currentFilter.value);
@@ -543,8 +546,8 @@ class DashboardFunctions {
       observePage.globalFilters.applyFilter.click();
 
       _self.verifyAppliedGlobalFilters(dashboardGlobalFilters);
-    }catch (e) {
-      console.log(e);
+    } catch (e) {
+      logger.error(e);
 
     }
   }
@@ -555,19 +558,19 @@ class DashboardFunctions {
       commonFunctions.waitFor.elementToBeVisible(observePage.filterButton);
       commonFunctions.waitFor.elementToBeClickable(observePage.filterButton);
       observePage.filterButton.click();
-      dashboardGlobalFilters.forEach(function(currentFilter) {
+      dashboardGlobalFilters.forEach(function (currentFilter) {
 
-        if(currentFilter.name.toLowerCase() === 'string'){
+        if (currentFilter.name.toLowerCase() === 'string') {
           browser.sleep(2000);
           expect(observePage.globalFilters.stringFilter.getAttribute('value')).toBe(currentFilter.value);
 
-        } else if(currentFilter.name.toLowerCase() === 'date'){
+        } else if (currentFilter.name.toLowerCase() === 'date') {
           browser.sleep(2000);
           expect(observePage.globalFilters.selectedPresetValue(currentFilter.preset).getText()).toContain(currentFilter.preset);
-        } else if(currentFilter.name.toLowerCase() === 'long'
+        } else if (currentFilter.name.toLowerCase() === 'long'
           || currentFilter.name.toLowerCase() === 'integer'
           || currentFilter.name.toLowerCase() === 'float'
-          || currentFilter.name.toLowerCase() === 'double'){
+          || currentFilter.name.toLowerCase() === 'double') {
           browser.sleep(2000);
           expect(observePage.globalFilters.numberSliderLow.getAttribute('aria-valuenow')).toBeGreaterThan(0.0);
 
@@ -579,8 +582,8 @@ class DashboardFunctions {
       commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.cancelButton);
       observePage.globalFilters.cancelButton.click();
 
-    }catch (e) {
-      console.log(e);
+    } catch (e) {
+      logger.error(e);
     }
   }
 
