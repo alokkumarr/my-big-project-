@@ -7,6 +7,7 @@ import { CHANNEL_TYPES } from '../../wb-comp-configs';
 import { ChannelObject } from '../../models/workbench.interface';
 
 import { DatasourceService } from '../../services/datasource.service';
+import { generateSchedule } from '../../../../common/utils/cron2Readable';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
@@ -282,6 +283,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     this.datasourceService.decryptPWD(pwd).subscribe(data => {
       this.selectedSourceData.password = data.data;
     });
+  }
+
+  calculateScheduleCellValue(rowData) {
+    const {cronexp, activeTab} = rowData.schedulerExpression;
+    return generateSchedule(cronexp, activeTab);
   }
 
   togglePWD() {

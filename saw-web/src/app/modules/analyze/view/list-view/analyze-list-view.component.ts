@@ -3,7 +3,7 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { AnalyzeActionsService } from '../../actions';
-import { generateSchedule } from '../../cron';
+import { generateSchedule } from '../../../../common/utils/cron2Readable';
 import {
   ExecuteService,
   EXECUTION_STATES
@@ -123,8 +123,14 @@ export class AnalyzeListViewComponent implements OnInit {
       },
       {
         caption: 'SCHEDULED',
-        calculateCellValue: rowData =>
-          generateSchedule(this.cronJobs, rowData.id),
+        calculateCellValue: rowData => {
+          const cron = this.cronJobs[rowData.id];
+          if (!cron) {
+            return '';
+          }
+          const {cronExpression, activeTab} = cron.jobDetails;
+          return generateSchedule(cronExpression, activeTab);
+        },
         width: '12%'
       },
       {
