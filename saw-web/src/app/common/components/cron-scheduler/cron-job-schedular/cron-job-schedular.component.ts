@@ -366,7 +366,7 @@ export class CronJobSchedularComponent implements OnInit {
       const meridium = parseCronValue[2].split(',');
       modelDate = {
         hour: parseInt(fetchTime[0], 10),
-        minute: fetchTime[1],
+        minute: parseInt(fetchTime[1], 10),
         hourType: meridium[0]
       };
     }

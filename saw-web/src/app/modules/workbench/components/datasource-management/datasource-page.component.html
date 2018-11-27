@@ -98,8 +98,11 @@
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" i18n>Created Date : </span>
-              <span>{{selectedSourceData?.createdDate | date: 'short'}}</span>
+              <span class="prop-name" i18n>Last Modified: </span>
+              <span *ngIf="selectedSourceData">
+                <span *ngIf="selectedSourceData.modifiedDate; else defDate">{{selectedSourceData?.modifiedDate | date: 'short'}}</span>
+                <ng-template #defDate>{{selectedSourceData?.createdDate | date: 'short'}}</ng-template>
+              </span>
             </div>
           </div>
           <mat-divider></mat-divider>
@@ -129,7 +132,7 @@
             <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
             <dxi-column caption="Route Name" dataField="routeName" alignment="left"></dxi-column>
             <dxi-column caption="Created By" dataField="createdBy" alignment="left"></dxi-column>
-            <dxi-column caption="Created Date" dataField="createdDate" alignment="left" cellTemplate="dateTemplate"></dxi-column>
+            <dxi-column caption="Last Modified" dataField="createdDate" alignment="left" cellTemplate="dateTemplate"></dxi-column>
             <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
             <dxi-column caption="Schedule" dataField="schedulerExpression" alignment="left" [calculateCellValue]="calculateScheduleCellValue"></dxi-column>
             <dxi-column caption="Source Location" dataField="sourceLocation" alignment="left"></dxi-column>
@@ -143,7 +146,8 @@
             </div>
 
             <div *dxTemplate="let data of 'dateTemplate'">
-              <span [innerHTML]="data.value | date: 'short'"></span>
+              <span *ngIf="data.data.modifiedDate; else defDate">{{data.data.modifiedDate | date: 'short'}}</span>
+                <ng-template #defDate>{{data.data.createdDate | date: 'short'}}</ng-template>
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
