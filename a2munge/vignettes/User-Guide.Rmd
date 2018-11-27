@@ -67,7 +67,7 @@ Wherever possible and appropriate the a2munge functions share common argument na
 In the following sections each of the a2munge functions are explained with examples. The examples assume a working knowledge of R and the tidyverse^[tidyverse: R packages for data science [via](https://www.tidyverse.org/)].
 
 
-In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. For more background on creating a Spark connection in R please see the [sparklyr](https://spark.rstudio.com/)] package. 
+In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. For more background on creating a Spark connection in R please see the [sparklyr](https://spark.rstudio.com/) package. 
 
 
 ```{r data-create, message=FALSE, warning=FALSE}
@@ -90,7 +90,7 @@ cat2 <- LETTERS[c(22:26)]          # Category Var 2
 df <- tibble()
 for(id in id_vars){
   d <- tibble(id = id,
-              date = as.character(sample(dates, n, replace = T)),
+              date = sample(dates, n, replace = T),
               cat1 = sample(cat1, n, replace = T, prob = c(.75, .25)),
               cat2 = sample(cat2, n, replace = T, prob = c(.4, .3, .2, .075, .025)),
               metric1 = sample(1:5, n, replace = T),
@@ -98,7 +98,10 @@ for(id in id_vars){
   df <- rbind(df, d)
 }
 
+```
 
+
+```{r spk-data, eval=FALSE}
 # Create Spark Connection
 sc <- spark_connect(master = "local",
                     spark_home = spark_home_dir())
@@ -106,11 +109,7 @@ sc <- spark_connect(master = "local",
 # Copy Data to Spark
 sdf <- copy_to(sc, df, "df", overwrite = TRUE)
 
-# Date Conversion patch to account for date serialization issue in sparklyr
-df <- mutate_at(df, "date", as.Date)
-sdf <- mutate_at(sdf, "date", funs(to_date))
 ```
-
 
 
 
@@ -128,8 +127,6 @@ The sample dataset has six columns of different types
 # R Dataset
 df
 
-# Spark Dataset
-sdf
 ```
 
 
@@ -147,7 +144,10 @@ summariser(df,
            group_vars   = c("id", "cat1"),
            measure_vars = c("metric1", "metric2"),
            fun          = c("mean", "sum"))
+```
 
+
+```{r summariser-spk, eval=FALSE}
 # Simple Summariser Spark Ex
 summariser(sdf,
            group_vars   = c("id", "cat1"),
@@ -325,20 +325,13 @@ The id_vars argument here specifies which columns are to be preserved in the res
 
 ```{r pivoter}
 
-# simple pivoter R example of pivoting cat1 by id and date for metric1
+# simple pivoter example of pivoting cat1 by id and date for metric1
 pivoter(df,
         id_vars      = c("id", "date"),
         group_vars   = "cat2",
         measure_vars = "metric1",
         fill         = 0) %>% 
   as.tibble()
-
-# Similar pivot with Spark
-pivoter(sdf,
-        id_vars      = c("id", "date"),
-        group_vars   = "cat2",
-        measure_vars = "metric1",
-        fill         = 0)
 
 
 # Pivot with multiple measure vars
@@ -602,7 +595,7 @@ Writer allows for R and Spark objects to be written to files. The file type is c
 
 The path argument should include the directory path and dfs protocol if distributed but not the file name. The file name should be provided in the name argument. For partitioned files, the name will be augmented with a file part number starting with 00001. 
 
-```{r writer}
+```{r writer, eval=FALSE}
 
 ## Simple Writer Ex:
 
@@ -623,6 +616,14 @@ dir(path, full.names = TRUE)
 
 ```
 
+```{r writer2, echo=FALSE}
+print(
+  paste(paste0(tempdir(), "/writer-ex"),
+            c("df-part-00000.json", "df-part-00001.json"),
+        sep = "/")
+  )
+```
+
 
 #### Reader
 
@@ -632,7 +633,7 @@ The path argument accepts wildcard and directory paths along with full file path
 
 Note the reader function works for reading files into Spark only. For reading files into R, use read.csv, read.table, or fread from the data.table package.
 
-```{r reader}
+```{r reader, eval=FALSE}
 
 # Simple Read Example:
 sdf2 <- reader(sc,
@@ -640,11 +641,10 @@ sdf2 <- reader(sc,
                path = path,
                type = "json")
 
-sdf2
 ```
 
 
-```{r remove, echo=FALSE}
+```{r remove, echo=FALSE, eval=FALSE}
 
 # Remove files
 file.remove(dir(path, full.names = TRUE))
@@ -656,16 +656,15 @@ file.remove(dir(path, full.names = TRUE))
 Collecter is a wrapper function around the sampler and sparklyr collect functions that allow Samples of Spark data to be collected into R. Note if the Spark data is distributed, this function will pull that data to the local R environment on the network. The API is similar to the sampler function with the Spark method capabilities.
 
 
-```{r collecter}
+```{r collecter, eval=FALSE}
 
 # Collecter Example:
 df_smpl2 <- collecter(sdf,
-                      sample = TRUE,
-                      method = "fraction",
-                      size   = 0.1,
+                      sample  = TRUE,
+                      method  = "fraction",
+                      size    = 0.1,
                       replace = FALSE,
                       seed    = 319)
-df_smpl2
 ```
 
 ### Insights
