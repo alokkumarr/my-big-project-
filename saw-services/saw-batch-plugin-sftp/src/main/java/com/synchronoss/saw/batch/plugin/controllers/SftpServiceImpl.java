@@ -25,6 +25,7 @@ import com.synchronoss.saw.batch.sftp.integration.SipFileFilterOnLastModifiedTim
 import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.sftp.integration.SipSftpFilter;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +42,9 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +69,8 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StreamUtils;
+
+
 
 
 
@@ -154,7 +159,7 @@ public class SftpServiceImpl extends SipPluginContract {
   // TODO: It has to be enhanced to stream the logs to user interface
   // TODO: SIP-4613
   @Override
-  public HttpStatus connectChannel(Long entityId) throws SftpProcessorException {
+  public HttpStatus connectChannel(Long entityId) {
     logger.trace("checking connectivity for the source id :" + entityId);
     HttpStatus status = null;
     try {
@@ -304,7 +309,9 @@ public class SftpServiceImpl extends SipPluginContract {
       throws SipNestedRuntimeException {
     logger.trace("Test connection to channel starts here");
     HttpStatus status = null;
+   
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
+    SftpSession sftpSession = null;
     try {
       defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
       defaultSftpSessionFactory.setHost(payload.getHostName());
@@ -315,7 +322,8 @@ public class SftpServiceImpl extends SipPluginContract {
       prop.setProperty("StrictHostKeyChecking", "no");
       defaultSftpSessionFactory.setSessionConfig(prop);
       defaultSftpSessionFactory.setPassword(payload.getPassword());
-      if (defaultSftpSessionFactory.getSession().isOpen()) {
+      sftpSession = defaultSftpSessionFactory.getSession();
+      if (sftpSession != null && sftpSession.isOpen()) {
         status = HttpStatus.OK;
         defaultSftpSessionFactory.getSession().close();
       }
@@ -323,8 +331,9 @@ public class SftpServiceImpl extends SipPluginContract {
       status = HttpStatus.UNAUTHORIZED;
       logger.error("Exception occurred while using immediateConnectChannel method ", ex);
     } finally {
-      if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession().isOpen()) {
-        defaultSftpSessionFactory.getSession().close();
+      if (sftpSession != null && sftpSession.isOpen()) {
+        logger.trace("closing connection from finally block");
+        sftpSession.close();
       }
     }
     return status;
