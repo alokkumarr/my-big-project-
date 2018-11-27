@@ -145,7 +145,7 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.error("Invalid directory path " + entityId, ex);
       }
     } else {
-      throw new SftpProcessorException(entityId + "does not exists");
+      throw new SftpProcessorException(entityId + " does not exists");
     }
     logger.trace("connection test for the route with entity id ends here :" + entityId);
     return status;
@@ -158,7 +158,8 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.trace("checking connectivity for the source id :" + entityId);
     HttpStatus status = null;
     try {
-      if (delegatingSessionFactory.getSessionFactory(entityId).getSession().isOpen()) {
+      if (delegatingSessionFactory.getSessionFactory(entityId) != null
+          && delegatingSessionFactory.getSessionFactory(entityId).getSession().isOpen()) {
         logger.info("connected successfully " + entityId);
         status = HttpStatus.OK;
         delegatingSessionFactory.getSessionFactory(entityId).getSession().close();
@@ -315,7 +316,8 @@ public class SftpServiceImpl extends SipPluginContract {
       prop.setProperty("StrictHostKeyChecking", "no");
       defaultSftpSessionFactory.setSessionConfig(prop);
       defaultSftpSessionFactory.setPassword(payload.getPassword());
-      if (defaultSftpSessionFactory.getSession().isOpen()) {
+      if (defaultSftpSessionFactory.getSession() != null
+          && defaultSftpSessionFactory.getSession().isOpen()) {
         status = HttpStatus.OK;
         defaultSftpSessionFactory.getSession().close();
       }
@@ -327,6 +329,7 @@ public class SftpServiceImpl extends SipPluginContract {
         defaultSftpSessionFactory.getSession().close();
       }
     }
+    logger.trace("Test connection to channel ends here");
     return status;
   }
 
@@ -366,8 +369,10 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error("Exception triggered while transferring the file", ex);
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
-      if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession().isOpen()) {
-        defaultSftpSessionFactory.getSession().close();
+      if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
+        if (defaultSftpSessionFactory.getSession().isOpen()) {
+          defaultSftpSessionFactory.getSession().close();
+        }
       }
     }
     logger.trace("Immediate Transfer file ends here with the channel id " + payload.getChannelId()
@@ -396,7 +401,7 @@ public class SftpServiceImpl extends SipPluginContract {
         } else {
           if (list.size() <= batchSize && entry.getAttrs().getSize() != 0) {
             String destination = payload.getDestinationLocation() != null
-                ? defaultDestinationLocation + payload.getDestinationLocation()
+                ? defaultDestinationLocation + File.separator + payload.getDestinationLocation()
                 : defaultDestinationLocation;
             logger.trace("file from the source is downnloaded in the location :" + destination);
             File localDirectory =
@@ -418,11 +423,23 @@ public class SftpServiceImpl extends SipPluginContract {
                 new InputStreamCallback() {
                   @Override
                   public void doWithInputStream(InputStream stream) throws IOException {
-                    logger.trace("Streaming the content of the file in the directory starts here "
-                        + entry.getFilename());
-                    FileCopyUtils.copy(StreamUtils.copyToByteArray(stream), localFile);
-                    logger.trace("Streaming the content of the file in the directory ends here "
-                        + entry.getFilename());
+                    try {
+                      if (stream != null) {
+                        logger
+                            .trace("Streaming the content of the file in the directory starts here "
+                                + entry.getFilename());
+                        FileCopyUtils.copy(StreamUtils.copyToByteArray(stream), localFile);
+                        logger.trace("Streaming the content of the file in the directory ends here "
+                            + entry.getFilename());
+                      }
+                    } catch (Exception ex) {
+                      logger.error("Exception occurred while writing file to the file system", ex);
+                    } finally {
+                      if (stream != null) {
+                        logger.trace("in finally block closing the stream");
+                        stream.close();
+                      }
+                    }
                   }
                 });
             bisDataMetaInfo = new BisDataMetaInfo();
@@ -447,6 +464,7 @@ public class SftpServiceImpl extends SipPluginContract {
     return list;
   }
 
+
   @Override
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId)
       throws SipNestedRuntimeException {
@@ -457,7 +475,8 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     try {
-      if (delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
+      if (delegatingSessionFactory.getSessionFactory(channelId) != null
+          & delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
         logger.trace("session opened starts here ");
         Optional<BisRouteEntity> channelEntity = bisRouteDataRestRepository.findById(routeId);
@@ -491,17 +510,21 @@ public class SftpServiceImpl extends SipPluginContract {
           delegatingSessionFactory.invalidateSessionFactoryMap();
           logger.trace("session opened closes here ");
         } else {
-          throw new SftpProcessorException("Exception occurred while connecting to channel");
+          throw new SftpProcessorException(
+              "Exception occurred while connecting to channel from factory of connections");
         }
       }
     } catch (Exception ex) {
       logger.info("Exception occurred while connecting to channel :", ex);
       throw new SftpProcessorException("Exception occurred while connecting to channel", ex);
     } finally {
-      if (delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
-        logger.trace("session opened closes here in final block ");
-        delegatingSessionFactory.getSessionFactory(channelId).getSession().close();
-        delegatingSessionFactory.invalidateSessionFactoryMap();
+      if (delegatingSessionFactory.getSessionFactory(channelId) != null
+          && delegatingSessionFactory.getSessionFactory(channelId).getSession() != null) {
+        if (delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
+          logger.trace("session opened closes here in final block ");
+          delegatingSessionFactory.getSessionFactory(channelId).getSession().close();
+          delegatingSessionFactory.invalidateSessionFactoryMap();
+        }
       }
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
@@ -512,8 +535,10 @@ public class SftpServiceImpl extends SipPluginContract {
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId) throws IOException, ParseException {
     List<BisDataMetaInfo> list = new ArrayList<>();
-    LsEntry[] files = template.list(sourcelocation + File.separator + pattern);
-    if (files != null && files.length > 0) {
+    LsEntry[] files = null;
+
+    if (template.list(sourcelocation + File.separator + pattern) != null) {
+      files = template.list(sourcelocation + File.separator + pattern);
       int sizeOfFileInPath = files.length;
       int iterationOfBatches = ((batchSize > sizeOfFileInPath) ? (batchSize / sizeOfFileInPath)
           : (sizeOfFileInPath / batchSize));
@@ -532,8 +557,8 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("number of files on this pull :" + filesArray.size());
       logger.trace("size of partitions :" + result.size());
       logger.trace("file from the source is downnloaded in the location :" + destinationLocation);
-      File localDirectory = new File(defaultDestinationLocation + destinationLocation
-          + File.separator + getBatchId() + File.separator);
+      File localDirectory = new File(defaultDestinationLocation + File.separator
+          + destinationLocation + File.separator + getBatchId() + File.separator);
       logger.trace(
           "directory where the file will be downnloaded  :" + localDirectory.getAbsolutePath());
       if (!localDirectory.exists()) {
@@ -563,8 +588,6 @@ public class SftpServiceImpl extends SipPluginContract {
             } else {
               File fileTobeDeleted = null;
               try {
-                // if ((list.size() <= batchSize && entry.getAttrs().getSize() != 0) &&
-                // !sipLogService
                 if (entry.getAttrs().getSize() != 0 && !sipLogService
                     .checkDuplicateFile(sourcelocation + File.separator + entry.getFilename())) {
                   logger.trace("file duplication completed " + sourcelocation + File.separator
@@ -597,10 +620,29 @@ public class SftpServiceImpl extends SipPluginContract {
                           logger.trace(
                               "Streaming the content of the file in the directory starts here "
                                   + entry.getFilename());
-                          FileCopyUtils.copy(StreamUtils.copyToByteArray(stream), localFile);
-                          logger
-                              .trace("Streaming the content of the file in the directory ends here "
+                          try {
+                            if (stream != null) {
+                              FileCopyUtils.copy(StreamUtils.copyToByteArray(stream), localFile);
+                              logger.trace(
+                                  "Streaming the content of the file in the directory ends here "
+                                      + entry.getFilename());
+                              stream.close();
+                              logger
+                                  .trace("closing the stream for the file " + entry.getFilename());
+                            }
+                          } catch (Exception ex) {
+                            logger.error("Exception occurred while writting to file system ", ex);
+                            throw new SftpProcessorException(
+                                "Exception throw while streaming the file " + entry.getFilename()
+                                    + " : ",
+                                ex);
+                          } finally {
+                            if (stream != null) {
+                              logger.trace("closing the stream for the file in finally block "
                                   + entry.getFilename());
+                              stream.close();
+                            }
+                          }
                         }
                       });
                   boolean userHasPermissionsToWriteFile =
@@ -619,12 +661,6 @@ public class SftpServiceImpl extends SipPluginContract {
                   sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                   list.add(bisDataMetaInfo);
                 } else {
-                  // if (list.size() == batchSize) {
-                  // logger.trace("list of the files downloaded using transferDataFromChannel() "
-                  // + list + "reached the limit of batcSize " + batchSize);
-                  // break;
-                  // }
-                  // else {
                   if (sipLogService
                       .checkDuplicateFile(sourcelocation + File.separator + entry.getFilename())) {
                     bisDataMetaInfo = new BisDataMetaInfo();
@@ -644,7 +680,6 @@ public class SftpServiceImpl extends SipPluginContract {
                     list.add(bisDataMetaInfo);
                   }
                 }
-                // }
               } catch (Exception ex) {
                 logger.error("Exception occurred while transferring the file from channel", ex);
                 if (fileTobeDeleted.exists()) {

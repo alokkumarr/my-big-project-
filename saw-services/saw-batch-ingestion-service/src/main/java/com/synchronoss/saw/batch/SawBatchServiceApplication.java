@@ -19,10 +19,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 
 @EnableJpaAuditing
 @EnableIntegration
+@EnableAsync
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.synchronoss.saw.batch"})
 public class SawBatchServiceApplication {
