@@ -5,8 +5,8 @@ var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var argv = require('yargs').argv;
 const webpackHelper = require('./webpack.helper');
-const generate = require('./src/javascript/data/generateTestData');
-
+const logger = require('./v2/conf/logger')(__filename);
+const SuiteSetup = require('./v2/helpers/SuiteSetup');
 /**
  * Note about intervals:
  * Defined to be dependent on environment where tests are executed. Running against distribution package in CI requires
@@ -207,8 +207,8 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'dev1.js',
-      testBaseDir + 'dev2.js'
+      testBaseDir + 'dummyDevelopmentTests1.js',
+      testBaseDir + 'dummyDevelopmentTests2.js'
     ]
   },
   onCleanUp: function (results) {
@@ -216,15 +216,6 @@ exports.config = {
   },
   onPrepare() {
     retry.onPrepare();
-    //
-    // // Generate test data
-    // if(webpackHelper.getSawWebUrl()) {
-    //   token = generate.token(webpackHelper.getSawWebUrl());
-    //   generate.usersRolesPrivilegesCategories(token);
-    //   //sleep.sleep(30);
-    // } else {
-    //   throw new Error('saw web url can not be null');
-    // }
 
     //console.log('Running instance at '+ new Date());
     jasmine.getEnv().addReporter(new SpecReporter({
@@ -288,15 +279,36 @@ exports.config = {
     if (fs.existsSync('jasmine-results.json')) {
       fs.unlink('jasmine-results.json');
     }
-    //console.log('beforeLaunch....generating the testdata...')
     // Generate test data
-    if(webpackHelper.getSawWebUrl()) {
-      const generate = require('./src/javascript/data/generateTestData');
-      token = generate.token(webpackHelper.getSawWebUrl());
-      generate.usersRolesPrivilegesCategories(token);
-    } else {
+    let appUrl = SuiteSetup.getSawWebUrl();
+
+    if (!appUrl) {
+      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' + appUrl
+        + ', hence exiting test suite and failing it...');
       process.exit(1);
     }
+
+    try {
+      logger.info('Generating test for this run...');
+
+      let APICommonHelpers = require('./v2/helpers/api/APICommonHelpers');
+
+      let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+      let token = APICommonHelpers.generateToken(apiBaseUrl);
+
+      if (!token) {
+        logger.error('cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.');
+        process.exit(1);
+      }
+      let TestDataGenerator = require('./v2/helpers/data-generation/TestDataGenerator');
+      new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
+
+    } catch (e) {
+      logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
+        'hence exiting test suite and failing it....' + e);
+      process.exit(1);
+    }
+
   },
   afterLaunch: function() {
     //console.log('afterLaunch....')
