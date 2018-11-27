@@ -313,6 +313,16 @@ export const DATE_INTERVALS_OBJ = fpPipe(
 export const CUSTOM_DATE_PRESET_VALUE = 'NA';
 export const DATE_PRESETS = [
   {
+    value: 'Yesterday',
+    keyword: 'YESTERDAY',
+    label: 'Yesterday'
+  },
+  {
+    value: 'Today',
+    keyword: 'TODAY',
+    label: 'Today'
+  },
+  {
     value: 'TW',
     keyword: 'THIS_WEEK',
     label: 'This Week'
@@ -356,6 +366,11 @@ export const DATE_PRESETS = [
     value: 'LSM',
     keyword: 'LAST_6_MONTHS',
     label: 'Last 6 Months'
+  },
+  {
+    value: 'LY',
+    keyword: 'LAST_YEAR',
+    label: 'Last Year'
   },
   {
     value: CUSTOM_DATE_PRESET_VALUE,

@@ -1,0 +1,22 @@
+- name: Copy RTIS package
+  copy: src="{{ item }}" dest=/tmp/sip-rtis.rpm
+  with_fileglob: ["../rpms/sip-rtis-*.rpm"]
+- name: Install RTIS package
+  yum: name=/tmp/sip-rtis.rpm state=present
+  notify:
+    - restart sip-rtis
+- name: Install RTIS configuration file
+  template: src=application.conf dest=/opt/bda/sip-rtis/conf
+  notify:
+    - restart sip-rtis
+- name: Install RTIS environment file
+  template: src=rtis.env dest=/etc/bda/rtis.env
+  notify:
+    - restart sip-rtis
+- name: Create symbolink link to current Spark version
+  file:
+    src: /opt/mapr/spark/spark-2.2.1
+    dest: /opt/mapr/spark/spark-current
+    state: link
+- name: Enable RTIS
+  systemd: name=sip-rtis enabled=true state=started

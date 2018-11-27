@@ -457,6 +457,11 @@
             <artifactId>swagger-parser</artifactId>
             <version>1.0.16</version>
         </dependency>
+        <dependency>
+          <groupId>info.faljse</groupId>
+          <artifactId>SDNotify</artifactId>
+          <version>1.1</version>
+        </dependency>
     </dependencies>
     <build>
         <defaultGoal>package</defaultGoal>
@@ -512,18 +517,133 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <!-- Assembly plugin -->
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.5</version>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                      <id>jar</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+              <groupId>de.dentrassi.maven</groupId>
+              <artifactId>rpm</artifactId>
+              <version>1.1.0</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>rpm</goal>
+                  </goals>
+                  <configuration>
+                    <packageName>sip-rtis</packageName>
+                    <version>${revision.nodash}</version>
+                     <rulesets>
+                      <ruleset>
+                        <id>default</id>
+                        <rules>
+                          <rule>
+                            <when>
+                              <prefix>/opt/bda/sip-rtis/sbin/</prefix>
+                            </when>
+                            <mode>0755</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>/var/bda/rtis/log</prefix>
+                            </when>
+                            <user>mapr</user>
+                            <group>mapr</group>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>/var/bda/rtis/run</prefix>
+                            </when>
+                            <user>mapr</user>
+                            <group>mapr</group>
+                          </rule>
+                        </rules>
+                      </ruleset>
+                    </rulesets>
+                    <entries>
+                      <entry>
+                        <name>/opt/bda/sip-rtis</name>
+                        <directory>true</directory>
+                      </entry>
+                      <entry>
+                        <name>/opt/bda/sip-rtis/sbin</name>
+                        <directory>true</directory>
+                      </entry>
+                      <entry>
+                        <name>/opt/bda/sip-rtis/sbin</name>
+                        <collect>
+                          <from>scripts</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/opt/bda/sip-rtis/conf</name>
+                        <directory>true</directory>
+                      </entry>
+                      <entry>
+                        <name>/opt/bda/sip-rtis/conf</name>
+                        <collect>
+                          <from>conf</from>
+                        </collect>
+                      </entry>
+                      <entry>
+                        <name>/opt/bda/sip-rtis/lib</name>
+                        <directory>true</directory>
+                      </entry>
+                      <entry>
+                        <name>/opt/bda/sip-rtis/lib</name>
+                        <collect>
+                          <from>${project.build.directory}/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib</from>
+                        </collect>
+                      </entry>
+                      <entry>
+                        <name>/usr/lib/systemd/system/sip-rtis.service</name>
+                        <file>src/main/system/sip-rtis.service</file>
+                      </entry>
+                      <entry>
+                        <name>/var/bda/rtis/log</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/bda/rtis/run</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                    </entries>
+                    <afterInstallation>
+                      <script>systemctl daemon-reload</script>
+                    </afterInstallation>
+                    <afterRemoval>
+                      <script>systemctl daemon-reload</script>
+                    </afterRemoval>
+                    <signature>
+                      <skip>true</skip>
+                    </signature>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            <!-- Assembly plugin -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                      <id>lib</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                 <configuration>
                     <tarLongFileMode>posix</tarLongFileMode>
                     <outputDirectory>${output.directory}</outputDirectory>
@@ -531,139 +651,25 @@
                         <descriptor>${project.basedir}/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
+                    </execution>
+                  <execution>
+                      <id>tar</id>
+                    <phase>package</phase>
+                <configuration>
+                  <descriptors>
+                    <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
+                  </descriptors>
+                  <finalName>sip-rtps-${project.version}</finalName>
+                  <!-- Enable long file names without Maven warning -->
+                  <tarLongFileMode>posix</tarLongFileMode>
+                </configuration>
+                    <goals>
+                      <goal>single</goal>
+                    </goals>
+                  </execution>
+                </executions>
             </plugin>
             <!-- Assembly plugin : end -->
-            <!-- RPM plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.5</version>
-                <configuration>
-                    <license>Synchronoss proprietary product</license>
-                    <distribution>Real Time Ingestion Service</distribution>
-                    <needarch>false</needarch>
-                    <targetOS>i386-linux</targetOS>
-                    <group>RTIS/FrontEnd Server</group>
-                    <packager>BDA</packager>
-                    <name>${rpm.name}</name>
-                    <!-- -->
-                    <defaultUsername>${app.user}</defaultUsername>
-                    <defaultGroupname>${app.group}</defaultGroupname>
-                    <defaultDirmode>550</defaultDirmode>
-                    <defaultFilemode>440</defaultFilemode>
-                    <!-- -->
-                    <defineStatements>
-                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-                    </defineStatements>
-                    <!-- -->
-                    <mappings>
-                        <mapping>
-                            <directory>${app.optDir}/lib</directory>
-                            <filemode>440</filemode>
-                            <sources>
-                                <source>
-                                    <location>
-                                        target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib
-                                    </location>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/sbin</directory>
-                            <filemode>750</filemode>
-                            <sources>
-                                <source>
-                                    <location>scripts</location>
-                                    <includes>
-                                        <include>*.sh</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/conf</directory>
-                            <filemode>644</filemode>
-                            <sources>
-                                <source>
-                                    <location>conf</location>
-                                    <includes>
-                                        <include>routes</include>
-                                        <include>logback.xml</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/conf/templates</directory>
-                            <filemode>644</filemode>
-                            <sources>
-                                <source>
-                                    <location>target/classes/temp/templates</location>
-                                    <includes>
-                                        <include>application.conf.template</include>
-                                        <include>cluster.vars.changeme</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <!-- /var/bda -->
-                        <mapping>
-                            <!-- writable dir only -->
-                            <directory>${app.varDir}</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <!-- dirmode>750</dirmode -->
-                            <filemode>750</filemode>
-                        </mapping>
-                        <mapping>
-                            <!-- writable dir only -->
-                            <directory>${app.varDir}/log</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>750</filemode>
-                            <configuration>noreplace</configuration>
-                        </mapping>
-                        <mapping>
-                            <!-- writable dir only -->
-                            <directory>${app.varDir}/run</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>750</filemode>
-                        </mapping>
-                    </mappings>
-                    <preinstallScriptlet>
-                        <script>echo Install is being prepared
-echo Check /etc/bda/cluster.vars can be read
-( &lt;/etc/bda/cluster.vars ) || exit 1
-
-# Check/create rtis-user user, group
-getent passwd rtis-user &gt;/dev/null || {
-    getent group rtis-user &gt;/dev/null || groupadd -g 4020 rtis-user
-    useradd -g 4020 -u 4020 rtis-user
-    usermod -L rtis-user
-    # Check rtis-user exists
-    getent passwd rtis-user &gt;/dev/null || {
-        echo Error creating Unix user rtis-user
-        exit 1
-    }
-    echo User created: rtis-user
-}
-
-# Save versioned name to env file to be used in postinstall
-{
-    echo app_home=${app.optDir}
-    echo app_version=${app.verRel}
-} &gt;/tmp/.rtis.tmp.env
-                        </script>
-                    </preinstallScriptlet>
-                    <postinstallScriptlet>
-                        <scriptFile>scripts/postinstall</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </postinstallScriptlet>
-                    <preremoveScriptlet>
-                        <scriptFile>scripts/preremove</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </preremoveScriptlet>
-                </configuration>
-            </plugin>
-            <!-- RPM plugin : end -->
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
@@ -690,37 +696,4 @@ getent passwd rtis-user &gt;/dev/null || {
             </plugin>
         </plugins>
     </build>
-  <!-- Workaround: This project uses the rpm-maven-plugin, which
-       requires RPM tools to be installed.  It should be migrated to
-       using the Java RPM builder.  Until then, put building RPMs
-       behind a profile actived only for continuous integration buils.
-       -->
-  <profiles>
-    <profile>
-      <id>all-modules</id>
-      <activation>
-        <property>
-          <name>sip.modules</name>
-          <value>all</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>rpm-maven-plugin</artifactId>
-            <version>2.1.5</version>
-            <executions>
-              <execution>
-                <id>rtis-rpm</id>
-                <goals>
-                  <goal>rpm</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

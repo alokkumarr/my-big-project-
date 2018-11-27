@@ -3,6 +3,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 
 import { Join, JoinChangeEvent } from '../types';
 import { JoinDialogComponent } from '../join-dialog';
+import * as clone from 'lodash/clone';
 
 @Component({
   selector: 'js-plumb-join-label-u',
@@ -37,6 +38,7 @@ export class JsPlumbJoinLabelComponent {
       } as MatDialogConfig)
       .afterClosed()
       .subscribe((result: JoinChangeEvent) => {
+        this.join = clone(result.join);
         this.change.emit(result);
       });
   }

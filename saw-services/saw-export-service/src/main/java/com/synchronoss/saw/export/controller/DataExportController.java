@@ -50,7 +50,26 @@ public class DataExportController {
     return responseObjectFuture;
   }
 
-  @RequestMapping(value = "/{analysisId}/executions/{executionId}/dispatch/{type}", method = RequestMethod.POST)
+    @RequestMapping(value = "/latestExecution/{analysisId}/data", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public ListenableFuture<ResponseEntity<DataResponse>> exportLatestAnalyses(
+        @PathVariable("analysisId") String analysisId,
+        HttpServletRequest request, HttpServletResponse response) {
+
+        String analysisType = request.getParameter("analysisType");
+        if (analysisType.equals("") || analysisType.isEmpty()) {
+            analysisType = "report"; // by default assume that it's report
+        }
+        String executionType = request.getParameter("executionType");
+        logger.debug(request.getHeader("Authorization"));
+        logger.debug(request.getHeader("Host"));
+        ListenableFuture<ResponseEntity<DataResponse>> responseObjectFuture = null;
+        responseObjectFuture = exportService.dataToBeExportedAsync(null, request, analysisId, analysisType,executionType);
+        return responseObjectFuture;
+    }
+
+
+    @RequestMapping(value = "/{analysisId}/executions/{executionId}/dispatch/{type}", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   public void dispatchAnalyses(@PathVariable("executionId") String executionId, @PathVariable("analysisId") String analysisId,
                                 @PathVariable("type") String analysisType,
