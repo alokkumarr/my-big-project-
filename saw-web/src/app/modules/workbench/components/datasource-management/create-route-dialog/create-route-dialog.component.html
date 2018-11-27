@@ -82,7 +82,7 @@
           <button mat-raised-button color="primary" matStepperNext [disabled]="!detailsFormGroup.valid" i18n>Next</button>
         </div>
       </mat-step>
-      <mat-step label="Schedule">
+      <mat-step label="Schedule Route">
         <div style="height: 80%;">
           <cron-job-schedular [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
         </div>

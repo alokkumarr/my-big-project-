@@ -167,7 +167,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   deleteChannel(channelID) {
     const dialogRef = this.dialog.open(ConfirmActionDialogComponent, {
-      width: '350px'
+      width: '350px',
+      data: {
+        typeTitle: 'Channel Name',
+        typeName: this.selectedSourceData.channelName
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -280,7 +284,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   deleteRoute(routeData) {
     const dialogRef = this.dialog.open(ConfirmActionDialogComponent, {
-      width: '350px'
+      width: '350px',
+      data: {
+        typeTitle: 'Route Name',
+        typeName: routeData.routeName
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
