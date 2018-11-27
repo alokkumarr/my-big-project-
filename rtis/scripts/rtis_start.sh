@@ -187,7 +187,9 @@ else
 fi
 #
 if [[ $FG_EXECJ ]] ; then
-  eval $exec_cmd &>$elog </dev/null
+  # Let logging be written onto standard output so that it is picked
+  # up and added to the systemd journal
+  eval $exec_cmd
   echo never gets here
 fi
 

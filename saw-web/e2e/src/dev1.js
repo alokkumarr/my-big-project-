@@ -3,7 +3,7 @@ const using = require('jasmine-data-provider');
 const protractorConf = require('../protractor.conf');
 var appRoot = require('app-root-path');
 var fs = require('fs');
-describe('dev test1 dev1.js', () => {
+describe('dev test1 dummyDevelopmentTests1.js', () => {
 
   //Prerequisites: two users should exist with user types: admin and user
 
@@ -27,11 +27,11 @@ describe('dev test1 dev1.js', () => {
     });
   });
 
-  // using(testDataReader.testData2.DEV2.dataProviderName1, function (data, description) {
-  //   it('Dev1Test2 second IT_Block ' + description + 'testData:'+JSON.stringify(testDataReader.testData.DEV1.dataProviderName1[description]), function () {
-  //     console.log(JSON.stringify(data));
-  //     expect(true).toBe(false);
-  //
-  //   });
-  // });
+  using(testDataReader.testData['DEV2']['dp'], function (data, description) {
+    it('DEV2Test1 first IT_Block ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DEV2', dp:'dp'}), function () {
+      console.log(JSON.stringify(data));
+      expect(true).toBe(false);
+
+    });
+  });
 });
