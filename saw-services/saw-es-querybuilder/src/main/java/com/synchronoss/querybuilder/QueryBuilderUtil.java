@@ -803,4 +803,27 @@ public class QueryBuilderUtil {
                     }
               //  return aggregationBuilder;
     }
+
+    /**
+     * query builder for DSK node.
+     * TODO: Original DSK was supporting only string format, So query builder is in place only for String.
+     * @param dataSecurityKeyNode
+     * @param builder
+     */
+    public static List<QueryBuilder> queryDSKBuilder(DataSecurityKey dataSecurityKeyNode , List<QueryBuilder> builder) {
+        if (dataSecurityKeyNode != null) {
+            for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
+                TermsQueryBuilder termsQueryBuilder =
+                    new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
+                List<?> modelValues = QueryBuilderUtil.buildStringTermsfilter(dsk.getValues());
+                TermsQueryBuilder termsQueryBuilder1 =
+                    new TermsQueryBuilder(QueryBuilderUtil.buildFilterColumn(dsk.getName()), modelValues);
+                BoolQueryBuilder dataSecurityBuilder = new BoolQueryBuilder();
+                dataSecurityBuilder.should(termsQueryBuilder);
+                dataSecurityBuilder.should(termsQueryBuilder1);
+                builder.add(dataSecurityBuilder);
+            }
+        }
+        return builder;
+    }
 }
