@@ -61,43 +61,56 @@ public class TransportUtils {
 
     {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String DATE_FORMAT_LTE = "00:00:00";
+        String DATE_FORMAT_LTE = "23:59:59";
         String DATE_FORMAT_GTE = "00:00:00";
         String SPACE = " ";
         DynamicConvertor dynamicConvertor = new DynamicConvertor();
+        LocalDateTime now = LocalDateTime.now();
 
         switch (dynamic) {
+            case "Yesterday" :
+                LocalDateTime yesterday = now.minusDays(1);
+                dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                dynamicConvertor.setGte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                break;
+            case "Today": {
+                LocalDateTime today = now;
+                LocalDateTime tomorrow = today.plusDays(1);
+                dynamicConvertor.setLte(tomorrow.format(dateTimeFormatter) + SPACE + DATE_FORMAT_GTE);
+                dynamicConvertor.setGte(today.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                break;
+            }
             case "YTD": {
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
                 dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(firstDay.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "MTD": {
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
                 dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(firstDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LTM": {
-
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime last3Month = now.minusMonths(3);
                 dynamicConvertor.setLte(now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(last3Month.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LSM": {
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime last6Months = now.minusMonths(6);
                 dynamicConvertor.setLte(now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
+            case "LY": {
+                LocalDateTime currentDayOflastYearDate = now.minusMonths(12);
+                dynamicConvertor.setLte(now.with(TemporalAdjusters.firstDayOfYear()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                dynamicConvertor.setGte(currentDayOflastYearDate.with(TemporalAdjusters.firstDayOfYear()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                break;
+            }
             case "LM": {
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime lastMonth = now.minusMonths(1);
                 dynamicConvertor.setLte(lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
@@ -111,7 +124,6 @@ public class TransportUtils {
             }
             case "LW": {
                 DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime lastWeek = now.minusWeeks(1);
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
@@ -122,7 +134,6 @@ public class TransportUtils {
             }
             case "LSW": {
                 DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime lastWeek = now.minusWeeks(6);
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
@@ -133,7 +144,6 @@ public class TransportUtils {
             }
             case "TW": {
                 DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime lastWeek = now;
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
@@ -142,7 +152,6 @@ public class TransportUtils {
                 break;
             }
             case "LTW": {
-                LocalDateTime now = LocalDateTime.now();
                 LocalDateTime last2Week = now.minusWeeks(2);
                 dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
