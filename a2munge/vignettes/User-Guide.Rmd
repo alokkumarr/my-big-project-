@@ -73,11 +73,14 @@ In the chunk below an sample dataset is create in local R. A local Spark connect
 ```{r data-create, message=FALSE, warning=FALSE}
 
 # R packages
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(tibble)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
 library(a2charter)
+library(ggplot2)
 
 # Create Simulated Dataset:
 set.seed(319)

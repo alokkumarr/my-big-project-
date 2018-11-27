@@ -92,7 +92,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <div id="overview" class="section level2">
 <h2>Overview</h2>
-<p>a2munge is an R package to help create <em>Big Data</em> Advanced Analytic data pipelines. The package contains a suite of Spark<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is design to efficiently create such pipelines.</p>
+<p>a2munge is an R package to help create Advanced Analytic data pipelines. The package contains a suite of R and Spark<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is design to efficiently create such pipelines.</p>
 <div id="features" class="section level3">
 <h3>Features</h3>
 <ul>
@@ -130,11 +130,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. For more background on creating a Spark connection in R please see the <a href="https://spark.rstudio.com/">sparklyr</a> package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># R packages</span>
-<span class="kw">library</span>(tidyverse)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(tidyr)
+<span class="kw">library</span>(tibble)
 <span class="kw">library</span>(lubridate)
 <span class="kw">library</span>(sparklyr)
 <span class="kw">library</span>(a2munge)
 <span class="kw">library</span>(a2charter)
+<span class="kw">library</span>(ggplot2)
 
 <span class="co"># Create Simulated Dataset:</span>
 <span class="kw">set.seed</span>(<span class="dv">319</span>)
@@ -898,16 +901,16 @@ df_ts
 <span class="co">#&gt; # A tibble: 10 x 3</span>
 <span class="co">#&gt;       id date_time           date_time_formatted</span>
 <span class="co">#&gt;    &lt;int&gt; &lt;dttm&gt;              &lt;chr&gt;              </span>
-<span class="co">#&gt;  1     1 2018-11-27 15:00:35 11/27/2018 15:00:35</span>
-<span class="co">#&gt;  2     2 2018-11-27 14:59:35 11/27/2018 14:59:35</span>
-<span class="co">#&gt;  3     3 2018-11-27 14:58:35 11/27/2018 14:58:35</span>
-<span class="co">#&gt;  4     4 2018-11-27 14:57:35 11/27/2018 14:57:35</span>
-<span class="co">#&gt;  5     5 2018-11-27 14:56:35 11/27/2018 14:56:35</span>
-<span class="co">#&gt;  6     6 2018-11-27 14:55:35 11/27/2018 14:55:35</span>
-<span class="co">#&gt;  7     7 2018-11-27 14:54:35 11/27/2018 14:54:35</span>
-<span class="co">#&gt;  8     8 2018-11-27 14:53:35 11/27/2018 14:53:35</span>
-<span class="co">#&gt;  9     9 2018-11-27 14:52:35 11/27/2018 14:52:35</span>
-<span class="co">#&gt; 10    10 2018-11-27 14:51:35 11/27/2018 14:51:35</span></code></pre></div>
+<span class="co">#&gt;  1     1 2018-11-27 15:31:47 11/27/2018 15:31:47</span>
+<span class="co">#&gt;  2     2 2018-11-27 15:30:47 11/27/2018 15:30:47</span>
+<span class="co">#&gt;  3     3 2018-11-27 15:29:47 11/27/2018 15:29:47</span>
+<span class="co">#&gt;  4     4 2018-11-27 15:28:47 11/27/2018 15:28:47</span>
+<span class="co">#&gt;  5     5 2018-11-27 15:27:47 11/27/2018 15:27:47</span>
+<span class="co">#&gt;  6     6 2018-11-27 15:26:47 11/27/2018 15:26:47</span>
+<span class="co">#&gt;  7     7 2018-11-27 15:25:47 11/27/2018 15:25:47</span>
+<span class="co">#&gt;  8     8 2018-11-27 15:24:47 11/27/2018 15:24:47</span>
+<span class="co">#&gt;  9     9 2018-11-27 15:23:47 11/27/2018 15:23:47</span>
+<span class="co">#&gt; 10    10 2018-11-27 15:22:47 11/27/2018 15:22:47</span></code></pre></div>
 </div>
 <div id="converter" class="section level4">
 <h4>Converter</h4>
@@ -949,16 +952,16 @@ df_ts <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="co">#&gt; # A tibble: 10 x 3</span>
 <span class="co">#&gt;       id date_time           date_time_converted</span>
 <span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;               &lt;dttm&gt;             </span>
-<span class="co">#&gt;  1     1 2018-11-27 15:00:35 2018-11-27 15:00:35</span>
-<span class="co">#&gt;  2     2 2018-11-27 14:59:35 2018-11-27 14:59:35</span>
-<span class="co">#&gt;  3     3 2018-11-27 14:58:35 2018-11-27 14:58:35</span>
-<span class="co">#&gt;  4     4 2018-11-27 14:57:35 2018-11-27 14:57:35</span>
-<span class="co">#&gt;  5     5 2018-11-27 14:56:35 2018-11-27 14:56:35</span>
-<span class="co">#&gt;  6     6 2018-11-27 14:55:35 2018-11-27 14:55:35</span>
-<span class="co">#&gt;  7     7 2018-11-27 14:54:35 2018-11-27 14:54:35</span>
-<span class="co">#&gt;  8     8 2018-11-27 14:53:35 2018-11-27 14:53:35</span>
-<span class="co">#&gt;  9     9 2018-11-27 14:52:35 2018-11-27 14:52:35</span>
-<span class="co">#&gt; 10    10 2018-11-27 14:51:35 2018-11-27 14:51:35</span></code></pre></div>
+<span class="co">#&gt;  1     1 2018-11-27 15:31:47 2018-11-27 15:31:47</span>
+<span class="co">#&gt;  2     2 2018-11-27 15:30:47 2018-11-27 15:30:47</span>
+<span class="co">#&gt;  3     3 2018-11-27 15:29:47 2018-11-27 15:29:47</span>
+<span class="co">#&gt;  4     4 2018-11-27 15:28:47 2018-11-27 15:28:47</span>
+<span class="co">#&gt;  5     5 2018-11-27 15:27:47 2018-11-27 15:27:47</span>
+<span class="co">#&gt;  6     6 2018-11-27 15:26:47 2018-11-27 15:26:47</span>
+<span class="co">#&gt;  7     7 2018-11-27 15:25:47 2018-11-27 15:25:47</span>
+<span class="co">#&gt;  8     8 2018-11-27 15:24:47 2018-11-27 15:24:47</span>
+<span class="co">#&gt;  9     9 2018-11-27 15:23:47 2018-11-27 15:23:47</span>
+<span class="co">#&gt; 10    10 2018-11-27 15:22:47 2018-11-27 15:22:47</span></code></pre></div>
 </div>
 </div>
 <div id="utilities" class="section level3">
@@ -985,8 +988,8 @@ sdf <span class="op">%&gt;%</span><span class="st"> </span>
          <span class="dt">partitions =</span> <span class="dv">2</span>)
 
 <span class="kw">dir</span>(path, <span class="dt">full.names =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>#&gt; [1] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpOkuug4/writer-ex/df-part-00000.json&quot;
-#&gt; [2] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpOkuug4/writer-ex/df-part-00001.json&quot;</code></pre>
+<pre><code>#&gt; [1] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpqOr3Va/writer-ex/df-part-00000.json&quot;
+#&gt; [2] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpqOr3Va/writer-ex/df-part-00001.json&quot;</code></pre>
 </div>
 <div id="reader" class="section level4">
 <h4>Reader</h4>
