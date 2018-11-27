@@ -22,7 +22,7 @@
              [value]="artifactColumn.aliasName || ''"/>
   </mat-form-field>
 
-  <form [formGroup]="stateForm">
+  <form *ngIf="artifactColumn.geoType" [formGroup]="stateForm">
     <mat-form-field appearance="outline">
       <mat-label>Region</mat-label>
       <input type="text" matInput [matAutocomplete]="autoGroup" formControlName="regionCtrl">

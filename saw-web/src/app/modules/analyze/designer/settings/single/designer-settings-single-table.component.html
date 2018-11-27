@@ -17,14 +17,25 @@
         <mat-icon fontIcon="icon-close"></mat-icon>
       </button>
     </mat-form-field>
-    <mat-button-toggle-group multiple>
+    <mat-form-field appearance="outline" class="form-select">
+      <mat-label>Types</mat-label>
+      <mat-select [value]="filterObj.types" (selectionChange)="onTypeFilterChange($event.value)" multiple>
+        <mat-option *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex" [value]="typeIcon.value">
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            {{ typeIcon.label}}
+            <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
+          </div>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- <mat-button-toggle-group multiple>
       <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
                          (change)="onTypeFilterChange($event)"
                          [value]="typeIcon.value"
                          [checked]="filterObj.types.includes(typeIcon.value)">
         <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
       </mat-button-toggle>
-    </mat-button-toggle-group>
+    </mat-button-toggle-group> -->
   </div>
 
   <div class="settings__unselected-fields"

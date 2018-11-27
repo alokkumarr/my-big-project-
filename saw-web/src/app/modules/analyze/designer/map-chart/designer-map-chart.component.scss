@@ -1,5 +1,12 @@
+@import "src/themes/base/colors";
+
 :host {
   display: block;
   height: calc(100% - 20px);
   width: calc(100% - 20px);
+}
+
+.no-map-selected {
+  color: $primary-grey-g3;
+  font-size: 26px;
 }

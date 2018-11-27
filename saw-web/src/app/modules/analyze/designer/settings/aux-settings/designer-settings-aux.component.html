@@ -1,10 +1,17 @@
 <ng-container [ngSwitch]="analysisType">
-  <designer-settings-aux-chart *ngSwitchCase="'chart'"
-    [isInverted]="auxSettings.isInverted"
-    [legend]="auxSettings.legend"
-    [labelOptions]="auxSettings.labelOptions"
-    [chartType]="analysisSubtype"
-    [chartTitle]="chartTitle"
-    (change)="change.emit($event)">
-  </designer-settings-aux-chart>
+  <div *ngSwitchCase="'chart'">
+      <designer-settings-aux-chart *ngIf="analysisSubtype !== 'geo'"
+      [isInverted]="auxSettings.isInverted"
+      [legend]="auxSettings.legend"
+      [labelOptions]="auxSettings.labelOptions"
+      [chartType]="analysisSubtype"
+      [chartTitle]="chartTitle"
+      (change)="change.emit($event)">
+    </designer-settings-aux-chart>
+    <designer-settings-aux-map-chart *ngIf="analysisSubtype === 'geo'"
+      [chartTitle]="chartTitle"
+      (change)="change.emit($event)">
+    </designer-settings-aux-map-chart>
+  </div>
+
 </ng-container>

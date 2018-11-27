@@ -25,8 +25,7 @@ export interface ArtifactColumnChart extends ArtifactColumn {
   limitType?: string;
   dateFormat?: string;
   dateInterval?: string;
-  geoType?: 'state' | 'country' | 'zip';
-  regionIdentifier?: 'name' | 'iso-a2' | 'iso-a3' | 'postal-code' | 'fips';
+  geoType?: string;
   region?: Region;
 }
 

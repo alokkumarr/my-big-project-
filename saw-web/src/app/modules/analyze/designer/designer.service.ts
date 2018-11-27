@@ -508,7 +508,6 @@ export class DesignerService {
             limitType: artifactColumn.limitType,
             geoType: artifactColumn.geoType,
             region: artifactColumn.region,
-            regionIdentifier: artifactColumn.regionIdentifier,
             // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {

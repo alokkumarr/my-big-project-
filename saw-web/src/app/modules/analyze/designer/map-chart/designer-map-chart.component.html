@@ -1,4 +1,12 @@
-<map-chart [attr.e2e]="'chart-type:' + chartType"
-           [updater]="chartUpdater"
-           [options]="chartOptions">
-</map-chart>
+<div [ngSwitch]="currentState">
+  <map-chart *ngSwitchCase="MapChartStates.OK"
+             [attr.e2e]="'chart-type:' + chartType"
+             [updater]="chartUpdater"
+             [options]="chartOptions">
+  </map-chart>
+  <div *ngSwitchCase="MapChartStates.NO_MAP_SELECTED" fxLayout="row" fxLayoutAlign="center center">
+    <div class="no-map-selected">
+      Select a Region to display the data in!
+    </div>
+  </div>
+</div>

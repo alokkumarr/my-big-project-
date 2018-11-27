@@ -66,7 +66,6 @@ export const TYPE_MAP = reduce(
     ...map(NUMBER_TYPES, type => ({ type, generalType: 'number' })),
     ...map(DATE_TYPES, type => ({ type, generalType: 'date' })),
     { type: 'string', generalType: 'string' },
-    { type: 'geo', generalType: 'geo' }
   ],
   (typeMap, { type, generalType }) => {
     typeMap[type] = generalType;
@@ -75,37 +74,28 @@ export const TYPE_MAP = reduce(
   {}
 );
 
-export const TYPE_ICONS = [
-  {
-    icon: 'icon-number-type',
-    label: 'Number',
-    value: 'number'
-  },
-  {
-    icon: 'icon-string-type',
-    label: 'String',
-    value: 'string'
-  },
-  {
-    icon: 'icon-geo-type',
-    label: 'Geo',
-    value: 'geo'
-  },
-  {
-    icon: 'icon-calendar',
-    label: 'Date',
-    value: 'date'
-  }
-];
+export const TYPE_ICONS = [{
+  icon: 'icon-number-type',
+  label: 'Number',
+  value: 'number'
+}, {
+  icon: 'icon-string-type',
+  label: 'String',
+  value: 'string'
+}, {
+  icon: 'icon-geo-type',
+  label: 'Geo',
+  value: 'geo'
+}, {
+  icon: 'icon-calendar',
+  label: 'Date',
+  value: 'date'
+}];
 
-export const TYPE_ICONS_OBJ = fpPipe(fpGroupBy('type'), fpMapValues(v => v[0]))(
-  [
-    ...map(NUMBER_TYPES, type => ({ type, icon: 'icon-number-type' })),
-    ...map(DATE_TYPES, type => ({ type, icon: 'icon-calendar' })),
-    { type: 'string', icon: 'icon-string-type' },
-    { type: 'geo', icon: 'icon-geo-type' }
-  ]
-);
+export const TYPE_ICONS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(TYPE_ICONS);
 
 export const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 

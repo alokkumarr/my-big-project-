@@ -16,6 +16,7 @@ import {
   DesignerSettingsGroupComponent,
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent,
+  DesignerSettingsAuxMapChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent
@@ -48,6 +49,7 @@ export {
   DesignerSettingsGroupComponent,
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent,
+  DesignerSettingsAuxMapChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent,

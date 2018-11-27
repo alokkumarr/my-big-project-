@@ -6,7 +6,6 @@ import {
   DesignerChangeEvent
 } from '../../types';
 import {
-  TYPE_ICONS_OBJ,
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   COMBO_TYPES,
@@ -14,6 +13,7 @@ import {
   TSCOMBO_TYPES,
   TSCOMBO_TYPES_OBJ
 } from '../../../consts';
+import { getArtifactColumnTypeIcon } from '../../utils';
 
 @Component({
   selector: 'expandable-field',
@@ -28,7 +28,6 @@ export class ExpandableFieldComponent {
   @Input() public analysisType: AnalysisType;
   @Input() public fieldCount: any;
 
-  TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;
   AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public isExpanded = false;
@@ -57,6 +56,10 @@ export class ExpandableFieldComponent {
    */
   asChartColumn(column): ArtifactColumnChart {
     return column;
+  }
+
+  getArtifactColumnTypeIcon(artifactColumn) {
+    return getArtifactColumnTypeIcon(artifactColumn);
   }
 
   toggleExpansion() {

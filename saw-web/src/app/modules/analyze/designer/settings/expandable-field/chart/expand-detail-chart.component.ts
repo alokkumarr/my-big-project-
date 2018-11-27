@@ -17,7 +17,7 @@ import {
   formatNumber,
   isFormatted
 } from '../../../../../../common/utils/numberFormatter';
-import { mapDataIndex } from '../../../../../../common/components/charts/map-data-index';
+import { getMapDataIndexByGeoType } from '../../../../../../common/components/charts/map-data-index';
 
 import { DesignerChangeEvent } from '../../../types';
 
@@ -43,7 +43,6 @@ export class ExpandDetailChartComponent implements OnInit {
   public isFloat: boolean;
   public limitType;
   public limitValue;
-  public mapDataIndex = mapDataIndex;
   public stateForm: FormGroup = this.fb.group({
     regionCtrl: '',
   });
@@ -95,13 +94,14 @@ export class ExpandDetailChartComponent implements OnInit {
   }
 
   private _filterRegions(value) {
+    const mapDataIndex = getMapDataIndexByGeoType(this.artifactColumn.geoType);
     if (value) {
-      return this.mapDataIndex
+      return mapDataIndex
         .map(group => ({name: group.name, children: this._filter(group.children, value)}))
         .filter(group => group.children.length > 0);
     }
 
-    return this.mapDataIndex;
+    return mapDataIndex;
   }
 
   onAliasChange(value) {

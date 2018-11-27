@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
@@ -22,7 +22,7 @@ export class DesignerChartComponent implements OnInit {
 
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
   chartOptions: any;
-  updateChart = new Subject();
+  updateChart = new BehaviorSubject([]);
   chartHgt = {
     height: 500
   };
