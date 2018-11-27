@@ -33,7 +33,7 @@ public class TransportUtils {
         for (int i =0; i<dataSecurityKeyNode.getDataSecuritykey().size();i++)
         {
             builder=   new StringBuilder();
-            builder.append(dataSecurityKeyNode.getDataSecuritykey().get(i).getName());
+            builder.append("upper("+dataSecurityKeyNode.getDataSecuritykey().get(i).getName()+")");
             builder.append(" IN (");
             int valueSize = dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().size();
             for (int j = 0; j<valueSize;j++){
@@ -41,11 +41,11 @@ public class TransportUtils {
                 {
                     /* since this is having potential bug in initial implementation, So appending single "'" 
                     to avoid sql query error */
-                    builder.append("'"+dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j)+"'");
+                    builder.append("'"+dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j).toUpperCase()+"'");
                     builder.append(",");
                 }
                 else {
-                    builder.append("'"+dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j)+"'");
+                    builder.append("'"+dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j).toUpperCase()+"'");
                 }
             }
             builder.append(")");
