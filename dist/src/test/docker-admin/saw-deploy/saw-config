@@ -117,5 +117,11 @@ saw_security_email_host=sip-admin
 [saw-security-arbitrator]
 sip-app3
 
-[sip-rtps]
+[sip-rtis]
 sip-app1
+
+[sip-rtis:vars]
+sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
+
+[sip-rtps]
+sip-app2

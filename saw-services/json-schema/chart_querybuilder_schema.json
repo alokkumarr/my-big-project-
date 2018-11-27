@@ -124,6 +124,8 @@
                     "id": "/properties/filters/model/properties/preset",
                     "type": "string",
 		          "enum": [
+                      "Yesterday",
+                      "Today",
                       "YTD",
                       "MTD",
                       "LTM",
@@ -131,6 +133,7 @@
                       "LM",
                       "LQ",
                       "LW",
+                      "LY",
                       "TW",
                       "LTW",
                     "LSW",

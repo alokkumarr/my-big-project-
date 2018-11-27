@@ -224,13 +224,15 @@ public class Model {
     }
 
     public enum Preset {
-
+      Yesterday("Yesterday"),
+      Today("Today"),
       YTD("YTD"),
       MTD("MTD"),
       LTM("LTM"),
       LSM("LSM"),
       LM("LM"),
       LQ("LQ"),
+      LY("LY"),
       LW("LW"),
       TW("TW"),
       LSW("LSW"),
