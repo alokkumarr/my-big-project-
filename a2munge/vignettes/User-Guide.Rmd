@@ -2,7 +2,9 @@
 title: "a2munge User Guide"
 author: "Haarstick"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{a2munge User Guide}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,7 +21,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-a2munge is an R package to help create _Big Data_ Advanced Analytic data pipelines. The package contains a suite of Spark^[Spark Data Processing Engine[via](https://spark.apache.org/)] compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preperation. The a2munge package is design to efficiently create such pipelines. 
+a2munge is an R package to help create _Big Data_ Advanced Analytic data pipelines. The package contains a suite of Spark^[Spark Data Processing Engine [via](https://spark.apache.org/)] compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is design to efficiently create such pipelines. 
  
  
 ### Features
@@ -34,29 +36,45 @@ a2munge is an R package to help create _Big Data_ Advanced Analytic data pipelin
 
 ### Design
 
-a2munge leverages the R S3^[R S3 OO [via](http://adv-r.had.co.nz/S3.html)] Object Oriented system to create generic functions with R data.frame and Spark class methods. This design creates a similiar set of functions and arguments for the user that can be applied on local R data.frames, local Spark data objects, or even distributed Spark objects. 
+a2munge leverages the R S3^[R S3 OO [via](http://adv-r.had.co.nz/S3.html)] Object Oriented system to create generic functions with R data.frame and Spark class methods. This design creates a similar set of functions and arguments for the user that can be applied on local R data.frames, local Spark data objects, or even distributed Spark objects. 
 
 
-a2munge uses standard evaluation ^[dplyr standard evaluation intro [via](https://dplyr.tidyverse.org/articles/programming.html)] to evaluate function arguments. This allows for function arguments to be assigned programmatically which is beneficial for re-usable template and component development. 
+a2munge uses standard evaluation^[dplyr standard evaluation intro [via](https://dplyr.tidyverse.org/articles/programming.html)] to evaluate function arguments. This allows for function arguments to be assigned programmatically which is beneficial for re-usable template and component development. 
 
 
-a2munge functions standarize the output naming convention and schema which creates consistency aiding in application development.
+a2munge functions standardize the output naming convention and schema which creates consistency aiding in application development.
 
 
-a2munge spark compatibility relies on the great sparklyr^[sparklyr R package [via](https://spark.rstudio.com/)] R package which enables a R API for working with Spark objets. 
+a2munge spark compatibility relies on the great sparklyr^[sparklyr R package [via](https://spark.rstudio.com/)] R package which enables a R API for working with Spark objects. 
+
+
+### API
+
+Wherever possible and appropriate the a2munge functions share common argument naming conventions and location. The following argument names are shared in multiple functions:
+
+* __group_vars__: one or more column names that indicate which columns to group the data by. This argument is option in many functions with default value of NULL, which corresponds to no grouping.
+* __measure_vars__: one or more column names to apply functionality to. Typically numeric column types. This argument is not typically optional. 
+* __fun__: name of mathematical function to apply on measure_vars. Can be more than one - eg c("sum", "mean"). Also supports the use of the [funs](https://dplyr.tidyverse.org/reference/funs.html) function from the dplyr package. 
+* __order_vars__: one or more column names to arrange the data by. Often a date or date-time type is used to order the data.
+* __id_vars__: one or more column names used in reshaping functions to specify which columns to retain in existing form. 
+* __sep__: character separator used for output data column naming. 
 
 
 ## Functions
 
-In the following sections each of the a2munge functions are explained with examples. In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. 
+In the following sections each of the a2munge functions are explained with examples. The examples assume a working knowledge of R and the tidyverse^[tidyverse: R packages for data science [via](https://www.tidyverse.org/)].
 
 
-```{r, message=FALSE, warning=FALSE}
+In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. For more background on creating a Spark connection in R please see the [sparklyr](https://spark.rstudio.com/)] package. 
+
+
+```{r data-create, message=FALSE, warning=FALSE}
 
 # R packages
 library(tidyverse)
 library(lubridate)
 library(sparklyr)
+library(a2munge)
 
 # Create Simulated Dataset:
 set.seed(319)
@@ -83,10 +101,26 @@ sc <- spark_connect(master = "local")
 
 # Copy Data to Spark
 sdf <- copy_to(sc, df, "df", overwrite = TRUE)
+
+# Date Conversion patch to account for date serialization issue in sparklyr
+df <- mutate_at(df, "date", as.Date)
+sdf <- mutate_at(sdf, "date", funs(to_date))
 ```
 
 
-```{r}
+
+
+The sample dataset has six columns of different types
+
+* __id__: integer type. Corresponds to unique identifer field such as unique device id or customer id
+* __date__: date type. Dates from past 90 days
+* __cat1__: character type. Arbitrary attribute column with 2 distinct values of weighted probability
+* __cat2__: character type. Arbitrary attribute column with 5 distinct values of weighted probability
+* __metric1__: numeric type. Arbitrary numeric column with integer values of 1:5
+* __metric2__: numerice type. Arbitrary numeric column with random values center at 50
+
+
+```{r datasets}
 # R Dataset
 df
 
@@ -101,69 +135,528 @@ The first set of functions are data manipulater: functions to aggregate or add n
 
 #### Summariser
 
-The summariser function 
+The summariser function aggregates a dataset based on combination of grouping variables, measure varaibles and function. In the following chuck, a simple aggregation is applied on both R and Spark datasets using the same combination of arguments. 
+
+```{r summariser}
+# Simple Summariser R Ex
+summariser(df,
+           group_vars   = c("id", "cat1"),
+           measure_vars = c("metric1", "metric2"),
+           fun          = c("mean", "sum"))
+
+# Simple Summariser Spark Ex
+summariser(sdf,
+           group_vars   = c("id", "cat1"),
+           measure_vars = c("metric1", "metric2"),
+           fun          = c("mean", "sum"))
+
+```
+
+
+In the following example, a similiar aggregation is made programatically via [standard evaluation](https://dplyr.tidyverse.org/articles/programming.html)
+
+```{r summariser-se}
+
+# Programatic interface
+.group_vars <- c("cat1", "cat2")
+.measure_vars <- c("metric1", "metric2")
+.funs <- c("min", "mean", "max")
+
+# Summariser Example
+summariser(df,
+           group_vars   = .group_vars,
+           measure_vars = .measure_vars,
+           fun          = .funs)
+```
 
 
 #### Summariser Map
 
+The summariser map function allows for more than one set of summariser arguments to be made and combined into single output dataset. This function enables aggregations of different cardinality to be combined. 
+
+The function applies each set seperately and combines into a single dataset via the [pivoter](#pivoter) a2munge function. The id_vars argument is used here to indicate what columns to perserve and join the aggregations by. Multiple sets of summariser arguments are stored in a list and passed to the map argument within an additional list. 
+
+
+```{r summariser-map}
+summariser_map(df,
+               id_vars = "id",
+               map = list(
+                 list(
+                   group_vars   = c("cat1"),
+                   measure_vars = c("metric1"),
+                   fun          = c("sum")
+                 ),
+                 list(
+                   group_vars   = c("cat2"),
+                   measure_vars = c("metric2"),
+                   fun          = c("mean")
+                 )
+               )
+) %>% 
+  as.tibble()
+```
+
 
 #### Mutater
+
+The mutater function allows for calculated fields to be added to a dataset. Mutater allows for ordering for cumulative calculations and grouping.
+
+In the first example, the log of metric2 is calculated by id and added to the dataset. In the second example, the cumulative sum of metric2 is calculated by date per id and added to the dataset 
+
+```{r mutater}
+# Simple mutater ex:
+mutater(df,
+        group_vars   = "id",
+        measure_vars = "metric1",
+        fun          = "log")
+
+# Ordered mutater ex:
+mutater(df,
+        order_vars   = "date",
+        group_vars   = "id",
+        measure_vars = "metric2",
+        fun          = "cumsum") %>% 
+  arrange(id, date)
+```
+
 
 
 #### Roller
 
+Roller is similar to mutater but allows for rolling (window) calculations. The width argument specifies the window width. The R API differs slightly from the Spark API allowing for additional arguments for by (sequence by input) and partial (calculate on windows smaller than width) arguments. 
+
+```{r roller}
+
+# Roller example with summariser first step
+df_agg <- summariser(df,
+                     group_vars   = "date",
+                     measure_vars = c("metric1", "metric2"),
+                     fun          = "sum") 
+df_agg
+
+# Rolling 7 day average
+roller(df_agg,
+       order_vars   = "date",
+       measure_vars = c("metric1_sum", "metric2_sum"),
+       fun          = "mean",
+       width        = 7)
+
+```
+
 
 #### Lagger
+
+Lagger is also similar to mutater but allows for lag values of variables to be appended to a dataset. Lagged values are often used in time series data. Lags are specified with the lags argument which accepts a numeric vector. The lags number will specify how many preceeding rows values to append as new column. Allows for grouping. 
+
+```{r lagger}
+
+# Lagger example with 1, 2, and 3 lagged values appended
+lagger(df_agg,
+       order_vars   = 'date',
+       group_vars   = NULL,
+       measure_vars = c("metric1_sum"),
+       lags = 1:3)
+```
+
 
 
 #### Imputer
 
+Imputer replaces missing values. Imputer has three impute functions specified with the fun argument:
 
+* _mean_: missing values replaced by the mean of remaining values. Default function. Appropriate for numerical types
+* _mode_: missing values replaced by the mode (most common) of remaining values. Appropriate for integer or character types
+* _constant_: missing values replaced by constant fill value. Constant specified with additional fill argument
+
+```{r}
+
+# Create dataset with missing values
+na_n <- 100
+df_na <- df %>% 
+  slice(1:na_n) %>% 
+  mutate(cat1 = ifelse(row_number() %in% sample(1:n(), na_n/4, replace = FALSE), NA, cat1),
+         metric1 = ifelse(row_number() %in% sample(1:n(), na_n/10, replace = FALSE), NA, metric1)) 
+df_na
+
+# Impute cat1 with mode
+imputer(df_na,
+        group_vars   = NULL,
+        measure_vars = "cat1",
+        fun          = "mode")
+
+# Compare Counts:
+count(df_na, cat1)
+df_na %>% 
+  imputer(.,
+          group_vars   = NULL,
+          measure_vars = "cat1",
+          fun          = "mode") %>% 
+  count(cat1)
+
+# Impute cat1 with constant
+imputer(df_na,
+        group_vars   = NULL,
+        measure_vars = "cat1",
+        fun          = "constant",
+        fill         = "FILLED!")
+
+# Impute metric1 with mean
+imputer(df_na,
+        group_vars   = NULL,
+        measure_vars = "metric1",
+        fun          = "mean")
+
+```
 
 
 ### Reshapers
 
-#### Pivoter
+Reshaping functions alter the structure of a dataset. 
+
+#### Pivoter {#pivoter}
+
+Pivoter reshapes data from long to wide format. This function is similar to the [spread](https://tidyr.tidyverse.org/reference/spread.html). Pivoter allows for multiple key-pairs to be spread across multiple columns however. Transforming datasets from long to wide form (or denormalizing a dataset) is a common step in statistical modeling workflows to convert data into matrix like format with a unique record per row required for most alogrithms. 
+
+The id_vars argument here specifies which columns are to be preserved in the resulting output dataset. The group_vars argument specficies which column(s) unique values should be transformed into new columns. Group_vars should be attribute (categorical) columns with relatively low number of unique values. The measure_vars specify the columns converted to the values. Pivoter does accept a single fun argument. Pivoter has an argument for a fill value to apply to missing values created from the pivot. Zero is a commoningly used fill value for pivoter. The sep argument can be modify to alter the output column naming convention 
+
+```{r pivoter}
+
+# simple pivoter R example of pivoting cat1 by id and date for metric1
+pivoter(df,
+        id_vars      = c("id", "date"),
+        group_vars   = "cat2",
+        measure_vars = "metric1",
+        fill         = 0) %>% 
+  as.tibble()
+
+# Similar pivot with Spark
+pivoter(sdf,
+        id_vars      = c("id", "date"),
+        group_vars   = "cat2",
+        measure_vars = "metric1",
+        fill         = 0)
+
+
+# Pivot with multiple measure vars
+pivoter(df,
+        id_vars      = c("id", "date"),
+        group_vars   = "cat1", 
+        measure_vars = c("metric1", "metric2"),
+        fill         = 0) %>% 
+  as.tibble()
+
+
+# Pivot with NULL sep and sum function
+pivoter(df,
+        id_vars      = "id",
+        group_vars   = "cat2", 
+        measure_vars = "metric1",
+        sep          = NULL,
+        fun          = "sum") %>% 
+  as.tibble()
+```
 
 
 #### Melter
 
+Melter works in opposite to pivoter by transforming wide data to long format. Similiar to tidyr [gather](https://tidyr.tidyverse.org/reference/gather.html) function.
+
+Similiar to the pivoter, id_vars specify which columns are preserved after the melt. The measure_vars are converted into a two column key-pair. Melter allows for the resulting key-pair columns to be given explict names with the variable_name and value_name arguments respectively.
+
+The measure_vars melted should be of the same type. Mixing column types will result in the value column reverting to the parent type. For the Spark API, the resulting value column type can be explictly specified with the type argument. 
+
+```{r melter}
+
+# melter example
+df %>% 
+  slice(1:5) %>% 
+  melter(.,
+         id_vars       = c("id", "date", "cat1", "cat2"),
+         measure_vars  = c("metric1", "metric2"),
+         variable_name = "new_variable",
+         value_name    = "new_value") %>% 
+  as_tibble()
+
+```
+
 
 #### Expander
+
+Technically expander converts implicit mising values to explicit values. Expander allows the dataset to be expanded based on a sequence or set of unique values provided. Similiar in scope to tidyr [expand](https://tidyr.tidyverse.org/reference/expand.html) set of functions. 
+
+Expander has two ways to expand a dataset: either by specifying a set of id_vars and mode or by providing a set of values directly with the fun argument. The behavior of the expansion can be modified with the mode argument. Either the full cartesian product of the id_vars can be specified with mode = 'crossing' or just the unique observed pairs with mode = 'nesting'.
+
+
+Expander is useful when aggregated date-time data with attributes such as ids or other groups. Often there is a not a record for each attribute time unit combination which a simple aggregation will not account for. In a following example, expander is used in a pipeline to create an aggregate of average total metric1 per id per day. Notice, there is not a record in our dataset for all prior 90 days for each id. 
+
+```{r expander}
+
+# simple expander date example
+df_101 <- df %>%
+  filter(id == 101) %>%
+  summariser(group_vars   = c("id", "date"),
+             measure_vars = "metric1",
+             fun          = "sum") %>% 
+  arrange(date)
+df_101
+
+# Create record for each id and day 
+expander(df_101,
+         id_vars = "id",
+         fun     = funs(date = full_seq(date, 1)))
+
+# Avg daily metric1 total per id - RIGHT WAY
+df %>% 
+  summariser(group_vars   = c("id", "date"),
+             measure_vars = "metric1",
+             fun          = "sum") %>% 
+  expander(id_vars = c("id", "date"),
+           mode    = "crossing") %>% 
+  imputer(measure_vars = "metric1_sum",
+          fun          = "constant",
+          fill         = 0) %>% 
+  summariser(group_vars   = NULL,
+             measure_vars = "metric1_sum",
+             fun          = "mean")
+
+# WRONG WAY
+df %>% 
+  summariser(group_vars   = c("id", "date"),
+             measure_vars = "metric1",
+             fun          = "sum") %>% 
+  summariser(group_vars   = NULL,
+             measure_vars = "metric1_sum",
+             fun          = "mean")
+```
 
 
 
 
 ### Time Series
 
+The next set of functions relate to time series data that manipulate a date or date-time column type. 
 
 #### Indexer
+
+Indexer calculates the time between two date values. Calculate the time difference from the measure_vars to a an origin argument where the origin can either be another date type column or date value. The resulting time difference can be further modified by the units and periods arguments - see examples. 
+
+```{r indexer}
+
+# simple indexer example
+df_ts <- df %>% 
+  slice(1:10) %>% 
+  select(id, date) %>% 
+  arrange(date) 
+df_ts
+
+indexer(df_ts,
+        measure_vars = c("date"),
+        origin       = today(),
+        units        = "days",
+        periods      = 1)
+
+# indexer with timediff of 4hr periods from today
+indexer(df_ts,
+        measure_vars = c("date"),
+        origin       = today(),
+        units        = "hours",
+        periods      = 4)
+
+```
 
 
 #### Date Parter
 
+Date_parter calculates and appends common date part values from a date type. Date_parter can be useful to generate features from a date type for a statistical model.
+
+```{r date_parter}
+
+# Simple Date Parter Ex
+date_parter(df_ts, "date")
+
+```
+
 
 #### Collapser
+
+Collapser allows for date or date time column types to be mutated into less granular time units and modified to either the beginning or end of the time unit through the side argument. This function is useful for time based aggregations
+
+```{r collapser}
+# Collapser End Ex:
+collapser(df_ts,
+          measure_vars  = "date",
+          unit          = "month",
+          side          = "end",
+          time_zone     = "UTC",
+          output_suffix = "month_end")
+
+# Collapser Start Ex:
+collapser(df_ts,
+          measure_vars  = "date",
+          unit          = "month",
+          side          = "start",
+          time_zone     = "UTC",
+          output_suffix = "month_start")
+```
 
 
 #### Formatter
 
+Formatter transforms a date or date-time type column to a character with a specific string format. This function can be useful to provide specific date-time formatting for downstream processes. 
+
+
+```{r formatter}
+
+# Formatter with Date type Ex:
+formatter(df_ts,
+          measure_vars  = "date",
+          input_format  = "yyyy-MM-dd",
+          output_format = "yyyy-MM-dd HH:mm:ss", 
+          output_suffix = "datetime")
+
+# Formatter with Date-time type Ex:
+tibble(id = 1:10, 
+       date_time = now() - minutes(0:9)) %>% 
+  formatter(.,
+            measure_vars  = "date_time",
+            input_format  = "yyyy-MM-dd HH:mm:ss",
+            output_format = "MM/dd/yyyy HH:mm:ss", 
+            output_suffix = "formatted")
+```
+
 
 #### Converter
 
+Converter allows character (string) type columns to be cast to either date or date-time types. The desired output type can be modified with the output_format argument.
+
+```{r converter}
+
+# Converter Date Example
+df_ts %>% 
+  mutate_at("date", as.character) %>% 
+  converter(.,
+            measure_vars  = "date",
+            input_format  = "yyyy-MM-dd",
+            output_type   = "date", 
+            time_zone     = "UTC",
+            output_suffix = "converted")
+
+# Converter Date-Time Example
+tibble(id = 1:10, 
+       date_time = now() - minutes(0:9)) %>%
+  mutate_at("date_time", as.character) %>% 
+  converter(.,
+            measure_vars  = "date_time",
+            input_format  = "yyyy-MM-dd HH:mm:ss",
+            output_type   = "datetime", 
+            time_zone     = "UTC",
+            output_suffix = "converted")
+
+```
 
 
 
 ### Others
 
+#### Writer
+
+Writer allows for R and Spark objects to be written to files. The file type is configurable and for the Spark method allows for csv, JSON, parquet and others.  The base R version allows for csv and text. Writer modes include append, replace, ignore, and error. The Spark method also allows for the number of partitions to be configured.
+
+The path argument should include the directoy path and dfs protocol if distributed but not the file name. The file name should be provided in the name argument. For partitioned files, the name will be augmented with a file part number starting with 00001. 
+
+```{r writer}
+
+## Simple Writer Ex:
+
+# Temp Directory Path
+path <- paste0(tempdir(), "/writer-ex")
+
+# Write to json file with partitions
+sdf %>% 
+  head(100) %>% 
+  writer(.,
+         path       = path,
+         name       = "df",
+         type       = "json",
+         mode       = "replace",
+         partitions = 2)
+
+dir(path, full.names = TRUE)
+
+```
+
 
 #### Reader
 
+Reader is a wrapper function to read files into a Spark Connection. Function can be configured to use one of [sparklyr read functions](https://spark.rstudio.com/dplyr/#reading-data) through the use of the type argument. Type argument accepts csv, parquet, json, jdbc, source, table and text inputs. Function allows for repartitioning and overwrite options. 
 
-#### Writer
+The path argument accepts wildcard and directory paths along with full file paths. If the file is distributed, the dfs protocol should be supplied in the path argument. 
+
+Note the reader function works for reading files into Spark only. For reading files into R, use read.csv, read.table, or fread from the data.table package.
+
+```{r reader}
+
+# Simple Read Example:
+sdf2 <- reader(sc,
+               name = "df2",
+               path = path,
+               type = "json")
+
+sdf2
+```
+
+
 
 
 #### Sampler
 
+Sampler function allows for Spark and R objects to be created from samples of data. Sampler supports various methods of sampling that differs slightly for R vs Spark:
+
+* __R Sampler Modes:__ 
+    + fraction (n % of total records)
+    + n (n number of recoreds)
+    + head (first n number of records) 
+    + tail (last n number of records)
+* __Spark Sampler Modes:__ 
+    + fraction (n % of total records)
+    + head (first n number of records) 
+  
+Note, the Spark sampling fraction mode is approximate not exact. 
+
+The R method additionally allows for stratified sampling with the group_vars argument and weighted sampling with the weight argument. 
+
+The seed argument allows for the seed to set to a specific number which ensure the random sampling methods generate the same result. The default is NULL which does not set a seed which will create different samples run to run. 
+
+```{r sampler}
+
+# Sampler Ex:
+df_smpl <- sampler(df,
+                   method  = "fraction",
+                   size    = 0.1,
+                   replace = FALSE, 
+                   weight  = NULL,
+                   seed    = 319)
+
+# Row Comparison
+format(nrow(df), big.mark = ",")
+format(nrow(df_smpl), big.mark = ",")
+```
+
 
 #### Collecter
+
+Collecter is a wrapper function around the sampler and sparklyr collect functions that allow Samples of Spark data to be collected into R. Note if the Spark data is distributed, this function will pull that data to the local R envirnoment on the network. The API is similar to the sampler function with the Spark method capabilities.
+
+
+```{r collecter}
+
+# Collecter Example:
+df_smpl2 <- collecter(sdf,
+                      sample = TRUE,
+                      method = "fraction",
+                      size   = 0.1,
+                      replace = FALSE,
+                      seed    = 319)
+df_smpl2
+```
+

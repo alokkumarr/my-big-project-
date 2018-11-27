@@ -12,7 +12,7 @@
 
 <meta name="author" content="Haarstick" />
 
-<meta name="date" content="2018-11-16" />
+<meta name="date" content="2018-11-27" />
 
 <title>a2munge User Guide</title>
 
@@ -70,13 +70,28 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">a2munge User Guide</h1>
 <h4 class="author"><em>Haarstick</em></h4>
-<h4 class="date"><em>2018-11-16</em></h4>
+<h4 class="date"><em>2018-11-27</em></h4>
 
 
+<div id="TOC">
+<ul>
+<li><a href="#overview">Overview</a><ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#design">Design</a></li>
+<li><a href="#api">API</a></li>
+</ul></li>
+<li><a href="#functions">Functions</a><ul>
+<li><a href="#manipulaters">Manipulaters</a></li>
+<li><a href="#reshapers">Reshapers</a></li>
+<li><a href="#time-series">Time Series</a></li>
+<li><a href="#others">Others</a></li>
+</ul></li>
+</ul>
+</div>
 
 <div id="overview" class="section level2">
 <h2>Overview</h2>
-<p>a2munge is an R package to help create <em>Big Data</em> Advanced Analytic data pipelines. The package contains a suite of Spark<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preperation. The a2munge package is design to efficiently create such pipelines.</p>
+<p>a2munge is an R package to help create <em>Big Data</em> Advanced Analytic data pipelines. The package contains a suite of Spark<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is design to efficiently create such pipelines.</p>
 <div id="features" class="section level3">
 <h3>Features</h3>
 <ul>
@@ -90,20 +105,33 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="design" class="section level3">
 <h3>Design</h3>
-<p>a2munge leverages the R S3<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> Object Oriented system to create generic functions with R data.frame and Spark class methods. This design creates a similiar set of functions and arguments for the user that can be applied on local R data.frames, local Spark data objects, or even distributed Spark objects.</p>
-<p>a2munge uses standard evaluation <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> to evaluate function arguments. This allows for function arguments to be assigned programmatically which is beneficial for re-usable template and component development.</p>
-<p>a2munge functions standarize the output naming convention and schema which creates consistency aiding in application development.</p>
-<p>a2munge spark compatibility relies on the great sparklyr<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> R package which enables a R API for working with Spark objets.</p>
+<p>a2munge leverages the R S3<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> Object Oriented system to create generic functions with R data.frame and Spark class methods. This design creates a similar set of functions and arguments for the user that can be applied on local R data.frames, local Spark data objects, or even distributed Spark objects.</p>
+<p>a2munge uses standard evaluation<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> to evaluate function arguments. This allows for function arguments to be assigned programmatically which is beneficial for re-usable template and component development.</p>
+<p>a2munge functions standardize the output naming convention and schema which creates consistency aiding in application development.</p>
+<p>a2munge spark compatibility relies on the great sparklyr<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> R package which enables a R API for working with Spark objects.</p>
+</div>
+<div id="api" class="section level3">
+<h3>API</h3>
+<p>Wherever possible and appropriate the a2munge functions share common argument naming conventions and location. The following argument names are shared in multiple functions:</p>
+<ul>
+<li><strong>group_vars</strong>: one or more column names that indicate which columns to group the data by. This argument is option in many functions with default value of NULL, which corresponds to no grouping.</li>
+<li><strong>measure_vars</strong>: one or more column names to apply functionality to. Typically numeric column types. This argument is not typically optional.</li>
+<li><strong>fun</strong>: name of mathematical function to apply on measure_vars. Can be more than one - eg c(“sum”, “mean”). Also supports the use of the <a href="https://dplyr.tidyverse.org/reference/funs.html">funs</a> function from the dplyr package.</li>
+<li><strong>order_vars</strong>: one or more column names to arrange the data by. Often a date or date-time type is used to order the data.</li>
+<li><strong>id_vars</strong>: one or more column names used in reshaping functions to specify which columns to retain in existing form.</li>
+<li><strong>sep</strong>: character separator used for output data column naming.</li>
+</ul>
 </div>
 </div>
 <div id="functions" class="section level2">
 <h2>Functions</h2>
-<p>In the following sections each of the a2munge functions are explained with examples. In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment.</p>
+<p>In the following sections each of the a2munge functions are explained with examples. In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. For more background on creating a Spark connection in R please see the <a href="https://spark.rstudio.com/">sparklyr</a>] package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># R packages</span>
 <span class="kw">library</span>(tidyverse)
 <span class="kw">library</span>(lubridate)
 <span class="kw">library</span>(sparklyr)
+<span class="kw">library</span>(a2munge)
 
 <span class="co"># Create Simulated Dataset:</span>
 <span class="kw">set.seed</span>(<span class="dv">319</span>)
@@ -129,111 +157,993 @@ df &lt;-<span class="st"> </span><span class="kw">tibble</span>()
 sc &lt;-<span class="st"> </span><span class="kw">spark_connect</span>(<span class="dt">master =</span> <span class="st">&quot;local&quot;</span>)
 
 <span class="co"># Copy Data to Spark</span>
-sdf &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, df, <span class="st">&quot;df&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</code></pre></div>
+sdf &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, df, <span class="st">&quot;df&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># Date Conversion patch to account for date serialization issue in sparklyr</span>
+df &lt;-<span class="st"> </span><span class="kw">mutate_at</span>(df, <span class="st">&quot;date&quot;</span>, as.Date)
+sdf &lt;-<span class="st"> </span><span class="kw">mutate_at</span>(sdf, <span class="st">&quot;date&quot;</span>, <span class="kw">funs</span>(to_date))</code></pre></div>
+<p>The sample dataset has six columns of different types</p>
+<ul>
+<li><strong>id</strong>: integer type. Corresponds to unique identifer field such as unique device id or customer id</li>
+<li><strong>date</strong>: date type. Dates from past 90 days</li>
+<li><strong>cat1</strong>: character type. Arbitrary attribute column with 2 distinct values of weighted probability</li>
+<li><strong>cat2</strong>: character type. Arbitrary attribute column with 5 distinct values of weighted probability</li>
+<li><strong>metric1</strong>: numeric type. Arbitrary numeric column with integer values of 1:5</li>
+<li><strong>metric2</strong>: numerice type. Arbitrary numeric column with random values center at 50</li>
+</ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># R Dataset</span>
 df
 <span class="co">#&gt; # A tibble: 10,000 x 6</span>
 <span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
-<span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt;  1   101 2018-09-04 A     V           4    52.2</span>
-<span class="co">#&gt;  2   101 2018-08-18 A     X           2    46.3</span>
-<span class="co">#&gt;  3   101 2018-10-01 A     W           5    54.4</span>
-<span class="co">#&gt;  4   101 2018-09-30 B     V           5    45.9</span>
-<span class="co">#&gt;  5   101 2018-10-31 A     V           3    55.4</span>
-<span class="co">#&gt;  6   101 2018-09-13 A     Y           1    43.5</span>
-<span class="co">#&gt;  7   101 2018-09-30 B     V           2    55.1</span>
-<span class="co">#&gt;  8   101 2018-08-19 A     W           5    45.9</span>
-<span class="co">#&gt;  9   101 2018-10-10 A     X           5    51.6</span>
-<span class="co">#&gt; 10   101 2018-11-12 A     X           1    51.8</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 B     V           2    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8</span>
 <span class="co">#&gt; # ... with 9,990 more rows</span>
 
 <span class="co"># Spark Dataset</span>
 sdf
-<span class="co">#&gt; # Source: spark&lt;df&gt; [?? x 6]</span>
+<span class="co">#&gt; # Source: spark&lt;?&gt; [?? x 6]</span>
 <span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
-<span class="co">#&gt;  * &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt;  1   101 2018-09-04 A     V           4    52.2</span>
-<span class="co">#&gt;  2   101 2018-08-18 A     X           2    46.3</span>
-<span class="co">#&gt;  3   101 2018-10-01 A     W           5    54.4</span>
-<span class="co">#&gt;  4   101 2018-09-30 B     V           5    45.9</span>
-<span class="co">#&gt;  5   101 2018-10-31 A     V           3    55.4</span>
-<span class="co">#&gt;  6   101 2018-09-13 A     Y           1    43.5</span>
-<span class="co">#&gt;  7   101 2018-09-30 B     V           2    55.1</span>
-<span class="co">#&gt;  8   101 2018-08-19 A     W           5    45.9</span>
-<span class="co">#&gt;  9   101 2018-10-10 A     X           5    51.6</span>
-<span class="co">#&gt; 10   101 2018-11-12 A     X           1    51.8</span>
+<span class="co">#&gt;  * &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-14 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-28 A     X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-11 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-10 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-23 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-10 B     V           2    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-29 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-20 A     X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8</span>
 <span class="co">#&gt; # ... with more rows</span></code></pre></div>
 <div id="manipulaters" class="section level3">
 <h3>Manipulaters</h3>
+<p>The first set of functions are data manipulater: functions to aggregate or add new columns as functions of other columns</p>
 <div id="summariser" class="section level4">
 <h4>Summariser</h4>
+<p>The summariser function aggregates a dataset based on combination of grouping variables, measure varaibles and function. In the following chuck, a simple aggregation is applied on both R and Spark datasets using the same combination of arguments.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Simple Summariser R Ex</span>
+<span class="kw">summariser</span>(df,
+           <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;cat1&quot;</span>),
+           <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+           <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sum&quot;</span>))
+<span class="co">#&gt; # A tibble: 200 x 6</span>
+<span class="co">#&gt;       id cat1  metric1_mean metric2_mean metric1_sum metric2_sum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;       &lt;int&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 A             3.11         49.1         218       3435.</span>
+<span class="co">#&gt;  2   101 B             2.93         51.1          88       1534.</span>
+<span class="co">#&gt;  3   102 A             3.06         50.5         242       3992.</span>
+<span class="co">#&gt;  4   102 B             3.33         50.6          70       1063.</span>
+<span class="co">#&gt;  5   103 A             2.98         50.3         238       4021.</span>
+<span class="co">#&gt;  6   103 B             2.8          49.8          56        996.</span>
+<span class="co">#&gt;  7   104 A             3.2          50.5         256       4043.</span>
+<span class="co">#&gt;  8   104 B             3            51.1          60       1022.</span>
+<span class="co">#&gt;  9   105 A             3            49.7         219       3632.</span>
+<span class="co">#&gt; 10   105 B             3.15         48.7          85       1316.</span>
+<span class="co">#&gt; # ... with 190 more rows</span>
+
+<span class="co"># Simple Summariser Spark Ex</span>
+<span class="kw">summariser</span>(sdf,
+           <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;cat1&quot;</span>),
+           <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+           <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sum&quot;</span>))
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; # Source: spark&lt;?&gt; [?? x 6]</span>
+<span class="co">#&gt;       id cat1  metric1_mean metric2_mean metric1_sum metric2_sum</span>
+<span class="co">#&gt;  * &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 A             3.11         49.1         218       3435.</span>
+<span class="co">#&gt;  2   101 B             2.93         51.1          88       1534.</span>
+<span class="co">#&gt;  3   103 A             2.98         50.3         238       4021.</span>
+<span class="co">#&gt;  4   104 B             3            51.1          60       1022.</span>
+<span class="co">#&gt;  5   106 A             2.92         50.0         225       3850.</span>
+<span class="co">#&gt;  6   107 A             3.04         49.0         228       3678.</span>
+<span class="co">#&gt;  7   110 B             3.08         49.6          74       1192.</span>
+<span class="co">#&gt;  8   112 A             2.99         51.1         233       3987.</span>
+<span class="co">#&gt;  9   113 B             2.91         50.4         102       1763.</span>
+<span class="co">#&gt; 10   116 A             3.16         50.9         243       3923.</span>
+<span class="co">#&gt; # ... with more rows</span></code></pre></div>
+<p>In the following example, a similiar aggregation is made programatically via <a href="https://dplyr.tidyverse.org/articles/programming.html">standard evaluation</a></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Programatic interface</span>
+.group_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;cat1&quot;</span>, <span class="st">&quot;cat2&quot;</span>)
+.measure_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>)
+.funs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;mean&quot;</span>, <span class="st">&quot;max&quot;</span>)
+
+<span class="co"># Summariser Example</span>
+<span class="kw">summariser</span>(df,
+           <span class="dt">group_vars   =</span> .group_vars,
+           <span class="dt">measure_vars =</span> .measure_vars,
+           <span class="dt">fun          =</span> .funs)
+<span class="co">#&gt; # A tibble: 10 x 8</span>
+<span class="co">#&gt;    cat1  cat2  metric1_min metric2_min metric1_mean metric2_mean</span>
+<span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 A     V               1        31.7         2.97         50.1</span>
+<span class="co">#&gt;  2 A     W               1        33.5         3.02         49.9</span>
+<span class="co">#&gt;  3 A     X               1        34.9         3.04         50.2</span>
+<span class="co">#&gt;  4 A     Y               1        36.2         2.96         49.9</span>
+<span class="co">#&gt;  5 A     Z               1        38.0         2.89         50.6</span>
+<span class="co">#&gt;  6 B     V               1        34.7         2.97         50.0</span>
+<span class="co">#&gt;  7 B     W               1        35.6         2.98         49.7</span>
+<span class="co">#&gt;  8 B     X               1        37.3         3.02         50.0</span>
+<span class="co">#&gt;  9 B     Y               1        34.3         2.82         49.8</span>
+<span class="co">#&gt; 10 B     Z               1        37.3         3.09         50.3</span>
+<span class="co">#&gt; # ... with 2 more variables: metric1_max &lt;dbl&gt;, metric2_max &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="summariser-map" class="section level4">
 <h4>Summariser Map</h4>
+<p>The summariser map function allows for more than one set of summariser arguments to be made and combined into single output dataset. This function enables aggregations of different cardinality to be combined.</p>
+<p>The function applies each set seperately and combines into a single dataset via the <a href="#pivoter">pivoter</a> a2munge function. The id_vars argument is used here to indicate what columns to perserve and join the aggregations by. Multiple sets of summariser arguments are stored in a list and passed to the map argument within an additional list.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summariser_map</span>(df,
+               <span class="dt">id_vars =</span> <span class="st">&quot;id&quot;</span>,
+               <span class="dt">map =</span> <span class="kw">list</span>(
+                 <span class="kw">list</span>(
+                   <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;cat1&quot;</span>),
+                   <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>),
+                   <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;sum&quot;</span>)
+                 ),
+                 <span class="kw">list</span>(
+                   <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;cat2&quot;</span>),
+                   <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric2&quot;</span>),
+                   <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;mean&quot;</span>)
+                 )
+               )
+) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 100 x 8</span>
+<span class="co">#&gt;       id cat1_A_metric1_~ cat1_B_metric1_~ cat2_V_metric2_~</span>
+<span class="co">#&gt;    &lt;dbl&gt;            &lt;int&gt;            &lt;int&gt;            &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101              218               88             49.9</span>
+<span class="co">#&gt;  2   102              242               70             51.5</span>
+<span class="co">#&gt;  3   103              238               56             50.6</span>
+<span class="co">#&gt;  4   104              256               60             50.3</span>
+<span class="co">#&gt;  5   105              219               85             49.8</span>
+<span class="co">#&gt;  6   106              225               67             49.4</span>
+<span class="co">#&gt;  7   107              228               75             49.9</span>
+<span class="co">#&gt;  8   108              240               86             51.2</span>
+<span class="co">#&gt;  9   109              218               65             50.1</span>
+<span class="co">#&gt; 10   110              228               74             51.0</span>
+<span class="co">#&gt; # ... with 90 more rows, and 4 more variables: cat2_W_metric2_mean &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cat2_X_metric2_mean &lt;dbl&gt;, cat2_Y_metric2_mean &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cat2_Z_metric2_mean &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="mutater" class="section level4">
 <h4>Mutater</h4>
+<p>The mutater function allows for calculated fields to be added to a dataset. Mutater allows for ordering for cumulative calculations and grouping.</p>
+<p>In the first example, the log of metric2 is calculated by id and added to the dataset. In the second example, the cumulative sum of metric2 is calculated by date per id and added to the dataset</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Simple mutater ex:</span>
+<span class="kw">mutater</span>(df,
+        <span class="dt">group_vars   =</span> <span class="st">&quot;id&quot;</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;log&quot;</span>)
+<span class="co">#&gt; # A tibble: 10,000 x 7</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2 metric1_log</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2       1.39 </span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X           2    46.3       0.693</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4       1.61 </span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9       1.61 </span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4       1.10 </span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5       0    </span>
+<span class="co">#&gt;  7   101 2018-10-11 B     V           2    55.1       0.693</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9       1.61 </span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6       1.61 </span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8       0    </span>
+<span class="co">#&gt; # ... with 9,990 more rows</span>
+
+<span class="co"># Ordered mutater ex:</span>
+<span class="kw">mutater</span>(df,
+        <span class="dt">order_vars   =</span> <span class="st">&quot;date&quot;</span>,
+        <span class="dt">group_vars   =</span> <span class="st">&quot;id&quot;</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric2&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;cumsum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(id, date)
+<span class="co">#&gt; # A tibble: 10,000 x 7</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2 metric2_cumsum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29 A     X           2    46.3           46.3</span>
+<span class="co">#&gt;  2   101 2018-08-29 B     X           4    57.2          103. </span>
+<span class="co">#&gt;  3   101 2018-08-30 A     W           5    45.9          149. </span>
+<span class="co">#&gt;  4   101 2018-08-30 B     V           1    47.8          197. </span>
+<span class="co">#&gt;  5   101 2018-08-30 A     V           4    47.7          245. </span>
+<span class="co">#&gt;  6   101 2018-09-01 A     W           4    48.4          293. </span>
+<span class="co">#&gt;  7   101 2018-09-03 A     V           3    48.0          341. </span>
+<span class="co">#&gt;  8   101 2018-09-04 A     W           4    48.5          390. </span>
+<span class="co">#&gt;  9   101 2018-09-04 A     X           4    48.2          438. </span>
+<span class="co">#&gt; 10   101 2018-09-05 B     W           2    52.7          491. </span>
+<span class="co">#&gt; # ... with 9,990 more rows</span></code></pre></div>
 </div>
 <div id="roller" class="section level4">
 <h4>Roller</h4>
+<p>Roller is similar to mutater but allows for rolling (window) calculations. The width argument specifies the window width. The R API differs slightly from the Spark API allowing for additional arguments for by (sequence by input) and partial (calculate on windows smaller than width) arguments.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Roller example with summariser first step</span>
+df_agg &lt;-<span class="st"> </span><span class="kw">summariser</span>(df,
+                     <span class="dt">group_vars   =</span> <span class="st">&quot;date&quot;</span>,
+                     <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+                     <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) 
+df_agg
+<span class="co">#&gt; # A tibble: 90 x 3</span>
+<span class="co">#&gt;    date       metric1_sum metric2_sum</span>
+<span class="co">#&gt;    &lt;date&gt;           &lt;int&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 2018-08-29         321       5283.</span>
+<span class="co">#&gt;  2 2018-08-30         281       4743.</span>
+<span class="co">#&gt;  3 2018-08-31         298       5626.</span>
+<span class="co">#&gt;  4 2018-09-01         378       6334.</span>
+<span class="co">#&gt;  5 2018-09-02         364       5987.</span>
+<span class="co">#&gt;  6 2018-09-03         342       5822.</span>
+<span class="co">#&gt;  7 2018-09-04         367       5843.</span>
+<span class="co">#&gt;  8 2018-09-05         334       5541.</span>
+<span class="co">#&gt;  9 2018-09-06         357       6069.</span>
+<span class="co">#&gt; 10 2018-09-07         251       4557.</span>
+<span class="co">#&gt; # ... with 80 more rows</span>
+
+<span class="co"># Rolling 7 day average</span>
+<span class="kw">roller</span>(df_agg,
+       <span class="dt">order_vars   =</span> <span class="st">&quot;date&quot;</span>,
+       <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1_sum&quot;</span>, <span class="st">&quot;metric2_sum&quot;</span>),
+       <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>,
+       <span class="dt">width        =</span> <span class="dv">7</span>)
+<span class="co">#&gt; # A tibble: 90 x 5</span>
+<span class="co">#&gt;    date       metric1_sum metric2_sum metric1_sum_7w_me~ metric2_sum_7w_m~</span>
+<span class="co">#&gt;    &lt;date&gt;           &lt;int&gt;       &lt;dbl&gt;              &lt;dbl&gt;             &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 2018-08-29         321       5283.               321              5283.</span>
+<span class="co">#&gt;  2 2018-08-30         281       4743.               301              5013.</span>
+<span class="co">#&gt;  3 2018-08-31         298       5626.               300              5218.</span>
+<span class="co">#&gt;  4 2018-09-01         378       6334.               320.             5497.</span>
+<span class="co">#&gt;  5 2018-09-02         364       5987.               328.             5595.</span>
+<span class="co">#&gt;  6 2018-09-03         342       5822.               331.             5633.</span>
+<span class="co">#&gt;  7 2018-09-04         367       5843.               336.             5663.</span>
+<span class="co">#&gt;  8 2018-09-05         334       5541.               338.             5700.</span>
+<span class="co">#&gt;  9 2018-09-06         357       6069.               349.             5889.</span>
+<span class="co">#&gt; 10 2018-09-07         251       4557.               342.             5736.</span>
+<span class="co">#&gt; # ... with 80 more rows</span></code></pre></div>
 </div>
 <div id="lagger" class="section level4">
 <h4>Lagger</h4>
+<p>Lagger is also similar to mutater but allows for lag values of variables to be appended to a dataset. Lagged values are often used in time series data. Lags are specified with the lags argument which accepts a numeric vector. The lags number will specify how many preceeding rows values to append as new column. Allows for grouping.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Lagger example with 1, 2, and 3 lagged values appended</span>
+<span class="kw">lagger</span>(df_agg,
+       <span class="dt">order_vars   =</span> <span class="st">'date'</span>,
+       <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+       <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1_sum&quot;</span>),
+       <span class="dt">lags =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
+<span class="co">#&gt; # A tibble: 90 x 6</span>
+<span class="co">#&gt;    date       metric1_sum metric2_sum metric1_sum_lag1 metric1_sum_lag2</span>
+<span class="co">#&gt;    &lt;date&gt;           &lt;int&gt;       &lt;dbl&gt;            &lt;int&gt;            &lt;int&gt;</span>
+<span class="co">#&gt;  1 2018-08-29         321       5283.               NA               NA</span>
+<span class="co">#&gt;  2 2018-08-30         281       4743.              321               NA</span>
+<span class="co">#&gt;  3 2018-08-31         298       5626.              281              321</span>
+<span class="co">#&gt;  4 2018-09-01         378       6334.              298              281</span>
+<span class="co">#&gt;  5 2018-09-02         364       5987.              378              298</span>
+<span class="co">#&gt;  6 2018-09-03         342       5822.              364              378</span>
+<span class="co">#&gt;  7 2018-09-04         367       5843.              342              364</span>
+<span class="co">#&gt;  8 2018-09-05         334       5541.              367              342</span>
+<span class="co">#&gt;  9 2018-09-06         357       6069.              334              367</span>
+<span class="co">#&gt; 10 2018-09-07         251       4557.              357              334</span>
+<span class="co">#&gt; # ... with 80 more rows, and 1 more variable: metric1_sum_lag3 &lt;int&gt;</span></code></pre></div>
 </div>
 <div id="imputer" class="section level4">
 <h4>Imputer</h4>
+<p>Imputer replaces missing values. Imputer has three impute functions specified with the fun argument:</p>
+<ul>
+<li><em>mean</em>: missing values replaced by the mean of remaining values. Default function. Appropriate for numerical types</li>
+<li><em>mode</em>: missing values replaced by the mode (most common) of remaining values. Appropriate for integer or character types</li>
+<li><em>constant</em>: missing values replaced by constant fill value. Constant specified with additional fill argument</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Create dataset with missing values</span>
+na_n &lt;-<span class="st"> </span><span class="dv">100</span>
+df_na &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span>na_n) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">cat1 =</span> <span class="kw">ifelse</span>(<span class="kw">row_number</span>() <span class="op">%in%</span><span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">n</span>(), na_n<span class="op">/</span><span class="dv">4</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>), <span class="ot">NA</span>, cat1),
+         <span class="dt">metric1 =</span> <span class="kw">ifelse</span>(<span class="kw">row_number</span>() <span class="op">%in%</span><span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">n</span>(), na_n<span class="op">/</span><span class="dv">10</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>), <span class="ot">NA</span>, metric1)) 
+df_na
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 &lt;NA&gt;  V          NA    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 &lt;NA&gt;  X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 &lt;NA&gt;  X           1    51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span>
+
+<span class="co"># Impute cat1 with mode</span>
+<span class="kw">imputer</span>(df_na,
+        <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;cat1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;mode&quot;</span>)
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 A     V          NA    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span>
+
+<span class="co"># Compare Counts:</span>
+<span class="kw">count</span>(df_na, cat1)
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   cat1      n</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1 A        53</span>
+<span class="co">#&gt; 2 B        22</span>
+<span class="co">#&gt; 3 &lt;NA&gt;     25</span>
+df_na <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">imputer</span>(.,
+          <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+          <span class="dt">measure_vars =</span> <span class="st">&quot;cat1&quot;</span>,
+          <span class="dt">fun          =</span> <span class="st">&quot;mode&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">count</span>(cat1)
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   cat1      n</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1 A        78</span>
+<span class="co">#&gt; 2 B        22</span>
+
+<span class="co"># Impute cat1 with constant</span>
+<span class="kw">imputer</span>(df_na,
+        <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;cat1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;constant&quot;</span>,
+        <span class="dt">fill         =</span> <span class="st">&quot;FILLED!&quot;</span>)
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1    cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A       V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 A       X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A       W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B       V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A       V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A       Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 FILLED! V          NA    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A       W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 FILLED! X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 FILLED! X           1    51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span>
+
+<span class="co"># Impute metric1 with mean</span>
+<span class="kw">imputer</span>(df_na,
+        <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>)
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V        4       52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X        2       46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W        5       54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V        5       45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V        3       55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y        1       43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 &lt;NA&gt;  V        2.99    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W        5       45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 &lt;NA&gt;  X        5       51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 &lt;NA&gt;  X        1       51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span></code></pre></div>
 </div>
 </div>
 <div id="reshapers" class="section level3">
 <h3>Reshapers</h3>
+<p>Reshaping functions alter the structure of a dataset.</p>
 <div id="pivoter" class="section level4">
 <h4>Pivoter</h4>
+<p>Pivoter reshapes data from long to wide format. This function is similar to the <a href="https://tidyr.tidyverse.org/reference/spread.html">spread</a>. Pivoter allows for multiple key-pairs to be spread across multiple columns however. Transforming datasets from long to wide form (or denormalizing a dataset) is a common step in statistical modeling workflows to convert data into matrix like format with a unique record per row required for most alogrithms.</p>
+<p>The id_vars argument here specifies which columns are to be preserved in the resulting output dataset. The group_vars argument specficies which column(s) unique values should be transformed into new columns. Group_vars should be attribute (categorical) columns with relatively low number of unique values. The measure_vars specify the columns converted to the values. Pivoter does accept a single fun argument. Pivoter has an argument for a fill value to apply to missing values created from the pivot. Zero is a commoningly used fill value for pivoter. The sep argument can be modify to alter the output column naming convention</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># simple pivoter R example of pivoting cat1 by id and date for metric1</span>
+<span class="kw">pivoter</span>(df,
+        <span class="dt">id_vars      =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+        <span class="dt">group_vars   =</span> <span class="st">&quot;cat2&quot;</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">fill         =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 6,046 x 7</span>
+<span class="co">#&gt;       id date       cat2_V_metric1 cat2_W_metric1 cat2_X_metric1</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;              &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29              0              0              6</span>
+<span class="co">#&gt;  2   101 2018-08-30              5              5              0</span>
+<span class="co">#&gt;  3   101 2018-09-01              0              4              0</span>
+<span class="co">#&gt;  4   101 2018-09-03              3              0              0</span>
+<span class="co">#&gt;  5   101 2018-09-04              0              4              4</span>
+<span class="co">#&gt;  6   101 2018-09-05              0              2              0</span>
+<span class="co">#&gt;  7   101 2018-09-06              0              0              2</span>
+<span class="co">#&gt;  8   101 2018-09-07              3              0              0</span>
+<span class="co">#&gt;  9   101 2018-09-09              5              0              0</span>
+<span class="co">#&gt; 10   101 2018-09-10              0              4              0</span>
+<span class="co">#&gt; # ... with 6,036 more rows, and 2 more variables: cat2_Y_metric1 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cat2_Z_metric1 &lt;dbl&gt;</span>
+
+<span class="co"># Similar pivot with Spark</span>
+<span class="kw">pivoter</span>(sdf,
+        <span class="dt">id_vars      =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+        <span class="dt">group_vars   =</span> <span class="st">&quot;cat2&quot;</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">fill         =</span> <span class="dv">0</span>)
+<span class="co">#&gt; # Source: spark&lt;?&gt; [?? x 7]</span>
+<span class="co">#&gt;       id date       cat2_V_metric1 cat2_W_metric1 cat2_X_metric1</span>
+<span class="co">#&gt;  * &lt;dbl&gt; &lt;date&gt;              &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-28              0              0              6</span>
+<span class="co">#&gt;  2   101 2018-10-15              0              2              0</span>
+<span class="co">#&gt;  3   101 2018-10-24              0              0              1</span>
+<span class="co">#&gt;  4   101 2018-10-17              0              1              0</span>
+<span class="co">#&gt;  5   101 2018-10-04              1              0              0</span>
+<span class="co">#&gt;  6   102 2018-10-28              3              0              9</span>
+<span class="co">#&gt;  7   102 2018-11-18              3              0              0</span>
+<span class="co">#&gt;  8   102 2018-10-20              0              0              5</span>
+<span class="co">#&gt;  9   102 2018-09-29              6              7              0</span>
+<span class="co">#&gt; 10   102 2018-10-24              8              2              0</span>
+<span class="co">#&gt; # ... with more rows, and 2 more variables: cat2_Y_metric1 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cat2_Z_metric1 &lt;dbl&gt;</span>
+
+
+<span class="co"># Pivot with multiple measure vars</span>
+<span class="kw">pivoter</span>(df,
+        <span class="dt">id_vars      =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+        <span class="dt">group_vars   =</span> <span class="st">&quot;cat1&quot;</span>, 
+        <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+        <span class="dt">fill         =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 6,046 x 6</span>
+<span class="co">#&gt;       id date       cat1_A_metric1 cat1_B_metric1 cat1_A_metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;              &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29              2              4           46.3</span>
+<span class="co">#&gt;  2   101 2018-08-30              9              1           93.6</span>
+<span class="co">#&gt;  3   101 2018-09-01              4              0           48.4</span>
+<span class="co">#&gt;  4   101 2018-09-03              3              0           48.0</span>
+<span class="co">#&gt;  5   101 2018-09-04              8              0           96.6</span>
+<span class="co">#&gt;  6   101 2018-09-05              0              2            0  </span>
+<span class="co">#&gt;  7   101 2018-09-06              0              2            0  </span>
+<span class="co">#&gt;  8   101 2018-09-07              3              0           45.2</span>
+<span class="co">#&gt;  9   101 2018-09-09              0              5            0  </span>
+<span class="co">#&gt; 10   101 2018-09-10              4              0           44.9</span>
+<span class="co">#&gt; # ... with 6,036 more rows, and 1 more variable: cat1_B_metric2 &lt;dbl&gt;</span>
+
+
+<span class="co"># Pivot with NULL sep and sum function</span>
+<span class="kw">pivoter</span>(df,
+        <span class="dt">id_vars      =</span> <span class="st">&quot;id&quot;</span>,
+        <span class="dt">group_vars   =</span> <span class="st">&quot;cat2&quot;</span>, 
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">sep          =</span> <span class="ot">NULL</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id     V     W     X     Y     Z</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
+<span class="co">#&gt;  1   101   136   107    28    23    12</span>
+<span class="co">#&gt;  2   102   122   100    58    15    17</span>
+<span class="co">#&gt;  3   103    98    89    69    32     6</span>
+<span class="co">#&gt;  4   104   116   110    58    17    15</span>
+<span class="co">#&gt;  5   105   116   112    59    14     3</span>
+<span class="co">#&gt;  6   106   122    74    55    25    16</span>
+<span class="co">#&gt;  7   107    98    97    81    22     5</span>
+<span class="co">#&gt;  8   108   134   107    68     7    10</span>
+<span class="co">#&gt;  9   109   108    96    54    18     7</span>
+<span class="co">#&gt; 10   110   121    53    83    28    17</span>
+<span class="co">#&gt; # ... with 90 more rows</span></code></pre></div>
 </div>
 <div id="melter" class="section level4">
 <h4>Melter</h4>
+<p>Melter works in opposite to pivoter by transforming wide data to long format. Similiar to tidyr <a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a> function.</p>
+<p>Similiar to the pivoter, id_vars specify which columns are preserved after the melt. The measure_vars are converted into a two column key-pair. Melter allows for the resulting key-pair columns to be given explict names with the variable_name and value_name arguments respectively.</p>
+<p>The measure_vars melted should be of the same type. Mixing column types will result in the value column reverting to the parent type. For the Spark API, the resulting value column type can be explictly specified with the type argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># melter example</span>
+df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">melter</span>(.,
+         <span class="dt">id_vars       =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>, <span class="st">&quot;cat1&quot;</span>, <span class="st">&quot;cat2&quot;</span>),
+         <span class="dt">measure_vars  =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+         <span class="dt">variable_name =</span> <span class="st">&quot;new_variable&quot;</span>,
+         <span class="dt">value_name    =</span> <span class="st">&quot;new_value&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as_tibble</span>()
+<span class="co">#&gt; # A tibble: 10 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  new_variable new_value</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V     metric1            4  </span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X     metric1            2  </span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W     metric1            5  </span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V     metric1            5  </span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V     metric1            3  </span>
+<span class="co">#&gt;  6   101 2018-09-15 A     V     metric2           52.2</span>
+<span class="co">#&gt;  7   101 2018-08-29 A     X     metric2           46.3</span>
+<span class="co">#&gt;  8   101 2018-10-12 A     W     metric2           54.4</span>
+<span class="co">#&gt;  9   101 2018-10-11 B     V     metric2           45.9</span>
+<span class="co">#&gt; 10   101 2018-11-11 A     V     metric2           55.4</span></code></pre></div>
 </div>
 <div id="expander" class="section level4">
 <h4>Expander</h4>
+<p>Technically expander converts implicit mising values to explicit values. Expander allows the dataset to be expanded based on a sequence or set of unique values provided. Similiar in scope to tidyr <a href="https://tidyr.tidyverse.org/reference/expand.html">expand</a> set of functions.</p>
+<p>Expander has two ways to expand a dataset: either by specifying a set of id_vars and mode or by providing a set of values directly with the fun argument. The behavior of the expansion can be modified with the mode argument. Either the full cartesian product of the id_vars can be specified with mode = ‘crossing’ or just the unique observed pairs with mode = ‘nesting’.</p>
+<p>Expander is useful when aggregated date-time data with attributes such as ids or other groups. Often there is a not a record for each attribute time unit combination which a simple aggregation will not account for. In a following example, expander is used in a pipeline to create an aggregate of average total metric1 per id per day. Notice, there is not a record in our dataset for all prior 90 days for each id.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># simple expander date example</span>
+df_<span class="dv">101</span> &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(id <span class="op">==</span><span class="st"> </span><span class="dv">101</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(date)
+df_<span class="dv">101</span>
+<span class="co">#&gt; # A tibble: 68 x 3</span>
+<span class="co">#&gt;       id date       metric1_sum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;           &lt;int&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29           6</span>
+<span class="co">#&gt;  2   101 2018-08-30          10</span>
+<span class="co">#&gt;  3   101 2018-09-01           4</span>
+<span class="co">#&gt;  4   101 2018-09-03           3</span>
+<span class="co">#&gt;  5   101 2018-09-04           8</span>
+<span class="co">#&gt;  6   101 2018-09-05           2</span>
+<span class="co">#&gt;  7   101 2018-09-06           2</span>
+<span class="co">#&gt;  8   101 2018-09-07           3</span>
+<span class="co">#&gt;  9   101 2018-09-09           5</span>
+<span class="co">#&gt; 10   101 2018-09-10           4</span>
+<span class="co">#&gt; # ... with 58 more rows</span>
+
+<span class="co"># Create record for each id and day </span>
+<span class="kw">expander</span>(df_<span class="dv">101</span>,
+         <span class="dt">id_vars =</span> <span class="st">&quot;id&quot;</span>,
+         <span class="dt">fun     =</span> <span class="kw">funs</span>(<span class="dt">date =</span> <span class="kw">full_seq</span>(date, <span class="dv">1</span>)))
+<span class="co">#&gt; # A tibble: 89 x 3</span>
+<span class="co">#&gt;       id date       metric1_sum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;           &lt;int&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29           6</span>
+<span class="co">#&gt;  2   101 2018-08-30          10</span>
+<span class="co">#&gt;  3   101 2018-08-31          NA</span>
+<span class="co">#&gt;  4   101 2018-09-01           4</span>
+<span class="co">#&gt;  5   101 2018-09-02          NA</span>
+<span class="co">#&gt;  6   101 2018-09-03           3</span>
+<span class="co">#&gt;  7   101 2018-09-04           8</span>
+<span class="co">#&gt;  8   101 2018-09-05           2</span>
+<span class="co">#&gt;  9   101 2018-09-06           2</span>
+<span class="co">#&gt; 10   101 2018-09-07           3</span>
+<span class="co">#&gt; # ... with 79 more rows</span>
+
+<span class="co"># Avg daily metric1 total per id - RIGHT WAY</span>
+df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">expander</span>(<span class="dt">id_vars =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+           <span class="dt">mode    =</span> <span class="st">&quot;crossing&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">imputer</span>(<span class="dt">measure_vars =</span> <span class="st">&quot;metric1_sum&quot;</span>,
+          <span class="dt">fun          =</span> <span class="st">&quot;constant&quot;</span>,
+          <span class="dt">fill         =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1_sum&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>)
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;   metric1_sum_mean</span>
+<span class="co">#&gt;              &lt;dbl&gt;</span>
+<span class="co">#&gt; 1             3.32</span>
+
+<span class="co"># WRONG WAY</span>
+df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1_sum&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>)
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;   metric1_sum_mean</span>
+<span class="co">#&gt;              &lt;dbl&gt;</span>
+<span class="co">#&gt; 1             4.95</span></code></pre></div>
 </div>
 </div>
 <div id="time-series" class="section level3">
 <h3>Time Series</h3>
+<p>The next set of functions relate to time series data that manipulate a date or date-time column type.</p>
 <div id="indexer" class="section level4">
 <h4>Indexer</h4>
+<p>Indexer calculates the time between two date values. Calculate the time difference from the measure_vars to a an origin argument where the origin can either be another date type column or date value. The resulting time difference can be further modified by the units and periods arguments - see examples.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># simple indexer example</span>
+df_ts &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(id, date) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(date) 
+df_ts
+<span class="co">#&gt; # A tibble: 10 x 2</span>
+<span class="co">#&gt;       id date      </span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;    </span>
+<span class="co">#&gt;  1   101 2018-08-29</span>
+<span class="co">#&gt;  2   101 2018-08-30</span>
+<span class="co">#&gt;  3   101 2018-09-15</span>
+<span class="co">#&gt;  4   101 2018-09-24</span>
+<span class="co">#&gt;  5   101 2018-10-11</span>
+<span class="co">#&gt;  6   101 2018-10-11</span>
+<span class="co">#&gt;  7   101 2018-10-12</span>
+<span class="co">#&gt;  8   101 2018-10-21</span>
+<span class="co">#&gt;  9   101 2018-11-11</span>
+<span class="co">#&gt; 10   101 2018-11-23</span>
+
+<span class="kw">indexer</span>(df_ts,
+        <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;date&quot;</span>),
+        <span class="dt">origin       =</span> <span class="kw">today</span>(),
+        <span class="dt">units        =</span> <span class="st">&quot;days&quot;</span>,
+        <span class="dt">periods      =</span> <span class="dv">1</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       `days_since_2018-11-27`</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;                       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29                     -90</span>
+<span class="co">#&gt;  2   101 2018-08-30                     -89</span>
+<span class="co">#&gt;  3   101 2018-09-15                     -73</span>
+<span class="co">#&gt;  4   101 2018-09-24                     -64</span>
+<span class="co">#&gt;  5   101 2018-10-11                     -47</span>
+<span class="co">#&gt;  6   101 2018-10-11                     -47</span>
+<span class="co">#&gt;  7   101 2018-10-12                     -46</span>
+<span class="co">#&gt;  8   101 2018-10-21                     -37</span>
+<span class="co">#&gt;  9   101 2018-11-11                     -16</span>
+<span class="co">#&gt; 10   101 2018-11-23                      -4</span>
+
+<span class="co"># indexer with timediff of 4hr periods from today</span>
+<span class="kw">indexer</span>(df_ts,
+        <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;date&quot;</span>),
+        <span class="dt">origin       =</span> <span class="kw">today</span>(),
+        <span class="dt">units        =</span> <span class="st">&quot;hours&quot;</span>,
+        <span class="dt">periods      =</span> <span class="dv">4</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       `4hour_periods_since_2018-11-27`</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;                                &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29                             -540</span>
+<span class="co">#&gt;  2   101 2018-08-30                             -534</span>
+<span class="co">#&gt;  3   101 2018-09-15                             -438</span>
+<span class="co">#&gt;  4   101 2018-09-24                             -384</span>
+<span class="co">#&gt;  5   101 2018-10-11                             -282</span>
+<span class="co">#&gt;  6   101 2018-10-11                             -282</span>
+<span class="co">#&gt;  7   101 2018-10-12                             -276</span>
+<span class="co">#&gt;  8   101 2018-10-21                             -222</span>
+<span class="co">#&gt;  9   101 2018-11-11                              -96</span>
+<span class="co">#&gt; 10   101 2018-11-23                              -24</span></code></pre></div>
 </div>
 <div id="date-parter" class="section level4">
 <h4>Date Parter</h4>
+<p>Date_parter calculates and appends common date part values from a date type. Date_parter can be useful to generate features from a date type for a statistical model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Simple Date Parter Ex</span>
+<span class="kw">date_parter</span>(df_ts, <span class="st">&quot;date&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 10</span>
+<span class="co">#&gt;       id date        year quarter month  week day_of_month day_of_week</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;        &lt;int&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29  2018       3     8    35           29           4</span>
+<span class="co">#&gt;  2   101 2018-08-30  2018       3     8    35           30           5</span>
+<span class="co">#&gt;  3   101 2018-09-15  2018       3     9    37           15           7</span>
+<span class="co">#&gt;  4   101 2018-09-24  2018       3     9    39           24           2</span>
+<span class="co">#&gt;  5   101 2018-10-11  2018       4    10    41           11           5</span>
+<span class="co">#&gt;  6   101 2018-10-11  2018       4    10    41           11           5</span>
+<span class="co">#&gt;  7   101 2018-10-12  2018       4    10    41           12           6</span>
+<span class="co">#&gt;  8   101 2018-10-21  2018       4    10    42           21           1</span>
+<span class="co">#&gt;  9   101 2018-11-11  2018       4    11    45           11           1</span>
+<span class="co">#&gt; 10   101 2018-11-23  2018       4    11    47           23           6</span>
+<span class="co">#&gt; # ... with 2 more variables: day_of_year &lt;dbl&gt;, days_left_in_month &lt;int&gt;</span></code></pre></div>
 </div>
 <div id="collapser" class="section level4">
 <h4>Collapser</h4>
+<p>Collapser allows for date or date time column types to be mutated into less granular time units and modified to either the beginning or end of the time unit through the side argument. This function is useful for time based aggregations</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Collapser End Ex:</span>
+<span class="kw">collapser</span>(df_ts,
+          <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+          <span class="dt">unit          =</span> <span class="st">&quot;month&quot;</span>,
+          <span class="dt">side          =</span> <span class="st">&quot;end&quot;</span>,
+          <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+          <span class="dt">output_suffix =</span> <span class="st">&quot;month_end&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_month_end</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;date&gt;        </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-31    </span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-31    </span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-30    </span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-30    </span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-31    </span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-31    </span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-31    </span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-31    </span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-30    </span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-30</span>
+
+<span class="co"># Collapser Start Ex:</span>
+<span class="kw">collapser</span>(df_ts,
+          <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+          <span class="dt">unit          =</span> <span class="st">&quot;month&quot;</span>,
+          <span class="dt">side          =</span> <span class="st">&quot;start&quot;</span>,
+          <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+          <span class="dt">output_suffix =</span> <span class="st">&quot;month_start&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_month_start</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;date&gt;          </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-01      </span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-01      </span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-01      </span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-01      </span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-01      </span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-01      </span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-01      </span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-01      </span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-01      </span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-01</span></code></pre></div>
 </div>
 <div id="formatter" class="section level4">
 <h4>Formatter</h4>
+<p>Formatter transforms a date or date-time type column to a character with a specific string format. This function can be useful to provide specific date-time formatting for downstream processes.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Formatter with Date type Ex:</span>
+<span class="kw">formatter</span>(df_ts,
+          <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+          <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd&quot;</span>,
+          <span class="dt">output_format =</span> <span class="st">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>, 
+          <span class="dt">output_suffix =</span> <span class="st">&quot;datetime&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_datetime      </span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;              </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-29 00:00:00</span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-30 00:00:00</span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-15 00:00:00</span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-24 00:00:00</span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-11 00:00:00</span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-11 00:00:00</span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-12 00:00:00</span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-21 00:00:00</span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-11 00:00:00</span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-23 00:00:00</span>
+
+<span class="co"># Formatter with Date-time type Ex:</span>
+<span class="kw">tibble</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, 
+       <span class="dt">date_time =</span> <span class="kw">now</span>() <span class="op">-</span><span class="st"> </span><span class="kw">minutes</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">formatter</span>(.,
+            <span class="dt">measure_vars  =</span> <span class="st">&quot;date_time&quot;</span>,
+            <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>,
+            <span class="dt">output_format =</span> <span class="st">&quot;MM/dd/yyyy HH:mm:ss&quot;</span>, 
+            <span class="dt">output_suffix =</span> <span class="st">&quot;formatted&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date_time           date_time_formatted</span>
+<span class="co">#&gt;    &lt;int&gt; &lt;dttm&gt;              &lt;chr&gt;              </span>
+<span class="co">#&gt;  1     1 2018-11-27 11:21:46 11/27/2018 11:21:46</span>
+<span class="co">#&gt;  2     2 2018-11-27 11:20:46 11/27/2018 11:20:46</span>
+<span class="co">#&gt;  3     3 2018-11-27 11:19:46 11/27/2018 11:19:46</span>
+<span class="co">#&gt;  4     4 2018-11-27 11:18:46 11/27/2018 11:18:46</span>
+<span class="co">#&gt;  5     5 2018-11-27 11:17:46 11/27/2018 11:17:46</span>
+<span class="co">#&gt;  6     6 2018-11-27 11:16:46 11/27/2018 11:16:46</span>
+<span class="co">#&gt;  7     7 2018-11-27 11:15:46 11/27/2018 11:15:46</span>
+<span class="co">#&gt;  8     8 2018-11-27 11:14:46 11/27/2018 11:14:46</span>
+<span class="co">#&gt;  9     9 2018-11-27 11:13:46 11/27/2018 11:13:46</span>
+<span class="co">#&gt; 10    10 2018-11-27 11:12:46 11/27/2018 11:12:46</span></code></pre></div>
 </div>
 <div id="converter" class="section level4">
 <h4>Converter</h4>
+<p>Converter allows character (string) type columns to be cast to either date or date-time types. The desired output type can be modified with the output_format argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Converter Date Example</span>
+df_ts <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate_at</span>(<span class="st">&quot;date&quot;</span>, as.character) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">converter</span>(.,
+            <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+            <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd&quot;</span>,
+            <span class="dt">output_type   =</span> <span class="st">&quot;date&quot;</span>, 
+            <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+            <span class="dt">output_suffix =</span> <span class="st">&quot;converted&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_converted</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt;      &lt;date&gt;        </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-29    </span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-30    </span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-15    </span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-24    </span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-11    </span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-11    </span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-12    </span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-21    </span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-11    </span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-23</span>
+
+<span class="co"># Converter Date-Time Example</span>
+<span class="kw">tibble</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, 
+       <span class="dt">date_time =</span> <span class="kw">now</span>() <span class="op">-</span><span class="st"> </span><span class="kw">minutes</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate_at</span>(<span class="st">&quot;date_time&quot;</span>, as.character) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">converter</span>(.,
+            <span class="dt">measure_vars  =</span> <span class="st">&quot;date_time&quot;</span>,
+            <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>,
+            <span class="dt">output_type   =</span> <span class="st">&quot;datetime&quot;</span>, 
+            <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+            <span class="dt">output_suffix =</span> <span class="st">&quot;converted&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date_time           date_time_converted</span>
+<span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;               &lt;dttm&gt;             </span>
+<span class="co">#&gt;  1     1 2018-11-27 11:21:46 2018-11-27 11:21:46</span>
+<span class="co">#&gt;  2     2 2018-11-27 11:20:46 2018-11-27 11:20:46</span>
+<span class="co">#&gt;  3     3 2018-11-27 11:19:46 2018-11-27 11:19:46</span>
+<span class="co">#&gt;  4     4 2018-11-27 11:18:46 2018-11-27 11:18:46</span>
+<span class="co">#&gt;  5     5 2018-11-27 11:17:46 2018-11-27 11:17:46</span>
+<span class="co">#&gt;  6     6 2018-11-27 11:16:46 2018-11-27 11:16:46</span>
+<span class="co">#&gt;  7     7 2018-11-27 11:15:46 2018-11-27 11:15:46</span>
+<span class="co">#&gt;  8     8 2018-11-27 11:14:46 2018-11-27 11:14:46</span>
+<span class="co">#&gt;  9     9 2018-11-27 11:13:46 2018-11-27 11:13:46</span>
+<span class="co">#&gt; 10    10 2018-11-27 11:12:46 2018-11-27 11:12:46</span></code></pre></div>
 </div>
 </div>
 <div id="others" class="section level3">
 <h3>Others</h3>
-<div id="reader" class="section level4">
-<h4>Reader</h4>
-</div>
 <div id="writer" class="section level4">
 <h4>Writer</h4>
+<p>Writer allows for R and Spark objects to be written to files. The file type is configurable and for the Spark method allows for csv, JSON, parquet and others. The base R version allows for csv and text. Writer modes include append, replace, ignore, and error. The Spark method also allows for the number of partitions to be configured.</p>
+<p>The path argument should include the directoy path and dfs protocol if distributed but not the file name. The file name should be provided in the name argument. For partitioned files, the name will be augmented with a file part number starting with 00001.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+## Simple Writer Ex:
+
+<span class="co"># Temp Directory Path</span>
+path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;/writer-ex&quot;</span>)
+
+<span class="co"># Write to json file with partitions</span>
+sdf <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">head</span>(<span class="dv">100</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">writer</span>(.,
+         <span class="dt">path       =</span> path,
+         <span class="dt">name       =</span> <span class="st">&quot;df&quot;</span>,
+         <span class="dt">type       =</span> <span class="st">&quot;json&quot;</span>,
+         <span class="dt">mode       =</span> <span class="st">&quot;replace&quot;</span>,
+         <span class="dt">partitions =</span> <span class="dv">2</span>)
+
+<span class="kw">dir</span>(path, <span class="dt">full.names =</span> <span class="ot">TRUE</span>)
+<span class="co">#&gt; [1] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpANr12u/writer-ex/df-part-00000.json&quot;</span>
+<span class="co">#&gt; [2] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpANr12u/writer-ex/df-part-00001.json&quot;</span></code></pre></div>
+</div>
+<div id="reader" class="section level4">
+<h4>Reader</h4>
+<p>Reader is a wrapper function to read files into a Spark Connection. Function can be configured to use one of <a href="https://spark.rstudio.com/dplyr/#reading-data">sparklyr read functions</a> through the use of the type argument. Type argument accepts csv, parquet, json, jdbc, source, table and text inputs. Function allows for repartitioning and overwrite options.</p>
+<p>The path argument accepts wildcard and directory paths along with full file paths. If the file is distributed, the dfs protocol should be supplied in the path argument.</p>
+<p>Note the reader function works for reading files into Spark only. For reading files into R, use read.csv, read.table, or fread from the data.table package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Simple Read Example:</span>
+sdf2 &lt;-<span class="st"> </span><span class="kw">reader</span>(sc,
+               <span class="dt">name =</span> <span class="st">&quot;df2&quot;</span>,
+               <span class="dt">path =</span> path,
+               <span class="dt">type =</span> <span class="st">&quot;json&quot;</span>)
+
+sdf2
+<span class="co">#&gt; # Source: spark&lt;df2&gt; [?? x 6]</span>
+<span class="co">#&gt;    cat1  cat2  date          id metric1 metric2</span>
+<span class="co">#&gt;  * &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 A     V     2018-09-15   101       4    52.2</span>
+<span class="co">#&gt;  2 A     W     2018-10-12   101       5    54.4</span>
+<span class="co">#&gt;  3 A     V     2018-11-11   101       3    55.4</span>
+<span class="co">#&gt;  4 B     V     2018-10-11   101       2    55.1</span>
+<span class="co">#&gt;  5 A     X     2018-10-21   101       5    51.6</span>
+<span class="co">#&gt;  6 B     W     2018-10-22   101       4    48.1</span>
+<span class="co">#&gt;  7 A     W     2018-10-03   101       5    52.1</span>
+<span class="co">#&gt;  8 A     V     2018-11-14   101       3    48.6</span>
+<span class="co">#&gt;  9 A     Y     2018-10-30   101       1    50.3</span>
+<span class="co">#&gt; 10 A     V     2018-10-24   101       3    51.2</span>
+<span class="co">#&gt; # ... with more rows</span></code></pre></div>
 </div>
 <div id="sampler" class="section level4">
 <h4>Sampler</h4>
+<p>Sampler function allows for Spark and R objects to be created from samples of data. Sampler supports various methods of sampling that differs slightly for R vs Spark:</p>
+<ul>
+<li><strong>R Sampler Modes:</strong>
+<ul>
+<li>fraction (n % of total records)</li>
+<li>n (n number of recoreds)</li>
+<li>head (first n number of records)</li>
+<li>tail (last n number of records)</li>
+</ul></li>
+<li><strong>Spark Sampler Modes:</strong>
+<ul>
+<li>fraction (n % of total records)</li>
+<li>head (first n number of records)</li>
+</ul></li>
+</ul>
+<p>Note, the Spark sampling fraction mode is approximate not exact.</p>
+<p>The R method additionally allows for stratified sampling with the group_vars argument and weighted sampling with the weight argument.</p>
+<p>The seed argument allows for the seed to set to a specific number which ensure the random sampling methods generate the same result. The default is NULL which does not set a seed which will create different samples run to run.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Sampler Ex:</span>
+df_smpl &lt;-<span class="st"> </span><span class="kw">sampler</span>(df,
+                   <span class="dt">method  =</span> <span class="st">&quot;fraction&quot;</span>,
+                   <span class="dt">size    =</span> <span class="fl">0.1</span>,
+                   <span class="dt">replace =</span> <span class="ot">FALSE</span>, 
+                   <span class="dt">weight  =</span> <span class="ot">NULL</span>,
+                   <span class="dt">seed    =</span> <span class="dv">319</span>)
+
+<span class="co"># Row Comparison</span>
+<span class="kw">format</span>(<span class="kw">nrow</span>(df), <span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>)
+<span class="co">#&gt; [1] &quot;10,000&quot;</span>
+<span class="kw">format</span>(<span class="kw">nrow</span>(df_smpl), <span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>)
+<span class="co">#&gt; [1] &quot;1,000&quot;</span></code></pre></div>
 </div>
 <div id="collecter" class="section level4">
 <h4>Collecter</h4>
+<p>Collecter is a wrapper function around the sampler and sparklyr collect functions that allow Samples of Spark data to be collected into R. Note if the Spark data is distributed, this function will pull that data to the local R envirnoment on the network. The API is similar to the sampler function with the Spark method capabilities.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Collecter Example:</span>
+df_smpl2 &lt;-<span class="st"> </span><span class="kw">collecter</span>(sdf,
+                      <span class="dt">sample =</span> <span class="ot">TRUE</span>,
+                      <span class="dt">method =</span> <span class="st">&quot;fraction&quot;</span>,
+                      <span class="dt">size   =</span> <span class="fl">0.1</span>,
+                      <span class="dt">replace =</span> <span class="ot">FALSE</span>,
+                      <span class="dt">seed    =</span> <span class="dv">319</span>)
+df_smpl2
+<span class="co">#&gt; # A tibble: 974 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-10-11 A     W           5    54.4</span>
+<span class="co">#&gt;  2   101 2018-10-20 A     X           5    51.6</span>
+<span class="co">#&gt;  3   101 2018-10-21 B     W           4    48.1</span>
+<span class="co">#&gt;  4   101 2018-10-02 A     W           5    52.1</span>
+<span class="co">#&gt;  5   101 2018-11-13 A     V           5    48.7</span>
+<span class="co">#&gt;  6   101 2018-10-29 B     V           3    49.0</span>
+<span class="co">#&gt;  7   101 2018-10-12 A     W           5    44.3</span>
+<span class="co">#&gt;  8   101 2018-10-02 A     V           2    45.1</span>
+<span class="co">#&gt;  9   101 2018-11-14 A     W           2    44.2</span>
+<span class="co">#&gt; 10   101 2018-11-20 B     V           5    44.4</span>
+<span class="co">#&gt; # ... with 964 more rows</span></code></pre></div>
 </div>
 </div>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Spark Data Processing Engine<a href="https://spark.apache.org/">via</a><a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p>Spark Data Processing Engine <a href="https://spark.apache.org/">via</a><a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p>dplyr R package <a href="https://dplyr.tidyverse.org/">via</a><a href="#fnref2">↩</a></p></li>
 <li id="fn3"><p>tidyr R package <a href="https://tidyr.tidyverse.org/">via</a><a href="#fnref3">↩</a></p></li>
 <li id="fn4"><p>R S3 OO <a href="http://adv-r.had.co.nz/S3.html">via</a><a href="#fnref4">↩</a></p></li>

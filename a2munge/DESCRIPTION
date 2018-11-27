@@ -20,8 +20,8 @@ Imports:
     purrr,
     DBI,
 Suggests:
-    testthat,,
+    testthat,
     knitr,
     rmarkdown
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
