@@ -14,7 +14,9 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
 )
 ```
 
@@ -75,6 +77,7 @@ library(tidyverse)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
+library(a2charter)
 
 # Create Simulated Dataset:
 set.seed(319)
@@ -97,7 +100,8 @@ for(id in id_vars){
 
 
 # Create Spark Connection
-sc <- spark_connect(master = "local")
+sc <- spark_connect(master = "local",
+                    spark_home = spark_home_dir())
 
 # Copy Data to Spark
 sdf <- copy_to(sc, df, "df", overwrite = TRUE)
@@ -112,12 +116,12 @@ sdf <- mutate_at(sdf, "date", funs(to_date))
 
 The sample dataset has six columns of different types
 
-* __id__: integer type. Corresponds to unique identifer field such as unique device id or customer id
+* __id__: integer type. Corresponds to unique identifier field such as unique device id or customer id
 * __date__: date type. Dates from past 90 days
 * __cat1__: character type. Arbitrary attribute column with 2 distinct values of weighted probability
 * __cat2__: character type. Arbitrary attribute column with 5 distinct values of weighted probability
 * __metric1__: numeric type. Arbitrary numeric column with integer values of 1:5
-* __metric2__: numerice type. Arbitrary numeric column with random values center at 50
+* __metric2__: numeric type. Arbitrary numeric column with random values center at 50
 
 
 ```{r datasets}
@@ -129,13 +133,13 @@ sdf
 ```
 
 
-### Manipulaters
+### Manipulators
 
-The first set of functions are data manipulater: functions to aggregate or add new columns as functions of other columns
+The first set of functions are data manipulator: functions to aggregate or add new columns as functions of other columns
 
 #### Summariser
 
-The summariser function aggregates a dataset based on combination of grouping variables, measure varaibles and function. In the following chuck, a simple aggregation is applied on both R and Spark datasets using the same combination of arguments. 
+The summariser function aggregates a dataset based on combination of grouping variables, measure variables and function. In the following chuck, a simple aggregation is applied on both R and Spark datasets using the same combination of arguments. 
 
 ```{r summariser}
 # Simple Summariser R Ex
@@ -153,7 +157,7 @@ summariser(sdf,
 ```
 
 
-In the following example, a similiar aggregation is made programatically via [standard evaluation](https://dplyr.tidyverse.org/articles/programming.html)
+In the following example, a similar aggregation is made programmatically via [standard evaluation](https://dplyr.tidyverse.org/articles/programming.html)
 
 ```{r summariser-se}
 
@@ -174,7 +178,7 @@ summariser(df,
 
 The summariser map function allows for more than one set of summariser arguments to be made and combined into single output dataset. This function enables aggregations of different cardinality to be combined. 
 
-The function applies each set seperately and combines into a single dataset via the [pivoter](#pivoter) a2munge function. The id_vars argument is used here to indicate what columns to perserve and join the aggregations by. Multiple sets of summariser arguments are stored in a list and passed to the map argument within an additional list. 
+The function applies each set separately and combines into a single dataset via the [pivoter](#pivoter) a2munge function. The id_vars argument is used here to indicate what columns to preserve and join the aggregations by. Multiple sets of summariser arguments are stored in a list and passed to the map argument within an additional list. 
 
 
 ```{r summariser-map}
@@ -246,7 +250,7 @@ roller(df_agg,
 
 #### Lagger
 
-Lagger is also similar to mutater but allows for lag values of variables to be appended to a dataset. Lagged values are often used in time series data. Lags are specified with the lags argument which accepts a numeric vector. The lags number will specify how many preceeding rows values to append as new column. Allows for grouping. 
+Lagger is also similar to mutater but allows for lag values of variables to be appended to a dataset. Lagged values are often used in time series data. Lags are specified with the lags argument which accepts a numeric vector. The lags number will specify how many preceding rows values to append as new column. Allows for grouping. 
 
 ```{r lagger}
 
@@ -315,9 +319,9 @@ Reshaping functions alter the structure of a dataset.
 
 #### Pivoter {#pivoter}
 
-Pivoter reshapes data from long to wide format. This function is similar to the [spread](https://tidyr.tidyverse.org/reference/spread.html). Pivoter allows for multiple key-pairs to be spread across multiple columns however. Transforming datasets from long to wide form (or denormalizing a dataset) is a common step in statistical modeling workflows to convert data into matrix like format with a unique record per row required for most alogrithms. 
+Pivoter reshapes data from long to wide format. This function is similar to the [spread](https://tidyr.tidyverse.org/reference/spread.html). Pivoter allows for multiple key-pairs to be spread across multiple columns however. Transforming datasets from long to wide form (or denormalizing a dataset) is a common step in statistical modeling workflows to convert data into matrix like format with a unique record per row required for most algorithms. 
 
-The id_vars argument here specifies which columns are to be preserved in the resulting output dataset. The group_vars argument specficies which column(s) unique values should be transformed into new columns. Group_vars should be attribute (categorical) columns with relatively low number of unique values. The measure_vars specify the columns converted to the values. Pivoter does accept a single fun argument. Pivoter has an argument for a fill value to apply to missing values created from the pivot. Zero is a commoningly used fill value for pivoter. The sep argument can be modify to alter the output column naming convention 
+The id_vars argument here specifies which columns are to be preserved in the resulting output dataset. The group_vars argument specifies which column(s) unique values should be transformed into new columns. Group_vars should be attribute (categorical) columns with relatively low number of unique values. The measure_vars specify the columns converted to the values. Pivoter does accept a single fun argument. Pivoter has an argument for a fill value to apply to missing values created from the pivot. Zero is a commonly used fill value for pivoter. The sep argument can be modify to alter the output column naming convention 
 
 ```{r pivoter}
 
@@ -359,11 +363,11 @@ pivoter(df,
 
 #### Melter
 
-Melter works in opposite to pivoter by transforming wide data to long format. Similiar to tidyr [gather](https://tidyr.tidyverse.org/reference/gather.html) function.
+Melter works in opposite to pivoter by transforming wide data to long format. Similar to tidyr [gather](https://tidyr.tidyverse.org/reference/gather.html) function.
 
-Similiar to the pivoter, id_vars specify which columns are preserved after the melt. The measure_vars are converted into a two column key-pair. Melter allows for the resulting key-pair columns to be given explict names with the variable_name and value_name arguments respectively.
+Similar to the pivoter, id_vars specify which columns are preserved after the melt. The measure_vars are converted into a two column key-pair. Melter allows for the resulting key-pair columns to be given explicit names with the variable_name and value_name arguments respectively.
 
-The measure_vars melted should be of the same type. Mixing column types will result in the value column reverting to the parent type. For the Spark API, the resulting value column type can be explictly specified with the type argument. 
+The measure_vars melted should be of the same type. Mixing column types will result in the value column reverting to the parent type. For the Spark API, the resulting value column type can be explicitly specified with the type argument. 
 
 ```{r melter}
 
@@ -382,7 +386,7 @@ df %>%
 
 #### Expander
 
-Technically expander converts implicit mising values to explicit values. Expander allows the dataset to be expanded based on a sequence or set of unique values provided. Similiar in scope to tidyr [expand](https://tidyr.tidyverse.org/reference/expand.html) set of functions. 
+Technically expander converts implicit missing values to explicit values. Expander allows the dataset to be expanded based on a sequence or set of unique values provided. Similar in scope to tidyr [expand](https://tidyr.tidyverse.org/reference/expand.html) set of functions. 
 
 Expander has two ways to expand a dataset: either by specifying a set of id_vars and mode or by providing a set of values directly with the fun argument. The behavior of the expansion can be modified with the mode argument. Either the full cartesian product of the id_vars can be specified with mode = 'crossing' or just the unique observed pairs with mode = 'nesting'.
 
@@ -430,7 +434,39 @@ df %>%
 ```
 
 
+#### Sampler
 
+Sampler function allows for Spark and R objects to be created from samples of data. Sampler supports various methods of sampling that differs slightly for R vs Spark:
+
+* __R Sampler Modes:__ 
+    + fraction (n % of total records)
+    + n (n number of records)
+    + head (first n number of records) 
+    + tail (last n number of records)
+* __Spark Sampler Modes:__ 
+    + fraction (n % of total records)
+    + head (first n number of records) 
+  
+Note, the Spark sampling fraction mode is approximate not exact. 
+
+The R method additionally allows for stratified sampling with the group_vars argument and weighted sampling with the weight argument. 
+
+The seed argument allows for the seed to set to a specific number which ensure the random sampling methods generate the same result. The default is NULL which does not set a seed which will create different samples run to run. 
+
+```{r sampler}
+
+# Sampler Ex:
+df_smpl <- sampler(df,
+                   method  = "fraction",
+                   size    = 0.1,
+                   replace = FALSE, 
+                   weight  = NULL,
+                   seed    = 319)
+
+# Row Comparison
+format(nrow(df), big.mark = ",")
+format(nrow(df_smpl), big.mark = ",")
+```
 
 ### Time Series
 
@@ -556,13 +592,15 @@ tibble(id = 1:10,
 
 
 
-### Others
+### Utilities
+
+In the next section are a set of utility functions for data input and output. 
 
 #### Writer
 
 Writer allows for R and Spark objects to be written to files. The file type is configurable and for the Spark method allows for csv, JSON, parquet and others.  The base R version allows for csv and text. Writer modes include append, replace, ignore, and error. The Spark method also allows for the number of partitions to be configured.
 
-The path argument should include the directoy path and dfs protocol if distributed but not the file name. The file name should be provided in the name argument. For partitioned files, the name will be augmented with a file part number starting with 00001. 
+The path argument should include the directory path and dfs protocol if distributed but not the file name. The file name should be provided in the name argument. For partitioned files, the name will be augmented with a file part number starting with 00001. 
 
 ```{r writer}
 
@@ -588,7 +626,7 @@ dir(path, full.names = TRUE)
 
 #### Reader
 
-Reader is a wrapper function to read files into a Spark Connection. Function can be configured to use one of [sparklyr read functions](https://spark.rstudio.com/dplyr/#reading-data) through the use of the type argument. Type argument accepts csv, parquet, json, jdbc, source, table and text inputs. Function allows for repartitioning and overwrite options. 
+Reader is a wrapper function to read files into a Spark Connection. Function can be configured to use one of [sparklyr read functions](https://spark.rstudio.com/dplyr/#reading-data) through the use of the type argument. Type argument accepts csv, parquet, json, jdbc, source, table and text inputs. Function allows for re-partitioning and overwrite options. 
 
 The path argument accepts wildcard and directory paths along with full file paths. If the file is distributed, the dfs protocol should be supplied in the path argument. 
 
@@ -606,46 +644,16 @@ sdf2
 ```
 
 
+```{r remove, echo=FALSE}
 
-
-#### Sampler
-
-Sampler function allows for Spark and R objects to be created from samples of data. Sampler supports various methods of sampling that differs slightly for R vs Spark:
-
-* __R Sampler Modes:__ 
-    + fraction (n % of total records)
-    + n (n number of recoreds)
-    + head (first n number of records) 
-    + tail (last n number of records)
-* __Spark Sampler Modes:__ 
-    + fraction (n % of total records)
-    + head (first n number of records) 
-  
-Note, the Spark sampling fraction mode is approximate not exact. 
-
-The R method additionally allows for stratified sampling with the group_vars argument and weighted sampling with the weight argument. 
-
-The seed argument allows for the seed to set to a specific number which ensure the random sampling methods generate the same result. The default is NULL which does not set a seed which will create different samples run to run. 
-
-```{r sampler}
-
-# Sampler Ex:
-df_smpl <- sampler(df,
-                   method  = "fraction",
-                   size    = 0.1,
-                   replace = FALSE, 
-                   weight  = NULL,
-                   seed    = 319)
-
-# Row Comparison
-format(nrow(df), big.mark = ",")
-format(nrow(df_smpl), big.mark = ",")
+# Remove files
+file.remove(dir(path, full.names = TRUE))
 ```
 
 
 #### Collecter
 
-Collecter is a wrapper function around the sampler and sparklyr collect functions that allow Samples of Spark data to be collected into R. Note if the Spark data is distributed, this function will pull that data to the local R envirnoment on the network. The API is similar to the sampler function with the Spark method capabilities.
+Collecter is a wrapper function around the sampler and sparklyr collect functions that allow Samples of Spark data to be collected into R. Note if the Spark data is distributed, this function will pull that data to the local R environment on the network. The API is similar to the sampler function with the Spark method capabilities.
 
 
 ```{r collecter}
@@ -658,5 +666,161 @@ df_smpl2 <- collecter(sdf,
                       replace = FALSE,
                       seed    = 319)
 df_smpl2
+```
+
+### Insights
+
+The next section contains the two Advanced Analytics functions
+
+#### Correlater
+
+Correlater is a function to calculate the [pearson correlation coeficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient) for two or more numerical variables. The correlater provides the results in long format with a three column schema: variable 1, variable 2, and the correlation coefficient the names of which can be configured.  
+
+Correlater provides an option to transform the data with either the standardize or normalize transformations. The target_var argument allows for 1 to n calculation which can be useful if the correlation of one variable to all others is wanted. Correlater automatically drops all non-numeric type columns.
+
+
+```{r correlater}
+
+# Correlater Example
+df_cor <- summariser(df,
+                  group_vars = c("date", "cat2"),
+                  measure_vars = "metric2",
+                  fun = "sum") %>%
+  pivoter(.,
+          id_vars = "date",
+          group_vars = "cat2",
+          measure_vars = "metric2_sum",
+          fill = 0,
+          sep = NULL) %>% 
+  as_tibble()
+df_cor
+
+correlater(df_cor,
+           target_var  = NULL,
+           transform   = "normalize",
+           remove_diag = TRUE) %>% 
+  arrange(-cor)
+```
+
+
+
+#### Detecter
+
+Detecter is a sophisticated function to identify statistical anomalies in time series data. Detecter is based on the Season Hybrid ESD algorithm^[Season Hybrid ESD algorithm [via](https://arxiv.org/pdf/1704.07706.pdf)] and similar to the AnomalyDetection^[AnomalyDetection R package [via](https://github.com/koalaverse/anomalyDetection)] function in the R package of the same name. 
+
+Detecter works by applying a seasonal decomposition to each time series, removing the trend and seasonal components, and applying a robust outlier analysis to the remainder.
+
+Detecter has Spark and R methods. The Spark method leverages the [sparklyr distributed R](https://spark.rstudio.com/guides/distributed-r/) to apply the core detect R function on a Spark object. Detecter can be applied on one or more numeric variables and allows for grouping. The anomaly detection threshold can be modified and fine tuned with frequency, direction, alpha, max_anoms and trend_window arguments discussed more below. 
+
+Detecter Anomaly Detection API:
+
+* __frequency__: controls the period length of the seasonal component. Number corresponds to number rows in time series. Example - a value of 7 for daily data would detect any weekly seasonality. For more details see the seasonality section from the [Forecasting Principles and Practice eBook](https://robjhyndman.com/hyndsight/seasonal-periods/)
+* __direction__: determines the direction of anomalies. Either positive, negative or both. In many cases, only positive anomalies are desired.
+* __alpha__: controls the statistical outlier threshold. 1-alpha corresponds to the statistical confidence. Smaller values increase the statistical scrutiny of outliers and increase the threshold for anomaly detection. The default is 0.01 or 99%. 
+* __max_anoms__: controls the max amount of anomalies detected as a function of total records. This control is applied after the statistical threshold is applied. The default is 0.01 which corresponds to max anomalies of 1% of total records. 
+* __trend_window__: this controls the sensitivity of the trend detection in the decomposition step. The range is between 0 and 1. Values closer to 1 will smooth out the trend component more. The default is 0.75. 
+
+The detecter output returns the entire input dataset, transformed into long format with a measure value key pair formatting of all measure vars provided, with 6 additional numeric columns.
+
+Detecter Output columns:
+
+* __seasonal__: isolated seasonal component calculated from decomposition
+* __trend__: isolated trend component calculated from decomposition
+* __resid__: remainder of input time series value after seasonal and trend components removed
+* __lower__: lower threshold for negative anomalies 
+* __upper__: upper threshold for positive anomalies
+* __anomaly__: binary flag for anomaly detected. 1 equates to anomaly. 
+
+
+
+```{r detecter}
+
+# Basic Anomaly Ex
+df_anom <- df %>%
+  summariser(.,
+             group_vars   = "date",
+             measure_vars = "metric2",
+             fun          = "mean") %>%
+  mutate_at("metric2_mean", funs(ifelse(
+    row_number() %in% sample(1:n(), 9, replace = FALSE),
+    . * runif(9, 0.75, 1.25),
+    .
+  )))
+gg_line_chart(df_anom,
+              x_variable = "date",
+              y_variable = "metric2_mean",
+              points     = TRUE,
+              title      = "Anomaly Detection Example")
+
+# Anomaly Detection with Both and 10% max anoms
+anom1 <- detecter(df_anom,
+                  index_var    = "date",
+                  measure_vars = "metric2_mean",
+                  frequency    = 7,
+                  direction    = "both",
+                  alpha        = 0.01,
+                  max_anoms    = 0.10)
+
+
+# Detecter Output filtered to anomalies:
+filter(anom1, anomaly == 1)
+
+
+gg_line_chart(anom1,
+              x_variable = "date",
+              y_variable = "value",
+              points     = TRUE,
+              title      = "Anomaly Detection Example",
+              subtitle   = "Max Anoms = 10%, Direction = both") +
+  geom_point(mapping = aes(x = date, y = value),
+             data    = filter(anom1, anomaly == 1),
+             color   = "red",
+             size    = 5,
+             shape   = 1)
+
+# Anomaly Detection with Positive dir and 10% max anoms
+anom2 <- detecter(df_anom,
+                  index_var    = "date",
+                  measure_vars = "metric2_mean",
+                  frequency    = 7,
+                  direction    = "pos",
+                  alpha        = 0.01,
+                  max_anoms    = 0.10)
+
+gg_line_chart(anom2,
+              x_variable = "date",
+              y_variable = "value",
+              points     = TRUE,
+              title      = "Anomaly Detection Example",
+              subtitle   = "Max Anoms = 10%, Direction = pos") +
+  geom_point(mapping = aes(x = date, y = value),
+             data    = filter(anom2, anomaly == 1),
+             color   = "red",
+             size    = 5,
+             shape   = 1)
+
+
+# Anomaly Detection with Positive dir and 2% max anoms
+anom3 <- detecter(df_anom,
+                  index_var    = "date",
+                  measure_vars = "metric2_mean",
+                  frequency    = 7,
+                  direction    = "pos",
+                  alpha        = 0.01,
+                  max_anoms    = 0.02)
+
+gg_line_chart(anom2,
+              x_variable = "date",
+              y_variable = "value",
+              points     = TRUE,
+              title      = "Anomaly Detection Example",
+              subtitle   = "Max Anoms = 02%, Direction = pos") +
+  geom_point(mapping = aes(x = date, y = value),
+             data    = filter(anom3, anomaly == 1),
+             color   = "red",
+             size    = 5,
+             shape   = 1)
+
+
 ```
 
