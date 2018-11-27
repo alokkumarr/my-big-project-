@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-a2munge is an R package to help create _Big Data_ Advanced Analytic data pipelines. The package contains a suite of Spark^[Spark Data Processing Engine [via](https://spark.apache.org/)] compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is design to efficiently create such pipelines. 
+a2munge is an R package to help create Advanced Analytic data pipelines. The package contains a suite of R and Spark^[Spark Data Processing Engine [via](https://spark.apache.org/)] compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is design to efficiently create such pipelines. 
  
  
 ### Features
