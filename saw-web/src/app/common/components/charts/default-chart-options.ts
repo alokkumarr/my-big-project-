@@ -16,8 +16,29 @@ export const globalChartOptions = {
   }
 };
 
-export const chartOptions = {
-  colors: CHART_COLORS,
+const baseChartOptions = {
+  colors: CHART_COLORS,,
+  title: {
+    text: '',
+    y: 5
+  },
+  lang: {
+    noData: 'No data to display'
+  },
+  noData: {
+    style: {
+      fontWeight: 'bold',
+      fontSize: '15px',
+      color: '#303030'
+    }
+  },
+  exporting: {
+    enabled: false
+  },
+  credits: false
+};
+
+export const chartOptions = defaultsDeep({
   plotOptions: {
     series: {
       // disable turboTreshold for biggger datasets
@@ -29,9 +50,6 @@ export const chartOptions = {
         lineColor: null // inherit from series
       }
     }
-  },
-  exporting: {
-    enabled: false
   },
   legend: {
     verticalAlign: 'top',
@@ -51,27 +69,10 @@ export const chartOptions = {
     pointFormat:
       '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
       'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
-  },
-  title: {
-    text: '',
-    y: 5
-  },
-  lang: {
-    noData: 'No data to display'
-  },
-  noData: {
-    style: {
-      fontWeight: 'bold',
-      fontSize: '15px',
-      color: '#303030'
-    }
-  },
-  credits: false
-};
+  }
+}, baseChartOptions);
 
-export const geoChartOptions = defaultsDeep({
-
-}, chartOptions);
+export const geoChartOptions = defaultsDeep({}, baseChartOptions);
 
 export const stockChartOptions = defaultsDeep({
   plotOptions: {

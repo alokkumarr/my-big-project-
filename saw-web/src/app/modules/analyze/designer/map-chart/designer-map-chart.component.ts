@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as split from 'lodash/split';
@@ -22,7 +22,7 @@ export enum MapChartStates {
   templateUrl: 'designer-map-chart.component.html',
   styleUrls: ['designer-map-chart.component.scss']
 })
-export class DesignerMapChartComponent implements OnInit {
+export class DesignerMapChartComponent {
   _fields: any;
   _data: Array<any>;
   _auxSettings: any = {};
@@ -67,24 +67,38 @@ export class DesignerMapChartComponent implements OnInit {
     private _mapDataService: MapDataService
   ) {}
 
-  ngOnInit() {
-    this.setChartConfig(this._fields, this._data);
-  }
-
   async setChartConfig(fields, data = []) {
+    const legend = {
+      layout: 'horizontal',
+      verticalAlign: 'top'
+    };
+    const colorAxis = {
+      min: 1,
+      type: 'logarithmic',
+      minColor: '#FFFFFF',
+      maxColor: '#1d3ab2'
+    };
     const series = await this.getSeries('geo', fields, map(data, clone));
 
+    // series['dataLabels'] = {
+    //   enabled: true,
+    //   color: '#FFFFFF',
+    //   format: '{point.code}'
+    // };
     this.chartOptions = {
-      legend: this.getLegendConfig(),
+      // legend: this.getLegendConfig(),
       mapNavigation: {
         enabled: true
       },
-      series
+      series,
+      legend,
+      colorAxis
     };
   }
 
   getSeries(type, fields, gridData) {
     const series = this._chartService.splitToSeries(gridData, fields, type);
+    series[0].data = map(series[0].data, ({x, y}) => ({value: y, x}));
     const xField = fields.x;
     const region = xField.region;
     const [, identifier] = split(xField.geoType, ':');
