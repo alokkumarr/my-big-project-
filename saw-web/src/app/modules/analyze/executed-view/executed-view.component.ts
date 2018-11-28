@@ -157,6 +157,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         const lastExecutionId = get(analyses, '[0].id', null);
         if (!this.executionId && lastExecutionId) {
           this.executionId = lastExecutionId;
+          if (!this.executedAt) {
+            this.setExecutedAt(this.executionId);
+          }
         }
       });
     }
