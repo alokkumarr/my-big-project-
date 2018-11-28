@@ -104,14 +104,7 @@ public String getJsonString() {
     if (sqlBuilderNode.getBooleanCriteria() !=null ){
     List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
     List<QueryBuilder> builder = new ArrayList<>();
-
-    if (dataSecurityKeyNode!=null) {
-  	  for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
-  	      TermsQueryBuilder dataSecurityBuilder = new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
-  	      builder.add(dataSecurityBuilder);
-  	      }
-    }
-
+        QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder);
     for (com.synchronoss.querybuilder.model.pivot.Filter item : filters)
     {
       if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null

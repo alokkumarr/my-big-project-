@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
+import { Router } from '@angular/router';
 
 import {
   AnalysisDialogData,
@@ -12,7 +13,6 @@ import {
   Artifact,
   Format
 } from '../types';
-import { DesignerDialogComponent } from '../designer/dialog';
 import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
 import {
   DesignerFilterDialogComponent,
@@ -26,7 +26,7 @@ import { ConfirmDialogData } from '../../../common/types';
 
 @Injectable()
 export class AnalyzeDialogService {
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog, private router: Router) {}
 
   openNewAnalysisDialog(analysisStarter: AnalysisStarter) {
     const data: AnalysisDialogData = {
@@ -45,13 +45,13 @@ export class AnalyzeDialogService {
   }
 
   openAnalysisDialog(data: AnalysisDialogData) {
-    return this.dialog.open(DesignerDialogComponent, {
-      panelClass: 'designer-dialog',
-      width: '100vw',
-      maxWidth: '100vw',
-      height: '100vh',
-      data
-    } as MatDialogConfig);
+    const mode = data.designerMode || 'new';
+    const analysisStarter = data.analysisStarter || {};
+    const analysis = data.analysis ? { analysisId: data.analysis.id } : {};
+
+    return this.router.navigate(['analyze/designer'], {
+      queryParams: { ...analysisStarter, ...analysis, mode }
+    });
   }
 
   openSortDialog(sorts: Sort[], artifacts: Artifact[]) {
