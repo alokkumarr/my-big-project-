@@ -181,7 +181,7 @@ const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
     ...COMPONENTS,
     ...DIRECTIVES
   ],
-  providers: [...INTERCEPTORS, ...GUARDS, ...SERVICES],
+  providers: [...INTERCEPTORS, ...GUARDS, CustomIconService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class CommonModuleTs {
