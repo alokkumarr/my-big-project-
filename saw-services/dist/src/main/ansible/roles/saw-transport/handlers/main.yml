@@ -15,6 +15,16 @@
 - name: restart saw-transport-executor-regular
   systemd: name=saw-transport-executor@regular-{{ item }} state=stopped daemon_reload=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
+  # Workaround: Occasionally deployments will fail with "Job for
+  # service canceled".  The root cause is not known, but retry as a
+  # workaround for now.
+  register: result
+  until: result is success
 - name: restart saw-transport-executor-fast
   systemd: name=saw-transport-executor@fast-{{ item }} state=stopped daemon_reload=true
   with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}
+  # Workaround: Occasionally deployments will fail with "Job for
+  # service canceled".  The root cause is not known, but retry as a
+  # workaround for now.
+  register: result
+  until: result is success

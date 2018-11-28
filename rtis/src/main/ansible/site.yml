@@ -1,0 +1,5 @@
+- name: RTIS
+  hosts: sip-rtis
+  become: true
+  roles:
+    - sip-rtis
