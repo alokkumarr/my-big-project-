@@ -14,7 +14,7 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   BisFileLog findByPid(String pid);
 
   @Query("SELECT COUNT(pid)>0 from BisFileLog Logs where Logs.fileName = :fileName "
-      + "and Logs.mflFileStatus != 'FAILED' and Logs.mflFileStatus != 'INPROGRESS' ")
+      + "and Logs.mflFileStatus != 'FAILED' ")
   boolean isFileNameExists(@Param("fileName") String fileName);
 
 }
