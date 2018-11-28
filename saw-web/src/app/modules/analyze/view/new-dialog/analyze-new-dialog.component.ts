@@ -168,11 +168,5 @@ export class AnalyzeNewDialogComponent {
       this._analyzeDialogService.openNewAnalysisDialog(model);
     });
     this._dialogRef.close();
-    // .afterClosed()
-    // .subscribe(successfullySaved => {
-    //   if (successfullySaved) {
-    //     this._dialogRef.close(successfullySaved);
-    //   }
-    // });
   }
 }
