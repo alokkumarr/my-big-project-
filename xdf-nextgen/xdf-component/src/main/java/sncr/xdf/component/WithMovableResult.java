@@ -40,20 +40,27 @@ public interface WithMovableResult {
 
                 if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
                     Path objOutputPath = new Path(moveTask.dest);
+
+                    WithMovableResultHelper.logger.debug("Object output path = " + objOutputPath);
+                    WithMovableResultHelper.logger.debug("Old path = " + oldPath);
                     try {
-                        if (ctx.fs.exists(objOutputPath) && oldPath != null && objOutputPath.toString().compareTo(oldPath.toString()) != 0) {
+
+                        if (oldPath == null && ctx.fs.exists(objOutputPath)) {
                             WithMovableResultHelper.logger.info("Data exists. Clearing everything");
 
-                            FileStatus[] list = ctx.fs.listStatus(objOutputPath);
-                            for (int i = 0; i < list.length; i++) {
-                                ctx.fs.delete(list[i].getPath(), true);
-                            }
+                            clearDirectory(objOutputPath, ctx);
+                            oldPath = objOutputPath;
+                        }
+                        else if (ctx.fs.exists(objOutputPath) && oldPath != null && objOutputPath.toString().compareTo(oldPath.toString()) != 0) {
+                            WithMovableResultHelper.logger.info("Data exists. Clearing everything");
 
+                            clearDirectory(objOutputPath, ctx);
                             oldPath = objOutputPath;
 
                         } else {
                             WithMovableResultHelper.logger.warn("Output directory: " + objOutputPath + " for data object: " + moveTask.objectName + " does not Exists -- create it");
                             ctx.fs.mkdirs(objOutputPath);
+                            oldPath = objOutputPath;
                         }
                     } catch (IOException e) {
                         WithMovableResultHelper.logger.warn("IO exception in attempt to create/clean up: destination directory", e);
@@ -174,6 +181,13 @@ public interface WithMovableResult {
 
         String fileExt = moveDesc.format;
         return moveDesc.dest + Path.SEPARATOR + moveDesc.objectName + "." + ctx.batchID + "." + ctx.startTs + "." + String.format("%05d", fileCounter ) + "." + fileExt;
+    }
+
+    default void clearDirectory (Path location, Context ctx) throws IOException {
+        FileStatus[] list = ctx.fs.listStatus(location);
+        for (int i = 0; i < list.length; i++) {
+            ctx.fs.delete(list[i].getPath(), true);
+        }
     }
 
 
