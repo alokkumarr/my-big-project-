@@ -1,1 +1,1 @@
-export { DesignerMapChartComponent } from './designer-map-chart.componenet';
+export { DesignerMapChartComponent } from './designer-map-chart.component';

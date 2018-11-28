@@ -27,7 +27,7 @@ export class DesignerChartComponent implements OnInit {
     height: 500
   };
 
-  @Input() chartType: string;
+  @Input() public chartType: string;
 
   @Input() sorts: Array<Sort> = [];
 

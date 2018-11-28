@@ -12,6 +12,7 @@ import { ArtifactColumnChart } from '../../../../models/artifact-column.model';
 class ChartStubComponent {
   @Input() updater: any;
   @Input() options: any;
+  @Input() chartType: string;
 }
 
 class ChartStubService {}

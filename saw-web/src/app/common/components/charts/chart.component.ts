@@ -46,8 +46,7 @@ export const CHART_SETTINGS_OBJ = [
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   updater: any;
-  @Input()
-  chartType: string;
+  @Input() chartType: string;
   @Input()
   enableExport: boolean;
   @ViewChild('container')
