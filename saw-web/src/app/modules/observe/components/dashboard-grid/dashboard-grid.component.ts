@@ -28,6 +28,7 @@ import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
 
+import { CUSTOM_HEADERS } from '../../../../common/consts';
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
 import { GlobalFilterService } from '../../services/global-filter.service';
@@ -355,21 +356,23 @@ export class DashboardGridComponent
         return;
       }
 
-      this.analyze.readAnalysis(tile.id).then(
-        data => {
-          tile.analysis = data;
-          tile.success = true;
-          this.addAnalysisTile(tile);
-          tileLoaded();
-          this.getDashboard.emit({ changed: true, dashboard: this.model });
-          this.refreshTile(tile);
-        },
-        err => {
-          tile.success = false;
-          this.dashboard.push(tile);
-          tileLoaded();
-        }
-      );
+      this.analyze
+        .readAnalysis(tile.id, { [CUSTOM_HEADERS.SKIP_TOAST]: '1' })
+        .then(
+          data => {
+            tile.analysis = data;
+            tile.success = true;
+            this.addAnalysisTile(tile);
+            tileLoaded();
+            this.getDashboard.emit({ changed: true, dashboard: this.model });
+            this.refreshTile(tile);
+          },
+          err => {
+            tile.success = false;
+            this.dashboard.push(tile);
+            tileLoaded();
+          }
+        );
     });
 
     this.initialised = true;
