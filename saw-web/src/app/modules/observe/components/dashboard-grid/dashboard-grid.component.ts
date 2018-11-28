@@ -206,6 +206,10 @@ export class DashboardGridComponent
   }
 
   refreshTile(item) {
+    if (item.success === false) {
+      return;
+    }
+
     const dimensions = this.getDimensions(item);
     if (item.kpi) {
       item.dimensions = dimensions;
@@ -342,6 +346,7 @@ export class DashboardGridComponent
       }
       if (tile.kpi || tile.bullet) {
         this.dashboard.push(tile);
+        tile.success = true;
         tileLoaded();
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         setTimeout(() => {
@@ -350,15 +355,21 @@ export class DashboardGridComponent
         return;
       }
 
-      this.analyze.readAnalysis(tile.id).then(data => {
-        tile.analysis = data;
-        this.addAnalysisTile(tile);
-        tileLoaded();
-        this.getDashboard.emit({ changed: true, dashboard: this.model });
-        this.refreshTile(tile);
-      }, err => {
-        tileLoaded();
-      });
+      this.analyze.readAnalysis(tile.id).then(
+        data => {
+          tile.analysis = data;
+          tile.success = true;
+          this.addAnalysisTile(tile);
+          tileLoaded();
+          this.getDashboard.emit({ changed: true, dashboard: this.model });
+          this.refreshTile(tile);
+        },
+        err => {
+          tile.success = false;
+          this.dashboard.push(tile);
+          tileLoaded();
+        }
+      );
     });
 
     this.initialised = true;
