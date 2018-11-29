@@ -34,7 +34,7 @@ public interface WithMovableResult {
             int fileCounter = 0;
             WithMovableResultHelper.logger.debug("Total movable files " + resultDataDesc.size());
 
-            Path oldPath = null;
+            Path oldPath = new Path("hdfs:///");
             for (MoveDataDescriptor moveTask : resultDataDesc) {
                 WithMovableResultHelper.logger.debug("Move data descriptor " + moveTask);
 
@@ -45,13 +45,7 @@ public interface WithMovableResult {
                     WithMovableResultHelper.logger.debug("Old path = " + oldPath);
                     try {
 
-                        if (oldPath == null && ctx.fs.exists(objOutputPath)) {
-                            WithMovableResultHelper.logger.info("Data exists. Clearing everything");
-
-                            clearDirectory(objOutputPath, ctx);
-                            oldPath = objOutputPath;
-                        }
-                        else if (ctx.fs.exists(objOutputPath) && oldPath != null && objOutputPath.toString().compareTo(oldPath.toString()) != 0) {
+                        if (ctx.fs.exists(objOutputPath) && oldPath != null && objOutputPath.toString().compareTo(oldPath.toString()) != 0) {
                             WithMovableResultHelper.logger.info("Data exists. Clearing everything");
 
                             clearDirectory(objOutputPath, ctx);
