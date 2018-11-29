@@ -30,5 +30,5 @@ sip:
    index: 0
 saw-analysis-service-url: http://localhost:9200/analysis
 saw-dispatch-service-url: http://localhost:9400/exports
-bis-transfer-url: http://localhost:9642/ingestion/batch/sftp/channel/transfers
+bis-transfer-url: http://localhost:9642/ingestion/batch/sftp/channel/transfers/data
        

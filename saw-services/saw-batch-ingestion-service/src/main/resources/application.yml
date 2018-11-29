@@ -39,6 +39,11 @@ management:
   endpoint:
     health:
       show-details: always
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
 sip:
   service:
     index: 0    

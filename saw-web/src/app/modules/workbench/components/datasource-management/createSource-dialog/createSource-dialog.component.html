@@ -113,7 +113,8 @@
         </form>
         <mat-divider></mat-divider>
         <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
-          <button mat-raised-button color="primary" matStepperPrevious>Previous</button>
+          <button mat-raised-button color="primary" *ngIf="isTypeEditable" matStepperPrevious>Previous</button>
+          <button mat-stroked-button color="primary" *ngIf="!isTypeEditable" (click)="onCancelClick()" color="warn" matStepperPrevious>Cancel</button>
           <button mat-stroked-button color="primary" (click)="testChannel(detailsFormGroup.value)" i18n [disabled]="!detailsFormGroup.valid">
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
