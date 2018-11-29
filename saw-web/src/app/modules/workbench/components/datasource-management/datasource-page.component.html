@@ -114,14 +114,16 @@
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Password : </span>
-              <span *ngIf="show; else hidePwd">{{selectedSourceData?.password}}</span>
-              <ng-template #hidePwd>&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;</ng-template>
-              <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
-                <mat-icon fontIcon="icon-show"></mat-icon>
-              </button>
-              <button *ngIf="show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
-                <mat-icon fontIcon="icon-hide"></mat-icon>
-              </button>
+              <div *ngIf="selectedSourceData">
+                  <span *ngIf="show; else hidePwd">{{selectedSourceData?.password}}</span>
+                  <ng-template #hidePwd>&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;</ng-template>
+                  <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                    <mat-icon fontIcon="icon-show"></mat-icon>
+                  </button>
+                  <button *ngIf="show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                    <mat-icon fontIcon="icon-hide"></mat-icon>
+                  </button>
+              </div>
             </div>
           </div>
           <mat-divider></mat-divider>
