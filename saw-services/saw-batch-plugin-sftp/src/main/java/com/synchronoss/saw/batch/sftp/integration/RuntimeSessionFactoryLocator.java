@@ -79,8 +79,10 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         defaultSftpSessionFactory.setUser(userName);
         defaultSftpSessionFactory.setPassword(password);
         defaultSftpSessionFactory.setAllowUnknownKeys(true);
+        defaultSftpSessionFactory.setTimeout(60000);
         Properties prop = new Properties();
         prop.setProperty("StrictHostKeyChecking", "no");
+        prop.setProperty("bufferSize", "100000");
         //prop.setProperty("PreferredAuthentications", "password");
         defaultSftpSessionFactory.setSessionConfig(prop);
       } catch (IOException e) {

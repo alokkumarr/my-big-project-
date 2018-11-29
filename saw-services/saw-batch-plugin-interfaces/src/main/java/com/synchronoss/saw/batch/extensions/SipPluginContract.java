@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -29,23 +31,23 @@ public abstract class SipPluginContract {
   /**
    * This method is to test connect the route.
    */
-  public abstract HttpStatus connectRoute(Long entityId) throws SipNestedRuntimeException;
+  public abstract String connectRoute(Long entityId) throws SipNestedRuntimeException;
 
   /**
    * This method is to test connect the source.
    */
-  public abstract HttpStatus connectChannel(Long entityId) throws SipNestedRuntimeException;
+  public abstract String connectChannel(Long entityId) throws SipNestedRuntimeException;
 
   /**
    * This method is to test connect the route.
    */
-  public abstract HttpStatus immediateConnectRoute(BisConnectionTestPayload payload)
+  public abstract String immediateConnectRoute(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException, IOException;
 
   /**
    * This method is to test connect the source.
    */
-  public abstract HttpStatus immediateConnectChannel(BisConnectionTestPayload payload)
+  public abstract String immediateConnectChannel(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException;
 
   /**
@@ -96,5 +98,6 @@ public abstract class SipPluginContract {
     DateFormat dtFormat = new SimpleDateFormat("MMddyyyyhhmmss");
     return dtFormat.format(new Date());
   }
+
 
 }

@@ -21,6 +21,12 @@ export class DefaultAnalyzeCategoryGuard implements CanActivate {
     if (params && params.keys.length) {
       return true;
     }
+
+    const queryParams: ParamMap = fpGet('children[0].queryParamMap', route);
+    if (queryParams && queryParams.keys.length) {
+      return true;
+    }
+
     this._menu.getMenu('ANALYZE').then(menu => {
       this.goToDefaultChildStateIfNeeded(menu);
     });
