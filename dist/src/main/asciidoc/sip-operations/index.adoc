@@ -110,6 +110,20 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older SAW versions.
 
+==== Upgrading to SIP 3.1
+
+The SIP environment configuration file must contain the roles
+`sip-rtis` and `sip-rtps`, as shown below:
+
+        [sip-rtis]
+        [sip-rtps]
+
+The environment configurations of previous SIP versions might not
+contain these roles, so they have to be added to the configuration
+file before deploying a newer SIP version.  The roles can however be
+left empty (no hosts listed under them), if RTIS and RTPS are not to
+be installed.
+
 ==== Upgrading to SAW 2.5
 
 Before upgrading, install and configure Apache Livy from the MapR
