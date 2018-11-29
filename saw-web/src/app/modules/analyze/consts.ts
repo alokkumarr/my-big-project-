@@ -83,7 +83,7 @@ export const TYPE_ICONS = [{
   label: 'String',
   value: 'string'
 }, {
-  icon: 'icon-geo-type',
+  icon: 'icon-geo-chart',
   label: 'Geo',
   value: 'geo'
 }, {
@@ -231,7 +231,7 @@ export const ANALYSIS_METHODS = [
           },
           {
             label: 'Geolocation',
-            icon: { font: 'icon-Candlestick-icon' },
+            icon: { font: 'icon-geo-chart' },
             type: 'chart:geo',
             typeOnBackEnd: 'chart:geo'
           }
