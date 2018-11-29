@@ -45,7 +45,7 @@ public interface WithMovableResult {
                     WithMovableResultHelper.logger.debug("Old path = " + oldPath);
                     try {
 
-                        if (ctx.fs.exists(objOutputPath) && oldPath != null && objOutputPath.toString().compareTo(oldPath.toString()) != 0) {
+                        if (ctx.fs.exists(objOutputPath) && objOutputPath.toString().compareTo(oldPath.toString()) != 0) {
                             WithMovableResultHelper.logger.info("Data exists. Clearing everything");
 
                             clearDirectory(objOutputPath, ctx);
@@ -186,8 +186,8 @@ public interface WithMovableResult {
      */
     default void clearDirectory (Path location, Context ctx) throws IOException {
         FileStatus[] list = ctx.fs.listStatus(location);
-        for (int i = 0; i < list.length; i++) {
-            ctx.fs.delete(list[i].getPath(), true);
+        for (FileStatus file: list) {
+            ctx.fs.delete(file.getPath(), true);
         }
     }
 
