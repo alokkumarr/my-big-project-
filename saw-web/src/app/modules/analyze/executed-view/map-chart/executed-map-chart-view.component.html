@@ -1,0 +1,11 @@
+<div style="width:84%;float: left;">
+  <h1 style="padding:0;" class="chart report-title" [textContent]="analysis.chartTitle || analysis.name"></h1>
+</div>
+
+<designer-map-chart [chartType]="analysis.chartType"
+                    [auxSettings]="{legend: analysis.legend}"
+                    [data]="data"
+                    [sqlBuilder]="analysis.sqlBuilder"
+                    [actionBus]="updater"
+>
+</designer-map-chart>

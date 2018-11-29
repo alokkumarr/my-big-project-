@@ -37,6 +37,8 @@ export class DesignerMapChartComponent implements OnInit {
   public chartOptions = {};
   public chartUpdater = new Subject();
 
+  @Input() actionBus;
+
   @Input()
   set sqlBuilder(sqlBuilder: SqlBuilderChart) {
     const { dataFields, nodeFields } = sqlBuilder;

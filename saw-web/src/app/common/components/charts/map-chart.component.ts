@@ -22,10 +22,6 @@ interface IChartUpdate {
   data: any;
 }
 
-interface IChartAction {
-  name: 'export';
-}
-
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'map-chart',
@@ -40,7 +36,7 @@ export class MapChartComponent {
     }
   }
   @Input()
-  set actionBus(actionBus: Subject<IChartAction>) {
+  set actionBus(actionBus: Subject<any>) {
     this._actionBus = actionBus;
     if (isObservable(actionBus)) {
       actionBus.subscribe(this.onAction.bind(this));
@@ -59,7 +55,7 @@ export class MapChartComponent {
   public highmaps: any = Highmaps;
   public chart: any = null;
   public _updater: Subject<IChartUpdate>;
-  public _actionBus: Subject<IChartAction>;
+  public _actionBus: Subject<any>;
   public _options: any;
   public config: any = {};
   public chartSettingsType: string;
@@ -90,11 +86,9 @@ export class MapChartComponent {
     this.chart.update(update, true, true);
   }
 
-  onAction(action: IChartAction) {
-    switch (action.name) {
-      case 'export':
-        this.onExport();
-      break;
+  onAction(action: any) {
+    if (action && action.export) {
+      this.onExport();
     }
   }
 

@@ -15,6 +15,7 @@ require('highcharts/modules/exporting')(Highstock);
 require('highcharts/modules/offline-exporting')(Highstock);
 
 require('highcharts/modules/exporting')(Highmaps);
+require('highcharts/modules/offline-exporting')(Highmaps);
 
 import { ChartComponent } from './chart.component';
 import { MapChartComponent } from './map-chart.component';
