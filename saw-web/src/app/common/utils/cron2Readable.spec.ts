@@ -21,9 +21,19 @@ describe('Cron to Readable (cron2Readable.ts)', () => {
   });
 
   it('should generate hourly schedule', () => {
+    const timeFormat = 'mm';
     const { cronExpression, activeTab } = hourlyCron;
+    const [, minutes] = cronExpression.split(' ');
+    const momentInput = {
+      hours: 1,
+      minutes: parseInt(minutes, 10)
+    };
+    const localTime = moment
+      .utc(momentInput)
+      .local()
+      .format(timeFormat);
     expect(generateSchedule(cronExpression, activeTab)).toEqual(
-      'At 02 minutes past the hour'
+      `At ${localTime} minutes past the hour`
     );
   });
 
