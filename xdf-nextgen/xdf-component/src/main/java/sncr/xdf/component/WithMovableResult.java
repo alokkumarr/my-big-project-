@@ -183,6 +183,13 @@ public interface WithMovableResult {
         return moveDesc.dest + Path.SEPARATOR + moveDesc.objectName + "." + ctx.batchID + "." + ctx.startTs + "." + String.format("%05d", fileCounter ) + "." + fileExt;
     }
 
+    /**
+     * Removed all the files inside the given directory
+     *
+     * @param location HDFS directory which needs to be cleaned up
+     * @param ctx XDF context object
+     * @throws IOException Incase the directory doesn't exist
+     */
     default void clearDirectory (Path location, Context ctx) throws IOException {
         FileStatus[] list = ctx.fs.listStatus(location);
         for (int i = 0; i < list.length; i++) {
