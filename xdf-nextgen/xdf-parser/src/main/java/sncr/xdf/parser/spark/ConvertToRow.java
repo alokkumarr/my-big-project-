@@ -92,9 +92,7 @@ public class ConvertToRow implements Function<String, Row> {
 
         logger.debug("Parsing line " + line);
 
-        String[] parsed = null;
-
-        parsed = parser.parseLine(line);
+        String[] parsed = parser.parseLine(line);
 
         if (parsed == null) {
             logger.info("Unable to parse the record");
