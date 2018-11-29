@@ -87,11 +87,7 @@ export class MapChartComponent {
   }
 
   onOptionsUpdate(update: IChartUpdate) {
-    this.chart.update({
-      [update.path]: update.data
-    },
-      false
-    );
+    this.chart.update(update, true, true);
   }
 
   onAction(action: IChartAction) {

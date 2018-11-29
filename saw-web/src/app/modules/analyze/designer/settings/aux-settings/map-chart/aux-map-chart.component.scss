@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  margin: 0 10px;
+
+  .chart-legend {
+    text-align: right;
+  }
+
+  .chart-title {
+    width: 55%;
+    margin: 1% 0 0% 21%;
+    text-align: center;
+
+    label {
+      word-wrap: break-word;
+    }
+
+    mat-form-field {
+      width: 100%;
+      text-align: center;
+    }
+
+    .chart-designer-title {
+      color: #333;
+      font-size: 17px;
+      fill: #333;
+    }
+
+    mat-icon.icon-edit-solid {
+      cursor: pointer;
+    }
+  }
+
+}
+
+button.chart-title-button {
+  font-size: 14px;
+  min-width: 9%;
+}

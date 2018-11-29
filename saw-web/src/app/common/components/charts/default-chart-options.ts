@@ -17,7 +17,7 @@ export const globalChartOptions = {
 };
 
 const baseChartOptions = {
-  colors: CHART_COLORS,,
+  colors: CHART_COLORS,
   title: {
     text: '',
     y: 5

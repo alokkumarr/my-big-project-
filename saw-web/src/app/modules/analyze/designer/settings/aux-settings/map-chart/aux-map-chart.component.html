@@ -1,1 +1,31 @@
-<div></div>
+<div fxLayout="column">
+  <div class="chart-legend">
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label>Legend Position</mat-label>
+      <mat-select [(ngModel)]="legend.align" (selectionChange)="onLegendChange()">
+        <mat-option *ngFor="let pos of legend.options.align" [value]="pos.name">
+          {{ pos.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="select-form-field" appearance="outline" style="margin-left: 10px;">
+      <mat-label>Legend Layout</mat-label>
+      <mat-select placeholder="Legend Layout" [(ngModel)]="legend.layout" (selectionChange)="onLegendChange()">
+        <mat-option *ngFor="let layout of legend.options.layout" [value]="layout.name">
+          {{ layout.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="chart-title">
+    <label class="chart-designer-title" *ngIf="!editMode">{{chartTitle}}</label>
+    <mat-icon *ngIf="!editMode" class="mat-icon material-icons icon-edit-solid" fonticon="icon-filter" (click)="EditMode = true"></mat-icon>
+    <mat-form-field *ngIf="editMode" style="margin-bottom: 2px;">
+      <input style="width: 84%;padding-bottom: 8px;" matInput
+             type="text"
+             [(ngModel)]="chartTitle"
+             autocomplete="off"
+             maxlength="50" required/>
+      <button mat-button color="primary" class="mat-raised-button mat-primary chart-title-button" (click)="onTitleChange()" [disabled]="!chartTitle">Apply</button>
+    </mat-form-field>
+  </div>

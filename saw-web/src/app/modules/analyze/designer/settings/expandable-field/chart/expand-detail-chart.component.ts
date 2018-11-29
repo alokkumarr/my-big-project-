@@ -66,9 +66,10 @@ export class ExpandDetailChartComponent implements OnInit {
     this.hasDateInterval = DATE_TYPES.includes(type);
     this.changeSample();
 
+    const defaultRegion = this.artifactColumn.region || {name: ''};
     this.filteredRegions = this.stateForm.get('regionCtrl').valueChanges
       .pipe(
-        startWith({name: ''}),
+        startWith(defaultRegion),
         map(value => {
           if (isString(value)) {
             return this._filterRegions(value);

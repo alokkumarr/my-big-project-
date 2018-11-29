@@ -1,13 +1,17 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import * as debounce from 'lodash/debounce';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as split from 'lodash/split';
 import * as clone from 'lodash/clone';
+import * as omitBy from 'lodash/omitBy';
+import * as isNil from 'lodash/isNil';
+import * as isArray from 'lodash/isArray';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpMapValues from 'lodash/fp/mapValues';
-import { Subject } from 'rxjs';
+import { Subject, Observable, isObservable } from 'rxjs';
 
 import { SqlBuilderChart } from '../types';
 import { ChartService } from '../../services/chart.service';
@@ -22,10 +26,12 @@ export enum MapChartStates {
   templateUrl: 'designer-map-chart.component.html',
   styleUrls: ['designer-map-chart.component.scss']
 })
-export class DesignerMapChartComponent {
+export class DesignerMapChartComponent implements OnInit {
   _fields: any;
   _data: Array<any>;
   _auxSettings: any = {};
+  _mapData: Observable<any>;
+  _rawSeries: any;
   public MapChartStates = MapChartStates;
   public currentState: MapChartStates = MapChartStates.NO_MAP_SELECTED;
   public chartOptions = {};
@@ -45,7 +51,10 @@ export class DesignerMapChartComponent {
       const oldState = this.currentState;
       this.currentState = MapChartStates.OK;
       if (this.currentState !== oldState) {
-        this.setChartConfig(this._fields, this._data);
+        if (this.currentState === MapChartStates.OK) {
+          this._mapData = this._mapDataService.getMapData(xField.region);
+          this.setSeries();
+        }
       }
     }
   }
@@ -53,11 +62,23 @@ export class DesignerMapChartComponent {
   @Input()
   set auxSettings(settings) {
     this._auxSettings = settings;
+    this.updateSettings(settings);
   }
 
   @Input()
   set data(executionData) {
+    if (!executionData) {
+      return;
+    }
+    const series = this._chartService.splitToSeries(
+      map(executionData, clone),
+      this._fields,
+      'geo'
+    );
+    series[0].data = map(series[0].data, ({ x, y }) => ({ value: y, x }));
     this._data = executionData;
+    this._rawSeries = series;
+    this.setSeries();
   }
 
   @Input() chartType: String;
@@ -65,9 +86,39 @@ export class DesignerMapChartComponent {
   constructor(
     private _chartService: ChartService,
     private _mapDataService: MapDataService
-  ) {}
+  ) {
+    this.setSeries = debounce(this.setSeries, 50);
+  }
 
-  async setChartConfig(fields, data = []) {
+  ngOnInit() {
+    this.setChartConfig();
+  }
+
+  setSeries() {
+    const mapData$ = this._mapData;
+    const rawSeries = this._rawSeries;
+    const fields = this._fields;
+
+    if (
+      isObservable(this._mapData) &&
+      isArray(rawSeries) &&
+      fields &&
+      fields.x
+    ) {
+      const xField = fields.x;
+      const [, identifier] = split(xField.geoType, ':');
+      rawSeries[0].joinBy = [identifier, 'x'];
+      mapData$.subscribe(mapData => {
+        rawSeries[0].mapData = mapData;
+        const updateObj = {
+          series: rawSeries
+        };
+        this.chartUpdater.next(updateObj);
+      });
+    }
+  }
+
+  async setChartConfig() {
     const legend = {
       layout: 'horizontal',
       verticalAlign: 'top'
@@ -76,59 +127,46 @@ export class DesignerMapChartComponent {
       min: 1,
       type: 'logarithmic',
       minColor: '#FFFFFF',
-      maxColor: '#1d3ab2'
+      maxColor: '#1A89D4'
     };
-    const series = await this.getSeries('geo', fields, map(data, clone));
 
-    // series['dataLabels'] = {
-    //   enabled: true,
-    //   color: '#FFFFFF',
-    //   format: '{point.code}'
-    // };
     this.chartOptions = {
-      // legend: this.getLegendConfig(),
       mapNavigation: {
         enabled: true
       },
-      series,
+      // series,
       legend,
       colorAxis
     };
   }
 
-  getSeries(type, fields, gridData) {
-    const series = this._chartService.splitToSeries(gridData, fields, type);
-    series[0].data = map(series[0].data, ({x, y}) => ({value: y, x}));
-    const xField = fields.x;
-    const region = xField.region;
-    const [, identifier] = split(xField.geoType, ':');
-    series[0].joinBy = [identifier, 'x'];
-
-    return new Promise(resolve => {
-      // add mapData to the series
-      this._mapDataService.getMapData(region).subscribe(mapData => {
-        series[0].mapData = mapData;
-        resolve(series);
-      });
-    });
-  }
-
-  getLegendConfig() {
+  updateSettings(auxSettings) {
     const align = this._chartService.LEGEND_POSITIONING[
-      get(this._auxSettings, 'legend.align')
+      get(auxSettings, 'legend.align')
     ];
     const layout = this._chartService.LAYOUT_POSITIONS[
-      get(this._auxSettings, 'legend.layout')
+      get(auxSettings, 'legend.layout')
     ];
 
+    let legend;
+
     if (!align || !layout) {
-      return {};
+      legend = null;
+    } else {
+      legend = {
+        align: align.align,
+        verticalAlign: align.verticalAlign,
+        layout: layout.layout
+      };
     }
 
-    return {
-      align: align.align,
-      verticalAlign: align.verticalAlign,
-      layout: layout.layout
-    };
+    const updateObj = omitBy(
+      {
+        legend
+      },
+      isNil
+    );
+
+    this.chartUpdater.next(updateObj);
   }
 }
