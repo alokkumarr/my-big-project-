@@ -1,10 +1,12 @@
 package com.synchronoss.saw.batch.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
+import com.synchronoss.saw.batch.plugin.controllers.SftpServiceImpl;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,6 +18,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -25,8 +29,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -36,6 +43,8 @@ public class SawBisSftpPluginController {
   @Autowired
   @Qualifier("sftpService")
   private SipPluginContract sftpServiceImpl;
+  
+  private static final Logger logger = LoggerFactory.getLogger(SawBisSftpPluginController.class);
   
   /**
    * This end-point to test connectivity for existing route.
@@ -49,9 +58,9 @@ public class SawBisSftpPluginController {
   @RequestMapping(value = "/routes/{routeId}/status", method = RequestMethod.GET, 
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public HttpStatus connectRoute(@ApiParam(value = "Route id to test connectivity",
+  public String connectRoute(@ApiParam(value = "Route id to test connectivity",
           required = true) @PathVariable(name = "routeId",required = true) Long routeId) {
-    return sftpServiceImpl.connectRoute(routeId);
+    return JSON.toJSONString(sftpServiceImpl.connectRoute(routeId));
   }
   /**
    * This end-point to test connectivity for route.
@@ -66,10 +75,10 @@ public class SawBisSftpPluginController {
   @RequestMapping(value = "/routes/test", method = RequestMethod.POST, 
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public HttpStatus connectImmediateRoute(@ApiParam(value = "Payload to test connectivity",
+  public String connectImmediateRoute(@ApiParam(value = "Payload to test connectivity",
           required = true) @Valid @RequestBody BisConnectionTestPayload payload) 
           throws SipNestedRuntimeException, IOException {
-    return sftpServiceImpl.immediateConnectRoute((payload));
+    return JSON.toJSONString(sftpServiceImpl.immediateConnectRoute((payload)));
   }
 
   /**
@@ -84,9 +93,9 @@ public class SawBisSftpPluginController {
   @RequestMapping(value = "/channels/{channelId}/status", method = RequestMethod.GET, 
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public HttpStatus connectChannel(@ApiParam(value = "Channel id to test connectivity",
+  public String connectChannel(@ApiParam(value = "Channel id to test connectivity",
           required = true) @PathVariable(name = "channelId",required = true) Long channelId) {
-    return sftpServiceImpl.connectChannel(channelId);
+    return JSON.toJSONString(sftpServiceImpl.connectChannel(channelId));
   }
   
   /**
@@ -102,9 +111,12 @@ public class SawBisSftpPluginController {
   @RequestMapping(value = "/channels/test", method = RequestMethod.POST, 
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public HttpStatus connectImmediateChannel(@ApiParam(value = "Payload to test connectivity",
-          required = true) @Valid @RequestBody BisConnectionTestPayload payload) {
-    return sftpServiceImpl.immediateConnectChannel(payload);
+  @ResponseBody
+  public  String connectImmediateChannel(@ApiParam(
+              value = "Payload to test connectivity",
+              required = true) @Valid @RequestBody BisConnectionTestPayload payload) {
+        
+    return JSON.toJSONString(sftpServiceImpl.immediateConnectChannel(payload));
   }
 
   /**

@@ -15,19 +15,24 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.model.BisChannelType;
+import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -67,10 +72,13 @@ public class SawBisRouteController {
 
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
+  private String deleteUrl = "/delete";
 
   @Value("${bis.default-data-drop-location}")
   private String dropLocation;
 
+  RestTemplate restTemplate = new RestTemplate();
+  
   /**
    * This API provides an ability to add a source.
    */
@@ -433,7 +441,14 @@ public class SawBisRouteController {
     if (!bisChannelDataRestRepository.existsById(channelId)) {
       throw new ResourceNotFoundException("channelId " + channelId + " not found");
     }
+    
     return ResponseEntity.ok(bisRouteDataRestRepository.findById(routeId).map(route -> {
+      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + deleteUrl);
+      BisScheduleKeys scheduleKeys = new BisScheduleKeys();
+      scheduleKeys.setGroupName(String.valueOf(routeId));
+      scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+      restTemplate.postForLocation(bisSchedulerUrl + deleteUrl, scheduleKeys);
+        
       logger.trace("Route deleted :" + route);
       bisRouteDataRestRepository.deleteById(routeId);
       return ResponseEntity.ok().build();

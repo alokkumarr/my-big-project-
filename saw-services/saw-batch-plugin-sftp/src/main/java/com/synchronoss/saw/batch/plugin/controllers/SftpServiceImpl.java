@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch.plugin.controllers;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,6 +30,8 @@ import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -74,6 +77,8 @@ import org.springframework.util.StreamUtils;
 
 
 
+
+
 @Service("sftpService")
 public class SftpServiceImpl extends SipPluginContract {
 
@@ -106,8 +111,10 @@ public class SftpServiceImpl extends SipPluginContract {
   // TODO: It has to be enhanced to stream the logs to user interface
   // TODO: SIP-4613
   @Override
-  public HttpStatus connectRoute(Long entityId) throws SftpProcessorException {
+  public String connectRoute(Long entityId) throws SftpProcessorException {
     logger.trace("connection test for the route with entity id starts here :" + entityId);
+    StringBuffer connectionLogs = new  StringBuffer();
+    String newLineChar = System.getProperty("line.separator");
     HttpStatus status = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -117,21 +124,37 @@ public class SftpServiceImpl extends SipPluginContract {
     ObjectNode rootNode = null;
     if (bisRouteEntity.isPresent()) {
       BisRouteEntity entity = bisRouteEntity.get();
+      
       try {
         nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
         String destinationLocation = (rootNode.get("destinationLocation").asText() != null
             ? defaultDestinationLocation + rootNode.get("destinationLocation").asText()
             : defaultDestinationLocation);
+
+     
+       
+        connectionLogs.append("Starting Test connectivity....");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Establishing connection to host");
+       
         File destinationPath = new File(destinationLocation);
         if (destinationPath.exists()) {
           if ((destinationPath.canRead() && destinationPath.canWrite())
               && destinationPath.canExecute()) {
             String sourceLocation = (rootNode.get("sourceLocation").asText());
+            connectionLogs.append(newLineChar);
+            connectionLogs.append("Connecting to source location " + sourceLocation 
+                    + "Destination location: " + destinationLocation);
+            connectionLogs.append(newLineChar);
+            connectionLogs.append("Connecting...");
             if (delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId()).getSession()
                 .exists(sourceLocation)) {
+              connectionLogs.append("Connection successful!!");
               status = HttpStatus.OK;
             } else {
+              connectionLogs.append(newLineChar);
+              connectionLogs.append("Unable to establish connection");
               status = HttpStatus.UNAUTHORIZED;
             }
           }
@@ -141,41 +164,80 @@ public class SftpServiceImpl extends SipPluginContract {
         }
       } catch (AccessDeniedException e) {
         status = HttpStatus.UNAUTHORIZED;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Path does not exists or Access Denied.");
         logger.error("Path does not exist or access denied for the entity" + entityId, e);
       } catch (IOException e) {
         status = HttpStatus.UNAUTHORIZED;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Exception occured");
         logger.error("Exception occurred during " + entityId, e);
       } catch (InvalidPathException | NullPointerException ex) {
         status = HttpStatus.UNAUTHORIZED;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Invalid path or some exception");
         logger.error("Invalid directory path " + entityId, ex);
       }
     } else {
       throw new SftpProcessorException(entityId + "does not exists");
     }
     logger.trace("connection test for the route with entity id ends here :" + entityId);
-    return status;
+    return   connectionLogs.toString();
   }
 
   // TODO: It has to be enhanced to stream the logs to user interface
   // TODO: SIP-4613
   @Override
-  public HttpStatus connectChannel(Long entityId) {
+  public String connectChannel(Long entityId) {
     logger.trace("checking connectivity for the source id :" + entityId);
+    
     HttpStatus status = null;
+    StringBuffer connectionLogs = new StringBuffer();
+    String newLineChar = System.getProperty("line.separator");
+    connectionLogs.append("Starting Test connectivity....");
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Establishing connection to host");
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Connecting...");
+    
     try {
       if (delegatingSessionFactory.getSessionFactory(entityId).getSession().isOpen()) {
         logger.info("connected successfully " + entityId);
+        connectionLogs.append("Connection successful!!");
         status = HttpStatus.OK;
         delegatingSessionFactory.getSessionFactory(entityId).getSession().close();
         delegatingSessionFactory.invalidateSessionFactoryMap();
       } else {
         status = HttpStatus.UNAUTHORIZED;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Connection Failed!!");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Unable to establish connection");
       }
     } catch (Exception ex) {
       logger.info("Exception :", ex);
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      ex.printStackTrace(pw);
+      connectionLogs.append(newLineChar);
+      connectionLogs.append("Connection Failed!!");
+      connectionLogs.append(newLineChar);
+      connectionLogs.append("Unable to establish connection with below exception");
+      connectionLogs.append(newLineChar);
+      connectionLogs.append(ex.getMessage());
+      connectionLogs.append(newLineChar);
+      connectionLogs.append("Make sure host is valid and reachable");
+      if (sw.toString().contains("java.net.UnknownHostException")) {
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("java.net.UnknownHostException. Invalid host name");
+      }
+      if (sw.toString().contains("Too many authentication failures")) {
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Invalid user name or password");
+      }
       status = HttpStatus.UNAUTHORIZED;
     }
-    return status;
+    return connectionLogs.toString();
   }
 
   /**
@@ -268,9 +330,16 @@ public class SftpServiceImpl extends SipPluginContract {
   // TODO: It has to be enhanced to stream the logs to user interface
   // TODO: SIP-4613
   @Override
-  public HttpStatus immediateConnectRoute(BisConnectionTestPayload payload)
+  public String immediateConnectRoute(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException, IOException {
     logger.trace("Test connection to route starts here");
+    StringBuffer connectionLogs = new StringBuffer();
+    String newLineChar = System.getProperty("line.separator");
+    connectionLogs.append("Starting Test connectivity....");
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Establishing connection to host");
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Connecting...");
     HttpStatus status = null;
     String dataPath = payload.getDestinationLocation() != null
         ? defaultDestinationLocation + payload.getDestinationLocation()
@@ -283,8 +352,11 @@ public class SftpServiceImpl extends SipPluginContract {
         if (!delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession()
             .exists(payload.getSourceLocation())) {
           status = HttpStatus.UNAUTHORIZED;
+          connectionLogs.append(newLineChar);
+          connectionLogs.append("Destinatipn location may not exists!!");
         } else {
           status = HttpStatus.OK;
+          connectionLogs.append("Connection successful!!");
         }
         delegatingSessionFactory.invalidateSessionFactoryMap();
       }
@@ -294,24 +366,36 @@ public class SftpServiceImpl extends SipPluginContract {
       } catch (Exception ex) {
         status = HttpStatus.UNAUTHORIZED;
         logger.error("Excpetion occurred while creating the directory " + "for destination", ex);
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Exception occured while creating directories");
       }
       status = HttpStatus.OK;
     }
     logger.trace("Test connection to route ends here");
-    return status;
+    return connectionLogs.toString();
   }
 
 
   // TODO: It has to be enhanced to stream the logs to user interface
   // TODO: SIP-4613
   @Override
-  public HttpStatus immediateConnectChannel(BisConnectionTestPayload payload)
+  public String immediateConnectChannel(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
     logger.trace("Test connection to channel starts here");
     HttpStatus status = null;
    
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
     SftpSession sftpSession = null;
+    StringBuffer connectionLogs = new StringBuffer();
+    String newLineChar = System.getProperty("line.separator");
+    connectionLogs.append("Starting Test connectivity....");
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Establishing connection to host: " 
+        + payload.getHostName() + " at port: "  + payload.getPortNo());
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("user name: " + payload.getUserName());
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Connecting...");
     try {
       defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
       defaultSftpSessionFactory.setHost(payload.getHostName());
@@ -323,20 +407,55 @@ public class SftpServiceImpl extends SipPluginContract {
       defaultSftpSessionFactory.setSessionConfig(prop);
       defaultSftpSessionFactory.setPassword(payload.getPassword());
       sftpSession = defaultSftpSessionFactory.getSession();
+      
+     
+     
+      
+      
       if (sftpSession != null && sftpSession.isOpen()) {
         status = HttpStatus.OK;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Connection successful!!");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("closing connection");
         defaultSftpSessionFactory.getSession().close();
       }
     } catch (Exception ex) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      ex.printStackTrace(pw);
+      
       status = HttpStatus.UNAUTHORIZED;
+      connectionLogs.append(newLineChar);
+      connectionLogs.append("Connection Failed!!");
+      connectionLogs.append(newLineChar);
+      connectionLogs.append("Unable to establish connection with below exception");
+      connectionLogs.append(newLineChar);
+      connectionLogs.append(ex.getMessage());
+      connectionLogs.append(newLineChar);
+      connectionLogs.append("Make sure host is valid and reachable");
+      if (sw.toString().contains("java.net.UnknownHostException")) {
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("java.net.UnknownHostException. Invalid host name" 
+              + payload.getHostName());
+      }
+      if (sw.toString().contains("Too many authentication failures")) {
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Invalid user name or password");
+      }
       logger.error("Exception occurred while using immediateConnectChannel method ", ex);
     } finally {
       if (sftpSession != null && sftpSession.isOpen()) {
         logger.trace("closing connection from finally block");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("closing connection");
         sftpSession.close();
       }
     }
-    return status;
+    
+  
+   
+    return connectionLogs.toString();
   }
 
   @Override

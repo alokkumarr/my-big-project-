@@ -8,8 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
+import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisChannelDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
+import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
+import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
@@ -53,6 +56,9 @@ public class SawBisChannelController {
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
+  
+  @Autowired
+  private BisRouteDataRestRepository bisRouteDataRestRepository;
 
 
   /**
@@ -288,12 +294,24 @@ public class SawBisChannelController {
   @Transactional
   public ResponseEntity<Object> deleteChannel(
       @ApiParam(value = "Entity id needs to be deleted", required = true) @PathVariable Long id)
-      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
-    return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
-      bisChannelDataRestRepository.deleteById(id);
-      logger.trace("Channel deleted :" + channel);
-      return ResponseEntity.ok().build();
-    }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
+      throws NullPointerException, JsonParseException, JsonMappingException, IOException, 
+          BisException {
+    
+    List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
+              .findByBisChannelSysId(id, PageRequest.of(0, 1, Direction.DESC, "createdDate"))
+                .getContent();
+    if (routeEntities.size() > 0) {
+      throw new BisException("Can not delete a channel until all routes associated are deleted");
+    } else {
+      return ResponseEntity.ok(bisChannelDataRestRepository.findById(id).map(channel -> {
+           
+        bisChannelDataRestRepository.deleteById(id);
+        logger.trace("Channel deleted :" + channel);
+        return ResponseEntity.ok().build();
+      }).orElseThrow(() -> new ResourceNotFoundException("channelId " + id + " not found")));
+    }
+    
+    
   }
 }
 
