@@ -7,7 +7,7 @@ import {
   HttpErrorResponse
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, flatMap } from 'rxjs/operators';
 
 import * as get from 'lodash/get';
 
@@ -60,7 +60,8 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
           );
 
           return observer;
-        }).flatMap(() => {
+        }).pipe(
+          flatMap(() => {
           const token = this.jwt.getTokenObj();
           if (token && this.jwt.isValid(token)) {
             const bearer = `Bearer ${this.jwt.getAccessToken()}`;
@@ -74,7 +75,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
             window.location.reload();
             return throwError(new Error(`Token can't be refreshed`));
           }
-        });
+        }));
       }) as any);
   }
 }
