@@ -27,7 +27,17 @@ mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {
   box-sizing: border-box;
 
   h2 {
+    overflow: hidden;
     flex-grow: 1;
+
+    & > span {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: top;
+      max-width: 80%;
+    }
 
     .dashboard-default-button {
       height: 30px;
@@ -40,7 +50,7 @@ mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {
       }
 
       &.default-selected {
-        color: #FCD53E;
+        color: #fcd53e;
       }
     }
   }
@@ -49,6 +59,9 @@ mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {
     align-self: center;
     display: flex;
     align-items: center;
+    flex-grow: 1;
+    min-width: 532px;
+    justify-content: flex-end;
 
     button {
       height: 36px;
@@ -56,6 +69,13 @@ mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {
 
     mat-slide-toggle {
       margin-left: 10px;
+    }
+
+    .dashboard-action-button {
+      padding: 0 2px;
+      flex-grow: 1;
+      min-width: 64px;
+      max-width: 88px;
     }
   }
 }
