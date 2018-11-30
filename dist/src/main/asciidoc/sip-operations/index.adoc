@@ -113,6 +113,20 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older SAW versions.
 
+==== Upgrading to SIP 3.1
+
+The SIP environment configuration file must contain the roles
+`sip-rtis` and `sip-rtps`, as shown below:
+
+        [sip-rtis]
+        [sip-rtps]
+
+The environment configurations of previous SIP versions might not
+contain these roles, so they have to be added to the configuration
+file before deploying a newer SIP version.  The roles can however be
+left empty (no hosts listed under them), if RTIS and RTPS are not to
+be installed.
+
 ==== Upgrading to SAW 2.5
 
 Before upgrading, install and configure Apache Livy from the MapR
@@ -289,18 +303,18 @@ checks.
 
 === Health checks
 
-SIP consists of services that are each performing some function,
-either by responding to incoming requests or executing something on a
-schedule.  The services are typically expected to be functioning
-normally, meaning they are in a healthy state.  However, in certain
-situations the services might not be able to perform the functions
-expected from them, in which case they are deemed to be in an
-unhealthy state.  Services expose health checks that allow external
-actors to verify the health state of a service.  This can be used in
-operations to detect issues early and pinpoint the source of a
-problem.  The health checks are additionally internally used for high
-availability, to route requests to services that are in a healthy
-state.
+SIP consists of services that are each performing some function, for
+example by responding to incoming requests, consuming a queue or
+executing something on a schedule.  The services are typically
+expected to be functioning normally, meaning they are in a healthy
+state.  However, in certain situations the services might not be able
+to perform the functions expected from them, in which case they are
+deemed to be in an unhealthy state.  Services expose health checks
+that allow external actors to verify the health state of a service.
+This can be used in operations to detect issues early and pinpoint the
+source of a problem.  The health checks are additionally internally
+used for high availability, to route requests to services that are in
+a healthy state.
 
 Health checks of services are accessed through a REST API.  Each
 service's endpoint exposes a `/actuator/health` resource, which
@@ -319,6 +333,95 @@ healthy state:
         {
             "status": "UP"
         }
+
+== High availability
+
+SIP supports high availability, so that if a single node in the
+environment fails or becomes unavailable, services will keep working
+normally.  This requires deploying the SIP environment in a highly
+available configuration.
+
+=== Highly available configuration
+
+To ensure a highly available SIP environment, each role in the SIP
+environment configuration (`saw-config`) must have at least two hosts.
+Additionally the `saw-security-arbitrator` role should have a separate
+third host (required for the MariaDB Galera Cluster).
+
+The sample configuration provided in the SIP package contains the
+hosts `sip-host1` and `sip-host2` in each role, plus `sip-host3` in
+the arbitrator role, which makes it a highly available configuration.
+The following is an example of a role that has been configured to be
+highly available:
+
+        [sip-role]
+        sip-host1
+        sip-host2
+
+NOTE: The arbitrator role has low resource requirements and can
+therefore be placed on a host whose primary purpose is something else,
+as long as it is separate form the other hosts in the SIP
+configuration.
+
+=== Full high availability
+
+SIP can be deployed with multiple hosts in the `saw-proxy` role, which
+will ensures redundancy for every host in the SIP environment.
+However, this requires clients of the SIP Services to be aware of each
+host in the `saw-proxy` role.  Additionally, the SAW Web module
+currently is only able to use a single endpoint, making it susceptible
+to being unavailable of that single endpoint becomes unavailable.
+
+Due to the above, SIP is currently recommended to be deployed with a
+load balancer in front of the hosts in the `saw-proxy` role, that
+exposes all of the hosts as a single endpoint reachable with a single
+IP address.  This will allow clients and the SAW Web module to
+continue working even if one of the hosts in the `saw-proxy` role
+become unavailable.
+
+=== Adding and removing hosts
+
+After a host fails or becomes unavailable, the SIP environment should
+be restored to its original host count and layout as soon as possible
+to ensure high availability.  Do this using the following steps:
+
+. Provision a new host with the same specifications as the failed host
+
+. If the hostname of the new host is different from the hostname of
+  the failed host, update references to the old hostname in the SIP
+  environment configuration (`saw-config`) to refer to the new
+  hostname
+
+. Rerun the SIP deployment (`saw-deploy <config>`) to install software
+  and configuration on the new host and update the configurations of
+  other hosts to include the new host
+
+=== Health checks for high availability
+
+The high availability support for SIP is based on health checks of
+services.  Requests are routed through the environment to services
+based on the health check status.  If a service is unhealthy, it will
+not receive requests.  Please see <<Health checks>> in the Monitoring
+section for an overview about health checks in the SIP environment.
+Also see <<Troubleshooting health checks>> in the Maintenance and
+troubleshooting section for how to investigate failing health checks.
+
+=== MariaDB high availability
+
+The SIP environment includes a highly available MariaDB Galera
+Cluster.  It is automatically managed by the SIP deployment and
+configuration and requires no manual handling in normal operation.
+
+In case all hosts in the SIP environment have been shut down and
+brought up again, please see <<Bootstrapping the MariaDB Galera cluster>>
+section for instructions on how to bootstrap the cluster again.
+
+=== Service level
+
+After a host fails or becomes unavailable, services of the SIP
+environment should be restored within 60 seconds.  During a short time
+period after a failure, services might be temporarily unavailable or
+return errors, before they are fully restored again.
 
 == Maintenance and troubleshooting
 
@@ -378,25 +481,65 @@ as it is within the same volume.  Moving SIP data across MapR volumes
 requires using the MapR-DB CopyTable tool.  Please refer to MapR
 documentation for instructions on using that.
 
-=== High availability and restoring failed nodes
+=== Troubleshooting health checks
 
-SIP provides high availability, so that if a single node in the
-environment fails or becomes unavailable services will keep working
-normally.
+Health checks are initiated from HAProxy every 10 seconds.  The
+HAProxy configuration can be inspected in the
+`/etc/haproxy/haproxy.cfg` file.  Execute the following command to see
+logs from HAProxy:
 
-After a node failure, the SIP environment should be restored to its
-original node count and layout as soon as possible to ensure high
-availability.  Do this using the following steps:
+        $ sudo journalctl -u haproxy
 
-. Provision a new node with the same specifications as the failed node
+HAProxy additionally provides a statistics page located at
+`http://<sip-url>/haproxy_stats` showing the status of the
+environment.
 
-. If the hostname of the new node is different from the hostname of
-  the failed node, update references to the old hostname in the SIP
-  environment configuration (`saw-config`) to refer to the new
-  hostname
+Each health check initiated from HAProxy causes a cascade of health
+checks of upstream dependencies.  To find out what the upstream
+services are, look at the configuration of the service.
 
-. Rerun the SIP deployment to restore software and configuration on
-the new node
+TIP: For example the Gateway Service configuration is located in
+`/opt/bda/saw-gateway-service/conf/application.yml` and contains the
+URLs of its upstream services.
+
+Once the URLs of the upstream services have been identified, append
+`/actuator/health` to get the health check location, which can then be
+used to manuall inspect it:
+
+        $ curl http://<service-url>/actuator/health
+
+The health check responses contain a `detail` propery with a
+human-readable explanation of the health check status, which can be
+used to further narrow down the cause for a possible failure.
+
+=== Troubleshooting the MariaDB cluster
+
+To troubleshoot MariaDB, inspect the MariaDB logs on each of the hosts
+in the cluster:
+
+        $ sudo journalctl -u mariadb
+
+The logs will also contain messages related to the MariaDB Galera
+cluster.
+
+=== Bootstrapping the MariaDB Galera cluster
+
+If all MariaDB server instances in the SIP environment are shut down,
+the MariaDB Galera Cluster might not be able to start up itself
+automatically.  In such cases bootstrap the cluster manually using the
+following command on one of the hosts:
+
+        $ sudo galera_new_cluster
+
+The host to run that command on should be the host that has
+`safe_to_bootstrap: 1` in its `/var/lib/mysql/grastate.dat` file.
+
+:mariadb_doc: https://mariadb.com/kb/en/library
+:galera_doc: {mariadb_doc}/getting-started-with-mariadb-galera-cluster
+
+NOTE: For more information, see the
+{galera_doc}#restarting-the-cluster[restarting the cluster] section in
+the MariaDB Galera Cluster documentation.
 
 === Clearing the Transport Service Executor queues
 
