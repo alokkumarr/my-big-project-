@@ -1,5 +1,6 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
+import { of } from 'rxjs';
 import { DesignerMapChartComponent, MapChartStates } from './designer-map-chart.component';
 import { ChartService } from '../../services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
@@ -16,7 +17,9 @@ class ChartStubComponent {
 }
 
 class ChartStubService {}
-class MapDataStubService {}
+class MapDataStubService {
+  getMapData = jasmine.createSpy('getMapData').and.returnValue(of('mapData'));
+}
 
 const normalSqlBuilder = {
   nodeFields: [{ checked: 'x' } as ArtifactColumn],
@@ -42,7 +45,7 @@ describe('Designer Map Chart Component', () => {
       TestBed.configureTestingModule({
         providers: [
           { provide: ChartService, useValue: ChartStubService },
-          { provide: MapDataService, useValue: MapDataStubService }
+          { provide: MapDataService, useClass: MapDataStubService }
         ],
         declarations: [DesignerMapChartComponent, ChartStubComponent],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -50,9 +53,6 @@ describe('Designer Map Chart Component', () => {
         .compileComponents()
         .then(() => {
           fixture = TestBed.createComponent(DesignerMapChartComponent);
-          spyOn(fixture.componentInstance, 'getLegendConfig').and.returnValue(
-            []
-          );
         });
     })
   );

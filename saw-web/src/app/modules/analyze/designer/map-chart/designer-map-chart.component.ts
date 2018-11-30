@@ -52,11 +52,9 @@ export class DesignerMapChartComponent implements OnInit {
     if (xField.region) {
       const oldState = this.currentState;
       this.currentState = MapChartStates.OK;
-      if (this.currentState !== oldState) {
-        if (this.currentState === MapChartStates.OK) {
-          this._mapData = this._mapDataService.getMapData(xField.region);
-          this.setSeries();
-        }
+      if (oldState === MapChartStates.NO_MAP_SELECTED) {
+        this._mapData = this._mapDataService.getMapData(xField.region);
+        this.setSeries();
       }
     }
   }

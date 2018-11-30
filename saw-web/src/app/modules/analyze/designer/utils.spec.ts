@@ -30,6 +30,6 @@ describe('Analyze utils', () => {
     forEach(dateColumns, col =>
       expect(getArtifactColumnTypeIcon(col)).toBe('icon-calendar'));
     expect(getArtifactColumnTypeIcon(stringColumn)).toBe('icon-string-type');
-    expect(getArtifactColumnTypeIcon(geoColumn)).toBe('icon-geo-type');
+    expect(getArtifactColumnTypeIcon(geoColumn)).toBe('icon-geo-chart');
   });
 });
