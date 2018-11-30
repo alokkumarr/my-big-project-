@@ -1,0 +1,51 @@
+<header class="base-dialog__header">
+  <strong [ngSwitch]="data.mode">
+    <ng-container *ngSwitchCase="'create'" i18n>
+      Add Attribute
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Edit Attribute
+    </ng-container>
+  </strong>
+</header>
+<div class="base-dialog__content">
+  <div fxLayout="column" fxLayoutAlign="center start">
+    <div class="errors" *ngIf="errorState">
+      <span [innerHtml]="errorMessage"></span>
+    </div>
+    <mat-form-field>
+      <input matInput placeholder="Security Group Name" [(ngModel)]="data.groupSelected.securityGroupName" disabled required/>
+    </mat-form-field>
+    <div fxLayout="row" fxLayoutAlign="center start">
+      <mat-form-field>
+        <input matInput [(ngModel)]="data.attributeName" placeholder="Field Name" maxlength="20" [disabled]="data.mode === 'edit'" required/>
+      </mat-form-field>
+
+      <span class="seperator">=</span>
+
+      <mat-form-field>
+        <input matInput [(ngModel)]="data.value" maxlength="45" placeholder="Value" required/>
+      </mat-form-field>
+    </div>
+  </div>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
+  <button (click)="submit()"
+          e2e="create-analysis-btn"
+          color="primary"
+          [ngSwitch]="data.mode"
+          [disabled]="!data.attributeName || !data.value"
+          mat-raised-button
+  >
+    <ng-container *ngSwitchCase="'create'" i18n>
+      Create Attribute
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Save
+    </ng-container>
+  </button>
+  <button mat-button
+          mat-dialog-close i18n
+  >Cancel</button>
+</div>

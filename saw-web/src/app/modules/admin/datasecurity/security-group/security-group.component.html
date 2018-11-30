@@ -1,0 +1,89 @@
+<mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
+  <div fxLayout="row" fxFlex="40">
+    <div class="admin-title" e2e="security-group-title">Manage Security Groups</div>
+    <!-- <search-box placeholder="Search"
+                [value]="filterObj.searchTerm"
+                (searchTermChange)="applySearchFilter($event)"
+                [delay]="1000">
+    </search-box> -->
+  </div>
+
+  <div fxLayout="row" class="customer-name" fxLayoutAlign="start center" fxFlex="40">
+    Customer: {{ticket.custCode}}
+  </div>
+  <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
+    <button (click)="addPropperty('securityGroup','create')"
+            mat-raised-button
+            color="primary" style="margin-right:10px;">
+      + <span i18n>Security Group</span>
+    </button>
+
+    <button (click)="addPropperty('attribute','create')"
+            mat-raised-button
+            color="primary"
+            [disabled]="addAttribute">
+      + <span i18n>Attribute</span>
+    </button>
+  </div>
+</mat-toolbar>
+
+<div *ngIf="emptyState" style="margin-left: 30%;
+  margin-top: 7%;
+  font-size: 25px;">
+    Add a new Group by clicking on the "+Security Group" button
+</div>
+<div *ngIf="!emptyState" style="float: left;">
+  <dx-data-grid class="security-group-grid" [customizeColumns]="config.customizeColumns"
+              [selectionFilter]="['securityGroupName', '=', groupSelected.securityGroupName]"
+              [columnAutoWidth]="config.columnAutoWidth"
+              [columnMinWidth]="config.columnMinWidth"
+              [columnResizingMode]="config.columnResizingMode"
+              [allowColumnReordering]="config.allowColumnReordering"
+              [allowColumnResizing]="config.allowColumnResizing"
+              [showColumnHeaders]="config.showColumnHeaders"
+              [showColumnLines]="config.showColumnLines"
+              [showRowLines]="config.showRowLines"
+              [showBorders]="config.showBorders"
+              [rowAlternationEnabled]="config.rowAlternationEnabled"
+              [hoverStateEnabled]="config.hoverStateEnabled"
+              [wordWrapEnabled]="config.wordWrapEnabled"
+              [scrolling]="config.scrolling"
+              [sorting]="config.sorting"
+              [dataSource]="data"
+              [columns]="config.columns"
+              [pager]="config.pager"
+              [paging]="config.paging"
+              [width]="config.width"
+              [height]="config.height"
+              (onRowClick)="config.onRowClick($event)"
+  >
+  <dxo-selection mode="single" [deferred]="true"></dxo-selection>
+  <div *dxTemplate="let cell of 'actionCellTemplate'">
+    <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
+      <button mat-icon-button class="update-security-property"
+      i18n-matTooltip="Edit Group"
+            matTooltip="Edit Group" (click)="editGroupData(cell.data)"
+              >
+        <mat-icon fontIcon="icon-edit"></mat-icon>
+      </button>
+      <button class="update-security-property" mat-icon-button
+              (click)="deleteGroup(cell.data)"
+              i18n-matTooltip="Delete Group"
+            matTooltip="Delete Group">
+        <mat-icon  fontIcon="icon-trash"></mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div *dxTemplate="let cell of 'toolTipCellTemplate'">
+    <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container" style="float: left !important;" >
+      <span i18n-matTooltip="{{cell.data.description}}"
+      matTooltip="{{cell.data.description}}">{{cell.data.securityGroupName}}</span>
+    </div>
+  </div>
+
+  </dx-data-grid>
+  <field-attribute-view [groupSelected]="groupSelected"></field-attribute-view>
+</div>
+
+

@@ -5,7 +5,6 @@ import * as map from 'lodash/map';
 @Pipe({
   name: 'checkedArtifactColumnFilter'
 })
-
 export class CheckedArtifactColumnFilterPipe implements PipeTransform {
   transform(artifacts: any): any {
     return map(artifacts, artifact => {
@@ -14,6 +13,6 @@ export class CheckedArtifactColumnFilterPipe implements PipeTransform {
         ...artifact,
         columns
       };
-    })
+    });
   }
 }

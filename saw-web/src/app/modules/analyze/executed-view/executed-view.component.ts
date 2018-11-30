@@ -486,36 +486,11 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   edit() {
-    this._analyzeActionsService.edit(this.analysis).then(result => {
-      if (!result) {
-        return;
-      }
-      const { requestExecution, analysis } = result;
-      if (analysis) {
-        this.analysis = analysis;
-        this.executedAnalysis = { ...this.analysis };
-      }
-      if (requestExecution) {
-        this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
-      }
-    });
+    this._analyzeActionsService.edit(this.analysis);
   }
 
   fork() {
-    this._analyzeActionsService.fork(this.analysis).then(result => {
-      if (!result) {
-        return;
-      }
-      const { requestExecution, analysis } = result;
-      if (analysis) {
-        this.analysis = analysis;
-        this.executedAnalysis = { ...this.analysis };
-      }
-      if (requestExecution) {
-        this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
-        this.gotoForkedAnalysis(analysis);
-      }
-    });
+    this._analyzeActionsService.fork(this.analysis);
   }
 
   gotoForkedAnalysis(analysis) {

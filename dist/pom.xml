@@ -106,6 +106,28 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>com.synchronoss</groupId>
+      <artifactId>bda-rtis</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss</groupId>
+      <artifactId>rtps</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
       <scope>test</scope>
@@ -230,7 +252,7 @@
                build instead.  When SIP 3.1 is release, use that
                instead. -->
           <!--<url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-882/artifact/shared/SIP-Package/saw-3.0.0.tgz</url>-->
-          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-955/artifact/shared/SIP-Package/saw-3.0.0-744-g402624624.tgz</url>
+          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-1084/artifact/shared/SIP-Package/saw-3.0.0-1721-g2f766e3fa.tgz</url>
           <outputDirectory>${project.build.directory}/docker/sip-admin/${revision}/build/maven/sip-old</outputDirectory>
           <skip>${sip.upgrade.skip}</skip>
         </configuration>

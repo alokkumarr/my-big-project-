@@ -45,7 +45,7 @@ class AnalysisHelper {
       return apiCall.post(host + 'services/analysis', deletePayload, token);
     }
 
-    getSubCategoriesByCatgeoryName(url,token, categoryName) {
+    getSubCategoriesByCategoryName(url,token, categoryName) {
       let requestPayLoad = 1;
       let response = apiCall.post(url + 'security/auth/admin/cust/manage/categories/fetch', requestPayLoad, token);
       if (response) {
@@ -58,12 +58,10 @@ class AnalysisHelper {
       return null;
     }
 
-    getSubCategoryIdBySubCatgeoryName(subCategories, subCategoryName) {
+    getSubCategoryIdBySubCategoryName(subCategories, subCategoryName) {
       return this.getValueFromListByKeyValue(subCategories, 'subCategoryName', subCategoryName, 'subCategoryId');
     }
 
-    getSubCategoriesByCatgeoryId(categoryId) {
-    }
     /**
      *
      * @param {*} url
@@ -140,9 +138,9 @@ class AnalysisHelper {
        let executePayload;
        let subCategoryId;
 
-      let cubCatList = _self.getSubCategoriesByCatgeoryName(url,token, categories.analyses.name);
+      let cubCatList = this.getSubCategoriesByCategoryName(url,token, categories.analyses.name);
       if(subCategories) {
-        subCategoryId = _self.getSubCategoryIdBySubCatgeoryName(cubCatList, subCategories.createAnalysis.name);
+        subCategoryId = _self.getSubCategoryIdBySubCategoryName(cubCatList, subCategories.createAnalysis.name);
       } else {
         throw new Error('There is subcategories found for categories' + categories.analyses.name);
       }
@@ -223,11 +221,11 @@ class AnalysisHelper {
 
 
       generateChart(url,semanticId, dataSetName, user, subCategory, token, name, description, analysisType, subType) {
-
+        let _self = this;
         let subCategoryId;
-        let subCatList = _self.getSubCategoriesByCatgeoryName(url,token, categories.analyses.name);
+        let subCatList = _self.getSubCategoriesByCategoryName(url,token, categories.analyses.name);
         if(subCategories) {
-          subCategoryId = _self.getSubCategoryIdBySubCatgeoryName(subCatList, subCategories.createAnalysis.name);
+          subCategoryId = _self.getSubCategoriesByCategoryName(subCatList, subCategories.createAnalysis.name);
         } else {
           throw new Error('There is subcategories found for categories' + categories.analyses.name);
         }

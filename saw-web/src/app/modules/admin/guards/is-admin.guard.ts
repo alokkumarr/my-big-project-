@@ -3,7 +3,7 @@ import { CanActivate, CanActivateChild } from '@angular/router';
 import { JwtService } from '../../../common/services';
 
 @Injectable()
-export class isAdminGuard implements CanActivate, CanActivateChild {
+export class IsAdminGuard implements CanActivate, CanActivateChild {
   constructor(private _jwt: JwtService) {}
 
   canActivate() {

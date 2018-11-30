@@ -193,7 +193,7 @@ export class JwtService {
       contents: {
         keys: [
           {
-            customerCode: get(token, 'ticket.custCode', 'ATT')
+            customerCode: get(token, 'ticket.custCode', 'SNCR')
             // dataSecurityKey: get(token, 'ticket.dataSecurityKey')
           }
         ]
@@ -218,6 +218,10 @@ export class JwtService {
 
   getUserName() {
     return get(this.getTokenObj(), 'ticket.userFullName').toString();
+  }
+
+  getProductName() {
+    return get(this.getTokenObj(), 'ticket.products[0].productCode').toString();
   }
 
   _isRole(token, role) {

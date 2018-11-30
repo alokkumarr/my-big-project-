@@ -18,7 +18,7 @@ NUMMSG=$2       # Number of messages to send
 MSG=$3          # Message text
 
 # Get first name of jar file
-JAR=$( set -- $RTPS_HOME/lib/rtps-*.jar ; echo $1 )
+JAR=$( set -- $RTPS_HOME/lib/sip-rtps.jar ; echo $1 )
 
 MAIN_CLASS=synchronoss.spark.drivers.rt.SimpleProducer
 

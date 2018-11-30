@@ -72,7 +72,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   loadCron = false;
   emailValidateFlag = false;
   isReport: boolean;
-  fileType: any;
+  fileType: string;
 
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
@@ -86,7 +86,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   ngOnInit() {
     this.scheduleState = 'new';
-    this.fileType = 'csv';
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {
       this.categories = response;
@@ -96,6 +95,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
     this.isReport = ['report', 'esReport'].includes(
       get(this.data.analysis, 'type'));
+
+    this.fileType = get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
   }
 
   trackByIndex(index) {

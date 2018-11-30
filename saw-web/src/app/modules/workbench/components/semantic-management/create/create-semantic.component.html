@@ -8,8 +8,8 @@
         <mat-slide-toggle (change)="joinEligibleToggled()" [checked]="joinToggleValue" [(ngModel)]="joinToggleValue" labelPosition="before">
             Show Join Eligible
         </mat-slide-toggle>
-        <button mat-raised-button color="primary" [disabled]="!isSelected" i18n (click)="gotoValidate()">
-            <span>VALIDATE</span>
+        <button mat-raised-button color="primary" [disabled]="!isSelected" (click)="gotoValidate()">
+            <span i18n>VALIDATE</span>
         </button>
     </div>
     <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">

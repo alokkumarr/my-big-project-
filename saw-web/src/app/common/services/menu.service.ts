@@ -58,7 +58,7 @@ export class MenuService {
             // 'WRK000001' is the module code for workbench.
             const url =
               subfeature.prodModCode === 'WRK000001'
-                ? [`/${moduleName.toLowerCase()}`, `${subfeature.defaultURL}`]
+                ? [`/${moduleName.toLowerCase()}/${subfeature.defaultURL}`]
                 : [
                     `/${moduleName.toLowerCase()}`,
                     `${subfeature.prodModFeatureID}`

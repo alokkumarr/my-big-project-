@@ -1,0 +1,53 @@
+info:
+  component: Synchronoss Batch Ingestion Service
+spring:
+  application:
+    name: saw-batch-ingestion-service
+  pf4j:
+    enabled: true
+    plugins-root: plugins
+  flyway:
+    baseline-on-migrate: true
+  datasource:
+    url: jdbc:mariadb://localhost:3306/sip_batch_ingestion
+    username: batch_user
+    password: {{ saw_batch_ingestion_db_password }}
+    driver-class-name: org.mariadb.jdbc.Driver
+    dbcp2:
+      test-while-idle: true
+      validation-query: SELECT 1
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql : true
+
+logging:
+  level:
+    com.synchronoss.saw: INFO
+    org.hibernate.type : INFO
+
+server:
+  address: localhost
+  port: 9651
+  servlet:
+    context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+management:
+  endpoint:
+    health:
+      show-details: always
+
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
+sip:
+  service:
+    index: {{ groups['saw-services'].index(inventory_hostname) }}
