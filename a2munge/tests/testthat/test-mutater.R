@@ -64,10 +64,9 @@ test_that("custom expression works as expected", {
   expect_equal(sdf_nrow(spk_mtr1), nrow(r_mtr1))
   expect_equal(spk_mtr1 %>%
                  collect() %>%
-                 arrange(id, date, cat1, cat2) %>%
-                 as.data.frame() %>%
+                 arrange(index) %>%
                  select_if(is.numeric),
                r_mtr1 %>%
-                 arrange(id, date, cat1, cat2) %>%
+                 arrange(index) %>%
                  select_if(is.numeric))
 })

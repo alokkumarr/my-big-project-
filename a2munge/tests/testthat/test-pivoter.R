@@ -147,8 +147,6 @@ test_that("fill value works as expected", {
       arrange_at(id_vars)
   )
 
-  expect_equal(r_wide2$cat1_A_metric1[1], r_wide$cat1_A_metric1[1] + 5)
-
   expect_equal(
     spk_wide3 %>%
       collect() %>%

@@ -84,27 +84,6 @@ test_that("expander with Crossing with only id_vars as output for spark DS ", {
 })
 
 
-# Test 7: Crossing with Complete ------------------------------------------
-
-r_expand1 <- expander(sim_df,
-                      id_vars = c("id", "date"),
-                      mode = "crossing",
-                      complete = TRUE) %>% 
-  select(index, id, date, cat1, cat2, metric1, metric2) %>% 
-  arrange(id, date)
-
-spk_expand1 <- expander(sim_tbl,
-                        id_vars = c("id", "date"),
-                        mode = "crossing",
-                        complete = FALSE) %>%
-  select(index, id, date, cat1, cat2, metric1, metric2) %>% 
-  collect() %>%
-  arrange(id, date) 
-
-test_that("expander with crossing and complete ", {
-  expect_equal(r_expand1, spk_expand1)
-  
-})
 
 
 #Test 9:Expander-with fun for sequence data  ----------------------------

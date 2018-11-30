@@ -100,7 +100,7 @@ spk_typ <- sdf_schema(Date1_spk_dt_opt)$date_time_CONV$type
 test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(colnames(Date1_R_dt_opt),
                colnames(Date1_spk_dt_opt))
-  expect_equal(class(Date1_R_dt_opt$date_time_CONV), c("POSIXct", "POSIXt"))
+  expect_equal(class(Date1_R_dt_opt$date_time_CONV_Test), c("POSIXct", "POSIXt"))
   expect_equal(spk_typ, "TimestampType")
 
 })
