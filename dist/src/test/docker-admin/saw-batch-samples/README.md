@@ -14,5 +14,21 @@ Testing SIP Batch Ingestion
         `same thing can be done for the small files`
   d) destination can `/tmp/data`
 
+3. Setting the limit of open file descriptors concurrently in source system,
+   here in case of docker, is sip-admin docker instance
+    a) use `root user`
+    b) go to `/etc/security/limits.d`
+    c) create a file `90-sip-batch-ingestion.conf`
+    d) set the below attribute as follows
+    `sip-admin           soft    nofile          20240
+     sip-admin           hard    nofile          63536`
+4. then open `/etc/pam.d/login`  & set `session required pam_limits.so`      
+
 Notes:
-In docker, we have not mounted mapRFS. So only NFS directory will work to test the route
+a) In docker, we have not mounted mapRFS. So only NFS directory will work to test the route
+b) while testing large number concurrent session in the source system you may find the below
+   commands handy which are as follows:
+      `sysctl fs.file-nr`
+      `lsof | grep sipadmin | wc -l`
+      `lsof -r 2 -u sipadmin`
+      `ulimit -u`
