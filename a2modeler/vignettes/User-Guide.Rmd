@@ -19,3 +19,28 @@ knitr::opts_chunk$set(
   fig.height = 4
 )
 ```
+
+
+## Overview
+
+a2modeler is an R package that provides a framework for efficiently and reliabily building statistical models. a2modeler currently supports the following use cases:
+
+* __Forecasting__: Statsitical models to make forward looking predicts of sequential or time series data
+* __Segmentation__: Statitical models to derive sub-groups withing a dataset based on measurable patterns
+* __Regression__: Statitical models to fit and make prediction for continuous numerical targets
+* __Classification__: Statitical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog
+* __Multi-Classification__: Statitical models to fit and make prediction for discrete targets with more than two unique values
+
+## Features
+
+
+## Design
+
+
+## Use Cases
+
+
+## Workflow
+
+
+## Example
