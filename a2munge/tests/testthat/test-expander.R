@@ -34,7 +34,6 @@ test_that("expander results right for nested with selected id_var columns", {
       distinct(id, cat1) %>%
       arrange(id, cat1)
   )
-  expect_equal(colnames(expand_nest), colnames(dist_dat))
 })
 
 # Test 2:Expander-with mode=nesting for unique "id-vars" for spark DS----------
@@ -67,12 +66,12 @@ test_that("expander with Crossing with only id_vars as output ", {
       count(id) %>% 
       pull(n) 
   ))
-
 })
 
 # Test 6:Expander- with mode=crossing for unique " id-vars" for Sa --------
 
-expand_crossing_spark_DS <- expander(id_vars = c("id", "date"),
+expand_crossing_spark_DS <- expander(sim_tbl,
+                                     id_vars = c("id", "date"),
                                      mode = "crossing",
                                      complete = FALSE) %>%
   collect() %>%

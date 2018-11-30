@@ -45,12 +45,12 @@ Date1_spk_dttime <- converter(sim_tbl,
                               time_zone = "UTC",
                               output_suffix = "CONV")
 
-spk_typ <- sdf_schema(Date1_spk_dttime)$date_CONV$type
+spk_typ <- sdf_schema(Date1_spk_dttime)$date_time_CONV$type
 
 test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(colnames(Date1_R_dtTime),
                colnames(Date1_spk_dttime))
-  expect_equal(class(Date1_R_dtTime$date_CONV), c("POSIXct", "POSIXt"))
+  expect_equal(class(Date1_R_dtTime$date_time_CONV), c("POSIXct", "POSIXt"))
   expect_equal(spk_typ, "TimestampType")
 })
 
@@ -71,11 +71,11 @@ Date1_spk_dt <- converter(sim_tbl,
                           time_zone = "UTC",
                           output_suffix = "CONV")
 
-spk_dt_type <- sdf_schema(Date1_spk_dt)$date_CONV$type
+spk_dt_type <- sdf_schema(Date1_spk_dt)$date_time_CONV$type
 
 test_that("compare output of both data R and Spark Dataframes", {
 
-  expect_equal(class(Date1_R_dt$date_CONV), c("Date"))
+  expect_equal(class(Date1_R_dt$date_time_CONV), c("Date"))
   expect_equal(spk_dt_type, "DateType")
 
 })
@@ -95,12 +95,12 @@ Date1_spk_dt_opt <- converter(sim_tbl,
                               time_zone = "PST",
                               output_suffix = "CONV_Test" )
 
-spk_typ <- sdf_schema(Date1_spk_dt_opt)$date_CONV$type
+spk_typ <- sdf_schema(Date1_spk_dt_opt)$date_time_CONV$type
 
 test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(colnames(Date1_R_dt_opt),
                colnames(Date1_spk_dt_opt))
-  expect_equal(class(Date1_R_dt_opt$date_CONV), c("POSIXct", "POSIXt"))
+  expect_equal(class(Date1_R_dt_opt$date_time_CONV), c("POSIXct", "POSIXt"))
   expect_equal(spk_typ, "TimestampType")
 
 })
