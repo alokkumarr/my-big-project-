@@ -29,14 +29,14 @@
                         [dataLoader]="dataLoader"
                         [isEditable]="false">
   </report-grid-upgraded>
-  <designer-map-chart *ngIf="analysis.type === 'chart' && analysis.chartType === 'geo'"
-                  [chartType]="analysis.chartType"
+  <designer-map-chart *ngIf="analysis.type === 'chart' && chartType === 'geo'"
+                  [chartType]="chartType"
                   [auxSettings]="{legend: analysis.legend}"
                   [data]="previewData"
                   [sqlBuilder]="analysis.sqlBuilder">
   </designer-map-chart>
-  <designer-chart *ngIf="analysis.type === 'chart' && analysis.chartType !== 'geo'"
-                  [chartType]="analysis.chartType"
+  <designer-chart *ngIf="analysis.type === 'chart' && chartType !== 'geo'"
+                  [chartType]="chartType"
                   [sorts]="analysis.sqlBuilder.sorts"
                   [auxSettings]="{isInverted: analysis.isInverted, legend: analysis.legend}"
                   [data]="previewData"
