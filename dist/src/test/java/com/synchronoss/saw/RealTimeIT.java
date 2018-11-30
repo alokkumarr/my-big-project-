@@ -31,7 +31,6 @@ public class RealTimeIT extends BaseIT {
         .queryParam("EVENT_ID", "1")
         .queryParam("EVENT_DATE", "1")
         .queryParam("RECEIVED_TS", "1")
-        .queryParam("UID", "1")
         .contentType(ContentType.JSON) 
         .body(root)
         .when().post("sip/rtis/events")
