@@ -66,8 +66,8 @@ sim_df_anom <- tibble(index = 1:n,
 pos_anoms_indx <- sample(1:n, 5, replace = F)
 neg_anoms_indx <- sample(setdiff(1:n, pos_anoms_indx), 5, replace = F)
 sim_df_anom <- sim_df_anom %>% 
-  mutate(y = ifelse(index %in% pos_anoms_indx, y + rnorm(5, mean = 5), y),
-         y = ifelse(index %in% neg_anoms_indx, y - rnorm(5, mean = 5), y),
+  mutate(y = ifelse(index %in% pos_anoms_indx, y + rnorm(5, mean = 10), y),
+         y = ifelse(index %in% neg_anoms_indx, y + rnorm(5, mean = -10), y),
          flag = case_when(index %in% pos_anoms_indx ~ 1, 
                           index %in% neg_anoms_indx ~ -1,
                           TRUE ~ 0))
