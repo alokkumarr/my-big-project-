@@ -19,7 +19,7 @@ sim_tbl_ts <- copy_to(sc, sim_df_ts, overwrite = TRUE)
 
 
 # Example Pipeline
-pipe1 <- pipeline(expr = identity(),
+pipe1 <- pipeline(expr = identity,
                   desc = "Example pipeline",
                   uid = "pipe-test")
 

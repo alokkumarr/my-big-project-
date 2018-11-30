@@ -47,3 +47,30 @@ sim_df <- sim_data(10, 200, 1, seed = 319) %>%
 # Save to Data folder
 save(sim_df, file = 'data/sim-df-behavioral.rdata', compress = 'xz')
 
+
+
+# Detecter Dataset --------------------------------------------------------
+
+
+# Dataset for Detecter Tests
+set.seed(319)
+n <- 100
+dates <- floor_date(today(), unit = "years") + days(0:(n-1))
+x <- arima.sim(n = n, list(order = c(1,0,0), ar = 0.7))
+
+sim_df_anom <- tibble(index = 1:n,
+                      date = dates,
+                      y = as.numeric(x))
+
+# Add anomalies
+pos_anoms_indx <- sample(1:n, 5, replace = F)
+neg_anoms_indx <- sample(setdiff(1:n, pos_anoms_indx), 5, replace = F)
+sim_df_anom <- sim_df_anom %>% 
+  mutate(y = ifelse(index %in% pos_anoms_indx, y + rnorm(5, mean = 5), y),
+         y = ifelse(index %in% neg_anoms_indx, y - rnorm(5, mean = 5), y),
+         flag = case_when(index %in% pos_anoms_indx ~ 1, 
+                          index %in% neg_anoms_indx ~ -1,
+                          TRUE ~ 0))
+
+# Save to Data folder
+save(sim_df_anom, file = 'data/sim-df-anomalies.rdata', compress = 'xz')

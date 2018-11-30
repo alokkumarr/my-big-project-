@@ -180,8 +180,8 @@ test_that("Prediction index test case", {
     predict(periods = 10)
   
   expect_data_frame(f8$predictions, nrow=10)
-  expect_class(f8$predictions$index, "Date")
-  expect_equal(f8$predictions$index, max(df_ts3$date)+days(1:10))
+  expect_class(f8$predictions$date, "Date")
+  expect_equal(f8$predictions$date, max(df_ts3$date)+days(1:10))
   
 })
 

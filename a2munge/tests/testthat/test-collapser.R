@@ -16,6 +16,11 @@ n = 20
 # Create Spark Connection
 spk_versions <- sparklyr::spark_installed_versions()
 
+
+if(! "2.3.0" %in% spk_versions$spark) {
+  sparklyr::spark_install(version = "2.3.0")
+}
+
 sc <- spark_connect(master = "local")
 
 
@@ -23,22 +28,22 @@ sc <- spark_connect(master = "local")
 set.seed(n)
 id_vars <- seq(1, n, by = 1)
 
-dates_day <-
-  as.Date('2018-09-13') + lubridate::days(seq(
+dates_day <- as.Date('2018-09-13') +
+  lubridate::days(seq(
     from = 1,
     length.out = n,
     by = 2
   ))
 
-dates_min <-
-  as.POSIXct('2018-09-13 10:20:25') + lubridate::minutes(seq(
+dates_min <-as.POSIXct('2018-09-13 10:20:25') + 
+  lubridate::minutes(seq(
     from = 1,
     length.out = n,
     by = 2
   ))
 
-dates_sec <-
-  as.POSIXct('2018-09-13 10:27:20') + lubridate::seconds(seq(
+dates_sec <- as.POSIXct('2018-09-13 10:27:20') + 
+  lubridate::seconds(seq(
     from = 1,
     length.out = n,
     by = 2
@@ -46,9 +51,10 @@ dates_sec <-
 
 cat1 <- c("A", "B")
 
+set.seed(319)
 dat <- data.frame()
 for (id in id_vars) {
-  n <- floor(runif(1) * n)
+  nid <- sample(1:20, 1, replace = TRUE)
   d <- data.frame(
     id = sample(id, 20, replace = T),
     dates_day = sample(dates_day, 20, replace = T),
@@ -62,13 +68,13 @@ for (id in id_vars) {
 dat$dates_day <- format(as.Date(dat$dates_day), "%Y-%m-%d %H:%M:%S")
 
 # Load data into Spark
-dat_tbl <-
-  copy_to(sc, dat %>% mutate(dates_min = as.character(dates_min), overwrite = TRUE))
+dat_tbl <- dat %>%
+  mutate(dates_min = as.character(dates_min)) %>% 
+  copy_to(sc, ., overwrite = TRUE)
 
 dat <- dat %>% mutate(dates_min = as.character(dates_min))
 
-Convert_R_dtTime <-
-  converter(
+Convert_R_dtTime <- converter(
     dat,
     measure_vars = "dates_min",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -77,8 +83,7 @@ Convert_R_dtTime <-
     output_suffix = "CONV"
   )
 
-Convert_spk_dttime <-
-  converter(
+Convert_spk_dttime <- converter(
     dat_tbl,
     measure_vars = "dates_min",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -88,8 +93,7 @@ Convert_spk_dttime <-
   )
 
 
-Convert_R_dtTime_sec <-
-  converter(
+Convert_R_dtTime_sec <- converter(
     dat,
     measure_vars = "dates_sec",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -98,8 +102,7 @@ Convert_R_dtTime_sec <-
     output_suffix = "CONV"
   )
 
-Convert_spk_dtTime_sec <-
-  converter(
+Convert_spk_dtTime_sec <- converter(
     dat_tbl,
     measure_vars = "dates_sec",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -108,18 +111,13 @@ Convert_spk_dtTime_sec <-
     output_suffix = "CONV"
   )
 
-Convert_R_dtTime <-
-  Convert_R_dtTime %>% mutate(st_time = Convert_R_dtTime$dates_min, end_time =
-                                Convert_R_dtTime$dates_min)
-Convert_spk_dttime_new <-
-  copy_to(
-    sc,
-    Convert_R_dtTime %>% mutate(
-      st_hur = as.character(Convert_R_dtTime$dates_min),
-      end_hr = as.character(Convert_R_dtTime$dates_min)
-    ),
-    overwrite = TRUE
-  )
+Convert_R_dtTime <- Convert_R_dtTime %>%
+  mutate(st_time = Convert_R_dtTime$dates_min,
+         end_time = Convert_R_dtTime$dates_min)
+Convert_spk_dttime_new <- Convert_R_dtTime %>% mutate(
+  st_hur = as.character(Convert_R_dtTime$dates_min),
+  end_hr = as.character(Convert_R_dtTime$dates_min)) %>% 
+  copy_to(sc, ., overwrite = TRUE)
 
 Convert_R_dtTime$st_hur <-
   as.POSIXct(paste0(substring(Convert_R_dtTime$end_time, 0, 13), ":00:00"))
