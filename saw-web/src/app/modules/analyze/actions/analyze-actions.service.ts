@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { first } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
@@ -33,13 +32,11 @@ export class AnalyzeActionsService {
   }
 
   fork(analysis) {
-    const model = clone(analysis);
-    model.name += ' Copy';
-    return this.openEditModal(model, 'fork');
+    return this.openEditModal(analysis, 'fork');
   }
 
   edit(analysis) {
-    return this.openEditModal(clone(analysis), 'edit');
+    return this.openEditModal(analysis, 'edit');
   }
 
   publish(analysis, type) {
@@ -80,10 +77,7 @@ export class AnalyzeActionsService {
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
       return this._analyzeDialogService
-        .openEditAnalysisDialog(analysis, mode)
-        .afterClosed()
-        .pipe(first())
-        .toPromise();
+        .openEditAnalysisDialog(analysis, mode);
     default:
     }
   }

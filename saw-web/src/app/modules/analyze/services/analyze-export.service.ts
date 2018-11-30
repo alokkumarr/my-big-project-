@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as fpPick from 'lodash/fp/pick';
 import * as fpPipe from 'lodash/fp/pipe';
-import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
 import * as map from 'lodash/map';
 import * as flatMap from 'lodash/flatMap';
@@ -14,6 +13,7 @@ import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 import { saveAs } from 'file-saver';
 import * as Blob from 'blob';
+import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
@@ -31,7 +31,8 @@ export class AnalyzeExportService {
     this._analyzeActionsService
       .exportAnalysis(analysisId, executionId, analysisType, executionType)
       .then(data => {
-        let fields = this.getCheckedFieldsForExport(analysis, data);
+        const exportData = get(data, 'data');
+        let fields = this.getCheckedFieldsForExport(analysis, exportData);
         fields = this.checkColumnName(fields);
         const columnNames = map(fields, 'columnName');
         const exportOptions = {
@@ -45,7 +46,7 @@ export class AnalyzeExportService {
           columnNames
         };
         json2csv(
-          data,
+          exportData,
           (err, csv) => {
             if (err) {
               this._toastMessage.error(
@@ -73,9 +74,8 @@ export class AnalyzeExportService {
   getCheckedFieldsForExport(analysis, data) {
     /* If report was using designer mode, find checked columns */
     if (!analysis.edit) {
-      return flatMap(analysis.artifacts, artifact =>
+      return flatMap(analysis.sqlBuilder.dataFields, artifact =>
         fpPipe(
-          fpFilter('checked'),
           fpMap(fpPick(['columnName', 'aliasName', 'displayName']))
         )(artifact.columns)
       );

@@ -1,14 +1,13 @@
 package controllers
 
-import com.synchronoss.querybuilder.{KPIDataQueryBuilder, SAWElasticSearchQueryExecutor}
+import com.synchronoss.BuilderUtil
 import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject
+import com.synchronoss.querybuilder.{KPIDataQueryBuilder, SAWElasticSearchQueryExecutor}
 import model.ClientException
-import org.json4s.{JArray, JNothing}
 import org.json4s.JsonAST.{JObject, JString, JValue}
 import org.json4s.native.JsonMethods.{compact, parse, render}
+import org.json4s.{JArray, JNothing}
 import play.mvc.Result
-import sncr.metadata.engine.context.SelectModels
-import sncr.metadata.semantix.SemanticNode
 import sncr.saw.common.config.SAWServiceConfig
 import sncr.service.InternalServiceClient
 import sncr.service.model.SemanticNodeObject
@@ -21,45 +20,55 @@ class KPIBuilder extends BaseController {
 
   private def doProcess(json: JValue, ticket: Option[Ticket]): JValue = {
     m_log trace("Validate and process request:  " + compact(render(json)))
-    val (userId: Integer, userFullName: String) = ticket match {
+    val (userId: Integer, userFullName: String, dataSecurityKey: java.util.List[Object]) = ticket match {
       case None => throw new ClientException(
         "Valid JWT not found in Authorization header")
       case Some(ticket) =>
-        (ticket.userId, ticket.userFullName)
+        (ticket.userId, ticket.userFullName, ticket.dataSecurityKey)
     }
     val action = (json \ "action").extract[String].toLowerCase;
     action match {
-        case "fetch" => {
-          val semanticId = extractKey(json,"semanticId")
-          val semanticNodeJson = readSemanticNode(semanticId)
-          val responseJson = json merge semanticNodeJson
-          responseJson
-        }
-        case "execute" => {
-          val jsonString: String = compact(render(json));
-          val timeOut :java.lang.Integer =if (SAWServiceConfig.es_conf.hasPath("timeout"))
-            new Integer(SAWServiceConfig.es_conf.getInt("timeout")) else new java.lang.Integer(3)
-          val executionObject : KPIExecutionObject = new KPIDataQueryBuilder(jsonString).buildQuery();
-          val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject,timeOut)
-          val responseJson = parse(data)
-          responseJson
-        }
+      case "fetch" => {
+        val semanticId = extractKey(json,"semanticId")
+        val semanticNodeJson = readSemanticNode(semanticId)
+        val responseJson = json merge semanticNodeJson
+        responseJson
       }
+      case "execute" => {
+        val jsonString: String = compact(render(json));
+        val timeOut :java.lang.Integer =if (SAWServiceConfig.es_conf.hasPath("timeout"))
+          new Integer(SAWServiceConfig.es_conf.getInt("timeout")) else new java.lang.Integer(3)
+        var dskStr: String = ""
+        if (dataSecurityKey!=null && dataSecurityKey.size() > 0) {
+          //dskStr = dataSecurityKey.asScala.mkString(",") ;
+          dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
+          m_log.trace("dskStr after processing in update: {}", dskStr);
+        }
+        var executionObject : KPIExecutionObject = null
+        if (dskStr!=null || !dskStr.isEmpty)
+          executionObject = new KPIDataQueryBuilder(jsonString,dskStr).buildQuery()
+        else
+          executionObject = new KPIDataQueryBuilder(jsonString).buildQuery()
+        val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject,timeOut)
+        val responseJson = parse(data)
+        responseJson
+      }
+    }
   }
 
-    private def readSemanticNode(semanticId: String): JObject = {
+  private def readSemanticNode(semanticId: String): JObject = {
     // The below has been commented because HBase Binary Store has been deprecated
     // val semanticNode = SemanticNode(semanticId, SelectModels.relation.id)
-      //semanticNode.getCachedData("content") match {
-       // case content: JObject => content
-       // case _ => throw new ClientException("no match")
-      //}
-       val semanticHost = SAWServiceConfig.semanticService.getString("host")
-       val semanticEndpoint = SAWServiceConfig.semanticService.getString("endpoint")
-       val semanticJsonMetaDataStore = parse(new InternalServiceClient(semanticHost + semanticEndpoint + semanticId)
-        .retrieveObject(new SemanticNodeObject())).asInstanceOf[JObject];
-      semanticJsonMetaDataStore
-    }
+    //semanticNode.getCachedData("content") match {
+    // case content: JObject => content
+    // case _ => throw new ClientException("no match")
+    //}
+    val semanticHost = SAWServiceConfig.semanticService.getString("host")
+    val semanticEndpoint = SAWServiceConfig.semanticService.getString("endpoint")
+    val semanticJsonMetaDataStore = parse(new InternalServiceClient(semanticHost + semanticEndpoint + semanticId)
+      .retrieveObject(new SemanticNodeObject())).asInstanceOf[JObject];
+    semanticJsonMetaDataStore
+  }
 
   private def checkSemanticwithKPIfieldsPresent(semanticNodeJson : JObject) =
   {
@@ -68,7 +77,7 @@ class KPIBuilder extends BaseController {
       case JNothing => List()
       case obj: JValue => unexpectedElement(obj, "array", "artifacts")
     }
-   checkKpiEligibleColumns(artifacts)
+    checkKpiEligibleColumns(artifacts)
   }
 
   private def checkKpiEligibleColumns(artifacts: List[JValue]) = {

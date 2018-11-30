@@ -386,7 +386,7 @@ public class AnalyzeIT extends BaseIT {
             .body(json)
             .when().post("/saw/services/analysis")
             .then().assertThat().statusCode(200)
-            .body(buckets + ".totalRows", equalTo(200));
+            .body(buckets + ".totalRows", equalTo(215));
     }
 
   private String listSingleExecution(String token, String analysisId) {
@@ -452,7 +452,7 @@ public class AnalyzeIT extends BaseIT {
                         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
     JsonNode jsonNode= root.get("long");
-    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1498);
+    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1513);
     Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
   }
 
