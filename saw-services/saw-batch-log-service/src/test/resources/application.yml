@@ -35,3 +35,5 @@ logging:
   level:
     com.synchronoss.saw.logs: DEBUG
     org.springframework: INFO
+    
+scheduler-url: http://localhost:9601/scheduler/bisscheduler
