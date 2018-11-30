@@ -18,13 +18,14 @@ sim_tbl <- mutate_at(sim_df, "date", as.character) %>%
   copy_to(sc, ., name = "df", overwrite = TRUE) %>%
   mutate(date = to_date(date))
 
+
 # Test 1:Expander- with mode=nesting for unique " id-vars" ----------------
 
 expand_nest <- expander(sim_df,
                         id_vars = c("id", "cat1"),
                         mode = "nesting",
                         complete = FALSE)
-dist_dat <- 
+
 
 test_that("expander results right for nested with selected id_var columns", {
   expect_equal(
