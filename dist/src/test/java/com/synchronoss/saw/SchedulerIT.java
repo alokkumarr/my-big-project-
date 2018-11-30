@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@Ignore
 public class SchedulerIT extends BaseIT {
 
   private static final String SERVICE_PATH = "/services/scheduler/bisscheduler/";
