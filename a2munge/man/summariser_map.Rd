@@ -8,11 +8,11 @@
 \usage{
 summariser_map(df, id_vars, map, sep, fill)
 
-\method{summariser_map}{data.frame}(df, id_vars, map = list(), sep = "_",
-  fill = NULL)
+\method{summariser_map}{data.frame}(df, id_vars, map = list(),
+  sep = "_", fill = NULL)
 
-\method{summariser_map}{tbl_spark}(df, id_vars, map = list(), sep = "_",
-  fill = NULL)
+\method{summariser_map}{tbl_spark}(df, id_vars, map = list(),
+  sep = "_", fill = NULL)
 }
 \arguments{
 \item{df}{DataFrame}
