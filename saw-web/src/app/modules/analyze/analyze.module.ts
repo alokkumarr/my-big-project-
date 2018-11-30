@@ -21,7 +21,7 @@ import { AnalyzePublishDialogModule } from './publish';
 import { AnalyzeModuleGlobal } from './analyze.global.module';
 import {
   AnalyzeReportQueryComponent,
-  DesignerDialogComponent,
+  DesignerPageComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
   DesignerToolbarComponent,
@@ -55,7 +55,7 @@ import { AnalyzePageComponent } from './page';
 
 const COMPONENTS = [
   AnalyzeReportQueryComponent,
-  DesignerDialogComponent,
+  DesignerPageComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
   DesignerToolbarComponent,

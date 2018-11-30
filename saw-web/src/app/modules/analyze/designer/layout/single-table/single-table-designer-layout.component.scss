@@ -2,12 +2,12 @@
 
 :host {
   background-color: white;
-  max-height: 93vh;
+  height: 100%;
   max-width: 100vw;
   display: grid;
   grid-template:
-    "data-settings content" 93vh
-    / 25vw 75vw;
+    "data-settings content" 100%
+    / 25% auto;
 }
 
 .designer__data-settings {

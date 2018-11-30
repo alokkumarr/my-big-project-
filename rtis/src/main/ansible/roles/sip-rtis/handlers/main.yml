@@ -1,0 +1,2 @@
+- name: restart sip-rtis
+  systemd: name=sip-rtis state=restarted daemon_reload=true

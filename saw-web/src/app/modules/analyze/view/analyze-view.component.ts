@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
-import * as isUndefined from 'lodash/isUndefined';
 import * as findIndex from 'lodash/findIndex';
+import * as reduce from 'lodash/reduce';
 
 import { JwtService } from '../../../common/services';
 import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
@@ -221,11 +221,13 @@ export class AnalyzeViewComponent implements OnInit {
       .getAllCronJobs(requestModel)
       .then((response: any) => {
         if (response.statusCode === 200) {
-          if (!isUndefined(response)) {
-            this.cronJobs = response.data;
-          } else {
-            this.cronJobs = '';
-          }
+          this.cronJobs = reduce(response.data, (accumulator, cron) => {
+            const { analysisID } = cron.jobDetails;
+            accumulator[analysisID] = cron;
+            return accumulator;
+          }, {});
+        } else {
+          this.cronJobs = {};
         }
       })
       .catch(err => {

@@ -1,4 +1,3 @@
-import { DesignerDialogComponent } from './dialog';
 import { DesignerContainerComponent } from './container';
 import { DesignerHeaderComponent } from './header';
 import { DesignerToolbarComponent } from './toolbar';
@@ -32,10 +31,11 @@ import { DesignerDescriptionComponent } from './description';
 import { DesignerPreviewDialogComponent } from './preview-dialog';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
+import { DesignerPageComponent } from './page/page.component';
 
 export {
   AnalyzeReportQueryComponent,
-  DesignerDialogComponent,
+  DesignerPageComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
   DesignerToolbarComponent,
