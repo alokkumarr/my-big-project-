@@ -133,8 +133,8 @@ test_that("Dateparter give right values", {
 
 # test 10:Column name and count comparision between R and Spark Dataset -------------
 
-Date_parter_check_DF <- date_parter(dat, "date")
-Date_parter_check_Spark_DF <- date_parter(tbl, "date")
+Date_parter_check_DF <- date_parter(sim_df, "date")
+Date_parter_check_Spark_DF <- date_parter(sim_tbl, "date")
 
 test_that("Date-part-column details of R ans Spark are matching", {
   expect_equal(colnames(Date_parter_check_DF),

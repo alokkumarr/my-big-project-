@@ -51,8 +51,8 @@ test_that("lagger methods consistent", {
 
 
 test_that("lagger returns correct dimensions", {
-  expect_equal(sdf_nrow(spk_lag), nrow(dat))
-  expect_equal(nrow(r_lag), nrow(dat))
+  expect_equal(sdf_nrow(spk_lag), nrow(sim_df))
+  expect_equal(nrow(r_lag), nrow(sim_df))
 })
 
 
