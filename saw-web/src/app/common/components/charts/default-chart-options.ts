@@ -1,4 +1,4 @@
-import {CHART_COLORS} from '../../consts';
+import { CHART_COLORS } from '../../consts';
 
 export const globalChartOptions = {
   lang: {

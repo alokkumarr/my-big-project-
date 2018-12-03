@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -75,7 +76,7 @@ public class SecurityController {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	private final String AdminRole = "ADMIN";
+    private final String AdminRole = "ADMIN";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -721,8 +722,11 @@ public class SecurityController {
      * @return List of group names
      */
 	@RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.GET)
-        public List<SecurityGroups> getSecurityGroups() {
-        List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames();
+        public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,HttpServletResponse response) {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
+	    List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
 	    return groupNames;
     }
 
@@ -737,6 +741,7 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String createdBy = extractValuesFromToken[2];
         String roleType = extractValuesFromToken[3];
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
         if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
             response.setStatus(400);
@@ -745,7 +750,7 @@ public class SecurityController {
             valid.setError(ServerResponseMessages.ADD_GROUPS_WITH_NON_ADMIN_ROLE);
             return valid;
         }
-        DskValidity dskValidity = dataSecurityKeyRepository.addSecurityGroups(securityGroups,createdBy);
+        DskValidity dskValidity = dataSecurityKeyRepository.addSecurityGroups(securityGroups,createdBy,custId);
         if ( dskValidity.getValid().booleanValue() == true )    {
             return dskValidity;
         }
@@ -767,9 +772,10 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
-    public Object updateSecurityGroups(HttpServletRequest request,HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
+    public Object updateSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
@@ -779,7 +785,7 @@ public class SecurityController {
             valid.setError(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
             return valid;
         }
-        DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups);
+        DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups,custId);
         if (dskValidity.getValid().booleanValue() == true)  {
             return dskValidity;
         }
@@ -827,7 +833,7 @@ public class SecurityController {
      * @return Valid obj containing Boolean, suceess/failure msg
      */
     @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.POST)
-    public Valid addSecurityGroupDskAttributeValues(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)  {
+    public Valid addSecurityGroupDskAttributeValues(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
@@ -856,7 +862,7 @@ public class SecurityController {
      * @return Valid obj containing Boolean, suceess/failure msg
      */
     @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method =  RequestMethod.PUT)
-    public Valid updateAttributeValues(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)    {
+    public Valid updateAttributeValues(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)    {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         String roleType = extractValuesFromToken[3];
@@ -928,6 +934,7 @@ public class SecurityController {
     public Valid updateUser(HttpServletRequest request, HttpServletResponse response, @PathVariable (name = "userSysId", required = true) Long userSysId, @RequestBody String securityGroupName)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
@@ -937,7 +944,7 @@ public class SecurityController {
             valid.setError(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
             return valid;
         }
-        Valid dskValidity = dataSecurityKeyRepository.updateUser(securityGroupName,userSysId);
+        Valid dskValidity = dataSecurityKeyRepository.updateUser(securityGroupName,userSysId,custId);
         if ( dskValidity.getValid().booleanValue() == true )    {
             return dskValidity;
         }
@@ -962,8 +969,11 @@ public class SecurityController {
      * @return List of all user Assignments
      */
     @RequestMapping ( value = "/auth/admin/user-assignments", method = RequestMethod.GET)
-    public List<UserAssignment> getAllUserAssignments()  {
-	    return dataSecurityKeyRepository.getAllUserAssignments();
+    public List<UserAssignment> getAllUserAssignments(HttpServletRequest request, HttpServletResponse response)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
+	    return dataSecurityKeyRepository.getAllUserAssignments(custId);
     }
 
 
