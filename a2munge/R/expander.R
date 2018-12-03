@@ -65,7 +65,7 @@ expander.data.frame <- function(df,
       tidyr::complete(., mode_fun(!!!rlang::syms(id_vars)),!!!fun)
 
   } else {
-    results <-  df %>%
+    results <- df %>%
       tidyr::expand(., mode_fun(!!!rlang::syms(id_vars)),!!!fun)
   }
 

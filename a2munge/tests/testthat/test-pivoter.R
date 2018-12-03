@@ -49,11 +49,13 @@ test_that("pivoter methods consistent", {
   expect_equal(
     spk_wide %>%
       collect() %>%
-      as.data.frame() %>%
-      mutate(date = as.Date(date)) %>%
-      arrange_at(id_vars),
+      select_if(is.numeric) %>%
+      summarise_all(mean) %>%
+      as.numeric(),
     r_wide %>%
-      arrange_at(id_vars)
+      select_if(is.numeric) %>%
+      summarise_all(mean) %>%
+      as.numeric()
   )
 })
 

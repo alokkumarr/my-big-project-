@@ -51,36 +51,34 @@ test_that("expander results right nested for spark DS", {
 # Test 5:Expander- with mode=crossing for unique " id-vars" ----------------
 
 expand_crossing <- expander(sim_df,
-                            id_vars = c("id", "date"),
+                            id_vars = c("id", "cat1", "cat2"),
                             mode = "crossing",
                             complete = FALSE) %>%
-  arrange(id, date)
+  arrange(id, cat1, cat2)
 
 test_that("expander with Crossing with only id_vars as output ", {
   
   ndates <- length(unique(sim_df$date))
   
-  expect_gte(nrow(expand_crossing), nrow(sim_df))
-  expect_true(all(
-    ndates == expand_crossing %>%
-      count(id) %>% 
-      pull(n) 
-  ))
+  expect_gte(nrow(expand_crossing), nrow(distinct(sim_df, id, cat1, cat2)))
+  expect_equal(nrow(expand_crossing),
+               nrow(expand.grid(id   = unique(sim_df$id),
+                                cat1 = unique(sim_df$cat1),
+                                cat2 = unique(sim_df$cat2))))
 })
 
 # Test 6:Expander- with mode=crossing for unique " id-vars" for Sa --------
 
 expand_crossing_spark_DS <- expander(sim_tbl,
-                                     id_vars = c("id", "date"),
+                                     id_vars = c("id", "cat1", "cat2"),
                                      mode = "crossing",
                                      complete = FALSE) %>%
   collect() %>%
-  arrange(id, date) 
+  arrange(id, cat1, cat2) 
 
 test_that("expander with Crossing with only id_vars as output for spark DS ", {
-  expect_equal(expand_crossing_spark_DS,
-               expand_crossing)
-
+  
+  expect_equal(expand_crossing_spark_DS, expand_crossing)
 })
 
 

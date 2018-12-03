@@ -17,6 +17,7 @@ sim_tbl <- mutate_at(sim_df, "date", as.character) %>%
   copy_to(sc, ., name = "df", overwrite = TRUE) %>%
   mutate(date = to_date(date))
 
+
 r_mtr <- sim_df %>%
   mutater(order_vars = c("id", 'date'),
           group_vars = c("cat1", "cat2"),
@@ -65,8 +66,8 @@ test_that("custom expression works as expected", {
   expect_equal(spk_mtr1 %>%
                  collect() %>%
                  arrange(index) %>%
-                 select_if(is.numeric),
+                 select(metric1, metric1_add2),
                r_mtr1 %>%
                  arrange(index) %>%
-                 select_if(is.numeric))
+                 select(metric1, metric1_add2))
 })

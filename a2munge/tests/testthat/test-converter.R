@@ -15,23 +15,23 @@ context("Date Converter unit tests")
 sc <- spark_connect(master = "local")
 
 # Load data into Spark
-sim_df <- sim_df %>% 
+sim_df1 <- sim_df %>% 
   mutate(rand_mins = sample(0:(23*60), n(), replace=TRUE), 
          date_time = as.POSIXct(date + minutes(rand_mins))) %>% 
   select(-rand_mins)
 
-sim_tbl <- sim_df %>% 
+sim_tbl <- sim_df1 %>% 
   mutate_at(c("date", "date_time"), as.character) %>% 
   copy_to(sc, ., overwrite = TRUE)
 
-sim_df <- sim_df %>% 
+sim_df1 <- sim_df1 %>% 
   mutate_at("date", as.Date) %>% 
   mutate_at("date_time", as.POSIXct)
 
 
 # Test 1 : Input String format Date to output type-DateTime ---------------
 
-Date1_R_dtTime <- converter(sim_df,
+Date1_R_dtTime <- converter(sim_df1,
                             measure_vars = "date_time",
                             input_format = "yyyy-MM-dd HH:mm:ss",
                             output_type = "datetime",
@@ -57,7 +57,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 
 # Test 2 : Input String format Date to output type-Date ---------------
 
-Date1_R_dt <- converter(sim_df,
+Date1_R_dt <- converter(sim_df1,
                         measure_vars = "date_time",
                         input_format = "yyyy-MM-dd HH:mm:ss",
                         output_type = "date",
@@ -83,7 +83,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 
 # Test 3 : Don't specify output format,default output type-Datetime ---------------
 
-Date1_R_dt_opt <- converter(sim_df,
+Date1_R_dt_opt <- converter(sim_df1,
                             measure_vars = "date_time",
                             input_format = "yyyy-MM-dd HH:mm:ss",
                             time_zone = "PST",
@@ -107,7 +107,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 
 # Test 4:Different input date format-"yyyy-MM-dd"-------------------------------------------
 
-Date1_R_format_dtTime <- converter(sim_df,
+Date1_R_format_dtTime <- converter(sim_df1,
                                    measure_vars = "date",
                                    input_format = "yyyy-MM-dd",
                                    output_type = "datetime",
