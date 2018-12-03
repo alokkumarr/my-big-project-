@@ -194,14 +194,16 @@ export class AnalyzeService {
     });
   }
 
-  readAnalysis(analysisId) {
+  readAnalysis(analysisId, customHeaders = {}) {
     const payload = this.getRequestParams([
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(
-      fpGet(`contents.analyze.[0]`)
-    );
+    return <Promise<Analysis>>this.postRequest(
+      `analysis`,
+      payload,
+      customHeaders
+    ).then(fpGet(`contents.analyze.[0]`));
   }
 
   previewExecution(model, options = {}) {
@@ -437,10 +439,11 @@ export class AnalyzeService {
     return this._http.get(`${apiUrl}/${path}`).toPromise();
   }
 
-  postRequest(path: string, params: Object) {
+  postRequest(path: string, params: Object, customHeaders = {}) {
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...customHeaders
       })
     };
     return this._http

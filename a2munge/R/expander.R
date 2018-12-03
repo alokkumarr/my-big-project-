@@ -5,10 +5,10 @@
 #' values
 #'
 #' @param df dataframe
+#' @param id_vars optional vector of column names to expand data by. default it
+#'   NULL.
 #' @param group_vars optional vector column names to group data by. default is
 #'   NULL. Any expansion function will be nested within the grouping vars
-#' @param id_vars optional vector of colnames to expand data by. default it
-#'   NULL.
 #' @param fun optional expansion function. useful for expanding continuous
 #'   variables with values that don't appear in the data (like missing dates).
 #'   fun argument should be wrapped in `funs(...)` function and should assign
@@ -35,7 +35,7 @@
 #' expander(mtcars, id_vars = c('am', 'cyl'), complete = FALSE)
 #' expander(mtcars, id_vars = c('am', 'cyl'), fun = funs(carb = 1:5), complete = TRUE)
 #' expander(mtcars, id_vars = c('am'), fun = funs(cyl = full_seq(cyl, 1)), complete = TRUE)
-expander <- function(df, group_vars, id_vars, fun, mode, complete) {
+expander <- function(df, id_vars, group_vars, fun, mode, complete) {
   UseMethod("expander")
 }
 
@@ -43,14 +43,14 @@ expander <- function(df, group_vars, id_vars, fun, mode, complete) {
 #' @export
 #' @rdname expander
 expander.data.frame <- function(df,
-                                group_vars = NULL,
                                 id_vars = NULL,
+                                group_vars = NULL,
                                 fun = NULL,
                                 mode = "crossing",
                                 complete = TRUE) {
   df_names <- colnames(df)
-  checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)
   checkmate::assert_subset(id_vars, df_names, empty.ok = TRUE)
+  checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)
   checkmate::assert_class(fun, "fun_list", null.ok = TRUE)
   checkmate::assert_choice(mode, c("crossing", "nesting"))
   checkmate::assert_logical(complete)
@@ -80,15 +80,15 @@ expander.data.frame <- function(df,
 #' @export
 #' @rdname expander
 expander.tbl_spark <- function(df,
-                               group_vars = NULL,
                                id_vars = NULL,
+                               group_vars = NULL,
                                fun = NULL,
                                mode = "crossing",
                                complete = TRUE) {
 
   df_names <- colnames(df)
-  checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)
   checkmate::assert_subset(id_vars, df_names, empty.ok = TRUE)
+  checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)
   checkmate::assert_class(fun, "fun_list", null.ok = TRUE)
   checkmate::assert_choice(mode, c("crossing", "nesting"))
   checkmate::assert_logical(complete)
