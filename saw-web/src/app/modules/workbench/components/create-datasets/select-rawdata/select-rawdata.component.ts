@@ -64,10 +64,10 @@ export class SelectRawdataComponent
   ngAfterViewInit() {
     this.getPageData();
     this.dataGrid.instance.option(this.gridConfig);
-    const stagingNode = this.tree.treeModel.getFirstRoot();
-    stagingNode.expand();
-    stagingNode.setIsActive(true);
-    this.nodeID = stagingNode.id;
+    // const stagingNode = this.tree.treeModel.getFirstRoot();
+    // stagingNode.expand();
+    // stagingNode.setIsActive(true);
+    // this.nodeID = stagingNode.id;
     this.fileMaskControl.valueChanges
       .pipe(debounceTime(1000))
       .subscribe(mask => this.maskSearch(mask));
@@ -98,6 +98,7 @@ export class SelectRawdataComponent
           .getStagingData(path)
           .toPromise()
           .then(function(data) {
+            console.log('data', data);
             const dir = filter(data.data, ['isDirectory', true]);
             return dir;
           });

@@ -25,7 +25,9 @@ export class WorkbenchService {
     public http: HttpClient,
     public jwt: JwtService,
     public router: Router
-  ) {}
+  ) {
+    this.getStagingData = this.getStagingData.bind(this);
+  }
 
   /** GET datasets from the server */
   getDatasets(): Observable<any> {
