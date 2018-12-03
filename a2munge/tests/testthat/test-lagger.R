@@ -35,15 +35,15 @@ test_that("lagger methods consistent", {
   expect_equal(
     spk_lag %>%
       collect() %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_lag %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_lag), colnames(r_lag))
 })

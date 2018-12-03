@@ -98,6 +98,7 @@ test_that("aggregation function works as expected", {
 
 
 test_that("fill value works as expected", {
+  
   spk_wide2 <- pivoter(
     sim_tbl,
     id_vars = id_vars,
@@ -106,7 +107,8 @@ test_that("fill value works as expected", {
     fun = "sum",
     sep = "_",
     fill = 5
-  )
+  ) %>%
+    collect()
 
   r_wide2 <- pivoter(
     sim_df,
@@ -117,7 +119,23 @@ test_that("fill value works as expected", {
     sep = "_",
     fill = 5
   )
-
+  
+  expect_equal( nrow(spk_wide2), nrow(r_wide2))
+  expect_equal( ncol(spk_wide2), ncol(r_wide2))
+  
+  expect_equal(
+    spk_wide2 %>%
+      select_if(is.numeric) %>%
+      summarise_all(mean) %>% 
+      as.numeric(),
+    r_wide2 %>%
+      select_if(is.numeric) %>%
+      summarise_all(mean) %>% 
+      as.numeric()
+  )
+  
+  
+  
   spk_wide3 <- pivoter(
     sim_tbl,
     id_vars = id_vars,
@@ -126,7 +144,8 @@ test_that("fill value works as expected", {
     fun = "sum",
     sep = "_",
     fill = NULL
-  )
+  ) %>%
+    collect()
 
   r_wide3 <- pivoter(
     sim_df,
@@ -138,25 +157,19 @@ test_that("fill value works as expected", {
     fill = NULL
   )
 
-
-  expect_equal(
-    spk_wide2 %>%
-      collect() %>%
-      as.data.frame() %>%
-      mutate(date = as.Date(date)) %>%
-      arrange_at(id_vars),
-    r_wide2 %>%
-      arrange_at(id_vars)
-  )
-
+  
+  expect_equal( nrow(spk_wide3), nrow(r_wide3))
+  expect_equal( ncol(spk_wide3), ncol(r_wide3))
+  
   expect_equal(
     spk_wide3 %>%
-      collect() %>%
-      as.data.frame() %>%
-      mutate(date = as.Date(date)) %>%
-      arrange_at(id_vars),
+      select_if(is.numeric) %>%
+      summarise_all(mean) %>% 
+      as.numeric(),
     r_wide3 %>%
-      arrange_at(id_vars)
+      select_if(is.numeric) %>%
+      summarise_all(mean) %>% 
+      as.numeric()
   )
 })
 
