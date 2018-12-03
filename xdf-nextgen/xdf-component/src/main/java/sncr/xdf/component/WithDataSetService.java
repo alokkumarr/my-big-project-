@@ -8,6 +8,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import scala.Tuple4;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
@@ -289,7 +290,8 @@ public interface WithDataSetService {
                 .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
                 .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
                 .append(Path.SEPARATOR + aux.ctx.batchID)
-                .append(Path.SEPARATOR + aux.ctx.componentName);
+                .append(Path.SEPARATOR + aux.ctx.componentName)
+                .append(Path.SEPARATOR + new DateTime().getMillis());
 
         DataSetServiceAux.logger.debug(String.format("Generated temp location: %s",
             tempLocationBuilder.toString()));
