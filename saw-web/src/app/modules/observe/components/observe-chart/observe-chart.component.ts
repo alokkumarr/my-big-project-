@@ -333,4 +333,8 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     ];
   }
+
+  exportGridToExcel() {
+    this.dataGrid.instance.exportToExcel(false);
+  }
 }

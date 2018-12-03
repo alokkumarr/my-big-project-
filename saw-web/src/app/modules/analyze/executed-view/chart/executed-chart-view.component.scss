@@ -13,10 +13,22 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   font-size: $header-font-size;
 }
 
+.analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-container {
+  width: 80%;
+}
+
+.flex-icon-container {
+  width: 20%
+}
+
 .toggle-icons {
   text-align: right;
-  height: 25px;
-  margin-right: 5%;
   font-size: 15px;
 }
 
