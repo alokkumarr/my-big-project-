@@ -2,7 +2,7 @@
 
 :host {
   display: block;
-  height: calc(100% - 20px);
+  height: calc(100% - 156px);
   width: calc(100% - 20px);
 }
 
@@ -21,4 +21,12 @@
   display: table;
   font-size: 200px;
   width: 200px;
+}
+
+.designer-chart-container {
+  height: 100%;
+
+  chart {
+    height: 100%;
+  }
 }

@@ -119,9 +119,11 @@ sip-app3
 
 [sip-rtis]
 sip-app1
+sip-app2
 
 [sip-rtis:vars]
 sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
 
 [sip-rtps]
+sip-app1
 sip-app2
