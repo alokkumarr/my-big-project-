@@ -14,9 +14,8 @@ context("regressor unit tests")
 # Basic Tests -------------------------------------------------------------
 
 
-# # Create Spark Connection
+# Create Spark Connection
 sc <- spark_connect(master = "local", version = "2.3.0")
-
 
 # Copy data to spark
 df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)

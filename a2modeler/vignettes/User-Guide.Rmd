@@ -21,26 +21,262 @@ knitr::opts_chunk$set(
 ```
 
 
+```{r packages, echo=FALSE}
+
+# R Packages
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(lubridate)
+library(sparklyr)
+library(a2munge)
+library(a2charter)
+library(ggplot2)
+```
+
+
 ## Overview
 
 a2modeler is an R package that provides a framework for efficiently and reliabily building statistical models. a2modeler currently supports the following use cases:
 
-* __Forecasting__: Statsitical models to make forward looking predicts of sequential or time series data
-* __Segmentation__: Statitical models to derive sub-groups withing a dataset based on measurable patterns
-* __Regression__: Statitical models to fit and make prediction for continuous numerical targets
+* __Forecasting__: Statistical models to make forward looking predicts of sequential or time series data
+* __Segmentation__: Statistical models to derive sub-groups withing a dataset based on measurable patterns
+* __Regression__: Statistical models to fit and make prediction for continuous numerical targets
 * __Classification__: Statitical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog
-* __Multi-Classification__: Statitical models to fit and make prediction for discrete targets with more than two unique values
+* __Multi-Classification__: Statistical models to fit and make prediction for discrete targets with more than two unique values
+
 
 ## Features
 
-
-## Design
-
-
-## Use Cases
+* Provides a consistent set of functions and APIs for common model development and application steps for multiple use cases
+    + adding a model to an a2modeler object uses the same function for Regression as Classification (see workflow section for more details)
+* Modular model package and algorithm backend 
+    + allows for different packages and algorithms to be implemented on same model object
+    + Spark-ML^[Spark-ML [via](https://spark.apache.org/mllib/)] currently implemented for Regression, Classification, Multi-Classification, and Segmentation
+* Feature engineering pipeline including in the model object
+    + Feature engineering is included in model testing framework
+    + Feature generation pipeline is shipped with final model object for efficient application
+* Model deployment functionality
+    + Model binary object saved and stored to file for re-usability
+* Rmarkdown^[R Markdown [via](https://rmarkdown.rstudio.com/)] development templates
+    + Re-usable templates provided with model reporting and visuals
+    + Regression and Classification templates currently completed
+    
 
 
 ## Workflow
 
+A key deisgn principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below. In this section each of the distinct workflow steps represented as a high level a2modeler function is reviewed and gone into detal.
+
+![a2modeler Workflow](figures/a2modeler-workflow.jpg)
+
+#### Setup
+
+The first step of building an a2modeler model is to set up and define the meta data parameters. It is in this step where the use case is defined through a specific a2modeler function, the model data set is defined, target variable if applicable and various other inputs.
+
+```{r echo=FALSE}
+
+tibble(`Use Case` ="Regression",
+       Description = "Statistical models to fit and make prediction for continuous numerical targets",
+       `Back End` = "Spark-ML") %>% 
+  add_row(
+    `Use Case` = "Forecasting", 
+    Description = "Statistical models to make forward looking predicts of sequential or time series data",
+    `Back End` = "R forecast package") %>% 
+  add_row(`Use Case` ="Segmentation",
+          Description ="Statistical models to derive sub-groups withing a dataset based on measurable patterns",
+          `Back End` = "Spark-ML") %>% 
+  add_row(`Use Case` ="Classification",
+          Description ="Statistical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog",
+          `Back End` = "Spark-ML") %>% 
+  add_row(`Use Case` = "Multi-Classification",
+          Description ="Statistical models to fit and make prediction for discrete targets with more than two unique values",
+          `Back End` = "Spark-ML") %>% 
+  knitr::kable(.,
+               caption = "a2modeler Use Cases")
+
+```
+
+
+##### Regressor
+
+The a2modeler regressor is used to create a regression object. Regression is a supervised learning approach where the target variable is numeric and typically continuous. 
+
+The key inputs are the dataframe to be used to develop the model and the target variable. Note: all other non-target variables in the dataframe are available for feature engineering. The latter is true for all a2modeler objects. 
+
+Currently only the spark-ml backend via sparklyr^[sparklyr R package [via](https://spark.rstudio.com/mlib/)] is supported for the regressor. That means the dataframe provided should be a spark object. a2modeler requires spark 2.3.0 version or higher. 
+
+```{r regressor, eval=FALSE}
+
+### Regressor Example:
+
+# Create Spark Connection
+sc <- spark_connect(master = "local", version = "2.3.0")
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+# Regressor
+r1 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example")
+
+```
+
+
+##### Forecaster
+
+The forecaster function is used to create a forecasting object. Forecasting is a form or regression applied on sequential, or time indexed datasets. Typically lagged or historical values of a target variable are used as predictors. The predictions from forecaster are strictly forward looking. As such, features used in forecaster need special care so that predictions are made ex ante requiring all features are known at time of prediction. 
+
+Currently forecaster only supports the great forecast^[forecast R package [via](http://pkg.robjhyndman.com/forecast/)] R package. Forecaster does support auto-forecasting R and spark based approaches. More on this in later section.
+
+An additional input for the index variable is required. The index variable is used internally to arrange the datasets and indexed predictions. The index variable (along with the target) is removed from the potential predictor variables. 
+
+```{r forecaster, eval=FALSE}
+
+### Forecaster Example
+
+# Simulated Time Series Data
+select(sim_df_ts, date, y)
+
+f1 <- forecaster(df        = select(sim_df_ts, date, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example")
+
+```
+
+
+##### Segmenter
+
+Segmenter is an a2modeler function to create a segmentation or clustering model. Cluster modeling is a form of unsupervised learning that looks for patterns to define sub-groups of records in a dataset. The segmenter does not take a target or index variable input. 
+
+The segmenter is supported with the Spark-ML backend.
+
+
+```{r segmenter, eval=FALSE}
+
+### Segmenter Example:
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+# Segmenter
+s1 <- segmenter(df     = df,
+                name   = "example")
+
+```
+
+
+
+##### Classifier
+
+Classifier is an a2modeler function to create a classification model. Classification is a special case of supervised learning where the target variable is binary. Classification models are often used to create both binary predictions and class probabilities predictions. The latter is sometimes refered to as propensity modeling. 
+
+The classifier is supported with the Spark-ML backend.
+
+
+```{r classifier, eval=FALSE}
+
+### Classifier Example:
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+# Classifier
+c1 <- classifier(df    = df,
+                 target = "am",
+                 name   = "example")
+
+```
+
+
+
+##### Multi-Classifier
+
+Multiclassifier is a similiar function to the classifier. The multiclassifier is appropriate for target variables with more than 2 discrete values. 
+
+The multiclassifier is supported with the Spark-ML backend.
+
+
+```{r multi-classifier, eval=FALSE}
+
+### Multi- Classifier Example:
+
+# Copy data to spark
+df <- copy_to(sc, iris, name = "iris", overwrite = TRUE)
+
+# Classifier
+c1 <- multiclassifier(df     = df,
+                      target = "Species",
+                      name   = "example")
+
+```
+
+
+##### Common Inputs
+
+In addition to the required inputs of the dataframe, target and index variables if required, the following inputs can be provided for meta-data purposes:
+
+* __name__: optional name for use case. Used in reporting and deployment pathing 
+* __uid__: optional input for unique identifier
+* __version__: optional input for use case version. Used in report and pathing
+* __desc__: optional input for use case description
+* __scientist__: optional input for data science developer
+* __execution_strategy__: input for parallel backend execution. Default is sequential. Leverages the future^[future R package [via](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)] for parallel execution. 
+* __refit__: Logical option to refit model to entire training dataset sample and validation fitting. If grid parameters supplied, the best param set determined by validation sample performance will be used. Default is TRUE.
+* __save_submodels__: logical flag to save sub model fits. Default is TRUE. 
+* __dir__: optional directory path for saving reports, data, and models
+* __seed__: seed number for random computations. Seed should be set to ensure repeatability of results.
+
+
+#### Sampling
+
+Now that the use case is defined and data inputs provided, the sampling criteria used in the model training/validation/testing should be defined. In a typical modeling workflow, the initial data provided is split into multiple chunks where one data sample is used to fit the model (training dataset) and a different sample is used to evaluate the model (validation dataset). The key concept is that the model predictions are evaluated on a dataset not used to fit the model. Some algorithms have the power to fit a provided dataset quite precisely, too precisely in fact, if the predictions results are not generalizable to new data samples. This is known as overfitting. A third sample is often used as a test sample once the final model is selected amoung many based on validation sample results as a final measure of predictive performance. 
+
+The a2modeler package currently supports the following sampling techinques:
+
+* __default__: single training sample only. Not recommend for more than simple exploratory examples
+* __holdout__: creates two or three data samples. Controled by split parameter. Sum of split parameter should equal 1. Each value represents the amount of data partitioned to each split. The order of the values matters - the splits correspond to train/validation/test samples. Test value optional. 
+    + ex - splits = c(.60, .20, .20): creates three samples. The training sample is 60 percent of the data, the validation sample is 20 percent and the test sample is the last 20 percent.
+* __random__: creates one or more random samples. The sample percentage of the total data is controlled through the amount parameter. There is an additional option for adding a test holdout sample.
+* __time slices__: creates one or more time slice samples which align the training sample with the validation sample by the index variable. Time slices are appropriate for forecasting use cases where the order of the data matters. The samples can be modified by width, horizon of predictions, and by sequence. There is an additional option for adding a test holdout sample.
+* __cross validation__: cross validation samples^[cross validation [via](https://en.wikipedia.org/wiki/Cross-validation_(statistics))] are widely used in machine learning model building workflows. Cross validation samples splits the data into multiple samples but ensures that each sample is used in one validation sample. The number of folds controls how many sampling pairs there are along with the amount of data in each. There is an additional option for adding a test holdout sample.
+
+
+Sampling is typically the second step in the workflow. Each of the sampling methods above can be "added" to the modeler object with the function convention of `add_*_samples()` where the sampling method is substitued for *. 
+
+```{r sampling, eval=FALSE}
+
+# Regressor with Sampling:
+r1 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2))
+
+```
+
+
+#### Measurement
+
+
+#### Models
+
+##### Features
+
+##### Method
+
+##### Parameters
+
+#### Train
+
+
+#### Select Final Model
+
+
+#### Deploy
+
+
+#### Predict
 
 ## Example
