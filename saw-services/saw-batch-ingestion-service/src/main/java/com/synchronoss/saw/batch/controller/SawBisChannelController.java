@@ -93,6 +93,10 @@ public class SawBisChannelController {
     ObjectNode rootNode = null;
     nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
     rootNode = (ObjectNode) nodeEntity;
+    String channelName =  rootNode.get("channelName").asText();
+    if (isChannelNameExists(channelName)) {
+      throw new BisException("Channel Name: " + channelName + " already exists");
+    }
     SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
     String secretPhrase = rootNode.get("password").asText();
     String passwordPhrase = obfuscator.encrypt(secretPhrase);
@@ -312,6 +316,54 @@ public class SawBisChannelController {
     }
     
     
+  }
+  
+  
+  /**
+   * This API provides an ability to delete a source.
+   */
+  @ApiOperation(value = "check channel Name is duplciate", response = Object.class)
+  @ApiResponses(value = { @ApiResponse(code = 200, 
+      message = "Request has been succeeded without any error"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+      @ApiResponse(code = 400, message = "Bad request"), 
+      @ApiResponse(code = 201, message = "Deleted"),
+      @ApiResponse(code = 401, message = "Unauthorized"),
+      @ApiResponse(code = 415, message = "Unsupported Type."
+          + "Representation not supported for the resource") })
+  @RequestMapping(value = "/channels/duplicate", 
+      method = RequestMethod.GET, produces = org.springframework.http
+          .MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  public ResponseEntity<Boolean> checkDuplicate(
+      @ApiParam(value = "channel Name", required = true) 
+      @RequestParam("channelName") String channelName) {
+
+    return new ResponseEntity<Boolean>(isChannelNameExists(channelName), HttpStatus.OK);
+
+  }
+
+  private boolean isChannelNameExists(String channelName) {
+    List<BisChannelEntity> channelEntities = bisChannelDataRestRepository.findAll();
+    ObjectMapper objectMapper = new ObjectMapper();
+    Optional<BisChannelEntity> channels = channelEntities.stream().filter(bisChannelEntity -> {
+      JsonNode metaDataNode;
+      JsonNode existingChannel;
+      try {
+        metaDataNode = objectMapper.readTree(bisChannelEntity.getChannelMetadata());
+        existingChannel = metaDataNode.get("channelName");
+        if (existingChannel != null && existingChannel.asText().equalsIgnoreCase(channelName)) {
+          return true;
+        }
+      } catch (IOException exception) {
+        logger.error(exception.getMessage());
+      }
+      return false;
+    }).findAny();
+
+    return channels.isPresent();
   }
 }
 

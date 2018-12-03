@@ -12,6 +12,7 @@ import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
+import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.model.BisChannelType;
@@ -30,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -39,6 +41,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -119,6 +122,18 @@ public class SawBisRouteController {
         BeanUtils.copyProperties(requestBody, routeEntity);
         routeEntity.setCreatedDate(new Date());
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        
+        /**
+         * Check duplicate route.
+         */
+        JsonNode routeName = routeData.get("routeName");
+        boolean isExists = this.isRouteNameExists(channelId, routeName.asText());
+        
+        if (isExists) {
+          throw new BisException("Route Name: " + routeName + "  already exists");
+        }
+        
+        
         /*
          * sentDestinationLocation = routeData.get("destinationLocation").asText() != null &&
          * !routeData.get("destinationLocation").asText().equals("") ?
@@ -454,4 +469,46 @@ public class SawBisRouteController {
       return ResponseEntity.ok().build();
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
   }
+  
+  /**
+   * checks is there a route with given route name.
+   * 
+   * @param channelId channe identifier
+   * @param routeName name of the route
+   * @return true or false
+   */
+  @RequestMapping(value = "/channels/{channelId}/duplicate", method 
+      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Boolean> isDuplicateRoute(
+      @RequestParam("channelId")  Long channelId,
+      @RequestParam("routeName") String routeName) {
+    
+    return new ResponseEntity<Boolean>(this.isRouteNameExists(channelId,routeName), HttpStatus.OK);
+  }
+  
+  
+  private boolean isRouteNameExists(Long channelId, String routeName) {
+    List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
+        .findByBisChannelSysId(channelId, Pageable.unpaged())
+        .getContent();
+    ObjectMapper objectMapper = new ObjectMapper();
+    Optional<BisRouteEntity> route = routeEntities.stream().filter(bisRouteEntity -> {
+      JsonNode metaDataNode;
+      JsonNode existingRoute;
+      try {
+        metaDataNode = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+        existingRoute = metaDataNode.get("routeName");
+        if (existingRoute != null && existingRoute.asText().equalsIgnoreCase(routeName)) {
+          return true;
+        }
+      } catch (IOException exception) {
+        logger.error(exception.getMessage());
+      }
+      return false;
+    }).findAny();
+    return route.isPresent();
+  }
+  
 }
+

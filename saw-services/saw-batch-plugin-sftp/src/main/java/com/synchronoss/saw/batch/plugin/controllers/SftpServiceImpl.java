@@ -726,6 +726,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         + FilenameUtils.getExtension(entry.getFilename()));
                     fileTobeDeleted = localDirectory;
                     bisDataMetaInfo = new BisDataMetaInfo();
+                    bisDataMetaInfo.setFilePattern(pattern);
                     bisDataMetaInfo
                         .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
                     bisDataMetaInfo.setReceivedDataName(localFile.getPath());
