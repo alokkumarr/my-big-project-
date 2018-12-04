@@ -17,7 +17,6 @@ import * as fpSplit from 'lodash/fp/split';
 
 export function flattenPivotData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
-
   return parseNodePivot(data, {}, nodeFieldMap, 0);
 }
 
@@ -30,12 +29,13 @@ export function flattenPivotData(data, sqlBuilder) {
 function getNodeFieldMapPivot(sqlBuilder) {
   const rowFieldMap = map(sqlBuilder.rowFields, 'columnName');
   const columnFieldMap = map(sqlBuilder.columnFields, 'columnName');
-
   return concat(rowFieldMap, columnFieldMap);
 }
 
 function parseNodePivot(node, dataObj, nodeFieldMap, level) {
-  if (node.key) {
+  if (!isUndefined(node.key)) {
+    // As per AC on 5216, if key is empty show undefined
+    node.key = isEmpty(node.key) ? 'undefined' : node.key;
     const columnName = getColumnName(nodeFieldMap, level);
     dataObj[columnName] = node.key_as_string || node.key;
   }

@@ -31,5 +31,11 @@
       <observe-kpi-bullet [item]="item" (onRefresh)="refreshTile($event)"
         [bulletKpi]="item.bullet" [enableChartDownload]="enableChartDownload" [updater]="item.updater"></observe-kpi-bullet>
     </ng-container>
+
+    <div class="dashboard-item-error-message" *ngIf="!item.success">
+      <h2>
+        This item could not be loaded. It may have been deleted.
+      </h2>
+    </div>
   </gridster-item>
 </gridster>
