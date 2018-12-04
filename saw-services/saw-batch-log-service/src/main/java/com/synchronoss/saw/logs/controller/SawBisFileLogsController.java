@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping(value = "/ingestion/batch")
 public class SawBisFileLogsController {
-  @Value("${scheduler-url}")
+  @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
 
   RestTemplate restTemplate = new RestTemplate();
