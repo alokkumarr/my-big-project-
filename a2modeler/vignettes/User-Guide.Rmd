@@ -30,14 +30,15 @@ library(tibble)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
-library(a2modeler)
+#library(a2modeler)
+devtools::load_all("~/software_projects/sip/a2modeler")
 library(a2charter)
 library(ggplot2)
 
 # Sim Data
-# sim_df_ts <- tibble(date = today() - days(1:100), 
-#                     y = arima.sim(n = 100, list(order = c(1,0,0), ar = 0.7)),
-#                     index = 1:100)
+sim_df_ts <- tibble(date = today() - days(1:100),
+                    y = arima.sim(n = 100, list(order = c(1,0,0), ar = 0.7)),
+                    index = 1:100)
 ```
 
 
@@ -358,7 +359,7 @@ f1 <- forecaster(df        = select(sim_df_ts, index, y),
   add_holdout_samples(splits = c(.6, .2, .2)) %>% 
   set_measure(RMSE) %>% 
   add_model(pipe = NULL, 
-            method = "auto.armia",
+            method = "auto.arima",
             param_map = list())
 ```
 
@@ -405,7 +406,7 @@ new_pipe <- pipeline(
   expr = function(df) {
     df %>% 
       select_if(is.numeric) %>% 
-      mutate_all( funs((. - min(.)) / max(.)))
+      mutate_all( funs((. - min(.)) / (max(.) - min(.))))
   },
   desc = "normalize numeric variables",
   uid = "get-normal-pipe"
@@ -467,7 +468,7 @@ expand.grid(reg_param = c(0, 0.01),
 
 Note, valid named arguments need to be provided. Method arguments can be found by looking at the native R help documentation
 
-```{r}
+```{r, eval=FALSE}
 # Method help
 ?ml_linear_regression
 ```
@@ -484,7 +485,8 @@ lag_pipe <- pipeline(
     df %>% 
       lagger(order_vars = "index",
              measure_vars = "y",
-             lags = 1:7)
+             lags = 1:7) %>% 
+      na.omit()
   },
   desc = "Create lagged values of y variable",
   uid = "lag-pipe"
@@ -497,7 +499,7 @@ f1 <- forecaster(df        = select(sim_df_ts, index, y),
                  name      = "example") %>% 
   add_holdout_samples(splits = c(.6, .2, .2)) %>% 
   set_measure(RMSE) %>% 
-   add_model(pipe = NULL, 
+  add_model(pipe = NULL, 
             method = "auto.arima",
             param_map = list(),
             uid = "auto-arima") %>% 
@@ -509,6 +511,10 @@ f1 <- forecaster(df        = select(sim_df_ts, index, y),
             method = "ets",
             param_map = list(model = c("AAA", "ANN", "ZZZ")),
             uid = "ets-lag")
+```
+
+
+```{r}
 
 # Models by Status
 purrr::map_df(f1$models, "status")
@@ -519,6 +525,37 @@ purrr::map_df(f1$models, "status")
 
 #### Train
 
+The next step in the model development process is to train the models on the training samples, and  evaluate on the validation samples. This step is handled with the `train_models` a2modeler function. The `train_model` function is governed by each model's status. The `train_model` function skips all previously trained models and will train all models with "added" status unless a specific model uid is provided.
+
+```{r}
+
+# Trained Model Example:
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL, 
+            method = "auto.arima",
+            param_map = list(),
+            uid = "auto-arima") %>% 
+  add_model(pipe = lag_pipe, 
+            method = "auto.arima",
+            param_map = list(),
+            uid = "auto-arima-lag-pipe") %>% 
+  add_model(pipe = lag_pipe, 
+            method = "ets",
+            param_map = list(model = c("AAA", "ANN", "ZZZ")),
+            uid = "ets-lag") %>% 
+  train_models()
+
+# Models by Status
+purrr::map_df(f1$models, "status")
+
+```
+
+The `train_models` function collects the model measurement on validation samples and stores as a tibble on the performance slot 
 
 #### Select Final Model
 
