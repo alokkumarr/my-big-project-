@@ -6,9 +6,9 @@
       </mat-icon>
     </div>
 
-    <h1  class="chart report-title flex-container" [textContent]="analysis.chartTitle || analysis.name"></h1>
+    <h1 class="chart report-title flex-container" [textContent]="analysis.chartTitle || analysis.name"></h1>
 
-    <div class="toggle-icons flex-icon-container">
+    <div *ngIf="ViewMode" class="toggle-icons flex-icon-container">
       <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="toggleToGrid = true" [ngClass]="{'active': toggleToGrid}"
         matTooltip="Toggle to Grid">
       </mat-icon>
