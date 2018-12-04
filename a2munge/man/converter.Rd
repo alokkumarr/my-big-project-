@@ -6,13 +6,16 @@
 \alias{converter.tbl_spark}
 \title{Date Converter Function}
 \usage{
-converter(df, measure_vars, input_format, output_type, time_zone, output_suffix)
+converter(df, measure_vars, input_format, output_type, time_zone,
+  output_suffix)
 
 \method{converter}{data.frame}(df, measure_vars, input_format,
-  output_type = "datetime", time_zone = "UTC", output_suffix = "CONV")
+  output_type = "datetime", time_zone = "UTC",
+  output_suffix = "CONV")
 
 \method{converter}{tbl_spark}(df, measure_vars, input_format,
-  output_type = "datetime", time_zone = "UTC", output_suffix = "CONV")
+  output_type = "datetime", time_zone = "UTC",
+  output_suffix = "CONV")
 }
 \arguments{
 \item{df}{DataFrame}
