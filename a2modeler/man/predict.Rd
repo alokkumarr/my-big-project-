@@ -16,8 +16,8 @@
 \usage{
 \method{predict}{classifier}(obj, data = NULL, desc = "", ...)
 
-\method{predict}{forecast_model}(mobj, data = NULL, periods, level = c(80,
-  95), ...)
+\method{predict}{forecast_model}(mobj, data = NULL, periods,
+  level = c(80, 95), ...)
 
 \method{predict}{forecaster}(obj, data = NULL, periods,
   uid = sparklyr::random_string(prefix = "pred"), desc = "", ...)
@@ -40,8 +40,6 @@
 \description{
 Method makes predictions using classifier object's final model
 
-Forecast Prediction Method
-
 Method makes predictions for Forecaster's final model
 
 Method makes predictions using multiclassifier object's final model
@@ -49,10 +47,4 @@ Method makes predictions using multiclassifier object's final model
 Method makes predictions using regressor object's final model
 
 Method makes predictions using segmenter object's final model
-
-Predict Method for Spark-ML Classification Object
-
-Predict Method for Spark-ML Regression Object
-
-Predict Method for Spark-Model Clustering Object
 }

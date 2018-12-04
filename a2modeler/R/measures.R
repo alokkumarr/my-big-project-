@@ -362,6 +362,11 @@ auc.spark_connection <- function(x, predicted = "predicted", actual = "label") {
 
 # F1 ----------------------------------------------------------------------
 
+
+#' F1 Measure Object
+#'
+#' @export F1
+#' @rdname measures
 F1 <- measure(id = "F1",
               method = "f1",
               method_args = list("x", "predicted", "actual"),

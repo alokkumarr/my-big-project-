@@ -35,9 +35,9 @@ library(a2charter)
 library(ggplot2)
 
 # Sim Data
-sim_df_ts <- tibble(date = today() - days(1:100), 
-                    y = arima.sim(n = 100, list(order = c(1,0,0), ar = 0.7)),
-                    index = 1:100)
+# sim_df_ts <- tibble(date = today() - days(1:100), 
+#                     y = arima.sim(n = 100, list(order = c(1,0,0), ar = 0.7)),
+#                     index = 1:100)
 ```
 
 
