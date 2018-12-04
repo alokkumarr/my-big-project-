@@ -29,23 +29,22 @@
       The logger name is typically the Java/Scala package name.
       This configures the log level to log at for a package and its children packages.
     -->
-  <logger level="ERROR" name="play">
-    <appender-ref ref="FILE"/>
+  <logger level="INFO" name="play">
+    <appender-ref ref="STDOUT"/>
   </logger>
-  <logger level="ERROR" name="controllers">
-    <appender-ref ref="FILE"/>
+  <logger level="INFO" name="controllers">
+    <appender-ref ref="STDOUT"/>
   </logger>
-  <logger level="ERROR" name="mapr.streaming.EventHandler">
-    <appender-ref ref="FILE"/>
+  <logger level="INFO" name="mapr.streaming.EventHandler">
+    <appender-ref ref="STDOUT"/>
   </logger>
-  <logger level="ERROR" name="mapr.streaming.EventSender">
-    <appender-ref ref="FILE"/>
+  <logger level="INFO" name="mapr.streaming.EventSender">
+    <appender-ref ref="STDOUT"/>
   </logger>
-  <logger level="ERROR" name="exceptions">
-    <appender-ref ref="FILE"/>
+  <logger level="INFO" name="exceptions">
+    <appender-ref ref="STDOUT"/>
   </logger>
-  <root level="ERROR">
-    <!--  <appender-ref ref="STDOUT" />-->
-    <appender-ref ref="FILE"/>
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
   </root>
 </configuration>
