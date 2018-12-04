@@ -586,21 +586,15 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.trace("number of files on this pull :" + filesArray.size());
         logger.trace("size of partitions :" + result.size());
         logger.trace("file from the source is downnloaded in the location :" + destinationLocation);
-        File localDirectory = new File(defaultDestinationLocation + File.separator
-            + destinationLocation + File.separator + getBatchId() + File.separator);
-        logger.trace(
-            "directory where the file will be downnloaded  :" + localDirectory.getAbsolutePath());
-        if (!localDirectory.exists()) {
-          logger.trace("directory where the file will be"
-              + " downnloaded does not exist so it will be created :"
-              + localDirectory.getAbsolutePath());
-          localDirectory.mkdirs();
-        }
+        File localDirectory = null;
         for (List<LsEntry> entries : result) {
           for (LsEntry entry : entries) {
             logger.trace("entry :" + entry.getFilename());
             long lastModified = entry.getAttrs().getMTime();
+            logger.trace("lastModified :" + lastModified);
             long currentTime = System.currentTimeMillis();
+            logger.trace("currentTime :" + currentTime);
+            logger.trace("currentTime - lastModified :" + (currentTime - lastModified));
             if ((currentTime - lastModified) > timeDifference) {
               if (entry.getAttrs().isDir()) {
                 logger.trace("invocation of method transferDataFromChannel "
@@ -619,6 +613,16 @@ public class SftpServiceImpl extends SipPluginContract {
                 try {
                   if (entry.getAttrs().getSize() != 0 && !sipLogService
                       .checkDuplicateFile(sourcelocation + File.separator + entry.getFilename())) {
+                    localDirectory = new File(defaultDestinationLocation + File.separator
+                        + destinationLocation + File.separator + getBatchId() + File.separator);
+                    if (localDirectory != null && !localDirectory.exists()) {
+                      logger.trace("directory where the file will be"
+                          + " downnloaded does not exist so it will be created :"
+                          + localDirectory.getAbsolutePath());
+                      logger.trace("directory where the file will be downnloaded  :"
+                          + localDirectory.getAbsolutePath());
+                      localDirectory.mkdirs();
+                    }
                     logger.trace("file duplication completed " + sourcelocation + File.separator
                         + entry.getFilename() + " batchSize " + batchSize);
                     final File localFile = new File(localDirectory.getPath() + File.separator
