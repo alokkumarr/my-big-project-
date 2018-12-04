@@ -12,7 +12,6 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
-import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
@@ -263,23 +262,18 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   editDashboard(): void {
-    this.dialog.open(CreateDashboardComponent, {
-      panelClass: 'full-screen-dialog',
-      data: {
-        dashboard: this.dashboard,
-        mode: 'edit'
-      },
-      maxWidth: '1600px'
+    this.router.navigate(['observe/designer'], {
+      queryParams: {
+        dashboardId: this.dashboard.entityId,
+        mode: 'edit',
+        categoryId: this.subCategoryId
+      }
     });
   }
 
   createDashboard(): void {
-    this.dialog.open(CreateDashboardComponent, {
-      panelClass: 'full-screen-dialog',
-      data: {
-        mode: 'create'
-      },
-      maxWidth: '1600px'
+    this.router.navigate(['observe/designer'], {
+      queryParams: { mode: 'create', categoryId: this.subCategoryId }
     });
   }
 
