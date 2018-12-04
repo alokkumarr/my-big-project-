@@ -35,3 +35,8 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
 .mat-icon.active {
   color: $primary-blue-b2;
 }
+
+.mat-icon.icon-export.report-grid-export {
+  font-size: 17px;
+}
+
