@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Haarstick" />
+
+<meta name="date" content="2018-11-27" />
+
+<title>a2munge User Guide</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">a2munge User Guide</h1>
+<h4 class="author"><em>Haarstick</em></h4>
+<h4 class="date"><em>2018-11-27</em></h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#overview">Overview</a><ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#design">Design</a></li>
+<li><a href="#api">API</a></li>
+</ul></li>
+<li><a href="#functions">Functions</a><ul>
+<li><a href="#manipulators">Manipulators</a></li>
+<li><a href="#reshapers">Reshapers</a></li>
+<li><a href="#time-series">Time Series</a></li>
+<li><a href="#utilities">Utilities</a></li>
+<li><a href="#insights">Insights</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>a2munge is an R package to help create Advanced Analytic data pipelines. The package contains a suite of R and Spark<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is design to efficiently create such pipelines.</p>
+<div id="features" class="section level3">
+<h3>Features</h3>
+<ul>
+<li>Data transformation functions support Spark and in-memory R data set classes </li>
+<li>Functions are compatible with dplyr<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> and tidyr<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> verbs</li>
+<li>Individual functions can be combined to create flexible, complex data pipelines</li>
+<li>Programmatic function interface support application and solution templates</li>
+<li>Combines with a2modeler R package to allow Advanced Analytics application development to be done with a single programming language (vs traditional sql / statistical software split)</li>
+<li>Statistical Anomaly Detection for time series data</li>
+</ul>
+</div>
+<div id="design" class="section level3">
+<h3>Design</h3>
+<p>a2munge leverages the R S3<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> Object Oriented system to create generic functions with R data.frame and Spark class methods. This design creates a similar set of functions and arguments for the user that can be applied on local R data.frames, local Spark data objects, or even distributed Spark objects.</p>
+<p>a2munge uses standard evaluation<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> to evaluate function arguments. This allows for function arguments to be assigned programmatically which is beneficial for re-usable template and component development.</p>
+<p>a2munge functions standardize the output naming convention and schema which creates consistency aiding in application development.</p>
+<p>a2munge spark compatibility relies on the great sparklyr<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> R package which enables a R API for working with Spark objects.</p>
+</div>
+<div id="api" class="section level3">
+<h3>API</h3>
+<p>Wherever possible and appropriate the a2munge functions share common argument naming conventions and location. The following argument names are shared in multiple functions:</p>
+<ul>
+<li><strong>group_vars</strong>: one or more column names that indicate which columns to group the data by. This argument is option in many functions with default value of NULL, which corresponds to no grouping.</li>
+<li><strong>measure_vars</strong>: one or more column names to apply functionality to. Typically numeric column types. This argument is not typically optional.</li>
+<li><strong>fun</strong>: name of mathematical function to apply on measure_vars. Can be more than one - eg c(“sum”, “mean”). Also supports the use of the <a href="https://dplyr.tidyverse.org/reference/funs.html">funs</a> function from the dplyr package.</li>
+<li><strong>order_vars</strong>: one or more column names to arrange the data by. Often a date or date-time type is used to order the data.</li>
+<li><strong>id_vars</strong>: one or more column names used in reshaping functions to specify which columns to retain in existing form.</li>
+<li><strong>sep</strong>: character separator used for output data column naming.</li>
+</ul>
+</div>
+</div>
+<div id="functions" class="section level2">
+<h2>Functions</h2>
+<p>In the following sections each of the a2munge functions are explained with examples. The examples assume a working knowledge of R and the tidyverse<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>.</p>
+<p>In the chunk below an sample dataset is create in local R. A local Spark connection is created and the sample dataset is copied to the Spark environment. For more background on creating a Spark connection in R please see the <a href="https://spark.rstudio.com/">sparklyr</a> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># R packages</span>
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(tidyr)
+<span class="kw">library</span>(tibble)
+<span class="kw">library</span>(lubridate)
+<span class="kw">library</span>(sparklyr)
+<span class="kw">library</span>(a2munge)
+<span class="kw">library</span>(a2charter)
+<span class="kw">library</span>(ggplot2)
+
+<span class="co"># Create Simulated Dataset:</span>
+<span class="kw">set.seed</span>(<span class="dv">319</span>)
+n &lt;-<span class="st"> </span><span class="dv">100</span>                           <span class="co"># Records per ID</span>
+id_vars &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">101</span>, <span class="dv">200</span>, <span class="dt">by=</span><span class="dv">1</span>)     <span class="co"># Unique IDs</span>
+dates &lt;-<span class="st"> </span><span class="kw">today</span>() <span class="op">-</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">90</span>)      <span class="co"># Date Range</span>
+cat1 &lt;-<span class="st"> </span>LETTERS[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]               <span class="co"># Category Var 1</span>
+cat2 &lt;-<span class="st"> </span>LETTERS[<span class="kw">c</span>(<span class="dv">22</span><span class="op">:</span><span class="dv">26</span>)]          <span class="co"># Category Var 2</span>
+
+df &lt;-<span class="st"> </span><span class="kw">tibble</span>()
+<span class="cf">for</span>(id <span class="cf">in</span> id_vars){
+  d &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">id =</span> id,
+              <span class="dt">date =</span> <span class="kw">sample</span>(dates, n, <span class="dt">replace =</span> T),
+              <span class="dt">cat1 =</span> <span class="kw">sample</span>(cat1, n, <span class="dt">replace =</span> T, <span class="dt">prob =</span> <span class="kw">c</span>(.<span class="dv">75</span>, .<span class="dv">25</span>)),
+              <span class="dt">cat2 =</span> <span class="kw">sample</span>(cat2, n, <span class="dt">replace =</span> T, <span class="dt">prob =</span> <span class="kw">c</span>(.<span class="dv">4</span>, .<span class="dv">3</span>, .<span class="dv">2</span>, .<span class="dv">075</span>, .<span class="dv">025</span>)),
+              <span class="dt">metric1 =</span> <span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, n, <span class="dt">replace =</span> T),
+              <span class="dt">metric2 =</span> <span class="kw">rnorm</span>(n, <span class="dt">mean=</span><span class="dv">50</span>, <span class="dt">sd =</span> <span class="dv">5</span>))
+  df &lt;-<span class="st"> </span><span class="kw">rbind</span>(df, d)
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create Spark Connection</span>
+sc &lt;-<span class="st"> </span><span class="kw">spark_connect</span>(<span class="dt">master =</span> <span class="st">&quot;local&quot;</span>,
+                    <span class="dt">spark_home =</span> <span class="kw">spark_home_dir</span>())
+
+<span class="co"># Copy Data to Spark</span>
+sdf &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, df, <span class="st">&quot;df&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p>The sample dataset has six columns of different types</p>
+<ul>
+<li><strong>id</strong>: integer type. Corresponds to unique identifier field such as unique device id or customer id</li>
+<li><strong>date</strong>: date type. Dates from past 90 days</li>
+<li><strong>cat1</strong>: character type. Arbitrary attribute column with 2 distinct values of weighted probability</li>
+<li><strong>cat2</strong>: character type. Arbitrary attribute column with 5 distinct values of weighted probability</li>
+<li><strong>metric1</strong>: numeric type. Arbitrary numeric column with integer values of 1:5</li>
+<li><strong>metric2</strong>: numeric type. Arbitrary numeric column with random values center at 50</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># R Dataset</span>
+df
+<span class="co">#&gt; # A tibble: 10,000 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 B     V           2    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8</span>
+<span class="co">#&gt; # ... with 9,990 more rows</span></code></pre></div>
+<div id="manipulators" class="section level3">
+<h3>Manipulators</h3>
+<p>The first set of functions are data manipulator: functions to aggregate or add new columns as functions of other columns</p>
+<div id="summariser" class="section level4">
+<h4>Summariser</h4>
+<p>The summariser function aggregates a dataset based on combination of grouping variables, measure variables and function. In the following chuck, a simple aggregation is applied on both R and Spark datasets using the same combination of arguments.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Simple Summariser R Ex</span>
+<span class="kw">summariser</span>(df,
+           <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;cat1&quot;</span>),
+           <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+           <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sum&quot;</span>))
+<span class="co">#&gt; # A tibble: 200 x 6</span>
+<span class="co">#&gt;       id cat1  metric1_mean metric2_mean metric1_sum metric2_sum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;       &lt;int&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 A             3.11         49.1         218       3435.</span>
+<span class="co">#&gt;  2   101 B             2.93         51.1          88       1534.</span>
+<span class="co">#&gt;  3   102 A             3.06         50.5         242       3992.</span>
+<span class="co">#&gt;  4   102 B             3.33         50.6          70       1063.</span>
+<span class="co">#&gt;  5   103 A             2.98         50.3         238       4021.</span>
+<span class="co">#&gt;  6   103 B             2.8          49.8          56        996.</span>
+<span class="co">#&gt;  7   104 A             3.2          50.5         256       4043.</span>
+<span class="co">#&gt;  8   104 B             3            51.1          60       1022.</span>
+<span class="co">#&gt;  9   105 A             3            49.7         219       3632.</span>
+<span class="co">#&gt; 10   105 B             3.15         48.7          85       1316.</span>
+<span class="co">#&gt; # ... with 190 more rows</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Simple Summariser Spark Ex</span>
+<span class="kw">summariser</span>(sdf,
+           <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;cat1&quot;</span>),
+           <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+           <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sum&quot;</span>))</code></pre></div>
+<p>In the following example, a similar aggregation is made programmatically via <a href="https://dplyr.tidyverse.org/articles/programming.html">standard evaluation</a></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Programatic interface</span>
+.group_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;cat1&quot;</span>, <span class="st">&quot;cat2&quot;</span>)
+.measure_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>)
+.funs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;mean&quot;</span>, <span class="st">&quot;max&quot;</span>)
+
+<span class="co"># Summariser Example</span>
+<span class="kw">summariser</span>(df,
+           <span class="dt">group_vars   =</span> .group_vars,
+           <span class="dt">measure_vars =</span> .measure_vars,
+           <span class="dt">fun          =</span> .funs)
+<span class="co">#&gt; # A tibble: 10 x 8</span>
+<span class="co">#&gt;    cat1  cat2  metric1_min metric2_min metric1_mean metric2_mean</span>
+<span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 A     V               1        31.7         2.97         50.1</span>
+<span class="co">#&gt;  2 A     W               1        33.5         3.02         49.9</span>
+<span class="co">#&gt;  3 A     X               1        34.9         3.04         50.2</span>
+<span class="co">#&gt;  4 A     Y               1        36.2         2.96         49.9</span>
+<span class="co">#&gt;  5 A     Z               1        38.0         2.89         50.6</span>
+<span class="co">#&gt;  6 B     V               1        34.7         2.97         50.0</span>
+<span class="co">#&gt;  7 B     W               1        35.6         2.98         49.7</span>
+<span class="co">#&gt;  8 B     X               1        37.3         3.02         50.0</span>
+<span class="co">#&gt;  9 B     Y               1        34.3         2.82         49.8</span>
+<span class="co">#&gt; 10 B     Z               1        37.3         3.09         50.3</span>
+<span class="co">#&gt; # ... with 2 more variables: metric1_max &lt;dbl&gt;, metric2_max &lt;dbl&gt;</span></code></pre></div>
+</div>
+<div id="summariser-map" class="section level4">
+<h4>Summariser Map</h4>
+<p>The summariser map function allows for more than one set of summariser arguments to be made and combined into single output dataset. This function enables aggregations of different cardinality to be combined.</p>
+<p>The function applies each set separately and combines into a single dataset via the <a href="#pivoter">pivoter</a> a2munge function. The id_vars argument is used here to indicate what columns to preserve and join the aggregations by. Multiple sets of summariser arguments are stored in a list and passed to the map argument within an additional list.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summariser_map</span>(df,
+               <span class="dt">id_vars =</span> <span class="st">&quot;id&quot;</span>,
+               <span class="dt">map =</span> <span class="kw">list</span>(
+                 <span class="kw">list</span>(
+                   <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;cat1&quot;</span>),
+                   <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>),
+                   <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;sum&quot;</span>)
+                 ),
+                 <span class="kw">list</span>(
+                   <span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;cat2&quot;</span>),
+                   <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric2&quot;</span>),
+                   <span class="dt">fun          =</span> <span class="kw">c</span>(<span class="st">&quot;mean&quot;</span>)
+                 )
+               )
+) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 100 x 8</span>
+<span class="co">#&gt;       id cat1_A_metric1_~ cat1_B_metric1_~ cat2_V_metric2_~</span>
+<span class="co">#&gt;    &lt;dbl&gt;            &lt;int&gt;            &lt;int&gt;            &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101              218               88             49.9</span>
+<span class="co">#&gt;  2   102              242               70             51.5</span>
+<span class="co">#&gt;  3   103              238               56             50.6</span>
+<span class="co">#&gt;  4   104              256               60             50.3</span>
+<span class="co">#&gt;  5   105              219               85             49.8</span>
+<span class="co">#&gt;  6   106              225               67             49.4</span>
+<span class="co">#&gt;  7   107              228               75             49.9</span>
+<span class="co">#&gt;  8   108              240               86             51.2</span>
+<span class="co">#&gt;  9   109              218               65             50.1</span>
+<span class="co">#&gt; 10   110              228               74             51.0</span>
+<span class="co">#&gt; # ... with 90 more rows, and 4 more variables: cat2_W_metric2_mean &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cat2_X_metric2_mean &lt;dbl&gt;, cat2_Y_metric2_mean &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cat2_Z_metric2_mean &lt;dbl&gt;</span></code></pre></div>
+</div>
+<div id="mutater" class="section level4">
+<h4>Mutater</h4>
+<p>The mutater function allows for calculated fields to be added to a dataset. Mutater allows for ordering for cumulative calculations and grouping.</p>
+<p>In the first example, the log of metric2 is calculated by id and added to the dataset. In the second example, the cumulative sum of metric2 is calculated by date per id and added to the dataset</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Simple mutater ex:</span>
+<span class="kw">mutater</span>(df,
+        <span class="dt">group_vars   =</span> <span class="st">&quot;id&quot;</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;log&quot;</span>)
+<span class="co">#&gt; # A tibble: 10,000 x 7</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2 metric1_log</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2       1.39 </span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X           2    46.3       0.693</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4       1.61 </span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9       1.61 </span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4       1.10 </span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5       0    </span>
+<span class="co">#&gt;  7   101 2018-10-11 B     V           2    55.1       0.693</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9       1.61 </span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6       1.61 </span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8       0    </span>
+<span class="co">#&gt; # ... with 9,990 more rows</span>
+
+<span class="co"># Ordered mutater ex:</span>
+<span class="kw">mutater</span>(df,
+        <span class="dt">order_vars   =</span> <span class="st">&quot;date&quot;</span>,
+        <span class="dt">group_vars   =</span> <span class="st">&quot;id&quot;</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric2&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;cumsum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(id, date)
+<span class="co">#&gt; # A tibble: 10,000 x 7</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2 metric2_cumsum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29 A     X           2    46.3           46.3</span>
+<span class="co">#&gt;  2   101 2018-08-29 B     X           4    57.2          103. </span>
+<span class="co">#&gt;  3   101 2018-08-30 A     W           5    45.9          149. </span>
+<span class="co">#&gt;  4   101 2018-08-30 B     V           1    47.8          197. </span>
+<span class="co">#&gt;  5   101 2018-08-30 A     V           4    47.7          245. </span>
+<span class="co">#&gt;  6   101 2018-09-01 A     W           4    48.4          293. </span>
+<span class="co">#&gt;  7   101 2018-09-03 A     V           3    48.0          341. </span>
+<span class="co">#&gt;  8   101 2018-09-04 A     W           4    48.5          390. </span>
+<span class="co">#&gt;  9   101 2018-09-04 A     X           4    48.2          438. </span>
+<span class="co">#&gt; 10   101 2018-09-05 B     W           2    52.7          491. </span>
+<span class="co">#&gt; # ... with 9,990 more rows</span></code></pre></div>
+</div>
+<div id="roller" class="section level4">
+<h4>Roller</h4>
+<p>Roller is similar to mutater but allows for rolling (window) calculations. The width argument specifies the window width. The R API differs slightly from the Spark API allowing for additional arguments for by (sequence by input) and partial (calculate on windows smaller than width) arguments.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Roller example with summariser first step</span>
+df_agg &lt;-<span class="st"> </span><span class="kw">summariser</span>(df,
+                     <span class="dt">group_vars   =</span> <span class="st">&quot;date&quot;</span>,
+                     <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+                     <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) 
+df_agg
+<span class="co">#&gt; # A tibble: 90 x 3</span>
+<span class="co">#&gt;    date       metric1_sum metric2_sum</span>
+<span class="co">#&gt;    &lt;date&gt;           &lt;int&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 2018-08-29         321       5283.</span>
+<span class="co">#&gt;  2 2018-08-30         281       4743.</span>
+<span class="co">#&gt;  3 2018-08-31         298       5626.</span>
+<span class="co">#&gt;  4 2018-09-01         378       6334.</span>
+<span class="co">#&gt;  5 2018-09-02         364       5987.</span>
+<span class="co">#&gt;  6 2018-09-03         342       5822.</span>
+<span class="co">#&gt;  7 2018-09-04         367       5843.</span>
+<span class="co">#&gt;  8 2018-09-05         334       5541.</span>
+<span class="co">#&gt;  9 2018-09-06         357       6069.</span>
+<span class="co">#&gt; 10 2018-09-07         251       4557.</span>
+<span class="co">#&gt; # ... with 80 more rows</span>
+
+<span class="co"># Rolling 7 day average</span>
+<span class="kw">roller</span>(df_agg,
+       <span class="dt">order_vars   =</span> <span class="st">&quot;date&quot;</span>,
+       <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1_sum&quot;</span>, <span class="st">&quot;metric2_sum&quot;</span>),
+       <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>,
+       <span class="dt">width        =</span> <span class="dv">7</span>)
+<span class="co">#&gt; # A tibble: 90 x 5</span>
+<span class="co">#&gt;    date       metric1_sum metric2_sum metric1_sum_7w_me~ metric2_sum_7w_m~</span>
+<span class="co">#&gt;    &lt;date&gt;           &lt;int&gt;       &lt;dbl&gt;              &lt;dbl&gt;             &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 2018-08-29         321       5283.               321              5283.</span>
+<span class="co">#&gt;  2 2018-08-30         281       4743.               301              5013.</span>
+<span class="co">#&gt;  3 2018-08-31         298       5626.               300              5218.</span>
+<span class="co">#&gt;  4 2018-09-01         378       6334.               320.             5497.</span>
+<span class="co">#&gt;  5 2018-09-02         364       5987.               328.             5595.</span>
+<span class="co">#&gt;  6 2018-09-03         342       5822.               331.             5633.</span>
+<span class="co">#&gt;  7 2018-09-04         367       5843.               336.             5663.</span>
+<span class="co">#&gt;  8 2018-09-05         334       5541.               338.             5700.</span>
+<span class="co">#&gt;  9 2018-09-06         357       6069.               349.             5889.</span>
+<span class="co">#&gt; 10 2018-09-07         251       4557.               342.             5736.</span>
+<span class="co">#&gt; # ... with 80 more rows</span></code></pre></div>
+</div>
+<div id="lagger" class="section level4">
+<h4>Lagger</h4>
+<p>Lagger is also similar to mutater but allows for lag values of variables to be appended to a dataset. Lagged values are often used in time series data. Lags are specified with the lags argument which accepts a numeric vector. The lags number will specify how many preceding rows values to append as new column. Allows for grouping.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Lagger example with 1, 2, and 3 lagged values appended</span>
+<span class="kw">lagger</span>(df_agg,
+       <span class="dt">order_vars   =</span> <span class="st">'date'</span>,
+       <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+       <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1_sum&quot;</span>),
+       <span class="dt">lags =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
+<span class="co">#&gt; # A tibble: 90 x 6</span>
+<span class="co">#&gt;    date       metric1_sum metric2_sum metric1_sum_lag1 metric1_sum_lag2</span>
+<span class="co">#&gt;    &lt;date&gt;           &lt;int&gt;       &lt;dbl&gt;            &lt;int&gt;            &lt;int&gt;</span>
+<span class="co">#&gt;  1 2018-08-29         321       5283.               NA               NA</span>
+<span class="co">#&gt;  2 2018-08-30         281       4743.              321               NA</span>
+<span class="co">#&gt;  3 2018-08-31         298       5626.              281              321</span>
+<span class="co">#&gt;  4 2018-09-01         378       6334.              298              281</span>
+<span class="co">#&gt;  5 2018-09-02         364       5987.              378              298</span>
+<span class="co">#&gt;  6 2018-09-03         342       5822.              364              378</span>
+<span class="co">#&gt;  7 2018-09-04         367       5843.              342              364</span>
+<span class="co">#&gt;  8 2018-09-05         334       5541.              367              342</span>
+<span class="co">#&gt;  9 2018-09-06         357       6069.              334              367</span>
+<span class="co">#&gt; 10 2018-09-07         251       4557.              357              334</span>
+<span class="co">#&gt; # ... with 80 more rows, and 1 more variable: metric1_sum_lag3 &lt;int&gt;</span></code></pre></div>
+</div>
+<div id="imputer" class="section level4">
+<h4>Imputer</h4>
+<p>Imputer replaces missing values. Imputer has three impute functions specified with the fun argument:</p>
+<ul>
+<li><em>mean</em>: missing values replaced by the mean of remaining values. Default function. Appropriate for numerical types</li>
+<li><em>mode</em>: missing values replaced by the mode (most common) of remaining values. Appropriate for integer or character types</li>
+<li><em>constant</em>: missing values replaced by constant fill value. Constant specified with additional fill argument</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Create dataset with missing values</span>
+na_n &lt;-<span class="st"> </span><span class="dv">100</span>
+df_na &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span>na_n) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">cat1 =</span> <span class="kw">ifelse</span>(<span class="kw">row_number</span>() <span class="op">%in%</span><span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">n</span>(), na_n<span class="op">/</span><span class="dv">4</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>), <span class="ot">NA</span>, cat1),
+         <span class="dt">metric1 =</span> <span class="kw">ifelse</span>(<span class="kw">row_number</span>() <span class="op">%in%</span><span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">n</span>(), na_n<span class="op">/</span><span class="dv">10</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>), <span class="ot">NA</span>, metric1)) 
+df_na
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 &lt;NA&gt;  X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 &lt;NA&gt;  V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 &lt;NA&gt;  V           2    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span>
+
+<span class="co"># Impute cat1 with mode</span>
+<span class="kw">imputer</span>(df_na,
+        <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;cat1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;mode&quot;</span>)
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 A     V           2    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span>
+
+<span class="co"># Compare Counts:</span>
+<span class="kw">count</span>(df_na, cat1)
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   cat1      n</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1 A        52</span>
+<span class="co">#&gt; 2 B        23</span>
+<span class="co">#&gt; 3 &lt;NA&gt;     25</span>
+df_na <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">imputer</span>(.,
+          <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+          <span class="dt">measure_vars =</span> <span class="st">&quot;cat1&quot;</span>,
+          <span class="dt">fun          =</span> <span class="st">&quot;mode&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">count</span>(cat1)
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   cat1      n</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1 A        77</span>
+<span class="co">#&gt; 2 B        23</span>
+
+<span class="co"># Impute cat1 with constant</span>
+<span class="kw">imputer</span>(df_na,
+        <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;cat1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;constant&quot;</span>,
+        <span class="dt">fill         =</span> <span class="st">&quot;FILLED!&quot;</span>)
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1    cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A       V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 FILLED! X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A       W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B       V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 FILLED! V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A       Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 FILLED! V           2    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A       W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 A       X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A       X           1    51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span>
+
+<span class="co"># Impute metric1 with mean</span>
+<span class="kw">imputer</span>(df_na,
+        <span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>)
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V           4    52.2</span>
+<span class="co">#&gt;  2   101 2018-08-29 &lt;NA&gt;  X           2    46.3</span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W           5    54.4</span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V           5    45.9</span>
+<span class="co">#&gt;  5   101 2018-11-11 &lt;NA&gt;  V           3    55.4</span>
+<span class="co">#&gt;  6   101 2018-09-24 A     Y           1    43.5</span>
+<span class="co">#&gt;  7   101 2018-10-11 &lt;NA&gt;  V           2    55.1</span>
+<span class="co">#&gt;  8   101 2018-08-30 A     W           5    45.9</span>
+<span class="co">#&gt;  9   101 2018-10-21 A     X           5    51.6</span>
+<span class="co">#&gt; 10   101 2018-11-23 A     X           1    51.8</span>
+<span class="co">#&gt; # ... with 90 more rows</span></code></pre></div>
+</div>
+</div>
+<div id="reshapers" class="section level3">
+<h3>Reshapers</h3>
+<p>Reshaping functions alter the structure of a dataset.</p>
+<div id="pivoter" class="section level4">
+<h4>Pivoter</h4>
+<p>Pivoter reshapes data from long to wide format. This function is similar to the <a href="https://tidyr.tidyverse.org/reference/spread.html">spread</a>. Pivoter allows for multiple key-pairs to be spread across multiple columns however. Transforming datasets from long to wide form (or denormalizing a dataset) is a common step in statistical modeling workflows to convert data into matrix like format with a unique record per row required for most algorithms.</p>
+<p>The id_vars argument here specifies which columns are to be preserved in the resulting output dataset. The group_vars argument specifies which column(s) unique values should be transformed into new columns. Group_vars should be attribute (categorical) columns with relatively low number of unique values. The measure_vars specify the columns converted to the values. Pivoter does accept a single fun argument. Pivoter has an argument for a fill value to apply to missing values created from the pivot. Zero is a commonly used fill value for pivoter. The sep argument can be modify to alter the output column naming convention</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># simple pivoter example of pivoting cat1 by id and date for metric1</span>
+<span class="kw">pivoter</span>(df,
+        <span class="dt">id_vars      =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+        <span class="dt">group_vars   =</span> <span class="st">&quot;cat2&quot;</span>,
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">fill         =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 6,046 x 7</span>
+<span class="co">#&gt;       id date       cat2_V_metric1 cat2_W_metric1 cat2_X_metric1</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;              &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29              0              0              6</span>
+<span class="co">#&gt;  2   101 2018-08-30              5              5              0</span>
+<span class="co">#&gt;  3   101 2018-09-01              0              4              0</span>
+<span class="co">#&gt;  4   101 2018-09-03              3              0              0</span>
+<span class="co">#&gt;  5   101 2018-09-04              0              4              4</span>
+<span class="co">#&gt;  6   101 2018-09-05              0              2              0</span>
+<span class="co">#&gt;  7   101 2018-09-06              0              0              2</span>
+<span class="co">#&gt;  8   101 2018-09-07              3              0              0</span>
+<span class="co">#&gt;  9   101 2018-09-09              5              0              0</span>
+<span class="co">#&gt; 10   101 2018-09-10              0              4              0</span>
+<span class="co">#&gt; # ... with 6,036 more rows, and 2 more variables: cat2_Y_metric1 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cat2_Z_metric1 &lt;dbl&gt;</span>
+
+
+<span class="co"># Pivot with multiple measure vars</span>
+<span class="kw">pivoter</span>(df,
+        <span class="dt">id_vars      =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+        <span class="dt">group_vars   =</span> <span class="st">&quot;cat1&quot;</span>, 
+        <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+        <span class="dt">fill         =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 6,046 x 6</span>
+<span class="co">#&gt;       id date       cat1_A_metric1 cat1_B_metric1 cat1_A_metric2</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;              &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29              2              4           46.3</span>
+<span class="co">#&gt;  2   101 2018-08-30              9              1           93.6</span>
+<span class="co">#&gt;  3   101 2018-09-01              4              0           48.4</span>
+<span class="co">#&gt;  4   101 2018-09-03              3              0           48.0</span>
+<span class="co">#&gt;  5   101 2018-09-04              8              0           96.6</span>
+<span class="co">#&gt;  6   101 2018-09-05              0              2            0  </span>
+<span class="co">#&gt;  7   101 2018-09-06              0              2            0  </span>
+<span class="co">#&gt;  8   101 2018-09-07              3              0           45.2</span>
+<span class="co">#&gt;  9   101 2018-09-09              0              5            0  </span>
+<span class="co">#&gt; 10   101 2018-09-10              4              0           44.9</span>
+<span class="co">#&gt; # ... with 6,036 more rows, and 1 more variable: cat1_B_metric2 &lt;dbl&gt;</span>
+
+
+<span class="co"># Pivot with NULL sep and sum function</span>
+<span class="kw">pivoter</span>(df,
+        <span class="dt">id_vars      =</span> <span class="st">&quot;id&quot;</span>,
+        <span class="dt">group_vars   =</span> <span class="st">&quot;cat2&quot;</span>, 
+        <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+        <span class="dt">sep          =</span> <span class="ot">NULL</span>,
+        <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as.tibble</span>()
+<span class="co">#&gt; # A tibble: 100 x 6</span>
+<span class="co">#&gt;       id     V     W     X     Y     Z</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
+<span class="co">#&gt;  1   101   136   107    28    23    12</span>
+<span class="co">#&gt;  2   102   122   100    58    15    17</span>
+<span class="co">#&gt;  3   103    98    89    69    32     6</span>
+<span class="co">#&gt;  4   104   116   110    58    17    15</span>
+<span class="co">#&gt;  5   105   116   112    59    14     3</span>
+<span class="co">#&gt;  6   106   122    74    55    25    16</span>
+<span class="co">#&gt;  7   107    98    97    81    22     5</span>
+<span class="co">#&gt;  8   108   134   107    68     7    10</span>
+<span class="co">#&gt;  9   109   108    96    54    18     7</span>
+<span class="co">#&gt; 10   110   121    53    83    28    17</span>
+<span class="co">#&gt; # ... with 90 more rows</span></code></pre></div>
+</div>
+<div id="melter" class="section level4">
+<h4>Melter</h4>
+<p>Melter works in opposite to pivoter by transforming wide data to long format. Similar to tidyr <a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a> function.</p>
+<p>Similar to the pivoter, id_vars specify which columns are preserved after the melt. The measure_vars are converted into a two column key-pair. Melter allows for the resulting key-pair columns to be given explicit names with the variable_name and value_name arguments respectively.</p>
+<p>The measure_vars melted should be of the same type. Mixing column types will result in the value column reverting to the parent type. For the Spark API, the resulting value column type can be explicitly specified with the type argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># melter example</span>
+df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">melter</span>(.,
+         <span class="dt">id_vars       =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>, <span class="st">&quot;cat1&quot;</span>, <span class="st">&quot;cat2&quot;</span>),
+         <span class="dt">measure_vars  =</span> <span class="kw">c</span>(<span class="st">&quot;metric1&quot;</span>, <span class="st">&quot;metric2&quot;</span>),
+         <span class="dt">variable_name =</span> <span class="st">&quot;new_variable&quot;</span>,
+         <span class="dt">value_name    =</span> <span class="st">&quot;new_value&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as_tibble</span>()
+<span class="co">#&gt; # A tibble: 10 x 6</span>
+<span class="co">#&gt;       id date       cat1  cat2  new_variable new_value</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-09-15 A     V     metric1            4  </span>
+<span class="co">#&gt;  2   101 2018-08-29 A     X     metric1            2  </span>
+<span class="co">#&gt;  3   101 2018-10-12 A     W     metric1            5  </span>
+<span class="co">#&gt;  4   101 2018-10-11 B     V     metric1            5  </span>
+<span class="co">#&gt;  5   101 2018-11-11 A     V     metric1            3  </span>
+<span class="co">#&gt;  6   101 2018-09-15 A     V     metric2           52.2</span>
+<span class="co">#&gt;  7   101 2018-08-29 A     X     metric2           46.3</span>
+<span class="co">#&gt;  8   101 2018-10-12 A     W     metric2           54.4</span>
+<span class="co">#&gt;  9   101 2018-10-11 B     V     metric2           45.9</span>
+<span class="co">#&gt; 10   101 2018-11-11 A     V     metric2           55.4</span></code></pre></div>
+</div>
+<div id="expander" class="section level4">
+<h4>Expander</h4>
+<p>Technically expander converts implicit missing values to explicit values. Expander allows the dataset to be expanded based on a sequence or set of unique values provided. Similar in scope to tidyr <a href="https://tidyr.tidyverse.org/reference/expand.html">expand</a> set of functions.</p>
+<p>Expander has two ways to expand a dataset: either by specifying a set of id_vars and mode or by providing a set of values directly with the fun argument. The behavior of the expansion can be modified with the mode argument. Either the full cartesian product of the id_vars can be specified with mode = ‘crossing’ or just the unique observed pairs with mode = ‘nesting’.</p>
+<p>Expander is useful when aggregated date-time data with attributes such as ids or other groups. Often there is a not a record for each attribute time unit combination which a simple aggregation will not account for. In a following example, expander is used in a pipeline to create an aggregate of average total metric1 per id per day. Notice, there is not a record in our dataset for all prior 90 days for each id.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># simple expander date example</span>
+df_<span class="dv">101</span> &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(id <span class="op">==</span><span class="st"> </span><span class="dv">101</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(date)
+df_<span class="dv">101</span>
+<span class="co">#&gt; # A tibble: 68 x 3</span>
+<span class="co">#&gt;       id date       metric1_sum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;           &lt;int&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29           6</span>
+<span class="co">#&gt;  2   101 2018-08-30          10</span>
+<span class="co">#&gt;  3   101 2018-09-01           4</span>
+<span class="co">#&gt;  4   101 2018-09-03           3</span>
+<span class="co">#&gt;  5   101 2018-09-04           8</span>
+<span class="co">#&gt;  6   101 2018-09-05           2</span>
+<span class="co">#&gt;  7   101 2018-09-06           2</span>
+<span class="co">#&gt;  8   101 2018-09-07           3</span>
+<span class="co">#&gt;  9   101 2018-09-09           5</span>
+<span class="co">#&gt; 10   101 2018-09-10           4</span>
+<span class="co">#&gt; # ... with 58 more rows</span>
+
+<span class="co"># Create record for each id and day </span>
+<span class="kw">expander</span>(df_<span class="dv">101</span>,
+         <span class="dt">id_vars =</span> <span class="st">&quot;id&quot;</span>,
+         <span class="dt">fun     =</span> <span class="kw">funs</span>(<span class="dt">date =</span> <span class="kw">full_seq</span>(date, <span class="dv">1</span>)))
+<span class="co">#&gt; # A tibble: 89 x 3</span>
+<span class="co">#&gt;       id date       metric1_sum</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;           &lt;int&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29           6</span>
+<span class="co">#&gt;  2   101 2018-08-30          10</span>
+<span class="co">#&gt;  3   101 2018-08-31          NA</span>
+<span class="co">#&gt;  4   101 2018-09-01           4</span>
+<span class="co">#&gt;  5   101 2018-09-02          NA</span>
+<span class="co">#&gt;  6   101 2018-09-03           3</span>
+<span class="co">#&gt;  7   101 2018-09-04           8</span>
+<span class="co">#&gt;  8   101 2018-09-05           2</span>
+<span class="co">#&gt;  9   101 2018-09-06           2</span>
+<span class="co">#&gt; 10   101 2018-09-07           3</span>
+<span class="co">#&gt; # ... with 79 more rows</span>
+
+<span class="co"># Avg daily metric1 total per id - RIGHT WAY</span>
+df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">expander</span>(<span class="dt">id_vars =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+           <span class="dt">mode    =</span> <span class="st">&quot;crossing&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">imputer</span>(<span class="dt">measure_vars =</span> <span class="st">&quot;metric1_sum&quot;</span>,
+          <span class="dt">fun          =</span> <span class="st">&quot;constant&quot;</span>,
+          <span class="dt">fill         =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1_sum&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>)
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;   metric1_sum_mean</span>
+<span class="co">#&gt;              &lt;dbl&gt;</span>
+<span class="co">#&gt; 1             3.32</span>
+
+<span class="co"># WRONG WAY</span>
+df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;date&quot;</span>),
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summariser</span>(<span class="dt">group_vars   =</span> <span class="ot">NULL</span>,
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric1_sum&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>)
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;   metric1_sum_mean</span>
+<span class="co">#&gt;              &lt;dbl&gt;</span>
+<span class="co">#&gt; 1             4.95</span></code></pre></div>
+</div>
+<div id="sampler" class="section level4">
+<h4>Sampler</h4>
+<p>Sampler function allows for Spark and R objects to be created from samples of data. Sampler supports various methods of sampling that differs slightly for R vs Spark:</p>
+<ul>
+<li><strong>R Sampler Modes:</strong>
+<ul>
+<li>fraction (n % of total records)</li>
+<li>n (n number of records)</li>
+<li>head (first n number of records)</li>
+<li>tail (last n number of records)</li>
+</ul></li>
+<li><strong>Spark Sampler Modes:</strong>
+<ul>
+<li>fraction (n % of total records)</li>
+<li>head (first n number of records)</li>
+</ul></li>
+</ul>
+<p>Note, the Spark sampling fraction mode is approximate not exact.</p>
+<p>The R method additionally allows for stratified sampling with the group_vars argument and weighted sampling with the weight argument.</p>
+<p>The seed argument allows for the seed to set to a specific number which ensure the random sampling methods generate the same result. The default is NULL which does not set a seed which will create different samples run to run.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Sampler Ex:</span>
+df_smpl &lt;-<span class="st"> </span><span class="kw">sampler</span>(df,
+                   <span class="dt">method  =</span> <span class="st">&quot;fraction&quot;</span>,
+                   <span class="dt">size    =</span> <span class="fl">0.1</span>,
+                   <span class="dt">replace =</span> <span class="ot">FALSE</span>, 
+                   <span class="dt">weight  =</span> <span class="ot">NULL</span>,
+                   <span class="dt">seed    =</span> <span class="dv">319</span>)
+
+<span class="co"># Row Comparison</span>
+<span class="kw">format</span>(<span class="kw">nrow</span>(df), <span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>)
+<span class="co">#&gt; [1] &quot;10,000&quot;</span>
+<span class="kw">format</span>(<span class="kw">nrow</span>(df_smpl), <span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>)
+<span class="co">#&gt; [1] &quot;1,000&quot;</span></code></pre></div>
+</div>
+</div>
+<div id="time-series" class="section level3">
+<h3>Time Series</h3>
+<p>The next set of functions relate to time series data that manipulate a date or date-time column type.</p>
+<div id="indexer" class="section level4">
+<h4>Indexer</h4>
+<p>Indexer calculates the time between two date values. Calculate the time difference from the measure_vars to a an origin argument where the origin can either be another date type column or date value. The resulting time difference can be further modified by the units and periods arguments - see examples.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># simple indexer example</span>
+df_ts &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(id, date) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(date) 
+df_ts
+<span class="co">#&gt; # A tibble: 10 x 2</span>
+<span class="co">#&gt;       id date      </span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;    </span>
+<span class="co">#&gt;  1   101 2018-08-29</span>
+<span class="co">#&gt;  2   101 2018-08-30</span>
+<span class="co">#&gt;  3   101 2018-09-15</span>
+<span class="co">#&gt;  4   101 2018-09-24</span>
+<span class="co">#&gt;  5   101 2018-10-11</span>
+<span class="co">#&gt;  6   101 2018-10-11</span>
+<span class="co">#&gt;  7   101 2018-10-12</span>
+<span class="co">#&gt;  8   101 2018-10-21</span>
+<span class="co">#&gt;  9   101 2018-11-11</span>
+<span class="co">#&gt; 10   101 2018-11-23</span>
+
+<span class="kw">indexer</span>(df_ts,
+        <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;date&quot;</span>),
+        <span class="dt">origin       =</span> <span class="kw">today</span>(),
+        <span class="dt">units        =</span> <span class="st">&quot;days&quot;</span>,
+        <span class="dt">periods      =</span> <span class="dv">1</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       `days_since_2018-11-27`</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;                       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29                     -90</span>
+<span class="co">#&gt;  2   101 2018-08-30                     -89</span>
+<span class="co">#&gt;  3   101 2018-09-15                     -73</span>
+<span class="co">#&gt;  4   101 2018-09-24                     -64</span>
+<span class="co">#&gt;  5   101 2018-10-11                     -47</span>
+<span class="co">#&gt;  6   101 2018-10-11                     -47</span>
+<span class="co">#&gt;  7   101 2018-10-12                     -46</span>
+<span class="co">#&gt;  8   101 2018-10-21                     -37</span>
+<span class="co">#&gt;  9   101 2018-11-11                     -16</span>
+<span class="co">#&gt; 10   101 2018-11-23                      -4</span>
+
+<span class="co"># indexer with timediff of 4hr periods from today</span>
+<span class="kw">indexer</span>(df_ts,
+        <span class="dt">measure_vars =</span> <span class="kw">c</span>(<span class="st">&quot;date&quot;</span>),
+        <span class="dt">origin       =</span> <span class="kw">today</span>(),
+        <span class="dt">units        =</span> <span class="st">&quot;hours&quot;</span>,
+        <span class="dt">periods      =</span> <span class="dv">4</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       `4hour_periods_since_2018-11-27`</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;                                &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29                             -540</span>
+<span class="co">#&gt;  2   101 2018-08-30                             -534</span>
+<span class="co">#&gt;  3   101 2018-09-15                             -438</span>
+<span class="co">#&gt;  4   101 2018-09-24                             -384</span>
+<span class="co">#&gt;  5   101 2018-10-11                             -282</span>
+<span class="co">#&gt;  6   101 2018-10-11                             -282</span>
+<span class="co">#&gt;  7   101 2018-10-12                             -276</span>
+<span class="co">#&gt;  8   101 2018-10-21                             -222</span>
+<span class="co">#&gt;  9   101 2018-11-11                              -96</span>
+<span class="co">#&gt; 10   101 2018-11-23                              -24</span></code></pre></div>
+</div>
+<div id="date-parter" class="section level4">
+<h4>Date Parter</h4>
+<p>Date_parter calculates and appends common date part values from a date type. Date_parter can be useful to generate features from a date type for a statistical model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Simple Date Parter Ex</span>
+<span class="kw">date_parter</span>(df_ts, <span class="st">&quot;date&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 10</span>
+<span class="co">#&gt;       id date        year quarter month  week day_of_month day_of_week</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;        &lt;int&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1   101 2018-08-29  2018       3     8    35           29           4</span>
+<span class="co">#&gt;  2   101 2018-08-30  2018       3     8    35           30           5</span>
+<span class="co">#&gt;  3   101 2018-09-15  2018       3     9    37           15           7</span>
+<span class="co">#&gt;  4   101 2018-09-24  2018       3     9    39           24           2</span>
+<span class="co">#&gt;  5   101 2018-10-11  2018       4    10    41           11           5</span>
+<span class="co">#&gt;  6   101 2018-10-11  2018       4    10    41           11           5</span>
+<span class="co">#&gt;  7   101 2018-10-12  2018       4    10    41           12           6</span>
+<span class="co">#&gt;  8   101 2018-10-21  2018       4    10    42           21           1</span>
+<span class="co">#&gt;  9   101 2018-11-11  2018       4    11    45           11           1</span>
+<span class="co">#&gt; 10   101 2018-11-23  2018       4    11    47           23           6</span>
+<span class="co">#&gt; # ... with 2 more variables: day_of_year &lt;dbl&gt;, days_left_in_month &lt;int&gt;</span></code></pre></div>
+</div>
+<div id="collapser" class="section level4">
+<h4>Collapser</h4>
+<p>Collapser allows for date or date time column types to be mutated into less granular time units and modified to either the beginning or end of the time unit through the side argument. This function is useful for time based aggregations</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Collapser End Ex:</span>
+<span class="kw">collapser</span>(df_ts,
+          <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+          <span class="dt">unit          =</span> <span class="st">&quot;month&quot;</span>,
+          <span class="dt">side          =</span> <span class="st">&quot;end&quot;</span>,
+          <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+          <span class="dt">output_suffix =</span> <span class="st">&quot;month_end&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_month_end</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;date&gt;        </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-31    </span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-31    </span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-30    </span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-30    </span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-31    </span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-31    </span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-31    </span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-31    </span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-30    </span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-30</span>
+
+<span class="co"># Collapser Start Ex:</span>
+<span class="kw">collapser</span>(df_ts,
+          <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+          <span class="dt">unit          =</span> <span class="st">&quot;month&quot;</span>,
+          <span class="dt">side          =</span> <span class="st">&quot;start&quot;</span>,
+          <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+          <span class="dt">output_suffix =</span> <span class="st">&quot;month_start&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_month_start</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;date&gt;          </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-01      </span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-01      </span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-01      </span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-01      </span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-01      </span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-01      </span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-01      </span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-01      </span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-01      </span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-01</span></code></pre></div>
+</div>
+<div id="formatter" class="section level4">
+<h4>Formatter</h4>
+<p>Formatter transforms a date or date-time type column to a character with a specific string format. This function can be useful to provide specific date-time formatting for downstream processes.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Formatter with Date type Ex:</span>
+<span class="kw">formatter</span>(df_ts,
+          <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+          <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd&quot;</span>,
+          <span class="dt">output_format =</span> <span class="st">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>, 
+          <span class="dt">output_suffix =</span> <span class="st">&quot;datetime&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_datetime      </span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;              </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-29 00:00:00</span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-30 00:00:00</span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-15 00:00:00</span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-24 00:00:00</span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-11 00:00:00</span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-11 00:00:00</span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-12 00:00:00</span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-21 00:00:00</span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-11 00:00:00</span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-23 00:00:00</span>
+
+<span class="co"># Formatter with Date-time type Ex:</span>
+<span class="kw">tibble</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, 
+       <span class="dt">date_time =</span> <span class="kw">now</span>() <span class="op">-</span><span class="st"> </span><span class="kw">minutes</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">formatter</span>(.,
+            <span class="dt">measure_vars  =</span> <span class="st">&quot;date_time&quot;</span>,
+            <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>,
+            <span class="dt">output_format =</span> <span class="st">&quot;MM/dd/yyyy HH:mm:ss&quot;</span>, 
+            <span class="dt">output_suffix =</span> <span class="st">&quot;formatted&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date_time           date_time_formatted</span>
+<span class="co">#&gt;    &lt;int&gt; &lt;dttm&gt;              &lt;chr&gt;              </span>
+<span class="co">#&gt;  1     1 2018-11-27 15:31:47 11/27/2018 15:31:47</span>
+<span class="co">#&gt;  2     2 2018-11-27 15:30:47 11/27/2018 15:30:47</span>
+<span class="co">#&gt;  3     3 2018-11-27 15:29:47 11/27/2018 15:29:47</span>
+<span class="co">#&gt;  4     4 2018-11-27 15:28:47 11/27/2018 15:28:47</span>
+<span class="co">#&gt;  5     5 2018-11-27 15:27:47 11/27/2018 15:27:47</span>
+<span class="co">#&gt;  6     6 2018-11-27 15:26:47 11/27/2018 15:26:47</span>
+<span class="co">#&gt;  7     7 2018-11-27 15:25:47 11/27/2018 15:25:47</span>
+<span class="co">#&gt;  8     8 2018-11-27 15:24:47 11/27/2018 15:24:47</span>
+<span class="co">#&gt;  9     9 2018-11-27 15:23:47 11/27/2018 15:23:47</span>
+<span class="co">#&gt; 10    10 2018-11-27 15:22:47 11/27/2018 15:22:47</span></code></pre></div>
+</div>
+<div id="converter" class="section level4">
+<h4>Converter</h4>
+<p>Converter allows character (string) type columns to be cast to either date or date-time types. The desired output type can be modified with the output_format argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Converter Date Example</span>
+df_ts <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate_at</span>(<span class="st">&quot;date&quot;</span>, as.character) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">converter</span>(.,
+            <span class="dt">measure_vars  =</span> <span class="st">&quot;date&quot;</span>,
+            <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd&quot;</span>,
+            <span class="dt">output_type   =</span> <span class="st">&quot;date&quot;</span>, 
+            <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+            <span class="dt">output_suffix =</span> <span class="st">&quot;converted&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date       date_converted</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt;      &lt;date&gt;        </span>
+<span class="co">#&gt;  1   101 2018-08-29 2018-08-29    </span>
+<span class="co">#&gt;  2   101 2018-08-30 2018-08-30    </span>
+<span class="co">#&gt;  3   101 2018-09-15 2018-09-15    </span>
+<span class="co">#&gt;  4   101 2018-09-24 2018-09-24    </span>
+<span class="co">#&gt;  5   101 2018-10-11 2018-10-11    </span>
+<span class="co">#&gt;  6   101 2018-10-11 2018-10-11    </span>
+<span class="co">#&gt;  7   101 2018-10-12 2018-10-12    </span>
+<span class="co">#&gt;  8   101 2018-10-21 2018-10-21    </span>
+<span class="co">#&gt;  9   101 2018-11-11 2018-11-11    </span>
+<span class="co">#&gt; 10   101 2018-11-23 2018-11-23</span>
+
+<span class="co"># Converter Date-Time Example</span>
+<span class="kw">tibble</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, 
+       <span class="dt">date_time =</span> <span class="kw">now</span>() <span class="op">-</span><span class="st"> </span><span class="kw">minutes</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate_at</span>(<span class="st">&quot;date_time&quot;</span>, as.character) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">converter</span>(.,
+            <span class="dt">measure_vars  =</span> <span class="st">&quot;date_time&quot;</span>,
+            <span class="dt">input_format  =</span> <span class="st">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>,
+            <span class="dt">output_type   =</span> <span class="st">&quot;datetime&quot;</span>, 
+            <span class="dt">time_zone     =</span> <span class="st">&quot;UTC&quot;</span>,
+            <span class="dt">output_suffix =</span> <span class="st">&quot;converted&quot;</span>)
+<span class="co">#&gt; # A tibble: 10 x 3</span>
+<span class="co">#&gt;       id date_time           date_time_converted</span>
+<span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;               &lt;dttm&gt;             </span>
+<span class="co">#&gt;  1     1 2018-11-27 15:31:47 2018-11-27 15:31:47</span>
+<span class="co">#&gt;  2     2 2018-11-27 15:30:47 2018-11-27 15:30:47</span>
+<span class="co">#&gt;  3     3 2018-11-27 15:29:47 2018-11-27 15:29:47</span>
+<span class="co">#&gt;  4     4 2018-11-27 15:28:47 2018-11-27 15:28:47</span>
+<span class="co">#&gt;  5     5 2018-11-27 15:27:47 2018-11-27 15:27:47</span>
+<span class="co">#&gt;  6     6 2018-11-27 15:26:47 2018-11-27 15:26:47</span>
+<span class="co">#&gt;  7     7 2018-11-27 15:25:47 2018-11-27 15:25:47</span>
+<span class="co">#&gt;  8     8 2018-11-27 15:24:47 2018-11-27 15:24:47</span>
+<span class="co">#&gt;  9     9 2018-11-27 15:23:47 2018-11-27 15:23:47</span>
+<span class="co">#&gt; 10    10 2018-11-27 15:22:47 2018-11-27 15:22:47</span></code></pre></div>
+</div>
+</div>
+<div id="utilities" class="section level3">
+<h3>Utilities</h3>
+<p>In the next section are a set of utility functions for data input and output.</p>
+<div id="writer" class="section level4">
+<h4>Writer</h4>
+<p>Writer allows for R and Spark objects to be written to files. The file type is configurable and for the Spark method allows for csv, JSON, parquet and others. The base R version allows for csv and text. Writer modes include append, replace, ignore, and error. The Spark method also allows for the number of partitions to be configured.</p>
+<p>The path argument should include the directory path and dfs protocol if distributed but not the file name. The file name should be provided in the name argument. For partitioned files, the name will be augmented with a file part number starting with 00001.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+## Simple Writer Ex:
+
+<span class="co"># Temp Directory Path</span>
+path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;/writer-ex&quot;</span>)
+
+<span class="co"># Write to json file with partitions</span>
+sdf <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">head</span>(<span class="dv">100</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">writer</span>(.,
+         <span class="dt">path       =</span> path,
+         <span class="dt">name       =</span> <span class="st">&quot;df&quot;</span>,
+         <span class="dt">type       =</span> <span class="st">&quot;json&quot;</span>,
+         <span class="dt">mode       =</span> <span class="st">&quot;replace&quot;</span>,
+         <span class="dt">partitions =</span> <span class="dv">2</span>)
+
+<span class="kw">dir</span>(path, <span class="dt">full.names =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>#&gt; [1] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpqOr3Va/writer-ex/df-part-00000.json&quot;
+#&gt; [2] &quot;C:\\Users\\chaa0001\\AppData\\Local\\Temp\\RtmpqOr3Va/writer-ex/df-part-00001.json&quot;</code></pre>
+</div>
+<div id="reader" class="section level4">
+<h4>Reader</h4>
+<p>Reader is a wrapper function to read files into a Spark Connection. Function can be configured to use one of <a href="https://spark.rstudio.com/dplyr/#reading-data">sparklyr read functions</a> through the use of the type argument. Type argument accepts csv, parquet, json, jdbc, source, table and text inputs. Function allows for re-partitioning and overwrite options.</p>
+<p>The path argument accepts wildcard and directory paths along with full file paths. If the file is distributed, the dfs protocol should be supplied in the path argument.</p>
+<p>Note the reader function works for reading files into Spark only. For reading files into R, use read.csv, read.table, or fread from the data.table package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Simple Read Example:</span>
+sdf2 &lt;-<span class="st"> </span><span class="kw">reader</span>(sc,
+               <span class="dt">name =</span> <span class="st">&quot;df2&quot;</span>,
+               <span class="dt">path =</span> path,
+               <span class="dt">type =</span> <span class="st">&quot;json&quot;</span>)</code></pre></div>
+</div>
+<div id="collecter" class="section level4">
+<h4>Collecter</h4>
+<p>Collecter is a wrapper function around the sampler and sparklyr collect functions that allow Samples of Spark data to be collected into R. Note if the Spark data is distributed, this function will pull that data to the local R environment on the network. The API is similar to the sampler function with the Spark method capabilities.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Collecter Example:</span>
+df_smpl2 &lt;-<span class="st"> </span><span class="kw">collecter</span>(sdf,
+                      <span class="dt">sample  =</span> <span class="ot">TRUE</span>,
+                      <span class="dt">method  =</span> <span class="st">&quot;fraction&quot;</span>,
+                      <span class="dt">size    =</span> <span class="fl">0.1</span>,
+                      <span class="dt">replace =</span> <span class="ot">FALSE</span>,
+                      <span class="dt">seed    =</span> <span class="dv">319</span>)</code></pre></div>
+</div>
+</div>
+<div id="insights" class="section level3">
+<h3>Insights</h3>
+<p>The next section contains the two Advanced Analytics functions</p>
+<div id="correlater" class="section level4">
+<h4>Correlater</h4>
+<p>Correlater is a function to calculate the <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">pearson correlation coeficient</a> for two or more numerical variables. The correlater provides the results in long format with a three column schema: variable 1, variable 2, and the correlation coefficient the names of which can be configured.</p>
+<p>Correlater provides an option to transform the data with either the standardize or normalize transformations. The target_var argument allows for 1 to n calculation which can be useful if the correlation of one variable to all others is wanted. Correlater automatically drops all non-numeric type columns.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Correlater Example</span>
+df_cor &lt;-<span class="st"> </span><span class="kw">summariser</span>(df,
+                  <span class="dt">group_vars =</span> <span class="kw">c</span>(<span class="st">&quot;date&quot;</span>, <span class="st">&quot;cat2&quot;</span>),
+                  <span class="dt">measure_vars =</span> <span class="st">&quot;metric2&quot;</span>,
+                  <span class="dt">fun =</span> <span class="st">&quot;sum&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">pivoter</span>(.,
+          <span class="dt">id_vars =</span> <span class="st">&quot;date&quot;</span>,
+          <span class="dt">group_vars =</span> <span class="st">&quot;cat2&quot;</span>,
+          <span class="dt">measure_vars =</span> <span class="st">&quot;metric2_sum&quot;</span>,
+          <span class="dt">fill =</span> <span class="dv">0</span>,
+          <span class="dt">sep =</span> <span class="ot">NULL</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">as_tibble</span>()
+df_cor
+<span class="co">#&gt; # A tibble: 90 x 6</span>
+<span class="co">#&gt;    date           V     W     X     Y     Z</span>
+<span class="co">#&gt;    &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 2018-08-29 2062. 1368. 1100.  505. 248. </span>
+<span class="co">#&gt;  2 2018-08-30 1941. 1305. 1157.  289.  50.7</span>
+<span class="co">#&gt;  3 2018-08-31 2538. 1146. 1338.  504.  99.8</span>
+<span class="co">#&gt;  4 2018-09-01 2439. 2256. 1221.  359.  58.3</span>
+<span class="co">#&gt;  5 2018-09-02 2466. 1675. 1185.  345. 316. </span>
+<span class="co">#&gt;  6 2018-09-03 2461. 1728. 1055.  432. 146. </span>
+<span class="co">#&gt;  7 2018-09-04 2467. 1772. 1184.  376.  45.3</span>
+<span class="co">#&gt;  8 2018-09-05 1807. 2060. 1376.  206.  91.8</span>
+<span class="co">#&gt;  9 2018-09-06 2240. 1790. 1382.  554. 102. </span>
+<span class="co">#&gt; 10 2018-09-07 1717. 1085. 1050.  542. 162. </span>
+<span class="co">#&gt; # ... with 80 more rows</span>
+
+<span class="kw">correlater</span>(df_cor,
+           <span class="dt">target_var  =</span> <span class="ot">NULL</span>,
+           <span class="dt">transform   =</span> <span class="st">&quot;normalize&quot;</span>,
+           <span class="dt">remove_diag =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="op">-</span>cor)
+<span class="co">#&gt;    var1 var2          cor</span>
+<span class="co">#&gt; 1     Y    X  0.107406188</span>
+<span class="co">#&gt; 2     X    Y  0.107406188</span>
+<span class="co">#&gt; 3     Z    X  0.069113825</span>
+<span class="co">#&gt; 4     X    Z  0.069113825</span>
+<span class="co">#&gt; 5     W    V  0.068709543</span>
+<span class="co">#&gt; 6     V    W  0.068709543</span>
+<span class="co">#&gt; 7     Z    V  0.031431291</span>
+<span class="co">#&gt; 8     V    Z  0.031431291</span>
+<span class="co">#&gt; 9     Y    V  0.025697002</span>
+<span class="co">#&gt; 10    V    Y  0.025697002</span>
+<span class="co">#&gt; 11    Z    W  0.021109784</span>
+<span class="co">#&gt; 12    W    Z  0.021109784</span>
+<span class="co">#&gt; 13    X    W -0.006216803</span>
+<span class="co">#&gt; 14    W    X -0.006216803</span>
+<span class="co">#&gt; 15    X    V -0.113056064</span>
+<span class="co">#&gt; 16    V    X -0.113056064</span>
+<span class="co">#&gt; 17    Y    W -0.134516993</span>
+<span class="co">#&gt; 18    W    Y -0.134516993</span>
+<span class="co">#&gt; 19    Z    Y -0.204310838</span>
+<span class="co">#&gt; 20    Y    Z -0.204310838</span></code></pre></div>
+</div>
+<div id="detecter" class="section level4">
+<h4>Detecter</h4>
+<p>Detecter is a sophisticated function to identify statistical anomalies in time series data. Detecter is based on the Season Hybrid ESD algorithm<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a> and similar to the AnomalyDetection<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> function in the R package of the same name.</p>
+<p>Detecter works by applying a seasonal decomposition to each time series, removing the trend and seasonal components, and applying a robust outlier analysis to the remainder.</p>
+<p>Detecter has Spark and R methods. The Spark method leverages the <a href="https://spark.rstudio.com/guides/distributed-r/">sparklyr distributed R</a> to apply the core detect R function on a Spark object. Detecter can be applied on one or more numeric variables and allows for grouping. The anomaly detection threshold can be modified and fine tuned with frequency, direction, alpha, max_anoms and trend_window arguments discussed more below.</p>
+<p>Detecter Anomaly Detection API:</p>
+<ul>
+<li><strong>frequency</strong>: controls the period length of the seasonal component. Number corresponds to number rows in time series. Example - a value of 7 for daily data would detect any weekly seasonality. For more details see the seasonality section from the <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">Forecasting Principles and Practice eBook</a></li>
+<li><strong>direction</strong>: determines the direction of anomalies. Either positive, negative or both. In many cases, only positive anomalies are desired.</li>
+<li><strong>alpha</strong>: controls the statistical outlier threshold. 1-alpha corresponds to the statistical confidence. Smaller values increase the statistical scrutiny of outliers and increase the threshold for anomaly detection. The default is 0.01 or 99%.</li>
+<li><strong>max_anoms</strong>: controls the max amount of anomalies detected as a function of total records. This control is applied after the statistical threshold is applied. The default is 0.01 which corresponds to max anomalies of 1% of total records.</li>
+<li><strong>trend_window</strong>: this controls the sensitivity of the trend detection in the decomposition step. The range is between 0 and 1. Values closer to 1 will smooth out the trend component more. The default is 0.75.</li>
+</ul>
+<p>The detecter output returns the entire input dataset, transformed into long format with a measure value key pair formatting of all measure vars provided, with 6 additional numeric columns.</p>
+<p>Detecter Output columns:</p>
+<ul>
+<li><strong>seasonal</strong>: isolated seasonal component calculated from decomposition</li>
+<li><strong>trend</strong>: isolated trend component calculated from decomposition</li>
+<li><strong>resid</strong>: remainder of input time series value after seasonal and trend components removed</li>
+<li><strong>lower</strong>: lower threshold for negative anomalies</li>
+<li><strong>upper</strong>: upper threshold for positive anomalies</li>
+<li><strong>anomaly</strong>: binary flag for anomaly detected. 1 equates to anomaly.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Basic Anomaly Ex</span>
+df_anom &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summariser</span>(.,
+             <span class="dt">group_vars   =</span> <span class="st">&quot;date&quot;</span>,
+             <span class="dt">measure_vars =</span> <span class="st">&quot;metric2&quot;</span>,
+             <span class="dt">fun          =</span> <span class="st">&quot;mean&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate_at</span>(<span class="st">&quot;metric2_mean&quot;</span>, <span class="kw">funs</span>(<span class="kw">ifelse</span>(
+    <span class="kw">row_number</span>() <span class="op">%in%</span><span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">n</span>(), <span class="dv">9</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>),
+    . <span class="op">*</span><span class="st"> </span><span class="kw">runif</span>(<span class="dv">9</span>, <span class="fl">0.75</span>, <span class="fl">1.25</span>),
+    .
+  )))
+<span class="kw">gg_line_chart</span>(df_anom,
+              <span class="dt">x_variable =</span> <span class="st">&quot;date&quot;</span>,
+              <span class="dt">y_variable =</span> <span class="st">&quot;metric2_mean&quot;</span>,
+              <span class="dt">points     =</span> <span class="ot">TRUE</span>,
+              <span class="dt">title      =</span> <span class="st">&quot;Anomaly Detection Example&quot;</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Anomaly Detection with Both and 10% max anoms</span>
+anom1 &lt;-<span class="st"> </span><span class="kw">detecter</span>(df_anom,
+                  <span class="dt">index_var    =</span> <span class="st">&quot;date&quot;</span>,
+                  <span class="dt">measure_vars =</span> <span class="st">&quot;metric2_mean&quot;</span>,
+                  <span class="dt">frequency    =</span> <span class="dv">7</span>,
+                  <span class="dt">direction    =</span> <span class="st">&quot;both&quot;</span>,
+                  <span class="dt">alpha        =</span> <span class="fl">0.01</span>,
+                  <span class="dt">max_anoms    =</span> <span class="fl">0.10</span>)
+
+
+<span class="co"># Detecter Output filtered to anomalies:</span>
+<span class="kw">filter</span>(anom1, anomaly <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
+<span class="co">#&gt; # A tibble: 8 x 9</span>
+<span class="co">#&gt;   date       measure      value seasonal trend  resid lower upper anomaly</span>
+<span class="co">#&gt;   &lt;date&gt;     &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 2018-08-29 metric2_mean  39.1  -0.0792  49.8 -10.6   48.5  51.0       1</span>
+<span class="co">#&gt; 2 2018-09-05 metric2_mean  62.3  -0.0792  49.8  12.6   48.6  51.0       1</span>
+<span class="co">#&gt; 3 2018-09-17 metric2_mean  52.7   0.123   49.9   2.66  48.8  51.3       1</span>
+<span class="co">#&gt; 4 2018-09-23 metric2_mean  62.6  -0.0196  49.9  12.7   48.7  51.2       1</span>
+<span class="co">#&gt; 5 2018-10-13 metric2_mean  39.2   0.0276  50.1 -10.9   48.9  51.4       1</span>
+<span class="co">#&gt; 6 2018-11-11 metric2_mean  61.6  -0.0196  50.1  11.6   48.9  51.3       1</span>
+<span class="co">#&gt; 7 2018-11-24 metric2_mean  47.4   0.0276  50.1  -2.67  48.9  51.4       1</span>
+<span class="co">#&gt; 8 2018-11-25 metric2_mean  62.2  -0.0196  50.1  12.1   48.9  51.4       1</span>
+
+
+<span class="kw">gg_line_chart</span>(anom1,
+              <span class="dt">x_variable =</span> <span class="st">&quot;date&quot;</span>,
+              <span class="dt">y_variable =</span> <span class="st">&quot;value&quot;</span>,
+              <span class="dt">points     =</span> <span class="ot">TRUE</span>,
+              <span class="dt">title      =</span> <span class="st">&quot;Anomaly Detection Example&quot;</span>,
+              <span class="dt">subtitle   =</span> <span class="st">&quot;Max Anoms = 10%, Direction = both&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> value),
+             <span class="dt">data    =</span> <span class="kw">filter</span>(anom1, anomaly <span class="op">==</span><span class="st"> </span><span class="dv">1</span>),
+             <span class="dt">color   =</span> <span class="st">&quot;red&quot;</span>,
+             <span class="dt">size    =</span> <span class="dv">5</span>,
+             <span class="dt">shape   =</span> <span class="dv">1</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Anomaly Detection with Positive dir and 10% max anoms</span>
+anom2 &lt;-<span class="st"> </span><span class="kw">detecter</span>(df_anom,
+                  <span class="dt">index_var    =</span> <span class="st">&quot;date&quot;</span>,
+                  <span class="dt">measure_vars =</span> <span class="st">&quot;metric2_mean&quot;</span>,
+                  <span class="dt">frequency    =</span> <span class="dv">7</span>,
+                  <span class="dt">direction    =</span> <span class="st">&quot;pos&quot;</span>,
+                  <span class="dt">alpha        =</span> <span class="fl">0.01</span>,
+                  <span class="dt">max_anoms    =</span> <span class="fl">0.10</span>)
+
+<span class="kw">gg_line_chart</span>(anom2,
+              <span class="dt">x_variable =</span> <span class="st">&quot;date&quot;</span>,
+              <span class="dt">y_variable =</span> <span class="st">&quot;value&quot;</span>,
+              <span class="dt">points     =</span> <span class="ot">TRUE</span>,
+              <span class="dt">title      =</span> <span class="st">&quot;Anomaly Detection Example&quot;</span>,
+              <span class="dt">subtitle   =</span> <span class="st">&quot;Max Anoms = 10%, Direction = pos&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> value),
+             <span class="dt">data    =</span> <span class="kw">filter</span>(anom2, anomaly <span class="op">==</span><span class="st"> </span><span class="dv">1</span>),
+             <span class="dt">color   =</span> <span class="st">&quot;red&quot;</span>,
+             <span class="dt">size    =</span> <span class="dv">5</span>,
+             <span class="dt">shape   =</span> <span class="dv">1</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+
+<span class="co"># Anomaly Detection with Positive dir and 2% max anoms</span>
+anom3 &lt;-<span class="st"> </span><span class="kw">detecter</span>(df_anom,
+                  <span class="dt">index_var    =</span> <span class="st">&quot;date&quot;</span>,
+                  <span class="dt">measure_vars =</span> <span class="st">&quot;metric2_mean&quot;</span>,
+                  <span class="dt">frequency    =</span> <span class="dv">7</span>,
+                  <span class="dt">direction    =</span> <span class="st">&quot;pos&quot;</span>,
+                  <span class="dt">alpha        =</span> <span class="fl">0.01</span>,
+                  <span class="dt">max_anoms    =</span> <span class="fl">0.02</span>)
+
+<span class="kw">gg_line_chart</span>(anom2,
+              <span class="dt">x_variable =</span> <span class="st">&quot;date&quot;</span>,
+              <span class="dt">y_variable =</span> <span class="st">&quot;value&quot;</span>,
+              <span class="dt">points     =</span> <span class="ot">TRUE</span>,
+              <span class="dt">title      =</span> <span class="st">&quot;Anomaly Detection Example&quot;</span>,
+              <span class="dt">subtitle   =</span> <span class="st">&quot;Max Anoms = 02%, Direction = pos&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> value),
+             <span class="dt">data    =</span> <span class="kw">filter</span>(anom3, anomaly <span class="op">==</span><span class="st"> </span><span class="dv">1</span>),
+             <span class="dt">color   =</span> <span class="st">&quot;red&quot;</span>,
+             <span class="dt">size    =</span> <span class="dv">5</span>,
+             <span class="dt">shape   =</span> <span class="dv">1</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Spark Data Processing Engine <a href="https://spark.apache.org/">via</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>dplyr R package <a href="https://dplyr.tidyverse.org/">via</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>tidyr R package <a href="https://tidyr.tidyverse.org/">via</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>R S3 OO <a href="http://adv-r.had.co.nz/S3.html">via</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>dplyr standard evaluation intro <a href="https://dplyr.tidyverse.org/articles/programming.html">via</a><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>sparklyr R package <a href="https://spark.rstudio.com/">via</a><a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>tidyverse: R packages for data science <a href="https://www.tidyverse.org/">via</a><a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>Season Hybrid ESD algorithm <a href="https://arxiv.org/pdf/1704.07706.pdf">via</a><a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p>AnomalyDetection R package <a href="https://github.com/koalaverse/anomalyDetection">via</a><a href="#fnref9">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

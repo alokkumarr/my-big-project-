@@ -4,12 +4,13 @@
 #
 set -eu
 
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <config>"
+if [ $# -lt 1 -o $# -gt 2 ]; then
+    echo "Usage: $0 <config> [<options>]"
     exit 1
 fi
 
 config=$1
+options="${2:-}"
 dir=$(dirname $0)
 
 yum_install() {
@@ -54,5 +55,5 @@ if ! grep -e '^\[sip-rtis\]$' $config; then
 fi
 
 echo "Starting deployment"
-ansible-playbook -i $config $dir/site.yml
+ansible-playbook -i $config $options $dir/site.yml
 echo "Finished deployment"
