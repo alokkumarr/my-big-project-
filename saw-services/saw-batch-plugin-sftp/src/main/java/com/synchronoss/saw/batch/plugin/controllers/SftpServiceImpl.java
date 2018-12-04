@@ -70,9 +70,9 @@ public class SftpServiceImpl extends SipPluginContract {
   @Autowired
   private SipLogging sipLogService;
 
-  @Value("${bis.partial-file-timeDifference}")
+  @Value("${bis.modified-retries}")
   @NotNull
-  private Long timeDifference;
+  private int retries;
 
   @Value("${bis.transfer-batch-size}")
   @NotNull
@@ -401,78 +401,83 @@ public class SftpServiceImpl extends SipPluginContract {
     List<BisDataMetaInfo> list = new ArrayList<>(payload.getBatchSize());
     LsEntry[] files = template.list(location + File.separator + pattern);
     BisDataMetaInfo bisDataMetaInfo = null;
+    long lastModifiedDate = 0L;
     for (LsEntry entry : files) {
-      long lastModified = entry.getAttrs().getMTime();
-      long currentTime = System.currentTimeMillis();
-      if ((currentTime - lastModified) > timeDifference) {
-        if (entry.getAttrs().isDir()) {
-          logger.trace("invocation of method immediatelistOfAll when directory "
-              + "is availble in destination with location starts here "
-              + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-          immediatelistOfAll(template, location + File.separator + entry.getFilename(), pattern,
-              payload);
-          logger.trace("invocation of method immediatelistOfAll when directory "
-              + "is availble in destination with location ends here " + payload.getSourceLocation()
-              + " & file pattern " + payload.getFilePattern());
-        } else {
-          if (list.size() <= batchSize && entry.getAttrs().getSize() != 0) {
-            String destination = payload.getDestinationLocation() != null
-                ? defaultDestinationLocation + File.separator + payload.getDestinationLocation()
-                : defaultDestinationLocation;
-            logger.trace("file from the source is downnloaded in the location :" + destination);
-            File localDirectory =
-                new File(destination + File.separator + getBatchId() + File.separator);
-            logger.trace("directory where the file will be downnloaded  :"
-                + localDirectory.getAbsolutePath());
-            if (!localDirectory.exists()) {
-              logger.trace("directory where the file will be downnloaded "
-                  + "does not exist so it will be created :" + localDirectory.getAbsolutePath());
-              localDirectory.mkdirs();
-            }
-            File localFile = new File(localDirectory.getPath() + File.separator
-                + FilenameUtils.getBaseName(entry.getFilename()) + "."
-                + IntegrationUtils.renameFileAppender() + "."
-                + FilenameUtils.getExtension(entry.getFilename()));
-            logger.trace("Actual file name after downloaded in the  :"
-                + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
-            template.get(payload.getSourceLocation() + File.separator + entry.getFilename(),
-                new InputStreamCallback() {
-                  @Override
-                  public void doWithInputStream(InputStream stream) throws IOException {
-                    try {
-                      if (stream != null) {
-                        logger
-                            .trace("Streaming the content of the file in the directory starts here "
-                                + entry.getFilename());
-                        FileCopyUtils.copy(StreamUtils.copyToByteArray(stream), localFile);
-                        logger.trace("Streaming the content of the file in the directory ends here "
-                            + entry.getFilename());
-                      }
-                    } catch (Exception ex) {
-                      logger.error("Exception occurred while writing file to the file system", ex);
-                    } finally {
-                      if (stream != null) {
-                        logger.trace("in finally block closing the stream");
-                        stream.close();
-                      }
+      logger.trace("entry :" + entry.getFilename());
+      long modifiedDate = new Date(entry.getAttrs().getMTime() * 1000L).getTime();
+      logger.trace("modifiedDate :" + modifiedDate);
+      for (int i = 0; i < retries; i++) {
+        lastModifiedDate = new Date(
+            template.list(location + File.separator + entry.getFilename())[0].getAttrs().getMTime()
+                * 1000L).getTime();
+      }
+      logger.trace("lastModifiedDate :" + lastModifiedDate);
+      logger.trace("lastModifiedDate - modifiedDate :" + (modifiedDate - lastModifiedDate));
+      if ((lastModifiedDate - modifiedDate) == 0) {
+        logger.trace("invocation of method immediatelistOfAll when directory "
+            + "is availble in destination with location starts here " + payload.getSourceLocation()
+            + " & file pattern " + payload.getFilePattern());
+        immediatelistOfAll(template, location + File.separator + entry.getFilename(), pattern,
+            payload);
+        logger.trace("invocation of method immediatelistOfAll when directory "
+            + "is availble in destination with location ends here " + payload.getSourceLocation()
+            + " & file pattern " + payload.getFilePattern());
+      } else {
+        if (list.size() <= batchSize && entry.getAttrs().getSize() != 0) {
+          String destination = payload.getDestinationLocation() != null
+              ? defaultDestinationLocation + File.separator + payload.getDestinationLocation()
+              : defaultDestinationLocation;
+          logger.trace("file from the source is downnloaded in the location :" + destination);
+          File localDirectory =
+              new File(destination + File.separator + getBatchId() + File.separator);
+          logger.trace(
+              "directory where the file will be downnloaded  :" + localDirectory.getAbsolutePath());
+          if (!localDirectory.exists()) {
+            logger.trace("directory where the file will be downnloaded "
+                + "does not exist so it will be created :" + localDirectory.getAbsolutePath());
+            localDirectory.mkdirs();
+          }
+          File localFile = new File(localDirectory.getPath() + File.separator
+              + FilenameUtils.getBaseName(entry.getFilename()) + "."
+              + IntegrationUtils.renameFileAppender() + "."
+              + FilenameUtils.getExtension(entry.getFilename()));
+          logger.trace("Actual file name after downloaded in the  :"
+              + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
+          template.get(payload.getSourceLocation() + File.separator + entry.getFilename(),
+              new InputStreamCallback() {
+                @Override
+                public void doWithInputStream(InputStream stream) throws IOException {
+                  try {
+                    if (stream != null) {
+                      logger.trace("Streaming the content of the file in the directory starts here "
+                          + entry.getFilename());
+                      FileCopyUtils.copy(StreamUtils.copyToByteArray(stream), localFile);
+                      logger.trace("Streaming the content of the file in the directory ends here "
+                          + entry.getFilename());
+                    }
+                  } catch (Exception ex) {
+                    logger.error("Exception occurred while writing file to the file system", ex);
+                  } finally {
+                    if (stream != null) {
+                      logger.trace("in finally block closing the stream");
+                      stream.close();
                     }
                   }
-                });
-            bisDataMetaInfo = new BisDataMetaInfo();
-            bisDataMetaInfo
-                .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-            bisDataMetaInfo.setDataSizeInBytes(entry.getAttrs().getSize());
-            bisDataMetaInfo.setActualDataName(
-                payload.getSourceLocation() + File.separator + entry.getFilename());
-            bisDataMetaInfo.setReceivedDataName(localFile.getPath());
-            bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-            bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
-            bisDataMetaInfo
-                .setActualReceiveDate(new Date(((long) entry.getAttrs().getATime()) * 1000L));
-            list.add(bisDataMetaInfo);
-          } else {
-            break;
-          }
+                }
+              });
+          bisDataMetaInfo = new BisDataMetaInfo();
+          bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+          bisDataMetaInfo.setDataSizeInBytes(entry.getAttrs().getSize());
+          bisDataMetaInfo.setActualDataName(
+              payload.getSourceLocation() + File.separator + entry.getFilename());
+          bisDataMetaInfo.setReceivedDataName(localFile.getPath());
+          bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+          bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
+          bisDataMetaInfo
+              .setActualReceiveDate(new Date(((long) entry.getAttrs().getATime()) * 1000L));
+          list.add(bisDataMetaInfo);
+        } else {
+          break;
         }
       }
     }
@@ -587,15 +592,20 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.trace("size of partitions :" + result.size());
         logger.trace("file from the source is downnloaded in the location :" + destinationLocation);
         File localDirectory = null;
+        long lastModifiedDate = 0L;
         for (List<LsEntry> entries : result) {
           for (LsEntry entry : entries) {
             logger.trace("entry :" + entry.getFilename());
-            long lastModified = entry.getAttrs().getMTime();
-            logger.trace("lastModified :" + lastModified);
-            long currentTime = System.currentTimeMillis();
-            logger.trace("currentTime :" + currentTime);
-            logger.trace("currentTime - lastModified :" + (currentTime - lastModified));
-            if ((currentTime - lastModified) > timeDifference) {
+            long modifiedDate = new Date(entry.getAttrs().getMTime() * 1000L).getTime();
+            logger.trace("modifiedDate :" + modifiedDate);
+            for (int i = 0; i < retries; i++) {
+              lastModifiedDate =
+                  new Date(template.list(sourcelocation + File.separator + entry.getFilename())[0]
+                      .getAttrs().getMTime() * 1000L).getTime();
+            }
+            logger.trace("lastModifiedDate :" + lastModifiedDate);
+            logger.trace("lastModifiedDate - modifiedDate :" + (modifiedDate - lastModifiedDate));
+            if ((lastModifiedDate - modifiedDate) == 0) {
               if (entry.getAttrs().isDir()) {
                 logger.trace("invocation of method transferDataFromChannel "
                     + "when directory is availble in destination with location starts here "

@@ -49,7 +49,7 @@ sip:
     index: 0    
 bis:
   transfer-batch-size: 10
-  partial-file-timeDifference: 1000
+  modified-retries: 3
   default-data-drop-location: /Users/spau0004/Desktop/workbench
   scheduler-url: http://localhost:9601/scheduler/bisscheduler
      
