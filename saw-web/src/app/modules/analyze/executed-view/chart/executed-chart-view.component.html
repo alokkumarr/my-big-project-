@@ -20,7 +20,7 @@
 
 
 <div class="chart-data-grid" *ngIf="toggleToGrid">
-  <dx-data-grid #dataGrid class="report-toggle" [customizeColumns]="customizeColumns" [columnMinWidth]="150" [columnResizingMode]="widget" [allowColumnReordering]="true"
+  <dx-data-grid #dataGrid class="report-toggle" [customizeColumns]="customizeColumns" [columnMinWidth]="150" [columnResizingMode]="'widget'" [allowColumnReordering]="true"
     [allowColumnResizing]="true" [showColumnHeaders]="true" [showColumnLines]="false" [showRowLines]="false"
     [showBorders]="false" [rowAlternationEnabled]="true" [hoverStateEnabled]="true" [wordWrapEnabled]="false"
     [dataSource]="chartToggleData">
