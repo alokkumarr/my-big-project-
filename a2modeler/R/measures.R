@@ -123,11 +123,18 @@ match_measure_method <- function(obj) {
 }
 
 
+#' a2modeler Measures
+#' 
+#' Measure objects compatible with a2modeler objects
+#' 
+#' @name measures
+NULL       
+
 
 # RMSE --------------------------------------------------------------------
 
 
-#' Root Mean Squared Error Measure Object
+#' @description RMSE - Root Mean Squared Error Measure Object
 #'
 #' @export RMSE
 #' @rdname measures
@@ -195,20 +202,20 @@ rmse.spark_connection <- function(x, predicted = "prediction", actual = "label")
 }
 
 
-#' rmse.tbl_spark <- function(x, predicted, actual){
-#'   checkmate::assert_choice(predicted, colnames(x))
-#'   checkmate::assert_choice(actual, colnames(x))
-#'   x %>%
-#'     dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
-#'     dplyr::collect()
-#' }
+# rmse.tbl_spark <- function(x, predicted, actual){
+#   checkmate::assert_choice(predicted, colnames(x))
+#   checkmate::assert_choice(actual, colnames(x))
+#   x %>%
+#     dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
+#     dplyr::collect()
+# }
 
 
 
 # MAPE --------------------------------------------------------------------
 
 
-#' Mean Absolute Percentage Error Measure Object
+#' @description MAPE - Mean Absolute Percentage Error Measure Object
 #'
 #' @export MAPE
 #' @rdname measures
@@ -258,7 +265,7 @@ mape.tbl_spark <- function(x, predicted, actual){
 # Slihouette --------------------------------------------------------------
 
 
-#' Silhouette Measure Object
+#' @description Silhouette - Silhouette Measure Object
 #'
 #' @export Silhouette
 #' @rdname measures
@@ -305,7 +312,7 @@ silhouette.spark_connection <- function(x, predicted = "predicted") {
 
 # AUC ---------------------------------------------------------------------
 
-#' Area Under the Curve Measure Object
+#' @description AUC - Area Under the Curve Measure Object
 #'
 #' @export AUC
 #' @rdname measures
@@ -363,7 +370,7 @@ auc.spark_connection <- function(x, predicted = "predicted", actual = "label") {
 # F1 ----------------------------------------------------------------------
 
 
-#' F1 Measure Object
+#' @description F1 - F1 Measure Object
 #'
 #' @export F1
 #' @rdname measures
