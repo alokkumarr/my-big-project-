@@ -1,0 +1,8 @@
+Version {project-version}
+:toc:
+:nofooter:
+:docinfo: shared
+:plantuml-config: plantuml-config
+:plantuml-format: svg
+// Embed diagrams in HTML document to simplify including
+:data-uri:
