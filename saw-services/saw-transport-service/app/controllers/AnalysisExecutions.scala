@@ -227,10 +227,13 @@ class AnalysisExecutions extends BaseController {
   def getLatestExecutionData(analysisId: String, page: Int, pageSize: Int, analysisType: String, executionType: String): Result = {
     handle(process = (json, ticket) => {
       val executions = listExecution(analysisId)
-      if(executions.isEmpty)
-        return null
-      val executionId = ((executions.head) \ "id").extract[String]
-      getExecutionResult(analysisId, executionId, page, pageSize, analysisType, executionType)
+      if(executions.isEmpty){
+        ("data",List[JValue]() ) ~ ("totalRows", 0) ~ ("queryBuilder", null) ~ ("executedBy", null): JValue
+      }
+      else{
+        val executionId = ((executions.head) \ "id").extract[String]
+        getExecutionResult(analysisId, executionId, page, pageSize, analysisType, executionType)
+      }
 
     })
   }
