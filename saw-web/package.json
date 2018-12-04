@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "run-s version dev:serve",
+    "dev:serve": "ng serve",
     "build": "run-s version build:only",
     "build:only": "ng build --prod",
     "build:stats": "ng build --prod --stats-json",
