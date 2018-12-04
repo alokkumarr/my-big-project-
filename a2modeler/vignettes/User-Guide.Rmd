@@ -30,8 +30,14 @@ library(tibble)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
+library(a2modeler)
 library(a2charter)
 library(ggplot2)
+
+# Sim Data
+sim_df_ts <- tibble(date = today() - days(1:100), 
+                    y = arima.sim(n = 100, list(order = c(1,0,0), ar = 0.7)),
+                    index = 1:100)
 ```
 
 
@@ -137,9 +143,9 @@ An additional input for the index variable is required. The index variable is us
 ### Forecaster Example
 
 # Simulated Time Series Data
-select(sim_df_ts, date, y)
+select(sim_df_ts, index, y)
 
-f1 <- forecaster(df        = select(sim_df_ts, date, y),
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
                  target    = "y",
                  index_var = "index",
                  name      = "example")
@@ -244,29 +250,272 @@ The a2modeler package currently supports the following sampling techinques:
 * __cross validation__: cross validation samples^[cross validation [via](https://en.wikipedia.org/wiki/Cross-validation_(statistics))] are widely used in machine learning model building workflows. Cross validation samples splits the data into multiple samples but ensures that each sample is used in one validation sample. The number of folds controls how many sampling pairs there are along with the amount of data in each. There is an additional option for adding a test holdout sample.
 
 
-Sampling is typically the second step in the workflow. Each of the sampling methods above can be "added" to the modeler object with the function convention of `add_*_samples()` where the sampling method is substitued for *. 
+Sampling is typically the second step in the workflow. Each of the sampling methods above can be "added" to the modeler object with the function convention of `add_*_samples()` where the sampling method is substitued for *. Examples below.
 
 ```{r sampling, eval=FALSE}
 
-# Regressor with Sampling:
+# Regressor with Training/Validation/Test Holdout Samples:
 r1 <- regressor(df     = df,
                 target = "mpg",
                 name   = "example") %>% 
   add_holdout_samples(splits = c(.6, .2, .2))
 
+
+# Regressor with 5-fold Cross-Validation and Test Holdout Samples
+r2 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example") %>% 
+  add_cross_validation_samples(folds = 5, test_holdout_prct = 0.2, seed = 319)
+```
+
+
+```{r sampling2, eval=TRUE}
+
+
+# Forecaster with holdout samples
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2))
+
+# Forecaster with time-slices
+f2 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_time_slice_samples(width = 50, horizon = 5, skip = 0)
+```
+
+The sample step creates a samples object and saves to the modeler object.  The samples object containts row indicies for each sample. The indicies are used internally by the a2modeler functionality to partition the data into the correct samples.
+
+```{r}
+
+# Stored samples object
+f1$samples
 ```
 
 
 #### Measurement
 
+The next step is to define the criteria and metric for model measurement. The a2modeler package comes with several measures, however, measures are generally appropriate only for a specific use case. In the measure print outs below, the measure properties lists which use cases are appropriate. 
+
+```{r measures}
+
+# RMSE
+RMSE
+
+# MAPE
+MAPE
+
+# AUC
+AUC
+
+# F1
+F1
+
+# Silhouette
+Silhouette
+```
+
+
+Each use case has a default measure, however, the measure can be explicitly added to a modeler object with the `set_meaure` function. The measure is stored in the modeler object and is used when model performance is measured.
+
+```{r}
+
+# Forecaster with RMSE Measure
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE)
+
+# Forecaster measure
+f1$measure
+
+```
+
 
 #### Models
 
-##### Features
+One or more models can be added to a modeler object. Each model added will be trained, validated and given opportunity for final selection on the same set of samples. In the a2modeler package a model is uniquly defined by three components:
+
+* __Method__: the model algorithm to use. See following section for available methods
+* __Features__: the feature engineering pipeline used to capture any transformations made on the input dataset
+* __Parameters__: the configuration of any model algorithm meta-parameters
+
+
+Adding a new model to a model is done by calling the `add_model` function shown below. Note the named method is the only required input. The default pipeline is NULL which produces the identity transformation. The default param_map (input for the parameters) is an empty list. 
+
+```{r}
+
+# Forecaster with auto.arima function
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL, 
+            method = "auto.armia",
+            param_map = list())
+```
+
 
 ##### Method
 
+The following model methods by use case type are supported
+
+```{r}
+
+# Model Methods
+model_methods %>% 
+  select( -class) %>% 
+  knitr::kable(.,
+               caption = "Model Methods")
+```
+
+
+Methods are specified with a string input within the `add_model` function.  
+
+##### Features
+
+Feature generation is included in the model definition. This design allows for feature generation changes to be tested in the same manner as model method or parameter changes. Features are encapsulated within a pipeline object. The pipeline object (shown below) stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once
+
+```{r}
+
+# Basic Indentity pipeline
+pipe <- pipeline(expr = identity,
+                 desc = "example")
+pipe
+```
+
+There are a few basic pipeline methods shown below
+
+* __flow__: apply pipeline expression on dataset. output not saved to pipeline
+* __execute__: apply pipeline expresssion on dataset. output saved to pipeline
+* __test__: apply pipeline expression on subset of data records
+* __clean__: removes stored output from pipeline
+
+```{r}
+
+# Pipeline example
+new_pipe <- pipeline(
+  expr = function(df) {
+    df %>% 
+      select_if(is.numeric) %>% 
+      mutate_all( funs((. - min(.)) / max(.)))
+  },
+  desc = "normalize numeric variables",
+  uid = "get-normal-pipe"
+)
+new_pipe
+
+
+# Flow example
+mtcars %>% 
+  select(mpg, wt, hp) %>% 
+  flow(pipe = new_pipe)
+
+# Execute example
+updated_pipe <- mtcars %>% 
+  select(mpg, wt, hp) %>% 
+  execute(pipe = new_pipe)
+
+# Pipe output
+updated_pipe
+
+```
+
+Pipelines can be created externally to a modeler object and passed in as an argument to one or more models
+
+
+
 ##### Parameters
+
+Many model methods have configurable parameters that should be specified. Parameter settings can impact a models performance greatly and it is good practice to test several values for important parameters. Testing of parameter values is sometimes referred to as model tuning. 
+
+Parameters values are configured for a2model with the param_map argument. The param_map takes a named list with parameter names and unique values to test. Under the hood, the a2modeler object will create a grid of possible parameter value combinations based on the param_map input and create a unique model for each. 
+
+```{r, eval = FALSE}
+
+# Regression example with paramater grid
+r1 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL,
+            method = "ml_linear_regression",
+            param_map = list(reg_param = c(0, 0.01),
+                             elastic_net_param = c(0, 0.01)),
+            desc = "linear example with param grid"
+            uid = "linear") 
+
+```
+
+
+```{r echo=FALSE}
+
+expand.grid(reg_param = c(0, 0.01),
+            elastic_net_param = c(0, 0.01)) %>% 
+  knitr::kable(.,
+               caption = "linear model parameter grid")
+
+```
+
+Note, valid named arguments need to be provided. Method arguments can be found by looking at the native R help documentation
+
+```{r}
+# Method help
+?ml_linear_regression
+```
+
+
+
+Putting it all together, in the following chunk a foreacaster is created with multiple models. Individual models are stored as list in the modeler object
+
+```{r}
+
+# Lagged Pipe
+lag_pipe <- pipeline(
+  expr = function(df) {
+    df %>% 
+      lagger(order_vars = "index",
+             measure_vars = "y",
+             lags = 1:7)
+  },
+  desc = "Create lagged values of y variable",
+  uid = "lag-pipe"
+)
+
+# Forecaster with multiple models
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+   add_model(pipe = NULL, 
+            method = "auto.arima",
+            param_map = list(),
+            uid = "auto-arima") %>% 
+  add_model(pipe = lag_pipe, 
+            method = "auto.arima",
+            param_map = list(),
+            uid = "auto-arima-lag-pipe") %>% 
+  add_model(pipe = lag_pipe, 
+            method = "ets",
+            param_map = list(model = c("AAA", "ANN", "ZZZ")),
+            uid = "ets-lag")
+
+# Models by Status
+purrr::map_df(f1$models, "status")
+
+```
+
+
 
 #### Train
 
