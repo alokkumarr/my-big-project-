@@ -291,6 +291,10 @@ public interface WithDataSetService {
                 .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
                 .append(Path.SEPARATOR + aux.ctx.batchID)
                 .append(Path.SEPARATOR + aux.ctx.componentName)
+
+                 /* Creating a dynamic directory, so that components running is parallel will not
+                  * run into conflicts
+                  */
                 .append(Path.SEPARATOR + new DateTime().getMillis());
 
         DataSetServiceAux.logger.debug(String.format("Generated temp location: %s",
