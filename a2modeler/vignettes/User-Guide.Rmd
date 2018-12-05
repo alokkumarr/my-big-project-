@@ -27,6 +27,7 @@ knitr::opts_chunk$set(
 library(dplyr)
 library(tidyr)
 library(tibble)
+library(purrr)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
@@ -344,7 +345,7 @@ One or more models can be added to a modeler object. Each model added will be tr
 
 * __Method__: the model algorithm to use. See following section for available methods
 * __Features__: the feature engineering pipeline used to capture any transformations made on the input dataset
-* __Parameters__: the configuration of any model algorithm meta-parameters
+* __Parameters__: the configuration of the model algorithm meta-parameters
 
 
 Adding a new model to a model is done by calling the `add_model` function shown below. Note the named method is the only required input. The default pipeline is NULL which produces the identity transformation. The default param_map (input for the parameters) is an empty list. 
@@ -437,7 +438,7 @@ Pipelines can be created externally to a modeler object and passed in as an argu
 
 Many model methods have configurable parameters that should be specified. Parameter settings can impact a models performance greatly and it is good practice to test several values for important parameters. Testing of parameter values is sometimes referred to as model tuning. 
 
-Parameters values are configured for a2model with the param_map argument. The param_map takes a named list with parameter names and unique values to test. Under the hood, the a2modeler object will create a grid of possible parameter value combinations based on the param_map input and create a unique model for each. 
+Parameters values are configured for a2model with the param_map argument. The param_map takes a named list with parameter names and unique values to test. Under the hood, the a2modeler object will create a grid of possible parameter value combinations based on the param_map input and create a unique sub-model for each. The best performing sub-model (parameter configuration) will stored at the parent model level. 
 
 ```{r, eval = FALSE}
 
@@ -475,21 +476,21 @@ Note, valid named arguments need to be provided. Method arguments can be found b
 
 
 
-Putting it all together, in the following chunk a foreacaster is created with multiple models. Individual models are stored as list in the modeler object
+In the following chunk a foreacaster is created with multiple models. Individual models are stored as a list in the modeler object. Sub-models are stored as a list within the model.
 
 ```{r}
 
-# Lagged Pipe
-lag_pipe <- pipeline(
+# Roll Pipe
+roll_pipe <- pipeline(
   expr = function(df) {
     df %>% 
-      lagger(order_vars = "index",
+      roller(order_vars = "index",
              measure_vars = "y",
-             lags = 1:7) %>% 
-      na.omit()
+             width = 5,
+             fun = "mean")
   },
-  desc = "Create lagged values of y variable",
-  uid = "lag-pipe"
+  desc = "Create rolling 5-window average of y variable",
+  uid = "roll-pipe"
 )
 
 # Forecaster with multiple models
@@ -503,11 +504,11 @@ f1 <- forecaster(df        = select(sim_df_ts, index, y),
             method = "auto.arima",
             param_map = list(),
             uid = "auto-arima") %>% 
-  add_model(pipe = lag_pipe, 
+  add_model(pipe = roll_pipe, 
             method = "auto.arima",
             param_map = list(),
             uid = "auto-arima-lag-pipe") %>% 
-  add_model(pipe = lag_pipe, 
+  add_model(pipe = roll_pipe, 
             method = "ets",
             param_map = list(model = c("AAA", "ANN", "ZZZ")),
             uid = "ets-lag")
@@ -517,8 +518,11 @@ f1 <- forecaster(df        = select(sim_df_ts, index, y),
 ```{r}
 
 # Models by Status
-purrr::map_df(f1$models, "status")
+map_df(f1$models, "status")
 
+
+# Example Model Structure
+str(f1$models$`auto-arima`)
 ```
 
 
@@ -527,7 +531,7 @@ purrr::map_df(f1$models, "status")
 
 The next step in the model development process is to train the models on the training samples, and  evaluate on the validation samples. This step is handled with the `train_models` a2modeler function. The `train_model` function is governed by each model's status. The `train_model` function skips all previously trained models and will train all models with "added" status unless a specific model uid is provided.
 
-```{r}
+```{r, warning=FALSE}
 
 # Trained Model Example:
 f1 <- forecaster(df        = select(sim_df_ts, index, y),
@@ -538,26 +542,59 @@ f1 <- forecaster(df        = select(sim_df_ts, index, y),
   set_measure(RMSE) %>% 
   add_model(pipe = NULL, 
             method = "auto.arima",
-            param_map = list(),
+            param_map = list(lambda = c(0, .5, 1)),
             uid = "auto-arima") %>% 
-  add_model(pipe = lag_pipe, 
+  add_model(pipe = roll_pipe, 
             method = "auto.arima",
             param_map = list(),
-            uid = "auto-arima-lag-pipe") %>% 
-  add_model(pipe = lag_pipe, 
+            uid = "auto-arima-roll") %>% 
+  add_model(pipe = NULL, 
             method = "ets",
-            param_map = list(model = c("AAA", "ANN", "ZZZ")),
-            uid = "ets-lag") %>% 
+            param_map = list(),
+            uid = "ets") %>% 
   train_models()
 
 # Models by Status
-purrr::map_df(f1$models, "status")
+map_df(f1$models, "status")
 
 ```
 
 The `train_models` function collects the model measurement on validation samples and stores as a tibble on the performance slot 
 
+```{r}
+
+# Model Performance
+f1$performance %>%  
+  arrange(rmse) %>% 
+  knitr::kable(.,
+               digits = 2,
+               caption = "Model Performance Leaderboard")
+```
+
+
 #### Select Final Model
+
+The selection of the final model amoung the canidate models is controlled by the `set_final_model` a2modeler function. This function has 2 methods for selection:
+
+1. __manual__: developer can select any of models by providing valid model uid to uid argument
+2. __best__: automatically selects best performing model based on validation measurement
+
+
+There are two more options in the `set_final_model` function to refit and reevaluate. The refit option will refit the final model to the entirety of the input dataset. the reevaluate option requires a test holdout sample and will refit the final model on the entire training and validation sample and measure the model performance on the test holdout set. This final re-evaluation can provide a better measure of future model predictive performance than validation peformance alone. The final model was selected on the basis of its validation performance. 
+
+The result of `set_final_model` function will store the selected model as the final_model internally. The final_model is what is used for deployment and prediction.
+
+```{r, warning=FALSE}
+
+# Set Final Model Example:
+f1 <- set_final_model(f1, method = "best", refit = TRUE, reevaluate = FALSE)
+
+# Models by Status
+map_df(f1$models, "status")
+
+# Final Model
+tibble(uid = f1$final_model$uid, status = f1$final_model$status)
+```
 
 
 #### Deploy

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Haarstick" />
 
-<meta name="date" content="2018-12-04" />
+<meta name="date" content="2018-12-05" />
 
 <title>a2modeler User Guide</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">a2modeler User Guide</h1>
 <h4 class="author"><em>Haarstick</em></h4>
-<h4 class="date"><em>2018-12-04</em></h4>
+<h4 class="date"><em>2018-12-05</em></h4>
 
 
 <div id="TOC">
@@ -95,9 +95,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 #&gt; The following object is masked from 'package:base':
 #&gt; 
 #&gt;     date
+#&gt; 
+#&gt; Attaching package: 'sparklyr'
+#&gt; The following object is masked from 'package:purrr':
+#&gt; 
+#&gt;     invoke
+#&gt; 
+#&gt; Attaching package: 'a2munge'
+#&gt; The following object is masked from 'package:purrr':
+#&gt; 
+#&gt;     detect
 #&gt; Loading a2modeler
 #&gt; 
 #&gt; Attaching package: 'testthat'
+#&gt; The following object is masked from 'package:purrr':
+#&gt; 
+#&gt;     is_null
 #&gt; The following object is masked from 'package:dplyr':
 #&gt; 
 #&gt;     matches</code></pre>
@@ -454,7 +467,7 @@ f1<span class="op">$</span>measure
 <ul>
 <li><strong>Method</strong>: the model algorithm to use. See following section for available methods</li>
 <li><strong>Features</strong>: the feature engineering pipeline used to capture any transformations made on the input dataset</li>
-<li><strong>Parameters</strong>: the configuration of any model algorithm meta-parameters</li>
+<li><strong>Parameters</strong>: the configuration of the model algorithm meta-parameters</li>
 </ul>
 <p>Adding a new model to a model is done by calling the <code>add_model</code> function shown below. Note the named method is the only required input. The default pipeline is NULL which produces the identity transformation. The default param_map (input for the parameters) is an empty list.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
@@ -668,7 +681,7 @@ model_methods <span class="op">%&gt;%</span><span class="st"> </span>
 pipe &lt;-<span class="st"> </span><span class="kw">pipeline</span>(<span class="dt">expr =</span> identity,
                  <span class="dt">desc =</span> <span class="st">&quot;example&quot;</span>)
 pipe
-<span class="co">#&gt; Pipeline: pipe4498136f2d97 ---------------- </span>
+<span class="co">#&gt; Pipeline: pipedec33457141 ---------------- </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Description:</span>
 <span class="co">#&gt;  example </span>
@@ -676,10 +689,10 @@ pipe
 <span class="co">#&gt; Expression:</span>
 <span class="co">#&gt; function (x) </span>
 <span class="co">#&gt; x</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000006909ae0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000006909a80&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:base&gt;</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Created at: 2018-12-04 15:34:38 </span>
+<span class="co">#&gt; Created at: 2018-12-05 10:53:24 </span>
 <span class="co">#&gt; Runtime: &lt; not run yet &gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Sample Output:</span>
@@ -715,7 +728,7 @@ new_pipe
 <span class="co">#&gt;       mutate_all( funs((. - min(.)) / (max(.) - min(.))))</span>
 <span class="co">#&gt;   }</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Created at: 2018-12-04 15:34:38 </span>
+<span class="co">#&gt; Created at: 2018-12-05 10:53:24 </span>
 <span class="co">#&gt; Runtime: &lt; not run yet &gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Sample Output:</span>
@@ -778,10 +791,10 @@ updated_pipe
 <span class="co">#&gt;       select_if(is.numeric) %&gt;% </span>
 <span class="co">#&gt;       mutate_all( funs((. - min(.)) / (max(.) - min(.))))</span>
 <span class="co">#&gt;   }</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000018f2ae30&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000190b0ee8&gt;</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Created at: 2018-12-04 15:34:38 </span>
-<span class="co">#&gt; Runtime: 0.02 seconds</span>
+<span class="co">#&gt; Created at: 2018-12-05 10:53:24 </span>
+<span class="co">#&gt; Runtime: 0.01 seconds</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Sample Output:</span>
 <span class="co">#&gt;         mpg        wt        hp</span>
@@ -796,7 +809,7 @@ updated_pipe
 <div id="parameters" class="section level5">
 <h5>Parameters</h5>
 <p>Many model methods have configurable parameters that should be specified. Parameter settings can impact a models performance greatly and it is good practice to test several values for important parameters. Testing of parameter values is sometimes referred to as model tuning.</p>
-<p>Parameters values are configured for a2model with the param_map argument. The param_map takes a named list with parameter names and unique values to test. Under the hood, the a2modeler object will create a grid of possible parameter value combinations based on the param_map input and create a unique model for each.</p>
+<p>Parameters values are configured for a2model with the param_map argument. The param_map takes a named list with parameter names and unique values to test. Under the hood, the a2modeler object will create a grid of possible parameter value combinations based on the param_map input and create a unique sub-model for each. The best performing sub-model (parameter configuration) will stored at the parent model level.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Regression example with paramater grid</span>
 r1 &lt;-<span class="st"> </span><span class="kw">regressor</span>(<span class="dt">df     =</span> df,
@@ -840,18 +853,19 @@ r1 &lt;-<span class="st"> </span><span class="kw">regressor</span>(<span class="
 <p>Note, valid named arguments need to be provided. Method arguments can be found by looking at the native R help documentation</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Method help</span>
 ?ml_linear_regression</code></pre></div>
-<p>Putting it all together, in the following chunk a foreacaster is created with multiple models. Individual models are stored as list in the modeler object</p>
+<p>In the following chunk a foreacaster is created with multiple models. Individual models are stored as a list in the modeler object. Sub-models are stored as a list within the model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-<span class="co"># Lagged Pipe</span>
-lag_pipe &lt;-<span class="st"> </span><span class="kw">pipeline</span>(
+<span class="co"># Roll Pipe</span>
+roll_pipe &lt;-<span class="st"> </span><span class="kw">pipeline</span>(
   <span class="dt">expr =</span> <span class="cf">function</span>(df) {
     df <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw">lagger</span>(<span class="dt">order_vars =</span> <span class="st">&quot;index&quot;</span>,
+<span class="st">      </span><span class="kw">roller</span>(<span class="dt">order_vars =</span> <span class="st">&quot;index&quot;</span>,
              <span class="dt">measure_vars =</span> <span class="st">&quot;y&quot;</span>,
-             <span class="dt">lags =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>)
+             <span class="dt">width =</span> <span class="dv">5</span>,
+             <span class="dt">fun =</span> <span class="st">&quot;mean&quot;</span>)
   },
-  <span class="dt">desc =</span> <span class="st">&quot;Create lagged values of y variable&quot;</span>,
-  <span class="dt">uid =</span> <span class="st">&quot;lag-pipe&quot;</span>
+  <span class="dt">desc =</span> <span class="st">&quot;Create rolling 5-window average of y variable&quot;</span>,
+  <span class="dt">uid =</span> <span class="st">&quot;roll-pipe&quot;</span>
 )
 
 <span class="co"># Forecaster with multiple models</span>
@@ -861,32 +875,171 @@ f1 &lt;-<span class="st"> </span><span class="kw">forecaster</span>(<span class=
                  <span class="dt">name      =</span> <span class="st">&quot;example&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">add_holdout_samples</span>(<span class="dt">splits =</span> <span class="kw">c</span>(.<span class="dv">6</span>, .<span class="dv">2</span>, .<span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">set_measure</span>(RMSE) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">   </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> <span class="ot">NULL</span>, 
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> <span class="ot">NULL</span>, 
             <span class="dt">method =</span> <span class="st">&quot;auto.arima&quot;</span>,
             <span class="dt">param_map =</span> <span class="kw">list</span>(),
             <span class="dt">uid =</span> <span class="st">&quot;auto-arima&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> lag_pipe, 
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> roll_pipe, 
             <span class="dt">method =</span> <span class="st">&quot;auto.arima&quot;</span>,
             <span class="dt">param_map =</span> <span class="kw">list</span>(),
             <span class="dt">uid =</span> <span class="st">&quot;auto-arima-lag-pipe&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> lag_pipe, 
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> roll_pipe, 
             <span class="dt">method =</span> <span class="st">&quot;ets&quot;</span>,
             <span class="dt">param_map =</span> <span class="kw">list</span>(<span class="dt">model =</span> <span class="kw">c</span>(<span class="st">&quot;AAA&quot;</span>, <span class="st">&quot;ANN&quot;</span>, <span class="st">&quot;ZZZ&quot;</span>)),
-            <span class="dt">uid =</span> <span class="st">&quot;ets-lag&quot;</span>)
-
+            <span class="dt">uid =</span> <span class="st">&quot;ets-lag&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Models by Status</span>
-purrr<span class="op">::</span><span class="kw">map_df</span>(f1<span class="op">$</span>models, <span class="st">&quot;status&quot;</span>)
+<span class="kw">map_df</span>(f1<span class="op">$</span>models, <span class="st">&quot;status&quot;</span>)
 <span class="co">#&gt; # A tibble: 1 x 3</span>
 <span class="co">#&gt;   `auto-arima` `auto-arima-lag-pipe` `ets-lag`</span>
 <span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                 &lt;chr&gt;    </span>
-<span class="co">#&gt; 1 added        added                 added</span></code></pre></div>
+<span class="co">#&gt; 1 added        added                 added</span>
+
+
+<span class="co"># Example Model Structure</span>
+<span class="kw">str</span>(f1<span class="op">$</span>models<span class="op">$</span><span class="st">`</span><span class="dt">auto-arima</span><span class="st">`</span>)
+<span class="co">#&gt; List of 11</span>
+<span class="co">#&gt;  $ pipe       : chr &quot;pipedecdf25855&quot;</span>
+<span class="co">#&gt;  $ target     : chr &quot;y&quot;</span>
+<span class="co">#&gt;  $ method     : chr &quot;auto.arima&quot;</span>
+<span class="co">#&gt;  $ method_args: list()</span>
+<span class="co">#&gt;  $ param_map  : list()</span>
+<span class="co">#&gt;  $ package    : chr &quot;forecast&quot;</span>
+<span class="co">#&gt;  $ desc       : chr &quot;&quot;</span>
+<span class="co">#&gt;  $ uid        : chr &quot;auto-arima&quot;</span>
+<span class="co">#&gt;  $ created_on : POSIXct[1:1], format: &quot;2018-12-05 10:53:25&quot;</span>
+<span class="co">#&gt;  $ status     : chr &quot;added&quot;</span>
+<span class="co">#&gt;  $ index_var  : chr &quot;index&quot;</span>
+<span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr [1:2] &quot;forecast_model&quot; &quot;model&quot;</span></code></pre></div>
 </div>
 </div>
 <div id="train" class="section level4">
 <h4>Train</h4>
+<p>The next step in the model development process is to train the models on the training samples, and evaluate on the validation samples. This step is handled with the <code>train_models</code> a2modeler function. The <code>train_model</code> function is governed by each model’s status. The <code>train_model</code> function skips all previously trained models and will train all models with “added” status unless a specific model uid is provided.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Trained Model Example:</span>
+f1 &lt;-<span class="st"> </span><span class="kw">forecaster</span>(<span class="dt">df        =</span> <span class="kw">select</span>(sim_df_ts, index, y),
+                 <span class="dt">target    =</span> <span class="st">&quot;y&quot;</span>,
+                 <span class="dt">index_var =</span> <span class="st">&quot;index&quot;</span>,
+                 <span class="dt">name      =</span> <span class="st">&quot;example&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_holdout_samples</span>(<span class="dt">splits =</span> <span class="kw">c</span>(.<span class="dv">6</span>, .<span class="dv">2</span>, .<span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">set_measure</span>(RMSE) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> <span class="ot">NULL</span>, 
+            <span class="dt">method =</span> <span class="st">&quot;auto.arima&quot;</span>,
+            <span class="dt">param_map =</span> <span class="kw">list</span>(<span class="dt">lambda =</span> <span class="kw">c</span>(<span class="dv">0</span>, .<span class="dv">5</span>, <span class="dv">1</span>)),
+            <span class="dt">uid =</span> <span class="st">&quot;auto-arima&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> roll_pipe, 
+            <span class="dt">method =</span> <span class="st">&quot;auto.arima&quot;</span>,
+            <span class="dt">param_map =</span> <span class="kw">list</span>(),
+            <span class="dt">uid =</span> <span class="st">&quot;auto-arima-roll&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> <span class="ot">NULL</span>, 
+            <span class="dt">method =</span> <span class="st">&quot;ets&quot;</span>,
+            <span class="dt">param_map =</span> <span class="kw">list</span>(),
+            <span class="dt">uid =</span> <span class="st">&quot;ets&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">train_models</span>()
+
+<span class="co"># Models by Status</span>
+<span class="kw">map_df</span>(f1<span class="op">$</span>models, <span class="st">&quot;status&quot;</span>)
+<span class="co">#&gt; # A tibble: 1 x 3</span>
+<span class="co">#&gt;   `auto-arima` `auto-arima-roll` ets    </span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;             &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 trained      trained           trained</span></code></pre></div>
+<p>The <code>train_models</code> function collects the model measurement on validation samples and stores as a tibble on the performance slot</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Model Performance</span>
+f1<span class="op">$</span>performance <span class="op">%&gt;%</span><span class="st">  </span>
+<span class="st">  </span><span class="kw">arrange</span>(rmse) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.,
+               <span class="dt">digits =</span> <span class="dv">2</span>,
+               <span class="dt">caption =</span> <span class="st">&quot;Model Performance Leaderboard&quot;</span>)</code></pre></div>
+<table>
+<caption>Model Performance Leaderboard</caption>
+<thead>
+<tr class="header">
+<th align="left">model_uid</th>
+<th align="left">pipeline_uid</th>
+<th align="left">submodel_uid</th>
+<th align="left">sample</th>
+<th align="left">method</th>
+<th align="left">param_grid</th>
+<th align="right">rmse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">auto-arima</td>
+<td align="left">pipedec313e7cc9</td>
+<td align="left">submodeldec3c635958</td>
+<td align="left">validation</td>
+<td align="left">auto.arima</td>
+<td align="left">list(lambda = 0)</td>
+<td align="right">1.44</td>
+</tr>
+<tr class="even">
+<td align="left">auto-arima-roll</td>
+<td align="left">roll-pipe</td>
+<td align="left">submodeldec5a1c4c7c</td>
+<td align="left">validation</td>
+<td align="left">auto.arima</td>
+<td align="left">NULL</td>
+<td align="right">1.44</td>
+</tr>
+<tr class="odd">
+<td align="left">auto-arima</td>
+<td align="left">pipedec313e7cc9</td>
+<td align="left">submodeldeca643dc0</td>
+<td align="left">validation</td>
+<td align="left">auto.arima</td>
+<td align="left">list(lambda = 1)</td>
+<td align="right">1.46</td>
+</tr>
+<tr class="even">
+<td align="left">auto-arima</td>
+<td align="left">pipedec313e7cc9</td>
+<td align="left">submodeldec49393aee</td>
+<td align="left">validation</td>
+<td align="left">auto.arima</td>
+<td align="left">list(lambda = 0.5)</td>
+<td align="right">1.48</td>
+</tr>
+<tr class="odd">
+<td align="left">ets</td>
+<td align="left">pipedec69783590</td>
+<td align="left">submodeldec750711b0</td>
+<td align="left">validation</td>
+<td align="left">ets</td>
+<td align="left">NULL</td>
+<td align="right">1.53</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="select-final-model" class="section level4">
 <h4>Select Final Model</h4>
+<p>The selection of the final model amoung the canidate models is controlled by the <code>set_final_model</code> a2modeler function. This function has 2 methods for selection:</p>
+<ol style="list-style-type: decimal">
+<li><strong>manual</strong>: developer can select any of models by providing valid model uid to uid argument</li>
+<li><strong>best</strong>: automatically selects best performing model based on validation measurement</li>
+</ol>
+<p>There are two more options in the <code>set_final_model</code> function to refit and reevaluate. The refit option will refit the final model to the entirety of the input dataset. the reevaluate option requires a test holdout sample and will refit the final model on the entire training and validation sample and measure the model performance on the test holdout set. This final re-evaluation can provide a better measure of future model predictive performance than validation peformance alone. The final model was selected on the basis of its validation performance.</p>
+<p>The result of <code>set_final_model</code> function will store the selected model as the final_model internally. The final_model is what is used for deployment and prediction.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Set Final Model Example:</span>
+f1 &lt;-<span class="st"> </span><span class="kw">set_final_model</span>(f1, <span class="dt">method =</span> <span class="st">&quot;best&quot;</span>, <span class="dt">refit =</span> <span class="ot">TRUE</span>, <span class="dt">reevaluate =</span> <span class="ot">FALSE</span>)
+
+<span class="co"># Models by Status</span>
+<span class="kw">map_df</span>(f1<span class="op">$</span>models, <span class="st">&quot;status&quot;</span>)
+<span class="co">#&gt; # A tibble: 1 x 3</span>
+<span class="co">#&gt;   `auto-arima` `auto-arima-roll` ets    </span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;             &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 trained      trained           trained</span>
+
+<span class="co"># Final Model</span>
+<span class="kw">tibble</span>(<span class="dt">uid =</span> f1<span class="op">$</span>final_model<span class="op">$</span>uid, <span class="dt">status =</span> f1<span class="op">$</span>final_model<span class="op">$</span>status)
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   uid        status</span>
+<span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt; </span>
+<span class="co">#&gt; 1 auto-arima final</span></code></pre></div>
 </div>
 <div id="deploy" class="section level4">
 <h4>Deploy</h4>
