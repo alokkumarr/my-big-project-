@@ -4,7 +4,8 @@
 \alias{model}
 \title{Model Class Helper}
 \usage{
-model(pipe, target, method, method_args, param_map, desc = NULL, uid = NULL)
+model(pipe, target, method, method_args, param_map, desc = NULL,
+  uid = NULL)
 }
 \arguments{
 \item{pipe}{pipeline uid string}

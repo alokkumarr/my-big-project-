@@ -15,8 +15,8 @@ n = 20
 # Basic Tests -------------------------------------------------------------
 set.seed(n)
 id_vars <- seq(1, n, by = 1)
-dates <-
-  as.Date('2018-09-13') + lubridate::minutes(seq(
+dates <-  as.Date('2018-09-13') +
+  lubridate::minutes(seq(
     from = 1,
     length.out = n,
     by = 2
