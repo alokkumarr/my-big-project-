@@ -33,7 +33,7 @@ module.exports = {
 
   },
   dashboard:{
-    dashboardTitle: name => element(by.xpath(`//h2[contains(text(),"${name}")]`)),
+    dashboardTitle: name => element(by.xpath(`//span[contains(text(),"${name}")]`)),
     dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),
     dashboardConfirmDeleteButton: element(by.css('[e2e="dashboard-confirm-dialog-confirm"]')),
     refreshButton: element(by.css('[e2e="dashboard-manual-refresh-button"]')),
