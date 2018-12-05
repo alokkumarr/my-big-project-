@@ -29,17 +29,17 @@
 
   <div class="settings__unselected-fields"
        dndSortableContainer
-       dndZone="designer-setting-zone">
+       dndZone="designer-setting-zone" style="visibility: visible;">
     <div *ngIf="unselectedArtifactColumns">
       <div *ngIf="!isEmpty(unselectedArtifactColumns)">
-        <div *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
+        <a *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
              [dndSortable]="artifactColumn"
              class="settings__list-item"
              fxLayout="row"
-             fxLayoutAlign="space-between center">
+             fxLayoutAlign="space-between center"  style="visibility: visible;">
           <div class="settings__list-item__name"
                fxLayout="row"
-               fxLayoutAlign="space-between center">
+               fxLayoutAlign="space-between center"  style="visibility: visible;">
             {{ artifactColumn.displayName }}
             <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
                       class="settings__list-item__icon">
@@ -50,10 +50,10 @@
                   (click)="addToGroupIfPossible(artifactColumn)">
             <mat-icon fontIcon="icon-plus"></mat-icon>
           </button>
-        </div>
+        </a>
       </div>
       <div *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
-           fxLayout="row" fxLayoutAlign="center center">
+           fxLayout="row" fxLayoutAlign="center center"  style="visibility: visible;">
         <div class="settings__unselected-fields--empty"
              i18n>
           There are no fields for this criteria
