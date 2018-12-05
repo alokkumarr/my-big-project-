@@ -31,10 +31,9 @@ library(purrr)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
-#library(a2modeler)
-devtools::load_all("~/software_projects/sip/a2modeler")
-library(a2charter)
-library(ggplot2)
+library(a2modeler)
+#devtools::load_all("~/software_projects/sip/a2modeler")l
+
 
 # Sim Data
 sim_df_ts <- tibble(date = today() - days(1:100),
