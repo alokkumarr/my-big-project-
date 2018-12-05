@@ -7,8 +7,8 @@
 forecaster(df, target, index_var, unit = NULL, frequency = NULL,
   prediction_conf_levels = c(80, 95), name = NULL, uid = NULL,
   version = NULL, desc = NULL, scientist = NULL,
-  execution_strategy = "sequential", refit = TRUE, save_submodels = TRUE,
-  dir = NULL, ...)
+  execution_strategy = "sequential", refit = TRUE,
+  save_submodels = TRUE, dir = NULL, ...)
 }
 \arguments{
 \item{df}{dataframe with target variable and any potential predictors}
@@ -60,3 +60,4 @@ Other use cases: \code{\link{classifier}},
   \code{\link{modeler}}, \code{\link{multiclassifier}},
   \code{\link{regressor}}, \code{\link{segmenter}}
 }
+\concept{use cases}

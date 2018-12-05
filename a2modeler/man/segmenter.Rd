@@ -45,3 +45,4 @@ Other use cases: \code{\link{classifier}},
   \code{\link{forecaster}}, \code{\link{modeler}},
   \code{\link{multiclassifier}}, \code{\link{regressor}}
 }
+\concept{use cases}

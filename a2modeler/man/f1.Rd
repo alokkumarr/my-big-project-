@@ -10,7 +10,8 @@ f1(x, predicted, actual)
 
 \method{f1}{tbl_spark}(x, predicted, actual)
 
-\method{f1}{spark_connection}(x, predicted = "prediction", actual = "label")
+\method{f1}{spark_connection}(x, predicted = "prediction",
+  actual = "label")
 }
 \arguments{
 \item{x}{dataframe object}
