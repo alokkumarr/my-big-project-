@@ -540,16 +540,16 @@ f1 <- forecaster(df        = select(sim_df_ts, index, y),
                  name      = "example") %>% 
   add_holdout_samples(splits = c(.6, .2, .2)) %>% 
   set_measure(RMSE) %>% 
-  add_model(pipe = NULL, 
-            method = "auto.arima",
+  add_model(pipe      = NULL, 
+            method    = "auto.arima",
             param_map = list(lambda = c(0, .5, 1)),
             uid = "auto-arima") %>% 
-  add_model(pipe = roll_pipe, 
-            method = "auto.arima",
+  add_model(pipe      = roll_pipe, 
+            method    = "auto.arima",
             param_map = list(),
             uid = "auto-arima-roll") %>% 
-  add_model(pipe = NULL, 
-            method = "ets",
+  add_model(pipe      = NULL, 
+            method    = "ets",
             param_map = list(),
             uid = "ets") %>% 
   train_models()
@@ -599,7 +599,91 @@ tibble(uid = f1$final_model$uid, status = f1$final_model$status)
 
 #### Deploy
 
+a2models can be deploy and stored for prediction on future datasets. The a2modeler package provides a `deploy` function that serializes the modeler object and saves to file path provided. The `deploy` function uses the a2model object name and version in the pathing. For spark based a2models the deploy function removes all spark datasets stored internally including pipeline output. 
+
+Deployed models can be loaded back into memory and applied on new datasets with the `a2_load` function. 
+
+
+```{r, eval=FALSE}
+
+# Deploy Example
+r1 <- regressor(df      = df,
+                target  = "mpg",
+                name    = "example",
+                version = "0.0.1") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL,
+            method = "ml_linear_regression",
+            param_map = list(reg_param = c(0, 0.01),
+                             elastic_net_param = c(0, 0.01)),
+            desc = "linear example with param grid"
+            uid = "linear") %>% 
+  train_models() %>% 
+  set_final_model(method = "best", refit = TRUE, reevaluate = FALSE)
+
+# Deploy Regressor
+deploy(r1, "~/a2modeler-deploy-example-path")
+
+# Load Regressor back into memory
+r1.1 <- a2_load(path = "~/a2modeler-deploy-example-path/example-0.0.1", sc)
+
+```
+
 
 #### Predict
 
-## Example
+a2models can make predictions on new datasets with the `predict` a2modeler method. The `predict` function uses the native model package predict methods on the a2model's final model. The a2modeler `predict` function applies a schema check on the new data to ensure its consistent with the data used to train the model. The `predict` function applies the final model's pipeline with the `flow` function to generate any required model features. The forecaster predict method requires an additional periods argument which controls the number of periods forecasted. 
+
+The a2modeler `predict` method creates a prediction class object that stores the prediction, the model used, and meta data on the predictions. The actual predictions are stored in the predictions slot.
+
+```{r, warning=FALSE}
+
+# Prediction Example
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe      = NULL, 
+            method    = "auto.arima",
+            param_map = list(lambda = c(0, .5, 1)),
+            uid = "auto-arima") %>% 
+  add_model(pipe      = NULL, 
+            method    = "ets",
+            param_map = list(),
+            uid = "ets") %>% 
+  train_models() %>% 
+  set_final_model(., method = "best", refit = TRUE, reevaluate = FALSE)
+
+# Create Prediction Object  
+p1 <- predict(f1, data = NULL, periods = 7)
+print(p1)
+
+# Actual predictions
+p1$predictions
+
+```
+
+
+
+#### Auto Predictions
+
+The a2modler package provides an `auto_forecaster` function that wraps an entire forecasting workflow into a single configurable function. This function is most appropriate for certain types of uni-variate forecasting applications where automation is more valued. 
+
+```{r}
+
+# Auto-Forecast Example
+af1 <- auto_forecast(select(sim_df_ts, index, y),
+                     target    = "y",
+                     index_var = "index",
+                     periods   = 10,
+                     unit      = NULL,
+                     models    = list(
+                       list(method = "auto.arima"),
+                       list(method = "ets")),
+                     execution_strategy = "sequential")
+af1
+```
+

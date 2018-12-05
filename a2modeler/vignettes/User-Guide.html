@@ -78,7 +78,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#overview">Overview</a></li>
 <li><a href="#features">Features</a></li>
 <li><a href="#workflow">Workflow</a></li>
-<li><a href="#example">Example</a></li>
 </ul>
 </div>
 
@@ -681,7 +680,7 @@ model_methods <span class="op">%&gt;%</span><span class="st"> </span>
 pipe &lt;-<span class="st"> </span><span class="kw">pipeline</span>(<span class="dt">expr =</span> identity,
                  <span class="dt">desc =</span> <span class="st">&quot;example&quot;</span>)
 pipe
-<span class="co">#&gt; Pipeline: pipedec33457141 ---------------- </span>
+<span class="co">#&gt; Pipeline: pipe43fc3e295e63 ---------------- </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Description:</span>
 <span class="co">#&gt;  example </span>
@@ -689,10 +688,10 @@ pipe
 <span class="co">#&gt; Expression:</span>
 <span class="co">#&gt; function (x) </span>
 <span class="co">#&gt; x</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000006909a80&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000006909c08&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:base&gt;</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Created at: 2018-12-05 10:53:24 </span>
+<span class="co">#&gt; Created at: 2018-12-05 15:16:56 </span>
 <span class="co">#&gt; Runtime: &lt; not run yet &gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Sample Output:</span>
@@ -728,7 +727,7 @@ new_pipe
 <span class="co">#&gt;       mutate_all( funs((. - min(.)) / (max(.) - min(.))))</span>
 <span class="co">#&gt;   }</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Created at: 2018-12-05 10:53:24 </span>
+<span class="co">#&gt; Created at: 2018-12-05 15:16:56 </span>
 <span class="co">#&gt; Runtime: &lt; not run yet &gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Sample Output:</span>
@@ -791,10 +790,10 @@ updated_pipe
 <span class="co">#&gt;       select_if(is.numeric) %&gt;% </span>
 <span class="co">#&gt;       mutate_all( funs((. - min(.)) / (max(.) - min(.))))</span>
 <span class="co">#&gt;   }</span>
-<span class="co">#&gt; &lt;bytecode: 0x00000000190b0ee8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001909f558&gt;</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Created at: 2018-12-05 10:53:24 </span>
-<span class="co">#&gt; Runtime: 0.01 seconds</span>
+<span class="co">#&gt; Created at: 2018-12-05 15:16:56 </span>
+<span class="co">#&gt; Runtime: 0 seconds</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Sample Output:</span>
 <span class="co">#&gt;         mpg        wt        hp</span>
@@ -899,7 +898,7 @@ f1 &lt;-<span class="st"> </span><span class="kw">forecaster</span>(<span class=
 <span class="co"># Example Model Structure</span>
 <span class="kw">str</span>(f1<span class="op">$</span>models<span class="op">$</span><span class="st">`</span><span class="dt">auto-arima</span><span class="st">`</span>)
 <span class="co">#&gt; List of 11</span>
-<span class="co">#&gt;  $ pipe       : chr &quot;pipedecdf25855&quot;</span>
+<span class="co">#&gt;  $ pipe       : chr &quot;pipe43fc2c6e6052&quot;</span>
 <span class="co">#&gt;  $ target     : chr &quot;y&quot;</span>
 <span class="co">#&gt;  $ method     : chr &quot;auto.arima&quot;</span>
 <span class="co">#&gt;  $ method_args: list()</span>
@@ -907,7 +906,7 @@ f1 &lt;-<span class="st"> </span><span class="kw">forecaster</span>(<span class=
 <span class="co">#&gt;  $ package    : chr &quot;forecast&quot;</span>
 <span class="co">#&gt;  $ desc       : chr &quot;&quot;</span>
 <span class="co">#&gt;  $ uid        : chr &quot;auto-arima&quot;</span>
-<span class="co">#&gt;  $ created_on : POSIXct[1:1], format: &quot;2018-12-05 10:53:25&quot;</span>
+<span class="co">#&gt;  $ created_on : POSIXct[1:1], format: &quot;2018-12-05 15:16:56&quot;</span>
 <span class="co">#&gt;  $ status     : chr &quot;added&quot;</span>
 <span class="co">#&gt;  $ index_var  : chr &quot;index&quot;</span>
 <span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr [1:2] &quot;forecast_model&quot; &quot;model&quot;</span></code></pre></div>
@@ -924,16 +923,16 @@ f1 &lt;-<span class="st"> </span><span class="kw">forecaster</span>(<span class=
                  <span class="dt">name      =</span> <span class="st">&quot;example&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">add_holdout_samples</span>(<span class="dt">splits =</span> <span class="kw">c</span>(.<span class="dv">6</span>, .<span class="dv">2</span>, .<span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">set_measure</span>(RMSE) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> <span class="ot">NULL</span>, 
-            <span class="dt">method =</span> <span class="st">&quot;auto.arima&quot;</span>,
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe      =</span> <span class="ot">NULL</span>, 
+            <span class="dt">method    =</span> <span class="st">&quot;auto.arima&quot;</span>,
             <span class="dt">param_map =</span> <span class="kw">list</span>(<span class="dt">lambda =</span> <span class="kw">c</span>(<span class="dv">0</span>, .<span class="dv">5</span>, <span class="dv">1</span>)),
             <span class="dt">uid =</span> <span class="st">&quot;auto-arima&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> roll_pipe, 
-            <span class="dt">method =</span> <span class="st">&quot;auto.arima&quot;</span>,
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe      =</span> roll_pipe, 
+            <span class="dt">method    =</span> <span class="st">&quot;auto.arima&quot;</span>,
             <span class="dt">param_map =</span> <span class="kw">list</span>(),
             <span class="dt">uid =</span> <span class="st">&quot;auto-arima-roll&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> <span class="ot">NULL</span>, 
-            <span class="dt">method =</span> <span class="st">&quot;ets&quot;</span>,
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe      =</span> <span class="ot">NULL</span>, 
+            <span class="dt">method    =</span> <span class="st">&quot;ets&quot;</span>,
             <span class="dt">param_map =</span> <span class="kw">list</span>(),
             <span class="dt">uid =</span> <span class="st">&quot;ets&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">train_models</span>()
@@ -967,49 +966,49 @@ f1<span class="op">$</span>performance <span class="op">%&gt;%</span><span class
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">auto-arima</td>
-<td align="left">pipedec313e7cc9</td>
-<td align="left">submodeldec3c635958</td>
-<td align="left">validation</td>
-<td align="left">auto.arima</td>
-<td align="left">list(lambda = 0)</td>
-<td align="right">1.44</td>
-</tr>
-<tr class="even">
 <td align="left">auto-arima-roll</td>
 <td align="left">roll-pipe</td>
-<td align="left">submodeldec5a1c4c7c</td>
+<td align="left">submodel43fc36b7638c</td>
 <td align="left">validation</td>
 <td align="left">auto.arima</td>
 <td align="left">NULL</td>
-<td align="right">1.44</td>
+<td align="right">1.13</td>
+</tr>
+<tr class="even">
+<td align="left">ets</td>
+<td align="left">pipe43fc5a7b2e88</td>
+<td align="left">submodel43fc4ac127e</td>
+<td align="left">validation</td>
+<td align="left">ets</td>
+<td align="left">NULL</td>
+<td align="right">1.17</td>
 </tr>
 <tr class="odd">
 <td align="left">auto-arima</td>
-<td align="left">pipedec313e7cc9</td>
-<td align="left">submodeldeca643dc0</td>
-<td align="left">validation</td>
-<td align="left">auto.arima</td>
-<td align="left">list(lambda = 1)</td>
-<td align="right">1.46</td>
-</tr>
-<tr class="even">
-<td align="left">auto-arima</td>
-<td align="left">pipedec313e7cc9</td>
-<td align="left">submodeldec49393aee</td>
+<td align="left">pipe43fc33984471</td>
+<td align="left">submodel43fc7899242</td>
 <td align="left">validation</td>
 <td align="left">auto.arima</td>
 <td align="left">list(lambda = 0.5)</td>
-<td align="right">1.48</td>
+<td align="right">1.17</td>
+</tr>
+<tr class="even">
+<td align="left">auto-arima</td>
+<td align="left">pipe43fc33984471</td>
+<td align="left">submodel43fc92b4b8f</td>
+<td align="left">validation</td>
+<td align="left">auto.arima</td>
+<td align="left">list(lambda = 1)</td>
+<td align="right">1.17</td>
 </tr>
 <tr class="odd">
-<td align="left">ets</td>
-<td align="left">pipedec69783590</td>
-<td align="left">submodeldec750711b0</td>
+<td align="left">auto-arima</td>
+<td align="left">pipe43fc33984471</td>
+<td align="left">submodel43fc60045e8e</td>
 <td align="left">validation</td>
-<td align="left">ets</td>
-<td align="left">NULL</td>
-<td align="right">1.53</td>
+<td align="left">auto.arima</td>
+<td align="left">list(lambda = 0)</td>
+<td align="right">1.24</td>
 </tr>
 </tbody>
 </table>
@@ -1037,19 +1036,121 @@ f1 &lt;-<span class="st"> </span><span class="kw">set_final_model</span>(f1, <sp
 <span class="co"># Final Model</span>
 <span class="kw">tibble</span>(<span class="dt">uid =</span> f1<span class="op">$</span>final_model<span class="op">$</span>uid, <span class="dt">status =</span> f1<span class="op">$</span>final_model<span class="op">$</span>status)
 <span class="co">#&gt; # A tibble: 1 x 2</span>
-<span class="co">#&gt;   uid        status</span>
-<span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt; </span>
-<span class="co">#&gt; 1 auto-arima final</span></code></pre></div>
+<span class="co">#&gt;   uid             status</span>
+<span class="co">#&gt;   &lt;chr&gt;           &lt;chr&gt; </span>
+<span class="co">#&gt; 1 auto-arima-roll final</span></code></pre></div>
 </div>
 <div id="deploy" class="section level4">
 <h4>Deploy</h4>
+<p>a2models can be deploy and stored for prediction on future datasets. The a2modeler package provides a <code>deploy</code> function that serializes the modeler object and saves to file path provided. The <code>deploy</code> function uses the a2model object name and version in the pathing. For spark based a2models the deploy function removes all spark datasets stored internally including pipeline output.</p>
+<p>Deployed models can be loaded back into memory and applied on new datasets with the <code>a2_load</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Deploy Example</span>
+r1 &lt;-<span class="st"> </span><span class="kw">regressor</span>(<span class="dt">df      =</span> df,
+                <span class="dt">target  =</span> <span class="st">&quot;mpg&quot;</span>,
+                <span class="dt">name    =</span> <span class="st">&quot;example&quot;</span>,
+                <span class="dt">version =</span> <span class="st">&quot;0.0.1&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_holdout_samples</span>(<span class="dt">splits =</span> <span class="kw">c</span>(.<span class="dv">6</span>, .<span class="dv">2</span>, .<span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">set_measure</span>(RMSE) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> <span class="ot">NULL</span>,
+            <span class="dt">method =</span> <span class="st">&quot;ml_linear_regression&quot;</span>,
+            <span class="dt">param_map =</span> <span class="kw">list</span>(<span class="dt">reg_param =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.01</span>),
+                             <span class="dt">elastic_net_param =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.01</span>)),
+            <span class="dt">desc =</span> <span class="st">&quot;linear example with param grid&quot;</span>
+            <span class="dt">uid =</span> <span class="st">&quot;linear&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">train_models</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">set_final_model</span>(<span class="dt">method =</span> <span class="st">&quot;best&quot;</span>, <span class="dt">refit =</span> <span class="ot">TRUE</span>, <span class="dt">reevaluate =</span> <span class="ot">FALSE</span>)
+
+<span class="co"># Deploy Regressor</span>
+<span class="kw">deploy</span>(r1, <span class="st">&quot;~/a2modeler-deploy-example-path&quot;</span>)
+
+<span class="co"># Load Regressor back into memory</span>
+r1.<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">a2_load</span>(<span class="dt">path =</span> <span class="st">&quot;~/a2modeler-deploy-example-path/example-0.0.1&quot;</span>, sc)</code></pre></div>
 </div>
 <div id="predict" class="section level4">
 <h4>Predict</h4>
+<p>a2models can make predictions on new datasets with the <code>predict</code> a2modeler method. The <code>predict</code> function uses the native model package predict methods on the a2model’s final model. The a2modeler <code>predict</code> function applies a schema check on the new data to ensure its consistent with the data used to train the model. The <code>predict</code> function applies the final model’s pipeline with the <code>flow</code> function to generate any required model features. The forecaster predict method requires an additional periods argument which controls the number of periods forecasted.</p>
+<p>The a2modeler <code>predict</code> method creates a prediction class object that stores the prediction, the model used, and meta data on the predictions. The actual predictions are stored in the predictions slot.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Prediction Example</span>
+f1 &lt;-<span class="st"> </span><span class="kw">forecaster</span>(<span class="dt">df        =</span> <span class="kw">select</span>(sim_df_ts, index, y),
+                 <span class="dt">target    =</span> <span class="st">&quot;y&quot;</span>,
+                 <span class="dt">index_var =</span> <span class="st">&quot;index&quot;</span>,
+                 <span class="dt">name      =</span> <span class="st">&quot;example&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_holdout_samples</span>(<span class="dt">splits =</span> <span class="kw">c</span>(.<span class="dv">6</span>, .<span class="dv">2</span>, .<span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">set_measure</span>(RMSE) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe      =</span> <span class="ot">NULL</span>, 
+            <span class="dt">method    =</span> <span class="st">&quot;auto.arima&quot;</span>,
+            <span class="dt">param_map =</span> <span class="kw">list</span>(<span class="dt">lambda =</span> <span class="kw">c</span>(<span class="dv">0</span>, .<span class="dv">5</span>, <span class="dv">1</span>)),
+            <span class="dt">uid =</span> <span class="st">&quot;auto-arima&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe      =</span> <span class="ot">NULL</span>, 
+            <span class="dt">method    =</span> <span class="st">&quot;ets&quot;</span>,
+            <span class="dt">param_map =</span> <span class="kw">list</span>(),
+            <span class="dt">uid =</span> <span class="st">&quot;ets&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">train_models</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">set_final_model</span>(., <span class="dt">method =</span> <span class="st">&quot;best&quot;</span>, <span class="dt">refit =</span> <span class="ot">TRUE</span>, <span class="dt">reevaluate =</span> <span class="ot">FALSE</span>)
+
+<span class="co"># Create Prediction Object  </span>
+p1 &lt;-<span class="st"> </span><span class="kw">predict</span>(f1, <span class="dt">data =</span> <span class="ot">NULL</span>, <span class="dt">periods =</span> <span class="dv">7</span>)
+<span class="kw">print</span>(p1)
+<span class="co">#&gt; ---------------------------- </span>
+<span class="co">#&gt; forecaster predictions </span>
+<span class="co">#&gt; ---------------------------- </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; model uid          : ets </span>
+<span class="co">#&gt; model method       : ets </span>
+<span class="co">#&gt; created on         : 2018-12-05 15:17:00 </span>
+<span class="co">#&gt; sample predictions : </span>
+<span class="co">#&gt;     index     mean    lower80  upper80   lower95  upper95</span>
+<span class="co">#&gt; 101   101 0.812034 -0.5841652 2.208233 -1.323268 2.947336</span>
+<span class="co">#&gt; 102   102 0.812034 -1.1384973 2.762565 -2.171046 3.795114</span>
+<span class="co">#&gt; 103   103 0.812034 -1.5669936 3.191062 -2.826375 4.450443</span>
+<span class="co">#&gt; 104   104 0.812034 -1.9293110 3.553379 -3.380491 5.004559</span>
+<span class="co">#&gt; 105   105 0.812034 -2.2490397 3.873108 -3.869474 5.493542</span>
+<span class="co">#&gt; 106   106 0.812034 -2.5383947 4.162463 -4.312004 5.936072</span>
+
+<span class="co"># Actual predictions</span>
+p1<span class="op">$</span>predictions
+<span class="co">#&gt;     index     mean    lower80  upper80   lower95  upper95</span>
+<span class="co">#&gt; 101   101 0.812034 -0.5841652 2.208233 -1.323268 2.947336</span>
+<span class="co">#&gt; 102   102 0.812034 -1.1384973 2.762565 -2.171046 3.795114</span>
+<span class="co">#&gt; 103   103 0.812034 -1.5669936 3.191062 -2.826375 4.450443</span>
+<span class="co">#&gt; 104   104 0.812034 -1.9293110 3.553379 -3.380491 5.004559</span>
+<span class="co">#&gt; 105   105 0.812034 -2.2490397 3.873108 -3.869474 5.493542</span>
+<span class="co">#&gt; 106   106 0.812034 -2.5383947 4.162463 -4.312004 5.936072</span>
+<span class="co">#&gt; 107   107 0.812034 -2.8046734 4.428741 -4.719243 6.343311</span></code></pre></div>
 </div>
+<div id="auto-predictions" class="section level4">
+<h4>Auto Predictions</h4>
+<p>The a2modler package provides an <code>auto_forecaster</code> function that wraps an entire forecasting workflow into a single configurable function. This function is most appropriate for certain types of uni-variate forecasting applications where automation is more valued.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Auto-Forecast Example</span>
+af1 &lt;-<span class="st"> </span><span class="kw">auto_forecast</span>(<span class="kw">select</span>(sim_df_ts, index, y),
+                     <span class="dt">target    =</span> <span class="st">&quot;y&quot;</span>,
+                     <span class="dt">index_var =</span> <span class="st">&quot;index&quot;</span>,
+                     <span class="dt">periods   =</span> <span class="dv">10</span>,
+                     <span class="dt">unit      =</span> <span class="ot">NULL</span>,
+                     <span class="dt">models    =</span> <span class="kw">list</span>(
+                       <span class="kw">list</span>(<span class="dt">method =</span> <span class="st">&quot;auto.arima&quot;</span>),
+                       <span class="kw">list</span>(<span class="dt">method =</span> <span class="st">&quot;ets&quot;</span>)),
+                     <span class="dt">execution_strategy =</span> <span class="st">&quot;sequential&quot;</span>)
+af1
+<span class="co">#&gt; ---------------------------- </span>
+<span class="co">#&gt; forecaster predictions </span>
+<span class="co">#&gt; ---------------------------- </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; model uid          : model43fca7d1f70 </span>
+<span class="co">#&gt; model method       : auto.arima </span>
+<span class="co">#&gt; created on         : 2018-12-05 15:17:00 </span>
+<span class="co">#&gt; sample predictions : </span>
+<span class="co">#&gt;     index        mean    lower80  upper80   lower95  upper95</span>
+<span class="co">#&gt; 101   101 0.687111137 -0.5702535 1.944476 -1.235862 2.610084</span>
+<span class="co">#&gt; 102   102 0.392124584 -1.2064364 1.990686 -2.052663 2.836913</span>
+<span class="co">#&gt; 103   103 0.186901654 -1.5048220 1.878625 -2.400366 2.774170</span>
+<span class="co">#&gt; 104   104 0.077709690 -1.6340145 1.789434 -2.540147 2.695566</span>
+<span class="co">#&gt; 105   105 0.028109269 -1.6869793 1.743198 -2.594892 2.651111</span>
+<span class="co">#&gt; 106   106 0.008389302 -1.7071285 1.723907 -2.615269 2.632047</span></code></pre></div>
 </div>
-<div id="example" class="section level2">
-<h2>Example</h2>
 </div>
 <div class="footnotes">
 <hr />
