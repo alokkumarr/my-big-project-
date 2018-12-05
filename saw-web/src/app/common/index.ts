@@ -63,7 +63,10 @@ import { ClickToCopyDirective, E2eDirective } from './directives';
 import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-schedular';
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
 
-import { RemoteFolderSelectorComponent } from './components/remote-folder-selector';
+import {
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
+} from './components/remote-folder-selector';
 
 import {
   DxDataGridService,
@@ -123,7 +126,8 @@ const COMPONENTS = [
   FieldDetailsComponent,
   CronDatePickerComponent,
   CronJobSchedularComponent,
-  RemoteFolderSelectorComponent
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];

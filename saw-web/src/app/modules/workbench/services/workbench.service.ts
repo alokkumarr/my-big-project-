@@ -27,6 +27,7 @@ export class WorkbenchService {
     public router: Router
   ) {
     this.getStagingData = this.getStagingData.bind(this);
+    this.createFolder = this.createFolder.bind(this);
   }
 
   /** GET datasets from the server */

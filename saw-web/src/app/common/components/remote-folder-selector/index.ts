@@ -1,1 +1,2 @@
-export { RemoteFolderSelectorComponent } from './remote-folder-selector.component';
+export { RemoteFolderSelectorComponent, IFileSystemAPI, ISelectionEvent } from './remote-folder-selector.component';
+export { CreatefolderDialogComponent } from './createFolder-dialog';

@@ -18,7 +18,6 @@ import { DatasetDetailsComponent } from './components/create-datasets/dataset-de
 import { RawpreviewDialogComponent } from './components/create-datasets/rawpreview-dialog/rawpreview-dialog.component';
 import { ParserPreviewComponent } from './components/create-datasets/parser-preview/parser-preview.component';
 import { DateformatDialogComponent } from './components/create-datasets/dateformat-dialog/dateformat-dialog.component';
-import { CreatefolderDialogComponent } from './components/create-datasets/createFolder-dialog/createfolder-dialog.component';
 import { SqlExecutorComponent } from './components/sql-executor/sql-executor.component';
 import { SqlScriptComponent } from './components/sql-executor/query/sql-script.component';
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
@@ -68,7 +67,6 @@ const COMPONENTS = [
   SqlScriptComponent,
   SqlpreviewGridPageComponent,
   DetailsDialogComponent,
-  CreatefolderDialogComponent,
   DatasetDetailViewComponent,
   CreateSemanticComponent,
   ValidateSemanticComponent,

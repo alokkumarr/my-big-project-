@@ -5,18 +5,35 @@ import { BehaviorSubject, merge, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as isFunction from 'lodash/isFunction';
 import * as lodashMap from 'lodash/map';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpGroupBy from 'lodash/fp/groupBy';
 
-/** Flat node with expandable and level information */
+export interface IFileSystemUnit {
+  isDirectory: boolean;
+  name: string;
+  path: string;
+  size: number;
+  subDirectories: boolean;
+}
+
 export class DynamicNode {
   public isLoading = false;
   public children: DynamicNode[] = null;
+  public nonNodeChildren: IFileSystemUnit[] = null;
 
-  constructor(public payload: any) {
+  constructor(public payload: IFileSystemUnit) {
     if (payload.size === 0) {
       this.children = [];
     }
   }
 }
+const defaultRootData: IFileSystemUnit = {
+  name: 'root',
+  path: 'root',
+  size: Infinity,
+  isDirectory: true,
+  subDirectories: true
+};
 
 @Injectable()
 export class DynamicTreeDataSourceService {
@@ -32,7 +49,8 @@ export class DynamicTreeDataSourceService {
 
   constructor(
     private treeControl: FlatTreeControl<DynamicNode>,
-    private getter: (path: string) => Observable<any>
+    private getter: (path: string) => Observable<any>,
+    public onNodeChildrenLoaded: (node: DynamicNode) => void
   ) {}
 
   connect(collectionViewer: CollectionViewer): Observable<DynamicNode[]> {
@@ -50,16 +68,35 @@ export class DynamicTreeDataSourceService {
     );
   }
 
-  initializeData() {
+  public updateNodeChildren(node, data) {
+    this._setNodeChildren(node, data);
+    this.onNodeChildrenLoaded(node);
+    this.treeControl.expand(node);
+    const _data = this.data;
+    this.dataChange.next(null);
+    this.dataChange.next(_data);
+  }
+
+  private _setNodeChildren(node, data) {
+    const { nodeChildren, nonNodeChildren } = this._getGroupedChildren(
+      data
+    );
+    node.children = nodeChildren;
+    node.nonNodeChildren = nonNodeChildren;
+  }
+
+  initializeData(rootData = defaultRootData) {
     if (isFunction(this.getter)) {
       this.getter('/')
         .pipe(
-          map(data => data.data),
-          map(data => lodashMap(data, datum => new DynamicNode(datum)))
+          map(data => data.data)
         )
         .toPromise()
         .then(data => {
-          this.data = data;
+          const rootNode = new DynamicNode(rootData);
+          this._setNodeChildren(rootNode, data);
+          this.dataChange.next([rootNode]);
+          this.treeControl.expand(rootNode);
         });
     }
   }
@@ -67,23 +104,39 @@ export class DynamicTreeDataSourceService {
   /** Handle expand/collapse behaviors */
   handleTreeControl(change: SelectionChange<DynamicNode>) {
     if (change.added) {
-      change.added.forEach(node => this.toggleNode(node, true));
+      change.added.forEach(node => this._toggleNode(node, true));
     }
     if (change.removed) {
       change.removed
         .slice()
         .reverse()
-        .forEach(node => this.toggleNode(node, false));
+        .forEach(node => this._toggleNode(node, false));
     }
   }
 
   /**
    * Toggle the node, remove from display list
    */
-  toggleNode(node: DynamicNode, expand: boolean) {
+  private _toggleNode(node: DynamicNode, expand: boolean) {
     if (expand) {
       this.loadNodeChildrenIfNeeded(node);
     }
+  }
+
+  private _isNode(payload) {
+    return payload.isDirectory;
+  }
+
+  private _getGroupedChildren(children) {
+    return fpPipe(
+      fpGroupBy(child =>
+        this._isNode(child) ? 'nodeChildren' : 'nonNodeChildren'
+      ),
+      ({ nodeChildren = [], nonNodeChildren = [] }) => ({
+        nodeChildren: lodashMap(nodeChildren, datum => new DynamicNode(datum)),
+        nonNodeChildren
+      })
+    )(children);
   }
 
   loadNodeChildrenIfNeeded(node: DynamicNode) {
@@ -94,10 +147,17 @@ export class DynamicTreeDataSourceService {
 
     this.getter(`${path}/${name}`)
       .pipe(
-        map(data => data.data),
-        map(children => lodashMap(children, child => new DynamicNode(child)))
+        map(data => data.data)
       )
       .toPromise()
-      .then(children => (node.children = children));
+      .then(data => {
+        this._setNodeChildren(node, data);
+        this.onNodeChildrenLoaded(node);
+        // have to set this.data to null first because of a bug in mat-tree
+        // https://stackoverflow.com/questions/51100217/why-is-my-angular-app-becoming-very-slow-after-changing-the-data-backing-a-mat-t
+        const _data = this.data;
+        this.dataChange.next(null);
+        this.dataChange.next(_data);
+      });
   }
 }
