@@ -29,17 +29,17 @@
 
   <div class="settings__unselected-fields"
        dndSortableContainer
-       dndZone="designer-setting-zone" style="visibility: visible;">
+       dndZone="designer-setting-zone">
     <div *ngIf="unselectedArtifactColumns">
       <div *ngIf="!isEmpty(unselectedArtifactColumns)">
         <a *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
              [dndSortable]="artifactColumn"
              class="settings__list-item"
              fxLayout="row"
-             fxLayoutAlign="space-between center"  style="visibility: visible;">
+             fxLayoutAlign="space-between center">
           <div class="settings__list-item__name"
                fxLayout="row"
-               fxLayoutAlign="space-between center"  style="visibility: visible;">
+               fxLayoutAlign="space-between center">
             {{ artifactColumn.displayName }}
             <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
                       class="settings__list-item__icon">
@@ -53,7 +53,7 @@
         </a>
       </div>
       <div *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
-           fxLayout="row" fxLayoutAlign="center center"  style="visibility: visible;">
+           fxLayout="row" fxLayoutAlign="center center">
         <div class="settings__unselected-fields--empty"
              i18n>
           There are no fields for this criteria
