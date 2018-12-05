@@ -4,6 +4,7 @@ a2modeler is an R package that provides a framework for efficiently and reliabil
 
 # Installation
 
+
 ### SIP Platform
 
 a2modeler is installed on the SIP platform as part of its deployment. The a2modeler package can be loaded by navigating to an available RStudio port or opening an R GUI
@@ -50,6 +51,12 @@ Once completed, its recommend you close the SIP RStudio project, then you should
 > # Load R Package
 > library(a2modeler)
 ```
+
+
+### Requirements
+
+* __R__ software language version >= 3.5.0
+* __Spark__ software version >= 2.3.0
 
 
 # Getting Started
