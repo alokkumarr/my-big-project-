@@ -47,6 +47,9 @@ provided in the environment:
 
 . Configure SAW server to use UTC timezone in all places where date and timezones are involved.
 
+. On all saw nodes, volumes i.e. MapRFS using NFS gateway service
+  has to be mounted. This is required by ingestion service.
+
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system
 level are expected to be managed externally, while SAW fully manages
@@ -320,7 +323,7 @@ The following shows a response indicating the Security Service is in a
 healthy state:
 
         $ curl https://<sip-proxy>/saw/security/actuator/health
-        HTTP/1.1 200 
+        HTTP/1.1 200
         Content-Type: application/json; charset=UTF-8
         <...>
         {

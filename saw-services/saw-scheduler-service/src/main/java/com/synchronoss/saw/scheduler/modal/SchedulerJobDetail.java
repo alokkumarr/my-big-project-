@@ -5,7 +5,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.IOException;
 import java.io.OptionalDataException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -340,8 +339,6 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(description);
         out.writeObject(emailList);
         out.writeObject(fileType);
-        if (ftp!=null && ftp.size()>0)
-        out.writeObject(ftp);
         out.writeObject(jobGroup);
         out.writeObject(jobName);
         out.writeObject(jobScheduleTime);
@@ -371,24 +368,13 @@ public class SchedulerJobDetail implements Serializable {
         description = (String) in.readObject();
         emailList = (List<String>) in.readObject();
         fileType = (String) in.readObject();
-        Object obj = in.readObject();
-        if(obj instanceof List) {
-            ftp = (List<String>) obj;
-            jobGroup = (String) in.readObject();
-            jobName = (String) in.readObject();
-            jobScheduleTime = (Date) in.readObject();
-            metricName = (String) in.readObject();
-            type = (String) in.readObject();
-            userFullName = (String) in.readObject();
-        }else
-        {
-            jobGroup = (String) obj;
-            jobName = (String) in.readObject();
-            jobScheduleTime = (Date) in.readObject();
-            metricName = (String) in.readObject();
-            type = (String) in.readObject();
-            userFullName = (String) in.readObject();
-        }
+        jobGroup = (String) in.readObject();
+        jobName = (String) in.readObject();
+        jobScheduleTime = (Date) in.readObject();
+        metricName = (String) in.readObject();
+        type = (String) in.readObject();
+        userFullName = (String) in.readObject();
+       
        try {
             /* End date is optional data field and it will contains null value for existing schedules
             generated prior to sip v2.6.0 , handle the Optional Data Exception explicitly to identify the end of stream*/
