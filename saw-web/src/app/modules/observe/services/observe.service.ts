@@ -193,55 +193,6 @@ export class ObserveService {
     this.menu.updateMenu(data, 'OBSERVE');
   }
 
-  /* Try to redirect to first dashboard or first empty subcategory */
-  redirectToFirstDash(menu, force = false) {
-    const basePath = this.route.snapshot.children[0].url[0].path;
-    const { dashboard, mode } = this.route.snapshot.queryParams;
-
-    /* If not on observe page, or a dashboard is being provided in url, don't
-     * load first dashboard automatically.
-     * If mode is set, then we're loading designer. Don't override it.
-     * If force is set, this behaviour is overrided, and first dashboard is
-     * loaded regardless.
-     */
-    if ((basePath !== 'observe' || dashboard || mode) && !force) {
-      return;
-    }
-
-    const categoryWithDashboard = find(menu, cat => {
-      const subCategory = find(cat.children, subCat => {
-        return subCat.children.length > 0;
-      });
-
-      return Boolean(subCategory);
-    });
-
-    const categoryWithSubCategory = find(menu, cat => cat.children.length > 0);
-
-    if (categoryWithDashboard) {
-      /* If a dashboard has been found in some category/subcategory, redirect to that */
-      const subCategory = find(categoryWithDashboard.children, subCat => {
-        return subCat.children.length > 0;
-      });
-
-      this.router.navigate(['observe', subCategory.id], {
-        queryParams: {
-          dashboard: subCategory.children[0].id
-        }
-      });
-    } else if (categoryWithSubCategory) {
-      /* Otherwise, redirect to the first empty subcategory available. */
-      this.router.navigate(
-        ['observe', categoryWithSubCategory.children[0].id],
-        {
-          queryParams: {
-            dashboard: ''
-          }
-        }
-      );
-    }
-  }
-
   getSubcategoryCount(data) {
     let count = 0;
     forEach(data, category => {

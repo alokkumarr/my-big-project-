@@ -17,7 +17,6 @@ export class ObservePageComponent implements OnInit {
 
     this.observe.reloadMenu().subscribe(menu => {
       this.observe.updateSidebar(menu);
-      this.observe.redirectToFirstDash(menu);
     });
   }
 }

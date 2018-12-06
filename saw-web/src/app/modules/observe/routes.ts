@@ -3,12 +3,13 @@ import { ObservePageComponent } from './components/observe-page/observe-page.com
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
 import { IsUserLoggedInGuard } from '../../common/guards';
+import { FirstDashboardGuard } from './guards';
 
 export const route: Route = {
   // name: 'observe',
   path: '',
   component: ObservePageComponent,
-  canActivate: [IsUserLoggedInGuard],
+  canActivate: [IsUserLoggedInGuard, FirstDashboardGuard],
   canActivateChild: [IsUserLoggedInGuard],
   children: [
     {
