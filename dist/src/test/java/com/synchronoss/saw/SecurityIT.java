@@ -123,12 +123,12 @@ public class SecurityIT extends BaseIT {
         .then().statusCode(200).extract().response();
     ArrayNode node = response.as(ArrayNode.class);
     Long userSysId = null;
-      for (int i=0; i <node.size(); i++) {
-          if (node.get(i).path("firstName").asText().equals("TestSipUser")) {
-              userSysId = node.get(i).path("userSysId").asLong();
-              break;
-          }
+    for (int i = 0; i < node.size(); i++) {
+      if (node.get(i).path("firstName").asText().equals("TestSipUser")) {
+        userSysId = node.get(i).path("userSysId").asLong();
+        break;
       }
+    }
 
     given(authSpec)
       .body("TestGroup2")
@@ -145,22 +145,22 @@ public class SecurityIT extends BaseIT {
       .body("valid", equalTo(true));
 
     Response secGroupResponse = given(authSpec)
-      .when()
-      .get("/security/auth/admin/security-groups")
-      .then().statusCode(200).extract().response();
+        .when()
+        .get("/security/auth/admin/security-groups")
+        .then().statusCode(200).extract().response();
     ArrayNode groupNode = secGroupResponse.as(ArrayNode.class);
     Long gid = null;
-      for (int i=0; i <groupNode.size(); i++) {
-          if (groupNode.get(i).path("securityGroupName").asText().equals("TestGroup2")) {
-              gid = groupNode.get(i).path("secGroupSysId").asLong();
-              break;
-          }
+    for (int i = 0; i < groupNode.size(); i++) {
+      if (groupNode.get(i).path("securityGroupName").asText().equals("TestGroup2")) {
+        gid = groupNode.get(i).path("secGroupSysId").asLong();
+        break;
       }
+    }
 
     given(authSpec)
       .body("TestGroup2")
       .when()
-      .delete("/security/auth/admin/security-groups/"+gid)
+      .delete("/security/auth/admin/security-groups/" + gid)
       .then().assertThat().statusCode(200);
 
   }
