@@ -44,12 +44,12 @@ sim_df_ts <- tibble(date = today() - days(1:100),
 
 ## Overview
 
-a2modeler is an R package that provides a framework for efficiently and reliabily building statistical models. a2modeler currently supports the following use cases:
+a2modeler is an R package that provides a framework for efficiently and reliably building statistical models. a2modeler currently supports the following use cases:
 
 * __Forecasting__: Statistical models to make forward looking predicts of sequential or time series data
 * __Segmentation__: Statistical models to derive sub-groups withing a dataset based on measurable patterns
 * __Regression__: Statistical models to fit and make prediction for continuous numerical targets
-* __Classification__: Statitical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog
+* __Classification__: Statistical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog
 * __Multi-Classification__: Statistical models to fit and make prediction for discrete targets with more than two unique values
 
 
@@ -73,7 +73,7 @@ a2modeler is an R package that provides a framework for efficiently and reliabil
 
 ## Workflow
 
-A key deisgn principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below. In this section each of the distinct workflow steps represented as a high level a2modeler function is reviewed and gone into detal.
+A key design principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below. In this section each of the distinct workflow steps represented as a high level a2modeler function is reviewed and gone into detail.
 
 ![a2modeler Workflow](figures/a2modeler-workflow.jpg)
 
@@ -178,7 +178,7 @@ s1 <- segmenter(df     = df,
 
 ##### Classifier
 
-Classifier is an a2modeler function to create a classification model. Classification is a special case of supervised learning where the target variable is binary. Classification models are often used to create both binary predictions and class probabilities predictions. The latter is sometimes refered to as propensity modeling. 
+Classifier is an a2modeler function to create a classification model. Classification is a special case of supervised learning where the target variable is binary. Classification models are often used to create both binary predictions and class probabilities predictions. The latter is sometimes referred to as propensity modeling. 
 
 The classifier is supported with the Spark-ML backend.
 
@@ -201,7 +201,7 @@ c1 <- classifier(df    = df,
 
 ##### Multi-Classifier
 
-Multiclassifier is a similiar function to the classifier. The multiclassifier is appropriate for target variables with more than 2 discrete values. 
+Multiclassifier is a similar function to the classifier. The multiclassifier is appropriate for target variables with more than 2 discrete values. 
 
 The multiclassifier is supported with the Spark-ML backend.
 
@@ -239,19 +239,19 @@ In addition to the required inputs of the dataframe, target and index variables 
 
 #### Sampling
 
-Now that the use case is defined and data inputs provided, the sampling criteria used in the model training/validation/testing should be defined. In a typical modeling workflow, the initial data provided is split into multiple chunks where one data sample is used to fit the model (training dataset) and a different sample is used to evaluate the model (validation dataset). The key concept is that the model predictions are evaluated on a dataset not used to fit the model. Some algorithms have the power to fit a provided dataset quite precisely, too precisely in fact, if the predictions results are not generalizable to new data samples. This is known as overfitting. A third sample is often used as a test sample once the final model is selected amoung many based on validation sample results as a final measure of predictive performance. 
+Now that the use case is defined and data inputs provided, the sampling criteria used in the model training/validation/testing should be defined. In a typical modeling workflow, the initial data provided is split into multiple chunks where one data sample is used to fit the model (training dataset) and a different sample is used to evaluate the model (validation dataset). The key concept is that the model predictions are evaluated on a dataset not used to fit the model. Some algorithms have the power to fit a provided dataset quite precisely, too precisely in fact, if the predictions results are not generalizable to new data samples. This is known as overfitting. A third sample is often used as a test sample once the final model is selected among many based on validation sample results as a final measure of predictive performance. 
 
-The a2modeler package currently supports the following sampling techinques:
+The a2modeler package currently supports the following sampling techniques:
 
 * __default__: single training sample only. Not recommend for more than simple exploratory examples
-* __holdout__: creates two or three data samples. Controled by split parameter. Sum of split parameter should equal 1. Each value represents the amount of data partitioned to each split. The order of the values matters - the splits correspond to train/validation/test samples. Test value optional. 
+* __holdout__: creates two or three data samples. Controlled by split parameter. Sum of split parameter should equal 1. Each value represents the amount of data partitioned to each split. The order of the values matters - the splits correspond to train/validation/test samples. Test value optional. 
     + ex - splits = c(.60, .20, .20): creates three samples. The training sample is 60 percent of the data, the validation sample is 20 percent and the test sample is the last 20 percent.
 * __random__: creates one or more random samples. The sample percentage of the total data is controlled through the amount parameter. There is an additional option for adding a test holdout sample.
 * __time slices__: creates one or more time slice samples which align the training sample with the validation sample by the index variable. Time slices are appropriate for forecasting use cases where the order of the data matters. The samples can be modified by width, horizon of predictions, and by sequence. There is an additional option for adding a test holdout sample.
 * __cross validation__: cross validation samples^[cross validation [via](https://en.wikipedia.org/wiki/Cross-validation_(statistics))] are widely used in machine learning model building workflows. Cross validation samples splits the data into multiple samples but ensures that each sample is used in one validation sample. The number of folds controls how many sampling pairs there are along with the amount of data in each. There is an additional option for adding a test holdout sample.
 
 
-Sampling is typically the second step in the workflow. Each of the sampling methods above can be "added" to the modeler object with the function convention of `add_*_samples()` where the sampling method is substitued for *. Examples below.
+Sampling is typically the second step in the workflow. Each of the sampling methods above can be "added" to the modeler object with the function convention of `add_*_samples()` where the sampling method is substituted for *. Examples below.
 
 ```{r sampling, eval=FALSE}
 
@@ -288,7 +288,7 @@ f2 <- forecaster(df        = select(sim_df_ts, index, y),
   add_time_slice_samples(width = 50, horizon = 5, skip = 0)
 ```
 
-The sample step creates a samples object and saves to the modeler object.  The samples object containts row indicies for each sample. The indicies are used internally by the a2modeler functionality to partition the data into the correct samples.
+The sample step creates a samples object and saves to the modeler object.  The samples object contains row indices for each sample. The indices are used internally by the a2modeler functionality to partition the data into the correct samples.
 
 ```{r}
 
@@ -340,7 +340,7 @@ f1$measure
 
 #### Models
 
-One or more models can be added to a modeler object. Each model added will be trained, validated and given opportunity for final selection on the same set of samples. In the a2modeler package a model is uniquly defined by three components:
+One or more models can be added to a modeler object. Each model added will be trained, validated and given opportunity for final selection on the same set of samples. In the a2modeler package a model is uniquely defined by three components:
 
 * __Method__: the model algorithm to use. See following section for available methods
 * __Features__: the feature engineering pipeline used to capture any transformations made on the input dataset
@@ -395,7 +395,7 @@ pipe
 There are a few basic pipeline methods shown below
 
 * __flow__: apply pipeline expression on dataset. output not saved to pipeline
-* __execute__: apply pipeline expresssion on dataset. output saved to pipeline
+* __execute__: apply pipeline expression on dataset. output saved to pipeline
 * __test__: apply pipeline expression on subset of data records
 * __clean__: removes stored output from pipeline
 
@@ -475,7 +475,7 @@ Note, valid named arguments need to be provided. Method arguments can be found b
 
 
 
-In the following chunk a foreacaster is created with multiple models. Individual models are stored as a list in the modeler object. Sub-models are stored as a list within the model.
+In the following chunk a forecaster is created with multiple models. Individual models are stored as a list in the modeler object. Sub-models are stored as a list within the model.
 
 ```{r}
 
@@ -573,13 +573,13 @@ f1$performance %>%
 
 #### Select Final Model
 
-The selection of the final model amoung the canidate models is controlled by the `set_final_model` a2modeler function. This function has 2 methods for selection:
+The selection of the final model among the candidate models is controlled by the `set_final_model` a2modeler function. This function has 2 methods for selection:
 
 1. __manual__: developer can select any of models by providing valid model uid to uid argument
 2. __best__: automatically selects best performing model based on validation measurement
 
 
-There are two more options in the `set_final_model` function to refit and reevaluate. The refit option will refit the final model to the entirety of the input dataset. the reevaluate option requires a test holdout sample and will refit the final model on the entire training and validation sample and measure the model performance on the test holdout set. This final re-evaluation can provide a better measure of future model predictive performance than validation peformance alone. The final model was selected on the basis of its validation performance. 
+There are two more options in the `set_final_model` function to refit and reevaluate. The refit option will refit the final model to the entirety of the input dataset. the reevaluate option requires a test holdout sample and will refit the final model on the entire training and validation sample and measure the model performance on the test holdout set. This final re-evaluation can provide a better measure of future model predictive performance than validation performance alone. The final model was selected on the basis of its validation performance. 
 
 The result of `set_final_model` function will store the selected model as the final_model internally. The final_model is what is used for deployment and prediction.
 
@@ -669,7 +669,7 @@ p1$predictions
 
 #### Auto Predictions
 
-The a2modler package provides an `auto_forecaster` function that wraps an entire forecasting workflow into a single configurable function. This function is most appropriate for certain types of uni-variate forecasting applications where automation is more valued. 
+The a2modeler package provides an `auto_forecaster` function that wraps an entire forecasting workflow into a single configurable function. This function is most appropriate for certain types of uni-variate forecasting applications where automation is more valued. 
 
 ```{r}
 
