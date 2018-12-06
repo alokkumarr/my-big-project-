@@ -7,7 +7,7 @@
 #' @param id name of measure ex - mse
 #' @param name full name of measure. ex - mean squared error
 #' @param method name of measure method. method function differ based on class
-#'   of input. Desigend to be accomdate spark dataframes
+#'   of input. Desigend to be accommodate spark dataframes
 #' @param method_args ([list]) additional arguments to pass to method
 #' @param properties measure's applicaple modeler classes
 #' @param minimize logical flag that minimizing the measure is optimal
