@@ -145,7 +145,7 @@
               [allowFiltering]="false" [allowSorting]="false"></dxi-column>
 
             <div *dxTemplate="let data of 'nameTemplate'">
-              <div class="details-title mat-subheading-2">Availalble Routes</div>
+              <div class="details-title mat-subheading-2" i18n>Availalble Routes</div>
             </div>
 
             <div *dxTemplate="let data of 'dateTemplate'">
@@ -154,7 +154,11 @@
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
-              <div fxHide.lt-lg="true">
+              <div fxHide.lt-lg="true" class="route-grid--action-buttons">
+                <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="View Route Logs"
+                  (click)="openLogsDialog(data.data)">
+                  <mat-icon fontIcon="icon-clipboard"></mat-icon>
+                </button>
                 <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Route Connectivity"
                   (click)="testRoute(data.data)">
                   <mat-icon fontIcon="icon-query-mode"></mat-icon>
@@ -174,17 +178,21 @@
                 <mat-icon fontIcon="icon-action-solid"></mat-icon>
               </button>
               <mat-menu #datapodmenu="matMenu">
+                <button mat-menu-item (click)="openLogsDialog(data.data)">
+                  <mat-icon class="menu-btn-icon" fontIcon="icon-clipboard"></mat-icon>
+                  <span i18n>View Route Logs</span>
+                </button>
                 <button mat-menu-item (click)="testRoute(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-query-mode"></mat-icon>
-                  <span>Test Route Connectivity</span>
+                  <span i18n>Test Route Connectivity</span>
                 </button>
                 <button mat-menu-item (click)="createRoute(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-edit"></mat-icon>
-                  <span>Edit Route</span>
+                  <span i18n>Edit Route</span>
                 </button>
                 <button color="warn" mat-menu-item (click)="deleteRoute(data.data)">
                   <mat-icon color="warn" class="menu-btn-icon" fontIcon="icon-delete"></mat-icon>
-                  <span>Delete Route</span>
+                  <span i18n>Delete Route</span>
                 </button>
               </mat-menu>
             </div>

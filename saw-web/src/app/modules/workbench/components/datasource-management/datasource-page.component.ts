@@ -13,6 +13,7 @@ import { CreateSourceDialogComponent } from './createSource-dialog/createSource-
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 import { ConfirmActionDialogComponent } from './confirm-action-dialog/confirm-action-dialog.component';
+import { LogsDialogComponent } from './logs-dialog';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
@@ -170,7 +171,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       width: '350px',
       data: {
         typeTitle: 'Channel Name',
-        typeName: this.selectedSourceData.channelName
+        typeName: this.selectedSourceData.channelName,
+        routesNr: this.routesData.length
       }
     });
 
@@ -310,5 +312,24 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   togglePWD() {
     this.show = !this.show;
+  }
+
+  openLogsDialog(routeData) {
+    this.dialog.open(LogsDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      disableClose: true,
+      height: '60%',
+      width: '70%',
+      minWidth: '750px',
+      minHeight: '600px',
+      maxWidth: '900px',
+      panelClass: 'sourceDialogClass',
+      data: {
+        ...routeData,
+        channelName: this.selectedSourceData.channelName
+      }
+    });
   }
 }

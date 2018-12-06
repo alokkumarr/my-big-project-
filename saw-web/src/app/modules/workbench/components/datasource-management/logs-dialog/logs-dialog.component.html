@@ -1,0 +1,78 @@
+<mat-card>
+    <mat-card-header>
+      <mat-card-title class="details-title mat-subheading-2">
+
+        <strong>{{routeData.routeName}}</strong>
+      </mat-card-title>
+      <div fxFlex></div>
+      <button mat-icon-button color="warn" class="close-button" (click)="close()">
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+
+      <div>
+        <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Channel Name : </span>
+            <span>{{routeData?.channelName}}</span>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Description : </span>
+            <span>{{routeData?.description}}</span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Created by : </span>
+            <span>{{routeData?.createdBy}}</span>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Created at : </span>
+            <span>{{routeData?.createdDate | date: 'dd/MMM/yy'}}</span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Modified by : </span>
+            <span>{{routeData?.modifiedBy}}</span>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Modified at : </span>
+            <span>{{routeData?.modifiedDate | date: 'dd/MMM/yy'}}</span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Destination : </span>
+            <span>{{routeData?.destinationLocation}}</span>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Source : </span>
+            <span>{{routeData?.sourceLocation}}</span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>File pattern : </span>
+            <span>{{routeData?.filePattern}}</span>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="details-content" fxFlex="50" fxLayout="row">
+            <span class="prop-name" i18n>Schedule : </span>
+            <span>{{getSchedule(routeData?.schedulerExpression)}}</span>
+          </div>
+        </div>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
