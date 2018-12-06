@@ -27,16 +27,16 @@ export class DefaultAnalyzeCategoryGuard implements CanActivate {
       return true;
     }
 
-    this._menu.getMenu('ANALYZE').then(menu => {
-      this.goToDefaultChildStateIfNeeded(menu);
+    return this._menu.getMenu('ANALYZE').then(menu => {
+      return this.goToDefaultChildStateIfNeeded(menu);
     });
-    return true;
   }
 
-  goToDefaultChildStateIfNeeded(menu) {
+  goToDefaultChildStateIfNeeded(menu): boolean {
     const id =
       window.localStorage[LAST_ANALYSES_CATEGORY_ID] ||
       fpPipe(fpFirst, fpGet('children'), fpFirst, fpGet('id'))(menu);
     this._router.navigate(['analyze', id]);
+    return false;
   }
 }
