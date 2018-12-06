@@ -13,7 +13,6 @@ const userProject = 'workbench';
 })
 export class DatasourceService {
   public api = get(APP_CONFIG, 'api.url');
-
   constructor(public http: HttpClient, public jwt: JwtService) {}
 
   /**
@@ -171,6 +170,62 @@ export class DatasourceService {
 
     return this.http
       .post(endpoint, JSON.stringify(payload))
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Test connectivity for a channel
+   *
+   * @param {*} channelID
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testChannel(channelID): Observable<any> {
+    return this.http
+      .get(`${this.api}/ingestion/batch/sftp/channels/${channelID}/status`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Test connectivity for a route
+   *
+   * @param {*} routeID
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testRoute(routeID): Observable<any> {
+    return this.http
+      .get(`${this.api}/ingestion/batch/sftp/routes/${routeID}/status`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Check channel connection using config
+   *
+   * @param {*} payload
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testChannelWithBody(payload): Observable<any> {
+    const endpoint = `${this.api}/ingestion/batch/sftp/channels/test`;
+
+    return this.http
+      .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Check route connection using config
+   *
+   * @param {*} payload
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testRouteWithBody(payload): Observable<any> {
+    const endpoint = `${this.api}/ingestion/batch/sftp/routes/test`;
+
+    return this.http
+      .post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
 

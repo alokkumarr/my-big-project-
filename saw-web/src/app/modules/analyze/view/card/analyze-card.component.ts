@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AnalyzeActionsService } from '../../actions';
-import { generateSchedule } from '../../cron';
 import {
   ExecuteService,
   IExecuteEvent,
@@ -10,6 +9,7 @@ import {
 import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
+import { generateSchedule } from '../../../../common/utils/cron2Readable';
 
 @Component({
   selector: 'analyze-card',
@@ -23,7 +23,13 @@ export class AnalyzeCardComponent implements OnInit {
   @Input() highlightTerm: string;
   @Input()
   set cronJobs(cronJobs: any) {
-    this.schedule = generateSchedule(cronJobs, this.analysis.id);
+    const cron = cronJobs[this.analysis.id];
+    if (!cron) {
+      this.schedule = '';
+      return;
+    }
+    const {cronExpression, activeTab} = cron.jobDetails;
+    this.schedule = generateSchedule(cronExpression, activeTab);
   }
 
   placeholderClass: string;
@@ -95,15 +101,7 @@ export class AnalyzeCardComponent implements OnInit {
   }
 
   fork(an) {
-    this._analyzeActionsService
-      .fork(an)
-      .then(({ analysis, requestExecution }: DesignerSaveEvent) => {
-        this.action.emit({
-          action: 'fork',
-          analysis,
-          requestExecution
-        });
-      });
+    this._analyzeActionsService.fork(an);
   }
 
   getType(type) {

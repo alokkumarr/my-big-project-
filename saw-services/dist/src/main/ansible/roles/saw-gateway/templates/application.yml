@@ -24,6 +24,10 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+management:
+  endpoint:
+    health:
+      show-details: always
 internal-analysis:
     service:
         host: http://localhost:9200
@@ -54,9 +58,9 @@ proxy:
 datapod:
     service:
         host: http://localhost:9900
-#batch:
-#   service:
-#        host: http://localhost:9952
+batch:
+   service:
+        host: http://localhost:9952
 
 api:
   gateway:
@@ -124,15 +128,15 @@ api:
         -   location: ${datapod.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
-#        -   location: ${batch.service.host}
-#            method: PUT
-#            path: '[/]ingestion/batch.*'
-#        -   location: ${batch.service.host}
-#            method: POST
-#            path: '[/]ingestion/batch.*'
-#        -   location: ${batch.service.host}
-#            method: GET
-#            path: '[/]ingestion/batch.*'
-#        -   location: ${batch.service.host}
-#            method: DELETE
-#            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: PUT
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: POST
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: GET
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: DELETE
+            path: '[/]ingestion/batch.*'

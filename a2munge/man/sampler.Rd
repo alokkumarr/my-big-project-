@@ -6,10 +6,12 @@
 \alias{sampler.tbl_spark}
 \title{DataFrame Sampler Generic Function}
 \usage{
-sampler(df, group_vars = NULL, method, size, replace, weight = NULL, seed)
+sampler(df, group_vars = NULL, method, size, replace, weight = NULL,
+  seed)
 
-\method{sampler}{data.frame}(df, group_vars = NULL, method = "fraction",
-  size = 1, replace = FALSE, weight = NULL, seed = NULL)
+\method{sampler}{data.frame}(df, group_vars = NULL,
+  method = "fraction", size = 1, replace = FALSE, weight = NULL,
+  seed = NULL)
 
 \method{sampler}{tbl_spark}(df, group_vars = NULL, method = "fraction",
   size = 1, replace = FALSE, weight = NULL, seed = NULL)

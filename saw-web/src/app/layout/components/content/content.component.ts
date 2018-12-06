@@ -9,16 +9,25 @@ import {
   NavigationStart
 } from '@angular/router';
 import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
-import * as includes from 'lodash/includes';
-import * as split from 'lodash/split';
-import * as replace from 'lodash/replace';
-import * as startCase from 'lodash/startCase';
-import * as upperCase from 'lodash/upperCase';
-
+import {
+  map,
+  filter,
+  forEach,
+  lowerCase,
+  startCase,
+  upperCase,
+  replace,
+  split,
+  includes,
+  get,
+  once
+} from 'lodash';
 import {
   UserService,
   MenuService,
-  HeaderProgressService
+  JwtService,
+  HeaderProgressService,
+  DynamicModuleService
 } from '../../../common/services';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../../../modules/admin/consts';
@@ -34,7 +43,8 @@ const TIMEOUT = 20 * 60;
 })
 export class LayoutContentComponent implements OnInit {
   title: string;
-  isOnLoginPage = false;
+  isUserLoggedIn = false;
+  public modules: any[];
   constructor(
     public _user: UserService,
     public _headerProgress: HeaderProgressService,
@@ -42,28 +52,77 @@ export class LayoutContentComponent implements OnInit {
     public _title: Title,
     public _sidenav: SidenavMenuService,
     public _menu: MenuService,
-    public _idle: Idle
+    public _idle: Idle,
+    public jwt: JwtService,
+    private _dynamicModuleService: DynamicModuleService
   ) {}
 
   ngOnInit() {
+    const loadExternalModulesOnce = once(() => this.loadExternalModules());
+
     this._router.events.subscribe((event: Event) => {
       if (event instanceof NavigationStart) {
-        // remove the exclamation mark from the url
-        const hasBang = includes(event.url, '!');
-        if (hasBang) {
-          const newUrl = replace(event.url, '!', '');
-          this._router.navigateByUrl(newUrl);
-        }
+        this.removeExclamationMarkFromUrl(event);
       } else if (event instanceof NavigationEnd) {
-        this.isOnLoginPage = event.url.includes('login');
+        this.isUserLoggedIn = this._user.isLoggedIn();
         this.setPageTitle(event);
         this.loadMenuForProperModule(event);
+        if (this.isUserLoggedIn) {
+          loadExternalModulesOnce();
+        }
       } else if (event instanceof RouteConfigLoadStart) {
         this._headerProgress.show();
       } else if (event instanceof RouteConfigLoadEnd) {
         this._headerProgress.hide();
       }
     });
+  }
+
+  loadExternalModules() {
+    const token = this.jwt.getTokenObj();
+    const product = get(token, 'ticket.products.[0]');
+    const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
+    const modules = map(
+      product.productModules,
+      ({ productModName, moduleURL }) => {
+        const lowerCaseName = lowerCase(productModName);
+        return {
+          label: productModName,
+          path: lowerCaseName,
+          name: lowerCaseName,
+          moduleName: `${startCase(lowerCaseName)}Module`,
+          moduleURL
+        };
+      }
+    );
+    const baseModules = filter(modules, ({ label }) => baseModuleNames.includes(label));
+    const externalModules = filter(
+      modules,
+      ({ label }) => !baseModuleNames.includes(label)
+    );
+
+    this.modules = baseModules;
+    forEach(externalModules, externalModule => {
+      this._dynamicModuleService.loadModuleSystemJs(externalModule).then(
+        success => {
+          if (success) {
+            this.modules = [...this.modules, externalModule];
+          }
+        },
+        err => {
+          console.error(err);
+        }
+      );
+    });
+  }
+
+  removeExclamationMarkFromUrl(event) {
+    // remove the exclamation mark from the url
+    const hasBang = includes(event.url, '!');
+    if (hasBang) {
+      const newUrl = replace(event.url, '!', '');
+      this._router.navigateByUrl(newUrl);
+    }
   }
 
   setUpIdleTimer() {

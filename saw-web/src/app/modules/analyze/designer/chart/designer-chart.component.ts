@@ -1,4 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  Input,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
@@ -14,7 +20,7 @@ import { ChartService } from '../../services/chart.service';
   templateUrl: './designer-chart.component.html',
   styleUrls: ['./designer-chart.component.scss']
 })
-export class DesignerChartComponent implements OnInit {
+export class DesignerChartComponent implements AfterViewInit {
   _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
   _auxSettings: any = {};
@@ -24,6 +30,8 @@ export class DesignerChartComponent implements OnInit {
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
   chartOptions: any;
   updateChart = new BehaviorSubject([]);
+
+  @ViewChild('chartContainer') chartContainer: ElementRef;
   chartHgt = {
     height: 500
   };
@@ -77,8 +85,9 @@ export class DesignerChartComponent implements OnInit {
 
   constructor(private _chartService: ChartService) {}
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.isStockChart = this.chartType.substring(0, 2) === 'ts';
+    this.chartHgt.height = this.getChartHeight();
     this.chartOptions = this._chartService.getChartConfigFor(this.chartType, {
       chart: this.chartHgt,
       legend: this._chartService.initLegend({
@@ -86,6 +95,21 @@ export class DesignerChartComponent implements OnInit {
         chartType: this.chartType
       })
     });
+  }
+
+  /**
+   * getChartHeight
+   * Highcharts doesn't work well with height adjustment from CSS.
+   * This method calculates the height of container available,
+   * so that it can be provided to chart as option during initialisation.
+   *
+   * @returns {number}
+   */
+  getChartHeight(): number {
+    return Math.min(
+      this.chartHgt.height,
+      this.chartContainer.nativeElement.offsetHeight
+    );
   }
 
   getLegendConfig() {

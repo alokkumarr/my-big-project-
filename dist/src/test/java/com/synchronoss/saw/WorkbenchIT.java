@@ -476,14 +476,4 @@ public class WorkbenchIT extends BaseIT {
         .when().post(WORKBENCH_PATH + "/raw/directory/upload/files")
         .then().assertThat().statusCode(200);
   }
-
-  /**
-   * Generate ID suitable for use as suffix in dataset names to ensure
-   * each test gets a unique dataset name.
-   *
-   * @return Randomly generated test ID which will be used for dataset id creation
-   */
-  private String testId() {
-    return UUID.randomUUID().toString();
-  }
 }

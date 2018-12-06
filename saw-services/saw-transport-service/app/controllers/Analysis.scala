@@ -218,8 +218,12 @@ class Analysis extends BaseController {
         m_log.trace("dataSecurityKey before processing in update: {}", dataSecurityKey);
         var dskStr: String = ""
         if (dataSecurityKey.size() > 0) {
-          //dskStr = dataSecurityKey.asScala.mkString(",") ;
-          dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
+          val analysisDef = (json \ "contents" \ "analyze") match {
+            case obj: JArray => analysisJson(json, null); // reading from request body
+            case _ => null
+          }
+          val applicableDSK = QueryBuilder.checkDSKApplicableAnalysis(dataSecurityKey,analysisDef)
+          dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(applicableDSK));
           m_log.trace("dskStr after processing in update: {}", dskStr);
         }
         val analysisId = extractAnalysisId(json)
@@ -239,7 +243,17 @@ class Analysis extends BaseController {
       }
       case "read" => {
         val analysisId = extractAnalysisId(json)
-        json merge contentsAnalyze(readAnalysisJson(analysisId))
+        var analysisDef : JObject = null
+        try {
+          analysisDef = readAnalysisJson(analysisId)
+        }
+        catch {
+          case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+            throw new ClientException("Analysis does not exist")
+        }
+        if (analysisDef==null)
+          throw new ClientException("Analysis does not exist")
+        json merge contentsAnalyze(analysisDef)
       }
       case "search" => {
         val keys = (json \ "contents" \ "keys") (0) match {
@@ -275,8 +289,13 @@ class Analysis extends BaseController {
           m_log.trace("dataSecurityKey before processing in execute: {}", dataSecurityKey);
           var dskStr: String = ""
           if (dataSecurityKey.size() > 0) {
-            //dskStr = dataSecurityKey.asScala.mkString(",") ;
-            dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
+            val analysisDef = (json \ "contents" \ "analyze") match {
+                case obj: JArray => analysisJson(json, null); // reading from request body
+                case _ => null
+              }
+            val applicableDSK = QueryBuilder.checkDSKApplicableAnalysis(dataSecurityKey,analysisDef)
+            if (applicableDSK.size()>0)
+            dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(applicableDSK));
             m_log.trace("dskStr after processing in execute: {}", dskStr);
           }
 

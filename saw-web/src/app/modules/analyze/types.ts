@@ -48,9 +48,9 @@ export type ChartType =
 export type Analysis = AnalysisChart | AnalysisReport;
 
 export interface AnalysisStarter {
-  name: string;
-  description: string;
-  scheduled: null;
+  name?: string;
+  description?: string;
+  scheduled?: null;
   semanticId: string;
   categoryId: string;
   metricName: string;
@@ -95,7 +95,7 @@ export interface IToolbarActionResult {
 
 export interface IAnalysisMethod {
   label: string;
-  icon: {font: string};
+  icon: { font: string };
   type: string;
   supportedTypes: string[];
 }

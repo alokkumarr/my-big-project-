@@ -135,7 +135,7 @@ public class AnalyzeIT extends BaseIT {
                  .header("Cache-Control", "no-store").
                  filter(document("sso-authentication",
                  preprocessResponse(prettyPrint())))
-            .when().get("/security/authentication?jwt=" +getJWTToken())
+            .when().get("/saw/security/authentication?jwt=" +getJWTToken())
             .then().assertThat().statusCode(200)
             .extract().response();
         assertNotNull("Valid access Token not found, Authentication failed ",response.path("aToken"));
@@ -155,7 +155,7 @@ public class AnalyzeIT extends BaseIT {
             .header("Authorization", "Bearer " + token)
             .filter(document("list-metrics",
                 preprocessResponse(prettyPrint())))
-            .when().get("/services/internal/semantic/md?projectId=workbench")
+            .when().get("/saw/services/internal/semantic/md?projectId=workbench")
             .then().assertThat().statusCode(200)
             .extract().response();
         try {
@@ -195,7 +195,7 @@ public class AnalyzeIT extends BaseIT {
     Response response = given(spec)
                         .header("Authorization", "Bearer " + token)
                         .body(json)
-                        .when().post("/services/analysis")
+                        .when().post("/saw/services/analysis")
                         .then().assertThat().statusCode(200)
                         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
@@ -254,7 +254,7 @@ public class AnalyzeIT extends BaseIT {
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(json)
-        .when().post("/services/analysis")
+        .when().post("/saw/services/analysis")
         .then().assertThat().statusCode(200);
   }
 
@@ -286,7 +286,7 @@ public class AnalyzeIT extends BaseIT {
       given(spec)
           .header("Authorization", "Bearer " + token)
           .body(json)
-          .when().post("/services/analysis")
+          .when().post("/saw/services/analysis")
           .then().assertThat().statusCode(200);
   }
 
@@ -348,7 +348,7 @@ public class AnalyzeIT extends BaseIT {
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(json)
-        .when().post("/services/analysis")
+        .when().post("/saw/services/analysis")
         .then().assertThat().statusCode(200)
         .body(path, equalTo("sample-elasticsearch"));
   }
@@ -366,7 +366,7 @@ public class AnalyzeIT extends BaseIT {
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(json)
-        .when().post("/services/analysis")
+        .when().post("/saw/services/analysis")
         .then().assertThat().statusCode(200)
         .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
   }
@@ -384,14 +384,14 @@ public class AnalyzeIT extends BaseIT {
         given(spec)
             .header("Authorization", "Bearer " + token)
             .body(json)
-            .when().post("/services/analysis")
+            .when().post("/saw/services/analysis")
             .then().assertThat().statusCode(200)
-            .body(buckets + ".totalRows", equalTo(200));
+            .body(buckets + ".totalRows", equalTo(215));
     }
 
   private String listSingleExecution(String token, String analysisId) {
     Response response = request(token)
-                        .when().get("/services/analysis/" + analysisId + "/executions")
+                        .when().get("/saw/services/analysis/" + analysisId + "/executions")
                         .then().assertThat().statusCode(200)
                         .body("executions", hasSize(1))
                         .extract().response();
@@ -400,7 +400,7 @@ public class AnalyzeIT extends BaseIT {
 
   private List<Map<String, String>> getExecution(
     String token, String analysisId, String executionId) {
-    String path = "/services/analysis/" + analysisId + "/executions/"
+    String path = "/saw/services/analysis/" + analysisId + "/executions/"
                   + executionId + "/data";
     return request(token).when().get(path)
         .then().assertThat().statusCode(200)
@@ -447,12 +447,12 @@ public class AnalyzeIT extends BaseIT {
     Response response = given(spec)
                         .header("Authorization", "Bearer " + token)
                         .body(json)
-                        .when().post("/services/filters")
+                        .when().post("/saw/services/filters")
                         .then().assertThat().statusCode(200)
                         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
     JsonNode jsonNode= root.get("long");
-    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1498);
+    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1513);
     Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
   }
 
@@ -493,7 +493,7 @@ public class AnalyzeIT extends BaseIT {
                                                     preprocessResponse(prettyPrint())))
                         .header("Authorization", "Bearer " + token)
                         .body(json)
-                        .when().post("/services/scheduler/schedule")
+                        .when().post("/saw/services/scheduler/schedule")
                         .then().assertThat().statusCode(200)
                         .extract().response();
   }
@@ -503,7 +503,7 @@ public class AnalyzeIT extends BaseIT {
                                                     preprocessResponse(prettyPrint())))
                         .header("Authorization", "Bearer " + token)
                         .body(json)
-                        .when().post("/services/scheduler/update")
+                        .when().post("/saw/services/scheduler/update")
                         .then().assertThat().statusCode(200)
                         .extract().response();
   }
@@ -517,7 +517,7 @@ public class AnalyzeIT extends BaseIT {
                                                     preprocessResponse(prettyPrint())))
                         .header("Authorization", "Bearer " + token)
                         .body(json)
-                        .when().post("/services/scheduler/jobs")
+                        .when().post("/saw/services/scheduler/jobs")
                         .then().assertThat().statusCode(200)
                         .extract().response();
   }
@@ -555,7 +555,7 @@ public class AnalyzeIT extends BaseIT {
     Response response = given(spec)
                         .header("Authorization", "Bearer " + token)
                         .body(json)
-                        .when().post("/services/kpi")
+                        .when().post("/saw/services/kpi")
                         .then().assertThat().statusCode(200)
                         .extract().response();
   }
@@ -614,7 +614,7 @@ public class AnalyzeIT extends BaseIT {
           .header("Authorization", "Bearer " + token)
          .header("Content-Type","application/json")
           .body(json)
-          .when().post("/security/auth/admin/user/preferences/upsert")
+          .when().post("/saw/security/auth/admin/user/preferences/upsert")
           .then().assertThat().statusCode(200).extract().response();
       ObjectNode createNode = create.as(ObjectNode.class);
       Assert.assertEquals(1,createNode.get("userID").asLong());
@@ -625,13 +625,13 @@ public class AnalyzeIT extends BaseIT {
           .header("Authorization", "Bearer " + token)
           .header("Content-Type","application/json")
           .body(json1)
-          .when().post("/security/auth/admin/user/preferences/delete")
+          .when().post("/saw/security/auth/admin/user/preferences/delete")
           .then().assertThat().statusCode(200).extract().response();
 
       Response fetch = given(spec)
           .header("Authorization", "Bearer " + token)
           .header("Content-Type","application/json")
-          .when().get("/security/auth/admin/user/preferences/fetch")
+          .when().get("/saw/security/auth/admin/user/preferences/fetch")
           .then().defaultParser(Parser.JSON).assertThat().statusCode(200).extract().response();
       ObjectNode fetchNode = fetch.as(ObjectNode.class);
       Assert.assertEquals(1,fetchNode.get("userID").asLong());

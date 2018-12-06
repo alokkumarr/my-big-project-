@@ -16,6 +16,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class BaseIT {
     if (port == null) {
       throw new RuntimeException("Property saw.docker.port unset");
     }
-    RestAssured.baseURI = "http://" + host + ":" + port + "/saw";
+    RestAssured.baseURI = "http://" + host + ":" + port + "/";
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
   }
     
@@ -104,5 +105,13 @@ public class BaseIT {
 
   private OperationPreprocessor preprocessReplace(String from, String to) {
     return replacePattern(Pattern.compile(Pattern.quote(from)), to);
+  }
+
+  /**
+   * Generate ID suitable for use as suffix in dataset names to ensure
+   * each test gets a unique dataset name.
+   */
+  protected String testId() {
+    return UUID.randomUUID().toString();
   }
 }

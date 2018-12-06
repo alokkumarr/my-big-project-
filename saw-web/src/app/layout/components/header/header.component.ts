@@ -1,14 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import toMaterialStyle from 'material-color-hash';
 import {
   JwtService,
   UserService,
-  HeaderProgressService,
-  DynamicModuleService
+  HeaderProgressService
 } from '../../../common/services';
 
-import { map, filter, forEach, lowerCase, startCase, split, get } from 'lodash';
+import { split } from 'lodash';
 
 @Component({
   selector: 'layout-header',
@@ -16,8 +15,8 @@ import { map, filter, forEach, lowerCase, startCase, split, get } from 'lodash';
   styleUrls: ['./header.component.scss']
 })
 export class LayoutHeaderComponent implements OnInit, OnDestroy {
+  @Input() modules: any[];
   public UserDetails: any;
-  public modules: any;
   public showAdmin: boolean;
   public showProgress = false;
   public userInitials: string;
@@ -28,8 +27,7 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     public jwt: JwtService,
     public user: UserService,
     public _router: Router,
-    public _headerProgress: HeaderProgressService,
-    private _dynamicModuleService: DynamicModuleService
+    public _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
       this.showProgress = showProgress;
@@ -38,55 +36,11 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const token = this.jwt.getTokenObj();
-    const product = get(token, 'ticket.products.[0]');
     this.UserDetails = token;
     this.userInitials = this.getInitials(this.UserDetails.ticket.userFullName);
-    this.setModules(product);
     if (this.jwt.isAdmin()) {
       this.showAdmin = true;
     }
-  }
-
-  setModules(product) {
-    const baseModules = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
-    const modules = map(
-      product.productModules,
-      ({ productModName, moduleURL }) => ({
-        label: productModName,
-        path: lowerCase(productModName),
-        name: lowerCase(productModName),
-        moduleName: `${startCase(productModName)}Module`,
-        moduleURL
-      })
-    );
-
-    this.modules = filter(modules, ({ label }) => baseModules.includes(label));
-
-    const externalModules = filter(
-      this.modules,
-      ({ label }) => !baseModules.includes(label)
-    );
-    // hardcoded stuff
-    // const externalModulesHard = [{
-    //   path: 'plugin',
-    //   label: 'PLUGIN',
-    //   name: 'plugin',
-    //   moduleName: 'PluginModule',
-    //   moduleURL: 'http://localhost:4200/assets/plugin.umd.js'
-    // }];
-
-    forEach(externalModules, externalModule => {
-      this._dynamicModuleService.loadModuleSystemJs(externalModule).then(
-        success => {
-          if (success) {
-            this.modules = [...this.modules, externalModule];
-          }
-        },
-        err => {
-          console.error(err);
-        }
-      );
-    });
   }
 
   ngOnDestroy() {

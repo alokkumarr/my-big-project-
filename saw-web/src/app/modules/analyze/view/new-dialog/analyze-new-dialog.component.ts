@@ -162,18 +162,11 @@ export class AnalyzeNewDialogComponent {
       chartType,
       categoryId: this.data.id,
       semanticId,
-      metricName,
-      name: 'Untitled Analysis',
-      description: '',
-      scheduled: null
+      metricName
     };
-    this._analyzeDialogService
-      .openNewAnalysisDialog(model)
-      .afterClosed()
-      .subscribe(successfullySaved => {
-        if (successfullySaved) {
-          this._dialogRef.close(successfullySaved);
-        }
-      });
+    this._dialogRef.afterClosed().subscribe(() => {
+      this._analyzeDialogService.openNewAnalysisDialog(model);
+    });
+    this._dialogRef.close();
   }
 }

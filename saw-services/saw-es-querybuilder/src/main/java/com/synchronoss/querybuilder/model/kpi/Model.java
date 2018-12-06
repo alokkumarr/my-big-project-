@@ -184,6 +184,7 @@ public class Model {
 
     public enum Preset {
         Yesterday("Yesterday"),
+        Today("Today"),
         YTD("YTD"),
         MTD("MTD"),
         LTM("LTM"),

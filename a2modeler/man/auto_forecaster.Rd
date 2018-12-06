@@ -10,9 +10,9 @@ auto_forecaster(...)
 
 \method{auto_forecaster}{data.frame}(df, index_var, group_vars = NULL,
   measure_vars, periods, unit = NULL, pipe = NULL,
-  models = list(list(method = "auto.arima", method_args = list()), list(method
-  = "ets", method_args = list())), splits = c(0.8, 0.2), conf_levels = c(80,
-  95), ...)
+  models = list(list(method = "auto.arima", method_args = list()),
+  list(method = "ets", method_args = list())), splits = c(0.8, 0.2),
+  conf_levels = c(80, 95), ...)
 
 \method{auto_forecaster}{tbl_spark}(df, index_var, group_vars = NULL,
   measure_vars, periods, unit = NULL, pipe = NULL,
