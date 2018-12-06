@@ -3,7 +3,7 @@
 
   <div fxLayout.gt-md="column" class="app-container">
     <div class="root-container">
-        <layout-header *ngIf="!isOnLoginPage"></layout-header>
+        <layout-header *ngIf="isUserLoggedIn" [modules]="modules"></layout-header>
 
         <main class="main-content">
           <div class="render-content">
