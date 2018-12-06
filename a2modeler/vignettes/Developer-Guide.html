@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Haarstick" />
+
+<meta name="date" content="2018-12-06" />
+
+<title>a2modeler Developer Guide</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">a2modeler Developer Guide</h1>
+<h4 class="author"><em>Haarstick</em></h4>
+<h4 class="date"><em>2018-12-06</em></h4>
+
+
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>a2modeler is an R package that provides a framework for efficiently and reliably building statistical models. a2modeler currently supports the following use cases:</p>
+<ul>
+<li><strong>Forecasting</strong>: Statistical models to make forward looking predicts of sequential or time series data</li>
+<li><strong>Segmentation</strong>: Statistical models to derive sub-groups withing a dataset based on measurable patterns</li>
+<li><strong>Regression</strong>: Statistical models to fit and make prediction for continuous numerical targets</li>
+<li><strong>Classification</strong>: Statistical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog</li>
+<li><strong>Multi-Classification</strong>: Statistical models to fit and make prediction for discrete targets with more than two unique values</li>
+</ul>
+<p>This developer guide is designed to give some details and context on package design.</p>
+</div>
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>This guide assumes a working knowledge of R, the tidyverse and sparklyr R packages, R S3 object oriented programming, and R package development. Relevant links:</p>
+<ul>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf">R</a><a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></li>
+<li><a href="https://www.tidyverse.org/">tidyverse</a><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></li>
+<li><a href="https://r4ds.had.co.nz/">R for Data Science</a><a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></li>
+<li><a href="http://adv-r.had.co.nz/S3.html">S3 OOP</a><a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></li>
+<li><a href="http://r-pkgs.had.co.nz/">R Packages</a><a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a></li>
+</ul>
+<p>This guide also assumes knowledge of how a2modeler is applied. Check out the User-Guide Vignette for details on how a2modeler is used.</p>
+</div>
+<div id="requirements" class="section level2">
+<h2>Requirements</h2>
+<ul>
+<li><strong>R</strong>: version &gt;= 3.5</li>
+<li><strong>Spark</strong>: version &gt;= 2.3.0</li>
+</ul>
+</div>
+<div id="classes" class="section level2">
+<h2>Classes</h2>
+<p>The a2modeler package functionality relies on several derived classes using R’s <a href="http://adv-r.had.co.nz/S3.html">R S3 Object System</a>. In the following sections each of the important classes are discussed. The most important class is the modeler class and it’s inherited sub-classes. These classes are the main object created in a a2modeler work flow.</p>
+<div id="samples" class="section level4">
+<h4>Samples</h4>
+<p>The samples class supports the creation of data samples for the purpose of model fitting and validating. There are several different types of sampling strategies - see the User-Guide for more details. For each of the a2modeler sampling strategies, a samples object is created with the <code>samples</code> constructor function with the following attributes:</p>
+<ul>
+<li><strong>validation_method</strong>: name of validation method. examples are holdout, cross-validation, etc…</li>
+<li><strong>validation_args</strong>: list of arguments to pass to validation method</li>
+<li><strong>test_holdout_prct</strong>: percent of total data records to use for test dataset</li>
+<li><strong>downsample_prct</strong>: percent of total data to downsample and use for analysis</li>
+<li><strong>train_indicies</strong>: list of numeric train indicies. each index contains numeric vector pertaining to row numbers to use for model fitting</li>
+<li><strong>validation_indicies</strong>: list of numeric validation indicies. each index contains numeric vector pertaining to row numbers to use for model validation</li>
+<li><strong>indicies_names</strong>: character vector of indicies names</li>
+<li><strong>test_index</strong>: numeric index with records to use for model testing</li>
+</ul>
+<p>In the following chunk code for <code>add_default_samples</code> methods are shown. The data.frame and tbl_spark methods use the numeric method internally to reduce code duplication. The default sample is the simplest strategy and only a single row based indicie is saved in the train_indicies list.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># add_default_samples.numeric code</span>
+add_default_samples.numeric
+<span class="co">#&gt; function(x){</span>
+<span class="co">#&gt;   samples(</span>
+<span class="co">#&gt;     validation_method = &quot;none&quot;,</span>
+<span class="co">#&gt;     validation_args = list(),</span>
+<span class="co">#&gt;     test_holdout_prct = NULL,</span>
+<span class="co">#&gt;     test_holdout_method = &quot;none&quot;,</span>
+<span class="co">#&gt;     downsample_prct = NULL,</span>
+<span class="co">#&gt;     train_indicies = list(default = x),</span>
+<span class="co">#&gt;     validation_indicies = NULL,</span>
+<span class="co">#&gt;     indicies_names = &quot;train&quot;,</span>
+<span class="co">#&gt;     test_index = NULL</span>
+<span class="co">#&gt;   )</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
+
+<span class="co"># add_default_samples.data.frame code</span>
+add_default_samples.data.frame
+<span class="co">#&gt; function(x){</span>
+<span class="co">#&gt;   z &lt;- 1:nrow(x)</span>
+<span class="co">#&gt;   add_default_samples(z)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
+
+<span class="co"># add_default_samples.tbl_spk</span>
+add_default_samples.tbl_spark
+<span class="co">#&gt; function(x){</span>
+<span class="co">#&gt;   z &lt;- 1:sparklyr::sdf_nrow(x)</span>
+<span class="co">#&gt;   add_default_samples(z)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+<p>Next is a set of methods for creating holdout samples. The numeric method creates train and validation row indicies based on the splits argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># add_holdout_samples.numeric code</span>
+add_holdout_samples.numeric
+<span class="co">#&gt; function(x, splits){</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   checkmate::assert_numeric(splits, lower = 0, upper = 1, min.len = 2, max.len = 3)</span>
+<span class="co">#&gt;   if(sum(splits) != 1){</span>
+<span class="co">#&gt;     stop(&quot;splits don't sum to 1. Recommend either an 80-20 or 60-20-20 split&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   if(length(splits) == 3){</span>
+<span class="co">#&gt;     tv_total &lt;- sum(splits[-3])</span>
+<span class="co">#&gt;     s1 &lt;- holdout(x, tv_total)</span>
+<span class="co">#&gt;     test_index &lt;- s1$tail</span>
+<span class="co">#&gt;     test_holdout_prct &lt;- splits[3]</span>
+<span class="co">#&gt;   }else{</span>
+<span class="co">#&gt;     test_index &lt;- NULL</span>
+<span class="co">#&gt;     test_holdout_prct &lt;- NULL</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   s2 &lt;- holdout(x, splits[1])</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   train_indicies &lt;- list(holdout = s2$head)</span>
+<span class="co">#&gt;   val_indicies &lt;- list(holdout = setdiff(s2$tail, test_index))</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   samples(</span>
+<span class="co">#&gt;     validation_method = &quot;holdout&quot;,</span>
+<span class="co">#&gt;     validation_args = list(split = splits[1]),</span>
+<span class="co">#&gt;     test_holdout_prct = test_holdout_prct,</span>
+<span class="co">#&gt;     test_holdout_method = &quot;holdout&quot;,</span>
+<span class="co">#&gt;     downsample_prct = NULL,</span>
+<span class="co">#&gt;     train_indicies = train_indicies,</span>
+<span class="co">#&gt;     validation_indicies = val_indicies,</span>
+<span class="co">#&gt;     indicies_names = &quot;holdout&quot;,</span>
+<span class="co">#&gt;     test_index = test_index</span>
+<span class="co">#&gt;   )</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
+
+<span class="co"># add_holdout_samples.data.frame code</span>
+add_holdout_samples.tbl_spark
+<span class="co">#&gt; function(x, splits){</span>
+<span class="co">#&gt;   z &lt;- 1:sparklyr::sdf_nrow(x)</span>
+<span class="co">#&gt;   add_holdout_samples(z, splits)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
+
+<span class="co"># add_holdout_samples.data.frame code</span>
+add_holdout_samples.tbl_spark
+<span class="co">#&gt; function(x, splits){</span>
+<span class="co">#&gt;   z &lt;- 1:sparklyr::sdf_nrow(x)</span>
+<span class="co">#&gt;   add_holdout_samples(z, splits)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+<p>The concept here is that the sampling strategy is set once, creating indicies that control the data partitions for all down stream modeling fitting and evaluating. The samples object is saved in the modeler object and referenced internally for data partitioning. More on its implementation later on.</p>
+<p>Each of the sampling strategies follows the same pattern shown above where the sampling logic is contained in the numeric method and the data.frame and tbl_spark methods simply create a row sequence and pass to internal numeric method.</p>
+<div id="methods" class="section level5">
+<h5>Methods</h5>
+<p>The samples class has a few methods to extract specific attributes of a sample object:</p>
+<ul>
+<li><strong>get_train_samples</strong>: returns training indicies</li>
+<li><strong>get_validation_samples</strong>: returns the validation indicies</li>
+<li><strong>get_indicies</strong>: returns a list with an element for each train and validation indicies pairs</li>
+</ul>
+</div>
+</div>
+<div id="measures" class="section level4">
+<h4>Measures</h4>
+<p>The measure class stores information on model measurement metrics. The a2modeler measure class was designed after similar named class in <a href="https://github.com/mlr-org/mlr/blob/master/R/Measure.R">mlr R package</a>. The measure class constructor stores the following attributes:</p>
+<ul>
+<li><strong>id</strong> name of measure ex - rmse</li>
+<li><strong>name</strong> full name of measure. ex - mean squared error</li>
+<li><strong>method</strong> name of measure method. method function differ based on class of input. Designed to be accommodate spark dataframes</li>
+<li><strong>method_args</strong> list of additional arguments to pass to method</li>
+<li><strong>properties</strong> measure’s applicable modeler classes</li>
+<li><strong>minimize</strong> logical flag that minimizing the measure is optimal</li>
+<li><strong>best</strong> best possible value for measure</li>
+<li><strong>worst</strong> worst possible value for measure</li>
+<li><strong>note</strong> additional notes for measure</li>
+</ul>
+<p>Several measure objects are created and shipped in the a2modeler package. Here are a few examples</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># RMSE Object</span>
+<span class="kw">class</span>(RMSE)
+<span class="co">#&gt; [1] &quot;measure&quot;</span>
+<span class="kw">str</span>(RMSE)
+<span class="co">#&gt; List of 9</span>
+<span class="co">#&gt;  $ id         : chr &quot;RMSE&quot;</span>
+<span class="co">#&gt;  $ method     : chr &quot;rmse&quot;</span>
+<span class="co">#&gt;  $ method_args:List of 3</span>
+<span class="co">#&gt;   ..$ : chr &quot;x&quot;</span>
+<span class="co">#&gt;   ..$ : chr &quot;predicted&quot;</span>
+<span class="co">#&gt;   ..$ : chr &quot;actual&quot;</span>
+<span class="co">#&gt;  $ properties : chr [1:3] &quot;modeler&quot; &quot;regressor&quot; &quot;forecaster&quot;</span>
+<span class="co">#&gt;  $ name       : chr &quot;Root mean squared error&quot;</span>
+<span class="co">#&gt;  $ minimize   : logi TRUE</span>
+<span class="co">#&gt;  $ best       : num 0</span>
+<span class="co">#&gt;  $ worst      : num Inf</span>
+<span class="co">#&gt;  $ note       : chr &quot;The RMSE is aggregated as sqrt(mean((predicted - actual)^2))&quot;</span>
+<span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;measure&quot;</span>
+
+
+<span class="co"># AUC Object</span>
+<span class="kw">class</span>(AUC)
+<span class="co">#&gt; [1] &quot;measure&quot;</span>
+<span class="kw">str</span>(AUC)
+<span class="co">#&gt; List of 9</span>
+<span class="co">#&gt;  $ id         : chr &quot;AUC&quot;</span>
+<span class="co">#&gt;  $ method     : chr &quot;auc&quot;</span>
+<span class="co">#&gt;  $ method_args:List of 3</span>
+<span class="co">#&gt;   ..$ : chr &quot;x&quot;</span>
+<span class="co">#&gt;   ..$ : chr &quot;predicted&quot;</span>
+<span class="co">#&gt;   ..$ : chr &quot;actual&quot;</span>
+<span class="co">#&gt;  $ properties : chr [1:2] &quot;modeler&quot; &quot;classifier&quot;</span>
+<span class="co">#&gt;  $ name       : chr &quot;Area under the curve&quot;</span>
+<span class="co">#&gt;  $ minimize   : logi FALSE</span>
+<span class="co">#&gt;  $ best       : num 1</span>
+<span class="co">#&gt;  $ worst      : num 0</span>
+<span class="co">#&gt;  $ note       : chr &quot;Integral over the graph that results from computing false and true positive rates for many different thresholds.&quot;</span>
+<span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;measure&quot;</span></code></pre></div>
+<p>Similar to the samples class, a measure class object is created and stored internally to the modeler object. All downstream model evaluation in modeler objects reference the measure object stored internally. The measure object does not store the function directly. It stores the function generic name which is can be used to get the function from the namespace environment and execute.</p>
+<p>Adding a new method requires that the measure function (such as <code>rmse</code>) is either developed or supported in a2modeler. There are meaningful differences in implementation for R vs Spark objects as seen below for the <code>rmse</code> methods. The spark method leverages the sparklyr, spark-ml evaluator. The evaluator function approach is used to intregrate with the rest of the spark-ml functionality.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># R rmse method</span>
+rmse.data.frame
+<span class="co">#&gt; function(x, predicted, actual){</span>
+<span class="co">#&gt;   checkmate::assert_choice(predicted, colnames(x))</span>
+<span class="co">#&gt;   checkmate::assert_choice(actual, colnames(x))</span>
+<span class="co">#&gt;   c(&quot;rmse&quot; = sqrt(mean((x[[predicted]] - x[[actual]])^2)))</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
+
+<span class="co"># Spark rmse method</span>
+rmse.tbl_spark
+<span class="co">#&gt; function(x, predicted, actual) {</span>
+<span class="co">#&gt;   checkmate::assert_choice(predicted, colnames(x))</span>
+<span class="co">#&gt;   checkmate::assert_choice(actual, colnames(x))</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   sparklyr::ml_regression_evaluator(</span>
+<span class="co">#&gt;     x,</span>
+<span class="co">#&gt;     label_col = actual,</span>
+<span class="co">#&gt;     prediction_col = predicted,</span>
+<span class="co">#&gt;     metric_name = &quot;rmse&quot;</span>
+<span class="co">#&gt;   )</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+<div id="methods-1" class="section level5">
+<h5>Methods</h5>
+<p>There are only minor measure methods such as <code>print</code>, <code>set_measure</code>, and <code>get_measure</code></p>
+</div>
+</div>
+<div id="pipelines" class="section level4">
+<h4>Pipelines</h4>
+<p>The pipeline class encapsulates data transformation logic to support repeatable feature generation in a2model developement. The pipeline object stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once.</p>
+<p>The pipeline class is created with the pipeline constructor</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Pipeline object</span>
+pipeline
+<span class="co">#&gt; function(expr = identity,</span>
+<span class="co">#&gt;                      desc = NULL,</span>
+<span class="co">#&gt;                      uid = sparklyr::random_string(&quot;pipe&quot;)) {</span>
+<span class="co">#&gt;   if (is.null(desc))</span>
+<span class="co">#&gt;     desc &lt;- &quot;&quot;</span>
+<span class="co">#&gt;   a1 &lt;- Sys.time()</span>
+<span class="co">#&gt;   new_pipeline(</span>
+<span class="co">#&gt;     expr,</span>
+<span class="co">#&gt;     output = NULL,</span>
+<span class="co">#&gt;     desc,</span>
+<span class="co">#&gt;     uid,</span>
+<span class="co">#&gt;     created_on = a1,</span>
+<span class="co">#&gt;     runtime = NULL</span>
+<span class="co">#&gt;   )</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
+p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
+<span class="kw">str</span>(p)
+<span class="co">#&gt; List of 6</span>
+<span class="co">#&gt;  $ expr      :function (x)  </span>
+<span class="co">#&gt;  $ output    : NULL</span>
+<span class="co">#&gt;  $ desc      : chr &quot;&quot;</span>
+<span class="co">#&gt;  $ uid       : chr &quot;pipe4ac417064f4d&quot;</span>
+<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-06 15:22:10&quot;</span>
+<span class="co">#&gt;  $ runtime   : NULL</span>
+<span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;pipeline&quot;</span></code></pre></div>
+<p>The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets.</p>
+<p>One or more pipelines can be created and stored in a modeler object. They are stored as a named list of pipelines in the pipelines slot. The name is the pipeline uid. The reusability concept is useful internally to the modeler object so that models can share pipeline output (and not require duplicate execution and storage).</p>
+<div id="methods-2" class="section level5">
+<h5>Methods</h5>
+</div>
+</div>
+<div id="modeler" class="section level4">
+<h4>Modeler</h4>
+</div>
+<div id="predictions" class="section level4">
+<h4>Predictions</h4>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>R Intro <a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf">via</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Tidyverse <a href="https://www.tidyverse.org/">via</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>R for Data Science <a href="https://r4ds.had.co.nz/">via</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>R S3 Object System <a href="http://adv-r.had.co.nz/S3.html">via</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>R Packages <a href="http://r-pkgs.had.co.nz/">via</a><a href="#fnref5">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

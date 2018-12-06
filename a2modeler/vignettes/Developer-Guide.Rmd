@@ -1,0 +1,212 @@
+---
+title: "a2modeler Developer Guide"
+author: "Haarstick"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a2modeler User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+
+
+```{r packages, echo=FALSE, warning=FALSE, message=FALSE}
+
+# R Packages
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(purrr)
+library(lubridate)
+library(sparklyr)
+library(a2munge)
+#library(a2modeler)
+devtools::load_all("~/software_projects/sip/a2modeler")
+
+
+# Sim Data
+sim_df_ts <- tibble(date = today() - days(1:100),
+                    y = arima.sim(n = 100, list(order = c(1,0,0), ar = 0.7)),
+                    index = 1:100)
+```
+
+
+## Overview
+
+a2modeler is an R package that provides a framework for efficiently and reliably building statistical models. a2modeler currently supports the following use cases:
+
+* __Forecasting__: Statistical models to make forward looking predicts of sequential or time series data
+* __Segmentation__: Statistical models to derive sub-groups withing a dataset based on measurable patterns
+* __Regression__: Statistical models to fit and make prediction for continuous numerical targets
+* __Classification__: Statistical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog
+* __Multi-Classification__: Statistical models to fit and make prediction for discrete targets with more than two unique values
+
+
+This developer guide is designed to give some details and context on package design. 
+
+
+## Background
+
+This guide assumes a working knowledge of R, the tidyverse and sparklyr R packages, R S3 object oriented programming, and R package development. Relevant links:
+
+* [R](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)^[R Intro [via](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)]
+* [tidyverse](https://www.tidyverse.org/)^[Tidyverse [via](https://www.tidyverse.org/)]
+* [R for Data Science](https://r4ds.had.co.nz/)^[R for Data Science [via](https://r4ds.had.co.nz/)]
+* [S3 OOP](http://adv-r.had.co.nz/S3.html)^[R S3 Object System [via](http://adv-r.had.co.nz/S3.html)]
+* [R Packages](http://r-pkgs.had.co.nz/)^[R Packages [via](http://r-pkgs.had.co.nz/)]
+
+
+This guide also assumes knowledge of how a2modeler is applied. Check out the User-Guide Vignette for details on how a2modeler is used. 
+
+
+## Requirements
+
+* __R__: version >= 3.5
+* __Spark__: version >= 2.3.0
+
+
+## Classes
+
+The a2modeler package functionality relies on several derived classes using R's [R S3 Object System ](http://adv-r.had.co.nz/S3.html). In the following sections each of the important classes are discussed. The most important class is the modeler class and it's inherited sub-classes. These classes are the main object created in a a2modeler work flow.  
+
+#### Samples
+
+The samples class supports the creation of data samples for the purpose of model fitting and validating. There are several different types of sampling strategies - see the User-Guide for more details. For each of the a2modeler sampling strategies, a samples object is created with the `samples` constructor function with the following attributes:
+
+* __validation_method__: name of validation method. examples are holdout, cross-validation, etc...
+* __validation_args__: list of arguments to pass to validation method
+* __test_holdout_prct__: percent of total data records to use for test dataset
+* __downsample_prct__: percent of total data to downsample and use for analysis
+* __train_indicies__: list of numeric train indicies. each index contains numeric vector pertaining to row numbers to use for model fitting
+* __validation_indicies__: list of numeric validation indicies. each index contains numeric vector pertaining to row numbers to use for model validation
+* __indicies_names__: character vector of indicies names
+* __test_index__:  numeric index with records to use for model testing 
+
+In the following chunk code for `add_default_samples` methods are shown. The data.frame and tbl_spark methods use the numeric method internally to reduce code duplication. The default sample is the simplest strategy and only a single row based indicie is saved in the train_indicies list. 
+
+```{r}
+# add_default_samples.numeric code
+add_default_samples.numeric
+
+# add_default_samples.data.frame code
+add_default_samples.data.frame
+
+# add_default_samples.tbl_spk
+add_default_samples.tbl_spark
+
+```
+
+
+Next is a set of methods for creating holdout samples. The numeric method creates train and validation row indicies based on the splits argument. 
+
+
+```{r}
+# add_holdout_samples.numeric code
+add_holdout_samples.numeric
+
+# add_holdout_samples.data.frame code
+add_holdout_samples.tbl_spark
+
+# add_holdout_samples.data.frame code
+add_holdout_samples.tbl_spark
+
+```
+
+
+The concept here is that the sampling strategy is set once, creating indicies that control the data partitions for all down stream modeling fitting and evaluating. The samples object is saved in the modeler object and referenced internally for data partitioning. More on its implementation later on. 
+
+Each of the sampling strategies follows the same pattern shown above where the sampling logic is contained in the numeric method and the data.frame and tbl_spark methods simply create a row sequence and pass to internal numeric method. 
+
+
+##### Methods
+
+The samples class has a few methods to extract specific attributes of a sample object:
+
+* __get_train_samples__: returns training indicies
+* __get_validation_samples__: returns the validation indicies
+* __get_indicies__: returns a list with an element for each train and validation indicies pairs
+
+
+#### Measures
+
+The measure class stores information on model measurement metrics. The a2modeler measure class was designed after similar named class in [mlr R package](https://github.com/mlr-org/mlr/blob/master/R/Measure.R). The measure class constructor stores the following attributes:
+
+* __id__ name of measure ex - rmse
+* __name__ full name of measure. ex - mean squared error
+* __method__ name of measure method. method function differ based on class of input. Designed to be accommodate spark dataframes
+* __method_args__ list of additional arguments to pass to method
+* __properties__ measure's applicable modeler classes
+* __minimize__ logical flag that minimizing the measure is optimal
+* __best__ best possible value for measure
+* __worst__ worst possible value for measure
+* __note__ additional notes for measure
+
+Several measure objects are created and shipped in the a2modeler package. Here are a few examples
+
+```{r}
+# RMSE Object
+class(RMSE)
+str(RMSE)
+
+
+# AUC Object
+class(AUC)
+str(AUC)
+```
+
+
+Similar to the samples class, a measure class object is created and stored internally to the modeler object. All downstream model evaluation in modeler objects reference the measure object stored internally. The measure object does not store the function directly. It stores the function generic name which is can be used to get the function from the namespace environment and execute. 
+
+Adding a new method requires that the measure function (such as `rmse`) is either developed or supported in a2modeler. There are meaningful differences in implementation for R vs Spark objects as seen below for the `rmse` methods. The spark method leverages the sparklyr, spark-ml evaluator. The evaluator function approach is used to intregrate with the rest of the spark-ml functionality.
+
+
+```{r}
+# R rmse method
+rmse.data.frame
+
+# Spark rmse method
+rmse.tbl_spark
+```
+
+
+##### Methods
+
+There are only minor measure methods such as `print`, `set_measure`, and `get_measure`
+
+
+#### Pipelines
+
+The pipeline class encapsulates data transformation logic to support repeatable feature generation in a2model developement. The pipeline object stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once.
+
+The pipeline class is created with the pipeline constructor
+
+```{r}
+
+# Pipeline object
+pipeline
+p <- pipeline()
+str(p)
+
+```
+
+The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets. 
+
+One or more pipelines can be created and stored in a modeler object. They are stored as a named list of pipelines in the pipelines slot. The name is the pipeline uid. The reusability concept is useful internally to the modeler object so that models can share pipeline output (and not require duplicate execution and storage).
+
+
+##### Methods
+
+#### Modeler
+
+#### Predictions
+
