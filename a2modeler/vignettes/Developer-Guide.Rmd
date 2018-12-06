@@ -206,7 +206,46 @@ One or more pipelines can be created and stored in a modeler object. They are st
 
 ##### Methods
 
+* __flow__: apply pipeline expression on dataset. output not saved to pipeline
+* __execute__: apply pipeline expression on dataset. output saved to pipeline
+* __test__: apply pipeline expression on subset of data records
+* __clean__: removes stored output from pipeline
+
+
 #### Modeler
+
+The main class in the a2modeler package is the modeler class. Modeler class objects provide the framework for developing models by storing information on the input dataset, target variable, sampling strategy, measurement, data transformation and models. The class enforces standards and some limits on the model development but creates consistency and allows for a consistent high level API for users (see User Guide). 
+
+The modeler object is model algothrim and package agnostic but requires that proper hooks are in place to produce the right outputs. In practice that means while the modeler backend is modular, only the Spark-ML^[Spark-ML [via](https://spark.apache.org/mllib/)] backend is implemented for all but the forecaster child class which uses the forecast R package^[forecast R package [via](http://pkg.robjhyndman.com/forecast/)] 
+
+Each of the use cases listed in the overview section have a child class that inherits from the parent modeler class. This allows for general code to be shared across sub-classes but specific constraints and parameters to be implemented for each use case. 
+
+In the following chunk the `regresser` constructor function can be see creating a modeler object internally with the `modeler`, adding a default RMSE measure, and updated the class with structure function. Note - `regressor` currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. 
+
+
+```{r}
+# regressor constructor
+regressor
+```
+
+
+##### Regresser
+
+
+##### Forecaster
+
+
+##### Classifier
+
+
+##### Multiclasifier
+
+
+##### Segmenter
+
+
+
+
 
 #### Predictions
 

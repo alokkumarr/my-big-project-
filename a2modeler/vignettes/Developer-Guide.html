@@ -332,18 +332,78 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <span class="co">#&gt;  $ expr      :function (x)  </span>
 <span class="co">#&gt;  $ output    : NULL</span>
 <span class="co">#&gt;  $ desc      : chr &quot;&quot;</span>
-<span class="co">#&gt;  $ uid       : chr &quot;pipe4ac417064f4d&quot;</span>
-<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-06 15:22:10&quot;</span>
+<span class="co">#&gt;  $ uid       : chr &quot;pipe1ea45d777d5d&quot;</span>
+<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-06 16:13:23&quot;</span>
 <span class="co">#&gt;  $ runtime   : NULL</span>
 <span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;pipeline&quot;</span></code></pre></div>
 <p>The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets.</p>
 <p>One or more pipelines can be created and stored in a modeler object. They are stored as a named list of pipelines in the pipelines slot. The name is the pipeline uid. The reusability concept is useful internally to the modeler object so that models can share pipeline output (and not require duplicate execution and storage).</p>
 <div id="methods-2" class="section level5">
 <h5>Methods</h5>
+<ul>
+<li><strong>flow</strong>: apply pipeline expression on dataset. output not saved to pipeline</li>
+<li><strong>execute</strong>: apply pipeline expression on dataset. output saved to pipeline</li>
+<li><strong>test</strong>: apply pipeline expression on subset of data records</li>
+<li><strong>clean</strong>: removes stored output from pipeline</li>
+</ul>
 </div>
 </div>
 <div id="modeler" class="section level4">
 <h4>Modeler</h4>
+<p>The main class in the a2modeler package is the modeler class. Modeler class objects provide the framework for developing models by storing information on the input dataset, target variable, sampling strategy, measurement, data transformation and models. The class enforces standards and some limits on the model development but creates consistency and allows for a consistent high level API for users (see User Guide).</p>
+<p>The modeler object is model algothrim and package agnostic but requires that proper hooks are in place to produce the right outputs. In practice that means while the modeler backend is modular, only the Spark-ML<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> backend is implemented for all but the forecaster child class which uses the forecast R package<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a></p>
+<p>Each of the use cases listed in the overview section have a child class that inherits from the parent modeler class. This allows for general code to be shared across sub-classes but specific constraints and parameters to be implemented for each use case.</p>
+<p>In the following chunk the <code>regresser</code> constructor function can be see creating a modeler object internally with the <code>modeler</code>, adding a default RMSE measure, and updated the class with structure function. Note - <code>regressor</code> currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># regressor constructor</span>
+regressor
+<span class="co">#&gt; function(df,</span>
+<span class="co">#&gt;                       target,</span>
+<span class="co">#&gt;                       name = NULL,</span>
+<span class="co">#&gt;                       uid = NULL,</span>
+<span class="co">#&gt;                       version = NULL,</span>
+<span class="co">#&gt;                       desc = NULL,</span>
+<span class="co">#&gt;                       scientist = NULL,</span>
+<span class="co">#&gt;                       execution_strategy = &quot;sequential&quot;,</span>
+<span class="co">#&gt;                       refit = TRUE,</span>
+<span class="co">#&gt;                       save_submodels = TRUE,</span>
+<span class="co">#&gt;                       dir = NULL,</span>
+<span class="co">#&gt;                       seed = 319,</span>
+<span class="co">#&gt;                       ...){</span>
+<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
+<span class="co">#&gt;                   target = target,</span>
+<span class="co">#&gt;                   type = &quot;regressor&quot;,</span>
+<span class="co">#&gt;                   name,</span>
+<span class="co">#&gt;                   uid,</span>
+<span class="co">#&gt;                   version,</span>
+<span class="co">#&gt;                   desc,</span>
+<span class="co">#&gt;                   scientist,</span>
+<span class="co">#&gt;                   execution_strategy,</span>
+<span class="co">#&gt;                   refit,</span>
+<span class="co">#&gt;                   save_submodels,</span>
+<span class="co">#&gt;                   dir)</span>
+<span class="co">#&gt;   mobj &lt;- structure(mobj, class = c(&quot;regressor&quot;, class(mobj)))</span>
+<span class="co">#&gt;   mobj &lt;- set_measure(mobj, RMSE)</span>
+<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+<div id="regresser" class="section level5">
+<h5>Regresser</h5>
+</div>
+<div id="forecaster" class="section level5">
+<h5>Forecaster</h5>
+</div>
+<div id="classifier" class="section level5">
+<h5>Classifier</h5>
+</div>
+<div id="multiclasifier" class="section level5">
+<h5>Multiclasifier</h5>
+</div>
+<div id="segmenter" class="section level5">
+<h5>Segmenter</h5>
+</div>
 </div>
 <div id="predictions" class="section level4">
 <h4>Predictions</h4>
@@ -357,6 +417,8 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <li id="fn3"><p>R for Data Science <a href="https://r4ds.had.co.nz/">via</a><a href="#fnref3">↩</a></p></li>
 <li id="fn4"><p>R S3 Object System <a href="http://adv-r.had.co.nz/S3.html">via</a><a href="#fnref4">↩</a></p></li>
 <li id="fn5"><p>R Packages <a href="http://r-pkgs.had.co.nz/">via</a><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>Spark-ML <a href="https://spark.apache.org/mllib/">via</a><a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>forecast R package <a href="http://pkg.robjhyndman.com/forecast/">via</a><a href="#fnref7">↩</a></p></li>
 </ol>
 </div>
 
