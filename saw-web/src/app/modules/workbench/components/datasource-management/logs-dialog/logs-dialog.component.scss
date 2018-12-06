@@ -1,0 +1,22 @@
+@import 'src/themes/base/colors';
+
+.close-button {
+  transform: translateY(-6px);
+}
+.details-content {
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 3;
+  padding: 0 9px;
+}
+.prop-name {
+  color: #727272;
+  width: 136px;
+}
+.details-title {
+  text-align: left;
+  color: $primary-blue-b1;
+  padding-left: 10px;
+  margin: 0;
+  font-weight: 600 !important;
+}

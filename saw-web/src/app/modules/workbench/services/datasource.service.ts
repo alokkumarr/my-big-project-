@@ -46,6 +46,22 @@ export class DatasourceService {
   }
 
   /**
+   * Get logs of a route
+   *
+   * @returns
+   * @memberof DatasourceService
+   */
+  getRoutesLogs(channelID, routeID): Observable<any> {
+    // This API supports for BE pagination.
+    // Refer to JIRA ID: SIP-4615 if more info needed about this API support.
+    return this.http
+      .get(
+        `${this.api}/ingestion/batch/channels/logs/${channelID}/${routeID}`
+      )
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
    * Delete a channel by ID
    *
    * @returns
