@@ -34,8 +34,6 @@ updated modeler object
 }
 \description{
 Evaluate the accuracy of a fitted and applied model
-
-Evaluate Method for Spark-Model Clustering Object
 }
 \details{
 Function applies the measure function associated with modeler object to a

@@ -305,7 +305,7 @@
               <amazonec2-region>${sip.cloud.aws.region}</amazonec2-region>
               <amazonec2-access-key>${sip.cloud.key}</amazonec2-access-key>
               <amazonec2-secret-key>${sip.cloud.key.secret}</amazonec2-secret-key>
-              <amazonec2-instance-type>t2.2xlarge</amazonec2-instance-type>
+              <amazonec2-instance-type>m5.4xlarge</amazonec2-instance-type>
               <amazonec2-root-size>64</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
@@ -634,7 +634,7 @@
           <dependency>
             <groupId>org.asciidoctor</groupId>
             <artifactId>asciidoctorj-diagram</artifactId>
-            <version>1.5.10</version>
+            <version>1.5.11</version>
           </dependency>
           <dependency>
             <groupId>org.asciidoctor</groupId>

@@ -5,8 +5,8 @@
 \title{Sample Class Helper function}
 \usage{
 samples(validation_method, validation_args, test_holdout_prct,
-  test_holdout_method, downsample_prct, train_indicies, validation_indicies,
-  indicies_names, test_index)
+  test_holdout_method, downsample_prct, train_indicies,
+  validation_indicies, indicies_names, test_index)
 }
 \arguments{
 \item{validation_method}{name of validation method. examples are holdout,

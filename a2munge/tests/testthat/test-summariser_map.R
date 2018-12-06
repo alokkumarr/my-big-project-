@@ -10,35 +10,16 @@ library(dplyr)
 
 context("summariser_map function unit tests")
 
-
-# Create toy dataset
-set.seed(319)
-id_vars <- seq(101, 200, by=1)
-dates <- seq(from=Sys.Date()-365, to=Sys.Date(), by="day")
-cat1 <- c("A", "B")
-cat2 <- c("X", "Y", "Z")
-
-dat <- data.frame()
-for(id in id_vars){
-  n <- floor(runif(1)*100)
-  d <- data.frame(id = id,
-                 date = sample(dates, n, replace = T),
-                 cat1 = sample(cat1, n, replace = T),
-                 cat2 = sample(cat2, n, replace = T),
-                 metric1 = sample(1:5, n, replace = T),
-                 metric2 = rnorm(n, mean=50, sd = 5))
- dat <- rbind(dat, d)
-}
-
-
 # Create Spark Connection and read in some data
 sc <- spark_connect(master = "local")
 
 # Load data into Spark
-dat_tbl <- copy_to(sc, dat, overwrite = TRUE)
+sim_tbl <- mutate_at(sim_df, "date", as.character) %>% 
+  copy_to(sc, ., name = "df", overwrite = TRUE) %>%
+  mutate(date = to_date(date))
 
 
-r_map <- summariser_map(dat,
+r_map <- summariser_map(sim_df,
                         id_vars = 'id',
                         map = list(
                           list(
@@ -53,7 +34,7 @@ r_map <- summariser_map(dat,
                           )
                         ))
 
-spk_map <- summariser_map(dat_tbl,
+spk_map <- summariser_map(sim_tbl,
                           id_vars = "id",
                           map = list(
                             list(
@@ -85,8 +66,8 @@ test_that("summariser_map methods consistent", {
 
 
 test_that("summariser_map return correct dimensions", {
-  expect_equal(nrow(spk_map), length(unique(dat$id)))
-  expect_equal(nrow(r_map), length(unique(dat$id)))
+  expect_equal(nrow(spk_map), length(unique(sim_df$id)))
+  expect_equal(nrow(r_map), length(unique(sim_df$id)))
 })
 
 

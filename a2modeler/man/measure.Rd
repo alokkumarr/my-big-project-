@@ -4,8 +4,8 @@
 \alias{measure}
 \title{Measure Class Constructer}
 \usage{
-measure(id, method, method_args = list(), properties, name = id, minimize,
-  best = NULL, worst = NULL, note = "")
+measure(id, method, method_args = list(), properties, name = id,
+  minimize, best = NULL, worst = NULL, note = "")
 }
 \arguments{
 \item{id}{name of measure ex - mse}
