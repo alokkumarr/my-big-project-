@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   display: block;
@@ -16,5 +16,10 @@
 
   .form-field {
     margin-bottom: 5px;
+  }
+
+  form {
+    width: 97%;
+    margin: 0 auto;
   }
 }
