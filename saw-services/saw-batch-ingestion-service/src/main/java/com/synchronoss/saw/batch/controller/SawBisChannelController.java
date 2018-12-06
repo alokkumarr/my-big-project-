@@ -14,6 +14,9 @@ import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestReposit
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.model.BisChannelType;
+import com.synchronoss.saw.batch.model.BisScheduleKeys;
+import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
 import io.swagger.annotations.Api;
@@ -44,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.ResourceAccessException;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -59,6 +63,9 @@ public class SawBisChannelController {
   
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+  
+  @Autowired
+  private BisChannelService bisChannelService;
 
 
   /**
@@ -94,7 +101,7 @@ public class SawBisChannelController {
     nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
     rootNode = (ObjectNode) nodeEntity;
     String channelName =  rootNode.get("channelName").asText();
-    if (isChannelNameExists(channelName)) {
+    if (bisChannelService.isChannelNameExists(channelName)) {
       throw new BisException("Channel Name: " + channelName + " already exists");
     }
     SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
@@ -341,29 +348,42 @@ public class SawBisChannelController {
       @ApiParam(value = "channel Name", required = true) 
       @RequestParam("channelName") String channelName) {
 
-    return new ResponseEntity<Boolean>(isChannelNameExists(channelName), HttpStatus.OK);
+    return new ResponseEntity<Boolean>(bisChannelService
+        .isChannelNameExists(channelName), HttpStatus.OK);
 
   }
-
-  private boolean isChannelNameExists(String channelName) {
-    List<BisChannelEntity> channelEntities = bisChannelDataRestRepository.findAll();
-    ObjectMapper objectMapper = new ObjectMapper();
-    Optional<BisChannelEntity> channels = channelEntities.stream().filter(bisChannelEntity -> {
-      JsonNode metaDataNode;
-      JsonNode existingChannel;
-      try {
-        metaDataNode = objectMapper.readTree(bisChannelEntity.getChannelMetadata());
-        existingChannel = metaDataNode.get("channelName");
-        if (existingChannel != null && existingChannel.asText().equalsIgnoreCase(channelName)) {
-          return true;
-        }
-      } catch (IOException exception) {
-        logger.error(exception.getMessage());
-      }
-      return false;
-    }).findAny();
-
-    return channels.isPresent();
+  
+  /**
+   * checks is there a route with given route name.
+   * 
+   * @param channelId channe identifier
+   * @return  ok
+   */
+  @RequestMapping(value = "/channels/{channelId}/deactivate", method 
+      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Object>  deactivateChannel(
+      @RequestParam("channelId")  Long channelId) {
+    bisChannelService.activateOrDeactivateChannel(channelId, false);
+    return new ResponseEntity<Object>(HttpStatus.OK);
   }
+  
+  /**
+   * checks is there a route with given route name.
+   * 
+   * @param channelId channe identifier
+   * @return ok
+   */
+  @RequestMapping(value = "/channels/{channelId}/activate", method 
+      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Object>  activateChannel(
+      @RequestParam("channelId")  Long channelId,
+      @RequestParam("routeId") Long routeId) {
+    bisChannelService.activateOrDeactivateChannel(channelId, true);
+    return new ResponseEntity<Object>(HttpStatus.OK);
+  }
+
+  
 }
 
