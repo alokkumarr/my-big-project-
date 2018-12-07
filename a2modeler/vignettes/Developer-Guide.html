@@ -12,7 +12,7 @@
 
 <meta name="author" content="Haarstick" />
 
-<meta name="date" content="2018-12-06" />
+<meta name="date" content="2018-12-07" />
 
 <title>a2modeler Developer Guide</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">a2modeler Developer Guide</h1>
 <h4 class="author"><em>Haarstick</em></h4>
-<h4 class="date"><em>2018-12-06</em></h4>
+<h4 class="date"><em>2018-12-07</em></h4>
 
 
 
@@ -332,8 +332,8 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <span class="co">#&gt;  $ expr      :function (x)  </span>
 <span class="co">#&gt;  $ output    : NULL</span>
 <span class="co">#&gt;  $ desc      : chr &quot;&quot;</span>
-<span class="co">#&gt;  $ uid       : chr &quot;pipe1ea45d777d5d&quot;</span>
-<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-06 16:13:23&quot;</span>
+<span class="co">#&gt;  $ uid       : chr &quot;pipe4d4823af115e&quot;</span>
+<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-07 11:49:47&quot;</span>
 <span class="co">#&gt;  $ runtime   : NULL</span>
 <span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;pipeline&quot;</span></code></pre></div>
 <p>The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets.</p>
@@ -352,8 +352,26 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <h4>Modeler</h4>
 <p>The main class in the a2modeler package is the modeler class. Modeler class objects provide the framework for developing models by storing information on the input dataset, target variable, sampling strategy, measurement, data transformation and models. The class enforces standards and some limits on the model development but creates consistency and allows for a consistent high level API for users (see User Guide).</p>
 <p>The modeler object is model algothrim and package agnostic but requires that proper hooks are in place to produce the right outputs. In practice that means while the modeler backend is modular, only the Spark-ML<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> backend is implemented for all but the forecaster child class which uses the forecast R package<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a></p>
-<p>Each of the use cases listed in the overview section have a child class that inherits from the parent modeler class. This allows for general code to be shared across sub-classes but specific constraints and parameters to be implemented for each use case.</p>
-<p>In the following chunk the <code>regresser</code> constructor function can be see creating a modeler object internally with the <code>modeler</code>, adding a default RMSE measure, and updated the class with structure function. Note - <code>regressor</code> currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided.</p>
+<p>Each of the use cases listed in the overview section have a child class that inherits from the parent modeler class. This allows for general code to be shared across sub-classes but specific constraints, parameters, and methods to be implemented for each use case.</p>
+<div id="modeler-inputs" class="section level5">
+<h5>Modeler Inputs</h5>
+<p>In addition to the required inputs of the dataframe, target and index variables if required, the following inputs can be provided for meta-data purposes:</p>
+<ul>
+<li><strong>name</strong>: optional name for use case. Used in reporting and deployment pathing</li>
+<li><strong>uid</strong>: optional input for unique identifier</li>
+<li><strong>version</strong>: optional input for use case version. Used in report and pathing</li>
+<li><strong>desc</strong>: optional input for use case description</li>
+<li><strong>scientist</strong>: optional input for data science developer</li>
+<li><strong>execution_strategy</strong>: input for parallel backend execution. Default is sequential. Leverages the future<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a> for parallel execution.</li>
+<li><strong>refit</strong>: Logical option to refit model to entire training dataset sample and validation fitting. If grid parameters supplied, the best param set determined by validation sample performance will be used. Default is TRUE.</li>
+<li><strong>save_submodels</strong>: logical flag to save sub model fits. Default is TRUE.</li>
+<li><strong>dir</strong>: optional directory path for saving reports, data, and models</li>
+<li><strong>seed</strong>: seed number for random computations. Seed should be set to ensure repeatability of results.</li>
+</ul>
+</div>
+<div id="regresser" class="section level5">
+<h5>Regresser</h5>
+<p>In the following chunk the <code>regresser</code> constructor function can be see creating a modeler object internally with the <code>modeler</code> constructor, adding a default RMSE measure, and updated the class with the <code>structure</code> function. Note - <code>regressor</code> currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. The spark constraint is true for <code>classifier</code>, <code>multi-classifier</code>, and <code>segmenter</code> as well. Also note that a check is made to ensure that there isn’t an existing ‘index’ column name. The data sampling partitioning functionality use the variable ‘index’ to create a row index and filter.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># regressor constructor</span>
 regressor
 <span class="co">#&gt; function(df,</span>
@@ -389,20 +407,406 @@ regressor
 <span class="co">#&gt;   mobj</span>
 <span class="co">#&gt; }</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
-<div id="regresser" class="section level5">
-<h5>Regresser</h5>
-</div>
-<div id="forecaster" class="section level5">
-<h5>Forecaster</h5>
 </div>
 <div id="classifier" class="section level5">
 <h5>Classifier</h5>
+<p>Next is the <code>classifier</code> constructor. The function is very similiar to the <code>regressor</code> except now there are checks for a binary distribution of the target variable and AUC default measure.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Classifier Constructor</span>
+classifier
+<span class="co">#&gt; function(df,</span>
+<span class="co">#&gt;                        target,</span>
+<span class="co">#&gt;                        name = NULL,</span>
+<span class="co">#&gt;                        uid = NULL,</span>
+<span class="co">#&gt;                        version = NULL,</span>
+<span class="co">#&gt;                        desc = NULL,</span>
+<span class="co">#&gt;                        scientist = NULL,</span>
+<span class="co">#&gt;                        execution_strategy = &quot;sequential&quot;,</span>
+<span class="co">#&gt;                        refit = TRUE,</span>
+<span class="co">#&gt;                        save_submodels = TRUE,</span>
+<span class="co">#&gt;                        dir = NULL,</span>
+<span class="co">#&gt;                        seed = 319,</span>
+<span class="co">#&gt;                        ...){</span>
+<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Target Check</span>
+<span class="co">#&gt;   target_dims &lt;- df %&gt;%</span>
+<span class="co">#&gt;     dplyr::distinct(!!rlang::sym(target)) %&gt;%</span>
+<span class="co">#&gt;     dplyr::collect() %&gt;%</span>
+<span class="co">#&gt;     pull(!!rlang::sym(target))</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   if(length(target_dims) != 2) {</span>
+<span class="co">#&gt;     stop(paste(&quot;target not a binary distribution.\n  Has&quot;, target_dims, &quot;unique values&quot;))</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   if(! all(c(0,1) %in% target_dims)) {</span>
+<span class="co">#&gt;     stop(&quot;binary target distribution not encoded as 0-1.\nPlease update to numeric with 0/1 values&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
+<span class="co">#&gt;                   target = target,</span>
+<span class="co">#&gt;                   type = &quot;classifier&quot;,</span>
+<span class="co">#&gt;                   name,</span>
+<span class="co">#&gt;                   uid,</span>
+<span class="co">#&gt;                   version,</span>
+<span class="co">#&gt;                   desc,</span>
+<span class="co">#&gt;                   scientist,</span>
+<span class="co">#&gt;                   execution_strategy,</span>
+<span class="co">#&gt;                   refit,</span>
+<span class="co">#&gt;                   save_submodels,</span>
+<span class="co">#&gt;                   dir,</span>
+<span class="co">#&gt;                   seed)</span>
+<span class="co">#&gt;   mobj &lt;- structure(mobj, class = c(&quot;classifier&quot;, class(mobj)))</span>
+<span class="co">#&gt;   mobj &lt;- set_measure(mobj, AUC)</span>
+<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="multiclasifier" class="section level5">
 <h5>Multiclasifier</h5>
+<p>The <code>multiclassifier</code> constructor function is very similar to the <code>classifier</code> function. Now the checks are for a target variable with more than 2 unique values, and a F1 default measure.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Multiclassifier Constructor</span>
+multiclassifier
+<span class="co">#&gt; function(df,</span>
+<span class="co">#&gt;                             target,</span>
+<span class="co">#&gt;                             name = NULL,</span>
+<span class="co">#&gt;                             uid = NULL,</span>
+<span class="co">#&gt;                             version = NULL,</span>
+<span class="co">#&gt;                             desc = NULL,</span>
+<span class="co">#&gt;                             scientist = NULL,</span>
+<span class="co">#&gt;                             execution_strategy = &quot;sequential&quot;,</span>
+<span class="co">#&gt;                             refit = TRUE,</span>
+<span class="co">#&gt;                             save_submodels = TRUE,</span>
+<span class="co">#&gt;                             dir = NULL,</span>
+<span class="co">#&gt;                             seed = 319,</span>
+<span class="co">#&gt;                             ...){</span>
+<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   # Target Check</span>
+<span class="co">#&gt;   target_dims &lt;- df %&gt;%</span>
+<span class="co">#&gt;     dplyr::distinct_(target) %&gt;%</span>
+<span class="co">#&gt;     sparklyr::sdf_nrow()</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   if(target_dims == 2) {</span>
+<span class="co">#&gt;     stop(paste(&quot;target is a binary distribution. Use a classifier instead&quot;))</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   if(target_dims &gt; 100) {</span>
+<span class="co">#&gt;     warnings(&quot;target has over 100 unique values&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
+<span class="co">#&gt;                   target = target,</span>
+<span class="co">#&gt;                   type = &quot;multiclassifier&quot;,</span>
+<span class="co">#&gt;                   name,</span>
+<span class="co">#&gt;                   uid,</span>
+<span class="co">#&gt;                   version,</span>
+<span class="co">#&gt;                   desc,</span>
+<span class="co">#&gt;                   scientist,</span>
+<span class="co">#&gt;                   execution_strategy,</span>
+<span class="co">#&gt;                   refit,</span>
+<span class="co">#&gt;                   save_submodels,</span>
+<span class="co">#&gt;                   dir,</span>
+<span class="co">#&gt;                   seed)</span>
+<span class="co">#&gt;   mobj &lt;- structure(mobj, class = c(&quot;multiclassifier&quot;, class(mobj)))</span>
+<span class="co">#&gt;   mobj &lt;- set_measure(mobj, F1)</span>
+<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="segmenter" class="section level5">
 <h5>Segmenter</h5>
+<p>The <code>segmenter</code> function differs slightly in that there is no target variable (set as NULL) and with a Silhouette default measure.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Segmenter Constructor</span>
+segmenter
+<span class="co">#&gt; function(df,</span>
+<span class="co">#&gt;                       name = NULL,</span>
+<span class="co">#&gt;                       uid = NULL,</span>
+<span class="co">#&gt;                       version = NULL,</span>
+<span class="co">#&gt;                       desc = NULL,</span>
+<span class="co">#&gt;                       scientist = NULL,</span>
+<span class="co">#&gt;                       execution_strategy = &quot;sequential&quot;,</span>
+<span class="co">#&gt;                       refit = TRUE,</span>
+<span class="co">#&gt;                       save_submodels = TRUE,</span>
+<span class="co">#&gt;                       dir = NULL,</span>
+<span class="co">#&gt;                       seed = 319,</span>
+<span class="co">#&gt;                       ...){</span>
+<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
+<span class="co">#&gt;                   target = NULL,</span>
+<span class="co">#&gt;                   type = &quot;segmenter&quot;,</span>
+<span class="co">#&gt;                   name,</span>
+<span class="co">#&gt;                   uid,</span>
+<span class="co">#&gt;                   version,</span>
+<span class="co">#&gt;                   desc,</span>
+<span class="co">#&gt;                   scientist,</span>
+<span class="co">#&gt;                   execution_strategy,</span>
+<span class="co">#&gt;                   refit,</span>
+<span class="co">#&gt;                   save_submodels,</span>
+<span class="co">#&gt;                   dir)</span>
+<span class="co">#&gt;   sobj &lt;- structure(mobj, class = c(&quot;segmenter&quot;, class(mobj)))</span>
+<span class="co">#&gt;   sobj &lt;- set_measure(sobj, Silhouette)</span>
+<span class="co">#&gt;   sobj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+</div>
+<div id="forecaster" class="section level5">
+<h5>Forecaster</h5>
+<p>As can be seen below the <code>forecaster</code> constructor is the most different from the others. <code>Forecaster</code> is R data.frame based, and requries an explict index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Forecaster Constructor</span>
+forecaster
+<span class="co">#&gt; function(df,</span>
+<span class="co">#&gt;                        target,</span>
+<span class="co">#&gt;                        index_var,</span>
+<span class="co">#&gt;                        unit = NULL,</span>
+<span class="co">#&gt;                        frequency = NULL,</span>
+<span class="co">#&gt;                        prediction_conf_levels = c(80, 95),</span>
+<span class="co">#&gt;                        name = NULL,</span>
+<span class="co">#&gt;                        uid = NULL,</span>
+<span class="co">#&gt;                        version = NULL,</span>
+<span class="co">#&gt;                        desc = NULL,</span>
+<span class="co">#&gt;                        scientist = NULL,</span>
+<span class="co">#&gt;                        execution_strategy = &quot;sequential&quot;,</span>
+<span class="co">#&gt;                        refit = TRUE,</span>
+<span class="co">#&gt;                        save_submodels = TRUE,</span>
+<span class="co">#&gt;                        dir = NULL,</span>
+<span class="co">#&gt;                        ...){</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   checkmate::assert_choice(index_var, colnames(df))</span>
+<span class="co">#&gt;   checkmate::assert_numeric(frequency, lower = 1, null.ok = TRUE)</span>
+<span class="co">#&gt;   checkmate::assert_numeric(prediction_conf_levels, lower = 50, upper = 100,</span>
+<span class="co">#&gt;                             min.len = 1, max.len = 2)</span>
+<span class="co">#&gt;   checkmate::assert_character(unit, null.ok = TRUE)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
+<span class="co">#&gt;                   target,</span>
+<span class="co">#&gt;                   type = &quot;forecaster&quot;,</span>
+<span class="co">#&gt;                   name,</span>
+<span class="co">#&gt;                   uid,</span>
+<span class="co">#&gt;                   version,</span>
+<span class="co">#&gt;                   desc,</span>
+<span class="co">#&gt;                   scientist,</span>
+<span class="co">#&gt;                   execution_strategy,</span>
+<span class="co">#&gt;                   refit,</span>
+<span class="co">#&gt;                   save_submodels,</span>
+<span class="co">#&gt;                   dir)</span>
+<span class="co">#&gt;   mobj$index_var &lt;- index_var</span>
+<span class="co">#&gt;   mobj$index &lt;- index(df[[index_var]], unit = unit)</span>
+<span class="co">#&gt;   mobj$frequency &lt;- frequency</span>
+<span class="co">#&gt;   mobj$conf_levels &lt;- prediction_conf_levels</span>
+<span class="co">#&gt;   fobj &lt;- structure(mobj, class = c(&quot;forecaster&quot;, class(mobj)))</span>
+<span class="co">#&gt;   fobj &lt;- set_measure(fobj, RMSE)</span>
+<span class="co">#&gt;   fobj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+</div>
+<div id="index-class" class="section level5">
+<h5>Index Class</h5>
+<p>The index class stores information on a sequence so that the sequence can be accurately extended such as the unit, number of periods, start and end values. There is a time_index sub-class for datetime based indices which enables a different extend behavior.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Create Index Object ex</span>
+i1 &lt;-<span class="st"> </span><span class="kw">index</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">unit =</span> <span class="ot">NULL</span>)
+i1
+<span class="co">#&gt; $unit</span>
+<span class="co">#&gt; [1] 1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $periods</span>
+<span class="co">#&gt; NULL</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $start</span>
+<span class="co">#&gt; [1] 1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $end</span>
+<span class="co">#&gt; [1] 10</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; attr(,&quot;class&quot;)</span>
+<span class="co">#&gt; [1] &quot;numeric_index&quot; &quot;index&quot;</span>
+
+<span class="co"># Create Date Index</span>
+d1 &lt;-<span class="st"> </span><span class="kw">index</span>(<span class="kw">today</span>() <span class="op">-</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">6</span>), <span class="dt">unit =</span> <span class="st">&quot;days&quot;</span>)
+d1
+<span class="co">#&gt; $unit</span>
+<span class="co">#&gt; [1] &quot;days&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $periods</span>
+<span class="co">#&gt; [1] 1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $start</span>
+<span class="co">#&gt; [1] &quot;2018-12-01&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $end</span>
+<span class="co">#&gt; [1] &quot;2018-12-07&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; attr(,&quot;class&quot;)</span>
+<span class="co">#&gt; [1] &quot;time_index&quot; &quot;index&quot;</span></code></pre></div>
+</div>
+<div id="index-methods" class="section level5">
+<h5>Index Methods</h5>
+<p>The index class only has one generic function in the a2modeler - <code>extend</code>. It is used to extend a an index by some length out. There are methods for numeric, index, and time_index classes.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Extend index</span>
+<span class="kw">extend</span>(i1, <span class="dv">5</span>)
+<span class="co">#&gt; [1] 11 12 13 14 15</span>
+<span class="kw">extend</span>(d1, <span class="dv">5</span>)
+<span class="co">#&gt; [1] &quot;2018-12-08&quot; &quot;2018-12-09&quot; &quot;2018-12-10&quot; &quot;2018-12-11&quot; &quot;2018-12-12&quot;</span></code></pre></div>
+</div>
+<div id="workflow" class="section level5">
+<h5>Workflow</h5>
+<p>Below is a simple but standard a2modeler workflow. The constructor is followed by setting the measure (which as we’ve seen is set by default), the sampling, model training, and model selection.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+
+<span class="co"># # Create Spark Connection</span>
+sc &lt;-<span class="st"> </span><span class="kw">spark_connect</span>(<span class="dt">master =</span> <span class="st">&quot;local&quot;</span>)
+
+<span class="co"># Copy data to spark</span>
+df &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, mtcars, <span class="dt">name =</span> <span class="st">&quot;df&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
+
+
+<span class="co"># Create Spark datasets </span>
+df1 &lt;-<span class="st"> </span>iris <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">sample_frac</span>(<span class="dt">size =</span> .<span class="dv">5</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">copy_to</span>(sc, ., <span class="dt">name =</span> <span class="st">&quot;df1&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># Simple A2 Regressor Workflow</span>
+r1 &lt;-<span class="st"> </span><span class="kw">regressor</span>(<span class="dt">df =</span> df1, <span class="dt">target =</span> <span class="st">&quot;Petal_Width&quot;</span>, <span class="dt">name =</span> <span class="st">&quot;test&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">add_holdout_samples</span>(<span class="dt">splits =</span> <span class="kw">c</span>(.<span class="dv">5</span>, .<span class="dv">5</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> test_pipe,
+            <span class="dt">method =</span> <span class="st">&quot;ml_linear_regression&quot;</span>,
+            <span class="dt">uid =</span> <span class="st">&quot;lm&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">add_model</span>(<span class="dt">pipe =</span> test_pipe,
+            <span class="dt">method =</span> <span class="st">&quot;ml_decision_tree_regressor&quot;</span>,
+            <span class="dt">uid =</span> <span class="st">&quot;tree&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">train_models</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">set_final_model</span>(., <span class="dt">method =</span> <span class="st">&quot;best&quot;</span>, <span class="dt">reevaluate =</span> <span class="ot">FALSE</span>, <span class="dt">refit =</span> <span class="ot">TRUE</span>)</code></pre></div>
+</div>
+<div id="add-model" class="section level5">
+<h5>Add Model</h5>
+</div>
+<div id="modeler---train-models" class="section level5">
+<h5>Modeler - Train Models</h5>
+<p>The <code>train_models</code> function does most of the heavy lifting in the workflow. The <code>train_models</code> function is responsible for:</p>
+<ul>
+<li>executing all of the pipelines</li>
+<li>partitioning the samples</li>
+<li>fitting all models to the training samples</li>
+<li>measuring model performance on validation samples</li>
+</ul>
+<p>Full modeler class method</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Parent Modeler class method</span>
+train_models.modeler
+<span class="co">#&gt; function(obj, uids = NULL, ...) {</span>
+<span class="co">#&gt;   checkmate::assert_character(uids, null.ok = TRUE)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Execute pipes</span>
+<span class="co">#&gt;   obj &lt;- execute_pipelines(obj)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   if (is.null(uids)) {</span>
+<span class="co">#&gt;     # Get Added only Models</span>
+<span class="co">#&gt;     uids &lt;- obj$models %&gt;%</span>
+<span class="co">#&gt;       purrr::map_df(., magrittr::extract, c(&quot;uid&quot;, &quot;status&quot;)) %&gt;%</span>
+<span class="co">#&gt;       dplyr::filter(status == &quot;added&quot;) %&gt;%</span>
+<span class="co">#&gt;       dplyr::pull(uid)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   for (uid in uids) {</span>
+<span class="co">#&gt;     </span>
+<span class="co">#&gt;     # Get Training Sample</span>
+<span class="co">#&gt;     train_data &lt;- obj$pipelines[[obj$models[[uid]]$pipe]]$output</span>
+<span class="co">#&gt;     </span>
+<span class="co">#&gt;     # Check for holdout</span>
+<span class="co">#&gt;     if (!is.null(obj$samples$test_holdout_prct)) {</span>
+<span class="co">#&gt;       train_data &lt;- train_data %&gt;%</span>
+<span class="co">#&gt;         dplyr::mutate(rn = 1) %&gt;% </span>
+<span class="co">#&gt;         dplyr::mutate(rn = row_number(rn)) %&gt;% </span>
+<span class="co">#&gt;         dplyr::filter(! rn %in% obj$samples$test_index) %&gt;%</span>
+<span class="co">#&gt;         dplyr::select(-rn)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     </span>
+<span class="co">#&gt;     obj$models[[uid]] &lt;- train_model(mobj = obj$models[[uid]],</span>
+<span class="co">#&gt;                                      data = train_data,</span>
+<span class="co">#&gt;                                      measure = obj$measure,</span>
+<span class="co">#&gt;                                      samples = obj$samples,</span>
+<span class="co">#&gt;                                      save_submodels = obj$save_submodels,</span>
+<span class="co">#&gt;                                      execution_strategy = obj$execution_strategy,</span>
+<span class="co">#&gt;                                      level = obj$conf_levels,</span>
+<span class="co">#&gt;                                      seed = obj$seed)</span>
+<span class="co">#&gt;     obj$models[[uid]]$features &lt;- setdiff(colnames(train_data), c(obj$target, obj$index_var))</span>
+<span class="co">#&gt;     obj$models[[uid]]$status &lt;- &quot;trained&quot;</span>
+<span class="co">#&gt;     obj$models[[uid]]$last_updated &lt;- Sys.time()</span>
+<span class="co">#&gt;     obj$performance &lt;- dplyr::bind_rows(</span>
+<span class="co">#&gt;       obj$performance,</span>
+<span class="co">#&gt;       obj$models[[uid]]$performance %&gt;% </span>
+<span class="co">#&gt;         dplyr::mutate(model_uid = uid,</span>
+<span class="co">#&gt;                       pipeline_uid = obj$models[[uid]]$pipe,</span>
+<span class="co">#&gt;                       method = obj$models[[uid]]$method) %&gt;% </span>
+<span class="co">#&gt;         dplyr::select(model_uid, pipeline_uid, submodel_uid, sample, method, param_grid, !!obj$measure$method)</span>
+<span class="co">#&gt;     )</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   obj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+<p>The first step is execute all the pipelines</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+train_models.modeler &lt;-<span class="st"> </span><span class="cf">function</span>(obj, <span class="dt">uids =</span> <span class="ot">NULL</span>, ...) {
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(uids, <span class="dt">null.ok =</span> <span class="ot">TRUE</span>)
+  
+  <span class="co"># Execute pipes</span>
+  obj &lt;-<span class="st"> </span><span class="kw">execute_pipelines</span>(obj)</code></pre></div>
+<p>The <code>execute_pipelines</code> function is descriptive - it calls the <code>execute</code> function on all un-excuted pipelines saved in the modeler object. Recall execute will save the pipeline output to the output slot.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">execute_pipelines.modeler
+<span class="co">#&gt; function(obj, uids = NULL, ...) {</span>
+<span class="co">#&gt;   checkmate::assert_character(uids, null.ok = TRUE)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   if (is.null(uids))</span>
+<span class="co">#&gt;     uids &lt;- names(obj$pipelines)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   for(uid in uids) {</span>
+<span class="co">#&gt;     pipe &lt;- obj$pipelines[[uid]]</span>
+<span class="co">#&gt;     if(is.null(pipe$output))</span>
+<span class="co">#&gt;       obj$pipelines[[uid]] &lt;- execute(obj$data, obj$pipelines[[uid]])</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   obj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+<p>The next step is to get the model uids to be trained by extracting the status and filtering to only models with “added” status.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+  <span class="cf">if</span> (<span class="kw">is.null</span>(uids)) {
+    <span class="co"># Get Added only Models</span>
+    uids &lt;-<span class="st"> </span>obj<span class="op">$</span>models <span class="op">%&gt;%</span>
+<span class="st">      </span>purrr<span class="op">::</span><span class="kw">map_df</span>(., magrittr<span class="op">::</span>extract, <span class="kw">c</span>(<span class="st">&quot;uid&quot;</span>, <span class="st">&quot;status&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">      </span>dplyr<span class="op">::</span><span class="kw">filter</span>(status <span class="op">==</span><span class="st"> &quot;added&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">      </span>dplyr<span class="op">::</span><span class="kw">pull</span>(uid)
+  }</code></pre></div>
+<p>Next for each model uid the training sample is generated. To clarify this training samples has yet to be split into specific train and validation partitions. The code below illustrates the data is filtered based on sample indices.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+
+ <span class="cf">for</span> (uid <span class="cf">in</span> uids) {
+    
+    <span class="co"># Get Training Sample</span>
+    train_data &lt;-<span class="st"> </span>obj<span class="op">$</span>pipelines[[obj<span class="op">$</span>models[[uid]]<span class="op">$</span>pipe]]<span class="op">$</span>output
+    
+    <span class="co"># Check for holdout</span>
+    <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(obj<span class="op">$</span>samples<span class="op">$</span>test_holdout_prct)) {
+      train_data &lt;-<span class="st"> </span>train_data <span class="op">%&gt;%</span>
+<span class="st">        </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">rn =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">        </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">rn =</span> <span class="kw">row_number</span>(rn)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">        </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="st"> </span>rn <span class="op">%in%</span><span class="st"> </span>obj<span class="op">$</span>samples<span class="op">$</span>test_index) <span class="op">%&gt;%</span>
+<span class="st">        </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>rn)
+    }</code></pre></div>
+<p>The next step is the train a single model uid with the <code>train_model</code> function. The <code>train_model</code> has methods for specific modeling backends.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+obj<span class="op">$</span>models[[uid]] &lt;-<span class="st"> </span><span class="kw">train_model</span>(<span class="dt">mobj =</span> obj<span class="op">$</span>models[[uid]],
+                                 <span class="dt">data =</span> train_data,
+                                 <span class="dt">measure =</span> obj<span class="op">$</span>measure,
+                                 <span class="dt">samples =</span> obj<span class="op">$</span>samples,
+                                 <span class="dt">save_submodels =</span> obj<span class="op">$</span>save_submodels,
+                                 <span class="dt">execution_strategy =</span> obj<span class="op">$</span>execution_strategy,
+                                 <span class="dt">level =</span> obj<span class="op">$</span>conf_levels,
+                                 <span class="dt">seed =</span> obj<span class="op">$</span>seed)</code></pre></div>
 </div>
 </div>
 <div id="predictions" class="section level4">
@@ -419,6 +823,7 @@ regressor
 <li id="fn5"><p>R Packages <a href="http://r-pkgs.had.co.nz/">via</a><a href="#fnref5">↩</a></p></li>
 <li id="fn6"><p>Spark-ML <a href="https://spark.apache.org/mllib/">via</a><a href="#fnref6">↩</a></p></li>
 <li id="fn7"><p>forecast R package <a href="http://pkg.robjhyndman.com/forecast/">via</a><a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>future R package <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html">via</a><a href="#fnref8">↩</a></p></li>
 </ol>
 </div>
 

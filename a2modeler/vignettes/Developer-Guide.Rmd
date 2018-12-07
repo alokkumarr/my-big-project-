@@ -218,9 +218,28 @@ The main class in the a2modeler package is the modeler class. Modeler class obje
 
 The modeler object is model algothrim and package agnostic but requires that proper hooks are in place to produce the right outputs. In practice that means while the modeler backend is modular, only the Spark-ML^[Spark-ML [via](https://spark.apache.org/mllib/)] backend is implemented for all but the forecaster child class which uses the forecast R package^[forecast R package [via](http://pkg.robjhyndman.com/forecast/)] 
 
-Each of the use cases listed in the overview section have a child class that inherits from the parent modeler class. This allows for general code to be shared across sub-classes but specific constraints and parameters to be implemented for each use case. 
+Each of the use cases listed in the overview section have a child class that inherits from the parent modeler class. This allows for general code to be shared across sub-classes but specific constraints, parameters, and methods to be implemented for each use case. 
 
-In the following chunk the `regresser` constructor function can be see creating a modeler object internally with the `modeler`, adding a default RMSE measure, and updated the class with structure function. Note - `regressor` currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. 
+
+##### Modeler Inputs
+
+In addition to the required inputs of the dataframe, target and index variables if required, the following inputs can be provided for meta-data purposes:
+
+* __name__: optional name for use case. Used in reporting and deployment pathing 
+* __uid__: optional input for unique identifier
+* __version__: optional input for use case version. Used in report and pathing
+* __desc__: optional input for use case description
+* __scientist__: optional input for data science developer
+* __execution_strategy__: input for parallel backend execution. Default is sequential. Leverages the future^[future R package [via](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)] for parallel execution. 
+* __refit__: Logical option to refit model to entire training dataset sample and validation fitting. If grid parameters supplied, the best param set determined by validation sample performance will be used. Default is TRUE.
+* __save_submodels__: logical flag to save sub model fits. Default is TRUE. 
+* __dir__: optional directory path for saving reports, data, and models
+* __seed__: seed number for random computations. Seed should be set to ensure repeatability of results.
+
+
+##### Regresser
+
+In the following chunk the `regresser` constructor function can be see creating a modeler object internally with the `modeler` constructor, adding a default RMSE measure, and updated the class with the `structure` function. Note - `regressor` currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. The spark constraint is true for `classifier`, `multi-classifier`, and `segmenter` as well. Also note that a check is made to ensure that there isn't an existing 'index' column name. The data sampling partitioning functionality use the variable 'index' to create a row index and filter.
 
 
 ```{r}
@@ -228,23 +247,213 @@ In the following chunk the `regresser` constructor function can be see creating 
 regressor
 ```
 
-
-##### Regresser
-
-
-##### Forecaster
-
-
 ##### Classifier
+
+Next is the `classifier` constructor. The function is very similiar to the `regressor` except now there are checks for a binary distribution of the target variable and AUC default measure.
+
+
+```{r}
+# Classifier Constructor
+classifier
+```
 
 
 ##### Multiclasifier
 
+The `multiclassifier` constructor function is very similar to the `classifier` function. Now the checks are for a target variable with more than 2 unique values, and a F1 default measure. 
+
+
+```{r}
+# Multiclassifier Constructor
+multiclassifier
+```
+
 
 ##### Segmenter
 
+The `segmenter` function differs slightly in that there is no target variable (set as NULL) and with a Silhouette default measure.
+
+```{r}
+# Segmenter Constructor
+segmenter
+```
 
 
+##### Forecaster
+
+As can be seen below the `forecaster` constructor is the most different from the others. `Forecaster` is R data.frame based, and requries an explict index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting. 
+
+```{r}
+# Forecaster Constructor
+forecaster
+```
+
+
+##### Index Class
+
+The index class stores information on a sequence so that the sequence can be accurately extended such as the unit, number of periods, start and end values. There is a time_index sub-class for datetime based indices which enables a different extend behavior. 
+
+```{r}
+
+# Create Index Object ex
+i1 <- index(1:10, unit = NULL)
+i1
+
+# Create Date Index
+d1 <- index(today() - days(0:6), unit = "days")
+d1
+```
+
+##### Index Methods
+
+The index class only has one generic function in the a2modeler - `extend`. It is used to extend a an index by some length out. There are methods for numeric, index, and time_index classes. 
+
+```{r}
+
+# Extend index
+extend(i1, 5)
+extend(d1, 5)
+
+```
+
+
+##### Workflow
+
+
+Below is a simple but standard a2modeler workflow. The constructor is followed by setting the measure (which as we've seen is set by default), the sampling, model training, and model selection.
+
+```{r, eval=FALSE}
+
+
+# # Create Spark Connection
+sc <- spark_connect(master = "local")
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+
+# Create Spark datasets 
+df1 <- iris %>%
+  sample_frac(size = .5) %>%
+  copy_to(sc, ., name = "df1", overwrite = TRUE)
+
+# Simple A2 Regressor Workflow
+r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
+  add_holdout_samples(splits = c(.5, .5)) %>%
+  add_model(pipe = test_pipe,
+            method = "ml_linear_regression",
+            uid = "lm") %>%
+  add_model(pipe = test_pipe,
+            method = "ml_decision_tree_regressor",
+            uid = "tree") %>%
+  train_models() %>%
+  set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+
+```
+
+
+##### Add Model
+
+
+
+
+##### Modeler - Train Models
+
+The `train_models` function does most of the heavy lifting in the workflow. The `train_models` function is responsible for:
+
+* executing all of the pipelines
+* partitioning the samples
+* fitting all models to the training samples
+* measuring model performance on validation samples
+
+Full modeler class method
+
+```{r}
+
+# Parent Modeler class method
+train_models.modeler
+
+```
+
+The first step is execute all the pipelines
+
+```{r, eval=FALSE}
+
+train_models.modeler <- function(obj, uids = NULL, ...) {
+  checkmate::assert_character(uids, null.ok = TRUE)
+  
+  # Execute pipes
+  obj <- execute_pipelines(obj)
+```
+
+The `execute_pipelines` function is descriptive - it calls the `execute` function on all un-excuted pipelines saved in the modeler object. Recall execute will save the pipeline output to the output slot. 
+
+```{r}
+execute_pipelines.modeler
+```
+
+
+The next step is to get the model uids to be trained by extracting the status and filtering to only models with "added" status. 
+
+```{r, eval=FALSE}
+
+  if (is.null(uids)) {
+    # Get Added only Models
+    uids <- obj$models %>%
+      purrr::map_df(., magrittr::extract, c("uid", "status")) %>%
+      dplyr::filter(status == "added") %>%
+      dplyr::pull(uid)
+  }
+```
+
+
+Next for each model uid the training sample is generated. To clarify this training samples has yet to be split into specific train and validation partitions. The code below illustrates the data is filtered based on sample indices.  
+
+```{r, eval=FALSE}
+
+
+ for (uid in uids) {
+    
+    # Get Training Sample
+    train_data <- obj$pipelines[[obj$models[[uid]]$pipe]]$output
+    
+    # Check for holdout
+    if (!is.null(obj$samples$test_holdout_prct)) {
+      train_data <- train_data %>%
+        dplyr::mutate(rn = 1) %>% 
+        dplyr::mutate(rn = row_number(rn)) %>% 
+        dplyr::filter(! rn %in% obj$samples$test_index) %>%
+        dplyr::select(-rn)
+    }
+```
+
+The next step is the train a single model uid with the `train_model` function. The `train_model` has methods for specific modeling backends. 
+
+```{r, eval=FALSE}
+
+obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
+                                 data = train_data,
+                                 measure = obj$measure,
+                                 samples = obj$samples,
+                                 save_submodels = obj$save_submodels,
+                                 execution_strategy = obj$execution_strategy,
+                                 level = obj$conf_levels,
+                                 seed = obj$seed)
+
+
+```
+
+
+
+```{r, eval=FALSE}
+
+```
+
+
+
+```{r, eval=FALSE}
+
+```
 
 
 #### Predictions
