@@ -32,7 +32,7 @@
        dndZone="designer-setting-zone">
     <div *ngIf="unselectedArtifactColumns">
       <div *ngIf="!isEmpty(unselectedArtifactColumns)">
-        <a *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
+        <div *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
              [dndSortable]="artifactColumn"
              class="settings__list-item"
              fxLayout="row"
@@ -50,7 +50,7 @@
                   (click)="addToGroupIfPossible(artifactColumn)">
             <mat-icon fontIcon="icon-plus"></mat-icon>
           </button>
-        </a>
+        </div>
       </div>
       <div *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
            fxLayout="row" fxLayoutAlign="center center">
