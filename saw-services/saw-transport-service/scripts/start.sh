@@ -364,7 +364,7 @@ addJava "-Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-2.7.0"
 # Middle tier specisfic
 # addJava "-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf"
 ##:$(mapr classpath)
-    app_classpath=${app_classpath}:$(mapr classpath)
+    app_classpath=${app_classpath}:$(mapr classpath):$(hadoop classpath):$(hbase classpath)
 for j in `ls /opt/mapr/spark/spark-2.2.1/jars/*.jar`; do
  app_classpath=${app_classpath}:"${j}"
 done

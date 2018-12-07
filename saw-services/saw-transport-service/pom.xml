@@ -34,8 +34,45 @@
         <threeten.extra>1.2</threeten.extra>
         <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
         <rpm.ts.root>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}</rpm.ts.root>
+        <hbase.version>1.1.8-mapr-1710-m7-6.0.1</hbase.version>
     </properties>
     <dependencies>
+      <dependency>
+        <groupId>org.apache.hbase</groupId>
+        <artifactId>hbase-common</artifactId>
+        <version>${hbase.version}</version>
+        <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>netty</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hbase</groupId>
+        <artifactId>hbase-client</artifactId>
+        <version>${hbase.version}</version>
+        <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>netty</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 	<dependency>
 		<groupId>com.synchronoss</groupId>
 		<artifactId>saw-common</artifactId>
@@ -762,6 +799,7 @@
                       <require>mapr-client &gt;= 6.0.1</require>
                       <require>mapr-spark &gt;= 2.2.1</require>
                       <require>mapr-kafka &gt;= 1.0.1</require>
+                      <require>mapr-hbase &gt;= 1.1.8</require>
                       <require>perl &gt;= 5.16.3</require>
                     </requires>
                   </configuration>

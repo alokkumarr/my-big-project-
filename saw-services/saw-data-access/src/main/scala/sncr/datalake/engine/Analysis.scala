@@ -5,7 +5,7 @@ import java.util
 import java.util.UUID
 import java.util.concurrent.{ExecutorService, Executors, Future}
 
-import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.util.Bytes
 import files.HFileOperations
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.DLConfiguration
