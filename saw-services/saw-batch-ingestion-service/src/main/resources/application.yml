@@ -3,20 +3,14 @@ spring:
     name: saw-batch-ingestion-service
   output:
     ansi:
-      enabled: always
-  pf4j:
-    enabled: true 
-    plugins-root: plugins
+      enabled: never
   flyway:
     baseline-on-migrate: true
   datasource:
-    url: jdbc:mariadb://localhost:3306/batch_ingestion
-    username: batch
-    password: batch
+    url: jdbc:mariadb://localhost:3306/sip_batch_ingestion
+    username: root
+    password: root
     driver-class-name: org.mariadb.jdbc.Driver
-    dbcp2:
-      test-while-idle: true
-      validation-query: SELECT 1
   jpa:
     show-sql: true
     hibernate:
@@ -24,10 +18,11 @@ spring:
     properties:
       hibernate:
         format_sql : true
+    open-in-view: false
   
 logging:
   level:
-    com.synchronoss.saw: TRACE
+    com.synchronoss.saw: INFO
     org.springframework: INFO
     org.hibernate.type : INFO
     
@@ -49,10 +44,14 @@ application:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
-    
 sip:
   service:
     index: 0    
-    
+bis:
+  transfer-batch-size: 10
+  partial-file-timeDifference: 1000
+  default-data-drop-location: /Users/spau0004/Desktop/workbench
+  scheduler-url: http://localhost:9601/scheduler/bisscheduler
+     
 
     
