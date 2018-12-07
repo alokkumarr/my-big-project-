@@ -14,7 +14,7 @@ context("regressor unit tests")
 # Basic Tests -------------------------------------------------------------
 
 
-# # Create Spark Connection
+# Create Spark Connection
 sc <- spark_connect(master = "local")
 
 # Copy data to spark
