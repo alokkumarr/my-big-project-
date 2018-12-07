@@ -2,7 +2,9 @@
 title: "a2modeler Developer Guide"
 author: "Haarstick"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{a2modeler User Guide}
   %\VignetteEngine{knitr::rmarkdown}
@@ -30,8 +32,8 @@ library(purrr)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
-library(a2modeler)
-#devtools::load_all("~/software_projects/sip/a2modeler")
+#library(a2modeler)
+devtools::load_all("~/software_projects/sip/a2modeler")
 
 ```
 
@@ -64,10 +66,14 @@ This guide assumes a working knowledge of R, the tidyverse and sparklyr R packag
 This guide also assumes knowledge of how a2modeler is applied. Check out the User-Guide Vignette for details on how a2modeler is used. 
 
 
+The a2modeler package functionality relies on several derived classes using R's [R S3 Object System ](http://adv-r.had.co.nz/S3.html). In the following sections each of the important classes are discussed. The most important class is the modeler class and it's inherited sub-classes. These classes are the main object created in a a2modeler work flow.  
+
+
 ## Requirements
 
 * __R__: version >= 3.5
 * __Spark__: version >= 2.3.0
+
 
 
 ## Workflow
@@ -108,15 +114,106 @@ r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
 
 ```
 
+In the following sections each step is discussed in depth
+
+### Modeler Constructor
+
+The a2modeler workflow starts with a use-case specific function with creates a modeler class object (discussed below). Each of use-case constructor function creates a seperate child class object that inherits from the parent modeler class. The actual `modeler` constructor is only used internally by the use case specific constructors. The use of class inheritence allows for general code to be shared across sub-classes but specific constraints, parameters, and methods to be implemented for each use case. 
+
+
+#### Modeler Class
+
+The main class in the a2modeler package is the modeler class. Modeler class objects provide the framework for developing models by storing information on the input dataset, target variable, sampling strategy, measurement, data transformation and models. The class enforces standards and some limits on the model development but creates consistency and allows for a consistent high level API for users (see User Guide). 
+
+The modeler object is model algorithm and package agnostic but requires that the proper hooks are in place to produce the right outputs. In practice that means while the modeler backend is modular, only the Spark-ML^[Spark-ML [via](https://spark.apache.org/mllib/)] backend is implemented for all but the forecaster child class which uses the forecast R package^[forecast R package [via](http://pkg.robjhyndman.com/forecast/)] 
 
 
 
+#### Modeler Inputs
 
-## Classes
+In addition to the required inputs of the dataframe, target and index variables if required, the following inputs can be provided for meta-data purposes:
 
-The a2modeler package functionality relies on several derived classes using R's [R S3 Object System ](http://adv-r.had.co.nz/S3.html). In the following sections each of the important classes are discussed. The most important class is the modeler class and it's inherited sub-classes. These classes are the main object created in a a2modeler work flow.  
+* __name__: optional name for use case. Used in reporting and deployment pathing 
+* __uid__: optional input for unique identifier
+* __version__: optional input for use case version. Used in report and pathing
+* __desc__: optional input for use case description
+* __scientist__: optional input for data science developer
+* __execution_strategy__: input for parallel backend execution. Default is sequential. Leverages the future^[future R package [via](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)] for parallel execution. 
+* __refit__: Logical option to refit model to entire training dataset sample and validation fitting. If grid parameters supplied, the best param set determined by validation sample performance will be used. Default is TRUE.
+* __save_submodels__: logical flag to save sub model fits. Default is TRUE. 
+* __dir__: optional directory path for saving reports, data, and models
+* __seed__: seed number for random computations. Seed should be set to ensure repeatability of results.
 
-#### Samples
+
+#### Regresser
+
+In the following chunk the `regresser` constructor function can be see creating a modeler object internally with the `modeler` constructor, adding a default RMSE measure, and updated the class with the `structure` function. Note - `regressor` currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. The spark constraint is true for `classifier`, `multi-classifier`, and `segmenter` as well. Also note that a check is made to ensure that there isn't an existing 'index' column name. The data sampling partitioning functionality use the variable 'index' to create a row index and filter.
+
+
+```{r}
+# regressor constructor
+regressor
+```
+
+#### Classifier
+
+Next is the `classifier` constructor. The function is very similiar to the `regressor` except now there are checks for a binary distribution of the target variable and AUC default measure.
+
+
+```{r}
+# Classifier Constructor
+classifier
+```
+
+
+#### Multiclasifier
+
+The `multiclassifier` constructor function is very similar to the `classifier` function. Now the checks are for a target variable with more than 2 unique values, and a F1 default measure. 
+
+
+```{r}
+# Multiclassifier Constructor
+multiclassifier
+```
+
+
+#### Segmenter
+
+The `segmenter` function differs slightly in that there is no target variable (set as NULL) and with a Silhouette default measure.
+
+```{r}
+# Segmenter Constructor
+segmenter
+```
+
+
+#### Forecaster
+
+As can be seen below the `forecaster` constructor is the most different from the others. `Forecaster` is R data.frame based, and requries an explict index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting. 
+
+```{r}
+# Forecaster Constructor
+forecaster
+```
+
+
+### Add Samples
+
+The `add_*_samples` functions add samples to the modeler object and have class specific methods. The `add_default_samples` modeler class method shown below does the following:
+
+* creates a sample object with the data stored on the modeler object
+* adds the sample object to the sample slot 
+* returns updated modeler object
+
+```{r}
+# Add Default Sample to modeler object
+add_default_samples.modeler
+```
+
+The other `add_*_samples` modeler methods behave similarily. The numeric methods is where the sampling logic is located. 
+
+
+#### Samples Class
 
 The samples class supports the creation of data samples for the purpose of model fitting and validating. There are several different types of sampling strategies - see the User-Guide for more details. For each of the a2modeler sampling strategies, a samples object is created with the `samples` constructor function with the following attributes:
 
@@ -174,7 +271,25 @@ The samples class has a few methods to extract specific attributes of a sample o
 * __get_indicies__: returns a list with an element for each train and validation indicies pairs
 
 
-#### Measures
+### Set Measures
+
+The next step in the a2modeler workflow is to set the measure used to measure model performance on validation samples. The `set_measure` function does the following
+
+* asserts proper classes
+* asserts measure is appropriate for use-case by checking measure properties
+* adds measure to modeler object
+* returns updated modeler object
+ 
+```{r}
+
+# Set Measure
+set_measure
+```
+
+As seen in the use case constructors, a default measure is set for each. 
+
+
+#### Measure Class
 
 The measure class stores information on model measurement metrics. The a2modeler measure class was designed after similar named class in [mlr R package](https://github.com/mlr-org/mlr/blob/master/R/Measure.R). The measure class constructor stores the following attributes:
 
@@ -221,11 +336,40 @@ rmse.tbl_spark
 There are only minor measure methods such as `print`, `set_measure`, and `get_measure`
 
 
-#### Pipelines
+
+### Add Model
+
+The `add_model` function creates a model object, and appends meta-data to the modeler object. It does not execute and model or pipeline code. As seen below the function does the following: 
+
+* asserts the method provided is one supported
+* creates default pipeline if not provided
+* adds the model pipeline to the modeler object pipeline list 
+* creates new model object with 'added' status add adds to modeler object
+
+
+```{r}
+
+# Add Model Function
+add_model
+```
+
+
+```{r, echo=FALSE}
+
+# Supported Model Methods
+model_methods %>% 
+  select(-class) %>% 
+  knitr::kable(caption = "a2modeler Supported Model Methods")
+```
+
+
+
+#### Pipeline Class
 
 The pipeline class encapsulates data transformation logic to support repeatable feature generation in a2model developement. The pipeline object stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once.
 
 The pipeline class is created with the pipeline constructor
+
 
 ```{r}
 
@@ -235,6 +379,7 @@ p <- pipeline()
 str(p)
 
 ```
+
 
 The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets. 
 
@@ -249,139 +394,8 @@ One or more pipelines can be created and stored in a modeler object. They are st
 * __clean__: removes stored output from pipeline
 
 
-#### Modeler
 
-The main class in the a2modeler package is the modeler class. Modeler class objects provide the framework for developing models by storing information on the input dataset, target variable, sampling strategy, measurement, data transformation and models. The class enforces standards and some limits on the model development but creates consistency and allows for a consistent high level API for users (see User Guide). 
-
-The modeler object is model algothrim and package agnostic but requires that proper hooks are in place to produce the right outputs. In practice that means while the modeler backend is modular, only the Spark-ML^[Spark-ML [via](https://spark.apache.org/mllib/)] backend is implemented for all but the forecaster child class which uses the forecast R package^[forecast R package [via](http://pkg.robjhyndman.com/forecast/)] 
-
-Each of the use cases listed in the overview section have a child class that inherits from the parent modeler class. This allows for general code to be shared across sub-classes but specific constraints, parameters, and methods to be implemented for each use case. 
-
-
-##### Modeler Inputs
-
-In addition to the required inputs of the dataframe, target and index variables if required, the following inputs can be provided for meta-data purposes:
-
-* __name__: optional name for use case. Used in reporting and deployment pathing 
-* __uid__: optional input for unique identifier
-* __version__: optional input for use case version. Used in report and pathing
-* __desc__: optional input for use case description
-* __scientist__: optional input for data science developer
-* __execution_strategy__: input for parallel backend execution. Default is sequential. Leverages the future^[future R package [via](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)] for parallel execution. 
-* __refit__: Logical option to refit model to entire training dataset sample and validation fitting. If grid parameters supplied, the best param set determined by validation sample performance will be used. Default is TRUE.
-* __save_submodels__: logical flag to save sub model fits. Default is TRUE. 
-* __dir__: optional directory path for saving reports, data, and models
-* __seed__: seed number for random computations. Seed should be set to ensure repeatability of results.
-
-
-##### Regresser
-
-In the following chunk the `regresser` constructor function can be see creating a modeler object internally with the `modeler` constructor, adding a default RMSE measure, and updated the class with the `structure` function. Note - `regressor` currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. The spark constraint is true for `classifier`, `multi-classifier`, and `segmenter` as well. Also note that a check is made to ensure that there isn't an existing 'index' column name. The data sampling partitioning functionality use the variable 'index' to create a row index and filter.
-
-
-```{r}
-# regressor constructor
-regressor
-```
-
-##### Classifier
-
-Next is the `classifier` constructor. The function is very similiar to the `regressor` except now there are checks for a binary distribution of the target variable and AUC default measure.
-
-
-```{r}
-# Classifier Constructor
-classifier
-```
-
-
-##### Multiclasifier
-
-The `multiclassifier` constructor function is very similar to the `classifier` function. Now the checks are for a target variable with more than 2 unique values, and a F1 default measure. 
-
-
-```{r}
-# Multiclassifier Constructor
-multiclassifier
-```
-
-
-##### Segmenter
-
-The `segmenter` function differs slightly in that there is no target variable (set as NULL) and with a Silhouette default measure.
-
-```{r}
-# Segmenter Constructor
-segmenter
-```
-
-
-##### Forecaster
-
-As can be seen below the `forecaster` constructor is the most different from the others. `Forecaster` is R data.frame based, and requries an explict index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting. 
-
-```{r}
-# Forecaster Constructor
-forecaster
-```
-
-
-##### Index Class
-
-The index class stores information on a sequence so that the sequence can be accurately extended such as the unit, number of periods, start and end values. There is a time_index sub-class for datetime based indices which enables a different extend behavior. 
-
-```{r}
-
-# Create Index Object ex
-i1 <- index(1:10, unit = NULL)
-i1
-
-# Create Date Index
-d1 <- index(today() - days(0:6), unit = "days")
-d1
-```
-
-##### Index Methods
-
-The index class only has one generic function in the a2modeler - `extend`. It is used to extend a an index by some length out. There are methods for numeric, index, and time_index classes. 
-
-```{r}
-
-# Extend index
-extend(i1, 5)
-extend(d1, 5)
-
-```
-
-
-
-
-
-##### Add Model
-
-The `add_model` function creates a model object, and appends meta-data to the modeler object. It does not execute and model or pipeline code. As seen below the function does the following: 
-
-* asserts the method provided is one supported
-* creates default pipeline if not provided
-* adds the model pipeline to the modeler object pipeline list 
-* creates new model object with 'added' status add adds to modeler object
-
-```{r}
-
-# Add Model Function
-add_model
-```
-
-
-```{r, echo=FALSE}
-
-# Supported Model Methods
-model_methods %>% 
-  knitr::kable(caption = "a2modeler Supported Model Methods")
-```
-
-
-##### Model Class
+#### Model Class
 
 The model class is designed to be able to support different model backends. The model object stores information on the model's pipeline (uid only), the target variable, model method, method arguments, parameter map, and some meta data. Model child classes are created to support specific model backend (package) behavior. 
 
@@ -391,7 +405,7 @@ The model class is designed to be able to support different model backends. The 
 model
 ```
 
-The model child class is assigned in the constructor below. A look up to the model_method dataset is made and class extracted and assigned in the `structure` function. 
+The model child class is assigned in the constructor below. A look up to the model_method dataset is made, the class extracted and assigned in the `structure` function. 
 
 ```{r}
 
@@ -401,7 +415,7 @@ new_model
 
 
 
-##### Train Models
+### Train Models
 
 The `train_models` function does most of the heavy lifting in the workflow. The `train_models` function is responsible for:
 
@@ -488,21 +502,217 @@ obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
 ```
 
 
-##### Model Class
+
+#### Train Model
+
+The `train_model` function has class specific methods that correspond to the model backend. The `train_model.spark_model` method for spark_model class (spark-ml) leverages the functionality  provided in spark version 2.3.0.
 
 
+##### Spark Train Model
 
+The following is the spark_model based method. We breakdown each section next
 
-```{r, eval=FALSE}
+```{r}
+
+# train_model.spark_model
+train_model.spark_model
 
 ```
 
 
+In the first part of the method, basic assertions are made about the inputs, a spark connection is extracted from the data input, and the model method is extracted and assigned. 
+
+```{r, eval=FALSE}
+train_model.spark_model <- function(mobj,
+                                    data,
+                                    measure,
+                                    samples,
+                                    save_submodels,
+                                    execution_strategy,
+                                    seed,
+                                    ...) {
+  
+  checkmate::assert_class(data, "tbl_spark")
+  checkmate::assert_class(measure, "measure")
+  checkmate::assert_class(samples, "samples")
+  checkmate::assert_logical(save_submodels)
+  checkmate::assert_choice(execution_strategy,
+                           c("sequential", "transparent", "multisession", "multicore",
+                             "multiprocess", "cluster", "remote"))
+  
+  # Get Spark connection
+  sc <- sparklyr::spark_connection(data)
+  
+  # Set method fun
+  method_fun <- get(mobj$method, asNamespace(mobj$package))
+```
+
+In the next section, a hack is made for using the spark-ml neural net functions. They require a valid layers input that is made seperately from the param_map
 
 ```{r, eval=FALSE}
 
+  # Perceptron Check
+  if(grepl("ml_multilayer_perceptron", mobj$method)) {
+    if(is.null(mobj$method_args$layers)) {
+      stop("method arguments missing layers")
+    } else {
+      layers <- mobj$method_args$layers
+      nfeatures <- sparklyr::sdf_ncol(data) - 1
+      if(layers[1] != nfeatures) {
+        stop(paste("input layer size", layers[1],
+                   "doesn't equal feature size", nfeatures))
+      }
+      if("spark_model_classification" %in% class(mobj) &
+         layers[length(layers)] != 2) {
+        stop(paste("output layer size", layers[length(layers)],
+                   "should be 2 for classifaction models"))
+      }
+    }
+  }
+  
 ```
 
+Next, a simple [validator pipeline](https://spark.rstudio.com/guides/pipelines/) is created which amounts to the model formula. Note - the formula uses all variables in the data provided. Selecting variables to a subset needs to be done in the model pipeline. The model takes what's given to it by the pipeline. 
+
+
+```{r, eval=FALSE}
+# Create validator pipeline
+  val_pipe <- sparklyr::ml_pipeline(sc) %>%
+    sparklyr::ft_r_formula(paste(mobj$target, "~.")) %>%
+    method_fun(uid = mobj$uid, layers = mobj$method_args$layers)
+```
+
+
+In the next step the validator function and arguments are configured. The options are holdout or cross validation.
+
+
+```{r, eval=FALSE} 
+  # Set Validator
+  if (samples$validation_method == "cross_validation") {
+    validator_fun <- get("ml_cross_validator", asNamespace("sparklyr"))
+    validator_args <- list(num_folds = samples$validation_args$folds)
+  } else{
+    validator_fun <- get("ml_train_validation_split", asNamespace("sparklyr"))
+    if (samples$validation_method == "holdout") {
+      validator_args <- list(train_ratio = samples$validation_args$split)
+    } else {
+      validator_args <- list(train_ratio = 0.99)
+    }
+  }
+  
+```
+
+Next the [evaluator](https://spark.apache.org/docs/1.6.1/api/java/org/apache/spark/ml/evaluation/RegressionEvaluator.html) is set by extracting the measurement method from the measure object. The method arguments are extracted from the param_map and formatted for the validator input. Then the parallel options are set based on the modeler execution strategy
+
+
+```{r, eval=FALSE}
+
+  # Set Evaluator
+  measure_fun <- match.fun(measure$method)
+  evaluator <- measure_fun(sc)
+  
+  
+  # Set param_map
+  if (length(mobj$param_map) == 0) {
+    method_args <- formals(method_fun)
+    param_map <- method_args[setdiff(names(method_args),  c("x", "formula", "layers"))][1]
+  } else{
+    param_map <- mobj$param_map
+  }
+  param_map <- list(param_map)
+  names(param_map) <- mobj$uid
+  
+  
+  # Set parallelism
+  if (execution_strategy == "sequential") {
+    cores = 1L
+  } else {
+    cores = future::availableCores() %>%
+      as.integer()
+  }
+  
+```
+
+Next the validator args are consolidated and passed to the validator function
+
+```{r, eval=FALSE}
+
+  # Set Validator args
+  validator_args <- c(
+    validator_args,
+    list(
+      x = data,
+      estimator = val_pipe,
+      estimator_param_maps = param_map,
+      evaluator = evaluator,
+      collect_sub_models = save_submodels,
+      parallelism = cores,
+      uid = "validator",
+      seed = seed
+    )
+  )
+  
+  
+  # Execute Validator
+  validator <- do.call(validator_fun, validator_args)
+```
+
+Lastly the key objects are extracted from the validator and stored in the modeler object including the validation measurement. The best model is saved at the fit slot where the submodels are stored in a nested list within the model object at the sub_models slot
+
+```{r, eval=FALSE}
+
+  # Extract Objects
+  n_sub_models <- length(validator$param_map$estimatorParamMaps)
+  sub_model_uids <- purrr::map_chr(1:n_sub_models, ~ sparklyr::random_string("submodel"))
+  if (save_submodels) {
+    sub_models <- sparklyr::ml_sub_models(validator)
+    if (samples$validation_method == "cross_validation") {
+      sub_models <- purrr::transpose(sub_models)
+    }
+    names(sub_models) <- sub_model_uids
+    mobj$sub_models <- sub_models
+  }
+  
+  mobj$performance <- sparklyr::ml_validation_metrics(validator) %>%
+    tibble::as.tibble() %>%
+    dplyr::mutate(rn = 1:n()) %>% 
+    tidyr::nest(!!names(.)[-c(1, length(names(.)))], .key = "param_grid") %>% 
+    dplyr::rename(!!measure$method := !!names(.)[1]) %>% 
+    dplyr::mutate(submodel_uid = sub_model_uids, sample = "validation") %>%
+    dplyr::select(submodel_uid, sample, !!measure$method,  param_grid)
+  mobj$fit <- validator$best_model
+  
+  mobj
+```
 
 #### Predictions
 
+
+
+
+##### Index Class
+
+The index class stores information on a sequence so that the sequence can be accurately extended such as the unit, number of periods, start and end values. There is a time_index sub-class for datetime based indices which enables a different extend behavior. 
+
+```{r}
+
+# Create Index Object ex
+i1 <- index(1:10, unit = NULL)
+i1
+
+# Create Date Index
+d1 <- index(today() - days(0:6), unit = "days")
+d1
+```
+
+##### Index Methods
+
+The index class only has one generic function in the a2modeler - `extend`. It is used to extend a an index by some length out. There are methods for numeric, index, and time_index classes. 
+
+```{r}
+
+# Extend index
+extend(i1, 5)
+extend(d1, 5)
+
+```
