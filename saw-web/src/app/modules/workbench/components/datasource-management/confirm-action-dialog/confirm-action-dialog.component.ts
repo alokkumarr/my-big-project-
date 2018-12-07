@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export interface DialogData {
   typeTitle: string;
   typeName: string;
+  routesNr?: number;
 }
 @Component({
   selector: 'confirm-action-dialog',
