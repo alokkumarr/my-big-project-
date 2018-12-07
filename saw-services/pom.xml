@@ -172,6 +172,7 @@
 	</pluginRepositories>
 	<modules>
 		<module>saw-common</module>
+        <module>sip-query-dsl</module>
 		<module>saw-analysis-service</module>
 		<module>saw-metadata-service</module>
 		<module>saw-data-access</module>
