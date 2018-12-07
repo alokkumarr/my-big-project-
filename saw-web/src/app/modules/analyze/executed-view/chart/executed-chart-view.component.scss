@@ -11,6 +11,7 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
   font-weight: normal;
   font-size: $header-font-size;
+  margin-left: 16%;
 }
 
 .analysis-header {
@@ -37,8 +38,8 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   color: $primary-blue-b2;
 }
 
-.mat-icon.icon-export.report-grid-export {
+.icon-export.report-grid-export {
   font-size: 17px;
-  margin-top: 8px;
+  margin-top: 9px;
   margin-left: 10px;
 }

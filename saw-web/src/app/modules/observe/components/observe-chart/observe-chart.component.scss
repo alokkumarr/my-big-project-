@@ -33,6 +33,7 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
   font-weight: normal;
   font-size: $header-font-size;
+  margin-left: 16%;
 }
 
 .analysis-header {
@@ -46,7 +47,7 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
 }
 
 .flex-icon-container {
-  width: 20%
+  width: 34%
 }
 
 .toggle-icons {
