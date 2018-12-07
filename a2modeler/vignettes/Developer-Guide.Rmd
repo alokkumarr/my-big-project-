@@ -75,6 +75,48 @@ This guide also assumes knowledge of how a2modeler is applied. Check out the Use
 * __Spark__: version >= 2.3.0
 
 
+## Workflow
+
+A key deisgn principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below:
+
+![a2modeler Workflow](figures/a2modeler-workflow.jpg)
+
+Below is an example of simple but standard a2modeler regression workflow
+
+```{r, eval=FALSE}
+
+
+# # Create Spark Connection
+sc <- spark_connect(master = "local")
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+
+# Create Spark datasets 
+df1 <- iris %>%
+  sample_frac(size = .5) %>%
+  copy_to(sc, ., name = "df1", overwrite = TRUE)
+
+# Simple A2 Regressor Workflow
+r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
+  set_measure(measure = RMSE) %>% 
+  add_holdout_samples(splits = c(.5, .5)) %>%
+  add_model(pipe = test_pipe,
+            method = "ml_linear_regression",
+            uid = "lm") %>%
+  add_model(pipe = test_pipe,
+            method = "ml_decision_tree_regressor",
+            uid = "tree") %>%
+  train_models() %>%
+  set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+
+```
+
+
+
+
+
 ## Classes
 
 The a2modeler package functionality relies on several derived classes using R's [R S3 Object System ](http://adv-r.had.co.nz/S3.html). In the following sections each of the important classes are discussed. The most important class is the modeler class and it's inherited sub-classes. These classes are the main object created in a a2modeler work flow.  
@@ -317,47 +359,54 @@ extend(d1, 5)
 ```
 
 
-##### Workflow
 
-
-Below is a simple but standard a2modeler workflow. The constructor is followed by setting the measure (which as we've seen is set by default), the sampling, model training, and model selection.
-
-```{r, eval=FALSE}
-
-
-# # Create Spark Connection
-sc <- spark_connect(master = "local")
-
-# Copy data to spark
-df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
-
-
-# Create Spark datasets 
-df1 <- iris %>%
-  sample_frac(size = .5) %>%
-  copy_to(sc, ., name = "df1", overwrite = TRUE)
-
-# Simple A2 Regressor Workflow
-r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
-  add_holdout_samples(splits = c(.5, .5)) %>%
-  add_model(pipe = test_pipe,
-            method = "ml_linear_regression",
-            uid = "lm") %>%
-  add_model(pipe = test_pipe,
-            method = "ml_decision_tree_regressor",
-            uid = "tree") %>%
-  train_models() %>%
-  set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
-
-```
 
 
 ##### Add Model
 
+The `add_model` function creates a model object, and appends meta-data to the modeler object. It does not execute and model or pipeline code. As seen below the function does the following: 
+
+* asserts the method provided is one supported
+* creates default pipeline if not provided
+* adds the model pipeline to the modeler object pipeline list 
+* creates new model object with 'added' status add adds to modeler object
+
+```{r}
+
+# Add Model Function
+add_model
+```
+
+
+```{r, echo=FALSE}
+
+# Supported Model Methods
+model_methods %>% 
+  knitr::kable(caption = "a2modeler Supported Model Methods")
+```
+
+
+##### Model Class
+
+The model class is designed to be able to support different model backends. The model object stores information on the model's pipeline (uid only), the target variable, model method, method arguments, parameter map, and some meta data. Model child classes are created to support specific model backend (package) behavior. 
+
+```{r}
+
+# Model Helpler
+model
+```
+
+The model child class is assigned in the constructor below. A look up to the model_method dataset is made and class extracted and assigned in the `structure` function. 
+
+```{r}
+
+# Model Constructor
+new_model
+```
 
 
 
-##### Modeler - Train Models
+##### Train Models
 
 The `train_models` function does most of the heavy lifting in the workflow. The `train_models` function is responsible for:
 
@@ -442,6 +491,10 @@ obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
 
 
 ```
+
+
+##### Model Class
+
 
 
 
