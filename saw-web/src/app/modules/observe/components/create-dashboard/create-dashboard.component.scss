@@ -66,11 +66,13 @@
   }
 }
 
+$add-analysis-button-bottom: 48%;
+
 .add-button-help {
   position: absolute;
   font-size: 1.5em;
   opacity: 1;
-  bottom: 54%;
+  bottom: calc(#{$add-analysis-button-bottom} + 46px);
   right: 50%;
   transform: translateX(50%);
   z-index: 9999;
@@ -85,14 +87,14 @@
   height: 90px;
   z-index: 4;
   position: absolute;
-  bottom: 58%;
+  bottom: calc(#{$add-analysis-button-bottom} + 80px);
   right: 50%;
   transform: translateX(50%);
 }
 
 .add-analysis {
   position: absolute;
-  bottom: 48%;
+  bottom: $add-analysis-button-bottom;
   right: 50%;
   transform: translateX(50%);
   z-index: 9999;
