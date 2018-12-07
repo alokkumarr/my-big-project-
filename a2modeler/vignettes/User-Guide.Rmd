@@ -1,0 +1,688 @@
+---
+title: "a2modeler User Guide"
+author: "Haarstick"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{a2munge User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+
+```{r packages, echo=FALSE}
+
+# R Packages
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(purrr)
+library(lubridate)
+library(sparklyr)
+library(a2munge)
+library(a2modeler)
+#devtools::load_all("~/software_projects/sip/a2modeler")l
+
+
+# Sim Data
+sim_df_ts <- tibble(date = today() - days(1:100),
+                    y = arima.sim(n = 100, list(order = c(1,0,0), ar = 0.7)),
+                    index = 1:100)
+```
+
+
+## Overview
+
+a2modeler is an R package that provides a framework for efficiently and reliably building statistical models. a2modeler currently supports the following use cases:
+
+* __Forecasting__: Statistical models to make forward looking predicts of sequential or time series data
+* __Segmentation__: Statistical models to derive sub-groups withing a dataset based on measurable patterns
+* __Regression__: Statistical models to fit and make prediction for continuous numerical targets
+* __Classification__: Statistical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog
+* __Multi-Classification__: Statistical models to fit and make prediction for discrete targets with more than two unique values
+
+
+## Features
+
+* Provides a consistent set of functions and APIs for common model development and application steps for multiple use cases
+    + adding a model to an a2modeler object uses the same function for Regression as Classification (see workflow section for more details)
+* Modular model package and algorithm backend 
+    + allows for different packages and algorithms to be implemented on same model object
+    + Spark-ML^[Spark-ML [via](https://spark.apache.org/mllib/)] currently implemented for Regression, Classification, Multi-Classification, and Segmentation
+* Feature engineering pipeline including in the model object
+    + Feature engineering is included in model testing framework
+    + Feature generation pipeline is shipped with final model object for efficient application
+* Model deployment functionality
+    + Model binary object saved and stored to file for re-usability
+* Rmarkdown^[R Markdown [via](https://rmarkdown.rstudio.com/)] development templates
+    + Re-usable templates provided with model reporting and visuals
+    + Regression and Classification templates currently completed
+    
+
+
+## Workflow
+
+A key design principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below. In this section each of the distinct workflow steps represented as a high level a2modeler function is reviewed and gone into detail.
+
+![a2modeler Workflow](figures/a2modeler-workflow.jpg)
+
+#### Setup
+
+The first step of building an a2modeler model is to set up and define the meta data parameters. It is in this step where the use case is defined through a specific a2modeler function, the model data set is defined, target variable if applicable and various other inputs.
+
+```{r echo=FALSE}
+
+tibble(`Use Case` ="Regression",
+       Description = "Statistical models to fit and make prediction for continuous numerical targets",
+       `Back End` = "Spark-ML") %>% 
+  add_row(
+    `Use Case` = "Forecasting", 
+    Description = "Statistical models to make forward looking predicts of sequential or time series data",
+    `Back End` = "R forecast package") %>% 
+  add_row(`Use Case` ="Segmentation",
+          Description ="Statistical models to derive sub-groups withing a dataset based on measurable patterns",
+          `Back End` = "Spark-ML") %>% 
+  add_row(`Use Case` ="Classification",
+          Description ="Statistical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog",
+          `Back End` = "Spark-ML") %>% 
+  add_row(`Use Case` = "Multi-Classification",
+          Description ="Statistical models to fit and make prediction for discrete targets with more than two unique values",
+          `Back End` = "Spark-ML") %>% 
+  knitr::kable(.,
+               caption = "a2modeler Use Cases")
+
+```
+
+
+##### Regressor
+
+The a2modeler regressor is used to create a regression object. Regression is a supervised learning approach where the target variable is numeric and typically continuous. 
+
+The key inputs are the dataframe to be used to develop the model and the target variable. Note: all other non-target variables in the dataframe are available for feature engineering. The latter is true for all a2modeler objects. 
+
+Currently only the spark-ml backend via sparklyr^[sparklyr R package [via](https://spark.rstudio.com/mlib/)] is supported for the regressor. That means the dataframe provided should be a spark object. a2modeler requires spark 2.3.0 version or higher. 
+
+```{r regressor, eval=FALSE}
+
+### Regressor Example:
+
+# Create Spark Connection
+sc <- spark_connect(master = "local", version = "2.3.0")
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+# Regressor
+r1 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example")
+
+```
+
+
+##### Forecaster
+
+The forecaster function is used to create a forecasting object. Forecasting is a form or regression applied on sequential, or time indexed datasets. Typically lagged or historical values of a target variable are used as predictors. The predictions from forecaster are strictly forward looking. As such, features used in forecaster need special care so that predictions are made ex ante requiring all features are known at time of prediction. 
+
+Currently forecaster only supports the great forecast^[forecast R package [via](http://pkg.robjhyndman.com/forecast/)] R package. Forecaster does support auto-forecasting R and spark based approaches. More on this in later section.
+
+An additional input for the index variable is required. The index variable is used internally to arrange the datasets and indexed predictions. The index variable (along with the target) is removed from the potential predictor variables. 
+
+```{r forecaster, eval=FALSE}
+
+### Forecaster Example
+
+# Simulated Time Series Data
+select(sim_df_ts, index, y)
+
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example")
+
+```
+
+
+##### Segmenter
+
+Segmenter is an a2modeler function to create a segmentation or clustering model. Cluster modeling is a form of unsupervised learning that looks for patterns to define sub-groups of records in a dataset. The segmenter does not take a target or index variable input. 
+
+The segmenter is supported with the Spark-ML backend.
+
+
+```{r segmenter, eval=FALSE}
+
+### Segmenter Example:
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+# Segmenter
+s1 <- segmenter(df     = df,
+                name   = "example")
+
+```
+
+
+
+##### Classifier
+
+Classifier is an a2modeler function to create a classification model. Classification is a special case of supervised learning where the target variable is binary. Classification models are often used to create both binary predictions and class probabilities predictions. The latter is sometimes referred to as propensity modeling. 
+
+The classifier is supported with the Spark-ML backend.
+
+
+```{r classifier, eval=FALSE}
+
+### Classifier Example:
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+# Classifier
+c1 <- classifier(df    = df,
+                 target = "am",
+                 name   = "example")
+
+```
+
+
+
+##### Multi-Classifier
+
+Multiclassifier is a similar function to the classifier. The multiclassifier is appropriate for target variables with more than 2 discrete values. 
+
+The multiclassifier is supported with the Spark-ML backend.
+
+
+```{r multi-classifier, eval=FALSE}
+
+### Multi- Classifier Example:
+
+# Copy data to spark
+df <- copy_to(sc, iris, name = "iris", overwrite = TRUE)
+
+# Classifier
+c1 <- multiclassifier(df     = df,
+                      target = "Species",
+                      name   = "example")
+
+```
+
+
+##### Common Inputs
+
+In addition to the required inputs of the dataframe, target and index variables if required, the following inputs can be provided for meta-data purposes:
+
+* __name__: optional name for use case. Used in reporting and deployment pathing 
+* __uid__: optional input for unique identifier
+* __version__: optional input for use case version. Used in report and pathing
+* __desc__: optional input for use case description
+* __scientist__: optional input for data science developer
+* __execution_strategy__: input for parallel backend execution. Default is sequential. Leverages the future^[future R package [via](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)] for parallel execution. 
+* __refit__: Logical option to refit model to entire training dataset sample and validation fitting. If grid parameters supplied, the best param set determined by validation sample performance will be used. Default is TRUE.
+* __save_submodels__: logical flag to save sub model fits. Default is TRUE. 
+* __dir__: optional directory path for saving reports, data, and models
+* __seed__: seed number for random computations. Seed should be set to ensure repeatability of results.
+
+
+#### Sampling
+
+Now that the use case is defined and data inputs provided, the sampling criteria used in the model training/validation/testing should be defined. In a typical modeling workflow, the initial data provided is split into multiple chunks where one data sample is used to fit the model (training dataset) and a different sample is used to evaluate the model (validation dataset). The key concept is that the model predictions are evaluated on a dataset not used to fit the model. Some algorithms have the power to fit a provided dataset quite precisely, too precisely in fact, if the predictions results are not generalizable to new data samples. This is known as overfitting. A third sample is often used as a test sample once the final model is selected among many based on validation sample results as a final measure of predictive performance. 
+
+The a2modeler package currently supports the following sampling techniques:
+
+* __default__: single training sample only. Not recommend for more than simple exploratory examples
+* __holdout__: creates two or three data samples. Controlled by split parameter. Sum of split parameter should equal 1. Each value represents the amount of data partitioned to each split. The order of the values matters - the splits correspond to train/validation/test samples. Test value optional. 
+    + ex - splits = c(.60, .20, .20): creates three samples. The training sample is 60 percent of the data, the validation sample is 20 percent and the test sample is the last 20 percent.
+* __random__: creates one or more random samples. The sample percentage of the total data is controlled through the amount parameter. There is an additional option for adding a test holdout sample.
+* __time slices__: creates one or more time slice samples which align the training sample with the validation sample by the index variable. Time slices are appropriate for forecasting use cases where the order of the data matters. The samples can be modified by width, horizon of predictions, and by sequence. There is an additional option for adding a test holdout sample.
+* __cross validation__: cross validation samples^[cross validation [via](https://en.wikipedia.org/wiki/Cross-validation_(statistics))] are widely used in machine learning model building workflows. Cross validation samples splits the data into multiple samples but ensures that each sample is used in one validation sample. The number of folds controls how many sampling pairs there are along with the amount of data in each. There is an additional option for adding a test holdout sample.
+
+
+Sampling is typically the second step in the workflow. Each of the sampling methods above can be "added" to the modeler object with the function convention of `add_*_samples()` where the sampling method is substituted for *. Examples below.
+
+```{r sampling, eval=FALSE}
+
+# Regressor with Training/Validation/Test Holdout Samples:
+r1 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2))
+
+
+# Regressor with 5-fold Cross-Validation and Test Holdout Samples
+r2 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example") %>% 
+  add_cross_validation_samples(folds = 5, test_holdout_prct = 0.2, seed = 319)
+```
+
+
+```{r sampling2, eval=TRUE}
+
+
+# Forecaster with holdout samples
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2))
+
+# Forecaster with time-slices
+f2 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_time_slice_samples(width = 50, horizon = 5, skip = 0)
+```
+
+The sample step creates a samples object and saves to the modeler object.  The samples object contains row indices for each sample. The indices are used internally by the a2modeler functionality to partition the data into the correct samples.
+
+```{r}
+
+# Stored samples object
+f1$samples
+```
+
+
+#### Measurement
+
+The next step is to define the criteria and metric for model measurement. The a2modeler package comes with several measures, however, measures are generally appropriate only for a specific use case. In the measure print outs below, the measure properties lists which use cases are appropriate. 
+
+```{r measures}
+
+# RMSE
+RMSE
+
+# MAPE
+MAPE
+
+# AUC
+AUC
+
+# F1
+F1
+
+# Silhouette
+Silhouette
+```
+
+
+Each use case has a default measure, however, the measure can be explicitly added to a modeler object with the `set_meaure` function. The measure is stored in the modeler object and is used when model performance is measured.
+
+```{r}
+
+# Forecaster with RMSE Measure
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE)
+
+# Forecaster measure
+f1$measure
+
+```
+
+
+#### Models
+
+One or more models can be added to a modeler object. Each model added will be trained, validated and given opportunity for final selection on the same set of samples. In the a2modeler package a model is uniquely defined by three components:
+
+* __Method__: the model algorithm to use. See following section for available methods
+* __Features__: the feature engineering pipeline used to capture any transformations made on the input dataset
+* __Parameters__: the configuration of the model algorithm meta-parameters
+
+
+Adding a new model to a model is done by calling the `add_model` function shown below. Note the named method is the only required input. The default pipeline is NULL which produces the identity transformation. The default param_map (input for the parameters) is an empty list. 
+
+```{r}
+
+# Forecaster with auto.arima function
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL, 
+            method = "auto.arima",
+            param_map = list())
+```
+
+
+##### Method
+
+The following model methods by use case type are supported
+
+```{r}
+
+# Model Methods
+model_methods %>% 
+  select( -class) %>% 
+  knitr::kable(.,
+               caption = "Model Methods")
+```
+
+
+Methods are specified with a string input within the `add_model` function.  
+
+##### Features
+
+Feature generation is included in the model definition. This design allows for feature generation changes to be tested in the same manner as model method or parameter changes. Features are encapsulated within a pipeline object. The pipeline object (shown below) stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once
+
+```{r}
+
+# Basic Indentity pipeline
+pipe <- pipeline(expr = identity,
+                 desc = "example")
+pipe
+```
+
+There are a few basic pipeline methods shown below
+
+* __flow__: apply pipeline expression on dataset. output not saved to pipeline
+* __execute__: apply pipeline expression on dataset. output saved to pipeline
+* __test__: apply pipeline expression on subset of data records
+* __clean__: removes stored output from pipeline
+
+```{r}
+
+# Pipeline example
+new_pipe <- pipeline(
+  expr = function(df) {
+    df %>% 
+      select_if(is.numeric) %>% 
+      mutate_all( funs((. - min(.)) / (max(.) - min(.))))
+  },
+  desc = "normalize numeric variables",
+  uid = "get-normal-pipe"
+)
+new_pipe
+
+
+# Flow example
+mtcars %>% 
+  select(mpg, wt, hp) %>% 
+  flow(pipe = new_pipe)
+
+# Execute example
+updated_pipe <- mtcars %>% 
+  select(mpg, wt, hp) %>% 
+  execute(pipe = new_pipe)
+
+# Pipe output
+updated_pipe
+
+```
+
+Pipelines can be created externally to a modeler object and passed in as an argument to one or more models
+
+
+
+##### Parameters
+
+Many model methods have configurable parameters that should be specified. Parameter settings can impact a models performance greatly and it is good practice to test several values for important parameters. Testing of parameter values is sometimes referred to as model tuning. 
+
+Parameters values are configured for a2model with the param_map argument. The param_map takes a named list with parameter names and unique values to test. Under the hood, the a2modeler object will create a grid of possible parameter value combinations based on the param_map input and create a unique sub-model for each. The best performing sub-model (parameter configuration) will stored at the parent model level. 
+
+```{r, eval = FALSE}
+
+# Regression example with paramater grid
+r1 <- regressor(df     = df,
+                target = "mpg",
+                name   = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL,
+            method = "ml_linear_regression",
+            param_map = list(reg_param = c(0, 0.01),
+                             elastic_net_param = c(0, 0.01)),
+            desc = "linear example with param grid"
+            uid = "linear") 
+
+```
+
+
+```{r echo=FALSE}
+
+expand.grid(reg_param = c(0, 0.01),
+            elastic_net_param = c(0, 0.01)) %>% 
+  knitr::kable(.,
+               caption = "linear model parameter grid")
+
+```
+
+Note, valid named arguments need to be provided. Method arguments can be found by looking at the native R help documentation
+
+```{r, eval=FALSE}
+# Method help
+?ml_linear_regression
+```
+
+
+
+In the following chunk a forecaster is created with multiple models. Individual models are stored as a list in the modeler object. Sub-models are stored as a list within the model.
+
+```{r}
+
+# Roll Pipe
+roll_pipe <- pipeline(
+  expr = function(df) {
+    df %>% 
+      roller(order_vars = "index",
+             measure_vars = "y",
+             width = 5,
+             fun = "mean")
+  },
+  desc = "Create rolling 5-window average of y variable",
+  uid = "roll-pipe"
+)
+
+# Forecaster with multiple models
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL, 
+            method = "auto.arima",
+            param_map = list(),
+            uid = "auto-arima") %>% 
+  add_model(pipe = roll_pipe, 
+            method = "auto.arima",
+            param_map = list(),
+            uid = "auto-arima-lag-pipe") %>% 
+  add_model(pipe = roll_pipe, 
+            method = "ets",
+            param_map = list(model = c("AAA", "ANN", "ZZZ")),
+            uid = "ets-lag")
+```
+
+
+```{r}
+
+# Models by Status
+map_df(f1$models, "status")
+
+
+# Example Model Structure
+str(f1$models$`auto-arima`)
+```
+
+
+
+#### Train
+
+The next step in the model development process is to train the models on the training samples, and  evaluate on the validation samples. This step is handled with the `train_models` a2modeler function. The `train_model` function is governed by each model's status. The `train_model` function skips all previously trained models and will train all models with "added" status unless a specific model uid is provided.
+
+```{r, warning=FALSE}
+
+# Trained Model Example:
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe      = NULL, 
+            method    = "auto.arima",
+            param_map = list(lambda = c(0, .5, 1)),
+            uid = "auto-arima") %>% 
+  add_model(pipe      = roll_pipe, 
+            method    = "auto.arima",
+            param_map = list(),
+            uid = "auto-arima-roll") %>% 
+  add_model(pipe      = NULL, 
+            method    = "ets",
+            param_map = list(),
+            uid = "ets") %>% 
+  train_models()
+
+# Models by Status
+map_df(f1$models, "status")
+
+```
+
+The `train_models` function collects the model measurement on validation samples and stores as a tibble on the performance slot 
+
+```{r}
+
+# Model Performance
+f1$performance %>%  
+  arrange(rmse) %>% 
+  knitr::kable(.,
+               digits = 2,
+               caption = "Model Performance Leaderboard")
+```
+
+
+#### Select Final Model
+
+The selection of the final model among the candidate models is controlled by the `set_final_model` a2modeler function. This function has 2 methods for selection:
+
+1. __manual__: developer can select any of models by providing valid model uid to uid argument
+2. __best__: automatically selects best performing model based on validation measurement
+
+
+There are two more options in the `set_final_model` function to refit and reevaluate. The refit option will refit the final model to the entirety of the input dataset. the reevaluate option requires a test holdout sample and will refit the final model on the entire training and validation sample and measure the model performance on the test holdout set. This final re-evaluation can provide a better measure of future model predictive performance than validation performance alone. The final model was selected on the basis of its validation performance. 
+
+The result of `set_final_model` function will store the selected model as the final_model internally. The final_model is what is used for deployment and prediction.
+
+```{r, warning=FALSE}
+
+# Set Final Model Example:
+f1 <- set_final_model(f1, method = "best", refit = TRUE, reevaluate = FALSE)
+
+# Models by Status
+map_df(f1$models, "status")
+
+# Final Model
+tibble(uid = f1$final_model$uid, status = f1$final_model$status)
+```
+
+
+#### Deploy
+
+a2models can be deploy and stored for prediction on future datasets. The a2modeler package provides a `deploy` function that serializes the modeler object and saves to file path provided. The `deploy` function uses the a2model object name and version in the pathing. For spark based a2models the deploy function removes all spark datasets stored internally including pipeline output. 
+
+Deployed models can be loaded back into memory and applied on new datasets with the `a2_load` function. 
+
+
+```{r, eval=FALSE}
+
+# Deploy Example
+r1 <- regressor(df      = df,
+                target  = "mpg",
+                name    = "example",
+                version = "0.0.1") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe = NULL,
+            method = "ml_linear_regression",
+            param_map = list(reg_param = c(0, 0.01),
+                             elastic_net_param = c(0, 0.01)),
+            desc = "linear example with param grid"
+            uid = "linear") %>% 
+  train_models() %>% 
+  set_final_model(method = "best", refit = TRUE, reevaluate = FALSE)
+
+# Deploy Regressor
+deploy(r1, "~/a2modeler-deploy-example-path")
+
+# Load Regressor back into memory
+r1.1 <- a2_load(path = "~/a2modeler-deploy-example-path/example-0.0.1", sc)
+
+```
+
+
+#### Predict
+
+a2models can make predictions on new datasets with the `predict` a2modeler method. The `predict` function uses the native model package predict methods on the a2model's final model. The a2modeler `predict` function applies a schema check on the new data to ensure its consistent with the data used to train the model. The `predict` function applies the final model's pipeline with the `flow` function to generate any required model features. The forecaster predict method requires an additional periods argument which controls the number of periods forecasted. 
+
+The a2modeler `predict` method creates a prediction class object that stores the prediction, the model used, and meta data on the predictions. The actual predictions are stored in the predictions slot.
+
+```{r, warning=FALSE}
+
+# Prediction Example
+f1 <- forecaster(df        = select(sim_df_ts, index, y),
+                 target    = "y",
+                 index_var = "index",
+                 name      = "example") %>% 
+  add_holdout_samples(splits = c(.6, .2, .2)) %>% 
+  set_measure(RMSE) %>% 
+  add_model(pipe      = NULL, 
+            method    = "auto.arima",
+            param_map = list(lambda = c(0, .5, 1)),
+            uid = "auto-arima") %>% 
+  add_model(pipe      = NULL, 
+            method    = "ets",
+            param_map = list(),
+            uid = "ets") %>% 
+  train_models() %>% 
+  set_final_model(., method = "best", refit = TRUE, reevaluate = FALSE)
+
+# Create Prediction Object  
+p1 <- predict(f1, data = NULL, periods = 7)
+print(p1)
+
+# Actual predictions
+p1$predictions
+
+```
+
+
+
+#### Auto Predictions
+
+The a2modeler package provides an `auto_forecaster` function that wraps an entire forecasting workflow into a single configurable function. This function is most appropriate for certain types of uni-variate forecasting applications where automation is more valued. 
+
+```{r}
+
+# Auto-Forecast Example
+af1 <- auto_forecast(select(sim_df_ts, index, y),
+                     target    = "y",
+                     index_var = "index",
+                     periods   = 10,
+                     unit      = NULL,
+                     models    = list(
+                       list(method = "auto.arima"),
+                       list(method = "ets")),
+                     execution_strategy = "sequential")
+af1
+```
+

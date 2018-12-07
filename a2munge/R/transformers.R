@@ -85,9 +85,9 @@ standardizer.tbl_spark <- function(df,
 #'DataFrame Normalizer Data Transform Function
 #'
 #'Data transformation function to normalize one or more variables. The normalize
-#'function transforms values by subtracting the min and dividing by the max of
-#'all values. The function is applied columnwise only. The function only applies
-#'to numerical data types.
+#'function transforms values by subtracting the min and dividing by the
+#'difference between the max and min of all values. The function is applied
+#'columnwise only. The function only applies to numerical data types.
 #'
 #'The normalize function transforms values to a [0,1] range. The underlying
 #'distribution is perserved.
@@ -122,7 +122,7 @@ normalizer.data.frame <- function(df,
   }
 
   results <- df %>%
-    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.)) / max(.)))
+    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.)) / (max(.) - min(.))))
 
   if (!is.null(group_vars)) {
     results %>% dplyr::ungroup()
@@ -147,7 +147,7 @@ normalizer.tbl_spark <- function(df,
   }
 
   results <- df %>%
-    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.)) / max(.)))
+    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.)) / (max(.) - min(.))))
 
   if (!is.null(group_vars)) {
     results %>% dplyr::ungroup()

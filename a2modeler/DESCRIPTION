@@ -3,7 +3,7 @@ Title: Synchronoss Advanced Analytics Statistical Modeling R Package
 Version: 0.0.0.9000
 Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
 Description: Statistical model building and predicting framework for forecasting, regression, classification and clustering use cases.
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.5.0)
 SystemRequirements: Spark (>= 2.3.0)
 License: file LICENSE
 Encoding: UTF-8
@@ -25,5 +25,9 @@ Imports:
     doFuture,
     future
 Suggests: 
-     testthat
-RoxygenNote: 6.0.1.9000
+     testthat,
+      knitr,
+      rmarkdown
+RoxygenNote: 6.1.1
+VignetteBuilder: knitr
+RoxygenNote: 6.1.1

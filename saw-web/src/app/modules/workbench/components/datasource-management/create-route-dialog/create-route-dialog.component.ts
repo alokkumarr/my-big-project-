@@ -1,8 +1,15 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl
+} from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
+import * as includes from 'lodash/includes';
+import { DatasourceService } from '../../../services/datasource.service';
 
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 
@@ -15,12 +22,13 @@ export class CreateRouteDialogComponent implements OnInit {
   public detailsFormGroup: FormGroup;
   crondetails: any = {};
   opType = 'create';
-  dialogTitle = 'Create Route';
+  channelName = '';
 
   constructor(
     private _formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
     private snackBar: MatSnackBar,
+    private datasourceService: DatasourceService,
     @Inject(MAT_DIALOG_DATA) public routeData: any
   ) {
     this.createForm();
@@ -31,17 +39,17 @@ export class CreateRouteDialogComponent implements OnInit {
       routeName: ['', Validators.required],
       sourceLocation: ['', Validators.required],
       destinationLocation: ['', Validators.required],
-      filePattern: ['', Validators.required],
+      filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: ['']
     });
   }
 
   ngOnInit() {
-    if (isUndefined(this.routeData.length)) {
+    this.channelName = this.routeData.channelName;
+    if (isUndefined(this.routeData.routeMetadata.length)) {
       this.opType = 'update';
-      this.dialogTitle = 'Update Route';
-      this.detailsFormGroup.patchValue(this.routeData);
-      this.crondetails = this.routeData.schedulerExpression;
+      this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
+      this.crondetails = this.routeData.routeMetadata.schedulerExpression;
     }
   }
 
@@ -49,11 +57,33 @@ export class CreateRouteDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  testConnection() {
+  validateFilePattern(
+    control: AbstractControl
+  ): { [key: string]: boolean } | null {
+    if (includes(control.value, '.*') || includes(control.value, ',')) {
+      return { inValidPattern: true };
+    }
+    return null;
+  }
+
+  testRoute(formData) {
+    const routeInfo = {
+      channelType: 'sftp',
+      channelId: this.routeData.channelID,
+      sourceLocation: formData.sourceLocation,
+      destinationLocation: formData.destinationLocation
+    };
+    this.datasourceService.testRouteWithBody(routeInfo).subscribe(data => {
+      this.showConnectivityLog(data);
+    });
+  }
+
+  showConnectivityLog(logData) {
     this.dialogRef.updatePosition({ top: '30px' });
     const snackBarRef = this.snackBar.openFromComponent(
       TestConnectivityComponent,
       {
+        data: logData,
         horizontalPosition: 'center',
         panelClass: ['mat-elevation-z9', 'testConnectivityClass']
       }

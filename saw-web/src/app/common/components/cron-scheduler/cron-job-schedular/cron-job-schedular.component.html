@@ -11,7 +11,7 @@
       <div fxFlex fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
         <span class="mat-h4 text-content">Every</span>
         <mat-form-field appearance="outline" class="form-select">
-          <mat-select placeholder="0" [(ngModel)]="hourly.hours" (selectionChange)="regenerateCron('')">
+          <mat-select placeholder="Hour" [(ngModel)]="hourly.hours" (selectionChange)="regenerateCron('')">
             <mat-option *ngFor="let hour of hours" [value]="hour">
               {{hour}}
             </mat-option>
@@ -19,7 +19,7 @@
         </mat-form-field>
         <span class="mat-h4 text-content">Hour(s) on minute</span>
         <mat-form-field appearance="outline" class="form-select">
-          <mat-select placeholder="00" [(ngModel)]="hourly.minutes" (selectionChange)="regenerateCron('')">
+          <mat-select placeholder="Minute" [(ngModel)]="hourly.minutes" (selectionChange)="regenerateCron('')">
             <mat-option *ngFor="let minute of minutes" [value]="minute">
               {{minute}}
             </mat-option>
@@ -34,21 +34,21 @@
           <mat-radio-button class="everyDay" value="everyDay" (click)="resetData()"> </mat-radio-button>
           <span class="mat-h4 text-content">Every</span>
           <mat-form-field appearance="outline" class="form-select align-select">
-            <mat-select placeholder="Days" [(ngModel)]="daily.days" (selectionChange)="regenerateCron(dailyTypeDay)">
+            <mat-select placeholder="Days" [(ngModel)]="daily.days" (selectionChange)="regenerateCron(dailyTypeDay)" [disabled]="daily.dailyType !== 'everyDay'">
               <mat-option *ngFor="let day of days" [value]="day">
                 {{day}}
               </mat-option>
             </mat-select>
           </mat-form-field>
           <span class="mat-h4 text-content">day(s) at</span>
-          <cron-date-picker [model]="dailyTypeDay" (onDateChange)="onDateChange($event)"></cron-date-picker>
+          <cron-date-picker [model]="dailyTypeDay" (onDateChange)="onDateChange($event)" [class.no-click]="daily.dailyType !== 'everyDay'"></cron-date-picker>
         </div>
 
         <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="10px">
           <mat-radio-button class="everyWeek" value="everyWeek" (click)="resetData()"></mat-radio-button><br />
           <span class="mat-h4 text-content">Every weekday (Monday through
             Friday) at </span>
-          <cron-date-picker [model]="dailyTypeWeek" (onDateChange)="onDateChange($event)"></cron-date-picker>
+          <cron-date-picker [model]="dailyTypeWeek" (onDateChange)="onDateChange($event)" [class.no-click]="daily.dailyType !== 'everyWeek'"></cron-date-picker>
         </div>
       </mat-radio-group>
     </mat-tab>
@@ -94,7 +94,7 @@
             </mat-select>
           </mat-form-field>
           <span class="mat-h4 text-content">month(s) at</span>
-          <cron-date-picker [model]="specificDayMonth" (onDateChange)="onDateChange($event)"></cron-date-picker>
+          <cron-date-picker  [model]="specificDayMonth" (onDateChange)="onDateChange($event)" [class.no-click]="monthly.monthlyType !== 'monthlyDay'"></cron-date-picker>
         </div>
         <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="3px">
           <mat-radio-button class="everyWeek" value="monthlyWeek" (click)="resetData()"></mat-radio-button>
@@ -128,7 +128,7 @@
             </mat-select>
           </mat-form-field>
           <span class="mat-h4 text-content">month(s) at</span>
-          <cron-date-picker [model]="specificWeekDayMonth" (onDateChange)="onDateChange($event)"></cron-date-picker>
+          <cron-date-picker [model]="specificWeekDayMonth" (onDateChange)="onDateChange($event)" [class.no-click]="monthly.monthlyType !== 'monthlyWeek'"></cron-date-picker>
         </div>
       </mat-radio-group>
     </mat-tab>
@@ -156,7 +156,7 @@
             </mat-select>
           </mat-form-field>
           <span class="mat-h4 text-content"> day at</span>
-          <cron-date-picker [model]="specificMonthDayYear" (onDateChange)="onDateChange($event)" [hidden]="yearly.yearlyType !== 'yearlyMonth'"></cron-date-picker>
+          <cron-date-picker [model]="specificMonthDayYear" (onDateChange)="onDateChange($event)" [class.no-click]="yearly.yearlyType !== 'yearlyMonth'"></cron-date-picker>
         </div>
 
         <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="10px">
@@ -188,7 +188,7 @@
             </mat-select>
           </mat-form-field>
           <span class="mat-h4 text-content">at </span>
-          <cron-date-picker [model]="specificMonthWeekYear" (onDateChange)="onDateChange($event)" [hidden]="yearly.yearlyType !== 'yearlyDay'"></cron-date-picker>
+          <cron-date-picker [model]="specificMonthWeekYear" (onDateChange)="onDateChange($event)" [class.no-click]="yearly.yearlyType !== 'yearlyDay'"></cron-date-picker>
         </div>
 
       </mat-radio-group>
