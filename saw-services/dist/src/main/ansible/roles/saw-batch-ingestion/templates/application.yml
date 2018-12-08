@@ -51,6 +51,6 @@ sip:
 
 bis:
   transfer-batch-size: 10
-  partial-file-timeDifference: 1000
+  modified-retries: 3
   default-data-drop-location: "{{ '/dfs/' + sip_var_path + '/workbench'  | default('/dfs/var/sip/workbench') }}"
   scheduler-url: http://localhost:9600/scheduler/bisscheduler
