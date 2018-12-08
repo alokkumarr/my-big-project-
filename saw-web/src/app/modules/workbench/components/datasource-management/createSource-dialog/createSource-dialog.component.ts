@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
 import { DatasourceService } from '../../../services/datasource.service';
+import { isUnique } from '../../../../../common/validators';
 
 import { CHANNEL_TYPES } from '../../../wb-comp-configs';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
@@ -41,7 +42,7 @@ export class CreateSourceDialogComponent implements OnInit {
     });
 
     this.detailsFormGroup = this._formBuilder.group({
-      channelName: ['', Validators.required],
+      channelName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateChannel)],
       hostName: ['', Validators.required],
       portNo: [
         '',

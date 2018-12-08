@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { JwtService } from '../../../common/services';
 import APP_CONFIG from '../../../../../appConfig';
 import { of, Observable } from 'rxjs';
@@ -13,7 +13,9 @@ const userProject = 'workbench';
 })
 export class DatasourceService {
   public api = get(APP_CONFIG, 'api.url');
-  constructor(public http: HttpClient, public jwt: JwtService) {}
+  constructor(public http: HttpClient, public jwt: JwtService) {
+    this.isDuplicateChannel = this.isDuplicateChannel.bind(this);
+  }
 
   /**
    * Get list of all data sources
@@ -56,9 +58,27 @@ export class DatasourceService {
     // Refer to JIRA ID: SIP-4615 if more info needed about this API support.
     return this.http
       .get(
-        `${this.api}/ingestion/batch/channels/logs/${channelID}/${routeID}`
+        `${this.api}/ingestion/batch/logs/${channelID}/${routeID}`
       )
       .pipe(catchError(this.handleError('data', {})));
+  }
+
+  isDuplicateChannel(channelName): Observable<boolean> {
+    const endpoint = `${this.api}/ingestion/batch/channels/duplicate`;
+    // const endpoint = `${this.api}/ingestion/batch/channels/duplicate/${channelName}`;
+
+    // return this.http
+    //   .get(endpoint)
+    //   .pipe(
+    //     map(data => get(data, 'data') as boolean),
+    //     catchError(this.handleError('data', false))
+    //   );
+    return this.http
+      .post(endpoint, JSON.stringify({channelName}))
+      .pipe(
+        map(data => get(data, 'data') as boolean),
+        catchError(this.handleError('data', false))
+      );
   }
 
   /**
