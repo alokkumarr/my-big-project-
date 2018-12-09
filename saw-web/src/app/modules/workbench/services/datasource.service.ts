@@ -15,6 +15,7 @@ export class DatasourceService {
   public api = get(APP_CONFIG, 'api.url');
   constructor(public http: HttpClient, public jwt: JwtService) {
     this.isDuplicateChannel = this.isDuplicateChannel.bind(this);
+    this.isDuplicateRoute = this.isDuplicateRoute.bind(this);
   }
 
   /**
@@ -64,19 +65,23 @@ export class DatasourceService {
   }
 
   isDuplicateChannel(channelName): Observable<boolean> {
-    const endpoint = `${this.api}/ingestion/batch/channels/duplicate`;
-    // const endpoint = `${this.api}/ingestion/batch/channels/duplicate/${channelName}`;
+    const endpoint = `${this.api}/ingestion/batch/channels/duplicate?channelName=${channelName}`;
 
-    // return this.http
-    //   .get(endpoint)
-    //   .pipe(
-    //     map(data => get(data, 'data') as boolean),
-    //     catchError(this.handleError('data', false))
-    //   );
     return this.http
-      .post(endpoint, JSON.stringify({channelName}))
+      .get(endpoint)
       .pipe(
-        map(data => get(data, 'data') as boolean),
+        map(data => data as boolean),
+        catchError(this.handleError('data', false))
+      );
+  }
+
+  isDuplicateRoute({channelId, routeName}): Observable<boolean> {
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?channelId=${channelId}&routeName=${routeName}`;
+
+    return this.http
+      .get(endpoint)
+      .pipe(
+        map(data => data as boolean),
         catchError(this.handleError('data', false))
       );
   }

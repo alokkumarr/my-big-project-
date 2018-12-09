@@ -2,10 +2,10 @@
   <mat-card-header>
     <mat-card-title class="details-title mat-subheading-2">
       <span *ngIf="opType === 'create'">
-        Create route for 
+        Create route for
       </span>
       <span *ngIf="opType === 'update'">
-          Editing route for 
+          Editing route for
         </span>
       <strong>{{channelName}}</strong></mat-card-title>
     <div fxFlex></div>
@@ -32,6 +32,10 @@
               <mat-error *ngIf="detailsFormGroup.controls.routeName.hasError('required')" i18n>
                 Route Name is
                 <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')" i18n>
+                Route Name already
+                <strong>exists</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">

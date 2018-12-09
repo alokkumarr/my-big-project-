@@ -15,9 +15,7 @@ export class LogsDialogComponent implements OnInit {
     private _dialogRef: MatDialogRef<LogsDialogComponent>,
     private _datasourceService: DatasourceService,
     @Inject(MAT_DIALOG_DATA) public routeData: any
-  ) {
-    console.log('routeData', routeData);
-  }
+  ) {}
 
   ngOnInit() {
     const { bisChannelSysId, bisRouteSysId } = this.routeData;

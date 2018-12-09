@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
 import * as includes from 'lodash/includes';
 import { DatasourceService } from '../../../services/datasource.service';
+import { isUnique } from '../../../../../common/validators';
 
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 
@@ -35,8 +36,10 @@ export class CreateRouteDialogComponent implements OnInit {
   }
 
   createForm() {
+    const channelId = this.routeData.channelID;
+    const tranformerFn = value => ({channelId, routeName: value});
     this.detailsFormGroup = this._formBuilder.group({
-      routeName: ['', Validators.required],
+      routeName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateRoute, tranformerFn)],
       sourceLocation: ['', Validators.required],
       destinationLocation: ['', Validators.required],
       filePattern: ['', [Validators.required, this.validateFilePattern]],
