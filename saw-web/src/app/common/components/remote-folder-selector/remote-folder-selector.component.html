@@ -1,20 +1,22 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
   <mat-nested-tree-node *matTreeNodeDef="let node">
     <li>
-      <div class="mat-tree-node"
-           [class.selected]="node === selectedNode"
+      <div class="tree-node"
+           [class.tree-node--selected]="node === selectedNode"
            fxLayout="row"
            fxLayoutAlign="space-between center"
       >
         <div>
           <ng-template #nodeicon>
-            <mat-icon [class.folder-empty]="isNodeEmpty(node)"
-                      [fontIcon]="treeControl.isExpanded(node) ? 'icon-folder-solid' : 'icon-folder-solid'"
+            <div class="tree-node__arrow-icon" [class.tree-node__arrow-icon--rotated]="treeControl.isExpanded(node)">►</div>
+            <mat-icon [class.tree-node__empty-folder-icon]="isNodeEmpty(node)"
+                      [class.tree-node__folder-icon]="!isNodeEmpty(node)"
+                      fontIcon="icon-folder-solid"
             >
             </mat-icon>
           </ng-template>
 
-          <button *ngIf="isNodeEmpty(node)" class="node-button-empty" mat-icon-button>
+          <button *ngIf="isNodeEmpty(node)" class="tree-node__empty-folder-btn" mat-icon-button>
             <ng-container *ngTemplateOutlet="nodeicon"></ng-container>
           </button>
 
@@ -22,7 +24,7 @@
             <ng-container *ngTemplateOutlet="nodeicon"></ng-container>
           </button>
 
-          <span (click)="selectNode(node)" class="node-label">
+          <span (click)="selectNode(node)" class="tree-node__label">
             {{getNodeLabel(node)}}
           </span>
         </div>
@@ -31,14 +33,14 @@
                 mat-icon-button
                 (click)="createFolder(node)"
         >
-          <mat-icon fontIcon="icon-new-folder"
+          <mat-icon fontIcon="tree-node__new-folder-icon"
                     color="primary"
                     class="new-folder"
                     matTooltip="New Folder"
           ></mat-icon>
         </button>
       </div>
-      <ul class="node-ul" [class.hidden]="!treeControl.isExpanded(node)">
+      <ul class="tree-node__sub-list" [class.tree-node__sub-list--hidden]="!treeControl.isExpanded(node)">
         <ng-container matTreeNodeOutlet></ng-container>
       </ul>
     </li>
