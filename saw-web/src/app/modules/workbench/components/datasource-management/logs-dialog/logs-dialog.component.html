@@ -74,5 +74,25 @@
         </div>
       </div>
 
+      <dx-data-grid #channelsGrid fxFlex="25" class="mat-elevation-z3 sources-grid"
+                    [dataSource]="logs" [showBorders]="false" [columnAutoWidth]="false"
+                    [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
+      >
+        <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+        <dxi-column caption="Pid" dataField="pid" alignment="left"></dxi-column>
+        <dxi-column caption="Channel Type" dataField="channelType" alignment="left"></dxi-column>
+        <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
+        <dxi-column caption="File Name" dataField="fileName" alignment="left"></dxi-column>
+        <dxi-column caption="Actual File Rec Date" dataField="actualFileRecDate" cellTemplate="dateTypeTemplate"></dxi-column>
+        <dxi-column caption="Rec File Name" dataField="recdFileName" alignment="left"></dxi-column>
+        <dxi-column caption="Rec File Size" dataField="recdFileSize" alignment="left"></dxi-column>
+        <dxi-column caption="File Status" dataField="mflFileStatus" alignment="left"></dxi-column>
+        <dxi-column caption="Process State" dataField="bisProcessState" alignment="left"></dxi-column>
+        <dxi-column caption="Modified at" dataField="modifiedDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
+        <dxi-column caption="Created at" dataField="createdDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
+        <div *dxTemplate="let data of 'dateTypeTemplate'">
+          {{data.value | date: 'dd/MMM/yy'}}
+        </div>
+      </dx-data-grid>
     </mat-card-content>
   </mat-card>
