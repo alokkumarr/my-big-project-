@@ -28,22 +28,50 @@ class SuiteSetup {
     if (!fs.existsSync('target')) {
       fs.mkdirSync('target');
     }
+    if (!fs.existsSync('target/e2e')) {
+      fs.mkdirSync('target/e2e');
+    }
 
-    if (fs.existsSync('target/failedTestData.json')) {
-      let existingFailures = JSON.parse(fs.readFileSync('target/failedTestData.json', 'utf8'));
+    if (fs.existsSync('target/e2e/failedTestData.json')) {
+      let existingFailures = JSON.parse(fs.readFileSync('target/e2e/failedTestData.json', 'utf8'));
       // There are already failed tests so add to existing list
       logger.debug('existingFailures---' + JSON.stringify(existingFailures));
       // add new failures to existing
-      this.writeToJsonFile(existingFailures, testInfo);
+      this.writeToJsonFile(existingFailures, testInfo, 'target/e2e/failedTestData.json');
 
     } else {
       logger.debug('first failure... ');
       // Write new failed test list json file;
-      this.writeToJsonFile(failedTestsData, testInfo);
+      this.writeToJsonFile(failedTestsData, testInfo, 'target/e2e/failedTestData.json');
     }
   }
 
-  writeToJsonFile(testDataObject, testInfo) {
+  passTestData(testInfo) {
+
+    logger.debug('writing pass test cases to success object');
+    let passTestsData = {};
+    if (!fs.existsSync('target')) {
+      fs.mkdirSync('target');
+    }
+    if (!fs.existsSync('target/e2e')) {
+      fs.mkdirSync('target/e2e');
+    }
+
+    if (fs.existsSync('target/e2e/passTestData.json')) {
+      let existingPassTests = JSON.parse(fs.readFileSync('target/e2e/passTestData.json', 'utf8'));
+      // There are already failed tests so add to existing list
+      logger.debug('existingSuccess tests---' + JSON.stringify(existingPassTests));
+      // add new failures to existing
+      this.writeToJsonFile(existingPassTests, testInfo, 'target/e2e/passTestData.json');
+
+    } else {
+      logger.debug('first success test... ');
+      // Write new pass test list json file;
+      this.writeToJsonFile(passTestsData, testInfo, 'target/e2e/passTestData.json');
+    }
+  }
+
+  writeToJsonFile(testDataObject, testInfo, fileLocation) {
 
     if (!testDataObject[testInfo.feature]) {
       testDataObject[testInfo.feature] = {};
@@ -53,7 +81,7 @@ class SuiteSetup {
     }
     if (!testDataObject[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]]) {
       testDataObject[[testInfo.feature]][[testInfo.dataProvider]][[testInfo.testId]] = testInfo.data;
-      fs.writeFileSync('target/failedTestData.json', JSON.stringify(testDataObject), { encoding: 'utf8' });
+      fs.writeFileSync(fileLocation, JSON.stringify(testDataObject), { encoding: 'utf8' });
     }
   }
 
@@ -78,19 +106,19 @@ class SuiteSetup {
   static failedTestDataForRetry() {
     logger.info('Generating failed test data set for next retry from failures');
 
-    if (fs.existsSync('target/failedTestDataForRetry.json')) {
-      fs.unlinkSync('target/failedTestDataForRetry.json');
+    if (fs.existsSync('target/e2e/failedTestDataForRetry.json')) {
+      fs.unlinkSync('target/e2e/failedTestDataForRetry.json');
     }
-    if (fs.existsSync('target/failedTestData.json')) {
-      fs.renameSync('target/failedTestData.json', 'target/failedTestDataForRetry.json');
+    if (fs.existsSync('target/e2e/failedTestData.json')) {
+      fs.renameSync('target/e2e/failedTestData.json', 'target/e2e/failedTestDataForRetry.json');
       logger.debug('Old failures json file is deleted and converted to failure data set ' +
-        'i.e. target/failedTestData.json converted to target/failedTestDataForRetry.jsons');
+        'i.e. target/failedTestData.json converted to target/e2e/failedTestDataForRetry.jsons');
     } else {
       logger.info('Yahooo....!!! There are no failures!');
     }
       // Delete the old file so that it can be again re-rewritten and used by another set of failures in next retry
-    if (fs.existsSync('target/failedTestData.json')) {
-      fs.unlinkSync('target/failedTestData.json');
+    if (fs.existsSync('target/e2e/failedTestData.json')) {
+      fs.unlinkSync('target/e2e/failedTestData.json');
       logger.debug('Old failures json file is deleted and converted to failure data set');
     }
   }
@@ -101,9 +129,12 @@ class SuiteSetup {
     if (!fs.existsSync('target')) {
       fs.mkdirSync('target');
     }
+    if (!fs.existsSync('target/e2e')) {
+      fs.mkdirSync('target/e2e');
+    }
 
-    if (fs.existsSync('target/url.json')) {
-      url = JSON.parse(fs.readFileSync('target/url.json', 'utf8')).baseUrl;
+    if (fs.existsSync('target/e2e/url.json')) {
+      url = JSON.parse(fs.readFileSync('target/e2e/url.json', 'utf8')).baseUrl;
     } else {
       process.argv.forEach(function (val) {
         if (val.includes('--baseUrl')) {
@@ -111,7 +142,7 @@ class SuiteSetup {
           let urlObject = {
             baseUrl: url, e2eId: globalVariables.generateE2eId
           };
-          fs.writeFileSync('target/url.json', JSON.stringify(urlObject), {
+          fs.writeFileSync('target/e2e/url.json', JSON.stringify(urlObject), {
             encoding: 'utf8'
           });
           return;
@@ -123,18 +154,21 @@ class SuiteSetup {
   }
 
   static getTestData() {
-    if (fs.existsSync('target/failedTestDataForRetry.json')) {
-      let data = JSON.parse(fs.readFileSync('target/failedTestDataForRetry.json', 'utf8'));
-      logger.warn('This is retry execution!! Executing with failed test data set, because failedTestDataForRetry found in  target/failedTestDataForRetry.json: data--->' + JSON.stringify(data));
+    if (fs.existsSync('target/e2e/failedTestDataForRetry.json')) {
+      let data = JSON.parse(fs.readFileSync('target/e2e/failedTestDataForRetry.json', 'utf8'));
+      logger.warn('This is retry execution!! Executing with failed test data set, because failedTestDataForRetry found in  target/e2e/failedTestDataForRetry.json: data--->' + JSON.stringify(data));
       return data;
     } else {
       let suiteName;
       if (!fs.existsSync('target')) {
         fs.mkdirSync('target');
       }
+      if (!fs.existsSync('target/e2e')) {
+        fs.mkdirSync('target/e2e');
+      }
 
-      if (fs.existsSync('target/suite.json')) {
-        suiteName = JSON.parse(fs.readFileSync('target/suite.json', 'utf8')).suiteName;
+      if (fs.existsSync('target/e2e/suite.json')) {
+        suiteName = JSON.parse(fs.readFileSync('target/e2e/suite.json', 'utf8')).suiteName;
       } else {
         process.argv.forEach(function (val) {
           if (val.includes('--suite')) {
@@ -142,7 +176,7 @@ class SuiteSetup {
             let suiteObject = {
               suiteName: suiteName
             };
-            fs.writeFileSync('target/suite.json', JSON.stringify(suiteObject), {
+            fs.writeFileSync('target/e2e/suite.json', JSON.stringify(suiteObject), {
               encoding: 'utf8'
             });
             return;

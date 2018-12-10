@@ -1,0 +1,56 @@
+{
+  "LOGIN": {
+    "positiveTests": {
+      "LOGIN001": {
+        "user": "userOne",
+        "description": "userOne should be able to login with valid credentials"
+      },
+      "LOGIN002": {
+        "user": "admin",
+        "description": "Admin should be able to login with valid credentials"
+      }
+    },
+    "negativeTests": {
+      "LOGIN003": {
+        "user": "userOne",
+        "password":"worngpassword",
+        "description": "Try to login with valid user & invalid password, should not be able to login",
+        "expected":{
+          "message":"Invalid User Credentials"
+        }
+      },
+      "LOGIN004": {
+        "user": "admin1",
+        "password":"Sawsyncnewuser1!",
+        "description": "Try to login with invalid user name & valid password, should not be able to login",
+        "expected":{
+          "message":"Invalid User Credentials"
+        }
+      },
+      "LOGIN005": {
+        "user": "admin1",
+        "password":"Sawsyncnewuser2!",
+        "description": "Try to login with invalid user name & password, should not be able to login",
+        "expected":{
+          "message":"Invalid User Credentials"
+        }
+      },
+      "LOGIN006": {
+        "user": "",
+        "password": "",
+        "description": "Try to login with without user name & password, should not be able to login",
+        "expected":{
+          "message":"Please enter a vaild Usernaeme and Password"
+        }
+      },
+      "LOGIN007": {
+        "user": "admin",
+        "password": "",
+        "description": "Try to login with valid user name & without password, should not be able to login",
+        "expected":{
+          "message":"Please enter a vaild Usernaeme and Password"
+        }
+      }
+    }
+  }
+}
