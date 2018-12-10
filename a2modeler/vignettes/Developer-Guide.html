@@ -84,9 +84,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#set-measures">Set Measures</a></li>
 <li><a href="#add-model">Add Model</a></li>
 <li><a href="#train-models">Train Models</a></li>
+</ul></li>
 <li><a href="#predictions">Predictions</a></li>
 <li><a href="#helper-functions">Helper Functions</a></li>
-</ul></li>
 </ul>
 </div>
 
@@ -910,8 +910,8 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <span class="co">#&gt;  $ expr      :function (x)  </span>
 <span class="co">#&gt;  $ output    : NULL</span>
 <span class="co">#&gt;  $ desc      : chr &quot;&quot;</span>
-<span class="co">#&gt;  $ uid       : chr &quot;pipe116054283edc&quot;</span>
-<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-10 11:48:28&quot;</span>
+<span class="co">#&gt;  $ uid       : chr &quot;pipe2ebce6070c1&quot;</span>
+<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-10 11:50:16&quot;</span>
 <span class="co">#&gt;  $ runtime   : NULL</span>
 <span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;pipeline&quot;</span></code></pre></div>
 <p>The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets.</p>
@@ -1819,8 +1819,9 @@ train_model.forecast_model
 </div>
 </div>
 </div>
-<div id="predictions" class="section level3">
-<h3>Predictions</h3>
+</div>
+<div id="predictions" class="section level2">
+<h2>Predictions</h2>
 <p>Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction mangement. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">new_predictions
 <span class="co">#&gt; function(predictions,</span>
@@ -1849,8 +1850,8 @@ train_model.forecast_model
 <span class="co">#&gt;   )</span>
 <span class="co">#&gt; }</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
-<div id="spark-predict-method" class="section level5">
-<h5>Spark Predict Method</h5>
+<div id="spark-predict-method" class="section level4">
+<h4>Spark Predict Method</h4>
 <p>The prediction class stores the predictions made with modeler predict methods. Below is the classifier method, which is very similar to the other spark based classes.</p>
 <p>The method first checks the new data schema to ensure its similar to the input data schema saved in the modeler object. Next the model pipeline is executed on the new data applying any feature engineering transformations. Lastly the predictions are made with the modeler’s final model on the pipeline output and saved in a predictions object.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Classifier Predict Method</span>
@@ -1900,8 +1901,8 @@ predict.spark_model_classification
 <span class="co">#&gt; }</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
-<div id="forecaster-predict-methods" class="section level5">
-<h5>Forecaster Predict Methods</h5>
+<div id="forecaster-predict-methods" class="section level4">
+<h4>Forecaster Predict Methods</h4>
 <p>The forecaster R predict method works differently. Here the data input is optional. If provided care should be given that it temporally aligns to the intended forecast horizon. The forecaster predictions are forward looking predictions of a sequential variable, which in most cases is a time series. The periods argument sets the prediction horizon length and levels controls the confidence intervals.</p>
 <p>Similar to the classifier predict method the forecaster print method below preforms a schema check on the data if provided, executes the final model’s pipeline and creates the predictions using an intenal predict method covered next. Note - the forecaster print method creates a prediction index by using the <code>extend</code> method on the forecaster’s index and combines with the prediction output. The index class is covered in the next section.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
@@ -1993,8 +1994,8 @@ get_forecasts.forecast
 <span class="co">#&gt; }</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
-<div id="index-class" class="section level5">
-<h5>Index Class</h5>
+<div id="index-class" class="section level4">
+<h4>Index Class</h4>
 <p>The index class stores information on a sequence so that the sequence can be accurately extended such as the unit, number of periods, start and end values. There is a time_index sub-class for datetime based indices which enables a different extend behavior.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Create Index Object ex</span>
@@ -2032,7 +2033,6 @@ d1
 <span class="co">#&gt; </span>
 <span class="co">#&gt; attr(,&quot;class&quot;)</span>
 <span class="co">#&gt; [1] &quot;time_index&quot; &quot;index&quot;</span></code></pre></div>
-</div>
 <div id="index-methods" class="section level5">
 <h5>Index Methods</h5>
 <p>The index class only has one generic function in the a2modeler - <code>extend</code>. It is used to extend a an index by some length out. There are methods for numeric, index, and time_index classes.</p>
@@ -2044,8 +2044,9 @@ d1
 <span class="co">#&gt; [1] &quot;2018-12-11&quot; &quot;2018-12-12&quot; &quot;2018-12-13&quot; &quot;2018-12-14&quot; &quot;2018-12-15&quot;</span></code></pre></div>
 </div>
 </div>
-<div id="helper-functions" class="section level3">
-<h3>Helper Functions</h3>
+</div>
+<div id="helper-functions" class="section level2">
+<h2>Helper Functions</h2>
 <p>In this section additional helper functions contained in the a2modeler package are discussed.</p>
 <div id="refit" class="section level4">
 <h4>Refit</h4>
@@ -2180,7 +2181,6 @@ a2_load
 <span class="co">#&gt;   obj</span>
 <span class="co">#&gt; }</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
-</div>
 </div>
 </div>
 <div class="footnotes">

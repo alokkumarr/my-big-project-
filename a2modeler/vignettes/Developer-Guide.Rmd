@@ -950,7 +950,7 @@ In the last section of the function the model is refit on the full data sample a
 
 
 
-### Predictions
+## Predictions
 
 Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction mangement. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.
 
@@ -958,7 +958,7 @@ Once a modeler workflow is completed predictions can be made on new datasets sim
 new_predictions
 ```
 
-##### Spark Predict Method
+#### Spark Predict Method
 
 The prediction class stores the predictions made with modeler predict methods. Below is the classifier method, which is very similar to the other spark based classes. 
 
@@ -979,7 +979,7 @@ predict.spark_model_classification
 ```
 
 
-##### Forecaster Predict Methods
+#### Forecaster Predict Methods
 
 The forecaster R predict method works differently. Here the data input is optional. If provided care should be given that it temporally aligns to the intended forecast horizon. The forecaster predictions are forward looking predictions of a sequential variable, which in most cases is a time series. The periods argument sets the prediction horizon length and levels controls the confidence intervals. 
 
@@ -1005,7 +1005,7 @@ get_forecasts.forecast
 
 
 
-##### Index Class
+#### Index Class
 
 The index class stores information on a sequence so that the sequence can be accurately extended such as the unit, number of periods, start and end values. There is a time_index sub-class for datetime based indices which enables a different extend behavior. 
 
@@ -1033,7 +1033,7 @@ extend(d1, 5)
 ```
 
 
-### Helper Functions
+## Helper Functions
 
 In this section additional helper functions contained in the a2modeler package are discussed.
 
