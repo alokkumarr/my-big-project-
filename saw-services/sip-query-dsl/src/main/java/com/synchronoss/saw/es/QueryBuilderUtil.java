@@ -3,9 +3,7 @@ package com.synchronoss.saw.es;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Filter;
-import com.synchronoss.saw.model.Model;
+import com.synchronoss.saw.model.*;
 import com.synchronoss.saw.util.BuilderUtil;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
@@ -40,7 +38,13 @@ public class QueryBuilderUtil {
       formats.put("MMMMdYYYY,h:mm:ssa", "hour");
       dateFormats = Collections.unmodifiableMap(formats);
   }
-	
+
+    /**
+     *
+     * @param field
+     * @param aggregationName
+     * @return
+     */
 	public static AggregationBuilder aggregationBuilder (Field field,
 	     String aggregationName)
 
@@ -63,10 +67,15 @@ public class QueryBuilderUtil {
 		else {
           aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(field.getColumnName()).size(BuilderUtil.SIZE);
 		}
-		
+
 		return aggregationBuilder;
 	}
 
+    /**
+     * Group interval for the DateHistogram.
+     * @param groupInterval
+     * @return
+     */
      public static DateHistogramInterval groupInterval(String groupInterval)
      {
     	 DateHistogramInterval histogramInterval = null; 
@@ -82,7 +91,12 @@ public class QueryBuilderUtil {
     	    return histogramInterval;
      }
 
-	public static AggregationBuilder aggregationBuilderDataFieldReport(Field field)
+    /**
+     * Aggregation builder for data fields.
+     * @param field
+     * @return
+     */
+	public static AggregationBuilder aggregationBuilderDataField(Field field)
 	{
 		AggregationBuilder aggregationBuilder = null;
 
@@ -101,6 +115,11 @@ public class QueryBuilderUtil {
 		return aggregationBuilder;
 	}
 
+    /**
+     * Set Group Interval.
+     * @param field
+     * @return
+     */
   public static Field setGroupInterval(
       Field field) {
     String interval = dateFormats.get(field.getDateFormat().replaceAll(SPACE_REGX, EMPTY_STRING));
@@ -127,6 +146,12 @@ public class QueryBuilderUtil {
     return field;
   }
 
+    /**
+     * Build numeric filter to handle different preset values.
+     * @param item
+     * @param builder
+     * @return
+     */
 	public static List<QueryBuilder> numericFilter(Filter item, List<QueryBuilder> builder)
 	{
 
@@ -171,6 +196,12 @@ public class QueryBuilderUtil {
 		return builder;
 	}
 
+    /**
+     *  Build String filter to handle case insensitive filter.
+     * @param item
+     * @param builder
+     * @return
+     */
 	public static List<QueryBuilder> stringFilter(Filter item, List<QueryBuilder> builder)
 	{
         if(item.getModel().getOperator().value().equals(Model.Operator.EQ.value()) ||
@@ -273,7 +304,7 @@ public class QueryBuilderUtil {
     }
 
     /**
-     *
+     *  To get the aggregation builder for data fields.
      * @param dataFields
      * @param preSearchSourceBuilder
      * @return
@@ -293,12 +324,12 @@ public class QueryBuilderUtil {
               //  return aggregationBuilder;
     }
 
-   /* *//**
+   /**
      * query builder for DSK node.
      * TODO: Original DSK was supporting only string format, So query builder is in place only for String.
      * @param dataSecurityKeyNode
      * @param builder
-     *//*
+     */
     public static List<QueryBuilder> queryDSKBuilder(DataSecurityKey dataSecurityKeyNode , List<QueryBuilder> builder) {
         if (dataSecurityKeyNode != null) {
             for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
@@ -314,8 +345,13 @@ public class QueryBuilderUtil {
             }
         }
         return builder;
-    }*/
+    }
 
+    /**
+     *  To build the report data ( Without elasticsearch aggregation).
+     * @param jsonNode
+     * @return
+     */
     public static List<Object> buildReportData(JsonNode jsonNode)
     {
         Iterator<JsonNode> recordIterator = jsonNode.get(HITS).get(HITS).iterator();

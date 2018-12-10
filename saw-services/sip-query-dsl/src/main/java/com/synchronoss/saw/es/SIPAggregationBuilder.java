@@ -43,12 +43,12 @@ public class SIPAggregationBuilder {
                     {
                         if (dataField.getGroupInterval()!=null){
                             aggregationBuilder = AggregationBuilders.
-                                dateHistogram(dataField.getDisplayName()).field(dataField.getColumnName()).format(DATE_FORMAT).
+                                dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount).field(dataField.getColumnName()).format(DATE_FORMAT).
                                 dateHistogramInterval(groupInterval(dataField.getGroupInterval().value())).order(BucketOrder.key(false));
                         }
                         else {
-                            aggregationBuilder =  AggregationBuilders.terms(dataField.getDisplayName()).field(dataField.getColumnName())
-                                .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+                            aggregationBuilder = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
+                                .field(dataField.getColumnName()).size(querySize);
                         }
                     }
                     else {
@@ -56,17 +56,35 @@ public class SIPAggregationBuilder {
                             .field(dataField.getColumnName()).size(querySize);
                     }
                     for(Field dataField1 : aggregateFields) {
-                        aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldReport(
+                        aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(
                                 dataField1));
                     }
                     return reportAggregationBuilder(dataFields, aggregateFields,
                             fieldCount,aggregatedFieldCount, aggregationBuilder);
 
                 } else {
-                    AggregationBuilder aggregationBuilderMain =
-                                    AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
-                                            .field(dataField.getColumnName())
-                                            .subAggregation(aggregationBuilder).size(querySize);
+
+                    AggregationBuilder aggregationBuilderMain = null;
+                    if (dataField.getType().name().equals(Field.Type.DATE.name())
+                        || dataField.getType().name().equals(Field.Type.TIMESTAMP.name()))
+                    {
+                        if (dataField.getGroupInterval()!=null){
+                            aggregationBuilderMain = AggregationBuilders.
+                                dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount).field(dataField.getColumnName()).format(DATE_FORMAT).
+                                dateHistogramInterval(groupInterval(dataField.getGroupInterval().value())).order(BucketOrder.key(false))
+                                .subAggregation(aggregationBuilder);
+                        }
+                        else {
+                            aggregationBuilderMain = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
+                                .field(dataField.getColumnName())
+                                .subAggregation(aggregationBuilder).size(querySize);
+                        }
+                    }
+                    else {
+                        aggregationBuilderMain = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
+                            .field(dataField.getColumnName())
+                            .subAggregation(aggregationBuilder).size(querySize);
+                    }
 
                     return reportAggregationBuilder(dataFields, aggregateFields,
                             fieldCount,aggregatedFieldCount, aggregationBuilderMain);
@@ -88,14 +106,20 @@ public class SIPAggregationBuilder {
        return aggregateFields;
    }
 
-   public void reportAggregationBuilder(List<Field> dataFields, List<Field> aggregateFields,
+    /**
+     *  Aggregation builder
+     * @param dataFields
+     * @param aggregateFields
+     * @param searchSourceBuilder
+     */
+   public void aggregationBuilder(List<Field> dataFields, List<Field> aggregateFields,
                                         SearchSourceBuilder searchSourceBuilder)
     {
         // if only aggregation fields are there.
 
         if (aggregateFields.size() == dataFields.size()) {
         for (Field dataField1 : aggregateFields) {
-            searchSourceBuilder.aggregation(QueryBuilderUtil.aggregationBuilderDataFieldReport(
+            searchSourceBuilder.aggregation(QueryBuilderUtil.aggregationBuilderDataField(
                     dataField1));
         }
     }
