@@ -1,15 +1,59 @@
 import { Injectable, Compiler } from '@angular/core';
 import { Route, Router } from '@angular/router';
-import * as AngularCore from '@angular/core';
-import * as AngularRouting from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { forEach } from 'lodash';
+import * as AngularCore from '@angular/core';
+import * as AngularRouting from '@angular/router';
+import * as AngularAnimation from '@angular/animations';
+import * as AngularCdk from '@angular/cdk';
+import * as AngularCommon from '@angular/common';
+import * as AngularCompiler from '@angular/compiler';
+import * as AngularFlexLayout from '@angular/flex-layout';
+import * as AngularForms from '@angular/forms';
+import * as AngularHttp from '@angular/common/http';
+import * as AngularMaterial from '@angular/material';
+import * as AngularMaterialMomentAdapter from '@angular/material-moment-adapter';
+import * as AngularBrowswer from '@angular/platform-browser';
+import * as AngularBrowserDynamic from '@angular/platform-browser-dynamic';
+import * as AngularSplit from 'angular-split';
+import * as AngularCountTo from 'angular2-counto';
+import * as CoreJs from 'core-js';
+import * as DevextremeAngular from 'devextreme-angular';
+import * as Ng2Nouslider from 'ng2-nouislider';
+import * as Nouslider from 'nouislider';
+import * as RxJsCompat from 'rxjs-compat';
+import * as Lodash from 'lodash';
+import * as LodashFp from 'lodash/fp';
+import * as Rxjs from 'rxjs';
+import * as RxjsOperators from 'rxjs/operators';
 
 declare var SystemJS: any;
 
 const dependencies = {
   '@angular/core': AngularCore,
-  '@angular/router': AngularRouting
+  '@angular/router': AngularRouting,
+  '@angular/animations': AngularAnimation,
+  '@angular/cdk': AngularCdk,
+  '@angular/common': AngularCommon,
+  '@angular/compiler': AngularCompiler,
+  '@angular/flex-layout': AngularFlexLayout,
+  '@angular/forms': AngularForms,
+  '@angular/common/http': AngularHttp,
+  '@angular/material': AngularMaterial,
+  '@angular/material-moment-adapter': AngularMaterialMomentAdapter,
+  '@angular/platform-browser': AngularBrowswer,
+  '@angular/platform-browser-dynamic': AngularBrowserDynamic,
+  'angular-split': AngularSplit,
+  'angular2-counto': AngularCountTo,
+  'core-js': CoreJs,
+  'devextreme-angular': DevextremeAngular,
+  'ng2-nouislider': Ng2Nouslider,
+  'nouislider': Nouslider,
+  'rxjs-compat': RxJsCompat,
+  'rxjs': Rxjs,
+  'rxjs/operators': RxjsOperators,
+  'lodash': Lodash,
+  'lodash/fp': LodashFp
 };
 
 interface ModuleInfo {
