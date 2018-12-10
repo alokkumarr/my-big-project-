@@ -56,3 +56,4 @@ Other use cases: \code{\link{classifier}},
   \code{\link{forecaster}}, \code{\link{multiclassifier}},
   \code{\link{regressor}}, \code{\link{segmenter}}
 }
+\concept{use cases}

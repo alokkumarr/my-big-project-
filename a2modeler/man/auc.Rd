@@ -10,7 +10,8 @@ auc(x, predicted, actual)
 
 \method{auc}{tbl_spark}(x, predicted, actual)
 
-\method{auc}{spark_connection}(x, predicted = "predicted", actual = "label")
+\method{auc}{spark_connection}(x, predicted = "predicted",
+  actual = "label")
 }
 \arguments{
 \item{x}{dataframe object}

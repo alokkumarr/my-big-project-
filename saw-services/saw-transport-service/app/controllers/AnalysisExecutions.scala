@@ -2,13 +2,13 @@ package controllers
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import model.PaginateDataSet
-import org.json4s.JsonAST.{JArray, JObject, JString, JValue}
+import org.json4s.JsonAST.{JObject, JValue}
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods.parse
-import play.mvc.{Http, Result, Results}
-import sncr.datalake.{DLConfiguration, DLSession}
+import play.mvc.Result
 import sncr.datalake.engine.ExecutionType
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
+import sncr.datalake.{DLConfiguration, DLSession}
 import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.MDObjectStruct
 import sncr.saw.common.config.SAWServiceConfig
@@ -226,8 +226,15 @@ class AnalysisExecutions extends BaseController {
 
   def getLatestExecutionData(analysisId: String, page: Int, pageSize: Int, analysisType: String, executionType: String): Result = {
     handle(process = (json, ticket) => {
-      val executionId = ((listExecution(analysisId).head) \ "id").extract[String]
-      getExecutionResult(analysisId,executionId,page,pageSize,analysisType,executionType)
+      val executions = listExecution(analysisId)
+      if(executions.isEmpty){
+        ("data",List[JValue]() ) ~ ("totalRows", 0) ~ ("queryBuilder", null) ~ ("executedBy", null): JValue
+      }
+      else{
+        val executionId = ((executions.head) \ "id").extract[String]
+        getExecutionResult(analysisId, executionId, page, pageSize, analysisType, executionType)
+      }
+
     })
   }
 

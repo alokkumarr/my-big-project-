@@ -18,13 +18,12 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/scheduler/")
-public class JobController {
+public class JobController extends BaseJobController{
 
 	private static final Logger logger = LoggerFactory.getLogger(JobController.class);
 	@Autowired
 	@Lazy
-	JobService jobService;
+	JobService<SchedulerJobDetail> jobService;
 
 	@RequestMapping(value ="schedule",method = RequestMethod.POST)
 	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail){
