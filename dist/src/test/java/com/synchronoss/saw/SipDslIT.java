@@ -1,16 +1,18 @@
 package com.synchronoss.saw;
 
-import java.io.File;
-import java.io.IOException;
+import static io.restassured.RestAssured.given;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.Response;
+
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static io.restassured.RestAssured.given;
 
 public class SipDslIT extends BaseIT {
   @Ignore("Placeholder integration test, dependency on SIP-5433")
@@ -21,11 +23,11 @@ public class SipDslIT extends BaseIT {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(file);
     Response response = given(spec)
-       .header("Authorization", "Bearer " + token)
-       .body(jsonNode)
-       .when().post("/saw/services/internal/proxy/storage/fetch")
-       .then().assertThat().statusCode(200)
-       .extract().response();
+        .header("Authorization", "Bearer " + token)
+        .body(jsonNode)
+        .when().post("/saw/services/internal/proxy/storage/fetch")
+        .then().assertThat().statusCode(200)
+        .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
   }
 
