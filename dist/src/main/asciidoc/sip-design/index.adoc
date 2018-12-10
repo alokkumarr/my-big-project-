@@ -458,3 +458,16 @@ response to the client.
 
 .Figure: Authenticating a client using the SAW Security Service
 plantuml::sip-design/figure-security-sequence.pum[format=svg]
+
+== SIP DSL
+
+SIP DSL JSON based high level library build for writing and running SIP queries
+against SIP platform with Elasticsearch, DataLake etc. SIP DSL supports aggregation
+which can be used for Pivot, Chart and report structure to visualize the data
+into platform.
+
+.Figure: SIP-DSL sequence Diagram with platform integration
+plantuml::sip-design/figure-SIP-DSL-sequence.pum[format=svg]
+
+==== SIP DSL Example :
+
