@@ -3,7 +3,7 @@ const {createLogger, format,transports} = require('winston');
 const colorizer = format.colorize();
 const Constants = require('../helpers/Constants')
 
-let level = process.env.LOGGER_LEVEL || 'info';
+let level = process.env.LOGGER_LEVEL || 'debug';
 level = (level in Constants.LOG_LEVELS) ? level : 'info';
 
 module.exports = (tag)=>createLogger({
