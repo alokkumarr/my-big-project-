@@ -1031,3 +1031,51 @@ extend(i1, 5)
 extend(d1, 5)
 
 ```
+
+
+### Helper Functions
+
+In this section additional helper functions contained in the a2modeler package are discussed.
+
+
+#### Refit
+
+The refit function can be used to refit a modeler object to a new dataset. The function provides the option to append the new data to the stored data (default) or fit on just the new data. The function returns an updated modeler object. Only the final model is fit. The entire workflow is not executed. 
+
+Below is the refit modeler method. Similar to the prediction methods, the refit applies assertions on the new data ensuring its the same class and schema of the orginial modeler input data. The final model pipeline is applied with a single default sample to create the training dataset and passed to the `train_model` function. 
+
+
+```{r}
+# Refit Method
+refit.modeler
+```
+
+
+#### Deploy
+
+The deploy function can be used to save a modeler object to file for use on a new dataset in a different time and environement. 
+
+The function below does the following:
+
+* Creates a label from the modeler name and version
+* Creates a model path using the label and model uid
+* Removes all spark objects from the modeler objects which should be saved seperately
+* saves the modeler object as a .rds file with the either the `ml_save` function for spark models or `saveRDS` function for R based models
+
+```{r}
+
+# deploy function
+deploy
+```
+
+
+#### A2 Load
+
+The `a2_load` function is used to load a saved modeler object into memory. The function takes a path argument and optional spark connection with modeler objects with a spark based final model. The path argument should be the directory location of the modeler object, not the final .rds file location.
+
+```{r}
+
+# a2_load function
+a2_load
+```
+

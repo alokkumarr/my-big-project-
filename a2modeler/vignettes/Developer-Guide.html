@@ -84,6 +84,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#set-measures">Set Measures</a></li>
 <li><a href="#add-model">Add Model</a></li>
 <li><a href="#train-models">Train Models</a></li>
+<li><a href="#predictions">Predictions</a></li>
+<li><a href="#helper-functions">Helper Functions</a></li>
 </ul></li>
 </ul>
 </div>
@@ -908,8 +910,8 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <span class="co">#&gt;  $ expr      :function (x)  </span>
 <span class="co">#&gt;  $ output    : NULL</span>
 <span class="co">#&gt;  $ desc      : chr &quot;&quot;</span>
-<span class="co">#&gt;  $ uid       : chr &quot;pipe820100a483a&quot;</span>
-<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-10 11:14:30&quot;</span>
+<span class="co">#&gt;  $ uid       : chr &quot;pipe116054283edc&quot;</span>
+<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-10 11:48:28&quot;</span>
 <span class="co">#&gt;  $ runtime   : NULL</span>
 <span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;pipeline&quot;</span></code></pre></div>
 <p>The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets.</p>
@@ -1816,8 +1818,9 @@ train_model.forecast_model
   mobj</code></pre></div>
 </div>
 </div>
-<div id="predictions" class="section level4">
-<h4>Predictions</h4>
+</div>
+<div id="predictions" class="section level3">
+<h3>Predictions</h3>
 <p>Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction mangement. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">new_predictions
 <span class="co">#&gt; function(predictions,</span>
@@ -2040,6 +2043,143 @@ d1
 <span class="kw">extend</span>(d1, <span class="dv">5</span>)
 <span class="co">#&gt; [1] &quot;2018-12-11&quot; &quot;2018-12-12&quot; &quot;2018-12-13&quot; &quot;2018-12-14&quot; &quot;2018-12-15&quot;</span></code></pre></div>
 </div>
+</div>
+<div id="helper-functions" class="section level3">
+<h3>Helper Functions</h3>
+<p>In this section additional helper functions contained in the a2modeler package are discussed.</p>
+<div id="refit" class="section level4">
+<h4>Refit</h4>
+<p>The refit function can be used to refit a modeler object to a new dataset. The function provides the option to append the new data to the stored data (default) or fit on just the new data. The function returns an updated modeler object. Only the final model is fit. The entire workflow is not executed.</p>
+<p>Below is the refit modeler method. Similar to the prediction methods, the refit applies assertions on the new data ensuring its the same class and schema of the orginial modeler input data. The final model pipeline is applied with a single default sample to create the training dataset and passed to the <code>train_model</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Refit Method</span>
+refit.modeler
+<span class="co">#&gt; function(obj, df, append = TRUE, ...) {</span>
+<span class="co">#&gt;   checkmate::assert_class(obj, &quot;modeler&quot;)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   if(! any(class(df) %in% class(obj$data))) { </span>
+<span class="co">#&gt;     stop(c(&quot;new dataframe class not consistent with expected data class\n&quot;,</span>
+<span class="co">#&gt;           &quot;expecting class: &quot;, paste(class(obj$data), collapse=&quot;, &quot;), &quot;\n&quot;, </span>
+<span class="co">#&gt;           &quot;dataframe class: &quot;, paste(class(df), collapse=&quot;, &quot;), &quot;\n&quot;  ))</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   if(is.null(obj$final_model)) {</span>
+<span class="co">#&gt;     stop(&quot;final model not set&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Schema Check</span>
+<span class="co">#&gt;   schema_compare &lt;- a2munge::get_schema(df) %&gt;% </span>
+<span class="co">#&gt;     a2munge::schema_check(obj$schema)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Append Option</span>
+<span class="co">#&gt;   pipe_uid &lt;- obj$final_model$pipe</span>
+<span class="co">#&gt;   if(append) {</span>
+<span class="co">#&gt;     bind_fun &lt;- ifelse(&quot;tbl_spark&quot; %in% class(df), </span>
+<span class="co">#&gt;                        get(&quot;sdf_bind_rows&quot;, asNamespace(&quot;sparklyr&quot;)),</span>
+<span class="co">#&gt;                        get(&quot;bind_rows&quot;, asNamespace(&quot;dplyr&quot;)))</span>
+<span class="co">#&gt;     obj$data &lt;- bind_fun(obj$data, df)</span>
+<span class="co">#&gt;     obj$pipelines[[pipe_uid]] &lt;- execute(obj$data, obj$pipelines[[pipe_uid]])</span>
+<span class="co">#&gt;     data &lt;- obj$pipelines[[pipe_uid]]$output</span>
+<span class="co">#&gt;   } else {</span>
+<span class="co">#&gt;     data &lt;- flow(df, obj$pipelines[[pipe_uid]])</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Samples</span>
+<span class="co">#&gt;   refit_sample &lt;- add_default_samples(data)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   obj$final_model &lt;- train_model(</span>
+<span class="co">#&gt;     mobj = obj$final_model,</span>
+<span class="co">#&gt;     data = data,</span>
+<span class="co">#&gt;     measure = obj$measure,</span>
+<span class="co">#&gt;     samples = refit_sample,</span>
+<span class="co">#&gt;     save_submodels = FALSE,</span>
+<span class="co">#&gt;     execution_strategy = obj$execution_strategy,</span>
+<span class="co">#&gt;     level = obj$conf_levels,</span>
+<span class="co">#&gt;     seed = obj$seed</span>
+<span class="co">#&gt;   )</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   obj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+</div>
+<div id="deploy" class="section level4">
+<h4>Deploy</h4>
+<p>The deploy function can be used to save a modeler object to file for use on a new dataset in a different time and environement.</p>
+<p>The function below does the following:</p>
+<ul>
+<li>Creates a label from the modeler name and version</li>
+<li>Creates a model path using the label and model uid</li>
+<li>Removes all spark objects from the modeler objects which should be saved seperately</li>
+<li>saves the modeler object as a .rds file with the either the <code>ml_save</code> function for spark models or <code>saveRDS</code> function for R based models</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># deploy function</span>
+deploy
+<span class="co">#&gt; function(obj, path, ...) {</span>
+<span class="co">#&gt;   checkmate::assert_class(obj, &quot;modeler&quot;)</span>
+<span class="co">#&gt;   checkmate::assert_directory(dirname(path))</span>
+<span class="co">#&gt;  </span>
+<span class="co">#&gt;   # Check for final model</span>
+<span class="co">#&gt;   if(is.null(obj$final_model)) {</span>
+<span class="co">#&gt;     stop(&quot;Deployment failed - Final Model not set&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Created model label</span>
+<span class="co">#&gt;   label &lt;- paste(obj$name, obj$version, sep=&quot;-&quot;)</span>
+<span class="co">#&gt;   modeler_path &lt;- paste(path, label, sep=&quot;/&quot;)</span>
+<span class="co">#&gt;   modeler_file &lt;- paste(modeler_path, paste0(label, &quot;.rds&quot;), sep=&quot;/&quot;)</span>
+<span class="co">#&gt;   model_path &lt;- paste(modeler_path, obj$final_model$uid, sep=&quot;/&quot;)</span>
+<span class="co">#&gt;   obj$final_model$path &lt;- model_path</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Remove Spark objects from obj</span>
+<span class="co">#&gt;   if(&quot;tbl_spark&quot; %in% class(obj$data)) obj$data &lt;- NULL</span>
+<span class="co">#&gt;   for(i in seq_along(obj$models)) {</span>
+<span class="co">#&gt;     if(&quot;spark_model&quot; %in% class(obj$models[[1]])){</span>
+<span class="co">#&gt;       obj$models[[i]]$fit &lt;- NULL</span>
+<span class="co">#&gt;       obj$models[[i]]$sub_models &lt;- NULL</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   for(i in seq_along(obj$pipelines)) {</span>
+<span class="co">#&gt;     if(&quot;tbl_spark&quot; %in% class(obj$pipelines[[i]]$output)) {</span>
+<span class="co">#&gt;       obj$pipelines[[i]]$output &lt;- NULL</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Create directory &amp; write modeler and Final Model</span>
+<span class="co">#&gt;   dir.create(modeler_path, recursive = TRUE)</span>
+<span class="co">#&gt;   if(&quot;spark_model&quot; %in% class(obj$final_model)) {</span>
+<span class="co">#&gt;     sparklyr::ml_save(obj$final_model$fit, model_path)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   saveRDS(object = obj, file = modeler_file, ...)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+</div>
+<div id="a2-load" class="section level4">
+<h4>A2 Load</h4>
+<p>The <code>a2_load</code> function is used to load a saved modeler object into memory. The function takes a path argument and optional spark connection with modeler objects with a spark based final model. The path argument should be the directory location of the modeler object, not the final .rds file location.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># a2_load function</span>
+a2_load
+<span class="co">#&gt; function(path, sc = NULL) {</span>
+<span class="co">#&gt;   checkmate::assert_directory(dirname(path))</span>
+<span class="co">#&gt;   checkmate::assert_class(sc, &quot;spark_connection&quot;, null.ok = TRUE)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Get modeler file</span>
+<span class="co">#&gt;   modeler_file &lt;- list.files(path = path, pattern = &quot;.rds&quot;, full.names = TRUE)</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   if(length(modeler_file) == 0) {</span>
+<span class="co">#&gt;     stop(&quot;Model Meta-data file not found\nLooking for .rds file&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   # Load Meta-data and Model</span>
+<span class="co">#&gt;   obj &lt;- readRDS(file = modeler_file)</span>
+<span class="co">#&gt;   if(! is.null(sc)) {</span>
+<span class="co">#&gt;     obj$final_model$fit &lt;- sparklyr::ml_load(sc, path = obj$final_model$path)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   </span>
+<span class="co">#&gt;   obj</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 </div>
 </div>
