@@ -52,6 +52,9 @@ public class BisDataMetaInfo {
   @JsonProperty("actualReceiveDate")
   private Date actualReceiveDate;
 
+  @JsonIgnore
+  private String destinationPath;
+
   @JsonProperty("actualReceiveDate")
   public Date getActualReceiveDate() {
     return actualReceiveDate;
@@ -183,6 +186,14 @@ public class BisDataMetaInfo {
   @JsonAnySetter
   public void setAdditionalProperty(String name, Object value) {
     this.additionalProperties.put(name, value);
+  }
+
+  public String getDestinationPath() {
+    return destinationPath;
+  }
+
+  public void setDestinationPath(String destinationPath) {
+    this.destinationPath = destinationPath;
   }
 
 

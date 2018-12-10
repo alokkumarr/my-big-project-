@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 @ApiModel("Channel Entity")
 @Entity
-@Table(name = "BIS_CHANNEL", catalog = "sip_batch_ingestion", schema = "")
+@Table(name = "BIS_CHANNEL", catalog = "sip_bis", schema = "")
 public class BisChannelEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
