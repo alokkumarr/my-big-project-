@@ -485,20 +485,30 @@ Next for each model uid the training sample is generated. To clarify this traini
     }
 ```
 
-The next step is the train a single model uid with the `train_model` function. The `train_model` has methods for specific modeling backends. 
+The next step is the train a single model uid with the `train_model` function. The `train_model` has methods for specific modeling backends and discussed indepth in the following sections. The model output from the train_model function is stored on the modeler model list and the model performance is added to the consolidated modeler performance. 
+
 
 ```{r, eval=FALSE}
 
-obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
-                                 data = train_data,
-                                 measure = obj$measure,
-                                 samples = obj$samples,
-                                 save_submodels = obj$save_submodels,
-                                 execution_strategy = obj$execution_strategy,
-                                 level = obj$conf_levels,
-                                 seed = obj$seed)
-
-
+    obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
+                                     data = train_data,
+                                     measure = obj$measure,
+                                     samples = obj$samples,
+                                     save_submodels = obj$save_submodels,
+                                     execution_strategy = obj$execution_strategy,
+                                     level = obj$conf_levels,
+                                     seed = obj$seed)
+    obj$models[[uid]]$features <- setdiff(colnames(train_data), c(obj$target, obj$index_var))
+    obj$models[[uid]]$status <- "trained"
+    obj$models[[uid]]$last_updated <- Sys.time()
+    obj$performance <- dplyr::bind_rows(
+      obj$performance,
+      obj$models[[uid]]$performance %>% 
+        dplyr::mutate(model_uid = uid,
+                      pipeline_uid = obj$models[[uid]]$pipe,
+                      method = obj$models[[uid]]$method) %>% 
+        dplyr::select(model_uid, pipeline_uid, submodel_uid, sample, method, param_grid, !!obj$measure$method)
+    )
 ```
 
 
@@ -657,7 +667,7 @@ Next the validator args are consolidated and passed to the validator function
   validator <- do.call(validator_fun, validator_args)
 ```
 
-Lastly the key objects are extracted from the validator and stored in the modeler object including the validation measurement. The best model is saved at the fit slot where the submodels are stored in a nested list within the model object at the sub_models slot
+Lastly the key objects are extracted from the validator and stored in the modeler object including the validation measurement. The best model is saved at the fit slot where the submodels are stored in a nested list within the model object at the sub_models slot. The model performance is extracted, formatted, and stored on the model object.
 
 ```{r, eval=FALSE}
 
@@ -685,8 +695,313 @@ Lastly the key objects are extracted from the validator and stored in the modele
   mobj
 ```
 
-#### Predictions
 
+##### Forecast R Train Model
+
+In this section the Forecast Model `train_model` method is described. Here the logic is much more explicit.
+
+
+```{r}
+
+# train_model.forecaster_model
+train_model.forecast_model
+
+```
+
+
+In the first section, assertions are made on the inputs, a potential parallel backend with doFuture^[Foreach Parallel Adaptor using Futures [via](https://cran.r-project.org/web/packages/doFuture/vignettes/doFuture.html)] is created, the model method function is defined and the indices are extracted. 
+
+```{r, eval=FALSE}
+train_model.forecast_model <- function(mobj, 
+                                       data,
+                                       measure,
+                                       samples,
+                                       save_submodels,
+                                       execution_strategy,
+                                       level,
+                                       ...){
+  
+  checkmate::assert_class(data, "data.frame")
+  checkmate::assert_class(measure, "measure")
+  checkmate::assert_class(samples, "samples")
+  checkmate::assert_logical(save_submodels)
+  checkmate::assert_numeric(level, max.len = 2, upper = 100)
+  
+  # Set Execution Strategy
+  future::plan(execution_strategy)
+  doFuture::registerDoFuture()
+  
+  # Set model function
+  model_fun <- get(mobj$method, asNamespace(mobj$package))
+  
+  # Get Indicies
+  indicies <- get_indicies(samples)
+```
+
+The next section a submodel grid is created as a combination of the method_args, the param_map, and the model method arguments. A unique model is fit for each unique row in the submodel_grid. 
+
+```{r, eval=FALSE}
+ # Submodel grid
+  submodel_grid <- data.frame(expand.grid(c(mobj$method_args,
+                                            mobj$param_map,
+                                            list(method = mobj$method)))) %>%
+    dplyr::mutate(submodel_uid = purrr::map_chr(1:n(), ~ sparklyr::random_string("submodel")),
+                  method = as.character(method))
+  grid_vars <- setdiff(colnames(submodel_grid), c("submodel_uid"))
+  
+```
+
+
+In this section a parameter grid is created including the index samples. A unique model fit is made for each row in the grid. The foreach loop iterates through each rows in the grid.
+
+```{r, eval=FALSE}
+
+  # Define param_grid including samples
+  param_grid <- data.frame(expand.grid(c(
+    mobj$method_args,
+    mobj$param_map,
+    list(index = samples$indicies_names)
+  )))
+  param_vars <- colnames(param_grid)[-ncol(param_grid)]
+```
+
+In the next section the packages are extracted for parallel computation, and the covariates and measure function are set.
+
+```{r, eval=FALSE}
+
+  # Define packages for parallel computation
+  packs <- model_methods %>%
+    dplyr::filter(type == "forecaster") %>%
+    dplyr::pull(package) %>%
+    c("a2modeler", "dplyr") %>%
+    unique()
+  
+  # Covariates
+  x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
+  
+  # Measurement Function:
+  measure_fun <- match.fun(measure$method)
+  
+```
+
+In the next section, the foreach loop is set defined. The benefit of using foreach and doFuture is the loop can be parallelized by changing the execution strategy only. The following code does not have to change for sequential execution.
+
+```{r, eval=FALSE}
+ # Fit submodel to train data for each sample
+  fits <- foreach(
+    rn = 1:nrow(param_grid),
+    .packages = packs,
+    .export = c("mobj", "data", "x_vars", "param_grid", "param_vars", 
+                "indicies", "model_fun", "measure_fun", "level"),
+    .errorhandling = "pass") %dopar% {
+```
+
+
+In the following section the unique model parameters and index are extracted, the training dataset is created, and a model is fit.
+
+```{r, eval=FALSE}
+ # Params
+      params <- as.list(param_grid[rn, param_vars, drop=FALSE])
+      
+      # Get Training Sample
+      index <- as.character(param_grid[["index"]][rn])
+      train_index <- indicies[[index]]$train
+      train_smpl <- data[train_index, , drop=FALSE]
+      
+      # Set Method Args
+      y <- as.numeric(train_smpl[[mobj$target]])
+     
+      if (length(x_vars) > 0) {
+        train_xreg <- train_smpl[, x_vars, drop = FALSE]
+      } else {
+        train_xreg <- NULL
+      }
+      args <- modifyList(params, c(list(y = y, xreg = train_xreg)))
+      
+      # Fit submodel to training sample
+      fit <- do.call(model_fun, args)
+      fit$method_args <- params
+```
+
+Next the rest of the foreach loop is shown. First the validation index is created and the model fit from the previous section is applied to create predictions. The predictions are measured, stored and the model fit is return to the foreach loop output
+
+```{r, eval=FALSE}
+# Make Predictions
+      if(! is.null(indicies[[index]]$validation)) {
+        # Predict each validation sample
+        val_index <- indicies[[index]]$validation
+        val_smpl <- data[val_index, , drop = FALSE]
+        
+        # Set Forecast Args
+        if (length(x_vars) > 0) {
+          val_xreg <- val_smpl[, x_vars, drop = FALSE]
+        } else{
+          val_xreg <- NULL
+        }
+        args <- c(list(
+          object = fit,
+          xreg = val_xreg,
+          h = length(val_index),
+          level = level
+        ),
+        params)
+        fun <- get("forecast", asNamespace("forecast"))
+        fcast <- get_forecasts(do.call(fun, args))
+        fit$predictions <- fcast
+        perf_smpl <-
+          cbind(fcast, val_smpl[, mobj$target, drop = FALSE])
+        
+      } else {
+        perf_smpl <- cbind(data.frame(mean = as.numeric(fit$fitted)),
+                           train_smpl[, mobj$target, drop = FALSE])
+      }
+
+
+      # Evalulate Performance
+      perf <- data.frame(
+        measure = measure_fun(perf_smpl,
+                              predicted = "mean",
+                              actual = mobj$target),
+        index = index,
+        sample = "validation"
+      )
+      perf$index <- as.character(perf$index)
+      perf$sample <- as.character(perf$sample)
+      fit$performance <- perf
+      fit
+```
+
+Once all the model fits are completed, the model performance is made for each unique model, formatted and stored.
+
+```{r, eval=FALSE}
+
+  # Calculate Final Performance
+  fit_grid <- purrr::map_df(fits, "performance") %>%
+    dplyr::rename(!!measure$method := !!names(.)[1]) %>% 
+    dplyr::bind_cols(purrr::map_df(fits, "method_args")) %>% 
+    dplyr::mutate(method = mobj$method) %>% 
+    dplyr::inner_join(submodel_grid, by = grid_vars) %>% 
+    dplyr::select(-method)
+  
+  performance <- fit_grid %>% 
+    dplyr::group_by_at(setdiff(colnames(fit_grid), c(measure$method, "index"))) %>%
+    dplyr::summarise_at(measure$method, mean) %>% 
+    dplyr::ungroup() 
+  
+  if(any(colnames(performance) %in% grid_vars)) {
+    performance <- performance %>% 
+      tidyr::nest(-submodel_uid, -sample, -!!measure$method, .key = "param_grid") 
+  }else {
+    performance <- performance %>% 
+      dplyr::mutate(param_grid = vector("list", 1))
+  }
+  
+  mobj$performance <- performance %>% 
+    dplyr::select(submodel_uid, sample, !!measure$method, param_grid)
+  
+```
+
+In the next section, the best sub model is selected based on the model performance
+
+```{r, eval=FALSE}
+
+  # select best model
+  best_submodel <- mobj$performance %>%
+    dplyr::arrange_at(measure$method,
+                      .funs = ifelse(measure$minimize, identity, dplyr::desc)) %>%
+    head(1)
+```
+
+
+In the last section of the function the model is refit on the full data sample and the submodels are stored on the model object if the save_submodels option is made.
+
+```{r, eval=FALSE}
+
+  # Refit on full sample
+  if (samples$validation_method == "none") {
+    mobj$fit <- fits[[1]]
+  } else {
+    params <- best_submodel$param_grid[[1]] %>% as.list()
+    y <- as.numeric(data[[mobj$target]])
+    if (length(x_vars) > 0) {
+      xreg <- data[, x_vars, drop = FALSE]
+    } else{
+      xreg <- NULL
+    }
+    args <- modifyList(params, list(y = y, xreg = xreg))
+    mobj$fit <- do.call(model_fun, args)
+    
+    # save submodels option
+    if (save_submodels) {
+      sub_models <- list()
+      for (uid in submodel_grid$submodel_uid) {
+        sub_model <- purrr::keep(fits, fit_grid$submodel_uid == uid)
+        names(sub_model) <- samples$indicies_names
+        sub_models[[uid]] <- sub_model
+      }
+      
+      mobj$sub_models <- sub_models
+    }
+  }
+ 
+  mobj
+```
+
+
+
+
+### Predictions
+
+Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction mangement. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.
+
+```{r}
+new_predictions
+```
+
+##### Spark Predict Method
+
+The prediction class stores the predictions made with modeler predict methods. Below is the classifier method, which is very similar to the other spark based classes. 
+
+The method first checks the new data schema to ensure its similar to the input data schema saved in the modeler object. Next the model pipeline is executed on the new data applying any feature engineering transformations. Lastly the predictions are made with the modeler's final model on the pipeline output and saved in a predictions object. 
+
+
+```{r}
+# Classifier Predict Method
+predict.classifier
+```
+
+
+The predict method used internally is specific to the final model class. In the classifier case, the internal predict method below uses the sparklyr `ml_predict` function on the sparkl-ml model and then formatted to the expected output schema. 
+
+```{r}
+# Spark Model Classification predict method
+predict.spark_model_classification 
+```
+
+
+##### Forecaster Predict Methods
+
+The forecaster R predict method works differently. Here the data input is optional. If provided care should be given that it temporally aligns to the intended forecast horizon. The forecaster predictions are forward looking predictions of a sequential variable, which in most cases is a time series. The periods argument sets the prediction horizon length and levels controls the confidence intervals. 
+
+Similar to the classifier predict method the forecaster print method below preforms a schema check on the data if provided, executes the final model's pipeline and creates the predictions using an intenal predict method covered next. Note - the forecaster print method creates a prediction index by using the `extend` method on the forecaster's index and combines with the prediction output. The index class is covered in the next section. 
+
+
+```{r}
+
+# Forecaster predict method
+predict.forecaster
+```
+
+The forecast predict method that creates the prediction output using the `forecast` function from the forecast package. The `get_forecast` function is used to format the output.
+
+
+```{r}
+# forecast model predict method
+predict.forecast_model
+
+# get_forecasts
+get_forecasts.forecast
+```
 
 
 
