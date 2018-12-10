@@ -2,7 +2,6 @@ package com.synchronoss.saw.storage.proxy.service;
 
 import static java.util.Collections.emptyMap;
 import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +12,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
+
+import com.synchronoss.saw.model.Store;
 import org.apache.hadoop.fs.Path;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -112,6 +113,35 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     logger.trace("Search Response", searchResponse.toString());
     return searchResponse;
   }
+
+    @Override
+    public JsonNode ExecuteESQuery(String query, Store store) throws Exception {
+        Preconditions.checkArgument(query != null && !"".equals(query), "query cannnot be null.");
+        logger.debug("Query:", query);
+        Response response = null;
+        RestClient client = null;
+        JsonNode jsonNode=null;
+        String endpoint = store.getDataStore() + "/" + SEARCH;
+        try{
+            HttpEntity requestPaylod = new NStringEntity(query, ContentType.APPLICATION_JSON);
+            client = prepareRESTESConnection();
+            response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+            HttpEntity entity = response.getEntity();
+            jsonNode = objectMapper.readTree(entity.getContent());
+
+            client.close();
+        }
+        finally{
+            if (client !=null){
+                client.close();
+            }
+        }
+        logger.trace("Search Response", jsonNode.toString());
+        return jsonNode;
+    }
 
  
   @Override
@@ -408,7 +438,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     }
     return httpHosts;
   }
-  
+
   private RestClient prepareRESTESConnection() throws Exception {
     RestClient restClient = null;
       if (active){
@@ -416,11 +446,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         credentialsProvider.setCredentials(AuthScope.ANY,
                 new UsernamePasswordCredentials(username, password));
         restClient = RestClient.builder(prepareHostAddresses(hosts, ports))
-                .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-                    @Override
-                    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-                        return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);}
-                }).setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
+                .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)).setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
                   @Override
                   public RequestConfig.Builder customizeRequestConfig(RequestConfig.Builder requestConfigBuilder) {
                       return requestConfigBuilder.setConnectTimeout(5000)
@@ -430,13 +456,8 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
                 .build();
       } else {
         restClient = RestClient.builder(prepareHostAddresses(hosts, ports))
-            .setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
-                @Override
-                public RequestConfig.Builder customizeRequestConfig(RequestConfig.Builder requestConfigBuilder) {
-                    return requestConfigBuilder.setConnectTimeout(5000)
-                            .setSocketTimeout(60000);
-                }
-            })
+            .setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(5000)
+                    .setSocketTimeout(60000))
             .setMaxRetryTimeoutMillis(60000)
             .build();
       }

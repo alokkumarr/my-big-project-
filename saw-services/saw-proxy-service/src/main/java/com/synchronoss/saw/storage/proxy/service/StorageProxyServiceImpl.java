@@ -9,6 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.synchronoss.saw.es.ESResponseParser;
+import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
+import com.synchronoss.saw.es.QueryBuilderUtil;
+import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SIPDSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -352,7 +359,25 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return response;
   }
 
-  public int getSize() {
+    @Override
+    public List<Object> execute(SIPDSL sipdsl) throws Exception {
+        ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl);
+        List<Object> result = null;
+        JsonNode response =
+            storageConnectorService.ExecuteESQuery(query, sipdsl.getSipQuery().getStore());
+        List<Field> dataFields =
+            sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+        List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
+        ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
+        if (response.get("aggregations")!=null)
+         result = esResponseParser.parseData(response.get("aggregations"));
+        else
+            result = QueryBuilderUtil.buildReportData(response);
+        return result;
+    }
+
+    public int getSize() {
     return size;
   }
 
