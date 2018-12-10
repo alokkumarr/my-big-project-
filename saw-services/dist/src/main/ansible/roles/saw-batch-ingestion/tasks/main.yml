@@ -5,6 +5,13 @@
   yum: name=/tmp/saw-batch-ingestion.rpm state=present
   notify:
     - restart saw-batch-ingestion
+- name: Migrate Batch Service database password from old location
+  fetch:
+    src: /etc/bda/saw-batch-ingestion-db-password
+    dest: "{{ inventory_dir + '/sip-batch-ingestion-db-password' }}"
+    flat: yes
+    fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
 - name: Look up Batch Ingestion Service database password
   set_fact:
     saw_batch_ingestion_db_password: >-
@@ -18,8 +25,8 @@
   copy:
     content: "{{ saw_batch_ingestion_db_password }}"
     dest: /etc/bda/saw-batch-ingestion-db-password
-# name: Run SAW Batch Ingestion initial database setup
-# command: /opt/bda/saw-batch-ingestion-service/db-setup/init
+- name: Run SAW Batch Ingestion initial database setup
+  command: /opt/bda/saw-batch-ingestion-service/db-setup/init
   # Note: Run database initialization only on one of the nodes
   when: "groups['saw-services'].index(inventory_hostname) == 0"
 # Workaround: The service restart handler will run only after all
@@ -30,9 +37,5 @@
 # setting before starting the socket activation proxy.  Can be removed
 # as no longer needed after the next SAW release.
 - meta: flush_handlers
-# name: Enable SAW Batch Ingestion Service
-#  systemd: name=saw-batch-ingestion-proxy.socket enabled=true state=started
-# Note: In difference to other socket-activates services, the
-# Batch Service is by default also enabled itself to ensure that
-# name: Enable SAW Batch Ingestion Service
-# systemd: name=saw-batch-ingestion enabled=true
+- name: Enable SAW Batch Ingestion Service
+  systemd: name=saw-batch-ingestion-proxy.socket enabled=true state=started

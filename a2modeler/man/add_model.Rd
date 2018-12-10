@@ -4,8 +4,8 @@
 \alias{add_model}
 \title{Add Model to Modeler Object function}
 \usage{
-add_model(obj, pipe = NULL, method, param_map = list(), ..., desc = NULL,
-  uid = sparklyr::random_string("model"))
+add_model(obj, pipe = NULL, method, param_map = list(), ...,
+  desc = NULL, uid = sparklyr::random_string("model"))
 }
 \arguments{
 \item{obj}{modeler object}

@@ -2,7 +2,6 @@
 % Please edit documentation in R/modeler.R
 \name{get_performance}
 \alias{get_performance}
-\alias{get_performance}
 \title{Get Model Performance}
 \usage{
 get_performance(obj)

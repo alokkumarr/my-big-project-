@@ -32,7 +32,7 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/systemjs/dist/system.src.js",
+              "./node_modules/systemjs/dist/system.src.js",
               "./node_modules/ace-builds/src-min-noconflict/ace.js",
               "./node_modules/ace-builds/src-min-noconflict/theme-eclipse.js",
               "./node_modules/ace-builds/src-min-noconflict/theme-sqlserver.js",

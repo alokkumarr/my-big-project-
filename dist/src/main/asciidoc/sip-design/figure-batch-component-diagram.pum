@@ -1,0 +1,40 @@
+@startuml
+
+node "saw-batch-ingestion-ui" {
+  [sip-portal] - HTTP
+}
+
+node "saw-services" {
+  [sip-portal] --> [saw-gateway]
+  [saw-batch--ingeston-service]
+  [saw-scheduler-service]
+  [saw-batch-log-service-plugin]
+  [saw-batch-sftp-service-plugin]
+
+}
+
+package "com.synchronoss.saw.batch.plugins" {
+ Contract - [extensions]
+}
+
+database "saw-storage" {
+  folder "saw_security" {
+  [saw_security_tables]
+  }
+  folder "sip_batch_ingestion" {
+	[sip_batch_ingestion_tables]
+  }
+  folder "saw_scheduler" {
+	[saw_scheduler_tables]
+  }
+  }
+
+[saw-gateway] --> [saw-batch-ingestion-service]
+[saw-batch-ingestion-service] <--> [saw-scheduler-service]
+[saw-batch-ingestion-service] <--> [saw-batch-log-service-plugin]
+[saw-batch-ingestion-service] <--> [saw-batch-sftp-service-plugin]
+[saw-batch-ingestion-service] --> [saw-batch-sftp-service-plugin]
+[saw-scheduler-service] --> [saw_scheduler_tables]
+[saw-batch-sftp-service-plugin] --> [extensions]
+[saw-batch-log-service-plugin] --> [extensions]
+@enduml
