@@ -179,7 +179,9 @@ export class ExecutedChartViewComponent {
   }
 
   exportGridToExcel() {
-    this.dataGrid.instance.exportToExcel(false);
+    if (!isEmpty(this.chartToggleData)) {
+      this.dataGrid.instance.exportToExcel(false);
+    }
   }
 
   customizeColumns(columns) {

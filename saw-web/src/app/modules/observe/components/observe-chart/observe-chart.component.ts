@@ -357,7 +357,10 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   exportGridToExcel() {
-    this.dataGrid.instance.exportToExcel(false);
+    if (!isEmpty(this.chartToggleData)) {
+      this.dataGrid.instance.exportToExcel(false);
+    }
+
   }
 
   customizeColumns(columns) {
