@@ -243,7 +243,17 @@ class Analysis extends BaseController {
       }
       case "read" => {
         val analysisId = extractAnalysisId(json)
-        json merge contentsAnalyze(readAnalysisJson(analysisId))
+        var analysisDef : JObject = null
+        try {
+          analysisDef = readAnalysisJson(analysisId)
+        }
+        catch {
+          case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+            throw new ClientException("Analysis does not exist")
+        }
+        if (analysisDef==null)
+          throw new ClientException("Analysis does not exist")
+        json merge contentsAnalyze(analysisDef)
       }
       case "search" => {
         val keys = (json \ "contents" \ "keys") (0) match {

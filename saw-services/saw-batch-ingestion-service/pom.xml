@@ -18,38 +18,33 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-boot-starter-pf4j.version>1.0.3.RELEASE</spring-boot-starter-pf4j.version>
-		<start-class>com.synchronoss.saw.SAWBatchServiceApplication</start-class>
+		<start-class>com.synchronoss.saw.batch.SawBatchServiceApplication</start-class>
 		<json.validate>2.2.6</json.validate>
-		<start-class>com.synchronoss.saw.semantic.SAWSemanticServiceApplication</start-class>
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
-		<snotify>1.1</snotify>
 		<wire.mock>2.7.1</wire.mock>
 		<spring.swagger>2.8.0</spring.swagger>
 		<guava>19.0</guava>
 		<flyway.db>5.2.0</flyway.db>
 		<mariadb>2.3.0</mariadb>
+		<snotify>1.1</snotify>
+		<common.io>2.6</common.io>
 	</properties>
 	<repositories>
-	 <repository>
-		<id>synchronoss</id>
+		<repository>
+			<id>synchronoss</id>
 			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+		</repository>
+		<repository>
+			<id>synchronoss-snapshots</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
 		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -59,7 +54,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -89,17 +83,19 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		<!-- Spring integration related service -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-integration</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-sftp</artifactId>
+		</dependency>
+		<!-- Spring integration related service -->
 		<dependency>
 			<groupId>info.faljse</groupId>
 			<artifactId>SDNotify</artifactId>
@@ -141,24 +137,26 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.6</version>
+			<version>${common.io}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.vindell</groupId>
-			<artifactId>spring-boot-starter-pf4j</artifactId>
-			<version>${spring-boot-starter-pf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>info.faljse</groupId>
-			<artifactId>SDNotify</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<!-- This is the SIP Batch plug-in based system -->
+
+		<!-- This is the SIP Batch plug-ins -->
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-batch-plugin-base</artifactId>
+			<artifactId>saw-batch-plugin-interfaces</artifactId>
 			<version>${revision}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-batch-plugin-sftp</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-batch-log-service</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
 		<!-- This is automated migration plugin -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
@@ -169,11 +167,6 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -221,35 +214,8 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<executable>true</executable>
-					<mainClass>com.synchronoss.saw.SawBatchServiceApplication</mainClass>
-					<!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues
-						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
-						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
 				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework</groupId>
-						<artifactId>springloaded</artifactId>
-						<version>1.2.7.RELEASE</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>appassembler-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -291,11 +257,6 @@
 									<directory>true</directory>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-batch-ingestion-service/plugins</name>
-									<directory>true</directory>
-								</entry>
-
-								<entry>
 									<name>/opt/bda/saw-batch-ingestion-service/saw-batch-ingestion.jar</name>
 									<file>target/saw-batch-ingestion-service-${revision}-exec.jar</file>
 								</entry>
@@ -314,9 +275,8 @@
 								<entry>
 									<name>/opt/bda/saw-batch-ingestion-service/db-setup/init</name>
 									<file>src/db-setup/init</file>
-                                    <mode>0755</mode>
+									<mode>0755</mode>
 								</entry>
-
 							</entries>
 							<afterInstallation>
 								<script>systemctl daemon-reload</script>

@@ -1,6 +1,6 @@
 <mat-card class="createsource-dialog">
   <mat-card-header>
-    <mat-card-title class="details-title">{{dialogTitle}}</mat-card-title>
+    <mat-card-title class="details-title mat-subheading-2">{{dialogTitle}}</mat-card-title>
     <div fxFlex></div>
     <button mat-icon-button color="warn" (click)="onCancelClick()">
       <mat-icon fontIcon="icon-close"></mat-icon>
@@ -8,14 +8,14 @@
   </mat-card-header>
   <mat-divider></mat-divider>
   <mat-card-content>
-    <mat-horizontal-stepper linear>
+    <mat-horizontal-stepper linear [selectedIndex]="selectedStepIndex">
       <ng-template matStepperIcon="edit">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
       <ng-template matStepperIcon="done">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
-      <mat-step label="Select Source Type" [stepControl]="firstStep">
+      <mat-step label="Select Channel Type" [stepControl]="firstStep" [editable]="isTypeEditable">
         <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="source-container">
           <div fxFlex fxLayout="row wrap" fxLayoutAlign="space-around space-around" class="source-list">
             <mat-card class="mat-elevation-z3" [class.selected]="selectedSource === source.uid" *ngFor="let source of sources"
@@ -41,6 +41,10 @@
               <mat-error *ngIf="detailsFormGroup.controls.channelName.hasError('required')" i18n>
                 Channel Name is
                 <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="detailsFormGroup.controls.channelName.hasError('isUnique')" i18n>
+                Channel Name already
+                <strong>exists</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
@@ -113,8 +117,9 @@
         </form>
         <mat-divider></mat-divider>
         <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
-          <button mat-raised-button color="primary" matStepperPrevious>Previous</button>
-          <button mat-stroked-button color="primary" (click)="testConnection()" i18n>
+          <button mat-raised-button color="primary" *ngIf="isTypeEditable" matStepperPrevious>Previous</button>
+          <button mat-stroked-button color="primary" *ngIf="!isTypeEditable" (click)="onCancelClick()" color="warn" matStepperPrevious>Cancel</button>
+          <button mat-stroked-button color="primary" (click)="testChannel(detailsFormGroup.value)" i18n [disabled]="!detailsFormGroup.valid">
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
           <button mat-raised-button *ngIf="opType === 'create'" color="primary" type="submit" [disabled]="!detailsFormGroup.valid"

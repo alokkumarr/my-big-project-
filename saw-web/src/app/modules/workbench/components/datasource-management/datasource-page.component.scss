@@ -72,11 +72,6 @@
     padding: 3px 3px 3px 0;
     border-radius: 5px;
 
-    ::ng-deep .dx-datagrid-headers .dx-header-row {
-      background-color: $background-color !important;
-      border-bottom: 1px solid $primary-grey-g1;
-    }
-
     .s-name {
       font-size: 14px;
       font-weight: 600;
@@ -89,8 +84,17 @@
     border-radius: 5px;
 
     .routes-card-body {
+      overflow: auto;
+      height: calc(100% - 43px);
+
       .mat-divider {
         border-color: rgba(0, 0, 0, 0.05) !important;
+      }
+
+      .route-grid--action-buttons {
+        button {
+          width: 24px;
+        }
       }
     }
 
@@ -101,9 +105,10 @@
 
     .details-title {
       text-align: left;
-      color: $primary-grey-g3;
+      color: $primary-blue-b1;
       padding-left: 10px;
       margin: 0;
+      font-weight: 600 !important;
     }
 
     .details-content {
@@ -130,14 +135,6 @@
 
   .dx-virtual-row {
     height: 0 !important;
-  }
-
-  .pwd-show {
-    -webkit-text-security: none !important;
-  }
-
-  .pwd-hide {
-    -webkit-text-security: disc;
   }
 }
 

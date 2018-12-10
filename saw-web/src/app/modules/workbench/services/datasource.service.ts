@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { JwtService } from '../../../common/services';
 import APP_CONFIG from '../../../../../appConfig';
 import { of, Observable } from 'rxjs';
@@ -13,8 +13,10 @@ const userProject = 'workbench';
 })
 export class DatasourceService {
   public api = get(APP_CONFIG, 'api.url');
-
-  constructor(public http: HttpClient, public jwt: JwtService) {}
+  constructor(public http: HttpClient, public jwt: JwtService) {
+    this.isDuplicateChannel = this.isDuplicateChannel.bind(this);
+    this.isDuplicateRoute = this.isDuplicateRoute.bind(this);
+  }
 
   /**
    * Get list of all data sources
@@ -44,6 +46,44 @@ export class DatasourceService {
         `${this.api}/ingestion/batch/channels/${channelID}/routes?size=10000`
       )
       .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Get logs of a route
+   *
+   * @returns
+   * @memberof DatasourceService
+   */
+  getRoutesLogs(channelID, routeID): Observable<any> {
+    // This API supports for BE pagination.
+    // Refer to JIRA ID: SIP-4615 if more info needed about this API support.
+    return this.http
+      .get(
+        `${this.api}/ingestion/batch/logs/${channelID}/${routeID}`
+      )
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  isDuplicateChannel(channelName): Observable<boolean> {
+    const endpoint = `${this.api}/ingestion/batch/channels/duplicate?channelName=${channelName}`;
+
+    return this.http
+      .get(endpoint)
+      .pipe(
+        map(data => data as boolean),
+        catchError(this.handleError('data', false))
+      );
+  }
+
+  isDuplicateRoute({channelId, routeName}): Observable<boolean> {
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?channelId=${channelId}&routeName=${routeName}`;
+
+    return this.http
+      .get(endpoint)
+      .pipe(
+        map(data => data as boolean),
+        catchError(this.handleError('data', false))
+      );
   }
 
   /**
@@ -171,6 +211,62 @@ export class DatasourceService {
 
     return this.http
       .post(endpoint, JSON.stringify(payload))
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Test connectivity for a channel
+   *
+   * @param {*} channelID
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testChannel(channelID): Observable<any> {
+    return this.http
+      .get(`${this.api}/ingestion/batch/sftp/channels/${channelID}/status`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Test connectivity for a route
+   *
+   * @param {*} routeID
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testRoute(routeID): Observable<any> {
+    return this.http
+      .get(`${this.api}/ingestion/batch/sftp/routes/${routeID}/status`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Check channel connection using config
+   *
+   * @param {*} payload
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testChannelWithBody(payload): Observable<any> {
+    const endpoint = `${this.api}/ingestion/batch/sftp/channels/test`;
+
+    return this.http
+      .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Check route connection using config
+   *
+   * @param {*} payload
+   * @returns {Observable<any>}
+   * @memberof DatasourceService
+   */
+  testRouteWithBody(payload): Observable<any> {
+    const endpoint = `${this.api}/ingestion/batch/sftp/routes/test`;
+
+    return this.http
+      .post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
 

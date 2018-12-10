@@ -1,10 +1,23 @@
 <h1 mat-dialog-title>Are you sure to delete ?</h1>
 <mat-divider></mat-divider>
 <div mat-dialog-content>
-  <p>This action deletes permanently and cannot be un-done.</p>
+  <div fxLayout="column">
+    <div class="details-content" fxFlex="50" fxLayout="row">
+      <span class="prop-name" i18n>{{ data?.typeTitle }} : </span>
+      <span>{{ data?.typeName }}</span>
+    </div>
+    <p *ngIf="!data.routesNr" class="mat-caption" i18n>
+      This action deletes the above permanently and cannot be un-done.
+    </p>
+    <p *ngIf="data.routesNr > 0" class="mat-caption" i18n>
+      This channel has {{data.routesNr}} routes and cannot be deleted. Delete the routes first!
+    </p>
+  </div>
 </div>
 <div mat-dialog-actions>
   <button mat-raised-button color="primary" (click)="onNoClick()">No</button>
   <div fxFlex></div>
-  <button mat-raised-button color="warn" (click)="onYesClick()" cdkFocusInitial>Yes</button>
+  <button [disabled]="data.routesNr > 0" mat-raised-button color="warn" (click)="onYesClick()" cdkFocusInitial>
+    Yes
+  </button>
 </div>

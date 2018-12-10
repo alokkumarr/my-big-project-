@@ -43,7 +43,8 @@ import {
   CreateSourceDialogComponent,
   TestConnectivityComponent,
   CreateRouteDialogComponent,
-  ConfirmActionDialogComponent
+  ConfirmActionDialogComponent,
+  LogsDialogComponent
 } from './components/datasource-management/index';
 
 import { DefaultWorkbenchPageGuard } from './guards';
@@ -76,6 +77,7 @@ const COMPONENTS = [
   DatapodsGridPageComponent,
   DatapodActionsComponent,
   DatasourceComponent,
+  LogsDialogComponent,
   CreateSourceDialogComponent,
   TestConnectivityComponent,
   CreateRouteDialogComponent,

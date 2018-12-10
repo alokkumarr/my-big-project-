@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
 import { DatasourceService } from '../../../services/datasource.service';
+import { isUnique } from '../../../../../common/validators';
 
 import { CHANNEL_TYPES } from '../../../wb-comp-configs';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
@@ -22,6 +23,8 @@ export class CreateSourceDialogComponent implements OnInit {
   opType = 'create';
   show = false;
   dialogTitle = 'Create Data Channel';
+  selectedStepIndex = 0;
+  isTypeEditable = true;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -39,7 +42,7 @@ export class CreateSourceDialogComponent implements OnInit {
     });
 
     this.detailsFormGroup = this._formBuilder.group({
-      channelName: ['', Validators.required],
+      channelName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateChannel)],
       hostName: ['', Validators.required],
       portNo: [
         '',
@@ -58,10 +61,9 @@ export class CreateSourceDialogComponent implements OnInit {
   ngOnInit() {
     if (isUndefined(this.channelData.length)) {
       this.opType = 'update';
-      this.dialogTitle = 'Edit Data Channel';
-      if (!isUndefined(this.channelData.password)) {
-        this.decryptPWD(this.channelData.password);
-      }
+      this.isTypeEditable = false;
+      this.dialogTitle = 'Edit Channel';
+      this.selectedStepIndex = 1;
       this.selectedSource = this.channelData.channelType;
       this.firstStep.patchValue(this.channelData);
       this.detailsFormGroup.patchValue(this.channelData);
@@ -76,11 +78,8 @@ export class CreateSourceDialogComponent implements OnInit {
   }
 
   createSource(formData) {
-    this.datasourceService.encryptPWD(formData.password).subscribe(data => {
-      formData.password = data.data;
-      const sourceDetails = this.mapData(formData);
-      this.dialogRef.close({ sourceDetails, opType: this.opType });
-    });
+    const sourceDetails = this.mapData(formData);
+    this.dialogRef.close({ sourceDetails, opType: this.opType });
   }
 
   mapData(data) {
@@ -105,17 +104,25 @@ export class CreateSourceDialogComponent implements OnInit {
     this.show = !this.show;
   }
 
-  decryptPWD(pwd) {
-    this.datasourceService.decryptPWD(pwd).subscribe(data => {
-      this.detailsFormGroup.controls.password.setValue(data.data);
+  testChannel(formData) {
+    const channelData = {
+      channelType: this.selectedSource,
+      hostName: formData.hostName,
+      password: formData.password,
+      portNo: formData.portNo,
+      userName: formData.userName
+    };
+    this.datasourceService.testChannelWithBody(channelData).subscribe(data => {
+      this.showConnectivityLog(data);
     });
   }
 
-  testConnection() {
+  showConnectivityLog(logData) {
     this.dialogRef.updatePosition({ top: '30px' });
     const snackBarRef = this.snackBar.openFromComponent(
       TestConnectivityComponent,
       {
+        data: logData,
         horizontalPosition: 'center',
         panelClass: ['mat-elevation-z9', 'testConnectivityClass']
       }

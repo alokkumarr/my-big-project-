@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.Response;
-import java.util.UUID;
 import org.junit.Test;
 
 /**
@@ -229,13 +228,5 @@ public class WorkbenchIT extends BaseIT {
       log.debug("Interrupted");
     }
     waitForPreview(id, retries - 1);
-  }
-
-  /**
-   * Generate ID suitable for use as suffix in dataset names to ensure
-   * each test gets a unique dataset name.
-   */
-  private String testId() {
-    return UUID.randomUUID().toString();
   }
 }

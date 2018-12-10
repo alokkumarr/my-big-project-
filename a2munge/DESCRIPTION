@@ -19,6 +19,9 @@ Imports:
     lubridate,
     purrr,
     DBI,
-Suggests: 
+Suggests:
     testthat,
-RoxygenNote: 6.1.0
+    knitr,
+    rmarkdown
+RoxygenNote: 6.1.1
+VignetteBuilder: knitr

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: saw-batch-log-service
+  datasource:
+    url: jdbc:mariadb://localhost/SIP_BATCH_INGESTION
+    username: root
+    password: root
+    driver-class-name:  org.mariadb.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql : true
+    open-in-view: false
+
+server:
+  address: localhost
+  port: 9645
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+logging:
+  level:
+    com.synchronoss.saw.logs: INFO
+    org.springframework: INFO
+scheduler-url : http://localhost:9601/scheduler/bisscheduler
+       

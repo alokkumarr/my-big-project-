@@ -13,6 +13,7 @@ import { CreateSourceDialogComponent } from './createSource-dialog/createSource-
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 import { ConfirmActionDialogComponent } from './confirm-action-dialog/confirm-action-dialog.component';
+import { LogsDialogComponent } from './logs-dialog';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
@@ -56,7 +57,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   getSources() {
     this.unFilteredSourceData = [];
     this.datasourceService.getSourceList().subscribe(data => {
-      forEach(data.content, value => {
+      forEach(data, value => {
         // Channel metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
         const tempVar = merge(value, JSON.parse(value.channelMetadata));
         this.unFilteredSourceData.push(tempVar);
@@ -99,11 +100,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       this.channelEditable = true;
       this.selectedSourceData = event.selectedRowsData[0];
       this.getRoutesForChannel(event.selectedRowKeys[0]);
-      this.decryptPWD(this.selectedSourceData.password);
     } else if (event.selectedRowKeys.length > 0) {
       this.channelEditable = true;
       this.selectedSourceData = event.selectedRowsData[0];
-      this.decryptPWD(this.selectedSourceData.password);
     } else {
       this.channelEditable = false;
       this.selectedSourceData = [];
@@ -169,7 +168,12 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   deleteChannel(channelID) {
     const dialogRef = this.dialog.open(ConfirmActionDialogComponent, {
-      width: '350px'
+      width: '350px',
+      data: {
+        typeTitle: 'Channel Name',
+        typeName: this.selectedSourceData.channelName,
+        routesNr: this.routesData.length
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -182,8 +186,22 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
   }
 
-  testConnection() {
+  testChannel(channelID) {
+    this.datasourceService.testChannel(channelID).subscribe(data => {
+      this.showConnectivityLog(data);
+    });
+  }
+
+  testRoute(routeData) {
+    const routeID = routeData.bisRouteSysId;
+    this.datasourceService.testRoute(routeID).subscribe(data => {
+      this.showConnectivityLog(data);
+    });
+  }
+
+  showConnectivityLog(logData) {
     this.snackBar.openFromComponent(TestConnectivityComponent, {
+      data: logData,
       horizontalPosition: 'center',
       panelClass: ['mat-elevation-z9', 'testConnectivityClass']
     });
@@ -206,7 +224,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   getRoutesForChannel(channelID) {
     this.routesData = [];
     this.datasourceService.getRoutesList(channelID).subscribe(data => {
-      forEach(data.content, value => {
+      forEach(data, value => {
         // routes metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
         const tempVar = merge(value, JSON.parse(value.routeMetadata));
         this.routesData.push(tempVar);
@@ -229,7 +247,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       minHeight: '600px',
       maxWidth: '900px',
       panelClass: 'sourceDialogClass',
-      data: routeMetadata
+      data: {
+        routeMetadata,
+        channelID: this.selectedSourceData.bisChannelSysId,
+        channelName: this.selectedSourceData.channelName
+      }
     });
 
     dateDialogRef.afterClosed().subscribe(data => {
@@ -264,7 +286,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   deleteRoute(routeData) {
     const dialogRef = this.dialog.open(ConfirmActionDialogComponent, {
-      width: '350px'
+      width: '350px',
+      data: {
+        typeTitle: 'Route Name',
+        typeName: routeData.routeName
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -279,18 +305,31 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
   }
 
-  decryptPWD(pwd) {
-    this.datasourceService.decryptPWD(pwd).subscribe(data => {
-      this.selectedSourceData.password = data.data;
-    });
-  }
-
   calculateScheduleCellValue(rowData) {
-    const {cronexp, activeTab} = rowData.schedulerExpression;
+    const { cronexp, activeTab } = rowData.schedulerExpression;
     return generateSchedule(cronexp, activeTab);
   }
 
   togglePWD() {
     this.show = !this.show;
+  }
+
+  openLogsDialog(routeData) {
+    this.dialog.open(LogsDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      disableClose: true,
+      height: '60%',
+      width: '70%',
+      minWidth: '750px',
+      minHeight: '600px',
+      maxWidth: '900px',
+      panelClass: 'sourceDialogClass',
+      data: {
+        ...routeData,
+        channelName: this.selectedSourceData.channelName
+      }
+    });
   }
 }
