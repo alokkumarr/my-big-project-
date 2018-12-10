@@ -186,38 +186,21 @@ r1 &lt;-<span class="st"> </span><span class="kw">regressor</span>(<span class="
 <p>In the following chunk the <code>regresser</code> constructor function can be see creating a modeler object internally with the <code>modeler</code> constructor, adding a default RMSE measure, and updated the class with the <code>structure</code> function. Note - <code>regressor</code> currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. The spark constraint is true for <code>classifier</code>, <code>multi-classifier</code>, and <code>segmenter</code> as well. Also note that a check is made to ensure that there isn’t an existing ‘index’ column name. The data sampling partitioning functionality use the variable ‘index’ to create a row index and filter.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># regressor constructor</span>
 regressor
-<span class="co">#&gt; function(df,</span>
-<span class="co">#&gt;                       target,</span>
-<span class="co">#&gt;                       name = NULL,</span>
-<span class="co">#&gt;                       uid = NULL,</span>
-<span class="co">#&gt;                       version = NULL,</span>
-<span class="co">#&gt;                       desc = NULL,</span>
-<span class="co">#&gt;                       scientist = NULL,</span>
-<span class="co">#&gt;                       execution_strategy = &quot;sequential&quot;,</span>
-<span class="co">#&gt;                       refit = TRUE,</span>
-<span class="co">#&gt;                       save_submodels = TRUE,</span>
-<span class="co">#&gt;                       dir = NULL,</span>
-<span class="co">#&gt;                       seed = 319,</span>
-<span class="co">#&gt;                       ...){</span>
-<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
-<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
-<span class="co">#&gt;                   target = target,</span>
-<span class="co">#&gt;                   type = &quot;regressor&quot;,</span>
-<span class="co">#&gt;                   name,</span>
-<span class="co">#&gt;                   uid,</span>
-<span class="co">#&gt;                   version,</span>
-<span class="co">#&gt;                   desc,</span>
-<span class="co">#&gt;                   scientist,</span>
-<span class="co">#&gt;                   execution_strategy,</span>
-<span class="co">#&gt;                   refit,</span>
-<span class="co">#&gt;                   save_submodels,</span>
-<span class="co">#&gt;                   dir)</span>
-<span class="co">#&gt;   mobj &lt;- structure(mobj, class = c(&quot;regressor&quot;, class(mobj)))</span>
-<span class="co">#&gt;   mobj &lt;- set_measure(mobj, RMSE)</span>
-<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt; function (df, target, name = NULL, uid = NULL, version = NULL, </span>
+<span class="co">#&gt;     desc = NULL, scientist = NULL, execution_strategy = &quot;sequential&quot;, </span>
+<span class="co">#&gt;     refit = TRUE, save_submodels = TRUE, dir = NULL, seed = 319, </span>
+<span class="co">#&gt;     ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;     checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt;     mobj &lt;- modeler(df, target = target, type = &quot;regressor&quot;, </span>
+<span class="co">#&gt;         name, uid, version, desc, scientist, execution_strategy, </span>
+<span class="co">#&gt;         refit, save_submodels, dir)</span>
+<span class="co">#&gt;     mobj &lt;- structure(mobj, class = c(&quot;regressor&quot;, class(mobj)))</span>
+<span class="co">#&gt;     mobj &lt;- set_measure(mobj, RMSE)</span>
+<span class="co">#&gt;     mobj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011353068&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="classifier" class="section level4">
@@ -225,53 +208,30 @@ regressor
 <p>Next is the <code>classifier</code> constructor. The function is very similiar to the <code>regressor</code> except now there are checks for a binary distribution of the target variable and AUC default measure.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Classifier Constructor</span>
 classifier
-<span class="co">#&gt; function(df,</span>
-<span class="co">#&gt;                        target,</span>
-<span class="co">#&gt;                        name = NULL,</span>
-<span class="co">#&gt;                        uid = NULL,</span>
-<span class="co">#&gt;                        version = NULL,</span>
-<span class="co">#&gt;                        desc = NULL,</span>
-<span class="co">#&gt;                        scientist = NULL,</span>
-<span class="co">#&gt;                        execution_strategy = &quot;sequential&quot;,</span>
-<span class="co">#&gt;                        refit = TRUE,</span>
-<span class="co">#&gt;                        save_submodels = TRUE,</span>
-<span class="co">#&gt;                        dir = NULL,</span>
-<span class="co">#&gt;                        seed = 319,</span>
-<span class="co">#&gt;                        ...){</span>
-<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
-<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Target Check</span>
-<span class="co">#&gt;   target_dims &lt;- df %&gt;%</span>
-<span class="co">#&gt;     dplyr::distinct(!!rlang::sym(target)) %&gt;%</span>
-<span class="co">#&gt;     dplyr::collect() %&gt;%</span>
-<span class="co">#&gt;     pull(!!rlang::sym(target))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(length(target_dims) != 2) {</span>
-<span class="co">#&gt;     stop(paste(&quot;target not a binary distribution.\n  Has&quot;, target_dims, &quot;unique values&quot;))</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(! all(c(0,1) %in% target_dims)) {</span>
-<span class="co">#&gt;     stop(&quot;binary target distribution not encoded as 0-1.\nPlease update to numeric with 0/1 values&quot;)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
-<span class="co">#&gt;                   target = target,</span>
-<span class="co">#&gt;                   type = &quot;classifier&quot;,</span>
-<span class="co">#&gt;                   name,</span>
-<span class="co">#&gt;                   uid,</span>
-<span class="co">#&gt;                   version,</span>
-<span class="co">#&gt;                   desc,</span>
-<span class="co">#&gt;                   scientist,</span>
-<span class="co">#&gt;                   execution_strategy,</span>
-<span class="co">#&gt;                   refit,</span>
-<span class="co">#&gt;                   save_submodels,</span>
-<span class="co">#&gt;                   dir,</span>
-<span class="co">#&gt;                   seed)</span>
-<span class="co">#&gt;   mobj &lt;- structure(mobj, class = c(&quot;classifier&quot;, class(mobj)))</span>
-<span class="co">#&gt;   mobj &lt;- set_measure(mobj, AUC)</span>
-<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt; function (df, target, name = NULL, uid = NULL, version = NULL, </span>
+<span class="co">#&gt;     desc = NULL, scientist = NULL, execution_strategy = &quot;sequential&quot;, </span>
+<span class="co">#&gt;     refit = TRUE, save_submodels = TRUE, dir = NULL, seed = 319, </span>
+<span class="co">#&gt;     ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;     checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt;     target_dims &lt;- df %&gt;% dplyr::distinct(!!rlang::sym(target)) %&gt;% </span>
+<span class="co">#&gt;         dplyr::collect() %&gt;% pull(!!rlang::sym(target))</span>
+<span class="co">#&gt;     if (length(target_dims) != 2) {</span>
+<span class="co">#&gt;         stop(paste(&quot;target not a binary distribution.\n  Has&quot;, </span>
+<span class="co">#&gt;             target_dims, &quot;unique values&quot;))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (!all(c(0, 1) %in% target_dims)) {</span>
+<span class="co">#&gt;         stop(&quot;binary target distribution not encoded as 0-1.\nPlease update to numeric with 0/1 values&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     mobj &lt;- modeler(df, target = target, type = &quot;classifier&quot;, </span>
+<span class="co">#&gt;         name, uid, version, desc, scientist, execution_strategy, </span>
+<span class="co">#&gt;         refit, save_submodels, dir, seed)</span>
+<span class="co">#&gt;     mobj &lt;- structure(mobj, class = c(&quot;classifier&quot;, class(mobj)))</span>
+<span class="co">#&gt;     mobj &lt;- set_measure(mobj, AUC)</span>
+<span class="co">#&gt;     mobj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001153d628&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="multiclasifier" class="section level4">
@@ -279,51 +239,28 @@ classifier
 <p>The <code>multiclassifier</code> constructor function is very similar to the <code>classifier</code> function. Now the checks are for a target variable with more than 2 unique values, and a F1 default measure.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Multiclassifier Constructor</span>
 multiclassifier
-<span class="co">#&gt; function(df,</span>
-<span class="co">#&gt;                             target,</span>
-<span class="co">#&gt;                             name = NULL,</span>
-<span class="co">#&gt;                             uid = NULL,</span>
-<span class="co">#&gt;                             version = NULL,</span>
-<span class="co">#&gt;                             desc = NULL,</span>
-<span class="co">#&gt;                             scientist = NULL,</span>
-<span class="co">#&gt;                             execution_strategy = &quot;sequential&quot;,</span>
-<span class="co">#&gt;                             refit = TRUE,</span>
-<span class="co">#&gt;                             save_submodels = TRUE,</span>
-<span class="co">#&gt;                             dir = NULL,</span>
-<span class="co">#&gt;                             seed = 319,</span>
-<span class="co">#&gt;                             ...){</span>
-<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
-<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   # Target Check</span>
-<span class="co">#&gt;   target_dims &lt;- df %&gt;%</span>
-<span class="co">#&gt;     dplyr::distinct_(target) %&gt;%</span>
-<span class="co">#&gt;     sparklyr::sdf_nrow()</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   if(target_dims == 2) {</span>
-<span class="co">#&gt;     stop(paste(&quot;target is a binary distribution. Use a classifier instead&quot;))</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   if(target_dims &gt; 100) {</span>
-<span class="co">#&gt;     warnings(&quot;target has over 100 unique values&quot;)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
-<span class="co">#&gt;                   target = target,</span>
-<span class="co">#&gt;                   type = &quot;multiclassifier&quot;,</span>
-<span class="co">#&gt;                   name,</span>
-<span class="co">#&gt;                   uid,</span>
-<span class="co">#&gt;                   version,</span>
-<span class="co">#&gt;                   desc,</span>
-<span class="co">#&gt;                   scientist,</span>
-<span class="co">#&gt;                   execution_strategy,</span>
-<span class="co">#&gt;                   refit,</span>
-<span class="co">#&gt;                   save_submodels,</span>
-<span class="co">#&gt;                   dir,</span>
-<span class="co">#&gt;                   seed)</span>
-<span class="co">#&gt;   mobj &lt;- structure(mobj, class = c(&quot;multiclassifier&quot;, class(mobj)))</span>
-<span class="co">#&gt;   mobj &lt;- set_measure(mobj, F1)</span>
-<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt; function (df, target, name = NULL, uid = NULL, version = NULL, </span>
+<span class="co">#&gt;     desc = NULL, scientist = NULL, execution_strategy = &quot;sequential&quot;, </span>
+<span class="co">#&gt;     refit = TRUE, save_submodels = TRUE, dir = NULL, seed = 319, </span>
+<span class="co">#&gt;     ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;     checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt;     target_dims &lt;- df %&gt;% dplyr::distinct_(target) %&gt;% sparklyr::sdf_nrow()</span>
+<span class="co">#&gt;     if (target_dims == 2) {</span>
+<span class="co">#&gt;         stop(paste(&quot;target is a binary distribution. Use a classifier instead&quot;))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (target_dims &gt; 100) {</span>
+<span class="co">#&gt;         warnings(&quot;target has over 100 unique values&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     mobj &lt;- modeler(df, target = target, type = &quot;multiclassifier&quot;, </span>
+<span class="co">#&gt;         name, uid, version, desc, scientist, execution_strategy, </span>
+<span class="co">#&gt;         refit, save_submodels, dir, seed)</span>
+<span class="co">#&gt;     mobj &lt;- structure(mobj, class = c(&quot;multiclassifier&quot;, class(mobj)))</span>
+<span class="co">#&gt;     mobj &lt;- set_measure(mobj, F1)</span>
+<span class="co">#&gt;     mobj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011703098&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="segmenter" class="section level4">
@@ -331,37 +268,20 @@ multiclassifier
 <p>The <code>segmenter</code> function differs slightly in that there is no target variable (set as NULL) and with a Silhouette default measure.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Segmenter Constructor</span>
 segmenter
-<span class="co">#&gt; function(df,</span>
-<span class="co">#&gt;                       name = NULL,</span>
-<span class="co">#&gt;                       uid = NULL,</span>
-<span class="co">#&gt;                       version = NULL,</span>
-<span class="co">#&gt;                       desc = NULL,</span>
-<span class="co">#&gt;                       scientist = NULL,</span>
-<span class="co">#&gt;                       execution_strategy = &quot;sequential&quot;,</span>
-<span class="co">#&gt;                       refit = TRUE,</span>
-<span class="co">#&gt;                       save_submodels = TRUE,</span>
-<span class="co">#&gt;                       dir = NULL,</span>
-<span class="co">#&gt;                       seed = 319,</span>
-<span class="co">#&gt;                       ...){</span>
-<span class="co">#&gt;   checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
-<span class="co">#&gt;   checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
-<span class="co">#&gt;                   target = NULL,</span>
-<span class="co">#&gt;                   type = &quot;segmenter&quot;,</span>
-<span class="co">#&gt;                   name,</span>
-<span class="co">#&gt;                   uid,</span>
-<span class="co">#&gt;                   version,</span>
-<span class="co">#&gt;                   desc,</span>
-<span class="co">#&gt;                   scientist,</span>
-<span class="co">#&gt;                   execution_strategy,</span>
-<span class="co">#&gt;                   refit,</span>
-<span class="co">#&gt;                   save_submodels,</span>
-<span class="co">#&gt;                   dir)</span>
-<span class="co">#&gt;   sobj &lt;- structure(mobj, class = c(&quot;segmenter&quot;, class(mobj)))</span>
-<span class="co">#&gt;   sobj &lt;- set_measure(sobj, Silhouette)</span>
-<span class="co">#&gt;   sobj</span>
+<span class="co">#&gt; function (df, name = NULL, uid = NULL, version = NULL, desc = NULL, </span>
+<span class="co">#&gt;     scientist = NULL, execution_strategy = &quot;sequential&quot;, refit = TRUE, </span>
+<span class="co">#&gt;     save_submodels = TRUE, dir = NULL, seed = 319, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_subset(&quot;tbl_spark&quot;, class(df))</span>
+<span class="co">#&gt;     checkmate::assert_false(&quot;index&quot; %in% colnames(df))</span>
+<span class="co">#&gt;     mobj &lt;- modeler(df, target = NULL, type = &quot;segmenter&quot;, name, </span>
+<span class="co">#&gt;         uid, version, desc, scientist, execution_strategy, refit, </span>
+<span class="co">#&gt;         save_submodels, dir)</span>
+<span class="co">#&gt;     sobj &lt;- structure(mobj, class = c(&quot;segmenter&quot;, class(mobj)))</span>
+<span class="co">#&gt;     sobj &lt;- set_measure(sobj, Silhouette)</span>
+<span class="co">#&gt;     sobj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000118d6430&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="forecaster" class="section level4">
@@ -369,49 +289,28 @@ segmenter
 <p>As can be seen below the <code>forecaster</code> constructor is the most different from the others. <code>Forecaster</code> is R data.frame based, and requries an explict index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Forecaster Constructor</span>
 forecaster
-<span class="co">#&gt; function(df,</span>
-<span class="co">#&gt;                        target,</span>
-<span class="co">#&gt;                        index_var,</span>
-<span class="co">#&gt;                        unit = NULL,</span>
-<span class="co">#&gt;                        frequency = NULL,</span>
-<span class="co">#&gt;                        prediction_conf_levels = c(80, 95),</span>
-<span class="co">#&gt;                        name = NULL,</span>
-<span class="co">#&gt;                        uid = NULL,</span>
-<span class="co">#&gt;                        version = NULL,</span>
-<span class="co">#&gt;                        desc = NULL,</span>
-<span class="co">#&gt;                        scientist = NULL,</span>
-<span class="co">#&gt;                        execution_strategy = &quot;sequential&quot;,</span>
-<span class="co">#&gt;                        refit = TRUE,</span>
-<span class="co">#&gt;                        save_submodels = TRUE,</span>
-<span class="co">#&gt;                        dir = NULL,</span>
-<span class="co">#&gt;                        ...){</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   checkmate::assert_choice(index_var, colnames(df))</span>
-<span class="co">#&gt;   checkmate::assert_numeric(frequency, lower = 1, null.ok = TRUE)</span>
-<span class="co">#&gt;   checkmate::assert_numeric(prediction_conf_levels, lower = 50, upper = 100,</span>
-<span class="co">#&gt;                             min.len = 1, max.len = 2)</span>
-<span class="co">#&gt;   checkmate::assert_character(unit, null.ok = TRUE)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   mobj &lt;- modeler(df,</span>
-<span class="co">#&gt;                   target,</span>
-<span class="co">#&gt;                   type = &quot;forecaster&quot;,</span>
-<span class="co">#&gt;                   name,</span>
-<span class="co">#&gt;                   uid,</span>
-<span class="co">#&gt;                   version,</span>
-<span class="co">#&gt;                   desc,</span>
-<span class="co">#&gt;                   scientist,</span>
-<span class="co">#&gt;                   execution_strategy,</span>
-<span class="co">#&gt;                   refit,</span>
-<span class="co">#&gt;                   save_submodels,</span>
-<span class="co">#&gt;                   dir)</span>
-<span class="co">#&gt;   mobj$index_var &lt;- index_var</span>
-<span class="co">#&gt;   mobj$index &lt;- index(df[[index_var]], unit = unit)</span>
-<span class="co">#&gt;   mobj$frequency &lt;- frequency</span>
-<span class="co">#&gt;   mobj$conf_levels &lt;- prediction_conf_levels</span>
-<span class="co">#&gt;   fobj &lt;- structure(mobj, class = c(&quot;forecaster&quot;, class(mobj)))</span>
-<span class="co">#&gt;   fobj &lt;- set_measure(fobj, RMSE)</span>
-<span class="co">#&gt;   fobj</span>
+<span class="co">#&gt; function (df, target, index_var, unit = NULL, frequency = NULL, </span>
+<span class="co">#&gt;     prediction_conf_levels = c(80, 95), name = NULL, uid = NULL, </span>
+<span class="co">#&gt;     version = NULL, desc = NULL, scientist = NULL, execution_strategy = &quot;sequential&quot;, </span>
+<span class="co">#&gt;     refit = TRUE, save_submodels = TRUE, dir = NULL, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_choice(index_var, colnames(df))</span>
+<span class="co">#&gt;     checkmate::assert_numeric(frequency, lower = 1, null.ok = TRUE)</span>
+<span class="co">#&gt;     checkmate::assert_numeric(prediction_conf_levels, lower = 50, </span>
+<span class="co">#&gt;         upper = 100, min.len = 1, max.len = 2)</span>
+<span class="co">#&gt;     checkmate::assert_character(unit, null.ok = TRUE)</span>
+<span class="co">#&gt;     mobj &lt;- modeler(df, target, type = &quot;forecaster&quot;, name, uid, </span>
+<span class="co">#&gt;         version, desc, scientist, execution_strategy, refit, </span>
+<span class="co">#&gt;         save_submodels, dir)</span>
+<span class="co">#&gt;     mobj$index_var &lt;- index_var</span>
+<span class="co">#&gt;     mobj$index &lt;- index(df[[index_var]], unit = unit)</span>
+<span class="co">#&gt;     mobj$frequency &lt;- frequency</span>
+<span class="co">#&gt;     mobj$conf_levels &lt;- prediction_conf_levels</span>
+<span class="co">#&gt;     fobj &lt;- structure(mobj, class = c(&quot;forecaster&quot;, class(mobj)))</span>
+<span class="co">#&gt;     fobj &lt;- set_measure(fobj, RMSE)</span>
+<span class="co">#&gt;     fobj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011a9f330&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 </div>
@@ -424,13 +323,14 @@ forecaster
 <li>returns updated modeler object</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Add Default Sample to modeler object</span>
-add_default_samples.modeler
-<span class="co">#&gt; function(x){</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   default &lt;- add_default_samples(x$data)</span>
-<span class="co">#&gt;   x$samples &lt;- default</span>
-<span class="co">#&gt;   x</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;add_default_samples&quot;</span>, <span class="st">&quot;modeler&quot;</span>)
+<span class="co">#&gt; function (x) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     default &lt;- add_default_samples(x$data)</span>
+<span class="co">#&gt;     x$samples &lt;- default</span>
+<span class="co">#&gt;     x</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011ca63d8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>The other <code>add_*_samples</code> modeler methods behave similarily. The numeric methods is where the sampling logic is located.</p>
 <div id="samples-class" class="section level4">
@@ -448,89 +348,87 @@ add_default_samples.modeler
 </ul>
 <p>In the following chunk code for <code>add_default_samples</code> methods are shown. The data.frame and tbl_spark methods use the numeric method internally to reduce code duplication. The default sample is the simplest strategy and only a single row based indicie is saved in the train_indicies list.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># add_default_samples.numeric code</span>
-add_default_samples.numeric
-<span class="co">#&gt; function(x){</span>
-<span class="co">#&gt;   samples(</span>
-<span class="co">#&gt;     validation_method = &quot;none&quot;,</span>
-<span class="co">#&gt;     validation_args = list(),</span>
-<span class="co">#&gt;     test_holdout_prct = NULL,</span>
-<span class="co">#&gt;     test_holdout_method = &quot;none&quot;,</span>
-<span class="co">#&gt;     downsample_prct = NULL,</span>
-<span class="co">#&gt;     train_indicies = list(default = x),</span>
-<span class="co">#&gt;     validation_indicies = NULL,</span>
-<span class="co">#&gt;     indicies_names = &quot;train&quot;,</span>
-<span class="co">#&gt;     test_index = NULL</span>
-<span class="co">#&gt;   )</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;add_default_samples&quot;</span>, <span class="st">&quot;numeric&quot;</span>)
+<span class="co">#&gt; function (x) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     samples(validation_method = &quot;none&quot;, validation_args = list(), </span>
+<span class="co">#&gt;         test_holdout_prct = NULL, test_holdout_method = &quot;none&quot;, </span>
+<span class="co">#&gt;         downsample_prct = NULL, train_indicies = list(default = x), </span>
+<span class="co">#&gt;         validation_indicies = NULL, indicies_names = &quot;train&quot;, </span>
+<span class="co">#&gt;         test_index = NULL)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011f3f158&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
 
 <span class="co"># add_default_samples.data.frame code</span>
-add_default_samples.data.frame
-<span class="co">#&gt; function(x){</span>
-<span class="co">#&gt;   z &lt;- 1:nrow(x)</span>
-<span class="co">#&gt;   add_default_samples(z)</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;add_default_samples&quot;</span>, <span class="st">&quot;data.frame&quot;</span>)
+<span class="co">#&gt; function (x) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     z &lt;- 1:nrow(x)</span>
+<span class="co">#&gt;     add_default_samples(z)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011fc8b20&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
 
 <span class="co"># add_default_samples.tbl_spk</span>
-add_default_samples.tbl_spark
-<span class="co">#&gt; function(x){</span>
-<span class="co">#&gt;   z &lt;- 1:sparklyr::sdf_nrow(x)</span>
-<span class="co">#&gt;   add_default_samples(z)</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;add_default_samples&quot;</span>, <span class="st">&quot;tbl_spark&quot;</span>)
+<span class="co">#&gt; function (x) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     z &lt;- 1:sparklyr::sdf_nrow(x)</span>
+<span class="co">#&gt;     add_default_samples(z)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000120532d8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>Next is a set of methods for creating holdout samples. The numeric method creates train and validation row indicies based on the splits argument.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># add_holdout_samples.numeric code</span>
-add_holdout_samples.numeric
-<span class="co">#&gt; function(x, splits){</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   checkmate::assert_numeric(splits, lower = 0, upper = 1, min.len = 2, max.len = 3)</span>
-<span class="co">#&gt;   if(sum(splits) != 1){</span>
-<span class="co">#&gt;     stop(&quot;splits don't sum to 1. Recommend either an 80-20 or 60-20-20 split&quot;)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   if(length(splits) == 3){</span>
-<span class="co">#&gt;     tv_total &lt;- sum(splits[-3])</span>
-<span class="co">#&gt;     s1 &lt;- holdout(x, tv_total)</span>
-<span class="co">#&gt;     test_index &lt;- s1$tail</span>
-<span class="co">#&gt;     test_holdout_prct &lt;- splits[3]</span>
-<span class="co">#&gt;   }else{</span>
-<span class="co">#&gt;     test_index &lt;- NULL</span>
-<span class="co">#&gt;     test_holdout_prct &lt;- NULL</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   s2 &lt;- holdout(x, splits[1])</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   train_indicies &lt;- list(holdout = s2$head)</span>
-<span class="co">#&gt;   val_indicies &lt;- list(holdout = setdiff(s2$tail, test_index))</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   samples(</span>
-<span class="co">#&gt;     validation_method = &quot;holdout&quot;,</span>
-<span class="co">#&gt;     validation_args = list(split = splits[1]),</span>
-<span class="co">#&gt;     test_holdout_prct = test_holdout_prct,</span>
-<span class="co">#&gt;     test_holdout_method = &quot;holdout&quot;,</span>
-<span class="co">#&gt;     downsample_prct = NULL,</span>
-<span class="co">#&gt;     train_indicies = train_indicies,</span>
-<span class="co">#&gt;     validation_indicies = val_indicies,</span>
-<span class="co">#&gt;     indicies_names = &quot;holdout&quot;,</span>
-<span class="co">#&gt;     test_index = test_index</span>
-<span class="co">#&gt;   )</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;add_holdout_samples&quot;</span>, <span class="st">&quot;numeric&quot;</span>)
+<span class="co">#&gt; function (x, splits) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_numeric(splits, lower = 0, upper = 1, min.len = 2, </span>
+<span class="co">#&gt;         max.len = 3)</span>
+<span class="co">#&gt;     if (sum(splits) != 1) {</span>
+<span class="co">#&gt;         stop(&quot;splits don't sum to 1. Recommend either an 80-20 or 60-20-20 split&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (length(splits) == 3) {</span>
+<span class="co">#&gt;         tv_total &lt;- sum(splits[-3])</span>
+<span class="co">#&gt;         s1 &lt;- holdout(x, tv_total)</span>
+<span class="co">#&gt;         test_index &lt;- s1$tail</span>
+<span class="co">#&gt;         test_holdout_prct &lt;- splits[3]</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         test_index &lt;- NULL</span>
+<span class="co">#&gt;         test_holdout_prct &lt;- NULL</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     s2 &lt;- holdout(x, splits[1])</span>
+<span class="co">#&gt;     train_indicies &lt;- list(holdout = s2$head)</span>
+<span class="co">#&gt;     val_indicies &lt;- list(holdout = setdiff(s2$tail, test_index))</span>
+<span class="co">#&gt;     samples(validation_method = &quot;holdout&quot;, validation_args = list(split = splits[1]), </span>
+<span class="co">#&gt;         test_holdout_prct = test_holdout_prct, test_holdout_method = &quot;holdout&quot;, </span>
+<span class="co">#&gt;         downsample_prct = NULL, train_indicies = train_indicies, </span>
+<span class="co">#&gt;         validation_indicies = val_indicies, indicies_names = &quot;holdout&quot;, </span>
+<span class="co">#&gt;         test_index = test_index)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000012318bd8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
 
 <span class="co"># add_holdout_samples.data.frame code</span>
-add_holdout_samples.tbl_spark
-<span class="co">#&gt; function(x, splits){</span>
-<span class="co">#&gt;   z &lt;- 1:sparklyr::sdf_nrow(x)</span>
-<span class="co">#&gt;   add_holdout_samples(z, splits)</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;add_holdout_samples&quot;</span>, <span class="st">&quot;data.frame&quot;</span>)
+<span class="co">#&gt; function (x, splits) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     z &lt;- 1:nrow(x)</span>
+<span class="co">#&gt;     add_holdout_samples(z, splits)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000123ad048&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
 
 <span class="co"># add_holdout_samples.data.frame code</span>
-add_holdout_samples.tbl_spark
-<span class="co">#&gt; function(x, splits){</span>
-<span class="co">#&gt;   z &lt;- 1:sparklyr::sdf_nrow(x)</span>
-<span class="co">#&gt;   add_holdout_samples(z, splits)</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;add_holdout_samples&quot;</span>, <span class="st">&quot;tbl_spark&quot;</span>)
+<span class="co">#&gt; function (x, splits) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     z &lt;- 1:sparklyr::sdf_nrow(x)</span>
+<span class="co">#&gt;     add_holdout_samples(z, splits)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001243c840&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>The concept here is that the sampling strategy is set once, creating indicies that control the data partitions for all down stream modeling fitting and evaluating. The samples object is saved in the modeler object and referenced internally for data partitioning. More on its implementation later on.</p>
 <p>Each of the sampling strategies follows the same pattern shown above where the sampling logic is contained in the numeric method and the data.frame and tbl_spark methods simply create a row sequence and pass to internal numeric method.</p>
@@ -557,13 +455,15 @@ add_holdout_samples.tbl_spark
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Set Measure</span>
 set_measure
-<span class="co">#&gt; function(obj, measure) {</span>
-<span class="co">#&gt;   checkmate::assert_class(obj, &quot;modeler&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_class(measure, &quot;measure&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_subset(class(obj), measure$properties)</span>
-<span class="co">#&gt;   obj$measure &lt;- measure</span>
-<span class="co">#&gt;   obj</span>
+<span class="co">#&gt; function (obj, measure) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_class(obj, &quot;modeler&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_class(measure, &quot;measure&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_subset(class(obj), measure$properties)</span>
+<span class="co">#&gt;     obj$measure &lt;- measure</span>
+<span class="co">#&gt;     obj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000012630558&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>As seen in the use case constructors, a default measure is set for each.</p>
 <div id="measure-class" class="section level4">
@@ -622,27 +522,26 @@ set_measure
 <p>Similar to the samples class, a measure class object is created and stored internally to the modeler object. All downstream model evaluation in modeler objects reference the measure object stored internally. The measure object does not store the function directly. It stores the function generic name which is can be used to get the function from the namespace environment and execute.</p>
 <p>Adding a new method requires that the measure function (such as <code>rmse</code>) is either developed or supported in a2modeler. There are meaningful differences in implementation for R vs Spark objects as seen below for the <code>rmse</code> methods. The spark method leverages the sparklyr, spark-ml evaluator. The evaluator function approach is used to intregrate with the rest of the spark-ml functionality.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># R rmse method</span>
-rmse.data.frame
-<span class="co">#&gt; function(x, predicted, actual){</span>
-<span class="co">#&gt;   checkmate::assert_choice(predicted, colnames(x))</span>
-<span class="co">#&gt;   checkmate::assert_choice(actual, colnames(x))</span>
-<span class="co">#&gt;   c(&quot;rmse&quot; = sqrt(mean((x[[predicted]] - x[[actual]])^2)))</span>
+<span class="kw">getS3method</span>(<span class="st">'rmse'</span>, <span class="st">'data.frame'</span>)
+<span class="co">#&gt; function (x, predicted, actual) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_choice(predicted, colnames(x))</span>
+<span class="co">#&gt;     checkmate::assert_choice(actual, colnames(x))</span>
+<span class="co">#&gt;     c(rmse = sqrt(mean((x[[predicted]] - x[[actual]])^2)))</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000013047ab0&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
 
 <span class="co"># Spark rmse method</span>
-rmse.tbl_spark
-<span class="co">#&gt; function(x, predicted, actual) {</span>
-<span class="co">#&gt;   checkmate::assert_choice(predicted, colnames(x))</span>
-<span class="co">#&gt;   checkmate::assert_choice(actual, colnames(x))</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   sparklyr::ml_regression_evaluator(</span>
-<span class="co">#&gt;     x,</span>
-<span class="co">#&gt;     label_col = actual,</span>
-<span class="co">#&gt;     prediction_col = predicted,</span>
-<span class="co">#&gt;     metric_name = &quot;rmse&quot;</span>
-<span class="co">#&gt;   )</span>
+<span class="kw">getS3method</span>(<span class="st">'rmse'</span>, <span class="st">'tbl_spark'</span>)
+<span class="co">#&gt; function (x, predicted, actual) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_choice(predicted, colnames(x))</span>
+<span class="co">#&gt;     checkmate::assert_choice(actual, colnames(x))</span>
+<span class="co">#&gt;     sparklyr::ml_regression_evaluator(x, label_col = actual, </span>
+<span class="co">#&gt;         prediction_col = predicted, metric_name = &quot;rmse&quot;)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000130d8b10&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <div id="methods-1" class="section level5">
 <h5>Methods</h5>
@@ -662,42 +561,26 @@ rmse.tbl_spark
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Add Model Function</span>
 add_model
-<span class="co">#&gt; function(obj,</span>
-<span class="co">#&gt;                      pipe = NULL,</span>
-<span class="co">#&gt;                      method,</span>
-<span class="co">#&gt;                      param_map = list(),</span>
-<span class="co">#&gt;                      ...,</span>
-<span class="co">#&gt;                      desc = NULL,</span>
-<span class="co">#&gt;                      uid = sparklyr::random_string(&quot;model&quot;)) {</span>
-<span class="co">#&gt;   checkmate::assert_class(obj, &quot;modeler&quot;)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Check Method</span>
-<span class="co">#&gt;   type_methods &lt;- model_methods %&gt;%</span>
-<span class="co">#&gt;     dplyr::filter(type == obj$type) %&gt;%</span>
-<span class="co">#&gt;     dplyr::pull(method) %&gt;%</span>
-<span class="co">#&gt;     as.character()</span>
-<span class="co">#&gt;   checkmate::assert_choice(method, type_methods)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Define pipeline</span>
-<span class="co">#&gt;   if(is.null(pipe))</span>
-<span class="co">#&gt;     pipe &lt;- pipeline()</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(! pipe$uid %in% names(obj$pipelines))</span>
-<span class="co">#&gt;     obj$pipelines[[pipe$uid]] &lt;- pipe</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Create model object</span>
-<span class="co">#&gt;   m &lt;- model(pipe = pipe$uid,</span>
-<span class="co">#&gt;              target = obj$target,</span>
-<span class="co">#&gt;              method = method,</span>
-<span class="co">#&gt;              method_args = list(...),</span>
-<span class="co">#&gt;              param_map = param_map,</span>
-<span class="co">#&gt;              desc = desc,</span>
-<span class="co">#&gt;              uid = uid)</span>
-<span class="co">#&gt;   m$status &lt;- &quot;added&quot;</span>
-<span class="co">#&gt;   m$index_var &lt;- obj$index_var</span>
-<span class="co">#&gt;   obj$models[[m$uid]] &lt;- m</span>
-<span class="co">#&gt;   obj</span>
+<span class="co">#&gt; function (obj, pipe = NULL, method, param_map = list(), ..., </span>
+<span class="co">#&gt;     desc = NULL, uid = sparklyr::random_string(&quot;model&quot;)) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_class(obj, &quot;modeler&quot;)</span>
+<span class="co">#&gt;     type_methods &lt;- model_methods %&gt;% dplyr::filter(type == obj$type) %&gt;% </span>
+<span class="co">#&gt;         dplyr::pull(method) %&gt;% as.character()</span>
+<span class="co">#&gt;     checkmate::assert_choice(method, type_methods)</span>
+<span class="co">#&gt;     if (is.null(pipe)) </span>
+<span class="co">#&gt;         pipe &lt;- pipeline()</span>
+<span class="co">#&gt;     if (!pipe$uid %in% names(obj$pipelines)) </span>
+<span class="co">#&gt;         obj$pipelines[[pipe$uid]] &lt;- pipe</span>
+<span class="co">#&gt;     m &lt;- model(pipe = pipe$uid, target = obj$target, method = method, </span>
+<span class="co">#&gt;         method_args = list(...), param_map = param_map, desc = desc, </span>
+<span class="co">#&gt;         uid = uid)</span>
+<span class="co">#&gt;     m$status &lt;- &quot;added&quot;</span>
+<span class="co">#&gt;     m$index_var &lt;- obj$index_var</span>
+<span class="co">#&gt;     obj$models[[m$uid]] &lt;- m</span>
+<span class="co">#&gt;     obj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000132b3660&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <table>
 <caption>a2modeler Supported Model Methods</caption>
@@ -887,22 +770,15 @@ add_model
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Pipeline object</span>
 pipeline
-<span class="co">#&gt; function(expr = identity,</span>
-<span class="co">#&gt;                      desc = NULL,</span>
-<span class="co">#&gt;                      uid = sparklyr::random_string(&quot;pipe&quot;)) {</span>
-<span class="co">#&gt;   if (is.null(desc))</span>
-<span class="co">#&gt;     desc &lt;- &quot;&quot;</span>
-<span class="co">#&gt;   a1 &lt;- Sys.time()</span>
-<span class="co">#&gt;   new_pipeline(</span>
-<span class="co">#&gt;     expr,</span>
-<span class="co">#&gt;     output = NULL,</span>
-<span class="co">#&gt;     desc,</span>
-<span class="co">#&gt;     uid,</span>
-<span class="co">#&gt;     created_on = a1,</span>
-<span class="co">#&gt;     runtime = NULL</span>
-<span class="co">#&gt;   )</span>
-<span class="co">#&gt;   </span>
+<span class="co">#&gt; function (expr = identity, desc = NULL, uid = sparklyr::random_string(&quot;pipe&quot;)) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     if (is.null(desc)) </span>
+<span class="co">#&gt;         desc &lt;- &quot;&quot;</span>
+<span class="co">#&gt;     a1 &lt;- Sys.time()</span>
+<span class="co">#&gt;     new_pipeline(expr, output = NULL, desc, uid, created_on = a1, </span>
+<span class="co">#&gt;         runtime = NULL)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000c019140&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
 p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <span class="kw">str</span>(p)
@@ -910,8 +786,8 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <span class="co">#&gt;  $ expr      :function (x)  </span>
 <span class="co">#&gt;  $ output    : NULL</span>
 <span class="co">#&gt;  $ desc      : chr &quot;&quot;</span>
-<span class="co">#&gt;  $ uid       : chr &quot;pipe2ebce6070c1&quot;</span>
-<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-10 11:50:16&quot;</span>
+<span class="co">#&gt;  $ uid       : chr &quot;pipe7b03e8666b0&quot;</span>
+<span class="co">#&gt;  $ created_on: POSIXct[1:1], format: &quot;2018-12-10 13:59:47&quot;</span>
 <span class="co">#&gt;  $ runtime   : NULL</span>
 <span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;pipeline&quot;</span></code></pre></div>
 <p>The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets.</p>
@@ -932,90 +808,77 @@ p &lt;-<span class="st"> </span><span class="kw">pipeline</span>()
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Model Helpler</span>
 model
-<span class="co">#&gt; function(pipe,</span>
-<span class="co">#&gt;                   target,</span>
-<span class="co">#&gt;                   method,</span>
-<span class="co">#&gt;                   method_args,</span>
-<span class="co">#&gt;                   param_map,</span>
-<span class="co">#&gt;                   desc = NULL,</span>
-<span class="co">#&gt;                   uid = NULL) {</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if (is.null(desc)) desc &lt;- &quot;&quot;</span>
-<span class="co">#&gt;   if (is.null(uid)) sparklyr::random_string(&quot;model&quot;)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   new_model(</span>
-<span class="co">#&gt;     pipe = pipe,</span>
-<span class="co">#&gt;     target = target,</span>
-<span class="co">#&gt;     method = method,</span>
-<span class="co">#&gt;     method_args = method_args,</span>
-<span class="co">#&gt;     param_map = param_map,</span>
-<span class="co">#&gt;     desc = desc,</span>
-<span class="co">#&gt;     uid = uid,</span>
-<span class="co">#&gt;     status = &quot;created&quot;,</span>
-<span class="co">#&gt;     created_on = Sys.time()</span>
-<span class="co">#&gt;   )</span>
+<span class="co">#&gt; function (pipe, target, method, method_args, param_map, desc = NULL, </span>
+<span class="co">#&gt;     uid = NULL) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     if (is.null(desc)) </span>
+<span class="co">#&gt;         desc &lt;- &quot;&quot;</span>
+<span class="co">#&gt;     if (is.null(uid)) </span>
+<span class="co">#&gt;         sparklyr::random_string(&quot;model&quot;)</span>
+<span class="co">#&gt;     new_model(pipe = pipe, target = target, method = method, </span>
+<span class="co">#&gt;         method_args = method_args, param_map = param_map, desc = desc, </span>
+<span class="co">#&gt;         uid = uid, status = &quot;created&quot;, created_on = Sys.time())</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b3d1cc8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>The model child class is assigned in the constructor below. A look up to the model_method dataset is made, the class extracted and assigned in the <code>structure</code> function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Model Constructor</span>
-new_model
-<span class="co">#&gt; function(pipe,</span>
-<span class="co">#&gt;                       target,</span>
-<span class="co">#&gt;                       method,</span>
-<span class="co">#&gt;                       method_args, </span>
-<span class="co">#&gt;                       param_map,</span>
-<span class="co">#&gt;                       desc,</span>
-<span class="co">#&gt;                       uid,</span>
-<span class="co">#&gt;                       status,</span>
-<span class="co">#&gt;                       created_on</span>
-<span class="co">#&gt; ) {</span>
-<span class="co">#&gt;   checkmate::assert_character(pipe)</span>
-<span class="co">#&gt;   checkmate::assert_character(target, null.ok = TRUE)</span>
-<span class="co">#&gt;   checkmate::assert_choice(method, choices = model_methods$method)</span>
-<span class="co">#&gt;   checkmate::assert_list(method_args, null.ok = TRUE)</span>
-<span class="co">#&gt;   checkmate::assert_list(param_map)</span>
-<span class="co">#&gt;   checkmate::assert_character(desc)</span>
-<span class="co">#&gt;   checkmate::assert_character(uid)</span>
-<span class="co">#&gt;   checkmate::assert_character(status)</span>
-<span class="co">#&gt;   checkmate::assert_posixct(created_on)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   .method &lt;- method</span>
-<span class="co">#&gt;   method_fun &lt;- model_methods %&gt;%</span>
-<span class="co">#&gt;     dplyr::filter(method == .method) %&gt;%</span>
-<span class="co">#&gt;     dplyr::pull(package) %&gt;%</span>
-<span class="co">#&gt;     asNamespace() %&gt;%</span>
-<span class="co">#&gt;     get(.method, .)</span>
-<span class="co">#&gt;   method_params &lt;- setdiff(c(names(method_args), names(param_map)), &quot;uid&quot;)</span>
-<span class="co">#&gt;   if(length(method_params) == 0) method_params &lt;- NULL</span>
-<span class="co">#&gt;   checkmate::assert_function(method_fun, args = method_params)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   method_class &lt;- model_methods %&gt;%</span>
-<span class="co">#&gt;     dplyr::filter(method == .method) %&gt;%</span>
-<span class="co">#&gt;     tidyr::unnest(class) %&gt;%</span>
-<span class="co">#&gt;     dplyr::pull(class) %&gt;%</span>
-<span class="co">#&gt;     as.character()</span>
-<span class="co">#&gt;   method_package &lt;- model_methods %&gt;%</span>
-<span class="co">#&gt;     dplyr::filter(method == .method) %&gt;%</span>
-<span class="co">#&gt;     dplyr::pull(package)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   structure(</span>
-<span class="co">#&gt;     list(</span>
-<span class="co">#&gt;       pipe = pipe,</span>
-<span class="co">#&gt;       target = target,</span>
-<span class="co">#&gt;       method = method,</span>
-<span class="co">#&gt;       method_args = method_args,</span>
-<span class="co">#&gt;       param_map = param_map,</span>
-<span class="co">#&gt;       package = method_package,</span>
-<span class="co">#&gt;       desc = desc,</span>
-<span class="co">#&gt;       uid = uid,</span>
-<span class="co">#&gt;       created_on = created_on,</span>
-<span class="co">#&gt;       status = status</span>
-<span class="co">#&gt;     ),</span>
-<span class="co">#&gt;     class = c(method_class, &quot;model&quot;)</span>
-<span class="co">#&gt;   )</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+new_model &lt;-<span class="st"> </span><span class="cf">function</span>(pipe,
+                      target,
+                      method,
+                      method_args, 
+                      param_map,
+                      desc,
+                      uid,
+                      status,
+                      created_on
+) {
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(pipe)
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(target, <span class="dt">null.ok =</span> <span class="ot">TRUE</span>)
+  checkmate<span class="op">::</span><span class="kw">assert_choice</span>(method, <span class="dt">choices =</span> model_methods<span class="op">$</span>method)
+  checkmate<span class="op">::</span><span class="kw">assert_list</span>(method_args, <span class="dt">null.ok =</span> <span class="ot">TRUE</span>)
+  checkmate<span class="op">::</span><span class="kw">assert_list</span>(param_map)
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(desc)
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(uid)
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(status)
+  checkmate<span class="op">::</span><span class="kw">assert_posixct</span>(created_on)
+  
+  .method &lt;-<span class="st"> </span>method
+  method_fun &lt;-<span class="st"> </span>model_methods <span class="op">%&gt;%</span>
+<span class="st">    </span>dplyr<span class="op">::</span><span class="kw">filter</span>(method <span class="op">==</span><span class="st"> </span>.method) <span class="op">%&gt;%</span>
+<span class="st">    </span>dplyr<span class="op">::</span><span class="kw">pull</span>(package) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">asNamespace</span>() <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">get</span>(.method, .)
+  method_params &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">c</span>(<span class="kw">names</span>(method_args), <span class="kw">names</span>(param_map)), <span class="st">&quot;uid&quot;</span>)
+  <span class="cf">if</span>(<span class="kw">length</span>(method_params) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) method_params &lt;-<span class="st"> </span><span class="ot">NULL</span>
+  checkmate<span class="op">::</span><span class="kw">assert_function</span>(method_fun, <span class="dt">args =</span> method_params)
+  
+  method_class &lt;-<span class="st"> </span>model_methods <span class="op">%&gt;%</span>
+<span class="st">    </span>dplyr<span class="op">::</span><span class="kw">filter</span>(method <span class="op">==</span><span class="st"> </span>.method) <span class="op">%&gt;%</span>
+<span class="st">    </span>tidyr<span class="op">::</span><span class="kw">unnest</span>(class) <span class="op">%&gt;%</span>
+<span class="st">    </span>dplyr<span class="op">::</span><span class="kw">pull</span>(class) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">as.character</span>()
+  method_package &lt;-<span class="st"> </span>model_methods <span class="op">%&gt;%</span>
+<span class="st">    </span>dplyr<span class="op">::</span><span class="kw">filter</span>(method <span class="op">==</span><span class="st"> </span>.method) <span class="op">%&gt;%</span>
+<span class="st">    </span>dplyr<span class="op">::</span><span class="kw">pull</span>(package)
+  
+  <span class="kw">structure</span>(
+    <span class="kw">list</span>(
+      <span class="dt">pipe =</span> pipe,
+      <span class="dt">target =</span> target,
+      <span class="dt">method =</span> method,
+      <span class="dt">method_args =</span> method_args,
+      <span class="dt">param_map =</span> param_map,
+      <span class="dt">package =</span> method_package,
+      <span class="dt">desc =</span> desc,
+      <span class="dt">uid =</span> uid,
+      <span class="dt">created_on =</span> created_on,
+      <span class="dt">status =</span> status
+    ),
+    <span class="dt">class =</span> <span class="kw">c</span>(method_class, <span class="st">&quot;model&quot;</span>)
+  )
+}</code></pre></div>
 </div>
 </div>
 <div id="train-models" class="section level3">
@@ -1030,58 +893,40 @@ new_model
 <p>Full modeler class method</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Parent Modeler class method</span>
-train_models.modeler
-<span class="co">#&gt; function(obj, uids = NULL, ...) {</span>
-<span class="co">#&gt;   checkmate::assert_character(uids, null.ok = TRUE)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Execute pipes</span>
-<span class="co">#&gt;   obj &lt;- execute_pipelines(obj)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if (is.null(uids)) {</span>
-<span class="co">#&gt;     # Get Added only Models</span>
-<span class="co">#&gt;     uids &lt;- obj$models %&gt;%</span>
-<span class="co">#&gt;       purrr::map_df(., magrittr::extract, c(&quot;uid&quot;, &quot;status&quot;)) %&gt;%</span>
-<span class="co">#&gt;       dplyr::filter(status == &quot;added&quot;) %&gt;%</span>
-<span class="co">#&gt;       dplyr::pull(uid)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   for (uid in uids) {</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt;     # Get Training Sample</span>
-<span class="co">#&gt;     train_data &lt;- obj$pipelines[[obj$models[[uid]]$pipe]]$output</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt;     # Check for holdout</span>
-<span class="co">#&gt;     if (!is.null(obj$samples$test_holdout_prct)) {</span>
-<span class="co">#&gt;       train_data &lt;- train_data %&gt;%</span>
-<span class="co">#&gt;         dplyr::mutate(rn = 1) %&gt;% </span>
-<span class="co">#&gt;         dplyr::mutate(rn = row_number(rn)) %&gt;% </span>
-<span class="co">#&gt;         dplyr::filter(! rn %in% obj$samples$test_index) %&gt;%</span>
-<span class="co">#&gt;         dplyr::select(-rn)</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;train_models&quot;</span>, <span class="st">&quot;modeler&quot;</span>)
+<span class="co">#&gt; function (obj, uids = NULL, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_character(uids, null.ok = TRUE)</span>
+<span class="co">#&gt;     obj &lt;- execute_pipelines(obj)</span>
+<span class="co">#&gt;     if (is.null(uids)) {</span>
+<span class="co">#&gt;         uids &lt;- obj$models %&gt;% purrr::map_df(., magrittr::extract, </span>
+<span class="co">#&gt;             c(&quot;uid&quot;, &quot;status&quot;)) %&gt;% dplyr::filter(status == &quot;added&quot;) %&gt;% </span>
+<span class="co">#&gt;             dplyr::pull(uid)</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt;     obj$models[[uid]] &lt;- train_model(mobj = obj$models[[uid]],</span>
-<span class="co">#&gt;                                      data = train_data,</span>
-<span class="co">#&gt;                                      measure = obj$measure,</span>
-<span class="co">#&gt;                                      samples = obj$samples,</span>
-<span class="co">#&gt;                                      save_submodels = obj$save_submodels,</span>
-<span class="co">#&gt;                                      execution_strategy = obj$execution_strategy,</span>
-<span class="co">#&gt;                                      level = obj$conf_levels,</span>
-<span class="co">#&gt;                                      seed = obj$seed)</span>
-<span class="co">#&gt;     obj$models[[uid]]$features &lt;- setdiff(colnames(train_data), c(obj$target, obj$index_var))</span>
-<span class="co">#&gt;     obj$models[[uid]]$status &lt;- &quot;trained&quot;</span>
-<span class="co">#&gt;     obj$models[[uid]]$last_updated &lt;- Sys.time()</span>
-<span class="co">#&gt;     obj$performance &lt;- dplyr::bind_rows(</span>
-<span class="co">#&gt;       obj$performance,</span>
-<span class="co">#&gt;       obj$models[[uid]]$performance %&gt;% </span>
-<span class="co">#&gt;         dplyr::mutate(model_uid = uid,</span>
-<span class="co">#&gt;                       pipeline_uid = obj$models[[uid]]$pipe,</span>
-<span class="co">#&gt;                       method = obj$models[[uid]]$method) %&gt;% </span>
-<span class="co">#&gt;         dplyr::select(model_uid, pipeline_uid, submodel_uid, sample, method, param_grid, !!obj$measure$method)</span>
-<span class="co">#&gt;     )</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   obj</span>
+<span class="co">#&gt;     for (uid in uids) {</span>
+<span class="co">#&gt;         train_data &lt;- obj$pipelines[[obj$models[[uid]]$pipe]]$output</span>
+<span class="co">#&gt;         if (!is.null(obj$samples$test_holdout_prct)) {</span>
+<span class="co">#&gt;             train_data &lt;- train_data %&gt;% dplyr::mutate(rn = 1) %&gt;% </span>
+<span class="co">#&gt;                 dplyr::mutate(rn = row_number(rn)) %&gt;% dplyr::filter(!rn %in% </span>
+<span class="co">#&gt;                 obj$samples$test_index) %&gt;% dplyr::select(-rn)</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         obj$models[[uid]] &lt;- train_model(mobj = obj$models[[uid]], </span>
+<span class="co">#&gt;             data = train_data, measure = obj$measure, samples = obj$samples, </span>
+<span class="co">#&gt;             save_submodels = obj$save_submodels, execution_strategy = obj$execution_strategy, </span>
+<span class="co">#&gt;             level = obj$conf_levels, seed = obj$seed)</span>
+<span class="co">#&gt;         obj$models[[uid]]$features &lt;- setdiff(colnames(train_data), </span>
+<span class="co">#&gt;             c(obj$target, obj$index_var))</span>
+<span class="co">#&gt;         obj$models[[uid]]$status &lt;- &quot;trained&quot;</span>
+<span class="co">#&gt;         obj$models[[uid]]$last_updated &lt;- Sys.time()</span>
+<span class="co">#&gt;         obj$performance &lt;- dplyr::bind_rows(obj$performance, </span>
+<span class="co">#&gt;             obj$models[[uid]]$performance %&gt;% dplyr::mutate(model_uid = uid, </span>
+<span class="co">#&gt;                 pipeline_uid = obj$models[[uid]]$pipe, method = obj$models[[uid]]$method) %&gt;% </span>
+<span class="co">#&gt;                 dplyr::select(model_uid, pipeline_uid, submodel_uid, </span>
+<span class="co">#&gt;                   sample, method, param_grid, !!obj$measure$method))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     obj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000071d38e8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>The first step is execute all the pipelines</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
@@ -1091,20 +936,21 @@ train_models.modeler &lt;-<span class="st"> </span><span class="cf">function</sp
   <span class="co"># Execute pipes</span>
   obj &lt;-<span class="st"> </span><span class="kw">execute_pipelines</span>(obj)</code></pre></div>
 <p>The <code>execute_pipelines</code> function is descriptive - it calls the <code>execute</code> function on all un-excuted pipelines saved in the modeler object. Recall execute will save the pipeline output to the output slot.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">execute_pipelines.modeler
-<span class="co">#&gt; function(obj, uids = NULL, ...) {</span>
-<span class="co">#&gt;   checkmate::assert_character(uids, null.ok = TRUE)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if (is.null(uids))</span>
-<span class="co">#&gt;     uids &lt;- names(obj$pipelines)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   for(uid in uids) {</span>
-<span class="co">#&gt;     pipe &lt;- obj$pipelines[[uid]]</span>
-<span class="co">#&gt;     if(is.null(pipe$output))</span>
-<span class="co">#&gt;       obj$pipelines[[uid]] &lt;- execute(obj$data, obj$pipelines[[uid]])</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   obj</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># execute pipeline modeler method</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;execute_pipelines&quot;</span>, <span class="st">&quot;modeler&quot;</span>)
+<span class="co">#&gt; function (obj, uids = NULL, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_character(uids, null.ok = TRUE)</span>
+<span class="co">#&gt;     if (is.null(uids)) </span>
+<span class="co">#&gt;         uids &lt;- names(obj$pipelines)</span>
+<span class="co">#&gt;     for (uid in uids) {</span>
+<span class="co">#&gt;         pipe &lt;- obj$pipelines[[uid]]</span>
+<span class="co">#&gt;         if (is.null(pipe$output)) </span>
+<span class="co">#&gt;             obj$pipelines[[uid]] &lt;- execute(obj$data, obj$pipelines[[uid]])</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     obj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000101cd480&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>The next step is to get the model uids to be trained by extracting the status and filtering to only models with “added” status.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
@@ -1160,139 +1006,96 @@ train_models.modeler &lt;-<span class="st"> </span><span class="cf">function</sp
 <p>The following is the spark_model based method. We breakdown each section next</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># train_model.spark_model</span>
-train_model.spark_model
-<span class="co">#&gt; function(mobj,</span>
-<span class="co">#&gt;                                     data,</span>
-<span class="co">#&gt;                                     measure,</span>
-<span class="co">#&gt;                                     samples,</span>
-<span class="co">#&gt;                                     save_submodels,</span>
-<span class="co">#&gt;                                     execution_strategy,</span>
-<span class="co">#&gt;                                     seed,</span>
-<span class="co">#&gt;                                     ...) {</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   checkmate::assert_class(data, &quot;tbl_spark&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_class(measure, &quot;measure&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_class(samples, &quot;samples&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_logical(save_submodels)</span>
-<span class="co">#&gt;   checkmate::assert_choice(execution_strategy,</span>
-<span class="co">#&gt;                            c(&quot;sequential&quot;, &quot;transparent&quot;, &quot;multisession&quot;, &quot;multicore&quot;,</span>
-<span class="co">#&gt;                              &quot;multiprocess&quot;, &quot;cluster&quot;, &quot;remote&quot;))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Get Spark connection</span>
-<span class="co">#&gt;   sc &lt;- sparklyr::spark_connection(data)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set method fun</span>
-<span class="co">#&gt;   method_fun &lt;- get(mobj$method, asNamespace(mobj$package))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Perceptron Check</span>
-<span class="co">#&gt;   if(grepl(&quot;ml_multilayer_perceptron&quot;, mobj$method)) {</span>
-<span class="co">#&gt;     if(is.null(mobj$method_args$layers)) {</span>
-<span class="co">#&gt;       stop(&quot;method arguments missing layers&quot;)</span>
-<span class="co">#&gt;     } else {</span>
-<span class="co">#&gt;       layers &lt;- mobj$method_args$layers</span>
-<span class="co">#&gt;       nfeatures &lt;- sparklyr::sdf_ncol(data) - 1</span>
-<span class="co">#&gt;       if(layers[1] != nfeatures) {</span>
-<span class="co">#&gt;         stop(paste(&quot;input layer size&quot;, layers[1],</span>
-<span class="co">#&gt;                    &quot;doesn't equal feature size&quot;, nfeatures))</span>
-<span class="co">#&gt;       }</span>
-<span class="co">#&gt;       if(&quot;spark_model_classification&quot; %in% class(mobj) &amp;</span>
-<span class="co">#&gt;          layers[length(layers)] != 2) {</span>
-<span class="co">#&gt;         stop(paste(&quot;output layer size&quot;, layers[length(layers)],</span>
-<span class="co">#&gt;                    &quot;should be 2 for classifaction models&quot;))</span>
-<span class="co">#&gt;       }</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;train_model&quot;</span>, <span class="st">&quot;spark_model&quot;</span>)
+<span class="co">#&gt; function (mobj, data, measure, samples, save_submodels, execution_strategy, </span>
+<span class="co">#&gt;     seed, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_class(data, &quot;tbl_spark&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_class(measure, &quot;measure&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_class(samples, &quot;samples&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_logical(save_submodels)</span>
+<span class="co">#&gt;     checkmate::assert_choice(execution_strategy, c(&quot;sequential&quot;, </span>
+<span class="co">#&gt;         &quot;transparent&quot;, &quot;multisession&quot;, &quot;multicore&quot;, &quot;multiprocess&quot;, </span>
+<span class="co">#&gt;         &quot;cluster&quot;, &quot;remote&quot;))</span>
+<span class="co">#&gt;     sc &lt;- sparklyr::spark_connection(data)</span>
+<span class="co">#&gt;     method_fun &lt;- get(mobj$method, asNamespace(mobj$package))</span>
+<span class="co">#&gt;     if (grepl(&quot;ml_multilayer_perceptron&quot;, mobj$method)) {</span>
+<span class="co">#&gt;         if (is.null(mobj$method_args$layers)) {</span>
+<span class="co">#&gt;             stop(&quot;method arguments missing layers&quot;)</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         else {</span>
+<span class="co">#&gt;             layers &lt;- mobj$method_args$layers</span>
+<span class="co">#&gt;             nfeatures &lt;- sparklyr::sdf_ncol(data) - 1</span>
+<span class="co">#&gt;             if (layers[1] != nfeatures) {</span>
+<span class="co">#&gt;                 stop(paste(&quot;input layer size&quot;, layers[1], &quot;doesn't equal feature size&quot;, </span>
+<span class="co">#&gt;                   nfeatures))</span>
+<span class="co">#&gt;             }</span>
+<span class="co">#&gt;             if (&quot;spark_model_classification&quot; %in% class(mobj) &amp; </span>
+<span class="co">#&gt;                 layers[length(layers)] != 2) {</span>
+<span class="co">#&gt;                 stop(paste(&quot;output layer size&quot;, layers[length(layers)], </span>
+<span class="co">#&gt;                   &quot;should be 2 for classifaction models&quot;))</span>
+<span class="co">#&gt;             }</span>
+<span class="co">#&gt;         }</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Create validator pipeline</span>
-<span class="co">#&gt;   val_pipe &lt;- sparklyr::ml_pipeline(sc) %&gt;%</span>
-<span class="co">#&gt;     sparklyr::ft_r_formula(paste(mobj$target, &quot;~.&quot;)) %&gt;%</span>
-<span class="co">#&gt;     method_fun(uid = mobj$uid, layers = mobj$method_args$layers)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set Validator</span>
-<span class="co">#&gt;   if (samples$validation_method == &quot;cross_validation&quot;) {</span>
-<span class="co">#&gt;     validator_fun &lt;- get(&quot;ml_cross_validator&quot;, asNamespace(&quot;sparklyr&quot;))</span>
-<span class="co">#&gt;     validator_args &lt;- list(num_folds = samples$validation_args$folds)</span>
-<span class="co">#&gt;   } else{</span>
-<span class="co">#&gt;     validator_fun &lt;- get(&quot;ml_train_validation_split&quot;, asNamespace(&quot;sparklyr&quot;))</span>
-<span class="co">#&gt;     if (samples$validation_method == &quot;holdout&quot;) {</span>
-<span class="co">#&gt;       validator_args &lt;- list(train_ratio = samples$validation_args$split)</span>
-<span class="co">#&gt;     } else {</span>
-<span class="co">#&gt;       validator_args &lt;- list(train_ratio = 0.99)</span>
-<span class="co">#&gt;     }</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set Evaluator</span>
-<span class="co">#&gt;   measure_fun &lt;- match.fun(measure$method)</span>
-<span class="co">#&gt;   evaluator &lt;- measure_fun(sc)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set param_map</span>
-<span class="co">#&gt;   if (length(mobj$param_map) == 0) {</span>
-<span class="co">#&gt;     method_args &lt;- formals(method_fun)</span>
-<span class="co">#&gt;     param_map &lt;- method_args[setdiff(names(method_args),  c(&quot;x&quot;, &quot;formula&quot;, &quot;layers&quot;))][1]</span>
-<span class="co">#&gt;   } else{</span>
-<span class="co">#&gt;     param_map &lt;- mobj$param_map</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   param_map &lt;- list(param_map)</span>
-<span class="co">#&gt;   names(param_map) &lt;- mobj$uid</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set parallelism</span>
-<span class="co">#&gt;   if (execution_strategy == &quot;sequential&quot;) {</span>
-<span class="co">#&gt;     cores = 1L</span>
-<span class="co">#&gt;   } else {</span>
-<span class="co">#&gt;     cores = future::availableCores() %&gt;%</span>
-<span class="co">#&gt;       as.integer()</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set Validator args</span>
-<span class="co">#&gt;   validator_args &lt;- c(</span>
-<span class="co">#&gt;     validator_args,</span>
-<span class="co">#&gt;     list(</span>
-<span class="co">#&gt;       x = data,</span>
-<span class="co">#&gt;       estimator = val_pipe,</span>
-<span class="co">#&gt;       estimator_param_maps = param_map,</span>
-<span class="co">#&gt;       evaluator = evaluator,</span>
-<span class="co">#&gt;       collect_sub_models = save_submodels,</span>
-<span class="co">#&gt;       parallelism = cores,</span>
-<span class="co">#&gt;       uid = &quot;validator&quot;,</span>
-<span class="co">#&gt;       seed = seed</span>
-<span class="co">#&gt;     )</span>
-<span class="co">#&gt;   )</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Execute Validator</span>
-<span class="co">#&gt;   validator &lt;- do.call(validator_fun, validator_args)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Extract Objects</span>
-<span class="co">#&gt;   n_sub_models &lt;- length(validator$param_map$estimatorParamMaps)</span>
-<span class="co">#&gt;   sub_model_uids &lt;- purrr::map_chr(1:n_sub_models, ~ sparklyr::random_string(&quot;submodel&quot;))</span>
-<span class="co">#&gt;   if (save_submodels) {</span>
-<span class="co">#&gt;     sub_models &lt;- sparklyr::ml_sub_models(validator)</span>
+<span class="co">#&gt;     val_pipe &lt;- sparklyr::ml_pipeline(sc) %&gt;% sparklyr::ft_r_formula(paste(mobj$target, </span>
+<span class="co">#&gt;         &quot;~.&quot;)) %&gt;% method_fun(uid = mobj$uid, layers = mobj$method_args$layers)</span>
 <span class="co">#&gt;     if (samples$validation_method == &quot;cross_validation&quot;) {</span>
-<span class="co">#&gt;       sub_models &lt;- purrr::transpose(sub_models)</span>
+<span class="co">#&gt;         validator_fun &lt;- get(&quot;ml_cross_validator&quot;, asNamespace(&quot;sparklyr&quot;))</span>
+<span class="co">#&gt;         validator_args &lt;- list(num_folds = samples$validation_args$folds)</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;     names(sub_models) &lt;- sub_model_uids</span>
-<span class="co">#&gt;     mobj$sub_models &lt;- sub_models</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   mobj$performance &lt;- sparklyr::ml_validation_metrics(validator) %&gt;%</span>
-<span class="co">#&gt;     tibble::as.tibble() %&gt;%</span>
-<span class="co">#&gt;     dplyr::mutate(rn = 1:n()) %&gt;% </span>
-<span class="co">#&gt;     tidyr::nest(!!names(.)[-c(1, length(names(.)))], .key = &quot;param_grid&quot;) %&gt;% </span>
-<span class="co">#&gt;     dplyr::rename(!!measure$method := !!names(.)[1]) %&gt;% </span>
-<span class="co">#&gt;     dplyr::mutate(submodel_uid = sub_model_uids, sample = &quot;validation&quot;) %&gt;%</span>
-<span class="co">#&gt;     dplyr::select(submodel_uid, sample, !!measure$method,  param_grid)</span>
-<span class="co">#&gt;   mobj$fit &lt;- validator$best_model</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         validator_fun &lt;- get(&quot;ml_train_validation_split&quot;, asNamespace(&quot;sparklyr&quot;))</span>
+<span class="co">#&gt;         if (samples$validation_method == &quot;holdout&quot;) {</span>
+<span class="co">#&gt;             validator_args &lt;- list(train_ratio = samples$validation_args$split)</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         else {</span>
+<span class="co">#&gt;             validator_args &lt;- list(train_ratio = 0.99)</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     measure_fun &lt;- match.fun(measure$method)</span>
+<span class="co">#&gt;     evaluator &lt;- measure_fun(sc)</span>
+<span class="co">#&gt;     if (length(mobj$param_map) == 0) {</span>
+<span class="co">#&gt;         method_args &lt;- formals(method_fun)</span>
+<span class="co">#&gt;         param_map &lt;- method_args[setdiff(names(method_args), </span>
+<span class="co">#&gt;             c(&quot;x&quot;, &quot;formula&quot;, &quot;layers&quot;))][1]</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         param_map &lt;- mobj$param_map</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     param_map &lt;- list(param_map)</span>
+<span class="co">#&gt;     names(param_map) &lt;- mobj$uid</span>
+<span class="co">#&gt;     if (execution_strategy == &quot;sequential&quot;) {</span>
+<span class="co">#&gt;         cores = 1L</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         cores = future::availableCores() %&gt;% as.integer()</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     validator_args &lt;- c(validator_args, list(x = data, estimator = val_pipe, </span>
+<span class="co">#&gt;         estimator_param_maps = param_map, evaluator = evaluator, </span>
+<span class="co">#&gt;         collect_sub_models = save_submodels, parallelism = cores, </span>
+<span class="co">#&gt;         uid = &quot;validator&quot;, seed = seed))</span>
+<span class="co">#&gt;     validator &lt;- do.call(validator_fun, validator_args)</span>
+<span class="co">#&gt;     n_sub_models &lt;- length(validator$param_map$estimatorParamMaps)</span>
+<span class="co">#&gt;     sub_model_uids &lt;- purrr::map_chr(1:n_sub_models, ~sparklyr::random_string(&quot;submodel&quot;))</span>
+<span class="co">#&gt;     if (save_submodels) {</span>
+<span class="co">#&gt;         sub_models &lt;- sparklyr::ml_sub_models(validator)</span>
+<span class="co">#&gt;         if (samples$validation_method == &quot;cross_validation&quot;) {</span>
+<span class="co">#&gt;             sub_models &lt;- purrr::transpose(sub_models)</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         names(sub_models) &lt;- sub_model_uids</span>
+<span class="co">#&gt;         mobj$sub_models &lt;- sub_models</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     mobj$performance &lt;- sparklyr::ml_validation_metrics(validator) %&gt;% </span>
+<span class="co">#&gt;         tibble::as.tibble() %&gt;% dplyr::mutate(rn = 1:n()) %&gt;% </span>
+<span class="co">#&gt;         tidyr::nest(!!names(.)[-c(1, length(names(.)))], .key = &quot;param_grid&quot;) %&gt;% </span>
+<span class="co">#&gt;         dplyr::rename(`:=`(!!measure$method, !!names(.)[1])) %&gt;% </span>
+<span class="co">#&gt;         dplyr::mutate(submodel_uid = sub_model_uids, sample = &quot;validation&quot;) %&gt;% </span>
+<span class="co">#&gt;         dplyr::select(submodel_uid, sample, !!measure$method, </span>
+<span class="co">#&gt;             param_grid)</span>
+<span class="co">#&gt;     mobj$fit &lt;- validator$best_model</span>
+<span class="co">#&gt;     mobj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000010663250&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>In the first part of the method, basic assertions are made about the inputs, a spark connection is extracted from the data input, and the model method is extracted and assigned.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train_model.spark_model &lt;-<span class="st"> </span><span class="cf">function</span>(mobj,
@@ -1433,194 +1236,126 @@ train_model.spark_model
 <p>In this section the Forecast Model <code>train_model</code> method is described. Here the logic is much more explicit.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># train_model.forecaster_model</span>
-train_model.forecast_model
-<span class="co">#&gt; function(mobj, </span>
-<span class="co">#&gt;                                        data,</span>
-<span class="co">#&gt;                                        measure,</span>
-<span class="co">#&gt;                                        samples,</span>
-<span class="co">#&gt;                                        save_submodels,</span>
-<span class="co">#&gt;                                        execution_strategy,</span>
-<span class="co">#&gt;                                        level,</span>
-<span class="co">#&gt;                                        ...){</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   checkmate::assert_class(data, &quot;data.frame&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_class(measure, &quot;measure&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_class(samples, &quot;samples&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_logical(save_submodels)</span>
-<span class="co">#&gt;   checkmate::assert_numeric(level, max.len = 2, upper = 100)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set Execution Strategy</span>
-<span class="co">#&gt;   future::plan(execution_strategy)</span>
-<span class="co">#&gt;   doFuture::registerDoFuture()</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Set model function</span>
-<span class="co">#&gt;   model_fun &lt;- get(mobj$method, asNamespace(mobj$package))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Get Indicies</span>
-<span class="co">#&gt;   indicies &lt;- get_indicies(samples)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Submodel grid</span>
-<span class="co">#&gt;   submodel_grid &lt;- data.frame(expand.grid(c(mobj$method_args,</span>
-<span class="co">#&gt;                                             mobj$param_map,</span>
-<span class="co">#&gt;                                             list(method = mobj$method)))) %&gt;%</span>
-<span class="co">#&gt;     dplyr::mutate(submodel_uid = purrr::map_chr(1:n(), ~ sparklyr::random_string(&quot;submodel&quot;)),</span>
-<span class="co">#&gt;                   method = as.character(method))</span>
-<span class="co">#&gt;   grid_vars &lt;- setdiff(colnames(submodel_grid), c(&quot;submodel_uid&quot;))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Define param_grid including samples</span>
-<span class="co">#&gt;   param_grid &lt;- data.frame(expand.grid(c(</span>
-<span class="co">#&gt;     mobj$method_args,</span>
-<span class="co">#&gt;     mobj$param_map,</span>
-<span class="co">#&gt;     list(index = samples$indicies_names)</span>
-<span class="co">#&gt;   )))</span>
-<span class="co">#&gt;   param_vars &lt;- colnames(param_grid)[-ncol(param_grid)]</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Define packages for parallel computation</span>
-<span class="co">#&gt;   packs &lt;- model_methods %&gt;%</span>
-<span class="co">#&gt;     dplyr::filter(type == &quot;forecaster&quot;) %&gt;%</span>
-<span class="co">#&gt;     dplyr::pull(package) %&gt;%</span>
-<span class="co">#&gt;     c(&quot;a2modeler&quot;, &quot;dplyr&quot;) %&gt;%</span>
-<span class="co">#&gt;     unique()</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Covariates</span>
-<span class="co">#&gt;   x_vars &lt;- setdiff(colnames(data), c(mobj$target, mobj$index_var))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Measurement Function:</span>
-<span class="co">#&gt;   measure_fun &lt;- match.fun(measure$method)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Fit submodel to train data for each sample</span>
-<span class="co">#&gt;   fits &lt;- foreach(</span>
-<span class="co">#&gt;     rn = 1:nrow(param_grid),</span>
-<span class="co">#&gt;     .packages = packs,</span>
-<span class="co">#&gt;     .export = c(&quot;mobj&quot;, &quot;data&quot;, &quot;x_vars&quot;, &quot;param_grid&quot;, &quot;param_vars&quot;, </span>
-<span class="co">#&gt;                 &quot;indicies&quot;, &quot;model_fun&quot;, &quot;measure_fun&quot;, &quot;level&quot;),</span>
-<span class="co">#&gt;     .errorhandling = &quot;pass&quot;) %dopar% {</span>
-<span class="co">#&gt;       </span>
-<span class="co">#&gt;       # Params</span>
-<span class="co">#&gt;       params &lt;- as.list(param_grid[rn, param_vars, drop=FALSE])</span>
-<span class="co">#&gt;       </span>
-<span class="co">#&gt;       # Get Training Sample</span>
-<span class="co">#&gt;       index &lt;- as.character(param_grid[[&quot;index&quot;]][rn])</span>
-<span class="co">#&gt;       train_index &lt;- indicies[[index]]$train</span>
-<span class="co">#&gt;       train_smpl &lt;- data[train_index, , drop=FALSE]</span>
-<span class="co">#&gt;       </span>
-<span class="co">#&gt;       # Set Method Args</span>
-<span class="co">#&gt;       y &lt;- as.numeric(train_smpl[[mobj$target]])</span>
-<span class="co">#&gt;      </span>
-<span class="co">#&gt;       if (length(x_vars) &gt; 0) {</span>
-<span class="co">#&gt;         train_xreg &lt;- train_smpl[, x_vars, drop = FALSE]</span>
-<span class="co">#&gt;       } else {</span>
-<span class="co">#&gt;         train_xreg &lt;- NULL</span>
-<span class="co">#&gt;       }</span>
-<span class="co">#&gt;       args &lt;- modifyList(params, c(list(y = y, xreg = train_xreg)))</span>
-<span class="co">#&gt;       </span>
-<span class="co">#&gt;       # Fit submodel to training sample</span>
-<span class="co">#&gt;       fit &lt;- do.call(model_fun, args)</span>
-<span class="co">#&gt;       fit$method_args &lt;- params</span>
-<span class="co">#&gt;       </span>
-<span class="co">#&gt;       # Make Predictions</span>
-<span class="co">#&gt;       if(! is.null(indicies[[index]]$validation)) {</span>
-<span class="co">#&gt;         # Predict each validation sample</span>
-<span class="co">#&gt;         val_index &lt;- indicies[[index]]$validation</span>
-<span class="co">#&gt;         val_smpl &lt;- data[val_index, , drop = FALSE]</span>
-<span class="co">#&gt;         </span>
-<span class="co">#&gt;         # Set Forecast Args</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;train_model&quot;</span>, <span class="st">&quot;forecast_model&quot;</span>)
+<span class="co">#&gt; function (mobj, data, measure, samples, save_submodels, execution_strategy, </span>
+<span class="co">#&gt;     level, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_class(data, &quot;data.frame&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_class(measure, &quot;measure&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_class(samples, &quot;samples&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_logical(save_submodels)</span>
+<span class="co">#&gt;     checkmate::assert_numeric(level, max.len = 2, upper = 100)</span>
+<span class="co">#&gt;     future::plan(execution_strategy)</span>
+<span class="co">#&gt;     doFuture::registerDoFuture()</span>
+<span class="co">#&gt;     model_fun &lt;- get(mobj$method, asNamespace(mobj$package))</span>
+<span class="co">#&gt;     indicies &lt;- get_indicies(samples)</span>
+<span class="co">#&gt;     submodel_grid &lt;- data.frame(expand.grid(c(mobj$method_args, </span>
+<span class="co">#&gt;         mobj$param_map, list(method = mobj$method)))) %&gt;% dplyr::mutate(submodel_uid = purrr::map_chr(1:n(), </span>
+<span class="co">#&gt;         ~sparklyr::random_string(&quot;submodel&quot;)), method = as.character(method))</span>
+<span class="co">#&gt;     grid_vars &lt;- setdiff(colnames(submodel_grid), c(&quot;submodel_uid&quot;))</span>
+<span class="co">#&gt;     param_grid &lt;- data.frame(expand.grid(c(mobj$method_args, </span>
+<span class="co">#&gt;         mobj$param_map, list(index = samples$indicies_names))))</span>
+<span class="co">#&gt;     param_vars &lt;- colnames(param_grid)[-ncol(param_grid)]</span>
+<span class="co">#&gt;     packs &lt;- model_methods %&gt;% dplyr::filter(type == &quot;forecaster&quot;) %&gt;% </span>
+<span class="co">#&gt;         dplyr::pull(package) %&gt;% c(&quot;a2modeler&quot;, &quot;dplyr&quot;) %&gt;% </span>
+<span class="co">#&gt;         unique()</span>
+<span class="co">#&gt;     x_vars &lt;- setdiff(colnames(data), c(mobj$target, mobj$index_var))</span>
+<span class="co">#&gt;     measure_fun &lt;- match.fun(measure$method)</span>
+<span class="co">#&gt;     fits &lt;- foreach(rn = 1:nrow(param_grid), .packages = packs, </span>
+<span class="co">#&gt;         .export = c(&quot;mobj&quot;, &quot;data&quot;, &quot;x_vars&quot;, &quot;param_grid&quot;, &quot;param_vars&quot;, </span>
+<span class="co">#&gt;             &quot;indicies&quot;, &quot;model_fun&quot;, &quot;measure_fun&quot;, &quot;level&quot;), </span>
+<span class="co">#&gt;         .errorhandling = &quot;pass&quot;) %dopar% {</span>
+<span class="co">#&gt;         params &lt;- as.list(param_grid[rn, param_vars, drop = FALSE])</span>
+<span class="co">#&gt;         index &lt;- as.character(param_grid[[&quot;index&quot;]][rn])</span>
+<span class="co">#&gt;         train_index &lt;- indicies[[index]]$train</span>
+<span class="co">#&gt;         train_smpl &lt;- data[train_index, , drop = FALSE]</span>
+<span class="co">#&gt;         y &lt;- as.numeric(train_smpl[[mobj$target]])</span>
 <span class="co">#&gt;         if (length(x_vars) &gt; 0) {</span>
-<span class="co">#&gt;           val_xreg &lt;- val_smpl[, x_vars, drop = FALSE]</span>
-<span class="co">#&gt;         } else{</span>
-<span class="co">#&gt;           val_xreg &lt;- NULL</span>
+<span class="co">#&gt;             train_xreg &lt;- train_smpl[, x_vars, drop = FALSE]</span>
 <span class="co">#&gt;         }</span>
-<span class="co">#&gt;         args &lt;- c(list(</span>
-<span class="co">#&gt;           object = fit,</span>
-<span class="co">#&gt;           xreg = val_xreg,</span>
-<span class="co">#&gt;           h = length(val_index),</span>
-<span class="co">#&gt;           level = level</span>
-<span class="co">#&gt;         ),</span>
-<span class="co">#&gt;         params)</span>
-<span class="co">#&gt;         fun &lt;- get(&quot;forecast&quot;, asNamespace(&quot;forecast&quot;))</span>
-<span class="co">#&gt;         fcast &lt;- get_forecasts(do.call(fun, args))</span>
-<span class="co">#&gt;         fit$predictions &lt;- fcast</span>
-<span class="co">#&gt;         perf_smpl &lt;-</span>
-<span class="co">#&gt;           cbind(fcast, val_smpl[, mobj$target, drop = FALSE])</span>
-<span class="co">#&gt;         </span>
-<span class="co">#&gt;       } else {</span>
-<span class="co">#&gt;         perf_smpl &lt;- cbind(data.frame(mean = as.numeric(fit$fitted)),</span>
-<span class="co">#&gt;                            train_smpl[, mobj$target, drop = FALSE])</span>
-<span class="co">#&gt;       }</span>
-<span class="co">#&gt;       </span>
-<span class="co">#&gt;       # Evalulate Performance</span>
-<span class="co">#&gt;       perf &lt;- data.frame(</span>
-<span class="co">#&gt;         measure = measure_fun(perf_smpl,</span>
-<span class="co">#&gt;                               predicted = &quot;mean&quot;,</span>
-<span class="co">#&gt;                               actual = mobj$target),</span>
-<span class="co">#&gt;         index = index,</span>
-<span class="co">#&gt;         sample = &quot;validation&quot;</span>
-<span class="co">#&gt;       )</span>
-<span class="co">#&gt;       perf$index &lt;- as.character(perf$index)</span>
-<span class="co">#&gt;       perf$sample &lt;- as.character(perf$sample)</span>
-<span class="co">#&gt;       fit$performance &lt;- perf</span>
-<span class="co">#&gt;       fit</span>
+<span class="co">#&gt;         else {</span>
+<span class="co">#&gt;             train_xreg &lt;- NULL</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         args &lt;- modifyList(params, c(list(y = y, xreg = train_xreg)))</span>
+<span class="co">#&gt;         fit &lt;- do.call(model_fun, args)</span>
+<span class="co">#&gt;         fit$method_args &lt;- params</span>
+<span class="co">#&gt;         if (!is.null(indicies[[index]]$validation)) {</span>
+<span class="co">#&gt;             val_index &lt;- indicies[[index]]$validation</span>
+<span class="co">#&gt;             val_smpl &lt;- data[val_index, , drop = FALSE]</span>
+<span class="co">#&gt;             if (length(x_vars) &gt; 0) {</span>
+<span class="co">#&gt;                 val_xreg &lt;- val_smpl[, x_vars, drop = FALSE]</span>
+<span class="co">#&gt;             }</span>
+<span class="co">#&gt;             else {</span>
+<span class="co">#&gt;                 val_xreg &lt;- NULL</span>
+<span class="co">#&gt;             }</span>
+<span class="co">#&gt;             args &lt;- c(list(object = fit, xreg = val_xreg, h = length(val_index), </span>
+<span class="co">#&gt;                 level = level), params)</span>
+<span class="co">#&gt;             fun &lt;- get(&quot;forecast&quot;, asNamespace(&quot;forecast&quot;))</span>
+<span class="co">#&gt;             fcast &lt;- get_forecasts(do.call(fun, args))</span>
+<span class="co">#&gt;             fit$predictions &lt;- fcast</span>
+<span class="co">#&gt;             perf_smpl &lt;- cbind(fcast, val_smpl[, mobj$target, </span>
+<span class="co">#&gt;                 drop = FALSE])</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         else {</span>
+<span class="co">#&gt;             perf_smpl &lt;- cbind(data.frame(mean = as.numeric(fit$fitted)), </span>
+<span class="co">#&gt;                 train_smpl[, mobj$target, drop = FALSE])</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         perf &lt;- data.frame(measure = measure_fun(perf_smpl, predicted = &quot;mean&quot;, </span>
+<span class="co">#&gt;             actual = mobj$target), index = index, sample = &quot;validation&quot;)</span>
+<span class="co">#&gt;         perf$index &lt;- as.character(perf$index)</span>
+<span class="co">#&gt;         perf$sample &lt;- as.character(perf$sample)</span>
+<span class="co">#&gt;         fit$performance &lt;- perf</span>
+<span class="co">#&gt;         fit</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Calculate Final Performance</span>
-<span class="co">#&gt;   fit_grid &lt;- purrr::map_df(fits, &quot;performance&quot;) %&gt;%</span>
-<span class="co">#&gt;     dplyr::rename(!!measure$method := !!names(.)[1]) %&gt;% </span>
-<span class="co">#&gt;     dplyr::bind_cols(purrr::map_df(fits, &quot;method_args&quot;)) %&gt;% </span>
-<span class="co">#&gt;     dplyr::mutate(method = mobj$method) %&gt;% </span>
-<span class="co">#&gt;     dplyr::inner_join(submodel_grid, by = grid_vars) %&gt;% </span>
-<span class="co">#&gt;     dplyr::select(-method)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   performance &lt;- fit_grid %&gt;% </span>
-<span class="co">#&gt;     dplyr::group_by_at(setdiff(colnames(fit_grid), c(measure$method, &quot;index&quot;))) %&gt;%</span>
-<span class="co">#&gt;     dplyr::summarise_at(measure$method, mean) %&gt;% </span>
-<span class="co">#&gt;     dplyr::ungroup() </span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(any(colnames(performance) %in% grid_vars)) {</span>
-<span class="co">#&gt;     performance &lt;- performance %&gt;% </span>
-<span class="co">#&gt;       tidyr::nest(-submodel_uid, -sample, -!!measure$method, .key = &quot;param_grid&quot;) </span>
-<span class="co">#&gt;   }else {</span>
-<span class="co">#&gt;     performance &lt;- performance %&gt;% </span>
-<span class="co">#&gt;       dplyr::mutate(param_grid = vector(&quot;list&quot;, 1))</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   mobj$performance &lt;- performance %&gt;% </span>
-<span class="co">#&gt;     dplyr::select(submodel_uid, sample, !!measure$method, param_grid)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # select best model</span>
-<span class="co">#&gt;   best_submodel &lt;- mobj$performance %&gt;%</span>
-<span class="co">#&gt;     dplyr::arrange_at(measure$method,</span>
-<span class="co">#&gt;                       .funs = ifelse(measure$minimize, identity, dplyr::desc)) %&gt;%</span>
-<span class="co">#&gt;     head(1)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Refit on full sample</span>
-<span class="co">#&gt;   if (samples$validation_method == &quot;none&quot;) {</span>
-<span class="co">#&gt;     mobj$fit &lt;- fits[[1]]</span>
-<span class="co">#&gt;   } else {</span>
-<span class="co">#&gt;     params &lt;- best_submodel$param_grid[[1]] %&gt;% as.list()</span>
-<span class="co">#&gt;     y &lt;- as.numeric(data[[mobj$target]])</span>
-<span class="co">#&gt;     if (length(x_vars) &gt; 0) {</span>
-<span class="co">#&gt;       xreg &lt;- data[, x_vars, drop = FALSE]</span>
-<span class="co">#&gt;     } else{</span>
-<span class="co">#&gt;       xreg &lt;- NULL</span>
+<span class="co">#&gt;     fit_grid &lt;- purrr::map_df(fits, &quot;performance&quot;) %&gt;% dplyr::rename(`:=`(!!measure$method, </span>
+<span class="co">#&gt;         !!names(.)[1])) %&gt;% dplyr::bind_cols(purrr::map_df(fits, </span>
+<span class="co">#&gt;         &quot;method_args&quot;)) %&gt;% dplyr::mutate(method = mobj$method) %&gt;% </span>
+<span class="co">#&gt;         dplyr::inner_join(submodel_grid, by = grid_vars) %&gt;% </span>
+<span class="co">#&gt;         dplyr::select(-method)</span>
+<span class="co">#&gt;     performance &lt;- fit_grid %&gt;% dplyr::group_by_at(setdiff(colnames(fit_grid), </span>
+<span class="co">#&gt;         c(measure$method, &quot;index&quot;))) %&gt;% dplyr::summarise_at(measure$method, </span>
+<span class="co">#&gt;         mean) %&gt;% dplyr::ungroup()</span>
+<span class="co">#&gt;     if (any(colnames(performance) %in% grid_vars)) {</span>
+<span class="co">#&gt;         performance &lt;- performance %&gt;% tidyr::nest(-submodel_uid, </span>
+<span class="co">#&gt;             -sample, -!!measure$method, .key = &quot;param_grid&quot;)</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;     args &lt;- modifyList(params, list(y = y, xreg = xreg))</span>
-<span class="co">#&gt;     mobj$fit &lt;- do.call(model_fun, args)</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt;     # save submodels option</span>
-<span class="co">#&gt;     if (save_submodels) {</span>
-<span class="co">#&gt;       sub_models &lt;- list()</span>
-<span class="co">#&gt;       for (uid in submodel_grid$submodel_uid) {</span>
-<span class="co">#&gt;         sub_model &lt;- purrr::keep(fits, fit_grid$submodel_uid == uid)</span>
-<span class="co">#&gt;         names(sub_model) &lt;- samples$indicies_names</span>
-<span class="co">#&gt;         sub_models[[uid]] &lt;- sub_model</span>
-<span class="co">#&gt;       }</span>
-<span class="co">#&gt;       </span>
-<span class="co">#&gt;       mobj$sub_models &lt;- sub_models</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         performance &lt;- performance %&gt;% dplyr::mutate(param_grid = vector(&quot;list&quot;, </span>
+<span class="co">#&gt;             1))</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;  </span>
-<span class="co">#&gt;   mobj</span>
+<span class="co">#&gt;     mobj$performance &lt;- performance %&gt;% dplyr::select(submodel_uid, </span>
+<span class="co">#&gt;         sample, !!measure$method, param_grid)</span>
+<span class="co">#&gt;     best_submodel &lt;- mobj$performance %&gt;% dplyr::arrange_at(measure$method, </span>
+<span class="co">#&gt;         .funs = ifelse(measure$minimize, identity, dplyr::desc)) %&gt;% </span>
+<span class="co">#&gt;         head(1)</span>
+<span class="co">#&gt;     if (samples$validation_method == &quot;none&quot;) {</span>
+<span class="co">#&gt;         mobj$fit &lt;- fits[[1]]</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         params &lt;- best_submodel$param_grid[[1]] %&gt;% as.list()</span>
+<span class="co">#&gt;         y &lt;- as.numeric(data[[mobj$target]])</span>
+<span class="co">#&gt;         if (length(x_vars) &gt; 0) {</span>
+<span class="co">#&gt;             xreg &lt;- data[, x_vars, drop = FALSE]</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         else {</span>
+<span class="co">#&gt;             xreg &lt;- NULL</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         args &lt;- modifyList(params, list(y = y, xreg = xreg))</span>
+<span class="co">#&gt;         mobj$fit &lt;- do.call(model_fun, args)</span>
+<span class="co">#&gt;         if (save_submodels) {</span>
+<span class="co">#&gt;             sub_models &lt;- list()</span>
+<span class="co">#&gt;             for (uid in submodel_grid$submodel_uid) {</span>
+<span class="co">#&gt;                 sub_model &lt;- purrr::keep(fits, fit_grid$submodel_uid == </span>
+<span class="co">#&gt;                   uid)</span>
+<span class="co">#&gt;                 names(sub_model) &lt;- samples$indicies_names</span>
+<span class="co">#&gt;                 sub_models[[uid]] &lt;- sub_model</span>
+<span class="co">#&gt;             }</span>
+<span class="co">#&gt;             mobj$sub_models &lt;- sub_models</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     mobj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000010e6f670&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>In the first section, assertions are made on the inputs, a potential parallel backend with doFuture<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> is created, the model method function is defined and the indices are extracted.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train_model.forecast_model &lt;-<span class="st"> </span><span class="cf">function</span>(mobj, 
@@ -1823,82 +1558,70 @@ train_model.forecast_model
 <div id="predictions" class="section level2">
 <h2>Predictions</h2>
 <p>Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction mangement. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">new_predictions
-<span class="co">#&gt; function(predictions,</span>
-<span class="co">#&gt;                             model,</span>
-<span class="co">#&gt;                             type,</span>
-<span class="co">#&gt;                             uid,</span>
-<span class="co">#&gt;                             desc) {</span>
-<span class="co">#&gt;   checkmate::assert_true(any(class(predictions) %in% c(&quot;data.frame&quot;, &quot;tbl_spark&quot;)))</span>
-<span class="co">#&gt;   checkmate::assert_class(model, &quot;model&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_character(uid)</span>
-<span class="co">#&gt;   checkmate::assert_character(desc)</span>
-<span class="co">#&gt;   checkmate::assert_choice(type,</span>
-<span class="co">#&gt;                            c(&quot;forecaster&quot;, &quot;segmenter&quot;, &quot;regressor&quot;,</span>
-<span class="co">#&gt;                              &quot;classifier&quot;, &quot;multiclassifier&quot;))</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   structure(</span>
-<span class="co">#&gt;     list(</span>
-<span class="co">#&gt;       predictions = predictions,</span>
-<span class="co">#&gt;       model = model,</span>
-<span class="co">#&gt;       type = type,</span>
-<span class="co">#&gt;       uid = uid,</span>
-<span class="co">#&gt;       desc = desc,</span>
-<span class="co">#&gt;       created_on = Sys.time()</span>
-<span class="co">#&gt;     ),</span>
-<span class="co">#&gt;     class = &quot;predictions&quot;</span>
-<span class="co">#&gt;   )</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Predictions Class Constructor</span>
+new_predictions &lt;-<span class="st"> </span><span class="cf">function</span>(predictions,
+                            model,
+                            type,
+                            uid,
+                            desc) {
+  checkmate<span class="op">::</span><span class="kw">assert_true</span>(<span class="kw">any</span>(<span class="kw">class</span>(predictions) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;data.frame&quot;</span>, <span class="st">&quot;tbl_spark&quot;</span>)))
+  checkmate<span class="op">::</span><span class="kw">assert_class</span>(model, <span class="st">&quot;model&quot;</span>)
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(uid)
+  checkmate<span class="op">::</span><span class="kw">assert_character</span>(desc)
+  checkmate<span class="op">::</span><span class="kw">assert_choice</span>(type,
+                           <span class="kw">c</span>(<span class="st">&quot;forecaster&quot;</span>, <span class="st">&quot;segmenter&quot;</span>, <span class="st">&quot;regressor&quot;</span>,
+                             <span class="st">&quot;classifier&quot;</span>, <span class="st">&quot;multiclassifier&quot;</span>))
+
+  <span class="kw">structure</span>(
+    <span class="kw">list</span>(
+      <span class="dt">predictions =</span> predictions,
+      <span class="dt">model =</span> model,
+      <span class="dt">type =</span> type,
+      <span class="dt">uid =</span> uid,
+      <span class="dt">desc =</span> desc,
+      <span class="dt">created_on =</span> <span class="kw">Sys.time</span>()
+    ),
+    <span class="dt">class =</span> <span class="st">&quot;predictions&quot;</span>
+  )
+}</code></pre></div>
 <div id="spark-predict-method" class="section level4">
 <h4>Spark Predict Method</h4>
 <p>The prediction class stores the predictions made with modeler predict methods. Below is the classifier method, which is very similar to the other spark based classes.</p>
 <p>The method first checks the new data schema to ensure its similar to the input data schema saved in the modeler object. Next the model pipeline is executed on the new data applying any feature engineering transformations. Lastly the predictions are made with the modeler’s final model on the pipeline output and saved in a predictions object.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Classifier Predict Method</span>
-predict.classifier
-<span class="co">#&gt; function(obj,</span>
-<span class="co">#&gt;                                data = NULL,</span>
-<span class="co">#&gt;                                desc = &quot;&quot;,</span>
-<span class="co">#&gt;                                ...) {</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if (is.null(obj$final_model)) {</span>
-<span class="co">#&gt;     stop(&quot;Final model not set&quot;)</span>
-<span class="co">#&gt;   } else {</span>
-<span class="co">#&gt;     final_model &lt;- obj$final_model</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Schema Check</span>
-<span class="co">#&gt;   schema_compare &lt;- obj$schema %&gt;% </span>
-<span class="co">#&gt;     purrr::keep(names(obj$schema) != obj$target) %&gt;% </span>
-<span class="co">#&gt;     a2munge::schema_check(., a2munge::get_schema(data))</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   pipe &lt;- obj$pipelines[[final_model$pipe]] %&gt;% </span>
-<span class="co">#&gt;     execute(data, .) </span>
-<span class="co">#&gt;   predict(final_model, data = pipe$output, ...) %&gt;% </span>
-<span class="co">#&gt;     new_predictions(</span>
-<span class="co">#&gt;       predictions = .,</span>
-<span class="co">#&gt;       model = final_model,</span>
-<span class="co">#&gt;       type = &quot;classifier&quot;,</span>
-<span class="co">#&gt;       uid = sparklyr::random_string(prefix = &quot;pred&quot;),</span>
-<span class="co">#&gt;       desc = desc</span>
-<span class="co">#&gt;     )</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;predict&quot;</span>, <span class="st">&quot;classifier&quot;</span>)
+<span class="co">#&gt; function (obj, data = NULL, desc = &quot;&quot;, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     if (is.null(obj$final_model)) {</span>
+<span class="co">#&gt;         stop(&quot;Final model not set&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         final_model &lt;- obj$final_model</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     schema_compare &lt;- obj$schema %&gt;% purrr::keep(names(obj$schema) != </span>
+<span class="co">#&gt;         obj$target) %&gt;% a2munge::schema_check(., a2munge::get_schema(data))</span>
+<span class="co">#&gt;     pipe &lt;- obj$pipelines[[final_model$pipe]] %&gt;% execute(data, </span>
+<span class="co">#&gt;         .)</span>
+<span class="co">#&gt;     predict(final_model, data = pipe$output, ...) %&gt;% new_predictions(predictions = ., </span>
+<span class="co">#&gt;         model = final_model, type = &quot;classifier&quot;, uid = sparklyr::random_string(prefix = &quot;pred&quot;), </span>
+<span class="co">#&gt;         desc = desc)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011af36d8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>The predict method used internally is specific to the final model class. In the classifier case, the internal predict method below uses the sparklyr <code>ml_predict</code> function on the sparkl-ml model and then formatted to the expected output schema.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Spark Model Classification predict method</span>
-predict.spark_model_classification 
-<span class="co">#&gt; function(mobj,</span>
-<span class="co">#&gt;                                                data,</span>
-<span class="co">#&gt;                                                prediction_col = &quot;predicted&quot;,</span>
-<span class="co">#&gt;                                                ...) {</span>
-<span class="co">#&gt;   checkmate::assert_class(data, &quot;tbl_spark&quot;)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   sparklyr::ml_predict(mobj$fit, data,  ...) %&gt;%</span>
-<span class="co">#&gt;     sparklyr::sdf_separate_column(&quot;probability&quot;, into = c(&quot;prob_0&quot;, &quot;prob_1&quot;)) %&gt;% </span>
-<span class="co">#&gt;     dplyr::select(prediction, prob_0, prob_1) %&gt;% </span>
-<span class="co">#&gt;     dplyr::rename(!!prediction_col := prediction) %&gt;% </span>
-<span class="co">#&gt;     dplyr::select(!!prediction_col, prob_0, prob_1)</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;predict&quot;</span>, <span class="st">&quot;spark_model_classification&quot;</span>)
+<span class="co">#&gt; function (mobj, data, prediction_col = &quot;predicted&quot;, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_class(data, &quot;tbl_spark&quot;)</span>
+<span class="co">#&gt;     sparklyr::ml_predict(mobj$fit, data, ...) %&gt;% sparklyr::sdf_separate_column(&quot;probability&quot;, </span>
+<span class="co">#&gt;         into = c(&quot;prob_0&quot;, &quot;prob_1&quot;)) %&gt;% dplyr::select(prediction, </span>
+<span class="co">#&gt;         prob_0, prob_1) %&gt;% dplyr::rename(`:=`(!!prediction_col, </span>
+<span class="co">#&gt;         prediction)) %&gt;% dplyr::select(!!prediction_col, prob_0, </span>
+<span class="co">#&gt;         prob_1)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011cdfb70&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="forecaster-predict-methods" class="section level4">
@@ -1907,91 +1630,72 @@ predict.spark_model_classification
 <p>Similar to the classifier predict method the forecaster print method below preforms a schema check on the data if provided, executes the final model’s pipeline and creates the predictions using an intenal predict method covered next. Note - the forecaster print method creates a prediction index by using the <code>extend</code> method on the forecaster’s index and combines with the prediction output. The index class is covered in the next section.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Forecaster predict method</span>
-predict.forecaster
-<span class="co">#&gt; function(obj,</span>
-<span class="co">#&gt;                                data = NULL,</span>
-<span class="co">#&gt;                                periods,</span>
-<span class="co">#&gt;                                uid = sparklyr::random_string(prefix = &quot;pred&quot;),</span>
-<span class="co">#&gt;                                desc = &quot;&quot;,</span>
-<span class="co">#&gt;                                ...) {</span>
-<span class="co">#&gt;   final_model &lt;- obj$final_model</span>
-<span class="co">#&gt;   if (is.null(final_model)) {</span>
-<span class="co">#&gt;     stop(&quot;Final model not set&quot;)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(! is.null(data)) {</span>
-<span class="co">#&gt;   # Schema Check</span>
-<span class="co">#&gt;   schema_compare &lt;- obj$schema %&gt;% </span>
-<span class="co">#&gt;     purrr::keep(! names(obj$schema) %in% c(obj$target, obj$index_var)) %&gt;% </span>
-<span class="co">#&gt;     a2munge::schema_check(., a2munge::get_schema(data))</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   pipe &lt;- execute(data, obj$pipelines[[final_model$pipe]])</span>
-<span class="co">#&gt;   preds &lt;- predict(final_model, data = pipe$output, periods, obj$level)</span>
-<span class="co">#&gt;   index_out &lt;- extend(obj$index, length_out = periods)</span>
-<span class="co">#&gt;   predictions &lt;- data.frame(index_out, preds)</span>
-<span class="co">#&gt;   colnames(predictions)[1] &lt;- obj$index_var</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   new_predictions(</span>
-<span class="co">#&gt;     predictions = predictions,</span>
-<span class="co">#&gt;     model = final_model,</span>
-<span class="co">#&gt;     type = &quot;forecaster&quot;,</span>
-<span class="co">#&gt;     uid = uid,</span>
-<span class="co">#&gt;     desc = desc</span>
-<span class="co">#&gt;   )</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;predict&quot;</span>, <span class="st">&quot;forecaster&quot;</span>)
+<span class="co">#&gt; function (obj, data = NULL, periods, uid = sparklyr::random_string(prefix = &quot;pred&quot;), </span>
+<span class="co">#&gt;     desc = &quot;&quot;, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     final_model &lt;- obj$final_model</span>
+<span class="co">#&gt;     if (is.null(final_model)) {</span>
+<span class="co">#&gt;         stop(&quot;Final model not set&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (!is.null(data)) {</span>
+<span class="co">#&gt;         schema_compare &lt;- obj$schema %&gt;% purrr::keep(!names(obj$schema) %in% </span>
+<span class="co">#&gt;             c(obj$target, obj$index_var)) %&gt;% a2munge::schema_check(., </span>
+<span class="co">#&gt;             a2munge::get_schema(data))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     pipe &lt;- execute(data, obj$pipelines[[final_model$pipe]])</span>
+<span class="co">#&gt;     preds &lt;- predict(final_model, data = pipe$output, periods, </span>
+<span class="co">#&gt;         obj$level)</span>
+<span class="co">#&gt;     index_out &lt;- extend(obj$index, length_out = periods)</span>
+<span class="co">#&gt;     predictions &lt;- data.frame(index_out, preds)</span>
+<span class="co">#&gt;     colnames(predictions)[1] &lt;- obj$index_var</span>
+<span class="co">#&gt;     new_predictions(predictions = predictions, model = final_model, </span>
+<span class="co">#&gt;         type = &quot;forecaster&quot;, uid = uid, desc = desc)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000011ea25c8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 <p>The forecast predict method that creates the prediction output using the <code>forecast</code> function from the forecast package. The <code>get_forecast</code> function is used to format the output.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># forecast model predict method</span>
-predict.forecast_model
-<span class="co">#&gt; function(mobj,</span>
-<span class="co">#&gt;                                    data = NULL,</span>
-<span class="co">#&gt;                                    periods,</span>
-<span class="co">#&gt;                                    level = c(80, 95),</span>
-<span class="co">#&gt;                                    ...) {</span>
-<span class="co">#&gt;   if (!is.null(data)) {</span>
-<span class="co">#&gt;     if (nrow(data) != periods) {</span>
-<span class="co">#&gt;       warning(&quot;number of data rows doesn't match forecast periods&quot;)</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;predict&quot;</span>, <span class="st">&quot;forecast_model&quot;</span>)
+<span class="co">#&gt; function (mobj, data = NULL, periods, level = c(80, 95), ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     if (!is.null(data)) {</span>
+<span class="co">#&gt;         if (nrow(data) != periods) {</span>
+<span class="co">#&gt;             warning(&quot;number of data rows doesn't match forecast periods&quot;)</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         x_vars &lt;- setdiff(colnames(data), c(mobj$target, mobj$index_var))</span>
+<span class="co">#&gt;         if (length(x_vars) &gt; 0) {</span>
+<span class="co">#&gt;             xreg &lt;- data[, x_vars, drop = FALSE]</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;         else {</span>
+<span class="co">#&gt;             xreg &lt;- NULL</span>
+<span class="co">#&gt;         }</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     x_vars &lt;- setdiff(colnames(data), c(mobj$target, mobj$index_var))</span>
-<span class="co">#&gt;     if (length(x_vars) &gt; 0) {</span>
-<span class="co">#&gt;       xreg &lt;- data[, x_vars, drop = FALSE]</span>
-<span class="co">#&gt;     } else {</span>
-<span class="co">#&gt;       xreg &lt;- NULL</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         xreg &lt;- NULL</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;   } else{</span>
-<span class="co">#&gt;     xreg &lt;- NULL</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   fun &lt;- get(&quot;forecast&quot;, asNamespace(&quot;forecast&quot;))</span>
-<span class="co">#&gt;   f &lt;- do.call(fun,</span>
-<span class="co">#&gt;                modifyList(</span>
-<span class="co">#&gt;                  mobj$method_args,</span>
-<span class="co">#&gt;                  list(</span>
-<span class="co">#&gt;                    object = mobj$fit,</span>
-<span class="co">#&gt;                    xreg = xreg,</span>
-<span class="co">#&gt;                    h = periods,</span>
-<span class="co">#&gt;                    level = level</span>
-<span class="co">#&gt;                  )</span>
-<span class="co">#&gt;                ))</span>
-<span class="co">#&gt;   get_forecasts(f)</span>
+<span class="co">#&gt;     fun &lt;- get(&quot;forecast&quot;, asNamespace(&quot;forecast&quot;))</span>
+<span class="co">#&gt;     f &lt;- do.call(fun, modifyList(mobj$method_args, list(object = mobj$fit, </span>
+<span class="co">#&gt;         xreg = xreg, h = periods, level = level)))</span>
+<span class="co">#&gt;     get_forecasts(f)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000120bb6f8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span>
 
 <span class="co"># get_forecasts</span>
-get_forecasts.forecast
-<span class="co">#&gt; function(mobj){</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   df &lt;- as.data.frame(mobj)</span>
-<span class="co">#&gt;   cns &lt;- tolower(colnames(df))</span>
-<span class="co">#&gt;   cns &lt;- gsub(&quot;lo&quot;, &quot;lower&quot;, cns)</span>
-<span class="co">#&gt;   cns &lt;- gsub(&quot;hi&quot;, &quot;upper&quot;, cns)</span>
-<span class="co">#&gt;   cns &lt;- gsub(&quot; &quot;, &quot;&quot;, cns)</span>
-<span class="co">#&gt;   cns[1] &lt;- &quot;mean&quot;</span>
-<span class="co">#&gt;   colnames(df) &lt;- cns</span>
-<span class="co">#&gt;   df</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;get_forecasts&quot;</span>, <span class="st">&quot;forecast&quot;</span>)
+<span class="co">#&gt; function (mobj) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     df &lt;- as.data.frame(mobj)</span>
+<span class="co">#&gt;     cns &lt;- tolower(colnames(df))</span>
+<span class="co">#&gt;     cns &lt;- gsub(&quot;lo&quot;, &quot;lower&quot;, cns)</span>
+<span class="co">#&gt;     cns &lt;- gsub(&quot;hi&quot;, &quot;upper&quot;, cns)</span>
+<span class="co">#&gt;     cns &lt;- gsub(&quot; &quot;, &quot;&quot;, cns)</span>
+<span class="co">#&gt;     cns[1] &lt;- &quot;mean&quot;</span>
+<span class="co">#&gt;     colnames(df) &lt;- cns</span>
+<span class="co">#&gt;     df</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000012135278&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="index-class" class="section level4">
@@ -2053,53 +1757,39 @@ d1
 <p>The refit function can be used to refit a modeler object to a new dataset. The function provides the option to append the new data to the stored data (default) or fit on just the new data. The function returns an updated modeler object. Only the final model is fit. The entire workflow is not executed.</p>
 <p>Below is the refit modeler method. Similar to the prediction methods, the refit applies assertions on the new data ensuring its the same class and schema of the orginial modeler input data. The final model pipeline is applied with a single default sample to create the training dataset and passed to the <code>train_model</code> function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Refit Method</span>
-refit.modeler
-<span class="co">#&gt; function(obj, df, append = TRUE, ...) {</span>
-<span class="co">#&gt;   checkmate::assert_class(obj, &quot;modeler&quot;)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(! any(class(df) %in% class(obj$data))) { </span>
-<span class="co">#&gt;     stop(c(&quot;new dataframe class not consistent with expected data class\n&quot;,</span>
-<span class="co">#&gt;           &quot;expecting class: &quot;, paste(class(obj$data), collapse=&quot;, &quot;), &quot;\n&quot;, </span>
-<span class="co">#&gt;           &quot;dataframe class: &quot;, paste(class(df), collapse=&quot;, &quot;), &quot;\n&quot;  ))</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(is.null(obj$final_model)) {</span>
-<span class="co">#&gt;     stop(&quot;final model not set&quot;)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Schema Check</span>
-<span class="co">#&gt;   schema_compare &lt;- a2munge::get_schema(df) %&gt;% </span>
-<span class="co">#&gt;     a2munge::schema_check(obj$schema)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Append Option</span>
-<span class="co">#&gt;   pipe_uid &lt;- obj$final_model$pipe</span>
-<span class="co">#&gt;   if(append) {</span>
-<span class="co">#&gt;     bind_fun &lt;- ifelse(&quot;tbl_spark&quot; %in% class(df), </span>
-<span class="co">#&gt;                        get(&quot;sdf_bind_rows&quot;, asNamespace(&quot;sparklyr&quot;)),</span>
-<span class="co">#&gt;                        get(&quot;bind_rows&quot;, asNamespace(&quot;dplyr&quot;)))</span>
-<span class="co">#&gt;     obj$data &lt;- bind_fun(obj$data, df)</span>
-<span class="co">#&gt;     obj$pipelines[[pipe_uid]] &lt;- execute(obj$data, obj$pipelines[[pipe_uid]])</span>
-<span class="co">#&gt;     data &lt;- obj$pipelines[[pipe_uid]]$output</span>
-<span class="co">#&gt;   } else {</span>
-<span class="co">#&gt;     data &lt;- flow(df, obj$pipelines[[pipe_uid]])</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Samples</span>
-<span class="co">#&gt;   refit_sample &lt;- add_default_samples(data)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   obj$final_model &lt;- train_model(</span>
-<span class="co">#&gt;     mobj = obj$final_model,</span>
-<span class="co">#&gt;     data = data,</span>
-<span class="co">#&gt;     measure = obj$measure,</span>
-<span class="co">#&gt;     samples = refit_sample,</span>
-<span class="co">#&gt;     save_submodels = FALSE,</span>
-<span class="co">#&gt;     execution_strategy = obj$execution_strategy,</span>
-<span class="co">#&gt;     level = obj$conf_levels,</span>
-<span class="co">#&gt;     seed = obj$seed</span>
-<span class="co">#&gt;   )</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   obj</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;refit&quot;</span>, <span class="st">&quot;modeler&quot;</span>)
+<span class="co">#&gt; function (obj, df, append = TRUE, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_class(obj, &quot;modeler&quot;)</span>
+<span class="co">#&gt;     if (!any(class(df) %in% class(obj$data))) {</span>
+<span class="co">#&gt;         stop(c(&quot;new dataframe class not consistent with expected data class\n&quot;, </span>
+<span class="co">#&gt;             &quot;expecting class: &quot;, paste(class(obj$data), collapse = &quot;, &quot;), </span>
+<span class="co">#&gt;             &quot;\n&quot;, &quot;dataframe class: &quot;, paste(class(df), collapse = &quot;, &quot;), </span>
+<span class="co">#&gt;             &quot;\n&quot;))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (is.null(obj$final_model)) {</span>
+<span class="co">#&gt;         stop(&quot;final model not set&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     schema_compare &lt;- a2munge::get_schema(df) %&gt;% a2munge::schema_check(obj$schema)</span>
+<span class="co">#&gt;     pipe_uid &lt;- obj$final_model$pipe</span>
+<span class="co">#&gt;     if (append) {</span>
+<span class="co">#&gt;         bind_fun &lt;- ifelse(&quot;tbl_spark&quot; %in% class(df), get(&quot;sdf_bind_rows&quot;, </span>
+<span class="co">#&gt;             asNamespace(&quot;sparklyr&quot;)), get(&quot;bind_rows&quot;, asNamespace(&quot;dplyr&quot;)))</span>
+<span class="co">#&gt;         obj$data &lt;- bind_fun(obj$data, df)</span>
+<span class="co">#&gt;         obj$pipelines[[pipe_uid]] &lt;- execute(obj$data, obj$pipelines[[pipe_uid]])</span>
+<span class="co">#&gt;         data &lt;- obj$pipelines[[pipe_uid]]$output</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         data &lt;- flow(df, obj$pipelines[[pipe_uid]])</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     refit_sample &lt;- add_default_samples(data)</span>
+<span class="co">#&gt;     obj$final_model &lt;- train_model(mobj = obj$final_model, data = data, </span>
+<span class="co">#&gt;         measure = obj$measure, samples = refit_sample, save_submodels = FALSE, </span>
+<span class="co">#&gt;         execution_strategy = obj$execution_strategy, level = obj$conf_levels, </span>
+<span class="co">#&gt;         seed = obj$seed)</span>
+<span class="co">#&gt;     obj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000012c2ec90&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="deploy" class="section level4">
@@ -2115,44 +1805,39 @@ refit.modeler
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># deploy function</span>
 deploy
-<span class="co">#&gt; function(obj, path, ...) {</span>
-<span class="co">#&gt;   checkmate::assert_class(obj, &quot;modeler&quot;)</span>
-<span class="co">#&gt;   checkmate::assert_directory(dirname(path))</span>
-<span class="co">#&gt;  </span>
-<span class="co">#&gt;   # Check for final model</span>
-<span class="co">#&gt;   if(is.null(obj$final_model)) {</span>
-<span class="co">#&gt;     stop(&quot;Deployment failed - Final Model not set&quot;)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Created model label</span>
-<span class="co">#&gt;   label &lt;- paste(obj$name, obj$version, sep=&quot;-&quot;)</span>
-<span class="co">#&gt;   modeler_path &lt;- paste(path, label, sep=&quot;/&quot;)</span>
-<span class="co">#&gt;   modeler_file &lt;- paste(modeler_path, paste0(label, &quot;.rds&quot;), sep=&quot;/&quot;)</span>
-<span class="co">#&gt;   model_path &lt;- paste(modeler_path, obj$final_model$uid, sep=&quot;/&quot;)</span>
-<span class="co">#&gt;   obj$final_model$path &lt;- model_path</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Remove Spark objects from obj</span>
-<span class="co">#&gt;   if(&quot;tbl_spark&quot; %in% class(obj$data)) obj$data &lt;- NULL</span>
-<span class="co">#&gt;   for(i in seq_along(obj$models)) {</span>
-<span class="co">#&gt;     if(&quot;spark_model&quot; %in% class(obj$models[[1]])){</span>
-<span class="co">#&gt;       obj$models[[i]]$fit &lt;- NULL</span>
-<span class="co">#&gt;       obj$models[[i]]$sub_models &lt;- NULL</span>
+<span class="co">#&gt; function (obj, path, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_class(obj, &quot;modeler&quot;)</span>
+<span class="co">#&gt;     checkmate::assert_directory(dirname(path))</span>
+<span class="co">#&gt;     if (is.null(obj$final_model)) {</span>
+<span class="co">#&gt;         stop(&quot;Deployment failed - Final Model not set&quot;)</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   for(i in seq_along(obj$pipelines)) {</span>
-<span class="co">#&gt;     if(&quot;tbl_spark&quot; %in% class(obj$pipelines[[i]]$output)) {</span>
-<span class="co">#&gt;       obj$pipelines[[i]]$output &lt;- NULL</span>
+<span class="co">#&gt;     label &lt;- paste(obj$name, obj$version, sep = &quot;-&quot;)</span>
+<span class="co">#&gt;     modeler_path &lt;- paste(path, label, sep = &quot;/&quot;)</span>
+<span class="co">#&gt;     modeler_file &lt;- paste(modeler_path, paste0(label, &quot;.rds&quot;), </span>
+<span class="co">#&gt;         sep = &quot;/&quot;)</span>
+<span class="co">#&gt;     model_path &lt;- paste(modeler_path, obj$final_model$uid, sep = &quot;/&quot;)</span>
+<span class="co">#&gt;     obj$final_model$path &lt;- model_path</span>
+<span class="co">#&gt;     if (&quot;tbl_spark&quot; %in% class(obj$data)) </span>
+<span class="co">#&gt;         obj$data &lt;- NULL</span>
+<span class="co">#&gt;     for (i in seq_along(obj$models)) {</span>
+<span class="co">#&gt;         if (&quot;spark_model&quot; %in% class(obj$models[[1]])) {</span>
+<span class="co">#&gt;             obj$models[[i]]$fit &lt;- NULL</span>
+<span class="co">#&gt;             obj$models[[i]]$sub_models &lt;- NULL</span>
+<span class="co">#&gt;         }</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Create directory &amp; write modeler and Final Model</span>
-<span class="co">#&gt;   dir.create(modeler_path, recursive = TRUE)</span>
-<span class="co">#&gt;   if(&quot;spark_model&quot; %in% class(obj$final_model)) {</span>
-<span class="co">#&gt;     sparklyr::ml_save(obj$final_model$fit, model_path)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   saveRDS(object = obj, file = modeler_file, ...)</span>
+<span class="co">#&gt;     for (i in seq_along(obj$pipelines)) {</span>
+<span class="co">#&gt;         if (&quot;tbl_spark&quot; %in% class(obj$pipelines[[i]]$output)) {</span>
+<span class="co">#&gt;             obj$pipelines[[i]]$output &lt;- NULL</span>
+<span class="co">#&gt;         }</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     dir.create(modeler_path, recursive = TRUE)</span>
+<span class="co">#&gt;     if (&quot;spark_model&quot; %in% class(obj$final_model)) {</span>
+<span class="co">#&gt;         sparklyr::ml_save(obj$final_model$fit, model_path)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     saveRDS(object = obj, file = modeler_file, ...)</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000012db6438&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 <div id="a2-load" class="section level4">
@@ -2161,25 +1846,22 @@ deploy
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># a2_load function</span>
 a2_load
-<span class="co">#&gt; function(path, sc = NULL) {</span>
-<span class="co">#&gt;   checkmate::assert_directory(dirname(path))</span>
-<span class="co">#&gt;   checkmate::assert_class(sc, &quot;spark_connection&quot;, null.ok = TRUE)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Get modeler file</span>
-<span class="co">#&gt;   modeler_file &lt;- list.files(path = path, pattern = &quot;.rds&quot;, full.names = TRUE)</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   if(length(modeler_file) == 0) {</span>
-<span class="co">#&gt;     stop(&quot;Model Meta-data file not found\nLooking for .rds file&quot;)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   # Load Meta-data and Model</span>
-<span class="co">#&gt;   obj &lt;- readRDS(file = modeler_file)</span>
-<span class="co">#&gt;   if(! is.null(sc)) {</span>
-<span class="co">#&gt;     obj$final_model$fit &lt;- sparklyr::ml_load(sc, path = obj$final_model$path)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt;   </span>
-<span class="co">#&gt;   obj</span>
+<span class="co">#&gt; function (path, sc = NULL) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_directory(dirname(path))</span>
+<span class="co">#&gt;     checkmate::assert_class(sc, &quot;spark_connection&quot;, null.ok = TRUE)</span>
+<span class="co">#&gt;     modeler_file &lt;- list.files(path = path, pattern = &quot;.rds&quot;, </span>
+<span class="co">#&gt;         full.names = TRUE)</span>
+<span class="co">#&gt;     if (length(modeler_file) == 0) {</span>
+<span class="co">#&gt;         stop(&quot;Model Meta-data file not found\nLooking for .rds file&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     obj &lt;- readRDS(file = modeler_file)</span>
+<span class="co">#&gt;     if (!is.null(sc)) {</span>
+<span class="co">#&gt;         obj$final_model$fit &lt;- sparklyr::ml_load(sc, path = obj$final_model$path)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     obj</span>
 <span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000012f7e488&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2modeler&gt;</span></code></pre></div>
 </div>
 </div>

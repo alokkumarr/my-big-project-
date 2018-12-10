@@ -32,8 +32,8 @@ library(purrr)
 library(lubridate)
 library(sparklyr)
 library(a2munge)
-#library(a2modeler)
-devtools::load_all("~/software_projects/sip/a2modeler")
+library(a2modeler)
+#devtools::load_all("~/software_projects/sip/a2modeler")
 
 ```
 
@@ -207,7 +207,7 @@ The `add_*_samples` functions add samples to the modeler object and have class s
 
 ```{r}
 # Add Default Sample to modeler object
-add_default_samples.modeler
+getS3method("add_default_samples", "modeler")
 ```
 
 The other `add_*_samples` modeler methods behave similarily. The numeric methods is where the sampling logic is located. 
@@ -230,13 +230,13 @@ In the following chunk code for `add_default_samples` methods are shown. The dat
 
 ```{r}
 # add_default_samples.numeric code
-add_default_samples.numeric
+getS3method("add_default_samples", "numeric")
 
 # add_default_samples.data.frame code
-add_default_samples.data.frame
+getS3method("add_default_samples", "data.frame")
 
 # add_default_samples.tbl_spk
-add_default_samples.tbl_spark
+getS3method("add_default_samples", "tbl_spark")
 
 ```
 
@@ -246,13 +246,13 @@ Next is a set of methods for creating holdout samples. The numeric method create
 
 ```{r}
 # add_holdout_samples.numeric code
-add_holdout_samples.numeric
+getS3method("add_holdout_samples", "numeric")
 
 # add_holdout_samples.data.frame code
-add_holdout_samples.tbl_spark
+getS3method("add_holdout_samples", "data.frame")
 
 # add_holdout_samples.data.frame code
-add_holdout_samples.tbl_spark
+getS3method("add_holdout_samples", "tbl_spark")
 
 ```
 
@@ -324,10 +324,10 @@ Adding a new method requires that the measure function (such as `rmse`) is eithe
 
 ```{r}
 # R rmse method
-rmse.data.frame
+getS3method('rmse', 'data.frame')
 
 # Spark rmse method
-rmse.tbl_spark
+getS3method('rmse', 'tbl_spark')
 ```
 
 
@@ -407,10 +407,64 @@ model
 
 The model child class is assigned in the constructor below. A look up to the model_method dataset is made, the class extracted and assigned in the `structure` function. 
 
-```{r}
+```{r, eval=FALSE}
 
 # Model Constructor
-new_model
+new_model <- function(pipe,
+                      target,
+                      method,
+                      method_args, 
+                      param_map,
+                      desc,
+                      uid,
+                      status,
+                      created_on
+) {
+  checkmate::assert_character(pipe)
+  checkmate::assert_character(target, null.ok = TRUE)
+  checkmate::assert_choice(method, choices = model_methods$method)
+  checkmate::assert_list(method_args, null.ok = TRUE)
+  checkmate::assert_list(param_map)
+  checkmate::assert_character(desc)
+  checkmate::assert_character(uid)
+  checkmate::assert_character(status)
+  checkmate::assert_posixct(created_on)
+  
+  .method <- method
+  method_fun <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    dplyr::pull(package) %>%
+    asNamespace() %>%
+    get(.method, .)
+  method_params <- setdiff(c(names(method_args), names(param_map)), "uid")
+  if(length(method_params) == 0) method_params <- NULL
+  checkmate::assert_function(method_fun, args = method_params)
+  
+  method_class <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    tidyr::unnest(class) %>%
+    dplyr::pull(class) %>%
+    as.character()
+  method_package <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    dplyr::pull(package)
+  
+  structure(
+    list(
+      pipe = pipe,
+      target = target,
+      method = method,
+      method_args = method_args,
+      param_map = param_map,
+      package = method_package,
+      desc = desc,
+      uid = uid,
+      created_on = created_on,
+      status = status
+    ),
+    class = c(method_class, "model")
+  )
+}
 ```
 
 
@@ -429,7 +483,7 @@ Full modeler class method
 ```{r}
 
 # Parent Modeler class method
-train_models.modeler
+getS3method("train_models", "modeler")
 
 ```
 
@@ -446,8 +500,10 @@ train_models.modeler <- function(obj, uids = NULL, ...) {
 
 The `execute_pipelines` function is descriptive - it calls the `execute` function on all un-excuted pipelines saved in the modeler object. Recall execute will save the pipeline output to the output slot. 
 
+
 ```{r}
-execute_pipelines.modeler
+# execute pipeline modeler method
+getS3method("execute_pipelines", "modeler")
 ```
 
 
@@ -525,7 +581,7 @@ The following is the spark_model based method. We breakdown each section next
 ```{r}
 
 # train_model.spark_model
-train_model.spark_model
+getS3method("train_model", "spark_model")
 
 ```
 
@@ -704,7 +760,7 @@ In this section the Forecast Model `train_model` method is described. Here the l
 ```{r}
 
 # train_model.forecaster_model
-train_model.forecast_model
+getS3method("train_model", "forecast_model")
 
 ```
 
@@ -955,7 +1011,33 @@ In the last section of the function the model is refit on the full data sample a
 Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction mangement. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.
 
 ```{r}
-new_predictions
+
+# Predictions Class Constructor
+new_predictions <- function(predictions,
+                            model,
+                            type,
+                            uid,
+                            desc) {
+  checkmate::assert_true(any(class(predictions) %in% c("data.frame", "tbl_spark")))
+  checkmate::assert_class(model, "model")
+  checkmate::assert_character(uid)
+  checkmate::assert_character(desc)
+  checkmate::assert_choice(type,
+                           c("forecaster", "segmenter", "regressor",
+                             "classifier", "multiclassifier"))
+
+  structure(
+    list(
+      predictions = predictions,
+      model = model,
+      type = type,
+      uid = uid,
+      desc = desc,
+      created_on = Sys.time()
+    ),
+    class = "predictions"
+  )
+}
 ```
 
 #### Spark Predict Method
@@ -967,7 +1049,7 @@ The method first checks the new data schema to ensure its similar to the input d
 
 ```{r}
 # Classifier Predict Method
-predict.classifier
+getS3method("predict", "classifier")
 ```
 
 
@@ -975,7 +1057,7 @@ The predict method used internally is specific to the final model class. In the 
 
 ```{r}
 # Spark Model Classification predict method
-predict.spark_model_classification 
+getS3method("predict", "spark_model_classification")
 ```
 
 
@@ -989,7 +1071,7 @@ Similar to the classifier predict method the forecaster print method below prefo
 ```{r}
 
 # Forecaster predict method
-predict.forecaster
+getS3method("predict", "forecaster")
 ```
 
 The forecast predict method that creates the prediction output using the `forecast` function from the forecast package. The `get_forecast` function is used to format the output.
@@ -997,10 +1079,10 @@ The forecast predict method that creates the prediction output using the `foreca
 
 ```{r}
 # forecast model predict method
-predict.forecast_model
+getS3method("predict", "forecast_model")
 
 # get_forecasts
-get_forecasts.forecast
+getS3method("get_forecasts", "forecast")
 ```
 
 
@@ -1047,7 +1129,7 @@ Below is the refit modeler method. Similar to the prediction methods, the refit 
 
 ```{r}
 # Refit Method
-refit.modeler
+getS3method("refit", "modeler")
 ```
 
 
