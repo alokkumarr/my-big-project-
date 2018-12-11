@@ -45,7 +45,8 @@ export class CreateRouteDialogComponent implements OnInit {
       sourceLocation: ['', Validators.required],
       destinationLocation: ['', Validators.required],
       filePattern: ['', [Validators.required, this.validateFilePattern]],
-      description: ['']
+      description: [''],
+      batchSize: ['', [Validators.required]]
     });
   }
 
@@ -115,7 +116,8 @@ export class CreateRouteDialogComponent implements OnInit {
       destinationLocation: data.destinationLocation,
       filePattern: data.filePattern,
       schedulerExpression: this.crondetails,
-      description: data.description
+      description: data.description,
+      batchSize: data.batchSize
     };
     return routeDetails;
   }
@@ -129,7 +131,6 @@ export class CreateRouteDialogComponent implements OnInit {
       width: '300px',
     });
     dateDialogRef.afterClosed().subscribe(sourcePath => {
-      console.log('sourcePath', sourcePath);
       this.detailsFormGroup.controls.destinationLocation.setValue(sourcePath);
     });
   }
