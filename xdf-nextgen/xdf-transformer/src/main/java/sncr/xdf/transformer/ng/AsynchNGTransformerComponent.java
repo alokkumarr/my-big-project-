@@ -56,7 +56,7 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
     private String getScriptFullPath() {
         String sqlScript = ngctx.componentConfiguration.getTransformer().getScriptLocation() + Path.SEPARATOR +
                            ngctx.componentConfiguration.getTransformer().getScript();
-        logger.debug(String.format("Get script %s in location: ", sqlScript));
+        logger.trace(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
 
@@ -71,12 +71,12 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
 //1. Read expression/scripts, compile it??
             String script;
             if (ngctx.componentConfiguration.getTransformer().getScriptLocation().equalsIgnoreCase("inline")) {
-                logger.debug("Script is inline encoded");
+                logger.trace("Script is inline encoded");
                 script = new String (Base64.getDecoder().decode(ngctx.componentConfiguration.getTransformer().getScript()));
             }
             else {
                 String pathToSQLScript = getScriptFullPath();
-                logger.debug("Path to script: " + pathToSQLScript);
+                logger.trace("Path to script: " + pathToSQLScript);
                 try {
                     script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
@@ -94,7 +94,7 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
                 String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
                 String format = (String) desc.get(DataSetProperties.Format.name());
                 Dataset ds = reader.readDataset(entry.getKey(), format, loc);
-                logger.debug("Added to DS map: " + entry.getKey());
+                logger.trace("Added to DS map: " + entry.getKey());
                 dsMap.put(entry.getKey(), ds);
             }
             Transformer.ScriptEngine engine = ngctx.componentConfiguration.getTransformer().getScriptEngine();
@@ -126,7 +126,7 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
                     String[] odi = ngctx.componentConfiguration.getTransformer().getAdditionalImports().toArray(new String[0]);
                     String m = "Additional imports: ";
                     for (int i = 0; i < odi.length ; i++) m += " " + odi[i];
-                    logger.debug(m);
+                    logger.trace(m);
 
                      NGJaninoExecutor janinoExecutor =
                          new NGJaninoExecutor(this,
@@ -179,14 +179,14 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
         StructField[] sf = new StructField[outputSchema.size()+3];
         OutputSchema[] osa = outputSchema.toArray(new OutputSchema[0]);
         for (int i = 0; i < osa.length; i++) {
-            logger.debug(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType()) ));
+            logger.trace(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType()) ));
            sf[i] = new StructField(osa[i].getName(), getType(osa[i].getType()), true, Metadata.empty());
            st = st.add(sf[i]);
         }
         st = st.add( new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty()));
         st = st.add( new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty()));
         st = st.add( new StructField(TRANSFORMATION_ERRMSG, DataTypes.StringType, true, Metadata.empty()));
-        logger.debug("Output schema: " + st.prettyJson() );
+        logger.trace("Output schema: " + st.prettyJson() );
         return st;
     }
 
@@ -233,7 +233,7 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
 
             MoveDataDescriptor desc = new MoveDataDescriptor(src, dest, name, mode, format, kl);
             ctx.resultDataDesc .add(desc);
-            logger.debug(String.format("DataSet %s will be moved to %s", name, dest));
+            logger.trace(String.format("DataSet %s will be moved to %s", name, dest));
         }
         return super.move();
     }
@@ -282,10 +282,10 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
 
-            logger.debug("Output datasets:");
+            logger.trace("Output datasets:");
 
             ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
-                logger.debug(id)
+                logger.trace(id)
             );
             AsynchNGTransformerComponent component = new AsynchNGTransformerComponent(ngCtxSvc.getNgctx());
           if (!component.initComponent(null))

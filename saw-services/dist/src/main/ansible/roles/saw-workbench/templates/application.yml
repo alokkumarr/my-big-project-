@@ -15,6 +15,7 @@ logging:
   level:
     org.springframework: WARN
     com.synchronoss.saw.workbench: INFO
+    com.synchronoss.bda: INFO
 server:
   address: localhost
   port: 9701

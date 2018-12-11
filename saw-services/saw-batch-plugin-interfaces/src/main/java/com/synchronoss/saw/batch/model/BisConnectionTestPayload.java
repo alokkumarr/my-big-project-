@@ -29,7 +29,7 @@ public class BisConnectionTestPayload {
   private Integer portNo = 21;
 
   @JsonProperty("batchSize")
-  private Integer batchSize = 10;
+  private Integer batchSize = 0;
 
   @JsonProperty("routeId")
   private String routeId;
