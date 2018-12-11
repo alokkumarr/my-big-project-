@@ -9,10 +9,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Integration test that test the Security Service.
@@ -89,7 +89,6 @@ public class SecurityIT extends BaseIT {
       .then().assertThat().statusCode(200);
   }
 
-  @Ignore("SIP-5245: DSK causes interference with other tests (SIP-5178) so disable until fixed")
   @Test
   public void testAssignGroupUser() {
     ObjectNode secGroup = mapper.createObjectNode();
@@ -102,12 +101,34 @@ public class SecurityIT extends BaseIT {
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
 
+    ObjectNode user = mapper.createObjectNode();
+    user.put("customerId","1");
+    user.put("roleId", "3");
+    user.put("middleName","");
+    user.put("firstName","TestSipUser");
+    user.put("lastName","dsk");
+    user.put("masterLoginId","TestSipUser.dsk");
+    user.put("password","Sawsyncnewuser1!");
+    user.put("email","Prabhulingappa.AS@synchronoss.com");
+    user.put("activeStatusInd","1");
+    given(authSpec)
+      .contentType(ContentType.JSON)
+      .body(user)
+      .when().post("/security/auth/admin/cust/manage/users/add")
+      .then().assertThat().statusCode(200)
+      .body("valid", equalTo(true));
+
     Response response = given(authSpec)
         .when().get("/security/auth/admin/user-assignments")
         .then().statusCode(200).extract().response();
     ArrayNode node = response.as(ArrayNode.class);
-    JsonNode jsonNode = node.get(0);
-    Long userSysId = jsonNode.get("userSysId").asLong();
+    Long userSysId = null;
+    for (int i = 0; i < node.size(); i++) {
+      if (node.get(i).path("firstName").asText().equals("TestSipUser")) {
+        userSysId = node.get(i).path("userSysId").asLong();
+        break;
+      }
+    }
 
     given(authSpec)
       .body("TestGroup2")
@@ -115,6 +136,33 @@ public class SecurityIT extends BaseIT {
       .put("/security/auth/admin/users/" + userSysId + "/security-group")
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
+
+    given(authSpec)
+      .body("-1")
+      .when()
+      .put("/security/auth/admin/users/" + userSysId + "/security-group")
+      .then().assertThat().statusCode(200)
+      .body("valid", equalTo(true));
+
+    Response secGroupResponse = given(authSpec)
+        .when()
+        .get("/security/auth/admin/security-groups")
+        .then().statusCode(200).extract().response();
+    ArrayNode groupNode = secGroupResponse.as(ArrayNode.class);
+    Long gid = null;
+    for (int i = 0; i < groupNode.size(); i++) {
+      if (groupNode.get(i).path("securityGroupName").asText().equals("TestGroup2")) {
+        gid = groupNode.get(i).path("secGroupSysId").asLong();
+        break;
+      }
+    }
+
+    given(authSpec)
+      .body("TestGroup2")
+      .when()
+      .delete("/security/auth/admin/security-groups/" + gid)
+      .then().assertThat().statusCode(200);
+
   }
 
 }
