@@ -8,10 +8,10 @@ class LoginPage {
 
   constructor() {
     // Initialize all elements
-    this._userName = element(by.id(`mat-input-0`));
-    this._password = element(by.id(`mat-input-1`));
-    this._loginButton = element(by.buttonText('Login'));
-    this._errorMessage = element(by.className('error-msg'));
+    this._userName = element(by.css(`[e2e='username-input']`));
+    this._password = element(by.css(`[e2e='password-input']`));
+    this._loginButton = element(by.css(`[e2e='login-btn']`));
+    this._errorMessage = element(by.css(`[e2e='error-msg-section']`));
   }
 
   fillUserNameField(userName) {

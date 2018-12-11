@@ -40,7 +40,7 @@
         "password": "",
         "description": "Try to login with without user name & password, should not be able to login",
         "expected":{
-          "message":"Please enter a vaild Usernaeme and Password"
+          "message":"Please enter a valid Username and Password"
         }
       },
       "LOGIN007": {
@@ -48,7 +48,7 @@
         "password": "",
         "description": "Try to login with valid user name & without password, should not be able to login",
         "expected":{
-          "message":"Please enter a vaild Usernaeme and Password"
+          "message":"Please enter a valid Username and Password"
         }
       }
     }
