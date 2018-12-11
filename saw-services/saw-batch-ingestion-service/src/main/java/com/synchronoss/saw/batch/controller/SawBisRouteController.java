@@ -490,11 +490,11 @@ public class SawBisRouteController {
    * @return true or false
    */
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/deactivate", method 
-      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Object> deactivateRoute(
-      @RequestParam("channelId")  Long channelId,
-      @RequestParam("routeId") Long routeId) {
+      @PathVariable("channelId")  Long channelId,
+      @PathVariable("routeId") Long routeId) {
     
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
@@ -511,11 +511,11 @@ public class SawBisRouteController {
    * @return true or false
    */
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/activate", method 
-      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Object> activateRoute(
-      @RequestParam("channelId")  Long channelId,
-      @RequestParam("routeId") Long routeId) {
+      @PathVariable("channelId")  Long channelId,
+      @PathVariable("routeId") Long routeId) {
     
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
