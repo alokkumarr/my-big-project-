@@ -37,7 +37,6 @@ export class LogsDialogComponent implements OnInit {
   ngOnInit() {
     const { bisChannelSysId, bisRouteSysId } = this.routeData;
     this._datasourceService.getRoutesLogs(bisChannelSysId, bisRouteSysId).subscribe(resp => {
-      console.log('logs', resp.logs);
       this.logs = resp.logs;
     });
   }

@@ -1,22 +1,39 @@
 @import 'src/themes/base/colors';
 
-.close-button {
-  transform: translateY(-6px);
-}
-.details-content {
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 3;
-  padding: 0 9px;
-}
-.prop-name {
-  color: #727272;
-  width: 136px;
-}
-.details-title {
-  text-align: left;
-  color: $primary-blue-b1;
-  padding-left: 10px;
-  margin: 0;
-  font-weight: 600 !important;
+:host {
+  .mat-card {
+    margin: 0;
+    padding: 20px;
+  }
+
+  .title {
+    text-align: left;
+    color: $primary-blue-b1;
+    padding-left: 10px;
+    margin: 0;
+    font-weight: 600 !important;
+  }
+
+  .logs__route-details {
+    .mat-divider.mat-divider-horizontal {
+      width: calc(100% - 40px);
+      margin-left: 20px;
+    }
+
+    &__cell {
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 3;
+      padding: 0 9px;
+
+      &__label {
+        color: #727272;
+        width: 136px;
+      }
+    }
+  }
+
+  .close-button {
+    transform: translateY(-6px);
+  }
 }
