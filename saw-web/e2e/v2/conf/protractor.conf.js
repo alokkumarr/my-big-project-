@@ -167,7 +167,6 @@ exports.config = {
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
         return /login/.test(url);
-       // return true;
       });
     }, pageResolveTimeout);
   },
