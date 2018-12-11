@@ -78,7 +78,7 @@ The foundation of the a2munge spark methods rest on top of [sparklyr's spark bas
 * __Sparklyr Extensions__^[Guide on creating sparklyr extensions with Scala [via](https://spark.rstudio.com/extensions/)]: sparklyr guide for creating extensions with Scala
 
 
-The implication is that while `mutate` might behavior in a similar fashion the functional logic may differ. There  there is some overlap between base R syntax and Hive UDFs, however most R functionality will not execute on spark objects as is. This is especially true for R packages. Below are a few examples where the code is consistent and where it differs
+The implication is that while `mutate` might behavior in a similar fashion the functional logic may differ. There  there is some overlap between base R syntax and Hive UDFs, however, most R functionality will not execute on spark objects as is. This is especially true for R packages. Below are a few examples where the code is consistent and where it differs
 
 
 ```{r}
