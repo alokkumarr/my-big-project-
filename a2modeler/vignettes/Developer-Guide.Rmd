@@ -78,7 +78,7 @@ The a2modeler package functionality relies on several derived classes using R's 
 
 ## Workflow
 
-A key deisgn principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below:
+A key design principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below:
 
 ![a2modeler Workflow](figures/a2modeler-workflow.jpg)
 
@@ -118,7 +118,7 @@ In the following sections each step is discussed in depth
 
 ### Modeler Constructor
 
-The a2modeler workflow starts with a use-case specific function with creates a modeler class object (discussed below). Each of use-case constructor function creates a seperate child class object that inherits from the parent modeler class. The actual `modeler` constructor is only used internally by the use case specific constructors. The use of class inheritence allows for general code to be shared across sub-classes but specific constraints, parameters, and methods to be implemented for each use case. 
+The a2modeler workflow starts with a use-case specific function with creates a modeler class object (discussed below). Each of use-case constructor function creates a separate child class object that inherits from the parent modeler class. The actual `modeler` constructor is only used internally by the use case specific constructors. The use of class inheritance allows for general code to be shared across sub-classes but specific constraints, parameters, and methods to be implemented for each use case. 
 
 
 #### Modeler Class
@@ -157,7 +157,7 @@ regressor
 
 #### Classifier
 
-Next is the `classifier` constructor. The function is very similiar to the `regressor` except now there are checks for a binary distribution of the target variable and AUC default measure.
+Next is the `classifier` constructor. The function is very similar to the `regressor` except now there are checks for a binary distribution of the target variable and AUC default measure.
 
 
 ```{r}
@@ -189,7 +189,7 @@ segmenter
 
 #### Forecaster
 
-As can be seen below the `forecaster` constructor is the most different from the others. `Forecaster` is R data.frame based, and requries an explict index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting. 
+As can be seen below the `forecaster` constructor is the most different from the others. `Forecaster` is R data.frame based, and requires an explicit index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting. 
 
 ```{r}
 # Forecaster Constructor
@@ -210,7 +210,7 @@ The `add_*_samples` functions add samples to the modeler object and have class s
 getS3method("add_default_samples", "modeler")
 ```
 
-The other `add_*_samples` modeler methods behave similarily. The numeric methods is where the sampling logic is located. 
+The other `add_*_samples` modeler methods behave similarly. The numeric methods is where the sampling logic is located. 
 
 
 #### Samples Class
@@ -221,12 +221,12 @@ The samples class supports the creation of data samples for the purpose of model
 * __validation_args__: list of arguments to pass to validation method
 * __test_holdout_prct__: percent of total data records to use for test dataset
 * __downsample_prct__: percent of total data to downsample and use for analysis
-* __train_indicies__: list of numeric train indicies. each index contains numeric vector pertaining to row numbers to use for model fitting
-* __validation_indicies__: list of numeric validation indicies. each index contains numeric vector pertaining to row numbers to use for model validation
-* __indicies_names__: character vector of indicies names
+* __train_indices__: list of numeric train indices. each index contains numeric vector pertaining to row numbers to use for model fitting
+* __validation_indices__: list of numeric validation indices. each index contains numeric vector pertaining to row numbers to use for model validation
+* __indices_names__: character vector of indices names
 * __test_index__:  numeric index with records to use for model testing 
 
-In the following chunk code for `add_default_samples` methods are shown. The data.frame and tbl_spark methods use the numeric method internally to reduce code duplication. The default sample is the simplest strategy and only a single row based indicie is saved in the train_indicies list. 
+In the following chunk code for `add_default_samples` methods are shown. The data.frame and tbl_spark methods use the numeric method internally to reduce code duplication. The default sample is the simplest strategy and only a single row based indie is saved in the train_indices list. 
 
 ```{r}
 # add_default_samples.numeric code
@@ -241,7 +241,7 @@ getS3method("add_default_samples", "tbl_spark")
 ```
 
 
-Next is a set of methods for creating holdout samples. The numeric method creates train and validation row indicies based on the splits argument. 
+Next is a set of methods for creating holdout samples. The numeric method creates train and validation row indices based on the splits argument. 
 
 
 ```{r}
@@ -257,7 +257,7 @@ getS3method("add_holdout_samples", "tbl_spark")
 ```
 
 
-The concept here is that the sampling strategy is set once, creating indicies that control the data partitions for all down stream modeling fitting and evaluating. The samples object is saved in the modeler object and referenced internally for data partitioning. More on its implementation later on. 
+The concept here is that the sampling strategy is set once, creating indices that control the data partitions for all down stream modeling fitting and evaluating. The samples object is saved in the modeler object and referenced internally for data partitioning. More on its implementation later on. 
 
 Each of the sampling strategies follows the same pattern shown above where the sampling logic is contained in the numeric method and the data.frame and tbl_spark methods simply create a row sequence and pass to internal numeric method. 
 
@@ -266,9 +266,9 @@ Each of the sampling strategies follows the same pattern shown above where the s
 
 The samples class has a few methods to extract specific attributes of a sample object:
 
-* __get_train_samples__: returns training indicies
-* __get_validation_samples__: returns the validation indicies
-* __get_indicies__: returns a list with an element for each train and validation indicies pairs
+* __get_train_samples__: returns training indices
+* __get_validation_samples__: returns the validation indices
+* __get_indices__: returns a list with an element for each train and validation indices pairs
 
 
 ### Set Measures
@@ -319,7 +319,7 @@ str(AUC)
 
 Similar to the samples class, a measure class object is created and stored internally to the modeler object. All downstream model evaluation in modeler objects reference the measure object stored internally. The measure object does not store the function directly. It stores the function generic name which is can be used to get the function from the namespace environment and execute. 
 
-Adding a new method requires that the measure function (such as `rmse`) is either developed or supported in a2modeler. There are meaningful differences in implementation for R vs Spark objects as seen below for the `rmse` methods. The spark method leverages the sparklyr, spark-ml evaluator. The evaluator function approach is used to intregrate with the rest of the spark-ml functionality.
+Adding a new method requires that the measure function (such as `rmse`) is either developed or supported in a2modeler. There are meaningful differences in implementation for R vs Spark objects as seen below for the `rmse` methods. The spark method leverages the sparklyr, spark-ml evaluator. The evaluator function approach is used to integrate with the rest of the spark-ml functionality.
 
 
 ```{r}
@@ -366,7 +366,7 @@ model_methods %>%
 
 #### Pipeline Class
 
-The pipeline class encapsulates data transformation logic to support repeatable feature generation in a2model developement. The pipeline object stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once.
+The pipeline class encapsulates data transformation logic to support repeatable feature generation in a2model development. The pipeline object stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once.
 
 The pipeline class is created with the pipeline constructor
 
@@ -383,7 +383,7 @@ str(p)
 
 The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets. 
 
-One or more pipelines can be created and stored in a modeler object. They are stored as a named list of pipelines in the pipelines slot. The name is the pipeline uid. The reusability concept is useful internally to the modeler object so that models can share pipeline output (and not require duplicate execution and storage).
+One or more pipelines can be created and stored in a modeler object. They are stored as a named list of pipelines in the pipelines slot. The name is the pipeline uid. The re-usability concept is useful internally to the modeler object so that models can share pipeline output (and not require duplicate execution and storage).
 
 
 ##### Methods
@@ -498,7 +498,7 @@ train_models.modeler <- function(obj, uids = NULL, ...) {
   obj <- execute_pipelines(obj)
 ```
 
-The `execute_pipelines` function is descriptive - it calls the `execute` function on all un-excuted pipelines saved in the modeler object. Recall execute will save the pipeline output to the output slot. 
+The `execute_pipelines` function is descriptive - it calls the `execute` function on all un-executed pipelines saved in the modeler object. Recall execute will save the pipeline output to the output slot. 
 
 
 ```{r}
@@ -541,7 +541,7 @@ Next for each model uid the training sample is generated. To clarify this traini
     }
 ```
 
-The next step is the train a single model uid with the `train_model` function. The `train_model` has methods for specific modeling backends and discussed indepth in the following sections. The model output from the train_model function is stored on the modeler model list and the model performance is added to the consolidated modeler performance. 
+The next step is the train a single model uid with the `train_model` function. The `train_model` has methods for specific modeling backends and discussed in-depth in the following sections. The model output from the train_model function is stored on the modeler model list and the model performance is added to the consolidated modeler performance. 
 
 
 ```{r, eval=FALSE}
@@ -613,7 +613,7 @@ train_model.spark_model <- function(mobj,
   method_fun <- get(mobj$method, asNamespace(mobj$package))
 ```
 
-In the next section, a hack is made for using the spark-ml neural net functions. They require a valid layers input that is made seperately from the param_map
+In the next section, a hack is made for using the spark-ml neural net functions. They require a valid layers input that is made separately from the param_map
 
 ```{r, eval=FALSE}
 
@@ -1008,7 +1008,7 @@ In the last section of the function the model is refit on the full data sample a
 
 ## Predictions
 
-Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction mangement. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.
+Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction management. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.
 
 ```{r}
 
@@ -1053,7 +1053,7 @@ getS3method("predict", "classifier")
 ```
 
 
-The predict method used internally is specific to the final model class. In the classifier case, the internal predict method below uses the sparklyr `ml_predict` function on the sparkl-ml model and then formatted to the expected output schema. 
+The predict method used internally is specific to the final model class. In the classifier case, the internal predict method below uses the sparklyr `ml_predict` function on the spark-ml model and then formatted to the expected output schema. 
 
 ```{r}
 # Spark Model Classification predict method
@@ -1065,7 +1065,7 @@ getS3method("predict", "spark_model_classification")
 
 The forecaster R predict method works differently. Here the data input is optional. If provided care should be given that it temporally aligns to the intended forecast horizon. The forecaster predictions are forward looking predictions of a sequential variable, which in most cases is a time series. The periods argument sets the prediction horizon length and levels controls the confidence intervals. 
 
-Similar to the classifier predict method the forecaster print method below preforms a schema check on the data if provided, executes the final model's pipeline and creates the predictions using an intenal predict method covered next. Note - the forecaster print method creates a prediction index by using the `extend` method on the forecaster's index and combines with the prediction output. The index class is covered in the next section. 
+Similar to the classifier predict method the forecaster print method below preforms a schema check on the data if provided, executes the final model's pipeline and creates the predictions using an internal predict method covered next. Note - the forecaster print method creates a prediction index by using the `extend` method on the forecaster's index and combines with the prediction output. The index class is covered in the next section. 
 
 
 ```{r}
@@ -1124,7 +1124,7 @@ In this section additional helper functions contained in the a2modeler package a
 
 The refit function can be used to refit a modeler object to a new dataset. The function provides the option to append the new data to the stored data (default) or fit on just the new data. The function returns an updated modeler object. Only the final model is fit. The entire workflow is not executed. 
 
-Below is the refit modeler method. Similar to the prediction methods, the refit applies assertions on the new data ensuring its the same class and schema of the orginial modeler input data. The final model pipeline is applied with a single default sample to create the training dataset and passed to the `train_model` function. 
+Below is the refit modeler method. Similar to the prediction methods, the refit applies assertions on the new data ensuring its the same class and schema of the original modeler input data. The final model pipeline is applied with a single default sample to create the training dataset and passed to the `train_model` function. 
 
 
 ```{r}
@@ -1135,13 +1135,13 @@ getS3method("refit", "modeler")
 
 #### Deploy
 
-The deploy function can be used to save a modeler object to file for use on a new dataset in a different time and environement. 
+The deploy function can be used to save a modeler object to file for use on a new dataset in a different time and environment. 
 
 The function below does the following:
 
 * Creates a label from the modeler name and version
 * Creates a model path using the label and model uid
-* Removes all spark objects from the modeler objects which should be saved seperately
+* Removes all spark objects from the modeler objects which should be saved separately
 * saves the modeler object as a .rds file with the either the `ml_save` function for spark models or `saveRDS` function for R based models
 
 ```{r}
