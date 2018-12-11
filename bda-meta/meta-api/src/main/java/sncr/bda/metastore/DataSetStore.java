@@ -129,11 +129,11 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         return convertToString(searchAsList(table, cond));
     }
 
-    public String  readDataSet(String project, String name) throws Exception {
-        if (project.isEmpty() || name == null || name.isEmpty()) {
+    public String  readDataSet(String project, String datasetName) throws Exception {
+        if (project.isEmpty() || datasetName == null || datasetName.isEmpty()) {
             throw new Exception("Search parameters are not correct: either project or name are null or empty.");
         }
-        Document res = table.findById(project + delimiter + name);
+        Document res = table.findById(project + delimiter + datasetName);
         return res.asJsonString();
     }
 

@@ -34,6 +34,8 @@ public class NGContext extends ContextMetadata {
     public final String xdfDataRootSys;
     public List<String> registeredOutputDSIds = new ArrayList<>();
 
+    public Map<ComponentServices, Boolean> serviceStatus = new HashMap<>();
+
     public NGContext(String xdfRoot,  ComponentConfiguration componentConfiguration, String applicationID, String componentName, String batchID){
         super(componentName, batchID, applicationID);
         xdfDataRootSys = xdfRoot;
@@ -102,7 +104,4 @@ public class NGContext extends ContextMetadata {
 
         return s.toString();
     }
-
-    public Map<ComponentServices, Boolean> serviceStatus = new HashMap<>();
-
 }
