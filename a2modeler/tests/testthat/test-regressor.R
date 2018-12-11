@@ -14,12 +14,12 @@ context("regressor unit tests")
 # Basic Tests -------------------------------------------------------------
 
 
-# # Create Spark Connection
-sc <- spark_connect(master = "local", version = "2.3.0")
-
+# Create Spark Connection
+sc <- spark_connect(master = "local")
 
 # Copy data to spark
 df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
 
 # Create Spark datasets 
 df1 <- iris %>%
@@ -29,6 +29,7 @@ df1 <- iris %>%
 df2 <- iris %>%
   sample_frac(size = .5) %>%
   copy_to(sc, ., name = "df2", overwrite = TRUE)
+
 
 test_that("Regressor Constructer", {
 

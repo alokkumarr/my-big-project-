@@ -22,25 +22,30 @@ get_variable_importance(mobj, ...)
 
 \method{get_variable_importance}{default}(mobj, ...)
 
-\method{get_variable_importance}{ml_linear_regression_model}(mobj, features)
+\method{get_variable_importance}{ml_linear_regression_model}(mobj,
+  features)
 
-\method{get_variable_importance}{ml_logistic_regression_model}(mobj, features)
+\method{get_variable_importance}{ml_logistic_regression_model}(mobj,
+  features)
 
 \method{get_variable_importance}{ml_decision_tree_regression_model}(mobj,
   features)
 
-\method{get_variable_importance}{ml_decision_tree_classification_model}(mobj,
+
+  \method{get_variable_importance}{ml_decision_tree_classification_model}(mobj,
   features)
 
 \method{get_variable_importance}{ml_random_forest_regression_model}(mobj,
   features)
 
-\method{get_variable_importance}{ml_random_forest_classification_model}(mobj,
+
+  \method{get_variable_importance}{ml_random_forest_classification_model}(mobj,
   features)
 
 \method{get_variable_importance}{ml_gbt_regression_model}(mobj, features)
 
-\method{get_variable_importance}{ml_gbt_classification_model}(mobj, features)
+\method{get_variable_importance}{ml_gbt_classification_model}(mobj,
+  features)
 
 \method{get_variable_importance}{spark_model}(mobj)
 }
