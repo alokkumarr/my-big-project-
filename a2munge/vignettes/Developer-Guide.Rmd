@@ -163,3 +163,26 @@ getS3method("melter", "data.frame")
 getS3method("melter", "tbl_spark")
 ```
 
+
+#### Detecter
+
+The detecter function is a special example of Sparkl Distributed R^[Spark Distributed R with sparklyr [via](https://spark.rstudio.com/guides/distributed-r/)]. The spark method uses the function `spark_apply` from the sparklyr package to apply the a2munge `detect` function in a distributed fashion. The R data.frame method uses the same `detect` function internally. 
+
+```{r}
+# Detecter R data.frame method
+getS3method('detecter', 'data.frame')
+
+```
+
+
+The spark method version with the spark_apply below. There are well known [performance issues](https://github.com/rstudio/sparklyr/issues/1382) with the `spark_apply` function. One of the other challeneges using the `spark_apply` function is the error message is not as verbose and its difficult to determine the cause of errors. The function internal to `spark_apply` is isolated to the context provided. So if external packages are required, they have to be shipped with the function across the network. This can cause some overhead and latency issues.
+
+```{r}
+# Detecter Spark tbl_spark method
+getS3method('detecter', "tbl_spark")
+```
+
+
+Below is the core `detect` function. The function uses the `stl` function to apply a seasonal decomposition on the time series to identify a trend, seasonal and resid components. The detect function is based on the `AnomalyDetection` function from the R package of the same name and the Seasonal Hybrid ESD^[Automatic Anomaly Detection in the Cloud
+Via Statistical Learning [via](https://arxiv.org/pdf/1704.07706.pdf) ]
+(https://arxiv.org/pdf/1704.07706.pdf) 

@@ -120,7 +120,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><strong>Hive UDFs</strong><a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>: Reference for Hive UDFs that can be executed in spark based methods</li>
 <li><strong>Sparklyr Extensions</strong><a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>: sparklyr guide for creating extensions with Scala</li>
 </ul>
-<p>The implication is that while <code>mutate</code> might behavior in a similar fashion the functional logic may differ. There there is some overlap between base R syntax and Hive UDFs, however most R functionality will not execute on spark objects as is. This is especially true for R packages. Below are a few examples where the code is consistent and where it differs</p>
+<p>The implication is that while <code>mutate</code> might behavior in a similar fashion the functional logic may differ. There there is some overlap between base R syntax and Hive UDFs, however, most R functionality will not execute on spark objects as is. This is especially true for R packages. Below are a few examples where the code is consistent and where it differs</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Example R data.frame </span>
 sim_df
 <span class="co">#&gt; # A tibble: 2,000 x 7</span>
@@ -203,7 +203,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;     agg</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000b751e50&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b7557c0&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span>
 
 
@@ -240,7 +240,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;     agg</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000b7ebe38&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b7ed700&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
 <p>Note that both functions have parametric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> which differs from default dplyr which uses non-standard evaluation<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>. a2munge functions use standard evaluation equivalent functions like <code>mutate_at</code> or <code>group_by_vars</code> (vs <code>mutate</code> or <code>group_by</code>) or by using quasiquotation<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a></p>
 <p>The input assertions can also be seen for both. Input assertions are made via the checkmate<a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a> suite of functions and exist throughout all a2munge functions.</p>
@@ -259,7 +259,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;         variable.name = variable_name, value.name = value_name) %&gt;% </span>
 <span class="co">#&gt;         dplyr::mutate_at(variable_name, as.character)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000bba0de8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000bba7d20&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span>
 
 <span class="co"># Melter Spark tbl_spark method</span>
@@ -286,8 +286,79 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;         &quot;long&quot;)</span>
 <span class="co">#&gt;     dplyr::tbl(sc, &quot;long&quot;)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000bc31230&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000bc359f8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
+</div>
+<div id="detecter" class="section level4">
+<h4>Detecter</h4>
+<p>The detecter function is a special example of Sparkl Distributed R<a href="#fn13" class="footnoteRef" id="fnref13"><sup>13</sup></a>. The spark method uses the function <code>spark_apply</code> from the sparklyr package to apply the a2munge <code>detect</code> function in a distributed fashion. The R data.frame method uses the same <code>detect</code> function internally.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Detecter R data.frame method</span>
+<span class="kw">getS3method</span>(<span class="st">'detecter'</span>, <span class="st">'data.frame'</span>)
+<span class="co">#&gt; function (df, index_var, group_vars = NULL, measure_vars, frequency, </span>
+<span class="co">#&gt;     direction = &quot;pos&quot;, alpha = 0.01, max_anoms = 0.01, trend_window = 0.75) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     df_names &lt;- colnames(df)</span>
+<span class="co">#&gt;     checkmate::assert_number(length(index_var), lower = 1, upper = 1)</span>
+<span class="co">#&gt;     checkmate::assert_choice(index_var, df_names)</span>
+<span class="co">#&gt;     checkmate::assert_subset(measure_vars, df_names)</span>
+<span class="co">#&gt;     checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)</span>
+<span class="co">#&gt;     df %&gt;% dplyr::select_at(c(index_var, group_vars, measure_vars)) %&gt;% </span>
+<span class="co">#&gt;         a2munge::melter(., id_vars = c(index_var, group_vars), </span>
+<span class="co">#&gt;             measure_vars, variable_name = &quot;measure&quot;, value_name = &quot;value&quot;) %&gt;% </span>
+<span class="co">#&gt;         dplyr::group_by_at(c(group_vars, &quot;measure&quot;)) %&gt;% dplyr::do(a2munge::detect(., </span>
+<span class="co">#&gt;         index_var = index_var, measure_var = &quot;value&quot;, frequency = frequency, </span>
+<span class="co">#&gt;         alpha = alpha, direction = direction, max_anoms = max_anoms, </span>
+<span class="co">#&gt;         trend_window = trend_window)) %&gt;% dplyr::ungroup()</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000c07a508&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
+<p>The spark method version with the spark_apply below. There are well known <a href="https://github.com/rstudio/sparklyr/issues/1382">performance issues</a> with the <code>spark_apply</code> function. One of the other challeneges using the <code>spark_apply</code> function is the error message is not as verbose and its difficult to determine the cause of errors. The function internal to <code>spark_apply</code> is isolated to the context provided. So if external packages are required, they have to be shipped with the function across the network. This can cause some overhead and latency issues.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Detecter Spark tbl_spark method</span>
+<span class="kw">getS3method</span>(<span class="st">'detecter'</span>, <span class="st">&quot;tbl_spark&quot;</span>)
+<span class="co">#&gt; function (df, index_var, group_vars, measure_vars, frequency, </span>
+<span class="co">#&gt;     direction = &quot;pos&quot;, alpha = 0.01, max_anoms = 0.01, trend_window = 0.75) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     df_names &lt;- colnames(df)</span>
+<span class="co">#&gt;     df_schema &lt;- sdf_schema(df)</span>
+<span class="co">#&gt;     checkmate::assert_number(length(index_var), lower = 1, upper = 1)</span>
+<span class="co">#&gt;     checkmate::assert_choice(index_var, df_names)</span>
+<span class="co">#&gt;     checkmate::assert_subset(measure_vars, df_names)</span>
+<span class="co">#&gt;     checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)</span>
+<span class="co">#&gt;     index_date_chk &lt;- df_schema[[index_var]]$type == &quot;DateType&quot;</span>
+<span class="co">#&gt;     if (index_date_chk) {</span>
+<span class="co">#&gt;         df &lt;- dplyr::mutate_at(df, index_var, as.character)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     results &lt;- df %&gt;% dplyr::select_at(c(index_var, group_vars, </span>
+<span class="co">#&gt;         measure_vars)) %&gt;% a2munge::melter(., id_vars = c(index_var, </span>
+<span class="co">#&gt;         group_vars), measure_vars, variable_name = &quot;measure&quot;, </span>
+<span class="co">#&gt;         value_name = &quot;value&quot;) %&gt;% sparklyr::spark_apply(., function(e, </span>
+<span class="co">#&gt;         l) {</span>
+<span class="co">#&gt;         index_var &lt;- l$i_var</span>
+<span class="co">#&gt;         measure_var &lt;- l$m_var</span>
+<span class="co">#&gt;         freq &lt;- l$freq</span>
+<span class="co">#&gt;         dir &lt;- l$dir</span>
+<span class="co">#&gt;         alpha &lt;- l$a</span>
+<span class="co">#&gt;         max_anoms &lt;- l$anoms</span>
+<span class="co">#&gt;         detect_fun &lt;- l$fun</span>
+<span class="co">#&gt;         trend_win &lt;- l$trend_win</span>
+<span class="co">#&gt;         detect_fun(e[, c(index_var, measure_var)], index_var, </span>
+<span class="co">#&gt;             measure_var, freq, dir, alpha, max_anoms, trend_win)</span>
+<span class="co">#&gt;     }, group_by = c(group_vars, &quot;measure&quot;), names = c(index_var, </span>
+<span class="co">#&gt;         &quot;value&quot;, &quot;seasonal&quot;, &quot;trend&quot;, &quot;resid&quot;, &quot;lower&quot;, &quot;upper&quot;, </span>
+<span class="co">#&gt;         &quot;anomaly&quot;), context = {</span>
+<span class="co">#&gt;         l = list(i_var = index_var, m_var = &quot;value&quot;, freq = frequency, </span>
+<span class="co">#&gt;             dir = direction, a = alpha, anoms = max_anoms, trend_win = trend_window, </span>
+<span class="co">#&gt;             fun = get(&quot;detect&quot;, asNamespace(&quot;a2munge&quot;)))</span>
+<span class="co">#&gt;     }) %&gt;% select_at(c(index_var, group_vars, &quot;measure&quot;, &quot;value&quot;, </span>
+<span class="co">#&gt;         &quot;seasonal&quot;, &quot;trend&quot;, &quot;resid&quot;, &quot;lower&quot;, &quot;upper&quot;, &quot;anomaly&quot;))</span>
+<span class="co">#&gt;     if (index_date_chk) {</span>
+<span class="co">#&gt;         results &lt;- dplyr::mutate_at(results, index_var, funs(to_date))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     results</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000c2e0a30&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
+<p>Below is the core <code>detect</code> function. The function uses the <code>stl</code> function to apply a seasonal decomposition on the time series to identify a trend, seasonal and resid components. The detect function is based on the <code>AnomalyDetection</code> function from the R package of the same name and the Seasonal Hybrid ESD<a href="#fn14" class="footnoteRef" id="fnref14"><sup>14</sup></a> (<a href="https://arxiv.org/pdf/1704.07706.pdf" class="uri">https://arxiv.org/pdf/1704.07706.pdf</a>)</p>
 </div>
 </div>
 <div class="footnotes">
@@ -305,6 +376,8 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <li id="fn10"><p>Advanced R chapter on Non-Standard Evaluation <a href="http://adv-r.had.co.nz/Computing-on-the-language.html">via</a><a href="#fnref10">↩</a></p></li>
 <li id="fn11"><p>Programming with R, quasiquotations <a href="https://dplyr.tidyverse.org/articles/programming.html#quasiquotation">via</a><a href="#fnref11">↩</a></p></li>
 <li id="fn12"><p>checkmate R package <a href="https://mllg.github.io/checkmate/">via</a><a href="#fnref12">↩</a></p></li>
+<li id="fn13"><p>Spark Distributed R with sparklyr <a href="https://spark.rstudio.com/guides/distributed-r/">via</a><a href="#fnref13">↩</a></p></li>
+<li id="fn14"><p>Automatic Anomaly Detection in the Cloud Via Statistical Learning <a href="https://arxiv.org/pdf/1704.07706.pdf">via</a><a href="#fnref14">↩</a></p></li>
 </ol>
 </div>
 
