@@ -394,7 +394,7 @@ public class AnalyzeIT extends BaseIT {
     Response response = request(token)
                         .when().get("/saw/services/analysis/" + analysisId + "/executions")
                         .then().assertThat().statusCode(200)
-                        .body("executions", greaterThan(0))
+                        .body("executions.size()", greaterThan(0))
                         .extract().response();
     return response.path("executions[0].id");
   }
