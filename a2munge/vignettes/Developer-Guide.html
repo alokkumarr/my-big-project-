@@ -143,7 +143,7 @@ sc &lt;-<span class="st"> </span><span class="kw">spark_connect</span>(<span cla
 
 <span class="co"># Copy data to spark</span>
 sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df, <span class="dt">name =</span> <span class="st">&quot;sim_tbl&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p>In the following chunk, the <code>month</code> function in the lubrdate package R is used to extract the month from the date. The ouput is consistent to the Hive <code>month</code> UDF and code is consistent for dataset objects.</p>
+<p>In the following chunk, the <code>month</code> function in the lubridate package R is used to extract the month from the date. The output is consistent to the Hive <code>month</code> UDF and code is consistent for dataset objects.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 ## Extract Month from date
 
@@ -153,7 +153,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 
 <span class="co"># WORKS: Spark tbl_spark</span>
 <span class="kw">mutate</span>(sim_tbl, <span class="dt">month =</span> <span class="kw">month</span>(date))</code></pre></div>
-<p>In the next chunk the <code>week</code> function in lubridate is used to extract the week number from a date, however, this function does not have a direct Hive corallary. Instead the <code>weekofyear</code> Hive UDF produces the same output as the lubridate <code>week</code> function.</p>
+<p>In the next chunk the <code>week</code> function in lubridate is used to extract the week number from a date, however, this function does not have a direct Hive corollary. Instead the <code>weekofyear</code> Hive UDF produces the same output as the lubridate <code>week</code> function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 ## Extract week number from date
 
@@ -167,7 +167,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="kw">mutate</span>(sim_tbl, <span class="dt">week =</span> <span class="kw">weekofyear</span>(date))</code></pre></div>
 <div id="a2munge-s3-example" class="section level4">
 <h4>a2munge S3 Example</h4>
-<p>Below is a few examples of a2munge functions with the R and Spark methods shown. The first example is the <code>summariser</code> where the two methods are very similiar.</p>
+<p>Below is a few examples of a2munge functions with the R and Spark methods shown. The first example is the <code>summariser</code> where the two methods are very similar. They both leverage dplyr verbs in similar fashion to produce the same summarized output.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># Summariser R data.frame method</span>
 <span class="kw">getS3method</span>(<span class="st">&quot;summariser&quot;</span>, <span class="st">&quot;data.frame&quot;</span>)
@@ -203,7 +203,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;     agg</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000b73e428&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b751e50&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span>
 
 
@@ -240,9 +240,54 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;     agg</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000b7d36f0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b7ebe38&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
-<p>Note that both functions have parameteric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> which differs from default dplyr which uses non-standard evaluation<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a></p>
+<p>Note that both functions have parametric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> which differs from default dplyr which uses non-standard evaluation<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>. a2munge functions use standard evaluation equivalent functions like <code>mutate_at</code> or <code>group_by_vars</code> (vs <code>mutate</code> or <code>group_by</code>) or by using quasiquotation<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a></p>
+<p>The input assertions can also be seen for both. Input assertions are made via the checkmate<a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a> suite of functions and exist throughout all a2munge functions.</p>
+<p>The <code>melter</code> function is a contrasting example where two methods differ significantly. The R version is a thin wrapper around the <code>melt</code> function from the reshape2 package. The spark method invokes the Scala <code>selectExpr</code> function with an expression using the <code>stack</code> UDF. The spark method creates a custom string from the inputs and passes to the Scala function via the sparklyr <code>invoke</code> function. This is a good example of how Scala extensions are used.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Melter R data.frame method</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;melter&quot;</span>, <span class="st">&quot;data.frame&quot;</span>)
+<span class="co">#&gt; function (df, id_vars = NULL, measure_vars, variable_name = &quot;variable&quot;, </span>
+<span class="co">#&gt;     value_name = &quot;value&quot;, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     variables &lt;- colnames(df)</span>
+<span class="co">#&gt;     checkmate::assert_subset(id_vars, variables, empty.ok = TRUE)</span>
+<span class="co">#&gt;     checkmate::assert_subset(measure_vars, variables)</span>
+<span class="co">#&gt;     checkmate::assert_character(variable_name, min.len = 1, max.len = 1)</span>
+<span class="co">#&gt;     checkmate::assert_character(value_name, min.len = 1, max.len = 1)</span>
+<span class="co">#&gt;     reshape2::melt(df, id.vars = id_vars, measure.vars = measure_vars, </span>
+<span class="co">#&gt;         variable.name = variable_name, value.name = value_name) %&gt;% </span>
+<span class="co">#&gt;         dplyr::mutate_at(variable_name, as.character)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000bba0de8&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span>
+
+<span class="co"># Melter Spark tbl_spark method</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;melter&quot;</span>, <span class="st">&quot;tbl_spark&quot;</span>)
+<span class="co">#&gt; function (df, id_vars = NULL, measure_vars, variable_name = &quot;variable&quot;, </span>
+<span class="co">#&gt;     value_name = &quot;value&quot;, type = &quot;DOUBLE&quot;, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     variables &lt;- colnames(df)</span>
+<span class="co">#&gt;     checkmate::assert_subset(id_vars, variables, empty.ok = TRUE)</span>
+<span class="co">#&gt;     checkmate::assert_subset(measure_vars, variables)</span>
+<span class="co">#&gt;     checkmate::assert_character(variable_name, min.len = 1, max.len = 1)</span>
+<span class="co">#&gt;     checkmate::assert_character(value_name, min.len = 1, max.len = 1)</span>
+<span class="co">#&gt;     str_fun &lt;- function(s) {</span>
+<span class="co">#&gt;         paste(paste0(&quot;'&quot;, s, &quot;'&quot;), paste(&quot;CAST(&quot;, s, &quot;AS&quot;, toupper(type), </span>
+<span class="co">#&gt;             &quot;)&quot;), sep = &quot;, &quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     stck_expr &lt;- paste0(&quot;stack(&quot;, length(measure_vars), &quot;, &quot;, </span>
+<span class="co">#&gt;         str_fun(measure_vars) %&gt;% paste(collapse = &quot;,&quot;), &quot;) as (&quot;, </span>
+<span class="co">#&gt;         paste(variable_name, value_name, sep = &quot;, &quot;), &quot;)&quot;)</span>
+<span class="co">#&gt;     sdf &lt;- sparklyr::spark_dataframe(df)</span>
+<span class="co">#&gt;     sc &lt;- sparklyr::spark_connection(sdf)</span>
+<span class="co">#&gt;     sdf %&gt;% sparklyr::invoke(&quot;selectExpr&quot;, c(as.list(id_vars), </span>
+<span class="co">#&gt;         stck_expr)) %&gt;% sparklyr::invoke(&quot;registerTempTable&quot;, </span>
+<span class="co">#&gt;         &quot;long&quot;)</span>
+<span class="co">#&gt;     dplyr::tbl(sc, &quot;long&quot;)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000bc31230&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
 </div>
 </div>
 <div class="footnotes">
@@ -258,6 +303,8 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <li id="fn8"><p>Guide on creating sparklyr extensions with Scala <a href="https://spark.rstudio.com/extensions/">via</a><a href="#fnref8">↩</a></p></li>
 <li id="fn9"><p>Programming with R <a href="https://dplyr.tidyverse.org/articles/programming.html">via</a><a href="#fnref9">↩</a></p></li>
 <li id="fn10"><p>Advanced R chapter on Non-Standard Evaluation <a href="http://adv-r.had.co.nz/Computing-on-the-language.html">via</a><a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>Programming with R, quasiquotations <a href="https://dplyr.tidyverse.org/articles/programming.html#quasiquotation">via</a><a href="#fnref11">↩</a></p></li>
+<li id="fn12"><p>checkmate R package <a href="https://mllg.github.io/checkmate/">via</a><a href="#fnref12">↩</a></p></li>
 </ol>
 </div>
 

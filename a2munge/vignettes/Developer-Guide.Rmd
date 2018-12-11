@@ -97,7 +97,7 @@ sc <- spark_connect(master = "local")
 sim_tbl <- copy_to(sc, sim_df, name = "sim_tbl", overwrite = TRUE)
 ```
 
-In the following chunk, the `month` function in the lubrdate package R is used to extract the month from the date. The ouput is consistent to the Hive `month` UDF and code is consistent for dataset objects.
+In the following chunk, the `month` function in the lubridate package R is used to extract the month from the date. The output is consistent to the Hive `month` UDF and code is consistent for dataset objects.
 
 ```{r, eval=FALSE}
 
@@ -113,7 +113,7 @@ mutate(sim_tbl, month = month(date))
 
 ```
 
-In the next chunk the `week` function in lubridate is used to extract the week number from a date, however, this function does not have a direct Hive corallary. Instead the `weekofyear` Hive UDF produces the same output as the lubridate `week` function.
+In the next chunk the `week` function in lubridate is used to extract the week number from a date, however, this function does not have a direct Hive corollary. Instead the `weekofyear` Hive UDF produces the same output as the lubridate `week` function.
 
 
 ```{r, eval=FALSE}
@@ -134,7 +134,7 @@ mutate(sim_tbl, week = weekofyear(date))
 
 #### a2munge S3 Example
 
-Below is a few examples of a2munge functions with the R and Spark methods shown. The first example is the `summariser` where the two methods are very similiar. 
+Below is a few examples of a2munge functions with the R and Spark methods shown. The first example is the `summariser` where the two methods are very similar. They both leverage dplyr verbs in similar fashion to produce the same summarized output. 
 
 
 ```{r}
@@ -148,5 +148,18 @@ getS3method("summariser", "tbl_spark")
 
 ```
 
-Note that both functions have parameteric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation^[Programming with R [via](https://dplyr.tidyverse.org/articles/programming.html)] which differs from default dplyr which uses non-standard evaluation^[Advanced R chapter on Non-Standard Evaluation [via](http://adv-r.had.co.nz/Computing-on-the-language.html)]
+Note that both functions have parametric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation^[Programming with R [via](https://dplyr.tidyverse.org/articles/programming.html)] which differs from default dplyr which uses non-standard evaluation^[Advanced R chapter on Non-Standard Evaluation [via](http://adv-r.had.co.nz/Computing-on-the-language.html)]. a2munge functions use standard evaluation equivalent functions like `mutate_at` or `group_by_vars` (vs `mutate` or `group_by`) or by using quasiquotation^[Programming with R, quasiquotations [via](https://dplyr.tidyverse.org/articles/programming.html#quasiquotation)]
+
+
+The input assertions can also be seen for both. Input assertions are made via the checkmate^[checkmate R package [via](https://mllg.github.io/checkmate/)] suite of functions and exist throughout all a2munge functions. 
+
+The `melter` function is a contrasting example where two methods differ significantly. The R version is a thin wrapper around the `melt` function from the reshape2 package. The spark method invokes the Scala `selectExpr` function with an expression using the `stack` UDF. The spark method creates a custom string from the inputs and passes to the Scala function via the sparklyr `invoke` function. This is a good example of how Scala extensions are used. 
+
+```{r}
+# Melter R data.frame method
+getS3method("melter", "data.frame")
+
+# Melter Spark tbl_spark method
+getS3method("melter", "tbl_spark")
+```
 
