@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Haarstick" />
+
+<meta name="date" content="2018-12-11" />
+
+<title>a2munge User Guide</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">a2munge User Guide</h1>
+<h4 class="author"><em>Haarstick</em></h4>
+<h4 class="date"><em>2018-12-11</em></h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#background">Background</a></li>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#design">Design</a></li>
+</ul>
+</div>
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>a2munge is an R package to help create Advanced Analytic data pipelines. The package contains a suite of R and Spark<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is designed to efficiently create such pipelines.</p>
+</div>
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>This guide assumes a working knowledge of R, the tidyverse and sparklyr R packages, R S3 object oriented programming, and R package development. Relevant links:</p>
+<ul>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf">R</a><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></li>
+<li><a href="https://www.tidyverse.org/">tidyverse</a><a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></li>
+<li><a href="https://r4ds.had.co.nz/">R for Data Science</a><a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></li>
+<li><a href="http://adv-r.had.co.nz/S3.html">S3 OOP</a><a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a></li>
+<li><a href="http://r-pkgs.had.co.nz/">R Packages</a><a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a></li>
+</ul>
+<p>This guide also assumes knowledge of how a2munge is applied. Check out the User-Guide Vignette for details on how this package is used.</p>
+</div>
+<div id="requirements" class="section level2">
+<h2>Requirements</h2>
+<ul>
+<li><strong>R</strong>: version &gt;= 3.5</li>
+<li><strong>Spark</strong>: version &gt;= 2.3.0</li>
+</ul>
+</div>
+<div id="design" class="section level2">
+<h2>Design</h2>
+<p>The a2munge package consists of many independent data manipulation and transformation functions. Each function has its own R and test file in the package directory. With a few exceptions (such as reader), a2munge functions follow a similar structure followed below using the S3 Object System</p>
+<ul>
+<li>generic function</li>
+<li>R data.frame method</li>
+<li>Spark tbl_spark method</li>
+</ul>
+<p>The a2munge functions follow this pattern to allow the user to scale to distributed pipelines from base R without significant changes to the code. Thus a2munge supports in memory and distributed data pipeline development.</p>
+<p>Functions following this pattern are tested for method equality. Ie - the spark and R methods are tested to ensure they produce the same output. In a few cases (such as Roller), the R method has a few more features than the spark method.</p>
+<p>The foundation of the a2munge spark methods rest on top of <a href="https://spark.rstudio.com/dplyr/">sparklyr’s spark based methods for dplyr verbs</a>. This allows for the basic dplyr syntax to extend to tbl_spark objects. Ie - the <code>mutate</code> functions operates in a similar way for both base R data.frames as it does for spark tbl_spark objects. However it is very important to understand that a2munge spark methods are using the sparklyr package to execute either HIVE UDFs or UDFs registered in Scala from R. Here are a few important links when developing new a2munge spark methods:</p>
+<ul>
+<li><strong>Hive UDFs</strong><a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>: Reference for Hive UDFs that can be executed in spark based methods</li>
+<li><strong>Sparklyr Extensions</strong><a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>: sparklyr guide for creating extensions with Scala</li>
+</ul>
+<p>The implication is that while <code>mutate</code> might behavior in a similar fashion the functional logic may differ. There there is some overlap between base R syntax and Hive UDFs, however most R functionality will not execute on spark objects as is. This is especially true for R packages. Below are a few examples where the code is consistent and where it differs</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Example R data.frame </span>
+sim_df
+<span class="co">#&gt; # A tibble: 2,000 x 7</span>
+<span class="co">#&gt;    index    id date       cat1  cat2  metric1 metric2</span>
+<span class="co">#&gt;    &lt;int&gt; &lt;int&gt; &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1     1     9 2018-05-26 A     X           1    50.5</span>
+<span class="co">#&gt;  2     2     7 2018-04-24 A     X           7    51.9</span>
+<span class="co">#&gt;  3     3     8 2018-01-26 A     Y           6    50.4</span>
+<span class="co">#&gt;  4     4     9 2018-07-27 B     W           7    52.2</span>
+<span class="co">#&gt;  5     5     5 2018-12-14 A     W           5    57.5</span>
+<span class="co">#&gt;  6     6     4 2018-12-01 A     Z           4    44.4</span>
+<span class="co">#&gt;  7     7     3 2018-01-07 A     Y           2    48.0</span>
+<span class="co">#&gt;  8     8     1 2018-08-03 A     X           3    45.9</span>
+<span class="co">#&gt;  9     9     3 2018-01-15 A     W           3    47.8</span>
+<span class="co">#&gt; 10    10     9 2018-02-03 A     V           1    50.3</span>
+<span class="co">#&gt; # ... with 1,990 more rows</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Create Spark Connection</span>
+sc &lt;-<span class="st"> </span><span class="kw">spark_connect</span>(<span class="dt">master =</span> <span class="st">&quot;local&quot;</span>)
+
+<span class="co"># Copy data to spark</span>
+sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df, <span class="dt">name =</span> <span class="st">&quot;sim_tbl&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p>In the following chunk, the <code>month</code> function in the lubrdate package R is used to extract the month from the date. The ouput is consistent to the Hive <code>month</code> UDF and code is consistent for dataset objects.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+## Extract Month from date
+
+<span class="co"># R Data.frame</span>
+<span class="kw">library</span>(lubridate)
+<span class="kw">mutate</span>(sim_df, <span class="dt">month =</span> <span class="kw">month</span>(date))
+
+<span class="co"># WORKS: Spark tbl_spark</span>
+<span class="kw">mutate</span>(sim_tbl, <span class="dt">month =</span> <span class="kw">month</span>(date))</code></pre></div>
+<p>In the next chunk the <code>week</code> function in lubridate is used to extract the week number from a date, however, this function does not have a direct Hive corallary. Instead the <code>weekofyear</code> Hive UDF produces the same output as the lubridate <code>week</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+## Extract week number from date
+
+<span class="co"># R Data.frame</span>
+<span class="kw">mutate</span>(sim_df, <span class="dt">week =</span> <span class="kw">week</span>(date))
+
+<span class="co"># FAILS: Spark tbl_spark</span>
+<span class="kw">mutate</span>(sim_tbl, <span class="dt">week =</span> <span class="kw">week</span>(date))
+
+<span class="co"># WORKS: Spark tbl_spark</span>
+<span class="kw">mutate</span>(sim_tbl, <span class="dt">week =</span> <span class="kw">weekofyear</span>(date))</code></pre></div>
+<div id="a2munge-s3-example" class="section level4">
+<h4>a2munge S3 Example</h4>
+<p>Below is a few examples of a2munge functions with the R and Spark methods shown. The first example is the <code>summariser</code> where the two methods are very similiar.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># Summariser R data.frame method</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;summariser&quot;</span>, <span class="st">&quot;data.frame&quot;</span>)
+<span class="co">#&gt; function (df, group_vars, measure_vars = NULL, fun = c(&quot;sum&quot;), </span>
+<span class="co">#&gt;     ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)</span>
+<span class="co">#&gt;     checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)</span>
+<span class="co">#&gt;     checkmate::assert_subset(fun, c(&quot;n_distinct&quot;, &quot;min&quot;, &quot;max&quot;, </span>
+<span class="co">#&gt;         &quot;sum&quot;, &quot;mean&quot;, &quot;variance&quot;, &quot;sd&quot;, &quot;kurtosis&quot;, &quot;skewness&quot;, </span>
+<span class="co">#&gt;         &quot;percentile&quot;))</span>
+<span class="co">#&gt;     if (is.null(group_vars) &amp; is.null(measure_vars)) {</span>
+<span class="co">#&gt;         stop(&quot;Both group_vars and measure_vars are NULL.\nNeed to supply one valid column name to one or the other\n&quot;, </span>
+<span class="co">#&gt;             .call = FALSE)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (is.null(measure_vars)) {</span>
+<span class="co">#&gt;         message(&quot;No measure vars provided. Providing counts of records only.\nfun input set to n_distinct&quot;)</span>
+<span class="co">#&gt;         fun &lt;- &quot;n_distinct&quot;</span>
+<span class="co">#&gt;         measure_vars &lt;- &quot;rn&quot;</span>
+<span class="co">#&gt;         df &lt;- df %&gt;% dplyr::group_by_at(.vars = group_vars) %&gt;% </span>
+<span class="co">#&gt;             dplyr::mutate(rn = 1:n()) %&gt;% dplyr::ungroup()</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     all_vars &lt;- c(group_vars, measure_vars)</span>
+<span class="co">#&gt;     group_by_vars &lt;- if (is.null(group_vars)) </span>
+<span class="co">#&gt;         vars()</span>
+<span class="co">#&gt;     else group_vars</span>
+<span class="co">#&gt;     agg &lt;- df %&gt;% dplyr::select_at(all_vars) %&gt;% dplyr::group_by_at(group_by_vars) %&gt;% </span>
+<span class="co">#&gt;         dplyr::summarise_all(.funs = fun, ...) %&gt;% dplyr::ungroup()</span>
+<span class="co">#&gt;     new_measure_vars &lt;- setdiff(colnames(agg), group_vars)</span>
+<span class="co">#&gt;     if (length(measure_vars) &lt; 2 | length(fun) &lt; 2) {</span>
+<span class="co">#&gt;         agg &lt;- dplyr::rename_(agg, .dots = setNames(new_measure_vars, </span>
+<span class="co">#&gt;             paste(measure_vars, fun, sep = &quot;_&quot;)))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     agg</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b73e428&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span>
+
+
+<span class="co"># Summariser Spark tbl_spark method</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;summariser&quot;</span>, <span class="st">&quot;tbl_spark&quot;</span>)
+<span class="co">#&gt; function (df, group_vars, measure_vars = NULL, fun = c(&quot;sum&quot;), </span>
+<span class="co">#&gt;     ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)</span>
+<span class="co">#&gt;     checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)</span>
+<span class="co">#&gt;     checkmate::assert_subset(fun, c(&quot;n_distinct&quot;, &quot;min&quot;, &quot;max&quot;, </span>
+<span class="co">#&gt;         &quot;sum&quot;, &quot;mean&quot;, &quot;variance&quot;, &quot;sd&quot;, &quot;kurtosis&quot;, &quot;skewness&quot;, </span>
+<span class="co">#&gt;         &quot;percentile&quot;))</span>
+<span class="co">#&gt;     if (is.null(group_vars) &amp; is.null(measure_vars)) {</span>
+<span class="co">#&gt;         stop(&quot;Both group_vars and measure_vars are NULL.\nNeed to supply one valid column name to one or the other\n&quot;, </span>
+<span class="co">#&gt;             .call = FALSE)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (is.null(measure_vars)) {</span>
+<span class="co">#&gt;         message(&quot;No measure vars provided. Providing counts of records only.\nfun input set to n_distinct&quot;)</span>
+<span class="co">#&gt;         fun &lt;- &quot;n_distinct&quot;</span>
+<span class="co">#&gt;         measure_vars &lt;- &quot;rn&quot;</span>
+<span class="co">#&gt;         df &lt;- df %&gt;% dplyr::arrange_at(.vars = group_vars) %&gt;% </span>
+<span class="co">#&gt;             dplyr::mutate(rn = row_number())</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     all_vars &lt;- c(group_vars, measure_vars)</span>
+<span class="co">#&gt;     group_by_vars &lt;- if (is.null(group_vars)) </span>
+<span class="co">#&gt;         vars()</span>
+<span class="co">#&gt;     else group_vars</span>
+<span class="co">#&gt;     agg &lt;- df %&gt;% dplyr::select_at(all_vars) %&gt;% dplyr::group_by_at(group_by_vars) %&gt;% </span>
+<span class="co">#&gt;         dplyr::summarise_all(.funs = fun, ...) %&gt;% dplyr::ungroup()</span>
+<span class="co">#&gt;     if (length(measure_vars) &lt; 2 | length(fun) &lt; 2) {</span>
+<span class="co">#&gt;         agg &lt;- agg %&gt;% dplyr::select_(.dots = stats::setNames(colnames(agg), </span>
+<span class="co">#&gt;             c(group_vars, paste(measure_vars, fun, sep = &quot;_&quot;))))</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     agg</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b7d36f0&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
+<p>Note that both functions have parameteric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> which differs from default dplyr which uses non-standard evaluation<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a></p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Spark Data Processing Engine <a href="https://spark.apache.org/">via</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>R Intro <a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf">via</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Tidyverse <a href="https://www.tidyverse.org/">via</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>R for Data Science <a href="https://r4ds.had.co.nz/">via</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>R S3 Object System <a href="http://adv-r.had.co.nz/S3.html">via</a><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>R Packages <a href="http://r-pkgs.had.co.nz/">via</a><a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>Hive UDFs <a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF">via</a><a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>Guide on creating sparklyr extensions with Scala <a href="https://spark.rstudio.com/extensions/">via</a><a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p>Programming with R <a href="https://dplyr.tidyverse.org/articles/programming.html">via</a><a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p>Advanced R chapter on Non-Standard Evaluation <a href="http://adv-r.had.co.nz/Computing-on-the-language.html">via</a><a href="#fnref10">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

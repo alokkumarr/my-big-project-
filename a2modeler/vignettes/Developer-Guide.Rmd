@@ -86,8 +86,7 @@ Below is an example of simple but standard a2modeler regression workflow
 
 ```{r, eval=FALSE}
 
-
-# # Create Spark Connection
+# Create Spark Connection
 sc <- spark_connect(master = "local")
 
 # Copy data to spark
