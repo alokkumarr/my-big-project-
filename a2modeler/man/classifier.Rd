@@ -48,3 +48,4 @@ Other use cases: \code{\link{forecaster}},
   \code{\link{modeler}}, \code{\link{multiclassifier}},
   \code{\link{regressor}}, \code{\link{segmenter}}
 }
+\concept{use cases}

@@ -134,9 +134,13 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void createChannel() throws JsonProcessingException {
+    
     ValidatableResponse response = given(authSpec).body(prepareChannelDataSet()).when()
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);
     log.debug("createChannel () " + response.log());
+    
+    //delete channel after testing
+    this.tearDownChannel();
   }
 
   /**
@@ -153,6 +157,11 @@ public class BatchIngestionIT extends BaseIT {
     ValidatableResponse response = given(authSpec).body(prepareRouteDataSet()).when().post(routeUri)
         .then().assertThat().statusCode(200);
     log.debug("createRoute () " + response.log());
+    
+    
+    //delete route after testing
+    this.tearDownRoute();
+    this.tearDownChannel();
   }
 
   /**
@@ -160,12 +169,19 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void readChannel() throws JsonProcessingException {
-    given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH).then()
+    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .jsonPath().getLong("bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    
+    given(authSpec).body(prepareChannelDataSet()).when().get(BATCH_CHANNEL_PATH).then()
         .assertThat().statusCode(200);
     List<?> listOfChannel = given(authSpec).when().get(BATCH_CHANNEL_PATH).then().assertThat()
         .statusCode(200).extract().response().jsonPath().getList("$");
     log.debug("readChannel :" + listOfChannel);
     assertTrue(listOfChannel.size() > 0);
+    
+    this.tearDownChannel();
   }
 
   /**
@@ -185,6 +201,10 @@ public class BatchIngestionIT extends BaseIT {
         .extract().response().jsonPath().getList("$");
     log.debug("readRoute :" + listOfRoutes);
     assertTrue(listOfRoutes.size() > 0);
+    
+    this.tearDownRoute();
+    this.tearDownChannel();
+   
   }
 
   /**
@@ -204,6 +224,8 @@ public class BatchIngestionIT extends BaseIT {
         .jsonPath().getJsonObject("modifiedBy");
     log.debug("updateChannel :" + modifiedBy);
     assertNotNull(modifiedBy);
+    
+    this.tearDownChannel();
   }
 
   /**
@@ -236,6 +258,10 @@ public class BatchIngestionIT extends BaseIT {
         .body().jsonPath().getJsonObject("modifiedBy");
     log.debug("updateRoute :" + modifiedBy);
     assertNotNull(modifiedBy);
+    
+   
+    this.tearDownRoute();
+    this.tearDownChannel();
   }
 
   /**
@@ -251,6 +277,62 @@ public class BatchIngestionIT extends BaseIT {
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     given(authSpec).body(prepareRouteDataSet()).when().post(urlForThatRouteUpdate).then()
         .assertThat().statusCode(200);
+    log.debug("updateRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
+    Long routeId = given(authSpec).when().get(urlForThatRouteUpdate).then().assertThat()
+        .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    // Long routeId = Long.valueOf(bisRouteSysId.get(0).get("bisRouteSysId").toString());
+    log.debug(" updateRoute bisRouteSysId : " + routeId);
+    String urlForThatRouteUpdateById =
+        BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
+    given(authSpec).when().delete(urlForThatRouteUpdateById).then().assertThat().statusCode(200);
+    
+    this.tearDownChannel();
+  }
+
+  /**
+   * The test case is to delete a route in batch Ingestion.
+   */
+  @Test
+  public void deleteChannel() throws JsonProcessingException {
+    
+   
+    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .jsonPath().getLong("bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    assertFalse(bisChannelSysId <= 0);
+    String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
+    log.debug("deleteChannel urlForThetoUpdate : " + urlForThatoUpdate);
+    given(authSpec).when().delete(urlForThatoUpdate).then().assertThat().statusCode(200);
+  }
+  
+  /**
+   * The method cleansup channel in batch Ingestion.
+   */
+  public void tearDownChannel() throws JsonProcessingException {
+    Integer bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .get(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .path("[0].bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    assertFalse(bisChannelSysId <= 0);
+    String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
+    log.debug("deleteChannel urlForThetoUpdate : " + urlForThatoUpdate);
+    given(authSpec).when().delete(urlForThatoUpdate).then().assertThat().statusCode(200);
+  }
+  
+  /**
+   * he method cleansup riyte in batch Ingestion.
+   * @throws JsonProcessingException exception
+   */
+  public void tearDownRoute() throws JsonProcessingException {
+    Integer bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .get(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .path("[0].bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    assertFalse(bisChannelSysId <= 0);
+    String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
+    given(authSpec).body(prepareRouteDataSet()).when().get(urlForThatRouteUpdate).then()
+        .assertThat().statusCode(200);
     log.debug("deleteRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
     log.debug(
         "deleteRoute data " + given(authSpec).when().get(urlForThatRouteUpdate).then().assertThat()
@@ -261,21 +343,6 @@ public class BatchIngestionIT extends BaseIT {
     String urlForThatRouteUpdateById =
         BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
     given(authSpec).when().delete(urlForThatRouteUpdateById).then().assertThat().statusCode(200);
-  }
-
-  /**
-   * The test case is to delete a route in batch Ingestion.
-   */
-  @Test
-  public void deleteChannel() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
-    log.debug("bisChannelSysId : " + bisChannelSysId);
-    assertFalse(bisChannelSysId <= 0);
-    String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
-    log.debug("deleteChannel urlForThetoUpdate : " + urlForThatoUpdate);
-    given(authSpec).when().delete(urlForThatoUpdate).then().assertThat().statusCode(200);
   }
 
   /**
@@ -295,5 +362,7 @@ public class BatchIngestionIT extends BaseIT {
     String connectRouteUri =
         BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
+    
+    this.tearDownChannel();
   }
 }

@@ -4,9 +4,9 @@
 \alias{new_modeler}
 \title{New Modeler Object Constructer function}
 \usage{
-new_modeler(df, schema, target, type, name, uid, version, desc, scientist, dir,
-  execution_strategy, refit, save_submodels, samples, pipelines, models,
-  measure, performance, final_model, seed, ...)
+new_modeler(df, schema, target, type, name, uid, version, desc, scientist,
+  dir, execution_strategy, refit, save_submodels, samples, pipelines,
+  models, measure, performance, final_model, seed, ...)
 }
 \arguments{
 \item{df}{dataframe with target variable and any potential predictors}

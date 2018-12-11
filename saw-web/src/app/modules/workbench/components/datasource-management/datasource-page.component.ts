@@ -320,11 +320,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       autoFocus: false,
       closeOnNavigation: true,
       disableClose: true,
-      height: '60%',
-      width: '70%',
-      minWidth: '750px',
-      minHeight: '600px',
-      maxWidth: '900px',
+      height: '590px',
+      width: '950px',
       panelClass: 'sourceDialogClass',
       data: {
         ...routeData,

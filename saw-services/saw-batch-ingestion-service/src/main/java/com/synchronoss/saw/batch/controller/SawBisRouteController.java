@@ -18,7 +18,6 @@ import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
-import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.service.BisRouteService;
 
 import io.swagger.annotations.Api;

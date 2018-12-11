@@ -4,12 +4,29 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DatasourceService } from '../../../services/datasource.service';
 import { generateSchedule } from '../../../../../common/utils/cron2Readable';
 
+interface ILogObject {
+  pid: string;
+  routeSysId: number;
+  channelSysId: number;
+  channelType: string;
+  filePattern: string;
+  fileName: string;
+  actualFileRecDate: number;
+  recdFileName: string;
+  recdFileSize: number;
+  mflFileStatus: string;
+  bisProcessState: string;
+  modifiedDate: number;
+  createdDate: number;
+}
 @Component({
   selector: 'logs-dialog',
   templateUrl: './logs-dialog.component.html',
   styleUrls: ['./logs-dialog.component.scss']
 })
 export class LogsDialogComponent implements OnInit {
+
+  public logs: ILogObject[];
 
   constructor(
     private _dialogRef: MatDialogRef<LogsDialogComponent>,
@@ -19,8 +36,8 @@ export class LogsDialogComponent implements OnInit {
 
   ngOnInit() {
     const { bisChannelSysId, bisRouteSysId } = this.routeData;
-    this._datasourceService.getRoutesLogs(bisChannelSysId, bisRouteSysId).subscribe(logs => {
-      console.log('logs', logs);
+    this._datasourceService.getRoutesLogs(bisChannelSysId, bisRouteSysId).subscribe(resp => {
+      this.logs = resp.logs;
     });
   }
 

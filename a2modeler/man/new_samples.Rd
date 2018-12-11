@@ -5,8 +5,8 @@
 \title{Sample Class Constructer function}
 \usage{
 new_samples(validation_method, validation_args, test_holdout_prct,
-  test_holdout_method, downsample_prct, train_indicies, validation_indicies,
-  indicies_names, test_index)
+  test_holdout_method, downsample_prct, train_indicies,
+  validation_indicies, indicies_names, test_index)
 }
 \description{
 Sample Class Constructer function
