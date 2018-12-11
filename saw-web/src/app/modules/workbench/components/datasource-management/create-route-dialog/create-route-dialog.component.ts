@@ -1,17 +1,18 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import {
   FormBuilder,
   FormGroup,
   Validators,
   AbstractControl
 } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
 import * as includes from 'lodash/includes';
 import { DatasourceService } from '../../../services/datasource.service';
 import { isUnique } from '../../../../../common/validators';
 
+import { SourceFolderDialogComponent } from '../select-folder-dialog';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 
 @Component({
@@ -30,6 +31,7 @@ export class CreateRouteDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
     private snackBar: MatSnackBar,
     private datasourceService: DatasourceService,
+    private _dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public routeData: any
   ) {
     this.createForm();
@@ -116,5 +118,19 @@ export class CreateRouteDialogComponent implements OnInit {
       description: data.description
     };
     return routeDetails;
+  }
+
+  openSelectSourceFolderDialog() {
+    const dateDialogRef = this._dialog.open(SourceFolderDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      height: '400px',
+      width: '300px',
+    });
+    dateDialogRef.afterClosed().subscribe(sourcePath => {
+      console.log('sourcePath', sourcePath);
+      this.detailsFormGroup.controls.destinationLocation.setValue(sourcePath);
+    });
   }
 }
