@@ -14,7 +14,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "version": "node ./src/version.js",
-    "postinstall": "node node_modules/protractor/bin/webdriver-manager update --gecko=false"
+    "postinstall": "node node_modules/protractor/bin/webdriver-manager update --versions.chrome 2.44 --gecko=false"
   },
   "private": true,
   "dependencies": {
