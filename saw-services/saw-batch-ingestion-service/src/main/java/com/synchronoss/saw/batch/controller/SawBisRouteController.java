@@ -536,7 +536,7 @@ public class SawBisRouteController {
       = RequestMethod.GET, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Boolean> isDuplicateRoute(
-      @RequestParam("channelId")  Long channelId,
+      @PathVariable("channelId")  Long channelId,
       @RequestParam("routeName") String routeName) {
     
     return new ResponseEntity<Boolean>(bisRouteService
