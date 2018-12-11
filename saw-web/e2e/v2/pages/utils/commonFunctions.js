@@ -9,19 +9,19 @@ const fluentWait = protractorConf.timeouts.fluentWait;
 module.exports = {
   waitFor: {
     elementToBeClickable: (element, wait = null) => {
-      return browser.wait(EC.elementToBeClickable(element),  wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not clickable");
+      return browser.wait(EC.elementToBeClickable(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not clickable");
     },
     elementToBeVisible: (element, wait = null) => {
-      return browser.wait(EC.visibilityOf(element),  wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not visible");
+      return browser.wait(EC.visibilityOf(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not visible");
     },
     elementToBePresent: (element, wait = null) => {
-      return browser.wait(EC.presenceOf(element),  wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not present");
+      return browser.wait(EC.presenceOf(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not present");
     },
     elementToBeEnabledAndVisible: (element, wait = null) => {
-      browser.wait(EC.elementToBeClickable(element),  wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-    },elementToBeNotVisible: (element, wait = null) =>{
+      browser.wait(EC.elementToBeClickable(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not clickable");
+    }, elementToBeNotVisible: (element, wait = null) => {
       return browser.wait(EC.not(EC.presenceOf(element)), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is present");
-    },textToBePresent:(element, value, wait = null)=>{
+    }, textToBePresent: (element, value, wait = null) => {
       return browser.wait(EC.textToBePresentInElement(element, value), wait ? wait : fluentWait);
     },
     //Eliminates error: is not clickable at point
@@ -81,13 +81,13 @@ module.exports = {
     stream.write(new Buffer(data, 'base64'));
     stream.end();
   },
-  getAnalysisIdFromUrl(url){
+  getAnalysisIdFromUrl(url) {
     let ulrParts = url.split("analyze/analysis/")[1];
     return ulrParts.split("/")[0];
-  },slideHorizontally(element, x_axis) {
+  }, slideHorizontally(element, x_axis) {
     browser.actions().dragAndDrop(
       element,
-      {x:x_axis, y:0}
+      { x: x_axis, y: 0 }
     ).perform();
   },
   goToHome() {

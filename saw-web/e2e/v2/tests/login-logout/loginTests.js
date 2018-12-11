@@ -8,20 +8,20 @@ const commonFunctions = require('../../pages/utils/commonFunctions')
 
 describe('Executing login tests from loginTests.js', () => {
 
-  beforeAll(function () {
+  beforeAll(() => {
     logger.info('Starting login tests...');
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
-  beforeEach(function (done) {
-    setTimeout(function () {
+  beforeEach((done) => {
+    setTimeout(() => {
       commonFunctions.goToHome();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function (done) {
-    setTimeout(function () {
+  afterEach((done) => {
+    setTimeout(() => {
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);

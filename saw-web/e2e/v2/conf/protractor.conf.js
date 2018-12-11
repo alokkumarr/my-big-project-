@@ -55,8 +55,6 @@ const pageResolveTimeout = 1000;
  */
 const customerCode = 'SYNCHRONOSS';
 
-let token;
-
 exports.timeouts = {
   fluentWait: fluentWait,
   pageResolveTimeout: pageResolveTimeout,
@@ -69,7 +67,6 @@ exports.config = {
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
   baseUrl: 'http://localhost:3000',
-  logger: logger,
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
@@ -95,26 +92,23 @@ exports.config = {
     includeStackTrace: true,
     realtimeFailure: true,
     showColors: true,
-    stopSpecOnExpectationFailure:true
+    stopSpecOnExpectationFailure: true
   },
   suites: {
+
+    smoke: testSuites.SMOKE,
+    sanity: testSuites.SANITY,
     /**
-     * This suite will be run as part of main bamboo build plan.
+     * This is default suite contains basic functionality aorund analyze + observe module
+     * Gets triggered on each push
      */
-    smoke: testSuites.SMOKE, /**
-     * This suite will be triggered from main bamboo plan frequently for sanity check
+    critical: testSuites.CRITICAL,
+    /**
+     * This suite is full regression and is triggered by e2e bamboo plan i.e
+     * https://bamboo.synchronoss.net:8443/browse/BDA-TSA
      */
-    sanity: testSuites.SANITY, /**
-     * This suite will be triggered from main bamboo plan and runs on every commit
-     * Contains all feature with minimal data set
-     */
-    critical: testSuites.CRITICAL, /**
-     * This suite will be triggered from e2e bamboo plan and dev team has to run this plan manually to verify that their
-     * changes are not causing any issues to app.
-     * Bamboo plan url: https://bamboo.synchronoss.net:8443/browse/BDA-TSA
-     * Contains all feature with minimal data set
-     */
-    regression: testSuites.REGRESSION, /**
+    regression: testSuites.REGRESSION,
+    /**
      * This suite is for developing new tests and quickly debug if something breaking
      */
     development: testSuites.DEVELOPMENT
@@ -154,11 +148,11 @@ exports.config = {
     jasmine.getEnv().addReporter(new function () {
       this.specDone = function (result) {
         if (result.status !== 'passed') {
-          logger.debug('Test is failed: '+JSON.stringify(result.testInfo));
+          logger.debug('Test is failed: ' + JSON.stringify(result.testInfo));
           new SuiteSetup().failedTestData(result.testInfo)
         }
-        if(result.status === 'passed') {
-          logger.debug('Test is passed: '+JSON.stringify(result.testInfo));
+        if (result.status === 'passed') {
+          logger.debug('Test is passed: ' + JSON.stringify(result.testInfo));
           new SuiteSetup().passTestData(result.testInfo)
         }
       };

@@ -14,14 +14,14 @@ class LoginPage {
     this._errorMessage = element(by.className('error-msg'));
   }
 
-  fillUserNameField(userName){
-    logger.debug('Filling user name with :'+userName);
+  fillUserNameField(userName) {
+    logger.debug('Filling user name with :' + userName);
     commonFunctions.waitFor.elementToBeVisible(this._userName);
     this._userName.clear().sendKeys(userName);
   }
 
   fillPasswordField(password) {
-    logger.debug('Filling password with :'+password);
+    logger.debug('Filling password with :' + password);
     commonFunctions.waitFor.elementToBeVisible(this._password);
     this._password.clear().sendKeys(password);
   }
@@ -40,17 +40,17 @@ class LoginPage {
   }
 
   logOutLogin(userName, password, redirectedPage = null) {
-    if(this.isUserLoggedIn()) {
+    if (this.isUserLoggedIn()) {
       new Header().doLogout();
     }
     this.doLogin(userName, password);
-    if(redirectedPage) {
+    if (redirectedPage) {
       commonFunctions.waitFor.pageToBeReady(redirectedPage);
     }
   }
   isUserLoggedIn() {
-    element(this._userName.isPresent().then(function(isPresent) {
-      if(isPresent) {
+    element(this._userName.isPresent().then(function (isPresent) {
+      if (isPresent) {
         logger.debug('User is on login page, hence do the login, no need');
         return false;
       }
@@ -60,7 +60,7 @@ class LoginPage {
   }
 
   loginAs(userName, redirectedPage = null) {
-    logger.silly('loginAs--->'+userName);
+    logger.silly('loginAs--->' + userName);
     switch (userName) {
       case 'admin':
         this.logOutLogin(users.admin.loginId, users.anyUser.password, redirectedPage);

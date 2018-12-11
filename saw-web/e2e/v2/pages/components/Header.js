@@ -5,15 +5,15 @@ const commonFunctions = require('../utils/commonFunctions')
 
 class Header {
 
-  constructor(){
+  constructor() {
     this._accountSettingIcon = element(by.css(`[e2e='account-settings-menu-btn']`));
     this._accountLogoutLink = element(by.css(`[e2e='account-settings-selector-logout']`));
     this._companyLogo = element(by.css('.company-logo'));
   }
 
-  doLogout(){
+  doLogout() {
     logger.silly('doing logout..');
-    if(!this._accountSettingIcon.isPresent()){
+    if (!this._accountSettingIcon.isPresent()) {
       commonFunctions.goToHome();
     }
     this._accountSettingIcon.click();
