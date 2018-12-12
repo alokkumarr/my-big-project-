@@ -82,8 +82,9 @@ export class PivotGridComponent implements OnInit, OnDestroy {
   set setData(data: any[]) {
     setTimeout(() => {
       this.data = this.preProcessData(data);
+      console.log(this.data);
       this.setPivotData();
-    }, 100);
+    }, 500);
   }
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public fields: any[];
