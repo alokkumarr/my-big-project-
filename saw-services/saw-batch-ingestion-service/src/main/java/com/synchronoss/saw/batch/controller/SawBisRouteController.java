@@ -81,9 +81,7 @@ public class SawBisRouteController {
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
   private String deleteUrl = "/delete";
-  private String pauseUrl = "/pause";
-  private String resumeUrl = "/resume";
-  private Long STATUS_ACTIVE = 1L;
+  private static final Long STATUS_ACTIVE = 1L;
 
   @Value("${bis.default-data-drop-location}")
   private String dropLocation;

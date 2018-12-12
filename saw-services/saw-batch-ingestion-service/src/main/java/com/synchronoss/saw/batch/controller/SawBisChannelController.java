@@ -67,7 +67,7 @@ public class SawBisChannelController {
   @Autowired
   private BisChannelService bisChannelService;
   
-  private Long STATUS_ACTIVE = 1L;
+  private static final Long STATUS_ACTIVE = 1L;
 
 
   /**
