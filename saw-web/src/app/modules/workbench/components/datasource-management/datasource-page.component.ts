@@ -321,7 +321,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       closeOnNavigation: true,
       disableClose: true,
       height: '590px',
-      width: '950px',
+      width: '800px',
       panelClass: 'sourceDialogClass',
       data: {
         ...routeData,

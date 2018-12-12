@@ -37,10 +37,12 @@ export class CreateRouteDialogComponent {
     this.channelName = this.routeData.channelName;
     if (isUndefined(this.routeData.routeMetadata.length)) {
       this.opType = 'update';
+    }
+    this.createForm();
+    if (isUndefined(this.routeData.routeMetadata.length)) {
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
       this.crondetails = this.routeData.routeMetadata.schedulerExpression;
     }
-    this.createForm();
   }
 
   createForm() {

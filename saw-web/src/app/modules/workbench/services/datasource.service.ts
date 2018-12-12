@@ -76,7 +76,7 @@ export class DatasourceService {
   }
 
   isDuplicateRoute({channelId, routeName}): Observable<boolean> {
-    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?channelId=${channelId}&routeName=${routeName}`;
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?routeName=${routeName}`;
 
     return this.http
       .get(endpoint)

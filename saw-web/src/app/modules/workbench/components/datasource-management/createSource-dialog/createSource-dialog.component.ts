@@ -39,10 +39,12 @@ export class CreateSourceDialogComponent {
       this.dialogTitle = 'Edit Channel';
       this.selectedStepIndex = 1;
       this.selectedSource = this.channelData.channelType;
+    }
+    this.createForm();
+    if (isUndefined(this.channelData.length)) {
       this.firstStep.patchValue(this.channelData);
       this.detailsFormGroup.patchValue(this.channelData);
     }
-    this.createForm();
   }
 
   createForm() {
