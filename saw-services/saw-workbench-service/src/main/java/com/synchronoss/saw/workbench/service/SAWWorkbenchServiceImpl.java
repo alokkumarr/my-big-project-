@@ -475,16 +475,15 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     return dataSets;
   }
 
-  public DataSet getDataSet(String projectId, String dataSetId) throws Exception {
-    logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, dataSetId);
+  public DataSet getDataSet(String projectId, String datasetName) throws Exception {
+    logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, datasetName);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonElement dataset = mdtStore.read(dataSetId);
-    DataSet returnData = objectMapper.readValue(dataset.toString(), DataSet.class);
-    return returnData;
+    String dataset = mdtStore.readDataSet(projectId, datasetName);
+    return objectMapper.readValue(dataset, DataSet.class);
   }
-
+  
   //TODO: This method needs re-factoring in future once SIP-4218 & SIP-4217 is resolved
   @Override
   public DataSet createDataSet(DataSet dataSet, String project) throws Exception {

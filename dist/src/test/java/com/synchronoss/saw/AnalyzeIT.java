@@ -3,6 +3,7 @@ package com.synchronoss.saw;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -393,7 +394,7 @@ public class AnalyzeIT extends BaseIT {
     Response response = request(token)
                         .when().get("/saw/services/analysis/" + analysisId + "/executions")
                         .then().assertThat().statusCode(200)
-                        .body("executions", hasSize(1))
+                        .body("executions.size()", greaterThan(0))
                         .extract().response();
     return response.path("executions[0].id");
   }

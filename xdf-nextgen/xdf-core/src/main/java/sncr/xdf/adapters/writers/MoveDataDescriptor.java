@@ -31,4 +31,16 @@ public class MoveDataDescriptor {
         this.objectName = objectName;
         this.partitionList = partitionList;
     }
+
+    @Override
+    public String toString() {
+        return "MoveDataDescriptor{" +
+            "source='" + source + '\'' +
+            ", dest='" + dest + '\'' +
+            ", mode='" + mode + '\'' +
+            ", format='" + format + '\'' +
+            ", objectName='" + objectName + '\'' +
+            ", partitionList=" + partitionList +
+            '}';
+    }
 }

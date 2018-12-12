@@ -13,8 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,6 +25,8 @@ import org.springframework.http.HttpStatus;
 public abstract class SipPluginContract {
 
   private static final Logger logger = LoggerFactory.getLogger(SipPluginContract.class);
+
+  private Integer batchSize = 0;
 
   /**
    * This method is to test connect the route.
@@ -98,6 +98,15 @@ public abstract class SipPluginContract {
     DateFormat dtFormat = new SimpleDateFormat("MMddyyyyhhmmss");
     return dtFormat.format(new Date());
   }
+
+  public Integer getBatchSize() {
+    return batchSize;
+  }
+
+  public void setBatchSize(Integer batchSize) {
+    this.batchSize = batchSize;
+  }
+
 
 
 }
