@@ -72,7 +72,8 @@ export class DatasetsGridPageComponent
       },
       {
         caption: 'Size',
-        dataField: 'size',
+        dataField: 'system.numberOfFiles',
+        dataType: 'number',
         width: '10%'
       },
       {
@@ -145,5 +146,12 @@ export class DatasetsGridPageComponent
 
   viewDetails(metadata) {
     this.workbench.navigateToDetails(metadata);
+  }
+
+  sizeCalculator(size) {
+    let a = size;
+
+
+    return a + " B";
   }
 }

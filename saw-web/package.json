@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "run-s version dev:serve",
+    "dev:serve": "ng serve",
     "build": "run-s version build:only",
-    "build:only": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build --prod",
+    "build:only": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build --prod --aot=false --build-optimizer=false",
     "build:stats": "ng build --prod --stats-json",
     "build:analyze": "run-s build:stats analyze:only",
     "analyze:only": "webpack-bundle-analyzer dist/stats.json",
@@ -14,7 +15,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "version": "node ./src/version.js",
-    "postinstall": "node node_modules/protractor/bin/webdriver-manager update --gecko=false"
+    "postinstall": "node node_modules/protractor/bin/webdriver-manager update --versions.chrome 2.44 --gecko=false"
   },
   "private": true,
   "dependencies": {

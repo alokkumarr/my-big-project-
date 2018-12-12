@@ -22,9 +22,9 @@ application:
 schema:
    file: /Users/spau0004/code/SIP/saw-services/saw-proxy-service/src/main/resources/schema/proxy-schema.json
 elastic-search:
-           cluster-name: sip-rd-es
-           transport-hosts: es-rd601.ana.dev.vaste.sncrcorp.net
-           transport-ports: 9200
+           cluster-name: elasticsearch
+           transport-hosts: es-rd601.ana.dev.vaste.sncrcorp.net,es-rd602.ana.dev.vaste.sncrcorp.net
+           transport-ports: 9200,9200
 elastic-xpack :
           cluster-active: false
           cluster-username: elastic

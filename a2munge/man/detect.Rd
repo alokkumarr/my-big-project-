@@ -3,17 +3,12 @@
 \name{detect}
 \alias{detect}
 \alias{detect.data.frame}
-\alias{detect.grouped_df}
 \title{Dataframe Anomaly Detection function}
 \usage{
 detect(df, index_var, measure_var, frequency, direction, alpha, max_anoms,
   trend_window)
 
 \method{detect}{data.frame}(df, index_var, measure_var, frequency,
-  direction = "pos", alpha = 0.01, max_anoms = 0.01,
-  trend_window = 0.75)
-
-\method{detect}{grouped_df}(df, index_var, measure_var, frequency,
   direction = "pos", alpha = 0.01, max_anoms = 0.01,
   trend_window = 0.75)
 }

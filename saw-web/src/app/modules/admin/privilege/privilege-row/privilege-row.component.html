@@ -1,5 +1,5 @@
 <td>
-  <div class="sub-category-label">{{subCategory.subCategoryName}}</div>
+  <div class="sub-category-label" [matTooltip]="subCategory.subCategoryName">{{subCategory.subCategoryName | truncate: 30}}</div>
 </td>
 <td>
 <mat-slide-toggle [checked]="privilegeCodeList[0]"
@@ -8,7 +8,7 @@
 </td>
 <td>
 <span *ngIf="privilegeCodeList[0]">
-    <div fxLayout="row" fxLayoutAlign="start center">
+    <div fxLayout="row" fxLayoutAlign="space-between center" class="privilege-options-row-container">
       <mat-checkbox type="checkbox"
                     (change)="onAllClicked()"
                     [checked]="privilegeCodeList[8]"

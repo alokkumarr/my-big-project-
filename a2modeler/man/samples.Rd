@@ -30,6 +30,9 @@ numeric vector pertaining to row numbers to use for model validation}
 
 \item{test_index}{numeric index with records to use for model testing}
 }
+\value{
+samples object
+}
 \description{
 Creates a valid object of samples class
 }

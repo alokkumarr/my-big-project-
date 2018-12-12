@@ -1,8 +1,10 @@
 package sncr.xdf.services;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
@@ -311,10 +313,12 @@ public interface WithDataSet {
         {
             Map<String, Map<String, Object>> resMap = new HashMap();
             for( Output output: this.ctx.componentConfiguration.getOutputs()){
-                Map<String, Object> res_output = new HashMap<>();
+                Map<String, Object> resOutput = new HashMap<>();
                 String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
                 String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
                 String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
+
+                String description = (output.getDescription() != null) ? output.getDescription() : "";
 
 
                 StringBuilder sb = new StringBuilder(ctx.xdfDataRootSys);
@@ -326,38 +330,52 @@ public interface WithDataSet {
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
                 logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
-                res_output.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
-                res_output.put(DataSetProperties.Name.name(), output.getDataSet());
+                resOutput.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
+                logger.debug("Phyical location : " + sb.toString());
+                resOutput.put(DataSetProperties.Name.name(), output.getDataSet());
 
                 Integer nof = (output.getNumberOfFiles() != null)? output.getNumberOfFiles() :1;
-                res_output.put(DataSetProperties.Type.name(), output.getDstype().toString() );
-                res_output.put(DataSetProperties.Catalog.name(), catalog);
-                res_output.put(DataSetProperties.Format.name(), format);
-                res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
-                res_output.put(DataSetProperties.Mode.name(), mode);
+                resOutput.put(DataSetProperties.Type.name(), output.getDstype().toString() );
+                resOutput.put(DataSetProperties.Catalog.name(), catalog);
+                resOutput.put(DataSetProperties.Format.name(), format);
+                resOutput.put(DataSetProperties.NumberOfFiles.name(), nof);
+                resOutput.put(DataSetProperties.Mode.name(), mode);
+                resOutput.put(DataSetProperties.Description.name(), description);
 
                 //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
-                res_output.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
+                resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
 
+                //Extract User Information
+                Object userDataObject = output.getUserdata();
+                logger.debug("UserDataobject = " + userDataObject);
+
+                JsonObject userData = null;
+                if (userDataObject != null) {
+                    userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
+                    if (userData != null) {
+                        resOutput.put(DataSetProperties.UserData.name(), userData);
+                    }
+                }
 
                 //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>(output.getPartitionKeys());
 
                 String m = "Configured keys: [" + kl.size()+ "]";
                 for (String s : kl) m += s + " ";
-                logger.trace( m);
-                res_output.put(DataSetProperties.PartitionKeys.name(), kl);
+                logger.debug( m);
+                resOutput.put(DataSetProperties.PartitionKeys.name(), kl);
 
-                DataSetHelper.logger.debug("Output DS result Map = " + res_output);
+                DataSetHelper.logger.debug("Output DS result Map = " + resOutput);
                 switch (ktype) {
                     case parameter:
                         if (output.getName() != null)
-                            resMap.put(output.getName(), res_output); break;
+                            resMap.put(output.getName(), resOutput); break;
                     case dataset:
                         if (output.getDataSet() != null)
-                            resMap.put(output.getDataSet(), res_output); break;
+                            resMap.put(output.getDataSet(), resOutput); break;
                 }
             }
+            logger.debug("ngBuildDataSetMap : " + resMap);
             return resMap;
         }
 
