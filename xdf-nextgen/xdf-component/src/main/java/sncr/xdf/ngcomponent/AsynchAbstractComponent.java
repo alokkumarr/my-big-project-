@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
- *  All component should be implemented as follow:
+ *  All component should be implemented as follows:
  *   - Component specific class inherits from AbstractComponent
  *   - Component specific class should implement interfaces with given functionality
  *   or using base classes:
@@ -85,7 +86,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
             throw new IllegalArgumentException("NGContext must not be null");
 
         this.ngctx = ngctx;
-        logger.debug(this.ngctx.toString());
+        logger.warn(this.ngctx.toString());
         if (this.ngctx.serviceStatus.isEmpty())
             throw new IllegalArgumentException("NGContext is not initialized correctly");
     }
@@ -224,7 +225,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
 
                 if (ngctx.componentConfiguration.getInputs() != null &&
                         ngctx.componentConfiguration.getInputs().size() > 0) {
-                    logger.info("Extracting meta data");
+                    logger.warn("Extracting meta data");
 
                     WithDataSet.DataSetHelper dsaux = new WithDataSet.DataSetHelper(ngctx, services.md);
 
@@ -254,8 +255,8 @@ public abstract class AsynchAbstractComponent implements WithContext{
                         ngctx.inputs = services.mddl.discoverDataParametersWithInput(dsaux);
                     }
 
-                    logger.debug("Input datasets = " + ngctx.inputDataSets);
-                    logger.debug("Inputs = " + ngctx.inputs);
+                    logger.warn("Input datasets = " + ngctx.inputDataSets);
+                    logger.warn("Inputs = " + ngctx.inputs);
                     ngctx.serviceStatus.put(ComponentServices.InputDSMetadata, true);
                 }
             }
@@ -284,7 +285,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
                 final int[] rc = {0};
                 ngctx.componentConfiguration.getOutputs().forEach(o ->
                 {
-                    logger.debug("Add output object to data object repository: " + o.getDataSet());
+                    logger.warn("Add output object to data object repository: " + o.getDataSet());
 
                     if (!services.mddl.discoverAndvalidateOutputDataSet(ngctx.outputDataSets.get(o.getDataSet()))) {
                         String error = "Could not validate output dataset: " + o.getDataSet();
@@ -301,10 +302,10 @@ public abstract class AsynchAbstractComponent implements WithContext{
                             rc[0] = -1;
                             return;
                         }
-                        logger.debug("Create/read DS and add it to Output object DS list");
+                        logger.warn("Create/read DS and add it to Output object DS list");
                         JsonObject dsObj = ds.getAsJsonObject();
                         String id = dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString();
-                        logger.debug(String.format("Add to output DataSet map document with ID: %s\n %s", id, ds.toString()));
+                        logger.warn(String.format("Add to output DataSet map document with ID: %s\n %s", id, ds.toString()));
 
                         ctx.mdOutputDSMap.put(id, ds);
                     }
@@ -367,7 +368,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
             ngctx.serviceStatus.put(ComponentServices.Sample, true);
             ngctx.serviceStatus.put(ComponentServices.Spark, false);
         }
-        logger.trace("Configuration dump: \n" + cfg.toString());
+        logger.warn("Configuration dump: \n" + cfg.toString());
         return initComponent(jsc);
     }
 
@@ -506,13 +507,32 @@ public abstract class AsynchAbstractComponent implements WithContext{
                         JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
 
                         if (schema != null) {
+                            Path outputLocation = null;
+                            if (outDS.get(DataSetProperties.PhysicalLocation.name()).toString() != null
+                                && !outDS.get(DataSetProperties.PhysicalLocation.name()).toString().trim()
+                                .equals("")) {
+                                outputLocation =
+                                    new Path(outDS.get(DataSetProperties.PhysicalLocation.name()).toString());
+                            }
+
+                            long size = 0;
+
+                            // Check if output location exists
+                            if (outputLocation != null && ctx.fs.exists(outputLocation)) {
+                                size = ctx.fs.getContentSummary(outputLocation).getSpaceConsumed();
+                            }
+                            logger.trace("Extracted size " + size);
+
                             logger.trace("Extracted schema: " + schema.toString());
 
                             // Set record count
                             long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
                             logger.trace("Extracted record count " + recordCount);
 
-                            services.md.updateDS(id, ngctx, ds, schema, recordCount);
+                            services.md.updateDS(id, ngctx, ds, schema, recordCount, size);
+
+
+
                         }
                         else{
                             logger.warn("The component was not able to get schema from NG context, assume something went wrong");

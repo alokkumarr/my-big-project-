@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AnalyzeViewComponent } from './view';
 import { ExecutedViewComponent } from './executed-view';
 import { AnalyzePageComponent } from './page';
+import { DesignerPageComponent } from './designer';
 import { IsUserLoggedInGuard } from '../../common/guards';
 import { DefaultAnalyzeCategoryGuard } from './guards';
 
@@ -14,11 +15,6 @@ export const routes: Routes = [
     component: AnalyzePageComponent,
     children: [
       {
-        // name: 'analyze.view',
-        path: ':id',
-        component: AnalyzeViewComponent
-      },
-      {
         // name: 'analyze.executedDetail',
         path: 'analysis/:analysisId/executed',
         component: ExecutedViewComponent
@@ -28,6 +24,15 @@ export const routes: Routes = [
         //   loadLastExecution: false,
         //   executionId: null
         // }
+      },
+      {
+        path: 'designer',
+        component: DesignerPageComponent
+      },
+      {
+        // name: 'analyze.view',
+        path: ':id',
+        component: AnalyzeViewComponent
       }
     ]
   }

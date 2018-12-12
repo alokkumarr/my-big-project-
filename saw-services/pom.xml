@@ -64,7 +64,11 @@
 		<scala.compat.version>2.11</scala.compat.version>
 		<Json4s.latestVersion>3.2.11</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
-		<metadata.api>1.0.9</metadata.api>
+		<metadata.api>1.0.11</metadata.api>
+		<commons-logging.version>1.2</commons-logging.version>
+		<ro.pf4j.version>1.3.0</ro.pf4j.version>
+		<ro.pf4j-update.version>0.4.0</ro.pf4j-update.version>
+		<ro.pf4j-spring.version>0.3.2</ro.pf4j-spring.version>
 	</properties>
   <repositories>
    <repository>
@@ -125,6 +129,36 @@
 		    <artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
  -->
+ <dependency>
+	 <groupId>commons-logging</groupId>
+	 <artifactId>commons-logging</artifactId>
+	 <version>${commons-logging.version}</version>
+ </dependency>
+ <dependency>
+	 <groupId>ro.fortsoft.pf4j</groupId>
+	 <artifactId>pf4j</artifactId>
+	 <version>${ro.pf4j.version}</version>
+ </dependency>
+ <dependency>
+	 <groupId>ro.fortsoft.pf4j</groupId>
+	 <artifactId>pf4j-update</artifactId>
+	 <version>${ro.pf4j-update.version}</version>
+ </dependency>
+ <dependency>
+	 <groupId>ro.fortsoft.pf4j</groupId>
+	 <artifactId>pf4j-spring</artifactId>
+	 <version>${ro.pf4j-spring.version}</version>
+	 <exclusions>
+		 <exclusion>
+			 <groupId>log4j</groupId>
+			 <artifactId>log4j</artifactId>
+		 </exclusion>
+		 <exclusion>
+			 <groupId>org.slf4j</groupId>
+			 <artifactId>slf4j-log4j12</artifactId>
+		 </exclusion>
+	 </exclusions>
+ </dependency>
  </dependencies>
 
 	<pluginRepositories>
@@ -138,6 +172,7 @@
 	</pluginRepositories>
 	<modules>
 		<module>saw-common</module>
+        <module>sip-query-dsl</module>
 		<module>saw-analysis-service</module>
 		<module>saw-metadata-service</module>
 		<module>saw-data-access</module>
@@ -152,6 +187,10 @@
 		<module>saw-scheduler-service</module>
 		<module>saw-proxy-service</module>
 		<module>saw-semantic-service</module>
+		<module>saw-batch-log-service</module>
+		<module>saw-batch-ingestion-service</module>
+		<module>saw-batch-plugin-interfaces</module>
+		<module>saw-batch-plugin-sftp</module>
 		<module>dist</module>
 	</modules>
 </project>

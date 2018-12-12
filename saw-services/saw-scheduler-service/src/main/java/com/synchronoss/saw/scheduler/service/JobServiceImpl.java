@@ -10,14 +10,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Primary
 @Service
-public class JobServiceImpl implements JobService{
+public class JobServiceImpl implements JobService<SchedulerJobDetail>{
 
     private static final Logger logger = LoggerFactory.getLogger(JobServiceImpl.class);
 

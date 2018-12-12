@@ -109,5 +109,6 @@ test_that("normalizer returns correct dimensions", {
 
 
 test_that("normalizer returns correct result", {
-  expect_equal(r_nrm$mpg, (mtcars$mpg - min(mtcars$mpg))/max(mtcars$mpg))
+  expect_equal(r_nrm$mpg,
+               (mtcars$mpg - min(mtcars$mpg))/(max(mtcars$mpg) - min(mtcars$mpg)))
 })

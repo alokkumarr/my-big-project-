@@ -1,9 +1,5 @@
 = SIP Design Guide
-Version {project-version}
-:toc:
-:nofooter:
-:docinfo: shared
-:plantuml-config: plantuml-config
+include::header.adoc[]
 
 == Introduction
 
@@ -37,7 +33,7 @@ a REST API for creating and executing analyses.  SIP Security manages
 authentication and privileges of users.
 
 .External SIP interfaces and their use
-plantuml::sip-design/figure-interfaces.pum[format=svg]
+plantuml::sip-design/figure-interfaces.pum[]
 
 == Security
 
@@ -56,7 +52,7 @@ with subsequent requests.  The server can then validate the token by
 inspecting its signature and the secret key.
 
 .Authentication using JSON Web Tokens
-plantuml::sip-design/figure-authentication.pum[format=svg]
+plantuml::sip-design/figure-authentication.pum[]
 
 For more details see the <<SAW Gateway Service>> and <<SAW Security>>
 sections.
@@ -101,7 +97,7 @@ highly available, configure redundant HAProxy nodes that listen to a
 virtual IP maintained by Keepalived.
 
 .High availability proxy for services
-plantuml::sip-design/figure-ha-proxy.pum[format=svg]
+plantuml::sip-design/figure-ha-proxy.pum[]
 
 === High availability for stateless services
 
@@ -123,7 +119,7 @@ job store, which itself is highly available through the use of a
 MariaDB Galera cluster setup.
 
 .High availability for Scheduler Service
-plantuml::sip-design/figure-ha-scheduler.pum[format=svg]
+plantuml::sip-design/figure-ha-scheduler.pum[]
 
 === High availability for stateful services
 
@@ -143,7 +139,7 @@ writes are replicated synchronously across the entire cluster to
 ensure consistency and availability.
 
 .High availability for MariaDB
-plantuml::sip-design/figure-ha-mariadb.pum[format=svg]
+plantuml::sip-design/figure-ha-mariadb.pum[]
 
 == SAW Web
 
@@ -164,7 +160,7 @@ implemented in Java and the Spring Framework.  As an exception, the
 SAW Transport Service is implemented in Scala and the Play framework.
 
 .Figure: SAW Services and their dependencies
-plantuml::sip-design/figure-services.pum[format=svg]
+plantuml::sip-design/figure-services.pum[]
 
 SAW Services use MapR-DB for persistence, using the OJAI interface.
 As an exception, the SAW Transport Service uses the MapR-DB binary
@@ -179,7 +175,7 @@ authenticates every request that passes by it and makes sure that it
 is valid.
 
 .Gateway Service routes requests to upstream services
-plantuml::sip-design/figure-gateway.pum[format=svg]
+plantuml::sip-design/figure-gateway.pum[]
 
 It comes with the following benefits:
 
@@ -240,7 +236,7 @@ analysis to execute as input, translates it into a query and executes
 the query and finally provides the results back to the client.
 
 .Figure: Executing an analysis using the SAW Execution Service
-plantuml::sip-design/figure-execution-sequence.pum[format=svg]
+plantuml::sip-design/figure-execution-sequence.pum[]
 
 The SAW Execution Service supports two types of storage: Apache Spark
 and Elasticsearch.  Analyses of type report are executed on Apache
@@ -254,7 +250,7 @@ project definition to execute as input, translates it into a Datalake operation 
 the operation's activity in MaprDB and finally provides the results back to the client.
 
 .Figure: Executing an analysis using the SAW Workbench Service
-plantuml::sip-design/figure-workbench-sequence.pum[format=svg]
+plantuml::sip-design/figure-workbench-sequence.pum[]
 
 The SAW Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
@@ -268,10 +264,10 @@ queuing mechanism for executing dataset transformations through the
 Workbench Executor component.
 
 .SIP Workbench Components
-plantuml::sip-design/figure-components.pum[format=svg]
+plantuml::sip-design/figure-components.pum[]
 
 .SIP Workbench Executor
-plantuml::sip-design/figure-executor.pum[format=svg]
+plantuml::sip-design/figure-executor.pum[]
 
 Workbench transformations are implemented using XDF components.
 Invoking an XDF component involves input and output to the data lake,
@@ -283,7 +279,7 @@ accessed using the BDA Metadata library.
 
 === SAW Storage Proxy Service
 
-he SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
+SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
 The intention of this services to provide access behind our gateway for our polyglot persistence
 layer *(ElasticSearch, Datalake, RDMS & MapRDB).*
 
@@ -292,7 +288,7 @@ One of the reason to access this service to perform transformation at backend se
 just needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
 
 .Figure: Executing an data query using the SAW Proxy Service via SIP Gateway Service
-plantuml::sip-design/figure-proxy-sequence.pum[format=svg]
+plantuml::sip-design/figure-proxy-sequence.pum[]
 
 The request (link:sip-developer/index.html[SIP Developer Guide]) body shall provide the query,
 storage type & other details. The below are salient feature for the service which are as follows:
@@ -310,13 +306,52 @@ storage type & other details. The below are salient feature for the service whic
 * Every incoming request to this story proxy service will be validated in gateway service layer.
 * It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to certain structure i.e request & response specification.
 
+=== SAW Batch Ingestion Service
+
+SAW Batch Ingestion Service allows to pull batch of data at uniform interval (can be defined by user) of time.
+It will facilitates to pull data from remote source like *(SFTP, SCP, S3, JDBC etc).*
+Currently with it supports only SCP/SFTP.
+
+[%hardbreaks]
+The REST API of this service is HATEOS Complaint API. To get an overview of the self descriptive API, it can
+accessed using URL (http://hostname/saw/services/batch, http://hostname/saw/services/batch/profiles)
+
+.Figure: Saw Batch ingestion request & response flow
+plantuml::sip-design/figure-batch-sequence.pum[]
+
+Below are the salient feature which are as follows:
+
+[[goals]]
+[role="incremental"]
+* Ability to setup a channel and provide channel information
+* Ability to setup a route and provide route information
+* Test connectivity of both channel & source.
+* Tracking from source to drop.
+* Monitoring.
+* Scheduling the data retrieval from the source.
+* Supports various protocol to pull data.
+
+.Figure: SAW Batch Ingestion ER Diagram
+plantuml::sip-design/figure-batch-er-diagram.pum[format=svg]
+
+The above entities are used to hold the base of Batch Ingestion module.
+Entity BIS_ROUTE is used to hold the details of route i.e it holds the details of destination, frequency etc etc.
+Entity BIS_CHANNEL is used to hold the details of channel i.e it holds the details of data channel.
+Entity BIS_FILE_LOGS is used to log details related to the files or data retrieved from the custom.
+
+.Figure: SAW Batch Ingestion Component Diagram
+plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
+
+.Figure: SAW Batch Ingestion Flow Diagram
+image::sip-design/bis-flow-diagram.png[flowChart,400,400]
+
 === SAW Semantic Service
 
 The SAW Semantic Service enables the consumer to store the semantic metadata of SIP. The intention of this services
 to provide CRUD operations to deal with semantic metadata
 
 .Figure: Executing an data query using the SAW Proxy Service
-plantuml::sip-design/figure-semantic-sequence.pum[format=svg]
+plantuml::sip-design/figure-semantic-sequence.pum[]
 
 1. Create Integrated Semantic Node JSON structure for both elastic search as well as data lake data pods.
 2. The structure is consistent with that used by SAW Analyze module and Observe modules in the store.
@@ -406,7 +441,7 @@ Spring Framework and uses a MariaDB database to persist authentication
 and privilege information.
 
 .Figure: The SAW Security Service and dependencies
-plantuml::sip-design/figure-security.pum[format=svg]
+plantuml::sip-design/figure-security.pum[]
 
 A client authenticated to the SAW Security Service by sending a to the
 REST API.  The credentials and privileges are checked against the SAW
@@ -414,4 +449,17 @@ Security database, after which a token is issued and returned in the
 response to the client.
 
 .Figure: Authenticating a client using the SAW Security Service
-plantuml::sip-design/figure-security-sequence.pum[format=svg]
+plantuml::sip-design/figure-security-sequence.pum[]
+
+== SIP DSL
+
+SIP DSL JSON based high level library build for writing and running SIP queries
+against SIP platform with Elasticsearch, DataLake etc. SIP DSL supports aggregation
+which can be used for Pivot, Chart and report structure to visualize the data
+into platform.
+
+.Figure: SIP-DSL sequence Diagram with platform integration
+plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
+
+==== SIP DSL Example :
+

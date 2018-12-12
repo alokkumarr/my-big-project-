@@ -12,24 +12,15 @@ library(foreach)
 
 context("forecaster unit tests")
 
-# Create simulated dataset
-n <- 200
-dat1 <- data.frame(index = 1:n,
-                   y = as.numeric(arima.sim(n = n,
-                                            list(order = c(1,0,0), ar = 0.7),
-                                            rand.gen = function(n, ...) rt(n, df = 2))))
 
 # Create Spark Connection
-# spark_home_dir <- sparklyr::spark_installed_versions() %>%
-#   as.data.frame() %>%
-#   dplyr::filter(spark == "2.3.0") %>%
-#   dplyr::pull(dir)
 sc <- spark_connect(master = "local")
 
+df_ts <- select(sim_df_ts, index, y)
 
 test_that("No holdout sampling test case", {
   
-  f1 <- forecaster(df = dat1,
+  f1 <- forecaster(df = df_ts,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -51,7 +42,7 @@ test_that("No holdout sampling test case", {
 
 test_that("Validation only holdout sampling test case", {
   
-  f2 <- forecaster(df = dat1,
+  f2 <- forecaster(df = df_ts,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -73,7 +64,7 @@ test_that("Validation only holdout sampling test case", {
 
 test_that("Multiple Model test case", {
   
-  f3 <- forecaster(df = dat1,
+  f3 <- forecaster(df = df_ts,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -100,7 +91,7 @@ test_that("Multiple Model test case", {
 
 test_that("Multiple Model with Test Holdout test case", {
   
-  f4 <- forecaster(df = dat1,
+  f4 <- forecaster(df = df_ts,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -128,7 +119,7 @@ test_that("Multiple Model with Test Holdout test case", {
 
 test_that("Multiple Model with Manual set final model method test case", {
   
-  f5 <- forecaster(df = dat1,
+  f5 <- forecaster(df = df_ts,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -152,9 +143,9 @@ test_that("Multiple Model with Manual set final model method test case", {
 
 test_that("Covariate test case", {
   
-  dat2 <- data.frame(dat1, x = rnorm(n))
+  df_ts2 <- mutate(df_ts, x = rnorm(n()))
   
-  f6 <- forecaster(df = dat2,
+  f6 <- forecaster(df = df_ts2,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -176,12 +167,11 @@ test_that("Covariate test case", {
 
 test_that("Prediction index test case", {
   
-  dat3 <- dat1 %>% 
-    mutate(index = seq(Sys.Date()-days(n-1), Sys.Date(), by="day"))
+  df_ts3 <- select(sim_df_ts, date, y)
   
-  f8 <- forecaster(df = dat3,
+  f8 <- forecaster(df = df_ts3,
                    target = "y",
-                   index_var = "index",
+                   index_var = "date",
                    unit = "days",
                    name = "test") %>%
     add_model(pipe = NULL, method = "auto.arima") %>%
@@ -190,8 +180,8 @@ test_that("Prediction index test case", {
     predict(periods = 10)
   
   expect_data_frame(f8$predictions, nrow=10)
-  expect_class(f8$predictions$index, "Date")
-  expect_equal(f8$predictions$index, Sys.Date()+days(1:10))
+  expect_class(f8$predictions$date, "Date")
+  expect_equal(f8$predictions$date, max(df_ts3$date)+days(1:10))
   
 })
 
@@ -204,7 +194,7 @@ test_that("Pipeline transformation test case", {
     x %>% mutate(y = BoxCox(y, bcl))
   })
   
-  f9 <- forecaster(df = dat1,
+  f9 <- forecaster(df = df_ts,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -216,14 +206,14 @@ test_that("Pipeline transformation test case", {
   f9_preds <- predict(f9, periods = 10)
   expect_data_frame(f9_preds$predictions, nrow=10)
   expect_equal(f9$pipelines[[1]]$output$y,
-               BoxCox(dat1$y, BoxCox.lambda(dat1$y)))
+               BoxCox(df_ts$y, BoxCox.lambda(df_ts$y)))
 })
 
 
 
 test_that("Time Slice Sampling test case", {
   
-  f10 <- forecaster(df = dat1,
+  f10 <- forecaster(df = df_ts,
                     target = "y",
                     index_var = "index",
                     name = "test") %>%
@@ -243,7 +233,7 @@ test_that("Time Slice Sampling test case", {
 
 test_that("Auto Forecast with parallel execution test case", {
   
-  af1 <- auto_forecast(dat1,
+  af1 <- auto_forecast(df_ts,
                        target = "y",
                        index_var = "index",
                        periods = 10,
@@ -255,7 +245,7 @@ test_that("Auto Forecast with parallel execution test case", {
   expect_data_frame(af1$predictions, nrow=10)
   
   
-  af2 <- auto_forecast(dat1,
+  af2 <- auto_forecast(df_ts,
                        target = "y",
                        index_var = "index",
                        periods = 10,
@@ -272,13 +262,13 @@ test_that("Auto Forecast with parallel execution test case", {
 test_that("Auto-Forecaster with Spark test case", {
   
   
-  dat3 <- rbind(dat1 %>% mutate(group = "A"),
-                dat1 %>% mutate(group = "B"))
+  df_ts4 <- rbind( mutate(df_ts, group = "A"),
+                   mutate(df_ts, group = "B"))
   
   # Load data into Spark
-  dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
+  tbl_ts4 <- copy_to(sc, df_ts4, overwrite = TRUE)
   
-  r_f1 <- auto_forecaster(dat3,
+  r_f1 <- auto_forecaster(df_ts4,
                           index_var = "index",
                           group_vars = "group",
                           measure_vars = c("y"),
@@ -289,7 +279,7 @@ test_that("Auto-Forecaster with Spark test case", {
                             list(method = "auto.arima"),
                             list(method = "ets")))
   
-  spk_f1 <- auto_forecaster(dat3_tbl,
+  spk_f1 <- auto_forecaster(tbl_ts4,
                             index_var = "index",
                             group_vars = "group",
                             measure_vars = c("y"),
@@ -318,9 +308,9 @@ test_that("Auto-Forecaster with Spark test case", {
 
 test_that("Schema Check works as expected", {
   
-  dat2 <- data.frame(dat1, x1 = rnorm(n), x2 = rnorm(n))
+  df_ts5 <- mutate(df_ts, x1 = rnorm(n()), x2 = rnorm(n()))
   
-  f12 <- forecaster(df = dat2,
+  f12 <- forecaster(df = df_ts5,
                     target = "y",
                     index_var = "index",
                     name = "test") %>%
@@ -339,7 +329,7 @@ test_that("Schema Check works as expected", {
 
 test_that("Deploy Function works as expected", {
   
-  f12 <- forecaster(df = dat1,
+  f12 <- forecaster(df = df_ts,
                     target = "y",
                     index_var = "index",
                     name = "test") %>%
@@ -370,7 +360,7 @@ test_that("Deploy Function works as expected", {
 
 test_that("Parallel Execution Strategy Test Case", {
   
-  f15 <- forecaster(df = dat1,
+  f15 <- forecaster(df = df_ts,
                     target = "y",
                     index_var = "index",
                     name = "test",

@@ -35,7 +35,7 @@ SPARK_SUBMIT_XPATH=/opt/mapr/spark/spark-current/bin/spark-submit
 }
 
 # Get first name of jar file
-jars=( $RTPS_HOME/lib/rtps-*.jar )
+jars=( $RTPS_HOME/lib/sip-rtps.jar )
 JAR="${jars[0]}"
 ( <"$JAR" ) || exit
 
@@ -67,6 +67,12 @@ VERBOSE_OPT=
         ${CONF_OPTS[@]}             \
         $JAR $APPL_CONF             & # run in BG!
     #################################
+
+    # If RTPS should run in the foreground, for example when run as a
+    # service, wait here
+    if [ "$rtps_wait" == "1" ]; then
+        wait
+    fi
 )
 
 exit

@@ -61,6 +61,9 @@ RUN systemctl enable saw-workbench-samples
 # Workaround: Set execute bit for Windows users
 RUN chmod a+x /root/saw-*/sample-*/load*
 
+# Add SAW Batch sample test data
+COPY saw-batch-samples /root/saw-batch-samples/
+
 # Add systemd journal gateway for browsing logs
 RUN yum -y -q install systemd-journal-gateway
 RUN systemctl enable systemd-journal-gatewayd.socket

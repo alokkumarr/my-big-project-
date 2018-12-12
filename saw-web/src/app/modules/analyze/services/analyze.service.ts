@@ -9,6 +9,7 @@ import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as isUndefined from 'lodash/isUndefined';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Analysis } from '../../../models';
@@ -105,9 +106,10 @@ export class AnalyzeService {
       executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
         : '';
-    return this.getRequest(
-      `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
-    );
+    const requestURL = isUndefined(executionId) ?
+      `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
+      : `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`;
+    return this.getRequest(requestURL);
   }
 
   getAnalysesFor(subCategoryId /* , opts = {} */) {
@@ -192,14 +194,16 @@ export class AnalyzeService {
     });
   }
 
-  readAnalysis(analysisId) {
+  readAnalysis(analysisId, customHeaders = {}) {
     const payload = this.getRequestParams([
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(
-      fpGet(`contents.analyze.[0]`)
-    );
+    return <Promise<Analysis>>this.postRequest(
+      `analysis`,
+      payload,
+      customHeaders
+    ).then(fpGet(`contents.analyze.[0]`));
   }
 
   previewExecution(model, options = {}) {
@@ -435,10 +439,11 @@ export class AnalyzeService {
     return this._http.get(`${apiUrl}/${path}`).toPromise();
   }
 
-  postRequest(path: string, params: Object) {
+  postRequest(path: string, params: Object, customHeaders = {}) {
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...customHeaders
       })
     };
     return this._http

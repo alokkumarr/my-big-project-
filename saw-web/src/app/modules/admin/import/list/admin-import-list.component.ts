@@ -17,8 +17,10 @@ import { DxDataGridService } from '../../../../common/services/dxDataGrid.servic
   templateUrl: 'admin-import-list.component.html'
 })
 export class AdminImportListComponent implements OnInit, OnChanges {
-  @Input() analyses: any[];
-  @Output() validityChange: EventEmitter<boolean> = new EventEmitter();
+  @Input()
+  analyses: any[];
+  @Output()
+  validityChange: EventEmitter<boolean> = new EventEmitter();
 
   config: any;
   areAllSelected = false;
@@ -43,11 +45,13 @@ export class AdminImportListComponent implements OnInit, OnChanges {
     row.selection = !row.selection;
     const isValid = some(
       this.analyses,
+      // tslint:disable-next-line:no-shadowed-variable
       row => !row.noMetricInd && row.selection
     );
     if (row.selection) {
       this.areAllSelected = every(
         this.analyses,
+        // tslint:disable-next-line:no-shadowed-variable
         row => !row.noMetricInd && row.selection
       );
     } else {

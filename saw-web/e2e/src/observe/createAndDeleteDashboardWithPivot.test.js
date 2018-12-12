@@ -4,13 +4,17 @@ const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const protractorConf = require('../../protractor.conf');
 const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
-let AnalysisHelper = require('../javascript/api/AnalysisHelper');
-let ApiUtils = require('../javascript/api/APiUtils');
+let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
 const Constants = require('../javascript/api/Constants');
 const globalVariables = require('../javascript/helpers/globalVariables');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../javascript/helpers/observe/DashboardFunctions');
-const ObserveHelper = require('../javascript/api/ObserveHelper');
+const ObserveHelper = require('../../v2/helpers/api/ObserveHelper');
+const chai = require('chai');
+const assert = chai.assert;
+const logger = require('../../v2/conf/logger')(__filename);
+let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
+
 
 describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.test.js', () => {
   const subCategoryName = subCategories.observeSubCategory.name;
@@ -23,8 +27,8 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.tes
   let dashboardId;
 
   beforeAll(function() {
-    host = new ApiUtils().getHost(browser.baseUrl);
-    token = new AnalysisHelper().getToken(host);
+    host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
   });
@@ -39,14 +43,17 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.tes
     setTimeout(function() {
       //Delete analysis
       analysesDetails.forEach(function(currentAnalysis) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
+        if(currentAnalysis.analysisId){
+          new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
+        }
       });
       //reset the array
       analysesDetails = [];
 
       //delete dashboard if ui failed.
-      let oh = new ObserveHelper();
-      oh.deleteDashboard(host, token, dashboardId);
+      if(dashboardId) {
+        new ObserveHelper().deleteDashboard(host, token, dashboardId);
+      }
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -55,7 +62,11 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.tes
   using(testDataReader.testData['DASHBOARD_WITH_PIVOT']['dashboardWithPivotDataProvider'], function(data, description) {
     it('should able to create & delete dashboard with pivot: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARD_WITH_PIVOT', dp:'dashboardWithPivotDataProvider'}), () => {
       try {
-
+        if(!token) {
+          logger.error('token cannot be null');
+          expect(token).toBeTruthy();
+          assert.isNotNull(token, 'token cannot be null');
+        }
         let currentTime = new Date().getTime();
         let user = data.user;
         let type = Constants.PIVOT;
@@ -65,6 +76,8 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.tes
         let name = 'AT ' + Constants.PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
         let description = 'AT Description:' + Constants.PIVOT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
         let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, null);
+        expect(analysis).toBeTruthy();
+        assert.isNotNull(analysis, 'analysis cannot be null');
         analysesDetails.push(analysis);
 
         loginPage.loginAs(user);

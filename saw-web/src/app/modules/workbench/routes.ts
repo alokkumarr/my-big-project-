@@ -7,51 +7,56 @@ import { DatasetDetailViewComponent } from './components/dataset-detailedView/da
 import { CreateSemanticComponent } from './components/semantic-management/create/create-semantic.component';
 import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
 import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
-import { DefaultWorkbenchPageGuard } from './guards';
+import { DatasourceComponent } from './components/datasource-management/datasource-page.component';
+
 import { IsUserLoggedInGuard } from '../../common/guards';
+import { IsAdminGuard } from '../admin/guards';
 
 export const routes: Routes = [
   {
-    // name: 'workbench',
     path: '',
-    canActivate: [IsUserLoggedInGuard, DefaultWorkbenchPageGuard],
+    canActivate: [IsUserLoggedInGuard],
     canActivateChild: [IsUserLoggedInGuard],
     component: WorkbenchPageComponent,
+    runGuardsAndResolvers: 'paramsOrQueryParamsChange',
     children: [
       {
-        // name: 'workbench.dataobjects',
         path: 'dataobjects',
         component: DataobjectsComponent
       },
       {
-        // name: 'workbench.add',
         path: 'dataset/add',
         component: CreateDatasetsComponent
       },
       {
-        // name: 'workbench.sql',
         path: 'create/sql',
         component: SqlExecutorComponent
       },
       {
-        // name: 'workbench.datasetDetails',
         path: 'dataset/details',
         component: DatasetDetailViewComponent
       },
       {
-        // name: 'workbench.createSemantic',
         path: 'semantic/create',
         component: CreateSemanticComponent
       },
       {
-        // name: 'workbench.validateSemantic',
         path: 'semantic/validate',
         component: ValidateSemanticComponent
       },
       {
-        // name: 'workbench.updateSemantic',
         path: 'semantic/update',
         component: UpdateSemanticComponent
+      },
+      {
+        path: 'datasource/create',
+        component: DatasourceComponent,
+        canActivate: [IsAdminGuard]
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'dataobjects'
       }
     ]
   }

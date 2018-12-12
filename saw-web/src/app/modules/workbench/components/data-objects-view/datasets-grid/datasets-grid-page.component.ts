@@ -147,4 +147,11 @@ export class DatasetsGridPageComponent
   viewDetails(metadata) {
     this.workbench.navigateToDetails(metadata);
   }
+
+  sizeCalculator(size) {
+    let a = size;
+
+
+    return a + " B";
+  }
 }

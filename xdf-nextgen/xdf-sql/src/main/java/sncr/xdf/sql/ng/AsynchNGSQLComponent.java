@@ -1,6 +1,9 @@
 package sncr.xdf.sql.ng;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.CliHandler;
 import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
@@ -29,7 +32,7 @@ import java.util.Map;
 //TODO:: Refactor AsynchNGSQLComponent and NGSQLComponent: eliminate duplicate
 public class AsynchNGSQLComponent extends AsynchAbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
-    private static final Logger logger = Logger.getLogger(AsynchNGSQLComponent.class);
+    private static final Logger logger = LoggerFactory.getLogger(AsynchNGSQLComponent.class);
     // Set name
     {
         componentName = "sql";
@@ -44,17 +47,25 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
     public AsynchNGSQLComponent() {  super(); }
 
     protected int execute(){
+        /* Workaround: If executed through Apache Livy the logging
+         * level will be WARN by default and at the moment no way to
+         * change that level through configuration files has been
+         * found, so set it programmatically to at least INFO to help
+         * troubleshooting */
+        if (!LogManager.getRootLogger().isInfoEnabled()) {
+            LogManager.getRootLogger().setLevel(Level.INFO);
+        }
         try {
             executor = new NGJobExecutor(this);
             String tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
                     ngctx.batchID,
                     ngctx.componentName,
                     null, null);
-
+        logger.info("tempDir : " +tempDir);
         executor.start(tempDir);
     } catch (Exception e) {
         error = "SQL Executor runtime exception: " + e.getMessage();
-        logger.error(e);
+        logger.error(e.toString());
         return -1;
     }
         return 0;
@@ -65,6 +76,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
+      logger.trace("Validate Config : " + config);
         return analyzeAndValidate(config);
     }
 
@@ -72,6 +84,9 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
 
     @Override
     protected int move(){
+
+        //TODO: Remove the below line
+        logger.warn("######### Moving data");
 
         if (executor.getResultDataSets() == null ||
             executor.getResultDataSets().size() == 0 )
@@ -81,11 +96,18 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
         }
 
         Map<String, SQLDescriptor> resultDataDesc = executor.getResultDataSets();
+
+        logger.warn("Move descriptors " + resultDataDesc);
+        logger.warn("Output datasets" + ngctx.outputDataSets);
+
+
         ngctx.outputDataSets.forEach(
             (on, obDesc) ->
             {
                 List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
-                String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
+                String partKeys = on + ": ";
+                for (String s : kl)
+                    partKeys += s + " ";
 
                 MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(
                         resultDataDesc.get(on),        // SQLDescriptor
@@ -99,6 +121,8 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
 
             }
         );
+
+        logger.warn("Result desc = " + ctx.resultDataDesc);
         return super.move();
     }
 

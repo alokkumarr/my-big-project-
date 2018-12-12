@@ -1,19 +1,21 @@
 #
 # Sample SAW environment configuration.  Customize it by replacing
-# "localhost" with the target host to deploy SAW modules on and
+# "sip-host*" with the target hosts to deploy SAW modules on and
 # updating the "[*:vars]" sections with values appropriate for the
 # environment.
 #
 
 [saw-proxy]
-localhost
+sip-host1
+sip-host2
 
 [saw-web]
-localhost
+sip-host1
+sip-host2
 
 [saw-services]
-localhost
-
+sip-host1
+sip-host2
 
 [saw-services:vars]
 #
@@ -123,7 +125,8 @@ saw_export_chunk_size=10000
 
 
 [saw-security]
-localhost
+sip-host1
+sip-host2
 
 [saw-security:vars]
 #
@@ -138,3 +141,18 @@ saw_security_email_from=noreply@example.com
 # generate secret key using command : openssl rand 32 -base64
 #
 saw_security_sso_secret=Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U
+
+[saw-security-arbitrator]
+sip-host3
+
+[sip-rtis]
+sip-host1
+sip-host2
+
+[sip-rtis:vars]
+# Event handler to use for processing incoming RTIS events
+sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
+
+[sip-rtps]
+sip-host1
+sip-host2

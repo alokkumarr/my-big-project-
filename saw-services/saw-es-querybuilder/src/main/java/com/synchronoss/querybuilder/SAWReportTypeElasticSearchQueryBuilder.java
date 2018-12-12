@@ -91,14 +91,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         if (sqlBuilderNode.getBooleanCriteria() !=null ){
             List<com.synchronoss.querybuilder.model.report.Filter> filters = sqlBuilderNode.getFilters();
             List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-
-            if (dataSecurityKeyNode!=null) {
-                for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
-                    TermsQueryBuilder dataSecurityBuilder = new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
-                    builder.add(dataSecurityBuilder);
-                }
-            }
-
+            builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder);
             for (com.synchronoss.querybuilder.model.report.Filter item : filters)
             {
                 if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
