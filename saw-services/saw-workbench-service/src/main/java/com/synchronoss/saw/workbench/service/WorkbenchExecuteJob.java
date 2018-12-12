@@ -2,13 +2,15 @@ package com.synchronoss.saw.workbench.service;
 
 import com.cloudera.livy.Job;
 import com.cloudera.livy.JobContext;
-import java.time.Instant;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sncr.xdf.component.Component;
-import sncr.xdf.context.Context;
-import sncr.xdf.parser.Parser;
-import sncr.xdf.sql.TempSqlComponent;
+import sncr.xdf.context.NGContext;
+import sncr.xdf.ngcomponent.AsynchAbstractComponent;
+import sncr.xdf.parser.AsynchNGParser;
+import sncr.xdf.sql.ng.AsynchNGSQLComponent;
+import sncr.xdf.transformer.ng.AsynchNGTransformerComponent;
 
 public class WorkbenchExecuteJob implements Job<Integer> {
   private static final long serialVersionUID = 1L;
@@ -16,63 +18,67 @@ public class WorkbenchExecuteJob implements Job<Integer> {
   private final String project;
   private final String component;
   private final String config;
+  private final NGContext ngctx;
 
   /**
-   * This is constructor.
-   * @param root is of type String.
-   * @param project is of type String.
-   * @param component is of type String.
-   * @param config is of type String.
+    * This is parameterized constructor.
    */
   public WorkbenchExecuteJob(String root, String project, String component, String config) {
     this.root = root;
     this.project = project;
     this.component = component;
     this.config = config;
+    ngctx = null;
   }
- 
+
   /**
-   * This is override method.
+   * This is parameterized.
    */
+  public WorkbenchExecuteJob(NGContext ngctx) {
+    this.root = null;
+    this.project = null;
+    this.component = null;
+    this.config = null;
+    this.ngctx = ngctx;
+  }
+
   @Override
   public Integer call(JobContext jobContext) throws Exception {
+    /* Workaround: If executed through Apache Livy the logging
+     * level will be WARN by default and at the moment no way to
+     * change that level through configuration files has been
+     * found, so set it programmatically to at least INFO to help
+     * troubleshooting */
+    if (!LogManager.getRootLogger().isInfoEnabled()) {
+        LogManager.getRootLogger().setLevel(Level.INFO);
+    }
     Logger log = LoggerFactory.getLogger(getClass().getName());
-    log.info("Starting execute job");
-    String batch = "batch-" + Instant.now().toEpochMilli();
-    Component xdfComponent;
-    log.info("component.equals(\"parser\") : " + component.trim().equals("parser"));
-    if (component.trim().equals("parser")) {
-      xdfComponent = new Parser() {
-        @Override
-        public void initSpark(Context ctx) {
-          try {
-            ctx.sparkSession = jobContext.sparkSession();
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        }
-      };
-    } else if (component.trim().equals("sql")) {
-      xdfComponent = new TempSqlComponent() {
-        @Override
-        public void initSpark(Context ctx) {
-          try {
-            ctx.sparkSession = jobContext.sparkSession();
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        }
-      };
-    } else {
-      throw new IllegalArgumentException("Unknown component: " + component);
+    log.info("Start execute job");
+    AsynchAbstractComponent aac = null;
+    switch (ngctx.componentName) {
+      case "sql":
+        aac = new AsynchNGSQLComponent(ngctx);
+        break;
+      case "parser":
+        aac = new AsynchNGParser(ngctx);
+        break;
+      case "transformer":
+        aac = new AsynchNGTransformerComponent(ngctx);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown component: " + ngctx.componentName);
     }
-    log.info(" Component.startComponent root = " + root);
-    log.info(" Component.startComponent config = " + config);
-    int status = Component.startComponent(xdfComponent, root, config, project, batch);
-    if (status != 0) {
-      throw new RuntimeException("XDF returned non-zero status: " + status);
+    if (!aac.initComponent(jobContext.sc())) {
+      log.error("Could not initialize component");
+      throw new RuntimeException("Could not initialize component:");
     }
-    log.info("Finished execute job");
-    return null;
+    log.info("Starting Workbench job");
+    int rc = aac.run();
+    log.info("Workbench job completed, result: " + rc + " error: " + aac.getError());
+
+    if (rc != 0) {
+      throw new RuntimeException("XDF returned non-zero status: " + rc);
+    }
+    return rc;
   }
 }

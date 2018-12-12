@@ -1,11 +1,13 @@
 package com.synchronoss.saw.batch;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import com.synchronoss.saw.batch.exception.SipAsyncExceptionHandler;
 
@@ -46,17 +48,23 @@ public class AsyncConfiguration implements AsyncConfigurer {
   }
 
   @Bean(name = TASK_EXECUTOR_CONTROLLER)
-  public Executor getControllerAsyncExecutor() {
-    return newTaskExecutor(TASK_EXECUTOR_NAME_PREFIX_CONTROLLER);
+  public ConcurrentTaskExecutor concurrentTaskExecutor() {
+    ConcurrentTaskExecutor concurrentTaskExecutor = new ConcurrentTaskExecutor();
+    concurrentTaskExecutor
+        .setConcurrentExecutor(newTaskExecutor(TASK_EXECUTOR_NAME_PREFIX_CONTROLLER));
+    return concurrentTaskExecutor;
   }
 
   private Executor newTaskExecutor(final String taskExecutorNamePrefix) {
     final ApplicationProperties.Async asyncProperties = applicationProperties.getAsync();
     final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setWaitForTasksToCompleteOnShutdown(true);
     executor.setCorePoolSize(asyncProperties.getCorePoolSize());
     executor.setMaxPoolSize(asyncProperties.getMaxPoolSize());
     executor.setQueueCapacity(asyncProperties.getQueueCapacity());
+    executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     executor.setThreadNamePrefix(taskExecutorNamePrefix);
+    executor.initialize();
     return executor;
   }
 

@@ -1,0 +1,12 @@
+
+== Execution ==
+
+Client -> "SAW Gateway Service": Execution request
+"SAW Gateway Service" -> "saw-storage-proxy-service": Execution request
+
+"saw-storage-proxy-service" -> "SIP DSL query Builder ": Verify Schema & build query
+"saw-storage-proxy-service" -> "Data Store": Execute Query
+"Data Store" --> "saw-storage-proxy-service" : Data Response
+"saw-storage-proxy-service" --> "SAW Gateway Service" : Execution response
+"SAW Gateway Service" --> Client: Execution response
+
