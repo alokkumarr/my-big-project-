@@ -1,4 +1,5 @@
 import http from 'k6/http';
+import { Counter, Trend} from "k6/metrics";
 import { conf } from './conf/loadtest.conf.js';
 import { AnalyzeTestCase } from './analyze/analyze.loadTest.js';
 import { LoginTestCase } from './login/login.loadTest.js';
@@ -8,6 +9,10 @@ let requestConfig = conf.requestConfig
 let GlobalData = conf.GlobalData;
 
 options.vus = conf.config.vus;
+
+let startTime = new Counter("start_time");
+let endTime = new Counter("end_time");
+let testDuration = new Trend("test_duration");
 
  let loginResponse;
  let randomNumber;
@@ -45,6 +50,9 @@ export function setup() {
 }
 
 export default function(data) {
+    let startDate = new Date();
+    startTime.add(new Date(startDate));
+
     conf.GlobalData.token.setAccessToken(data.accessToken);
     conf.GlobalData.token.setRefreshToken(data.refreshToken);
 
@@ -65,7 +73,13 @@ export default function(data) {
     let reqBody = JSON.parse(refreshAnalysisRequest.body);
     reqBody.contents.analyze[0].sqlBuilder.dataFields[0].columns = columns;
     refreshAnalysisRequest.body = JSON.stringify(reqBody);
-    http.post(refreshAnalysisRequest.url, refreshAnalysisRequest.body, refreshAnalysisRequest.params);
+    let resp = http.post(refreshAnalysisRequest.url, refreshAnalysisRequest.body, refreshAnalysisRequest.params);
+    
+    let endDate = new Date();
+    endTime.add(new Date(endDate));
+    testDuration.add(resp.timings.duration);
+
+
 }
 
 export function teardown() {
