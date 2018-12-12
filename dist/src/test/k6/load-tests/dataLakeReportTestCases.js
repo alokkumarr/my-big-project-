@@ -36,7 +36,7 @@ export function setup() {
     response.analyze.analysisListType = JSON.parse(getListOfAnalysisTypeResponse.body);
 
     response.analyze.analysisListType = response.analyze.analysisListType.contents[0].ANALYZE.filter(item => {
-        return (item.metricName === 'SVARUF VIEW');
+        return (item.metricName === 'SVARUF VIEW ');
     });
 
     let getAnalysisFilterRequest = AnalyzeTestCase.createNewAnalysis(response.analyze.analysisListType[0].id);   
