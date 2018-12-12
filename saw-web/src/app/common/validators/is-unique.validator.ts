@@ -15,12 +15,20 @@ type Request = (param: RequestParams) => Observable<boolean>;
  */
 type TransformerFn = (value: string) => RequestParams;
 
-export const isUnique = (isDupicateFn: Request, value2Params: TransformerFn = val => val) => {
+/**
+ * isUnique valiator checks if the value in the input is unique
+ * @param isDuplicateFn function to check if the input value already exists or not
+ * @param value2Params function to get the parameters needed for the isDuplicateFn
+ *                     if it needs other parameters besides the input value
+ * @param oldValue the old value of the input, for example when editing an object, the value that is already
+ *                 there should not be checked if it already exists
+ */
+export const isUnique = (isDupicateFn: Request, value2Params: TransformerFn = val => val, oldValue: string) => {
   return (thisControl: FormControl) => {
     return timer(DEBOUNCE_TIME).pipe(
       switchMap(() => {
         const value = trim(thisControl.value);
-        if (!value) {
+        if (!value || (oldValue && oldValue === value)) {
           return of(null);
         }
         const errorObject = { isUnique: true };

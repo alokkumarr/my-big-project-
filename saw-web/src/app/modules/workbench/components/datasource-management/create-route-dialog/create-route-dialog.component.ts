@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -20,10 +20,10 @@ import { TestConnectivityComponent } from '../test-connectivity/test-connectivit
   templateUrl: './create-route-dialog.component.html',
   styleUrls: ['./create-route-dialog.component.scss']
 })
-export class CreateRouteDialogComponent implements OnInit {
+export class CreateRouteDialogComponent {
   public detailsFormGroup: FormGroup;
   crondetails: any = {};
-  opType = 'create';
+  opType: 'create' | 'update' = 'create';
   channelName = '';
 
   constructor(
@@ -34,29 +34,27 @@ export class CreateRouteDialogComponent implements OnInit {
     private _dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public routeData: any
   ) {
-    this.createForm();
-  }
-
-  createForm() {
-    const channelId = this.routeData.channelID;
-    const tranformerFn = value => ({channelId, routeName: value});
-    this.detailsFormGroup = this._formBuilder.group({
-      routeName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateRoute, tranformerFn)],
-      sourceLocation: ['', Validators.required],
-      destinationLocation: ['', Validators.required],
-      filePattern: ['', [Validators.required, this.validateFilePattern]],
-      description: [''],
-      batchSize: ['', [Validators.required]]
-    });
-  }
-
-  ngOnInit() {
     this.channelName = this.routeData.channelName;
     if (isUndefined(this.routeData.routeMetadata.length)) {
       this.opType = 'update';
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
       this.crondetails = this.routeData.routeMetadata.schedulerExpression;
     }
+    this.createForm();
+  }
+
+  createForm() {
+    const channelId = this.routeData.channelID;
+    const tranformerFn = value => ({channelId, routeName: value});
+    const oldRouteName = this.opType === 'update' ? this.routeData.routeMetadata.routeName : '';
+    this.detailsFormGroup = this._formBuilder.group({
+      routeName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateRoute, tranformerFn, oldRouteName)],
+      sourceLocation: ['', Validators.required],
+      destinationLocation: ['', Validators.required],
+      filePattern: ['', [Validators.required, this.validateFilePattern]],
+      description: [''],
+      batchSize: ['', [Validators.required]]
+    });
   }
 
   onCancelClick(): void {
