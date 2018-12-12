@@ -1,0 +1,14 @@
+<tree-root
+  [nodes]="menu | async"
+  [options]="treeOptions"
+  (activate)="onClickMenuItem($event)"
+></tree-root>
+
+<!--
+  <h2>Dashboards</h2>
+  <tree-root
+    [nodes]="observeMenu$ | async"
+    [options]="treeOptions"
+    (activate)="onClickDashboardMenu($event)"
+  ></tree-root>
+-->

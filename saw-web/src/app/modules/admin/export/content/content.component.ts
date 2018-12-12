@@ -1,20 +1,27 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { Observable } from 'rxjs/Observable';
-import { ExportItemChangeOutput } from '../content/content.component';
+import { Dashboard } from '../../../observe/models/dashboard.interface';
+import { Analysis } from '../../../analyze/models';
+import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
+import { map } from 'rxjs/operators';
+
+export interface ExportItemChangeOutput {
+  checked: boolean;
+  item: Analysis | Dashboard;
+}
 
 @Component({
-  selector: 'admin-export-list',
-  templateUrl: 'admin-export-list.component.html',
-  styleUrls: ['admin-export-list.component.scss']
+  selector: 'admin-export-content',
+  templateUrl: './content.component.html',
+  styleUrls: ['./content.component.scss']
 })
-export class AdminExportListComponent implements OnInit {
+export class AdminExportContentComponent implements OnInit {
   @Input() exportList: Observable<any[]>;
+  @Input() analyses: Observable<any[]>;
+  // @Input() dashboards: Observable<any[]>;
   @Output() change: EventEmitter<ExportItemChangeOutput> = new EventEmitter();
 
   config: any;
-
-  areAllSelected = false;
 
   constructor(private dxDataGridService: DxDataGridService) {}
 
@@ -22,8 +29,20 @@ export class AdminExportListComponent implements OnInit {
     this.config = this.getConfig();
   }
 
-  onItemToggle({ checked }, item) {
+  onItemToggled({ checked }, item) {
     this.change.emit({ checked, item });
+  }
+
+  isSelectedForExport$(item): Observable<boolean> {
+    return this.exportList.pipe(
+      map(list =>
+        list.some(a => {
+          return item.entityId
+            ? a.entityId === item.entityId
+            : a.id === item.id;
+        })
+      )
+    );
   }
 
   getConfig() {
@@ -40,23 +59,17 @@ export class AdminExportListComponent implements OnInit {
         dataField: 'name',
         allowSorting: true,
         alignment: 'left',
-        width: '40%'
+        width: '50%'
       },
       {
         caption: 'Type',
         dataField: 'type',
         allowSorting: true,
         alignment: 'left',
-        width: '20%'
-      },
-      {
-        caption: 'Metric Name',
-        dataField: 'metricName',
-        allowSorting: true,
-        alignment: 'left',
-        width: '30%'
+        width: '40%'
       }
     ];
+
     return this.dxDataGridService.mergeWithDefaultConfig({
       columns,
       width: '100%',

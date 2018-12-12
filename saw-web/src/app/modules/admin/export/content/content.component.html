@@ -14,7 +14,7 @@
   [wordWrapEnabled]="config.wordWrapEnabled"
   [scrolling]="config.scrolling"
   [sorting]="config.sorting"
-  [dataSource]="exportList | async"
+  [dataSource]="analyses | async"
   [columns]="config.columns"
   [pager]="config.pager"
   [paging]="config.paging"
@@ -22,7 +22,10 @@
   [height]="config.height"
 >
   <div *dxTemplate="let cell of 'selectionCellTemplate'">
-    <mat-checkbox (change)="onItemToggle($event, cell.data)" [checked]="true">
+    <mat-checkbox
+      (change)="onItemToggled($event, cell.data)"
+      [checked]="isSelectedForExport$(cell.data) | async"
+    >
     </mat-checkbox>
   </div>
 </dx-data-grid>
