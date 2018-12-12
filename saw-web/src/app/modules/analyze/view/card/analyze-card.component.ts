@@ -10,6 +10,7 @@ import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
 import { generateSchedule } from '../../../../common/utils/cron2Readable';
+import * as isUndefined from 'lodash/isUndefined';
 
 @Component({
   selector: 'analyze-card',
@@ -23,7 +24,7 @@ export class AnalyzeCardComponent implements OnInit {
   @Input() highlightTerm: string;
   @Input()
   set cronJobs(cronJobs: any) {
-    const cron = cronJobs[this.analysis.id];
+    const cron = isUndefined(this.cronJobs) ? null : this.cronJobs[this.analysis.id];
     if (!cron) {
       this.schedule = '';
       return;
