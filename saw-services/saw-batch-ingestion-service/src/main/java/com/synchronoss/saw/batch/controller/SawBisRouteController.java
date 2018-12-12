@@ -83,6 +83,7 @@ public class SawBisRouteController {
   private String deleteUrl = "/delete";
   private String pauseUrl = "/pause";
   private String resumeUrl = "/resume";
+  private Long STATUS_ACTIVE = 1L;
 
   @Value("${bis.default-data-drop-location}")
   private String dropLocation;
@@ -133,6 +134,7 @@ public class SawBisRouteController {
         requestBody.setBisChannelSysId(channelId);
         BeanUtils.copyProperties(requestBody, routeEntity);
         routeEntity.setCreatedDate(new Date());
+        routeEntity.setStatus(STATUS_ACTIVE);
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
         
         /**
