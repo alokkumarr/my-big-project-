@@ -141,8 +141,18 @@ function generateFailedTests(dir) {
       fs.writeFileSync('target/e2e/testData/failed/failedTests.json', JSON.stringify(subset), { encoding: 'utf8' });
     }
   }
+
   if(Object.keys(subset).length > 0) {
-    //console.log('failed data-->'+subset)
+    // There are some failures hence deleting the old failed file & creating it again with new data set
+    if(fs.existsSync('target/testData/failed/finalFail.json')) {
+      fs.unlinkSync('target/testData/failed/finalFail.json');
+    }
+    fs.writeFileSync('target/testData/failed/finalFail.json', JSON.stringify(subset), { encoding: 'utf8' });
+  } else {
+    // There are no failures hence deleting the old failed file...
+    if(fs.existsSync('target/testData/failed/finalFail.json')) {
+      fs.unlinkSync('target/testData/failed/finalFail.json');
+    }
   }
 }
 

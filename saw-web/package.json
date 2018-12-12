@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "run-s version dev:serve",
+    "dev:serve": "ng serve",
     "build": "run-s version build:only",
     "build:only": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build --prod --aot=false --build-optimizer=false",
     "build:stats": "ng build --prod --stats-json",
