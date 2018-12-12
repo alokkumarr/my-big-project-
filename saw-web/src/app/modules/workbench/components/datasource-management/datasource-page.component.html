@@ -94,14 +94,13 @@
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Created By : </span>
-              <span>{{selectedSourceData?.createdBy}}</span>
+              <span>{{selectedSourceData?.modifiedBy || selectedSourceData?.createdBy}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Last Modified: </span>
               <span *ngIf="selectedSourceData">
-                <span *ngIf="selectedSourceData.modifiedDate; else defDate">{{selectedSourceData?.modifiedDate | date: 'short'}}</span>
-                <ng-template #defDate>{{selectedSourceData?.createdDate | date: 'short'}}</ng-template>
+                <span>{{selectedSourceData?.modifiedDate || selectedSourceData?.createdDate | date: 'short'}}</span>
               </span>
             </div>
           </div>

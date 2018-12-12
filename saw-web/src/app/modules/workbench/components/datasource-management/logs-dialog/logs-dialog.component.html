@@ -17,34 +17,21 @@
           <span class="logs__route-details__cell__label" i18n>Channel Name : </span>
           <span>{{routeData?.channelName}}</span>
         </div>
-        <mat-divider [vertical]="true"></mat-divider>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
-          <span class="logs__route-details__cell__label" i18n>Description : </span>
-          <span>{{routeData?.description}}</span>
-        </div>
-      </div>
-      <mat-divider></mat-divider>
-      <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
-          <span class="logs__route-details__cell__label" i18n>Created by : </span>
-          <span>{{routeData?.createdBy}}</span>
-        </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
-          <span class="logs__route-details__cell__label" i18n>Created at : </span>
-          <span>{{routeData?.createdDate | date: 'dd/MMM/yy'}}</span>
+          <span class="logs__route-details__cell__label" i18n>File pattern : </span>
+          <span>{{routeData?.filePattern}}</span>
         </div>
       </div>
       <mat-divider></mat-divider>
       <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Modified by : </span>
-          <span>{{routeData?.modifiedBy}}</span>
+          <span>{{routeData?.modifiedBy || routeData?.mcreatedBy}}</span>
         </div>
         <mat-divider [vertical]="true"></mat-divider>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Modified at : </span>
-          <span>{{routeData?.modifiedDate | date: 'dd/MMM/yy'}}</span>
+          <span>{{routeData?.modifiedDate || routeData?.createdDate | date: 'short'}}</span>
         </div>
       </div>
       <mat-divider></mat-divider>
@@ -62,13 +49,13 @@
       <mat-divider></mat-divider>
       <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
-          <span class="logs__route-details__cell__label" i18n>File pattern : </span>
-          <span>{{routeData?.filePattern}}</span>
+          <span class="logs__route-details__cell__label" i18n>Last Fire Time : </span>
+          <span>{{lastFireTime | date: 'short'}}</span>
         </div>
         <mat-divider [vertical]="true"></mat-divider>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
-          <span class="logs__route-details__cell__label" i18n>Schedule : </span>
-          <span>{{getSchedule(routeData?.schedulerExpression)}}</span>
+          <span class="logs__route-details__cell__label" i18n>Next Fire Time : </span>
+          <span>{{nextFireTime | date: 'short'}}</span>
         </div>
       </div>
     </div>
@@ -80,8 +67,6 @@
                     [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
       >
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
-        <dxi-column caption="Pid" dataField="pid" alignment="left"></dxi-column>
-        <dxi-column caption="Channel Type" dataField="channelType" alignment="left"></dxi-column>
         <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
         <dxi-column caption="File Name" dataField="fileName" alignment="left"></dxi-column>
         <dxi-column caption="Actual File Rec Date" dataField="actualFileRecDate"></dxi-column>
@@ -92,7 +77,7 @@
         <dxi-column caption="Modified at" dataField="modifiedDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
         <dxi-column caption="Created at" dataField="createdDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
         <div *dxTemplate="let data of 'dateTypeTemplate'">
-          {{data.value | date: 'dd/MMM/yy'}}
+          {{data.value | date: 'short'}}
         </div>
       </dx-data-grid>
     </div>
