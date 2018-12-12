@@ -12,7 +12,7 @@
 
 <meta name="author" content="Haarstick" />
 
-<meta name="date" content="2018-12-11" />
+<meta name="date" content="2018-12-12" />
 
 <title>a2munge User Guide</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">a2munge User Guide</h1>
 <h4 class="author"><em>Haarstick</em></h4>
-<h4 class="date"><em>2018-12-11</em></h4>
+<h4 class="date"><em>2018-12-12</em></h4>
 
 
 <div id="TOC">
@@ -78,7 +78,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#overview">Overview</a></li>
 <li><a href="#background">Background</a></li>
 <li><a href="#requirements">Requirements</a></li>
-<li><a href="#design">Design</a></li>
+<li><a href="#design">Design</a><ul>
+<li><a href="#detecter">Detecter</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -203,7 +205,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;     agg</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000b7557c0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b797b50&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span>
 
 
@@ -240,7 +242,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;     agg</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000b7ed700&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000b838200&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
 <p>Note that both functions have parametric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> which differs from default dplyr which uses non-standard evaluation<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>. a2munge functions use standard evaluation equivalent functions like <code>mutate_at</code> or <code>group_by_vars</code> (vs <code>mutate</code> or <code>group_by</code>) or by using quasiquotation<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a></p>
 <p>The input assertions can also be seen for both. Input assertions are made via the checkmate<a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a> suite of functions and exist throughout all a2munge functions.</p>
@@ -259,7 +261,7 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;         variable.name = variable_name, value.name = value_name) %&gt;% </span>
 <span class="co">#&gt;         dplyr::mutate_at(variable_name, as.character)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000bba7d20&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000bbde590&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span>
 
 <span class="co"># Melter Spark tbl_spark method</span>
@@ -286,12 +288,12 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;         &quot;long&quot;)</span>
 <span class="co">#&gt;     dplyr::tbl(sc, &quot;long&quot;)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000bc359f8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000bc727a8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
 </div>
-<div id="detecter" class="section level4">
-<h4>Detecter</h4>
-<p>The detecter function is a special example of Sparkl Distributed R<a href="#fn13" class="footnoteRef" id="fnref13"><sup>13</sup></a>. The spark method uses the function <code>spark_apply</code> from the sparklyr package to apply the a2munge <code>detect</code> function in a distributed fashion. The R data.frame method uses the same <code>detect</code> function internally.</p>
+<div id="detecter" class="section level3">
+<h3>Detecter</h3>
+<p>The detecter function is a special example of Spark Distributed R<a href="#fn13" class="footnoteRef" id="fnref13"><sup>13</sup></a>. The spark method uses the function <code>spark_apply</code> from the sparklyr package to apply the a2munge <code>detect</code> function in a distributed fashion. The R data.frame method uses the same <code>detect</code> function internally.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Detecter R data.frame method</span>
 <span class="kw">getS3method</span>(<span class="st">'detecter'</span>, <span class="st">'data.frame'</span>)
 <span class="co">#&gt; function (df, index_var, group_vars = NULL, measure_vars, frequency, </span>
@@ -310,9 +312,9 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;         alpha = alpha, direction = direction, max_anoms = max_anoms, </span>
 <span class="co">#&gt;         trend_window = trend_window)) %&gt;% dplyr::ungroup()</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000c07a508&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000c0ca3c8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
-<p>The spark method version with the spark_apply below. There are well known <a href="https://github.com/rstudio/sparklyr/issues/1382">performance issues</a> with the <code>spark_apply</code> function. One of the other challeneges using the <code>spark_apply</code> function is the error message is not as verbose and its difficult to determine the cause of errors. The function internal to <code>spark_apply</code> is isolated to the context provided. So if external packages are required, they have to be shipped with the function across the network. This can cause some overhead and latency issues.</p>
+<p>The spark method version with the spark_apply below. There are well known <a href="https://github.com/rstudio/sparklyr/issues/1382">performance issues</a> with the <code>spark_apply</code> function. One of the other challenges using the <code>spark_apply</code> function is the error message is not as verbose and its difficult to determine the cause of errors. The function internal to <code>spark_apply</code> is isolated to the context provided. So if external packages are required, they have to be shipped with the function across the network. This can cause some overhead and latency issues.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Detecter Spark tbl_spark method</span>
 <span class="kw">getS3method</span>(<span class="st">'detecter'</span>, <span class="st">&quot;tbl_spark&quot;</span>)
 <span class="co">#&gt; function (df, index_var, group_vars, measure_vars, frequency, </span>
@@ -356,9 +358,136 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;     results</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000000c2e0a30&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000c3305a8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
-<p>Below is the core <code>detect</code> function. The function uses the <code>stl</code> function to apply a seasonal decomposition on the time series to identify a trend, seasonal and resid components. The detect function is based on the <code>AnomalyDetection</code> function from the R package of the same name and the Seasonal Hybrid ESD<a href="#fn14" class="footnoteRef" id="fnref14"><sup>14</sup></a> (<a href="https://arxiv.org/pdf/1704.07706.pdf" class="uri">https://arxiv.org/pdf/1704.07706.pdf</a>)</p>
+<p>Below is the core <code>detect</code> function. The function uses the <code>stl</code> function to apply a seasonal decomposition on the time series to identify a trend, seasonal and resid components. The detect function is based on the <code>AnomalyDetection</code> function from the R package of the same name and the Seasonal Hybrid ESD<a href="#fn14" class="footnoteRef" id="fnref14"><sup>14</sup></a> (<a href="https://arxiv.org/pdf/1704.07706.pdf" class="uri">https://arxiv.org/pdf/1704.07706.pdf</a>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># detect function</span>
+<span class="kw">getS3method</span>(<span class="st">&quot;detect&quot;</span>, <span class="st">&quot;data.frame&quot;</span>)
+<span class="co">#&gt; function (df, index_var, measure_var, frequency, direction = &quot;pos&quot;, </span>
+<span class="co">#&gt;     alpha = 0.01, max_anoms = 0.01, trend_window = 0.75) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     df_names &lt;- colnames(df)</span>
+<span class="co">#&gt;     checkmate::assert_choice(index_var, df_names)</span>
+<span class="co">#&gt;     checkmate::assert_choice(measure_var, df_names)</span>
+<span class="co">#&gt;     checkmate::assert_subset(class(df[[measure_var]]), c(&quot;numeric&quot;, </span>
+<span class="co">#&gt;         &quot;integer&quot;))</span>
+<span class="co">#&gt;     checkmate::assert_choice(direction, c(&quot;pos&quot;, &quot;both&quot;, &quot;neg&quot;))</span>
+<span class="co">#&gt;     checkmate::assert_number(frequency, lower = 2, upper = Inf)</span>
+<span class="co">#&gt;     checkmate::assert_number(alpha, lower = 0, upper = 1)</span>
+<span class="co">#&gt;     checkmate::assert_number(max_anoms, lower = 0, upper = 1)</span>
+<span class="co">#&gt;     checkmate::assert_number(trend_window, lower = 0, upper = 1)</span>
+<span class="co">#&gt;     if (alpha &gt; 0.1) {</span>
+<span class="co">#&gt;         message(&quot;alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     if (max_anoms &gt; 0.1) {</span>
+<span class="co">#&gt;         message(&quot;max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01&quot;)</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     two_tail &lt;- ifelse(direction == &quot;both&quot;, TRUE, FALSE)</span>
+<span class="co">#&gt;     n &lt;- nrow(df)</span>
+<span class="co">#&gt;     ma &lt;- max_anoms * n</span>
+<span class="co">#&gt;     p &lt;- ifelse(two_tail, 1 - alpha/2, 1 - alpha)</span>
+<span class="co">#&gt;     cv &lt;- qnorm(p, 0, 1)</span>
+<span class="co">#&gt;     t_window &lt;- round(n * trend_window)</span>
+<span class="co">#&gt;     if (t_window%%2 == 1) </span>
+<span class="co">#&gt;         t_window &lt;- t_window + 1</span>
+<span class="co">#&gt;     df_ts &lt;- ts(df[[measure_var]], frequency = frequency)</span>
+<span class="co">#&gt;     df_stl &lt;- as.data.frame(stl(df_ts, s.window = &quot;period&quot;, robust = TRUE, </span>
+<span class="co">#&gt;         t.window = t_window)$time.series)</span>
+<span class="co">#&gt;     df$seasonal &lt;- df_stl$seasonal</span>
+<span class="co">#&gt;     df$trend &lt;- df_stl$trend</span>
+<span class="co">#&gt;     df$resid &lt;- df_stl$remainder</span>
+<span class="co">#&gt;     df_mad &lt;- mad(df$resid)</span>
+<span class="co">#&gt;     df_med &lt;- median(df$resid)</span>
+<span class="co">#&gt;     df$lower &lt;- df$trend + df$seasonal + df_med - abs(cv) * df_mad</span>
+<span class="co">#&gt;     df$upper &lt;- df$trend + df$seasonal + df_med + abs(cv) * df_mad</span>
+<span class="co">#&gt;     if (direction == &quot;pos&quot;) {</span>
+<span class="co">#&gt;         df$resid_std &lt;- (df$resid - df_med)/df_mad</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else if (direction == &quot;neg&quot;) {</span>
+<span class="co">#&gt;         df$resid_std &lt;- (df_med - df$resid)/df_mad</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     else {</span>
+<span class="co">#&gt;         df$resid_std &lt;- abs((df$resid - df_med))/df_mad</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     df$anomaly &lt;- ifelse(df$resid_std &gt; cv, 1, 0)</span>
+<span class="co">#&gt;     df &lt;- df[order(df$resid_std, decreasing = T), ]</span>
+<span class="co">#&gt;     df$metric_index &lt;- 1:n</span>
+<span class="co">#&gt;     df$anomaly &lt;- ifelse(df$metric_index &gt; ma, 0, df$anomaly)</span>
+<span class="co">#&gt;     df[order(df[[index_var]]), c(df_names, &quot;seasonal&quot;, &quot;trend&quot;, </span>
+<span class="co">#&gt;         &quot;resid&quot;, &quot;lower&quot;, &quot;upper&quot;, &quot;anomaly&quot;)]</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000000c5c21a0&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:a2munge&gt;</span></code></pre></div>
+<p>Next we’ll break down the <code>detect</code> function in parts</p>
+<p>The <code>detect</code> data.frame method starts with a series of input arguments assertions along with a few warning messages.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">detect.data.frame &lt;-<span class="st"> </span><span class="cf">function</span>(df,
+                              index_var,
+                              measure_var,
+                              frequency,
+                              <span class="dt">direction =</span> <span class="st">'pos'</span>,
+                              <span class="dt">alpha =</span> .<span class="dv">01</span>,
+                              <span class="dt">max_anoms =</span> .<span class="dv">01</span>,
+                              <span class="dt">trend_window =</span> <span class="fl">0.75</span>) {
+
+  df_names &lt;-<span class="st"> </span><span class="kw">colnames</span>(df)
+  checkmate<span class="op">::</span><span class="kw">assert_choice</span>(index_var, df_names)
+  checkmate<span class="op">::</span><span class="kw">assert_choice</span>(measure_var, df_names)
+  checkmate<span class="op">::</span><span class="kw">assert_subset</span>(<span class="kw">class</span>(df[[measure_var]]), <span class="kw">c</span>(<span class="st">&quot;numeric&quot;</span>, <span class="st">&quot;integer&quot;</span>))
+  checkmate<span class="op">::</span><span class="kw">assert_choice</span>(direction, <span class="kw">c</span>(<span class="st">&quot;pos&quot;</span>, <span class="st">&quot;both&quot;</span>, <span class="st">&quot;neg&quot;</span>))
+  checkmate<span class="op">::</span><span class="kw">assert_number</span>(frequency, <span class="dt">lower=</span><span class="dv">2</span>, <span class="dt">upper=</span><span class="ot">Inf</span>)
+  checkmate<span class="op">::</span><span class="kw">assert_number</span>(alpha, <span class="dt">lower=</span><span class="dv">0</span>, <span class="dt">upper=</span><span class="dv">1</span>)
+  checkmate<span class="op">::</span><span class="kw">assert_number</span>(max_anoms, <span class="dt">lower=</span><span class="dv">0</span>, <span class="dt">upper=</span><span class="dv">1</span>)
+  checkmate<span class="op">::</span><span class="kw">assert_number</span>(trend_window, <span class="dt">lower=</span><span class="dv">0</span>, <span class="dt">upper=</span><span class="dv">1</span>)
+
+  <span class="cf">if</span>(alpha <span class="op">&gt;</span><span class="st"> </span>.<span class="dv">1</span> ){
+    <span class="kw">message</span>(<span class="st">&quot;alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001&quot;</span>)
+  }
+
+  <span class="cf">if</span> (max_anoms <span class="op">&gt;</span><span class="st"> </span>.<span class="dv">1</span>) {
+    <span class="kw">message</span>(<span class="st">&quot;max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01&quot;</span>)
+  }</code></pre></div>
+<p>In the next chunk the residual statistical threshold is calculated based on the alpha input. A p-value is calculated from the direction and alpha and passed to the <code>qnorm</code> function which provides a quantile value from a normal distribution. The trend_window input is formatted for the <code>stl</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+  two_tail &lt;-<span class="st"> </span><span class="kw">ifelse</span>(direction <span class="op">==</span><span class="st"> &quot;both&quot;</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)
+  n &lt;-<span class="st"> </span><span class="kw">nrow</span>(df)
+  ma &lt;-<span class="st"> </span>max_anoms <span class="op">*</span><span class="st"> </span>n
+  p &lt;-<span class="st"> </span><span class="kw">ifelse</span>(two_tail, <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>alpha <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>alpha)
+  cv &lt;-<span class="st"> </span><span class="kw">qnorm</span>(p, <span class="dv">0</span>, <span class="dv">1</span>)
+  t_window &lt;-<span class="st"> </span><span class="kw">round</span>(n <span class="op">*</span><span class="st"> </span>trend_window)
+  <span class="cf">if</span> (t_window <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
+    t_window &lt;-<span class="st"> </span>t_window <span class="op">+</span><span class="st"> </span><span class="dv">1</span></code></pre></div>
+<p>In the next chunk the <code>stl</code><a href="#fn15" class="footnoteRef" id="fnref15"><sup>15</sup></a> function is called and the seasonal, trend, and residual components are extracted.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"> df_ts &lt;-<span class="st"> </span><span class="kw">ts</span>(df[[measure_var]], <span class="dt">frequency =</span> frequency)
+  df_stl &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">stl</span>(
+    df_ts,
+    <span class="dt">s.window =</span> <span class="st">&quot;period&quot;</span>,
+    <span class="dt">robust =</span> <span class="ot">TRUE</span>,
+    <span class="dt">t.window =</span> t_window
+  )<span class="op">$</span>time.series)
+
+  df<span class="op">$</span>seasonal &lt;-<span class="st"> </span>df_stl<span class="op">$</span>seasonal
+  df<span class="op">$</span>trend &lt;-<span class="st"> </span>df_stl<span class="op">$</span>trend
+  df<span class="op">$</span>resid &lt;-<span class="st"> </span>df_stl<span class="op">$</span>remainder</code></pre></div>
+<p>In the next section the <code>median</code> and <code>mad</code><a href="#fn16" class="footnoteRef" id="fnref16"><sup>16</sup></a> are calculated from the <code>stl</code> residual component. These two measures are more robust and less sensitive to outliers than the mean and standard deviation counterparts. The residual is standardized by removing the median and dividing mad values. Lastly anomalies are identified where the standardized residual is greater than the statistical threshold calculated in the previous section.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df_mad &lt;-<span class="st"> </span><span class="kw">mad</span>(df<span class="op">$</span>resid)
+  df_med &lt;-<span class="st"> </span><span class="kw">median</span>(df<span class="op">$</span>resid)
+  df<span class="op">$</span>lower &lt;-<span class="st"> </span>df<span class="op">$</span>trend <span class="op">+</span><span class="st"> </span>df<span class="op">$</span>seasonal <span class="op">+</span><span class="st"> </span>df_med <span class="op">-</span><span class="st"> </span><span class="kw">abs</span>(cv) <span class="op">*</span><span class="st"> </span>df_mad
+  df<span class="op">$</span>upper &lt;-<span class="st"> </span>df<span class="op">$</span>trend <span class="op">+</span><span class="st"> </span>df<span class="op">$</span>seasonal <span class="op">+</span><span class="st"> </span>df_med <span class="op">+</span><span class="st"> </span><span class="kw">abs</span>(cv) <span class="op">*</span><span class="st"> </span>df_mad
+
+  <span class="cf">if</span> (direction <span class="op">==</span><span class="st"> &quot;pos&quot;</span>) {
+    df<span class="op">$</span>resid_std &lt;-<span class="st"> </span>(df<span class="op">$</span>resid <span class="op">-</span><span class="st"> </span>df_med) <span class="op">/</span><span class="st"> </span>df_mad
+  } <span class="cf">else</span> <span class="cf">if</span> (direction <span class="op">==</span><span class="st"> &quot;neg&quot;</span>) {
+    df<span class="op">$</span>resid_std &lt;-<span class="st"> </span>(df_med <span class="op">-</span><span class="st"> </span>df<span class="op">$</span>resid) <span class="op">/</span><span class="st"> </span>df_mad
+  } <span class="cf">else</span> {
+    df<span class="op">$</span>resid_std &lt;-<span class="st"> </span><span class="kw">abs</span>((df<span class="op">$</span>resid <span class="op">-</span><span class="st"> </span>df_med)) <span class="op">/</span><span class="st"> </span>df_mad
+  }
+
+  df<span class="op">$</span>anomaly &lt;-<span class="st"> </span><span class="kw">ifelse</span>(df<span class="op">$</span>resid_std <span class="op">&gt;</span><span class="st"> </span>cv, <span class="dv">1</span>, <span class="dv">0</span>)</code></pre></div>
+<p>In the last step the standardized residual is ordered by magnitude and an additional filter is applied based the max_anoms input which corresponds to the max number of anomalies as a function of number of rows. Lastly the results is re-ordered by the index_var and columns are arranged and returned.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"> df &lt;-<span class="st"> </span>df[<span class="kw">order</span>(df<span class="op">$</span>resid_std, <span class="dt">decreasing =</span> T), ]
+  df<span class="op">$</span>metric_index &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n
+  df<span class="op">$</span>anomaly &lt;-<span class="st"> </span><span class="kw">ifelse</span>(df<span class="op">$</span>metric_index <span class="op">&gt;</span><span class="st"> </span>ma, <span class="dv">0</span>, df<span class="op">$</span>anomaly)
+  df[<span class="kw">order</span>(df[[index_var]]), <span class="kw">c</span>(df_names, <span class="st">&quot;seasonal&quot;</span>, <span class="st">&quot;trend&quot;</span>, <span class="st">&quot;resid&quot;</span>, <span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>, <span class="st">&quot;anomaly&quot;</span>)]</code></pre></div>
 </div>
 </div>
 <div class="footnotes">
@@ -378,6 +507,8 @@ sim_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, sim_df
 <li id="fn12"><p>checkmate R package <a href="https://mllg.github.io/checkmate/">via</a><a href="#fnref12">↩</a></p></li>
 <li id="fn13"><p>Spark Distributed R with sparklyr <a href="https://spark.rstudio.com/guides/distributed-r/">via</a><a href="#fnref13">↩</a></p></li>
 <li id="fn14"><p>Automatic Anomaly Detection in the Cloud Via Statistical Learning <a href="https://arxiv.org/pdf/1704.07706.pdf">via</a><a href="#fnref14">↩</a></p></li>
+<li id="fn15"><p>STL decomposition <a href="https://otexts.org/fpp2/stl.html">via</a><a href="#fnref15">↩</a></p></li>
+<li id="fn16"><p>Median absolute deviation <a href="https://en.wikipedia.org/wiki/Median_absolute_deviation">via</a><a href="#fnref16">↩</a></p></li>
 </ol>
 </div>
 

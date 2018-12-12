@@ -164,9 +164,9 @@ getS3method("melter", "tbl_spark")
 ```
 
 
-#### Detecter
+### Detecter
 
-The detecter function is a special example of Sparkl Distributed R^[Spark Distributed R with sparklyr [via](https://spark.rstudio.com/guides/distributed-r/)]. The spark method uses the function `spark_apply` from the sparklyr package to apply the a2munge `detect` function in a distributed fashion. The R data.frame method uses the same `detect` function internally. 
+The detecter function is a special example of Spark Distributed R^[Spark Distributed R with sparklyr [via](https://spark.rstudio.com/guides/distributed-r/)]. The spark method uses the function `spark_apply` from the sparklyr package to apply the a2munge `detect` function in a distributed fashion. The R data.frame method uses the same `detect` function internally. 
 
 ```{r}
 # Detecter R data.frame method
@@ -175,7 +175,7 @@ getS3method('detecter', 'data.frame')
 ```
 
 
-The spark method version with the spark_apply below. There are well known [performance issues](https://github.com/rstudio/sparklyr/issues/1382) with the `spark_apply` function. One of the other challeneges using the `spark_apply` function is the error message is not as verbose and its difficult to determine the cause of errors. The function internal to `spark_apply` is isolated to the context provided. So if external packages are required, they have to be shipped with the function across the network. This can cause some overhead and latency issues.
+The spark method version with the spark_apply below. There are well known [performance issues](https://github.com/rstudio/sparklyr/issues/1382) with the `spark_apply` function. One of the other challenges using the `spark_apply` function is the error message is not as verbose and its difficult to determine the cause of errors. The function internal to `spark_apply` is isolated to the context provided. So if external packages are required, they have to be shipped with the function across the network. This can cause some overhead and latency issues.
 
 ```{r}
 # Detecter Spark tbl_spark method
@@ -185,4 +185,106 @@ getS3method('detecter', "tbl_spark")
 
 Below is the core `detect` function. The function uses the `stl` function to apply a seasonal decomposition on the time series to identify a trend, seasonal and resid components. The detect function is based on the `AnomalyDetection` function from the R package of the same name and the Seasonal Hybrid ESD^[Automatic Anomaly Detection in the Cloud
 Via Statistical Learning [via](https://arxiv.org/pdf/1704.07706.pdf) ]
-(https://arxiv.org/pdf/1704.07706.pdf) 
+(https://arxiv.org/pdf/1704.07706.pdf).
+
+```{r}
+# detect function
+getS3method("detect", "data.frame")
+```
+
+
+Next we'll break down the `detect` function in parts
+
+
+The `detect` data.frame method starts with a series of input arguments assertions along with a few warning messages.  
+
+```{r, eval = FALSE}
+detect.data.frame <- function(df,
+                              index_var,
+                              measure_var,
+                              frequency,
+                              direction = 'pos',
+                              alpha = .01,
+                              max_anoms = .01,
+                              trend_window = 0.75) {
+
+  df_names <- colnames(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_choice(measure_var, df_names)
+  checkmate::assert_subset(class(df[[measure_var]]), c("numeric", "integer"))
+  checkmate::assert_choice(direction, c("pos", "both", "neg"))
+  checkmate::assert_number(frequency, lower=2, upper=Inf)
+  checkmate::assert_number(alpha, lower=0, upper=1)
+  checkmate::assert_number(max_anoms, lower=0, upper=1)
+  checkmate::assert_number(trend_window, lower=0, upper=1)
+
+  if(alpha > .1 ){
+    message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
+  }
+
+  if (max_anoms > .1) {
+    message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
+  }
+
+```
+
+In the next chunk the residual statistical threshold is calculated based on the alpha input. A p-value is calculated from the direction and alpha and passed to the `qnorm` function which provides a quantile value from a normal distribution. The trend_window input is formatted for the `stl` function.
+
+```{r, eval = FALSE}
+
+  two_tail <- ifelse(direction == "both", TRUE, FALSE)
+  n <- nrow(df)
+  ma <- max_anoms * n
+  p <- ifelse(two_tail, 1 - alpha / 2, 1 - alpha)
+  cv <- qnorm(p, 0, 1)
+  t_window <- round(n * trend_window)
+  if (t_window %% 2 == 1)
+    t_window <- t_window + 1
+```
+
+In the next chunk the `stl`^[STL decomposition [via](https://otexts.org/fpp2/stl.html)] function is called and the seasonal, trend, and residual components are extracted. 
+
+```{r, eval = FALSE}
+ df_ts <- ts(df[[measure_var]], frequency = frequency)
+  df_stl <- as.data.frame(stl(
+    df_ts,
+    s.window = "period",
+    robust = TRUE,
+    t.window = t_window
+  )$time.series)
+
+  df$seasonal <- df_stl$seasonal
+  df$trend <- df_stl$trend
+  df$resid <- df_stl$remainder
+```
+
+
+In the next section the `median` and `mad`^[Median absolute deviation [via](https://en.wikipedia.org/wiki/Median_absolute_deviation)] are calculated from the `stl` residual component. These two measures are more robust and less sensitive to outliers than the mean and standard deviation counterparts. The residual is standardized by removing the median and dividing mad values. Lastly anomalies are identified where the standardized residual is greater than the statistical threshold calculated in the previous section. 
+
+
+```{r, eval = FALSE}
+df_mad <- mad(df$resid)
+  df_med <- median(df$resid)
+  df$lower <- df$trend + df$seasonal + df_med - abs(cv) * df_mad
+  df$upper <- df$trend + df$seasonal + df_med + abs(cv) * df_mad
+
+  if (direction == "pos") {
+    df$resid_std <- (df$resid - df_med) / df_mad
+  } else if (direction == "neg") {
+    df$resid_std <- (df_med - df$resid) / df_mad
+  } else {
+    df$resid_std <- abs((df$resid - df_med)) / df_mad
+  }
+
+  df$anomaly <- ifelse(df$resid_std > cv, 1, 0)
+```
+
+In the last step the standardized residual is ordered by magnitude and an additional filter is applied based the max_anoms input which corresponds to the max number of anomalies as a function of number of rows. Lastly the results is re-ordered by the index_var and columns are arranged and returned. 
+
+```{r, eval=FALSE}
+ df <- df[order(df$resid_std, decreasing = T), ]
+  df$metric_index <- 1:n
+  df$anomaly <- ifelse(df$metric_index > ma, 0, df$anomaly)
+  df[order(df[[index_var]]), c(df_names, "seasonal", "trend", "resid", "lower", "upper", "anomaly")]
+```
+
