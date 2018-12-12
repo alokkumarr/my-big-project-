@@ -37,10 +37,6 @@ get_coefs(mobj, ...)
 \item{...}{additional arguments to pass through}
 }
 \description{
-Get Coefficients from Forecast Model Object
-
-Return the Model Coefficients
-
 Extracts coefficient summary from Spark-ML linear regression model
 
 Extracts coefficient summary from Spark-ML logistic regression model

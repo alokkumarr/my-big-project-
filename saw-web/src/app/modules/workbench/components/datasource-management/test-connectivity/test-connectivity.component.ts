@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBarRef } from '@angular/material';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { MatSnackBarRef, MAT_SNACK_BAR_DATA } from '@angular/material';
 
 @Component({
   selector: 'test-connectivity',
@@ -7,26 +7,29 @@ import { MatSnackBarRef } from '@angular/material';
   styleUrls: ['./test-connectivity.component.scss']
 })
 export class TestConnectivityComponent implements OnInit {
-  private text = [
-    'Last login: Fri Sep 28 17:29:06 2018 from 192.168.1.74',
-    '** Authorized Use Only **',
+  // private text = [
+  //   'Last login: Fri Sep 28 17:29:06 2018 from 192.168.1.74',
+  //   '** Authorized Use Only **',
 
-    'Chef-Client: saw01.ana.demo.vaste.sncrcorp.net',
-    'Node platform: centos 7.4.1708 (rhel)',
-    'Node arch: x86_64',
-    'Hostnawme: saw01 (saw01.ana.demo.vaste.sncrcorp.net)',
+  //   'Chef-Client: saw01.ana.demo.vaste.sncrcorp.net',
+  //   'Node platform: centos 7.4.1708 (rhel)',
+  //   'Node arch: x86_64',
+  //   'Hostnawme: saw01 (saw01.ana.demo.vaste.sncrcorp.net)',
 
-    'Chef Server: https://chef02-itopscorpvaste.sncrcorp.net:443/organizations/sncr-sip',
-    'Environment: sip-demo',
-    'Last Run: 2018-10-02 17:03:26 +0000'
-  ];
-  constructor(private snackBarRef: MatSnackBarRef<TestConnectivityComponent>) {}
+  //   'Chef Server: https://chef02-itopscorpvaste.sncrcorp.net:443/organizations/sncr-sip',
+  //   'Environment: sip-demo',
+  //   'Last Run: 2018-10-02 17:03:26 +0000'
+  // ];
+  constructor(
+    private snackBarRef: MatSnackBarRef<TestConnectivityComponent>,
+    @Inject(MAT_SNACK_BAR_DATA) public logData: any
+  ) {}
 
   @ViewChild('screen')
   private screen;
 
   ngOnInit() {
-    this.typeMessage(this.text, this.screen.nativeElement);
+    this.typeMessage(this.logData, this.screen.nativeElement);
   }
 
   close() {

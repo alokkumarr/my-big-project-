@@ -15,8 +15,10 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
 import java.util.UUID;
 import java.util.regex.Pattern;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -60,6 +62,7 @@ public class BaseIT {
     RestAssured.baseURI = "http://" + host + ":" + port + "/";
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
   }
+    
 
   @Before
   public void setUp() throws JsonProcessingException {

@@ -14,25 +14,15 @@
 
 
 
-#' Salaries of San Fransico Municipal Workers
+#' Simulated Time Series Dataset
 #'
-#' A dataset containing the San Fransico Municipal workers salaries
-#'
-#' @format A data frame with 148686 rows and 14 variables:
+#' A dataset with sequential data created from arima.sim function with random
+#' innovations
+#' 
+#' @format A tibble with 200 rows and 2 variables
 #'  \describe{
-#'   \item{first_name}{first name}
-#'   \item{last_name}{last name}
-#'   \item{gender_guess}{gender guess based on first name}
-#'   \item{job_title}{job title}
-#'   \item{year}{employment year}
-#'   \item{base_pay}{base salary}
-#'   \item{overtime_pay}{overtime pay}
-#'   \item{other_pay}{other pay}
-#'   \item{total_pay}{base, overtime and other pay total}
-#'   \item{benefits}{total benefit cost}
-#'   \item{total}{total pay plus benefits}
-#'   \item{police}{flag for police based on job title}
-#'   \item{fire}{flag for firefighter based on job title}
-#'   \item{medical}{flag for medical professional based on job title}...
-#'   }
-"salaries"
+#'   \item{index}{integer type with sequential index of records}
+#'   \item{date}{date type. with date of record}
+#'   \item{y}{time series values}
+#'  }
+"sim_df_ts"

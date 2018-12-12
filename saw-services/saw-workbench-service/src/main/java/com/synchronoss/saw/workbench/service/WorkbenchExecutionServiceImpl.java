@@ -3,7 +3,10 @@ package com.synchronoss.saw.workbench.service;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+
+import com.google.gson.Gson;
 import org.apache.hadoop.fs.Path;
+import org.joda.time.DateTime;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
@@ -18,8 +22,13 @@ import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
 import sncr.bda.base.MetadataBase;
+import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.xdf.context.NGContext;
+import sncr.xdf.services.NGContextServices;
+import sncr.xdf.context.ComponentServices;
+import static sncr.xdf.context.ComponentServices.*;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -45,8 +54,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Value("${workbench.project-root}/services/metadata/previews")
   @NotNull
   private String previewsTablePath;
-    
-  
+
   /**
    * Cached Workbench Livy client to be kept around for next operation to reduce startup time.
    */
@@ -54,13 +62,14 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
   @PostConstruct
   private void init() throws Exception {
-    /* Workaround: If the "/apps/spark" directory does not exist in
-     * the data lake, Apache Livy will fail with a file not found
-     * error.  So create the "/apps/spark" directory here.  */
-    String appsSparkPath = "/apps/spark";
-    if (!HFileOperations.exists(appsSparkPath)) {
-      HFileOperations.createDir(appsSparkPath);
-    }
+      /* Workaround: If the "/apps/spark" directory does not exist in
+       * the data lake, Apache Livy will fail with a file not found
+       * error.  So create the "/apps/spark" directory here.  */
+      String appsSparkPath = "/apps/spark";
+      if (!HFileOperations.exists(appsSparkPath)) {
+          HFileOperations.createDir(appsSparkPath);
+      }
+
     /* Initialize the previews MapR-DB table */
     try (Admin admin = MapRDB.newAdmin()) {
       if (!admin.tableExists(previewsTablePath)) {
@@ -83,9 +92,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
        * be able to recover by reattempting to create the client.  */
       log.warn("Unable to create Workbench client upon startup", e);
     }
-    
-    
-    
   }
 
   /**
@@ -117,34 +123,40 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     cachedClient = new WorkbenchClient(livyUri);
   }
 
-
-  //  /**
-  //   * execute a transformation component on a dataset to create a new
-  //   * dataset
-  //   */
-
   /**
-   * Runs the given component using XDF hooks.
-   * @param project Project ID
-   * @param name Name of the dataset
-   * @param component Component name
-   * @param config Conponent configuration
-   * @return Object Node
-   * @throws Exception Incase of failures
+   * Execute a transformation component on a dataset to create a new dataset.
    */
   @Override
   public ObjectNode execute(
-      String project, String name, String component, String config) throws Exception {
+    String project, String name, String component, String cfg) throws Exception {
     log.info("Executing dataset transformation starts here ");
-    log.info("XDF Configuration = " + config);
+    log.info("XDF Configuration = " + cfg);
     WorkbenchClient client = getWorkbenchClient();
     createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
     log.info("execute name = " + name);
     log.info("execute root = " + root);
     log.info("execute component = " + component);
-    client.submit(new WorkbenchExecuteJob(
-                root, project, component, config));
+
+    ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
+
+    log.info("Component Config = " + config);
+
+    String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
+
+    NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
+    contextServices.initContext();
+
+    contextServices.registerOutputDataSet();
+
+    NGContext workBenchcontext = contextServices.getNgctx();
+
+    workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
+    client.submit(new WorkbenchExecuteJob(workBenchcontext));
     ObjectNode root = mapper.createObjectNode();
+    ArrayNode ids = root.putArray("outputDatasetIds");
+    for (String id: workBenchcontext.registeredOutputDSIds) {
+      ids.add(id);
+    }
     log.info("Executing dataset transformation ends here ");
     return root;
   }
@@ -172,7 +184,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   private String metastoreBase;
 
   /**
-   * Preview the output of a executing a transformation component on a dataset
+   * Preview the output of a executing a transformation component on a dataset.
    * Also used for simply viewing the contents of an existing dataset.
    */
   @Override

@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MaterialModule } from '../../../../../material.module';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { ConfirmActionDialogComponent } from './confirm-action-dialog.component';
 
@@ -13,7 +13,12 @@ describe('ConfirmActionDialogComponent', () => {
       imports: [MaterialModule],
       providers: [
         // workaround: Can't inject MatDialogRef in the unit test?
-        { provide: MatDialogRef, useValue: {} }
+        {
+          provide: MatDialogRef, useValue: {},
+        },
+        {
+          provide: MAT_DIALOG_DATA, useValue: {},
+        }
       ],
       declarations: [ConfirmActionDialogComponent]
     }).compileComponents();
