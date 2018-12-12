@@ -15,13 +15,13 @@ describe('Executing login tests from loginTests.js', () => {
 
   beforeEach((done) => {
     setTimeout(() => {
-      commonFunctions.goToHome();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach((done) => {
     setTimeout(() => {
+      // Logout by clearing the storage
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -41,6 +41,7 @@ describe('Executing login tests from loginTests.js', () => {
   using(testDataReader.testData['LOGIN']['negativeTests'] ? testDataReader.testData['LOGIN']['negativeTests'] : {}, (data, id) => {
     it(`${id}:${data.description}`, () => {
 
+      commonFunctions.goToHome();
       let loginPage = new LoginPage();
       loginPage.fillUserNameField(data.user);
       loginPage.fillPasswordField(data.password);

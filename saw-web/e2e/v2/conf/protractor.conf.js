@@ -91,8 +91,7 @@ exports.config = {
     showTiming: true,
     includeStackTrace: true,
     realtimeFailure: true,
-    showColors: true,
-    stopSpecOnExpectationFailure: true
+    showColors: true
   },
   suites: {
 
@@ -113,10 +112,10 @@ exports.config = {
      */
     development: testSuites.DEVELOPMENT
   },
-  onCleanUp: function (results) {
+  onCleanUp: (results)=> {
     retry.onCleanUp(results);
   },
-  onPrepare() {
+  onPrepare:() =>{
     retry.onPrepare();
 
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
@@ -164,7 +163,7 @@ exports.config = {
       });
     }, pageResolveTimeout);
   },
-  beforeLaunch: function () {
+  beforeLaunch: () => {
     //Delete old e2e unique id.
     logger.info('Doing cleanup and setting up test data for e2e tests....');
     if (fs.existsSync('target/e2eId.json')) {
@@ -200,7 +199,7 @@ exports.config = {
       process.exit(1);
     }
   },
-  afterLaunch: function () {
+  afterLaunch: () => {
     var retryCounter = 1;
     if (argv.retry) {
       retryCounter = ++argv.retry;

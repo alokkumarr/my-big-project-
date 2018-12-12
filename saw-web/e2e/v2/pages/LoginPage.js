@@ -40,6 +40,9 @@ class LoginPage {
   }
 
   logOutLogin(userName, password, redirectedPage = null) {
+    browser.ignoreSynchronization = false;
+    commonFunctions.goToHome();
+    browser.ignoreSynchronization = true;
     if (this.isUserLoggedIn()) {
       new Header().doLogout();
     }
