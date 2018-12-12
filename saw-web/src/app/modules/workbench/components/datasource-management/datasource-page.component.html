@@ -153,7 +153,7 @@
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
-              <div fxHide.lt-lg="true" class="route-grid--action-buttons">
+              <!-- <div fxHide.lt-lg="true" class="route-grid--action-buttons">
                 <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="View Route Logs"
                   (click)="openLogsDialog(data.data)">
                   <mat-icon fontIcon="icon-clipboard"></mat-icon>
@@ -170,13 +170,17 @@
                   i18n-matTooltip matTooltip="Delete Route">
                   <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
                 </button>
-              </div>
+              </div> -->
 
 
-              <button fxHide.gt-md="true" mat-icon-button class="triggerbtn" [matMenuTriggerFor]="datapodmenu">
+              <button mat-icon-button class="triggerbtn" [matMenuTriggerFor]="datapodmenu">
                 <mat-icon fontIcon="icon-action-solid"></mat-icon>
               </button>
               <mat-menu #datapodmenu="matMenu">
+                <button mat-menu-item (click)="toggleRouteActivation(data.data)">
+                  <mat-icon class="menu-btn-icon" fontIcon="icon-logout"></mat-icon>
+                  <span i18n>Deactivate</span>
+                </button>
                 <button mat-menu-item (click)="openLogsDialog(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-clipboard"></mat-icon>
                   <span i18n>View Route Logs</span>

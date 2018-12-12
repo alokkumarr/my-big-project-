@@ -75,6 +75,28 @@ export class DatasourceService {
       );
   }
 
+  deActivateRoute() {
+
+  }
+
+  deActivateChannel(channelId, routeId) {
+    // const endpoint = `/ingestion/batch/channels/${channelId}/routes/${routeId}/deactivate?channelId=${channelId}&routeId=${routeId}`;
+    // return this.http
+    //   .get(endpoint)
+    //   .pipe(
+    //     catchError(this.handleError('data', false))
+    //   );
+
+    const endpoint = `/ingestion/batch/channels/${channelId}/routes/${routeId}/deactivate`;
+    const payload = {
+      channelId,
+      routeId
+    };
+    return this.http
+      .put(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
   isDuplicateRoute({channelId, routeName}): Observable<boolean> {
     const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?routeName=${routeName}`;
 

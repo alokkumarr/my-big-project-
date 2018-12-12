@@ -329,4 +329,12 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  toggleRouteActivation(route) {
+    console.log('route', route);
+    const { bisChannelSysId, bisRouteSysId } = route;
+    this.datasourceService.deActivateChannel(bisChannelSysId, bisRouteSysId).subscribe(resp => {
+      console.log('resp', resp);
+    });
+  }
 }
