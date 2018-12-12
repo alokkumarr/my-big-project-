@@ -88,7 +88,10 @@ valid_samples <- function(x){
 #' @param validation_indicies list of numeric validation indicies. each index contains
 #'   numeric vector pertaining to row numbers to use for model validation
 #' @param indicies_names character vector of indicies names
-#' @param test_index  numeric index with records to use for model testing   
+#' @param test_index  numeric index with records to use for model testing 
+#' 
+#' @return samples object
+#' @export     
 samples <- function(validation_method,
                     validation_args,
                     test_holdout_prct,
