@@ -8,10 +8,14 @@ import static org.junit.Assert.assertTrue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
@@ -142,6 +146,30 @@ public class BatchIngestionIT extends BaseIT {
     //delete channel after testing
     this.tearDownChannel();
   }
+  
+  /**
+   * The test case is to create a channel in batch Ingestion.
+   */
+  @Test
+  public void isDupllicateChannel() throws JsonProcessingException {
+    ValidatableResponse response = given(authSpec).body(prepareChannelDataSet()).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);
+    log.debug("createChannel () " + response.log());
+    
+    Integer bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .get(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .path("[0].bisChannelSysId");
+    
+    Response duplicateResp = given(authSpec).queryParam("channelName", "messaging")
+        .body(prepareChannelDataSet()).when()
+        .get(BATCH_CHANNEL_PATH 
+            + "/duplicate");
+    log.debug("duplicateResp () " + duplicateResp.body());
+    Assert.assertEquals(duplicateResp.body().asString(),"true");
+    
+    //delete channel after testing
+    this.tearDownChannel();
+  }
 
   /**
    * The test case is to create a route in batch Ingestion.
@@ -164,6 +192,96 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
   }
 
+  
+  /**
+   * The test case is to create a channel in batch Ingestion.
+   */
+  @Test
+  public void isDupllicateRoute() throws JsonProcessingException {
+    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .jsonPath().getLong("bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    
+    String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
+    ValidatableResponse response = given(authSpec).body(prepareRouteDataSet()).when().post(routeUri)
+        .then().assertThat().statusCode(200);
+    log.debug("createRoute () " + response.log());
+ 
+    
+    Response duplicateResp = given(authSpec).queryParam("routeName", "route123")
+        .body(prepareChannelDataSet()).when()
+        .get(BATCH_CHANNEL_PATH 
+            + "/" + bisChannelSysId + "/duplicate-route");
+    log.debug("duplicateResp () " + duplicateResp.body());
+    Assert.assertEquals(duplicateResp.body().asString(),"true");
+    
+    //delete channel after testing
+    this.tearDownRoute();
+    this.tearDownChannel();
+    
+  }
+  
+  /**
+   * The test case is to create a channel in batch Ingestion.
+   */
+  @Test
+  public void activateDeactivateChannel() throws JsonProcessingException {
+    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .jsonPath().getLong("bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    
+    String channelActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "activate";
+    given(authSpec).body(prepareRouteDataSet()).when().put(channelActivateUri)
+        .then().assertThat().statusCode(200);
+    
+    String channelDeActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "deactivate";
+    given(authSpec).body(prepareRouteDataSet()).when().put(channelDeActivateUri)
+        .then().assertThat().statusCode(200);
+ 
+    
+    //delete channel after testing
+    this.tearDownChannel();
+    
+  }
+  
+  /**
+   * The test case is to create a channel in batch Ingestion.
+   */
+  @Test
+  public void activateDeactivateRoute() throws JsonProcessingException {
+    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
+        .jsonPath().getLong("bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    
+    String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
+    ValidatableResponse response = given(authSpec).body(prepareRouteDataSet()).when().post(routeUri)
+        .then().assertThat().statusCode(200);
+    log.debug("createRoute () " + response.log());
+   
+    Long routeId = given(authSpec).when().get(routeUri).then().assertThat()
+        .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    log.debug(" updateRoute bisRouteSysId : " + routeId);
+    String activateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" 
+        + BATCH_ROUTE + "/" + routeId + "/activate";
+    String deActivateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" 
+        + BATCH_ROUTE + "/" + routeId + "/deactivate";
+  
+    given(authSpec).body(prepareUpdateRouteDataSet()).when()
+        .put(activateUrl).then().assertThat().statusCode(200);
+  
+    given(authSpec).body(prepareUpdateRouteDataSet()).when()
+      .put(deActivateUrl).then().assertThat().statusCode(200);
+
+ 
+    
+    //delete channel after testing
+    this.tearDownChannel();
+    
+  }
+  
   /**
    * The test case is to read a channel in batch Ingestion.
    */
