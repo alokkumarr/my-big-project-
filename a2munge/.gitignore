@@ -6,3 +6,4 @@ logs/
 .Ruserdata
 metastore_db/
 a2munge.Rproj
+inst/doc

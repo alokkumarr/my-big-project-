@@ -91,4 +91,14 @@ describe('DatasourceService', () => {
       datasourceService.encryptPWD('123') instanceof Observable
     ).toBeTruthy();
   });
+
+  it('testChannel should exist and return an Observable', () => {
+    expect(
+      datasourceService.testChannel('1') instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('testRoute should exist and return an Observable', () => {
+    expect(datasourceService.testRoute('1') instanceof Observable).toBeTruthy();
+  });
 });

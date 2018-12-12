@@ -16,8 +16,8 @@ train_model(mobj, ...)
 \method{train_model}{spark_model_clustering}(mobj, data, measure, samples,
   save_submodels, execution_strategy = "sequential", ...)
 
-\method{train_model}{spark_model}(mobj, data, measure, samples, save_submodels,
-  execution_strategy, seed, ...)
+\method{train_model}{spark_model}(mobj, data, measure, samples,
+  save_submodels, execution_strategy, seed, ...)
 }
 \arguments{
 \item{mobj}{model object}

@@ -6,7 +6,6 @@ library(testthat)
 library(checkmate)
 library(dplyr)
 library(sparklyr)
-# adding lubridate for time sequences
 library(lubridate)
 
 context("index unit tests")
@@ -15,10 +14,6 @@ context("index unit tests")
 # Basic Tests -------------------------------------------------------------
 
 # Create Spark Connection
-# spark_home_dir <- sparklyr::spark_installed_versions() %>%
-#   as.data.frame() %>%
-#   dplyr::filter(spark == "2.3.0") %>%
-#   dplyr::pull(dir)
 sc <- spark_connect(master = "local")
 
 n <- 20

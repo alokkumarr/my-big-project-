@@ -61,7 +61,6 @@ export class AdminListViewComponent implements OnInit {
   }
 
   validateClearOption(cell) {
-    console.log(cell.data.groupName);
     return (cell.data.groupName !== null && cell.data.groupName !== '-2' && cell.data.groupName !== '');
   }
 
