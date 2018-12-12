@@ -360,10 +360,10 @@ public class SawBisChannelController {
    * @return  ok
    */
   @RequestMapping(value = "/channels/{channelId}/deactivate", method 
-      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Object>  deactivateChannel(
-      @RequestParam("channelId")  Long channelId) {
+      @PathVariable("channelId")  Long channelId) {
     bisChannelService.activateOrDeactivateChannel(channelId, false);
     return new ResponseEntity<Object>(HttpStatus.OK);
   }
@@ -375,11 +375,10 @@ public class SawBisChannelController {
    * @return ok
    */
   @RequestMapping(value = "/channels/{channelId}/activate", method 
-      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Object>  activateChannel(
-      @RequestParam("channelId")  Long channelId,
-      @RequestParam("routeId") Long routeId) {
+      @PathVariable("channelId")  Long channelId) {
     bisChannelService.activateOrDeactivateChannel(channelId, true);
     return new ResponseEntity<Object>(HttpStatus.OK);
   }

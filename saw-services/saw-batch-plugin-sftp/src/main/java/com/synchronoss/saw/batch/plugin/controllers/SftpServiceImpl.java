@@ -236,6 +236,8 @@ public class SftpServiceImpl extends SipPluginContract {
         ? defaultDestinationLocation + payload.getDestinationLocation()
         : defaultDestinationLocation;
     File destinationPath = new File(dataPath);
+    logger.trace("Destionation path: " + destinationPath);
+    logger.trace("Checking permissions for Destionation path: " + destinationPath);
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
@@ -244,7 +246,7 @@ public class SftpServiceImpl extends SipPluginContract {
             .exists(payload.getSourceLocation())) {
           status = HttpStatus.UNAUTHORIZED;
           connectionLogs.append(newLineChar);
-          connectionLogs.append("Destinatipn location may not exists!!");
+          connectionLogs.append("Destinatipn location may not exists!! or no permission!!");
           connectionLogs.append(newLineChar);
           connectionLogs.append(status);
         } else {
