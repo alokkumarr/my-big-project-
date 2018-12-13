@@ -317,7 +317,7 @@ exports.config = {
       fs.unlinkSync('target/e2e/e2eId.json');
     }
 
-    var retryCounter = 1;
+    let retryCounter = 1;
     if (argv.retry) {
       retryCounter = ++argv.retry;
     }
