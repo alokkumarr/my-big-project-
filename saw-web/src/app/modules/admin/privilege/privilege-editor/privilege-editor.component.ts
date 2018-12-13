@@ -2,7 +2,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'privilege-editor',
-  templateUrl: 'privilege-editor.component.html'
+  templateUrl: 'privilege-editor.component.html',
+  styleUrls: ['privilege-editor.component.scss']
 })
 export class PrivilegeEditorComponent {
   @Output()

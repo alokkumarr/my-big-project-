@@ -311,11 +311,10 @@ exports.config = {
 
   },
   afterLaunch: function() {
-    //console.log('afterLaunch....')
-    if (fs.existsSync('target/e2eId.json')) {
+    if (fs.existsSync('target/e2e/e2eId.json')) {
       // delete and create new always
       //console.log('deleting e2e id json file....')
-      fs.unlinkSync('target/e2eId.json');
+      fs.unlinkSync('target/e2e/e2eId.json');
     }
 
     var retryCounter = 1;

@@ -1,21 +1,29 @@
-import * as Highstock from 'highcharts/highstock';
-import * as Highmaps from 'highcharts/highmaps';
-import * as Highcharts from 'highcharts/highcharts';
+import Highstock from 'highcharts/highstock';
+import Highmaps from 'highcharts/highmaps';
+import Highcharts from 'highcharts/highcharts';
 
 import { NgModule } from '@angular/core';
 
-require('highcharts/highcharts-more')(Highcharts);
-require('highcharts/modules/exporting')(Highcharts);
-require('highcharts/modules/no-data-to-display')(Highcharts);
-require('highcharts/modules/offline-exporting')(Highcharts);
-require('highcharts/modules/bullet')(Highcharts);
+import HighChartsExporting from 'highcharts/modules/exporting';
+import HighChartsOfflineExporting from 'highcharts/modules/offline-exporting';
+import HighChartDragPanes from 'highcharts/modules/drag-panes';
 
-require('highcharts/modules/drag-panes')(Highstock);
-require('highcharts/modules/exporting')(Highstock);
-require('highcharts/modules/offline-exporting')(Highstock);
+HighChartDragPanes(Highstock);
+HighChartsExporting(Highstock);
+HighChartsOfflineExporting(Highstock);
 
-require('highcharts/modules/exporting')(Highmaps);
-require('highcharts/modules/offline-exporting')(Highmaps);
+import HighChartsMore from 'highcharts/highcharts-more';
+import HighChartsNoData from 'highcharts/modules/no-data-to-display';
+import HighChartsBullet from 'highcharts/modules/bullet';
+
+HighChartsMore(Highcharts);
+HighChartsBullet(Highcharts);
+HighChartsNoData(Highcharts);
+HighChartsExporting(Highcharts);
+HighChartsOfflineExporting(Highcharts);
+
+HighChartsExporting(Highmaps);
+HighChartsOfflineExporting(Highmaps);
 
 import { ChartComponent } from './chart.component';
 import { MapChartComponent } from './map-chart.component';

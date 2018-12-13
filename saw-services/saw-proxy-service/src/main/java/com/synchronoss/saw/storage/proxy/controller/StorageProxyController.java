@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.validation.Valid;
+
+import com.synchronoss.saw.model.SIPDSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,7 +160,7 @@ public class StorageProxyController {
       @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
       @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
       @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-      @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")
+      @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
 })
   @RequestMapping(value = "/internal/proxy/storage", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
@@ -191,10 +193,46 @@ public class StorageProxyController {
     }
    logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
    return responseObjectFuture;
-  }  
- 
-  
-  public static void main(String[] args) throws JsonProcessingException {
+  }
+
+
+    @RequestMapping(value = "/internal/proxy/storage/fetch", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public List<?> retrieveStorageDataSync(@ApiParam(value = "Storage object that needs to be added/updated/deleted to the store" ,required=true )
+                                                @Valid @RequestBody SIPDSL sipdsl) throws JsonProcessingException {
+        logger.debug("Request Body:{}", sipdsl);
+        if (sipdsl == null) {
+            throw new JSONMissingSAWException("json body is missing in request body");
+        }
+        List<Object> responseObjectFuture = null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        try {
+            //proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
+            logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipdsl));
+            responseObjectFuture = proxyService.execute(sipdsl);
+        } catch (IOException e){
+            logger.error("expected missing on the request body.", e);
+            throw new JSONProcessingSAWException("expected missing on the request body");
+        } catch (ReadEntitySAWException ex){
+            logger.error("Problem on the storage while reading data from storage.", ex);
+            throw new ReadEntitySAWException("Problem on the storage while reading data from storage");
+        } catch (ProcessingException e){
+            logger.error("Exception generated while validating incoming json against schema.", e);
+            throw new JSONProcessingSAWException("Exception generated while validating incoming json against schema.");
+           // responseObjectFuture = StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
+        }catch (Exception e) {
+            logger.error("Exception generated while processing incoming json.", e);
+            throw new RuntimeException("Exception generated while processing incoming json.");
+          //  responseObjectFuture= StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
+        }
+        logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
+        return responseObjectFuture;
+    }
+
+
+    public static void main(String[] args) throws JsonProcessingException {
     
     StorageProxy proxy = new StorageProxy();
     proxy.setAction(Action.SEARCH);

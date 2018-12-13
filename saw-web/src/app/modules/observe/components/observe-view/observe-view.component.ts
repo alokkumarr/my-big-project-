@@ -12,10 +12,10 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
-import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
+import { FirstDashboardGuard } from '../../guards';
 import { JwtService, ConfigService } from '../../../../common/services';
 import { PREFERENCES } from '../../../../common/services/configuration.service';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
@@ -57,6 +57,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private observe: ObserveService,
+    private guard: FirstDashboardGuard,
     private dashboardService: DashboardService,
     private router: Router,
     private filters: GlobalFilterService,
@@ -218,7 +219,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.observe.reloadMenu().subscribe(menu => {
           this.observe.updateSidebar(menu);
-          this.observe.redirectToFirstDash(menu, true);
+          this.guard.redirectToFirstDash(null, menu, true);
         });
       });
   }
@@ -263,23 +264,18 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   editDashboard(): void {
-    this.dialog.open(CreateDashboardComponent, {
-      panelClass: 'full-screen-dialog',
-      data: {
-        dashboard: this.dashboard,
-        mode: 'edit'
-      },
-      maxWidth: '1600px'
+    this.router.navigate(['observe/designer'], {
+      queryParams: {
+        dashboardId: this.dashboard.entityId,
+        mode: 'edit',
+        categoryId: this.subCategoryId
+      }
     });
   }
 
   createDashboard(): void {
-    this.dialog.open(CreateDashboardComponent, {
-      panelClass: 'full-screen-dialog',
-      data: {
-        mode: 'create'
-      },
-      maxWidth: '1600px'
+    this.router.navigate(['observe/designer'], {
+      queryParams: { mode: 'create', categoryId: this.subCategoryId }
     });
   }
 

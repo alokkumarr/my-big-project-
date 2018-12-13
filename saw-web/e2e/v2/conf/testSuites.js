@@ -3,7 +3,7 @@ var appRoot = require('app-root-path');
 const TEST_BASE_DIR = appRoot + '/e2e/v2/tests/';
 
 const SMOKE = [
-  TEST_BASE_DIR + 'login.test.js',
+  TEST_BASE_DIR + 'login-logout/loginTests.js',
 ];
 
 const SANITY = [...SMOKE,
@@ -36,7 +36,7 @@ TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithESReport.test.js',
 const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
-  TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
+  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',
 ];
 

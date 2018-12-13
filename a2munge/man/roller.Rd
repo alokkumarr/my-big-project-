@@ -9,11 +9,12 @@
 roller(df, order_vars, group_vars, measure_vars, fun, width, by, partial,
   temp_tbl_name, ...)
 
-\method{roller}{data.frame}(df, order_vars, group_vars = NULL, measure_vars,
-  fun, width, by = 1, partial = TRUE, ...)
+\method{roller}{data.frame}(df, order_vars, group_vars = NULL,
+  measure_vars, fun, width, by = 1, partial = TRUE, ...)
 
-\method{roller}{tbl_spark}(df, order_vars, group_vars = NULL, measure_vars,
-  fun, width, temp_tbl_name = sparklyr::random_string("tbl"), ...)
+\method{roller}{tbl_spark}(df, order_vars, group_vars = NULL,
+  measure_vars, fun, width,
+  temp_tbl_name = sparklyr::random_string("tbl"), ...)
 }
 \arguments{
 \item{df}{DataFrame}

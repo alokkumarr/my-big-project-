@@ -5,13 +5,13 @@ $header-bar-height: 64px;
 
   @if $name != null {
     $flexName: 'flex-#{$name}';
-    $name : '-#{$name}';
+    $name: '-#{$name}';
   } @else {
-    $name : '';
+    $name: '';
   }
 
   @for $i from 0 through 20 {
-    $value : #{$i * 5 + '%'};
+    $value: #{$i * 5 + '%'};
 
     .#{$flexName}-#{$i * 5} {
       flex: 1 1 $value;
@@ -49,6 +49,7 @@ $header-bar-height: 64px;
   display: flex;
   min-height: 100vh;
   max-height: 100vh;
+  width: 100%;
   flex-direction: column;
 
   & > .main-content {
@@ -96,5 +97,5 @@ $header-bar-height: 64px;
 
 .render-content {
   width: 100%;
-  overflow: hidden;
+  overflow-y: auto;
 }

@@ -6,22 +6,22 @@
 \alias{expander.tbl_spark}
 \title{Dataframe Expander Function}
 \usage{
-expander(df, group_vars, id_vars, fun, mode, complete)
+expander(df, id_vars, group_vars, fun, mode, complete)
 
-\method{expander}{data.frame}(df, group_vars = NULL, id_vars = NULL,
+\method{expander}{data.frame}(df, id_vars = NULL, group_vars = NULL,
   fun = NULL, mode = "crossing", complete = TRUE)
 
-\method{expander}{tbl_spark}(df, group_vars = NULL, id_vars = NULL,
+\method{expander}{tbl_spark}(df, id_vars = NULL, group_vars = NULL,
   fun = NULL, mode = "crossing", complete = TRUE)
 }
 \arguments{
 \item{df}{dataframe}
 
+\item{id_vars}{optional vector of column names to expand data by. default it
+NULL.}
+
 \item{group_vars}{optional vector column names to group data by. default is
 NULL. Any expansion function will be nested within the grouping vars}
-
-\item{id_vars}{optional vector of colnames to expand data by. default it
-NULL.}
 
 \item{fun}{optional expansion function. useful for expanding continuous
 variables with values that don't appear in the data (like missing dates).
