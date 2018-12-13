@@ -14,7 +14,7 @@ import { ExportService } from './export.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
 import { Observable } from 'rxjs/Observable';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
@@ -82,6 +82,24 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
           : new RemoveAnalysisFromExport(item)
       );
     }
+  }
+
+  onChangeAllSelectionList(checked: boolean) {
+    const analyses$ = this.store.selectOnce(
+      state => state.admin.exportPage.categoryAnalyses
+    );
+    analyses$
+      .pipe(
+        tap(analyses => {
+          const actions = analyses.map(analysis =>
+            checked
+              ? new AddAnalysisToExport(analysis)
+              : new RemoveAnalysisFromExport(analysis)
+          );
+          this.store.dispatch(actions);
+        })
+      )
+      .subscribe();
   }
 
   export() {

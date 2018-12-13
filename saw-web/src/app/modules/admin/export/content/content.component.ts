@@ -3,7 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import { Dashboard } from '../../../observe/models/dashboard.interface';
 import { Analysis } from '../../../analyze/models';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
-import { map } from 'rxjs/operators';
+import { map, withLatestFrom } from 'rxjs/operators';
+import * as intersectionBy from 'lodash/intersectionBy';
 
 export interface ExportItemChangeOutput {
   checked: boolean;
@@ -20,6 +21,11 @@ export class AdminExportContentComponent implements OnInit {
   @Input() analyses: Observable<any[]>;
   // @Input() dashboards: Observable<any[]>;
   @Output() change: EventEmitter<ExportItemChangeOutput> = new EventEmitter();
+  @Output() changeAll: EventEmitter<boolean> = new EventEmitter();
+
+  intersection$: Observable<any[]>;
+  allSelected$: Observable<boolean>;
+  someSelected$: Observable<boolean>;
 
   config: any;
 
@@ -27,12 +33,56 @@ export class AdminExportContentComponent implements OnInit {
 
   ngOnInit() {
     this.config = this.getConfig();
+
+    // Calculates intersection of export bucket and current selection list.
+    // Meant to cacluate which analyses in current selection list are also in export
+    this.intersection$ = this.exportList.pipe(
+      withLatestFrom(this.analyses),
+      map(([exportList, analyses]) => {
+        return [
+          intersectionBy(exportList, analyses, x =>
+            x.entityId ? x.entityId : x.id
+          ),
+          analyses
+        ];
+      })
+    );
+
+    // Whether all analyses in current selection list have been added to export
+    this.allSelected$ = this.intersection$.pipe(
+      map(
+        ([intersection, analyses]) =>
+          intersection.length === analyses.length && analyses.length > 0
+      )
+    );
+
+    // Whether some analyses in current selection list have been added to export
+    this.someSelected$ = this.intersection$.pipe(
+      map(
+        ([intersection, analyses]) =>
+          intersection.length < analyses.length && intersection.length > 0
+      )
+    );
   }
 
+  /**
+   * Handler for checkbox change of each item in list
+   *
+   * @param {*} { checked }
+   * @param {*} item
+   * @memberof AdminExportContentComponent
+   */
   onItemToggled({ checked }, item) {
     this.change.emit({ checked, item });
   }
 
+  /**
+   * Whether the given item is also present in export bucket
+   *
+   * @param {*} item
+   * @returns {Observable<boolean>}
+   * @memberof AdminExportContentComponent
+   */
   isSelectedForExport$(item): Observable<boolean> {
     return this.exportList.pipe(
       map(list =>
@@ -45,12 +95,29 @@ export class AdminExportContentComponent implements OnInit {
     );
   }
 
+  /**
+   * Handle toggling the 'all' checkbox at the top of list
+   *
+   * @param {*} { checked }
+   * @memberof AdminExportContentComponent
+   */
+  onToggleAll({ checked }) {
+    this.changeAll.emit(checked);
+  }
+
+  /**
+   * Returns data grid config merged with default
+   *
+   * @returns
+   * @memberof AdminExportContentComponent
+   */
   getConfig() {
     const columns = [
       {
         caption: '',
         allowSorting: false,
         alignment: 'center',
+        headerCellTemplate: 'selectionHeaderCellTemplate',
         cellTemplate: 'selectionCellTemplate',
         width: '10%'
       },

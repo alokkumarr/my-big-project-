@@ -92,12 +92,17 @@ export class ExportPageState {
     { analysis }: AddAnalysisToExport
   ) {
     const { exportData } = getState();
-    patchState({
-      exportData: {
-        ...exportData,
-        analyses: [...exportData.analyses, analysis]
-      }
-    });
+    const alreadyInExport = exportData.analyses.some(
+      exportAnalysis => exportAnalysis.id === analysis.id
+    );
+
+    !alreadyInExport &&
+      patchState({
+        exportData: {
+          ...exportData,
+          analyses: [...exportData.analyses, analysis]
+        }
+      });
   }
 
   @Action(RemoveAnalysisFromExport)

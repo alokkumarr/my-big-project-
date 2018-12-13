@@ -32,9 +32,11 @@
     [exportList]="exportList$"
     [analyses]="exportAnalyses$"
     (change)="onChangeItemSelection($event)"
+    (changeAll)="onChangeAllSelectionList($event)"
   ></admin-export-content>
   <admin-export-list
     [exportList]="exportList$"
     (change)="onChangeItemSelection($event)"
+    (changeAll)="onChangeAllExportList($event)"
   ></admin-export-list>
 </div>
