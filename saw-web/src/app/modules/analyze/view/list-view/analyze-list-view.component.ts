@@ -11,7 +11,6 @@ import {
 import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
-import * as isUndefined from 'lodash/isUndefined';
 
 @Component({
   selector: 'analyze-list-view',
@@ -117,7 +116,7 @@ export class AnalyzeListViewComponent implements OnInit {
       {
         caption: 'SCHEDULED',
         calculateCellValue: rowData => {
-          const cron = isUndefined(this.cronJobs) ? null : this.cronJobs[rowData.id];
+          const cron = this.cronJobs[rowData.id];
           if (!cron) {
             return '';
           }
