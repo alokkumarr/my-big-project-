@@ -1,19 +1,5 @@
 package com.synchronoss.saw.semantic.service;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,12 +20,23 @@ import com.synchronoss.saw.semantic.model.DataSemanticObjects;
 import com.synchronoss.saw.semantic.model.MetaDataObjects;
 import com.synchronoss.saw.semantic.model.request.BinarySemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is used to migrate the existing HBase Binary data to MapRDBStore.
@@ -86,7 +83,6 @@ public class MigrationService {
          semanticNode.setCustomerCode(binarySemanticNode.getCustomerCode());
          semanticNode.setModule(com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
          semanticNode.setProjectCode(binarySemanticNode.getProjectCode()!=null ? binarySemanticNode.getProjectCode() : "workbench");
-         semanticNode.setUsername("sipadmin@synchronoss.com");
          semanticNode.setMetricName(binarySemanticNode.getMetricName());
           if (binarySemanticNode.getEsRepository() != null) {
             JsonNode esRepository = objectMapper
@@ -292,7 +288,6 @@ public class MigrationService {
       semanticNode.setCustomerCode(binarySemanticNode.getCustomerCode());
       semanticNode.setModule(com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
       semanticNode.setProjectCode(binarySemanticNode.getProjectCode()!=null ? binarySemanticNode.getProjectCode() : "workbench");
-      semanticNode.setUsername("sipadmin@synchronoss.com");
       semanticNode.setMetricName(binarySemanticNode.getMetricName());
       if (binarySemanticNode.getEsRepository()!=null) 
         {semanticNode.setEsRepository(binarySemanticNode.getEsRepository());}
