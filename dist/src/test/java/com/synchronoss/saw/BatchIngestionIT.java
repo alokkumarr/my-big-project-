@@ -91,6 +91,7 @@ public class BatchIngestionIT extends BaseIT {
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
     root.put("channelType", "SFTP");
+    root.put("status", "1");
     root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));;
     root.put("modifiedBy", "sncr@synchronoss.com");
     return root;
@@ -114,10 +115,12 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("filePattern", "*.csv");
     childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "file");
+    
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("modifiedBy", "dataAdmin@synchronoss.com");
     root.put("routeMetadata", new ObjectMapper().writeValueAsString(childNode));
+    root.put("status", "1");
     return root;
   }
 
@@ -232,12 +235,14 @@ public class BatchIngestionIT extends BaseIT {
         .jsonPath().getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     
-    String channelActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "activate";
-    given(authSpec).body(prepareRouteDataSet()).when().put(channelActivateUri)
-        .then().assertThat().statusCode(200);
+    
     
     String channelDeActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "deactivate";
-    given(authSpec).body(prepareRouteDataSet()).when().put(channelDeActivateUri)
+    given(authSpec).when().put(channelDeActivateUri)
+        .then().assertThat().statusCode(200);
+    
+    String channelActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "activate";
+    given(authSpec).when().put(channelActivateUri)
         .then().assertThat().statusCode(200);
  
     
@@ -277,7 +282,7 @@ public class BatchIngestionIT extends BaseIT {
 
  
     
-    //delete channel after testing
+    this.tearDownRoute();
     this.tearDownChannel();
     
   }

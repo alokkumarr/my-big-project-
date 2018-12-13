@@ -492,7 +492,7 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/deactivate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Object> deactivateRoute(
+  public ResponseEntity<Boolean> deactivateRoute(
       @PathVariable("channelId")  Long channelId,
       @PathVariable("routeId") Long routeId) {
     
@@ -500,7 +500,7 @@ public class SawBisRouteController {
     scheduleKeys.setGroupName(String.valueOf(routeId));
     scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
     bisRouteService.activateOrDeactivateRoute(channelId, routeId, true);
-    return new ResponseEntity<Object>(HttpStatus.OK);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
   
   /**
@@ -513,7 +513,7 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/activate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Object> activateRoute(
+  public ResponseEntity<Boolean> activateRoute(
       @PathVariable("channelId")  Long channelId,
       @PathVariable("routeId") Long routeId) {
     
@@ -521,7 +521,7 @@ public class SawBisRouteController {
     scheduleKeys.setGroupName(String.valueOf(routeId));
     scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
     bisRouteService.activateOrDeactivateRoute(channelId, routeId, true);
-    return new ResponseEntity<Object>(HttpStatus.OK);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
   
   

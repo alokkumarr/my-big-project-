@@ -79,21 +79,30 @@ public class BisRouteService {
    */
   public void activateOrDeactivateRoutes(long channelId, boolean isActivate) {
 
+    logger.trace("Retriving routes");
     List<BisRouteEntity> routes = bisRouteRepository.findByBisChannelSysId(
         channelId, Pageable.unpaged()).getContent();
 
     // update route status
 
-    /**
-     * For each route pause the scheduled jobs.
-     */
-    for (BisRouteEntity bisRouteEntity : routes) {
-      BisScheduleKeys scheduleKeys = new BisScheduleKeys();
-      scheduleKeys.setGroupName(String.valueOf(bisRouteEntity.getBisRouteSysId()));
-      scheduleKeys.setJobName(BisChannelType.SFTP.name() 
-          + channelId + bisRouteEntity.getBisRouteSysId());
-      updateScheduledJobsStatus(isActivate, scheduleKeys);
+    if (routes.isEmpty()) {
+      logger.trace("No routes exists for this channel");
+    } else {
+      
+      logger.trace("Updating routes....");
+      /**
+       * For each route pause the scheduled jobs.
+       */
+      for (BisRouteEntity bisRouteEntity : routes) {
+        BisScheduleKeys scheduleKeys = new BisScheduleKeys();
+        scheduleKeys.setGroupName(String.valueOf(bisRouteEntity.getBisRouteSysId()));
+        scheduleKeys.setJobName(BisChannelType.SFTP.name() 
+            + channelId + bisRouteEntity.getBisRouteSysId());
+        updateScheduledJobsStatus(isActivate, scheduleKeys);
+      }
+      logger.trace("Updating routes completed");
     }
+    
 
   }
 

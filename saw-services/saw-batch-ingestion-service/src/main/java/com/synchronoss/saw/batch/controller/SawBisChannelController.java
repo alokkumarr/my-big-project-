@@ -365,10 +365,11 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels/{channelId}/deactivate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Object>  deactivateChannel(
+  public ResponseEntity<Boolean>  deactivateChannel(
       @PathVariable("channelId")  Long channelId) {
+    logger.trace("Insid deactivating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, false);
-    return new ResponseEntity<Object>(HttpStatus.OK);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
   
   /**
@@ -380,10 +381,11 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels/{channelId}/activate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Object>  activateChannel(
+  public ResponseEntity<Boolean>  activateChannel(
       @PathVariable("channelId")  Long channelId) {
+    logger.trace("Insid activating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, true);
-    return new ResponseEntity<Object>(HttpStatus.OK);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
 
   
