@@ -2,7 +2,8 @@ package sncr.xdf.sql.ng;
 
 import net.sf.jsqlparser.statement.Statement;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
@@ -24,7 +25,7 @@ import java.util.*;
  */
 public class NGJobExecutor {
 
-    private static final Logger logger = Logger.getLogger(NGJobExecutor.class);
+    private static final Logger logger = LoggerFactory.getLogger(NGJobExecutor.class);
 
     private WithContext parent;
     private String script;
@@ -51,6 +52,7 @@ public class NGJobExecutor {
         if (this.parent.getNgctx().componentConfiguration.getSql().getScriptLocation().equalsIgnoreCase("inline")) {
             logger.debug("Script is inline encoded");
             script = new String (Base64.getDecoder().decode(this.parent.getNgctx().componentConfiguration.getSql().getScript()));
+            logger.trace("Inline Script :" + script);
         }
         else {
             String pathToSQLScript = getScriptFullPath();
@@ -85,7 +87,7 @@ public class NGJobExecutor {
                 HFileOperations.deleteEnt(tempDir);
             }
             HFileOperations.createDir(tempDir);
-
+            logger.trace("NGJobExecutor:start :"+tempDir);
             List<Statement> statements = scriptDescriptor.getParsedStatements().getStatements();
 
             for (int i = 0; i < statements.size(); i++) {
@@ -130,7 +132,7 @@ public class NGJobExecutor {
                         destDir = tblDesc.getLocation();
                     }
                     descriptor.location = destDir;
-
+                    logger.trace("destination directory :"+destDir);
                     if (descriptor.location != null && !descriptor.location.isEmpty() ) {
 
                         if (HFileOperations.exists(descriptor.location)) {

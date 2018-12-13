@@ -66,6 +66,8 @@ public class SawBisChannelController {
   
   @Autowired
   private BisChannelService bisChannelService;
+  
+  private static final Long STATUS_ACTIVE = 1L;
 
 
   /**
@@ -112,6 +114,7 @@ public class SawBisChannelController {
     BisChannelEntity channelEntity = new BisChannelEntity();
     BeanUtils.copyProperties(requestBody, channelEntity);
     channelEntity.setCreatedDate(new Date());
+    channelEntity.setStatus(STATUS_ACTIVE);
     channelEntity = bisChannelDataRestRepository.save(channelEntity);
     BeanUtils.copyProperties(channelEntity, requestBody);
     requestBody.setCreatedDate(channelEntity.getCreatedDate().getTime());

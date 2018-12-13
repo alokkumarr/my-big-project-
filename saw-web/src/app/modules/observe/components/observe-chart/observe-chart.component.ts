@@ -31,6 +31,24 @@ import * as concat from 'lodash/concat';
 import * as moment from 'moment';
 
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
+import { ArtifactColumnReport } from '../../../analyze/types';
+
+interface ReportGridField {
+  caption: string;
+  dataField: string;
+  dataType: string;
+  type: string;
+  visibleIndex: number;
+  payload: ArtifactColumnReport;
+  visible: boolean;
+  allowSorting?: boolean;
+  alignment?: 'center' | 'left' | 'right';
+  format?: string | object;
+  sortOrder?: 'asc' | 'desc';
+  sortIndex?: number;
+  changeColumnProp: Function;
+  headerCellTemplate: string;
+}
 
 @Component({
   selector: 'observe-chart',
@@ -38,7 +56,9 @@ import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
   styleUrls: ['./observe-chart.component.scss'],
   providers: [ChartService]
 })
+
 export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
+  public columns: ReportGridField[];
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
@@ -65,7 +85,9 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
     public chartService: ChartService,
     public analyzeService: AnalyzeService,
     public filterService: FilterService
-  ) {}
+  ) {
+    this.customizeColumns = this.customizeColumns.bind(this);
+  }
 
   ngOnInit() {
     this.legend = this.chartService.initLegend(this.analysis);
@@ -332,5 +354,18 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
         data: layout.layout
       }
     ];
+  }
+
+  exportGridToExcel() {
+    if (!isEmpty(this.chartToggleData)) {
+      this.dataGrid.instance.exportToExcel(false);
+    }
+
+  }
+
+  customizeColumns(columns) {
+    forEach(columns, (col: ReportGridField) => {
+      col.alignment = 'left';
+    });
   }
 }

@@ -14,10 +14,10 @@ import java.util.List;
 public interface WithProjectScope {
 
     default void getProjectData(NGContext ngctx) throws Exception {
-        WithProjectScopeHelper.logger.debug("Getting project metadata");
+        WithProjectScopeHelper.logger.trace("Getting project metadata");
         ProjectStore prjStore = new ProjectStore(ngctx.xdfDataRootSys);
         JsonElement prj = prjStore.readProjectData(ngctx.applicationID);
-        WithProjectScopeHelper.logger.debug("Project metadata for " + ngctx.applicationID + " is " + prj);
+        WithProjectScopeHelper.logger.trace("Project metadata for " + ngctx.applicationID + " is " + prj);
 
         JsonObject prjJo = prj.getAsJsonObject();
         JsonElement plp;
@@ -29,7 +29,7 @@ public interface WithProjectScope {
             plpJA.forEach(plpen -> {
                 JsonObject plpJO = plpen.getAsJsonObject();
                 Parameter parameter = new Parameter(plpJO.get("name").getAsString(), plpJO.get("value").getAsString());
-                WithProjectScopeHelper.logger.debug("Process parameter  " + parameter.getName() + " value: " + parameter.getValue());
+                WithProjectScopeHelper.logger.trace("Process parameter  " + parameter.getName() + " value: " + parameter.getValue());
                 newList.add(parameter);
             });
             for (Parameter pn : newList) {

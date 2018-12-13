@@ -1,0 +1,1162 @@
+---
+title: "a2modeler Developer Guide"
+author: "Haarstick"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{a2modeler User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+
+
+```{r packages, echo=FALSE, warning=FALSE, message=FALSE}
+
+# R Packages
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(purrr)
+library(lubridate)
+library(sparklyr)
+library(a2munge)
+library(a2modeler)
+#devtools::load_all("~/software_projects/sip/a2modeler")
+
+```
+
+
+## Overview
+
+a2modeler is an R package that provides a framework for efficiently and reliably building statistical models. a2modeler currently supports the following use cases:
+
+* __Forecasting__: Statistical models to make forward looking predicts of sequential or time series data
+* __Segmentation__: Statistical models to derive sub-groups withing a dataset based on measurable patterns
+* __Regression__: Statistical models to fit and make prediction for continuous numerical targets
+* __Classification__: Statistical models to fit and make prediction for binary targets such as Yes/No, 0/1, Hot Dog/Not Hog Dog
+* __Multi-Classification__: Statistical models to fit and make prediction for discrete targets with more than two unique values
+
+
+This developer guide is designed to give some details and context on package design. 
+
+
+## Background
+
+This guide assumes a working knowledge of R, the tidyverse and sparklyr R packages, R S3 object oriented programming, and R package development. Relevant links:
+
+* [R](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)^[R Intro [via](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)]
+* [tidyverse](https://www.tidyverse.org/)^[Tidyverse [via](https://www.tidyverse.org/)]
+* [R for Data Science](https://r4ds.had.co.nz/)^[R for Data Science [via](https://r4ds.had.co.nz/)]
+* [S3 OOP](http://adv-r.had.co.nz/S3.html)^[R S3 Object System [via](http://adv-r.had.co.nz/S3.html)]
+* [R Packages](http://r-pkgs.had.co.nz/)^[R Packages [via](http://r-pkgs.had.co.nz/)]
+
+
+This guide also assumes knowledge of how a2modeler is applied. Check out the User-Guide Vignette for details on how a2modeler is used. 
+
+
+The a2modeler package functionality relies on several derived classes using R's [R S3 Object System ](http://adv-r.had.co.nz/S3.html). In the following sections each of the important classes are discussed. The most important class is the modeler class and it's inherited sub-classes. These classes are the main object created in a a2modeler work flow.  
+
+
+## Requirements
+
+* __R__: version >= 3.5
+* __Spark__: version >= 2.3.0
+
+
+
+## Workflow
+
+A key design principle of a2modeler is the set of high level functions common to multiple use cases seen in the image below:
+
+![a2modeler Workflow](figures/a2modeler-workflow.jpg)
+
+Below is an example of simple but standard a2modeler regression workflow
+
+```{r, eval=FALSE}
+
+# Create Spark Connection
+sc <- spark_connect(master = "local")
+
+# Copy data to spark
+df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
+
+
+# Create Spark datasets 
+df1 <- iris %>%
+  sample_frac(size = .5) %>%
+  copy_to(sc, ., name = "df1", overwrite = TRUE)
+
+# Simple A2 Regressor Workflow
+r1 <- regressor(df = df1, target = "Petal_Width", name = "test") %>%
+  set_measure(measure = RMSE) %>% 
+  add_holdout_samples(splits = c(.5, .5)) %>%
+  add_model(pipe = test_pipe,
+            method = "ml_linear_regression",
+            uid = "lm") %>%
+  add_model(pipe = test_pipe,
+            method = "ml_decision_tree_regressor",
+            uid = "tree") %>%
+  train_models() %>%
+  set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+
+```
+
+In the following sections each step is discussed in depth
+
+### Modeler Constructor
+
+The a2modeler workflow starts with a use-case specific function with creates a modeler class object (discussed below). Each of use-case constructor function creates a separate child class object that inherits from the parent modeler class. The actual `modeler` constructor is only used internally by the use case specific constructors. The use of class inheritance allows for general code to be shared across sub-classes but specific constraints, parameters, and methods to be implemented for each use case. 
+
+
+#### Modeler Class
+
+The main class in the a2modeler package is the modeler class. Modeler class objects provide the framework for developing models by storing information on the input dataset, target variable, sampling strategy, measurement, data transformation and models. The class enforces standards and some limits on the model development but creates consistency and allows for a consistent high level API for users (see User Guide). 
+
+The modeler object is model algorithm and package agnostic but requires that the proper hooks are in place to produce the right outputs. In practice that means while the modeler backend is modular, only the Spark-ML^[Spark-ML [via](https://spark.apache.org/mllib/)] backend is implemented for all but the forecaster child class which uses the forecast R package^[forecast R package [via](http://pkg.robjhyndman.com/forecast/)] 
+
+
+
+#### Modeler Inputs
+
+In addition to the required inputs of the dataframe, target and index variables if required, the following inputs can be provided for meta-data purposes:
+
+* __name__: optional name for use case. Used in reporting and deployment pathing 
+* __uid__: optional input for unique identifier
+* __version__: optional input for use case version. Used in report and pathing
+* __desc__: optional input for use case description
+* __scientist__: optional input for data science developer
+* __execution_strategy__: input for parallel backend execution. Default is sequential. Leverages the future^[future R package [via](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)] for parallel execution. 
+* __refit__: Logical option to refit model to entire training dataset sample and validation fitting. If grid parameters supplied, the best param set determined by validation sample performance will be used. Default is TRUE.
+* __save_submodels__: logical flag to save sub model fits. Default is TRUE. 
+* __dir__: optional directory path for saving reports, data, and models
+* __seed__: seed number for random computations. Seed should be set to ensure repeatability of results.
+
+
+#### Regresser
+
+In the following chunk the `regresser` constructor function can be see creating a modeler object internally with the `modeler` constructor, adding a default RMSE measure, and updated the class with the `structure` function. Note - `regressor` currently asserts a tbl_spark class data input due to the spark-ml backend and will error if a R data.frame is provided. The spark constraint is true for `classifier`, `multi-classifier`, and `segmenter` as well. Also note that a check is made to ensure that there isn't an existing 'index' column name. The data sampling partitioning functionality use the variable 'index' to create a row index and filter.
+
+
+```{r}
+# regressor constructor
+regressor
+```
+
+#### Classifier
+
+Next is the `classifier` constructor. The function is very similar to the `regressor` except now there are checks for a binary distribution of the target variable and AUC default measure.
+
+
+```{r}
+# Classifier Constructor
+classifier
+```
+
+
+#### Multiclasifier
+
+The `multiclassifier` constructor function is very similar to the `classifier` function. Now the checks are for a target variable with more than 2 unique values, and a F1 default measure. 
+
+
+```{r}
+# Multiclassifier Constructor
+multiclassifier
+```
+
+
+#### Segmenter
+
+The `segmenter` function differs slightly in that there is no target variable (set as NULL) and with a Silhouette default measure.
+
+```{r}
+# Segmenter Constructor
+segmenter
+```
+
+
+#### Forecaster
+
+As can be seen below the `forecaster` constructor is the most different from the others. `Forecaster` is R data.frame based, and requires an explicit index_var input. The index plays an important role - the data input to forecaster should have a sequential nature. This can either be date, datetime, or numerical based. If the index_var is either date or datetime an additional argument for the unit and frequency should be provided. These values are used to create an index object explained below. The index class allows for sequences to be extended for forecasting. 
+
+```{r}
+# Forecaster Constructor
+forecaster
+```
+
+
+### Add Samples
+
+The `add_*_samples` functions add samples to the modeler object and have class specific methods. The `add_default_samples` modeler class method shown below does the following:
+
+* creates a sample object with the data stored on the modeler object
+* adds the sample object to the sample slot 
+* returns updated modeler object
+
+```{r}
+# Add Default Sample to modeler object
+getS3method("add_default_samples", "modeler")
+```
+
+The other `add_*_samples` modeler methods behave similarly. The numeric methods is where the sampling logic is located. 
+
+
+#### Samples Class
+
+The samples class supports the creation of data samples for the purpose of model fitting and validating. There are several different types of sampling strategies - see the User-Guide for more details. For each of the a2modeler sampling strategies, a samples object is created with the `samples` constructor function with the following attributes:
+
+* __validation_method__: name of validation method. examples are holdout, cross-validation, etc...
+* __validation_args__: list of arguments to pass to validation method
+* __test_holdout_prct__: percent of total data records to use for test dataset
+* __downsample_prct__: percent of total data to downsample and use for analysis
+* __train_indices__: list of numeric train indices. each index contains numeric vector pertaining to row numbers to use for model fitting
+* __validation_indices__: list of numeric validation indices. each index contains numeric vector pertaining to row numbers to use for model validation
+* __indices_names__: character vector of indices names
+* __test_index__:  numeric index with records to use for model testing 
+
+In the following chunk code for `add_default_samples` methods are shown. The data.frame and tbl_spark methods use the numeric method internally to reduce code duplication. The default sample is the simplest strategy and only a single row based indie is saved in the train_indices list. 
+
+```{r}
+# add_default_samples.numeric code
+getS3method("add_default_samples", "numeric")
+
+# add_default_samples.data.frame code
+getS3method("add_default_samples", "data.frame")
+
+# add_default_samples.tbl_spk
+getS3method("add_default_samples", "tbl_spark")
+
+```
+
+
+Next is a set of methods for creating holdout samples. The numeric method creates train and validation row indices based on the splits argument. 
+
+
+```{r}
+# add_holdout_samples.numeric code
+getS3method("add_holdout_samples", "numeric")
+
+# add_holdout_samples.data.frame code
+getS3method("add_holdout_samples", "data.frame")
+
+# add_holdout_samples.data.frame code
+getS3method("add_holdout_samples", "tbl_spark")
+
+```
+
+
+The concept here is that the sampling strategy is set once, creating indices that control the data partitions for all down stream modeling fitting and evaluating. The samples object is saved in the modeler object and referenced internally for data partitioning. More on its implementation later on. 
+
+Each of the sampling strategies follows the same pattern shown above where the sampling logic is contained in the numeric method and the data.frame and tbl_spark methods simply create a row sequence and pass to internal numeric method. 
+
+
+##### Methods
+
+The samples class has a few methods to extract specific attributes of a sample object:
+
+* __get_train_samples__: returns training indices
+* __get_validation_samples__: returns the validation indices
+* __get_indices__: returns a list with an element for each train and validation indices pairs
+
+
+### Set Measures
+
+The next step in the a2modeler workflow is to set the measure used to measure model performance on validation samples. The `set_measure` function does the following
+
+* asserts proper classes
+* asserts measure is appropriate for use-case by checking measure properties
+* adds measure to modeler object
+* returns updated modeler object
+ 
+```{r}
+
+# Set Measure
+set_measure
+```
+
+As seen in the use case constructors, a default measure is set for each. 
+
+
+#### Measure Class
+
+The measure class stores information on model measurement metrics. The a2modeler measure class was designed after similar named class in [mlr R package](https://github.com/mlr-org/mlr/blob/master/R/Measure.R). The measure class constructor stores the following attributes:
+
+* __id__ name of measure ex - rmse
+* __name__ full name of measure. ex - mean squared error
+* __method__ name of measure method. method function differ based on class of input. Designed to be accommodate spark dataframes
+* __method_args__ list of additional arguments to pass to method
+* __properties__ measure's applicable modeler classes
+* __minimize__ logical flag that minimizing the measure is optimal
+* __best__ best possible value for measure
+* __worst__ worst possible value for measure
+* __note__ additional notes for measure
+
+Several measure objects are created and shipped in the a2modeler package. Here are a few examples
+
+```{r}
+# RMSE Object
+class(RMSE)
+str(RMSE)
+
+
+# AUC Object
+class(AUC)
+str(AUC)
+```
+
+
+Similar to the samples class, a measure class object is created and stored internally to the modeler object. All downstream model evaluation in modeler objects reference the measure object stored internally. The measure object does not store the function directly. It stores the function generic name which is can be used to get the function from the namespace environment and execute. 
+
+Adding a new method requires that the measure function (such as `rmse`) is either developed or supported in a2modeler. There are meaningful differences in implementation for R vs Spark objects as seen below for the `rmse` methods. The spark method leverages the sparklyr, spark-ml evaluator. The evaluator function approach is used to integrate with the rest of the spark-ml functionality.
+
+
+```{r}
+# R rmse method
+getS3method('rmse', 'data.frame')
+
+# Spark rmse method
+getS3method('rmse', 'tbl_spark')
+```
+
+
+##### Methods
+
+There are only minor measure methods such as `print`, `set_measure`, and `get_measure`
+
+
+
+### Add Model
+
+The `add_model` function creates a model object, and appends meta-data to the modeler object. It does not execute and model or pipeline code. As seen below the function does the following: 
+
+* asserts the method provided is one supported
+* creates default pipeline if not provided
+* adds the model pipeline to the modeler object pipeline list 
+* creates new model object with 'added' status add adds to modeler object
+
+
+```{r}
+
+# Add Model Function
+add_model
+```
+
+
+```{r, echo=FALSE}
+
+# Supported Model Methods
+model_methods %>% 
+  select(-class) %>% 
+  knitr::kable(caption = "a2modeler Supported Model Methods")
+```
+
+
+
+#### Pipeline Class
+
+The pipeline class encapsulates data transformation logic to support repeatable feature generation in a2model development. The pipeline object stores the transformation logic, some meta-data, and potentially pipeline output. Appending transformation output to the pipeline is useful for cases when that output is used more than once.
+
+The pipeline class is created with the pipeline constructor
+
+
+```{r}
+
+# Pipeline object
+pipeline
+p <- pipeline()
+str(p)
+
+```
+
+
+The pipeline object stores the transformation logic as a function in the expr slot. This allows for the pipeline to be reused on different datasets. 
+
+One or more pipelines can be created and stored in a modeler object. They are stored as a named list of pipelines in the pipelines slot. The name is the pipeline uid. The re-usability concept is useful internally to the modeler object so that models can share pipeline output (and not require duplicate execution and storage).
+
+
+##### Methods
+
+* __flow__: apply pipeline expression on dataset. output not saved to pipeline
+* __execute__: apply pipeline expression on dataset. output saved to pipeline
+* __test__: apply pipeline expression on subset of data records
+* __clean__: removes stored output from pipeline
+
+
+
+#### Model Class
+
+The model class is designed to be able to support different model backends. The model object stores information on the model's pipeline (uid only), the target variable, model method, method arguments, parameter map, and some meta data. Model child classes are created to support specific model backend (package) behavior. 
+
+```{r}
+
+# Model Helpler
+model
+```
+
+The model child class is assigned in the constructor below. A look up to the model_method dataset is made, the class extracted and assigned in the `structure` function. 
+
+```{r, eval=FALSE}
+
+# Model Constructor
+new_model <- function(pipe,
+                      target,
+                      method,
+                      method_args, 
+                      param_map,
+                      desc,
+                      uid,
+                      status,
+                      created_on
+) {
+  checkmate::assert_character(pipe)
+  checkmate::assert_character(target, null.ok = TRUE)
+  checkmate::assert_choice(method, choices = model_methods$method)
+  checkmate::assert_list(method_args, null.ok = TRUE)
+  checkmate::assert_list(param_map)
+  checkmate::assert_character(desc)
+  checkmate::assert_character(uid)
+  checkmate::assert_character(status)
+  checkmate::assert_posixct(created_on)
+  
+  .method <- method
+  method_fun <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    dplyr::pull(package) %>%
+    asNamespace() %>%
+    get(.method, .)
+  method_params <- setdiff(c(names(method_args), names(param_map)), "uid")
+  if(length(method_params) == 0) method_params <- NULL
+  checkmate::assert_function(method_fun, args = method_params)
+  
+  method_class <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    tidyr::unnest(class) %>%
+    dplyr::pull(class) %>%
+    as.character()
+  method_package <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    dplyr::pull(package)
+  
+  structure(
+    list(
+      pipe = pipe,
+      target = target,
+      method = method,
+      method_args = method_args,
+      param_map = param_map,
+      package = method_package,
+      desc = desc,
+      uid = uid,
+      created_on = created_on,
+      status = status
+    ),
+    class = c(method_class, "model")
+  )
+}
+```
+
+
+
+### Train Models
+
+The `train_models` function does most of the heavy lifting in the workflow. The `train_models` function is responsible for:
+
+* executing all of the pipelines
+* partitioning the samples
+* fitting all models to the training samples
+* measuring model performance on validation samples
+
+Full modeler class method
+
+```{r}
+
+# Parent Modeler class method
+getS3method("train_models", "modeler")
+
+```
+
+The first step is execute all the pipelines
+
+```{r, eval=FALSE}
+
+train_models.modeler <- function(obj, uids = NULL, ...) {
+  checkmate::assert_character(uids, null.ok = TRUE)
+  
+  # Execute pipes
+  obj <- execute_pipelines(obj)
+```
+
+The `execute_pipelines` function is descriptive - it calls the `execute` function on all un-executed pipelines saved in the modeler object. Recall execute will save the pipeline output to the output slot. 
+
+
+```{r}
+# execute pipeline modeler method
+getS3method("execute_pipelines", "modeler")
+```
+
+
+The next step is to get the model uids to be trained by extracting the status and filtering to only models with "added" status. 
+
+```{r, eval=FALSE}
+
+  if (is.null(uids)) {
+    # Get Added only Models
+    uids <- obj$models %>%
+      purrr::map_df(., magrittr::extract, c("uid", "status")) %>%
+      dplyr::filter(status == "added") %>%
+      dplyr::pull(uid)
+  }
+```
+
+
+Next for each model uid the training sample is generated. To clarify this training samples has yet to be split into specific train and validation partitions. The code below illustrates the data is filtered based on sample indices.  
+
+```{r, eval=FALSE}
+
+
+ for (uid in uids) {
+    
+    # Get Training Sample
+    train_data <- obj$pipelines[[obj$models[[uid]]$pipe]]$output
+    
+    # Check for holdout
+    if (!is.null(obj$samples$test_holdout_prct)) {
+      train_data <- train_data %>%
+        dplyr::mutate(rn = 1) %>% 
+        dplyr::mutate(rn = row_number(rn)) %>% 
+        dplyr::filter(! rn %in% obj$samples$test_index) %>%
+        dplyr::select(-rn)
+    }
+```
+
+The next step is the train a single model uid with the `train_model` function. The `train_model` has methods for specific modeling backends and discussed in-depth in the following sections. The model output from the train_model function is stored on the modeler model list and the model performance is added to the consolidated modeler performance. 
+
+
+```{r, eval=FALSE}
+
+    obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
+                                     data = train_data,
+                                     measure = obj$measure,
+                                     samples = obj$samples,
+                                     save_submodels = obj$save_submodels,
+                                     execution_strategy = obj$execution_strategy,
+                                     level = obj$conf_levels,
+                                     seed = obj$seed)
+    obj$models[[uid]]$features <- setdiff(colnames(train_data), c(obj$target, obj$index_var))
+    obj$models[[uid]]$status <- "trained"
+    obj$models[[uid]]$last_updated <- Sys.time()
+    obj$performance <- dplyr::bind_rows(
+      obj$performance,
+      obj$models[[uid]]$performance %>% 
+        dplyr::mutate(model_uid = uid,
+                      pipeline_uid = obj$models[[uid]]$pipe,
+                      method = obj$models[[uid]]$method) %>% 
+        dplyr::select(model_uid, pipeline_uid, submodel_uid, sample, method, param_grid, !!obj$measure$method)
+    )
+```
+
+
+
+#### Train Model
+
+The `train_model` function has class specific methods that correspond to the model backend. The `train_model.spark_model` method for spark_model class (spark-ml) leverages the functionality  provided in spark version 2.3.0.
+
+
+##### Spark Train Model
+
+The following is the spark_model based method. We breakdown each section next
+
+```{r}
+
+# train_model.spark_model
+getS3method("train_model", "spark_model")
+
+```
+
+
+In the first part of the method, basic assertions are made about the inputs, a spark connection is extracted from the data input, and the model method is extracted and assigned. 
+
+```{r, eval=FALSE}
+train_model.spark_model <- function(mobj,
+                                    data,
+                                    measure,
+                                    samples,
+                                    save_submodels,
+                                    execution_strategy,
+                                    seed,
+                                    ...) {
+  
+  checkmate::assert_class(data, "tbl_spark")
+  checkmate::assert_class(measure, "measure")
+  checkmate::assert_class(samples, "samples")
+  checkmate::assert_logical(save_submodels)
+  checkmate::assert_choice(execution_strategy,
+                           c("sequential", "transparent", "multisession", "multicore",
+                             "multiprocess", "cluster", "remote"))
+  
+  # Get Spark connection
+  sc <- sparklyr::spark_connection(data)
+  
+  # Set method fun
+  method_fun <- get(mobj$method, asNamespace(mobj$package))
+```
+
+In the next section, a hack is made for using the spark-ml neural net functions. They require a valid layers input that is made separately from the param_map
+
+```{r, eval=FALSE}
+
+  # Perceptron Check
+  if(grepl("ml_multilayer_perceptron", mobj$method)) {
+    if(is.null(mobj$method_args$layers)) {
+      stop("method arguments missing layers")
+    } else {
+      layers <- mobj$method_args$layers
+      nfeatures <- sparklyr::sdf_ncol(data) - 1
+      if(layers[1] != nfeatures) {
+        stop(paste("input layer size", layers[1],
+                   "doesn't equal feature size", nfeatures))
+      }
+      if("spark_model_classification" %in% class(mobj) &
+         layers[length(layers)] != 2) {
+        stop(paste("output layer size", layers[length(layers)],
+                   "should be 2 for classifaction models"))
+      }
+    }
+  }
+  
+```
+
+Next, a simple [validator pipeline](https://spark.rstudio.com/guides/pipelines/) is created which amounts to the model formula. Note - the formula uses all variables in the data provided. Selecting variables to a subset needs to be done in the model pipeline. The model takes what's given to it by the pipeline. 
+
+
+```{r, eval=FALSE}
+# Create validator pipeline
+  val_pipe <- sparklyr::ml_pipeline(sc) %>%
+    sparklyr::ft_r_formula(paste(mobj$target, "~.")) %>%
+    method_fun(uid = mobj$uid, layers = mobj$method_args$layers)
+```
+
+
+In the next step the validator function and arguments are configured. The options are holdout or cross validation.
+
+
+```{r, eval=FALSE} 
+  # Set Validator
+  if (samples$validation_method == "cross_validation") {
+    validator_fun <- get("ml_cross_validator", asNamespace("sparklyr"))
+    validator_args <- list(num_folds = samples$validation_args$folds)
+  } else{
+    validator_fun <- get("ml_train_validation_split", asNamespace("sparklyr"))
+    if (samples$validation_method == "holdout") {
+      validator_args <- list(train_ratio = samples$validation_args$split)
+    } else {
+      validator_args <- list(train_ratio = 0.99)
+    }
+  }
+  
+```
+
+Next the [evaluator](https://spark.apache.org/docs/1.6.1/api/java/org/apache/spark/ml/evaluation/RegressionEvaluator.html) is set by extracting the measurement method from the measure object. The method arguments are extracted from the param_map and formatted for the validator input. Then the parallel options are set based on the modeler execution strategy
+
+
+```{r, eval=FALSE}
+
+  # Set Evaluator
+  measure_fun <- match.fun(measure$method)
+  evaluator <- measure_fun(sc)
+  
+  
+  # Set param_map
+  if (length(mobj$param_map) == 0) {
+    method_args <- formals(method_fun)
+    param_map <- method_args[setdiff(names(method_args),  c("x", "formula", "layers"))][1]
+  } else{
+    param_map <- mobj$param_map
+  }
+  param_map <- list(param_map)
+  names(param_map) <- mobj$uid
+  
+  
+  # Set parallelism
+  if (execution_strategy == "sequential") {
+    cores = 1L
+  } else {
+    cores = future::availableCores() %>%
+      as.integer()
+  }
+  
+```
+
+Next the validator args are consolidated and passed to the validator function
+
+```{r, eval=FALSE}
+
+  # Set Validator args
+  validator_args <- c(
+    validator_args,
+    list(
+      x = data,
+      estimator = val_pipe,
+      estimator_param_maps = param_map,
+      evaluator = evaluator,
+      collect_sub_models = save_submodels,
+      parallelism = cores,
+      uid = "validator",
+      seed = seed
+    )
+  )
+  
+  
+  # Execute Validator
+  validator <- do.call(validator_fun, validator_args)
+```
+
+Lastly the key objects are extracted from the validator and stored in the modeler object including the validation measurement. The best model is saved at the fit slot where the submodels are stored in a nested list within the model object at the sub_models slot. The model performance is extracted, formatted, and stored on the model object.
+
+```{r, eval=FALSE}
+
+  # Extract Objects
+  n_sub_models <- length(validator$param_map$estimatorParamMaps)
+  sub_model_uids <- purrr::map_chr(1:n_sub_models, ~ sparklyr::random_string("submodel"))
+  if (save_submodels) {
+    sub_models <- sparklyr::ml_sub_models(validator)
+    if (samples$validation_method == "cross_validation") {
+      sub_models <- purrr::transpose(sub_models)
+    }
+    names(sub_models) <- sub_model_uids
+    mobj$sub_models <- sub_models
+  }
+  
+  mobj$performance <- sparklyr::ml_validation_metrics(validator) %>%
+    tibble::as.tibble() %>%
+    dplyr::mutate(rn = 1:n()) %>% 
+    tidyr::nest(!!names(.)[-c(1, length(names(.)))], .key = "param_grid") %>% 
+    dplyr::rename(!!measure$method := !!names(.)[1]) %>% 
+    dplyr::mutate(submodel_uid = sub_model_uids, sample = "validation") %>%
+    dplyr::select(submodel_uid, sample, !!measure$method,  param_grid)
+  mobj$fit <- validator$best_model
+  
+  mobj
+```
+
+
+##### Forecast R Train Model
+
+In this section the Forecast Model `train_model` method is described. Here the logic is much more explicit.
+
+
+```{r}
+
+# train_model.forecaster_model
+getS3method("train_model", "forecast_model")
+
+```
+
+
+In the first section, assertions are made on the inputs, a potential parallel backend with doFuture^[Foreach Parallel Adaptor using Futures [via](https://cran.r-project.org/web/packages/doFuture/vignettes/doFuture.html)] is created, the model method function is defined and the indices are extracted. 
+
+```{r, eval=FALSE}
+train_model.forecast_model <- function(mobj, 
+                                       data,
+                                       measure,
+                                       samples,
+                                       save_submodels,
+                                       execution_strategy,
+                                       level,
+                                       ...){
+  
+  checkmate::assert_class(data, "data.frame")
+  checkmate::assert_class(measure, "measure")
+  checkmate::assert_class(samples, "samples")
+  checkmate::assert_logical(save_submodels)
+  checkmate::assert_numeric(level, max.len = 2, upper = 100)
+  
+  # Set Execution Strategy
+  future::plan(execution_strategy)
+  doFuture::registerDoFuture()
+  
+  # Set model function
+  model_fun <- get(mobj$method, asNamespace(mobj$package))
+  
+  # Get Indicies
+  indicies <- get_indicies(samples)
+```
+
+The next section a submodel grid is created as a combination of the method_args, the param_map, and the model method arguments. A unique model is fit for each unique row in the submodel_grid. 
+
+```{r, eval=FALSE}
+ # Submodel grid
+  submodel_grid <- data.frame(expand.grid(c(mobj$method_args,
+                                            mobj$param_map,
+                                            list(method = mobj$method)))) %>%
+    dplyr::mutate(submodel_uid = purrr::map_chr(1:n(), ~ sparklyr::random_string("submodel")),
+                  method = as.character(method))
+  grid_vars <- setdiff(colnames(submodel_grid), c("submodel_uid"))
+  
+```
+
+
+In this section a parameter grid is created including the index samples. A unique model fit is made for each row in the grid. The foreach loop iterates through each rows in the grid.
+
+```{r, eval=FALSE}
+
+  # Define param_grid including samples
+  param_grid <- data.frame(expand.grid(c(
+    mobj$method_args,
+    mobj$param_map,
+    list(index = samples$indicies_names)
+  )))
+  param_vars <- colnames(param_grid)[-ncol(param_grid)]
+```
+
+In the next section the packages are extracted for parallel computation, and the covariates and measure function are set.
+
+```{r, eval=FALSE}
+
+  # Define packages for parallel computation
+  packs <- model_methods %>%
+    dplyr::filter(type == "forecaster") %>%
+    dplyr::pull(package) %>%
+    c("a2modeler", "dplyr") %>%
+    unique()
+  
+  # Covariates
+  x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
+  
+  # Measurement Function:
+  measure_fun <- match.fun(measure$method)
+  
+```
+
+In the next section, the foreach loop is set defined. The benefit of using foreach and doFuture is the loop can be parallelized by changing the execution strategy only. The following code does not have to change for sequential execution.
+
+```{r, eval=FALSE}
+ # Fit submodel to train data for each sample
+  fits <- foreach(
+    rn = 1:nrow(param_grid),
+    .packages = packs,
+    .export = c("mobj", "data", "x_vars", "param_grid", "param_vars", 
+                "indicies", "model_fun", "measure_fun", "level"),
+    .errorhandling = "pass") %dopar% {
+```
+
+
+In the following section the unique model parameters and index are extracted, the training dataset is created, and a model is fit.
+
+```{r, eval=FALSE}
+ # Params
+      params <- as.list(param_grid[rn, param_vars, drop=FALSE])
+      
+      # Get Training Sample
+      index <- as.character(param_grid[["index"]][rn])
+      train_index <- indicies[[index]]$train
+      train_smpl <- data[train_index, , drop=FALSE]
+      
+      # Set Method Args
+      y <- as.numeric(train_smpl[[mobj$target]])
+     
+      if (length(x_vars) > 0) {
+        train_xreg <- train_smpl[, x_vars, drop = FALSE]
+      } else {
+        train_xreg <- NULL
+      }
+      args <- modifyList(params, c(list(y = y, xreg = train_xreg)))
+      
+      # Fit submodel to training sample
+      fit <- do.call(model_fun, args)
+      fit$method_args <- params
+```
+
+Next the rest of the foreach loop is shown. First the validation index is created and the model fit from the previous section is applied to create predictions. The predictions are measured, stored and the model fit is return to the foreach loop output
+
+```{r, eval=FALSE}
+# Make Predictions
+      if(! is.null(indicies[[index]]$validation)) {
+        # Predict each validation sample
+        val_index <- indicies[[index]]$validation
+        val_smpl <- data[val_index, , drop = FALSE]
+        
+        # Set Forecast Args
+        if (length(x_vars) > 0) {
+          val_xreg <- val_smpl[, x_vars, drop = FALSE]
+        } else{
+          val_xreg <- NULL
+        }
+        args <- c(list(
+          object = fit,
+          xreg = val_xreg,
+          h = length(val_index),
+          level = level
+        ),
+        params)
+        fun <- get("forecast", asNamespace("forecast"))
+        fcast <- get_forecasts(do.call(fun, args))
+        fit$predictions <- fcast
+        perf_smpl <-
+          cbind(fcast, val_smpl[, mobj$target, drop = FALSE])
+        
+      } else {
+        perf_smpl <- cbind(data.frame(mean = as.numeric(fit$fitted)),
+                           train_smpl[, mobj$target, drop = FALSE])
+      }
+
+
+      # Evalulate Performance
+      perf <- data.frame(
+        measure = measure_fun(perf_smpl,
+                              predicted = "mean",
+                              actual = mobj$target),
+        index = index,
+        sample = "validation"
+      )
+      perf$index <- as.character(perf$index)
+      perf$sample <- as.character(perf$sample)
+      fit$performance <- perf
+      fit
+```
+
+Once all the model fits are completed, the model performance is made for each unique model, formatted and stored.
+
+```{r, eval=FALSE}
+
+  # Calculate Final Performance
+  fit_grid <- purrr::map_df(fits, "performance") %>%
+    dplyr::rename(!!measure$method := !!names(.)[1]) %>% 
+    dplyr::bind_cols(purrr::map_df(fits, "method_args")) %>% 
+    dplyr::mutate(method = mobj$method) %>% 
+    dplyr::inner_join(submodel_grid, by = grid_vars) %>% 
+    dplyr::select(-method)
+  
+  performance <- fit_grid %>% 
+    dplyr::group_by_at(setdiff(colnames(fit_grid), c(measure$method, "index"))) %>%
+    dplyr::summarise_at(measure$method, mean) %>% 
+    dplyr::ungroup() 
+  
+  if(any(colnames(performance) %in% grid_vars)) {
+    performance <- performance %>% 
+      tidyr::nest(-submodel_uid, -sample, -!!measure$method, .key = "param_grid") 
+  }else {
+    performance <- performance %>% 
+      dplyr::mutate(param_grid = vector("list", 1))
+  }
+  
+  mobj$performance <- performance %>% 
+    dplyr::select(submodel_uid, sample, !!measure$method, param_grid)
+  
+```
+
+In the next section, the best sub model is selected based on the model performance
+
+```{r, eval=FALSE}
+
+  # select best model
+  best_submodel <- mobj$performance %>%
+    dplyr::arrange_at(measure$method,
+                      .funs = ifelse(measure$minimize, identity, dplyr::desc)) %>%
+    head(1)
+```
+
+
+In the last section of the function the model is refit on the full data sample and the submodels are stored on the model object if the save_submodels option is made.
+
+```{r, eval=FALSE}
+
+  # Refit on full sample
+  if (samples$validation_method == "none") {
+    mobj$fit <- fits[[1]]
+  } else {
+    params <- best_submodel$param_grid[[1]] %>% as.list()
+    y <- as.numeric(data[[mobj$target]])
+    if (length(x_vars) > 0) {
+      xreg <- data[, x_vars, drop = FALSE]
+    } else{
+      xreg <- NULL
+    }
+    args <- modifyList(params, list(y = y, xreg = xreg))
+    mobj$fit <- do.call(model_fun, args)
+    
+    # save submodels option
+    if (save_submodels) {
+      sub_models <- list()
+      for (uid in submodel_grid$submodel_uid) {
+        sub_model <- purrr::keep(fits, fit_grid$submodel_uid == uid)
+        names(sub_model) <- samples$indicies_names
+        sub_models[[uid]] <- sub_model
+      }
+      
+      mobj$sub_models <- sub_models
+    }
+  }
+ 
+  mobj
+```
+
+
+
+
+## Predictions
+
+Once a modeler workflow is completed predictions can be made on new datasets similar to the input data. In the a2modeler package the prediction class supports prediction management. Below is the constructor function for creating a predictions object. The class stores information on the predictions, the model used to make the predictions, the modeler type (class), and some meta-data.
+
+```{r}
+
+# Predictions Class Constructor
+new_predictions <- function(predictions,
+                            model,
+                            type,
+                            uid,
+                            desc) {
+  checkmate::assert_true(any(class(predictions) %in% c("data.frame", "tbl_spark")))
+  checkmate::assert_class(model, "model")
+  checkmate::assert_character(uid)
+  checkmate::assert_character(desc)
+  checkmate::assert_choice(type,
+                           c("forecaster", "segmenter", "regressor",
+                             "classifier", "multiclassifier"))
+
+  structure(
+    list(
+      predictions = predictions,
+      model = model,
+      type = type,
+      uid = uid,
+      desc = desc,
+      created_on = Sys.time()
+    ),
+    class = "predictions"
+  )
+}
+```
+
+#### Spark Predict Method
+
+The prediction class stores the predictions made with modeler predict methods. Below is the classifier method, which is very similar to the other spark based classes. 
+
+The method first checks the new data schema to ensure its similar to the input data schema saved in the modeler object. Next the model pipeline is executed on the new data applying any feature engineering transformations. Lastly the predictions are made with the modeler's final model on the pipeline output and saved in a predictions object. 
+
+
+```{r}
+# Classifier Predict Method
+getS3method("predict", "classifier")
+```
+
+
+The predict method used internally is specific to the final model class. In the classifier case, the internal predict method below uses the sparklyr `ml_predict` function on the spark-ml model and then formatted to the expected output schema. 
+
+```{r}
+# Spark Model Classification predict method
+getS3method("predict", "spark_model_classification")
+```
+
+
+#### Forecaster Predict Methods
+
+The forecaster R predict method works differently. Here the data input is optional. If provided care should be given that it temporally aligns to the intended forecast horizon. The forecaster predictions are forward looking predictions of a sequential variable, which in most cases is a time series. The periods argument sets the prediction horizon length and levels controls the confidence intervals. 
+
+Similar to the classifier predict method the forecaster print method below preforms a schema check on the data if provided, executes the final model's pipeline and creates the predictions using an internal predict method covered next. Note - the forecaster print method creates a prediction index by using the `extend` method on the forecaster's index and combines with the prediction output. The index class is covered in the next section. 
+
+
+```{r}
+
+# Forecaster predict method
+getS3method("predict", "forecaster")
+```
+
+The forecast predict method that creates the prediction output using the `forecast` function from the forecast package. The `get_forecast` function is used to format the output.
+
+
+```{r}
+# forecast model predict method
+getS3method("predict", "forecast_model")
+
+# get_forecasts
+getS3method("get_forecasts", "forecast")
+```
+
+
+
+#### Index Class
+
+The index class stores information on a sequence so that the sequence can be accurately extended such as the unit, number of periods, start and end values. There is a time_index sub-class for datetime based indices which enables a different extend behavior. 
+
+```{r}
+
+# Create Index Object ex
+i1 <- index(1:10, unit = NULL)
+i1
+
+# Create Date Index
+d1 <- index(today() - days(0:6), unit = "days")
+d1
+```
+
+##### Index Methods
+
+The index class only has one generic function in the a2modeler - `extend`. It is used to extend a an index by some length out. There are methods for numeric, index, and time_index classes. 
+
+```{r}
+
+# Extend index
+extend(i1, 5)
+extend(d1, 5)
+
+```
+
+
+## Helper Functions
+
+In this section additional helper functions contained in the a2modeler package are discussed.
+
+
+#### Refit
+
+The refit function can be used to refit a modeler object to a new dataset. The function provides the option to append the new data to the stored data (default) or fit on just the new data. The function returns an updated modeler object. Only the final model is fit. The entire workflow is not executed. 
+
+Below is the refit modeler method. Similar to the prediction methods, the refit applies assertions on the new data ensuring its the same class and schema of the original modeler input data. The final model pipeline is applied with a single default sample to create the training dataset and passed to the `train_model` function. 
+
+
+```{r}
+# Refit Method
+getS3method("refit", "modeler")
+```
+
+
+#### Deploy
+
+The deploy function can be used to save a modeler object to file for use on a new dataset in a different time and environment. 
+
+The function below does the following:
+
+* Creates a label from the modeler name and version
+* Creates a model path using the label and model uid
+* Removes all spark objects from the modeler objects which should be saved separately
+* saves the modeler object as a .rds file with the either the `ml_save` function for spark models or `saveRDS` function for R based models
+
+```{r}
+
+# deploy function
+deploy
+```
+
+
+#### A2 Load
+
+The `a2_load` function is used to load a saved modeler object into memory. The function takes a path argument and optional spark connection with modeler objects with a spark based final model. The path argument should be the directory location of the modeler object, not the final .rds file location.
+
+```{r}
+
+# a2_load function
+a2_load
+```
+

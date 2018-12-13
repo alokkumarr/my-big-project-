@@ -160,7 +160,7 @@ implemented in Java and the Spring Framework.  As an exception, the
 SAW Transport Service is implemented in Scala and the Play framework.
 
 .Figure: SAW Services and their dependencies
-plantuml::sip-design/figure-services.pum[]
+plantuml::sip-design/figure-system.pum[]
 
 SAW Services use MapR-DB for persistence, using the OJAI interface.
 As an exception, the SAW Transport Service uses the MapR-DB binary
@@ -450,3 +450,16 @@ response to the client.
 
 .Figure: Authenticating a client using the SAW Security Service
 plantuml::sip-design/figure-security-sequence.pum[]
+
+== SIP DSL
+
+SIP DSL JSON based high level library build for writing and running SIP queries
+against SIP platform with Elasticsearch, DataLake etc. SIP DSL supports aggregation
+which can be used for Pivot, Chart and report structure to visualize the data
+into platform.
+
+.Figure: SIP-DSL sequence Diagram with platform integration
+plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
+
+==== SIP DSL Example :
+
