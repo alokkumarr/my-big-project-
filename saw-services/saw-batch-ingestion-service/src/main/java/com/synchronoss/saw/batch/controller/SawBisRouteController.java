@@ -69,6 +69,8 @@ public class SawBisRouteController {
 
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
+  private String scheduleUri = "/scheduler/bisscheduler";
+  
 
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
@@ -189,9 +191,9 @@ public class SawBisRouteController {
         }
         // }
         RestTemplate restTemplate = new RestTemplate();
-        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + insertUrl);
-        restTemplate.postForLocation(bisSchedulerUrl + insertUrl, schedulerRequest);
-        logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl + insertUrl);
+        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + scheduleUri + insertUrl);
+        restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + insertUrl, schedulerRequest);
+        logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl + scheduleUri + insertUrl);
       }
       /*
        * try { routeData = (ObjectNode) objectMapper.readTree(routeEntity.getRouteMetadata());
@@ -385,16 +387,16 @@ public class SawBisRouteController {
         routeEntity.setModifiedDate(new Date());
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
-        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + updateUrl);
+        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + updateUrl);
         try {
-          logger.trace("Sending the content to " + bisSchedulerUrl + updateUrl 
+          logger.trace("Sending the content to " + bisSchedulerUrl + scheduleUri + updateUrl 
               + " : " + objectMapper.writeValueAsString(schedulerRequest));
         } catch (JsonProcessingException e) {
           throw new SftpProcessorException("excpetion occurred while writing to"
               + " schedulerRequest ",e);
         }
-        restTemplate.postForLocation(bisSchedulerUrl + updateUrl, schedulerRequest);
-        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl + updateUrl);
+        restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + updateUrl, schedulerRequest);
+        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl + scheduleUri + updateUrl);
       }
       BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
       try {
@@ -443,11 +445,11 @@ public class SawBisRouteController {
     }
     
     return ResponseEntity.ok(bisRouteDataRestRepository.findById(routeId).map(route -> {
-      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + deleteUrl);
+      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + deleteUrl);
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
       scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
-      restTemplate.postForLocation(bisSchedulerUrl + deleteUrl, scheduleKeys);
+      restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + deleteUrl, scheduleKeys);
         
       logger.trace("Route deleted :" + route);
       bisRouteDataRestRepository.deleteById(routeId);

@@ -51,7 +51,7 @@ bis:
   transfer-batch-size: 10
   modified-retries: 3
   default-data-drop-location: /Users/spau0004/Desktop/workbench
-  scheduler-url: http://localhost:9601/scheduler/bisscheduler
+  scheduler-url: http://localhost:9601
      
 
     
