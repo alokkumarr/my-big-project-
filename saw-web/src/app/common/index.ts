@@ -64,6 +64,11 @@ import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
 
 import {
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
+} from './components/remote-folder-selector';
+
+import {
   DxDataGridService,
   ErrorDetailService,
   ErrorDetailDialogService,
@@ -120,7 +125,9 @@ const COMPONENTS = [
   SearchBoxComponent,
   FieldDetailsComponent,
   CronDatePickerComponent,
-  CronJobSchedularComponent
+  CronJobSchedularComponent,
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];

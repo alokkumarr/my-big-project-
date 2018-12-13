@@ -75,8 +75,45 @@ export class DatasourceService {
       );
   }
 
+  activateRoute(channelId, routeId) {
+    return this.toggleRoute(channelId, routeId, false);
+  }
+
+  deActivateRoute(channelId, routeId) {
+    return this.toggleRoute(channelId, routeId, false);
+  }
+
+  toggleRoute(channelId, routeId, activate: boolean) {
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/routes/${routeId}/${activate ? 'activate' : 'deactivate'}`;
+    const payload = {
+      channelId,
+      routeId
+    };
+    return this.http
+      .put(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  activateChannel(channelId) {
+    return this.toggleChannel(channelId, true);
+  }
+
+  deActivateChannel(channelId) {
+    return this.toggleChannel(channelId, false);
+  }
+
+  toggleChannel(channelId, activate: boolean) {
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/${activate ? 'activate' : 'deactivate'}`;
+    const payload = {
+      channelId
+    };
+    return this.http
+      .put(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
   isDuplicateRoute({channelId, routeName}): Observable<boolean> {
-    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?channelId=${channelId}&routeName=${routeName}`;
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?routeName=${routeName}`;
 
     return this.http
       .get(endpoint)

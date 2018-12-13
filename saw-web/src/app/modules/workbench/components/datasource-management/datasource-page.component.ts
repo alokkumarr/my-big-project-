@@ -321,12 +321,27 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       closeOnNavigation: true,
       disableClose: true,
       height: '590px',
-      width: '950px',
+      width: '800px',
       panelClass: 'sourceDialogClass',
       data: {
         ...routeData,
         channelName: this.selectedSourceData.channelName
       }
+    });
+  }
+
+  toggleRouteActivation(route) {
+    console.log('route', route);
+    const { bisChannelSysId, bisRouteSysId } = route;
+    this.datasourceService.deActivateRoute(bisChannelSysId, bisRouteSysId).subscribe(resp => {
+      console.log('resp', resp);
+    });
+  }
+
+  toggleChannelActivation(channel) {
+    console.log('channel', channel);
+    this.datasourceService.deActivateChannel(channel.bisChannelSysId).subscribe(resp => {
+      console.log('resp', resp);
     });
   }
 }

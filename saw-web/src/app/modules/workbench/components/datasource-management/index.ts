@@ -12,3 +12,4 @@ export {
   ConfirmActionDialogComponent
 } from './confirm-action-dialog/confirm-action-dialog.component';
 export { LogsDialogComponent } from './logs-dialog';
+export { SourceFolderDialogComponent } from './select-folder-dialog';

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
@@ -14,13 +14,13 @@ import { TestConnectivityComponent } from '../test-connectivity/test-connectivit
   templateUrl: './createSource-dialog.component.html',
   styleUrls: ['./createSource-dialog.component.scss']
 })
-export class CreateSourceDialogComponent implements OnInit {
+export class CreateSourceDialogComponent {
   selectedSource = '';
   form: FormGroup;
   sources = CHANNEL_TYPES;
   firstStep: FormGroup;
   public detailsFormGroup: FormGroup;
-  opType = 'create';
+  opType: 'create' | 'update' = 'create';
   show = false;
   dialogTitle = 'Create Data Channel';
   selectedStepIndex = 0;
@@ -33,7 +33,18 @@ export class CreateSourceDialogComponent implements OnInit {
     private datasourceService: DatasourceService,
     @Inject(MAT_DIALOG_DATA) public channelData: any
   ) {
+    if (isUndefined(this.channelData.length)) {
+      this.opType = 'update';
+      this.isTypeEditable = false;
+      this.dialogTitle = 'Edit Channel';
+      this.selectedStepIndex = 1;
+      this.selectedSource = this.channelData.channelType;
+    }
     this.createForm();
+    if (isUndefined(this.channelData.length)) {
+      this.firstStep.patchValue(this.channelData);
+      this.detailsFormGroup.patchValue(this.channelData);
+    }
   }
 
   createForm() {
@@ -41,8 +52,10 @@ export class CreateSourceDialogComponent implements OnInit {
       channelType: ['', Validators.required]
     });
 
+    const oldChannelName = this.opType === 'update' ? this.channelData.channelName : '';
+
     this.detailsFormGroup = this._formBuilder.group({
-      channelName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateChannel)],
+      channelName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateChannel, v => v, oldChannelName)],
       hostName: ['', Validators.required],
       portNo: [
         '',
@@ -56,18 +69,6 @@ export class CreateSourceDialogComponent implements OnInit {
       description: [''],
       accessType: ['R', Validators.required]
     });
-  }
-
-  ngOnInit() {
-    if (isUndefined(this.channelData.length)) {
-      this.opType = 'update';
-      this.isTypeEditable = false;
-      this.dialogTitle = 'Edit Channel';
-      this.selectedStepIndex = 1;
-      this.selectedSource = this.channelData.channelType;
-      this.firstStep.patchValue(this.channelData);
-      this.detailsFormGroup.patchValue(this.channelData);
-    }
   }
 
   sourceSelected(source) {

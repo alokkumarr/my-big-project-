@@ -50,6 +50,14 @@
                   <strong> Cannot Have " . *" or more than one pattern</strong>
                 </mat-error>
             </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label i18n>Batch size</mat-label>
+              <input matInput type="number" name="batchSize" formControlName="batchSize" required />
+              <mat-error *ngIf="detailsFormGroup.controls.batchSize.hasError('required')" i18n>
+                Batch size is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
           </section>
           <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
@@ -64,14 +72,15 @@
             <mat-form-field appearance="outline">
               <mat-label i18n>Destination Location</mat-label>
               <input matInput name="destinationLocation" formControlName="destinationLocation" required />
+              <button mat-button matSuffix mat-icon-button (click)="openSelectSourceFolderDialog()">
+                <mat-icon matTooltip="Browse" fontIcon="icon-folder-solid"></mat-icon>
+              </button>
               <mat-error *ngIf="detailsFormGroup.controls.destinationLocation.hasError('required')" i18n>
                 Destination Location is
                 <strong>required</strong>
               </mat-error>
             </mat-form-field>
-          </section>
-          <section fxFlex fxLayout="column" fxLayoutAlign="center center">
-            <mat-form-field style="width: 90%;" appearance="outline">
+            <mat-form-field appearance="outline">
               <mat-label i18n>Description about the route</mat-label>
               <textarea matInput formControlName="description"></textarea>
             </mat-form-field>

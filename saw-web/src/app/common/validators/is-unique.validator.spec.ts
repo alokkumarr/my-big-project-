@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 
 let formControl1: FormControl;
 let formControl2: FormControl;
+let formControl3: FormControl;
 
 function checkValidity(formControl: FormControl, value: string, done) {
   const sub = formControl.statusChanges.subscribe(status => {
@@ -40,8 +41,9 @@ describe('Is Unique Validator', () => {
   const transformerFn = (value: string) => ({value, someOtherParameter: 'something'});
 
   beforeEach(() => {
-    formControl1 = new FormControl('', [], isUnique(simpleMockRemoteFunction));
-    formControl2 = new FormControl('', [], isUnique(complexMockRemoteFunction, transformerFn));
+    formControl1 = new FormControl('', [], isUnique(simpleMockRemoteFunction, v => v, ''));
+    formControl2 = new FormControl('', [], isUnique(complexMockRemoteFunction, transformerFn, ''));
+    formControl3 = new FormControl('', [], isUnique(simpleMockRemoteFunction, v => v, 'duplicate'));
   });
 
   it('should be valid if control is empty', done => {
@@ -56,5 +58,9 @@ describe('Is Unique Validator', () => {
 
   it('should be valid if value does not exist', done => {
     checkValidity(formControl2, 'whatever', done);
+  });
+
+  it('should be valid if value exists but is the same as the old value', done => {
+    checkValidity(formControl3, 'duplicate', done);
   });
 });
