@@ -54,7 +54,7 @@ public class BisRouteService {
 
     Optional<BisRouteEntity> route = bisRouteRepository.findById(routeId);
     BisRouteEntity routeEntity = null;
-    if(route.isPresent()) {
+    if (route.isPresent()) {
       routeEntity =  route.get();
       //routeEntity.setStatus(isActivate?STATUS_ACTIVE:STATUS_INACTIVE);
     }
