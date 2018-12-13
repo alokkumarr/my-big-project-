@@ -30,9 +30,9 @@ class Utils {
     return returnValue;
   }
 
-  validApiCall(serverResponse, messageKey){
-    if(!serverResponse) {
-      logger.error(messageKey+ ' failed, hence marking test suite as failure & terminating the suite..Please refer logs for more details..');
+  validApiCall(serverResponse, messageKey) {
+    if (!serverResponse) {
+      logger.error(messageKey + ' failed, hence marking test suite as failure & terminating the suite..Please refer logs for more details..');
       process.exit(1);
     }
     return serverResponse;

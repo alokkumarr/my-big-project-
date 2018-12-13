@@ -6,7 +6,7 @@ class RestClient {
   post(url, payload, token) {
     logger.info('making post call to url :' + url);
     logger.debug('post call payload :' + JSON.stringify(payload));
-    logger.debug('Api call token :' + token);
+    logger.silly('Api call token :' + token);
     let headers = {};
     if (token) {
       headers['Authorization'] = token;
@@ -27,7 +27,7 @@ class RestClient {
 
   get(url, token) {
     logger.info('making get call to url :' + url);
-    logger.debug('get call token :' + token);
+    logger.silly('get call token :' + token);
     let response = request('GET', url, {
       headers: { Authorization: token }
     });
@@ -45,7 +45,7 @@ class RestClient {
   delete(url, token) {
 
     logger.info('making delete call to url :' + url);
-    logger.debug('delete call token :' + token);
+    logger.silly('delete call token :' + token);
     let response = request('DELETE', url, {
       headers: { Authorization: token }
     });
