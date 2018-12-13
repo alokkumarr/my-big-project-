@@ -75,22 +75,37 @@ export class DatasourceService {
       );
   }
 
-  deActivateRoute() {
-
+  activateRoute(channelId, routeId) {
+    return this.toggleRoute(channelId, routeId, false);
   }
 
-  deActivateChannel(channelId, routeId) {
-    // const endpoint = `/ingestion/batch/channels/${channelId}/routes/${routeId}/deactivate?channelId=${channelId}&routeId=${routeId}`;
-    // return this.http
-    //   .get(endpoint)
-    //   .pipe(
-    //     catchError(this.handleError('data', false))
-    //   );
+  deActivateRoute(channelId, routeId) {
+    return this.toggleRoute(channelId, routeId, false);
+  }
 
-    const endpoint = `/ingestion/batch/channels/${channelId}/routes/${routeId}/deactivate`;
+  toggleRoute(channelId, routeId, activate: boolean) {
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/routes/${routeId}/${activate ? 'activate' : 'deactivate'}`;
     const payload = {
       channelId,
       routeId
+    };
+    return this.http
+      .put(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  activateChannel(channelId) {
+    return this.toggleChannel(channelId, true);
+  }
+
+  deActivateChannel(channelId) {
+    return this.toggleChannel(channelId, false);
+  }
+
+  toggleChannel(channelId, activate: boolean) {
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/${activate ? 'activate' : 'deactivate'}`;
+    const payload = {
+      channelId
     };
     return this.http
       .put(endpoint, payload)
