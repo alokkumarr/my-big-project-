@@ -1,7 +1,11 @@
+@import 'src/themes/base/colors';
+
 :host {
   display: flex;
   height: 100%;
   flex-direction: column;
   overflow: auto;
   padding: 0 10px;
+  margin-left: 10px;
+  border-left: 2px dashed $primary-grey-g1;
 }

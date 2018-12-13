@@ -139,6 +139,7 @@ export class AdminExportContentComponent implements OnInit {
 
     return this.dxDataGridService.mergeWithDefaultConfig({
       columns,
+      noDataText: 'No Data. Select a category to view analyses.',
       width: '100%',
       height: '100%',
       paging: {

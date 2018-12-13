@@ -71,6 +71,7 @@ export class AdminExportListComponent implements OnInit {
     ];
     return this.dxDataGridService.mergeWithDefaultConfig({
       columns,
+      noDataText: 'No data to export. Select items from left to add them here.',
       width: '100%',
       height: '100%',
       paging: {

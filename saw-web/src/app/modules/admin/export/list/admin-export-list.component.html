@@ -3,6 +3,7 @@
   [columnAutoWidth]="config.columnAutoWidth"
   [columnMinWidth]="config.columnMinWidth"
   [columnResizingMode]="config.columnResizingMode"
+  [noDataText]="config.noDataText"
   [allowColumnReordering]="config.allowColumnReordering"
   [allowColumnResizing]="config.allowColumnResizing"
   [showColumnHeaders]="config.showColumnHeaders"
@@ -27,6 +28,7 @@
   </div>
   <div *dxTemplate="let cell of 'selectionHeaderCellTemplate'">
     <mat-checkbox
+      matTooltip="Remove All"
       (change)="onToggleAll($event)"
       [checked]="(exportList | async).length > 0"
       [hidden]="!(exportList | async).length"

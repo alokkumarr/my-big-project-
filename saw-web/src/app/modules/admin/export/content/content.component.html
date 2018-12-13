@@ -1,6 +1,7 @@
 <dx-data-grid
   [customizeColumns]="config.customizeColumns"
   [columnAutoWidth]="config.columnAutoWidth"
+  [noDataText]="config.noDataText"
   [columnMinWidth]="config.columnMinWidth"
   [columnResizingMode]="config.columnResizingMode"
   [allowColumnReordering]="config.allowColumnReordering"
@@ -30,6 +31,7 @@
   </div>
   <div *dxTemplate="let cell of 'selectionHeaderCellTemplate'">
     <mat-checkbox
+      matTooltip="Toggle All"
       (change)="onToggleAll($event)"
       [checked]="allSelected$ | async"
       [indeterminate]="someSelected$ | async"

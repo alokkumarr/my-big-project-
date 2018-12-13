@@ -3,12 +3,12 @@
   fxLayoutAlign="space-between center"
   style="width: 100%;"
 >
-  <div fxLayout="row" fxFlex="10">
-    <div class="admin-title">Export Analysis</div>
-  </div>
+  <div fxLayout="row" fxFlex="10"><div class="admin-title">Export</div></div>
 
   <div class="admin-export__actions">
-    <mat-checkbox class="admin-export__actions--metrics-checkbox"
+    <mat-checkbox
+      [hidden]="true"
+      class="admin-export__actions--metrics-checkbox"
       >Include Metrics</mat-checkbox
     >
     <button
