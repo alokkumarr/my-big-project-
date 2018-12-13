@@ -144,14 +144,14 @@ function generateFailedTests(dir) {
 
   if(Object.keys(subset).length > 0) {
     // There are some failures hence deleting the old failed file & creating it again with new data set
-    if(fs.existsSync('target/testData/failed/finalFail.json')) {
-      fs.unlinkSync('target/testData/failed/finalFail.json');
+    if(fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+      fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
     }
-    fs.writeFileSync('target/testData/failed/finalFail.json', JSON.stringify(subset), { encoding: 'utf8' });
-  } else {
+    fs.writeFileSync('target/e2e/testData/failed/finalFail.json', JSON.stringify(subset), { encoding: 'utf8' });
+  } else {s
     // There are no failures hence deleting the old failed file...
-    if(fs.existsSync('target/testData/failed/finalFail.json')) {
-      fs.unlinkSync('target/testData/failed/finalFail.json');
+    if(fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+      fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
     }
   }
 }

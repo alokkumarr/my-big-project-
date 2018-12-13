@@ -205,7 +205,7 @@ exports.config = {
       retryCounter = ++argv.retry;
     }
     // Rename failedFailedTests.json to
-    if (retryCounter <= maxRetryForFailedTests) {
+    if (retryCounter <= maxRetriesForFailedTests) {
       // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
       SuiteSetup.failedTestDataForRetry();
 
