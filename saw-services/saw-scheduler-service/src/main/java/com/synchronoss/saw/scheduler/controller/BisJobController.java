@@ -139,17 +139,22 @@ public class BisJobController extends BaseJobController {
       boolean isJobRunning = bisService.isJobRunning(schedule);
 
       if (!isJobRunning) {
+        logger.info("Job is not running state. So Pausing now......");
         boolean status = bisService.pauseJob(schedule);
         if (status) {
+          logger.info("Pause Job Success!!");
           return getServerResponse(ServerResponseCode.SUCCESS, true);
         } else {
+          logger.info("Pause Job failure!!");
           return getServerResponse(ServerResponseCode.ERROR, false);
         }
       } else {
+        logger.info("Job is right now running. So can not update. Try after some time.");
         return getServerResponse(ServerResponseCode.JOB_ALREADY_IN_RUNNING_STATE, false);
       }
 
     } else {
+      logger.info("Job " + schedule  + "doesnt exists");
       // Job doesn't exist
       return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }

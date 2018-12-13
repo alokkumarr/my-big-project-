@@ -51,18 +51,18 @@ public class BisRouteService {
   public void activateOrDeactivateRoute(Long channelId, Long routeId, boolean isActivate) {
     // update bis_route table status
     // resume schedule for route
-
+    logger.trace("Retrieve route");
     Optional<BisRouteEntity> route = bisRouteRepository.findById(routeId);
     BisRouteEntity routeEntity = null;
     if (route.isPresent()) {
+      logger.trace("Updating route status");
       routeEntity =  route.get();
-      //routeEntity.setStatus(isActivate?STATUS_ACTIVE:STATUS_INACTIVE);
-    }
-    if (route.isPresent()) {
+      routeEntity.setStatus(isActivate ? STATUS_ACTIVE : STATUS_INACTIVE);
+      bisRouteRepository.saveAndFlush(routeEntity);
+      
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
       scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
-      bisRouteRepository.saveAndFlush(routeEntity);
       updateScheduledJobsStatus(isActivate, scheduleKeys);
 
     } else {
@@ -89,11 +89,15 @@ public class BisRouteService {
       logger.trace("No routes exists for this channel");
     } else {
       
-      logger.trace("Updating routes....");
+     
       /**
        * For each route pause the scheduled jobs.
        */
       for (BisRouteEntity bisRouteEntity : routes) {
+        logger.trace("Updating routes....");
+        bisRouteEntity.setStatus(isActivate ? STATUS_ACTIVE : STATUS_INACTIVE);
+        bisRouteRepository.saveAndFlush(bisRouteEntity);
+        
         BisScheduleKeys scheduleKeys = new BisScheduleKeys();
         scheduleKeys.setGroupName(String.valueOf(bisRouteEntity.getBisRouteSysId()));
         scheduleKeys.setJobName(BisChannelType.SFTP.name() 
@@ -108,11 +112,16 @@ public class BisRouteService {
 
   private void updateScheduledJobsStatus(boolean isActivate, BisScheduleKeys scheduleKeys) {
     String url;
+    logger.trace("Updating route scheduled jobs");
+    
     if (isActivate) {
       url = bisSchedulerUrl + resumeUrl;
+      
     } else {
       url = bisSchedulerUrl + pauseUrl;
     }
+    logger.trace("Invoking URL:" + url);
+    
     try {
       restTemplate.postForLocation(url, scheduleKeys);
     } catch (ResourceAccessException exception) {
@@ -140,11 +149,13 @@ public class BisRouteService {
         .findByBisChannelSysId(channelId, Pageable.unpaged())
         .getContent();
     ObjectMapper objectMapper = new ObjectMapper();
+    logger.trace("Retrieving route metadata");
     Optional<BisRouteEntity> route = routeEntities.stream().filter(bisRouteEntity -> {
       JsonNode metaDataNode;
       JsonNode existingRoute;
       try {
         metaDataNode = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+        logger.trace("Parsing route metadata");
         existingRoute = metaDataNode.get("routeName");
         if (existingRoute != null && existingRoute.asText().equalsIgnoreCase(routeName)) {
           return true;

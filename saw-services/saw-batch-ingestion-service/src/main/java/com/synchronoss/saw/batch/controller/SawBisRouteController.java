@@ -32,8 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -42,11 +40,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,10 +52,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.DefaultResponseErrorHandler;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+
+
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -470,7 +465,7 @@ public class SawBisRouteController {
     }
     
     return ResponseEntity.ok(bisRouteDataRestRepository.findById(routeId).map(route -> {
-      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + deleteUrl);
+      logger.trace("scheduler uri to update starts here : " + bisSchedulerUrl + deleteUrl);
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
       scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
@@ -495,11 +490,11 @@ public class SawBisRouteController {
   public ResponseEntity<Boolean> deactivateRoute(
       @PathVariable("channelId")  Long channelId,
       @PathVariable("routeId") Long routeId) {
-    
+    logger.trace("Inside deactivating route  channelID " + channelId + "routeId: " + routeId);
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
     scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
-    bisRouteService.activateOrDeactivateRoute(channelId, routeId, true);
+    bisRouteService.activateOrDeactivateRoute(channelId, routeId, false);
     return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
   
@@ -516,7 +511,7 @@ public class SawBisRouteController {
   public ResponseEntity<Boolean> activateRoute(
       @PathVariable("channelId")  Long channelId,
       @PathVariable("routeId") Long routeId) {
-    
+    logger.trace("Inside activate route  channelID " + channelId + "routeId: " + routeId);
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
     scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
@@ -538,7 +533,8 @@ public class SawBisRouteController {
   public ResponseEntity<Boolean> isDuplicateRoute(
       @PathVariable("channelId")  Long channelId,
       @RequestParam("routeName") String routeName) {
-    
+    logger.trace("Checking for duplicate route namewith channelId: " + channelId 
+        + " and routeName: " + routeName);
     return new ResponseEntity<Boolean>(bisRouteService
         .isRouteNameExists(channelId,routeName), HttpStatus.OK);
   }
