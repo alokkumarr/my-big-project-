@@ -25,4 +25,13 @@
     <mat-checkbox (change)="onItemToggle($event, cell.data)" [checked]="true">
     </mat-checkbox>
   </div>
+  <div *dxTemplate="let cell of 'selectionHeaderCellTemplate'">
+    <mat-checkbox
+      (change)="onToggleAll($event)"
+      [checked]="(exportList | async).length > 0"
+      [hidden]="!(exportList | async).length"
+      i18n
+    >
+    </mat-checkbox>
+  </div>
 </dx-data-grid>

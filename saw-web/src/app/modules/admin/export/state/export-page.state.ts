@@ -7,7 +7,10 @@ import {
   RemoveAnalysisFromExport,
   AddDashboardToExport,
   RemoveDashboardFromExport,
-  ResetExportPageState
+  ResetExportPageState,
+  ClearExport,
+  AddAllAnalysesToExport,
+  RemoveAllAnalysesFromExport
 } from '../actions/export-page.actions';
 import { ExportPageModel } from './export-page.model';
 import { ExportService } from '../export.service';
@@ -119,6 +122,28 @@ export class ExportPageState {
     });
   }
 
+  @Action(AddAllAnalysesToExport)
+  addAllAnalysesToExport({
+    getState,
+    dispatch
+  }: StateContext<ExportPageModel>) {
+    const { categoryAnalyses } = getState();
+    dispatch(
+      categoryAnalyses.map(analysis => new AddAnalysisToExport(analysis))
+    );
+  }
+
+  @Action(RemoveAllAnalysesFromExport)
+  removeAllAnalysesFromExport({
+    getState,
+    dispatch
+  }: StateContext<ExportPageModel>) {
+    const { categoryAnalyses } = getState();
+    dispatch(
+      categoryAnalyses.map(analysis => new RemoveAnalysisFromExport(analysis))
+    );
+  }
+
   @Action(AddDashboardToExport)
   addDashboardToExport(
     { patchState, getState }: StateContext<ExportPageModel>,
@@ -147,6 +172,20 @@ export class ExportPageState {
         )
       }
     });
+  }
+
+  @Action(ClearExport)
+  clearExportList({ dispatch, getState }: StateContext<ExportPageModel>) {
+    const { exportData } = getState();
+    const actions = [
+      ...exportData.analyses.map(
+        analysis => new RemoveAnalysisFromExport(analysis)
+      ),
+      ...exportData.dashboards.map(
+        dashboard => new RemoveDashboardFromExport(dashboard)
+      )
+    ];
+    dispatch(actions);
   }
 
   @Action(ResetExportPageState)

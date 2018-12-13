@@ -23,23 +23,38 @@ export class ExportLoadDashboards {
 }
 
 export class AddAnalysisToExport {
-  static readonly type = '[Admin Export Page Content] Add analysis to export';
+  static readonly type = '[Admin Export Page] Add analysis to export';
   constructor(public analysis: Analysis) {}
 }
 
 export class RemoveAnalysisFromExport {
-  static readonly type =
-    '[Admin Export Page Content] Remove analysis from export';
+  static readonly type = '[Admin Export Page] Remove analysis from export';
   constructor(public analysis: Analysis) {}
 }
 
+export class AddAllAnalysesToExport {
+  static readonly type =
+    '[Admin Export Page] Add all analyses in selected category to export';
+  constructor() {}
+}
+
+export class RemoveAllAnalysesFromExport {
+  static readonly type =
+    '[Admin Export Page] Remove all analyses in selected category from export';
+  constructor() {}
+}
+
 export class AddDashboardToExport {
-  static readonly type = '[Admin Export Page Content] Add dashboard to export';
+  static readonly type = '[Admin Export Page] Add dashboard to export';
   constructor(public dashboard: Dashboard) {}
 }
 
 export class RemoveDashboardFromExport {
-  static readonly type =
-    '[Admin Export Page Content] Remove Dashboard from export';
+  static readonly type = '[Admin Export Page] Remove Dashboard from export';
   constructor(public dashboard: Dashboard) {}
+}
+
+export class ClearExport {
+  static readonly type = '[Admin Export Page] Clear export list';
+  constructor() {}
 }

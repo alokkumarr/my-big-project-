@@ -72,7 +72,7 @@ export class AdminExportContentComponent implements OnInit {
    * @param {*} item
    * @memberof AdminExportContentComponent
    */
-  onItemToggled({ checked }, item) {
+  onItemToggled({ checked }: any, item: any) {
     this.change.emit({ checked, item });
   }
 
@@ -83,7 +83,7 @@ export class AdminExportContentComponent implements OnInit {
    * @returns {Observable<boolean>}
    * @memberof AdminExportContentComponent
    */
-  isSelectedForExport$(item): Observable<boolean> {
+  isSelectedForExport$(item: any): Observable<boolean> {
     return this.exportList.pipe(
       map(list =>
         list.some(a => {
@@ -101,7 +101,7 @@ export class AdminExportContentComponent implements OnInit {
    * @param {*} { checked }
    * @memberof AdminExportContentComponent
    */
-  onToggleAll({ checked }) {
+  onToggleAll({ checked }: any) {
     this.changeAll.emit(checked);
   }
 

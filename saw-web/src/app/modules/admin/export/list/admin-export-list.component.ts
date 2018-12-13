@@ -11,6 +11,7 @@ import { ExportItemChangeOutput } from '../content/content.component';
 export class AdminExportListComponent implements OnInit {
   @Input() exportList: Observable<any[]>;
   @Output() change: EventEmitter<ExportItemChangeOutput> = new EventEmitter();
+  @Output() changeAll: EventEmitter<boolean> = new EventEmitter();
 
   config: any;
 
@@ -26,12 +27,23 @@ export class AdminExportListComponent implements OnInit {
     this.change.emit({ checked, item });
   }
 
+  /**
+   * Handle toggling the 'all' checkbox at top of the list
+   *
+   * @param {*} { checked }
+   * @memberof AdminExportListComponent
+   */
+  onToggleAll({ checked }: any) {
+    this.changeAll.emit(checked);
+  }
+
   getConfig() {
     const columns = [
       {
         caption: '',
         allowSorting: false,
         alignment: 'center',
+        headerCellTemplate: 'selectionHeaderCellTemplate',
         cellTemplate: 'selectionCellTemplate',
         width: '10%'
       },
