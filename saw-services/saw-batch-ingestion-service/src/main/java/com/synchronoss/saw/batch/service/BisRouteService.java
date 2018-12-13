@@ -32,6 +32,8 @@ public class BisRouteService {
   private String deleteUrl = "/delete";
   private String pauseUrl = "/pause";
   private String resumeUrl = "/resume";
+  private static final Long STATUS_ACTIVE = 1L;
+  private static final Long STATUS_INACTIVE = 0L;
 
   private static final Logger logger = LoggerFactory.getLogger(BisRouteService.class);
   @Autowired
@@ -51,11 +53,17 @@ public class BisRouteService {
     // resume schedule for route
 
     Optional<BisRouteEntity> route = bisRouteRepository.findById(routeId);
+    BisRouteEntity routeEntity = null;
+    if(route.isPresent()) {
+      routeEntity =  route.get();
+      //routeEntity.setStatus(isActivate?STATUS_ACTIVE:STATUS_INACTIVE);
+    }
     if (route.isPresent()) {
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
       scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
-      invokeScheduleJobs(isActivate, scheduleKeys);
+      bisRouteRepository.saveAndFlush(routeEntity);
+      updateScheduledJobsStatus(isActivate, scheduleKeys);
 
     } else {
       new ResourceNotFoundException("No route found with route " + routeId);
@@ -84,12 +92,12 @@ public class BisRouteService {
       scheduleKeys.setGroupName(String.valueOf(bisRouteEntity.getBisRouteSysId()));
       scheduleKeys.setJobName(BisChannelType.SFTP.name() 
           + channelId + bisRouteEntity.getBisRouteSysId());
-      invokeScheduleJobs(isActivate, scheduleKeys);
+      updateScheduledJobsStatus(isActivate, scheduleKeys);
     }
 
   }
 
-  private void invokeScheduleJobs(boolean isActivate, BisScheduleKeys scheduleKeys) {
+  private void updateScheduledJobsStatus(boolean isActivate, BisScheduleKeys scheduleKeys) {
     String url;
     if (isActivate) {
       url = bisSchedulerUrl + resumeUrl;
