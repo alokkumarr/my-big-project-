@@ -48,6 +48,7 @@ import {
 } from './components/global-filter';
 import { DashboardService } from './services/dashboard.service';
 import { CommonModuleTs } from '../../common';
+import { FirstDashboardGuard } from './guards';
 
 const components = [
   ObservePageComponent,
@@ -67,6 +68,8 @@ const components = [
   SaveDashboardComponent,
   ConfirmDialogComponent
 ];
+
+const GUARDS = [FirstDashboardGuard];
 
 @NgModule({
   imports: [
@@ -97,7 +100,8 @@ const components = [
     MenuService,
     ToastService,
     SideNavService,
-    FilterService
+    FilterService,
+    ...GUARDS
   ]
 })
 export class ObserveUpgradeModule {}
