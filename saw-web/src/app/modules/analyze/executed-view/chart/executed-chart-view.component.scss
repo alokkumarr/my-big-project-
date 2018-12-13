@@ -11,15 +11,35 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
   font-weight: normal;
   font-size: $header-font-size;
+  margin-left: 16%;
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-container {
+  width: 80%;
+}
+
+.flex-icon-container {
+  width: 20%
 }
 
 .toggle-icons {
   text-align: right;
-  height: 25px;
-  margin-right: 5%;
   font-size: 15px;
+  margin-right: 10px;
 }
 
 .mat-icon.active {
   color: $primary-blue-b2;
+}
+
+.icon-export.report-grid-export {
+  font-size: 17px;
+  margin-top: 9px;
+  margin-left: 10px;
 }

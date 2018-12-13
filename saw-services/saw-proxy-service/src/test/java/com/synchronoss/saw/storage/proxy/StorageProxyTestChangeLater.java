@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+//import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.After;
 import org.junit.Before;
@@ -87,8 +87,10 @@ public class StorageProxyTestChangeLater {
             .withSettings(settingStream).build())
         .withStartTimeout(5, TimeUnit.MINUTES).build().start();
     Settings settings = Settings.builder().put("cluster.name", CLUSTER_NAME).build();
-    client = new PreBuiltTransportClient(settings).addTransportAddress(
-        new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9350));
+    //Client is not being used anywhere in the test class and PreBuiltTransportClient not available
+      // in ES 6.3 version , So commenting out this code for future reference.
+   /* client = new PreBuiltTransportClient(settings).addTransportAddress(
+        new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9350));*/
   }
 
   @After

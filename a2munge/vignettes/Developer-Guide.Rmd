@@ -1,0 +1,290 @@
+---
+title: "a2munge User Guide"
+author: "Haarstick"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{a2munge User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+
+```{r packages, echo=FALSE, warning=FALSE, message=FALSE}
+
+# R Packages
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(purrr)
+library(lubridate)
+library(sparklyr)
+library(a2munge)
+
+```
+
+
+## Overview
+
+
+a2munge is an R package to help create Advanced Analytic data pipelines. The package contains a suite of R and Spark^[Spark Data Processing Engine [via](https://spark.apache.org/)] compatible data preparation, transformation and analytic functions (aka munging). Advanced Analytics data pipelines, or data pipelines to create statistical model training data often require complex data cleansing, transformation and preparation. The a2munge package is designed to efficiently create such pipelines. 
+
+## Background
+
+This guide assumes a working knowledge of R, the tidyverse and sparklyr R packages, R S3 object oriented programming, and R package development. Relevant links:
+
+* [R](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)^[R Intro [via](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)]
+* [tidyverse](https://www.tidyverse.org/)^[Tidyverse [via](https://www.tidyverse.org/)]
+* [R for Data Science](https://r4ds.had.co.nz/)^[R for Data Science [via](https://r4ds.had.co.nz/)]
+* [S3 OOP](http://adv-r.had.co.nz/S3.html)^[R S3 Object System [via](http://adv-r.had.co.nz/S3.html)]
+* [R Packages](http://r-pkgs.had.co.nz/)^[R Packages [via](http://r-pkgs.had.co.nz/)]
+
+
+This guide also assumes knowledge of how a2munge is applied. Check out the User-Guide Vignette for details on how this package is used. 
+
+
+## Requirements
+
+* __R__: version >= 3.5
+* __Spark__: version >= 2.3.0
+
+
+## Design
+
+The a2munge package consists of many independent data manipulation and transformation functions. Each function has its own R and test file in the package directory. With a few exceptions (such as reader), a2munge functions follow a similar structure followed below using the S3 Object System
+
+* generic function
+* R data.frame method
+* Spark tbl_spark method
+
+The a2munge functions follow this pattern to allow the user to scale to distributed pipelines from base R without significant changes to the code. Thus a2munge supports in memory and distributed data pipeline development. 
+
+Functions following this pattern are tested for method equality. Ie - the spark and R methods are tested to ensure they produce the same output. In a few cases (such as Roller), the R method has a few more features than the spark method. 
+
+The foundation of the a2munge spark methods rest on top of [sparklyr's spark based methods for dplyr verbs](https://spark.rstudio.com/dplyr/). This allows for the basic dplyr syntax to extend to tbl_spark objects. Ie - the `mutate` functions operates in a similar way for both base R data.frames as it does for spark tbl_spark objects. However it is very important to understand that a2munge spark methods are using the sparklyr package to execute either HIVE UDFs or UDFs registered in Scala from R. Here are a few important links when developing new a2munge spark methods:
+
+* __Hive UDFs__^[Hive UDFs [via](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF)]: Reference for Hive UDFs that can be executed in spark based methods
+* __Sparklyr Extensions__^[Guide on creating sparklyr extensions with Scala [via](https://spark.rstudio.com/extensions/)]: sparklyr guide for creating extensions with Scala
+
+
+The implication is that while `mutate` might behavior in a similar fashion the functional logic may differ. There  there is some overlap between base R syntax and Hive UDFs, however, most R functionality will not execute on spark objects as is. This is especially true for R packages. Below are a few examples where the code is consistent and where it differs
+
+
+```{r}
+# Example R data.frame 
+sim_df
+
+```
+
+
+```{r, eval=FALSE}
+
+# Create Spark Connection
+sc <- spark_connect(master = "local")
+
+# Copy data to spark
+sim_tbl <- copy_to(sc, sim_df, name = "sim_tbl", overwrite = TRUE)
+```
+
+In the following chunk, the `month` function in the lubridate package R is used to extract the month from the date. The output is consistent to the Hive `month` UDF and code is consistent for dataset objects.
+
+```{r, eval=FALSE}
+
+## Extract Month from date
+
+# R Data.frame
+library(lubridate)
+mutate(sim_df, month = month(date))
+
+# WORKS: Spark tbl_spark
+mutate(sim_tbl, month = month(date))
+
+
+```
+
+In the next chunk the `week` function in lubridate is used to extract the week number from a date, however, this function does not have a direct Hive corollary. Instead the `weekofyear` Hive UDF produces the same output as the lubridate `week` function.
+
+
+```{r, eval=FALSE}
+
+## Extract week number from date
+
+# R Data.frame
+mutate(sim_df, week = week(date))
+
+# FAILS: Spark tbl_spark
+mutate(sim_tbl, week = week(date))
+
+# WORKS: Spark tbl_spark
+mutate(sim_tbl, week = weekofyear(date))
+
+```
+
+
+#### a2munge S3 Example
+
+Below is a few examples of a2munge functions with the R and Spark methods shown. The first example is the `summariser` where the two methods are very similar. They both leverage dplyr verbs in similar fashion to produce the same summarized output. 
+
+
+```{r}
+
+# Summariser R data.frame method
+getS3method("summariser", "data.frame")
+
+
+# Summariser Spark tbl_spark method
+getS3method("summariser", "tbl_spark")
+
+```
+
+Note that both functions have parametric inputs for the columns to be manipulated. This concept persists throughout the a2munge functions. In R this is known as standard evaluation^[Programming with R [via](https://dplyr.tidyverse.org/articles/programming.html)] which differs from default dplyr which uses non-standard evaluation^[Advanced R chapter on Non-Standard Evaluation [via](http://adv-r.had.co.nz/Computing-on-the-language.html)]. a2munge functions use standard evaluation equivalent functions like `mutate_at` or `group_by_vars` (vs `mutate` or `group_by`) or by using quasiquotation^[Programming with R, quasiquotations [via](https://dplyr.tidyverse.org/articles/programming.html#quasiquotation)]
+
+
+The input assertions can also be seen for both. Input assertions are made via the checkmate^[checkmate R package [via](https://mllg.github.io/checkmate/)] suite of functions and exist throughout all a2munge functions. 
+
+The `melter` function is a contrasting example where two methods differ significantly. The R version is a thin wrapper around the `melt` function from the reshape2 package. The spark method invokes the Scala `selectExpr` function with an expression using the `stack` UDF. The spark method creates a custom string from the inputs and passes to the Scala function via the sparklyr `invoke` function. This is a good example of how Scala extensions are used. 
+
+```{r}
+# Melter R data.frame method
+getS3method("melter", "data.frame")
+
+# Melter Spark tbl_spark method
+getS3method("melter", "tbl_spark")
+```
+
+
+### Detecter
+
+The detecter function is a special example of Spark Distributed R^[Spark Distributed R with sparklyr [via](https://spark.rstudio.com/guides/distributed-r/)]. The spark method uses the function `spark_apply` from the sparklyr package to apply the a2munge `detect` function in a distributed fashion. The R data.frame method uses the same `detect` function internally. 
+
+```{r}
+# Detecter R data.frame method
+getS3method('detecter', 'data.frame')
+
+```
+
+
+The spark method version with the spark_apply below. There are well known [performance issues](https://github.com/rstudio/sparklyr/issues/1382) with the `spark_apply` function. One of the other challenges using the `spark_apply` function is the error message is not as verbose and its difficult to determine the cause of errors. The function internal to `spark_apply` is isolated to the context provided. So if external packages are required, they have to be shipped with the function across the network. This can cause some overhead and latency issues.
+
+```{r}
+# Detecter Spark tbl_spark method
+getS3method('detecter', "tbl_spark")
+```
+
+
+Below is the core `detect` function. The function uses the `stl` function to apply a seasonal decomposition on the time series to identify a trend, seasonal and resid components. The detect function is based on the `AnomalyDetection` function from the R package of the same name and the Seasonal Hybrid ESD^[Automatic Anomaly Detection in the Cloud
+Via Statistical Learning [via](https://arxiv.org/pdf/1704.07706.pdf) ]
+(https://arxiv.org/pdf/1704.07706.pdf).
+
+```{r}
+# detect function
+getS3method("detect", "data.frame")
+```
+
+
+Next we'll break down the `detect` function in parts
+
+
+The `detect` data.frame method starts with a series of input arguments assertions along with a few warning messages.  
+
+```{r, eval = FALSE}
+detect.data.frame <- function(df,
+                              index_var,
+                              measure_var,
+                              frequency,
+                              direction = 'pos',
+                              alpha = .01,
+                              max_anoms = .01,
+                              trend_window = 0.75) {
+
+  df_names <- colnames(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_choice(measure_var, df_names)
+  checkmate::assert_subset(class(df[[measure_var]]), c("numeric", "integer"))
+  checkmate::assert_choice(direction, c("pos", "both", "neg"))
+  checkmate::assert_number(frequency, lower=2, upper=Inf)
+  checkmate::assert_number(alpha, lower=0, upper=1)
+  checkmate::assert_number(max_anoms, lower=0, upper=1)
+  checkmate::assert_number(trend_window, lower=0, upper=1)
+
+  if(alpha > .1 ){
+    message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
+  }
+
+  if (max_anoms > .1) {
+    message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
+  }
+
+```
+
+In the next chunk the residual statistical threshold is calculated based on the alpha input. A p-value is calculated from the direction and alpha and passed to the `qnorm` function which provides a quantile value from a normal distribution. The trend_window input is formatted for the `stl` function.
+
+```{r, eval = FALSE}
+
+  two_tail <- ifelse(direction == "both", TRUE, FALSE)
+  n <- nrow(df)
+  ma <- max_anoms * n
+  p <- ifelse(two_tail, 1 - alpha / 2, 1 - alpha)
+  cv <- qnorm(p, 0, 1)
+  t_window <- round(n * trend_window)
+  if (t_window %% 2 == 1)
+    t_window <- t_window + 1
+```
+
+In the next chunk the `stl`^[STL decomposition [via](https://otexts.org/fpp2/stl.html)] function is called and the seasonal, trend, and residual components are extracted. 
+
+```{r, eval = FALSE}
+ df_ts <- ts(df[[measure_var]], frequency = frequency)
+  df_stl <- as.data.frame(stl(
+    df_ts,
+    s.window = "period",
+    robust = TRUE,
+    t.window = t_window
+  )$time.series)
+
+  df$seasonal <- df_stl$seasonal
+  df$trend <- df_stl$trend
+  df$resid <- df_stl$remainder
+```
+
+
+In the next section the `median` and `mad`^[Median absolute deviation [via](https://en.wikipedia.org/wiki/Median_absolute_deviation)] are calculated from the `stl` residual component. These two measures are more robust and less sensitive to outliers than the mean and standard deviation counterparts. The residual is standardized by removing the median and dividing mad values. Lastly anomalies are identified where the standardized residual is greater than the statistical threshold calculated in the previous section. 
+
+
+```{r, eval = FALSE}
+df_mad <- mad(df$resid)
+  df_med <- median(df$resid)
+  df$lower <- df$trend + df$seasonal + df_med - abs(cv) * df_mad
+  df$upper <- df$trend + df$seasonal + df_med + abs(cv) * df_mad
+
+  if (direction == "pos") {
+    df$resid_std <- (df$resid - df_med) / df_mad
+  } else if (direction == "neg") {
+    df$resid_std <- (df_med - df$resid) / df_mad
+  } else {
+    df$resid_std <- abs((df$resid - df_med)) / df_mad
+  }
+
+  df$anomaly <- ifelse(df$resid_std > cv, 1, 0)
+```
+
+In the last step the standardized residual is ordered by magnitude and an additional filter is applied based the max_anoms input which corresponds to the max number of anomalies as a function of number of rows. Lastly the results is re-ordered by the index_var and columns are arranged and returned. 
+
+```{r, eval=FALSE}
+ df <- df[order(df$resid_std, decreasing = T), ]
+  df$metric_index <- 1:n
+  df$anomaly <- ifelse(df$metric_index > ma, 0, df$anomaly)
+  df[order(df[[index_var]]), c(df_names, "seasonal", "trend", "resid", "lower", "upper", "anomaly")]
+```
+

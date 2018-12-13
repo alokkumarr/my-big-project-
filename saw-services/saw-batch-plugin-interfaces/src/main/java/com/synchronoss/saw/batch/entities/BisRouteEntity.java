@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @ApiModel("Route Entity")
 @Entity(name = "routes")
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "BIS_ROUTE", catalog = "sip_batch_ingestion", schema = "")
+@Table(name = "BIS_ROUTE", catalog = "sip_bis", schema = "")
 public class BisRouteEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
