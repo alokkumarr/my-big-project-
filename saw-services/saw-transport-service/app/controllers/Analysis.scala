@@ -144,6 +144,7 @@ class Analysis extends BaseController {
           ("createdTimestamp", Instant.now().toEpochMilli()) ~
           ("userId", userId.asInstanceOf[Number].longValue) ~
           ("createdBy", masterLoginId) ~
+          ("username", masterLoginId) ~
           ("userFullName", userFullName)
         val analysisId = UUID.randomUUID.toString
         val idJson: JObject = ("id", analysisId)
