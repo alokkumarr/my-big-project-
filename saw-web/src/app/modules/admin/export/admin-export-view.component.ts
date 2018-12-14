@@ -10,7 +10,7 @@ import {
   AddAllAnalysesToExport,
   RemoveAllAnalysesFromExport
 } from './actions/export-page.actions';
-import { Menu } from '../../../common/state/common.state.model';
+import { MenuItem } from '../../../common/state/common.state.model';
 import { AdminExportLoadMenu } from '../../../common/actions/menu.actions';
 import { ExportPageState } from './state/export-page.state';
 import { ExportService } from './export.service';
@@ -29,7 +29,10 @@ import * as get from 'lodash/get';
   styleUrls: ['./admin-export-view.component.scss']
 })
 export class AdminExportViewComponent implements OnInit, OnDestroy {
-  @Select(state => state.common.analyzeMenu) analyzeMenu$: Observable<Menu>;
+  @Select(state => state.common.analyzeMenu) analyzeMenu$: Observable<
+    MenuItem[]
+  >;
+  categorisedMenu$: Observable<MenuItem[]>;
 
   @Select(ExportPageState.exportList) exportList$: Observable<any[]>;
 
@@ -52,6 +55,16 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
+    this.categorisedMenu$ = this.analyzeMenu$.pipe(
+      map(menu => [
+        {
+          id: 'analyze_1',
+          name: 'Analyze',
+          expanded: true,
+          children: menu
+        }
+      ])
+    );
   }
 
   ngOnDestroy() {
