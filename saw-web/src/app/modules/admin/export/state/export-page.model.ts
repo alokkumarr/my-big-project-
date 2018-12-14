@@ -7,10 +7,10 @@ export interface ExportPageModel {
   selectedCategory: MenuItem;
 
   /* Analyses in currently selected category */
-  categoryAnalyses?: Analysis[];
+  categoryAnalyses: Analysis[];
 
   /* Dashboards in currently selected category */
-  categoryDashboards?: Dashboard[];
+  categoryDashboards: Dashboard[];
 
   shouldExportMetric: boolean;
 

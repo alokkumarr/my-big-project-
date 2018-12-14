@@ -17,7 +17,7 @@ import { ExportService } from '../export.service';
 import { tap } from 'rxjs/operators';
 import * as cloneDeep from 'lodash/clone';
 
-const defaultState: ExportPageModel = {
+const defaultExportPageState: ExportPageModel = {
   selectedModule: null,
   selectedCategory: null,
   shouldExportMetric: false,
@@ -32,7 +32,7 @@ const defaultState: ExportPageModel = {
 
 @State<ExportPageModel>({
   name: 'exportPage',
-  defaults: <ExportPageModel>cloneDeep(defaultState)
+  defaults: <ExportPageModel>cloneDeep(defaultExportPageState)
 })
 export class ExportPageState {
   constructor(private exportService: ExportService) {}
@@ -68,7 +68,7 @@ export class ExportPageState {
   ) {
     return this.exportService.getAnalysesByCategoryId(categoryId).pipe(
       tap(analyses => {
-        patchState({
+        return patchState({
           categoryAnalyses: analyses
         });
       })
@@ -82,7 +82,7 @@ export class ExportPageState {
   ) {
     return this.exportService.getDashboardsForCategory(categoryId).pipe(
       tap(dashboards => {
-        patchState({
+        return patchState({
           categoryDashboards: dashboards
         });
       })
@@ -99,13 +99,15 @@ export class ExportPageState {
       exportAnalysis => exportAnalysis.id === analysis.id
     );
 
-    !alreadyInExport &&
+    return (
+      !alreadyInExport &&
       patchState({
         exportData: {
           ...exportData,
           analyses: [...exportData.analyses, analysis]
         }
-      });
+      })
+    );
   }
 
   @Action(RemoveAnalysisFromExport)
@@ -114,7 +116,7 @@ export class ExportPageState {
     { analysis }: AddAnalysisToExport
   ) {
     const { exportData } = getState();
-    patchState({
+    return patchState({
       exportData: {
         ...exportData,
         analyses: exportData.analyses.filter(a => a.id !== analysis.id)
@@ -128,7 +130,7 @@ export class ExportPageState {
     dispatch
   }: StateContext<ExportPageModel>) {
     const { categoryAnalyses } = getState();
-    dispatch(
+    return dispatch(
       categoryAnalyses.map(analysis => new AddAnalysisToExport(analysis))
     );
   }
@@ -139,7 +141,7 @@ export class ExportPageState {
     dispatch
   }: StateContext<ExportPageModel>) {
     const { categoryAnalyses } = getState();
-    dispatch(
+    return dispatch(
       categoryAnalyses.map(analysis => new RemoveAnalysisFromExport(analysis))
     );
   }
@@ -150,7 +152,7 @@ export class ExportPageState {
     { dashboard }: AddDashboardToExport
   ) {
     const { exportData } = getState();
-    patchState({
+    return patchState({
       exportData: {
         ...exportData,
         dashboards: [...exportData.dashboards, dashboard]
@@ -164,7 +166,7 @@ export class ExportPageState {
     { dashboard }: AddDashboardToExport
   ) {
     const { exportData } = getState();
-    patchState({
+    return patchState({
       exportData: {
         ...exportData,
         dashboards: exportData.dashboards.filter(
@@ -185,11 +187,11 @@ export class ExportPageState {
         dashboard => new RemoveDashboardFromExport(dashboard)
       )
     ];
-    dispatch(actions);
+    return dispatch(actions);
   }
 
   @Action(ResetExportPageState)
   resetState({ setState }: StateContext<ExportPageModel>) {
-    setState(cloneDeep(defaultState));
+    return setState(cloneDeep(defaultExportPageState));
   }
 }
