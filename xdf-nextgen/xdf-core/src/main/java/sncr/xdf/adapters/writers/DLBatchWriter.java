@@ -108,16 +108,16 @@ public class DLBatchWriter {
             // Setup proper number of output files and write partitions
             switch (format) {
                 case "parquet":
-                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).parquet(dataLocation);
+                    DS.coalesce(numberOfFiles).write().partitionBy(partitionKeysList).parquet(dataLocation);
                     break;
                 case "json":
-                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).json(dataLocation);
+                    DS.coalesce(numberOfFiles).write().partitionBy(partitionKeysList).json(dataLocation);
                     break;
                 case "csv":
-                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).csv(dataLocation);
+                    DS.coalesce(numberOfFiles).write().partitionBy(partitionKeysList).csv(dataLocation);
                     break;
                 default:
-                    DS.repartition(numberOfFiles).write().partitionBy(partitionKeysList).parquet(dataLocation);
+                    DS.coalesce(numberOfFiles).write().partitionBy(partitionKeysList).parquet(dataLocation);
                     break;
             }
         }
@@ -126,16 +126,16 @@ public class DLBatchWriter {
             // Create flat structure/compact files - no key file definitions provided
             switch (format){
                 case "parquet":
-                    DS.repartition(numberOfFiles).write().parquet(dataLocation);
+                    DS.coalesce(numberOfFiles).write().parquet(dataLocation);
                     break;
                 case "json" :
-                    DS.repartition(numberOfFiles).write().json(dataLocation);
+                    DS.coalesce(numberOfFiles).write().json(dataLocation);
                     break;
                 case "csv" :
-                    DS.repartition(numberOfFiles).write().csv(dataLocation);
+                    DS.coalesce(numberOfFiles).write().csv(dataLocation);
                     break;
                 default:
-                    DS.repartition(numberOfFiles).write().parquet(dataLocation);
+                    DS.coalesce(numberOfFiles).write().parquet(dataLocation);
                     break;
             }
         }
@@ -143,16 +143,16 @@ public class DLBatchWriter {
         if (produceSample) {
             switch (format){
                 case "parquet":
-                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                     break;
                 case "json" :
-                    DS.repartition(1).sample(false, 0.1).write().json(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().json(sampleLocation);
                     break;
                 case "csv" :
-                    DS.repartition(1).sample(false, 0.1).write().csv(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().csv(sampleLocation);
                     break;
                 default:
-                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                     break;
             }
         }
