@@ -1,0 +1,10 @@
+.privilege-editor {
+  &__privilege-table {
+    width: 97%;
+    margin: 0 auto;
+
+    tr:hover {
+      background-color: aliceblue;
+    }
+  }
+}

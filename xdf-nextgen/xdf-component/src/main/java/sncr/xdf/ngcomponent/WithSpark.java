@@ -13,7 +13,7 @@ import java.util.List;
 public interface WithSpark {
 
     default void initSpark(SparkSession sparkSession, InternalContext ctx, NGContext ngctx) {
-        WithSparkHelper.logger.debug("Configure spark context: " + ngctx.componentName);
+        WithSparkHelper.logger.trace("Configure spark context: " + ngctx.componentName);
         SparkConf sparkConf = new SparkConf().setAppName(ngctx.componentName + "::" + ngctx.applicationID + "::" + ngctx.batchID );
 
         /// Overwrite configuration with parameters from component

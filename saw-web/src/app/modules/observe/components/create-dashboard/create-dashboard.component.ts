@@ -1,17 +1,13 @@
 import {
   Component,
-  Inject,
   ViewChild,
   OnDestroy,
+  OnInit,
   AfterContentInit
 } from '@angular/core';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatSidenav
-} from '@angular/material';
-import { Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { MatDialog, MatSidenav } from '@angular/material';
+import { Router, ActivatedRoute } from '@angular/router';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { MenuService } from '../../../../common/services/menu.service';
@@ -33,7 +29,8 @@ import { GlobalFilterService } from '../../services/global-filter.service';
   animations,
   providers: [DashboardService, GlobalFilterService]
 })
-export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
+export class CreateDashboardComponent
+  implements OnDestroy, OnInit, AfterContentInit {
   public fillState = 'empty';
   public dashboard: Dashboard;
   public requester = new BehaviorSubject({});
@@ -46,18 +43,38 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
   @ViewChild('widgetChoice') widgetSidenav: MatSidenav;
 
   constructor(
-    public dialogRef: MatDialogRef<CreateDashboardComponent>,
     public dialog: MatDialog,
     public router: Router,
     public menu: MenuService,
     public globalFilterService: GlobalFilterService,
     public dashboardService: DashboardService,
     public observe: ObserveService,
-    @Inject(MAT_DIALOG_DATA) public dialogData: any
-  ) {
-    this.dashboard = get(this.dialogData, 'dashboard');
-    this.mode = get(this.dialogData, 'mode');
-    this.checkEmpty(this.dashboard);
+    private locationService: Location,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    const { dashboardId, mode, categoryId } = this.route.snapshot.queryParams;
+    this.mode = mode;
+    if (this.mode === 'create') {
+      this.dashboard = {
+        entityId: null,
+        categoryId,
+        autoRefreshEnabled: false,
+        name: '',
+        description: '',
+        tiles: [],
+        filters: []
+      };
+      this.checkEmpty(this.dashboard);
+    } else {
+      this.observe
+        .getDashboard(dashboardId)
+        .subscribe((dashboard: Dashboard) => {
+          this.dashboard = dashboard;
+          this.checkEmpty(this.dashboard);
+        });
+    }
   }
 
   ngOnDestroy() {
@@ -127,7 +144,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
   }
 
   exitCreator() {
-    this.dialogRef.close();
+    this.locationService.back();
   }
 
   chooseAnalysis() {
@@ -217,13 +234,10 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
 
     dialogRef.afterClosed().subscribe((result: Dashboard) => {
       if (result) {
-        this.dialogRef.afterClosed().subscribe(() => {
-          this.updateSideMenu(result);
-          this.router.navigate(['observe', result.categoryId], {
-            queryParams: { dashboard: result.entityId }
-          });
+        this.updateSideMenu(result);
+        this.router.navigate(['observe', result.categoryId], {
+          queryParams: { dashboard: result.entityId }
         });
-        this.exitCreator();
       }
     });
   }

@@ -295,7 +295,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
      *
      * Retrieve the properties of a given dataset id
      * @param projectId
-     * @param datasetId
+     * @param datasetName
      * @return
      */
   @RequestMapping(value = "{projectId}/datasets/{datasetId}",
@@ -304,15 +304,15 @@ public class SAWWorkBenchInternalAddRAWDataController {
   @ResponseStatus(HttpStatus.OK)
   public DataSet getDataset(
           @PathVariable(name="projectId", required = true) String projectId,
-          @PathVariable(name="datasetId", required = true) String datasetId) {
-      logger.debug("Get the properties of a dataset {} under project {}", datasetId, projectId);
+          @PathVariable(name="datasetId", required = true) String datasetName) {
+      logger.debug("Get the properties of a dataset {} under project {}", datasetName, projectId);
 
       DataSet dataset = null;
 
       try {
-          dataset = sawWorkbenchService.getDataSet(projectId, datasetId);
+          dataset = sawWorkbenchService.getDataSet(projectId, datasetName);
       } catch(Exception ex) {
-          logger.error("Error occurred while retriving the dataset properties");
+          logger.error("Error occurred while retriving the dataset properties " + ex);
       }
 
       return dataset;

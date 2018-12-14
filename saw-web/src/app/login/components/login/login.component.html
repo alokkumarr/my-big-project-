@@ -3,27 +3,28 @@
 
   <div class="login-info">
     <span>Use the login credentials given at time of sign up. If you don't</span>
-    <br/>
+    <br />
     <span>have an account yet contact your system administrator</span>
   </div>
 
   <form #loginForm="ngForm" name="loginForm" class="login-form" method="post">
-    <div class="error-msg"
-         [innerHtml]="states.error"></div>
+    <div class="error-msg" e2e="error-msg-section" [innerHtml]="states.error"></div>
 
     <mat-form-field>
-      <input matInput maxlength="30" [(ngModel)]="dataHolder.username"  [ngModelOptions]="{standalone: true}" placeholder="Username" required />
+      <input matInput maxlength="30" [(ngModel)]="dataHolder.username" [ngModelOptions]="{standalone: true}"
+        placeholder="Username" e2e="username-input" required />
     </mat-form-field>
-    <br/>
+    <br />
 
     <mat-form-field>
-      <input matInput type="password" maxlength="30" [(ngModel)]="dataHolder.password"  placeholder="Password" [ngModelOptions]="{standalone: true}" required />
+      <input matInput type="password" maxlength="30" [(ngModel)]="dataHolder.password" placeholder="Password"
+        [ngModelOptions]="{standalone: true}" e2e="password-input" required />
     </mat-form-field>
     <div class="login-buttons button-row">
       <div class="forgot-password">
         <a (click)="reset()">Forgot Password?</a>
       </div>
-      <button mat-raised-button color="primary" type="submit" (click)="login()">Login</button>
+      <button mat-raised-button color="primary" e2e="login-btn" type="submit" (click)="login()">Login</button>
     </div>
   </form>
 </div>
