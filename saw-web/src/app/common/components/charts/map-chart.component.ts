@@ -17,9 +17,13 @@ import {
   geoChartOptions
 } from './default-chart-options';
 
-interface IChartUpdate {
+export interface IChartUpdate {
   path: string;
   data: any;
+}
+
+export interface IChartAction {
+  export?: boolean;
 }
 
 @Component({
@@ -36,7 +40,7 @@ export class MapChartComponent {
     }
   }
   @Input()
-  set actionBus(actionBus: Subject<any>) {
+  set actionBus(actionBus: Subject<IChartAction>) {
     this._actionBus = actionBus;
     if (isObservable(actionBus)) {
       actionBus.subscribe(this.onAction.bind(this));
@@ -86,7 +90,7 @@ export class MapChartComponent {
     this.chart.update(update, true, true);
   }
 
-  onAction(action: any) {
+  onAction(action: IChartAction) {
     if (action && action.export) {
       this.onExport();
     }
