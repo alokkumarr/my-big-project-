@@ -5,7 +5,7 @@ var fs = require('fs');
 var argv = require('yargs').argv;
 const SuiteSetup = require('../helpers/SuiteSetup');
 const logger = require('./logger')(__filename);
-const testSuite = require('./testSuites');
+const testSuites = require('./testSuites');
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
@@ -51,25 +51,14 @@ let maxRetryForFailedTests = SuiteSetup.distRun() ? 1 : 1;
 const pageResolveTimeout = 1000;
 
 /**
- * Note: Prefix with "../saw-web" because end-to-end tests are invoked from "dist" when run against the
- * distribution package. The same path also works when run directly out of "saw-web".
- */
-const testBaseDir = appRoot + '/e2e/v2/tests/';
-
-/**
- * Output path for the junit reports. Folder should be created in advance
- */
-const protractorPath = 'target/protractor-reports';
-/**
  * All tests are running for customer
  */
 const customerCode = 'SYNCHRONOSS';
 
-let token;
-
 exports.timeouts = {
   fluentWait: fluentWait,
-  pageResolveTimeout: pageResolveTimeout
+  pageResolveTimeout: pageResolveTimeout,
+  timeoutInterval: timeoutInterval,
 };
 
 exports.config = {
@@ -78,7 +67,6 @@ exports.config = {
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
   baseUrl: 'http://localhost:3000',
-  logger: logger,
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
@@ -106,31 +94,28 @@ exports.config = {
     showColors: true
   },
   suites: {
+
+    smoke: testSuites.SMOKE,
+    sanity: testSuites.SANITY,
     /**
-     * This suite will be run as part of main bamboo build plan.
+     * This is default suite contains basic functionality aorund analyze + observe module
+     * Gets triggered on each push
      */
-    smoke: testSuite.SMOKE, /**
-     * This suite will be triggered from main bamboo plan frequently for sanity check
+    critical: testSuites.CRITICAL,
+    /**
+     * This suite is full regression and is triggered by e2e bamboo plan i.e
+     * https://bamboo.synchronoss.net:8443/browse/BDA-TSA
      */
-    sanity: testSuite.SANITY, /**
-     * This suite will be triggered from main bamboo plan and runs on every commit
-     * Contains all feature with minimal data set
-     */
-    critical: testSuite.CRITICAL, /**
-     * This suite will be triggered from e2e bamboo plan and dev team has to run this plan manually to verify that their
-     * changes are not causing any issues to app.
-     * Bamboo plan url: https://bamboo.synchronoss.net:8443/browse/BDA-TSA
-     * Contains all feature with minimal data set
-     */
-    regression: testSuite.REGRESSION, /**
+    regression: testSuites.REGRESSION,
+    /**
      * This suite is for developing new tests and quickly debug if something breaking
      */
-    development: testSuite.DEVELOPMENT
+    development: testSuites.DEVELOPMENT
   },
-  onCleanUp: function (results) {
+  onCleanUp: (results)=> {
     retry.onCleanUp(results);
   },
-  onPrepare() {
+  onPrepare:() =>{
     retry.onPrepare();
 
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
@@ -162,7 +147,12 @@ exports.config = {
     jasmine.getEnv().addReporter(new function () {
       this.specDone = function (result) {
         if (result.status !== 'passed') {
+          logger.debug('Test is failed: ' + JSON.stringify(result.testInfo));
           new SuiteSetup().failedTestData(result.testInfo)
+        }
+        if (result.status === 'passed') {
+          logger.debug('Test is passed: ' + JSON.stringify(result.testInfo));
+          new SuiteSetup().passTestData(result.testInfo)
         }
       };
     });
@@ -173,7 +163,7 @@ exports.config = {
       });
     }, pageResolveTimeout);
   },
-  beforeLaunch: function () {
+  beforeLaunch: () => {
     //Delete old e2e unique id.
     logger.info('Doing cleanup and setting up test data for e2e tests....');
     if (fs.existsSync('target/e2eId.json')) {
@@ -209,7 +199,7 @@ exports.config = {
       process.exit(1);
     }
   },
-  afterLaunch: function () {
+  afterLaunch: () => {
     var retryCounter = 1;
     if (argv.retry) {
       retryCounter = ++argv.retry;
