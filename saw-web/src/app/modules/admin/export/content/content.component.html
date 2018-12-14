@@ -31,10 +31,10 @@
   </div>
   <div *dxTemplate="let cell of 'selectionHeaderCellTemplate'">
     <mat-checkbox
-      matTooltip="Toggle All"
+      [matTooltip]="toggleAllHint"
       (change)="onToggleAll($event)"
-      [checked]="allSelected()"
-      [indeterminate]="someSelected()"
+      [checked]="allSelected"
+      [indeterminate]="someSelected"
       [hidden]="!analyses.length"
       i18n
     >

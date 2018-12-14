@@ -70,10 +70,11 @@ export class AdminExportContentComponent implements OnInit {
   /**
    * Whether all analyses in current selection list have been added to export
    *
+   * @readonly
    * @returns {boolean}
    * @memberof AdminExportContentComponent
    */
-  allSelected(): boolean {
+  get allSelected(): boolean {
     const [intersection, analyses] = this.intersection();
     return intersection.length === analyses.length && analyses.length > 0;
   }
@@ -81,12 +82,24 @@ export class AdminExportContentComponent implements OnInit {
   /**
    * Whether some analyses in current selection list have been added to export
    *
+   * @readonly
    * @returns {boolean}
    * @memberof AdminExportContentComponent
    */
-  someSelected(): boolean {
+  get someSelected(): boolean {
     const [intersection, analyses] = this.intersection();
     return intersection.length < analyses.length && intersection.length > 0;
+  }
+
+  /**
+   * Returns hint text for toggle all checkbox
+   *
+   * @readonly
+   * @type {string}
+   * @memberof AdminExportContentComponent
+   */
+  get toggleAllHint(): string {
+    return this.allSelected ? 'Unselect All' : 'Select All';
   }
 
   /**

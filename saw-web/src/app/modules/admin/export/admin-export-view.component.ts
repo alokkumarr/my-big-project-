@@ -32,14 +32,12 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
   @Select(state => state.common.analyzeMenu) analyzeMenu$: Observable<
     MenuItem[]
   >;
-  categorisedMenu$: Observable<MenuItem[]>;
-
   @Select(ExportPageState.exportList) exportList$: Observable<any[]>;
-
   @Select(state => state.admin.exportPage.categoryAnalyses)
   exportAnalyses$: Observable<any[]>;
 
   isExportListEmpty$ = this.exportList$.pipe(map(list => list.length <= 0));
+  categorisedMenu$: Observable<MenuItem[]>;
 
   constructor(
     public _exportService: ExportService,
