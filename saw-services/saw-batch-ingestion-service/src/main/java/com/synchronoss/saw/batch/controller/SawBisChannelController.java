@@ -51,7 +51,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 
-@CrossOrigin(origins = "*")
 @RestController
 @Api(value = "The controller provides operations related Channel Entity "
     + "synchronoss analytics platform ")
