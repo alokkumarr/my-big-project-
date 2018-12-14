@@ -1,12 +1,10 @@
 package com.synchronoss.saw.export;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.synchronoss.saw.export.controller.DataExportController;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.model.*;
 import org.junit.Before;
@@ -29,13 +27,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.synchronoss.saw.export.controller.DataExportController;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 
 @RunWith(SpringRunner.class)
@@ -51,7 +47,11 @@ public class DataExportControllerTest {
 
 	@Before
 	public void setup() throws Exception {
-		wireMockServer = new WireMockServer(options().port(9091));
+		/**
+         * Note : Fixed Port number has been modified to use random ports,
+         * to make the tests pass reliably even with multiple parallel runs.
+         */
+	    wireMockServer = new WireMockServer(options().dynamicPort());
 		wireMockServer.start();
 	}
     @Test
@@ -132,7 +132,7 @@ public class DataExportControllerTest {
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.set("host", "localhost");
 		requestHeaders.set("authorization", "localhost");
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(analysisUrl + "md/?analysisId="+ANALYSIS_ID)
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(analysisUrl + wireMockServer.port() + "md/?analysisId="+ANALYSIS_ID)
 				.headers(requestHeaders).contentType(MediaType.APPLICATION_JSON);
 		mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isNotFound())
 				.andDo(MockMvcResultHandlers.print());
