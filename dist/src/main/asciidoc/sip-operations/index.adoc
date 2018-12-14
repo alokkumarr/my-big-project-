@@ -201,7 +201,19 @@ config file to support larger files upload (more than 1MB)
 
 === XDF-NG
 
-==== Installing
+==== Prerequisites
+XDF-NG requires `jq` to be installed in the host cluster
+(all nodes of the cluster, because jobs can be submitted on any node).
+jq can be installed using the below command:
+
+    yum install jq
+
+Once the installtion is complete, use the below command to validate the installation:
+
+    $ jq --version
+    jq-1.5
+
+==== Installing XDF-NG
 
 Execute the following steps to install XDF-NG:
 
