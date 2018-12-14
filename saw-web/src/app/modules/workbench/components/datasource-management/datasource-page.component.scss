@@ -130,6 +130,14 @@
     .menu-btn-icon {
       margin-right: 0px;
       vertical-align: baseline;
+
+      &.mat-error {
+        color: red;
+      }
+
+      &.mat-primary {
+        color: $primary-blue-b1;
+      }
     }
   }
 
