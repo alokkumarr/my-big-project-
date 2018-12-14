@@ -55,6 +55,8 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
+
+    // Group menus under their modules
     this.categorisedMenu$ = this.analyzeMenu$.pipe(
       map(menu => [
         {
@@ -100,16 +102,35 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * When 'All' checkbox in a list is toggled, update store accordingly.
+   *
+   * @param {boolean} checked
+   * @memberof AdminExportViewComponent
+   */
   onChangeAllSelectionList(checked: boolean) {
     this.store.dispatch([
       checked ? new AddAllAnalysesToExport() : new RemoveAllAnalysesFromExport()
     ]);
   }
 
+  /**
+   * When 'All' checkbox in export list is toggled, clear the list.
+   * Export list doesn't support keeping some items unchecked.
+   * Item is either selected, or not present.
+   *
+   * @param {boolean} checked
+   * @memberof AdminExportViewComponent
+   */
   onChangeAllExportList(checked: boolean) {
     this.store.dispatch(new ClearExport());
   }
 
+  /**
+   * Creates a zip file and export the items.
+   *
+   * @memberof AdminExportViewComponent
+   */
   export() {
     const zip = new JSZip();
     const { analyses } = this.store.selectSnapshot(
@@ -131,7 +152,14 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  getFileName(name) {
+  /**
+   * Returns formatted file name based on input
+   *
+   * @param {string} name
+   * @returns {string}
+   * @memberof AdminExportViewComponent
+   */
+  getFileName(name: string): string {
     const formatedDate = moment().format('YYYYMMDDHHmmss');
     const custCode = get(this._jwtService.getTokenObj(), 'ticket.custCode');
     name = name.replace(' ', '_');

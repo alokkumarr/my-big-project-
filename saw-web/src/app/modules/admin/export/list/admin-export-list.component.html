@@ -15,7 +15,7 @@
   [wordWrapEnabled]="config.wordWrapEnabled"
   [scrolling]="config.scrolling"
   [sorting]="config.sorting"
-  [dataSource]="exportList | async"
+  [dataSource]="exportList"
   [columns]="config.columns"
   [pager]="config.pager"
   [paging]="config.paging"
@@ -30,8 +30,8 @@
     <mat-checkbox
       matTooltip="Remove All"
       (change)="onToggleAll($event)"
-      [checked]="(exportList | async).length > 0"
-      [hidden]="!(exportList | async).length"
+      [checked]="exportList.length > 0"
+      [hidden]="!exportList.length"
       i18n
     >
     </mat-checkbox>

@@ -1,9 +1,14 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { Dashboard } from '../../../observe/models/dashboard.interface';
 import { Analysis } from '../../../analyze/models';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
-import { map, withLatestFrom } from 'rxjs/operators';
 import * as intersectionBy from 'lodash/intersectionBy';
 
 export interface ExportItemChangeOutput {
@@ -14,18 +19,29 @@ export interface ExportItemChangeOutput {
 @Component({
   selector: 'admin-export-content',
   templateUrl: './content.component.html',
-  styleUrls: ['./content.component.scss']
+  styleUrls: ['./content.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminExportContentComponent implements OnInit {
-  @Input() exportList: Observable<any[]>;
-  @Input() analyses: Observable<any[]>;
+  @Input() exportList: any[];
+  @Input() analyses: any[];
   // @Input() dashboards: Observable<any[]>;
-  @Output() change: EventEmitter<ExportItemChangeOutput> = new EventEmitter();
-  @Output() changeAll: EventEmitter<boolean> = new EventEmitter();
 
-  intersection$: Observable<any[]>;
-  allSelected$: Observable<boolean>;
-  someSelected$: Observable<boolean>;
+  /**
+   * Happens whenever an item in the list is toggled
+   *
+   * @type {EventEmitter<ExportItemChangeOutput>}
+   * @memberof AdminExportContentComponent
+   */
+  @Output() change: EventEmitter<ExportItemChangeOutput> = new EventEmitter();
+
+  /**
+   * Happens when user toggles the 'All' checkbox in header
+   *
+   * @type {EventEmitter<boolean>}
+   * @memberof AdminExportContentComponent
+   */
+  @Output() changeAll: EventEmitter<boolean> = new EventEmitter();
 
   config: any;
 
@@ -33,36 +49,57 @@ export class AdminExportContentComponent implements OnInit {
 
   ngOnInit() {
     this.config = this.getConfig();
+  }
 
-    // Calculates intersection of export bucket and current selection list.
-    // Meant to cacluate which analyses in current selection list are also in export
-    this.intersection$ = this.exportList.pipe(
-      withLatestFrom(this.analyses),
-      map(([exportList, analyses]) => {
-        return [
-          intersectionBy(exportList, analyses, x =>
-            x.entityId ? x.entityId : x.id
-          ),
-          analyses
-        ];
-      })
-    );
+  /**
+   * Calculates intersection of export bucket and current selection list.
+   * Meant to cacluate which analyses in current selection list are also in export.
+   *
+   * @returns
+   * @memberof AdminExportContentComponent
+   */
+  intersection(): any[] {
+    return [
+      intersectionBy(this.exportList, this.analyses, x =>
+        x.entityId ? x.entityId : x.id
+      ),
+      this.analyses
+    ];
+  }
 
-    // Whether all analyses in current selection list have been added to export
-    this.allSelected$ = this.intersection$.pipe(
-      map(
-        ([intersection, analyses]) =>
-          intersection.length === analyses.length && analyses.length > 0
-      )
-    );
+  /**
+   * Whether all analyses in current selection list have been added to export
+   *
+   * @returns {boolean}
+   * @memberof AdminExportContentComponent
+   */
+  allSelected(): boolean {
+    const [intersection, analyses] = this.intersection();
+    return intersection.length === analyses.length && analyses.length > 0;
+  }
 
-    // Whether some analyses in current selection list have been added to export
-    this.someSelected$ = this.intersection$.pipe(
-      map(
-        ([intersection, analyses]) =>
-          intersection.length < analyses.length && intersection.length > 0
-      )
-    );
+  /**
+   * Whether some analyses in current selection list have been added to export
+   *
+   * @returns {boolean}
+   * @memberof AdminExportContentComponent
+   */
+  someSelected(): boolean {
+    const [intersection, analyses] = this.intersection();
+    return intersection.length < analyses.length && intersection.length > 0;
+  }
+
+  /**
+   * Whether the given item is also present in export bucket
+   *
+   * @param {*} item
+   * @returns {Observable<boolean>}
+   * @memberof AdminExportContentComponent
+   */
+  isSelectedForExport(item: any): boolean {
+    return this.exportList.some(a => {
+      return item.entityId ? a.entityId === item.entityId : a.id === item.id;
+    });
   }
 
   /**
@@ -74,25 +111,6 @@ export class AdminExportContentComponent implements OnInit {
    */
   onItemToggled({ checked }: any, item: any) {
     this.change.emit({ checked, item });
-  }
-
-  /**
-   * Whether the given item is also present in export bucket
-   *
-   * @param {*} item
-   * @returns {Observable<boolean>}
-   * @memberof AdminExportContentComponent
-   */
-  isSelectedForExport$(item: any): Observable<boolean> {
-    return this.exportList.pipe(
-      map(list =>
-        list.some(a => {
-          return item.entityId
-            ? a.entityId === item.entityId
-            : a.id === item.id;
-        })
-      )
-    );
   }
 
   /**

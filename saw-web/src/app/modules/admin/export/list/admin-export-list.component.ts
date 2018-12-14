@@ -1,16 +1,37 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
-import { Observable } from 'rxjs/Observable';
 import { ExportItemChangeOutput } from '../content/content.component';
 
 @Component({
   selector: 'admin-export-list',
   templateUrl: 'admin-export-list.component.html',
-  styleUrls: ['admin-export-list.component.scss']
+  styleUrls: ['admin-export-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminExportListComponent implements OnInit {
-  @Input() exportList: Observable<any[]>;
+  @Input() exportList: any[];
+
+  /**
+   * Happens when individual item in the list is toggled
+   *
+   * @type {EventEmitter<ExportItemChangeOutput>}
+   * @memberof AdminExportListComponent
+   */
   @Output() change: EventEmitter<ExportItemChangeOutput> = new EventEmitter();
+
+  /**
+   * Happens when the 'All' checkbox in header is toggled
+   *
+   * @type {EventEmitter<boolean>}
+   * @memberof AdminExportListComponent
+   */
   @Output() changeAll: EventEmitter<boolean> = new EventEmitter();
 
   config: any;
@@ -23,6 +44,13 @@ export class AdminExportListComponent implements OnInit {
     this.config = this.getConfig();
   }
 
+  /**
+   * Handle toggling individual items in the list
+   *
+   * @param {*} { checked }
+   * @param {*} item
+   * @memberof AdminExportListComponent
+   */
   onItemToggle({ checked }, item) {
     this.change.emit({ checked, item });
   }
@@ -37,7 +65,13 @@ export class AdminExportListComponent implements OnInit {
     this.changeAll.emit(checked);
   }
 
-  getConfig() {
+  /**
+   * Returns config for the grid
+   *
+   * @returns {Object}
+   * @memberof AdminExportListComponent
+   */
+  getConfig(): Object {
     const columns = [
       {
         caption: '',

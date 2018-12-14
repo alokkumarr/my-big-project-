@@ -1,6 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { ITreeOptions, TREE_ACTIONS } from 'angular-tree-component';
-import { Observable } from 'rxjs/Observable';
 import { MenuItem } from '../../../../common/state/common.state.model';
 
 interface SelectMenuOutput {
@@ -11,12 +17,18 @@ interface SelectMenuOutput {
 @Component({
   selector: 'admin-export-tree',
   templateUrl: './tree.component.html',
-  styleUrls: ['./tree.component.scss']
+  styleUrls: ['./tree.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminExportTreeComponent implements OnInit {
-  // @Select(state => state.common.observeMenu) observeMenu$: Observable<Menu>;
+  @Input() menu: MenuItem[];
 
-  @Input() menu: Observable<MenuItem[]>;
+  /**
+   * Happens when a leaf node (which has no children) is clicked.
+   *
+   * @type {EventEmitter<SelectMenuOutput>}
+   * @memberof AdminExportTreeComponent
+   */
   @Output() select: EventEmitter<SelectMenuOutput> = new EventEmitter();
 
   treeOptions: ITreeOptions = {
@@ -38,6 +50,12 @@ export class AdminExportTreeComponent implements OnInit {
 
   ngOnInit() {}
 
+  /**
+   * Handles clicking a menu item
+   *
+   * @param {*} event
+   * @memberof AdminExportTreeComponent
+   */
   onClickMenuItem(event) {
     this.select.emit({ moduleName: 'ANALYZE', menuItem: event.node.data });
   }

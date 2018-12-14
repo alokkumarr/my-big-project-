@@ -25,17 +25,17 @@
 
 <div class="admin-export__main-content">
   <admin-export-tree
-    [menu]="categorisedMenu$"
+    [menu]="categorisedMenu$ | async"
     (select)="onSelectMenuItem($event)"
   ></admin-export-tree>
   <admin-export-content
-    [exportList]="exportList$"
-    [analyses]="exportAnalyses$"
+    [exportList]="exportList$ | async"
+    [analyses]="exportAnalyses$ | async"
     (change)="onChangeItemSelection($event)"
     (changeAll)="onChangeAllSelectionList($event)"
   ></admin-export-content>
   <admin-export-list
-    [exportList]="exportList$"
+    [exportList]="exportList$ | async"
     (change)="onChangeItemSelection($event)"
     (changeAll)="onChangeAllExportList($event)"
   ></admin-export-list>
