@@ -40,7 +40,8 @@ public class SawBisFileLogsController {
   @Autowired
   private BisFileLogsRepository bisLogsRepository;
   
-  @ApiOperation(value = "Retrieve all logs of all routes", nickname = "all routes history", notes = "",
+  @ApiOperation(value = "Retrieve all logs of all routes", 
+      nickname = "all routes history", notes = "",
       response = BisRouteHistory.class)
   @RequestMapping(value = "", method = RequestMethod.GET)
   @ApiResponses(
