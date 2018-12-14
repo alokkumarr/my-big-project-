@@ -14,3 +14,8 @@
   file:
     path: /etc/sip
     state: directory
+# Create old /etc/bda directory for backwards compatibility
+- name: Create the /etc/bda directory
+  file:
+    path: /etc/bda
+    state: directory

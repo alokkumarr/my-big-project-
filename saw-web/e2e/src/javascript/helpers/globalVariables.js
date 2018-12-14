@@ -9,8 +9,11 @@ function getId() {
   if (!fs.existsSync('target')){
     fs.mkdirSync('target');
   }
-  if (fs.existsSync('target/e2eId.json')) {
-    let e2eId = JSON.parse(fs.readFileSync('target/e2eId.json', 'utf8')).uniqueId;
+  if (!fs.existsSync('target/e2e')){
+    fs.mkdirSync('target/e2e');
+  }
+  if (fs.existsSync('target/e2e/e2eId.json')) {
+    let e2eId = JSON.parse(fs.readFileSync('target/e2e/e2eId.json', 'utf8')).uniqueId;
     //console.log('existing e2eid---@' + new Date() + ' is-->' + e2eId);
     return e2eId;
   } else {
@@ -18,7 +21,7 @@ function getId() {
       uniqueId:generateId()
     };
 
-    fs.writeFileSync('target/e2eId.json', JSON.stringify(id), { encoding: 'utf8' });
+    fs.writeFileSync('target/e2e/e2eId.json', JSON.stringify(id), { encoding: 'utf8' });
     //console.log('created e2eid---@' + new Date() + ' is-->' + id.uniqueId);
     return id.uniqueId;
   }

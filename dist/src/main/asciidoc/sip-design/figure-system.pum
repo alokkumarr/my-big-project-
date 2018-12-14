@@ -1,0 +1,28 @@
+[SIP Client]
+
+package SIP {
+    node Services {
+        [SIP Proxy]
+        [SIP Gateway]
+        [SIP Web]
+        [SIP Services]
+        [SIP Security]
+    }
+    node "MapR cluster" {
+        [MapR Services]
+        [Apache Spark]
+    }
+    node "Elasticsearch cluster" {
+        [Elasticsearch]
+    }
+}
+
+[SIP Client] ..> [SIP Proxy] : HTTP
+[SIP Proxy] ..> [SIP Web] : HTTP
+[SIP Proxy] ..> [SIP Gateway] : HTTP
+[SIP Proxy] ..> [SIP Security] : HTTP
+[SIP Gateway] ..> [SIP Services] : HTTP
+
+[SIP Services] ..> [MapR Services] : MapR client
+[SIP Services] ..> [Apache Spark] : Spark client
+[SIP Services] ..> [Elasticsearch] : Elasticsearch client

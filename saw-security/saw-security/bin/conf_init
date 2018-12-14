@@ -59,7 +59,6 @@ shopt -s extglob
 
 # Set database password
 db_password_file=/etc/bda/saw-security-db-password
-db_root_password_file=/etc/bda/mariadb-root-password
 initial_setup_marker=/etc/bda/saw-security-initial-setup
 
 # For old environments, if password file does not exist, initialize to default
@@ -79,7 +78,6 @@ generate_password() {
     chmod go-rwx $password_file
 }
 generate_password $db_password_file
-generate_password $db_root_password_file
 
 # Calculate encrypted database password
 db_init_pass=$(< $db_password_file)
