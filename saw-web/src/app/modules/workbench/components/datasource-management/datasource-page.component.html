@@ -170,10 +170,12 @@
               </button>
               <mat-menu #datapodmenu="matMenu">
                 <button mat-menu-item
+                        [attr.color]="data.data.status ? 'warn' : 'primary'"
                         (click)="toggleRouteActivation(data.data)"
                 >
                   <mat-icon class="menu-btn-icon"
-                            [color]="data.data.status ? 'error' : 'primary'"
+                            [color]="data.data.status ? 'warn' : 'primary'"
+                            [attr.color]="data.data.status ? 'warn' : 'primary'"
                             fontIcon="icon-logout">
                   </mat-icon>
                   <span>{{data.data.status ? 'Deactivate' : 'Activate'}}</span>
