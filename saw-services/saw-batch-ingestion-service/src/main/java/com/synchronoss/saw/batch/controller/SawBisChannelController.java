@@ -14,11 +14,10 @@ import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestReposit
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
-import com.synchronoss.saw.batch.model.BisChannelType;
-import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -47,7 +48,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.ResourceAccessException;
+
+
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -365,10 +367,11 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels/{channelId}/deactivate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Object>  deactivateChannel(
+  public ResponseEntity<Boolean>  deactivateChannel(
       @PathVariable("channelId")  Long channelId) {
+    logger.trace("Inside deactivating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, false);
-    return new ResponseEntity<Object>(HttpStatus.OK);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
   
   /**
@@ -380,10 +383,11 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels/{channelId}/activate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Object>  activateChannel(
+  public ResponseEntity<Boolean>  activateChannel(
       @PathVariable("channelId")  Long channelId) {
+    logger.trace("Inside activating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, true);
-    return new ResponseEntity<Object>(HttpStatus.OK);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
 
   

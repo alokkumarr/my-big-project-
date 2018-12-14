@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +30,7 @@ public class SawBisFileLogsController {
   private String bisSchedulerUrl;
 
   RestTemplate restTemplate = new RestTemplate();
-
+  private static final Logger logger = LoggerFactory.getLogger(SawBisFileLogsController.class);
   @Autowired
   private BisFileLogsRepository bisLogsRepository;
 
@@ -54,11 +56,14 @@ public class SawBisFileLogsController {
   @RequestMapping(value = "/logs/{channelId}/{routeId}", method = RequestMethod.GET)
   public BisRouteHistory retrieveRouteLogHistory(
       @PathVariable Long channelId, @PathVariable Long routeId) {
-    
+    logger.trace("Constructing request for job with group key: " 
+        + routeId + "and CategoryID: " + channelId);
     ScheduleDetail params = new ScheduleDetail();
     params.setGroupkey(String.valueOf(routeId));
     params.setCategoryId(String.valueOf(channelId));
-
+    logger.trace("Invoking scheduler for last fire time and next fire time "
+        + "values. URL :  " + bisSchedulerUrl + "/jobs?categoryId=" 
+        + channelId + "&groupkey=" + routeId);
     String response = restTemplate
         .getForObject(bisSchedulerUrl + "/jobs?categoryId=" 
             + channelId + "&groupkey=" + routeId, String.class);
@@ -76,9 +81,10 @@ public class SawBisFileLogsController {
         nextFired = objNode.get("nextFireTime");
 
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException exception) {
+      logger.error(exception.getMessage());
     }
+    
     
     List<BisFileLog> bisFileLogs = this.bisLogsRepository.findByRouteSysId(routeId);
     List<BisFileLogDetails> bisFileLogDtos = new ArrayList<BisFileLogDetails>();

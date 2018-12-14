@@ -34,7 +34,9 @@ public class BisChannelService {
   public void activateOrDeactivateChannel(Long channelId, boolean isActivate) {
 
     Optional<BisChannelEntity> bisChannel = bisChannelRepository.findById(channelId);
+    logger.trace("Retriving channel");
     if (bisChannel.isPresent()) {
+      logger.trace("Retriving channel successful");
       BisChannelEntity bisChannelEntity = bisChannel.get();
       Long status;
       if (isActivate) {
@@ -43,7 +45,10 @@ public class BisChannelService {
         status = 0L;
       }
       bisChannelEntity.setStatus(status);
+      logger.trace("updating channel status to deactivate");
       bisChannelRepository.saveAndFlush(bisChannelEntity);
+      logger.trace("updating channel status to deactivate");
+      logger.trace("updating routes");
       bisRouteService.activateOrDeactivateRoutes(channelId, isActivate);
     } else {
       throw new ResourceNotFoundException("No resource found ");
