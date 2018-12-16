@@ -167,8 +167,10 @@ exports.config = {
   beforeLaunch: () => {
     //Delete old e2e unique id.
     logger.info('Doing cleanup and setting up test data for e2e tests....');
-    if (fs.existsSync('target/e2eId.json')) {
-      fs.unlinkSync('target/e2eId.json');
+    if (fs.existsSync('target/e2e/e2eId.json')) {
+      // delete and create new always
+      //console.log('deleting e2e id json file....')
+      fs.unlinkSync('target/e2e/e2eId.json');
     }
     // Generate test data
     let appUrl = SuiteSetup.getSawWebUrl();
@@ -201,11 +203,6 @@ exports.config = {
     }
   },
   afterLaunch: () => {
-    if (fs.existsSync('target/e2e/e2eId.json')) {
-      // delete and create new always
-      //console.log('deleting e2e id json file....')
-      fs.unlinkSync('target/e2e/e2eId.json');
-    }
 
     SuiteSetup.failedTestDataForRetry();
 
