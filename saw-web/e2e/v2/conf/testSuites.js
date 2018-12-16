@@ -4,6 +4,7 @@ const TEST_BASE_DIR = appRoot + '/e2e/v2/tests/';
 
 const SMOKE = [
   TEST_BASE_DIR + 'login-logout/login.test.js',
+  TEST_BASE_DIR + 'login-logout/logout.test.js',
 ];
 
 const SANITY = [...SMOKE,

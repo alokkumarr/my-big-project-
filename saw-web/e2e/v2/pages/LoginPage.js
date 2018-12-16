@@ -56,7 +56,7 @@ class LoginPage {
   isUserLoggedIn() {
     element(this._userName.isPresent().then(function (isPresent) {
       if (isPresent) {
-        logger.debug('User is on login page, hence do the login, no need');
+        logger.debug('User is on login page, hence do the login, no need to logout');
         return false;
       }
       logger.debug('User is already loggedIn');
