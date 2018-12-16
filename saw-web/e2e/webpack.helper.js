@@ -148,7 +148,7 @@ function generateFailedTests(dir) {
       fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
     }
     fs.writeFileSync('target/e2e/testData/failed/finalFail.json', JSON.stringify(subset), { encoding: 'utf8' });
-  } else {s
+  } else {
     // There are no failures hence deleting the old failed file...
     if(fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
       fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
