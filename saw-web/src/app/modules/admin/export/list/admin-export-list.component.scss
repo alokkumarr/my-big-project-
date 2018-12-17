@@ -9,3 +9,12 @@
   margin-left: 10px;
   border-left: 2px dashed $primary-grey-g1;
 }
+
+// Following is a workaround for https://github.com/angular/material2/issues/8600
+::ng-deep .dx-header-row {
+  ::ng-deep td:first-child {
+    ::ng-deep .dx-datagrid-text-content {
+      overflow: visible;
+    }
+  }
+}

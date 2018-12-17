@@ -167,7 +167,7 @@ export class AdminExportContentComponent implements OnInit {
         width: '25%'
       },
       {
-        caption: 'Metric',
+        caption: 'Metric Name',
         dataField: 'metricName',
         allowSorting: true,
         alignment: 'left',
