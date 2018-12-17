@@ -1,11 +1,13 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AnalyzeService } from '../../services/analyze.service';
+import { AnalyzeService, EXECUTION_MODES } from '../../services/analyze.service';
 import { DesignerSaveEvent, DesignerMode } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
 import { MatDialog, MatDialogConfig } from '@angular/material';
+import { ExecuteService } from '../../services/execute.service';
+
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -44,7 +46,8 @@ export class DesignerPageComponent implements OnInit {
     private locationService: Location,
     private analyzeService: AnalyzeService,
     private dialogService: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public _executeService: ExecuteService
   ) {}
 
   ngOnInit() {
@@ -76,6 +79,10 @@ export class DesignerPageComponent implements OnInit {
 
   onSave({ analysis, requestExecution }: DesignerSaveEvent) {
     if (requestExecution) {
+      this._executeService.executeAnalysis(
+        analysis,
+        EXECUTION_MODES.PUBLISH
+      );
       this.locationService.back();
     }
   }
