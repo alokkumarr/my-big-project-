@@ -37,7 +37,7 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import { flattenChartData } from '../../../common/utils/dataFlattener';
+import { flattenChartData } from '../utils/dataFlattener';
 
 import {
   NUMBER_TYPES,
@@ -45,7 +45,7 @@ import {
   DATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   CHART_COLORS
-} from '../consts';
+} from '../../modules/analyze/consts';
 
 const LEGEND_POSITIONING = {
   left: {

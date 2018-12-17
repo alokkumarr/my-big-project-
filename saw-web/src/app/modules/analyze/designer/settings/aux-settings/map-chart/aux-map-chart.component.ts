@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as values from 'lodash/values';
 
-import { ChartService } from '../../../../services/chart.service';
+import { ChartService } from '../../../../../../common/services/chart.service';
 
 @Component({
   selector: 'designer-settings-aux-map-chart',

@@ -14,7 +14,7 @@ import * as filter from 'lodash/filter';
 
 import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from '../../../../common/services/chart.service';
 
 @Component({
   selector: 'designer-chart',

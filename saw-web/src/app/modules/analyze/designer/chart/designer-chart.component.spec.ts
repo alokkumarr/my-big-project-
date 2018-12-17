@@ -1,7 +1,7 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { DesignerChartComponent } from './designer-chart.component';
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from '../../../../common/services/chart.service';
 import { ArtifactColumnChart } from '../../../../models/artifact-column.model';
 
 @Component({

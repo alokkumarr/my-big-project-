@@ -6,7 +6,7 @@ import {
   OnInit,
   AfterViewInit
 } from '@angular/core';
-import { ChartService } from '../../../../services/chart.service';
+import { ChartService } from '../../../../../../common/services/chart.service';
 import * as isEmpty from 'lodash/isEmpty';
 
 @Component({

@@ -1,6 +1,6 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { FilterService } from './services/filter.service';
-import { ChartService } from './services/chart.service';
+import { ChartService } from '../../common/services/chart.service';
 import { MapDataService } from '../../common/components/charts/map-data.service';
 
 import { AnalyzeService } from './services/analyze.service';

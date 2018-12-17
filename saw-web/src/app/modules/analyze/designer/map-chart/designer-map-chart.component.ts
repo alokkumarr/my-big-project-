@@ -14,7 +14,7 @@ import * as fpMapValues from 'lodash/fp/mapValues';
 import { Subject, Observable, isObservable } from 'rxjs';
 
 import { SqlBuilderChart } from '../types';
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from '../../../../common/services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
 
 export enum MapChartStates {

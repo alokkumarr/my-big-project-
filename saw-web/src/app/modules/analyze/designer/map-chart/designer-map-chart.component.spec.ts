@@ -2,7 +2,7 @@ import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { of } from 'rxjs';
 import { DesignerMapChartComponent, MapChartStates } from './designer-map-chart.component';
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from '../../../../common/services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
 import { ArtifactColumn, ArtifactColumnChart } from '../../../../models/artifact-column.model';
 
