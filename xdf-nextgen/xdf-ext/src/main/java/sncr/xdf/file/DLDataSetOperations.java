@@ -150,7 +150,7 @@ public class DLDataSetOperations {
         FileSystem fileSystem = HFileOperations.getFileSystem();
         List<String> kl = new ArrayList<>();
 
-        while(i == PARTITION_STRUCTURE.DRILL || i == PARTITION_STRUCTURE.HIVE ){
+        while(i == PARTITION_STRUCTURE.DRILL){
             logger.debug("Checking locations: " + glob + " depth: " + depth);
 
             glob += File.separatorChar + "*";
