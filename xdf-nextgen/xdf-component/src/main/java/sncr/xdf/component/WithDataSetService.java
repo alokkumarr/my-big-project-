@@ -243,15 +243,15 @@ public interface WithDataSetService {
             throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
         }
 
-        List<String> existingPartitionKeys =
+        List<String> partitionKeys =
             (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
 
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
-            if (existingPartitionKeys != null) {
+            if (partitionKeys != null) {
                 if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE
                     && trgDSPartitioning._2() != null) {
-                    for (int i = 0; i < existingPartitionKeys.size(); i++)
-                        if (!existingPartitionKeys.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
+                    for (int i = 0; i < partitionKeys.size(); i++)
+                        if (!partitionKeys.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
                             throw new XDFException(XDFException.ErrorCodes.ConfigError,
                                 "Order and/or set of partitioning keys in Metadata" +
                                     " and in dataset does not match");
