@@ -83,6 +83,7 @@ public class MigrationService {
          semanticNode.setCustomerCode(binarySemanticNode.getCustomerCode());
          semanticNode.setModule(com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
          semanticNode.setProjectCode(binarySemanticNode.getProjectCode()!=null ? binarySemanticNode.getProjectCode() : "workbench");
+         semanticNode.setUsername(binarySemanticNode.getUsername()!=null ? binarySemanticNode.getUsername() : "sipadmin@synchronoss.com");
          semanticNode.setMetricName(binarySemanticNode.getMetricName());
           if (binarySemanticNode.getEsRepository() != null) {
             JsonNode esRepository = objectMapper
@@ -288,6 +289,7 @@ public class MigrationService {
       semanticNode.setCustomerCode(binarySemanticNode.getCustomerCode());
       semanticNode.setModule(com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
       semanticNode.setProjectCode(binarySemanticNode.getProjectCode()!=null ? binarySemanticNode.getProjectCode() : "workbench");
+      semanticNode.setUsername(binarySemanticNode.getUsername()!=null ? binarySemanticNode.getUsername() : "sipadmin@synchronoss.com");
       semanticNode.setMetricName(binarySemanticNode.getMetricName());
       if (binarySemanticNode.getEsRepository()!=null) 
         {semanticNode.setEsRepository(binarySemanticNode.getEsRepository());}
