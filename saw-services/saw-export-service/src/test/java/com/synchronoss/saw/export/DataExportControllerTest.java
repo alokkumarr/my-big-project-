@@ -41,11 +41,15 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 public class DataExportControllerTest {
 
 	@Rule
-	public WireMockRule wireMockRule_1 = new WireMockRule(options().port(8090));
+	public WireMockRule wireMockRule_1;
 	WireMockServer wireMockServer = null;
 
+    public DataExportControllerTest() {
+        wireMockRule_1 = new WireMockRule(options().port(wireMockRulePort));
+    }
 
-	@Before
+
+    @Before
 	public void setup() throws Exception {
 		/**
          * Note : Fixed Port number has been modified to use random ports,
@@ -70,6 +74,9 @@ public class DataExportControllerTest {
 
 	@Value("${analysis.service.host}")
 	private String analysisUrl;
+
+	@Value("${analysis.wireMockRule.port}")
+    private int wireMockRulePort;
 
 	private static final String ANALYSIS_ID = "123";
 
