@@ -21,6 +21,6 @@ public class WebIT extends BaseIT {
     given(spec).accept("text/html")
         .when().get("/web/")
         .then().statusCode(200).body(
-          "html.head.script", containsString("document.write"));
+          "html.title", containsString("SawWeb"));
   }
 }
