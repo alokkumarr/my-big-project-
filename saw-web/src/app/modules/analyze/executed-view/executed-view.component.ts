@@ -188,7 +188,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   onExecutionSuccess(response) {
     const thereIsDataLoaded = this.data || this.dataLoader;
-    const isDataLakeReport = this.analysis.type === 'report';
+    const isDataLakeReport = get(this.analysis, 'type') === 'report';
     this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
