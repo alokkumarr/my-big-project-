@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as set from 'lodash/set';
+import * as orderBy from 'lodash/orderBy';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as fpGet from 'lodash/fp/get';
@@ -49,7 +50,10 @@ export class ExportService {
       .request<AnalysisResponse>('analysis', params, { forWhat: 'export' })
       .pipe(
         first(),
-        mapObservable(fpGet('contents.analyze'))
+        mapObservable(fpGet('contents.analyze')),
+        mapObservable(analyses =>
+          orderBy(analyses, ['createdTimestamp'], ['desc'])
+        )
       );
   }
 
