@@ -28,6 +28,7 @@ public class SipLogging {
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+  
   /**
    * To make an entry to a log table. 
    */
@@ -70,7 +71,17 @@ public class SipLogging {
     bisFileLogsRepository.deleteById(pid);
   }
   
-  public boolean duplicateCheck(boolean isDisableDuplicate, String sourcelocation, ChannelSftp.LsEntry entry ) {
+  /**
+   * verify duplicate check enabled and is duplicate
+   * or if duplicate check disabled.
+   * 
+   * @param isDisableDuplicate disabled duplicate check flag
+   * @param sourcelocation source path
+   * @param entry file entry
+   * @return true or false
+   */
+  public boolean duplicateCheck(boolean isDisableDuplicate, 
+      String sourcelocation, ChannelSftp.LsEntry entry) {
     return (!isDisableDuplicate && !checkDuplicateFile(sourcelocation + File.separator 
         + entry.getFilename())) || isDisableDuplicate;
     
