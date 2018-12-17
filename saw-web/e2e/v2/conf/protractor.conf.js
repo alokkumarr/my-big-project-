@@ -43,7 +43,7 @@ const timeoutInterval = 3600000;
 /**
  * number of retries in case of failure, executes all failed tests
  */
-let maxRetryForFailedTests = SuiteSetup.distRun() ? 1 : 1;
+let maxRetriesForFailedTests = SuiteSetup.distRun() ? 3 : 2;
 
 /**
  * Waits ms after page is loaded
@@ -200,16 +200,16 @@ exports.config = {
     }
   },
   afterLaunch: () => {
-    var retryCounter = 1;
+    let retryCounter = 1;
     if (argv.retry) {
       retryCounter = ++argv.retry;
     }
     // Rename failedFailedTests.json to
-    if (retryCounter <= maxRetryForFailedTests) {
+    if (retryCounter <= maxRetriesForFailedTests) {
       // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
       SuiteSetup.failedTestDataForRetry();
 
     }
-    return retry.afterLaunch(maxRetryForFailedTests);
+    return retry.afterLaunch(maxRetriesForFailedTests);
   }
 };
