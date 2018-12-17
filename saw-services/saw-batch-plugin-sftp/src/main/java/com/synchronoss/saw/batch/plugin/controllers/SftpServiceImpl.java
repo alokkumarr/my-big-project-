@@ -528,7 +528,7 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location starts here " + sourceLocation
               + " & file pattern " + filePattern);
-          String disableDupFlag = rootNode.get("disableDupllicate").asText();
+          String disableDupFlag = rootNode.get("disableDuplicate").asText();
           Boolean isDisable = Boolean.valueOf(disableDupFlag);
           listOfFiles = transferDataFromChannel(template, sourceLocation, filePattern,
               destinationLocation, channelId, routeId,isDisable);
