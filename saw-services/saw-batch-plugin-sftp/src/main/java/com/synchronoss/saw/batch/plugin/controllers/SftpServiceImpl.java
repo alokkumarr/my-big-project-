@@ -496,7 +496,8 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     try {
-      if (true) {
+      if (delegatingSessionFactory.getSessionFactory(channelId) != null
+          && delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
         logger.trace("session opened starts here ");
         Optional<BisRouteEntity> channelEntity = bisRouteDataRestRepository.findById(routeId);
