@@ -74,12 +74,11 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     public _jwt: JwtService,
     public _analyzeExportService: AnalyzeExportService,
     public _toastMessage: ToastService
-  ) {
-    this.onExecutionEvent = this.onExecutionEvent.bind(this);
-    this.onExecutionsEvent = this.onExecutionsEvent.bind(this);
-  }
+  ) { }
 
   ngOnInit() {
+    this.onExecutionEvent = this.onExecutionEvent.bind(this);
+    this.onExecutionsEvent = this.onExecutionsEvent.bind(this);
     combineLatest(this._route.params, this._route.queryParams)
       .pipe(debounce(() => timer(100)))
       .subscribe(([params, queryParams]) => {
