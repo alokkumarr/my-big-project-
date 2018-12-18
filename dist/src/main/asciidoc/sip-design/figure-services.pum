@@ -1,0 +1,46 @@
+package "MapR cluster" {
+    [MapR Services]
+    [Apache Spark]
+}
+
+package "Elasticsearch cluster" {
+    [Elasticsearch]
+}
+
+[SIP Gateway] .> [SIP Security] : HTTP
+
+[SIP Gateway] ..> [SIP Batch Ingestion] : HTTP
+[SIP Gateway] ..> [SIP Datapod] : HTTP
+[SIP Gateway] ..> [SIP Export] : HTTP
+[SIP Gateway] ..> [SIP Observe] : HTTP
+[SIP Gateway] ..> [SIP Scheduler] : HTTP
+[SIP Gateway] ..> [SIP Semantic] : HTTP
+[SIP Gateway] ..> [SIP Storage Proxy] : HTTP
+[SIP Gateway] ..> [SIP Transport] : HTTP
+[SIP Gateway] ..> [SIP Workbench] : HTTP
+
+[SIP Datapod] ..> [MapR Services] : MapR client
+[SIP Observe] ..> [MapR Services] : MapR client
+[SIP Storage Proxy] ..> [MapR Services] : MapR client
+[SIP Semantic] ..> [MapR Services] : MapR client
+[SIP Transport] ..> [MapR Services] : MapR client
+[SIP Workbench] ..> [MapR Services] : MapR client
+
+[SIP Transport] ..> [Apache Spark] : Spark client
+[SIP Workbench] ..> [Apache Spark] : Spark client
+
+[SIP Storage Proxy] ..> [Elasticsearch] : Elasticsearch client
+[SIP Transport] ..> [Elasticsearch] : Elasticsearch client
+
+database MariaDB
+
+[SIP Batch Ingestion] ..> MariaDB : MariaDB client
+[SIP Scheduler] ..> MariaDB : MariaDB client
+[SIP Security] ..> MariaDB : MariaDB client
+
+[SIP Batch Ingestion] ..> [SIP Scheduler] : HTTP
+[SIP Scheduler] ..> [SIP Export] : HTTP
+[SIP Scheduler] ..> [SIP Batch Ingestion] : HTTP
+[SIP Scheduler] ..> [SIP Transport] : HTTP
+[SIP Semantic] ..> [SIP Transport] : HTTP
+[SIP Semantic] ..> [SIP Workbench] : HTTP
