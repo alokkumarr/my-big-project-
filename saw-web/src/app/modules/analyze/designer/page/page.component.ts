@@ -84,7 +84,7 @@ export class DesignerPageComponent implements OnInit {
       this._executeService.executeAnalysis(
         analysis,
         EXECUTION_MODES.PUBLISH,
-        'true'
+        true
       );
 
       const navigateToList = !filter(f => f.isRuntimeFilter, get(analysis, 'sqlBuilder.filters', [])).length;

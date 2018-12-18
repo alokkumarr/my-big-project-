@@ -253,7 +253,7 @@ export class FilterService {
     };
   }
 
-  getRuntimeFilterValues(analysis, navigateBack = '') {
+  getRuntimeFilterValues(analysis, navigateBack = false) {
     const clone = cloneDeep(analysis);
     const runtimeFilters = this.getRuntimeFiltersFrom(
       get(clone, 'sqlBuilder.filters', [])

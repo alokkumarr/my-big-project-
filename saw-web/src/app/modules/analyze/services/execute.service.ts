@@ -38,7 +38,7 @@ export class ExecuteService {
     this.execs$ = new ReplaySubject<IExecuteEventEmitter>(bufferSize);
   }
 
-  executeAnalysis(analysis, mode = EXECUTION_MODES.LIVE, navigateBack = '') {
+  executeAnalysis(analysis, mode = EXECUTION_MODES.LIVE, navigateBack = false) {
     return this._filterService.getRuntimeFilterValues(analysis, navigateBack).then(model => {
       if (model) {
         this.doExecute(model, mode);
