@@ -13,7 +13,7 @@ import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.*;
-import com.sncr.saw.security.common.bean.repo.UserRelatedMetaData;
+import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.*;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -133,9 +133,9 @@ public class SecurityController {
 	}
 
 	   @RequestMapping(value = "/customer/details", method = RequestMethod.POST)
-	    public UserRelatedMetaData getCustomerDetailsbyUser(@RequestBody LoginDetails loginDetails) {
+	    public UserCustomerMetaData getCustomerDetailsbyUser(@RequestBody LoginDetails loginDetails) {
 	        logger.info("Authenticating & getting the customerDetails starts here");
-	        UserRelatedMetaData userRelatedMetaData = new UserRelatedMetaData();
+	        UserCustomerMetaData userRelatedMetaData = new UserCustomerMetaData();
 	        Ticket ticket = new Ticket();
 	        User user = null;
 	        TicketHelper tHelper = new TicketHelper(userRepository);
