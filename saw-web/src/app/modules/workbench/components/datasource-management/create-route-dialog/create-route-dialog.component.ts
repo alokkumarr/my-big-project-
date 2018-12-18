@@ -40,7 +40,8 @@ export class CreateRouteDialogComponent implements OnInit {
       sourceLocation: ['', Validators.required],
       destinationLocation: ['', Validators.required],
       filePattern: ['', [Validators.required, this.validateFilePattern]],
-      description: ['']
+      description: [''],
+      disableDuplicate: [false]
     });
   }
 
@@ -110,7 +111,8 @@ export class CreateRouteDialogComponent implements OnInit {
       destinationLocation: data.destinationLocation,
       filePattern: data.filePattern,
       schedulerExpression: this.crondetails,
-      description: data.description
+      description: data.description,
+      disableDuplicate: data.disableDuplicate
     };
     return routeDetails;
   }
