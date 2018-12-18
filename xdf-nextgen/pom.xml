@@ -272,7 +272,7 @@
     <repository>
       <id>mapr-releases</id>
 <!--      <url>http://repository.mapr.com/maven/</url> -->
-      <url>http://repository.mapr.com/nexus/content/repositories/mapr-public</url>
+      <url>http://repository.mapr.com/maven/</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
