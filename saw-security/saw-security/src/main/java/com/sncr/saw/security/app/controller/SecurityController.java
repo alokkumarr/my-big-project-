@@ -13,6 +13,7 @@ import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.*;
+import com.sncr.saw.security.common.bean.repo.UserRelatedMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.*;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -131,6 +132,52 @@ public class SecurityController {
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 	}
 
+	   @RequestMapping(value = "/customer/details", method = RequestMethod.POST)
+	    public UserRelatedMetaData getCustomerDetailsbyUser(@RequestBody LoginDetails loginDetails) {
+	        logger.info("Authenticating & getting the customerDetails starts here");
+	        UserRelatedMetaData userRelatedMetaData = new UserRelatedMetaData();
+	        Ticket ticket = new Ticket();
+	        User user = null;
+	        TicketHelper tHelper = new TicketHelper(userRepository);
+	        ticket.setMasterLoginId(loginDetails.getMasterLoginId());
+	        ticket.setValid(false);
+	        try {
+	            boolean[] ret = userRepository.authenticateUser(loginDetails.getMasterLoginId(),
+	                    loginDetails.getPassword());
+	            boolean isUserAuthentic = ret[0];
+	            boolean isPassWordActive = ret[1];
+	            if (isUserAuthentic) {
+	                if (isPassWordActive) {
+	                    user = new User();
+	                    user.setMasterLoginId(loginDetails.getMasterLoginId());
+	                    user.setValidMins((nSSOProperties.getValidityMins() != null
+	                            ? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
+	                    ticket = tHelper.createTicket(user, false);
+	                } else {
+	                    ticket.setValidityReason("Password Expired");
+	                }
+	            } else {
+	                ticket.setValidityReason("Invalid User Credentials");
+	            }
+	            userRelatedMetaData.setCustCode(ticket.getCustCode());
+	            if (ticket.getDataSecurityKey()!=null && ticket.getDataSecurityKey().size() >0) {
+	              userRelatedMetaData.setDataSKey(ticket.getDataSecurityKey());
+	            }
+	            if (ticket.getRoleCode()!=null) {userRelatedMetaData.setRoleCode(ticket.getRoleCode());}
+	            if (ticket.getRoleType()!=null) {userRelatedMetaData.setRoleType(ticket.getRoleType());}
+	            if (ticket.getUserFullName()!=null) {userRelatedMetaData.setUserFullName(ticket.getUserFullName());}
+	            userRelatedMetaData.setUserName(loginDetails.getMasterLoginId());
+	            userRelatedMetaData.setValid(true);
+	        } catch (DataAccessException de) {
+	            logger.error("Exception occured creating ticket ", de, null);
+	            userRelatedMetaData.setValid(false);
+	        } catch (Exception e) {
+	            logger.error("Exception occured creating ticket ", e);
+	            userRelatedMetaData.setValid(false);
+	        }
+	        logger.info("Authenticating & getting the customerDetails ends here");
+	        return userRelatedMetaData;
+	    }
 	/**
 	 *
 	 * @param token

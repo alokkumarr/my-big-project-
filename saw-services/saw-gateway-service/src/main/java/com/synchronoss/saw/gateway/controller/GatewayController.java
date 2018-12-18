@@ -64,6 +64,7 @@ import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
 import com.synchronoss.saw.gateway.utils.ContentRequestTransformer;
 import com.synchronoss.saw.gateway.utils.HeadersRequestTransformer;
 import com.synchronoss.saw.gateway.utils.URLRequestTransformer;
+import com.synchronoss.saw.gateway.utils.UserRelatedMetaData;
 import com.synchronoss.saw.gateway.utils.Valid;
 
 /**
@@ -130,18 +131,17 @@ public class GatewayController {
     if (header!=null){
     	HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     	RestTemplate restTemplate = new RestTemplate();
-    	String url = apiGatewayOtherProperties+"/auth/validateToken";
+    	String url = apiGatewayOtherProperties+"/customer/details";
     	logger.debug("security server URL {}", url);
     	try {
         ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
-            requestEntity, Valid.class);
+            requestEntity, UserRelatedMetaData.class);
         logger.debug(securityResponse.getStatusCode().getReasonPhrase());
         logger.debug(securityResponse.toString());
-        Valid validate =(Valid) securityResponse.getBody();
-          
+        UserRelatedMetaData userMetadata =(UserRelatedMetaData) securityResponse.getBody();
     	  if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
     	  if (!ServletFileUpload.isMultipartContent(request)) {
-          proxiedRequest = createHttpUriRequest(request);  
+          proxiedRequest = createHttpUriRequest(request,userMetadata);  
           proxiedResponse = httpClient.execute(proxiedRequest);
           responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()), 
               makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
@@ -192,7 +192,7 @@ public class GatewayController {
             logger.trace("responseEntity response structure {}",  responseEntity.getStatusCodeValue());
             return responseEntity;
           }
-        } else {responseEntity = new ResponseEntity<>(validate.getValidityMessage(),makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);}
+        } else {responseEntity = new ResponseEntity<>("{\"message\":\"Invalid User Credential\"}",makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);}
       } catch(HttpClientErrorException e) {
     	  //SAW-1374: Just keep the message hardcoded itself.
         responseEntity = new ResponseEntity<>("{\"message\":\"Invalid Token\"}", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
@@ -261,10 +261,11 @@ public class GatewayController {
   }
   
 
-  private HttpUriRequest createHttpUriRequest(HttpServletRequest request) throws URISyntaxException, IOException, UnsupportedCharsetException, ServletException {
+  private HttpUriRequest createHttpUriRequest(HttpServletRequest request, UserRelatedMetaData userRelatedMetaData) throws URISyntaxException, IOException, UnsupportedCharsetException, ServletException {
     URLRequestTransformer urlRequestTransformer = new URLRequestTransformer(apiGatewayProperties);
     ContentRequestTransformer contentRequestTransformer = new ContentRequestTransformer();
     HeadersRequestTransformer headersRequestTransformer = new HeadersRequestTransformer();
+    headersRequestTransformer.setUserRelatedMetaData(userRelatedMetaData);
     headersRequestTransformer.setPredecessor(contentRequestTransformer);
     contentRequestTransformer.setPredecessor(urlRequestTransformer);
     return headersRequestTransformer.transform(request).build();

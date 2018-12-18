@@ -3,12 +3,14 @@ package com.synchronoss.saw.semantic.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonParser;
@@ -227,10 +229,13 @@ public class SemanticServiceImpl implements SemanticService {
 
 
   @Override
-  public SemanticNodes search(SemanticNode node)
+  public SemanticNodes search(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, ReadEntitySAWException {
     logger.trace("search criteria :{}", node);
     SemanticNodes responseNode = new SemanticNodes();
+    if (headers.get("x-customerCode")!=null) {
+      node.setCustomerCode(headers.get("x-customerCode"));
+    }
     try {
       Query query = new Query();
       query.setConjunction(Conjunction.AND);

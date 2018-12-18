@@ -5,10 +5,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -182,14 +184,14 @@ public class SAWSemanticController {
   @ResponseStatus(HttpStatus.OK)
   public SemanticNodes searchSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @RequestParam Map<String, String> queryMap) throws JSONMissingSAWException {
+      @RequestParam Map<String, String> queryMap, @RequestHeader Map<String, String> headers ) throws JSONMissingSAWException {
     SemanticNodes responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       SemanticNode requestBody =
           objectMapper.readValue(objectMapper.writeValueAsString(queryMap), SemanticNode.class);
       logger.trace("Search Request Body : {} ", objectMapper.writeValueAsString(requestBody));
-      responseObjectFuture = semanticService.search(requestBody);
+      responseObjectFuture = semanticService.search(requestBody, headers);
       logger.trace("Search Semantic Result : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
     } catch (ReadEntitySAWException | JsonProcessingException ex) {
