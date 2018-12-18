@@ -546,11 +546,26 @@ public class SftpServiceImpl extends SipPluginContract {
           throw new SftpProcessorException("Exception occurred while connecting to channel from "
               + "factory of connections because channel is not present with the Id " + channelId
               + " & routeId " + routeId);
+          
         }
       }
     } catch (Exception ex) {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
+      
+      BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+      bisDataMetaInfo
+          .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+      bisDataMetaInfo.setReceivedDataName("");
+      bisDataMetaInfo.setDataSizeInBytes(0L);
+      bisDataMetaInfo
+          .setActualDataName("");
+      bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+      bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
+      bisDataMetaInfo.setChannelId(channelId);
+      bisDataMetaInfo.setRouteId(channelId);
+      bisDataMetaInfo.setActualReceiveDate( new Date());
+      sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     } finally {
       if (delegatingSessionFactory.getSessionFactory(channelId) != null
           && delegatingSessionFactory.getSessionFactory(channelId).getSession() != null) {
