@@ -233,8 +233,9 @@ public class SemanticServiceImpl implements SemanticService {
       throws JSONValidationSAWException, ReadEntitySAWException {
     logger.trace("search criteria :{}", node);
     SemanticNodes responseNode = new SemanticNodes();
-    if (headers.get("x-customerCode")!=null) {
-      node.setCustomerCode(headers.get("x-customerCode"));
+    if (headers.get("x-customercode")!=null) {
+      node.setCustomerCode(headers.get("x-customercode"));
+      logger.trace(headers.get("x-customercode"));
     }
     try {
       Query query = new Query();
@@ -330,13 +331,16 @@ public class SemanticServiceImpl implements SemanticService {
 
 
   @Override
-  public BackCompatibleStructure list(SemanticNode node)
+  public BackCompatibleStructure list(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, ReadEntitySAWException {
     logger.trace("search criteria :{}", node);
     BackCompatibleStructure structure = new BackCompatibleStructure();
     Content  content = new Content();
     List<Content> contents = new ArrayList<>();
-
+    if (headers.get("x-customercode")!=null) {
+      node.setCustomerCode(headers.get("x-customercode"));
+      logger.trace(headers.get("x-customercode"));
+    }
     try {
       Query query = new Query();
       query.setConjunction(Conjunction.AND);

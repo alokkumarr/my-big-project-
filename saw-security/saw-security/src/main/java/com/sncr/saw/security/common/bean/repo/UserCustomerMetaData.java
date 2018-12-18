@@ -3,9 +3,7 @@
  */
 package com.sncr.saw.security.common.bean.repo;
 
-import com.sncr.saw.security.common.bean.DSKDetails;
 import java.io.Serializable;
-import java.util.List;
 
 public class UserCustomerMetaData implements Serializable {
 
@@ -16,7 +14,7 @@ public class UserCustomerMetaData implements Serializable {
   private String roleCode;
   private String roleType;
   private boolean isValid = false;
-  private List<DSKDetails> dataSKey;
+  private Object dataSKey;
 
   public boolean isValid() {
     return isValid;
@@ -36,11 +34,11 @@ public class UserCustomerMetaData implements Serializable {
   }
 
 
-  public List<DSKDetails> getDataSKey() {
+  public Object getDataSKey() {
     return dataSKey;
   }
 
-  public void setDataSKey(List<DSKDetails> dataSKey) {
+  public void setDataSKey(Object dataSKey) {
     this.dataSKey = dataSKey;
   }
 

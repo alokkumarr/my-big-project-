@@ -34,7 +34,7 @@ public interface SemanticService {
   public SemanticNodes search(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, ReadEntitySAWException;
 
-  public BackCompatibleStructure list(SemanticNode node)
+  public BackCompatibleStructure list(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, ReadEntitySAWException;
 
   /**

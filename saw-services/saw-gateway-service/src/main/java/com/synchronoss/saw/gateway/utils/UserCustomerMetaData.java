@@ -3,11 +3,9 @@
  */
 package com.synchronoss.saw.gateway.utils;
 
-
 import java.io.Serializable;
-import java.util.List;
 
-public class UserRelatedMetaData implements Serializable {
+public class UserCustomerMetaData implements Serializable {
 
   private static final long serialVersionUID = 7546190895561288031L;
   private String userFullName;
@@ -16,7 +14,7 @@ public class UserRelatedMetaData implements Serializable {
   private String roleCode;
   private String roleType;
   private boolean isValid = false;
-  private List<DSKDetails> dataSKey;
+  private Object dataSKey;
 
   public boolean isValid() {
     return isValid;
@@ -36,14 +34,22 @@ public class UserRelatedMetaData implements Serializable {
   }
 
 
-  public List<DSKDetails> getDataSKey() {
+  public Object getDataSKey() {
     return dataSKey;
   }
 
-  public void setDataSKey(List<DSKDetails> dataSKey) {
+  public void setDataSKey(Object dataSKey) {
     this.dataSKey = dataSKey;
   }
 
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
 
   /**
    * @return the userName
@@ -86,15 +92,5 @@ public class UserRelatedMetaData implements Serializable {
   public void setRoleType(String roleType) {
     this.roleType = roleType;
   }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
-  
-  
 
 }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class HeadersRequestTransformer extends ProxyRequestTransformer {
 
-  private UserRelatedMetaData userRelatedMetaData =  null;
+  private UserCustomerMetaData userRelatedMetaData =  null;
 	Logger logger = LoggerFactory.getLogger(this.getClass());
   @Override
   public RequestBuilder transform(HttpServletRequest request) throws URISyntaxException, IOException, UnsupportedCharsetException, ServletException {
@@ -29,15 +29,16 @@ public class HeadersRequestTransformer extends ProxyRequestTransformer {
     	requestBuilder.addHeader("x-roleCode", userRelatedMetaData.getRoleCode());
     	requestBuilder.addHeader("x-roleType", userRelatedMetaData.getRoleType());
     	requestBuilder.addHeader("x-userName", userRelatedMetaData.getUserName());
-        logger.debug("HeaderValue",headerValue);
+    	logger.debug("requestBuilder.addHeader" + requestBuilder);
+        logger.debug("HeaderValue" + headerValue);
       }
     }
     return requestBuilder;
   }
-  public UserRelatedMetaData getUserRelatedMetaData() {
+  public UserCustomerMetaData getUserRelatedMetaData() {
     return userRelatedMetaData;
   }
-  public void setUserRelatedMetaData(UserRelatedMetaData userRelatedMetaData) {
+  public void setUserRelatedMetaData(UserCustomerMetaData userRelatedMetaData) {
     this.userRelatedMetaData = userRelatedMetaData;
   }
   

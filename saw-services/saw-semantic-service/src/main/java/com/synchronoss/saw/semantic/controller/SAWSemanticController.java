@@ -215,14 +215,14 @@ public class SAWSemanticController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public BackCompatibleStructure searchSemanticWithOutArtifacts(
-      @RequestParam Map<String, String> queryMap) throws JSONMissingSAWException {
+      @RequestParam Map<String, String> queryMap, @RequestHeader Map<String, String> headers) throws JSONMissingSAWException {
     BackCompatibleStructure responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       SemanticNode requestBody =
           objectMapper.readValue(objectMapper.writeValueAsString(queryMap), SemanticNode.class);
       logger.trace("Search Request Body : {} ", requestBody);
-      responseObjectFuture = semanticService.list(requestBody);
+      responseObjectFuture = semanticService.list(requestBody, headers);
       logger.trace("Search Semantic Result : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
     } catch (ReadEntitySAWException | JsonProcessingException ex) {
