@@ -36,6 +36,7 @@ import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
+import { isUndefined } from 'util';
 
 @Component({
   selector: 'executed-view',
@@ -74,11 +75,12 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     public _jwt: JwtService,
     public _analyzeExportService: AnalyzeExportService,
     public _toastMessage: ToastService
-  ) { }
-
-  ngOnInit() {
+  ) {
     this.onExecutionEvent = this.onExecutionEvent.bind(this);
     this.onExecutionsEvent = this.onExecutionsEvent.bind(this);
+  }
+
+  ngOnInit() {
     combineLatest(this._route.params, this._route.queryParams)
       .pipe(debounce(() => timer(100)))
       .subscribe(([params, queryParams]) => {
@@ -97,6 +99,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.executionId = executionId;
 
     this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
+      this.analysis = analysis;
       this.setPrivileges(analysis);
 
       /* If an execution is not already going on, create a new execution
@@ -174,7 +177,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (state) {
     case EXECUTION_STATES.SUCCESS:
-      this.onExecutionSuccess(response);
+      setTimeout(() => {
+        this.onExecutionSuccess(response);
+      }, 500);
       break;
     case EXECUTION_STATES.ERROR:
       this.onExecutionError();
@@ -186,6 +191,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   onExecutionSuccess(response) {
+    if (isUndefined(this.analysis)) {
+      return;
+    }
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = get(this.analysis, 'type') === 'report';
     this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
@@ -199,18 +207,18 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           closeButton: true,
           onclick: () =>
             this.loadExecutedAnalysesAndExecutionData(
-              this.analysis.id,
+              get(this.analysis, 'id'),
               response.executionId,
-              this.analysis.type,
+              get(this.analysis, 'type'),
               response
             )
         }
       );
     } else {
       this.loadExecutedAnalysesAndExecutionData(
-        this.analysis.id,
+        get(this.analysis, 'id'),
         response.executionId,
-        this.analysis.type,
+        get(this.analysis, 'type'),
         response
       );
     }
