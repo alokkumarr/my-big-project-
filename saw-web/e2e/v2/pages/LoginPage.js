@@ -49,6 +49,8 @@ class LoginPage {
     this.doLogin(userName, password);
     if (redirectedPage) {
       commonFunctions.waitFor.pageToBeReady(redirectedPage);
+    } else {
+      commonFunctions.waitFor.pageToBeReady(/analyze/);
     }
   }
   isUserLoggedIn() {

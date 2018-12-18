@@ -1,0 +1,14 @@
+{
+  "LOGOUT": {
+    "positiveTests": {
+      "LOGOUT001": {
+        "user": "userOne",
+        "description": "userOne should be able to logout"
+      },
+      "LOGOUT002": {
+        "user": "admin",
+        "description": "Admin should be able to logout"
+      }
+    }
+  }
+}
