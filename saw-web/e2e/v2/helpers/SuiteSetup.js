@@ -101,7 +101,7 @@ class SuiteSetup {
     } else {
       logger.silly('first test result... ');
     }
-    testResultStatus[currentResult.testInfo.testId ]= currentResult;
+    testResultStatus[currentResult.testInfo.testId] = currentResult;
     fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json', JSON.stringify(testResultStatus), { encoding: 'utf8' });
 
   }
@@ -213,6 +213,54 @@ class SuiteSetup {
         //let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.json', 'utf8'));
         let data = SuiteSetup.readAllData();
         return data;
+      }
+    }
+  }
+
+  static convertJsonToJunitXml() {
+
+    if (fs.existsSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json')) {
+      let testResultStatus = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json', 'utf8'));
+
+      let totalTests = Object.keys(testResultStatus).length;
+      let failedCount = 0;
+      let failedTests = '';
+      let passedTests = '';
+
+      for (let key in testResultStatus) {
+        if (testResultStatus.hasOwnProperty(key)) {
+
+          if (testResultStatus[key].status.toLowerCase() === 'failed') {
+            failedCount++;
+            failedTests += `<testcase classname="${testResultStatus[key].fullName}" name="${testResultStatus[key].description}">
+                                    <failure type="exception" message="${testResultStatus[key].failedExpectations[0].message}">
+                                        <![CDATA[${testResultStatus[key].failedExpectations[0].stack}]]>
+                                    </failure>
+                                </testcase>`;
+
+          } else if (testResultStatus[key].status.toLowerCase() === 'passed') {
+            passedTests += `<testcase classname="${testResultStatus[key].fullName}" name="${testResultStatus[key].description}" />`
+          }
+        }
+      }
+      if (totalTests > 0) {
+        let testSuitesStart = `<testsuites name="End to end suite report" failures="${failedCount}" tests="${totalTests}" timestamp="${new Date()}">`;
+        let testSuitesEnd = `</testsuites>`;
+        let suiteName = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/suite.json', 'utf8')).suiteName;
+        let testSuiteStart = `	<testsuite name="executed suite: ${suiteName}" timestamp="${new Date()}" failures="${failedCount}" tests="${totalTests}">`;
+        let testSuiteEnd = `</testsuite>`;
+        let xmlDocument = `<?xml version="1.0" encoding="UTF-8" ?>`;
+
+        xmlDocument += testSuitesStart;
+        xmlDocument += testSuiteStart;
+        xmlDocument += failedTests;
+        xmlDocument += passedTests;
+
+        xmlDocument += testSuiteEnd;
+        xmlDocument += testSuitesEnd;
+
+        fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/myjunit.xml', xmlDocument, { encoding: 'utf8' });
+
       }
     }
   }
