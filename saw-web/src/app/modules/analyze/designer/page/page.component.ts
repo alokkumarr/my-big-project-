@@ -7,6 +7,8 @@ import { ConfirmDialogComponent } from '../../../../common/components/confirm-di
 import { ConfirmDialogData } from '../../../../common/types';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ExecuteService } from '../../services/execute.service';
+import * as filter from 'lodash/fp/filter';
+import * as get from 'lodash/get';
 
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
@@ -81,9 +83,14 @@ export class DesignerPageComponent implements OnInit {
     if (requestExecution) {
       this._executeService.executeAnalysis(
         analysis,
-        EXECUTION_MODES.PUBLISH
+        EXECUTION_MODES.PUBLISH,
+        'true'
       );
-      this.locationService.back();
+
+      const navigateToList = !filter(f => f.isRuntimeFilter, get(analysis, 'sqlBuilder.filters', [])).length;
+      if (navigateToList) {
+        this.locationService.back();
+      }
     }
   }
 
