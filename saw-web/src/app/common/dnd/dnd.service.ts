@@ -114,7 +114,7 @@ export class DragnDropService {
     }
 
     if (get(this._moveEventAccumulator, 'from.container.marker') === get(this._moveEventAccumulator, 'to.container.marker')) {
-      return false;
+      return;
     }
 
     if (this._moveEventAccumulator.from && this._moveEventAccumulator.to) {
