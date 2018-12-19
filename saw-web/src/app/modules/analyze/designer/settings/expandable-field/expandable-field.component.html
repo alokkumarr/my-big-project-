@@ -24,7 +24,7 @@
       </mat-menu>
     </div>
 
-    <aggregate-chooser-u *ngIf="artifactColumn.aggregate" (change)="onAggregateChange($event)" [type]="artifactColumn.type" [aggregate]="artifactColumn.aggregate">
+    <aggregate-chooser-u *ngIf="artifactColumn.aggregate" (change)="onAggregateChange($event)" [columnType]="artifactColumn.type" [analysisType]="analysisType" [aggregate]="artifactColumn.aggregate">
     </aggregate-chooser-u>
 
     <button mat-icon-button class="expandable-field__remove-btn" (click)="removeRequest.emit()">

@@ -118,48 +118,57 @@ export const CHART_DATE_FORMATS_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(CHART_DATE_FORMATS);
 
-export const AGGREGATE_TYPES = [
-  {
-    label: 'Total',
-    value: 'sum',
-    icon: 'icon-Sum'
-  },
-  {
-    label: 'Average',
-    value: 'avg',
-    icon: 'icon-AVG'
-  },
-  {
-    label: 'Mininum',
-    value: 'min',
-    icon: 'icon-MIN'
-  },
-  {
-    label: 'Maximum',
-    value: 'max',
-    icon: 'icon-MAX'
-  },
-  {
-    label: 'Count',
-    value: 'count',
-    icon: 'icon-Count',
-    type: 'long'
-  },
-  {
-    label: 'Percentage',
-    value: 'percentage',
-    icon: 'icon-Percentage',
-    type: 'float'
-  }
-];
+export const AGGREGATE_TYPES = [{
+  label: 'Total',
+  value: 'sum',
+  icon: 'icon-Sum',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Average',
+  value: 'avg',
+  icon: 'icon-AVG',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Mininum',
+  value: 'min',
+  icon: 'icon-MIN',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Maximum',
+  value: 'max',
+  icon: 'icon-MAX',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Count',
+  value: 'count',
+  icon: 'icon-Count',
+  type: 'long',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Percentage',
+  value: 'percentage',
+  icon: 'icon-Percentage',
+  type: 'float',
+  valid: ['pivot', 'report', 'esReport']
+}, {
+  label: 'Percentage By Row',
+  value: 'percentageByRow',
+  icon: 'icon-Percentage',
+  type: 'float',
+  valid: ['chart']
+}, {
+  label: 'Percentage by Column',
+  value: 'percentageByColumn',
+  icon: 'icon-Percentage',
+  type: 'float',
+  valid: ['chart']
+}];
 
-export const AGGREGATE_STRING_TYPES = [
-  {
-    label: 'Count',
-    value: 'count',
-    icon: 'icon-Count'
-  }
-];
+export const AGGREGATE_STRING_TYPES = [{
+  label: 'Count',
+  value: 'count',
+  icon: 'icon-Count'
+}];
 
 export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
 
