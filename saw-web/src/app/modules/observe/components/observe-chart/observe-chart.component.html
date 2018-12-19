@@ -5,7 +5,8 @@
       <div *ngIf="ViewMode" class="toggle-icons">
         <mat-icon *ngIf="toggleToGrid"  class="mat-icon material-icons" role="img" (click)="exportGridToExcel()"
           matTooltip="Export Grid Data">
-          <img src="./../../../../../assets/img/excel.png" style="width: 15px;">
+          <!-- <img src="./../../../../../assets/img/excel.png" style="width: 15px;"> -->
+          <img src="/assets/img/excel.png" style="width: 15px;">
         </mat-icon>
         <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="toggleToGrid = true" [ngClass]="{'active': toggleToGrid}"
           matTooltip="Toggle to Grid">
