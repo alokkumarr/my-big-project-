@@ -3,7 +3,7 @@ Title: Synchronoss Advanced Analytics Data Charting R Package
 Version: 0.0.0.9000
 Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
 Description: a2charter contains high level functions for creating data visualizations using ggplot2.
-Depends: R (== 3.5.0)
+Depends: R (>= 3.4.1)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
