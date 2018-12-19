@@ -112,20 +112,6 @@ export class PivotGridComponent implements OnDestroy {
   public _preExportState: any;
   public _subscription: any;
 
-  // ngOnInit() {
-  //   setTimeout(() => {
-  //     // have to repaint the grid because of the animation of the modal
-  //     // if it's not repainted it appears smaller
-  //     this._gridInstance.repaint();
-  //     if (this.updater) {
-  //       this._subscription = this.updater.subscribe(updates => {
-  //         this._gridInstance.repaint();
-  //         return this.update(updates);
-  //       });
-  //     }
-  //   }, 500);
-  // }
-
   ngOnDestroy() {
     if (this._subscription) {
       this._subscription.unsubscribe();
