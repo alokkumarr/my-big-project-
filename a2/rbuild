@@ -15,8 +15,7 @@ cd $dir
 
 # Iterate through each R package to be built, build it, run tests and
 # package
-#for dir in a2charter a2munge a2modeler a2sipr; do
-for dir in a2munge a2modeler a2sipr; do
+for dir in a2charter a2munge a2modeler a2sipr; do
     pushd $dir > /dev/null
     
     # If version is "2", skip updating the R package description as it
