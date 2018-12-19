@@ -68,7 +68,7 @@ public class SemanticServiceImpl implements SemanticService {
   @NotNull
   private String migrationMetadataHome;
 
-  @PostConstruct
+  //@PostConstruct
   private void init() throws Exception {
     if (migrationRequires) {
       new MigrationService().convertHBaseBinaryToMaprDBStore(transportURI, basePath, migrationMetadataHome);
@@ -339,7 +339,7 @@ public class SemanticServiceImpl implements SemanticService {
     List<Content> contents = new ArrayList<>();
     if (headers.get("x-customercode")!=null) {
       node.setCustomerCode(headers.get("x-customercode"));
-      logger.trace(headers.get("x-customercode"));
+      logger.trace("x-customercode:" + headers.get("x-customercode"));
     }
     try {
       Query query = new Query();
@@ -358,7 +358,7 @@ public class SemanticServiceImpl implements SemanticService {
         filterCustomerCode.setFieldPath("customerCode");
         filterCustomerCode.setCondition(Condition.EQ);
         filterCustomerCode.setValue(node.getCustomerCode());
-        filters.add(filterCreated);
+        filters.add(filterCustomerCode);
       }
       Filter filterModule = new Filter();
       if (node.getModule() != null) {
@@ -382,7 +382,7 @@ public class SemanticServiceImpl implements SemanticService {
         filters.add(filterMetricName);
       }
       Filter filterProjectCode = new Filter();
-      if (node.getMetricName() != null) {
+      if (node.getProjectCode()!= null) {
         filterProjectCode.setFieldPath("projectCode");
         filterProjectCode.setCondition(Condition.EQ);
         filterProjectCode.setValue(node.getProjectCode());
@@ -391,7 +391,7 @@ public class SemanticServiceImpl implements SemanticService {
       query.setFilter(filters);
       String searchQuery = SAWSemanticUtils.node2JsonString(node, basePath, node.get_id(),
           Action.search, Category.Semantic, query);
-      logger.debug("Search Query to get the semantic :" + searchQuery);
+      logger.trace("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);
       requestMetaDataStore.process();
       List<Object> semanticNodes = new ArrayList<Object>();
@@ -399,13 +399,13 @@ public class SemanticServiceImpl implements SemanticService {
       if (requestMetaDataStore.getSearchResultJsonArray() != null
           && requestMetaDataStore.getSearchResultJsonArray().size() > 0) {
         JsonElement resultArray = requestMetaDataStore.getSearchResultJsonArray();
-        logger.debug("Entity has retrieved successfully :" + resultArray.toString());
+        logger.trace("Entity has retrieved successfully :" + resultArray.toString());
         if (resultArray.isJsonArray()) {
           for (int i = 0, j = 1; i < resultArray.getAsJsonArray().size(); i++, j++) {
-            logger.debug("Inside resultArray.isJsonArray() ");
-            logger.debug(
+            logger.trace("Inside resultArray.isJsonArray() ");
+            logger.trace(
                 " element.isJsonArray() :" + resultArray.getAsJsonArray().get(i).isJsonArray());
-            logger.debug(" element.isJsonObject() :" + resultArray.getAsJsonArray().get(i)
+            logger.trace(" element.isJsonObject() :" + resultArray.getAsJsonArray().get(i)
                 .getAsJsonObject().getAsJsonObject(String.valueOf(j)));
             String jsonString = resultArray.getAsJsonArray().get(i).getAsJsonObject()
                 .getAsJsonObject(String.valueOf(j)).toString();
