@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
+import { NgxsModule } from '@ngxs/store';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TreeModule } from 'angular-tree-component';
 import { RouterModule } from '@angular/router';
 import { CommonModuleTs } from '../../common';
 import { AdminListViewComponent } from './list-view';
@@ -14,22 +16,22 @@ import { UserAssignmentService } from './datasecurity/userassignment.service';
 import { routes } from './routes';
 import { FormsModule } from '@angular/forms';
 
+import { AdminState } from './state/admin.state';
+
 import {
   AdminExportViewComponent,
-  AdminExportListComponent
+  AdminExportListComponent,
+  AdminExportTreeComponent,
+  AdminExportContentComponent,
+  ExportPageState
 } from './export';
 import { CategoryService } from './category/category.service';
-import {
-  UserEditDialogComponent,
-  UserService
-} from './user';
+import { UserEditDialogComponent, UserService } from './user';
 import {
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent
 } from './category';
-import {
-  RoleEditDialogComponent
-} from './role';
+import { RoleEditDialogComponent } from './role';
 import {
   AdminImportViewComponent,
   AdminImportListComponent,
@@ -47,14 +49,18 @@ import {
   FieldAttributeViewComponent,
   DeleteDialogComponent
 } from './datasecurity';
-import {JwtService} from '../../common/services';
+import { JwtService } from '../../common/services';
 import {
   AddTokenInterceptor,
   HandleErrorInterceptor,
   RefreshTokenInterceptor
 } from '../../common/interceptor';
 import { SidenavMenuService } from '../../common/components/sidenav';
-import { DxDataGridService, ToastService, LocalSearchService } from '../../common/services';
+import {
+  DxDataGridService,
+  ToastService,
+  LocalSearchService
+} from '../../common/services';
 import { IsAdminGuard, GoToDefaultAdminPageGuard } from './guards';
 
 const COMPONENTS = [
@@ -73,6 +79,8 @@ const COMPONENTS = [
   FieldAttributeViewComponent,
   AdminExportViewComponent,
   AdminExportListComponent,
+  AdminExportTreeComponent,
+  AdminExportContentComponent,
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent,
   AdminImportViewComponent,
@@ -112,19 +120,15 @@ const SERVICES = [
 ];
 @NgModule({
   imports: [
+    NgxsModule.forFeature([AdminState, ExportPageState]),
     CommonModuleTs,
     FormsModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    TreeModule
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [
-    ...INTERCEPTORS,
-    ...SERVICES,
-    ...GUARDS
-  ],
-  exports: [
-    AdminPageComponent
-  ]
+  providers: [...INTERCEPTORS, ...SERVICES, ...GUARDS],
+  exports: [AdminPageComponent]
 })
 export class AdminModule {}
