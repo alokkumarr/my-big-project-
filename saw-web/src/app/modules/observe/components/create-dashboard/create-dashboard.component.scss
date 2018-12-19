@@ -5,21 +5,25 @@
   flex-direction: column;
 }
 
-[mat-dialog-title] {
+.dashboard-designer-title {
   display: flex;
   flex-direction: row;
+  margin: 0 0 20px;
+  padding: 24px 24px 0;
+  box-sizing: border-box;
 
   span {
     flex-grow: 1;
-    line-height: 2em;
+    line-height: 40px;
+    font-size: 20px;
   }
 }
 
-[mat-dialog-content] {
+.dashboard-designer-content {
   flex-grow: 1;
   max-height: 100%;
   height: 100%;
-  padding: 0 20px 0 0;
+  padding: 0 10px 0 10px;
 
   chart {
     max-width: 100%;
@@ -62,11 +66,13 @@
   }
 }
 
+$add-analysis-button-bottom: 48%;
+
 .add-button-help {
   position: absolute;
   font-size: 1.5em;
   opacity: 1;
-  bottom: 54%;
+  bottom: calc(#{$add-analysis-button-bottom} + 46px);
   right: 50%;
   transform: translateX(50%);
   z-index: 9999;
@@ -81,14 +87,14 @@
   height: 90px;
   z-index: 4;
   position: absolute;
-  bottom: 58%;
+  bottom: calc(#{$add-analysis-button-bottom} + 80px);
   right: 50%;
   transform: translateX(50%);
 }
 
 .add-analysis {
   position: absolute;
-  bottom: 48%;
+  bottom: $add-analysis-button-bottom;
   right: 50%;
   transform: translateX(50%);
   z-index: 9999;

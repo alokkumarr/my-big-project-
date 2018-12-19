@@ -56,7 +56,6 @@ import org.springframework.web.client.RestTemplate;
 
 
 
-@CrossOrigin(origins = "*")
 @RestController
 @Api(value = "The controller provides operations related Route Entity "
     + "synchronoss analytics platform ")

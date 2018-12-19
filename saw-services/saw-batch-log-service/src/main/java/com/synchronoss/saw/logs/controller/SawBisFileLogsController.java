@@ -8,6 +8,10 @@ import com.synchronoss.saw.logs.models.BisRouteHistory;
 import com.synchronoss.saw.logs.models.ScheduleDetail;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+
+
 @RestController
 @RequestMapping(value = "/ingestion/batch")
 public class SawBisFileLogsController {
@@ -33,13 +39,34 @@ public class SawBisFileLogsController {
   private static final Logger logger = LoggerFactory.getLogger(SawBisFileLogsController.class);
   @Autowired
   private BisFileLogsRepository bisLogsRepository;
-
+  
+  @ApiOperation(value = "Retrieve all logs of all routes", 
+      nickname = "all routes history", notes = "",
+      response = BisRouteHistory.class)
   @RequestMapping(value = "", method = RequestMethod.GET)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized"), 
+          @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   public List<BisFileLog> retrieveAllLogs() {
     return this.bisLogsRepository.findAll();
   }
 
+  @ApiOperation(value = "Retrieve log record by log Id", nickname = "routeLogWithId", notes = "",
+      response = BisRouteHistory.class)
   @RequestMapping(value = "/logs/{id}", method = RequestMethod.GET)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized"), 
+          @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   public BisFileLog retriveLogById(@PathVariable String id) {
 
     return this.bisLogsRepository.findByPid(id);
@@ -53,7 +80,17 @@ public class SawBisFileLogsController {
    * @param routeId route
    * @return route history
    */
+  @ApiOperation(value = "Retrieve logs of route as history", nickname = "routeHistory", notes = "",
+      response = BisRouteHistory.class)
   @RequestMapping(value = "/logs/{channelId}/{routeId}", method = RequestMethod.GET)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized"), 
+          @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   public BisRouteHistory retrieveRouteLogHistory(
       @PathVariable Long channelId, @PathVariable Long routeId) {
     logger.trace("Constructing request for job with group key: " 
