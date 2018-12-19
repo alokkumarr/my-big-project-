@@ -3,7 +3,7 @@ Title: Synchronoss Advanced Analytics Data Munging R Package
 Version: 0.0.0.9000
 Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
 Description: Data munging functionality to support Synchronoss Advanced Analytics applications. Includes functions for data ingestion, data preperation, data transformation and data enrichment. The package supports both base R and Spark DataFrame objects. 
-Depends: R (>= 3.4.0)
+Depends: R (= 3.5.0)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
