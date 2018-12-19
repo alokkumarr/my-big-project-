@@ -12,6 +12,8 @@ import {
   ModuleWithProviders
 } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { NgxsModule } from '@ngxs/store';
+import { CommonState } from './state/common.state';
 import { RouterModule } from '@angular/router';
 import {
   DxPivotGridComponent,
@@ -170,7 +172,7 @@ const INTERCEPTORS = [
 
 const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
 @NgModule({
-  imports: MODULES,
+  imports: [NgxsModule.forFeature([CommonState]), ...MODULES],
   declarations: [...COMPONENTS, ...DIRECTIVES],
   entryComponents: COMPONENTS,
   exports: [
