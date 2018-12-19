@@ -1,88 +1,111 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import * as forEach from 'lodash/forEach';
-import * as some from 'lodash/some';
-import * as every from 'lodash/every';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
+import { ExportItemChangeOutput } from '../content/content.component';
 
 @Component({
   selector: 'admin-export-list',
-  templateUrl: 'admin-export-list.component.html'
+  templateUrl: 'admin-export-list.component.html',
+  styleUrls: ['admin-export-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminExportListComponent implements OnInit {
-  @Input() analyses: any[];
-  @Output() validityChange: EventEmitter<boolean> = new EventEmitter();
+  @Input() exportList: any[];
+
+  /**
+   * Happens when individual item in the list is toggled
+   *
+   * @type {EventEmitter<ExportItemChangeOutput>}
+   * @memberof AdminExportListComponent
+   */
+  @Output() change: EventEmitter<ExportItemChangeOutput> = new EventEmitter();
+
+  /**
+   * Happens when the 'All' checkbox in header is toggled
+   *
+   * @type {EventEmitter<boolean>}
+   * @memberof AdminExportListComponent
+   */
+  @Output() changeAll: EventEmitter<boolean> = new EventEmitter();
 
   config: any;
 
   areAllSelected = false;
 
-  constructor(private _DxDataGridService: DxDataGridService) {}
+  constructor(private dxDataGridService: DxDataGridService) {}
 
   ngOnInit() {
     this.config = this.getConfig();
   }
 
-  onChecked(analysis) {
-    analysis.selection = !analysis.selection;
-    const isValid = some(this.analyses, 'selection');
-    if (analysis.selection) {
-      this.areAllSelected = every(this.analyses, 'selection');
-    } else {
-      this.areAllSelected = false;
-    }
-    this.validityChange.emit(isValid);
+  /**
+   * Handle toggling individual items in the list
+   *
+   * @param {*} { checked }
+   * @param {*} item
+   * @memberof AdminExportListComponent
+   */
+  onItemToggle({ checked }, item) {
+    this.change.emit({ checked, item });
   }
 
-  selectAll() {
-    this.areAllSelected = !this.areAllSelected;
-    forEach(this.analyses, analysis => {
-      analysis.selection = this.areAllSelected;
-    });
-    this.validityChange.emit(this.areAllSelected);
+  /**
+   * Handle toggling the 'all' checkbox at top of the list
+   *
+   * @param {*} { checked }
+   * @memberof AdminExportListComponent
+   */
+  onToggleAll({ checked }: any) {
+    this.changeAll.emit(checked);
   }
 
-  getConfig() {
+  /**
+   * Returns config for the grid
+   *
+   * @returns {Object}
+   * @memberof AdminExportListComponent
+   */
+  getConfig(): Object {
     const columns = [
       {
-        caption: 'Select All to Export',
-        dataField: 'selection',
+        caption: '',
         allowSorting: false,
         alignment: 'center',
-        width: '5%',
         headerCellTemplate: 'selectionHeaderCellTemplate',
-        cellTemplate: 'selectionCellTemplate'
+        cellTemplate: 'selectionCellTemplate',
+        width: '10%'
       },
       {
-        caption: 'Analysis Name',
-        dataField: 'analysis.name',
+        caption: 'Name',
+        dataField: 'name',
         allowSorting: true,
         alignment: 'left',
         width: '40%'
       },
       {
-        caption: 'Analysis Type',
-        dataField: 'analysis.type',
+        caption: 'Type',
+        dataField: 'type',
         allowSorting: true,
         alignment: 'left',
-        width: '10%'
+        width: '20%'
       },
       {
         caption: 'Metric Name',
-        dataField: 'analysis.metricName',
+        dataField: 'metricName',
         allowSorting: true,
         alignment: 'left',
-        width: '25%'
-      },
-      {
-        caption: 'Sub-Category Name',
-        dataField: 'categoryName',
-        allowSorting: true,
-        alignment: 'left',
-        width: '15%'
+        width: '30%'
       }
     ];
-    return this._DxDataGridService.mergeWithDefaultConfig({
+    return this.dxDataGridService.mergeWithDefaultConfig({
       columns,
+      noDataText: 'No data to export. Select items from left to add them here.',
       width: '100%',
       height: '100%',
       paging: {

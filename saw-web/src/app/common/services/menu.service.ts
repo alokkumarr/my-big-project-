@@ -42,38 +42,40 @@ export class MenuService {
         return error('Module name for menu not found!');
       }
 
-      const features = filter(targetModule.prodModFeature, ({prodModCode}) => prodModCode === targetModule.productModCode);
-
-      resolve(
-        map(features, feature => {
-          const obj: any = {
-            id: feature.prodModFeatureID,
-            name: feature.prodModFeatureName || feature.prodModFeatureDesc,
-            data: feature
-          };
-
-          /* Since there are no subcategories in observe, don't add them if they're there */
-          obj.children = map(feature.productModuleSubFeatures, subfeature => {
-            // Workbench uses defaultURL attribute value to navigate from side nav.
-            // 'WRK000001' is the module code for workbench.
-            const url =
-              subfeature.prodModCode === 'WRK000001'
-                ? [`/${moduleName.toLowerCase()}/${subfeature.defaultURL}`]
-                : [
-                    `/${moduleName.toLowerCase()}`,
-                    `${subfeature.prodModFeatureID}`
-                  ];
-            return {
-              id: subfeature.prodModFeatureID,
-              name:
-                subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
-              url,
-              data: subfeature
-            };
-          });
-          return obj;
-        })
+      const features = filter(
+        targetModule.prodModFeature,
+        ({ prodModCode }) => prodModCode === targetModule.productModCode
       );
+
+      const menu = map(features, feature => {
+        const obj: any = {
+          id: feature.prodModFeatureID,
+          name: feature.prodModFeatureName || feature.prodModFeatureDesc,
+          data: feature
+        };
+
+        /* Since there are no subcategories in observe, don't add them if they're there */
+        obj.children = map(feature.productModuleSubFeatures, subfeature => {
+          // Workbench uses defaultURL attribute value to navigate from side nav.
+          // 'WRK000001' is the module code for workbench.
+          const url =
+            subfeature.prodModCode === 'WRK000001'
+              ? [`/${moduleName.toLowerCase()}/${subfeature.defaultURL}`]
+              : [
+                  `/${moduleName.toLowerCase()}`,
+                  `${subfeature.prodModFeatureID}`
+                ];
+          return {
+            id: subfeature.prodModFeatureID,
+            name:
+              subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
+            url,
+            data: subfeature
+          };
+        });
+        return obj;
+      });
+      resolve(menu);
     });
 
     return menuPromise;
