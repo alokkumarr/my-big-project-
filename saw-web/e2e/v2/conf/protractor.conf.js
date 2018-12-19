@@ -209,7 +209,7 @@ exports.config = {
     let retryStatus = retry.afterLaunch(maxRetriesForFailedTests);
     if(retryStatus === 1) {
       // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
-      logger.error('There are some failures hence marking test suite failed. Failed tests are: '+JSON.stringify(failedTests));
+      logger.error('There are some failures hence marking test suite failed');
       // TODO: Convert testResult json to junit.xml file
       SuiteSetup.convertJsonToJunitXml();
       process.exit(1); // this will mark build failure as well
