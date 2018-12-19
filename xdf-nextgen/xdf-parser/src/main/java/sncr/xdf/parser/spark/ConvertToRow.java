@@ -3,8 +3,6 @@ package sncr.xdf.parser.spark;
 import com.univocity.parsers.common.processor.NoopRowProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import org.apache.commons.httpclient.util.ExceptionUtil;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Row;
@@ -30,8 +28,6 @@ public class ConvertToRow implements Function<String, Row> {
     private char quoteChar;
     private char quoteEscapeChar;
     private char charToEscapeQuoteEscaping;
-
-    private static CsvParser parser = null;
 
     private LongAccumulator recCounter;
     private LongAccumulator errCounter;
@@ -69,7 +65,6 @@ public class ConvertToRow implements Function<String, Row> {
     }
     public Row call(String line) throws Exception {
 
-        if(parser == null){
             CsvParserSettings settings = new CsvParserSettings();
 
             settings.getFormat().setLineSeparator(lineSeparator);
@@ -84,8 +79,7 @@ public class ConvertToRow implements Function<String, Row> {
             settings.setIgnoreTrailingWhitespaces(true);
             settings.setReadInputOnSeparateThread(false);
             settings.setProcessor(NoopRowProcessor.instance);
-            parser = new CsvParser(settings);
-        }
+            CsvParser  parser = new CsvParser(settings);
 
         Object[] record = new Object[schema.length() + 2];
         record[schema.length()] = 0;
@@ -98,30 +92,17 @@ public class ConvertToRow implements Function<String, Row> {
             logger.info("Unable to parse the record");
             errCounter.add(1);
             record = createRejectedRecord(line, "Unable to parse the record");
-
-//            String srcRecord[] = line.split(String.valueOf(delimiter));
-//
-//            System.arraycopy(srcRecord, 0, record, 0, srcRecord.length);
-//
-//            record[schema.length()] = 1;
-//            record[schema.length() + 1] = "Unable to parse the record";
-        } else if(parsed.length != schema.fields().length){
+        }
+        else if(parsed.length != schema.fields().length){
             // Create record with rejected flag
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");
-            // Copy columns from input string to output record
-//            if (parsed.length < schema.length()) {
-//                System.arraycopy(parsed, 0, record, 0, parsed.length);
-//            } else {
-//                System.arraycopy(parsed, 0, record, 0, schema.length());
-//            }
-//            record[schema.length()] = 1;
-//            record[schema.length() + 1] = "Invalid number of columns";
+
         } else {
             // TODO: Faster implementation will require automatic Janino code generation
             try {
                 if (Arrays.stream(parsed).filter(val -> val != null).count() == 0) {
-                    throw new Exception("All fields are null");
+                    record = createRejectedRecord(line, "All fields are null");
                 }
                 int i = 0;
                 for (StructField sf : schema.fields()) {
@@ -160,11 +141,6 @@ public class ConvertToRow implements Function<String, Row> {
                 }
             } catch(Exception e){
                 errCounter.add(1);
-
-                // Copy columns from input string to output record
-//                System.arraycopy(parsed, 0, record, 0, schema.length());
-//                record[schema.length()] = 1;
-//                record[schema.length() + 1] = e.getClass().getCanonicalName() + ": " + e.getMessage();
 
                 //TODO; Not working - Sunil
 //                record = new Object[]{line, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()};
