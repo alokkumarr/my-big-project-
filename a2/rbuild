@@ -38,6 +38,6 @@ for dir in a2charter a2munge a2modeler a2sipr; do
     
     # Install the built R package locally, for use by other R packages
     # later in the build process
-    R CMD INSTALL *.tar.gz
+    R CMD INSTALL --no-docs --no-html *.tar.gz
     popd > /dev/null
 done
