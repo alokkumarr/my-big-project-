@@ -244,10 +244,10 @@ class SuiteSetup {
         }
       }
       if (totalTests > 0) {
-        let testSuitesStart = `<testsuites name="End to end suite report" failures="${failedCount}" tests="${totalTests}" timestamp="${new Date()}">`;
+        let testSuitesStart = `<testsuites name="End to end suite report" failures="${failedCount}" tests="${totalTests}" timestamp="${new Date().getTime()}">`;
         let testSuitesEnd = `</testsuites>`;
         let suiteName = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/suite.json', 'utf8')).suiteName;
-        let testSuiteStart = `	<testsuite name="executed suite: ${suiteName}" timestamp="${new Date()}" failures="${failedCount}" tests="${totalTests}">`;
+        let testSuiteStart = `	<testsuite name="executed suite: ${suiteName}" timestamp="${new Date().getTime()}" failures="${failedCount}" tests="${totalTests}">`;
         let testSuiteEnd = `</testsuite>`;
         let xmlDocument = `<?xml version="1.0" encoding="UTF-8" ?>`;
 
