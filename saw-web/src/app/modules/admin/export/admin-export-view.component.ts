@@ -1,160 +1,148 @@
-import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Observable } from 'rxjs';
-import { from } from 'rxjs';
-import { FormControl } from '@angular/forms';
-import { mergeMap, startWith, map } from 'rxjs/operators';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Select, Store } from '@ngxs/store';
 import { JwtService } from '../../../common/services';
+import {
+  ResetExportPageState,
+  ExportSelectTreeItem,
+  AddAnalysisToExport,
+  RemoveAnalysisFromExport,
+  ClearExport,
+  AddAllAnalysesToExport,
+  RemoveAllAnalysesFromExport
+} from './actions/export-page.actions';
+import { MenuItem } from '../../../common/state/common.state.model';
+import { AdminExportLoadMenu } from '../../../common/actions/menu.actions';
+import { ExportPageState } from './state/export-page.state';
+import { ExportService } from './export.service';
+import { SidenavMenuService } from '../../../common/components/sidenav';
+import { AdminMenuData } from '../consts';
+import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
-import * as lowerCase from 'lodash/lowerCase';
-import * as includes from 'lodash/includes';
-import * as isEmpty from 'lodash/isEmpty';
-import * as lodashMap from 'lodash/map';
-import * as forEach from 'lodash/forEach';
-import * as reduce from 'lodash/reduce';
 import * as get from 'lodash/get';
-import * as difference from 'lodash/difference';
-import * as isUndefined from 'lodash/isUndefined';
-import * as fpFilter from 'lodash/fp/filter';
-import * as fpGroupBy from 'lodash/fp/groupBy';
-import * as lodashFilter from 'lodash/filter';
-import * as debounce from 'lodash/debounce';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpMap from 'lodash/fp/map';
-import { ExportService } from './export.service';
-import { CategoryService } from '../category/category.service';
-import { SidenavMenuService } from '../../../common/components/sidenav';
-import { AdminMenuData } from '../consts';
 
 @Component({
   selector: 'admin-export-view',
   templateUrl: './admin-export-view.component.html',
   styleUrls: ['./admin-export-view.component.scss']
 })
-export class AdminExportViewComponent implements OnInit {
-  @ViewChild('metricInput') metricInput: ElementRef;
-  @Input() columns: any[];
-  data: any[];
-  metrics: any[] = [];
-  selectedMetrics: any[] = [];
-  metricCtrl = new FormControl();
-  unSelectedMetrics: Observable<any[]>;
-  separatorKeysCodes: number[] = [ENTER, COMMA];
-  analyses: any[] = [];
-  metrics$: Promise<any>;
-  categoriesMap;
-  isMetricSelectorFocused = false;
-  isAtLeastOneAnalysisSelected = false;
-  labelRequested = false;
+export class AdminExportViewComponent implements OnInit, OnDestroy {
+  @Select(state => state.common.analyzeMenu) analyzeMenu$: Observable<
+    MenuItem[]
+  >;
+  @Select(ExportPageState.exportList) exportList$: Observable<any[]>;
+  @Select(state => state.admin.exportPage.categoryAnalyses)
+  exportAnalyses$: Observable<any[]>;
 
-  isEmpty = isEmpty;
+  isExportListEmpty$ = this.exportList$.pipe(map(list => list.length <= 0));
+  categorisedMenu$: Observable<MenuItem[]>;
 
   constructor(
     public _exportService: ExportService,
     public _sidenav: SidenavMenuService,
-    public _categoryService: CategoryService,
-    public _jwtService: JwtService
+    public _jwtService: JwtService,
+    private store: Store
   ) {
-    this.loadCategories();
-    this.metrics$ = this._exportService.getMetricList();
-    this.unSelectedMetrics = this.metricCtrl.valueChanges.pipe(
-      startWith(''),
-      mergeMap((searchTerm: string) => this._asyncFilter(searchTerm))
-    );
-    this.loadAnalyses = debounce(this.loadAnalyses, 1000);
+    this.store.dispatch([
+      new AdminExportLoadMenu('ANALYZE'),
+      new AdminExportLoadMenu('OBSERVE')
+    ]);
   }
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
+
+    // Group menus under their modules
+    this.categorisedMenu$ = this.analyzeMenu$.pipe(
+      map(menu => [
+        {
+          id: 'analyze_1',
+          name: 'Analyze',
+          expanded: true,
+          children: menu
+        }
+      ])
+    );
   }
 
-  onFocus() {
-    this.isMetricSelectorFocused = true;
+  ngOnDestroy() {
+    this.store.dispatch(new ResetExportPageState());
   }
 
-  onBlur() {
-    this.isMetricSelectorFocused = false;
+  /**
+   * Handler for changes in left pane - Selection of category/sub-category
+   *
+   * @param {*} { moduleName, menuItem }
+   * @memberof AdminExportViewComponent
+   */
+  onSelectMenuItem({ moduleName, menuItem }) {
+    this.store.dispatch(new ExportSelectTreeItem(moduleName, menuItem));
   }
 
-  loadCategories() {
-    this._categoryService.getList().then(categories => {
-      this.categoriesMap = reduce(
-        categories,
-        (acc, category) => {
-          if (category.moduleName === 'ANALYZE') {
-            forEach(category.subCategories, subCategory => {
-              acc[subCategory.subCategoryId] = subCategory.subCategoryName;
-            });
-          }
-          return acc;
-        },
-        {}
+  /**
+   * When the item in middle pane is toggled, update store with it.
+   *
+   * @param {*} { checked, item }
+   * @memberof AdminExportViewComponent
+   */
+  onChangeItemSelection({ checked, item }) {
+    if (item.entityId) {
+      // TODO: Handle dashboard
+    } else {
+      // Item is analysis
+      this.store.dispatch(
+        checked
+          ? new AddAnalysisToExport(item)
+          : new RemoveAnalysisFromExport(item)
       );
-    });
-  }
-
-  loadAnalyses() {
-    const metricIds = lodashMap(this.selectedMetrics, ({ id }) => id);
-    if (isEmpty(this.selectedMetrics)) {
-      this.analyses = [];
-      return;
-    }
-    this._exportService.getAnalysisByMetricIds(metricIds).then(analyses => {
-      this.analyses = fpPipe(
-        fpFilter(
-          ({ categoryId, name }) =>
-            !isUndefined(categoryId) && !isUndefined(name) && name !== ''
-        ),
-        fpMap(analysis => {
-          return {
-            analysis,
-            selection: false,
-            categoryName: this.categoriesMap[analysis.categoryId]
-          };
-        })
-      )(analyses);
-    });
-  }
-
-  onRemove(index) {
-    if (index >= 0) {
-      this.selectedMetrics.splice(index, 1);
-      this.loadAnalyses();
-      this.metricCtrl.setValue(null);
-      this.metricInput.nativeElement.value = '';
     }
   }
 
-  onValidityChange(isValid) {
-    this.isAtLeastOneAnalysisSelected = isValid;
+  /**
+   * When 'All' checkbox in a list is toggled, update store accordingly.
+   *
+   * @param {boolean} checked
+   * @memberof AdminExportViewComponent
+   */
+  onChangeAllSelectionList(checked: boolean) {
+    this.store.dispatch([
+      checked ? new AddAllAnalysesToExport() : new RemoveAllAnalysesFromExport()
+    ]);
   }
 
-  onSelect(metric) {
-    this.selectedMetrics.push(metric);
-    this.metricInput.nativeElement.value = '';
-    this.metricCtrl.setValue(null);
-    this.loadAnalyses();
+  /**
+   * When 'All' checkbox in export list is toggled, clear the list.
+   * Export list doesn't support keeping some items unchecked.
+   * Item is either selected, or not present.
+   *
+   * @param {boolean} checked
+   * @memberof AdminExportViewComponent
+   */
+  onChangeAllExportList(checked: boolean) {
+    this.store.dispatch(new ClearExport());
   }
 
+  /**
+   * Creates a zip file and export the items.
+   *
+   * @memberof AdminExportViewComponent
+   */
   export() {
     const zip = new JSZip();
-    const groupedAnalyses = fpPipe(
-      fpFilter('selection'),
-      fpMap('analysis'),
-      fpGroupBy('metricName')
-    )(this.analyses);
+    const { analyses } = this.store.selectSnapshot(
+      state => state.admin.exportPage.exportData
+    );
 
-    forEach(groupedAnalyses, (analyses, metricName) => {
-      const fileName = this.getFileName(metricName);
-      zip.file(
-        `${fileName}.json`,
-        new Blob([JSON.stringify(analyses)], {
-          type: 'application/json;charset=utf-8'
-        })
-      );
-    });
+    const fileName = this.getFileName('ANALYZE');
+    zip.file(
+      `${fileName}.json`,
+      new Blob([JSON.stringify(analyses)], {
+        type: 'application/json;charset=utf-8'
+      })
+    );
+
     zip.generateAsync({ type: 'blob' }).then(content => {
       let zipFileName = this.getFileName('');
       zipFileName = zipFileName.replace('_', '');
@@ -162,41 +150,19 @@ export class AdminExportViewComponent implements OnInit {
     });
   }
 
-  getFileName(name) {
+  /**
+   * Returns formatted file name based on input
+   *
+   * @param {string} name
+   * @returns {string}
+   * @memberof AdminExportViewComponent
+   */
+  getFileName(name: string): string {
     const formatedDate = moment().format('YYYYMMDDHHmmss');
     const custCode = get(this._jwtService.getTokenObj(), 'ticket.custCode');
     name = name.replace(' ', '_');
     name = name.replace('\\', '-');
     name = name.replace('/', '-');
     return `${custCode}_${name}_${formatedDate}`;
-  }
-
-  splitAnalysisOnMetric(exportAnalysisList, metrics) {
-    return lodashMap(metrics, ({ metricName }) => {
-      return {
-        fileName: this.getFileName(metricName),
-        analysisList: lodashFilter(
-          exportAnalysisList,
-          analysis => analysis.metricName === metricName
-        )
-      };
-    });
-  }
-
-  public _asyncFilter(value) {
-    const filterValue = lowerCase(value);
-    return from(this.metrics$).pipe(
-      map(metrics => {
-        return fpPipe(
-          fpFilter(metric => {
-            if (!filterValue) {
-              return true;
-            }
-            const metricName = lowerCase(metric.metricName);
-            return includes(metricName, filterValue);
-          })
-        )(difference(metrics, this.selectedMetrics));
-      })
-    );
   }
 }

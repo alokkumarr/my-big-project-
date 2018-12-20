@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 $toolbar-height: 74px;
 
 :host {
@@ -16,21 +16,22 @@ $toolbar-height: 74px;
   background-color: transparent;
   height: auto;
   padding: 0 20px;
-
-  .mat-form-field {
-    max-width: 100%;
-    width: auto;
-    margin: 0;
-    font-size: 16px;
-
-    .mat-form-field-infix {
-      width: unset;
-    }
-  }
 }
 
-admin-export-list {
-  padding: 0 20px;
-  height: calc(100% - 74px);
-  display: block;
+.admin-export {
+  &__actions {
+    padding: 5px 0;
+
+    &--metrics-checkbox {
+      margin-right: 10px;
+      font-size: 16px;
+    }
+  }
+
+  &__main-content {
+    height: calc(100% - 46px);
+    display: grid;
+    grid-template-columns: 1fr 2fr 3fr;
+    grid-template-rows: 100%;
+  }
 }
