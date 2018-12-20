@@ -103,11 +103,22 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     private int registerDataset () throws Exception {
         int result = 0;
 
+        String datasetId = ctx.applicationID + "::" + ESLOADER_DATASET;
+
+        String esDatasetId = datasetId + "::esdata";
+
+        // Fetch the existing ES dataset
         JsonElement inputDsConfigElement = dsaux.dl.getDSStore()
-            .read(ctx.applicationID + "::" + ESLOADER_DATASET);
+            .read(esDatasetId);
+
+        if (inputDsConfigElement == null || inputDsConfigElement.equals("")) {
+            logger.info("ES dataset doesn't exist. Creating it with input dataset");
+            inputDsConfigElement = dsaux.dl.getDSStore()
+                .read(datasetId);
+        }
 
         if (inputDsConfigElement == null) {
-            logger.error("Input dataset is null");
+            logger.error("Input dataset is not registered");
 
             return -1;
         }
@@ -116,6 +127,9 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
         JsonObject inputDsConfigObject = inputDsConfigElement.getAsJsonObject();
         inputDsConfigObject.remove(DataSetProperties.UserData.toString());
+        inputDsConfigObject.remove("userdata");
+        inputDsConfigObject.remove(DataSetProperties.CreatedTime.toString());
+        inputDsConfigObject.remove(DataSetProperties.ModifiedTime.toString());
 
         String indexType = esLoaderConfig.getDestinationIndexName();
 
@@ -142,13 +156,14 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
         inputDsConfigObject.add(DataSetProperties.System.toString(), updateSystemObject(system, index, type));
 
-        //TODO: Remove the created and updated timestamp
-        //Update ID Fields
-        //Fetch the existing document if already present and update the values
-
-
+        // Update ID Field
+        inputDsConfigObject.addProperty("_id", esDatasetId);
 
         logger.debug("Updated dataset = " + inputDsConfigObject);
+
+        logger.info("Registering " + esDatasetId + " to metadata");
+
+        dsaux.dl.getDSStore().create(esDatasetId, inputDsConfigElement);
 
         return result;
     }
@@ -160,6 +175,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
         system.addProperty(DataSetProperties.PhysicalLocation.toString(), index);
         system.addProperty(DataSetProperties.Name.toString(), index);
+        system.addProperty("type", "ESIndex");
 
         return system;
     }
