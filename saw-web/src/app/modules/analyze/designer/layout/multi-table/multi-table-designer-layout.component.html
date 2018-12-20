@@ -1,5 +1,5 @@
 <div class="designer__data-settings"
-     [ngClass]="{'expanded': !isGridPanelExpanded}">
+     [ngClass]="{'expanded': !isGridPanelExpanded}" [ngStyle]="{'height': filters.length > 1 ? 'calc(100% - 359px)' : 'calc(100% - 301px)'}">
 
   <designer-settings-query *ngIf="isInQueryMode"
                         [analysis]="analysis"
@@ -13,7 +13,6 @@
                                  [useAggregate]="analysis.type === 'esReport'"
                                  [sqlBuilder]="sqlBuilder">
   </designer-settings-multi-table>
-
   <button mat-mini-fab
           e2e="report-expand-btn"
           [ngClass]="{'expanded': !isGridPanelExpanded}"
