@@ -46,7 +46,9 @@ application:
         queue-capacity: 10000
 sip:
   service:
-    index: 0    
+    index: 0
+    max.attempts : 3
+    retry.delay: 5000    
 bis:
   transfer-batch-size: 10
   modified-retries: 3

@@ -8,6 +8,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +21,11 @@ public class SipLogging {
   private BisFileLogsRepository bisFileLogsRepository;
 
   /**
-   * To make an entry to a log table. 
+   * To make an entry to a log table.
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public void upsert(BisDataMetaInfo entity, String pid) throws SipNestedRuntimeException {
     logger.trace("Integrate with logging API to update with a status start here : "
         + entity.getProcessState());
@@ -45,9 +50,8 @@ public class SipLogging {
       bisLog.setCreatedDate(new Date());
       bisFileLogsRepository.save(bisLog);
     }
-    logger.trace("Integrate with logging API to update with a status ends here : " 
-        + entity.getProcessState()
-        + " with an process Id " + bisLog.getPid());
+    logger.trace("Integrate with logging API to update with a status ends here : "
+        + entity.getProcessState() + " with an process Id " + bisLog.getPid());
   }
 
   public boolean checkDuplicateFile(String fileName) throws SipNestedRuntimeException {

@@ -48,7 +48,8 @@ application:
 sip:
   service:
     index: {{ groups['saw-services'].index(inventory_hostname) }}
-
+    max.attempts : 3
+    retry.delay: 5000
 bis:
   transfer-batch-size: 10
   modified-retries: 3

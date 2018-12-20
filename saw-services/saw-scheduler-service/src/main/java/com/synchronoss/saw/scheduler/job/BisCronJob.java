@@ -1,9 +1,7 @@
 package com.synchronoss.saw.scheduler.job;
 
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
-
 import java.util.Date;
-
 import org.quartz.InterruptableJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -13,7 +11,9 @@ import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,10 +24,12 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
   private volatile boolean toStopFlag = true;
 
   protected static final String JOB_DATA_MAP_ID = "JOB_DATA_MAP";
-  
+
   @Value("${bis-transfer-url}")
   private String bisTransferUrl;
-  
+
+  @Autowired
+  RetryTemplate retryTemplate;
   RestTemplate restTemplate = new RestTemplate();
 
 
@@ -47,9 +49,13 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
     JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
     String myValue = dataMap.getString("myKey");
     logger.info("Value:" + myValue);
-   
-    restTemplate.postForLocation(bisTransferUrl, jobRequest);
-
+    retryTemplate.execute(context -> {
+      logger.info("inside retry method");
+      restTemplate.postForLocation(bisTransferUrl, jobRequest);
+      throw new IllegalStateException(
+          "Exception occurred while executing ingestion service from cron job");
+    });
+    // restTemplate.postForLocation(bisTransferUrl, jobRequest);
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

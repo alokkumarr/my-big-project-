@@ -191,9 +191,11 @@ public class SawBisRouteController {
         }
         // }
         RestTemplate restTemplate = new RestTemplate();
-        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + scheduleUri + insertUrl);
+        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl 
+            + scheduleUri + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + insertUrl, schedulerRequest);
-        logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl + scheduleUri + insertUrl);
+        logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl
+            + scheduleUri + insertUrl);
       }
       /*
        * try { routeData = (ObjectNode) objectMapper.readTree(routeEntity.getRouteMetadata());
@@ -387,7 +389,8 @@ public class SawBisRouteController {
         routeEntity.setModifiedDate(new Date());
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
-        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + updateUrl);
+        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl 
+            + scheduleUri + updateUrl);
         try {
           logger.trace("Sending the content to " + bisSchedulerUrl + scheduleUri + updateUrl 
               + " : " + objectMapper.writeValueAsString(schedulerRequest));
@@ -396,7 +399,8 @@ public class SawBisRouteController {
               + " schedulerRequest ",e);
         }
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + updateUrl, schedulerRequest);
-        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl + scheduleUri + updateUrl);
+        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl 
+            + scheduleUri + updateUrl);
       }
       BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
       try {
@@ -445,7 +449,8 @@ public class SawBisRouteController {
     }
     
     return ResponseEntity.ok(bisRouteDataRestRepository.findById(routeId).map(route -> {
-      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + deleteUrl);
+      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl 
+          + scheduleUri + deleteUrl);
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
       scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);

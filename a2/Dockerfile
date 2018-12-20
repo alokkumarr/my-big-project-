@@ -17,7 +17,7 @@ FROM centos:7.4.1708
 RUN yum -q -y install epel-release
 
 # Install the R language environment
-RUN yum -q -y install R
+RUN yum -q -y install R-3.5.1
 
 # Install dependencies for SIP Advanced Analytics R packages
 RUN yum -q -y install openssl-devel libcurl-devel libxml2-devel \

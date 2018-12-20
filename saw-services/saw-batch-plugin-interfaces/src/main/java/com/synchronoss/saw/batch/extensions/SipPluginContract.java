@@ -16,6 +16,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
 /**
  * This class defines the specification for plug in implementation.
@@ -31,11 +33,17 @@ public abstract class SipPluginContract {
   /**
    * This method is to test connect the route.
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public abstract String connectRoute(Long entityId) throws SipNestedRuntimeException;
 
   /**
    * This method is to test connect the source.
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public abstract String connectChannel(Long entityId) throws SipNestedRuntimeException;
 
   /**
@@ -47,12 +55,18 @@ public abstract class SipPluginContract {
   /**
    * This method is to test connect the source.
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public abstract String immediateConnectChannel(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException;
 
   /**
    * This method is to test connect the source.
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public List<BisDataMetaInfo> immediateTransfer(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because "
@@ -63,6 +77,9 @@ public abstract class SipPluginContract {
   /**
    * * This method is to test connect the source.
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId)
       throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because it "
