@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: auto;
+}
+
+// Following is a workaround for https://github.com/angular/material2/issues/8600
+::ng-deep .dx-header-row {
+  ::ng-deep td:first-child {
+    ::ng-deep .dx-datagrid-text-content {
+      overflow: visible;
+    }
+  }
+}

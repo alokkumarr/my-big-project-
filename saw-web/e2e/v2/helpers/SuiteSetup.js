@@ -85,6 +85,27 @@ class SuiteSetup {
     }
   }
 
+  addToExecutedTests(currentResult) {
+
+    let testResultStatus = {};
+    if (!fs.existsSync('target')) {
+      fs.mkdirSync('target');
+    }
+    if (!fs.existsSync(Constants.E2E_OUTPUT_BASE_DIR)) {
+      fs.mkdirSync(Constants.E2E_OUTPUT_BASE_DIR);
+    }
+    if (fs.existsSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json')) {
+      testResultStatus = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json', 'utf8'));
+      // There are already some test exits then add new one or replace the existing one with latest result
+      logger.silly('existingResult---' + JSON.stringify(testResultStatus));
+    } else {
+      logger.silly('first test result... ');
+    }
+    testResultStatus[currentResult.testInfo.testId ]= currentResult;
+    fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json', JSON.stringify(testResultStatus), { encoding: 'utf8' });
+
+  }
+
   static readAllData(dir = null) {
     let completeTestData = {};
     let location;
