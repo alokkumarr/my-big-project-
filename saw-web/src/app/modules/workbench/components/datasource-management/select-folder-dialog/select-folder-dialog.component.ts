@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
+import * as startsWith from 'lodash/startsWith';
+import * as replace from 'lodash/replace';
 
 import { STAGING_TREE } from '../../../wb-comp-configs';
 import { IFileSystemAPI, ISelectionEvent } from '../../../../../common/components/remote-folder-selector';
@@ -42,6 +44,9 @@ export class SourceFolderDialogComponent {
   }
 
   onYesClick(): void {
-    this.dialogRef.close(this.selectedPath);
+    const result = startsWith(this.selectedPath, '//') ?
+      replace(this.selectedPath, '/', '') : this.selectedPath;
+
+    this.dialogRef.close(result);
   }
 }
