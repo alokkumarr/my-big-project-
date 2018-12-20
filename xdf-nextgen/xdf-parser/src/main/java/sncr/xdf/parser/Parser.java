@@ -11,7 +11,6 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
@@ -277,13 +276,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         logger.info("Parsing " + sourcePath + " to " + tempDir);
         logger.info("Header size : " + headerSize);
-
+        // Keep the minimum partition as same as number of files (outputNOF) requested for output.
+        // Spark also optimize and handle the number of partition automatically based on input
+        // data and number of executor configured. This will also avoid the repartitioning of
+        // Dataset later on to insure output number of files.
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(sourcePath, 1);
+            .textFile(sourcePath, outputNOF);
+        logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter));
+                '\'', recCounter, errCounter));;
 
         logger.debug("Parsed rdd length = " + parsedRdd.count());
         // Create output dataset
@@ -291,10 +294,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
         logger.debug("Output rdd length = " + outputRdd.count());
+        logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
-
+        logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
         boolean status = writeDataset(outputDataset, outputFormat, tempDir);
-
         if (!status) {
             return -1;
         }

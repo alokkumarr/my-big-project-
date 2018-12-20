@@ -15,7 +15,7 @@ echo 'options(repos = c(CRAN = "http://cloud.r-project.org"))' > ~/.Rprofile
 
 # Workaround: Some R packages give an error when trying to install
 # documentation due to a missing directory, so create it here.
-mkdir -p /usr/share/doc/R-3.5.0/html
+mkdir -p /usr/share/doc/R-3.5.1/html
 
 precache='"testthat","dplyr","magrittr","tidyr","rlang","checkmate","ggplot2","forcats","Hmisc","scales","pals","gridExtra","sparklyr","reshape2","zoo","lubridate","httr","purrr","jsonlite","forecast","doFuture","foreach","iterators","future"'
 
