@@ -3010,6 +3010,22 @@ public class UserRepositoryImpl implements UserRepository {
 			logger.error("Exception encountered while deleting category " + e.getMessage(), null, e);
 			return false;
 		}
+		/** whenever we delete a category,
+         *  the corresponding privilege created using the category remains in the system.
+         *  So, herby we are deleting that corresponding privilege whenever category is deleted.
+         **/
+        String sql = "DELETE FROM privileges " + " WHERE CUST_PROD_MOD_FEATURE_SYS_ID = ?";
+        try {
+            jdbcTemplate.update(sql, new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                    preparedStatement.setLong(1, categoryId);
+
+                }
+            });
+        } catch (Exception e1) {
+            logger.error("Exception encountered while deleting privilege related to this category " + e1.getMessage(), null, e1);
+            return false;
+        }
 		return true;
 	}
 
