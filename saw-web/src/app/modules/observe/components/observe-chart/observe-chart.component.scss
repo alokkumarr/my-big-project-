@@ -64,3 +64,8 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   font-size: 17px;
   margin: 8px 0px 0px 10px;
 }
+
+mat-icon.export {
+  background-image: url('/assets/img/excel.png');
+  zoom: 0.7;
+}
