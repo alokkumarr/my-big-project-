@@ -31,8 +31,8 @@
   </report-grid-upgraded>
   <designer-map-chart *ngIf="analysis.type === 'chart' && chartType === 'geo'"
                   [chartType]="chartType"
-                  [auxSettings]="{legend: analysis.legend}"
                   [data]="previewData"
+                  [auxSettings]="{legend: analysis.legend}"
                   [sqlBuilder]="analysis.sqlBuilder">
   </designer-map-chart>
   <designer-chart *ngIf="analysis.type === 'chart' && chartType !== 'geo'"

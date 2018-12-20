@@ -27,12 +27,14 @@ HighChartsOfflineExporting(Highmaps);
 
 import { ChartComponent } from './chart.component';
 import { MapChartComponent } from './map-chart.component';
+import { MapChartViewerComponent } from './map-chart-viewer';
 
 export const ChartsModule = 'components.charts';
 
 const COMPONENTS = [
   ChartComponent,
-  MapChartComponent
+  MapChartComponent,
+  MapChartViewerComponent
 ];
 @NgModule({
   declarations: COMPONENTS,

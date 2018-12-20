@@ -7,7 +7,6 @@ import { ExecutedReportViewComponent } from './report';
 import { ExecutedPivotViewComponent } from './pivot';
 import { ExecutedChartViewComponent } from './chart';
 import { ExecutedMapChartViewComponent } from './map-chart';
-import { DesignerMapChartComponent } from '../designer/map-chart';
 import { ChartService, ToastService } from '../../../common/services';
 import { ExecuteService } from '../services/execute.service';
 import { UChartModule } from '../../../common/components/charts';
@@ -20,8 +19,7 @@ const COMPONENTS = [
   ExecutedReportViewComponent,
   ExecutedPivotViewComponent,
   ExecutedChartViewComponent,
-  ExecutedMapChartViewComponent,
-  DesignerMapChartComponent
+  ExecutedMapChartViewComponent
 ];
 
 @NgModule({
@@ -41,7 +39,7 @@ const COMPONENTS = [
     AnalyzeExportService,
     ChartService
   ],
-  exports: [ExecutedViewComponent, DesignerMapChartComponent]
+  exports: [ExecutedViewComponent]
 })
 export class ExecutedViewModule {}
 export {

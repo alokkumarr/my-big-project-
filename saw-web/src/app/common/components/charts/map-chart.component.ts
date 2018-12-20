@@ -11,6 +11,8 @@ import * as Highmaps from 'highcharts/highmaps';
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
+import * as isArray from 'lodash/isArray';
+import * as reduce from 'lodash/reduce';
 
 import {
   globalChartOptions,
@@ -36,14 +38,14 @@ export class MapChartComponent {
   set updater(updater: Subject<IChartUpdate>) {
     this._updater = updater;
     if (isObservable(updater)) {
-      updater.subscribe(this.onOptionsUpdate.bind(this));
+      updater.subscribe(this.onOptionsUpdate);
     }
   }
   @Input()
   set actionBus(actionBus: Subject<IChartAction>) {
     this._actionBus = actionBus;
     if (isObservable(actionBus)) {
-      actionBus.subscribe(this.onAction.bind(this));
+      actionBus.subscribe(this.onAction);
     }
   }
   @Input()
@@ -57,7 +59,7 @@ export class MapChartComponent {
   container: ElementRef;
 
   public highmaps: any = Highmaps;
-  public chart: any = null;
+  public chart: any;
   public _updater: Subject<IChartUpdate>;
   public _actionBus: Subject<any>;
   public _options: any;
@@ -66,6 +68,8 @@ export class MapChartComponent {
 
   constructor() {
     this.highmaps.setOptions(globalChartOptions);
+    this.onOptionsUpdate = this.onOptionsUpdate.bind(this);
+    this.onAction = this.onAction.bind(this);
   }
 
   setOptions(options) {
@@ -87,7 +91,34 @@ export class MapChartComponent {
   }
 
   onOptionsUpdate(update: IChartUpdate) {
-    this.chart.update(update, true, true);
+    const chartUpdate = this.transformUpdateIfNeeded(update);
+
+    this.delayIfNeeded(!this.chart, () => {
+      this.chart.update(chartUpdate, true, true);
+      this.chart.reflow();
+    }, 0);
+  }
+
+  delayIfNeeded(condition, fn, delay) {
+    if (condition) {
+      setTimeout(() => fn(), delay);
+    } else {
+      fn();
+    }
+  }
+
+  /**
+   * Trasnform the updates to highcharts config object form, if it comes in array form
+   */
+  transformUpdateIfNeeded(updates) {
+    if (isArray(updates)) {
+      return reduce(updates, (acc, update) => {
+        set(acc, update.path, update.data);
+        return acc;
+      }, {});
+    }
+
+    return updates;
   }
 
   onAction(action: IChartAction) {

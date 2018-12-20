@@ -1,1 +1,1 @@
-export type AnalysisType = 'report' | 'pivot' | 'chart' | 'esReport';
+export type AnalysisType = 'report' | 'pivot' | 'chart' | 'mapChart' | 'esReport';

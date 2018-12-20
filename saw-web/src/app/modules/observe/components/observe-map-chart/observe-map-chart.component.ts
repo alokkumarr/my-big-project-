@@ -15,11 +15,12 @@ import * as isUndefined from 'lodash/isUndefined';
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 
 @Component({
-  selector: 'observe-chart',
-  templateUrl: './observe-chart.component.html'
+  selector: 'observe-map-chart',
+  templateUrl: './observe-map-chart.component.html',
+  styleUrls: ['./observe-map-chart.component.scss']
 })
 
-export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ObserveMapChartComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
