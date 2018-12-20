@@ -161,7 +161,7 @@ class SuiteSetup {
         if (val.includes('--baseUrl')) {
           url = val.split('=')[1];
           let urlObject = {
-            baseUrl: url, e2eId: globalVariables.generateE2eId
+            baseUrl: url
           };
           fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/url.json', JSON.stringify(urlObject), {
             encoding: 'utf8'
