@@ -60,7 +60,7 @@ export class CreateRouteDialogComponent implements OnInit {
   validateFilePattern(
     control: AbstractControl
   ): { [key: string]: boolean } | null {
-    if (includes(control.value, '.*') || includes(control.value, ',')) {
+    if (includes(control.value, ',')) {
       return { inValidPattern: true };
     }
     return null;
