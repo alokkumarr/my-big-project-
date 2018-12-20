@@ -1,0 +1,47 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+  padding: 0 0 0 20px;
+}
+
+h1 {
+  background: #d3e9fc;
+  color: #0b4d99;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 36px;
+  margin: 0;
+  padding-left: 10px;
+}
+
+tree-root {
+  font-size: 16px;
+}
+
+::ng-deep .tree-node-level-1 {
+  font-weight: 800;
+  padding: 5px 0;
+}
+
+::ng-deep .tree-node-level-2 {
+  font-weight: 600;
+  padding: 5px 0;
+}
+
+::ng-deep .tree-node-level-3 {
+  font-weight: 400;
+  padding: 0;
+}
+
+::ng-deep .node-content-wrapper-active.node-content-wrapper-active {
+  background: transparent;
+  color: $primary-blue-b2;
+
+  &:hover {
+    background: #f7fbff;
+  }
+}
