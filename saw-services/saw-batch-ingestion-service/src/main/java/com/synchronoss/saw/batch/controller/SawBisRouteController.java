@@ -404,6 +404,9 @@ public class SawBisRouteController {
         routeEntity.setBisChannelSysId(channelId);
         routeEntity.setBisRouteSysId(routeId);
         routeEntity.setModifiedDate(new Date());
+        if (routeEntity.getStatus() == null) {
+          routeEntity.setStatus(STATUS_ACTIVE);
+        }
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
         logger.info("scheduler uri to update starts here : " + bisSchedulerUrl + updateUrl);
