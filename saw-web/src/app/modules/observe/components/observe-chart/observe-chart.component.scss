@@ -47,13 +47,15 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
 }
 
 .flex-icon-container {
-  width: 130px;
+  width: 100px;
+  display: flex;
 }
 
 .toggle-icons {
   text-align: right;
   font-size: 15px;
-  margin: 10px 10px 0 0px;
+  margin: 10px 4px 0 -6px;
+  width: 50px;
 }
 
 .mat-icon.active {
@@ -65,7 +67,8 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   margin: 8px 0px 0px 10px;
 }
 
-mat-icon.export {
+.icon-grid-export {
   background-image: url('/assets/img/excel.png');
-  zoom: 0.7;
+  transform: scale(0.7);
+  margin-top: 5px;
 }

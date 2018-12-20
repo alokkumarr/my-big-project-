@@ -2,10 +2,10 @@
   <div class="analysis-header">
     <h1 class="chart report-title flex-container" [textContent]="analysis.chartTitle || analysis.name"></h1>
     <div class="flex-icon-container">
+      <div *ngIf="toggleToGrid"  class="mat-icon material-icons icon-grid-export" role="img" (click)="exportGridToExcel()"
+        matTooltip="Export Grid Data">
+      </div>
       <div *ngIf="ViewMode" class="toggle-icons">
-        <mat-icon *ngIf="toggleToGrid"  class="mat-icon material-icons export" role="img" (click)="exportGridToExcel()"
-          matTooltip="Export Grid Data">
-        </mat-icon>
         <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="toggleToGrid = true" [ngClass]="{'active': toggleToGrid}"
           matTooltip="Toggle to Grid">
         </mat-icon>
