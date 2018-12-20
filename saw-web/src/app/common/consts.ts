@@ -203,31 +203,31 @@ export const SCHEDULE_TYPES = [{
 }];
 
 export const DATAPOD_CATEGORIES = [{
-  name: 'default',
+  name: 'Default',
   icon: 'category-default'
 }, {
-  name: 'errors',
+  name: 'Errors',
   icon: 'category-errors'
 }, {
-  name: 'orders',
+  name: 'Orders',
   icon: 'category-orders'
 }, {
-  name: 'sessions',
+  name: 'Sessions',
   icon: 'category-sessions'
 }, {
-  name: 'subscribers',
+  name: 'Subscribers',
   icon: 'category-subscribers'
 }, {
-  name: 'usage',
+  name: 'Usage',
   icon: 'category-usage'
 }, {
-  name: 'events',
+  name: 'Events',
   icon: 'calendar-events'
 }, {
-  name: 'retention',
+  name: 'Retention',
   icon: 'calendar-retention'
 }, {
-  name: 'funnel',
+  name: 'Funnel',
   icon: 'calendar-funnel'
 }];
 
