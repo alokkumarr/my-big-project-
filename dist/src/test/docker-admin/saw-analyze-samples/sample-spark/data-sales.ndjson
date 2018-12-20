@@ -245,4 +245,3 @@
 {"string": "string 245", "long": 1244, "float": 1000.245, "date": "2018-12-30 00:00:00", "integer": 344, "double": 99995.245}
 {"string": "string 246", "long": 1245, "float": 1000.246, "date": "2018-12-31 00:00:00", "integer": 345, "double": 99995.246}
 {"string": "string 247", "long": 1246, "float": 1000.247, "date": "2019-01-01 00:00:00", "integer": 346, "double": 99995.247}
-
