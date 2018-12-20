@@ -1,0 +1,15 @@
+<h1>Select category</h1>
+<tree-root
+  [nodes]="menu"
+  [options]="treeOptions"
+  (activate)="onClickMenuItem($event)"
+></tree-root>
+
+<!--
+  <h2>Dashboards</h2>
+  <tree-root
+    [nodes]="observeMenu$ | async"
+    [options]="treeOptions"
+    (activate)="onClickDashboardMenu($event)"
+  ></tree-root>
+-->

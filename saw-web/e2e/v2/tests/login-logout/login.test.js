@@ -6,7 +6,7 @@ const LoginPage = require('../../pages/LoginPage');
 const Header = require('../../pages/components/Header');
 const commonFunctions = require('../../pages/utils/commonFunctions')
 
-describe('Executing login tests from loginTests.js', () => {
+describe('Executing login tests from login.test.js', () => {
 
   beforeAll(() => {
     logger.info('Starting login tests...');
