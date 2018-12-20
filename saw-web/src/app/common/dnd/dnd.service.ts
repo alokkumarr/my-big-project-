@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as isFunction from 'lodash/isFunction';
-import * as get from 'lodash/get';
 import {
   IDragPayload,
   IDroppableOptions,
