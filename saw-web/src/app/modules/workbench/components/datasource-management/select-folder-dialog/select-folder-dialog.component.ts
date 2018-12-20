@@ -44,7 +44,7 @@ export class SourceFolderDialogComponent {
   }
 
   onYesClick(): void {
-    const result = startsWith(this.selectedPath, '\\') ?
+    const result = startsWith(this.selectedPath, '//') ?
       replace(this.selectedPath, '/', '') : this.selectedPath;
 
     this.dialogRef.close(result);
