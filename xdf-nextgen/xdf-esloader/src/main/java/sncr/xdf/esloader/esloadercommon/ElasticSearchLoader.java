@@ -97,14 +97,14 @@ public class ElasticSearchLoader {
         return configMap;
     }
 
-    public Long loadSingleObject(String objectName,
+    public int loadSingleObject(String objectName,
                                  Dataset<Row> originalFrame, String inputDataFormat) throws Exception {
         // Parse index/type name
         ElasticSearchStructureManager essm = new ElasticSearchStructureManager(this.esLoader);
         //long totalRecordCount = 0;
 
         if(!essm.elasticSearchLoaderConfigured()){
-            return -1L;
+            return -1;
         }
 
         // In case of partitioned data, each partition will be loaded separately
@@ -214,7 +214,7 @@ public class ElasticSearchLoader {
         logger.debug("Indices = " + newIndices);
 
         essm.ProcessAliases(esClient, newIndices.toArray(new String[newIndices.size()]));
-        return 0L;
+        return 0;
     }
 
     public Dataset<Row> filterData(Dataset<Row> dataSet, String condition) {

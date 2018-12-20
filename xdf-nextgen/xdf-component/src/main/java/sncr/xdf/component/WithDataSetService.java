@@ -337,7 +337,7 @@ public interface WithDataSetService {
     class DataSetServiceAux {
         private static final Logger logger = Logger.getLogger(WithDataSetService.class);
         Context ctx;
-        DLDataSetService dl;
+        public DLDataSetService dl;
 
 
         public DataSetServiceAux(Context c, DLDataSetService md){

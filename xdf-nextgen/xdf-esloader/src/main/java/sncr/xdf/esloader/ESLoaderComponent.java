@@ -1,11 +1,16 @@
 package sncr.xdf.esloader;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.ESLoader;
+import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithSparkContext;
@@ -14,6 +19,7 @@ import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.exceptions.FatalXDFException;
 import sncr.xdf.exceptions.XDFException;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +35,8 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     private Map<String, Object> esDataset;
     private String dataSetName;
     private String inputDataFormat;
+
+    private ESLoader esLoaderConfig;
 
     ESLoaderComponent() {
         super.componentName = "esloader";
@@ -52,7 +60,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     protected int execute() {
         int retVal = 0;
         try {
-            ESLoader esLoaderConfig = this.ctx.componentConfiguration.getEsLoader();
+            esLoaderConfig = this.ctx.componentConfiguration.getEsLoader();
             if (this.inputDataSets != null && !this.inputDataSets.isEmpty()) {
                 ESLOADER_DATASET = this.inputDataSets.keySet().iterator().next();
             }
@@ -65,14 +73,24 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
             Map<String, Dataset> dataSetMap = createDatasetMap();
 
+            logger.debug("Input dataset map = " + dataSetMap);
+
             Dataset<Row> inputDataset = dataSetMap.get(this.dataSetName);
 
 
             ElasticSearchLoader loader = new ElasticSearchLoader(this.ctx.sparkSession, esLoaderConfig);
 
-            loader.loadSingleObject(this.dataSetName, inputDataset, inputDataFormat);
+            JsonElement inputDsConfig = dsaux.dl.getDSStore().read(ctx.applicationID + "::" + ESLOADER_DATASET);
+            logger.debug("Input DS config = " + inputDsConfig);
 
-            return 0;
+            registerDataset();
+            int rc = loader.loadSingleObject(this.dataSetName, inputDataset, inputDataFormat);
+
+//            if (rc == 0) {
+//                rc = registerDataset();
+//            }
+
+            return rc;
         } catch (Exception ex) {
             logger.error(ex);
             logger.debug(ExceptionUtils.getStackTrace(ex));
@@ -80,6 +98,107 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         }
 
         return retVal;
+    }
+
+    private int registerDataset () throws Exception {
+        int result = 0;
+
+        JsonElement inputDsConfigElement = dsaux.dl.getDSStore()
+            .read(ctx.applicationID + "::" + ESLOADER_DATASET);
+
+        if (inputDsConfigElement == null) {
+            logger.error("Input dataset is null");
+
+            return -1;
+        }
+
+        logger.debug("Input DS config = " + inputDsConfigElement);
+
+        JsonObject inputDsConfigObject = inputDsConfigElement.getAsJsonObject();
+        inputDsConfigObject.remove(DataSetProperties.UserData.toString());
+
+        String indexType = esLoaderConfig.getDestinationIndexName();
+
+        String index = indexType.substring(0, indexType.indexOf("/"));
+        String type = indexType.substring(indexType.indexOf("/") + 1);
+
+        String mappingFileLocation = esLoaderConfig.getIndexMappingfile();
+
+        String mappingInfo = HFileOperations.readFile(mappingFileLocation);
+
+        logger.debug("Mapping info = " + mappingInfo);
+
+        JsonObject mappingObject = new JsonParser().parse(mappingInfo).getAsJsonObject();
+
+        JsonObject esFields = mappingObject.getAsJsonObject("mappings")
+            .getAsJsonObject(type).getAsJsonObject("properties");
+
+        JsonObject schema = generateSchema(esFields);
+        inputDsConfigObject.add(DataSetProperties.Schema.toString(), schema);
+
+
+        JsonObject system = inputDsConfigObject.get(DataSetProperties.System.toString())
+            .getAsJsonObject();
+
+        inputDsConfigObject.add(DataSetProperties.System.toString(), updateSystemObject(system, index, type));
+
+        //TODO: Remove the created and updated timestamp
+        //Update ID Fields
+        //Fetch the existing document if already present and update the values
+
+
+
+        logger.debug("Updated dataset = " + inputDsConfigObject);
+
+        return result;
+    }
+
+    private JsonObject updateSystemObject(JsonObject system, String index, String type) {
+        if (system == null) {
+            system = new JsonObject();
+        }
+
+        system.addProperty(DataSetProperties.PhysicalLocation.toString(), index);
+        system.addProperty(DataSetProperties.Name.toString(), index);
+
+        return system;
+    }
+
+    private JsonObject generateSchema (JsonObject esFields) {
+        JsonObject schema = new JsonObject();
+
+        JsonArray fields = transformFields(esFields);
+
+        schema.add("fields", fields);
+
+        return schema;
+    }
+
+    private JsonArray transformFields (JsonObject esFields) {
+        JsonArray schemaFields = new JsonArray();
+
+        esFields.entrySet().forEach(entry -> {
+            JsonObject field = new JsonObject();
+
+            field.addProperty("name", entry.getKey());
+
+            String fieldType = entry.getValue().getAsJsonObject().get("type").getAsString();
+            field.addProperty("type", fieldType);
+
+            JsonElement fieldsObject = entry.getValue().getAsJsonObject().get("fields");
+            if (fieldsObject != null) {
+                field.add("fields", fieldsObject.getAsJsonObject());
+            }
+
+            JsonElement fieldFormat = entry.getValue().getAsJsonObject().get("format");
+            if (fieldFormat != null) {
+                field.addProperty("format", fieldFormat.getAsString());
+            }
+
+            schemaFields.add(field);
+        });
+
+        return schemaFields;
     }
 
     @Override
