@@ -1,7 +1,9 @@
 package com.synchronoss.saw.semantic.service;
 
 
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
@@ -29,10 +31,10 @@ public interface SemanticService {
   public SemanticNode deleteSemantic(SemanticNode node)
       throws JSONValidationSAWException, DeleteEntitySAWException;
 
-  public SemanticNodes search(SemanticNode node)
+  public SemanticNodes search(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, ReadEntitySAWException;
 
-  public BackCompatibleStructure list(SemanticNode node)
+  public BackCompatibleStructure list(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, ReadEntitySAWException;
 
   /**
