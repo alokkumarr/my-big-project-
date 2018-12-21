@@ -58,8 +58,8 @@
             <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
           </button>
           <div fxLayout="column" fxLayoutAlign="center center">
-            <div>
-              <span *ngIf="analysis" class="analysis__title">{{analysis.name}}</span>
+            <div *ngIf="analysis">
+              <span class="analysis__title">{{analysis.name}}</span>
               <label *ngIf="isExecuting" class="execution-tag" i18n>Executing</label>
             </div>
             <div *ngIf="analysis" class="analysis__subheader">{{analysis.metrics}}</div>
