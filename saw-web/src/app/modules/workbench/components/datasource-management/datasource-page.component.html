@@ -36,7 +36,7 @@
         <dxi-column caption="Actions" dataField="bisRouteSysId" alignment="center" cellTemplate="actionsTemplate"
               [allowFiltering]="false" [allowSorting]="false">
         </dxi-column>
-        <div *dxTemplate="let data of 'actionsTemplate'">
+        <div *dxTemplate="let data of 'actionsTemplate'" fxLayout="row" fxLayoutAlign="center center">
           <button mat-icon-button i18n-matTooltip
                   class="grid-icon-btn"
                   [color]="data.data.status ? 'error' : 'primary'"
@@ -49,7 +49,7 @@
           <div fxHide.lt-lg="true" class="master-detail-caption">{{selectedSourceType | uppercase}}</div>
         </div>
         <div *dxTemplate="let data of 'nameTemplate'">
-          <div class="s-name">{{data.value}}</div>
+          <div class="s-name" [matTooltip]="data.value">{{data.value}}</div>
         </div>
       </dx-data-grid>
 
