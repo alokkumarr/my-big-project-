@@ -9,6 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
 import * as includes from 'lodash/includes';
+import * as isEmpty from 'lodash/isEmpty';
 import { DatasourceService } from '../../../services/datasource.service';
 import { isUnique } from '../../../../../common/validators';
 
@@ -25,6 +26,7 @@ export class CreateRouteDialogComponent {
   crondetails: any = {};
   opType: 'create' | 'update' = 'create';
   channelName = '';
+  isCronExpressionValid = false;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -102,6 +104,9 @@ export class CreateRouteDialogComponent {
 
   onCronChanged(cronexpression) {
     this.crondetails = cronexpression;
+    this.isCronExpressionValid =
+      !(isEmpty(cronexpression.cronexp) &&
+      cronexpression.activeTab !== 'immediate');
   }
 
   createRoute(data) {
