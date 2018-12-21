@@ -1,0 +1,15 @@
+.mat-form-field {
+  max-width: 100%;
+  width: auto;
+  margin: 0;
+  font-size: 14px;
+
+  .mat-form-field-infix {
+    width: unset;
+  }
+}
+
+.category-selector {
+  margin-left: 10px;
+  max-width: 180px;
+}

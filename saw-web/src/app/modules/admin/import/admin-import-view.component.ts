@@ -1,4 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Store, Select } from '@ngxs/store';
+import {
+  LoadAllAnalyzeCategories,
+  SelectAnalysisGlobalCategory,
+  LoadMetrics
+} from './actions/import-page.actions';
+import { Observable } from 'rxjs';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
@@ -55,11 +62,14 @@ interface FileContent {
   styleUrls: ['./admin-import-view.component.scss']
 })
 export class AdminImportViewComponent implements OnInit {
+  @Select(state => state.admin.importPage.categories.analyze)
+  categories$: Observable<any[]>;
+
+  @Select(state => state.admin.importPage.metrics) metricMap$: Observable<any>;
+
   files: Array<FileInfo>;
   fileContents: Array<FileContent>;
   selectedCategory;
-  categories$;
-  metricsMap: Object = {};
   analyses: Array<Analysis>;
   analysesFromBEMap: Object = {};
   userCanExportErrors = false;
@@ -72,28 +82,13 @@ export class AdminImportViewComponent implements OnInit {
     public _exportService: ExportService,
     public _categoryService: CategoryService,
     public _sidenav: SidenavMenuService,
-    public _jwtService: JwtService
+    public _jwtService: JwtService,
+    private store: Store
   ) {}
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
-    this.categories$ = this._categoryService
-      .getList()
-      .then(fpFilter(category => category.moduleName === 'ANALYZE'));
-    this.getMetrics();
-  }
-
-  getMetrics() {
-    this._exportService.getMetricList().then(metrics => {
-      this.metricsMap = reduce(
-        metrics,
-        (acc, metric) => {
-          acc[metric.metricName] = metric;
-          return acc;
-        },
-        {}
-      );
-    });
+    this.store.dispatch([new LoadAllAnalyzeCategories(), new LoadMetrics()]);
   }
 
   onRemoveFile(fileName) {
@@ -146,8 +141,9 @@ export class AdminImportViewComponent implements OnInit {
     });
   }
 
-  onCategoryChange(categoryId) {
+  onCategoryChange(categoryId: string) {
     this.selectedCategory = categoryId;
+    this.store.dispatch(new SelectAnalysisGlobalCategory(categoryId));
     this._importService.getAnalysesFor(toString(categoryId)).then(analyses => {
       this.analysesFromBEMap = reduce(
         analyses,
@@ -164,7 +160,10 @@ export class AdminImportViewComponent implements OnInit {
   }
 
   getAnalysisObjectForGrid(analysis) {
-    const metric = this.metricsMap[analysis.metricName];
+    const metricsMap = this.store.selectSnapshot(
+      state => state.admin.importPage.metrics
+    );
+    const metric = metricsMap[analysis.metricName];
     if (metric) {
       analysis.semanticId = metric.id;
     }
@@ -173,7 +172,9 @@ export class AdminImportViewComponent implements OnInit {
     ];
 
     const possibilitySelector = metric
-      ? analysisFromBE ? 'duplicate' : 'normal'
+      ? analysisFromBE
+        ? 'duplicate'
+        : 'normal'
       : 'noMetric';
 
     const possibility = this.getPossibleGridObjects(

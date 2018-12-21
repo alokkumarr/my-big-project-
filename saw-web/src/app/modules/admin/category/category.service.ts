@@ -3,6 +3,7 @@ import { AdminService } from '../main-view/admin.service';
 import { JwtService } from '../../../common/services';
 import { map } from 'rxjs/operators';
 import { IAdminDataService } from '../admin-data-service.interface';
+import { Observable } from 'rxjs';
 
 interface CategoryResponse {
   categories: any[];
@@ -32,12 +33,15 @@ export class CategoryService implements IAdminDataService {
     this.customerId = customerId;
   }
 
-  getList() {
+  getList$(): Observable<any[]> {
     const customerId = parseInt(this.customerId, 10);
     return this._adminService
       .request<CategoryResponse>('categories/fetch', customerId)
-      .pipe(map(resp => resp.categories))
-      .toPromise();
+      .pipe(map(resp => resp.categories));
+  }
+
+  getList() {
+    return this.getList$().toPromise();
   }
 
   save(user) {
