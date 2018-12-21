@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
+import { map as rxMap, finalize } from 'rxjs/operators';
 
 import { CHANNEL_TYPES } from '../../wb-comp-configs';
 import { ChannelObject } from '../../models/workbench.interface';
@@ -18,7 +19,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
 import * as get from 'lodash/get';
-import * as merge from 'lodash/merge';
+import * as map from 'lodash/map';
 import * as findKey from 'lodash/findKey';
 import * as filter from 'lodash/filter';
 
@@ -35,6 +36,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   sourceTypes = CHANNEL_TYPES;
   selectedSourceType: string;
   selectedSourceData: any;
+  // channel activation/deactivation request is pending
+  channelToggleRequestPending = false;
   show = false;
   channelEditable = false;
 
@@ -55,15 +58,13 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   ngOnDestroy() {}
 
   getSources() {
-    this.unFilteredSourceData = [];
-    this.datasourceService.getSourceList().subscribe(data => {
-      forEach(data, value => {
-        // Channel metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
-        const tempVar = merge(value, JSON.parse(value.channelMetadata));
-        this.unFilteredSourceData.push(tempVar);
+    this.datasourceService.getSourceList()
+      .pipe(
+        rxMap(channels => map(channels, channel => ({...channel, ...JSON.parse(channel.channelMetadata)})))
+      ).subscribe(channels => {
+        this.unFilteredSourceData = channels;
+        this.countSourceByType(this.unFilteredSourceData);
       });
-      this.countSourceByType(this.unFilteredSourceData);
-    });
   }
 
   countSourceByType(sources) {
@@ -99,7 +100,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     ) {
       this.channelEditable = true;
       this.selectedSourceData = event.selectedRowsData[0];
-      this.getRoutesForChannel(event.selectedRowKeys[0]);
+      if (!this.channelToggleRequestPending) {
+        this.getRoutesForChannel(event.selectedRowKeys[0]);
+      }
     } else if (event.selectedRowKeys.length > 0) {
       this.channelEditable = true;
       this.selectedSourceData = event.selectedRowsData[0];
@@ -222,14 +225,13 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   getRoutesForChannel(channelID) {
-    this.routesData = [];
-    this.datasourceService.getRoutesList(channelID).subscribe(data => {
-      forEach(data, value => {
-        // routes metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
-        const tempVar = merge(value, JSON.parse(value.routeMetadata));
-        this.routesData.push(tempVar);
+    this.datasourceService.getRoutesList(channelID)
+      .pipe(
+        rxMap(routes => map(routes, route => ({...route, ...JSON.parse(route.routeMetadata)})))
+      )
+      .subscribe(routes => {
+        this.routesData = routes;
       });
-    });
   }
 
   createRoute(routeData) {
@@ -332,26 +334,33 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   toggleRouteActivation(route) {
     const { bisChannelSysId, bisRouteSysId, status } = route;
-    this.datasourceService.toggleRoute(bisChannelSysId, bisRouteSysId, !status).subscribe(success => {
-      if (success) {
-        route.status = this.reverseStatus(status);
-      }
+    this.datasourceService.toggleRoute(bisChannelSysId, bisRouteSysId, !status).subscribe(() => {
+      route.status = this.reverseStatus(status);
     });
   }
 
   toggleChannelActivation(channel) {
     const { status } = channel;
-    this.datasourceService.toggleChannel(channel.bisChannelSysId, !status).subscribe(success => {
-      if (success) {
-        channel.status = this.reverseStatus(status);
-      }
+    this.channelToggleRequestPending = true;
+    this.datasourceService.toggleChannel(channel.bisChannelSysId, !status)
+    .pipe(
+      finalize(() => {
+        this.channelToggleRequestPending = false;
+      })
+    ).subscribe(() => {
+      this.channelToggleRequestPending = false;
+      channel.status = this.reverseStatus(status);
+      this.getRoutesForChannel(channel.bisChannelSysId);
+    });
+  }
+
+  toggleAllRoutesOnFrontEnd(status) {
+    forEach(this.routesData, route => {
+      route.status = status;
     });
   }
 
   reverseStatus(status) {
-    if (status === 1) {
-      return 0;
-    }
-    return 1;
+    return status === 1 ? 0 : 1;
   }
 }
