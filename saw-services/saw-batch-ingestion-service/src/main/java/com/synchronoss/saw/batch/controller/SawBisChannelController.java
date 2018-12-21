@@ -376,7 +376,7 @@ public class SawBisChannelController {
     Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
     logger.trace("Inside deactivating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, false);
-    responseMap.put("isActivated", Boolean.TRUE);
+    responseMap.put("isDeactivated", Boolean.TRUE);
     return responseMap;
   }
   
