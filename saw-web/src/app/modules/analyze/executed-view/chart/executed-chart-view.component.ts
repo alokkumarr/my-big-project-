@@ -51,7 +51,7 @@ export class ExecutedChartViewComponent {
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
       this.updater.next(this.updates);
-    }, 100);
+    });
   }
 
   analysis: AnalysisChart;

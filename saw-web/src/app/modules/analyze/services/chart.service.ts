@@ -883,7 +883,6 @@ export class ChartService {
         data: category
       });
     });
-    console.log(changes);
     return changes;
   }
 
