@@ -866,26 +866,24 @@ export class ChartService {
       data: yAxesChanges
     });
 
-    if (!isEmpty(gridData)) {
-      const { series, categories } = this.splitToSeriesAndCategories(
-        gridData,
-        fields,
-        opts,
-        type
-      );
+    const { series, categories } = this.splitToSeriesAndCategories(
+      gridData,
+      fields,
+      opts,
+      type
+    );
+    changes.push({
+      path: 'series',
+      data: series
+    });
+    // add the categories
+    forEach(categories, (category, k) => {
       changes.push({
-        path: 'series',
-        data: series
+        path: `${k}Axis.categories`,
+        data: category
       });
-      // add the categories
-      forEach(categories, (category, k) => {
-        changes.push({
-          path: `${k}Axis.categories`,
-          data: category
-        });
-      });
-    }
-
+    });
+    console.log(changes);
     return changes;
   }
 
