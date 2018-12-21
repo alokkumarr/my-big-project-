@@ -1,6 +1,6 @@
 package controllers
 
-import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.util.Bytes
 import model.PaginateDataSet
 import org.json4s.JsonAST.{JObject, JValue}
 import org.json4s.JsonDSL._
