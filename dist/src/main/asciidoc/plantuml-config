@@ -6,7 +6,19 @@ skinparam componentStyle uml2
 skinparam style strictuml
 skinparam shadowing false
 
+skinparam Database {
+    BorderColor Black
+    BackgroundColor WhiteSmoke
+}
 skinparam Component {
+    BorderColor Black
+    BackgroundColor WhiteSmoke
+}
+skinparam Interface {
+    BorderColor Black
+    BackgroundColor WhiteSmoke
+}
+skinparam Participant {
     BorderColor Black
     BackgroundColor WhiteSmoke
 }

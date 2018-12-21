@@ -159,8 +159,11 @@ APIs.  They enable creating and executing analyses.  They are
 implemented in Java and the Spring Framework.  As an exception, the
 SAW Transport Service is implemented in Scala and the Play framework.
 
-.Figure: SAW Services and their dependencies
+.Figure: SIP system overview
 plantuml::sip-design/figure-system.pum[]
+
+.Figure: SIP Services and their dependencies
+plantuml::sip-design/figure-services.pum[]
 
 SAW Services use MapR-DB for persistence, using the OJAI interface.
 As an exception, the SAW Transport Service uses the MapR-DB binary
