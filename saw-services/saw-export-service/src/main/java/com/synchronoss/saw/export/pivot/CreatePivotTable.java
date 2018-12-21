@@ -211,6 +211,13 @@ public class CreatePivotTable {
                     pivotTable.addDataColumn(count,true);
                     pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(count++).setDataField(true);
                     break;
+                case PERCENTAGE:
+                    /* PERCENTAGE is already calculated by elastic search aggregation, no need to calculate it again. consider the default
+                     value as sum to display PERCENTAGE value */
+                    pivotTable.addColumnLabel(DataConsolidateFunction.SUM,count,dataField.getColumnName());
+                    pivotTable.addDataColumn(count,true);
+                    pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(count++).setDataField(true);
+                    break;
             }
         }
         logger.debug(this.getClass().getName() + " setPivotFields ends here");
