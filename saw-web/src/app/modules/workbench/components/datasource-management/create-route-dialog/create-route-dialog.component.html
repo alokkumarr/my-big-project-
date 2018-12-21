@@ -105,7 +105,7 @@
           <button mat-stroked-button color="primary" (click)="testRoute(detailsFormGroup.value)" [disabled]="!detailsFormGroup.valid" i18n>
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
-          <button mat-raised-button color="primary" *ngIf="opType === 'create'" [disabled]="!detailsFormGroup.valid"
+          <button mat-raised-button color="primary" *ngIf="opType === 'create'" [disabled]="!detailsFormGroup.valid || !isCronExpressionValid"
             (click)="createRoute(detailsFormGroup.value)" i18n>Create</button>
           <button mat-raised-button color="primary" *ngIf="opType === 'update'" [disabled]="!detailsFormGroup.valid"
             (click)="createRoute(detailsFormGroup.value)" i18n>Update</button>
