@@ -145,16 +145,16 @@ public class DLBatchWriter {
         if (produceSample) {
             switch (format){
                 case "parquet":
-                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                     break;
                 case "json" :
-                    DS.repartition(1).sample(false, 0.1).write().json(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().json(sampleLocation);
                     break;
                 case "csv" :
-                    DS.repartition(1).sample(false, 0.1).write().csv(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().csv(sampleLocation);
                     break;
                 default:
-                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                     break;
             }
         }

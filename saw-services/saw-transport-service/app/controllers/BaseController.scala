@@ -92,7 +92,8 @@ class BaseController extends Controller {
             ticket.get("userFullName").asInstanceOf[String],
             ticket.get("dataSecurityKey").asInstanceOf[java.util.List[Object]],
             ticket.get("roleType").asInstanceOf[String],
-            ticket.get("products").asInstanceOf[java.util.List[Object]]))
+            ticket.get("products").asInstanceOf[java.util.List[Object]],
+            ticket.get("masterLoginId").asInstanceOf[String]))
         } else {
           log.info("Unrecognized Authorization header: " + value)
           None
@@ -131,6 +132,8 @@ class BaseController extends Controller {
   }
 }
 
-case class Ticket(userId: Integer, userFullName: String, dataSecurityKey: java.util.List[Object], roleType:String , product :java.util.List[Object])
+case class Ticket(userId: Integer, userFullName: String, dataSecurityKey: java.util.List[Object],
+                  roleType:String , product :java.util.List[Object], masterLoginId:String)
+
 
 

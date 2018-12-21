@@ -236,6 +236,8 @@ public class SftpServiceImpl extends SipPluginContract {
         ? defaultDestinationLocation + payload.getDestinationLocation()
         : defaultDestinationLocation;
     File destinationPath = new File(dataPath);
+    logger.trace("Destionation path: " + destinationPath);
+    logger.trace("Checking permissions for Destionation path: " + destinationPath);
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
@@ -244,7 +246,7 @@ public class SftpServiceImpl extends SipPluginContract {
             .exists(payload.getSourceLocation())) {
           status = HttpStatus.UNAUTHORIZED;
           connectionLogs.append(newLineChar);
-          connectionLogs.append("Destinatipn location may not exists!!");
+          connectionLogs.append("Destinatipn location may not exists!! or no permission!!");
           connectionLogs.append(newLineChar);
           connectionLogs.append(status);
         } else {
@@ -641,6 +643,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         + FilenameUtils.getExtension(entry.getFilename()));
                     fileTobeDeleted = localFile;
                     bisDataMetaInfo = new BisDataMetaInfo();
+                    bisDataMetaInfo.setFilePattern(pattern);
                     bisDataMetaInfo
                         .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
                     bisDataMetaInfo.setReceivedDataName(localFile.getPath());
@@ -652,7 +655,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     bisDataMetaInfo.setActualReceiveDate(
                         new Date(((long) entry.getAttrs().getATime()) * 1000L));
                     bisDataMetaInfo.setChannelId(channelId);
-                    bisDataMetaInfo.setRouteId(channelId);
+                    bisDataMetaInfo.setRouteId(routeId);
                     sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                     bisDataMetaInfo.setDestinationPath(localDirectory.getPath());
                     logger.trace("Actual file name after downloaded in the  :"
@@ -722,7 +725,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       bisDataMetaInfo.setActualReceiveDate(
                           new Date(((long) entry.getAttrs().getATime()) * 1000L));
                       bisDataMetaInfo.setChannelId(channelId);
-                      bisDataMetaInfo.setRouteId(channelId);
+                      bisDataMetaInfo.setRouteId(routeId);
                       bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                       bisDataMetaInfo.setReasonCode(BisProcessState.DUPLICATE.value());
                       list.add(bisDataMetaInfo);

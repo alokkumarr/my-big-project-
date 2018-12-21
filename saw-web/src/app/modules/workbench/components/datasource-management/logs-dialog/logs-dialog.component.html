@@ -1,0 +1,85 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title class="title mat-subheading-2">
+      <strong>{{routeData.routeName}}</strong>
+    </mat-card-title>
+    <div fxFlex></div>
+    <button mat-icon-button color="warn" class="close-button" (click)="close()">
+      <mat-icon fontIcon="icon-close"></mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content>
+
+    <div class="logs__route-details">
+      <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>Channel Name : </span>
+          <span>{{routeData?.channelName}}</span>
+        </div>
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>File pattern : </span>
+          <span>{{routeData?.filePattern}}</span>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>Modified by : </span>
+          <span>{{routeData?.modifiedBy || routeData?.mcreatedBy}}</span>
+        </div>
+        <mat-divider [vertical]="true"></mat-divider>
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>Modified at : </span>
+          <span>{{routeData?.modifiedDate || routeData?.createdDate | date: 'short'}}</span>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>Destination : </span>
+          <span>{{routeData?.destinationLocation}}</span>
+        </div>
+        <mat-divider [vertical]="true"></mat-divider>
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>Source : </span>
+          <span>{{routeData?.sourceLocation}}</span>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>Last Fire Time : </span>
+          <span>{{lastFireTime | date: 'short'}}</span>
+        </div>
+        <mat-divider [vertical]="true"></mat-divider>
+        <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
+          <span class="logs__route-details__cell__label" i18n>Next Fire Time : </span>
+          <span>{{nextFireTime | date: 'short'}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <dx-data-grid #channelsGrid class="mat-elevation-z3"
+                    height="300px" width="760px"
+                    [dataSource]="logs" [showBorders]="false" [columnAutoWidth]="true"
+                    [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
+      >
+        <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+        <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
+        <dxi-column caption="File Name" dataField="fileName" alignment="left"></dxi-column>
+        <dxi-column caption="Actual File Rec Date" dataField="actualFileRecDate"></dxi-column>
+        <dxi-column caption="Rec File Name" dataField="recdFileName" alignment="left"></dxi-column>
+        <dxi-column caption="Rec File Size" dataField="recdFileSize" alignment="left"></dxi-column>
+        <dxi-column caption="File Status" dataField="mflFileStatus" alignment="left"></dxi-column>
+        <dxi-column caption="Process State" dataField="bisProcessState" alignment="left"></dxi-column>
+        <dxi-column caption="Modified at" dataField="modifiedDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
+        <dxi-column caption="Created at" dataField="createdDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
+        <div *dxTemplate="let data of 'dateTypeTemplate'">
+          {{data.value | date: 'short'}}
+        </div>
+      </dx-data-grid>
+    </div>
+  </mat-card-content>
+</mat-card>

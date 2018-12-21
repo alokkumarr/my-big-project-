@@ -1,38 +1,39 @@
-<dx-data-grid [customizeColumns]="config.customizeColumns"
-              [columnAutoWidth]="config.columnAutoWidth"
-              [columnMinWidth]="config.columnMinWidth"
-              [columnResizingMode]="config.columnResizingMode"
-              [allowColumnReordering]="config.allowColumnReordering"
-              [allowColumnResizing]="config.allowColumnResizing"
-              [showColumnHeaders]="config.showColumnHeaders"
-              [showColumnLines]="config.showColumnLines"
-              [showRowLines]="config.showRowLines"
-              [showBorders]="config.showBorders"
-              [rowAlternationEnabled]="config.rowAlternationEnabled"
-              [hoverStateEnabled]="config.hoverStateEnabled"
-              [wordWrapEnabled]="config.wordWrapEnabled"
-              [scrolling]="config.scrolling"
-              [sorting]="config.sorting"
-              [dataSource]="analyses"
-              [columns]="config.columns"
-              [pager]="config.pager"
-              [paging]="config.paging"
-              [width]="config.width"
-              [height]="config.height"
+<dx-data-grid
+  [customizeColumns]="config.customizeColumns"
+  [columnAutoWidth]="config.columnAutoWidth"
+  [columnMinWidth]="config.columnMinWidth"
+  [columnResizingMode]="config.columnResizingMode"
+  [noDataText]="config.noDataText"
+  [allowColumnReordering]="config.allowColumnReordering"
+  [allowColumnResizing]="config.allowColumnResizing"
+  [showColumnHeaders]="config.showColumnHeaders"
+  [showColumnLines]="config.showColumnLines"
+  [showRowLines]="config.showRowLines"
+  [showBorders]="config.showBorders"
+  [rowAlternationEnabled]="config.rowAlternationEnabled"
+  [hoverStateEnabled]="config.hoverStateEnabled"
+  [wordWrapEnabled]="config.wordWrapEnabled"
+  [scrolling]="config.scrolling"
+  [sorting]="config.sorting"
+  [dataSource]="exportList"
+  [columns]="config.columns"
+  [pager]="config.pager"
+  [paging]="config.paging"
+  [width]="config.width"
+  [height]="config.height"
 >
-
   <div *dxTemplate="let cell of 'selectionCellTemplate'">
-    <mat-checkbox (change)="onChecked(cell.data)"
-                  [checked]="cell.data.selection">
+    <mat-checkbox (change)="onItemToggle($event, cell.data)" [checked]="true">
     </mat-checkbox>
   </div>
-
   <div *dxTemplate="let cell of 'selectionHeaderCellTemplate'">
-    <mat-checkbox (change)="selectAll()"
-                  [checked]="areAllSelected"
-                  i18n>
-      All
+    <mat-checkbox
+      matTooltip="Remove All"
+      (change)="onToggleAll($event)"
+      [checked]="exportList.length > 0"
+      [hidden]="!exportList.length"
+      i18n
+    >
     </mat-checkbox>
   </div>
-
 </dx-data-grid>

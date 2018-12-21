@@ -76,9 +76,12 @@ export class DndSortableDirective {
   }
 
   @HostListener('dragstart', ['$event'])
-  onDragStart() {
+  onDragStart(event: Event) {
     // this timeout is needed so that the browser makes the img if the dragged element while it's still visible
     // as the _isDragged property will apply a class, that makes the element invisible
+
+    // this setdata event is inorder to make sure DnD is working as expected on FireFox browser as per ticket SIP-5330
+    (<any>event).dataTransfer.setData('application/node type', this._data);
     setTimeout(() => {
       this._isDragged = true;
     }, 50);

@@ -14,8 +14,10 @@ import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestReposit
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -45,7 +49,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = "*")
+
+
 @RestController
 @Api(value = "The controller provides operations related Channel Entity "
     + "synchronoss analytics platform ")
@@ -59,6 +64,11 @@ public class SawBisChannelController {
   
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+  
+  @Autowired
+  private BisChannelService bisChannelService;
+  
+  private static final Long STATUS_ACTIVE = 1L;
 
 
   /**
@@ -93,6 +103,10 @@ public class SawBisChannelController {
     ObjectNode rootNode = null;
     nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
     rootNode = (ObjectNode) nodeEntity;
+    String channelName =  rootNode.get("channelName").asText();
+    if (bisChannelService.isChannelNameExists(channelName)) {
+      throw new BisException("Channel Name: " + channelName + " already exists");
+    }
     SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
     String secretPhrase = rootNode.get("password").asText();
     String passwordPhrase = obfuscator.encrypt(secretPhrase);
@@ -101,6 +115,7 @@ public class SawBisChannelController {
     BisChannelEntity channelEntity = new BisChannelEntity();
     BeanUtils.copyProperties(requestBody, channelEntity);
     channelEntity.setCreatedDate(new Date());
+    channelEntity.setStatus(STATUS_ACTIVE);
     channelEntity = bisChannelDataRestRepository.save(channelEntity);
     BeanUtils.copyProperties(channelEntity, requestBody);
     requestBody.setCreatedDate(channelEntity.getCreatedDate().getTime());
@@ -313,5 +328,67 @@ public class SawBisChannelController {
     
     
   }
+  
+  
+  /**
+   * This API provides an ability to delete a source.
+   */
+  @ApiOperation(value = "check channel Name is duplciate", response = Object.class)
+  @ApiResponses(value = { @ApiResponse(code = 200, 
+      message = "Request has been succeeded without any error"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+      @ApiResponse(code = 400, message = "Bad request"), 
+      @ApiResponse(code = 201, message = "Deleted"),
+      @ApiResponse(code = 401, message = "Unauthorized"),
+      @ApiResponse(code = 415, message = "Unsupported Type."
+          + "Representation not supported for the resource") })
+  @RequestMapping(value = "/channels/duplicate", 
+      method = RequestMethod.GET, produces = org.springframework.http
+          .MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  public ResponseEntity<Boolean> checkDuplicate(
+      @ApiParam(value = "channel Name", required = true) 
+      @RequestParam("channelName") String channelName) {
+
+    return new ResponseEntity<Boolean>(bisChannelService
+        .isChannelNameExists(channelName), HttpStatus.OK);
+
+  }
+  
+  /**
+   * checks is there a route with given route name.
+   * 
+   * @param channelId channe identifier
+   * @return  ok
+   */
+  @RequestMapping(value = "/channels/{channelId}/deactivate", method 
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Boolean>  deactivateChannel(
+      @PathVariable("channelId")  Long channelId) {
+    logger.trace("Inside deactivating channel");
+    bisChannelService.activateOrDeactivateChannel(channelId, false);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+  }
+  
+  /**
+   * checks is there a route with given route name.
+   * 
+   * @param channelId channe identifier
+   * @return ok
+   */
+  @RequestMapping(value = "/channels/{channelId}/activate", method 
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Boolean>  activateChannel(
+      @PathVariable("channelId")  Long channelId) {
+    logger.trace("Inside activating channel");
+    bisChannelService.activateOrDeactivateChannel(channelId, true);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+  }
+
+  
 }
 

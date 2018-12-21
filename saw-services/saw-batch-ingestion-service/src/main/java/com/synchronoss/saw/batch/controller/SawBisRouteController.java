@@ -12,11 +12,13 @@ import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
+import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
+import com.synchronoss.saw.batch.service.BisRouteService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -53,7 +54,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-@CrossOrigin(origins = "*")
+
+
 @RestController
 @Api(value = "The controller provides operations related Route Entity "
     + "synchronoss analytics platform ")
@@ -70,17 +72,23 @@ public class SawBisRouteController {
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
   private String scheduleUri = "/scheduler/bisscheduler";
-  
+
 
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
   private String deleteUrl = "/delete";
+  private static final Long STATUS_ACTIVE = 1L;
 
   @Value("${bis.default-data-drop-location}")
   private String dropLocation;
 
+
+  @Autowired
+  private BisRouteService bisRouteService;
+
+
   RestTemplate restTemplate = new RestTemplate();
-  
+
   /**
    * This API provides an ability to add a source.
    */
@@ -120,7 +128,20 @@ public class SawBisRouteController {
         requestBody.setBisChannelSysId(channelId);
         BeanUtils.copyProperties(requestBody, routeEntity);
         routeEntity.setCreatedDate(new Date());
+        routeEntity.setStatus(STATUS_ACTIVE);
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+
+        /**
+         * Check duplicate route.
+         */
+        JsonNode routeName = routeData.get("routeName");
+        boolean isExists = bisRouteService.isRouteNameExists(channelId, routeName.asText());
+
+        if (isExists) {
+          throw new BisException("Route Name: " + routeName + "  already exists");
+        }
+
+
         /*
          * sentDestinationLocation = routeData.get("destinationLocation").asText() != null &&
          * !routeData.get("destinationLocation").asText().equals("") ?
@@ -191,7 +212,7 @@ public class SawBisRouteController {
         }
         // }
         RestTemplate restTemplate = new RestTemplate();
-        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl 
+        logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl
             + scheduleUri + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + insertUrl, schedulerRequest);
         logger.info("posting scheduler inserting uri ends here: " + bisSchedulerUrl
@@ -387,19 +408,22 @@ public class SawBisRouteController {
         routeEntity.setBisChannelSysId(channelId);
         routeEntity.setBisRouteSysId(routeId);
         routeEntity.setModifiedDate(new Date());
+        if (routeEntity.getStatus() == null) {
+          routeEntity.setStatus(STATUS_ACTIVE);
+        }
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
         RestTemplate restTemplate = new RestTemplate();
-        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl 
+        logger.info("scheduler uri to update starts here : " + bisSchedulerUrl
             + scheduleUri + updateUrl);
         try {
-          logger.trace("Sending the content to " + bisSchedulerUrl + scheduleUri + updateUrl 
+          logger.trace("Sending the content to " + bisSchedulerUrl + scheduleUri + updateUrl
               + " : " + objectMapper.writeValueAsString(schedulerRequest));
         } catch (JsonProcessingException e) {
           throw new SftpProcessorException("excpetion occurred while writing to"
               + " schedulerRequest ",e);
         }
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + updateUrl, schedulerRequest);
-        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl 
+        logger.trace("scheduler uri to update ends here : " + bisSchedulerUrl
             + scheduleUri + updateUrl);
       }
       BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
@@ -447,18 +471,84 @@ public class SawBisRouteController {
     if (!bisChannelDataRestRepository.existsById(channelId)) {
       throw new ResourceNotFoundException("channelId " + channelId + " not found");
     }
-    
+
     return ResponseEntity.ok(bisRouteDataRestRepository.findById(routeId).map(route -> {
-      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl 
+      logger.info("scheduler uri to update starts here : " + bisSchedulerUrl
           + scheduleUri + deleteUrl);
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
       scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
       restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + deleteUrl, scheduleKeys);
-        
+
       logger.trace("Route deleted :" + route);
       bisRouteDataRestRepository.deleteById(routeId);
       return ResponseEntity.ok().build();
     }).orElseThrow(() -> new ResourceNotFoundException("routeId " + routeId + " not found")));
   }
+
+  /**
+   * checks is there a route with given route name.
+   *
+   * @param channelId channe identifier
+   * @param routeId id of the route
+   * @return true or false
+   */
+  @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/deactivate", method
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Boolean> deactivateRoute(
+      @PathVariable("channelId")  Long channelId,
+      @PathVariable("routeId") Long routeId) {
+    logger.trace("Inside deactivating route  channelID " + channelId + "routeId: " + routeId);
+    BisScheduleKeys scheduleKeys = new BisScheduleKeys();
+    scheduleKeys.setGroupName(String.valueOf(routeId));
+    scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+    bisRouteService.activateOrDeactivateRoute(channelId, routeId, false);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+  }
+
+  /**
+   * checks is there a route with given route name.
+   *
+   * @param channelId channe identifier
+   * @param routeId id of the route
+   * @return true or false
+   */
+  @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/activate", method
+      = RequestMethod.PUT, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Boolean> activateRoute(
+      @PathVariable("channelId")  Long channelId,
+      @PathVariable("routeId") Long routeId) {
+    logger.trace("Inside activate route  channelID " + channelId + "routeId: " + routeId);
+    BisScheduleKeys scheduleKeys = new BisScheduleKeys();
+    scheduleKeys.setGroupName(String.valueOf(routeId));
+    scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+    bisRouteService.activateOrDeactivateRoute(channelId, routeId, true);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+  }
+
+
+  /**
+   * checks is there a route with given route name.
+   *
+   * @param channelId channe identifier
+   * @param routeName name of the route
+   * @return true or false
+   */
+  @RequestMapping(value = "/channels/{channelId}/duplicate-route", method
+      = RequestMethod.GET, produces = org.springframework.http.MediaType
+      .APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Boolean> isDuplicateRoute(
+      @PathVariable("channelId")  Long channelId,
+      @RequestParam("routeName") String routeName) {
+    logger.trace("Checking for duplicate route namewith channelId: " + channelId
+        + " and routeName: " + routeName);
+    return new ResponseEntity<Boolean>(bisRouteService
+        .isRouteNameExists(channelId,routeName), HttpStatus.OK);
+  }
+
+
+
+
 }
