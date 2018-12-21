@@ -655,7 +655,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     bisDataMetaInfo.setActualReceiveDate(
                         new Date(((long) entry.getAttrs().getATime()) * 1000L));
                     bisDataMetaInfo.setChannelId(channelId);
-                    bisDataMetaInfo.setRouteId(channelId);
+                    bisDataMetaInfo.setRouteId(routeId);
                     sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                     bisDataMetaInfo.setDestinationPath(localDirectory.getPath());
                     logger.trace("Actual file name after downloaded in the  :"
@@ -725,7 +725,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       bisDataMetaInfo.setActualReceiveDate(
                           new Date(((long) entry.getAttrs().getATime()) * 1000L));
                       bisDataMetaInfo.setChannelId(channelId);
-                      bisDataMetaInfo.setRouteId(channelId);
+                      bisDataMetaInfo.setRouteId(routeId);
                       bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                       bisDataMetaInfo.setReasonCode(BisProcessState.DUPLICATE.value());
                       list.add(bisDataMetaInfo);

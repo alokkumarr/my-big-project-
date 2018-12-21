@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+
 
 
 
@@ -104,24 +108,32 @@ public class SawBisFileLogsController {
     String response = restTemplate
         .getForObject(bisSchedulerUrl + "/jobs?categoryId=" 
             + channelId + "&groupkey=" + routeId, String.class);
+
+    logger.trace("response from scheduler on last fire, next fire" + response);
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode rootNode;
     JsonNode dataNode;
-    JsonNode latFired = null;
-    JsonNode nextFired = null;
+    Long latFired = null;
+    Long nextFired = null;
     try {
       rootNode = objectMapper.readTree(response);
       dataNode = rootNode.get("data");
+      logger.trace("data node from response " + dataNode);
       if (dataNode.isArray() && dataNode.size() > 0) {
         JsonNode objNode = dataNode.get(0);
-        latFired = objNode.get("lastFiredTime");
-        nextFired = objNode.get("nextFireTime");
+        latFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+            .parse(objNode.get("lastFiredTime").asText()).getTime();
+        nextFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+            .parse(objNode.get("nextFireTime").asText()).getTime();
+        logger.trace("latFired from response after parsing in long" + latFired);
+        logger.trace("nextFired from response after parsing in long" + nextFired);
 
       }
     } catch (IOException exception) {
       logger.error(exception.getMessage());
+    } catch (ParseException exception) {
+      logger.error(exception.getMessage());
     }
-    
     
     List<BisFileLog> bisFileLogs = this.bisLogsRepository.findByRouteSysId(routeId);
     List<BisFileLogDetails> bisFileLogDtos = new ArrayList<BisFileLogDetails>();
@@ -131,13 +143,18 @@ public class SawBisFileLogsController {
       bisFileLogDtos.add(logDto);
     }
     BisRouteHistory bisRouteHistory = new BisRouteHistory();
+   
     if (latFired != null) {
-      bisRouteHistory.setLastFireTime(latFired.asLong());
+      bisRouteHistory.setLastFireTime(latFired);
     }
 
     if (nextFired != null) {
-      bisRouteHistory.setLastFireTime(nextFired.asLong());
+      bisRouteHistory.setNextFireTime(nextFired);
     }
+    logger.trace("latFired from response  after setting to "
+        + "response " + bisRouteHistory.getLastFireTime());
+    logger.trace("nextFired from response  after setting to "
+        + "response " + bisRouteHistory.getNextFireTime());
     bisRouteHistory.setLogs(bisFileLogDtos);
     return bisRouteHistory;
 
