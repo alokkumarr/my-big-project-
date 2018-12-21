@@ -20,4 +20,5 @@ $designer-header-height: 57px;
 
 .designer__main {
   grid-area: content;
+  overflow-x: hidden;
 }
