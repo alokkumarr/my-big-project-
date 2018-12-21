@@ -19,7 +19,6 @@ import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.exceptions.FatalXDFException;
 import sncr.xdf.exceptions.XDFException;
 
-import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
 
