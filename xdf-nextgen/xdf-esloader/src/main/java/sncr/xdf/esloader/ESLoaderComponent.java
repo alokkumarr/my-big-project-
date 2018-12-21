@@ -127,7 +127,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
         JsonObject inputDsConfigObject = inputDsConfigElement.getAsJsonObject();
         inputDsConfigObject.remove(DataSetProperties.UserData.toString());
-        inputDsConfigObject.remove("userdata");
+        inputDsConfigObject.remove("userData");
         inputDsConfigObject.remove(DataSetProperties.CreatedTime.toString());
         inputDsConfigObject.remove(DataSetProperties.ModifiedTime.toString());
 
