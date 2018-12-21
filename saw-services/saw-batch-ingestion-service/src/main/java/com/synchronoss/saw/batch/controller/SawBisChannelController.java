@@ -26,7 +26,9 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -279,6 +281,9 @@ public class SawBisChannelController {
       requestBody.setBisChannelSysId(channelId);
       BeanUtils.copyProperties(requestBody, channel, "modifiedDate", "createdDate");
       channel.setModifiedDate(new Date());
+      if (channel.getStatus() == null) {
+        channel.setStatus(STATUS_ACTIVE);
+      }
       channel = bisChannelDataRestRepository.save(channel);
       channel = bisChannelDataRestRepository.findById(channelId).get();
       BeanUtils.copyProperties(channel, requestBody);
@@ -348,13 +353,13 @@ public class SawBisChannelController {
           .MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
-  public ResponseEntity<Boolean> checkDuplicate(
+  public Map<String,Boolean> checkDuplicate(
       @ApiParam(value = "channel Name", required = true) 
       @RequestParam("channelName") String channelName) {
-
-    return new ResponseEntity<Boolean>(bisChannelService
-        .isChannelNameExists(channelName), HttpStatus.OK);
-
+    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
+    responseMap.put("isDuplicate", bisChannelService
+        .isChannelNameExists(channelName));
+    return responseMap;
   }
   
   /**
@@ -366,11 +371,13 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels/{channelId}/deactivate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Boolean>  deactivateChannel(
+  public Map<String,Boolean>  deactivateChannel(
       @PathVariable("channelId")  Long channelId) {
+    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
     logger.trace("Inside deactivating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, false);
-    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+    responseMap.put("isActivated", Boolean.TRUE);
+    return responseMap;
   }
   
   /**
@@ -382,11 +389,13 @@ public class SawBisChannelController {
   @RequestMapping(value = "/channels/{channelId}/activate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Boolean>  activateChannel(
+  public Map<String,Boolean>  activateChannel(
       @PathVariable("channelId")  Long channelId) {
+    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
     logger.trace("Inside activating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, true);
-    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+    responseMap.put("isActivated", Boolean.TRUE);
+    return responseMap;
   }
 
   
