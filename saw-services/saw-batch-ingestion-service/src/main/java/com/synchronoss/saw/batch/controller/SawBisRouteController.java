@@ -31,7 +31,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -44,7 +47,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +55,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+
 
 
 
@@ -489,15 +493,18 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/deactivate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Boolean> deactivateRoute(
+  public Map<String,Boolean> deactivateRoute(
       @PathVariable("channelId")  Long channelId,
       @PathVariable("routeId") Long routeId) {
+
     logger.trace("Inside deactivating route  channelID " + channelId + "routeId: " + routeId);
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
     scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
     bisRouteService.activateOrDeactivateRoute(channelId, routeId, false);
-    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
+    responseMap.put("isDeactivated",Boolean.TRUE);
+    return responseMap;
   }
   
   /**
@@ -510,15 +517,18 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/activate", method 
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Boolean> activateRoute(
+  public Map<String,Boolean> activateRoute(
       @PathVariable("channelId")  Long channelId,
       @PathVariable("routeId") Long routeId) {
+
     logger.trace("Inside activate route  channelID " + channelId + "routeId: " + routeId);
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
     scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
     bisRouteService.activateOrDeactivateRoute(channelId, routeId, true);
-    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
+    responseMap.put("isActivated", Boolean.TRUE);
+    return responseMap;
   }
   
   
@@ -532,13 +542,16 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{channelId}/duplicate-route", method 
       = RequestMethod.GET, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Boolean> isDuplicateRoute(
+  public Map<String,Boolean> isDuplicateRoute(
       @PathVariable("channelId")  Long channelId,
       @RequestParam("routeName") String routeName) {
+    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
     logger.trace("Checking for duplicate route namewith channelId: " + channelId 
         + " and routeName: " + routeName);
-    return new ResponseEntity<Boolean>(bisRouteService
-        .isRouteNameExists(channelId,routeName), HttpStatus.OK);
+    Boolean result =  bisRouteService
+        .isRouteNameExists(channelId,routeName);
+    responseMap.put("isDuplicate", result);
+    return responseMap;
   }
   
   
