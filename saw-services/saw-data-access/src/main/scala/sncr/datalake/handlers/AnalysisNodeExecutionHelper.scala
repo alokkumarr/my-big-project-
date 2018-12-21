@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.util
 import java.util.UUID
 
-import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.util.Bytes
 import com.typesafe.config.Config
 import org.json.JSONException
 import org.json4s.JsonAST.{JObject, _}
