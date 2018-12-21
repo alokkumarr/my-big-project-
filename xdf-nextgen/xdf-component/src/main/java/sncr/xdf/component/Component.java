@@ -152,6 +152,12 @@ public abstract class Component {
 
         mdOutputDataSetMap = new HashMap<>();
         final int[] rc = {0};
+
+        logger.debug("Component configuration = " + ctx.componentConfiguration);
+        logger.debug("Output datasets = " + ctx.componentConfiguration.getOutputs()
+            + " Length = " + ctx.componentConfiguration.getOutputs().size());
+
+
         ctx.componentConfiguration.getOutputs().forEach(o -> {
           logger.debug("Add output object to data object repository: " + o.getDataSet());
 
