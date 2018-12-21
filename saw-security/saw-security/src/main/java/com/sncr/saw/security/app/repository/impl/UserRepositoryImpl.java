@@ -2998,7 +2998,7 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public boolean deleteCategory(Long categoryId) {
 
-		String sql2 = "DELETE FROM CUSTOMER_PRODUCT_MODULE_FEATURES " + " WHERE CUST_PROD_MOD_FEATURE_SYS_ID = ?";
+		String sql2 = "DELETE FROM CUSTOMER_PRODUCT_MODULE_FEATURES WHERE CUST_PROD_MOD_FEATURE_SYS_ID = ?";
 		try {
 			jdbcTemplate.update(sql2, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -3014,7 +3014,7 @@ public class UserRepositoryImpl implements UserRepository {
          *  the corresponding privilege created using the category remains in the system.
          *  So, herby we are deleting that corresponding privilege whenever category is deleted.
          **/
-        String sql = "DELETE FROM privileges " + " WHERE CUST_PROD_MOD_FEATURE_SYS_ID = ?";
+        String sql = "DELETE FROM privileges WHERE CUST_PROD_MOD_FEATURE_SYS_ID = ?";
         try {
             jdbcTemplate.update(sql, new PreparedStatementSetter() {
                 public void setValues(PreparedStatement preparedStatement) throws SQLException {
