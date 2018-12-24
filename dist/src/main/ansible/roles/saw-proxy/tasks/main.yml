@@ -30,7 +30,7 @@
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     state: present
   register: result
-  until: 'result.rc == 0'
+  until: result is success
   retries: 5
   delay: 10
 - name: Install NGINX configuration

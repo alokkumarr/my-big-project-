@@ -43,7 +43,7 @@ const timeoutInterval = 3600000;
 /**
  * number of retries in case of failure, executes all failed tests
  */
-let maxRetryForFailedTests = SuiteSetup.distRun() ? 1 : 1;
+let maxRetriesForFailedTests = SuiteSetup.distRun() ? 3 : 2;
 
 /**
  * Waits ms after page is loaded
@@ -121,6 +121,7 @@ exports.config = {
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
 
     browser.manage().timeouts().implicitlyWait(implicitlyWait);
+
     // Allure reporter start
     let AllureReporter = require('jasmine-allure-reporter');
     jasmine.getEnv().addReporter(
@@ -150,12 +151,12 @@ exports.config = {
           logger.debug('Test is failed: ' + JSON.stringify(result.testInfo));
           new SuiteSetup().failedTestData(result.testInfo)
         }
-        if (result.status === 'passed') {
-          logger.debug('Test is passed: ' + JSON.stringify(result.testInfo));
-          new SuiteSetup().passTestData(result.testInfo)
-        }
+        // Add executed test status in a result.json file which contains pass and fail tests
+        // This fill be used for converting to junit xml so that e2e results can display under test status in bamboo
+        new SuiteSetup().addToExecutedTests(result);
       };
     });
+
     browser.get(browser.baseUrl);
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
@@ -164,10 +165,11 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: () => {
-    //Delete old e2e unique id.
+    // Delete old e2e unique id.
     logger.info('Doing cleanup and setting up test data for e2e tests....');
-    if (fs.existsSync('target/e2eId.json')) {
-      fs.unlinkSync('target/e2eId.json');
+    if (fs.existsSync('target/e2e/e2eId.json')) {
+      // delete and create new always
+      fs.unlinkSync('target/e2e/e2eId.json');
     }
     // Generate test data
     let appUrl = SuiteSetup.getSawWebUrl();
@@ -200,16 +202,20 @@ exports.config = {
     }
   },
   afterLaunch: () => {
-    var retryCounter = 1;
-    if (argv.retry) {
-      retryCounter = ++argv.retry;
-    }
-    // Rename failedFailedTests.json to
-    if (retryCounter <= maxRetryForFailedTests) {
-      // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
-      SuiteSetup.failedTestDataForRetry();
 
+    SuiteSetup.failedTestDataForRetry();
+
+    let retryStatus = retry.afterLaunch(maxRetriesForFailedTests);
+    if(retryStatus === 1) {
+      // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
+      logger.error('There are some failures hence marking test suite failed. Failed tests are: '+JSON.stringify(failedTests));
+      // TODO: Convert testResult json to junit.xml file
+      process.exit(1); // this will mark build failure as well
+
+    } else if(retryStatus === 0) {
+      // retryStatus 0 means there are no failures
+      // TODO: Convert testResult json to junit.xml file
     }
-    return retry.afterLaunch(maxRetryForFailedTests);
+    return retryStatus;
   }
 };

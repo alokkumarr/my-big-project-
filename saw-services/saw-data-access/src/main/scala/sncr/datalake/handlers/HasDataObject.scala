@@ -1,6 +1,6 @@
 package sncr.datalake.handlers
 
-import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}

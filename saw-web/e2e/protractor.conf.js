@@ -317,15 +317,32 @@ exports.config = {
       fs.unlinkSync('target/e2e/e2eId.json');
     }
 
-    var retryCounter = 1;
+    let retryCounter = 1;
     if (argv.retry) {
       retryCounter = ++argv.retry;
     }
-    if (retryCounter <= maxRetryForFailedTests){
-     // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
-      webpackHelper.generateFailedTests('target/allure-results');
+
+    webpackHelper.generateFailedTests('target/allure-results');
+
+    let retryStatus = retry.afterLaunch(maxRetryForFailedTests);
+    if(retryStatus === 1) {
+      // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
+        let failedTests;
+        if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+          failedTests = JSON.parse(fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8'));
+        }
+      logger.error('There are some failures hence marking test suite failed. Failed tests are: '+JSON.stringify(failedTests));
+      process.exit(1);
+
+    } else if(retryStatus === 0) {
+      // retryStatus 0 means there are no failures but to be double sure check the finalfail json file
+      if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+        let failedTests = JSON.parse(fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8'));
+        logger.error('There are some failures hence marking test suite failed. Failed tests are: '+JSON.stringify(failedTests));
+        process.exit(1);
+      }
     }
 
-    return retry.afterLaunch(maxRetryForFailedTests);
+    return retryStatus;
   }
 };

@@ -317,6 +317,11 @@ example 1.0.1, 1.0.2 and so on).
 [project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
 [release notes]: https://confluence.synchronoss.net:8443/display/BDA/SAW+Releases+Documentation
 
+# Rebuilding an older release
+
+Use the same steps as for making a release generally, but use a Bamboo
+plan branch for building the older release.  This avoids automatically
+deploying the older release to the shared develoment environment.
 
 # Troubleshooting
 

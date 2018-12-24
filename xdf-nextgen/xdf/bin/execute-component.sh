@@ -118,7 +118,15 @@ hadoop fs -stat $XDF_DATA_ROOT >/dev/null || exit 1
 set -o pipefail
 
 # read SPARK_DRIVER_MEMORY param value from config JSON file
-SPARK_MEMORY_CONFIG="$(cat $CONFIG_FILE| jq -r '.parameters | .[] | select(.name == "spark.driver.memory")| .value ')"
+
+CONFIG_FILE_PATH=
+
+if [[ $CONFIG_FILE == file://* ]];
+then
+    CONFIG_FILE_PATH=${CONFIG_FILE:7}
+fi
+
+SPARK_MEMORY_CONFIG="$(cat $CONFIG_FILE_PATH | jq -r '.parameters | .[] | select(.name == "spark.driver.memory")| .value ')"
 echo "SPARK DRIVER MEMORY:: $SPARK_MEMORY_CONFIG"
 
 SPARK_DRIVER_MEMORY=

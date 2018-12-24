@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import * as debounce from 'lodash/debounce';
-import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as split from 'lodash/split';
 import * as clone from 'lodash/clone';

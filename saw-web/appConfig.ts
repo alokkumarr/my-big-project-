@@ -1,7 +1,7 @@
 import { environment } from './src/environments/environment';
 
 let apiUrl;
-const endpoints = {security: 'security', services: 'services'};
+const endpoints = { security: 'security', services: 'services' };
 
 /* eslint-disable */
 if (environment.production) {
@@ -19,6 +19,7 @@ export default {
     jwtKey: 'jwtToken'
   },
   api: {
-    url: `${apiUrl}/${endpoints.services}`
+    url: `${apiUrl}/${endpoints.services}`,
+    pluginUrl: `${apiUrl}/web`
   }
 };

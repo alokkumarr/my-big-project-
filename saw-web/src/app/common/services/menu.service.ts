@@ -3,6 +3,7 @@ import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
+import * as includes from 'lodash/includes';
 import { JwtService } from './jwt.service';
 import { SidenavMenuService } from '../components/sidenav/sidenav-menu.service';
 
@@ -42,38 +43,38 @@ export class MenuService {
         return error('Module name for menu not found!');
       }
 
-      const features = filter(targetModule.prodModFeature, ({prodModCode}) => prodModCode === targetModule.productModCode);
-
-      resolve(
-        map(features, feature => {
-          const obj: any = {
-            id: feature.prodModFeatureID,
-            name: feature.prodModFeatureName || feature.prodModFeatureDesc,
-            data: feature
-          };
-
-          /* Since there are no subcategories in observe, don't add them if they're there */
-          obj.children = map(feature.productModuleSubFeatures, subfeature => {
-            // Workbench uses defaultURL attribute value to navigate from side nav.
-            // 'WRK000001' is the module code for workbench.
-            const url =
-              subfeature.prodModCode === 'WRK000001'
-                ? [`/${moduleName.toLowerCase()}/${subfeature.defaultURL}`]
-                : [
-                    `/${moduleName.toLowerCase()}`,
-                    `${subfeature.prodModFeatureID}`
-                  ];
-            return {
-              id: subfeature.prodModFeatureID,
-              name:
-                subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
-              url,
-              data: subfeature
-            };
-          });
-          return obj;
-        })
+      const features = filter(
+        targetModule.prodModFeature,
+        ({ prodModCode }) => prodModCode === targetModule.productModCode
       );
+
+      const menu = map(features, feature => {
+        const obj: any = {
+          id: feature.prodModFeatureID,
+          name: feature.prodModFeatureName || feature.prodModFeatureDesc,
+          data: feature
+        };
+
+        /* Since there are no subcategories in observe, don't add them if they're there */
+        obj.children = map(feature.productModuleSubFeatures, subfeature => {
+          // Only Analyze and observe have dynamic categories/sub-categories.
+          // Rest all modules uses and should use "defaultURL" field for routing
+          const dynamicMenuModules = ['ANLYS00001', 'OBSR000001'];
+          const url = includes(dynamicMenuModules, subfeature.prodModCode)
+            ? [`/${moduleName.toLowerCase()}`, `${subfeature.prodModFeatureID}`]
+            : [`/${moduleName.toLowerCase()}/${subfeature.defaultURL}`];
+
+          return {
+            id: subfeature.prodModFeatureID,
+            name:
+              subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
+            url,
+            data: subfeature
+          };
+        });
+        return obj;
+      });
+      resolve(menu);
     });
 
     return menuPromise;
