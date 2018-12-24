@@ -23,15 +23,18 @@ export class DesignerSettingsAuxMapChartComponent {
     if (!data) {
       return;
     }
-    this.legend = this.legend || {};
     this.legend.align = data.align;
     this.legend.layout = data.layout;
   }
 
-  legend: any;
+  legend: any = {};
   public editMode: false;
 
   constructor(private _chartService: ChartService) {
+    this.legend = {
+      align: 'bottom',
+      layout: 'horizontal'
+    };
     this.options = {
       align: values(this._chartService.LEGEND_POSITIONING),
       layout: values(this._chartService.LAYOUT_POSITIONS)
