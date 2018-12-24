@@ -8,6 +8,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.Tuple2;
+import sncr.bda.conf.Alias;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.ESLoader;
 import sncr.bda.core.file.HFileOperations;
@@ -19,8 +21,12 @@ import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.exceptions.FatalXDFException;
 import sncr.xdf.exceptions.XDFException;
 
+import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by skbm0001 on 29/1/2018.
@@ -79,17 +85,27 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
             ElasticSearchLoader loader = new ElasticSearchLoader(this.ctx.sparkSession, esLoaderConfig);
 
-            JsonElement inputDsConfig = dsaux.dl.getDSStore().read(ctx.applicationID + "::" + ESLOADER_DATASET);
+            JsonElement inputDsConfig =
+                dsaux.dl.getDSStore().read(ctx.applicationID + "::" + ESLOADER_DATASET);
             logger.debug("Input DS config = " + inputDsConfig);
 
-            registerDataset();
-            int rc = loader.loadSingleObject(this.dataSetName, inputDataset, inputDataFormat);
 
-//            if (rc == 0) {
-//                rc = registerDataset();
-//            }
+            Tuple2<Integer, Map<String, String>> ret =
+                loader.loadSingleObject(this.dataSetName, inputDataset, inputDataFormat);
 
-            return rc;
+            retVal = ret._1;
+
+            if (retVal == 0) {
+                Map<String, String> indexMap = ret._2;
+                logger.debug("Index Map list = " + indexMap);
+
+                String indexType = indexMap.get(this.dataSetName);
+                logger.debug("Final indexType = " + indexType);
+
+                retVal = registerDataset(indexType);
+            }
+
+            return retVal;
         } catch (Exception ex) {
             logger.error(ex);
             logger.debug(ExceptionUtils.getStackTrace(ex));
@@ -99,41 +115,56 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         return retVal;
     }
 
-    private int registerDataset () throws Exception {
-        int result = 0;
-
+    private int registerDataset (String indexType) throws Exception {
         String datasetId = ctx.applicationID + "::" + ESLOADER_DATASET;
 
-        String esDatasetId = datasetId + "::esdata";
+        // Append '_esdata' to the dataset id to identify this as ES dataset
+        String esDatasetId = datasetId + "_esdata";
 
         // Fetch the existing ES dataset
-        JsonElement inputDsConfigElement = dsaux.dl.getDSStore()
+        JsonElement esDatasetElement = dsaux.dl.getDSStore()
             .read(esDatasetId);
 
-        if (inputDsConfigElement == null || inputDsConfigElement.equals("")) {
+        JsonObject esDatasetObject = null;
+
+        if (esDatasetElement == null) {
+            // Create ES dataset using input dataset
+
             logger.info("ES dataset doesn't exist. Creating it with input dataset");
-            inputDsConfigElement = dsaux.dl.getDSStore()
+            esDatasetElement = dsaux.dl.getDSStore()
                 .read(datasetId);
+
+            esDatasetObject = esDatasetElement.getAsJsonObject();
+
+            long currentTime = Instant.now().toEpochMilli();
+
+            esDatasetObject.addProperty(DataSetProperties.CreatedTime.toString(), currentTime);
+            esDatasetObject.addProperty(DataSetProperties.ModifiedTime.toString(), currentTime);
+        } else {
+            esDatasetObject = esDatasetElement.getAsJsonObject();
+
+            // Update modified time
+            long currentTime = Instant.now().toEpochMilli();
+            esDatasetObject.addProperty(DataSetProperties.ModifiedTime.toString(), currentTime);
         }
 
-        if (inputDsConfigElement == null) {
-            logger.error("Input dataset is not registered");
+        if (esDatasetObject == null) {
+            logger.error("Unable to initialize ES dataset");
 
             return -1;
         }
 
-        logger.debug("Input DS config = " + inputDsConfigElement);
+        logger.debug("Input DS config = " + esDatasetElement);
 
-        JsonObject inputDsConfigObject = inputDsConfigElement.getAsJsonObject();
-        inputDsConfigObject.remove(DataSetProperties.UserData.toString());
-        inputDsConfigObject.remove("userData");
-        inputDsConfigObject.remove(DataSetProperties.CreatedTime.toString());
-        inputDsConfigObject.remove(DataSetProperties.ModifiedTime.toString());
+        esDatasetObject.remove(DataSetProperties.UserData.toString());
+        esDatasetObject.remove("userData");
 
-        String indexType = esLoaderConfig.getDestinationIndexName();
+        List<Alias> aliases = esLoaderConfig.getAliases();
 
         String index = indexType.substring(0, indexType.indexOf("/"));
         String type = indexType.substring(indexType.indexOf("/") + 1);
+
+        esDatasetObject.addProperty("storageType", "ES");
 
         String mappingFileLocation = esLoaderConfig.getIndexMappingfile();
 
@@ -147,36 +178,65 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             .getAsJsonObject(type).getAsJsonObject("properties");
 
         JsonObject schema = generateSchema(esFields);
-        inputDsConfigObject.add(DataSetProperties.Schema.toString(), schema);
+        esDatasetObject.add(DataSetProperties.Schema.toString(), schema);
 
 
-        JsonObject system = inputDsConfigObject.get(DataSetProperties.System.toString())
+        JsonObject system = esDatasetObject.get(DataSetProperties.System.toString())
             .getAsJsonObject();
 
-        inputDsConfigObject.add(DataSetProperties.System.toString(), updateSystemObject(system, index, type));
+        esDatasetObject.add(DataSetProperties.System.toString(),
+            updateSystemObject(system, index, type, aliases));
 
         // Update ID Field
-        inputDsConfigObject.addProperty("_id", esDatasetId);
+        esDatasetObject.addProperty("_id", esDatasetId);
 
-        logger.debug("Updated dataset = " + inputDsConfigObject);
+        logger.debug("Updated dataset = " + esDatasetObject);
 
         logger.info("Registering " + esDatasetId + " to metadata");
 
-        dsaux.dl.getDSStore().create(esDatasetId, inputDsConfigElement);
+        dsaux.dl.getDSStore().create(esDatasetId, esDatasetElement);
 
-        return result;
+        return 0;
     }
 
-    private JsonObject updateSystemObject(JsonObject system, String index, String type) {
+    private JsonObject updateSystemObject(JsonObject system, String index, String type,
+                                          List<Alias> aliases) {
         if (system == null) {
             system = new JsonObject();
         }
 
+
         system.addProperty(DataSetProperties.PhysicalLocation.toString(), index);
         system.addProperty(DataSetProperties.Name.toString(), index);
-        system.addProperty("type", "ESIndex");
+
+        // Add alias information
+        String alias = extractAlias(aliases);
+
+        if (alias != null) {
+            system.addProperty("alias", alias);
+        }
+
+        // Add index type information
+        system.remove("type");
+        system.addProperty("esIndexType", type);
 
         return system;
+    }
+
+    private String extractAlias(List<Alias> aliases) {
+        String alias = null;
+
+        if (aliases != null && aliases.size() != 0) {
+            List <Alias> appendAlias = aliases.stream().filter(aliasObject -> {
+                return aliasObject.getMode() == Alias.Mode.APPEND;
+            }).collect(toList());
+
+            if (appendAlias.size() != 0) {
+                alias = appendAlias.get(0).getAliasName();
+            }
+        }
+
+        return alias;
     }
 
     private JsonObject generateSchema (JsonObject esFields) {
@@ -200,9 +260,13 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             String fieldType = entry.getValue().getAsJsonObject().get("type").getAsString();
             field.addProperty("type", fieldType);
 
-            JsonElement fieldsObject = entry.getValue().getAsJsonObject().get("fields");
-            if (fieldsObject != null) {
-                field.add("fields", fieldsObject.getAsJsonObject());
+            JsonElement fieldsElement = entry.getValue().getAsJsonObject().get("fields");
+            if (fieldsElement != null) {
+                JsonObject fieldsObject = fieldsElement.getAsJsonObject();
+
+                if (fieldsObject.has("keyword")) {
+                    field.addProperty("isKeyword", true);
+                }
             }
 
             JsonElement fieldFormat = entry.getValue().getAsJsonObject().get("format");

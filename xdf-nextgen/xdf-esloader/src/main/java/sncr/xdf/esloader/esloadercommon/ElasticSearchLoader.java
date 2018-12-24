@@ -12,6 +12,7 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
+import scala.Tuple2;
 import sncr.bda.conf.ESLoader;
 import sncr.bda.conf.Input;
 import sncr.xdf.esloader.XDFTimestampconverter;
@@ -97,14 +98,24 @@ public class ElasticSearchLoader {
         return configMap;
     }
 
-    public int loadSingleObject(String objectName,
-                                 Dataset<Row> originalFrame, String inputDataFormat) throws Exception {
+    /**
+     *
+     * @param objectName Name of the dataset object
+     * @param originalFrame Dataframe which needs to be loaded into the ES index
+     * @param inputDataFormat Dataset format
+     *
+     * @return tuple2 Contains the return code (status of 0 - SUCCESS and -1 - FAULURE)
+     *         and a map of dataset objects and their respective indexes
+     * @throws Exception In case of loading failure
+     */
+    public Tuple2<Integer, Map<String, String>> loadSingleObject(String objectName, Dataset<Row> originalFrame,
+                                String inputDataFormat) throws Exception {
         // Parse index/type name
         ElasticSearchStructureManager essm = new ElasticSearchStructureManager(this.esLoader);
         //long totalRecordCount = 0;
 
         if(!essm.elasticSearchLoaderConfigured()){
-            return -1;
+            return new Tuple2<>(-1, null);
         }
 
         // In case of partitioned data, each partition will be loaded separately
@@ -214,7 +225,7 @@ public class ElasticSearchLoader {
         logger.debug("Indices = " + newIndices);
 
         essm.ProcessAliases(esClient, newIndices.toArray(new String[newIndices.size()]));
-        return 0;
+        return new Tuple2<>(0, locationList);
     }
 
     public Dataset<Row> filterData(Dataset<Row> dataSet, String condition) {
