@@ -1,4 +1,3 @@
-<!-- <div class="view-analysis-grid" [ngStyle]="{'height': calc(100% - 320px)}"> -->
 <div class="view-analysis-grid" [ngStyle]="{'height': analysis.sqlBuilder.filters.length !== 0 ? 'calc(100vh - 303px)' : 'calc(100vh - 193px)'}">
   <report-grid-upgraded *ngIf="analysis && dataLoader"
                         (change)="onReportGridChange($event)"
