@@ -158,6 +158,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
           payload.productCode = channelData.productCode;
           payload.projectCode = channelData.projectCode;
           payload.customerCode = channelData.customerCode;
+          payload.status = !channelData.status ? 0 : 1;
 
           this.datasourceService
             .updateSource(channelData.bisChannelSysId, payload)
@@ -258,7 +259,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
     dateDialogRef.afterClosed().subscribe(data => {
       if (!isUndefined(data)) {
-        const payload = {
+        const payload: {status?: number, createdBy: string, routeMetadata: Object} = {
           createdBy: '',
           // Route metadata JSON object have to be stringified  to store in MariaDB due to BE limitation.
           routeMetadata: JSON.stringify(data.routeDetails)
@@ -271,6 +272,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
             });
         } else {
           payload.createdBy = routeData.createdBy;
+          payload.status = !routeData.status ? 0 : 1;
 
           this.datasourceService
             .updateRoute(
