@@ -7,7 +7,6 @@ import {
 import { Subject, isObservable } from 'rxjs';
 
 import * as Highmaps from 'highcharts/highmaps';
-// Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';

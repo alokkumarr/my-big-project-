@@ -153,6 +153,24 @@ export class ChartService {
     return analysis;
   }
 
+  analysisLegend2ChartLegend(legend) {
+    const align = LEGEND_POSITIONING[
+      get(legend, 'align')
+    ];
+    const layout = LAYOUT_POSITIONS[
+      get(legend, 'layout')
+    ];
+
+    if (!align || !layout) {
+      return null;
+    }
+    return {
+      align: align.align,
+      verticalAlign: align.verticalAlign,
+      layout: layout.layout
+    };
+  }
+
   initLegend(analysis) {
     const initialLegendPosition =
       analysis.chartType === 'combo'

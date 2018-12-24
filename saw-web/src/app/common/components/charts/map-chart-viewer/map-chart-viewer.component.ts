@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import * as debounce from 'lodash/debounce';
 import * as map from 'lodash/map';
 import * as split from 'lodash/split';
@@ -8,7 +8,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpMapValues from 'lodash/fp/mapValues';
-import { Observable, isObservable } from 'rxjs';
+import { Observable, isObservable, Subject } from 'rxjs';
 
 import { AnalysisChart, SqlBuilderChart } from '../../../types';
 import { ChartService } from '../../../../common/services/chart.service';
@@ -19,7 +19,7 @@ import { MapDataService } from '../../../../common/components/charts/map-data.se
   templateUrl: 'map-chart-viewer.component.html',
   styleUrls: ['map-chart-viewer.component.scss']
 })
-export class MapChartViewerComponent implements OnInit {
+export class MapChartViewerComponent {
   _fields: any;
   _data: Array<any>;
   _auxSettings: any = {};
@@ -44,6 +44,8 @@ export class MapChartViewerComponent implements OnInit {
       this._mapData = this._mapDataService.getMapData(xField.region);
       this.setSeries();
     }
+
+    this.setChartConfig(analysis.legend);
   }
 
   @Input()
@@ -71,10 +73,6 @@ export class MapChartViewerComponent implements OnInit {
     this.setSeries = debounce(this.setSeries, 50);
   }
 
-  ngOnInit() {
-    this.setChartConfig();
-  }
-
   setSeries() {
     const mapData$ = this._mapData;
     const rawSeries = this._rawSeries;
@@ -94,16 +92,15 @@ export class MapChartViewerComponent implements OnInit {
         const updateObj = {
           series: rawSeries
         };
+        if (!this.updater) {
+          this.updater = new Subject();
+        }
         this.updater.next(updateObj);
       });
     }
   }
 
-  setChartConfig() {
-    const legend = {
-      layout: 'horizontal',
-      verticalAlign: 'top'
-    };
+  setChartConfig(analysisLegend) {
     const colorAxis = {
       min: 1,
       type: 'logarithmic',
@@ -111,13 +108,14 @@ export class MapChartViewerComponent implements OnInit {
       maxColor: '#1A89D4'
     };
 
+    const legend = this._chartService.analysisLegend2ChartLegend(analysisLegend);
+
     this.chartOptions = {
       mapNavigation: {
         enabled: true
       },
-      // series,
-      legend,
-      colorAxis
+      colorAxis,
+      legend
     };
   }
 }

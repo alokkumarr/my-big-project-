@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as values from 'lodash/values';
 
@@ -10,18 +10,19 @@ import { ChartService } from '../../../../../../common/services/chart.service';
   styleUrls: ['aux-map-chart.component.scss']
 })
 
-export class DesignerSettingsAuxMapChartComponent implements OnInit {
+export class DesignerSettingsAuxMapChartComponent {
 
   @Input() chartTitle;
   @Input() chartType: string;
   @Output() change = new EventEmitter();
+
+  public options;
 
   @Input('legend')
   set analysisLegend(data: any) {
     if (!data) {
       return;
     }
-
     this.legend = this.legend || {};
     this.legend.align = data.align;
     this.legend.layout = data.layout;
@@ -30,16 +31,10 @@ export class DesignerSettingsAuxMapChartComponent implements OnInit {
   legend: any;
   public editMode: false;
 
-  constructor(private _chartService: ChartService) { }
-
-  ngOnInit() {
-    this.legend = {
-      align: 'top',
-      layout: 'horizontal',
-      options: {
-        align: values(this._chartService.LEGEND_POSITIONING),
-        layout: values(this._chartService.LAYOUT_POSITIONS)
-      }
+  constructor(private _chartService: ChartService) {
+    this.options = {
+      align: values(this._chartService.LEGEND_POSITIONING),
+      layout: values(this._chartService.LAYOUT_POSITIONS)
     };
   }
 

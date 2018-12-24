@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import * as debounce from 'lodash/debounce';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
@@ -26,7 +26,7 @@ export enum MapChartStates {
   templateUrl: 'designer-map-chart.component.html',
   styleUrls: ['designer-map-chart.component.scss']
 })
-export class DesignerMapChartComponent implements OnInit {
+export class DesignerMapChartComponent {
   _fields: any;
   _data: Array<any>;
   _auxSettings: any = {};
@@ -88,11 +88,9 @@ export class DesignerMapChartComponent implements OnInit {
     private _mapDataService: MapDataService
   ) {
     this.setSeries = debounce(this.setSeries, 50);
-  }
-
-  ngOnInit() {
     this.setChartConfig();
   }
+
 
   setSeries() {
     const mapData$ = this._mapData;
@@ -119,10 +117,6 @@ export class DesignerMapChartComponent implements OnInit {
   }
 
   setChartConfig() {
-    const legend = {
-      layout: 'horizontal',
-      verticalAlign: 'top'
-    };
     const colorAxis = {
       min: 1,
       type: 'logarithmic',
@@ -134,39 +128,19 @@ export class DesignerMapChartComponent implements OnInit {
       mapNavigation: {
         enabled: true
       },
-      // series,
-      legend,
       colorAxis
     };
   }
 
   updateSettings(auxSettings) {
-    const align = this._chartService.LEGEND_POSITIONING[
-      get(auxSettings, 'legend.align')
-    ];
-    const layout = this._chartService.LAYOUT_POSITIONS[
-      get(auxSettings, 'legend.layout')
-    ];
+    const legend = this._chartService.analysisLegend2ChartLegend(auxSettings.legend);
 
-    let legend;
+    const updateObj = omitBy({
+      legend,
 
-    if (!align || !layout) {
-      legend = null;
-    } else {
-      legend = {
-        align: align.align,
-        verticalAlign: align.verticalAlign,
-        layout: layout.layout
-      };
-    }
-
-    const updateObj = omitBy(
-      {
-        legend
-      },
-      isNil
-    );
-
-    this.chartUpdater.next(updateObj);
+    }, isNil);
+    setTimeout(() => {
+      this.chartUpdater.next(updateObj);
+    });
   }
 }
