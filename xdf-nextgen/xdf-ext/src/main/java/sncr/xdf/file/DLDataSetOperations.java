@@ -150,7 +150,7 @@ public class DLDataSetOperations {
         FileSystem fileSystem = HFileOperations.getFileSystem();
         List<String> kl = new ArrayList<>();
 
-        while(i == PARTITION_STRUCTURE.DRILL){
+        while(i == PARTITION_STRUCTURE.HIVE || i == PARTITION_STRUCTURE.DRILL){
             logger.debug("Checking locations: " + glob + " depth: " + depth);
 
             glob += File.separatorChar + "*";
@@ -161,11 +161,11 @@ public class DLDataSetOperations {
                     break;
                 case DRILL:
                     overallStructure = (overallStructure != PARTITION_STRUCTURE.DRILL)
-                            ? PARTITION_STRUCTURE.ERROR : overallStructure;
+                        ? PARTITION_STRUCTURE.ERROR : overallStructure;
                     break;
                 case HIVE:
                     overallStructure = (overallStructure != PARTITION_STRUCTURE.HIVE)
-                            ? PARTITION_STRUCTURE.ERROR : overallStructure;
+                        ? PARTITION_STRUCTURE.ERROR : overallStructure;
                     break;
             }
             depth++;
@@ -179,7 +179,7 @@ public class DLDataSetOperations {
             retval = new Tuple4<>(glob, kl, depth, overallStructure);
         }
         else if(overallStructure == PARTITION_STRUCTURE.HIVE ) {
-            retval = new Tuple4<>(glob, kl, depth, overallStructure);
+            retval = new Tuple4<>(location, kl, depth, overallStructure);
         }
         else {
             retval = new Tuple4<>(location, kl, depth, PARTITION_STRUCTURE.ERROR);
