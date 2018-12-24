@@ -502,7 +502,7 @@ public class SftpServiceImpl extends SipPluginContract {
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     try {
       SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
-      if (sesionFactory!= null
+      if (sesionFactory != null
           & sesionFactory.getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
         logger.trace("session opened starts here ");
@@ -530,7 +530,7 @@ public class SftpServiceImpl extends SipPluginContract {
               "destinationLocation from routeId " + routeId + " location " + destinationLocation);
           String filePattern = rootNode.get("filePattern").asText();
           logger.trace("filePattern from routeId " + routeId + " filePattern " + filePattern);
-          logger.trace("session factory before connecting"+ sesionFactory);
+          logger.trace("session factory before connecting" + sesionFactory);
           SftpRemoteFileTemplate template =
               new SftpRemoteFileTemplate(sesionFactory);
           logger.trace("invocation of method transferData when "
@@ -575,7 +575,7 @@ public class SftpServiceImpl extends SipPluginContract {
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId) throws IOException, ParseException {
     ZonedDateTime startTime = ZonedDateTime.now();
-    logger.trace("Starting transfer data......start time::"+ startTime);
+    logger.trace("Starting transfer data......start time::" + startTime);
     List<BisDataMetaInfo> list = new ArrayList<>();
     LsEntry[] files = null;
     if (template.list(sourcelocation + File.separator + pattern) != null) {
@@ -756,10 +756,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   if (template.getSession() != null) {
                     template.getSession().close();
                   }
-                } finally {
-                  
-                  
-                }
+                } 
               }
             }
           } // end of loop for the number of files to be download at each batch
@@ -773,10 +770,10 @@ public class SftpServiceImpl extends SipPluginContract {
           "there is no directory path available " + sourcelocation + File.separator + pattern);
     }
     ZonedDateTime endTime = ZonedDateTime.now();
-    logger.trace("Ending transfer data......end time:: " +endTime);
+    logger.trace("Ending transfer data......end time:: " + endTime);
     
     long durationInMillis = Duration.between(startTime, endTime).toMillis();
-    logger.trace("End of data tranfer.....Total time in milliseconds::: "+ durationInMillis);
+    logger.trace("End of data tranfer.....Total time in milliseconds::: " + durationInMillis);
     if (template.getSession() != null) {
       template.getSession().close();
     }
