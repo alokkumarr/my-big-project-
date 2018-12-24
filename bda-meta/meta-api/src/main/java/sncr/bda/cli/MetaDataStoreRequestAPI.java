@@ -211,12 +211,12 @@ public class MetaDataStoreRequestAPI {
                 String fp = cjo.getAsJsonPrimitive("field-path").getAsString();
                 String cond = cjo.getAsJsonPrimitive("condition").getAsString();
                 String val = cjo.getAsJsonPrimitive("value").getAsString();
-                if (fp != null && fp.isEmpty() && cond != null && cond.isEmpty() && val != null && val.isEmpty())
+                if (((fp != null && fp.isEmpty()) && (cond != null && cond.isEmpty())) && (val != null && val.isEmpty()))
                 {
-                    if (cond.equalsIgnoreCase("like"))
-                        maprDBCondition.like(fp, val);
+                    if (cond.equalsIgnoreCase("like")) {
+                        maprDBCondition.like(fp, val);}
                     else
-                        maprDBCondition.is(fp, getOperation( cond ), val );
+                        {maprDBCondition.is(fp, getOperation( cond ), val );}
                 }else {
                     logger.error("Skip incorrect filter element: " + c.getAsJsonObject().toString());
                 }

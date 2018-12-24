@@ -1,15 +1,16 @@
 <div class="analysis-header">
   <h1  class="chart report-title flex-container" [textContent]="analysis.chartTitle || analysis.name"></h1>
 
-  <div class="toggle-icons flex-icon-container">
-    <mat-icon *ngIf="toggleToGrid"  class="mat-icon material-icons" role="img" (click)="exportGridToExcel()"
+  <div class="flex-icon-export">
+    <mat-icon *ngIf="toggleToGrid"  class="mat-icon material-icons export" role="img" (click)="exportGridToExcel()"
       matTooltip="Export Grid Data">
-      <img src="./../../../../../assets/img/excel.png" style="width: 15px;">
     </mat-icon>
+  </div>
+
+  <div class="toggle-icons flex-icon-container">
     <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="viewToggle(true)" [ngClass]="{'active': toggleToGrid}"
       matTooltip="Toggle to Grid">
     </mat-icon>
-
     <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" (click)="viewToggle(false)" [ngClass]="{'active': !toggleToGrid}"
       matTooltip="Toggle to Chart">
     </mat-icon>

@@ -3,6 +3,9 @@
  */
 package com.sncr.saw.security.app.controller;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
@@ -13,6 +16,7 @@ import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.*;
+import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.*;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -131,6 +135,38 @@ public class SecurityController {
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 	}
 
+	   @RequestMapping(value = "/auth/customer/details", method = RequestMethod.POST)
+	    public UserCustomerMetaData getCustomerDetailsbyUser(@RequestHeader("Authorization") String token) {
+	        logger.info("Authenticating & getting the customerDetails starts here");
+	        token = token.replaceAll("Bearer", "").trim();
+	        UserCustomerMetaData userRelatedMetaData = new UserCustomerMetaData();
+	        Claims body = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(token).getBody();
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+	        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	        JsonNode node = null;
+	        try {
+	        node = mapper.readTree(mapper.writeValueAsString(body.get("ticket")));
+	        userRelatedMetaData.setCustCode(node.get("custCode").asText());
+	        Object dsk = node.get("dataSecurityKey");
+	            if (dsk!=null) {
+	              userRelatedMetaData.setDataSKey(dsk);
+	            }
+	            if (node.get("roleCode").asText()!=null) {userRelatedMetaData.setRoleCode(node.get("roleCode").asText());}
+	            if (node.get("roleType").asText()!=null) {userRelatedMetaData.setRoleType(node.get("roleType").asText());}
+	            if (node.get("userFullName").asText()!=null) {userRelatedMetaData.setUserFullName(node.get("userFullName").asText());}
+	            userRelatedMetaData.setUserName(node.get("masterLoginId").asText());
+	            userRelatedMetaData.setValid(true);
+	        } catch (DataAccessException de) {
+	            logger.error("Exception occured creating ticket ", de, null);
+	            userRelatedMetaData.setValid(false);
+	        } catch (Exception e) {
+	            logger.error("Exception occured creating ticket ", e);
+	            userRelatedMetaData.setValid(false);
+	        }
+	        logger.info("Authenticating & getting the customerDetails ends here");
+	        return userRelatedMetaData;
+	    }
 	/**
 	 *
 	 * @param token
