@@ -72,7 +72,9 @@
     </div>
     <admin-import-list
       [analyses]="analyses"
+      [categories]="categories$ | async"
       (validityChange)="onAnalysesValiditychange($event)"
+      (categorySelected)="onAnalysisCategoryChange($event)"
     ></admin-import-list>
   </mat-card>
 </div>

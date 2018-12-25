@@ -3,7 +3,8 @@ import { Store, Select } from '@ngxs/store';
 import {
   LoadAllAnalyzeCategories,
   SelectAnalysisGlobalCategory,
-  LoadMetrics
+  LoadMetrics,
+  LoadAnalysesForCategory
 } from './actions/import-page.actions';
 import { Observable } from 'rxjs';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -70,7 +71,7 @@ export class AdminImportViewComponent implements OnInit {
   files: Array<FileInfo>;
   fileContents: Array<FileContent>;
   selectedCategory;
-  analyses: Array<Analysis>;
+  analyses: Array<any>;
   userCanExportErrors = false;
   atLeast1AnalysisIsSelected = false;
 
@@ -105,6 +106,7 @@ export class AdminImportViewComponent implements OnInit {
     this.analyses = fpPipe(
       fpFlatMap(({ analyses }) => analyses),
       fpMap(analysis => {
+        analysis.categoryId = this.selectedCategory || '';
         const gridObj = this.getAnalysisObjectForGrid(analysis);
         if (gridObj.errorInd) {
           hasErrors = true;
@@ -113,6 +115,16 @@ export class AdminImportViewComponent implements OnInit {
       })
     )(contents);
     this.userCanExportErrors = hasErrors;
+  }
+
+  updateGridObject(analysisId) {
+    const id = this.analyses.findIndex(
+      ({ analysis }) => analysis.id === analysisId
+    );
+    const newGridObject = this.getAnalysisObjectForGrid(
+      this.analyses[id].analysis
+    );
+    this.analyses.splice(id, 1, newGridObject);
   }
 
   readFiles(event) {
@@ -147,18 +159,23 @@ export class AdminImportViewComponent implements OnInit {
       .subscribe(() => {
         this.splitFileContents(this.fileContents);
       });
-    // this._importService.getAnalysesFor(toString(categoryId)).then(analyses => { this.analysesFromBEMap = reduce(
-    //     analyses,
-    //     (acc, analysis) => {
-    //       acc[
-    //         `${analysis.name}:${analysis.metricName}:${analysis.type}`
-    //       ] = analysis;
-    //       return acc;
-    //     },
-    //     {}
-    //   );
-    //   this.splitFileContents(this.fileContents);
-    // });
+  }
+
+  onAnalysisCategoryChange({ categoryId, analysisId }) {
+    this.setAnalysisCategory(categoryId, analysisId);
+    this.store
+      .dispatch(new LoadAnalysesForCategory(categoryId))
+      .subscribe(() => {
+        this.updateGridObject(analysisId);
+      });
+  }
+
+  setAnalysisCategory(categoryId, analysisId) {
+    const a = this.analyses.find(({ analysis }) => analysis.id === analysisId);
+    if (a && a.analysis) {
+      a.analysis.categoryId = toString(categoryId);
+      console.log(categoryId, analysisId);
+    }
   }
 
   getAnalysisObjectForGrid(analysis) {
@@ -169,10 +186,13 @@ export class AdminImportViewComponent implements OnInit {
     if (metric) {
       analysis.semanticId = metric.id;
     }
+    const analysisCategory =
+      referenceAnalyses[analysis.categoryId.toString()] || {};
     const analysisFromBE =
-      referenceAnalyses[
+      analysisCategory[
         `${analysis.name}:${analysis.metricName}:${analysis.type}`
       ];
+    console.log(analysisFromBE, metric);
 
     const possibilitySelector = metric
       ? analysisFromBE
@@ -388,7 +408,6 @@ export class AdminImportViewComponent implements OnInit {
   }
 
   importExistingAnalysis(analysis): Promise<Analysis> {
-    analysis.categoryId = toString(this.selectedCategory);
     return this._importService.updateAnalysis(analysis);
   }
 

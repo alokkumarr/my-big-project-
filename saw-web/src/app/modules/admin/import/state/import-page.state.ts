@@ -92,11 +92,15 @@ export class AdminImportPageState {
     { getState, patchState }: StateContext<ImportPageModel>,
     { category }: LoadAnalysesForCategory
   ) {
+    const referenceAnalyses = getState().referenceAnalyses;
+    if (referenceAnalyses[category.toString()]) {
+      return;
+    }
     return this.exportService.getAnalysesByCategoryId(category).pipe(
       tap(analyses => {
         const referenceMap = this.importService.createReferenceMapFor(analyses);
         patchState({
-          referenceAnalyses: { ...referenceMap }
+          referenceAnalyses: { ...referenceAnalyses, [category]: referenceMap }
         });
       })
     );

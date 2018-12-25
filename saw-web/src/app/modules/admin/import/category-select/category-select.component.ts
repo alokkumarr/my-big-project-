@@ -7,6 +7,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 })
 export class AdminImportCategorySelectComponent implements OnInit {
   @Input() categories: any[];
+  @Input() value: any;
   @Output() change: EventEmitter<string> = new EventEmitter();
   constructor() {}
 

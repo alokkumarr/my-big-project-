@@ -9,7 +9,9 @@ export interface ImportAnalysisRecord {
 }
 
 export interface ImportAnalysesDictionary {
-  [analysisReference: string]: Analysis;
+  [categoryId: string]: {
+    [analysisReference: string]: Analysis;
+  };
 }
 
 export interface ImportPageModel {

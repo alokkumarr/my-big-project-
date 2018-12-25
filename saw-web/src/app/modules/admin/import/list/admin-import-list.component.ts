@@ -17,10 +17,13 @@ import { DxDataGridService } from '../../../../common/services/dxDataGrid.servic
   templateUrl: 'admin-import-list.component.html'
 })
 export class AdminImportListComponent implements OnInit, OnChanges {
-  @Input()
-  analyses: any[];
+  @Input() analyses: any[];
+  @Input() categories: any[];
   @Output()
   validityChange: EventEmitter<boolean> = new EventEmitter();
+
+  @Output()
+  categorySelected: EventEmitter<any> = new EventEmitter();
 
   config: any;
   areAllSelected = false;
@@ -70,6 +73,13 @@ export class AdminImportListComponent implements OnInit, OnChanges {
     this.validityChange.emit(this.areAllSelected);
   }
 
+  onSelectCategory(event, { analysis }) {
+    this.categorySelected.emit({
+      categoryId: event,
+      analysisId: analysis.id
+    });
+  }
+
   getConfig() {
     const columns = [
       {
@@ -105,6 +115,8 @@ export class AdminImportListComponent implements OnInit, OnChanges {
       {
         caption: 'Category',
         allowSorting: false,
+        cellTemplate: 'categoryCellTemplate',
+        alignment: 'left',
         width: '15%'
       },
       {

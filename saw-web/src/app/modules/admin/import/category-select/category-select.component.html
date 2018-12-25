@@ -5,7 +5,7 @@
   <mat-label i18n>Category</mat-label>
   <mat-select
     class="form-field"
-    [value]="selectedCategory"
+    [value]="value"
     (selectionChange)="onCategoryChange($event.value)"
   >
     <mat-optgroup
@@ -14,7 +14,7 @@
     >
       <mat-option
         *ngFor="let subCategory of category.subCategories"
-        [value]="subCategory.subCategoryId"
+        [value]="subCategory.subCategoryId.toString()"
       >
         {{ subCategory.subCategoryName }}
       </mat-option>

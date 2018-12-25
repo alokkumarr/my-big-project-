@@ -13,6 +13,10 @@
     font-weight: bold;
     margin-right: 10px;
   }
+
+  admin-import-category-select {
+    margin-left: 10px;
+  }
 }
 
 .grid-title {
@@ -37,7 +41,7 @@ admin-import-list {
   &__list-container {
     display: grid;
     height: calc(100% - 64px);
-    grid-template-columns: 2fr 3fr;
+    grid-template-columns: 1fr 2fr;
 
     mat-card {
       box-shadow: none;
