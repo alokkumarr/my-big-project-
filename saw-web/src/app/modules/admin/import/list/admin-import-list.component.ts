@@ -77,7 +77,7 @@ export class AdminImportListComponent implements OnInit, OnChanges {
         dataField: 'selection',
         allowSorting: false,
         alignment: 'left',
-        width: '7%',
+        width: '10%',
         headerCellTemplate: 'selectionHeaderCellTemplate',
         cellTemplate: 'selectionCellTemplate'
       },
@@ -86,7 +86,7 @@ export class AdminImportListComponent implements OnInit, OnChanges {
         dataField: 'analysis.name',
         allowSorting: true,
         alignment: 'left',
-        width: '30%'
+        width: '25%'
       },
       {
         caption: 'Analysis Type',
@@ -100,7 +100,12 @@ export class AdminImportListComponent implements OnInit, OnChanges {
         dataField: 'analysis.metricName',
         allowSorting: true,
         alignment: 'left',
-        width: '30%'
+        width: '20%'
+      },
+      {
+        caption: 'Category',
+        allowSorting: false,
+        width: '15%'
       },
       {
         caption: 'Logs',

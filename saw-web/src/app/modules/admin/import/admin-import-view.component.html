@@ -36,40 +36,43 @@
     </div>
   </div>
 </mat-toolbar>
-<mat-card>
-  <div i18n class="grid-title">Package file(s) details</div>
-  <admin-import-file-list
-    [files]="files"
-    (remove)="onRemoveFile($event)"
-  ></admin-import-file-list>
-</mat-card>
-<mat-card>
-  <div fxLayout="row" fxLayoutAlign="space-between center">
-    <div i18n class="grid-title">Analyses to import</div>
-    <div>
-      <button
-        mat-raised-button
-        color="primary"
-        i18n
-        (click)="import()"
-        style="margin-right: 10px;"
-        [disabled]="!(atLeast1AnalysisIsSelected && selectedCategory)"
-      >
-        Import
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        i18n
-        (click)="exportErrors()"
-        [disabled]="!userCanExportErrors"
-      >
-        Export Error Logs
-      </button>
+<div class="admin-import-page__list-container">
+  <mat-card>
+    <div i18n class="grid-title">Package file(s) details</div>
+    <admin-import-file-list
+      [files]="files"
+      (remove)="onRemoveFile($event)"
+    ></admin-import-file-list>
+  </mat-card>
+
+  <mat-card>
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <div i18n class="grid-title">Analyses to import</div>
+      <div>
+        <button
+          mat-raised-button
+          color="primary"
+          i18n
+          (click)="import()"
+          style="margin-right: 10px;"
+          [disabled]="!(atLeast1AnalysisIsSelected && selectedCategory)"
+        >
+          Import
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          i18n
+          (click)="exportErrors()"
+          [disabled]="!userCanExportErrors"
+        >
+          Export Error Logs
+        </button>
+      </div>
     </div>
-  </div>
-  <admin-import-list
-    [analyses]="analyses"
-    (validityChange)="onAnalysesValiditychange($event)"
-  ></admin-import-list>
-</mat-card>
+    <admin-import-list
+      [analyses]="analyses"
+      (validityChange)="onAnalysesValiditychange($event)"
+    ></admin-import-list>
+  </mat-card>
+</div>
