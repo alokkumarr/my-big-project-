@@ -3,18 +3,21 @@ import { ImportPageModel } from './import-page.model';
 import {
   SelectAnalysisGlobalCategory,
   LoadAllAnalyzeCategories,
-  LoadMetrics
+  LoadMetrics,
+  LoadAnalysesForCategory
 } from '../actions/import-page.actions';
 
 import { map, tap } from 'rxjs/operators';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { CategoryService } from '../../category';
 import { ExportService } from '../../export/export.service';
+import { ImportService } from '../import.service';
 
 const defaultImportPageState: ImportPageModel = {
   analysisGlobalCategory: null,
   importFiles: [],
   metrics: {},
+  referenceAnalyses: {},
   categories: {
     analyze: [],
     observe: []
@@ -31,7 +34,8 @@ const defaultImportPageState: ImportPageModel = {
 export class AdminImportPageState {
   constructor(
     private categoryService: CategoryService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private importService: ImportService
   ) {}
 
   @Action(LoadAllAnalyzeCategories)
@@ -43,6 +47,12 @@ export class AdminImportPageState {
     return this.categoryService.getList$().pipe(
       map(allCategories =>
         allCategories.filter(category => category.moduleName === 'ANALYZE')
+      ),
+      map(analyzeCategories =>
+        analyzeCategories.map(category => {
+          category.analyses = [];
+          return category;
+        })
       ),
       tap(analyzeCategories =>
         patchState({
@@ -67,11 +77,28 @@ export class AdminImportPageState {
 
   @Action(SelectAnalysisGlobalCategory)
   selectAnalysisGlobalCategory(
-    { patchState }: StateContext<ImportPageModel>,
+    { patchState, dispatch }: StateContext<ImportPageModel>,
     { category }: SelectAnalysisGlobalCategory
   ) {
     patchState({
       analysisGlobalCategory: category
     });
+    return dispatch(new LoadAnalysesForCategory(category));
+    // TODO: Update overwrite status for each analysis
+  }
+
+  @Action(LoadAnalysesForCategory)
+  loadAnalysesForCategory(
+    { getState, patchState }: StateContext<ImportPageModel>,
+    { category }: LoadAnalysesForCategory
+  ) {
+    return this.exportService.getAnalysesByCategoryId(category).pipe(
+      tap(analyses => {
+        const referenceMap = this.importService.createReferenceMapFor(analyses);
+        patchState({
+          referenceAnalyses: { ...referenceMap }
+        });
+      })
+    );
   }
 }

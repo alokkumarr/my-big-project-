@@ -15,3 +15,9 @@ export class LoadAllAnalyzeCategories {
 export class LoadMetrics {
   static readonly type = '[Admin Import Page OnInit] Load all metrics';
 }
+
+export class LoadAnalysesForCategory {
+  static readonly type =
+    '[Admin Import Category Change] Load analyses for category';
+  constructor(public category: string | number) {}
+}

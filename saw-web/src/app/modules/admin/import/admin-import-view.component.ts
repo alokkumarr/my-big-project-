@@ -71,7 +71,6 @@ export class AdminImportViewComponent implements OnInit {
   fileContents: Array<FileContent>;
   selectedCategory;
   analyses: Array<Analysis>;
-  analysesFromBEMap: Object = {};
   userCanExportErrors = false;
   atLeast1AnalysisIsSelected = false;
 
@@ -143,33 +142,37 @@ export class AdminImportViewComponent implements OnInit {
 
   onCategoryChange(categoryId: string) {
     this.selectedCategory = categoryId;
-    this.store.dispatch(new SelectAnalysisGlobalCategory(categoryId));
-    this._importService.getAnalysesFor(toString(categoryId)).then(analyses => {
-      this.analysesFromBEMap = reduce(
-        analyses,
-        (acc, analysis) => {
-          acc[
-            `${analysis.name}:${analysis.metricName}:${analysis.type}`
-          ] = analysis;
-          return acc;
-        },
-        {}
-      );
-      this.splitFileContents(this.fileContents);
-    });
+    this.store
+      .dispatch(new SelectAnalysisGlobalCategory(categoryId))
+      .subscribe(() => {
+        this.splitFileContents(this.fileContents);
+      });
+    // this._importService.getAnalysesFor(toString(categoryId)).then(analyses => { this.analysesFromBEMap = reduce(
+    //     analyses,
+    //     (acc, analysis) => {
+    //       acc[
+    //         `${analysis.name}:${analysis.metricName}:${analysis.type}`
+    //       ] = analysis;
+    //       return acc;
+    //     },
+    //     {}
+    //   );
+    //   this.splitFileContents(this.fileContents);
+    // });
   }
 
   getAnalysisObjectForGrid(analysis) {
-    const metricsMap = this.store.selectSnapshot(
-      state => state.admin.importPage.metrics
+    const { metrics, referenceAnalyses } = this.store.selectSnapshot(
+      state => state.admin.importPage
     );
-    const metric = metricsMap[analysis.metricName];
+    const metric = metrics[analysis.metricName];
     if (metric) {
       analysis.semanticId = metric.id;
     }
-    const analysisFromBE = this.analysesFromBEMap[
-      `${analysis.name}:${analysis.metricName}:${analysis.type}`
-    ];
+    const analysisFromBE =
+      referenceAnalyses[
+        `${analysis.name}:${analysis.metricName}:${analysis.type}`
+      ];
 
     const possibilitySelector = metric
       ? analysisFromBE
