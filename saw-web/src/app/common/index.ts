@@ -12,6 +12,8 @@ import {
   ModuleWithProviders
 } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { NgxsModule } from '@ngxs/store';
+import { CommonState } from './state/common.state';
 import { RouterModule } from '@angular/router';
 import {
   DxPivotGridComponent,
@@ -62,6 +64,11 @@ import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { ClickToCopyDirective, E2eDirective } from './directives';
 import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-schedular';
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
+
+import {
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
+} from './components/remote-folder-selector';
 
 import {
   DxDataGridService,
@@ -120,7 +127,9 @@ const COMPONENTS = [
   SearchBoxComponent,
   FieldDetailsComponent,
   CronDatePickerComponent,
-  CronJobSchedularComponent
+  CronJobSchedularComponent,
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
@@ -170,7 +179,7 @@ const INTERCEPTORS = [
 
 const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
 @NgModule({
-  imports: MODULES,
+  imports: [NgxsModule.forFeature([CommonState]), ...MODULES],
   declarations: [...COMPONENTS, ...DIRECTIVES],
   entryComponents: COMPONENTS,
   exports: [

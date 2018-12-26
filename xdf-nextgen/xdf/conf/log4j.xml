@@ -22,12 +22,12 @@
   </appender> 		 
 		 
   <logger name="sncr.xdf" additivity="false">
-	  <level value="debug"/> 
+	  <level value="info"/>
     <appender-ref ref="FILE"/>
   </logger>
 
   <root> 
-    <priority value ="debug" /> 
+    <priority value ="info" />
     <appender-ref ref="FILE"/>
   </root>
   

@@ -13,6 +13,9 @@ import { CommonModuleTs, CommonModuleGlobal } from './common';
 import { AnalyzeModuleGlobal } from './modules/analyze/analyze.global.module';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { environment } from '../environments/environment';
 
 import {
   LayoutContentComponent,
@@ -33,6 +36,8 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    NgxsModule.forRoot([], { developmentMode: !environment.production }),
+    NgxsLoggerPluginModule.forRoot({ disabled: environment.production }),
     AppRoutingModule,
     NgIdleModule.forRoot(),
     CommonModuleTs,

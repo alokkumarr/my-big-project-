@@ -2,7 +2,7 @@ package sncr.metadata;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mapr.org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.TableName;
 import org.slf4j.Logger;

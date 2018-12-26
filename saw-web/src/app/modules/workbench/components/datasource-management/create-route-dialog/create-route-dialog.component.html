@@ -33,6 +33,10 @@
                 Route Name is
                 <strong>required</strong>
               </mat-error>
+              <mat-error *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')" i18n>
+                Route Name already
+                <strong>exists</strong>
+              </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>File Pattern</mat-label>
@@ -46,9 +50,20 @@
                   <strong> Cannot Have " . *" or more than one pattern</strong>
                 </mat-error>
             </mat-form-field>
+
             <mat-checkbox style="margin: 20px 0 65px 0;" formControlName="disableDuplicate" i18n>
               Disable duplicate check
             </mat-checkbox>
+
+            <mat-form-field appearance="outline">
+              <mat-label i18n>Batch size</mat-label>
+              <input matInput type="number" name="batchSize" formControlName="batchSize" required />
+              <mat-error *ngIf="detailsFormGroup.controls.batchSize.hasError('required')" i18n>
+                Batch size is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+
           </section>
           <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
@@ -63,6 +78,9 @@
             <mat-form-field appearance="outline">
               <mat-label i18n>Destination Location</mat-label>
               <input matInput name="destinationLocation" formControlName="destinationLocation" required />
+              <button mat-button matSuffix mat-icon-button (click)="openSelectSourceFolderDialog()">
+                <mat-icon matTooltip="Browse" fontIcon="icon-folder-solid"></mat-icon>
+              </button>
               <mat-error *ngIf="detailsFormGroup.controls.destinationLocation.hasError('required')" i18n>
                 Destination Location is
                 <strong>required</strong>
@@ -93,7 +111,7 @@
           <button mat-stroked-button color="primary" (click)="testRoute(detailsFormGroup.value)" [disabled]="!detailsFormGroup.valid" i18n>
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
-          <button mat-raised-button color="primary" *ngIf="opType === 'create'" [disabled]="!detailsFormGroup.valid"
+          <button mat-raised-button color="primary" *ngIf="opType === 'create'" [disabled]="!detailsFormGroup.valid || !isCronExpressionValid"
             (click)="createRoute(detailsFormGroup.value)" i18n>Create</button>
           <button mat-raised-button color="primary" *ngIf="opType === 'update'" [disabled]="!detailsFormGroup.valid"
             (click)="createRoute(detailsFormGroup.value)" i18n>Update</button>
