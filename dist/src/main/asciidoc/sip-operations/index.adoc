@@ -611,6 +611,9 @@ Service to use the required number of session, add the below to the
 
     MaxSessions 5000
 
+After that run `systemctl reload sshd` to reload the SSH daemon
+configuration.
+
 == Loading semantic metadata
 
 To enable creating analyses in SAW, load semantic metadata as follows:
