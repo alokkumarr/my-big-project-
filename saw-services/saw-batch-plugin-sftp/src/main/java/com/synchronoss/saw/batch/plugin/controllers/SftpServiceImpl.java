@@ -82,6 +82,10 @@ public class SftpServiceImpl extends SipPluginContract {
   @NotNull
   private String defaultDestinationLocation;
 
+  @Value("${bis.recheck-file-modified}")
+  @NotNull
+  private Boolean recheckFileModified;
+
   @Override
   public String connectRoute(Long entityId) throws SftpProcessorException {
     logger.trace("connection test for the route with entity id starts here :" + entityId);
@@ -566,7 +570,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   /**
    * Transfer files from given directory, recursing into each
-   * subdirectory
+   * subdirectory.
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
@@ -635,10 +639,16 @@ public class SftpServiceImpl extends SipPluginContract {
             logger.trace("entry :" + entry.getFilename());
             long modifiedDate = new Date(entry.getAttrs().getMTime() * 1000L).getTime();
             logger.trace("modifiedDate :" + modifiedDate);
-            for (int i = 0; i < retries; i++) {
-              lastModifiedDate =
-                  new Date(template.list(sourcelocation + File.separator + entry.getFilename())[0]
-                      .getAttrs().getMTime() * 1000L).getTime();
+            if (recheckFileModified) {
+              for (int i = 0; i < retries; i++) {
+                lastModifiedDate =
+                    new Date(template.list(sourcelocation + File.separator + entry.getFilename())[0]
+                             .getAttrs().getMTime() * 1000L).getTime();
+              }
+            } else {
+              /* Recheck not requested, so use modified time provided
+               * by listing */
+              lastModifiedDate = modifiedDate;
             }
             logger.trace("lastModifiedDate :" + lastModifiedDate);
             logger.trace("lastModifiedDate - modifiedDate :" + (modifiedDate - lastModifiedDate));

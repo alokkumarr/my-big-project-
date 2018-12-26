@@ -31,4 +31,5 @@ logging:
 bis:
   transfer-batch-size: 10
   partial-file-timeDifference: 1000
-  default-data-drop-location: /workbench  
+  default-data-drop-location: /workbench
+  recheck-file-modified: false
