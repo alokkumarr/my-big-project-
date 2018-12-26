@@ -205,15 +205,16 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             system = new JsonObject();
         }
 
-
-        system.addProperty(DataSetProperties.PhysicalLocation.toString(), index);
-        system.addProperty(DataSetProperties.Name.toString(), index);
-
-        // Add alias information
+        // Get alias information
         String alias = extractAlias(aliases);
 
         if (alias != null) {
-            system.addProperty("alias", alias);
+            system.addProperty(DataSetProperties.PhysicalLocation.toString(), alias);
+            system.addProperty(DataSetProperties.Name.toString(), alias);
+//            system.addProperty("alias", alias);
+        } else {
+            system.addProperty(DataSetProperties.PhysicalLocation.toString(), index);
+            system.addProperty(DataSetProperties.Name.toString(), index);
         }
 
         // Add index type information
