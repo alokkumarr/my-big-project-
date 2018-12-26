@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { AnalyzeService } from '../../services/analyze.service';
+import { ExecuteService } from '../../services/execute.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DesignerPageComponent } from './page.component';
@@ -14,6 +15,11 @@ class AnalysisStubService {
 class ActivatedRouteStub {
   snapshot = { queryParams: {} };
 }
+
+class ExecuteServiceStub {
+  executeAnalysis() {}
+}
+
 class MatDialogStub {}
 
 describe('DesignerPageComponent', () => {
@@ -29,6 +35,7 @@ describe('DesignerPageComponent', () => {
           { provide: Location, useValue: LocationStub },
           { provide: AnalyzeService, useValue: new AnalysisStubService() },
           { provide: ActivatedRoute, useValue: new ActivatedRouteStub() },
+          { provide: ExecuteService, useValue: new ExecuteServiceStub() },
           { provide: MatDialog, useValue: new MatDialogStub() }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
