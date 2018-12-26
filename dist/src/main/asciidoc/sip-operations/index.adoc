@@ -98,6 +98,20 @@ smoother installation experience.  The deploy command should be run as
 a normal user.  The deploy command will use sudo to request privileges
 for relevant operations.
 
+==== Offline installation
+
+To support offline installation SIP allows specifying alternative URLs
+for used YUM repositories and RPM packages, for example local mirrors.
+These can be configured in the SIP environment configuration
+(`saw-config`) as follows:
+
+        [saw-services:vars]
+        sip_epel_rpm_url = https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        [saw-security:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+        [saw-security-arbitrator:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+
 ==== Upgrading
 
 To upgrade an existing installation, follow the same steps as for

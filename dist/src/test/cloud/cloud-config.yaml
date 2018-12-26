@@ -63,8 +63,6 @@ write_files:
       }
       EOF
       )
-      # Workaround: https://bugs.centos.org/view.php?id=15518
-      sed -i -e 's/\/lib\//\/lib64\//' /usr/lib/python2.7/site-packages/awscli/clidriver.py
       aws route53 change-resource-record-sets \
         --hosted-zone-id "$hosted_zone_id" --cli-input-json "$changes"
 runcmd:
