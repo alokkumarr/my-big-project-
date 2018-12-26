@@ -281,7 +281,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         // data and number of executor configured. This will also avoid the repartitioning of
         // Dataset later on to insure output number of files.
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(sourcePath, outputNOF);
+            .textFile(sourcePath, 1);
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
 
         JavaRDD<Row> parsedRdd = rdd.map(
@@ -420,6 +420,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private boolean writeDataset(Dataset<Row> dataset, String format, String path) {
         try {
             DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, outputDsPartitionKeys);
+            dataset.cache();
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
@@ -433,9 +434,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     }
 
     private boolean writeRdd(JavaRDD rdd, String path) {
-        if (rdd != null && path != null && !rdd.isEmpty()) {
+        if (rdd != null && path != null) {
             logger.debug("Writing data to location " + path);
-            rdd.coalesce(1).saveAsTextFile(path);
+            rdd.saveAsTextFile(path);
         } else {
             logger.info("Nothing to write");
         }
