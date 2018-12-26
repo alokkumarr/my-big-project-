@@ -158,7 +158,7 @@ export const AGGREGATE_TYPES = [{
   valid: ['chart']
 }, {
   label: 'Percentage by Column',
-  value: 'percentageByColumn',
+  value: 'percentage',
   icon: 'icon-Percentage',
   type: 'float',
   valid: ['chart']
