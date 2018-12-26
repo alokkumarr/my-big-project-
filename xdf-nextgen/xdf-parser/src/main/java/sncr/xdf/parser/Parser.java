@@ -436,7 +436,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private boolean writeRdd(JavaRDD rdd, String path) {
         if (rdd != null && path != null) {
             logger.debug("Writing data to location " + path);
-            rdd.saveAsTextFile(path);
+            rdd.coalesce(1).saveAsTextFile(path);
         } else {
             logger.info("Nothing to write");
         }
