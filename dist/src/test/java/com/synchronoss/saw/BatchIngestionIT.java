@@ -296,4 +296,48 @@ public class BatchIngestionIT extends BaseIT {
         BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
   }
+
+  /**
+   * Test creating a channel and route that is scheduled immediately.
+   */
+  @Test
+  public void testImmediateRoute() throws JsonProcessingException {
+    ObjectNode channelMetadata = mapper.createObjectNode();
+    channelMetadata.put("channelName", "Test");
+    channelMetadata.put("channelType", "SCP");
+    channelMetadata.put("hostName", "sip-admin");
+    channelMetadata.put("portNo", 22);
+    channelMetadata.put("accessType", "read");
+    channelMetadata.put("userName", "root");
+    channelMetadata.put("password", "root");
+    channelMetadata.put("description", "Test");
+    ObjectNode channel = mapper.createObjectNode();
+    channel.put("createdBy", "admin@synchronoss.com");
+    channel.put("productCode", "SIP");
+    channel.put("customerCode", "SNCR");
+    channel.put("projectCode", "workbench");
+    channel.put("channelType", "SFTP");
+    channel.put("channelMetadata", new ObjectMapper()
+             .writeValueAsString(channelMetadata));;
+    ObjectNode routeMetadata = mapper.createObjectNode();
+    routeMetadata.put("status", "active");
+    routeMetadata.put("routeName", "Test");
+    routeMetadata.put("sourceLocation", "/data");
+    routeMetadata.put("destinationLocation", "/data");
+    routeMetadata.put("filePattern", "*.log");
+    ObjectNode schedulerNode = mapper.createObjectNode();
+    schedulerNode.put("activeTab", "immediate");
+    routeMetadata.put("description", "file");
+    ObjectNode route = mapper.createObjectNode();
+    route.put("createdBy", "admin@synchronoss.com");
+    route.put("routeMetadata", new ObjectMapper()
+             .writeValueAsString(routeMetadata));
+    Long channelId = given(authSpec).body(channel).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200)
+        .extract().response().getBody().jsonPath().getLong("bisChannelSysId");
+    String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
+    ValidatableResponse response = given(authSpec)
+        .body(route).when().post(routeUri)
+        .then().assertThat().statusCode(200);
+  }
 }
