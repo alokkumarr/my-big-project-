@@ -39,7 +39,7 @@ semantic:
         host: http://localhost:9200
 security:
     service:
-        host: http://10.48.22.231/security
+        host: http://localhost:9000/saw-security
 export:
     service:
         host: http://localhost:9400

@@ -2,7 +2,7 @@ package sncr.datalake.engine
 
 import java.util.concurrent.Callable
 
-import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.metadata.analysis.AnalysisNode

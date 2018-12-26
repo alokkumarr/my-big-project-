@@ -71,13 +71,13 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT)(filters("AND", filterDate(
         "date", "t", "a", "2017-01-01", "2017-01-02"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a >= " +
-        "TO_DATE('2017-01-02') AND t.a <= TO_DATE('2017-01-01')")
+        "TO_DATE('2017-01-02') AND t.a <= TO_DATE(date_add('2017-01-01', 1))")
     }
     it("with timestamp between filter should have a WHERE clause with BETWEEN") {
       query(artifactT)(filters("AND", filterDate(
         "timestamp", "t", "a", "2017-01-01T00:00:00Z", "2017-01-02T00:00:00Z"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a >= " +
-        "TO_DATE('2017-01-02T00:00:00Z') AND t.a <= TO_DATE('2017-01-01T00:00:00Z')")
+        "TO_DATE('2017-01-02T00:00:00Z') AND t.a <= TO_DATE(date_add('2017-01-01T00:00:00Z', 1))")
     }
 
    it("with two filters should have a WHERE clause with one OR") {

@@ -9,8 +9,8 @@ spring:
       max-file-size: 25MB
 logging:
   level:
-    com.synchronoss.saw.semantic: TRACE
-    org.springframework: TRACE
+    com.synchronoss.saw.semantic: INFO
+    org.springframework: INFO
     sncr.bda: INFO
 server:
   address: localhost

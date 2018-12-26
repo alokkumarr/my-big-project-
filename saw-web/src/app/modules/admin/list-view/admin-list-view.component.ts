@@ -13,7 +13,12 @@ import * as get from 'lodash/get';
 export class AdminListViewComponent implements OnInit {
   @Input() data: any[];
   @Input() columns: any[];
-  @Input() section: 'user' | 'role' | 'privilege' | 'categories' | 'user assignments';
+  @Input() section:
+    | 'user'
+    | 'role'
+    | 'privilege'
+    | 'categories'
+    | 'user assignments';
   @Input() highlightTerm: string;
   @Output() editRow: EventEmitter<any> = new EventEmitter();
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
@@ -28,7 +33,7 @@ export class AdminListViewComponent implements OnInit {
   constructor(
     private _dxDataGridService: DxDataGridService,
     private _userAssignmentService: UserAssignmentService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.config = this.getConfig();
@@ -46,22 +51,31 @@ export class AdminListViewComponent implements OnInit {
       return false;
     }
     const request = {
-      securityGroupName : groupName.value,
+      securityGroupName: groupName.value,
       userId: cell.data.userSysId
     };
-    this._userAssignmentService.assignGroupToUser(request).then(response => {
-      this.groupAssignSuccess = get(response, 'valid') ? 'checkmark' : 'close';
-      this.userGroupID = cell.data.loginId;
-      if (groupName.value === -1) {
-        cell.data.groupName = '';
-      }
-    }).catch(err => {
-      this.groupAssignSuccess = 'close';
-    });
+    this._userAssignmentService
+      .assignGroupToUser(request)
+      .then(response => {
+        this.groupAssignSuccess = get(response, 'valid')
+          ? 'checkmark'
+          : 'close';
+        this.userGroupID = cell.data.loginId;
+        if (groupName.value === -1) {
+          cell.data.groupName = '';
+        }
+      })
+      .catch(err => {
+        this.groupAssignSuccess = 'close';
+      });
   }
 
   validateClearOption(cell) {
-    return (cell.data.groupName !== null && cell.data.groupName !== '-2' && cell.data.groupName !== '');
+    return (
+      cell.data.groupName !== null &&
+      cell.data.groupName !== '-2' &&
+      cell.data.groupName !== ''
+    );
   }
 
   getConfig() {
