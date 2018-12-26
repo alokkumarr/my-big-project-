@@ -63,6 +63,11 @@ RUN chmod a+x /root/saw-*/sample-*/load*
 
 # Add SAW Batch sample test data
 COPY saw-batch-samples /root/saw-batch-samples/
+# Workaround: The Batch Ingestion Service uses a large number of
+# sessions when transfering a large amount of files, so increase the
+# MaxSession parameters as a workaround until Batch Ingestion Service
+# has been fixed to work better with the defaults.
+RUN echo "MaxSessions 50000" >> /etc/ssh/sshd_config
 
 # Add systemd journal gateway for browsing logs
 RUN yum -y -q install systemd-journal-gateway
