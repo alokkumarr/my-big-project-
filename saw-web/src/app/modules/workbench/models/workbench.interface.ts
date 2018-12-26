@@ -5,4 +5,5 @@ export interface ChannelObject {
   customerCode: string;
   channelType: string;
   channelMetadata: string;
+  status?: number;
 }

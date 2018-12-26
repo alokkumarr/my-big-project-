@@ -52,6 +52,12 @@ public class BisRouteEntity implements Serializable {
 
   @Column(name = "CREATED_DATE")
   private Date createdDate;
+  
+  
+  @Column(name = "STATUS")
+  private Long status;
+
+  
 
   public BisRouteEntity() {}
 
@@ -127,6 +133,14 @@ public class BisRouteEntity implements Serializable {
 
   public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
+  }
+  
+  public Long getStatus() {
+    return status;
+  }
+
+  public void setStatus(Long status) {
+    this.status = status;
   }
 
   @Override
