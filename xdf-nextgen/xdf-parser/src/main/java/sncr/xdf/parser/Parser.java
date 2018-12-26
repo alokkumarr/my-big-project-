@@ -286,10 +286,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter));;
+                '\'', recCounter, errCounter));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
+
+        logger.debug("Output rdd length = " + recCounter.value());
+        logger.debug("Rejected rdd length = " + errCounter.value());
+
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
@@ -420,11 +424,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private boolean writeDataset(Dataset<Row> dataset, String format, String path) {
         try {
             DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, outputDsPartitionKeys);
-            dataset.cache();
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
-            outputDS.put(DataSetProperties.RecordCount.name(), xdfDW.extractrecordCount(dataset));
+            outputDS.put(DataSetProperties.RecordCount.name(), this.recCounter.value());
             return true;
         } catch (Exception e) {
             error = ExceptionUtils.getFullStackTrace(e);
