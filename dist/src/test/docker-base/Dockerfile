@@ -70,6 +70,7 @@ RUN systemctl enable sshd
 # In testing containers, set known password for use by deployment
 # automation and integration testing
 RUN echo root | passwd --stdin root
+RUN yum -y -q install sshpass
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
 # Install SSH client in each container
