@@ -19,6 +19,7 @@ import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as isArray from 'lodash/isArray';
 import * as find from 'lodash/find';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import {
   globalChartOptions,
@@ -204,17 +205,19 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.clonedConfig = {};
     } else {
       this.addExportConfig(this.config);
+      console.log(this.config.plotOptions);
+      const requestConfig = cloneDeep(this.config);
       forEach(this.config.series, seriesOptions => {
-        set(this.config, 'plotOptions.column.stacking', 'percent');
         if (['percentageByRow'].includes(seriesOptions.aggregate)) {
-          set(this.config, 'plotOptions.column.stacking', 'percent');
+          set(requestConfig, 'plotOptions.column.stacking', 'percent');
         }
       });
+      console.log(requestConfig.plotOptions);
       this.chart = this.highcharts.chart(
         this.container.nativeElement,
-        this.config
+        requestConfig
       );
-      this.addExportSize(this.config);
+      this.addExportSize(requestConfig);
     }
 
     // This is causing more problems than it solves. Updating the defaultsDeep

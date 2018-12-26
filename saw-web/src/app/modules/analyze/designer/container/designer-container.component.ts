@@ -333,6 +333,15 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
+  formulateChartRequest(analysis) {
+    if (analysis.sqlBuilder.dataFields.length > 1) {
+      forEach(analysis.sqlBuilder.dataFields, dataField => {
+        dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
+      });
+    }
+    return analysis;
+  }
+
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
@@ -362,6 +371,8 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
+
+    this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
