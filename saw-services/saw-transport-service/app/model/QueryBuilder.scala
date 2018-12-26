@@ -114,7 +114,10 @@ object QueryBuilder extends {
 
   private def column(artifactName: String, column: JValue) = {
     val aggregate = (column \ "aggregate")
-    if (!(aggregate ==JNothing))
+    if((aggregate !=JNothing) && aggregate.extract[String].equalsIgnoreCase("percentage"))
+      "("+(artifactName + "." + (column \ "columnName").extract[String])+"*100)/(Select sum("+
+        (artifactName + "." + (column \ "columnName").extract[String])+") FROM "+ artifactName +") as PercentageCol"
+    else if (!(aggregate ==JNothing))
       aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
     else
     artifactName + "." + (column \ "columnName").extract[String]
@@ -329,7 +332,7 @@ object QueryBuilder extends {
           val columns = extractArray(fields, "columns")
           val aggregateColumns = columns.filter(col => {
             val aggregate = (col \ "aggregate")
-            !(aggregate == JNothing || aggregate == None)
+              !(aggregate == JNothing || aggregate == None)
           })
           // In case of multiple artifacts join if one artifacts contains the
           // aggregate then another artifacts columns should be considered as
@@ -361,10 +364,15 @@ object QueryBuilder extends {
       (groupBy \ name).extract[String]
     }
 
-    "%s.%s".format(
-      tableName,
-      property("columnName")
-    )
+    if((groupBy !=JNothing) && (property("aggregate")).equalsIgnoreCase("percentage"))  {
+      "PercentageCol"
+    }
+    else  {
+      "%s.%s".format(
+        tableName,
+        property("columnName")
+      )
+    }
   }
 
   private def buildOrderBy(sqlBuilder: JObject) = {
