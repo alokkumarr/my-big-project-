@@ -150,6 +150,7 @@
 			<groupId>com.mapr.db</groupId>
 			<artifactId>maprdb</artifactId>
 			<version>${mapr.db.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -223,7 +224,8 @@
 					<classifier>exec</classifier>
 					<!-- The Spring Boot Maven plug-in includes also dependencies with "provided" scope by default.  Exclude
 						Spark and Scala to reduce artifact size. -->
-					<excludeGroupIds>org.apache.spark,org.scala-lang</excludeGroupIds>
+					<excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,org.ojai,org.scala-lang</excludeGroupIds>
+					<layout>ZIP</layout>
 				</configuration>
 			</plugin>
 			<plugin>
