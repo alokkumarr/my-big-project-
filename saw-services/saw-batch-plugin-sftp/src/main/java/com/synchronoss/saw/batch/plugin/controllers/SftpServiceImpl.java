@@ -564,7 +564,44 @@ public class SftpServiceImpl extends SipPluginContract {
     return listOfFiles;
   }
 
+  /**
+   * Transfer files from given directory, recursing into each
+   * subdirectory
+   */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
+      String sourcelocation, String pattern, String destinationLocation, Long channelId,
+      Long routeId) throws IOException, ParseException {
+    logger.debug("Transfer files from directory recursively: {}, {}",
+                 sourcelocation, pattern);
+    List<BisDataMetaInfo> list = new ArrayList<>();
+    /* First transfer the files from the directory */
+    list.addAll(transferDataFromChannelDirectory(
+        template, sourcelocation, pattern, destinationLocation,
+        channelId, routeId));
+    /* Then iterate through directory looking for subdirectories */
+    LsEntry[] entries = template.list(sourcelocation);
+    for (LsEntry entry : entries) {
+      logger.trace("Directory entry: " + entry.getFilename());
+      /* Skip non-directory entries as they cannot be recursed into */
+      if (!entry.getAttrs().isDir()) {
+        logger.trace("Skip non-directory entry: " + entry.getFilename());
+        continue;
+      }
+      /* Skip dot files, including special entries "." and ".." */
+      if (entry.getFilename().startsWith(".")) {
+        continue;
+      }
+      /* Transfer files from subdirectory */
+      String sourcelocationDirectory =
+          sourcelocation + File.separator + entry.getFilename();
+      list.addAll(transferDataFromChannel(
+          template, sourcelocationDirectory, pattern, destinationLocation,
+          channelId, routeId));
+    }
+    return list;
+  }
+
+  private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId) throws IOException, ParseException {
     List<BisDataMetaInfo> list = new ArrayList<>();
