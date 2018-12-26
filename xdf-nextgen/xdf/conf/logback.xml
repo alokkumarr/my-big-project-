@@ -18,10 +18,10 @@
       <pattern>%d{dd MMM yyyy HH:mm:ss,SSS} [%level] %date %thread %logger %line - %message%n%xException</pattern>
     </encoder>
   </appender>
-  <logger level="DEBUG" name="sncr.xdf">
+  <logger level="INFO" name="sncr.xdf">
     <appender-ref ref="FILE"/>
   </logger>
-  <root level="DEBUG">
+  <root level="INFO">
     <appender-ref ref="FILE"/>
   </root>
 </configuration>

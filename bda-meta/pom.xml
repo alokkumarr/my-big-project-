@@ -67,7 +67,7 @@
     <app.user>mapr</app.user>
     <app.group>mapr</app.group>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <s-value>compile</s-value>
+    <s-value>provided</s-value>
   </properties>
   <!--dependencyManagement-->
   <dependencies>
@@ -156,7 +156,7 @@
     <repository>
       <id>mapr-releases</id>
 <!--      <url>http://repository.mapr.com/maven/</url> -->
-      <url>http://repository.mapr.com/nexus/content/repositories/mapr-public</url>
+      <url>http://repository.mapr.com/maven/</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>

@@ -5,7 +5,7 @@ import org.json4s.JsonAST.{JNothing, JValue}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import MDObjectStruct._
-import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.util.Bytes
 
 /**
   * Created by srya0001 on 3/3/2017.

@@ -287,13 +287,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
                 '\'', recCounter, errCounter));;
-
-        logger.debug("Parsed rdd length = " + parsedRdd.count());
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
-        logger.debug("Output rdd length = " + outputRdd.count());
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
@@ -390,8 +387,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             logger.debug("Collecting rejected data");
 
             JavaRDD<Row> rejectedRdd = getRejectedData(fullRdd);
-
-            logger.debug("Rejected rdd length = " + rejectedRdd.count());
 
             if (this.rejectedDataCollector == null) {
                 rejectedDataCollector = rejectedRdd;

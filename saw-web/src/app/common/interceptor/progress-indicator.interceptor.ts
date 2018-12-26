@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import {
   HttpEvent,
   HttpInterceptor,
@@ -13,7 +13,10 @@ import { HeaderProgressService } from '../../common/services';
 
 @Injectable()
 export class ProgressIndicatorInterceptor implements HttpInterceptor {
-  constructor(private _headerProgress: HeaderProgressService) {}
+  constructor(
+    private _headerProgress: HeaderProgressService,
+    private zone: NgZone
+  ) {}
 
   intercept(
     req: HttpRequest<any>,
@@ -24,15 +27,21 @@ export class ProgressIndicatorInterceptor implements HttpInterceptor {
         event => {
           switch (event.type) {
             case HttpEventType.Sent:
-              this._headerProgress.show();
+              this.zone.run(() => {
+                this._headerProgress.show();
+              });
               break;
             case HttpEventType.Response:
-              this._headerProgress.hide();
+              this.zone.run(() => {
+                this._headerProgress.hide();
+              });
               break;
           }
         },
         err => {
-          this._headerProgress.hide();
+          this.zone.run(() => {
+            this._headerProgress.hide();
+          });
           return err;
         }
       )

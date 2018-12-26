@@ -26,9 +26,11 @@ import * as Lodash from 'lodash';
 import * as LodashFp from 'lodash/fp';
 import * as Rxjs from 'rxjs';
 import * as RxjsOperators from 'rxjs/operators';
+import * as get from 'lodash/get';
+import APP_CONFIG from '../../../../appConfig';
 
 declare var SystemJS: any;
-
+// prettier-ignore
 const dependencies = {
   '@angular/core': AngularCore,
   '@angular/router': AngularRouting,
@@ -67,32 +69,41 @@ interface ModuleInfo {
 @Injectable()
 export class DynamicModuleService {
   existingRoutes$: BehaviorSubject<Route[]>;
-
-  constructor(
-    private compiler: Compiler,
-    private router: Router
-    ) {
-      this.existingRoutes$ = new BehaviorSubject<Route[]>(this.routes);
-    }
+  api = get(APP_CONFIG, 'api.pluginUrl');
+  constructor(private compiler: Compiler, private router: Router) {
+    this.existingRoutes$ = new BehaviorSubject<Route[]>(this.routes);
+  }
 
   loadModuleSystemJs(moduleInfo: ModuleInfo) {
-    forEach(dependencies, (dep, key) => SystemJS.set(key, SystemJS.newModule(dep)));
+    // To fetch the plugin code, "moduleURL" should reflect just the umd file name without extensions.
+    // Eg: If Insights plugin code is in "insights.umd.js", then moduleURL="insights"
+    // Also it is expected that plugin code should be placed in saw/web folder in server
+
+    const moduleServerURL = `${this.api}/${moduleInfo.moduleURL}.umd.js`;
+    forEach(dependencies, (dep, key) =>
+      SystemJS.set(key, SystemJS.newModule(dep))
+    );
 
     // now, import the new module
 
     return new Promise((resolve, reject) => {
-
-      SystemJS.import(`${moduleInfo.moduleURL}`).then((module) => {
+      SystemJS.import(moduleServerURL).then(
+        module => {
           const mod = module[moduleInfo.moduleName];
-          this.compiler.compileModuleAndAllComponentsAsync(mod).then(compiled => {
-            this.createAndRegisterRoute(moduleInfo, module);
-            resolve(true);
-        }, err => {
+          this.compiler.compileModuleAndAllComponentsAsync(mod).then(
+            compiled => {
+              this.createAndRegisterRoute(moduleInfo, module);
+              resolve(true);
+            },
+            err => {
+              reject(err);
+            }
+          );
+        },
+        err => {
           reject(err);
-        });
-      }, err => {
-        reject(err);
-      });
+        }
+      );
     });
   }
 
@@ -103,8 +114,8 @@ export class DynamicModuleService {
 
   createAndRegisterRoute(moduleToRegister, module: any) {
     const route: Route = {
-        path: moduleToRegister.path,
-        loadChildren: () => module[`${moduleToRegister.moduleName}`]
+      path: moduleToRegister.path,
+      loadChildren: () => module[`${moduleToRegister.moduleName}`]
     };
 
     this.registerRoute(route);
