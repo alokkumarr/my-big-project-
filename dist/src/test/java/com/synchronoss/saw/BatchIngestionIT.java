@@ -302,8 +302,9 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void testImmediateRoute() throws JsonProcessingException {
+    String name = "test-immediate-" + testId();
     ObjectNode channelMetadata = mapper.createObjectNode();
-    channelMetadata.put("channelName", "Test");
+    channelMetadata.put("channelName", name + "-channel");
     channelMetadata.put("channelType", "SCP");
     channelMetadata.put("hostName", "sip-admin");
     channelMetadata.put("portNo", 22);
@@ -321,12 +322,13 @@ public class BatchIngestionIT extends BaseIT {
              .writeValueAsString(channelMetadata));;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
-    routeMetadata.put("routeName", "Test");
+    routeMetadata.put("routeName", name + "-route");
     routeMetadata.put("sourceLocation", "/data");
     routeMetadata.put("destinationLocation", "/data");
     routeMetadata.put("filePattern", "*.log");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
+    routeMetadata.set("schedulerExpression", schedulerNode);
     routeMetadata.put("description", "file");
     ObjectNode route = mapper.createObjectNode();
     route.put("createdBy", "admin@synchronoss.com");
