@@ -281,7 +281,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         // data and number of executor configured. This will also avoid the repartitioning of
         // Dataset later on to insure output number of files.
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(sourcePath, 1);
+            .textFile(sourcePath, outputNOF);
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
 
         JavaRDD<Row> parsedRdd = rdd.map(
