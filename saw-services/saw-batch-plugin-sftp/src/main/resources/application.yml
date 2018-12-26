@@ -2,7 +2,7 @@ spring:
   application:
     name: saw-bis-sftp-plugin-services
   datasource:
-    url: jdbc:mariadb://localhost:3306/sip_batch_ingestion
+    url: jdbc:mariadb://localhost:3306/sip_bis
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver

@@ -8,20 +8,17 @@
         <mat-icon fontIcon="icon-upload"></mat-icon>
       </button>
       <input fxHide e2e="uploaded-file" type="file" #fileUpload (change)="fileInput($event)" multiple accept="text/csv, 'text/plain'" />
-      <button mat-icon-button color="primary" matTooltip="New Folder" e2e="create-new-folder" i18n (click)="createFolder()">
-        <mat-icon fontIcon="icon-new-folder"></mat-icon>
-      </button>
     </mat-card-header>
     <mat-divider></mat-divider>
     <mat-card-content class="staging-content">
       <div fxLayout="row" [style.height.%]="100">
         <div class="tree" fxFlex="30">
-          <tree-root #tree [nodes]="treeNodes" [options]="treeOptions">
-            <ng-template #treeNodeTemplate let-node let-index="index">
-              <mat-icon (click)="openFolder(node)" class="tree-icon" fontIcon="icon-folder-solid"></mat-icon>
-              <span (click)="openFolder(node)" style="vertical-align: top;">{{ node.data.name }}</span>
-            </ng-template>
-          </tree-root>
+          <remote-folder-selector (selectionChange)="onFolderSelected($event)"
+                                  [fileSystemAPI]="fileSystemAPI"
+                                  [enableFolderCreation]="true"
+                                  [rootNode]="treeNodes"
+          >
+          </remote-folder-selector>
         </div>
         <div fxFlex="70" fxFill fxLayout="column">
           <mat-form-field id="infoForMask">
