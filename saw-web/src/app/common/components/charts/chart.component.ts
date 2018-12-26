@@ -205,14 +205,12 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.clonedConfig = {};
     } else {
       this.addExportConfig(this.config);
-      console.log(this.config.plotOptions);
       const requestConfig = cloneDeep(this.config);
       forEach(this.config.series, seriesOptions => {
         if (['percentageByRow'].includes(seriesOptions.aggregate)) {
           set(requestConfig, 'plotOptions.column.stacking', 'percent');
         }
       });
-      console.log(requestConfig.plotOptions);
       this.chart = this.highcharts.chart(
         this.container.nativeElement,
         requestConfig
