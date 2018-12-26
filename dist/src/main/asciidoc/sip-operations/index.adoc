@@ -22,7 +22,8 @@ provided in the environment:
   the MapR cluster, and set `livy.file.upload.max.size = 500000000`
   and `livy.spark.master` in `livy.conf`
 
-. Provision a MapR user in the MapR cluster (with user ID 500)
+. Provision a MapR user in the MapR cluster (with user ID 500 and
+  group ID 5000)
 
 . Optionally create a MapR volume to hold the SIP data (at the
   location specified by the `sip_var_path` variable in the SIP
