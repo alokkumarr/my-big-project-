@@ -67,7 +67,7 @@ export class CreateRouteDialogComponent {
       filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: [''],
       batchSize: ['', [Validators.required]],
-      excludeExt: ['', this.validateFilePattern]
+      fileExclusions: ['', this.validatefileExclusion]
     });
   }
 
@@ -79,6 +79,15 @@ export class CreateRouteDialogComponent {
     control: AbstractControl
   ): { [key: string]: boolean } | null {
     if (includes(control.value, ',')) {
+      return { inValidPattern: true };
+    }
+    return null;
+  }
+
+  validatefileExclusion(
+    control: AbstractControl
+  ): { [key: string]: boolean } | null {
+    if (includes(control.value, ',') || includes(control.value, '.')) {
       return { inValidPattern: true };
     }
     return null;
@@ -134,7 +143,7 @@ export class CreateRouteDialogComponent {
       schedulerExpression: this.crondetails,
       description: data.description,
       batchSize: data.batchSize,
-      excludeExt: data.excludeExt
+      fileExclusions: data.fileExclusions
     };
     return routeDetails;
   }

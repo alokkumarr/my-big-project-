@@ -88,18 +88,21 @@
               <input
                 matInput
                 type="text"
-                name="excludeExt"
-                formControlName="excludeExt"
+                name="fileExclusions"
+                formControlName="fileExclusions"
               />
               <mat-error
                 *ngIf="
-                  detailsFormGroup.controls.excludeExt.hasError(
+                  detailsFormGroup.controls.fileExclusions.hasError(
                     'inValidPattern'
                   )
                 "
                 i18n
               >
-                <strong> Cannot have more than one extension</strong>
+                <strong>
+                  Cannot have more than one extension or a ' . ' in extension
+                  value</strong
+                >
               </mat-error>
             </mat-form-field>
           </section>
