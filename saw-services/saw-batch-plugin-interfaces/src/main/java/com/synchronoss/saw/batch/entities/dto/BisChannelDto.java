@@ -48,6 +48,12 @@ public class BisChannelDto implements Serializable {
 
   @JsonProperty("createdDate")
   private Long createdDate;
+  
+
+  @JsonProperty("status")
+  private Long status;
+
+  
 
   @JsonProperty("modifiedDate")
   public Long getModifiedDate() {
@@ -147,6 +153,16 @@ public class BisChannelDto implements Serializable {
   @JsonProperty("channelType")
   public void setChannelType(String channelType) {
     this.channelType = channelType;
+  }
+  
+  @JsonProperty("status")
+  public Long getStatus() {
+    return status;
+  }
+
+  @JsonProperty("status")
+  public void setStatus(Long status) {
+    this.status = status;
   }
 
   @Override
