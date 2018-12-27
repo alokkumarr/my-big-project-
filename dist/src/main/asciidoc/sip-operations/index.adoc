@@ -600,6 +600,21 @@ Automatically generated credentials, such as for internal service and
 administrator accounts, can be found in the `/etc/bda` directory on
 the respective host.
 
+=== Batch ingestion: SFTP
+
+The Batch Ingestion Service can connect to SFTP sources to ingest
+files.  Ingesting a large number of files requires the Batch Ingestion
+Service to be able to use a large number of sessions per SFTP
+connection.  The default settings of OpenSSH only allows ten
+concurrent sessions per SFTP connection.  To allow Batch Ingestion
+Service to use the required number of session, add the below to the
+`/etc/ssh/sshd_config` file:
+
+    MaxSessions 5000
+
+After that run `systemctl reload sshd` to reload the SSH daemon
+configuration.
+
 == Loading semantic metadata
 
 To enable creating analyses in SAW, load semantic metadata as follows:
