@@ -164,7 +164,6 @@ export class ExecutedChartViewComponent {
     }
 
     this.chartToggleData = this.trimKeyword(data);
-
     return [
       ...this._chartService.dataToChangeConfig(
         analysis.chartType,

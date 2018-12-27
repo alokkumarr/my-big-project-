@@ -52,6 +52,7 @@ bis:
   modified-retries: 3
   default-data-drop-location: /Users/spau0004/Desktop/workbench
   scheduler-url: http://localhost:9601/scheduler/bisscheduler
+  recheck-file-modified: false
      
 
     
