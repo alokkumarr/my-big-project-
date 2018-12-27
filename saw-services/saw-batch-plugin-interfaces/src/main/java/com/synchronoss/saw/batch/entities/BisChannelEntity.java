@@ -47,6 +47,17 @@ public class BisChannelEntity implements Serializable {
 
   @Column(name = "CREATED_DATE")
   private Date createdDate;
+  
+  @Column(name = "STATUS")
+  private Long status;
+
+  public Long getStatus() {
+    return status;
+  }
+
+  public void setStatus(Long status) {
+    this.status = status;
+  }
 
   @Basic(optional = false)
   @Lob

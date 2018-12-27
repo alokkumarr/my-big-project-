@@ -125,7 +125,9 @@ public class BisJobController extends BaseJobController {
   }
   
   /**
-   * Pause a job.
+   * Pause a job. Even a job is running currently
+   * invoke pause job so as to pause all future
+   * triggers for the job.
    * 
    * @param schedule schedule key
    * @return SchedulerResponse.
@@ -137,19 +139,21 @@ public class BisJobController extends BaseJobController {
     if (bisService.isJobWithNamePresent(schedule)) {
 
       boolean isJobRunning = bisService.isJobRunning(schedule);
+      
 
-      if (!isJobRunning) {
-        boolean status = bisService.pauseJob(schedule);
-        if (status) {
-          return getServerResponse(ServerResponseCode.SUCCESS, true);
-        } else {
-          return getServerResponse(ServerResponseCode.ERROR, false);
-        }
+      logger.info("Is job running :: ? " + isJobRunning);
+      logger.info("Pausing now....");
+      boolean status = bisService.pauseJob(schedule);
+      if (status) {
+        logger.info("Pause Job Success!!");
+        return getServerResponse(ServerResponseCode.SUCCESS, true);
       } else {
-        return getServerResponse(ServerResponseCode.JOB_ALREADY_IN_RUNNING_STATE, false);
+        logger.info("Pause Job failure!!");
+        return getServerResponse(ServerResponseCode.ERROR, false);
       }
-
+  
     } else {
+      logger.info("Job " + schedule  + "doesnt exists");
       // Job doesn't exist
       return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }

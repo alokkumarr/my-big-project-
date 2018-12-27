@@ -27,9 +27,10 @@ sip_var_path=/var/sip
 #
 # MapR configuration
 #
-# If the MapR cluster "mapr" user ID differs from the expected default
-# of 500, use the variable below to set it
+# If the MapR cluster "mapr" user or group ID differs from the
+# expected default, use the variable below to set it
 #saw_mapr_user_id=500
+#saw_mapr_group_id=5000
 
 #
 # Spark configuration
