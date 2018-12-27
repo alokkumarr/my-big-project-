@@ -90,6 +90,12 @@
       .mat-divider {
         border-color: rgba(0, 0, 0, 0.05) !important;
       }
+
+      .route-grid--action-buttons {
+        button {
+          width: 24px;
+        }
+      }
     }
 
     .mat-mini-fab {
@@ -124,6 +130,14 @@
     .menu-btn-icon {
       margin-right: 0px;
       vertical-align: baseline;
+
+      &.mat-error {
+        color: red;
+      }
+
+      &.mat-primary {
+        color: $primary-blue-b1;
+      }
     }
   }
 
