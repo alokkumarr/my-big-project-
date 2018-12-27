@@ -32,6 +32,8 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -49,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.file.remote.InputStreamCallback;
+import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.integration.sftp.session.SftpSession;
@@ -498,8 +501,9 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     try {
-      if (delegatingSessionFactory.getSessionFactory(channelId) != null
-          & delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
+      SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
+      if (sesionFactory != null
+          & sesionFactory.getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
         logger.trace("session opened starts here ");
         Optional<BisRouteEntity> channelEntity = bisRouteDataRestRepository.findById(routeId);
@@ -526,8 +530,9 @@ public class SftpServiceImpl extends SipPluginContract {
               "destinationLocation from routeId " + routeId + " location " + destinationLocation);
           String filePattern = rootNode.get("filePattern").asText();
           logger.trace("filePattern from routeId " + routeId + " filePattern " + filePattern);
+          logger.trace("session factory before connecting" + sesionFactory);
           SftpRemoteFileTemplate template =
-              new SftpRemoteFileTemplate(delegatingSessionFactory.getSessionFactory(channelId));
+              new SftpRemoteFileTemplate(sesionFactory);
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location starts here " + sourceLocation
               + " & file pattern " + filePattern);
@@ -569,10 +574,14 @@ public class SftpServiceImpl extends SipPluginContract {
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId) throws IOException, ParseException {
+    ZonedDateTime startTime = ZonedDateTime.now();
+    logger.trace("Starting transfer data......start time::" + startTime);
     List<BisDataMetaInfo> list = new ArrayList<>();
     LsEntry[] files = null;
     if (template.list(sourcelocation + File.separator + pattern) != null) {
       files = template.list(sourcelocation + File.separator + pattern);
+      logger.trace("Total files matching pattern " + pattern 
+          + " at source location " + sourcelocation + " are :: " + files.length);
       if (files.length > 0) {
         int sizeOfFileInPath = files.length;
         batchSize = getBatchSize() > 0 ? getBatchSize() : batchSize;
@@ -744,23 +753,31 @@ public class SftpServiceImpl extends SipPluginContract {
                     }
                     fileTobeDeleted.delete();
                   }
-                } finally {
                   if (template.getSession() != null) {
                     template.getSession().close();
                   }
-                }
+                } 
               }
             }
           } // end of loop for the number of files to be download at each batch
         } // time it should iterate
       } else {
         logger.info("On this current pull no data found on the source.");
+        
       }
     } else {
       logger.info(
           "there is no directory path available " + sourcelocation + File.separator + pattern);
     }
-    template.getSession().close();
+    ZonedDateTime endTime = ZonedDateTime.now();
+    logger.trace("Ending transfer data......end time:: " + endTime);
+    
+    long durationInMillis = Duration.between(startTime, endTime).toMillis();
+    logger.trace("End of data tranfer.....Total time in milliseconds::: " + durationInMillis);
+    if (template.getSession() != null) {
+      template.getSession().close();
+    }
+    //template.getSession().close();
     return list;
   }
 }
