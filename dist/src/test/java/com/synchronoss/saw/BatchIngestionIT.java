@@ -485,7 +485,6 @@ public class BatchIngestionIT extends BaseIT {
     String connectRouteUri =
         BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
-    
     this.tearDownChannel();
   }
 
@@ -496,7 +495,7 @@ public class BatchIngestionIT extends BaseIT {
   public void testImmediateRoute() throws JsonProcessingException {
     String name = "test-immediate-" + testId();
     ObjectNode channelMetadata = mapper.createObjectNode();
-    channelMetadata.put("channelName", name + "-channel");
+    channelMetadata.put("channelName", "Messaging");
     channelMetadata.put("channelType", "SCP");
     channelMetadata.put("hostName", "sip-admin");
     channelMetadata.put("portNo", 22);
@@ -514,7 +513,7 @@ public class BatchIngestionIT extends BaseIT {
              .writeValueAsString(channelMetadata));;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
-    routeMetadata.put("routeName", name + "-route");
+    routeMetadata.put("routeName", "route123");
     routeMetadata.put("sourceLocation", "/data");
     routeMetadata.put("destinationLocation", "/data");
     routeMetadata.put("filePattern", "*.log");
@@ -533,5 +532,10 @@ public class BatchIngestionIT extends BaseIT {
     ValidatableResponse response = given(authSpec)
         .body(route).when().post(routeUri)
         .then().assertThat().statusCode(200);
+    
+    this.tearDownRoute();
+    this.tearDownChannel();
+    
+    
   }
 }
