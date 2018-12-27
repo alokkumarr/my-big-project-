@@ -267,8 +267,15 @@ export class DatasourceComponent implements OnInit, OnDestroy {
         if (data.opType === 'create') {
           this.datasourceService
             .createRoute(routeData, payload)
-            .subscribe(() => {
-              this.getRoutesForChannel(routeData);
+            .subscribe(createdRoute => {
+              const promise = this.afterRouteAddedChanged(createdRoute);
+              if (promise) {
+                promise.then(() => {
+                  this.getRoutesForChannel(routeData);
+                });
+              } else {
+                this.getRoutesForChannel(routeData);
+              }
             });
         } else {
           payload.createdBy = routeData.createdBy;
@@ -286,6 +293,16 @@ export class DatasourceComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  afterRouteAddedChanged(createdRoute) {
+    const channelId = createdRoute.bisChannelSysId;
+    const routeId = createdRoute.bisRouteSysId;
+    const selectedChannelId = this.selectedSourceData.bisChannelSysId;
+    const isChannelNotActive = this.selectedSourceData.status === 0;
+    if (isChannelNotActive && channelId === selectedChannelId) {
+      return this.datasourceService.toggleRoute(channelId, routeId, false).toPromise();
+    }
   }
 
   deleteRoute(routeData) {
