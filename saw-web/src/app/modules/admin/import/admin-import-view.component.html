@@ -55,7 +55,7 @@
           i18n
           (click)="import()"
           style="margin-right: 10px;"
-          [disabled]="!(atLeast1AnalysisIsSelected && selectedCategory)"
+          [disabled]="!canImport()"
         >
           Import
         </button>

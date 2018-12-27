@@ -407,6 +407,14 @@ export class AdminImportViewComponent implements OnInit {
     });
   }
 
+  canImport() {
+    const selectedAnalyses = filter(this.analyses, 'selection') || [];
+    return (
+      selectedAnalyses.length &&
+      selectedAnalyses.every(({ analysis }) => Boolean(analysis.categoryId))
+    );
+  }
+
   importExistingAnalysis(analysis): Promise<Analysis> {
     return this._importService.updateAnalysis(analysis);
   }
