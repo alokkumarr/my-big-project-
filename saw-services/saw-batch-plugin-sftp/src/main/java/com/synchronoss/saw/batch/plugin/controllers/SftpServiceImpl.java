@@ -737,8 +737,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     }
                     bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
                     bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
-                    sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                    list.add(bisDataMetaInfo);
+                   
                   } else {
                     if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
                         sourcelocation + File.separator + entry.getFilename())) {
@@ -759,6 +758,8 @@ public class SftpServiceImpl extends SipPluginContract {
                       list.add(bisDataMetaInfo);
                     }
                   }
+                  sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                  list.add(bisDataMetaInfo);
                 } catch (Exception ex) {
                   logger.error("Exception occurred while transferring the file from channel", ex);
                   if (fileTobeDeleted.exists()) {
