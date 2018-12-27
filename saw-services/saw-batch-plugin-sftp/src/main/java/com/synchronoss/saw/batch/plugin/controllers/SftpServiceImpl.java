@@ -631,12 +631,12 @@ public class SftpServiceImpl extends SipPluginContract {
       
       if (files.length > 0) {
         
-        if(exclusions.isEmpty()) {
+        if (exclusions.isEmpty()) {
           filteredFiles =  Arrays.copyOf(files, files.length);
           
         } else {
-          filteredFiles = Arrays.stream(files).filter(file->!file.getFilename().
-              endsWith("." + exclusions)).toArray( LsEntry[]::new);
+          filteredFiles = Arrays.stream(files).filter(file -> !file.getFilename()
+              .endsWith("." + exclusions)).toArray(LsEntry[]::new);
         }
         
         logger.trace("Total files after filtering exclusions " + exclusions 
@@ -650,7 +650,8 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.trace("iterationOfBatches :" + iterationOfBatches);
         logger.trace("batchSize :" + batchSize);
         logger.trace("filteredFiles.size :" + filteredFiles.length);
-        final int partitionSize = (filteredFiles.length + iterationOfBatches - 1) / iterationOfBatches;
+        final int partitionSize = (filteredFiles.length 
+            + iterationOfBatches - 1) / iterationOfBatches;
         
         logger.trace("partitionSize :" + partitionSize);
         BisDataMetaInfo bisDataMetaInfo = null;
