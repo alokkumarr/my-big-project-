@@ -112,7 +112,6 @@ export class DragnDropService {
       break;
     }
 
-    console.log(this._moveEventAccumulator);
     if (this._moveEventAccumulator.from && this._moveEventAccumulator.to) {
       const {
         container: fromContainer,
