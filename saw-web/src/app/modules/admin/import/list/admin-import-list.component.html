@@ -59,10 +59,11 @@
   <div
     *dxTemplate="let cell of 'logCellTemplate'"
     [style.color]="cell.data.logColor"
+    [style.whiteSpace]="'pre-line'"
   >
     <span
       *ngIf="cell.data.errorInd"
-      style="cursor: pointer;"
+      style="cursor: pointer"
       (click)="displayError(cell.data.errorMsg)"
     >
       {{ cell.value }}
