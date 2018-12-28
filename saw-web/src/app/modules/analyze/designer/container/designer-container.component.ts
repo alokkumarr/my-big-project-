@@ -334,11 +334,18 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   formulateChartRequest(analysis) {
-    if (analysis.sqlBuilder.dataFields.length > 1) {
+    let isGroupByPresent = false;
+    forEach(analysis.sqlBuilder.nodeFields, node => {
+      if (node.checked === 'g') {
+        isGroupByPresent = true;
+      }
+    });
+    if (!isGroupByPresent) {
       forEach(analysis.sqlBuilder.dataFields, dataField => {
         dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
       });
     }
+    console.log(analysis);
     return analysis;
   }
 

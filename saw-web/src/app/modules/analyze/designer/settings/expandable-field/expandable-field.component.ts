@@ -27,6 +27,7 @@ export class ExpandableFieldComponent {
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
   @Input() public fieldCount: any;
+  @Input() public sqlBuilder;
 
   TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;

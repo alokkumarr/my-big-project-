@@ -1,5 +1,6 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {
   AGGREGATE_TYPES,
@@ -7,6 +8,7 @@ import {
   NUMBER_TYPES
 } from '../../consts';
 import { AnalysisType } from '../../types';
+import * as forEach from 'lodash/forEach';
 
 @Component({
   selector: 'aggregate-chooser-u',
@@ -18,6 +20,7 @@ export class AggregateChooserComponent implements OnInit {
   @Input() public aggregate: string;
   @Input() public columnType: string;
   @Input() public analysisType: AnalysisType;
+  @Input() public sqlBuilder;
 
   public AGGREGATE_TYPES = AGGREGATE_TYPES;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
@@ -48,5 +51,26 @@ export class AggregateChooserComponent implements OnInit {
         return true;
       }
     });
+  }
+
+  checkColumn(value, sqlBuilder) {
+    let isGroupByPresent = false;
+    if (isUndefined(sqlBuilder.dataFields)) {
+      return;
+    }
+    forEach(sqlBuilder.nodeFields, node => {
+      if (node.checked === 'g') {
+        isGroupByPresent = true;
+      }
+    });
+    if (!isGroupByPresent) {
+      if (this.aggregate === 'percentageByRow') {
+        this.aggregate = 'percentage';
+      }
+    }
+    if (value === 'percentageByRow' && !isGroupByPresent) {
+      return false;
+    }
+    return true;
   }
 }
