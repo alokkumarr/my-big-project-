@@ -122,7 +122,8 @@ export class AdminImportViewComponent implements OnInit {
       ({ analysis }) => analysis.id === analysisId
     );
     const newGridObject = this.getAnalysisObjectForGrid(
-      this.analyses[id].analysis
+      this.analyses[id].analysis,
+      this.analyses[id].selection
     );
     this.analyses.splice(id, 1, newGridObject);
   }
@@ -174,11 +175,10 @@ export class AdminImportViewComponent implements OnInit {
     const a = this.analyses.find(({ analysis }) => analysis.id === analysisId);
     if (a && a.analysis) {
       a.analysis.categoryId = toString(categoryId);
-      console.log(categoryId, analysisId);
     }
   }
 
-  getAnalysisObjectForGrid(analysis) {
+  getAnalysisObjectForGrid(analysis, selection = false) {
     const { metrics, referenceAnalyses } = this.store.selectSnapshot(
       state => state.admin.importPage
     );
@@ -192,7 +192,6 @@ export class AdminImportViewComponent implements OnInit {
       analysisCategory[
         `${analysis.name}:${analysis.metricName}:${analysis.type}`
       ];
-    console.log(analysisFromBE, metric);
 
     const possibilitySelector = metric
       ? analysisFromBE
@@ -208,7 +207,7 @@ export class AdminImportViewComponent implements OnInit {
 
     return {
       ...possibility,
-      selection: false
+      selection
     };
   }
 
