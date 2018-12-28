@@ -297,11 +297,6 @@ public class TransformerComponent extends Component implements WithMovableResult
     protected String mkConfString() {
         return null;
     }
-
-
-
-
-
 }
 
 
