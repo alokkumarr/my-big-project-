@@ -170,7 +170,7 @@
               </button>
               <mat-menu #datapodmenu="matMenu">
                 <button mat-menu-item
-                        [disabled]="!selectedSourceData.status"
+                        [disabled]="!selectedSourceData?.status"
                         [attr.color]="data.data.status ? 'warn' : 'primary'"
                         (click)="toggleRouteActivation(data.data)"
                 >
