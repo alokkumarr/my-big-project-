@@ -36,7 +36,7 @@
         <dxi-column caption="Actions" dataField="bisRouteSysId" alignment="center" cellTemplate="actionsTemplate"
               [allowFiltering]="false" [allowSorting]="false">
         </dxi-column>
-        <div *dxTemplate="let data of 'actionsTemplate'">
+        <div *dxTemplate="let data of 'actionsTemplate'" fxLayout="row" fxLayoutAlign="center center">
           <button mat-icon-button i18n-matTooltip
                   class="grid-icon-btn"
                   [color]="data.data.status ? 'error' : 'primary'"
@@ -49,7 +49,7 @@
           <div fxHide.lt-lg="true" class="master-detail-caption">{{selectedSourceType | uppercase}}</div>
         </div>
         <div *dxTemplate="let data of 'nameTemplate'">
-          <div class="s-name">{{data.value}}</div>
+          <div class="s-name" [matTooltip]="data.value">{{data.value}}</div>
         </div>
       </dx-data-grid>
 
@@ -128,10 +128,10 @@
               <div *ngIf="selectedSourceData">
                   <span *ngIf="show; else hidePwd">{{selectedSourceData?.password}}</span>
                   <ng-template #hidePwd>&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;</ng-template>
-                  <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                  <button *ngIf="!show" matTooltip="Show Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                     <mat-icon fontIcon="icon-show"></mat-icon>
                   </button>
-                  <button *ngIf="show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                  <button *ngIf="show" matTooltip="Hide Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                     <mat-icon fontIcon="icon-hide"></mat-icon>
                   </button>
               </div>
@@ -156,7 +156,7 @@
               [allowFiltering]="false" [allowSorting]="false"></dxi-column>
 
             <div *dxTemplate="let data of 'nameTemplate'">
-              <div class="details-title mat-subheading-2" i18n>Availalble Routes</div>
+              <div class="details-title mat-subheading-2" i18n>Available Routes</div>
             </div>
 
             <div *dxTemplate="let data of 'dateTemplate'">
@@ -170,7 +170,7 @@
               </button>
               <mat-menu #datapodmenu="matMenu">
                 <button mat-menu-item
-                        [disabled]="!selectedSourceData.status"
+                        [disabled]="!selectedSourceData?.status"
                         [attr.color]="data.data.status ? 'warn' : 'primary'"
                         (click)="toggleRouteActivation(data.data)"
                 >

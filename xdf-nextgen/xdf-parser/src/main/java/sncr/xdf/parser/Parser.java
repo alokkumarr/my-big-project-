@@ -286,14 +286,15 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter));;
-
-        logger.debug("Parsed rdd length = " + parsedRdd.count());
+                '\'', recCounter, errCounter));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
+
+        logger.debug("Output rdd length = " + recCounter.value());
+        logger.debug("Rejected rdd length = " + errCounter.value());
+
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
-        logger.debug("Output rdd length = " + outputRdd.count());
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
@@ -348,13 +349,19 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             .filter(new HeaderFilter(headerSize))
             // Get rid of file numbers
             .keys()
-            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
+            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
+                quoteEscapeChar, '\'', recCounter, errCounter));
 
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
-            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
+            scala.collection.JavaConversions.asScalaBuffer(
+                createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema)
+            .select(outputColumns);
+
+        logger.debug("Output rdd length = " + recCounter.value());
+        logger.debug("Rejected rdd length = " + errCounter.value());
 
         logger.debug("Dest dir for file " + file + " = " + destDir);
 
@@ -391,8 +398,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
             JavaRDD<Row> rejectedRdd = getRejectedData(fullRdd);
 
-            logger.debug("Rejected rdd length = " + rejectedRdd.count());
-
             if (this.rejectedDataCollector == null) {
                 rejectedDataCollector = rejectedRdd;
             } else {
@@ -428,7 +433,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
-            outputDS.put(DataSetProperties.RecordCount.name(), xdfDW.extractrecordCount(dataset));
+            outputDS.put(DataSetProperties.RecordCount.name(), this.recCounter.value());
             return true;
         } catch (Exception e) {
             error = ExceptionUtils.getFullStackTrace(e);
@@ -438,7 +443,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     }
 
     private boolean writeRdd(JavaRDD rdd, String path) {
-        if (rdd != null && path != null && !rdd.isEmpty()) {
+        if (rdd != null && path != null) {
             logger.debug("Writing data to location " + path);
             rdd.coalesce(1).saveAsTextFile(path);
         } else {
@@ -456,7 +461,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         try {
 //            JavaRDD<String> rejectedRecords = rejectedDataCollector.map(row -> row.mkString(" | "));
 
-            JavaRDD<String> rejectedRecords = rejectedDataCollector.map(new TransformRDDWithDelimiter(this.delimiter));
+            JavaRDD<String> rejectedRecords = rejectedDataCollector
+                .map(new TransformRDDWithDelimiter(this.delimiter));
             if (rejectedDatasetLocation != null) {
                 if (rejectedDataSetMode.equalsIgnoreCase(Output.Mode.APPEND.toString())) {
                     /**

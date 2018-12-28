@@ -70,7 +70,7 @@ export class DatasourceService {
     return this.http
       .get(endpoint)
       .pipe(
-        map(data => data as boolean),
+        map(data => get(data, 'isDuplicate') as boolean),
         catchError(this.handleError('data', false))
       );
   }
@@ -118,7 +118,7 @@ export class DatasourceService {
     return this.http
       .get(endpoint)
       .pipe(
-        map(data => data as boolean),
+        map(data => get(data, 'isDuplicate') as boolean),
         catchError(this.handleError('data', false))
       );
   }

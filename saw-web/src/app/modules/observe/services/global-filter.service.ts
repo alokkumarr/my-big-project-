@@ -13,7 +13,7 @@ export class GlobalFilterService {
   public updatedFilters = [];
   public onFilterChange = new Subject();
   public onSidenavStateChange = new Subject();
-  public onApplyKPIFilter = new BehaviorSubject({ preset: '' });
+  public onApplyKPIFilter = new BehaviorSubject(null);
   public onApplyFilter = new Subject();
   public onClearAllFilters = new Subject();
 

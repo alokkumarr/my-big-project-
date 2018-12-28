@@ -7,7 +7,7 @@
   yum_repository:
     name: mariadb
     description: MariaDB repository
-    baseurl: http://yum.mariadb.org/10.3/centos7-amd64
+    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.3/centos7-amd64') }}"
     gpgcheck: no
 - name: Install MariaDB package
   # Note: While using the MariaDB repository, use the capitalized

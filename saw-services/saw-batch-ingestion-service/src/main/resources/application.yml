@@ -19,13 +19,13 @@ spring:
       hibernate:
         format_sql : true
     open-in-view: false
-  
+
 logging:
   level:
     com.synchronoss.saw: INFO
     org.springframework: INFO
     org.hibernate.type : INFO
-    
+
 server:
   address: localhost
   port: 9642
@@ -48,12 +48,10 @@ sip:
   service:
     index: 0
     max.attempts : 3
-    retry.delay: 5000    
+    retry.delay: 5000
 bis:
   transfer-batch-size: 10
   modified-retries: 3
   default-data-drop-location: /Users/spau0004/Desktop/workbench
   scheduler-url: http://localhost:9601
-     
-
-    
+  recheck-file-modified: false

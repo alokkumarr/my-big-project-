@@ -14,5 +14,13 @@
     src: /opt/mapr/spark/spark-2.2.1
     dest: /opt/mapr/spark/spark-current
     state: link
+# Workaround: Installing the MapR HBase client gives empty entries in
+# the classpath, which causes spark-submit to fail, as used by RTPS.
+# So add a workaround to remove the empty entries before invoking
+# spark-submit.
+- name: Add workaround to remove empty entries from spark-submit classpath
+  lineinfile:
+    path: /opt/mapr/spark/spark-current/conf/spark-env.sh
+    line: 'SPARK_SUBMIT_OPTS="$(echo $SPARK_SUBMIT_OPTS | sed -e s/=://g)"'
 - name: Enable RTPS
   systemd: name=sip-rtps enabled=true state=started
