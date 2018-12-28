@@ -57,10 +57,11 @@ export class AggregateChooserComponent implements OnInit {
     if (this.analysisType !== 'chart') {
       return;
     }
-    if (!this.getGroupByPresent(sqlBuilder) && this.aggregate === 'percentageByRow') {
+    const isGroupBy = this.getGroupByPresent(sqlBuilder);
+    if (!isGroupBy && this.aggregate === 'percentageByRow') {
       this.aggregate = 'percentage';
     }
-    return (value === 'percentageByRow' && !this.getGroupByPresent(sqlBuilder)) ? false : true;
+    return (value === 'percentageByRow' && !isGroupBy) ? false : true;
   }
 
   getGroupByPresent(sqlBuilder) {
