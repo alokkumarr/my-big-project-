@@ -345,7 +345,6 @@ export class DesignerContainerComponent implements OnInit {
         dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
       });
     }
-    console.log(analysis);
     return analysis;
   }
 

@@ -1,6 +1,7 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
-import * as isUndefined from 'lodash/isUndefined';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
 
 import {
   AGGREGATE_TYPES,
@@ -8,7 +9,6 @@ import {
   NUMBER_TYPES
 } from '../../consts';
 import { AnalysisType } from '../../types';
-import * as forEach from 'lodash/forEach';
 
 @Component({
   selector: 'aggregate-chooser-u',
@@ -54,23 +54,22 @@ export class AggregateChooserComponent implements OnInit {
   }
 
   checkColumn(value, sqlBuilder) {
-    let isGroupByPresent = false;
-    if (isUndefined(sqlBuilder.dataFields)) {
+    if (this.analysisType !== 'chart') {
       return;
     }
-    forEach(sqlBuilder.nodeFields, node => {
-      if (node.checked === 'g') {
-        isGroupByPresent = true;
-      }
-    });
-    if (!isGroupByPresent) {
-      if (this.aggregate === 'percentageByRow') {
-        this.aggregate = 'percentage';
-      }
+    if (!this.getGroupByPresent(sqlBuilder) && this.aggregate === 'percentageByRow') {
+      this.aggregate = 'percentage';
     }
-    if (value === 'percentageByRow' && !isGroupByPresent) {
-      return false;
-    }
-    return true;
+    return (value === 'percentageByRow' && !this.getGroupByPresent(sqlBuilder)) ? false : true;
+  }
+
+  getGroupByPresent(sqlBuilder) {
+    return fpPipe(
+      fpFilter(({ checked }) => {
+        return (
+          checked === 'g'
+        );
+      })
+    )(sqlBuilder.nodeFields).length > 0;
   }
 }
