@@ -1,5 +1,5 @@
 {
-    "baseURL" : "http://saw-rd601.ana.dev.vaste.sncrcorp.net",
+    "baseURL" : "https://saw-pac-sip-vaste.sncrcorp.net",
     "auth" : {
       "login" : {
         "endPoint" : "/security/doAuthenticate/",
@@ -216,11 +216,24 @@
         "method" : "GET",
         "params" : {
           "headers" : {
-            "Authorization" : "Bearer "
-          }
-        }
+              "Content-Type" : "application/json; charset=UTF-8",
+              "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+              "Authorization": ""
+            }
+      }
+    },
+      "getTheListOfDataPods" : {
+        "endPoint" : "/saw/services/internal/semantic/md?projectId=workbench",
+        "method" : "GET",
+        "params" : {
+          "headers" : {
+              "Content-Type" : "application/json; charset=UTF-8",
+              "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+              "Authorization": ""
+            }
+      }
       },
-      
+
       "dataSetPreviewSummary" : {
         "endPoint" : "/saw/services/internal/workbench/projects/workbench/previews/",
         "method" : "POST",
@@ -235,12 +248,17 @@
       }, 
       
       "dataSetDataPreview" : {
-        "endPoint" : "/saw/services/internal/workbench/projects/workbench/previews/Data set id goes here",
-        "method" : "GET",
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/previews",
+        "method" : "POST",
         "params" : {
           "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
             "Authorization" : "Bearer "
           }
+        },
+        "requestBody" : {
+          "name" : "Data Set Name Goes Here"
         }
       },
       
@@ -249,11 +267,28 @@
         "method" : "POST",
         "params" : {
           "headers" : {
-            "Authorization" : "Bearer "
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
           }
         },
         "requestBody" : {
-          "path" : "/"
+          "path":"/"
+        }
+      },
+
+      "getTheListOfSubDirectories" : {
+        "endPoint" : "/saw/services/internal/workbench/projects/workbench/raw/directory/",
+        "method" : "POST",
+        "params" : {
+          "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
+            "Authorization" : ""
+          }
+        },
+        "requestBody" : {
+          "path":""
         }
       },
       
@@ -262,29 +297,21 @@
         "method" : "POST",
         "params" : {
           "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
             "Authorization" : "Bearer "
           }
         },
-        "requestBody" : {
-          "file":"//Workbench1234/dummy-file_0642.txt"
-          ,"lineSeparator":"\n",
-          "delimiter":","
-          ,"quoteChar":"",
-          "quoteEscapeChar":"",
-          "headerSize":"1",
-          "fieldNamesLine":"1",
-          "dateFormats":[],
-          "rowsToInspect":100,
-          "delimiterType":"delimited",
-          "header":"yes"
-        }
+        "requestBody" : {"file":"","lineSeparator":"\n","delimiter":",","quoteChar":"","quoteEscapeChar":"","headerSize":"1","fieldNamesLine":"1","dateFormats":[],"rowsToInspect":100,"delimiterType":"delimited","header":"yes"}
       },
       
-      "rawPreviewData" : {
+      "rawPreviewFile" : {
         "endPoint" : "/saw/services/internal/workbench/projects/workbench/raw/directory/preview",
         "method" : "POST",
         "params" : {
           "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Accept-Language" : "en-GB,en-US;q=0.9,en;q=0.8",
             "Authorization" : "Bearer "
           }
         },

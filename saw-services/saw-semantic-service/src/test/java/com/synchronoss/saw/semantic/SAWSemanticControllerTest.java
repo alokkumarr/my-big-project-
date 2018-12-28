@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,8 +81,6 @@ public class SAWSemanticControllerTest {
 
   @Test
   public void filterSemanticTestCase() throws Exception {
-    Mockito.when(semanticService.search(Mockito.any(SemanticNode.class)))
-        .thenReturn(getSemanticList(responseReadSemanticJSON));
     RequestBuilder requestBuilder = MockMvcRequestBuilders
         .get("/internal/semantic/workbench/filter?username=sawadmin@synchronoss.com&module=ANALYZE")
         .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)

@@ -134,15 +134,17 @@ class Analysis extends BaseController {
     action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
-        val (userId: Integer, userFullName: String) = ticket match {
+        val (userId: Integer, userFullName: String, masterLoginId: String) = ticket match {
           case None => throw new ClientException(
             "Valid JWT not found in Authorization header")
           case Some(ticket) =>
-            (ticket.userId, ticket.userFullName)
+            (ticket.userId, ticket.userFullName, ticket.masterLoginId)
         }
         val instanceJson: JObject = ("semanticId", semanticId) ~
           ("createdTimestamp", Instant.now().toEpochMilli()) ~
           ("userId", userId.asInstanceOf[Number].longValue) ~
+          ("createdBy", masterLoginId) ~
+          ("username", masterLoginId) ~
           ("userFullName", userFullName)
         val analysisId = UUID.randomUUID.toString
         val idJson: JObject = ("id", analysisId)

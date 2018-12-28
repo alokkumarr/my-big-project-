@@ -1,22 +1,22 @@
 package model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.DynamicConvertor;
+import org.threeten.extra.YearQuarter;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-
-import com.synchronoss.DynamicConvertor;
-import org.threeten.extra.YearQuarter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 public class TransportUtils {
 
     public static String buildDSK (String dataSecurityKey)throws JsonProcessingException, IOException
@@ -66,6 +66,7 @@ public class TransportUtils {
         String SPACE = " ";
         DynamicConvertor dynamicConvertor = new DynamicConvertor();
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tomorrow = now.plusDays(1);
 
         switch (dynamic) {
             case "Yesterday" :
@@ -75,32 +76,31 @@ public class TransportUtils {
                 break;
             case "Today": {
                 LocalDateTime today = now;
-                LocalDateTime tomorrow = today.plusDays(1);
                 dynamicConvertor.setLte(tomorrow.format(dateTimeFormatter) + SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(today.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "YTD": {
                 LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
-                dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(tomorrow.format(dateTimeFormatter) + SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(firstDay.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "MTD": {
                 LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
-                dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(tomorrow.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(firstDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LTM": {
                 LocalDateTime last3Month = now.minusMonths(3);
-                dynamicConvertor.setLte(now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(last3Month.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LSM": {
                 LocalDateTime last6Months = now.minusMonths(6);
-                dynamicConvertor.setLte(now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -112,13 +112,13 @@ public class TransportUtils {
             }
             case "LM": {
                 LocalDateTime lastMonth = now.minusMonths(1);
-                dynamicConvertor.setLte(lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LQ": {
                 YearQuarter quarter = YearQuarter.now();
-                dynamicConvertor.setLte(quarter.minusQuarters(1).atEndOfQuarter().toString()+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(quarter.minusQuarters(1).atEndOfQuarter().plusDays(1).toString()+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(quarter.minusQuarters(1).atDay(1).toString()+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -128,7 +128,7 @@ public class TransportUtils {
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
                 LocalDateTime endOfWeek = lastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-                dynamicConvertor.setLte(endOfWeek.plusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(endOfWeek.plusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -138,7 +138,7 @@ public class TransportUtils {
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
                 LocalDateTime endOfWeek = lastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-                dynamicConvertor.setLte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(endOfWeek.plusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -147,13 +147,13 @@ public class TransportUtils {
                 LocalDateTime lastWeek = now;
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-                dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(tomorrow.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LTW": {
                 LocalDateTime last2Week = now.minusWeeks(2);
-                dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 dynamicConvertor.setGte(last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }

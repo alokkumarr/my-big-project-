@@ -203,6 +203,7 @@
 			<groupId>com.mapr.db</groupId>
 			<artifactId>maprdb</artifactId>
 			<version>${mapr.db.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
@@ -256,6 +257,8 @@
 						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
 						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
+					<excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,org.ojai,org.scala-lang</excludeGroupIds>
+					<layout>ZIP</layout>
 				</configuration>
 			</plugin>
 			<plugin>

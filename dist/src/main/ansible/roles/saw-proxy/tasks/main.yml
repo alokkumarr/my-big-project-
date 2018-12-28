@@ -27,10 +27,10 @@
   systemd: name=haproxy enabled=true state=started
 - name: Install EPEL release package (for NGINX)
   yum:
-    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    name: "{{ sip_epel_rpm_url | default('https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm') }}"
     state: present
   register: result
-  until: 'result.rc == 0'
+  until: result is success
   retries: 5
   delay: 10
 - name: Install NGINX configuration

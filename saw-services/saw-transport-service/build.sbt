@@ -38,8 +38,8 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.3.0"
 libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.3.0"
 
-libraryDependencies += "org.apache.hbase" % "hbase-client" % "1.1.1-mapr-1602"   
-libraryDependencies += "org.apache.hbase" % "hbase-common" % "1.1.1-mapr-1602"
+libraryDependencies += "org.apache.hbase" % "hbase-client" % "1.1.8-mapr-1710-m7-6.0.1"
+libraryDependencies += "org.apache.hbase" % "hbase-common" % "1.1.8-mapr-1710-m7-6.0.1"
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0-mapr-1803"
 libraryDependencies += "com.mapr.streams" % "mapr-streams" % "6.0.1-mapr"
 libraryDependencies += "org.apache.kafka" % "kafka-clients" % "1.0.1-mapr-1803"
