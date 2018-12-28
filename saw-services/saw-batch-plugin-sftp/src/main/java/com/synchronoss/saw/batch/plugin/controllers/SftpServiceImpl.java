@@ -628,16 +628,14 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("Total files matching pattern " + pattern 
           + " at source location " + sourcelocation + " are :: " + files.length);
       LsEntry[] filteredFiles =  null;
-      
-      if (files.length > 0) {
-        
-        if (exclusions.isEmpty()) {
-          filteredFiles =  Arrays.copyOf(files, files.length);
-          
-        } else {
-          filteredFiles = Arrays.stream(files).filter(file -> !file.getFilename()
-              .endsWith("." + exclusions)).toArray(LsEntry[]::new);
-        }
+      if (exclusions.isEmpty()) {
+        filteredFiles =  Arrays.copyOf(files, files.length);
+      } else {
+        filteredFiles = Arrays.stream(files)
+            .filter(file -> !file.getFilename()
+                    .endsWith("." + exclusions)).toArray(LsEntry[]::new);
+      }
+      if (filteredFiles.length > 0) {
         
         logger.trace("Total files after filtering exclusions " + exclusions 
             + " at source location " + sourcelocation + " are :: " + files.length);
