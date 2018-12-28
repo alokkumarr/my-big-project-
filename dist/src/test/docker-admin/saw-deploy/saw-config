@@ -2,6 +2,11 @@
 # SAW environment configuration for local testing
 #
 
+[all:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_ssh_pass=root
+
 [saw-proxy]
 sip-proxy
 

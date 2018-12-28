@@ -38,6 +38,10 @@
   .details-container {
     height: 85%;
     overflow: auto;
+
+    .mat-form-field {
+      width: 80%;
+    }
   }
 
   .source-list {
