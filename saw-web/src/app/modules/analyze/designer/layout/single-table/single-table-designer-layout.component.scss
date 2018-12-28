@@ -7,7 +7,7 @@
   display: grid;
   grid-template:
     'data-settings content' 100%
-    / 25% auto;
+    / 25% 75%;
 }
 
 .designer {
@@ -20,6 +20,7 @@
     grid-area: content;
     padding: 10px;
     display: grid;
+    overflow: auto;
     grid-template-rows: repeat(2, auto) 1fr;
     grid-template-areas:
       'aux-settings'
