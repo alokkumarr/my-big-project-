@@ -69,6 +69,11 @@ import { ChartGridComponent } from './components/chart-grid';
 import { UChartModule } from './components/charts';
 
 import {
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
+} from './components/remote-folder-selector';
+
+import {
   DxDataGridService,
   ErrorDetailService,
   ErrorDetailDialogService,
@@ -127,7 +132,9 @@ const COMPONENTS = [
   FieldDetailsComponent,
   CronDatePickerComponent,
   CronJobSchedularComponent,
-  ChartGridComponent
+  ChartGridComponent,
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];

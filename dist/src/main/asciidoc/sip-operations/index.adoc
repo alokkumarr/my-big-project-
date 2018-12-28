@@ -22,7 +22,8 @@ provided in the environment:
   the MapR cluster, and set `livy.file.upload.max.size = 500000000`
   and `livy.spark.master` in `livy.conf`
 
-. Provision a MapR user in the MapR cluster (with user ID 500)
+. Provision a MapR user in the MapR cluster (with user ID 500 and
+  group ID 5000)
 
 . Optionally create a MapR volume to hold the SIP data (at the
   location specified by the `sip_var_path` variable in the SIP
@@ -97,6 +98,20 @@ TIP: Configure passwordless SSH access to the SAW target host for a
 smoother installation experience.  The deploy command should be run as
 a normal user.  The deploy command will use sudo to request privileges
 for relevant operations.
+
+==== Offline installation
+
+To support offline installation SIP allows specifying alternative URLs
+for used YUM repositories and RPM packages, for example local mirrors.
+These can be configured in the SIP environment configuration
+(`saw-config`) as follows:
+
+        [saw-services:vars]
+        sip_epel_rpm_url = https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        [saw-security:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+        [saw-security-arbitrator:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
 
 ==== Upgrading
 
@@ -584,6 +599,21 @@ preview in directory name.
 Automatically generated credentials, such as for internal service and
 administrator accounts, can be found in the `/etc/bda` directory on
 the respective host.
+
+=== Batch ingestion: SFTP
+
+The Batch Ingestion Service can connect to SFTP sources to ingest
+files.  Ingesting a large number of files requires the Batch Ingestion
+Service to be able to use a large number of sessions per SFTP
+connection.  The default settings of OpenSSH only allows ten
+concurrent sessions per SFTP connection.  To allow Batch Ingestion
+Service to use the required number of session, add the below to the
+`/etc/ssh/sshd_config` file:
+
+    MaxSessions 5000
+
+After that run `systemctl reload sshd` to reload the SSH daemon
+configuration.
 
 == Loading semantic metadata
 

@@ -88,7 +88,7 @@
                                   (afterExport)="exportData()"></analyze-actions-menu-u>
         </div>
       </mat-toolbar>
-      <mat-card>
+      <mat-card class="executed-view-analysis">
         <filter-chips-u *ngIf="analysis && !(analysis.type === 'report' && analysis.edit) && executedAnalysis.sqlBuilder.filters.length > 0"
                         [filters]="executedAnalysis.sqlBuilder.filters"
                         [readonly]="true"
