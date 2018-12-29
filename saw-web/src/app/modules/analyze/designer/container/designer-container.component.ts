@@ -344,6 +344,10 @@ export class DesignerContainerComponent implements OnInit {
       forEach(analysis.sqlBuilder.dataFields, dataField => {
         dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
       });
+
+      forEach(this.artifacts[0].columns, col => {
+        col.aggregate = col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+      });
     }
     return analysis;
   }
