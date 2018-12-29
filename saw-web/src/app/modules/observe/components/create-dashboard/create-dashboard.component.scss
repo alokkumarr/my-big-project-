@@ -22,7 +22,7 @@
 .dashboard-designer-content {
   flex-grow: 1;
   max-height: 100%;
-  height: 100%;
+  height: calc(100% - 84px);
   padding: 0 10px 0 10px;
 
   chart {
