@@ -55,7 +55,7 @@ export class AggregateChooserComponent implements OnInit {
 
   checkColumn(value, sqlBuilder) {
     if (this.analysisType !== 'chart') {
-      return;
+      return true;
     }
     const isGroupBy = this.getGroupByPresent(sqlBuilder);
     if (!isGroupBy && this.aggregate === 'percentageByRow') {

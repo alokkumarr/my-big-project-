@@ -20,7 +20,6 @@ import * as clone from 'lodash/clone';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
 import * as find from 'lodash/find';
-import * as cloneDeep from 'lodash/cloneDeep';
 
 import {
   globalChartOptions,
