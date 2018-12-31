@@ -581,7 +581,7 @@ public class SftpServiceImpl extends SipPluginContract {
       bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
       bisDataMetaInfo.setChannelId(channelId);
       bisDataMetaInfo.setRouteId(channelId);
-      bisDataMetaInfo.setActualReceiveDate( new Date());
+      bisDataMetaInfo.setActualReceiveDate(new Date());
       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     } finally {
       if (delegatingSessionFactory.getSessionFactory(channelId) != null
@@ -604,7 +604,8 @@ public class SftpServiceImpl extends SipPluginContract {
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, boolean isDisableDuplicate) throws IOException, ParseException {
+      Long routeId, String exclusions, 
+      boolean isDisableDuplicate) throws IOException, ParseException {
     logger.debug("Transfer files from directory recursively: {}, {}",
                  sourcelocation, pattern);
     List<BisDataMetaInfo> list = new ArrayList<>();
@@ -637,7 +638,8 @@ public class SftpServiceImpl extends SipPluginContract {
 
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, boolean isDisableDuplicate) throws IOException, ParseException {
+      Long routeId, String exclusions, 
+      boolean isDisableDuplicate) throws IOException, ParseException {
     ZonedDateTime startTime = ZonedDateTime.now();
     logger.trace("Starting transfer data......start time::" + startTime);
 
