@@ -160,6 +160,24 @@ public class SawBisSftpPluginController {
       } else {
         response = sftpServiceImpl.immediateTransfer(requestBody);
       }
+      for (BisDataMetaInfo info : response) {
+        if (info.getDestinationPath() != null) {
+          File folderWhereFilesDumped = new File(info.getDestinationPath());
+          if (folderWhereFilesDumped.exists() && folderWhereFilesDumped.isDirectory()) {
+            logger.trace("Thread with Name :" + Thread.currentThread().getName()
+                + "has completed & created folder to put the files in "
+                + info.getDestinationPath());
+            File[] listOfFiles = folderWhereFilesDumped.listFiles();
+            if (listOfFiles != null && listOfFiles.length == 0) {
+              folderWhereFilesDumped.delete();
+              logger.trace("Thread with Name :" + Thread.currentThread().getName()
+                  + "has completed & created folder to put the files in "
+                  + info.getDestinationPath()
+                  + " & it is empty so it has been deleted after completion of the thread.");
+            }
+          }
+        }
+      }
     } catch (Exception e) {
       throw new SftpProcessorException("Exception occured while transferring the file", e);
     }

@@ -24,7 +24,9 @@ logging:
   level:
     com.synchronoss.saw: INFO
     org.springframework: INFO
-    org.hibernate.type : INFO
+    org.hibernate.type.descriptor.sql.BasicBinder : INFO
+    org.hibernate.SQL: INFO
+    org.springframework.retry: TRACE
 
 server:
   address: localhost
@@ -49,6 +51,8 @@ sip:
     index: 0
     max.attempts : 3
     retry.delay: 5000
+    retry.diff.mins: 1
+    retry.page.size: 20
 bis:
   transfer-batch-size: 10
   modified-retries: 3

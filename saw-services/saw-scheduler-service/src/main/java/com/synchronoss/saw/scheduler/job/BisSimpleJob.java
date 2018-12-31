@@ -41,14 +41,9 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
 
     BisSchedulerJobDetails jobDetails =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
-    retryTemplate.execute(context -> {
-      logger.info("inside retry method");
-      restTemplate.postForLocation(bisTransferUrl, jobDetails);
-      throw new IllegalStateException(
-          "Exception occurred while executing ingestion service for simple job");
-    });
+    retryTemplate.execute(context -> restTemplate.postForLocation(bisTransferUrl, jobDetails)
+    );
     // restTemplate.postForLocation(bisTransferUrl, jobDetails);
-
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

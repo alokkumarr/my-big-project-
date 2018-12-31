@@ -49,13 +49,15 @@ public class BisFileLog implements Serializable {
 
   @Column(name = "BIS_PROCESS_STATE")
   String bisProcessState;
-  
+
   @Column(name = "MODIFIED_DATE")
   private Date modifiedDate;
 
   @Column(name = "CREATED_DATE")
   private Date createdDate;
 
+  @Column(name = "CHECKPOINT_DATE")
+  private Date checkpointDate;
 
   public String getPid() {
     return pid;
@@ -154,7 +156,7 @@ public class BisFileLog implements Serializable {
   public Date getCreatedDate() {
     return createdDate;
   }
-  
+
   public void setModifiedDate(Date modifiedDate) {
     this.modifiedDate = modifiedDate;
   }
@@ -162,6 +164,13 @@ public class BisFileLog implements Serializable {
   public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
   }
-  
+
+  public Date getCheckpointDate() {
+    return checkpointDate;
+  }
+
+  public void setCheckpointDate(Date checkpointDate) {
+    this.checkpointDate = checkpointDate;
+  }
 
 }
