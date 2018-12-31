@@ -21,3 +21,13 @@ export class LoadAnalysesForCategory {
     '[Admin Import Category Change] Load analyses for category';
   constructor(public category: string | number) {}
 }
+
+export class RemoveFileFromImport {
+  static readonly type = '[Admin Import Delete File] Remove file from import';
+  constructor(public filename: string) {}
+}
+
+export class RefreshAllCategories {
+  static readonly type =
+    '[Admin Import File Load] Refresh all cached categories';
+}

@@ -1,10 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Store, Select } from '@ngxs/store';
 import {
   LoadAllAnalyzeCategories,
   SelectAnalysisGlobalCategory,
   LoadMetrics,
-  LoadAnalysesForCategory
+  LoadAnalysesForCategory,
+  ClearImport,
+  RefreshAllCategories
 } from './actions/import-page.actions';
 import { Observable } from 'rxjs';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -62,7 +64,7 @@ interface FileContent {
   templateUrl: './admin-import-view.component.html',
   styleUrls: ['./admin-import-view.component.scss']
 })
-export class AdminImportViewComponent implements OnInit {
+export class AdminImportViewComponent implements OnInit, OnDestroy {
   @Select(state => state.admin.importPage.categories.analyze)
   categories$: Observable<any[]>;
 
@@ -91,10 +93,14 @@ export class AdminImportViewComponent implements OnInit {
     this.store.dispatch([new LoadAllAnalyzeCategories(), new LoadMetrics()]);
   }
 
+  ngOnDestroy() {
+    this.store.dispatch(new ClearImport());
+  }
+
   onRemoveFile(fileName) {
     this.fileContents = filter(
       this.fileContents,
-      ({ name }) => fileName !== name
+      ({ name, analyses }) => fileName !== name
     );
     this.splitFileContents(this.fileContents);
   }
@@ -148,6 +154,8 @@ export class AdminImportViewComponent implements OnInit {
     Promise.all(contentPromises).then(contents => {
       this.fileContents = contents;
       this.splitFileContents(contents);
+      this.store.dispatch(new RefreshAllCategories());
+
       // clear the file input
       event.target.value = '';
     });

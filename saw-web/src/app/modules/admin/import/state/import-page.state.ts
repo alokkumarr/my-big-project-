@@ -4,11 +4,14 @@ import {
   SelectAnalysisGlobalCategory,
   LoadAllAnalyzeCategories,
   LoadMetrics,
-  LoadAnalysesForCategory
+  LoadAnalysesForCategory,
+  ClearImport,
+  RefreshAllCategories
 } from '../actions/import-page.actions';
 
 import { map, tap } from 'rxjs/operators';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as keys from 'lodash/keys';
 import { CategoryService } from '../../category';
 import { ExportService } from '../../export/export.service';
 import { ImportService } from '../import.service';
@@ -104,5 +107,23 @@ export class AdminImportPageState {
         });
       })
     );
+  }
+
+  @Action(RefreshAllCategories)
+  refreshAllCategories({
+    getState,
+    patchState,
+    dispatch
+  }: StateContext<ImportPageModel>) {
+    const categoryIds = keys(getState().referenceAnalyses);
+    patchState({
+      referenceAnalyses: {}
+    });
+    return dispatch(categoryIds.map(id => new LoadAnalysesForCategory(id)));
+  }
+
+  @Action(ClearImport)
+  resetImportState({ patchState }: StateContext<ImportPageModel>) {
+    return patchState(cloneDeep(defaultImportPageState));
   }
 }
