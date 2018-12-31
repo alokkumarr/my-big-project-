@@ -121,8 +121,9 @@ public class SawBisChannelController {
     BisChannelEntity channelEntityData =
         retryTemplate.execute((RetryCallback<BisChannelEntity, BisException>) context -> {
           BisChannelEntity retryChannelEntity = bisChannelDataRestRepository.save(channelEntity);
-          if (retryChannelEntity == null)
+          if (retryChannelEntity == null) {
             throw new BisException("retryChannelEntity must not be null");
+          }
           return retryChannelEntity;
         });
     BeanUtils.copyProperties(channelEntityData, requestBody);
@@ -220,8 +221,9 @@ public class SawBisChannelController {
     BisChannelEntity channelEntityData = retryTemplate
         .execute((RetryCallback<BisChannelEntity, ResourceNotFoundException>) context -> {
           BisChannelEntity retryChannelEntity = bisChannelDataRestRepository.findById(id).get();
-          if (retryChannelEntity == null)
+          if (retryChannelEntity == null) {
             throw new ResourceNotFoundException("retryChannelEntity must not be null");
+          }
           return retryChannelEntity;
         });
     logger.trace("Channel retrieved :" + channelEntityData);
@@ -292,9 +294,11 @@ public class SawBisChannelController {
     requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     BisChannelDto optionalChannel =
         retryTemplate.execute((RetryCallback<BisChannelDto, ResourceNotFoundException>) context -> {
-          Optional<BisChannelEntity> retryChannelEntity = bisChannelDataRestRepository.findById(channelId);
-          if (retryChannelEntity == null)
+          Optional<BisChannelEntity> retryChannelEntity =
+              bisChannelDataRestRepository.findById(channelId);
+          if (retryChannelEntity == null) {
             throw new ResourceNotFoundException("retryChannelEntity must not be null");
+          }
           BisChannelEntity channel = retryChannelEntity.get();
           logger.trace("Channel updated :" + channel);
           requestBody.setBisChannelSysId(channelId);
@@ -338,9 +342,9 @@ public class SawBisChannelController {
           List<BisRouteEntity> routeEntities = bisRouteDataRestRepository
               .findByBisChannelSysId(id, PageRequest.of(0, 1, Direction.DESC, "createdDate"))
               .getContent();
-          if (routeEntities == null || routeEntities.size() > 0)
+          if (routeEntities == null || routeEntities.size() > 0) {
             throw new ResourceNotFoundException("routeEntities must not be null");
-          else {
+          } else {
             Optional<BisChannelEntity> channel = bisChannelDataRestRepository.findById(id);
             if (channel == null || channel.get() == null) {
               throw new ResourceNotFoundException("channel must not be null");
@@ -382,14 +386,12 @@ public class SawBisChannelController {
    * checks is there a route with given route name.
    * 
    * @param channelId channe identifier
-   * @return  ok
+   * @return ok
    */
-  @RequestMapping(value = "/channels/{channelId}/deactivate", method 
-      = RequestMethod.PUT, produces = org.springframework.http.MediaType
-      .APPLICATION_JSON_UTF8_VALUE)
-  public Map<String,Boolean>  deactivateChannel(
-      @PathVariable("channelId")  Long channelId) {
-    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
+  @RequestMapping(value = "/channels/{channelId}/deactivate", method = RequestMethod.PUT,
+      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public Map<String, Boolean> deactivateChannel(@PathVariable("channelId") Long channelId) {
+    Map<String, Boolean> responseMap = new HashMap<String, Boolean>();
     logger.trace("Inside deactivating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, false);
     responseMap.put("isDeactivated", Boolean.TRUE);
@@ -402,12 +404,10 @@ public class SawBisChannelController {
    * @param channelId channe identifier
    * @return ok
    */
-  @RequestMapping(value = "/channels/{channelId}/activate", method 
-      = RequestMethod.PUT, produces = org.springframework.http.MediaType
-      .APPLICATION_JSON_UTF8_VALUE)
-  public Map<String,Boolean>  activateChannel(
-      @PathVariable("channelId")  Long channelId) {
-    Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
+  @RequestMapping(value = "/channels/{channelId}/activate", method = RequestMethod.PUT,
+      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public Map<String, Boolean> activateChannel(@PathVariable("channelId") Long channelId) {
+    Map<String, Boolean> responseMap = new HashMap<String, Boolean>();
     logger.trace("Inside activating channel");
     bisChannelService.activateOrDeactivateChannel(channelId, true);
     responseMap.put("isActivated", Boolean.TRUE);

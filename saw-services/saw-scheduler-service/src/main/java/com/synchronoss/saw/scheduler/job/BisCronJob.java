@@ -49,9 +49,7 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
     JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
     String myValue = dataMap.getString("myKey");
     logger.info("Value:" + myValue);
-    retryTemplate.execute(context ->
-    restTemplate.postForLocation(bisTransferUrl, jobRequest)
-    );
+    retryTemplate.execute(context -> restTemplate.postForLocation(bisTransferUrl, jobRequest));
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

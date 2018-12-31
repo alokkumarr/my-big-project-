@@ -878,7 +878,7 @@ public class SftpServiceImpl extends SipPluginContract {
   /**
    * This is method to handle inconsistency during failure.
    */
-  //@Scheduled(fixedDelayString = "${sip.service.retry.delay}")
+  @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   @org.springframework.transaction.annotation.Transactional
   public void recoverFromInconsistentState() {
     logger.trace("recoverFromInconsistentState execution starts here");
