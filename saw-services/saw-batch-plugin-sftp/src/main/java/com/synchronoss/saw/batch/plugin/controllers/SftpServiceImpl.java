@@ -563,7 +563,7 @@ public class SftpServiceImpl extends SipPluginContract {
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
     } finally {
       closeSession(sesionFactory);
-      }
+    }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
   }
@@ -735,10 +735,8 @@ public class SftpServiceImpl extends SipPluginContract {
                                   // localFile);
                                   java.nio.file.Files.copy(stream, localFile.toPath(),
                                       StandardCopyOption.REPLACE_EXISTING);
-                                  logger.trace(
-                                      "Streaming the content of the file in the directory "
-                                      + "ends here "
-                                          + entry.getFilename());
+                                  logger.trace("Streaming the content of the file in the directory "
+                                      + "ends here " + entry.getFilename());
                                   IOUtils.closeQuietly(stream);
                                   logger.trace(
                                       "closing the stream for the file " + entry.getFilename());
@@ -826,7 +824,7 @@ public class SftpServiceImpl extends SipPluginContract {
       }
     } catch (Exception e) {
       logger.error("Exception occured while downloading the file from source", e);
-    } 
+    }
     ZonedDateTime endTime = ZonedDateTime.now();
     logger.trace("Ending transfer data......end time:: " + endTime);
     long durationInMillis = Duration.between(startTime, endTime).toMillis();
@@ -836,10 +834,10 @@ public class SftpServiceImpl extends SipPluginContract {
     }
     return list;
   }
-  
+
   private void closeSession(SessionFactory<LsEntry> session) {
     logger.trace("Closing session");
-    if (session!=null && session.getSession()!=null) {
+    if (session != null && session.getSession() != null) {
       session.getSession().close();
     }
   }
