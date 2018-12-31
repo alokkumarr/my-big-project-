@@ -67,7 +67,7 @@ export class CreateRouteDialogComponent {
       filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: [''],
       disableDuplicate: [false],
-      batchSize: ['', [Validators.required],
+      batchSize: ['', [Validators.required]],
       fileExclusions: ['', this.validatefileExclusion]
 
     });
@@ -144,7 +144,7 @@ export class CreateRouteDialogComponent {
       filePattern: data.filePattern,
       schedulerExpression: this.crondetails,
       description: data.description,
-      disableDuplicate: data.disableDuplicate
+      disableDuplicate: data.disableDuplicate,
       batchSize: data.batchSize,
       fileExclusions: data.fileExclusions
     };
