@@ -142,7 +142,9 @@ public class SftpServiceImpl extends SipPluginContract {
           Files.createDirectories(Paths.get(destinationLocation));
           status = HttpStatus.OK;
         }
-        closeSession(sessionFactory);
+        if (sessionFactory != null && sessionFactory.getSession() != null) {
+          sessionFactory.getSession().close();
+        }
       } catch (AccessDeniedException e) {
         status = HttpStatus.UNAUTHORIZED;
         connectionLogs.append(newLineChar);
@@ -165,7 +167,10 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append(status);
         logger.error("Invalid directory path " + entityId, ex);
       } finally {
-        closeSession(sessionFactory);
+        if (sessionFactory != null && sessionFactory.getSession() != null) {
+          sessionFactory.getSession().close();
+        }
+
       }
     } else {
       throw new SftpProcessorException(entityId + " does not exists");
@@ -189,11 +194,13 @@ public class SftpServiceImpl extends SipPluginContract {
     SessionFactory<LsEntry> sessionFactory = null;
     try {
       sessionFactory = delegatingSessionFactory.getSessionFactory(entityId);
-      if (sessionFactory != null && sessionFactory.getSession().isOpen()) {
+      if (sessionFactory != null && sessionFactory.getSession() != null) {
         logger.info("connected successfully " + entityId);
         connectionLogs.append("Connection successful!!");
         status = HttpStatus.OK;
-        closeSession(sessionFactory);
+        if (sessionFactory != null && sessionFactory.getSession() != null) {
+          sessionFactory.getSession().close();
+        }
       } else {
         status = HttpStatus.UNAUTHORIZED;
         connectionLogs.append(newLineChar);
@@ -202,7 +209,9 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append("Unable to establish connection");
         connectionLogs.append(newLineChar);
         connectionLogs.append(status);
-        closeSession(sessionFactory);
+        if (sessionFactory != null && sessionFactory.getSession() != null) {
+          sessionFactory.getSession().close();
+        }
       }
     } catch (Exception ex) {
       logger.info("Exception :", ex);
@@ -227,7 +236,9 @@ public class SftpServiceImpl extends SipPluginContract {
       }
       status = HttpStatus.UNAUTHORIZED;
     } finally {
-      closeSession(sessionFactory);
+      if (sessionFactory != null && sessionFactory.getSession() != null) {
+        sessionFactory.getSession().close();
+      }
     }
     return connectionLogs.toString();
   }
@@ -269,7 +280,10 @@ public class SftpServiceImpl extends SipPluginContract {
           connectionLogs.append(newLineChar);
           connectionLogs.append(status);
         }
-        closeSession(sessionFactory);
+        if (sessionFactory != null && sessionFactory.getSession() != null) {
+          sessionFactory.getSession().close();
+        }
+
       }
     } else {
       try {
@@ -280,7 +294,10 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append(newLineChar);
         connectionLogs.append("Exception occured while creating directories");
       } finally {
-        closeSession(sessionFactory);
+        if (sessionFactory != null && sessionFactory.getSession() != null) {
+          sessionFactory.getSession().close();
+        }
+
       }
       status = HttpStatus.OK;
     }
@@ -394,14 +411,19 @@ public class SftpServiceImpl extends SipPluginContract {
             payload.getFilePattern(), payload);
         logger.trace("invocation of method immediatelistOfAll with location ends here "
             + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-        closeSession(defaultSftpSessionFactory);
+        if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
+          defaultSftpSessionFactory.getSession().close();
+        }
+
         logger.trace("session opened closes here ");
       }
     } catch (Exception ex) {
       logger.error("Exception triggered while transferring the file", ex);
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
-      closeSession(defaultSftpSessionFactory);
+      if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
+        defaultSftpSessionFactory.getSession().close();
+      }
     }
     logger.trace("Immediate Transfer file ends here with the channel id " + payload.getChannelId()
         + "& route Id " + payload.getRouteId());
@@ -550,7 +572,9 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location ends here " + sourceLocation
               + " & file pattern " + filePattern);
-          closeSession(sesionFactory);
+          if (sesionFactory != null && sesionFactory.getSession() != null) {
+            sesionFactory.getSession().close();
+          }
           logger.trace("opened session has been closed here.");
         } else {
           throw new SftpProcessorException("Exception occurred while connecting to channel from "
@@ -562,7 +586,9 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
     } finally {
-      closeSession(sesionFactory);
+      if (sesionFactory != null && sesionFactory.getSession() != null) {
+        sesionFactory.getSession().close();
+      }
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
@@ -835,10 +861,4 @@ public class SftpServiceImpl extends SipPluginContract {
     return list;
   }
 
-  private void closeSession(SessionFactory<LsEntry> session) {
-    logger.trace("Closing session");
-    if (session != null && session.getSession() != null) {
-      session.getSession().close();
-    }
-  }
 }

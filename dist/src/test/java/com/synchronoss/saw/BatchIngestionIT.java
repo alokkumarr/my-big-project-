@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
@@ -471,6 +472,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to test a connectivity route in batch Ingestion.
    */
+  @Ignore
   @Test
   public void connectChannel() throws JsonProcessingException {
     String username = "user";
