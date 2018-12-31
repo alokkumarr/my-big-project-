@@ -19,13 +19,14 @@
   &__content {
     grid-area: content;
     padding: 10px;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     overflow: auto;
-    grid-template-rows: repeat(2, auto) 1fr;
-    grid-template-areas:
-      'aux-settings'
-      'filters'
-      'data';
+    // grid-template-rows: repeat(2, auto) 1fr;
+    // grid-template-areas:
+    //   'aux-settings'
+    //   'filters'
+    //   'data';
   }
   &__filters {
     padding: 0 20px;
@@ -38,6 +39,7 @@
   &__data {
     grid-area: data;
     overflow: auto;
+    flex: 1;
     height: 100%;
     width: 100%;
   }
