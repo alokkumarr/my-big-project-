@@ -17,6 +17,8 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithSparkContext;
 import sncr.xdf.component.Component;
+import sncr.xdf.esloader.esloadercommon.ESConfig;
+import sncr.xdf.esloader.esloadercommon.ESHttpClient;
 import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.exceptions.FatalXDFException;
 import sncr.xdf.exceptions.XDFException;
@@ -102,7 +104,9 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
                 String indexType = indexMap.get(this.dataSetName);
                 logger.debug("Final indexType = " + indexType);
 
-                retVal = registerDataset(indexType);
+                ESHttpClient esHttpClient = loader.getHttpClient();
+
+                retVal = registerDataset(indexType, esHttpClient);
             }
 
             return retVal;
@@ -115,7 +119,15 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         return retVal;
     }
 
-    private int registerDataset (String indexType) throws Exception {
+    /**
+     *
+     * @param indexType Combintion of index and type value in the form of index/type
+     * @param esHttpClient HTTP client to communicate with ElasticSearch
+     * @return  0 - Success
+     *         -1 - Failure
+     * @throws Exception In case of failures during metadata retrival
+     */
+    private int registerDataset (String indexType, ESHttpClient esHttpClient) throws Exception {
         String datasetId = ctx.applicationID + "::" + ESLOADER_DATASET;
 
         // Append '_esdata' to the dataset id to identify this as ES dataset
@@ -156,8 +168,17 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
         logger.debug("Input DS config = " + esDatasetElement);
 
+        // Removed unwanted fields
         esDatasetObject.remove(DataSetProperties.UserData.toString());
         esDatasetObject.remove("userData");
+        esDatasetObject.remove("asInput");
+        esDatasetObject.remove(DataSetProperties.Project.toString());
+        esDatasetObject.remove(DataSetProperties.Transformations.toString());
+
+        // Add User details
+        JsonObject userData = generateUserData();
+        esDatasetObject.add(DataSetProperties.UserData.toString(), userData);
+
 
         List<Alias> aliases = esLoaderConfig.getAliases();
 
@@ -184,8 +205,17 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         JsonObject system = esDatasetObject.get(DataSetProperties.System.toString())
             .getAsJsonObject();
 
-        esDatasetObject.add(DataSetProperties.System.toString(),
-            updateSystemObject(system, index, type, aliases));
+        system = updateSystemObject(system, index, type, aliases);
+
+        esDatasetObject.add(DataSetProperties.System.toString(), system);
+
+        String updatedIndex = system.get(DataSetProperties.PhysicalLocation.toString()).getAsString();
+
+        //Get index/alias info and extract record count
+        long recordCount = extractRecordCount(esHttpClient, updatedIndex);
+
+        esDatasetObject.addProperty(DataSetProperties.RecordCount.toString(), recordCount);
+
 
         // Update ID Field
         esDatasetObject.addProperty("_id", esDatasetId);
@@ -199,6 +229,43 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         return 0;
     }
 
+    /**
+     *
+     * @return Retuns an object containing user information
+     */
+    private JsonObject generateUserData() {
+        JsonObject userObject = new JsonObject();
+
+        userObject.addProperty(DataSetProperties.createdBy.toString(),
+            "pipelineadmin@synchronoss.com");
+
+        return userObject;
+    }
+
+    /**
+     *
+     * @param esHttpClient HTTP client used to communicate with ElasticSearch
+     * @param esIndex - ES index for which record count has to be retrieved
+     * @return Record count
+     */
+    private long extractRecordCount (ESHttpClient esHttpClient,
+                                     String esIndex) {
+        long recordCount = 0;
+
+        recordCount = esHttpClient.getRecordCount(esIndex);
+
+        return recordCount;
+    }
+
+    /**
+     *
+     * @param system Original <code>system</code> object
+     * @param index ES Index
+     * @param type ES type
+     * @param aliases List of alias objects
+     *
+     * @return Updated <code>system</code> object
+     */
     private JsonObject updateSystemObject(JsonObject system, String index, String type,
                                           List<Alias> aliases) {
         if (system == null) {
@@ -224,6 +291,12 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         return system;
     }
 
+    /**
+     *
+     * @param aliases List of alias objects
+     * @return First alias in the list which is in append mode.
+     *         <code>null</code> in case nothing matched
+     */
     private String extractAlias(List<Alias> aliases) {
         String alias = null;
 
@@ -240,6 +313,13 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         return alias;
     }
 
+    /**
+     * Used to generate the schema structure for ES dataset
+     *
+     * @param esFields <code>properties</code> object from ES mapping file
+     *
+     * @return <code>schema</code> object
+     */
     private JsonObject generateSchema (JsonObject esFields) {
         JsonObject schema = new JsonObject();
 
@@ -250,6 +330,48 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         return schema;
     }
 
+    /**
+     * Transforms the <code>properties</code> object
+     * from the mapping file into the required ES dataset structure.<br />
+     *
+     * E.g.: If the <code>properties</code> object has fields as shown below:
+     *       <pre>
+     *         {
+     *             "properties":{
+     *                 "NAME":{
+     *                     "type":"text",
+     *                     "fields":{
+     *                         "keyword":{
+     *                             "type":"keyword"
+     *                         }
+     *                     }
+     *                 },
+     *                 "NTDID":{
+     *                     "type":"integer"
+     *                 }
+     *             }
+     *         }
+     *       </pre>,
+     *
+     *       it will be transformed as below:
+     *       <pre>
+     *         "fields":[
+     *          {
+     *             "name":"NAME",
+     *             "type":"text",
+     *             "isKeyword":true
+     *          },
+     *          {
+     *             "name":"NTDID",
+     *             "type":"integer"
+     *          }
+     *       ]
+     *       </pre>
+     *
+     * @param esFields <code>properties</code> object from ES mapping file
+     *
+     * @return Transformed fields
+     */
     private JsonArray transformFields (JsonObject esFields) {
         JsonArray schemaFields = new JsonArray();
 

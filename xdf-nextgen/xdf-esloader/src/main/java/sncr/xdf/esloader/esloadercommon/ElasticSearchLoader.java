@@ -77,6 +77,10 @@ public class ElasticSearchLoader {
         this.sparkSession.udf().register("_XdfDateToString", new XDFTimestampconverter(), DataTypes.StringType);
     }
 
+    public ESHttpClient getHttpClient() {
+        return this.esClient;
+    }
+
     public static Map<String, String> generateESParamMap(ESConfig config) {
         Map<String, String> configMap = new HashMap<>();
 
