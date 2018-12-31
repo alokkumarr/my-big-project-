@@ -104,6 +104,7 @@ public abstract class Executor {
         DLBatchWriter xdfDW = new DLBatchWriter(format, nof, partitionKeys);
         xdfDW.writeToTempLoc(outputResult,  loc);
         outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(outputResult));
+        outputDS.put(DataSetProperties.RecordCount.name(), successTransformationsCount.value());
 
         logger.trace("Dataset: "  + name + ", Result schema: " + ((JsonElement)outputDS.get(DataSetProperties.Schema.name())).toString());
 
@@ -145,8 +146,8 @@ public abstract class Executor {
         if (rejectedDataSet != null && !rejectedDataSet.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
 
-        logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
-        logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+        logger.debug("Final DS: " + successTransformationsCount.value());
+        logger.debug("Rejected DS: " + failedTransformationsCount.value());
 
         writeResults(outputResult, outDataSet, tempLoc);
         writeResults(rejectedRecords, rejectedDataSet, tempLoc);

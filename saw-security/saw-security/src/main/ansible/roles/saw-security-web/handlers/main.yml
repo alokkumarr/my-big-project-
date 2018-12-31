@@ -1,2 +1,7 @@
 - name: restart saw-security
   systemd: name=saw-security state=restarted daemon_reload=true
+  # Workaround: Occasionally deployments will fail with "Job for
+  # service canceled".  The root cause is not known, but retry as a
+  # workaround for now.
+  register: result
+  until: result is success

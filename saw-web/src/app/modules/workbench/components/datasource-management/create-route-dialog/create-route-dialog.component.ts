@@ -49,16 +49,27 @@ export class CreateRouteDialogComponent {
 
   createForm() {
     const channelId = this.routeData.channelID;
-    const tranformerFn = value => ({channelId, routeName: value});
-    const oldRouteName = this.opType === 'update' ? this.routeData.routeMetadata.routeName : '';
+    const tranformerFn = value => ({ channelId, routeName: value });
+    const oldRouteName =
+      this.opType === 'update' ? this.routeData.routeMetadata.routeName : '';
     this.detailsFormGroup = this._formBuilder.group({
-      routeName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateRoute, tranformerFn, oldRouteName)],
+      routeName: [
+        '',
+        Validators.required,
+        isUnique(
+          this.datasourceService.isDuplicateRoute,
+          tranformerFn,
+          oldRouteName
+        )
+      ],
       sourceLocation: ['', Validators.required],
       destinationLocation: ['', Validators.required],
       filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: [''],
       disableDuplicate: [false],
-      batchSize: ['', [Validators.required]]
+      batchSize: ['', [Validators.required],
+      fileExclusions: ['', this.validatefileExclusion]
+
     });
   }
 
@@ -70,6 +81,15 @@ export class CreateRouteDialogComponent {
     control: AbstractControl
   ): { [key: string]: boolean } | null {
     if (includes(control.value, ',')) {
+      return { inValidPattern: true };
+    }
+    return null;
+  }
+
+  validatefileExclusion(
+    control: AbstractControl
+  ): { [key: string]: boolean } | null {
+    if (includes(control.value, ',') || includes(control.value, '.')) {
       return { inValidPattern: true };
     }
     return null;
@@ -105,9 +125,10 @@ export class CreateRouteDialogComponent {
 
   onCronChanged(cronexpression) {
     this.crondetails = cronexpression;
-    this.isCronExpressionValid =
-      !(isEmpty(cronexpression.cronexp) &&
-      cronexpression.activeTab !== 'immediate');
+    this.isCronExpressionValid = !(
+      isEmpty(cronexpression.cronexp) &&
+      cronexpression.activeTab !== 'immediate'
+    );
   }
 
   createRoute(data) {
@@ -124,7 +145,8 @@ export class CreateRouteDialogComponent {
       schedulerExpression: this.crondetails,
       description: data.description,
       disableDuplicate: data.disableDuplicate
-      batchSize: data.batchSize
+      batchSize: data.batchSize,
+      fileExclusions: data.fileExclusions
     };
     return routeDetails;
   }
@@ -135,7 +157,7 @@ export class CreateRouteDialogComponent {
       autoFocus: false,
       closeOnNavigation: true,
       height: '400px',
-      width: '300px',
+      width: '300px'
     });
     dateDialogRef.afterClosed().subscribe(sourcePath => {
       this.detailsFormGroup.controls.destinationLocation.setValue(sourcePath);
