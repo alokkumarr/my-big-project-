@@ -154,7 +154,6 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
     Promise.all(contentPromises).then(contents => {
       this.fileContents = contents;
       this.splitFileContents(contents);
-      this.store.dispatch(new RefreshAllCategories());
 
       // clear the file input
       event.target.value = '';
@@ -292,59 +291,65 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
       })
     )(this.analyses);
 
-    executeAllPromises(importPromises).then(results => {
-      const selectedAnalyses = filter(this.analyses, 'selection');
+    executeAllPromises(importPromises).then(
+      results => {
+        const selectedAnalyses = filter(this.analyses, 'selection');
 
-      const updatedAnalysesMap = reduce(
-        results,
-        (acc, result, index) => {
-          if (result.result) {
-            const analysis = result.result;
-            acc[analysis.id] = { analysis };
-          } else {
-            const error = result.error;
-            const gridObj = selectedAnalyses[index];
-            acc[gridObj.analysis.id] = { error };
+        const updatedAnalysesMap = reduce(
+          results,
+          (acc, result, index) => {
+            if (result.result) {
+              const analysis = result.result;
+              acc[analysis.id] = { analysis };
+            } else {
+              const error = result.error;
+              const gridObj = selectedAnalyses[index];
+              acc[gridObj.analysis.id] = { error };
+            }
+
+            return acc;
+          },
+          {}
+        );
+
+        let hasErrors = false;
+        let someImportsWereSuccesful = false;
+        // update the logs
+        forEach(this.analyses, gridObj => {
+          if (gridObj.selection) {
+            const id = gridObj.analysis.id;
+            const container = updatedAnalysesMap[id];
+            // if analysis was updated
+            if (container && container.analysis) {
+              gridObj.logColor = 'green';
+              gridObj.log = 'Successfully Imported';
+              gridObj.errorInd = false;
+              gridObj.duplicateAnalysisInd = true;
+              gridObj.selection = false;
+              someImportsWereSuccesful = true;
+            } else {
+              hasErrors = true;
+              const error = container.error;
+              gridObj.logColor = 'red';
+              gridObj.log = 'Error While Importing';
+              gridObj.errorMsg = get(error, 'error.error.message');
+              gridObj.errorInd = true;
+            }
           }
+        });
 
-          return acc;
-        },
-        {}
-      );
+        this.userCanExportErrors = hasErrors;
 
-      let hasErrors = false;
-      let someImportsWereSuccesful = false;
-      // update the logs
-      forEach(this.analyses, gridObj => {
-        if (gridObj.selection) {
-          const id = gridObj.analysis.id;
-          const container = updatedAnalysesMap[id];
-          // if analysis was updated
-          if (container && container.analysis) {
-            gridObj.logColor = 'green';
-            gridObj.log = 'Successfully Imported';
-            gridObj.errorInd = false;
-            gridObj.duplicateAnalysisInd = true;
-            gridObj.selection = false;
-            someImportsWereSuccesful = true;
-          } else {
-            hasErrors = true;
-            const error = container.error;
-            gridObj.logColor = 'red';
-            gridObj.log = 'Error While Importing';
-            gridObj.errorMsg = get(error, 'error.error.message');
-            gridObj.errorInd = true;
-          }
+        if (someImportsWereSuccesful) {
+          this.analyses = [...this.analyses];
         }
-      });
-
-      this.userCanExportErrors = hasErrors;
-
-      if (someImportsWereSuccesful) {
-        this.analyses = [...this.analyses];
+        this.atLeast1AnalysisIsSelected = false;
+        this.store.dispatch(new RefreshAllCategories());
+      },
+      () => {
+        this.store.dispatch(new RefreshAllCategories());
       }
-      this.atLeast1AnalysisIsSelected = false;
-    });
+    );
   }
 
   exportErrors() {
