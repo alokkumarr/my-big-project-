@@ -19,7 +19,7 @@
 #'
 #' @return data.frame
 #' @export
-#' @importFrom lubridate is.Date is.POSIXct interval
+#' @importFrom lubridate is.Date is.POSIXct interval isoweek
 #'
 #' @examples
 #' df <- data.frame(today = Sys.Date())
@@ -158,7 +158,7 @@ indexer.tbl_spark <- function(df,
 #' @param ... not currently implemented
 #'
 #' @return data.frame
-#' @importFrom lubridate year quarter month week day hour minute wday yday days_in_month
+#' @importFrom lubridate year quarter month week day hour minute wday yday days_in_month isoweek
 #' @importFrom dplyr funs
 #' @export
 #' @examples
