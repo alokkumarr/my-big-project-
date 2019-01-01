@@ -42,6 +42,10 @@
                 Channel Name is
                 <strong>required</strong>
               </mat-error>
+              <mat-error *ngIf="detailsFormGroup.controls.channelName.hasError('isUnique')" i18n>
+                Channel Name already
+                <strong>exists</strong>
+              </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Hostname</mat-label>

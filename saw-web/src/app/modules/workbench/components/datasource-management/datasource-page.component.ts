@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
+import { map as rxMap, finalize } from 'rxjs/operators';
 
 import { CHANNEL_TYPES } from '../../wb-comp-configs';
 import { ChannelObject } from '../../models/workbench.interface';
@@ -13,11 +14,13 @@ import { CreateSourceDialogComponent } from './createSource-dialog/createSource-
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 import { ConfirmActionDialogComponent } from './confirm-action-dialog/confirm-action-dialog.component';
+import { LogsDialogComponent } from './logs-dialog';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
 import * as get from 'lodash/get';
-import * as merge from 'lodash/merge';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 import * as findKey from 'lodash/findKey';
 import * as filter from 'lodash/filter';
 
@@ -34,6 +37,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   sourceTypes = CHANNEL_TYPES;
   selectedSourceType: string;
   selectedSourceData: any;
+  // channel activation/deactivation request is pending
+  channelToggleRequestPending = false;
   show = false;
   channelEditable = false;
 
@@ -54,15 +59,13 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   ngOnDestroy() {}
 
   getSources() {
-    this.unFilteredSourceData = [];
-    this.datasourceService.getSourceList().subscribe(data => {
-      forEach(data, value => {
-        // Channel metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
-        const tempVar = merge(value, JSON.parse(value.channelMetadata));
-        this.unFilteredSourceData.push(tempVar);
+    this.datasourceService.getSourceList()
+      .pipe(
+        rxMap(channels => map(channels, channel => ({...channel, ...JSON.parse(channel.channelMetadata)})))
+      ).subscribe(channels => {
+        this.unFilteredSourceData = channels;
+        this.countSourceByType(this.unFilteredSourceData);
       });
-      this.countSourceByType(this.unFilteredSourceData);
-    });
   }
 
   countSourceByType(sources) {
@@ -79,7 +82,18 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   filterSourcesByType(channelData, cType) {
     this.sourceData = filter(channelData, ['channelType', cType]);
     if (this.sourceData.length > 0) {
-      this.selectSingleChannel(this.sourceData[0].bisChannelSysId);
+      const firstChannelId = this.sourceData[0].bisChannelSysId;
+      if (this.selectedSourceData) {
+        const selectedId = this.selectedSourceData.bisChannelSysId;
+        const alreadySelected = find(this.sourceData, ({bisChannelSysId}) => bisChannelSysId === selectedId);
+        if (alreadySelected) {
+          this.selectSingleChannel(selectedId);
+        } else {
+          this.selectSingleChannel(firstChannelId);
+        }
+      } else {
+        this.selectSingleChannel(firstChannelId);
+      }
     }
   }
 
@@ -97,16 +111,22 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       event.selectedRowKeys.length > 0
     ) {
       this.channelEditable = true;
-      this.selectedSourceData = event.selectedRowsData[0];
-      this.getRoutesForChannel(event.selectedRowKeys[0]);
+      this.selectChannel(event.selectedRowsData[0]);
+      if (!this.channelToggleRequestPending) {
+        this.getRoutesForChannel(event.selectedRowKeys[0]);
+      }
     } else if (event.selectedRowKeys.length > 0) {
       this.channelEditable = true;
-      this.selectedSourceData = event.selectedRowsData[0];
+      this.selectChannel(event.selectedRowsData[0]);
     } else {
       this.channelEditable = false;
-      this.selectedSourceData = [];
+      this.selectChannel(null);
       this.routesData = [];
     }
+  }
+
+  selectChannel(channel) {
+    this.selectedSourceData = channel;
   }
 
   sourceSelectedType(sourceType, channelCount) {
@@ -154,6 +174,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
           payload.productCode = channelData.productCode;
           payload.projectCode = channelData.projectCode;
           payload.customerCode = channelData.customerCode;
+          payload.status = !channelData.status ? 0 : 1;
 
           this.datasourceService
             .updateSource(channelData.bisChannelSysId, payload)
@@ -170,7 +191,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       width: '350px',
       data: {
         typeTitle: 'Channel Name',
-        typeName: this.selectedSourceData.channelName
+        typeName: this.selectedSourceData.channelName,
+        routesNr: this.routesData.length
       }
     });
 
@@ -220,14 +242,13 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   getRoutesForChannel(channelID) {
-    this.routesData = [];
-    this.datasourceService.getRoutesList(channelID).subscribe(data => {
-      forEach(data, value => {
-        // routes metadata is stored as stringified JSON due to BE limitation. So have to Parse it back.
-        const tempVar = merge(value, JSON.parse(value.routeMetadata));
-        this.routesData.push(tempVar);
+    this.datasourceService.getRoutesList(channelID)
+      .pipe(
+        rxMap(routes => map(routes, route => ({...route, ...JSON.parse(route.routeMetadata)})))
+      )
+      .subscribe(routes => {
+        this.routesData = routes;
       });
-    });
   }
 
   createRoute(routeData) {
@@ -254,7 +275,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
     dateDialogRef.afterClosed().subscribe(data => {
       if (!isUndefined(data)) {
-        const payload = {
+        const payload: {status?: number, createdBy: string, routeMetadata: Object} = {
           createdBy: '',
           // Route metadata JSON object have to be stringified  to store in MariaDB due to BE limitation.
           routeMetadata: JSON.stringify(data.routeDetails)
@@ -262,11 +283,19 @@ export class DatasourceComponent implements OnInit, OnDestroy {
         if (data.opType === 'create') {
           this.datasourceService
             .createRoute(routeData, payload)
-            .subscribe(() => {
-              this.getRoutesForChannel(routeData);
+            .subscribe(createdRoute => {
+              const promise = this.afterRouteAddedChanged(createdRoute);
+              if (promise) {
+                promise.then(() => {
+                  this.getRoutesForChannel(routeData);
+                });
+              } else {
+                this.getRoutesForChannel(routeData);
+              }
             });
         } else {
           payload.createdBy = routeData.createdBy;
+          payload.status = !routeData.status ? 0 : 1;
 
           this.datasourceService
             .updateRoute(
@@ -280,6 +309,16 @@ export class DatasourceComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  afterRouteAddedChanged(createdRoute) {
+    const channelId = createdRoute.bisChannelSysId;
+    const routeId = createdRoute.bisRouteSysId;
+    const selectedChannelId = this.selectedSourceData.bisChannelSysId;
+    const isChannelNotActive = this.selectedSourceData.status === 0;
+    if (isChannelNotActive && channelId === selectedChannelId) {
+      return this.datasourceService.toggleRoute(channelId, routeId, false).toPromise();
+    }
   }
 
   deleteRoute(routeData) {
@@ -310,5 +349,53 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   togglePWD() {
     this.show = !this.show;
+  }
+
+  openLogsDialog(routeData) {
+    this.dialog.open(LogsDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      disableClose: true,
+      height: '590px',
+      width: '800px',
+      panelClass: 'sourceDialogClass',
+      data: {
+        ...routeData,
+        channelName: this.selectedSourceData.channelName
+      }
+    });
+  }
+
+  toggleRouteActivation(route) {
+    const { bisChannelSysId, bisRouteSysId, status } = route;
+    this.datasourceService.toggleRoute(bisChannelSysId, bisRouteSysId, !status).subscribe(() => {
+      route.status = this.reverseStatus(status);
+    });
+  }
+
+  toggleChannelActivation(channel) {
+    const { status } = channel;
+    this.channelToggleRequestPending = true;
+    this.datasourceService.toggleChannel(channel.bisChannelSysId, !status)
+    .pipe(
+      finalize(() => {
+        this.channelToggleRequestPending = false;
+      })
+    ).subscribe(() => {
+      this.channelToggleRequestPending = false;
+      channel.status = this.reverseStatus(status);
+      this.getRoutesForChannel(channel.bisChannelSysId);
+    });
+  }
+
+  toggleAllRoutesOnFrontEnd(status) {
+    forEach(this.routesData, route => {
+      route.status = status;
+    });
+  }
+
+  reverseStatus(status) {
+    return status === 1 ? 0 : 1;
   }
 }

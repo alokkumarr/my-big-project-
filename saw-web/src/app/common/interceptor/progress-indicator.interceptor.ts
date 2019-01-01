@@ -7,7 +7,7 @@ import {
   HttpEventType
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, finalize } from 'rxjs/operators';
 
 import { HeaderProgressService } from '../../common/services';
 
@@ -22,6 +22,7 @@ export class ProgressIndicatorInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    let cancelled = true;
     return next.handle(req).pipe(
       tap(
         event => {
@@ -32,6 +33,7 @@ export class ProgressIndicatorInterceptor implements HttpInterceptor {
               });
               break;
             case HttpEventType.Response:
+              cancelled = false;
               this.zone.run(() => {
                 this._headerProgress.hide();
               });
@@ -39,12 +41,20 @@ export class ProgressIndicatorInterceptor implements HttpInterceptor {
           }
         },
         err => {
+          cancelled = false;
           this.zone.run(() => {
             this._headerProgress.hide();
           });
           return err;
         }
-      )
+      ),
+      finalize(() => {
+        if (cancelled) {
+          this.zone.run(() => {
+            this._headerProgress.hide();
+          });
+        }
+      })
     );
   }
 }
