@@ -89,6 +89,13 @@ sys_month <- as.numeric(format(systm_date, format = "%m"))
 sys_date <- as.numeric(format(systm_date, format = "%d"))
 quater_of_year <- lubridate::quarter(systm_date$today)
 week_of_d <- as.numeric(format(systm_date, format = "%W"))
+
+if(week_of_d == 52) {
+  week_of_d <- 1
+} else {
+  week_of_d <- week_of_d + 1
+}
+
 day_of_year <-  as.numeric(format(systm_date, format = "%j"))
 
 # Indexer uses lubridate::wday() for day_of_week
