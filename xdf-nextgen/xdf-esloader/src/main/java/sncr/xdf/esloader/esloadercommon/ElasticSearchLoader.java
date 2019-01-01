@@ -16,6 +16,7 @@ import scala.Tuple2;
 import sncr.bda.conf.ESLoader;
 import sncr.bda.conf.Input;
 import sncr.xdf.esloader.XDFTimestampconverter;
+import sncr.xdf.exceptions.XDFException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -110,7 +111,7 @@ public class ElasticSearchLoader {
      *
      * @return tuple2 Contains the return code (status of 0 - SUCCESS and -1 - FAULURE)
      *         and a map of dataset objects and their respective indexes
-     * @throws Exception In case of loading failure
+     * @throws Exception In case of invalid configuration or loading failure
      */
     public Tuple2<Integer, Map<String, String>> loadSingleObject(String objectName, Dataset<Row> originalFrame,
                                 String inputDataFormat) throws Exception {
@@ -119,7 +120,7 @@ public class ElasticSearchLoader {
         //long totalRecordCount = 0;
 
         if(!essm.elasticSearchLoaderConfigured()){
-            return new Tuple2<>(-1, null);
+            throw new XDFException(XDFException.ErrorCodes.ConfigError);
         }
 
         // In case of partitioned data, each partition will be loaded separately
