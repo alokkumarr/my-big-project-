@@ -4,6 +4,7 @@ import java.util
 
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
+import org.json4s
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.slf4j.{Logger, LoggerFactory}
@@ -116,7 +117,7 @@ object QueryBuilder extends {
     val aggregate = (column \ "aggregate")
     if((aggregate !=JNothing) && aggregate.extract[String].equalsIgnoreCase("percentage"))
       "("+(artifactName + "." + (column \ "columnName").extract[String])+"*100)/(Select sum("+
-        (artifactName + "." + (column \ "columnName").extract[String])+") FROM "+ artifactName +") as PercentageCol"
+        (artifactName + "." + (column \ "columnName").extract[String])+") FROM "+ artifactName +") as " + (column \ "columnName").extract[String]
     else if (!(aggregate ==JNothing))
       aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
     else
@@ -345,7 +346,8 @@ object QueryBuilder extends {
           if (aggregateFlag) {
             val groupByColumn = columns.filter(col => {
               val groupBy = (col \ "aggregate")
-              (groupBy == JNothing || groupBy == None)
+              //Since we don't have built in Spark function to calculate percentage, and we are implementing our own logic, percentage column should do come under groupBy.(it's not a aggregate function here)
+              (groupBy == JNothing || groupBy == None) || (!(groupBy == JNothing || groupBy == None) && groupBy.extract[String].equalsIgnoreCase("percentage"))
             })
             val groupByColumns = groupByColumn.map(buildGroupByElement(_, tableName)).toSet
             // return groupByColumn
@@ -367,15 +369,10 @@ object QueryBuilder extends {
       (groupBy \ name).extract[String]
     }
 
-    if((groupBy !=JNothing) && (property("aggregate")).equalsIgnoreCase("percentage"))  {
-      "PercentageCol"
-    }
-    else  {
-      "%s.%s".format(
-        tableName,
-        property("columnName")
-      )
-    }
+    "%s.%s".format(
+      tableName,
+      property("columnName")
+    )
   }
 
   private def buildOrderBy(sqlBuilder: JObject) = {
