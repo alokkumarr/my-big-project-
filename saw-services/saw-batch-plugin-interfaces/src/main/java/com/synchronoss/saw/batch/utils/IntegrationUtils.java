@@ -30,7 +30,7 @@ public final class IntegrationUtils {
 
   }
 
-  public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-HH-mm-ss";
+  public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-HH-mm-ss-SSS";
   public static final String TAR_GZIP_FILE_EXTENSION = "gz";
   public static final String ZIP_FILE_EXTENSION = "zip";
   public static final String TAR_FILE_EXTENSION = "tar";

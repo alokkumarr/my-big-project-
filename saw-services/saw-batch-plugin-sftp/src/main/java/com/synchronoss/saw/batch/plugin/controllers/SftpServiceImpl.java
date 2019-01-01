@@ -521,7 +521,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
 
   @Override
-  public List<BisDataMetaInfo> transferData(Long channelId, Long routeId)
+  public synchronized List<BisDataMetaInfo> transferData(Long channelId, Long routeId)
       throws SipNestedRuntimeException {
     Preconditions.checkNotNull(channelId != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(routeId != null, "payload.getRouteId() cannot be null");
