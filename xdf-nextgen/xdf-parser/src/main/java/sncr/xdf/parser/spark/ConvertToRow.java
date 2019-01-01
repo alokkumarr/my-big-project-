@@ -36,6 +36,8 @@ public class ConvertToRow implements Function<String, Row> {
 
     private SimpleDateFormat df;
 
+    private CsvParser parser = null;
+
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
                         String lineSeparator,
@@ -65,6 +67,7 @@ public class ConvertToRow implements Function<String, Row> {
     }
     public Row call(String line) throws Exception {
 
+        if (parser == null) {
             CsvParserSettings settings = new CsvParserSettings();
 
             settings.getFormat().setLineSeparator(lineSeparator);
@@ -79,7 +82,10 @@ public class ConvertToRow implements Function<String, Row> {
             settings.setIgnoreTrailingWhitespaces(true);
             settings.setReadInputOnSeparateThread(false);
             settings.setProcessor(NoopRowProcessor.instance);
-            CsvParser  parser = new CsvParser(settings);
+
+            parser = new CsvParser(settings);
+        }
+
 
         Object[] record = new Object[schema.length() + 2];
         record[schema.length()] = 0;

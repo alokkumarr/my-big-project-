@@ -71,7 +71,7 @@ export const AnalyzeTestCase = {
 
     executeUserAnalysis : (id) => {
         let executeAnalysisRequest = {
-            method: demoConf.analyze.executeAnalysis.method,
+            method: demoConf.analyze.executeAnalysis.method, 
             url : demoConf.baseURL + demoConf.analyze.executeAnalysis.endPoint + id + '/executions',
             params: demoConf.analyze.executeAnalysis.params
         }
