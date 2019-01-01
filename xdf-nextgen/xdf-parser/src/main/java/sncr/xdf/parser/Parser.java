@@ -34,6 +34,7 @@ import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -232,17 +233,18 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
             if (files != null && files.length != 0) {
                 //Create archive directory
-                Path archivePath = new Path(archiveDir);
-                ctx.fs.mkdirs(archivePath);
 
                 logger.debug("Total files = " + files.length);
 
                 int archiveCounter = 0;
 
-                for(FileStatus status: files) {
-                    logger.debug("Archiving " +  status.getPath() + " to " + archivePath);
+                for(FileStatus fiile: files) {
+                    long currentTimestamp = Instant.now().toEpochMilli();
 
-                    if (archiveSingleFile(status.getPath(), archivePath)) {
+                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
+                    ctx.fs.mkdirs(archivePath);
+
+                    if (archiveSingleFile(fiile.getPath(), archivePath)) {
                         archiveCounter++;
                     }
                 }
