@@ -13,7 +13,7 @@
   <mat-chip-list #chipList>
     <mat-chip *ngFor="let filter of filters; let i = index;"
               [removable]="!readonly"
-              (removed)="onRemove(i)">
+              (removed)="onRemove(i)" style="padding-bottom: 1px;padding-top: 3px;">
       {{getDisplayName(filter)}}{{getFilterValue(filter)}}
       <mat-icon *ngIf="!readonly" matChipRemove fontIcon="icon-remove"></mat-icon>
     </mat-chip>

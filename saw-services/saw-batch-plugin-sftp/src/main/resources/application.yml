@@ -2,7 +2,7 @@ spring:
   application:
     name: saw-bis-sftp-plugin-services
   datasource:
-    url: jdbc:mariadb://localhost:3306/sip_batch_ingestion
+    url: jdbc:mariadb://localhost:3306/sip_bis
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver
@@ -31,4 +31,5 @@ logging:
 bis:
   transfer-batch-size: 10
   partial-file-timeDifference: 1000
-  default-data-drop-location: /workbench  
+  default-data-drop-location: /workbench
+  recheck-file-modified: false

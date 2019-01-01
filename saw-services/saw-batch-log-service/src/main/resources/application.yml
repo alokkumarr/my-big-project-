@@ -2,7 +2,7 @@ spring:
   application:
     name: saw-batch-log-service
   datasource:
-    url: jdbc:mariadb://localhost/SIP_BATCH_INGESTION
+    url: jdbc:mariadb://localhost/sip_bis
     username: root
     password: root
     driver-class-name:  org.mariadb.jdbc.Driver
@@ -27,5 +27,6 @@ logging:
   level:
     com.synchronoss.saw.logs: INFO
     org.springframework: INFO
-   
+bis:
+  scheduler-url : http://localhost:9601/scheduler/bisscheduler
        

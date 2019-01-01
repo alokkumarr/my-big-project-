@@ -301,13 +301,16 @@ object QueryBuilder extends {
         if (preset != null && !preset.equals("NA")) {
           lte = TransportUtils.dynamicDecipher(preset).getLte();
           gte = TransportUtils.dynamicDecipher(preset).getGte();
+          //"BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(gte, lte)
+          ">= TO_DATE('%s') AND %s.%s <= TO_DATE('%s')".format(gte, property("tableName"), property("columnName"), lte)
         }
         else {
           lte = subProperty("model", "lte")
           gte = subProperty("model", "gte")
+          // Here TO_DATE() method returns date and it ignores the timestamp part of it. So if user give date/timestamp as example
+          // ex : '23-12-2018 12:29:32' then TO_DATE('23-12-2018 12:29:32') will return '23-12-2018 00:00:00' so correcting this here by following:
+          ">= TO_DATE('%s') AND %s.%s <= TO_DATE(date_add('%s', 1))".format(gte, property("tableName"), property("columnName"), lte)
         }
-        //"BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(gte, lte)
-        ">= TO_DATE('%s') AND %s.%s <= TO_DATE('%s')".format(gte, property("tableName"), property("columnName"), lte)
       }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }
