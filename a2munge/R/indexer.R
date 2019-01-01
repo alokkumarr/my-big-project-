@@ -188,7 +188,7 @@ date_parter.data.frame <- function(df, measure_vars, label = FALSE, abbr = FALSE
         year = year(.),
         quarter = quarter(.),
         month = month(., abbr = abbr, label = label),
-        week = week(.),
+        week = isoweek(.),
         day_of_month = day(.),
         day_of_week = wday(., abbr = abbr, label = label),
         day_of_year = yday(.),
