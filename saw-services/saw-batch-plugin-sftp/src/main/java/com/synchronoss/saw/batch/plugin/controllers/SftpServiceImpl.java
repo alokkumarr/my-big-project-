@@ -570,7 +570,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
       
-      BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+      /*BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
       bisDataMetaInfo
           .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
       bisDataMetaInfo.setReceivedDataName("");
@@ -582,7 +582,7 @@ public class SftpServiceImpl extends SipPluginContract {
       bisDataMetaInfo.setChannelId(channelId);
       bisDataMetaInfo.setRouteId(channelId);
       bisDataMetaInfo.setActualReceiveDate(new Date());
-      sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+      sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());*/
     } finally {
       if (delegatingSessionFactory.getSessionFactory(channelId) != null
           && delegatingSessionFactory.getSessionFactory(channelId).getSession() != null) {
@@ -806,7 +806,8 @@ public class SftpServiceImpl extends SipPluginContract {
                     }
                     bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
                     bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
-                   
+                    sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                    list.add(bisDataMetaInfo);
                   } else {
                     if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
                         sourcelocation + File.separator + entry.getFilename())) {
@@ -827,8 +828,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       list.add(bisDataMetaInfo);
                     }
                   }
-                  sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                  list.add(bisDataMetaInfo);
+                 
                 } catch (Exception ex) {
                   logger.error("Exception occurred while transferring the file from channel", ex);
                   if (fileTobeDeleted.exists()) {
