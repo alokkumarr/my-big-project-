@@ -35,6 +35,8 @@ import sncr.xdf.preview.CsvInspectorRowProcessor;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -239,7 +241,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 int archiveCounter = 0;
 
                 for(FileStatus fiile: files) {
-                    long currentTimestamp = Instant.now().toEpochMilli();
+                    String currentTimestamp = LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
 
                     Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
                     ctx.fs.mkdirs(archivePath);
