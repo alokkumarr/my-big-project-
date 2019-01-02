@@ -35,7 +35,9 @@ import { RoleEditDialogComponent } from './role';
 import {
   AdminImportViewComponent,
   AdminImportListComponent,
-  AdminImportFileListComponent
+  AdminImportFileListComponent,
+  AdminImportCategorySelectComponent,
+  AdminImportPageState
 } from './import';
 import {
   PrivilegeEditDialogComponent,
@@ -85,7 +87,8 @@ const COMPONENTS = [
   CategoryDeleteDialogComponent,
   AdminImportViewComponent,
   AdminImportListComponent,
-  AdminImportFileListComponent
+  AdminImportFileListComponent,
+  AdminImportCategorySelectComponent
 ];
 
 const INTERCEPTORS = [
@@ -120,7 +123,7 @@ const SERVICES = [
 ];
 @NgModule({
   imports: [
-    NgxsModule.forFeature([AdminState, ExportPageState]),
+    NgxsModule.forFeature([AdminState, ExportPageState, AdminImportPageState]),
     CommonModuleTs,
     FormsModule,
     RouterModule.forChild(routes),
