@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   width: 100%;
@@ -14,26 +14,15 @@
     margin-right: 10px;
   }
 
-  .mat-form-field {
-    max-width: 100%;
-    width: auto;
-    margin: 0;
-    font-size: 14px;
-
-    .mat-form-field-infix {
-      width: unset;
-    }
-  }
-
-  .category-selector {
+  admin-import-category-select {
     margin-left: 10px;
-    max-width: 180px;
   }
 }
 
 .grid-title {
   color: $grey-text-color;
   font-size: 18px;
+  height: 36px;
   margin-right: 10px;
 }
 
@@ -46,4 +35,20 @@ admin-import-list {
   padding: 10px 0 0;
   height: calc(100% - 120px);
   display: block;
+}
+
+.admin-import-page {
+  &__list-container {
+    display: grid;
+    height: calc(100% - 64px);
+    grid-template-columns: 1fr 2fr;
+
+    mat-card {
+      box-shadow: none;
+    }
+
+    mat-card:last-child {
+      border-left: 2px dashed $primary-grey-g1;
+    }
+  }
 }
