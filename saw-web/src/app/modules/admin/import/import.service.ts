@@ -21,6 +21,26 @@ export class ImportService {
     public _jwtService: JwtService
   ) {}
 
+  /**
+   * Transforms a list of analyses into a map for easy lookup
+   * by analysis name, metric name and analysis type.
+   * Helps in quickly finding possible duplicates while importing.
+   *
+   * @param {Analysis[]} analyses
+   * @returns {{ [reference: string]: Analysis }}
+   * @memberof ImportService
+   */
+  createReferenceMapFor(
+    analyses: Analysis[]
+  ): { [reference: string]: Analysis } {
+    return analyses.reduce((acc, analysis) => {
+      acc[
+        `${analysis.name}:${analysis.metricName}:${analysis.type}`
+      ] = analysis;
+      return acc;
+    }, {});
+  }
+
   getRequestParams(params = []) {
     const reqParams = this._jwtService.getRequestParams();
 
