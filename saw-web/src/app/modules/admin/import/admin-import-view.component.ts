@@ -1,4 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Store, Select } from '@ngxs/store';
+import {
+  LoadAllAnalyzeCategories,
+  SelectAnalysisGlobalCategory,
+  LoadMetrics,
+  LoadAnalysesForCategory,
+  ClearImport,
+  RefreshAllCategories
+} from './actions/import-page.actions';
+import { Observable } from 'rxjs';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
@@ -54,14 +64,16 @@ interface FileContent {
   templateUrl: './admin-import-view.component.html',
   styleUrls: ['./admin-import-view.component.scss']
 })
-export class AdminImportViewComponent implements OnInit {
+export class AdminImportViewComponent implements OnInit, OnDestroy {
+  @Select(state => state.admin.importPage.categories.analyze)
+  categories$: Observable<any[]>;
+
+  @Select(state => state.admin.importPage.metrics) metricMap$: Observable<any>;
+
   files: Array<FileInfo>;
   fileContents: Array<FileContent>;
   selectedCategory;
-  categories$;
-  metricsMap: Object = {};
-  analyses: Array<Analysis>;
-  analysesFromBEMap: Object = {};
+  analyses: Array<any>;
   userCanExportErrors = false;
   atLeast1AnalysisIsSelected = false;
 
@@ -72,34 +84,23 @@ export class AdminImportViewComponent implements OnInit {
     public _exportService: ExportService,
     public _categoryService: CategoryService,
     public _sidenav: SidenavMenuService,
-    public _jwtService: JwtService
+    public _jwtService: JwtService,
+    private store: Store
   ) {}
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
-    this.categories$ = this._categoryService
-      .getList()
-      .then(fpFilter(category => category.moduleName === 'ANALYZE'));
-    this.getMetrics();
+    this.store.dispatch([new LoadAllAnalyzeCategories(), new LoadMetrics()]);
   }
 
-  getMetrics() {
-    this._exportService.getMetricList().then(metrics => {
-      this.metricsMap = reduce(
-        metrics,
-        (acc, metric) => {
-          acc[metric.metricName] = metric;
-          return acc;
-        },
-        {}
-      );
-    });
+  ngOnDestroy() {
+    this.store.dispatch(new ClearImport());
   }
 
   onRemoveFile(fileName) {
     this.fileContents = filter(
       this.fileContents,
-      ({ name }) => fileName !== name
+      ({ name, analyses }) => fileName !== name
     );
     this.splitFileContents(this.fileContents);
   }
@@ -111,6 +112,7 @@ export class AdminImportViewComponent implements OnInit {
     this.analyses = fpPipe(
       fpFlatMap(({ analyses }) => analyses),
       fpMap(analysis => {
+        analysis.categoryId = this.selectedCategory || '';
         const gridObj = this.getAnalysisObjectForGrid(analysis);
         if (gridObj.errorInd) {
           hasErrors = true;
@@ -119,6 +121,17 @@ export class AdminImportViewComponent implements OnInit {
       })
     )(contents);
     this.userCanExportErrors = hasErrors;
+  }
+
+  updateGridObject(analysisId) {
+    const id = this.analyses.findIndex(
+      ({ analysis }) => analysis.id === analysisId
+    );
+    const newGridObject = this.getAnalysisObjectForGrid(
+      this.analyses[id].analysis,
+      this.analyses[id].selection
+    );
+    this.analyses.splice(id, 1, newGridObject);
   }
 
   readFiles(event) {
@@ -141,39 +154,56 @@ export class AdminImportViewComponent implements OnInit {
     Promise.all(contentPromises).then(contents => {
       this.fileContents = contents;
       this.splitFileContents(contents);
+
       // clear the file input
       event.target.value = '';
     });
   }
 
-  onCategoryChange(categoryId) {
+  onCategoryChange(categoryId: string) {
     this.selectedCategory = categoryId;
-    this._importService.getAnalysesFor(toString(categoryId)).then(analyses => {
-      this.analysesFromBEMap = reduce(
-        analyses,
-        (acc, analysis) => {
-          acc[
-            `${analysis.name}:${analysis.metricName}:${analysis.type}`
-          ] = analysis;
-          return acc;
-        },
-        {}
-      );
-      this.splitFileContents(this.fileContents);
-    });
+    this.store
+      .dispatch(new SelectAnalysisGlobalCategory(categoryId))
+      .subscribe(() => {
+        this.splitFileContents(this.fileContents);
+      });
   }
 
-  getAnalysisObjectForGrid(analysis) {
-    const metric = this.metricsMap[analysis.metricName];
+  onAnalysisCategoryChange({ categoryId, analysisId }) {
+    this.setAnalysisCategory(categoryId, analysisId);
+    this.store
+      .dispatch(new LoadAnalysesForCategory(categoryId))
+      .subscribe(() => {
+        this.updateGridObject(analysisId);
+      });
+  }
+
+  setAnalysisCategory(categoryId, analysisId) {
+    const a = this.analyses.find(({ analysis }) => analysis.id === analysisId);
+    if (a && a.analysis) {
+      a.analysis.categoryId = toString(categoryId);
+    }
+  }
+
+  getAnalysisObjectForGrid(analysis, selection = false) {
+    const { metrics, referenceAnalyses } = this.store.selectSnapshot(
+      state => state.admin.importPage
+    );
+    const metric = metrics[analysis.metricName];
     if (metric) {
       analysis.semanticId = metric.id;
     }
-    const analysisFromBE = this.analysesFromBEMap[
-      `${analysis.name}:${analysis.metricName}:${analysis.type}`
-    ];
+    const analysisCategory =
+      referenceAnalyses[analysis.categoryId.toString()] || {};
+    const analysisFromBE =
+      analysisCategory[
+        `${analysis.name}:${analysis.metricName}:${analysis.type}`
+      ];
 
     const possibilitySelector = metric
-      ? analysisFromBE ? 'duplicate' : 'normal'
+      ? analysisFromBE
+        ? 'duplicate'
+        : 'normal'
       : 'noMetric';
 
     const possibility = this.getPossibleGridObjects(
@@ -184,7 +214,7 @@ export class AdminImportViewComponent implements OnInit {
 
     return {
       ...possibility,
-      selection: false
+      selection
     };
   }
 
@@ -261,59 +291,65 @@ export class AdminImportViewComponent implements OnInit {
       })
     )(this.analyses);
 
-    executeAllPromises(importPromises).then(results => {
-      const selectedAnalyses = filter(this.analyses, 'selection');
+    executeAllPromises(importPromises).then(
+      results => {
+        const selectedAnalyses = filter(this.analyses, 'selection');
 
-      const updatedAnalysesMap = reduce(
-        results,
-        (acc, result, index) => {
-          if (result.result) {
-            const analysis = result.result;
-            acc[analysis.id] = { analysis };
-          } else {
-            const error = result.error;
-            const gridObj = selectedAnalyses[index];
-            acc[gridObj.analysis.id] = { error };
+        const updatedAnalysesMap = reduce(
+          results,
+          (acc, result, index) => {
+            if (result.result) {
+              const analysis = result.result;
+              acc[analysis.id] = { analysis };
+            } else {
+              const error = result.error;
+              const gridObj = selectedAnalyses[index];
+              acc[gridObj.analysis.id] = { error };
+            }
+
+            return acc;
+          },
+          {}
+        );
+
+        let hasErrors = false;
+        let someImportsWereSuccesful = false;
+        // update the logs
+        forEach(this.analyses, gridObj => {
+          if (gridObj.selection) {
+            const id = gridObj.analysis.id;
+            const container = updatedAnalysesMap[id];
+            // if analysis was updated
+            if (container && container.analysis) {
+              gridObj.logColor = 'green';
+              gridObj.log = 'Successfully Imported';
+              gridObj.errorInd = false;
+              gridObj.duplicateAnalysisInd = true;
+              gridObj.selection = false;
+              someImportsWereSuccesful = true;
+            } else {
+              hasErrors = true;
+              const error = container.error;
+              gridObj.logColor = 'red';
+              gridObj.log = 'Error While Importing';
+              gridObj.errorMsg = get(error, 'error.error.message');
+              gridObj.errorInd = true;
+            }
           }
+        });
 
-          return acc;
-        },
-        {}
-      );
+        this.userCanExportErrors = hasErrors;
 
-      let hasErrors = false;
-      let someImportsWereSuccesful = false;
-      // update the logs
-      forEach(this.analyses, gridObj => {
-        if (gridObj.selection) {
-          const id = gridObj.analysis.id;
-          const container = updatedAnalysesMap[id];
-          // if analysis was updated
-          if (container && container.analysis) {
-            gridObj.logColor = 'green';
-            gridObj.log = 'Successfully Imported';
-            gridObj.errorInd = false;
-            gridObj.duplicateAnalysisInd = true;
-            gridObj.selection = false;
-            someImportsWereSuccesful = true;
-          } else {
-            hasErrors = true;
-            const error = container.error;
-            gridObj.logColor = 'red';
-            gridObj.log = 'Error While Importing';
-            gridObj.errorMsg = get(error, 'error.error.message');
-            gridObj.errorInd = true;
-          }
+        if (someImportsWereSuccesful) {
+          this.analyses = [...this.analyses];
         }
-      });
-
-      this.userCanExportErrors = hasErrors;
-
-      if (someImportsWereSuccesful) {
-        this.analyses = [...this.analyses];
+        this.atLeast1AnalysisIsSelected = false;
+        this.store.dispatch(new RefreshAllCategories());
+      },
+      () => {
+        this.store.dispatch(new RefreshAllCategories());
       }
-      this.atLeast1AnalysisIsSelected = false;
-    });
+    );
   }
 
   exportErrors() {
@@ -383,8 +419,15 @@ export class AdminImportViewComponent implements OnInit {
     });
   }
 
+  canImport() {
+    const selectedAnalyses = filter(this.analyses, 'selection') || [];
+    return (
+      selectedAnalyses.length &&
+      selectedAnalyses.every(({ analysis }) => Boolean(analysis.categoryId))
+    );
+  }
+
   importExistingAnalysis(analysis): Promise<Analysis> {
-    analysis.categoryId = toString(this.selectedCategory);
     return this._importService.updateAnalysis(analysis);
   }
 

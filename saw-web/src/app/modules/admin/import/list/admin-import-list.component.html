@@ -1,62 +1,81 @@
-<dx-data-grid [customizeColumns]="config.customizeColumns"
-              [columnAutoWidth]="config.columnAutoWidth"
-              [columnMinWidth]="config.columnMinWidth"
-              [columnResizingMode]="config.columnResizingMode"
-              [allowColumnReordering]="config.allowColumnReordering"
-              [allowColumnResizing]="config.allowColumnResizing"
-              [showColumnHeaders]="config.showColumnHeaders"
-              [showColumnLines]="config.showColumnLines"
-              [showRowLines]="config.showRowLines"
-              [showBorders]="config.showBorders"
-              [rowAlternationEnabled]="config.rowAlternationEnabled"
-              [hoverStateEnabled]="config.hoverStateEnabled"
-              [wordWrapEnabled]="config.wordWrapEnabled"
-              [scrolling]="config.scrolling"
-              [sorting]="config.sorting"
-              [dataSource]="analyses"
-              [columns]="config.columns"
-              [pager]="{
-                showPageSizeSelector: !isEmpty(analyses),
-                showInfo: true,
-                showNavigationButtons: true,
-                allowedPageSizes: [5, 10, 20]
-              }"
-              [paging]="config.paging"
-              [width]="config.width"
-              [height]="config.height"
+<dx-data-grid
+  [customizeColumns]="config.customizeColumns"
+  [columnAutoWidth]="config.columnAutoWidth"
+  [columnMinWidth]="config.columnMinWidth"
+  [columnResizingMode]="config.columnResizingMode"
+  [allowColumnReordering]="config.allowColumnReordering"
+  [allowColumnResizing]="config.allowColumnResizing"
+  [showColumnHeaders]="config.showColumnHeaders"
+  [showColumnLines]="config.showColumnLines"
+  [showRowLines]="config.showRowLines"
+  [showBorders]="config.showBorders"
+  [rowAlternationEnabled]="config.rowAlternationEnabled"
+  [hoverStateEnabled]="config.hoverStateEnabled"
+  [wordWrapEnabled]="config.wordWrapEnabled"
+  [scrolling]="config.scrolling"
+  [sorting]="config.sorting"
+  [dataSource]="analyses"
+  [columns]="config.columns"
+  [pager]="{
+    showPageSizeSelector: !isEmpty(analyses),
+    showInfo: true,
+    showNavigationButtons: true,
+    allowedPageSizes: [5, 10, 20]
+  }"
+  [paging]="config.paging"
+  [width]="config.width"
+  [height]="config.height"
 >
   <div *dxTemplate="let cell of 'selectionHeaderCellTemplate'">
-    <mat-checkbox (change)="selectAll()"
-                  [checked]="areAllSelected"
-                  i18n>
+    <mat-checkbox (change)="selectAll()" [checked]="areAllSelected" i18n>
       All
     </mat-checkbox>
   </div>
 
-  <div *dxTemplate="let cell of 'selectionCellTemplate'" fxLayout="row" fxLayoutAlign="space-between center">
-    <mat-checkbox (change)="onChecked(cell.data)"
-                  [checked]="cell.data.selection"
-                  [disabled]="cell.data.noMetricInd || (cell.data.duplicateAnalysisInd && !cell.data.selection)">
-    </mat-checkbox>
-    <a *ngIf="cell.data.duplicateAnalysisInd"
-       (click)="overWrite(cell.data)"
-       style="font-size: x-small;"
-       i18n
+  <div
+    *dxTemplate="let cell of 'selectionCellTemplate'"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+  >
+    <mat-checkbox
+      (change)="onChecked(cell.data)"
+      [checked]="cell.data.selection"
+      [disabled]="
+        cell.data.noMetricInd ||
+        (cell.data.duplicateAnalysisInd && !cell.data.selection)
+      "
     >
-    [OVERWRITE]
+    </mat-checkbox>
+    <a
+      *ngIf="cell.data.duplicateAnalysisInd"
+      (click)="overWrite(cell.data)"
+      style="font-size: x-small;"
+      i18n
+    >
+      [OVERWRITE]
     </a>
   </div>
 
-  <div *dxTemplate="let cell of 'logCellTemplate'" [style.color]="cell.data.logColor">
-    <span *ngIf="cell.data.errorInd"
-          style="cursor: pointer;"
-          (click)="displayError(cell.data.errorMsg)"
+  <div
+    *dxTemplate="let cell of 'logCellTemplate'"
+    [style.color]="cell.data.logColor"
+    [style.whiteSpace]="'pre-line'"
+  >
+    <span
+      *ngIf="cell.data.errorInd"
+      style="cursor: pointer"
+      (click)="displayError(cell.data.errorMsg)"
     >
-      {{cell.value}}
+      {{ cell.value }}
     </span>
-    <span *ngIf="!cell.data.errorInd">
-      {{cell.value}}
-    </span>
+    <span *ngIf="!cell.data.errorInd"> {{ cell.value }} </span>
   </div>
 
+  <div *dxTemplate="let cell of 'categoryCellTemplate'">
+    <admin-import-category-select
+      [categories]="categories"
+      [value]="cell.data.analysis.categoryId.toString()"
+      (change)="onSelectCategory($event, cell.data)"
+    ></admin-import-category-select>
+  </div>
 </dx-data-grid>
