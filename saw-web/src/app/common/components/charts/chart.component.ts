@@ -105,13 +105,13 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // set the appropriate config based on chart type
     this.cType = this.isStockChart ? 'highStock' : options.chart.type;
     this.config = defaultsDeep(
+      options,
+      this.config,
       get(
         find(this.chartSettings, ['type', this.cType]),
         'config',
         cloneDeep(chartOptions)
-      ),
-      options,
-      this.config
+      )
     );
     if (this.enableExport) {
       this.config.exporting = {
