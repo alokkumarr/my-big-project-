@@ -3,7 +3,8 @@ package sncr.xdf.adapters.writers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.base.MetadataBase;
@@ -14,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class DLBatchWriter {
-    private static final Logger logger = Logger.getLogger(DLBatchWriter.class);
+    public static final Logger logger = LoggerFactory.getLogger(DLBatchWriter.class);
     protected String format;
     protected Integer numberOfFiles;
     protected List<String> keys;
@@ -84,6 +85,7 @@ public class DLBatchWriter {
         }
 
         String dataLocation = (produceSample)? tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR : tempLocation;
+        logger.trace("baseWrite:dataLocation:destination :" + dataLocation);
         //TODO:: Fix BDA Meta
         String sampleLocation = tempLocation + Path.SEPARATOR + "sample";
 
@@ -143,16 +145,16 @@ public class DLBatchWriter {
         if (produceSample) {
             switch (format){
                 case "parquet":
-                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                     break;
                 case "json" :
-                    DS.repartition(1).sample(false, 0.1).write().json(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().json(sampleLocation);
                     break;
                 case "csv" :
-                    DS.repartition(1).sample(false, 0.1).write().csv(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().csv(sampleLocation);
                     break;
                 default:
-                    DS.repartition(1).sample(false, 0.1).write().parquet(sampleLocation);
+                    DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                     break;
             }
         }

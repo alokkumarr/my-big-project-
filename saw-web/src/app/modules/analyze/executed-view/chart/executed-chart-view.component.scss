@@ -13,13 +13,31 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   font-size: $header-font-size;
 }
 
+.analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-container {
+  width: 90%;
+}
+
 .toggle-icons {
   text-align: right;
-  height: 25px;
-  margin-right: 5%;
   font-size: 15px;
+  margin-top: 7px;
+
+  .icon-report {
+    width: 19px;
+  }
 }
 
 .mat-icon.active {
   color: $primary-blue-b2;
+}
+
+mat-icon.export {
+  background-image: url('/assets/img/excel.png');
+  transform: scale(0.7);
 }

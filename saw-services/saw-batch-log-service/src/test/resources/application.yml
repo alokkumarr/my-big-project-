@@ -1,0 +1,39 @@
+info:
+  component: Synchronoss log Service
+spring:
+  application:
+    name: saw-log-service
+  datasource:
+    url:  jdbc:hsqldb:hsql//localhost/SIP_BIS
+    username: root
+    password: null
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+    max-active: 25
+    testOnBorrow: true
+    testOnConnect: true
+    testOnReturn: true
+    validationQuery: SELECT 1
+    testWhileIdle: true
+    logValidationErrors: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        default_schema: SIP_BIS
+    database-platform: org.hibernate.dialect.HSQLDialect
+server:
+  address: localhost
+  port: 9200
+  servlet:
+    context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+logging:
+  level:
+    com.synchronoss.saw.logs: DEBUG
+    org.springframework: INFO
+    
+scheduler-url: http://localhost:9601/scheduler/bisscheduler

@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+  @import "src/themes/base/colors";
 
 $back-button-size: 32px;
 
@@ -7,7 +7,7 @@ $back-button-size: 32px;
 }
 
 filter-chips-u {
-  padding: 10px 0 10px 10px;
+  padding: 11px 0 10px 10px;
 }
 
 
@@ -95,4 +95,8 @@ filter-chips-u {
 
 .chart-data-grid .dx-datagrid .dx-datagrid-headers .dx-datagrid-content table tbody tr.dx-header-row td {
   text-align: left !important;
+}
+
+.executed-view-analysis {
+  margin: 0 10px 0 10px;
 }

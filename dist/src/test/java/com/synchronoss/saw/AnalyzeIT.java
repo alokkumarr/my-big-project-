@@ -1,20 +1,5 @@
 package com.synchronoss.saw;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.*;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -25,13 +10,31 @@ import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.net.ftp.FTPClient;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
 /**
  * Integration test that lists metrics, creates an analysis, saves it,
@@ -386,14 +389,14 @@ public class AnalyzeIT extends BaseIT {
             .body(json)
             .when().post("/saw/services/analysis")
             .then().assertThat().statusCode(200)
-            .body(buckets + ".totalRows", equalTo(215));
+            .body(buckets + ".totalRows", equalTo(247));
     }
 
   private String listSingleExecution(String token, String analysisId) {
     Response response = request(token)
                         .when().get("/saw/services/analysis/" + analysisId + "/executions")
                         .then().assertThat().statusCode(200)
-                        .body("executions", hasSize(1))
+                        .body("executions.size()", greaterThan(0))
                         .extract().response();
     return response.path("executions[0].id");
   }
@@ -452,7 +455,7 @@ public class AnalyzeIT extends BaseIT {
                         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
     JsonNode jsonNode= root.get("long");
-    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1513);
+    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1546);
     Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
   }
 

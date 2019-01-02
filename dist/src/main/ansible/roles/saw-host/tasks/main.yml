@@ -14,3 +14,29 @@
   file:
     path: /etc/sip
     state: directory
+# Create old /etc/bda directory for backwards compatibility
+- name: Create the /etc/bda directory
+  file:
+    path: /etc/bda
+    state: directory
+- name: Add MapR classpath utility for services
+  copy:
+    dest: /usr/bin/sip-mapr-classpath
+    mode: a=rx
+    content: |
+      #!/bin/bash
+      #
+      # Output MapR classpath in format compatible with Spring
+      # launcher "loader.path" option, as needed by SIP services
+      # using Spring Boot Maven plug-in for packaging while still needing
+      # to add the external MapR classpath at runtime
+      #
+      set -eu
+      # Some patterns do not match anything, so use nullglob to keep going
+      shopt -s nullglob
+      # Get the MapR and Hadoop classpaths and remove colons to prepare
+      # for glob expansion
+      classpath=$((mapr classpath && hadoop classpath) | sed -e 's/:/ /g')
+      # Expand glob patterns and separate entries by comma
+      # as required by Spring "loader.path" option
+      echo $classpath | sed -e 's/ /,/g'

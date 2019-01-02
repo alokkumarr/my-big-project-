@@ -7,7 +7,7 @@
   yum_repository:
     name: mariadb
     description: MariaDB repository
-    baseurl: http://yum.mariadb.org/10.3/centos7-amd64
+    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.3/centos7-amd64') }}"
     gpgcheck: no
 - name: Install MariaDB package
   # Note: While using the MariaDB repository, use the capitalized
@@ -72,3 +72,20 @@
 - name: Run MariaDB databases upgrade
   shell: "mysql_upgrade --password=$(< /etc/bda/mariadb-root-password)"
   when: "groups['saw-security'].index(inventory_hostname) == 0"
+- name: Migrate MariaDB root password from old location
+  fetch:
+    src: /etc/bda/mariadb-root-password
+    dest: "{{ inventory_dir + '/mariadb-root-password' }}"
+    flat: yes
+    fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+- name: Look up MariaDB root database password
+  set_fact:
+    mariadb_root_password: >-
+      {{ lookup('password', inventory_dir
+        + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Store the MariaDB root password
+  copy:
+    content: "{{ mariadb_root_password }}"
+    dest: /etc/bda/mariadb-root-password
+    mode: u=rw,g=,o=

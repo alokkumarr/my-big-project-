@@ -1,0 +1,12 @@
+- name: Install SIP product module on Security Service nodes
+  hosts: saw-security
+  become: true
+  roles:
+    - role: saw-security
+      # Database initialization only needs to run on one host
+      when: "groups['saw-security'].index(inventory_hostname) == 0"
+- name: Install SIP product module on Web Service nodes
+  hosts: saw-web
+  become: true
+  roles:
+    - saw-web

@@ -33,11 +33,23 @@
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
         <dxi-column caption="Channel Name" dataField="channelName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
         <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
+        <dxi-column caption="Actions" dataField="bisRouteSysId" alignment="center" cellTemplate="actionsTemplate"
+              [allowFiltering]="false" [allowSorting]="false">
+        </dxi-column>
+        <div *dxTemplate="let data of 'actionsTemplate'" fxLayout="row" fxLayoutAlign="center center">
+          <button mat-icon-button i18n-matTooltip
+                  class="grid-icon-btn"
+                  [color]="data.data.status ? 'error' : 'primary'"
+                  [matTooltip]="data.data.status ? 'Deactivate' : 'Activate'"
+            (click)="toggleChannelActivation(data.data)">
+            <mat-icon fontIcon="icon-logout"></mat-icon>
+          </button>
+        </div>
         <div *dxTemplate="let data of 'sourceTypeTemplate'">
           <div fxHide.lt-lg="true" class="master-detail-caption">{{selectedSourceType | uppercase}}</div>
         </div>
         <div *dxTemplate="let data of 'nameTemplate'">
-          <div class="s-name">{{data.value}}</div>
+          <div class="s-name" [matTooltip]="data.value">{{data.value}}</div>
         </div>
       </dx-data-grid>
 
@@ -47,8 +59,8 @@
             <span class="details-title mat-subheading-2">{{selectedSourceData?.channelName | uppercase}}</span>
           </div>
           <span fxFlex></span>
-          <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="testConnection()"
-            i18n-matTooltip matTooltip="Test Connectivity">
+          <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="testChannel(selectedSourceData?.bisChannelSysId)"
+            i18n-matTooltip matTooltip="Test Channel Connectivity">
             <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
           <button mat-mini-fab class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="createSource(selectedSourceData)"
@@ -59,7 +71,7 @@
             matTooltip="Delete Channel" i18n-matTooltip>
             <mat-icon fontIcon="icon-delete-solid"></mat-icon>
           </button>
-          <button mat-raised-button color="primary" [disabled]="!channelEditable" (click)="createRoute( selectedSourceData?.bisChannelSysId)">
+          <button mat-raised-button color="primary" [disabled]="!channelEditable" (click)="createRoute(selectedSourceData?.bisChannelSysId)">
             <span i18n>+ Route</span>
           </button>
         </div>
@@ -68,56 +80,61 @@
         </div>
         <div class="routes-card-body">
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Host Name : </span>
               <span>{{selectedSourceData?.hostName}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Port No : </span>
               <span>{{selectedSourceData?.portNo}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Access Type : </span>
               <span>{{selectedSourceData?.accessType}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Description : </span>
               <span>{{selectedSourceData?.description}}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Created By : </span>
-              <span>{{selectedSourceData?.createdBy}}</span>
+              <span>{{selectedSourceData?.modifiedBy || selectedSourceData?.createdBy}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
-              <span class="prop-name" i18n>Created Date : </span>
-              <span>{{selectedSourceData?.createdDate | date: 'short'}}</span>
+            <div class="details-content" fxFlex="50" fxLayout="row">
+              <span class="prop-name" i18n>Last Modified: </span>
+              <span *ngIf="selectedSourceData">
+                <span>{{selectedSourceData?.modifiedDate || selectedSourceData?.createdDate | date: 'short'}}</span>
+              </span>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>User Name : </span>
               <span>{{selectedSourceData?.userName}}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxFlex.lt-md="100" fxLayout="row">
+            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" i18n>Password : </span>
-              <span class="pwd-hide" [class.pwd-show]="show === true">{{selectedSourceData?.password}}</span>
-              <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
-                <mat-icon fontIcon="icon-show"></mat-icon>
-              </button>
-              <button *ngIf="show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
-                <mat-icon fontIcon="icon-hide"></mat-icon>
-              </button>
+              <div *ngIf="selectedSourceData">
+                  <span *ngIf="show; else hidePwd">{{selectedSourceData?.password}}</span>
+                  <ng-template #hidePwd>&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;</ng-template>
+                  <button *ngIf="!show" matTooltip="Show Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                    <mat-icon fontIcon="icon-show"></mat-icon>
+                  </button>
+                  <button *ngIf="show" matTooltip="Hide Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                    <mat-icon fontIcon="icon-hide"></mat-icon>
+                  </button>
+              </div>
             </div>
           </div>
           <mat-divider></mat-divider>
@@ -129,7 +146,7 @@
             <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
             <dxi-column caption="Route Name" dataField="routeName" alignment="left"></dxi-column>
             <dxi-column caption="Created By" dataField="createdBy" alignment="left"></dxi-column>
-            <dxi-column caption="Created Date" dataField="createdDate" alignment="left" cellTemplate="dateTemplate"></dxi-column>
+            <dxi-column caption="Last Modified" dataField="createdDate" alignment="left" cellTemplate="dateTemplate"></dxi-column>
             <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
             <dxi-column caption="Schedule" dataField="schedulerExpression" alignment="left" [calculateCellValue]="calculateScheduleCellValue"></dxi-column>
             <dxi-column caption="Source Location" dataField="sourceLocation" alignment="left"></dxi-column>
@@ -139,45 +156,46 @@
               [allowFiltering]="false" [allowSorting]="false"></dxi-column>
 
             <div *dxTemplate="let data of 'nameTemplate'">
-              <div class="details-title mat-subheading-2">Availalble Routes</div>
+              <div class="details-title mat-subheading-2" i18n>Available Routes</div>
             </div>
 
             <div *dxTemplate="let data of 'dateTemplate'">
-              <span [innerHTML]="data.value * 1000 | date: 'short'"></span>
+              <span *ngIf="data.data.modifiedDate; else defDate">{{data.data.modifiedDate | date: 'short'}}</span>
+                <ng-template #defDate>{{data.data.createdDate | date: 'short'}}</ng-template>
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
-              <div fxHide.lt-lg="true">
-                <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Test Connectivity"
-                  (click)="testConnection()">
-                  <mat-icon fontIcon="icon-query-mode"></mat-icon>
-                </button>
-                <button mat-icon-button class="grid-icon-btn" color="primary" i18n-matTooltip matTooltip="Edit Route"
-                  (click)="createRoute(data.data)">
-                  <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
-                </button>
-                <button mat-icon-button class="grid-icon-btn" color="warn" (click)="deleteRoute(data.data)"
-                  i18n-matTooltip matTooltip="Delete Route">
-                  <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
-                </button>
-              </div>
-
-
-              <button fxHide.gt-md="true" mat-icon-button class="triggerbtn" [matMenuTriggerFor]="datapodmenu">
+              <button mat-icon-button class="triggerbtn" [matMenuTriggerFor]="datapodmenu">
                 <mat-icon fontIcon="icon-action-solid"></mat-icon>
               </button>
               <mat-menu #datapodmenu="matMenu">
-                <button mat-menu-item (click)="testConnection()">
+                <button mat-menu-item
+                        [disabled]="!selectedSourceData?.status"
+                        [attr.color]="data.data.status ? 'warn' : 'primary'"
+                        (click)="toggleRouteActivation(data.data)"
+                >
+                  <mat-icon class="menu-btn-icon"
+                            [color]="data.data.status ? 'warn' : 'primary'"
+                            [attr.color]="data.data.status ? 'warn' : 'primary'"
+                            fontIcon="icon-logout">
+                  </mat-icon>
+                  <span>{{data.data.status ? 'Deactivate' : 'Activate'}}</span>
+                </button>
+                <button mat-menu-item (click)="openLogsDialog(data.data)">
+                  <mat-icon class="menu-btn-icon" fontIcon="icon-clipboard"></mat-icon>
+                  <span i18n>View Route Logs</span>
+                </button>
+                <button mat-menu-item (click)="testRoute(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-query-mode"></mat-icon>
-                  <span>Test Connectivity</span>
+                  <span i18n>Test Route Connectivity</span>
                 </button>
                 <button mat-menu-item (click)="createRoute(data.data)">
                   <mat-icon class="menu-btn-icon" fontIcon="icon-edit"></mat-icon>
-                  <span>Edit Route</span>
+                  <span i18n>Edit Route</span>
                 </button>
                 <button color="warn" mat-menu-item (click)="deleteRoute(data.data)">
                   <mat-icon color="warn" class="menu-btn-icon" fontIcon="icon-delete"></mat-icon>
-                  <span>Delete Route</span>
+                  <span i18n>Delete Route</span>
                 </button>
               </mat-menu>
             </div>

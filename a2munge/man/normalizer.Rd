@@ -26,9 +26,9 @@ Transformed Dataframe with the same dimensions of input dataframe
 }
 \description{
 Data transformation function to normalize one or more variables. The normalize
-function transforms values by subtracting the min and dividing by the max of
-all values. The function is applied columnwise only. The function only applies
-to numerical data types.
+function transforms values by subtracting the min and dividing by the
+difference between the max and min of all values. The function is applied
+columnwise only. The function only applies to numerical data types.
 }
 \details{
 The normalize function transforms values to a [0,1] range. The underlying

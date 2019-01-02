@@ -1,37 +1,46 @@
-[SAW Gateway Service]
-
-node "SAW Transport Service" {
-    [SAW Dataset Service]
-    [SAW Analysis Service]
-    [SAW Execution Service]
-    [SAW Export Service]
-}
-
-[SAW Scheduler Service]
-
-cloud "MapR cluster" {
-    [MapR-DB]
+package "MapR cluster" {
+    [MapR Services]
     [Apache Spark]
 }
 
-cloud "Elasticsearch cluster" {
+package "Elasticsearch cluster" {
     [Elasticsearch]
 }
 
-[SAW Gateway Service] ..> [SAW Dataset Service]
-[SAW Gateway Service] ..> [SAW Analysis Service]
-[SAW Gateway Service] ..> [SAW Execution Service]
+[SIP Gateway] .> [SIP Security] : HTTP
 
-[SAW Dataset Service] ..> [MapR-DB]
-[SAW Analysis Service] ..> [MapR-DB]
+[SIP Gateway] ..> [SIP Batch Ingestion] : HTTP
+[SIP Gateway] ..> [SIP Datapod] : HTTP
+[SIP Gateway] ..> [SIP Export] : HTTP
+[SIP Gateway] ..> [SIP Observe] : HTTP
+[SIP Gateway] ..> [SIP Scheduler] : HTTP
+[SIP Gateway] ..> [SIP Semantic] : HTTP
+[SIP Gateway] ..> [SIP Storage Proxy] : HTTP
+[SIP Gateway] ..> [SIP Transport] : HTTP
+[SIP Gateway] ..> [SIP Workbench] : HTTP
 
-[SAW Execution Service] ..> [SAW Analysis Service]
-[SAW Execution Service] ..> [MapR-DB]
-[SAW Execution Service] ..> [Apache Spark]
-[SAW Execution Service] ...> [Elasticsearch]
+[SIP Datapod] ..> [MapR Services] : MapR client
+[SIP Observe] ..> [MapR Services] : MapR client
+[SIP Storage Proxy] ..> [MapR Services] : MapR client
+[SIP Semantic] ..> [MapR Services] : MapR client
+[SIP Transport] ..> [MapR Services] : MapR client
+[SIP Workbench] ..> [MapR Services] : MapR client
 
-[SAW Export Service] ..> [SAW Execution Service]
+[SIP Transport] ..> [Apache Spark] : Spark client
+[SIP Workbench] ..> [Apache Spark] : Spark client
 
-[SAW Scheduler Service] ..> [SAW Analysis Service]
-[SAW Scheduler Service] ..> [SAW Execution Service]
-[SAW Scheduler Service] ..> [MapR-DB]
+[SIP Storage Proxy] ..> [Elasticsearch] : Elasticsearch client
+[SIP Transport] ..> [Elasticsearch] : Elasticsearch client
+
+database MariaDB
+
+[SIP Batch Ingestion] ..> MariaDB : MariaDB client
+[SIP Scheduler] ..> MariaDB : MariaDB client
+[SIP Security] ..> MariaDB : MariaDB client
+
+[SIP Batch Ingestion] ..> [SIP Scheduler] : HTTP
+[SIP Scheduler] ..> [SIP Export] : HTTP
+[SIP Scheduler] ..> [SIP Batch Ingestion] : HTTP
+[SIP Scheduler] ..> [SIP Transport] : HTTP
+[SIP Semantic] ..> [SIP Transport] : HTTP
+[SIP Semantic] ..> [SIP Workbench] : HTTP

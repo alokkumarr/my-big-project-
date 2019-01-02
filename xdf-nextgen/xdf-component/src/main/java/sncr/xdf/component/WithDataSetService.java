@@ -8,6 +8,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import scala.Tuple4;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
@@ -234,20 +235,26 @@ public interface WithDataSetService {
         Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
                 DLDataSetOperations.getPartitioningInfo(location);
 
+        DataSetServiceAux.logger.debug("Dataset partitioning = " + trgDSPartitioning);
+
         //Check partitioning structure and match it with metadata/input
         if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
                 trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
             throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
         }
 
-        List<String> system = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
+        List<String> partitionKeys =
+            (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
 
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
-            if (system != null) {
-                if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && trgDSPartitioning._2() != null) {
-                    for (int i = 0; i < system.size(); i++)
-                        if (!system.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
-                            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
+            if (partitionKeys != null) {
+                if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE
+                    && trgDSPartitioning._2() != null) {
+                    for (int i = 0; i < partitionKeys.size(); i++)
+                        if (!partitionKeys.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
+                            throw new XDFException(XDFException.ErrorCodes.ConfigError,
+                                "Order and/or set of partitioning keys in Metadata" +
+                                    " and in dataset does not match");
                         }
                 }
             } else  //No key were provided in Output Dataset configuration: add them from existing dataset
@@ -289,7 +296,12 @@ public interface WithDataSetService {
                 .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
                 .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
                 .append(Path.SEPARATOR + aux.ctx.batchID)
-                .append(Path.SEPARATOR + aux.ctx.componentName);
+                .append(Path.SEPARATOR + aux.ctx.componentName)
+
+                 /* Creating a dynamic directory, so that components running is parallel will not
+                  * run into conflicts
+                  */
+                .append(Path.SEPARATOR + new DateTime().getMillis());
 
         DataSetServiceAux.logger.debug(String.format("Generated temp location: %s",
             tempLocationBuilder.toString()));

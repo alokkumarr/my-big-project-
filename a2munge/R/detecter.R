@@ -118,69 +118,6 @@ detect.data.frame <- function(df,
 
 
 
-#' @inheritParams detect
-#' @rdname detect
-#' @export
-detect.grouped_df <- function(df,
-                              index_var,
-                              measure_var,
-                              frequency,
-                              direction = 'pos',
-                              alpha = .01,
-                              max_anoms = .01,
-                              trend_window = 0.75){
-
-  df_names <- colnames(df)
-  checkmate::assert_choice(index_var, df_names)
-  checkmate::assert_choice(measure_var, df_names)
-  checkmate::assert_subset(class(df[[measure_var]]), c("numeric", "integer"))
-  checkmate::assert_choice(direction, c("pos", "both", "neg"))
-  checkmate::assert_number(frequency, lower=2, upper=Inf)
-  checkmate::assert_number(alpha, lower=0, upper=1)
-  checkmate::assert_number(max_anoms, lower=0, upper=1)
-  checkmate::assert_number(trend_window, lower=0, upper=1)
-
-  if (alpha > .1) {
-    message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
-  }
-
-  if(max_anoms > .1 ){
-    message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
-  }
-
-  two_tail <- ifelse(direction == "both", TRUE, FALSE)
-  p <- ifelse(two_tail, 1-alpha/2, 1-alpha)
-  cv <- qnorm(p, 0, 1)
-
-  df_ts <- ts(df[[measure_var]], frequency = frequency)
-  t_window <- round(length(df_ts)*trend_window)
-  if(t_window %% 2 == 1) t_window <- t_window + 1
-  df_stl <- as.data.frame(stl(df_ts,
-                              s.window = "period",
-                              robust = TRUE,
-                              t.window = t_window)$time.series)
-
-  df %>%
-    dplyr::select_at(c(index_var, measure_var)) %>%
-    dplyr::mutate(seasonal = df_stl$seasonal,
-                  trend = df_stl$trend,
-                  resid = df_stl$remainder) %>%
-    dplyr::mutate_at("resid", funs(resid_std = if (direction == "pos") {
-      (. - median(.)) / mad(.)
-    } else if (direction == "neg") {
-      (median(.) - .) / mad(.)
-    } else{
-      abs((. - median(.)) / mad(.))
-    })) %>%
-    dplyr::mutate(lower = trend + seasonal + median(resid) - abs(cv) * mad(resid),
-                  upper = trend + seasonal + median(resid) + abs(cv) * mad(resid),
-                  anomaly = ifelse(resid_std > cv, 1, 0)) %>%
-    dplyr::arrange(desc(resid_std)) %>%
-    dplyr::mutate(anomaly = ifelse(row_number() > max_anoms*n(), 0, anomaly)) %>%
-    dplyr::arrange_at(index_var) %>%
-    dplyr::select_at(c(index_var, measure_var, 'seasonal', 'trend', "lower", "upper", 'resid', 'anomaly'))
-}
-
 
 #' Anomaly Dectection Wrapper Function
 #'

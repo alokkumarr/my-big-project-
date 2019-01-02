@@ -19,7 +19,7 @@ import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
 import * as isEmpty from 'lodash/isEmpty';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import DataSource from 'devextreme/data/data_source';
+import CustomStore from 'devextreme/data/custom_store';
 import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
@@ -144,7 +144,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     // setup pagination for paginated data
     if (isFunction(dataLoader)) {
       this.dataLoader = dataLoader;
-      this.data = new DataSource({
+      this.data = new CustomStore({
         load: options => this.dataLoader(options)
       });
       this.remoteOperations = { paging: true };

@@ -1,0 +1,35 @@
+{
+  "group_by_field_2":{
+    "doc_count_error_upper_bound":0,
+    "sum_other_doc_count":0,
+    "buckets":[
+      {
+        "key":1513209600000,
+        "key_as_string":"2017-12-14 00:00:00",
+        "doc_count":1,
+        "group_by_field_1":{
+          "doc_count_error_upper_bound":0,
+          "sum_other_doc_count":0,
+          "buckets":[
+            {
+              "key":"string 1",
+              "doc_count":1,
+              "Integer":{
+                "value":100
+              },
+              "Float":{
+                "value":1000.010009765625
+              },
+              "Long":{
+                "value":1000
+              },
+              "Double":{
+                "value":99995.01
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

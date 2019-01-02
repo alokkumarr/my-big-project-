@@ -160,7 +160,7 @@ export class AnalyzeNewDialogComponent {
   }
 
   getCategoryIcon(metricCategory) {
-    const name = metricCategory.label;
+    const name = startCase(metricCategory.label);
     const icon = get(DATAPOD_CATEGORIES_OBJ[name], 'icon');
     return icon || '';
   }

@@ -61,17 +61,20 @@ COPY sip-tmpfiles-journal.conf /etc/tmpfiles.d/
 RUN systemctl enable systemd-journal-upload.service
 RUN echo "URL=http://sip-admin:19532" >> /etc/systemd/journal-upload.conf
 RUN install -d -o systemd-journal-upload -g systemd-journal-upload \
-  /var/lib/systemd/journal-upload        
+  /var/lib/systemd/journal-upload
 
 # Install SSH server in each container so that the deployment
 # automation can log in and perform installation steps
 RUN yum -y -q install openssh-server
 RUN systemctl enable sshd
-# In testing containers, remove passwords so that deployment
-# automation can log in without authentication
-RUN passwd -d root
-RUN echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config
+# In testing containers, set known password for use by deployment
+# automation and integration testing
+RUN echo root | passwd --stdin root
+RUN yum -y -q install sshpass
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
+# Install SSH client in each container
+RUN yum -y -q install openssh-clients
 
 # Add MapR package repository
 COPY maprtech.repo /etc/yum.repos.d

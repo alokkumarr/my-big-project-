@@ -31,6 +31,39 @@
 	</properties>
 
 	<dependencies>
+    <dependency>
+      <groupId>com.synchronoss</groupId>
+      <artifactId>sip-query-dsl</artifactId>
+      <version>${revision}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.fge</groupId>
+      <artifactId>json-schema-validator</artifactId>
+      <version>2.2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.fge</groupId>
+      <artifactId>jackson-coreutils</artifactId>
+      <version>1.8</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.fge</groupId>
+      <artifactId>json-schema-core</artifactId>
+      <version>1.2.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>${es.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.threeten</groupId>
+      <artifactId>threeten-extra</artifactId>
+      <version>1.2</version>
+    </dependency>
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -119,16 +152,10 @@
 			<version>19.0</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>elasticsearch-rest-client</artifactId>
 			<version>${es.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -176,6 +203,7 @@
 			<groupId>com.mapr.db</groupId>
 			<artifactId>maprdb</artifactId>
 			<version>${mapr.db.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
@@ -229,6 +257,8 @@
 						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
 						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
+					<excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,org.ojai,org.scala-lang</excludeGroupIds>
+					<layout>ZIP</layout>
 				</configuration>
 			</plugin>
 			<plugin>

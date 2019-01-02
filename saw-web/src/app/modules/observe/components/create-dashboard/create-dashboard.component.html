@@ -1,4 +1,4 @@
-<div mat-dialog-title>
+<div class="dashboard-designer-title">
   <button mat-icon-button e2e="dashboard-designer-exit-button" (click)="exitCreator()">
     <mat-icon fontIcon="icon-arrow-left"></mat-icon>
   </button>
@@ -17,7 +17,7 @@
     </button>
   </div>
 </div>
-<div mat-dialog-content>
+<div class="dashboard-designer-content">
 
   <mat-sidenav-container class="widget-container" [autosize]="false">
     <mat-sidenav #widgetChoice mode="over" [opened]="false" position="end" (openedChange)="sidenavStateChange($event)">
@@ -28,7 +28,7 @@
     </mat-sidenav>
 
     <mat-sidenav-content>
-      <dashboard-grid [model]="dashboard" [requester]="requester" [mode]="mode" (getDashboard)="onDashboardChange($event)"></dashboard-grid>
+      <dashboard-grid *ngIf="dashboard" [model]="dashboard" [requester]="requester" [mode]="mode" (getDashboard)="onDashboardChange($event)"></dashboard-grid>
 
       <span [@hideHelp]="fillState" class="empty-dashboard-image"></span>
       <strong [@hideHelp]="fillState" class="add-button-help">There's nothing here yet.</strong>

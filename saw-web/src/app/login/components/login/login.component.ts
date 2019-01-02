@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit {
 
   login() {
     if (isEmpty(this.dataHolder.username) || isEmpty(this.dataHolder.password)) {
-      this.states.error = 'Please enter a vaild Usernaeme and Password';
+      this.states.error = 'Please enter a valid Username and Password';
       return false;
     }
     const params = {

@@ -1,5 +1,8 @@
 - name: Create MapR group
-  group: name=mapr gid=5000 state=present
+  group:
+    name: mapr
+    gid: "{{ saw_mapr_group_id | default('5000') }}"
+    state: present
 - name: Create MapR user
   user:
     name: mapr

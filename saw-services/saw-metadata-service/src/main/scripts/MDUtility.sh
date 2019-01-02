@@ -21,7 +21,7 @@ for j in `ls $lib_dir`
 do
 	app_classpath=${app_classpath}:"${lib_dir}/${j}"
 done
-app_classpath=${app_classpath}:$(mapr classpath) 
+app_classpath=${app_classpath}:$(mapr classpath):$(hadoop classpath):$(hbase classpath)
 
 cmd="java -Dlog.dir=${log_dir} -Dhadoop.home.dir=${HADOOP_HOME} -classpath $app_classpath $app_mainclass $@"
 

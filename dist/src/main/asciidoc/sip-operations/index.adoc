@@ -1,9 +1,5 @@
 = SIP Operations Guide
-Version {project-version}
-:toc:
-:nofooter:
-:docinfo: shared
-:plantuml-config: plantuml-config
+include::header.adoc[]
 
 == Introduction
 
@@ -26,7 +22,8 @@ provided in the environment:
   the MapR cluster, and set `livy.file.upload.max.size = 500000000`
   and `livy.spark.master` in `livy.conf`
 
-. Provision a MapR user in the MapR cluster (with user ID 500)
+. Provision a MapR user in the MapR cluster (with user ID 500 and
+  group ID 5000)
 
 . Optionally create a MapR volume to hold the SIP data (at the
   location specified by the `sip_var_path` variable in the SIP
@@ -50,6 +47,9 @@ provided in the environment:
 . Install and configure MapR client on the SAW target host.
 
 . Configure SAW server to use UTC timezone in all places where date and timezones are involved.
+
+. On all saw nodes, volumes i.e. MapRFS using NFS gateway service
+  has to be mounted. This is required by ingestion service.
 
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system
@@ -98,6 +98,20 @@ TIP: Configure passwordless SSH access to the SAW target host for a
 smoother installation experience.  The deploy command should be run as
 a normal user.  The deploy command will use sudo to request privileges
 for relevant operations.
+
+==== Offline installation
+
+To support offline installation SIP allows specifying alternative URLs
+for used YUM repositories and RPM packages, for example local mirrors.
+These can be configured in the SIP environment configuration
+(`saw-config`) as follows:
+
+        [saw-services:vars]
+        sip_epel_rpm_url = https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        [saw-security:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+        [saw-security-arbitrator:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
 
 ==== Upgrading
 
@@ -202,7 +216,19 @@ config file to support larger files upload (more than 1MB)
 
 === XDF-NG
 
-==== Installing
+==== Prerequisites
+XDF-NG requires `jq` to be installed in the host cluster
+(all nodes of the cluster, because jobs can be submitted on any node).
+jq can be installed using the below command:
+
+    yum install jq
+
+Once the installtion is complete, use the below command to validate the installation:
+
+    $ jq --version
+    jq-1.5
+
+==== Installing XDF-NG
 
 Execute the following steps to install XDF-NG:
 
@@ -293,6 +319,23 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTIS versions.
 
+== Installing SIP product modules
+
+Execute the following steps to install SIP product modules:
+
+. Get the SIP product module package (`sip-module-*.tgz`)
+
+. Copy the SIP product module package to the SIP deploy host, where
+  the SIP package and SIP environment configuration (`saw-config`) is
+  located
+
+. Execute the product module deploy command, giving it the path to the
+  SIP environment configuration file as the first argument and the SIP
+  product module package as the second argument:
+
+        cd saw
+        ./sip-deploy-module <sip-config> <sip-module-package>
+
 == Monitoring
 
 To support monitoring of a SIP environment, services expose health
@@ -324,7 +367,7 @@ The following shows a response indicating the Security Service is in a
 healthy state:
 
         $ curl https://<sip-proxy>/saw/security/actuator/health
-        HTTP/1.1 200 
+        HTTP/1.1 200
         Content-Type: application/json; charset=UTF-8
         <...>
         {
@@ -573,6 +616,21 @@ preview in directory name.
 Automatically generated credentials, such as for internal service and
 administrator accounts, can be found in the `/etc/bda` directory on
 the respective host.
+
+=== Batch ingestion: SFTP
+
+The Batch Ingestion Service can connect to SFTP sources to ingest
+files.  Ingesting a large number of files requires the Batch Ingestion
+Service to be able to use a large number of sessions per SFTP
+connection.  The default settings of OpenSSH only allows ten
+concurrent sessions per SFTP connection.  To allow Batch Ingestion
+Service to use the required number of session, add the below to the
+`/etc/ssh/sshd_config` file:
+
+    MaxSessions 5000
+
+After that run `systemctl reload sshd` to reload the SSH daemon
+configuration.
 
 == Loading semantic metadata
 

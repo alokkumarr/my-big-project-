@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import {
   HttpEvent,
   HttpInterceptor,
@@ -7,35 +7,54 @@ import {
   HttpEventType
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, finalize } from 'rxjs/operators';
 
 import { HeaderProgressService } from '../../common/services';
 
 @Injectable()
 export class ProgressIndicatorInterceptor implements HttpInterceptor {
-  constructor(private _headerProgress: HeaderProgressService) {}
+  constructor(
+    private _headerProgress: HeaderProgressService,
+    private zone: NgZone
+  ) {}
 
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    let cancelled = true;
     return next.handle(req).pipe(
       tap(
         event => {
           switch (event.type) {
             case HttpEventType.Sent:
-              this._headerProgress.show();
+              this.zone.run(() => {
+                this._headerProgress.show();
+              });
               break;
             case HttpEventType.Response:
-              this._headerProgress.hide();
+              cancelled = false;
+              this.zone.run(() => {
+                this._headerProgress.hide();
+              });
               break;
           }
         },
         err => {
-          this._headerProgress.hide();
+          cancelled = false;
+          this.zone.run(() => {
+            this._headerProgress.hide();
+          });
           return err;
         }
-      )
+      ),
+      finalize(() => {
+        if (cancelled) {
+          this.zone.run(() => {
+            this._headerProgress.hide();
+          });
+        }
+      })
     );
   }
 }
