@@ -71,7 +71,6 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String portNumber = rootNode.get("portNo").asText();
         SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
         String password = obfuscator.decrypt(rootNode.get("password").asText());
-        //String password = rootNode.get("password").asText();
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         String userName = rootNode.get("userName").asText();        
@@ -82,7 +81,6 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         Properties prop = new Properties();
         prop.setProperty("StrictHostKeyChecking", "no");
         prop.setProperty("bufferSize", "100000");
-        //prop.setProperty("PreferredAuthentications", "password");
         defaultSftpSessionFactory.setSessionConfig(prop);
       } catch (IOException e) {
         throw new SftpProcessorException("for the given id + " + key + ""
@@ -95,26 +93,4 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
     return defaultSftpSessionFactory;
   }
 
-    public void invalidateSessionFactoryMap() {
-        for (Long key : sessionFactoryMap.keySet()) {
-            if (sessionFactoryMap.get(key)!=null &&
-                sessionFactoryMap.get(key).getSession().isOpen()) {
-                sessionFactoryMap.get(key).getSession().close();
-                logger.info("invalidateSessionFactoryMap size " + sessionFactoryMap.size());
-            }
-            logger.info("invalidateSessionFactoryMap size outside " + sessionFactoryMap.size());
-        }
-        sessionFactoryMap.clear();
-    }
-
-    public void remove(Object key) {
-        Long id = Long.valueOf(key.toString());
-        if (sessionFactoryMap.get(id)!=null &&
-            sessionFactoryMap.get(id).getSession().isOpen()) {
-            sessionFactoryMap.get(id).getSession().close();
-            logger.info("remove size " + sessionFactoryMap.size());
-        }
-        logger.info("remove size outside " + sessionFactoryMap.size());
-        sessionFactoryMap.remove(id);
-    }
 }
