@@ -106,12 +106,18 @@ for used YUM repositories and RPM packages, for example local mirrors.
 These can be configured in the SIP environment configuration
 (`saw-config`) as follows:
 
-        [saw-services:vars]
-        sip_epel_rpm_url = https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        [saw-proxy:vars]
+        sip_epel_yum_url = https://download.fedoraproject.org/pub/epel/$releasever/$basearch
         [saw-security:vars]
         sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
         [saw-security-arbitrator:vars]
         sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+
+TIP: If the EPEL repository is already provided on the system by other
+means, installation of the EPEL repository file in `/etc/yum.repos.d`
+by SIP can be skipped by adding `sip_epel_yum_provided = true` under
+the `saw-proxy:vars` section in the SIP environment configuration
+`saw-config`.
 
 ==== Upgrading
 
