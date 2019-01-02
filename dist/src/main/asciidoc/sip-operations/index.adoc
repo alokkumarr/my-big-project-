@@ -319,6 +319,23 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTIS versions.
 
+== Installing SIP product modules
+
+Execute the following steps to install SIP product modules:
+
+. Get the SIP product module package (`sip-module-*.tgz`)
+
+. Copy the SIP product module package to the SIP deploy host, where
+  the SIP package and SIP environment configuration (`saw-config`) is
+  located
+
+. Execute the product module deploy command, giving it the path to the
+  SIP environment configuration file as the first argument and the SIP
+  product module package as the second argument:
+
+        cd saw
+        ./sip-deploy-module <sip-config> <sip-module-package>
+
 == Monitoring
 
 To support monitoring of a SIP environment, services expose health

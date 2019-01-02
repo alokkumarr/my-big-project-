@@ -1,0 +1,25 @@
+- name: Look up MariaDB root database password
+  set_fact:
+    mariadb_root_password: >-
+      {{ lookup('password', inventory_dir
+        + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Create temporary directory on remote host
+  tempfile:
+    state: directory
+    prefix: sip-product-module-security
+  register: tempfile
+- name: Copy product module database initialization files to remote host
+  copy:
+    src: "{{ item }}"
+    dest: "{{ tempfile.path }}/"
+  with_fileglob:
+    - "{{ lookup('env','SIP_PRODUCT_MODULE') }}/sip-security/*.sql"
+  register: copy_result
+- name: Run product module database initialization scripts
+  mysql_db: 
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    name: saw_security
+    state: import
+    target: "{{ item.dest }}"
+  with_items: "{{ copy_result.results }}"
