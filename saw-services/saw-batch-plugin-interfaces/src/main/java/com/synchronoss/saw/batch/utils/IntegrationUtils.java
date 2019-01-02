@@ -69,7 +69,7 @@ public final class IntegrationUtils {
    */
   public static String renameFileAppender() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RENAME_DATE_FORMAT);
-    return simpleDateFormat.format(new Date());
+    return simpleDateFormat.format(new Date()) + Thread.currentThread().getId();
   }
 
 

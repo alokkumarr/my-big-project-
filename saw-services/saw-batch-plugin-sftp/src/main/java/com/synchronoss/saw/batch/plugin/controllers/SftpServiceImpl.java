@@ -104,7 +104,8 @@ public class SftpServiceImpl extends SipPluginContract {
     ObjectNode rootNode = null;
     if (bisRouteEntity.isPresent()) {
       BisRouteEntity entity = bisRouteEntity.get();
-      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId());
+      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.
+          getSessionFactory(entity.getBisChannelSysId());
       try (Session session = sessionFactory.getSession()) {
         nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
@@ -138,8 +139,9 @@ public class SftpServiceImpl extends SipPluginContract {
               connectionLogs.append(newLineChar);
               connectionLogs.append(status);
             }
-              if (session.isOpen())
-              session.close();
+              if (session.isOpen()) {
+                  session.close();
+              }
           }
         } else {
           Files.createDirectories(Paths.get(destinationLocation));
@@ -239,8 +241,6 @@ public class SftpServiceImpl extends SipPluginContract {
     connectionLogs.append(newLineChar);
     connectionLogs.append("Connecting...");
     HttpStatus status = null;
-    SessionFactory<LsEntry> sessionFactory =
-        delegatingSessionFactory.getSessionFactory(payload.getChannelId());
     String dataPath = payload.getDestinationLocation() != null
         ? defaultDestinationLocation + payload.getDestinationLocation()
         : defaultDestinationLocation;
@@ -250,6 +250,7 @@ public class SftpServiceImpl extends SipPluginContract {
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
+          SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(payload.getChannelId());
           Session session = sessionFactory.getSession();
         if (!session
             .exists(payload.getSourceLocation())) {
@@ -389,7 +390,8 @@ public class SftpServiceImpl extends SipPluginContract {
             payload.getFilePattern(), payload);
         logger.trace("invocation of method immediatelistOfAll with location ends here "
             + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-        defaultSftpSessionFactory.getSession().close();
+        session.close();
+          template.getSession().close();
         logger.trace("session opened closes here ");
       }
     } catch (Exception ex) {
