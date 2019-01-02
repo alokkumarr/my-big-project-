@@ -11,3 +11,4 @@ export { SideNavService } from './sidenav.service';
 export { ToastService } from './toastMessage.service';
 export { UserService } from './user.service';
 export { WindowService } from './window.service';
+export { CustomIconService } from './custom-icon.service';

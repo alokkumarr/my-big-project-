@@ -81,13 +81,14 @@ export class ValidateSemanticComponent implements OnDestroy {
       autoFocus: true,
       closeOnNavigation: true,
       disableClose: true,
-      height: '250px',
+      height: 'auto',
       width: '350px'
     });
 
-    dialogRef.afterClosed().subscribe(name => {
+    dialogRef.afterClosed().subscribe(({name, category}) => {
       if (trim(name).length > 0) {
         const payload = {
+          category,
           customerCode: '',
           username: '',
           projectCode: '',
