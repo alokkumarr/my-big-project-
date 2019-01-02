@@ -6,6 +6,9 @@ $pivot-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - 
 :host {
   display: block;
   height: 100%;
+  pivot-grid {
+    overflow: hidden !important;
+  }
 }
 
 .pivot-title {
@@ -20,5 +23,4 @@ $pivot-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - 
 pivot-grid {
   display: block;
   height: $pivot-height;
-  overflow: hidden !important;
 }
