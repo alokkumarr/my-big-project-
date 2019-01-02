@@ -28,6 +28,7 @@ export class ExpandableFieldComponent {
   @Input() public analysisType: AnalysisType;
   @Input() public fieldCount: any;
   @Input() public sqlBuilder;
+  @Input() analysisSubtype: string;
 
   TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;

@@ -25,6 +25,7 @@ export class DesignerSettingsGroupComponent implements OnInit {
   @Input() public groupAdapter: IDEsignerSettingGroupAdapter;
   @Input() public groupAdapters: Array<IDEsignerSettingGroupAdapter>;
   @Input() fieldCount: number;
+  @Input() analysisSubtype: string;
   @Input() public sqlBuilder;
 
   public dndSortableContainerObj = {};

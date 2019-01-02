@@ -18,6 +18,7 @@
                       [fieldCount]="fieldCount"
                       [sqlBuilder]="sqlBuilder"
                       [analysisType]="groupAdapter.type"
+                      [analysisSubtype]="analysisSubtype"
                       (removeRequest)="onRemoveField(artifactColumn)"
                       class="settings__list-item"
                       [attr.e2e]="'designer-expandable-field-' + (artifactColumn.aliasName || artifactColumn.displayName)">
