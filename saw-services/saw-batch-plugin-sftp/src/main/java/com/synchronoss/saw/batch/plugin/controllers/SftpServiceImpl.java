@@ -104,8 +104,8 @@ public class SftpServiceImpl extends SipPluginContract {
     ObjectNode rootNode = null;
     if (bisRouteEntity.isPresent()) {
       BisRouteEntity entity = bisRouteEntity.get();
-      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.
-          getSessionFactory(entity.getBisChannelSysId());
+      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory
+          .getSessionFactory(entity.getBisChannelSysId());
       try (Session session = sessionFactory.getSession()) {
         nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
@@ -139,9 +139,9 @@ public class SftpServiceImpl extends SipPluginContract {
               connectionLogs.append(newLineChar);
               connectionLogs.append(status);
             }
-              if (session.isOpen()) {
-                  session.close();
-              }
+            if (session.isOpen()) {
+              session.close();
+            }
           }
         } else {
           Files.createDirectories(Paths.get(destinationLocation));
@@ -188,7 +188,7 @@ public class SftpServiceImpl extends SipPluginContract {
     connectionLogs.append("Establishing connection to host");
     connectionLogs.append(newLineChar);
     connectionLogs.append("Connecting...");
-      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(entityId);
+    SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(entityId);
     try (Session session = sessionFactory.getSession()) {
       if (session.isOpen()) {
         logger.info("connected successfully " + entityId);
@@ -250,8 +250,9 @@ public class SftpServiceImpl extends SipPluginContract {
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
-          SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(payload.getChannelId());
-          Session session = sessionFactory.getSession();
+        SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory
+            .getSessionFactory(payload.getChannelId());
+        Session session = sessionFactory.getSession();
         if (!session
             .exists(payload.getSourceLocation())) {
           status = HttpStatus.UNAUTHORIZED;
@@ -266,8 +267,9 @@ public class SftpServiceImpl extends SipPluginContract {
           connectionLogs.append(newLineChar);
           connectionLogs.append(status);
         }
-        if(session.isOpen())
-            session.close();
+        if (session.isOpen()) {
+          session.close();
+        }
       }
     } else {
       try {
@@ -371,15 +373,15 @@ public class SftpServiceImpl extends SipPluginContract {
         + "& route Id " + payload.getRouteId());
     List<BisDataMetaInfo> transferredFiles = new ArrayList<>();
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
-      defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
-      defaultSftpSessionFactory.setHost(payload.getHostName());
-      defaultSftpSessionFactory.setPort(payload.getPortNo());
-      defaultSftpSessionFactory.setUser(payload.getUserName());
-      defaultSftpSessionFactory.setPassword(payload.getPassword());
-      defaultSftpSessionFactory.setAllowUnknownKeys(true);
-      Properties prop = new Properties();
-      prop.setProperty("StrictHostKeyChecking", "no");
-      defaultSftpSessionFactory.setSessionConfig(prop);
+    defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
+    defaultSftpSessionFactory.setHost(payload.getHostName());
+    defaultSftpSessionFactory.setPort(payload.getPortNo());
+    defaultSftpSessionFactory.setUser(payload.getUserName());
+    defaultSftpSessionFactory.setPassword(payload.getPassword());
+    defaultSftpSessionFactory.setAllowUnknownKeys(true);
+    Properties prop = new Properties();
+    prop.setProperty("StrictHostKeyChecking", "no");
+    defaultSftpSessionFactory.setSessionConfig(prop);
     try (Session session = defaultSftpSessionFactory.getSession()) {
       if (session.isOpen()) {
         logger.trace("session opened starts here ");
@@ -391,7 +393,7 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.trace("invocation of method immediatelistOfAll with location ends here "
             + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
         session.close();
-          template.getSession().close();
+        template.getSession().close();
         logger.trace("session opened closes here ");
       }
     } catch (Exception ex) {
@@ -508,8 +510,8 @@ public class SftpServiceImpl extends SipPluginContract {
         "transferData file starts here with the channel id " + channelId + "& route Id " + routeId);
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
-      SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
-    try(Session session = sesionFactory.getSession()){
+    SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
+    try (Session session = sesionFactory.getSession()) {
       if (sesionFactory != null
           & sesionFactory.getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
