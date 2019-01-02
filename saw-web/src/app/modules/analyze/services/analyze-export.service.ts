@@ -75,7 +75,7 @@ export class AnalyzeExportService {
       .map(columnName => {
         const field = fields.find(f => f.columnName === columnName);
         if (!field) {
-          return '';
+          return columnName;
         }
         return field.aliasName || field.displayName;
       })
