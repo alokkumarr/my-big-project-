@@ -33,12 +33,11 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
   private static final Logger logger = 
       LoggerFactory.getLogger(RuntimeSessionFactoryLocator.class);
-  private final Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
+  private Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
-    
-    
+
   @Override
   public SessionFactory<LsEntry> getSessionFactory(Object key) {
     Long id = Long.valueOf(key.toString());
@@ -96,11 +95,26 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
     return defaultSftpSessionFactory;
   }
 
-  public void invalidateSessionFactoryMap() {
-    sessionFactoryMap.clear();
-  }
+    public void invalidateSessionFactoryMap() {
+        for (Long key : sessionFactoryMap.keySet()) {
+            if (sessionFactoryMap.get(key)!=null &&
+                sessionFactoryMap.get(key).getSession().isOpen()) {
+                sessionFactoryMap.get(key).getSession().close();
+                logger.info("invalidateSessionFactoryMap size " + sessionFactoryMap.size());
+            }
+            logger.info("invalidateSessionFactoryMap size outside " + sessionFactoryMap.size());
+        }
+        sessionFactoryMap.clear();
+    }
 
-  public void remove(Object key) {
-    sessionFactoryMap.remove(key);
-  }
+    public void remove(Object key) {
+        Long id = Long.valueOf(key.toString());
+        if (sessionFactoryMap.get(id)!=null &&
+            sessionFactoryMap.get(id).getSession().isOpen()) {
+            sessionFactoryMap.get(id).getSession().close();
+            logger.info("remove size " + sessionFactoryMap.size());
+        }
+        logger.info("remove size outside " + sessionFactoryMap.size());
+        sessionFactoryMap.remove(id);
+    }
 }

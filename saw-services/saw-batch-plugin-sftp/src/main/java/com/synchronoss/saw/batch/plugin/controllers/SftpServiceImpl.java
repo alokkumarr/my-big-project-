@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.file.remote.InputStreamCallback;
+import org.springframework.integration.file.remote.session.Session;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
@@ -103,8 +104,8 @@ public class SftpServiceImpl extends SipPluginContract {
     ObjectNode rootNode = null;
     if (bisRouteEntity.isPresent()) {
       BisRouteEntity entity = bisRouteEntity.get();
-
-      try {
+      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId());
+      try (Session session = sessionFactory.getSession()) {
         nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
         String destinationLocation = (rootNode.get("destinationLocation").asText() != null
@@ -124,7 +125,7 @@ public class SftpServiceImpl extends SipPluginContract {
             connectionLogs.append("Connecting to destination location " + destinationLocation);
             connectionLogs.append(newLineChar);
             connectionLogs.append("Connecting...");
-            if (delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId()).getSession()
+            if (session
                 .exists(sourceLocation)) {
               connectionLogs.append("Connection successful!!");
               status = HttpStatus.OK;
@@ -137,6 +138,8 @@ public class SftpServiceImpl extends SipPluginContract {
               connectionLogs.append(newLineChar);
               connectionLogs.append(status);
             }
+              if (session.isOpen())
+              session.close();
           }
         } else {
           Files.createDirectories(Paths.get(destinationLocation));
@@ -183,16 +186,12 @@ public class SftpServiceImpl extends SipPluginContract {
     connectionLogs.append("Establishing connection to host");
     connectionLogs.append(newLineChar);
     connectionLogs.append("Connecting...");
-
-    try {
-      if (delegatingSessionFactory.getSessionFactory(entityId) != null
-          && delegatingSessionFactory.getSessionFactory(entityId).getSession().isOpen()) {
+      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(entityId);
+    try (Session session = sessionFactory.getSession()) {
+      if (session.isOpen()) {
         logger.info("connected successfully " + entityId);
         connectionLogs.append("Connection successful!!");
         status = HttpStatus.OK;
-        delegatingSessionFactory.getSessionFactory(entityId).getSession().close();
-        delegatingSessionFactory.remove(entityId);
-        delegatingSessionFactory.invalidateSessionFactoryMap();
       } else {
         status = HttpStatus.UNAUTHORIZED;
         connectionLogs.append(newLineChar);
@@ -249,8 +248,9 @@ public class SftpServiceImpl extends SipPluginContract {
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
-        delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession().isOpen();
-        if (!delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession()
+          SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(payload.getChannelId());
+          Session session = sessionFactory.getSession();
+        if (!session
             .exists(payload.getSourceLocation())) {
           status = HttpStatus.UNAUTHORIZED;
           connectionLogs.append(newLineChar);
@@ -264,9 +264,8 @@ public class SftpServiceImpl extends SipPluginContract {
           connectionLogs.append(newLineChar);
           connectionLogs.append(status);
         }
-        delegatingSessionFactory.getSessionFactory(payload.getChannelId()).getSession().close();
-        delegatingSessionFactory.remove(payload.getChannelId());
-        delegatingSessionFactory.invalidateSessionFactoryMap();
+        if(session.isOpen())
+            session.close();
       }
     } else {
       try {
@@ -370,7 +369,6 @@ public class SftpServiceImpl extends SipPluginContract {
         + "& route Id " + payload.getRouteId());
     List<BisDataMetaInfo> transferredFiles = new ArrayList<>();
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
-    try {
       defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
       defaultSftpSessionFactory.setHost(payload.getHostName());
       defaultSftpSessionFactory.setPort(payload.getPortNo());
@@ -380,7 +378,8 @@ public class SftpServiceImpl extends SipPluginContract {
       Properties prop = new Properties();
       prop.setProperty("StrictHostKeyChecking", "no");
       defaultSftpSessionFactory.setSessionConfig(prop);
-      if (defaultSftpSessionFactory.getSession().isOpen()) {
+    try (Session session = defaultSftpSessionFactory.getSession()) {
+      if (session.isOpen()) {
         logger.trace("session opened starts here ");
         SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
         logger.trace("invocation of method immediatelistOfAll with location starts here "
@@ -389,7 +388,8 @@ public class SftpServiceImpl extends SipPluginContract {
             payload.getFilePattern(), payload);
         logger.trace("invocation of method immediatelistOfAll with location ends here "
             + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-        defaultSftpSessionFactory.getSession().close();
+        session.close();
+          template.getSession().close();
         logger.trace("session opened closes here ");
       }
     } catch (Exception ex) {
@@ -506,8 +506,8 @@ public class SftpServiceImpl extends SipPluginContract {
         "transferData file starts here with the channel id " + channelId + "& route Id " + routeId);
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
-    try {
       SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
+    try(Session session = sesionFactory.getSession()){
       if (sesionFactory != null
           & sesionFactory.getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
@@ -537,10 +537,10 @@ public class SftpServiceImpl extends SipPluginContract {
           String filePattern = rootNode.get("filePattern").asText();
           logger.trace("filePattern from routeId " + routeId + " filePattern " + filePattern);
           logger.trace("session factory before connecting" + sesionFactory);
-          
+
           String fileExclusions = rootNode.get("fileExclusions").asText();
           logger.trace("File exclusions configured for  route" + fileExclusions);
-          
+
           SftpRemoteFileTemplate template =
               new SftpRemoteFileTemplate(sesionFactory);
           logger.trace("invocation of method transferData when "
@@ -551,10 +551,8 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location ends here " + sourceLocation
               + " & file pattern " + filePattern);
-          if (delegatingSessionFactory.getSessionFactory(channelId).getSession() != null) {
-            delegatingSessionFactory.getSessionFactory(channelId).getSession().close();
-            delegatingSessionFactory.remove(channelId);
-            delegatingSessionFactory.invalidateSessionFactoryMap();
+          if (session.isOpen()) {
+            session.close();
           }
           logger.trace("opened session has been closed here.");
         } else {
@@ -566,16 +564,6 @@ public class SftpServiceImpl extends SipPluginContract {
     } catch (Exception ex) {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
-    } finally {
-      if (delegatingSessionFactory.getSessionFactory(channelId) != null
-          && delegatingSessionFactory.getSessionFactory(channelId).getSession() != null) {
-        if (delegatingSessionFactory.getSessionFactory(channelId).getSession().isOpen()) {
-          logger.trace("session opened closes here in final block ");
-          delegatingSessionFactory.getSessionFactory(channelId).getSession().close();
-          delegatingSessionFactory.remove(channelId);
-          delegatingSessionFactory.invalidateSessionFactoryMap();
-        }
-      }
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
@@ -615,6 +603,7 @@ public class SftpServiceImpl extends SipPluginContract {
           template, sourcelocationDirectory, pattern, destinationLocation,
           channelId, routeId,exclusions));
     }
+    template.getSession().close();
     return list;
   }
 
@@ -627,10 +616,10 @@ public class SftpServiceImpl extends SipPluginContract {
     LsEntry[] files = null;
     if (template.list(sourcelocation + File.separator + pattern) != null) {
       files = template.list(sourcelocation + File.separator + pattern);
-      logger.trace("Total files matching pattern " + pattern 
+      logger.trace("Total files matching pattern " + pattern
           + " at source location " + sourcelocation + " are :: " + files.length);
       LsEntry[] filteredFiles =  null;
-      if (exclusions.isEmpty()) {
+      if (exclusions==null || exclusions.isEmpty()) {
         filteredFiles =  Arrays.copyOf(files, files.length);
       } else {
         filteredFiles = Arrays.stream(files)
@@ -638,11 +627,11 @@ public class SftpServiceImpl extends SipPluginContract {
                     .endsWith("." + exclusions)).toArray(LsEntry[]::new);
       }
       if (filteredFiles.length > 0) {
-        
-        logger.trace("Total files after filtering exclusions " + exclusions 
+
+        logger.trace("Total files after filtering exclusions " + exclusions
             + " at source location " + sourcelocation + " are :: " + files.length);
-        
-        
+
+
         int sizeOfFileInPath = filteredFiles.length;
         batchSize = getBatchSize() > 0 ? getBatchSize() : batchSize;
         int iterationOfBatches = ((batchSize > sizeOfFileInPath) ? (batchSize / sizeOfFileInPath)
@@ -650,9 +639,9 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.trace("iterationOfBatches :" + iterationOfBatches);
         logger.trace("batchSize :" + batchSize);
         logger.trace("filteredFiles.size :" + filteredFiles.length);
-        final int partitionSize = (filteredFiles.length 
+        final int partitionSize = (filteredFiles.length
             + iterationOfBatches - 1) / iterationOfBatches;
-        
+
         logger.trace("partitionSize :" + partitionSize);
         BisDataMetaInfo bisDataMetaInfo = null;
         List<LsEntry> filesArray = Arrays.asList(filteredFiles);
@@ -821,17 +810,14 @@ public class SftpServiceImpl extends SipPluginContract {
                     }
                     fileTobeDeleted.delete();
                   }
-                  if (template.getSession() != null) {
-                    template.getSession().close();
-                  }
-                } 
+                }
               }
             }
           } // end of loop for the number of files to be download at each batch
         } // time it should iterate
       } else {
         logger.info("On this current pull no data found on the source.");
-        
+
       }
     } else {
       logger.info(
@@ -839,12 +825,9 @@ public class SftpServiceImpl extends SipPluginContract {
     }
     ZonedDateTime endTime = ZonedDateTime.now();
     logger.trace("Ending transfer data......end time:: " + endTime);
-    
+
     long durationInMillis = Duration.between(startTime, endTime).toMillis();
     logger.trace("End of data tranfer.....Total time in milliseconds::: " + durationInMillis);
-    if (template.getSession() != null) {
-      template.getSession().close();
-    }
     //template.getSession().close();
     return list;
   }
