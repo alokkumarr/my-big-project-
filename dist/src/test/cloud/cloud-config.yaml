@@ -63,14 +63,5 @@ write_files:
       }
       EOF
       )
-      # Workaround: https://bugs.centos.org/view.php?id=15518
-      sed -i -e 's/\/lib\//\/lib64\//' /usr/lib/python2.7/site-packages/awscli/clidriver.py
       aws route53 change-resource-record-sets \
         --hosted-zone-id "$hosted_zone_id" --cli-input-json "$changes"
-runcmd:
-  # Set a password for the user to enable logging into environments
-  # deployed for example from continuous integration, where the
-  # original host credentials are not accessible.
-  - hostname | passwd --stdin centos
-  - sed -i -e '/^PasswordAuthentication no/d' /etc/ssh/sshd_config
-  - systemctl reload sshd
