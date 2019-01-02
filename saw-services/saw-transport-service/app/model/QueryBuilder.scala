@@ -347,7 +347,7 @@ object QueryBuilder extends {
             val groupByColumn = columns.filter(col => {
               val groupBy = (col \ "aggregate")
               //Since we don't have built in Spark function to calculate percentage, and we are implementing our own logic, percentage column should do come under groupBy.(it's not a aggregate function here)
-              (groupBy == JNothing || groupBy == None) || (!(groupBy == JNothing || groupBy == None) && groupBy.extract[String].equalsIgnoreCase("percentage"))
+              (groupBy == JNothing || groupBy == None) || (groupBy.extract[String].equalsIgnoreCase("percentage"))
             })
             val groupByColumns = groupByColumn.map(buildGroupByElement(_, tableName)).toSet
             // return groupByColumn
