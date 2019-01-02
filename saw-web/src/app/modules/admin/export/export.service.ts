@@ -70,15 +70,18 @@ export class ExportService {
       );
   }
 
-  getMetricList() {
+  getMetricList$(): Observable<any[]> {
     const projectId = 'workbench';
     return this._adminService
       .getRequest<MetricResponse>(
         `internal/semantic/md?projectId=${projectId}`,
         { forWhat: 'export' }
       )
-      .pipe(mapObservable(fpGet(`contents.[0].${ANALYZE_MODULE_NAME}`)))
-      .toPromise();
+      .pipe(mapObservable(fpGet(`contents.[0].${ANALYZE_MODULE_NAME}`)));
+  }
+
+  getMetricList() {
+    return this.getMetricList$().toPromise();
   }
 
   getAnalysisByMetricIds(metricIds) {

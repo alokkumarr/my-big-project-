@@ -283,7 +283,7 @@ public class SawBisRouteController {
        * SftpProcessorException("Exception occurred while reading routeMetaData ", e); }
        */
       if (route.getCreatedDate() != null) {
-        routeDto.setCreatedDate(route.getCreatedDate().getTime()); 
+        routeDto.setCreatedDate(route.getCreatedDate().getTime());
       }
       if (route.getModifiedDate() != null) {
         routeDto.setModifiedDate(route.getModifiedDate().getTime());
