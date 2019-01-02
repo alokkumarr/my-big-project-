@@ -64,10 +64,22 @@ export class AnalyzeExportService {
   replaceCSVHeader(csv, fields) {
     const firstNewLine = indexOf(csv, '\n');
     const firstRow = slice(csv, 0, firstNewLine).join('');
-    const displayNames = map(
-      fields,
-      ({ aliasName, displayName }) => aliasName || displayName
-    ).join(',');
+    const firstRowColumns = firstRow
+      .split(',')
+      .map(columnName => columnName.replace(/"/g, '').trim());
+
+    /* Following logic replaces column names in CSV header row with their
+       display names or aliases, while preserving the order they appear in
+      */
+    const displayNames = firstRowColumns
+      .map(columnName => {
+        const field = fields.find(f => f.columnName === columnName);
+        if (!field) {
+          return '';
+        }
+        return field.aliasName || field.displayName;
+      })
+      .join(',');
     return replace(csv, firstRow, displayNames);
   }
 
@@ -75,9 +87,9 @@ export class AnalyzeExportService {
     /* If report was using designer mode, find checked columns */
     if (!analysis.edit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
-        fpPipe(
-          fpMap(fpPick(['columnName', 'aliasName', 'displayName']))
-        )(artifact.columns)
+        fpPipe(fpMap(fpPick(['columnName', 'aliasName', 'displayName'])))(
+          artifact.columns
+        )
       );
     }
     /* If report was using sql mode, we don't really have any info
