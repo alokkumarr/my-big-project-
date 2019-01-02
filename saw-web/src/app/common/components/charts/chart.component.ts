@@ -17,6 +17,7 @@ import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
 import * as find from 'lodash/find';
 
@@ -32,16 +33,12 @@ export const UPDATE_PATHS = {
   X_AXIS: 'xAxis'
 };
 
-export const CHART_SETTINGS_OBJ = [
-  { type: 'default', config: chartOptions },
-  { type: 'highStock', config: stockChartOptions },
-  { type: 'bullet', config: bulletChartOptions }
-];
-
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'chart',
-  template: `<div #container></div>`
+  template: `
+    <div #container></div>
+  `
 })
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
@@ -51,6 +48,19 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   enableExport: boolean;
   @ViewChild('container')
   container: ElementRef;
+
+  /**
+   * Cloning all the options to create a new copy per object.
+   * Otherwise, any changes to these options will be shared between
+   * all instances of chart.
+   *
+   * @memberof ChartComponent
+   */
+  chartSettings = [
+    { type: 'default', config: cloneDeep(chartOptions) },
+    { type: 'highStock', config: cloneDeep(stockChartOptions) },
+    { type: 'bullet', config: cloneDeep(bulletChartOptions) }
+  ];
 
   public highcharts: any = Highcharts;
   public highstocks: any = Highstock;
@@ -104,13 +114,13 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // set the appropriate config based on chart type
     this.chartSettingsType = this.getChartSettingsType(this.chartType);
     this.config = defaultsDeep(
-      options,
-      this.config,
       get(
-        find(CHART_SETTINGS_OBJ, ['type', this.chartSettingsType]),
+        find(this.chartSettings, ['type', this.chartSettingsType]),
         'config',
         chartOptions
-      )
+      ),
+      options,
+      this.config
     );
     if (this.enableExport) {
       this.config.exporting = {

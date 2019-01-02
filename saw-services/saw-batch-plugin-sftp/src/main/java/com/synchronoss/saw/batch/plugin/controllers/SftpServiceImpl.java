@@ -537,13 +537,17 @@ public class SftpServiceImpl extends SipPluginContract {
           String filePattern = rootNode.get("filePattern").asText();
           logger.trace("filePattern from routeId " + routeId + " filePattern " + filePattern);
           logger.trace("session factory before connecting" + sesionFactory);
+          
+          String fileExclusions = rootNode.get("fileExclusions").asText();
+          logger.trace("File exclusions configured for  route" + fileExclusions);
+          
           SftpRemoteFileTemplate template =
               new SftpRemoteFileTemplate(sesionFactory);
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location starts here " + sourceLocation
               + " & file pattern " + filePattern);
           listOfFiles = transferDataFromChannel(template, sourceLocation, filePattern,
-              destinationLocation, channelId, routeId);
+              destinationLocation, channelId, routeId, fileExclusions);
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location ends here " + sourceLocation
               + " & file pattern " + filePattern);
@@ -583,14 +587,14 @@ public class SftpServiceImpl extends SipPluginContract {
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId) throws IOException, ParseException {
+      Long routeId, String exclusions) throws IOException, ParseException {
     logger.debug("Transfer files from directory recursively: {}, {}",
                  sourcelocation, pattern);
     List<BisDataMetaInfo> list = new ArrayList<>();
     /* First transfer the files from the directory */
     list.addAll(transferDataFromChannelDirectory(
         template, sourcelocation, pattern, destinationLocation,
-        channelId, routeId));
+        channelId, routeId,exclusions));
     /* Then iterate through directory looking for subdirectories */
     LsEntry[] entries = template.list(sourcelocation);
     for (LsEntry entry : entries) {
@@ -609,14 +613,14 @@ public class SftpServiceImpl extends SipPluginContract {
           sourcelocation + File.separator + entry.getFilename();
       list.addAll(transferDataFromChannel(
           template, sourcelocationDirectory, pattern, destinationLocation,
-          channelId, routeId));
+          channelId, routeId,exclusions));
     }
     return list;
   }
 
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId) throws IOException, ParseException {
+      Long routeId, String exclusions) throws IOException, ParseException {
     ZonedDateTime startTime = ZonedDateTime.now();
     logger.trace("Starting transfer data......start time::" + startTime);
     List<BisDataMetaInfo> list = new ArrayList<>();
@@ -625,18 +629,33 @@ public class SftpServiceImpl extends SipPluginContract {
       files = template.list(sourcelocation + File.separator + pattern);
       logger.trace("Total files matching pattern " + pattern 
           + " at source location " + sourcelocation + " are :: " + files.length);
-      if (files.length > 0) {
-        int sizeOfFileInPath = files.length;
+      LsEntry[] filteredFiles =  null;
+      if (exclusions.isEmpty()) {
+        filteredFiles =  Arrays.copyOf(files, files.length);
+      } else {
+        filteredFiles = Arrays.stream(files)
+            .filter(file -> !file.getFilename()
+                    .endsWith("." + exclusions)).toArray(LsEntry[]::new);
+      }
+      if (filteredFiles.length > 0) {
+        
+        logger.trace("Total files after filtering exclusions " + exclusions 
+            + " at source location " + sourcelocation + " are :: " + files.length);
+        
+        
+        int sizeOfFileInPath = filteredFiles.length;
         batchSize = getBatchSize() > 0 ? getBatchSize() : batchSize;
         int iterationOfBatches = ((batchSize > sizeOfFileInPath) ? (batchSize / sizeOfFileInPath)
             : (sizeOfFileInPath / batchSize));
         logger.trace("iterationOfBatches :" + iterationOfBatches);
         logger.trace("batchSize :" + batchSize);
-        logger.trace("files.size :" + files.length);
-        final int partitionSize = (files.length + iterationOfBatches - 1) / iterationOfBatches;
+        logger.trace("filteredFiles.size :" + filteredFiles.length);
+        final int partitionSize = (filteredFiles.length 
+            + iterationOfBatches - 1) / iterationOfBatches;
+        
         logger.trace("partitionSize :" + partitionSize);
         BisDataMetaInfo bisDataMetaInfo = null;
-        List<LsEntry> filesArray = Arrays.asList(files);
+        List<LsEntry> filesArray = Arrays.asList(filteredFiles);
         logger.trace("number of files on this pull :" + filesArray.size());
         List<List<LsEntry>> result = IntStream.range(0, partitionSize)
             .mapToObj(i -> filesArray.subList(iterationOfBatches * i,
@@ -673,7 +692,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     + channelId + " & route Id" + routeId);
                 transferDataFromChannel(template,
                     sourcelocation + File.separator + entry.getFilename(), pattern,
-                    destinationLocation, channelId, routeId);
+                    destinationLocation, channelId, routeId,exclusions);
                 logger.trace("invocation of method transferDataFromChannel"
                     + " when directory is availble in destination with location ends here "
                     + sourcelocation + " & file pattern " + pattern + " with channel Id "

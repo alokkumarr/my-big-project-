@@ -193,38 +193,38 @@ public class MetaDataStoreRequestAPI {
 
 
     private void doSearch() throws Exception {
-        maprDBCondition =  MapRDB.newCondition();
-        boolean toBeClosed = false;
-        if (filter.size() > 1) {
-            if (query.has("conjunction"))
-                if (query.get("conjunction").getAsString().equalsIgnoreCase("or"))
-                    maprDBCondition.or();
-                else
-                    maprDBCondition.and();
-            else
-                maprDBCondition.and();
-            toBeClosed = true;
-        }
+      maprDBCondition = MapRDB.newCondition();
+      if (filter.size() > 0) {
+        if (query.has("conjunction"))
+          if (query.get("conjunction").getAsString().equalsIgnoreCase("or"))
+            maprDBCondition.or();
+          else
+            maprDBCondition.and();
         filter.forEach(c -> {
-            if ( c.isJsonObject() ){
-                JsonObject cjo = c.getAsJsonObject();
-                String fp = cjo.getAsJsonPrimitive("field-path").getAsString();
-                String cond = cjo.getAsJsonPrimitive("condition").getAsString();
-                String val = cjo.getAsJsonPrimitive("value").getAsString();
-                if (((fp != null && fp.isEmpty()) && (cond != null && cond.isEmpty())) && (val != null && val.isEmpty()))
-                {
-                    if (cond.equalsIgnoreCase("like")) {
-                        maprDBCondition.like(fp, val);}
-                    else
-                        {maprDBCondition.is(fp, getOperation( cond ), val );}
-                }else {
-                    logger.error("Skip incorrect filter element: " + c.getAsJsonObject().toString());
-                }
+          if (c.isJsonObject()) {
+            JsonObject cjo = c.getAsJsonObject();
+            String fp = cjo.getAsJsonPrimitive("field-path").getAsString();
+            String cond = cjo.getAsJsonPrimitive("condition").getAsString();
+            String val = cjo.getAsJsonPrimitive("value").getAsString();
+            if (((fp != null && !fp.isEmpty()) && (cond != null && !cond.isEmpty()))
+                && (val != null && !val.isEmpty())) {
+              if (cond.equalsIgnoreCase("like")) {
+                maprDBCondition.like(fp, val);
+              } else {
+                maprDBCondition.is(fp, getOperation(cond), val);
+              }
+            } else {
+              logger.info("Skip incorrect filter element: " + c.getAsJsonObject().toString());
             }
-            else{
-                logger.warn("Incorrect query");}});
-        if (toBeClosed) maprDBCondition.close();
-        maprDBCondition.build();
+          } else {
+            logger.info("Incorrect query : " + maprDBCondition);
+          }
+        });
+      }
+      maprDBCondition.close();
+      maprDBCondition.build();
+      logger.info("Filter Query : " + maprDBCondition);
+  
         Map<String, Document> searchResult = null;
         switch ( category ){
             case DataSet:

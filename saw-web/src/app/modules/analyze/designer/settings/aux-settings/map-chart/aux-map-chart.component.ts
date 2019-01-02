@@ -55,6 +55,7 @@ export class DesignerSettingsAuxMapChartComponent {
 
   onTitleChange() {
     if (!isEmpty(this.chartTitle)) {
+      this.editMode = false;
       this.change.emit({
         subject: 'chartTitle',
         data: {

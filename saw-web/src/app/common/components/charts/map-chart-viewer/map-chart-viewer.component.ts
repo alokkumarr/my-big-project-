@@ -25,7 +25,7 @@ export class MapChartViewerComponent {
   _auxSettings: any = {};
   _mapData: Observable<any>;
   _rawSeries: any;
-  public chartOptions = {};
+  public chartOptions: any = {};
 
   @Input() actionBus;
   @Input() updater;
@@ -109,13 +109,17 @@ export class MapChartViewerComponent {
     };
 
     const legend = this._chartService.analysisLegend2ChartLegend(analysisLegend);
+    console.log('legend', legend);
 
     this.chartOptions = {
       mapNavigation: {
         enabled: true
       },
-      colorAxis,
-      legend
+      colorAxis
     };
+
+    if (legend) {
+      this.chartOptions.legend = legend;
+    }
   }
 }

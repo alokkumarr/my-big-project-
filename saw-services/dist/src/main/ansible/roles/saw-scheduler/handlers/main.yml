@@ -5,3 +5,8 @@
   # However, skip starting in development mode as tasks do not exist
   # and instead let socket activation start it on demand
   when: lookup('env', 'container') != 'docker'
+  # Workaround: Occasionally deployments will fail with "Job for
+  # service canceled".  The root cause is not known, but retry as a
+  # workaround for now.
+  register: result
+  until: result is success

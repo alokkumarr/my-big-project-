@@ -19,7 +19,7 @@
   </div>
   <div class="chart-title">
     <label class="chart-designer-title" *ngIf="!editMode">{{chartTitle}}</label>
-    <mat-icon *ngIf="!editMode" class="mat-icon material-icons icon-edit-solid" fonticon="icon-filter" (click)="EditMode = true"></mat-icon>
+    <mat-icon *ngIf="!editMode" class="mat-icon material-icons icon-edit-solid" fonticon="icon-filter" (click)="editMode = true"></mat-icon>
     <mat-form-field *ngIf="editMode" style="margin-bottom: 2px;">
       <input style="width: 84%;padding-bottom: 8px;" matInput
              type="text"
