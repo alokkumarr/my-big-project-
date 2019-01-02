@@ -341,7 +341,7 @@ object QueryBuilder extends {
           // In case of multiple artifacts join if one artifacts contains the
           // aggregate then another artifacts columns should be considered as
           // group by columns. initialise the flag to detect that.
-          if (aggregateColumns.size > 0 && columns.size > aggregateColumns.size)
+          if ((aggregateColumns.size > 0 && columns.size > aggregateColumns.size) || columns.size == aggregateColumns.size)
             aggregateFlag = true;
           if (aggregateFlag) {
             val groupByColumn = columns.filter(col => {
