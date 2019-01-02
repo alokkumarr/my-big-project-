@@ -15,8 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
@@ -43,11 +41,11 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("channelName", "Messaging");
     childNode.put("channelType", "SCP");
-    childNode.put("hostName", "localhost");
-    childNode.put("portNo", 21);
+    childNode.put("hostName", "sip-admin");
+    childNode.put("portNo", 22);
     childNode.put("accessType", "read");
-    childNode.put("userName", "user");
-    childNode.put("password", "saw123");
+    childNode.put("userName", "root");
+    childNode.put("password", "root");
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -80,11 +78,11 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("channelName", "Messaging");
     childNode.put("channelType", "SCP");
-    childNode.put("hostName", "localhost");
-    childNode.put("portNo", 21);
+    childNode.put("hostName", "sip-admin");
+    childNode.put("portNo", 22);
     childNode.put("accessType", "read");
-    childNode.put("userName", "user");
-    childNode.put("password", "saw123");
+    childNode.put("userName", "root");
+    childNode.put("password", "root");
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -357,9 +355,9 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void updateRoute() throws JsonProcessingException {
-    String username = "user";
-    String password = "password";
-    String homeDirectory = "/";
+    String username = "root";
+    String password = "root";
+    String homeDirectory = "/data";
     String filename = "report.csv";
     createFileOnFakeFtp(username, password, homeDirectory, filename);
     Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
@@ -472,12 +470,11 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to test a connectivity route in batch Ingestion.
    */
-  @Ignore
   @Test
   public void connectChannel() throws JsonProcessingException {
-    String username = "user";
-    String password = "password";
-    String homeDirectory = "/";
+    String username = "root";
+    String password = "root";
+    String homeDirectory = "/data";
     String filename = "report.csv";
     createFileOnFakeFtp(username, password, homeDirectory, filename);
     Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()

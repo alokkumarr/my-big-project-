@@ -887,8 +887,8 @@ public class SftpServiceImpl extends SipPluginContract {
     int totalNoOfPages = countOfRecords % retryPageSize;
     logger.info("totalNoOfPages :" + totalNoOfPages);
     for (int i = pageStart; i < totalNoOfPages; i++) {
-      List<BisFileLog> logs = sipLogService.listOfRetryIds(retryDiff, i, retryPageSize,
-          "checkpointDate");
+      List<BisFileLog> logs =
+          sipLogService.listOfRetryIds(retryDiff, i, retryPageSize, "checkpointDate");
       logger.trace("Data listOfRetryIds :", logs);
       int rowId = 0;
       for (BisFileLog log : logs) {
@@ -898,6 +898,24 @@ public class SftpServiceImpl extends SipPluginContract {
         if (rowId <= 0) {
           throw new PersistenceException(
               "Exception occured while updating the bis log table to handle inconsistency");
+        }
+        String fileName = null;
+        if (log.getRecdFileName() != null) {
+          fileName = log.getRecdFileName();
+          logger.trace("Delete the corrupted file :", fileName);
+          File fileDelete = new File(fileName);
+          if (fileDelete != null) {
+            if (fileDelete.isDirectory()) {
+              logger.trace("Directory deleted :", fileDelete);
+              fileDelete.delete();
+            } else {
+              logger.trace("Parent Directory deleted :", fileDelete);
+              fileDelete.getParentFile().delete();
+
+            }
+          }
+        } else {
+          logger.trace("Corrupted file does not exist.");
         }
       }
     }
