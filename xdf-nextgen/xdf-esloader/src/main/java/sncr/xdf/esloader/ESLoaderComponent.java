@@ -146,7 +146,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
             esDatasetObject = esDatasetElement.getAsJsonObject();
 
-            long currentTime = Instant.now().toEpochMilli();
+            long currentTime = Instant.now().getEpochSecond();
 
             esDatasetObject.addProperty(DataSetProperties.CreatedTime.toString(), currentTime);
             esDatasetObject.addProperty(DataSetProperties.ModifiedTime.toString(), currentTime);
@@ -154,7 +154,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             esDatasetObject = esDatasetElement.getAsJsonObject();
 
             // Update modified time
-            long currentTime = Instant.now().toEpochMilli();
+            long currentTime = Instant.now().getEpochSecond();
             esDatasetObject.addProperty(DataSetProperties.ModifiedTime.toString(), currentTime);
         }
 
