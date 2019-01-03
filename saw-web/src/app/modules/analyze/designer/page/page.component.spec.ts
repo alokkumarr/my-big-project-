@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzeService } from '../../services/analyze.service';
 import { ExecuteService } from '../../services/execute.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -16,6 +16,8 @@ class ActivatedRouteStub {
   snapshot = { queryParams: {} };
 }
 
+class RouterStub {}
+
 class ExecuteServiceStub {
   executeAnalysis() {}
 }
@@ -27,21 +29,20 @@ describe('DesignerPageComponent', () => {
   let fixture: ComponentFixture<DesignerPageComponent>;
   let readAnalysisSpy;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [DesignerPageComponent],
-        providers: [
-          { provide: Location, useValue: LocationStub },
-          { provide: AnalyzeService, useValue: new AnalysisStubService() },
-          { provide: ActivatedRoute, useValue: new ActivatedRouteStub() },
-          { provide: ExecuteService, useValue: new ExecuteServiceStub() },
-          { provide: MatDialog, useValue: new MatDialogStub() }
-        ],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [DesignerPageComponent],
+      providers: [
+        { provide: Location, useValue: LocationStub },
+        { provide: AnalyzeService, useValue: new AnalysisStubService() },
+        { provide: ActivatedRoute, useValue: new ActivatedRouteStub() },
+        { provide: Router, useValue: new RouterStub() },
+        { provide: ExecuteService, useValue: new ExecuteServiceStub() },
+        { provide: MatDialog, useValue: new MatDialogStub() }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     const promise = new Promise(succ => {
