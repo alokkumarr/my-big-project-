@@ -83,6 +83,7 @@
                 <strong> Cannot have more than one pattern</strong>
               </mat-error>
             </mat-form-field>
+
             <mat-form-field appearance="outline">
               <mat-label i18n>Exclude Extension</mat-label>
               <input
@@ -105,6 +106,13 @@
                 >
               </mat-error>
             </mat-form-field>
+            <mat-checkbox
+              style="margin: 20px 0 65px 0;"
+              formControlName="disableDuplicate"
+              i18n
+            >
+              Disable duplicate check
+            </mat-checkbox>
           </section>
           <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
           <section
@@ -175,8 +183,6 @@
                 Batch size is <strong>required</strong>
               </mat-error>
             </mat-form-field>
-          </section>
-          <section fxFlex fxLayout="row" fxLayoutAlign="space-around center">
             <mat-form-field appearance="outline">
               <mat-label i18n>Description about the route</mat-label>
               <textarea matInput formControlName="description"></textarea>
