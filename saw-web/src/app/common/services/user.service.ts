@@ -5,14 +5,15 @@ import AppConfig from '../../../../appConfig';
 import { JwtService } from './jwt.service';
 const loginUrl = AppConfig.login.url;
 const refreshTokenEndpoint = 'getNewAccessToken';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class UserService {
   static refreshTokenEndpoint = refreshTokenEndpoint;
-  constructor(
-    public _http: HttpClient,
-    public _jwtService: JwtService
-  ) {}
+
+  loginChange$ = new BehaviorSubject(false);
+
+  constructor(public _http: HttpClient, public _jwtService: JwtService) {}
 
   attemptAuth(formData) {
     const LoginDetails = {
@@ -22,14 +23,20 @@ export class UserService {
 
     const route = '/doAuthenticate';
 
-    return this._http.post(loginUrl + route, LoginDetails).toPromise()
+    return this._http
+      .post(loginUrl + route, LoginDetails)
+      .toPromise()
       .then(response => {
         const resp = this._jwtService.parseJWT(get(response, 'aToken'));
 
         // Store the user's info for easy lookup
         if (this._jwtService.isValid(resp)) {
           // this._jwtService.destroy();
-          this._jwtService.set(get(response, 'aToken'), get(response, 'rToken'));
+          this._jwtService.set(
+            get(response, 'aToken'),
+            get(response, 'rToken')
+          );
+          this.loginChange$.next(true);
         }
 
         return resp;
@@ -48,21 +55,27 @@ export class UserService {
   exchangeLoginToken(token) {
     const route = '/authentication';
 
-    return this._http.get(loginUrl + route, {
-      params: {
-        jwt: token
-      }
-    }).toPromise().then(response => {
-      const resp = this._jwtService.parseJWT(get(response, 'aToken'));
+    return this._http
+      .get(loginUrl + route, {
+        params: {
+          jwt: token
+        }
+      })
+      .toPromise()
+      .then(response => {
+        const resp = this._jwtService.parseJWT(get(response, 'aToken'));
 
-      // Store the user's info for easy lookup
-      if (this._jwtService.isValid(resp)) {
-        // this._jwtService.destroy();
-        this._jwtService.set(get(response, 'aToken'), get(response, 'rToken'));
-      }
+        // Store the user's info for easy lookup
+        if (this._jwtService.isValid(resp)) {
+          // this._jwtService.destroy();
+          this._jwtService.set(
+            get(response, 'aToken'),
+            get(response, 'rToken')
+          );
+        }
 
-      return true;
-    });
+        return true;
+      });
   }
 
   logout(path) {
@@ -73,11 +86,13 @@ export class UserService {
     const resp = JSON.parse(window.atob(base64));
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       })
     };
-    return this._http.post(loginUrl + route, resp.ticket.ticketId, httpOptions).toPromise()
+    return this._http
+      .post(loginUrl + route, resp.ticket.ticketId, httpOptions)
+      .toPromise()
       .then(() => {
         this._jwtService.destroy();
         if (path === 'logout') {
@@ -102,12 +117,14 @@ export class UserService {
     };
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${this._jwtService.get()}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this._jwtService.get()}`
       })
     };
 
-    return this._http.post(loginUrl + route, LoginDetails, httpOptions).toPromise()
+    return this._http
+      .post(loginUrl + route, LoginDetails, httpOptions)
+      .toPromise()
       .then((res: any) => {
         if (res.valid) {
           this.logout('change');
@@ -119,7 +136,9 @@ export class UserService {
 
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = `${window.location.href.split('/preResetPwd')[0]}/resetPassword`;
+    const productUrl = `${
+      window.location.href.split('/preResetPwd')[0]
+    }/resetPassword`;
 
     const LoginDetails = {
       masterLoginId: credentials.masterLoginId,
@@ -127,12 +146,14 @@ export class UserService {
     };
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${this._jwtService.get()}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this._jwtService.get()}`
       })
     };
 
-    return this._http.post(loginUrl + route, LoginDetails, httpOptions).toPromise()
+    return this._http
+      .post(loginUrl + route, LoginDetails, httpOptions)
+      .toPromise()
       .then(res => {
         return res;
       });
@@ -148,11 +169,13 @@ export class UserService {
     };
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${this._jwtService.get()}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this._jwtService.get()}`
       })
     };
-    return this._http.post(loginUrl + route, ResetPasswordDetails, httpOptions).toPromise()
+    return this._http
+      .post(loginUrl + route, ResetPasswordDetails, httpOptions)
+      .toPromise()
       .then(res => {
         return res;
       });
@@ -160,7 +183,9 @@ export class UserService {
 
   verify(hashCode) {
     const route = '/vfyRstPwd';
-    return this._http.post(loginUrl + route, hashCode).toPromise()
+    return this._http
+      .post(loginUrl + route, hashCode)
+      .toPromise()
       .then(res => {
         return res;
       });
@@ -168,7 +193,9 @@ export class UserService {
 
   redirect(baseURL) {
     const route = '/auth/redirect';
-    return this._http.post(loginUrl + route, baseURL).toPromise()
+    return this._http
+      .post(loginUrl + route, baseURL)
+      .toPromise()
       .then(res => {
         return res;
       });
@@ -176,17 +203,25 @@ export class UserService {
 
   refreshAccessToken(rtoken = this._jwtService.getRefreshToken()) {
     const route = `/${refreshTokenEndpoint}`;
-    return this._http.post(loginUrl + route, rtoken).toPromise()
-      .then(response => {
-        const resp = this._jwtService.parseJWT(get(response, 'aToken'));
-        // Store the user's info for easy lookup
-        if (this._jwtService.isValid(resp)) {
-          // this._jwtService.destroy();
-          this._jwtService.set(get(response, 'aToken'), get(response, 'rToken'));
+    return this._http
+      .post(loginUrl + route, rtoken)
+      .toPromise()
+      .then(
+        response => {
+          const resp = this._jwtService.parseJWT(get(response, 'aToken'));
+          // Store the user's info for easy lookup
+          if (this._jwtService.isValid(resp)) {
+            // this._jwtService.destroy();
+            this._jwtService.set(
+              get(response, 'aToken'),
+              get(response, 'rToken')
+            );
+          }
+          return resp;
+        },
+        err => {
+          throw err;
         }
-        return resp;
-      }, err => {
-        throw err;
-      });
+      );
   }
 }
