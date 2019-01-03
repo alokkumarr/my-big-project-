@@ -41,3 +41,7 @@ mat-icon.export {
   background-image: url('/assets/img/excel.png');
   transform: scale(0.7);
 }
+
+.report-toggle {
+  height: calc(100vh - 245px);
+}
