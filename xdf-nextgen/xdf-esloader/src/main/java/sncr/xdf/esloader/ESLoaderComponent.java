@@ -17,7 +17,6 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithSparkContext;
 import sncr.xdf.component.Component;
-import sncr.xdf.esloader.esloadercommon.ESConfig;
 import sncr.xdf.esloader.esloadercommon.ESHttpClient;
 import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.exceptions.FatalXDFException;
@@ -106,7 +105,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
                 ESHttpClient esHttpClient = loader.getHttpClient();
 
-                retVal = registerDataset(indexType, esHttpClient);
+                retVal = registerOrUpdateESDataset(indexType, esHttpClient);
             }
 
             return retVal;
@@ -127,7 +126,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
      *         -1 - Failure
      * @throws Exception In case of failures during metadata retrival
      */
-    private int registerDataset (String indexType, ESHttpClient esHttpClient) throws Exception {
+    private int registerOrUpdateESDataset(String indexType, ESHttpClient esHttpClient) throws Exception {
         String datasetId = ctx.applicationID + "::" + ESLOADER_DATASET;
 
         // Append '_esdata' to the dataset id to identify this as ES dataset
