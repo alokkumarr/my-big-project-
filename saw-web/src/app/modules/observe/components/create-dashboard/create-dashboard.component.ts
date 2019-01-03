@@ -128,9 +128,12 @@ export class CreateDashboardComponent
       this.widgetSidenav.close();
       return;
     }
-
-    this.globalFilterService.onApplyFilter.next(data.analysisFilters);
-    this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
+    if (!isEmpty(data.analysisFilters)) {
+      this.globalFilterService.onApplyFilter.next(data.analysisFilters);
+    }
+    if (!isEmpty(data.kpiFilters)) {
+      this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
+    }
     this.widgetSidenav.close();
   }
 

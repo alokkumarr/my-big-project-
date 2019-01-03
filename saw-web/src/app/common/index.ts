@@ -83,7 +83,8 @@ import {
   SideNavService,
   WindowService,
   HeaderProgressService,
-  DynamicModuleService
+  DynamicModuleService,
+  CustomIconService
 } from './services';
 
 const MODULES = [
@@ -155,7 +156,8 @@ const SERVICES = [
   SidenavMenuService,
   ToastService,
   UserService,
-  WindowService
+  WindowService,
+  CustomIconService
 ];
 
 const INTERCEPTORS = [
@@ -188,10 +190,14 @@ const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
     ...COMPONENTS,
     ...DIRECTIVES
   ],
-  providers: [...INTERCEPTORS, ...GUARDS],
+  providers: [...INTERCEPTORS, ...GUARDS, CustomIconService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class CommonModuleTs {}
+export class CommonModuleTs {
+  constructor(private _customIconService: CustomIconService) {
+    this._customIconService.init();
+  }
+}
 
 /* CommonModuleGlobal exposes services that are shared for lazy loaded components as well */
 @NgModule({})

@@ -33,12 +33,11 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
   private static final Logger logger = 
       LoggerFactory.getLogger(RuntimeSessionFactoryLocator.class);
-  private final Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
+  private Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
-    
-    
+
   @Override
   public SessionFactory<LsEntry> getSessionFactory(Object key) {
     Long id = Long.valueOf(key.toString());
@@ -72,7 +71,6 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String portNumber = rootNode.get("portNo").asText();
         SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
         String password = obfuscator.decrypt(rootNode.get("password").asText());
-        //String password = rootNode.get("password").asText();
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         String userName = rootNode.get("userName").asText();        
@@ -83,7 +81,6 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         Properties prop = new Properties();
         prop.setProperty("StrictHostKeyChecking", "no");
         prop.setProperty("bufferSize", "100000");
-        //prop.setProperty("PreferredAuthentications", "password");
         defaultSftpSessionFactory.setSessionConfig(prop);
       } catch (IOException e) {
         throw new SftpProcessorException("for the given id + " + key + ""
@@ -96,11 +93,4 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
     return defaultSftpSessionFactory;
   }
 
-  public void invalidateSessionFactoryMap() {
-    sessionFactoryMap.clear();
-  }
-
-  public void remove(Object key) {
-    sessionFactoryMap.remove(key);
-  }
 }

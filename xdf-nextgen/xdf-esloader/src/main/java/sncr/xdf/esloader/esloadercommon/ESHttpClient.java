@@ -75,7 +75,7 @@ public class ESHttpClient {
                 logger.error(cr.getStatus());
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
         return retval;
     }
@@ -209,6 +209,32 @@ public class ESHttpClient {
         } else {
             return -1;
         }
+    }
+
+    /**
+     * Returns the total number of records for a given index/alias
+     *
+     * @param index Name of the index or alias
+     *
+     * @return Total number of records in the index/alias
+     */
+    public long getRecordCount (String index) {
+        long count = 0;
+
+        String countURL = "/" + index + "/_count";
+
+        String response = get(countURL);
+
+        logger.debug("Response = " + response);
+
+        if (response != null && response.length() != 0) {
+            // Extract count
+            JsonObject responseObject = new JsonParser().parse(response).getAsJsonObject();
+
+            count = responseObject.get("count").getAsLong();
+        }
+
+        return count;
     }
 
     public boolean esIndexExists(String idx) throws Exception  {
