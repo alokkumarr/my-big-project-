@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import * as map from 'lodash/fp/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as get from 'lodash/get';
@@ -40,7 +41,8 @@ export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 export class FilterService {
   constructor(
     public _dialog: AnalyzeDialogService,
-    private locationService: Location,
+    private router: Router,
+    private locationService: Location
   ) {}
 
   getType(inputType) {
@@ -199,7 +201,7 @@ export class FilterService {
     return filter(f => f.isRuntimeFilter, filters);
   }
 
-  openRuntimeModal(analysis, filters = [], navigateBack )  {
+  openRuntimeModal(analysis, filters = [], navigateBack: string) {
     return new Promise(resolve => {
       this._dialog
         .openFilterPromptDialog(filters, analysis)
@@ -225,7 +227,9 @@ export class FilterService {
           // );
 
           resolve(analysis);
-          if (navigateBack )  {
+          if (navigateBack === 'home') {
+            this.router.navigate(['analyze', analysis.categoryId]);
+          } else if (navigateBack === 'back') {
             this.locationService.back();
           }
         });
@@ -253,7 +257,7 @@ export class FilterService {
     };
   }
 
-  getRuntimeFilterValues(analysis, navigateBack = false) {
+  getRuntimeFilterValues(analysis, navigateBack: string = null) {
     const clone = cloneDeep(analysis);
     const runtimeFilters = this.getRuntimeFiltersFrom(
       get(clone, 'sqlBuilder.filters', [])
@@ -262,6 +266,6 @@ export class FilterService {
     if (!runtimeFilters.length) {
       return Promise.resolve(clone);
     }
-    return this.openRuntimeModal(clone, runtimeFilters, navigateBack ) ;
+    return this.openRuntimeModal(clone, runtimeFilters, navigateBack);
   }
 }
