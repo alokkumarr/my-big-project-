@@ -240,6 +240,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     }
     this.detailsSidenav && this.detailsSidenav.close();
     window['siden'] = this.detailsSidenav;
+    this.onetimeExecution = false;
     this._router.navigate(
       ['analyze', 'analysis', this.analysis.id, 'executed'],
       {
