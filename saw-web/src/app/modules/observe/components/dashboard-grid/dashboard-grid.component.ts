@@ -530,8 +530,10 @@ export class DashboardGridComponent
       name: get(model, 'name', ''),
       description: get(model, 'description', ''),
       createdBy: get(model, 'createdBy', ''),
+      createdByName: get(model, 'createdByName', ''),
       createdAt: get(model, 'createdAt', ''),
       updatedBy: get(model, 'updatedBy', ''),
+      updatedByName: get(model, 'updatedByName', ''),
       updatedAt: get(model, 'updatedAt', ''),
       tiles: map(this.dashboard, tile => ({
         type: this.tileType(tile),
