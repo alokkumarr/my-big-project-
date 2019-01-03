@@ -14,6 +14,7 @@ import {
   TSCOMBO_TYPES,
   TSCOMBO_TYPES_OBJ
 } from '../../../consts';
+import * as filter from 'lodash/filter';
 
 @Component({
   selector: 'expandable-field',
@@ -66,6 +67,14 @@ export class ExpandableFieldComponent {
   }
 
   onAggregateChange(value) {
+    this.comboTypes = filter(COMBO_TYPES, type => {
+      if (value === 'percentageByRow' && type.value === 'column') {
+        return true;
+      } 
+      if (value !== 'percentageByRow') {
+        return true;
+      }
+    });
     this.artifactColumn.aggregate = value;
     this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
   }
