@@ -73,7 +73,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   public cType: string;
 
   constructor() {
-    this.highcharts.setOptions(globalChartOptions);
+    this.highcharts.setOptions(cloneDeep(globalChartOptions));
   }
 
   @Input()
@@ -105,13 +105,13 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // set the appropriate config based on chart type
     this.cType = this.isStockChart ? 'highStock' : options.chart.type;
     this.config = defaultsDeep(
+      options,
+      this.config,
       get(
         find(this.chartSettings, ['type', this.cType]),
         'config',
-        chartOptions
-      ),
-      options,
-      this.config
+        cloneDeep(chartOptions)
+      )
     );
     if (this.enableExport) {
       this.config.exporting = {
