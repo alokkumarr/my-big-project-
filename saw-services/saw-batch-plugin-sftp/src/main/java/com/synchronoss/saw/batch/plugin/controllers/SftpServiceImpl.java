@@ -785,7 +785,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         bisDataMetaInfo = new BisDataMetaInfo();
                         bisDataMetaInfo.setProcessId(
                             new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-                        bisDataMetaInfo.setDataSizeInBytes(entry.getAttrs().getSize());
+                        bisDataMetaInfo.setDataSizeInBytes(0L);
                         bisDataMetaInfo.setActualDataName(
                             sourcelocation + File.separator + entry.getFilename());
                         bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
@@ -794,8 +794,10 @@ public class SftpServiceImpl extends SipPluginContract {
                             new Date(((long) entry.getAttrs().getATime()) * 1000L));
                         bisDataMetaInfo.setChannelId(channelId);
                         bisDataMetaInfo.setRouteId(routeId);
+                        bisDataMetaInfo.setFilePattern(pattern);
                         bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
-                        bisDataMetaInfo.setReasonCode(BisProcessState.DUPLICATE.value());
+                        bisDataMetaInfo.setComponentState(BisProcessState.DUPLICATE.value());
+                        sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                         list.add(bisDataMetaInfo);
                       }
                     }
