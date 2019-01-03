@@ -397,8 +397,8 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("session opened closes here ");
     } catch (Exception ex) {
       logger.error("Exception triggered while transferring the file", ex);
-      updateLogs(Long.valueOf(payload.getChannelId()), Long.valueOf(
-          payload.getRouteId()));
+      sipLogService.updateLogs(Long.valueOf(payload.getChannelId()), Long.valueOf(
+          payload.getRouteId()),UNREACHABLE_HOST);
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
       if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
@@ -568,7 +568,7 @@ public class SftpServiceImpl extends SipPluginContract {
     } catch (Exception ex) {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
-      updateLogs(channelId, routeId);
+      sipLogService.updateLogs(channelId, routeId, UNREACHABLE_HOST);
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
@@ -841,19 +841,5 @@ public class SftpServiceImpl extends SipPluginContract {
     return list;
   }
   
-  private void updateLogs(Long channelId, Long routeId) {
-    
-    BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
-    bisDataMetaInfo
-        .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-    bisDataMetaInfo.setDataSizeInBytes(0L);
-    bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-    bisDataMetaInfo.setProcessState(UNREACHABLE_HOST);
-    bisDataMetaInfo.setComponentState(UNREACHABLE_HOST);
-    bisDataMetaInfo.setActualReceiveDate(new Date());
-    bisDataMetaInfo.setChannelId(channelId);
-    bisDataMetaInfo.setRouteId(routeId);
-    sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-  }
 
 }
