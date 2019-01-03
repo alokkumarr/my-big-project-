@@ -4,6 +4,7 @@ import java.util
 
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
+import org.json4s
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.slf4j.{Logger, LoggerFactory}
@@ -114,7 +115,10 @@ object QueryBuilder extends {
 
   private def column(artifactName: String, column: JValue) = {
     val aggregate = (column \ "aggregate")
-    if (!(aggregate ==JNothing))
+    if((aggregate !=JNothing) && aggregate.extract[String].equalsIgnoreCase("percentage"))
+      "("+(artifactName + "." + (column \ "columnName").extract[String])+"*100)/(Select sum("+
+        (artifactName + "." + (column \ "columnName").extract[String])+") FROM "+ artifactName +") as " + (column \ "columnName").extract[String]
+    else if (!(aggregate ==JNothing))
       aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
     else
     artifactName + "." + (column \ "columnName").extract[String]
@@ -332,17 +336,18 @@ object QueryBuilder extends {
           val columns = extractArray(fields, "columns")
           val aggregateColumns = columns.filter(col => {
             val aggregate = (col \ "aggregate")
-            !(aggregate == JNothing || aggregate == None)
+              !(aggregate == JNothing || aggregate == None)
           })
           // In case of multiple artifacts join if one artifacts contains the
           // aggregate then another artifacts columns should be considered as
           // group by columns. initialise the flag to detect that.
-          if (aggregateColumns.size > 0 && columns.size > aggregateColumns.size)
+          if ((aggregateColumns.size > 0 && columns.size > aggregateColumns.size) || columns.size == aggregateColumns.size)
             aggregateFlag = true;
           if (aggregateFlag) {
             val groupByColumn = columns.filter(col => {
               val groupBy = (col \ "aggregate")
-              (groupBy == JNothing || groupBy == None)
+              //Since we don't have built in Spark function to calculate percentage, and we are implementing our own logic, percentage column should do come under groupBy.(it's not a aggregate function here)
+              (groupBy == JNothing || groupBy == None) || (groupBy.extract[String].equalsIgnoreCase("percentage"))
             })
             val groupByColumns = groupByColumn.map(buildGroupByElement(_, tableName)).toSet
             // return groupByColumn

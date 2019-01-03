@@ -36,10 +36,11 @@ export class AdminImportFileListComponent implements OnInit {
         dataField: 'count',
         allowSorting: true,
         alignment: 'left',
-        width: '40%'
+        width: '25%'
       },
       {
-        width: '10%',
+        width: '25%',
+        alignment: 'center',
         caption: '',
         cellTemplate: 'actionCellTemplate'
       }

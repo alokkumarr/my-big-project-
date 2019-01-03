@@ -128,10 +128,10 @@
               <div *ngIf="selectedSourceData">
                   <span *ngIf="show; else hidePwd">{{selectedSourceData?.password}}</span>
                   <ng-template #hidePwd>&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;</ng-template>
-                  <button *ngIf="!show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                  <button *ngIf="!show" matTooltip="Show Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                     <mat-icon fontIcon="icon-show"></mat-icon>
                   </button>
-                  <button *ngIf="show" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
+                  <button *ngIf="show" matTooltip="Hide Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
                     <mat-icon fontIcon="icon-hide"></mat-icon>
                   </button>
               </div>
@@ -170,7 +170,7 @@
               </button>
               <mat-menu #datapodmenu="matMenu">
                 <button mat-menu-item
-                        [disabled]="!selectedSourceData.status"
+                        [disabled]="!selectedSourceData?.status"
                         [attr.color]="data.data.status ? 'warn' : 'primary'"
                         (click)="toggleRouteActivation(data.data)"
                 >

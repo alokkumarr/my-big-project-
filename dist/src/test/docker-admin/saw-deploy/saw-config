@@ -2,6 +2,15 @@
 # SAW environment configuration for local testing
 #
 
+[all:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_ssh_pass=root
+
+# The EPEL is installed in the SIP container base images, so mark it
+# as provided
+sip_epel_yum_provided=true
+
 [saw-proxy]
 sip-proxy
 

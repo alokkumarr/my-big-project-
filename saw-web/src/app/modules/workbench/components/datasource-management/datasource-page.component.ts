@@ -20,6 +20,7 @@ import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 import * as findKey from 'lodash/findKey';
 import * as filter from 'lodash/filter';
 
@@ -81,7 +82,18 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   filterSourcesByType(channelData, cType) {
     this.sourceData = filter(channelData, ['channelType', cType]);
     if (this.sourceData.length > 0) {
-      this.selectSingleChannel(this.sourceData[0].bisChannelSysId);
+      const firstChannelId = this.sourceData[0].bisChannelSysId;
+      if (this.selectedSourceData) {
+        const selectedId = this.selectedSourceData.bisChannelSysId;
+        const alreadySelected = find(this.sourceData, ({bisChannelSysId}) => bisChannelSysId === selectedId);
+        if (alreadySelected) {
+          this.selectSingleChannel(selectedId);
+        } else {
+          this.selectSingleChannel(firstChannelId);
+        }
+      } else {
+        this.selectSingleChannel(firstChannelId);
+      }
     }
   }
 
@@ -99,18 +111,22 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       event.selectedRowKeys.length > 0
     ) {
       this.channelEditable = true;
-      this.selectedSourceData = event.selectedRowsData[0];
+      this.selectChannel(event.selectedRowsData[0]);
       if (!this.channelToggleRequestPending) {
         this.getRoutesForChannel(event.selectedRowKeys[0]);
       }
     } else if (event.selectedRowKeys.length > 0) {
       this.channelEditable = true;
-      this.selectedSourceData = event.selectedRowsData[0];
+      this.selectChannel(event.selectedRowsData[0]);
     } else {
       this.channelEditable = false;
-      this.selectedSourceData = [];
+      this.selectChannel(null);
       this.routesData = [];
     }
+  }
+
+  selectChannel(channel) {
+    this.selectedSourceData = channel;
   }
 
   sourceSelectedType(sourceType, channelCount) {
@@ -267,8 +283,15 @@ export class DatasourceComponent implements OnInit, OnDestroy {
         if (data.opType === 'create') {
           this.datasourceService
             .createRoute(routeData, payload)
-            .subscribe(() => {
-              this.getRoutesForChannel(routeData);
+            .subscribe(createdRoute => {
+              const promise = this.afterRouteAddedChanged(createdRoute);
+              if (promise) {
+                promise.then(() => {
+                  this.getRoutesForChannel(routeData);
+                });
+              } else {
+                this.getRoutesForChannel(routeData);
+              }
             });
         } else {
           payload.createdBy = routeData.createdBy;
@@ -286,6 +309,16 @@ export class DatasourceComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  afterRouteAddedChanged(createdRoute) {
+    const channelId = createdRoute.bisChannelSysId;
+    const routeId = createdRoute.bisRouteSysId;
+    const selectedChannelId = this.selectedSourceData.bisChannelSysId;
+    const isChannelNotActive = this.selectedSourceData.status === 0;
+    if (isChannelNotActive && channelId === selectedChannelId) {
+      return this.datasourceService.toggleRoute(channelId, routeId, false).toPromise();
+    }
   }
 
   deleteRoute(routeData) {

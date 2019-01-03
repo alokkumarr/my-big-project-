@@ -575,6 +575,14 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
+  checkifSortsApplied(event) {
+    forEach(this.analysis.sqlBuilder.orderByColumns, field => {
+      if (event.column.columnName === field.columnName) {
+        field.aggregate = event.column.aggregate;
+      }
+    });
+  }
+
   onSettingsChange(event: DesignerChangeEvent) {
     /* prettier-ignore */
     switch (this.analysis.type) {
@@ -625,6 +633,11 @@ export class DesignerContainerComponent implements OnInit {
         });
       }
       this.data = cloneDeep(this.data);
+
+      // Need this fucntion to check if aggregation is applied for the same sorted column.
+      // Need to remove this function once backend moves all logic of aggrregation to datafields.
+      this.checkifSortsApplied(event);
+
       this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;

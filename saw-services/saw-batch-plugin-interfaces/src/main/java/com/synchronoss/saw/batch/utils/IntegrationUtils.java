@@ -30,7 +30,7 @@ public final class IntegrationUtils {
 
   }
 
-  public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-HH-mm-ss";
+  public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-HH-mm-ss-SSS";
   public static final String TAR_GZIP_FILE_EXTENSION = "gz";
   public static final String ZIP_FILE_EXTENSION = "zip";
   public static final String TAR_FILE_EXTENSION = "tar";
@@ -67,9 +67,9 @@ public final class IntegrationUtils {
   /**
    * This method is used when renaming a file is necessary.
    */
-  public static String renameFileAppender() {
+  public static synchronized String renameFileAppender() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RENAME_DATE_FORMAT);
-    return simpleDateFormat.format(new Date());
+    return simpleDateFormat.format(new Date()) + Thread.currentThread().getId();
   }
 
 

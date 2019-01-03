@@ -45,9 +45,11 @@ export class ObserveService {
       method = 'put';
       endpoint = `update/${model.entityId}`;
       model.updatedBy = this.jwt.getUserId();
+      model.updatedByName = this.jwt.getUserName();
     } else {
       // Log the creator id if creating for first time
       model.createdBy = this.jwt.getUserId();
+      model.createdByName = this.jwt.getUserName();
     }
 
     return this.http[method](

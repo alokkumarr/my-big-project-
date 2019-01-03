@@ -1,0 +1,23 @@
+<mat-form-field
+  class="select-form-field category-selector"
+  appearance="outline"
+>
+  <mat-label i18n>Category</mat-label>
+  <mat-select
+    class="form-field"
+    [value]="value"
+    (selectionChange)="onCategoryChange($event.value)"
+  >
+    <mat-optgroup
+      *ngFor="let category of categories"
+      [label]="category.categoryName"
+    >
+      <mat-option
+        *ngFor="let subCategory of category.subCategories"
+        [value]="subCategory.subCategoryId.toString()"
+      >
+        {{ subCategory.subCategoryName }}
+      </mat-option>
+    </mat-optgroup>
+  </mat-select>
+</mat-form-field>

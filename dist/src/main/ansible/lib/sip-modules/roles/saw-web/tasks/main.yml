@@ -1,0 +1,8 @@
+- name: Copy product module web files into web app directory
+  copy:
+    src: "{{ item }}"
+    dest: /usr/share/tomcat/webapps/saw/
+    owner: tomcat
+    group: tomcat
+  with_fileglob:
+    - "{{ lookup('env','SIP_PRODUCT_MODULE') }}/sip-web/*.js"

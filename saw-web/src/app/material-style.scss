@@ -1,0 +1,6 @@
+@import 'src/themes/base/colors';
+
+// change completed mat-stepper checkmar icons to green
+div.mat-step-icon[ng-reflect-ng-switch="edit"] {
+  background-color: $primary-green;
+}
