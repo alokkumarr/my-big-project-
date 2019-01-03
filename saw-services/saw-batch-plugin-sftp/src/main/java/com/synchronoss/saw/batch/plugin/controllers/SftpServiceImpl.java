@@ -64,6 +64,7 @@ import org.springframework.util.StreamUtils;
 public class SftpServiceImpl extends SipPluginContract {
 
   private static final Logger logger = LoggerFactory.getLogger(SftpServiceImpl.class);
+  private static final String UNREACHABLE_HOST = "HOST NOT REACHABLE";
 
   @Autowired
   private RuntimeSessionFactoryLocator delegatingSessionFactory;
@@ -396,6 +397,8 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("session opened closes here ");
     } catch (Exception ex) {
       logger.error("Exception triggered while transferring the file", ex);
+      updateLogs(Long.valueOf(payload.getChannelId()), Long.valueOf(
+          payload.getRouteId()));
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
       if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
@@ -565,6 +568,7 @@ public class SftpServiceImpl extends SipPluginContract {
     } catch (Exception ex) {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
+      updateLogs(channelId, routeId);
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
@@ -833,6 +837,21 @@ public class SftpServiceImpl extends SipPluginContract {
     long durationInMillis = Duration.between(startTime, endTime).toMillis();
     logger.trace("End of data tranfer.....Total time in milliseconds::: " + durationInMillis);
     return list;
+  }
+  
+  private void updateLogs(Long channelId, Long routeId) {
+    
+    BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+    bisDataMetaInfo
+        .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setDataSizeInBytes(0L);
+    bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+    bisDataMetaInfo.setProcessState(UNREACHABLE_HOST);
+    bisDataMetaInfo.setComponentState(UNREACHABLE_HOST);
+    bisDataMetaInfo.setActualReceiveDate(new Date());
+    bisDataMetaInfo.setChannelId(channelId);
+    bisDataMetaInfo.setRouteId(routeId);
+    sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
   }
 
 }
