@@ -111,7 +111,6 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             return retVal;
         } catch (Exception ex) {
             logger.error(ex);
-            logger.debug(ExceptionUtils.getStackTrace(ex));
             retVal = -1;
         }
 
