@@ -14,6 +14,7 @@ import {
   TSCOMBO_TYPES,
   TSCOMBO_TYPES_OBJ
 } from '../../../consts';
+import * as filter from 'lodash/filter';
 
 @Component({
   selector: 'expandable-field',
@@ -27,6 +28,9 @@ export class ExpandableFieldComponent {
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
   @Input() public fieldCount: any;
+  @Input() public sqlBuilder;
+  @Input() analysisSubtype: string;
+  public enablePercentByRow: boolean = true;
 
   TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;
@@ -64,11 +68,20 @@ export class ExpandableFieldComponent {
   }
 
   onAggregateChange(value) {
+    this.comboTypes = filter(COMBO_TYPES, type => {
+      if (value === 'percentageByRow' && type.value === 'column') {
+        return true;
+      }
+      if (value !== 'percentageByRow') {
+        return true;
+      }
+    });
     this.artifactColumn.aggregate = value;
     this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
   }
 
   onComboTypeChange(comboType) {
+    this.enablePercentByRow = comboType === 'column' ? true : false;
     (this.artifactColumn as ArtifactColumnChart).comboType = comboType;
     this.change.emit({ subject: 'comboType', column: this.artifactColumn });
   }

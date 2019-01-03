@@ -214,11 +214,17 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.clonedConfig = {};
     } else {
       this.addExportConfig(this.config);
+      const requestConfig = cloneDeep(this.config);
+      forEach(this.config.series, seriesOptions => {
+        if (['percentageByRow'].includes(seriesOptions.aggregate)) {
+          set(requestConfig, 'plotOptions.column.stacking', 'percent');
+        }
+      });
       this.chart = this.highcharts.chart(
         this.container.nativeElement,
-        this.config
+        requestConfig
       );
-      this.addExportSize(this.config);
+      this.addExportSize(requestConfig);
     }
 
     // This is causing more problems than it solves. Updating the defaultsDeep

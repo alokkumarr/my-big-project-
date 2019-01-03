@@ -4,10 +4,13 @@
   <mat-icon [style.width.px]="40" [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate].icon : 'icon-more'"></mat-icon>
 </button>
 <mat-menu #aggregatemenu="matMenu">
-  <button mat-menu-item
-          *ngFor="let aggregateType of aggregates; trackBy: trackByIndex"
-          (click)="onAggregateChange(aggregateType.value)">
-    <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
-    <span style="margin-left: 20px;">{{aggregateType.label}}</span>
-  </button>
+  <div *ngFor="let aggregateType of aggregates; trackBy: trackByIndex">
+      <button mat-menu-item
+      (click)="onAggregateChange(aggregateType.value)"
+      *ngIf="checkColumn(aggregateType.value, sqlBuilder)" [ngStyle]="{'color': aggregate ===  aggregateType.value ? '#0077BE' : '#737373'}">
+        <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
+        <span style="margin-left: 20px;">{{aggregateType.label}}</span>
+      </button>
+  </div>
+
 </mat-menu>
