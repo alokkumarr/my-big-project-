@@ -6,14 +6,16 @@ import {
   FormBuilder,
   Validators
 } from '@angular/forms';
+import { DATAPOD_CATEGORIES } from '../../../consts';
 
 @Component({
-  selector: 'createfolder-dialog',
+  selector: 'semantic-details-dialog',
   templateUrl: './semantic-details-dialog.component.html',
   styleUrls: ['./semantic-details-dialog.component.scss']
 })
 export class SemanticDetailsDialogComponent implements OnInit {
   form: FormGroup;
+  dataPodCategories = DATAPOD_CATEGORIES;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -22,15 +24,18 @@ export class SemanticDetailsDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const defaultCategory = DATAPOD_CATEGORIES[0].name;
     this.form = new FormGroup({
-      nameControl: new FormControl('', [
+      name: new FormControl('', [
         Validators.required,
         Validators.maxLength(25)
-      ])
+      ]),
+      category: new FormControl(defaultCategory)
     });
   }
 
-  submit(form) {
-    this.dialogRef.close(`${this.form.value.nameControl}`);
+  submit() {
+    const {name, category} = this.form.value;
+    this.dialogRef.close({name, category});
   }
 }

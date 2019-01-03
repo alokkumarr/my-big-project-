@@ -173,47 +173,70 @@ export const AGGREGATE_TYPES_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(AGGREGATE_TYPES);
 
-export const COMBO_TYPES = [
-  {
-    label: 'line',
-    value: 'line',
-    icon: 'icon-line-chart'
-  },
-  {
-    label: 'column',
-    value: 'column',
-    icon: 'icon-vert-bar-chart'
-  },
-  {
-    label: 'area',
-    value: 'area',
-    icon: 'icon-area-chart'
-  }
-];
+export const COMBO_TYPES = [{
+  label: 'line',
+  value: 'line',
+  icon: 'icon-line-chart'
+}, {
+  label: 'column',
+  value: 'column',
+  icon: 'icon-vert-bar-chart'
+}, {
+  label: 'area',
+  value: 'area',
+  icon: 'icon-area-chart'
+}];
 
-export const SCHEDULE_TYPES = [
-  {
-    label: 'Immediate',
-    value: 'immediate'
-  },
-  {
-    label: 'Hourly',
-    value: 'hourly'
-  },
-  {
-    label: 'Daily',
-    value: 'daily'
-  },
-  {
-    label: 'Weekly',
-    value: 'weeklybasis'
-  },
-  {
-    label: 'Monthly',
-    value: 'monthly'
-  },
-  {
-    label: 'Yearly',
-    value: 'yearly'
-  }
-];
+export const SCHEDULE_TYPES = [{
+  label: 'Immediate',
+  value: 'immediate'
+}, {
+  label: 'Hourly',
+  value: 'hourly'
+}, {
+  label: 'Daily',
+  value: 'daily'
+}, {
+  label: 'Weekly',
+  value: 'weeklybasis'
+}, {
+  label: 'Monthly',
+  value: 'monthly'
+}, {
+  label: 'Yearly',
+  value: 'yearly'
+}];
+
+export const DATAPOD_CATEGORIES = [{
+  name: 'Default',
+  icon: 'category-default'
+}, {
+  name: 'Errors',
+  icon: 'category-errors'
+}, {
+  name: 'Orders',
+  icon: 'category-orders'
+}, {
+  name: 'Sessions',
+  icon: 'category-sessions'
+}, {
+  name: 'Subscribers',
+  icon: 'category-subscribers'
+}, {
+  name: 'Usage',
+  icon: 'category-usage'
+}, {
+  name: 'Events',
+  icon: 'calendar-events'
+}, {
+  name: 'Retention',
+  icon: 'calendar-retention'
+}, {
+  name: 'Funnel',
+  icon: 'calendar-funnel'
+}];
+
+export const DATAPOD_CATEGORIES_OBJ = fpPipe(
+  fpGroupBy('name'),
+  fpMapValues(v => v[0])
+)(DATAPOD_CATEGORIES);
