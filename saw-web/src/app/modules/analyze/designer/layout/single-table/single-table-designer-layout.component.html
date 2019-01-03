@@ -1,43 +1,53 @@
-<designer-settings-single-table class="designer__data-settings"
-                   [analysisType]="analysisType"
-                   [analysisSubtype]="analysisSubtype"
-                   (change)="change.emit($event)"
-                   [fieldCount]="fieldCount"
-                   [artifacts]="artifacts">
+<designer-settings-single-table
+  class="designer__data-settings"
+  [analysisType]="analysisType"
+  [analysisSubtype]="analysisSubtype"
+  (change)="change.emit($event)"
+  [fieldCount]="fieldCount"
+  [artifacts]="artifacts"
+>
 </designer-settings-single-table>
 
-<div fxLayout="column">
-  <designer-settings-aux class="designer__content"
-                         [auxSettings]="auxSettings"
-                         [analysisType]="analysisType"
-                         [analysisSubtype]="analysisSubtype"
-                         [chartTitle]="chartTitle"
-                         (change)="change.emit($event)"></designer-settings-aux>
+<div class="designer__content">
+  <designer-settings-aux
+    class="designer__aux-settings"
+    [auxSettings]="auxSettings"
+    [analysisType]="analysisType"
+    [analysisSubtype]="analysisSubtype"
+    [chartTitle]="chartTitle"
+    (change)="change.emit($event)"
+  ></designer-settings-aux>
 
   <ng-container [ngSwitch]="analysisType">
-
-    <filter-chips-u *ngIf="filters.length > 0"
-                    (remove)="onRemoveFilter($event)"
-                    (removeAll)="onRemoveFilterAll()"
-                    [filters]="filters"
-                    [artifacts]="artifacts">
+    <filter-chips-u
+      *ngIf="filters.length > 0"
+      class="designer__filters"
+      (remove)="onRemoveFilter($event)"
+      (removeAll)="onRemoveFilterAll()"
+      [filters]="filters"
+      [artifacts]="artifacts"
+    >
     </filter-chips-u>
 
-    <designer-pivot class="designer__content"
-                    *ngSwitchCase="'pivot'"
-                    [data]="data"
-                    [sorts]="sorts"
-                    [artifacts]="artifacts"
-                    [designerState]="designerState">
+    <designer-pivot
+      class="designer__data"
+      *ngSwitchCase="'pivot'"
+      [data]="data"
+      [sorts]="sorts"
+      [artifacts]="artifacts"
+      [designerState]="designerState"
+    >
     </designer-pivot>
-    <designer-chart class="designer__content"
-                    *ngSwitchCase="'chart'"
-                    [chartType]="analysisSubtype"
-                    [sorts]="sorts"
-                    [auxSettings]="auxSettings"
-                    [data]="data"
-                    [designerState]="designerState"
-                    [sqlBuilder]="sqlBuilder">
+    <designer-chart
+      class="designer__data"
+      *ngSwitchCase="'chart'"
+      [chartType]="analysisSubtype"
+      [sorts]="sorts"
+      [auxSettings]="auxSettings"
+      [data]="data"
+      [designerState]="designerState"
+      [sqlBuilder]="sqlBuilder"
+    >
     </designer-chart>
   </ng-container>
 </div>
