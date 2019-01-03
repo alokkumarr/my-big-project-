@@ -188,7 +188,8 @@ public class DataField {
         MIN("min"),
         MAX("max"),
         COUNT("count"),
-        PERCENTAGE("percentage");
+        PERCENTAGE("percentage"),
+        PERCENTAGE_BY_ROW("percentageByRow");
         private final String value;
         private final static Map<String, DataField.Aggregate> CONSTANTS = new HashMap<String, DataField.Aggregate>();
 

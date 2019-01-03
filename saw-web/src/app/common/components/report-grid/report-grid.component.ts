@@ -243,6 +243,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     this.listeners.forEach(sub => sub.unsubscribe());
   }
 
+  isAggregateEligible() {
+    return filter(AGGREGATE_TYPES, aggregate => {
+      if (aggregate.valid.includes(this.analysis.type)) {
+        return true;
+      }
+    });
+  }
+
   onContentReady({ component }) {
     if (this.isEditable) {
       this.updateVisibleIndices(component);
@@ -303,7 +311,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   fetchAggregation(type) {
     if (NUMBER_TYPES.includes(type)) {
-      this.aggregates = AGGREGATE_TYPES;
+      this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, t => {
         return t.value === 'count';

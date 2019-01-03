@@ -73,7 +73,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   public cType: string;
 
   constructor() {
-    this.highcharts.setOptions(globalChartOptions);
+    this.highcharts.setOptions(cloneDeep(globalChartOptions));
   }
 
   @Input()
@@ -105,13 +105,13 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // set the appropriate config based on chart type
     this.cType = this.isStockChart ? 'highStock' : options.chart.type;
     this.config = defaultsDeep(
+      options,
+      this.config,
       get(
         find(this.chartSettings, ['type', this.cType]),
         'config',
-        chartOptions
-      ),
-      options,
-      this.config
+        cloneDeep(chartOptions)
+      )
     );
     if (this.enableExport) {
       this.config.exporting = {
@@ -214,11 +214,17 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.clonedConfig = {};
     } else {
       this.addExportConfig(this.config);
+      const requestConfig = cloneDeep(this.config);
+      forEach(this.config.series, seriesOptions => {
+        if (['percentageByRow'].includes(seriesOptions.aggregate)) {
+          set(requestConfig, 'plotOptions.column.stacking', 'percent');
+        }
+      });
       this.chart = this.highcharts.chart(
         this.container.nativeElement,
-        this.config
+        requestConfig
       );
-      this.addExportSize(this.config);
+      this.addExportSize(requestConfig);
     }
 
     // This is causing more problems than it solves. Updating the defaultsDeep

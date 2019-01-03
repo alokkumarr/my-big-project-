@@ -121,8 +121,8 @@ public class SftpServiceImpl extends SipPluginContract {
     ObjectNode rootNode = null;
     if (bisRouteEntity.isPresent()) {
       BisRouteEntity entity = bisRouteEntity.get();
-      SessionFactory<LsEntry> sessionFactory =
-          delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId());
+      SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory
+          .getSessionFactory(entity.getBisChannelSysId());
       try (Session session = sessionFactory.getSession()) {
         nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
@@ -143,7 +143,8 @@ public class SftpServiceImpl extends SipPluginContract {
             connectionLogs.append("Connecting to destination location " + destinationLocation);
             connectionLogs.append(newLineChar);
             connectionLogs.append("Connecting...");
-            if (session.exists(sourceLocation)) {
+            if (session
+                .exists(sourceLocation)) {
               connectionLogs.append("Connection successful!!");
               status = HttpStatus.OK;
               connectionLogs.append(newLineChar);
@@ -266,10 +267,11 @@ public class SftpServiceImpl extends SipPluginContract {
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
-        SessionFactory<LsEntry> sessionFactory =
-            delegatingSessionFactory.getSessionFactory(payload.getChannelId());
+        SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory
+            .getSessionFactory(payload.getChannelId());
         Session session = sessionFactory.getSession();
-        if (!session.exists(payload.getSourceLocation())) {
+        if (!session
+            .exists(payload.getSourceLocation())) {
           status = HttpStatus.UNAUTHORIZED;
           connectionLogs.append(newLineChar);
           connectionLogs
@@ -526,7 +528,8 @@ public class SftpServiceImpl extends SipPluginContract {
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
     try (Session session = sesionFactory.getSession()) {
-      if (sesionFactory != null & sesionFactory.getSession().isOpen()) {
+      if (sesionFactory != null
+          & sesionFactory.getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
         logger.trace("session opened starts here ");
         Optional<BisRouteEntity> channelEntity = bisRouteDataRestRepository.findById(routeId);
@@ -588,10 +591,9 @@ public class SftpServiceImpl extends SipPluginContract {
   /**
    * Transfer files from given directory, recursing into each subdirectory.
    */
-  private synchronized List<BisDataMetaInfo> transferDataFromChannel(
-      SftpRemoteFileTemplate template, String sourcelocation, String pattern,
-      String destinationLocation, Long channelId, Long routeId, String exclusions)
-      throws IOException, ParseException {
+  private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
+      String sourcelocation, String pattern, String destinationLocation, Long channelId,
+      Long routeId, String exclusions) throws IOException, ParseException {
     logger.debug("Transfer files from directory recursively: {}, {}", sourcelocation, pattern);
     List<BisDataMetaInfo> list = new ArrayList<>();
     /* First transfer the files from the directory */

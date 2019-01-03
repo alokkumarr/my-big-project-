@@ -333,6 +333,25 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
+  formulateChartRequest(analysis) {
+    let isGroupByPresent = false;
+    forEach(analysis.sqlBuilder.nodeFields, node => {
+      if (node.checked === 'g') {
+        isGroupByPresent = true;
+      }
+    });
+    if (!isGroupByPresent) {
+      forEach(analysis.sqlBuilder.dataFields, dataField => {
+        dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
+      });
+
+      forEach(this.artifacts[0].columns, col => {
+        col.aggregate = col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+      });
+    }
+    return analysis;
+  }
+
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
@@ -362,6 +381,8 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
+
+    this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
