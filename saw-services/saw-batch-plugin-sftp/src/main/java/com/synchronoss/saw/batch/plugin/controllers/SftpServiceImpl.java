@@ -545,13 +545,16 @@ public class SftpServiceImpl extends SipPluginContract {
 
           String fileExclusions = rootNode.get("fileExclusions").asText();
           logger.trace("File exclusions configured for  route" + fileExclusions);
+          
+          String disableDupFlag = rootNode.get("disableDuplicate").asText();
+          Boolean isDisable = Boolean.valueOf(disableDupFlag);
 
           SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location starts here " + sourceLocation
               + " & file pattern " + filePattern);
           listOfFiles = transferDataFromChannel(template, sourceLocation, filePattern,
-              destinationLocation, channelId, routeId, fileExclusions);
+              destinationLocation, channelId, routeId, fileExclusions,isDisable);
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location ends here " + sourceLocation
               + " & file pattern " + filePattern);
@@ -579,12 +582,13 @@ public class SftpServiceImpl extends SipPluginContract {
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions) throws IOException, ParseException {
+      Long routeId, String exclusions, 
+      boolean isDisableDuplicate) throws IOException, ParseException {
     logger.debug("Transfer files from directory recursively: {}, {}", sourcelocation, pattern);
     List<BisDataMetaInfo> list = new ArrayList<>();
     /* First transfer the files from the directory */
     list.addAll(transferDataFromChannelDirectory(template, sourcelocation, pattern,
-        destinationLocation, channelId, routeId, exclusions, getBatchId()));
+        destinationLocation, channelId, routeId, exclusions, getBatchId(), isDisableDuplicate));
     /* Then iterate through directory looking for subdirectories */
     LsEntry[] entries = template.list(sourcelocation);
     for (LsEntry entry : entries) {
@@ -601,14 +605,15 @@ public class SftpServiceImpl extends SipPluginContract {
       /* Transfer files from subdirectory */
       String sourcelocationDirectory = sourcelocation + File.separator + entry.getFilename();
       list.addAll(transferDataFromChannel(template, sourcelocationDirectory, pattern,
-          destinationLocation, channelId, routeId, exclusions));
+          destinationLocation, channelId, routeId, exclusions, isDisableDuplicate));
     }
     return list;
   }
 
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, String batchId) throws IOException, ParseException {
+      Long routeId, String exclusions, String batchId, 
+      boolean isDisableDuplicate) throws IOException, ParseException {
     ZonedDateTime startTime = ZonedDateTime.now();
     logger.trace("Starting transfer data......start time::" + startTime);
     List<BisDataMetaInfo> list = new ArrayList<>();
@@ -683,7 +688,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       + channelId + " & route Id" + routeId);
                   transferDataFromChannel(template,
                       sourcelocation + File.separator + entry.getFilename(), pattern,
-                      destinationLocation, channelId, routeId, exclusions);
+                      destinationLocation, channelId, routeId, exclusions,isDisableDuplicate);
                   logger.trace("invocation of method transferDataFromChannel"
                       + " when directory is availble in destination with location ends here "
                       + sourcelocation + " & file pattern " + pattern + " with channel Id "
@@ -691,8 +696,8 @@ public class SftpServiceImpl extends SipPluginContract {
                 } else {
                   File fileTobeDeleted = null;
                   try {
-                    if (entry.getAttrs().getSize() != 0 && !sipLogService.checkDuplicateFile(
-                        sourcelocation + File.separator + entry.getFilename())) {
+                    if (entry.getAttrs().getSize() != 0 && sipLogService
+                        .duplicateCheck(isDisableDuplicate,sourcelocation,entry)) {
                       localDirectory = new File(defaultDestinationLocation + File.separator
                           + destinationLocation + File.separator + batchId + File.separator);
                       if (localDirectory != null && !localDirectory.exists()) {
@@ -780,7 +785,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                       list.add(bisDataMetaInfo);
                     } else {
-                      if (sipLogService.checkDuplicateFile(
+                      if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
                           sourcelocation + File.separator + entry.getFilename())) {
                         bisDataMetaInfo = new BisDataMetaInfo();
                         bisDataMetaInfo.setProcessId(

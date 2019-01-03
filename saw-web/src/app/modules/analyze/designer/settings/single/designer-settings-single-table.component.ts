@@ -43,6 +43,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() fieldCount: number;
+  @Input() public sqlBuilder;
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
