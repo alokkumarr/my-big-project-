@@ -222,7 +222,8 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
 
         logger.info("Registering " + esDatasetId + " to metadata");
 
-        dsaux.dl.getDSStore().create(esDatasetId, esDatasetElement);
+        // Update will insert a new record if ID doesn't exist or update if exists
+        dsaux.dl.getDSStore().update(esDatasetId, esDatasetElement);
 
         return 0;
     }
