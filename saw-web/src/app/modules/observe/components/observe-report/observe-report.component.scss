@@ -1,7 +1,7 @@
 $header-padding-top: 12px;
 $header-padding-bottom: 12px;
 $header-font-size: 18px;
-$report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size});
+$report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size} - 7px);
 
 :host {
   display: flex;
