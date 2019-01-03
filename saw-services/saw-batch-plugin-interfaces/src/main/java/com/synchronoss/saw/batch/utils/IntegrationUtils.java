@@ -67,7 +67,7 @@ public final class IntegrationUtils {
   /**
    * This method is used when renaming a file is necessary.
    */
-  public static String renameFileAppender() {
+  public static synchronized String renameFileAppender() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RENAME_DATE_FORMAT);
     return simpleDateFormat.format(new Date()) + Thread.currentThread().getId();
   }

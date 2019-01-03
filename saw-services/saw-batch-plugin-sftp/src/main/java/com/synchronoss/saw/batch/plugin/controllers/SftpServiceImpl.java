@@ -383,19 +383,17 @@ public class SftpServiceImpl extends SipPluginContract {
     prop.setProperty("StrictHostKeyChecking", "no");
     defaultSftpSessionFactory.setSessionConfig(prop);
     try (Session session = defaultSftpSessionFactory.getSession()) {
-      if (session.isOpen()) {
-        logger.trace("session opened starts here ");
-        SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
-        logger.trace("invocation of method immediatelistOfAll with location starts here "
-            + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-        transferredFiles = immediatelistOfAll(template, payload.getSourceLocation(),
-            payload.getFilePattern(), payload);
-        logger.trace("invocation of method immediatelistOfAll with location ends here "
-            + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-        session.close();
-        template.getSession().close();
-        logger.trace("session opened closes here ");
-      }
+      logger.trace("session opened starts here ");
+      SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
+      logger.trace("invocation of method immediatelistOfAll with location starts here "
+          + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
+      transferredFiles = immediatelistOfAll(template, payload.getSourceLocation(),
+          payload.getFilePattern(), payload);
+      logger.trace("invocation of method immediatelistOfAll with location ends here "
+          + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
+      session.close();
+      template.getSession().close();
+      logger.trace("session opened closes here ");
     } catch (Exception ex) {
       logger.error("Exception triggered while transferring the file", ex);
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
