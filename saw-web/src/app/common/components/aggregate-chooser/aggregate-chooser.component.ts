@@ -22,6 +22,7 @@ export class AggregateChooserComponent implements OnInit {
   @Input() public analysisType: AnalysisType;
   @Input() public sqlBuilder;
   @Input() analysisSubtype: string;
+  @Input() enablePercentByRow: boolean;
 
   public AGGREGATE_TYPES = AGGREGATE_TYPES;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
@@ -62,6 +63,9 @@ export class AggregateChooserComponent implements OnInit {
     const isGroupBy = this.getGroupByPresent(sqlBuilder);
     if (['column', 'bar', 'stack', 'combo'].includes(this.analysisSubtype)) {
       if (isGroupBy) {
+        if (value === 'percentageByRow' && !this.enablePercentByRow) {
+          return false;
+        }
         enableByRowPercentage = true;
       }
     } else {
@@ -71,6 +75,10 @@ export class AggregateChooserComponent implements OnInit {
     }
     if (!isGroupBy && this.aggregate === 'percentageByRow') {
       this.aggregate = 'percentage';
+    }
+
+    if (isGroupBy && this.enablePercentByRow) {
+      return true;
     }
     return (value === 'percentageByRow' && !isGroupBy && !enableByRowPercentage) ? false : true;
   }

@@ -30,6 +30,7 @@ export class ExpandableFieldComponent {
   @Input() public fieldCount: any;
   @Input() public sqlBuilder;
   @Input() analysisSubtype: string;
+  public enablePercentByRow: boolean = true;
 
   TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;
@@ -70,7 +71,7 @@ export class ExpandableFieldComponent {
     this.comboTypes = filter(COMBO_TYPES, type => {
       if (value === 'percentageByRow' && type.value === 'column') {
         return true;
-      } 
+      }
       if (value !== 'percentageByRow') {
         return true;
       }
@@ -80,6 +81,7 @@ export class ExpandableFieldComponent {
   }
 
   onComboTypeChange(comboType) {
+    this.enablePercentByRow = comboType === 'column' ? true : false;
     (this.artifactColumn as ArtifactColumnChart).comboType = comboType;
     this.change.emit({ subject: 'comboType', column: this.artifactColumn });
   }
