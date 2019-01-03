@@ -23,6 +23,7 @@ import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -53,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.file.remote.InputStreamCallback;
+import org.springframework.integration.file.remote.session.Session;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
@@ -111,83 +113,80 @@ public class SftpServiceImpl extends SipPluginContract {
     StringBuffer connectionLogs = new StringBuffer();
     String newLineChar = System.getProperty("line.separator");
     HttpStatus status = null;
-    SessionFactory<LsEntry> session = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     Optional<BisRouteEntity> bisRouteEntity = bisRouteDataRestRepository.findById(entityId);
     JsonNode nodeEntity = null;
     ObjectNode rootNode = null;
-    try {
-      if (bisRouteEntity.isPresent()) {
-        BisRouteEntity entity = bisRouteEntity.get();
-        session = delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId());
-        try {
-          nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
-          rootNode = (ObjectNode) nodeEntity;
-          String destinationLocation = (rootNode.get("destinationLocation").asText() != null
-              ? defaultDestinationLocation + rootNode.get("destinationLocation").asText()
-              : defaultDestinationLocation);
-          connectionLogs.append("Starting Test connectivity....");
-          connectionLogs.append(newLineChar);
-          connectionLogs.append("Establishing connection to host");
-          File destinationPath = new File(destinationLocation);
-          if (destinationPath.exists()) {
-            if ((destinationPath.canRead() && destinationPath.canWrite())
-                && destinationPath.canExecute()) {
-              String sourceLocation = (rootNode.get("sourceLocation").asText());
+    if (bisRouteEntity.isPresent()) {
+      BisRouteEntity entity = bisRouteEntity.get();
+      SessionFactory<LsEntry> sessionFactory =
+          delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId());
+      try (Session session = sessionFactory.getSession()) {
+        nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
+        rootNode = (ObjectNode) nodeEntity;
+        String destinationLocation = (rootNode.get("destinationLocation").asText() != null
+            ? defaultDestinationLocation + rootNode.get("destinationLocation").asText()
+            : defaultDestinationLocation);
+        connectionLogs.append("Starting Test connectivity....");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Establishing connection to host");
+        File destinationPath = new File(destinationLocation);
+        if (destinationPath.exists()) {
+          if ((destinationPath.canRead() && destinationPath.canWrite())
+              && destinationPath.canExecute()) {
+            String sourceLocation = (rootNode.get("sourceLocation").asText());
+            connectionLogs.append(newLineChar);
+            connectionLogs.append("Connecting to source location " + sourceLocation);
+            connectionLogs.append(newLineChar);
+            connectionLogs.append("Connecting to destination location " + destinationLocation);
+            connectionLogs.append(newLineChar);
+            connectionLogs.append("Connecting...");
+            if (session.exists(sourceLocation)) {
+              connectionLogs.append("Connection successful!!");
+              status = HttpStatus.OK;
               connectionLogs.append(newLineChar);
-              connectionLogs.append("Connecting to source location " + sourceLocation
-                  + "Destination location: " + destinationLocation);
+              connectionLogs.append(status);
+            } else {
               connectionLogs.append(newLineChar);
-              connectionLogs.append("Connecting...");
-              if (session.getSession().exists(sourceLocation)) {
-                connectionLogs.append("Connection successful!!");
-                status = HttpStatus.OK;
-                connectionLogs.append(newLineChar);
-                connectionLogs.append(status);
-              } else {
-                connectionLogs.append(newLineChar);
-                connectionLogs.append("Unable to establish connection");
-                status = HttpStatus.UNAUTHORIZED;
-                connectionLogs.append(newLineChar);
-                connectionLogs.append(status);
-              }
+              connectionLogs.append("Unable to establish connection");
+              status = HttpStatus.UNAUTHORIZED;
+              connectionLogs.append(newLineChar);
+              connectionLogs.append(status);
             }
-          } else {
-            Files.createDirectories(Paths.get(destinationLocation));
-            status = HttpStatus.OK;
+            if (session.isOpen()) {
+              session.close();
+            }
           }
-          session.getSession().close();
-        } catch (AccessDeniedException e) {
-          status = HttpStatus.UNAUTHORIZED;
-          connectionLogs.append(newLineChar);
-          connectionLogs.append("Path does not exists or Access Denied.");
-          connectionLogs.append(newLineChar);
-          connectionLogs.append(status);
-          logger.error("Path does not exist or access denied for the entity" + entityId, e);
-        } catch (IOException e) {
-          status = HttpStatus.UNAUTHORIZED;
-          connectionLogs.append(newLineChar);
-          connectionLogs.append("Exception occured");
-          connectionLogs.append(newLineChar);
-          connectionLogs.append(status);
-          logger.error("Exception occurred during " + entityId, e);
-        } catch (InvalidPathException | NullPointerException ex) {
-          status = HttpStatus.UNAUTHORIZED;
-          connectionLogs.append(newLineChar);
-          connectionLogs.append("Invalid path or some exception");
-          connectionLogs.append(newLineChar);
-          connectionLogs.append(status);
-          logger.error("Invalid directory path " + entityId, ex);
+        } else {
+          Files.createDirectories(Paths.get(destinationLocation));
+          status = HttpStatus.OK;
         }
-      } else {
-        throw new SftpProcessorException(entityId + " does not exists");
+      } catch (AccessDeniedException e) {
+        status = HttpStatus.UNAUTHORIZED;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Path does not exists or Access Denied.");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append(status);
+        logger.error("Path does not exist or access denied for the entity" + entityId, e);
+      } catch (IOException e) {
+        status = HttpStatus.UNAUTHORIZED;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Exception occured");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append(status);
+        logger.error("Exception occurred during " + entityId, e);
+      } catch (InvalidPathException | NullPointerException ex) {
+        status = HttpStatus.UNAUTHORIZED;
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Invalid path or some exception");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append(status);
+        logger.error("Invalid directory path " + entityId, ex);
       }
-    } finally {
-      if (session.getSession() != null && session.getSession().isOpen()) {
-        session.getSession().close();
-      }
+    } else {
+      throw new SftpProcessorException(entityId + " does not exists");
     }
     logger.trace("connection test for the route with entity id ends here :" + entityId);
     return connectionLogs.toString();
@@ -196,7 +195,7 @@ public class SftpServiceImpl extends SipPluginContract {
   @Override
   public String connectChannel(Long entityId) {
     logger.trace("checking connectivity for the source id :" + entityId);
-    SessionFactory<LsEntry> session = null;
+
     HttpStatus status = null;
     StringBuffer connectionLogs = new StringBuffer();
     String newLineChar = System.getProperty("line.separator");
@@ -205,16 +204,12 @@ public class SftpServiceImpl extends SipPluginContract {
     connectionLogs.append("Establishing connection to host");
     connectionLogs.append(newLineChar);
     connectionLogs.append("Connecting...");
-
-    try {
-      session = delegatingSessionFactory.getSessionFactory(entityId);
-      if (session != null && session.getSession().isOpen()) {
+    SessionFactory<LsEntry> sessionFactory = delegatingSessionFactory.getSessionFactory(entityId);
+    try (Session session = sessionFactory.getSession()) {
+      if (session.isOpen()) {
         logger.info("connected successfully " + entityId);
         connectionLogs.append("Connection successful!!");
         status = HttpStatus.OK;
-        session.getSession().close();
-        // delegatingSessionFactory.remove(entityId);
-        // delegatingSessionFactory.invalidateSessionFactoryMap();
       } else {
         status = HttpStatus.UNAUTHORIZED;
         connectionLogs.append(newLineChar);
@@ -246,10 +241,6 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append("Invalid user name or password");
       }
       status = HttpStatus.UNAUTHORIZED;
-    } finally {
-      if (session != null && session.getSession() != null) {
-        session.getSession().close();
-      }
     }
     return connectionLogs.toString();
   }
@@ -259,64 +250,64 @@ public class SftpServiceImpl extends SipPluginContract {
       throws SipNestedRuntimeException, IOException {
     logger.trace("Test connection to route starts here");
     StringBuffer connectionLogs = new StringBuffer();
-    HttpStatus status = null;
     String newLineChar = System.getProperty("line.separator");
-    SessionFactory<LsEntry> session = null;
-    try {
-      connectionLogs.append("Starting Test connectivity....");
-      connectionLogs.append(newLineChar);
-      connectionLogs.append("Establishing connection to host");
-      connectionLogs.append(newLineChar);
-      connectionLogs.append("Connecting...");
-
-      String dataPath = payload.getDestinationLocation() != null
-          ? defaultDestinationLocation + payload.getDestinationLocation()
-          : defaultDestinationLocation;
-      File destinationPath = new File(dataPath);
-      logger.trace("Destionation path: " + destinationPath);
-      logger.trace("Checking permissions for Destionation path: " + destinationPath);
-      session = delegatingSessionFactory.getSessionFactory(payload.getChannelId());
-      if (destinationPath.exists()) {
-        if ((destinationPath.canRead() && destinationPath.canWrite())
-            && destinationPath.canExecute()) {
-          session.getSession().isOpen();
-          if (!session.getSession().exists(payload.getSourceLocation())) {
-            status = HttpStatus.UNAUTHORIZED;
-            connectionLogs.append(newLineChar);
-            connectionLogs.append("Destinatipn location may not exists!! or no permission!!");
-            connectionLogs.append(newLineChar);
-            connectionLogs.append(status);
-          } else {
-            status = HttpStatus.OK;
-            connectionLogs.append("Connection successful!!");
-            connectionLogs.append(newLineChar);
-            connectionLogs.append(status);
-          }
-          session.getSession().close();
+    connectionLogs.append("Starting Test connectivity....");
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Establishing connection to host");
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Connecting...");
+    HttpStatus status = null;
+    String dataPath = payload.getDestinationLocation() != null
+        ? defaultDestinationLocation + payload.getDestinationLocation()
+        : defaultDestinationLocation;
+    File destinationPath = new File(dataPath);
+    logger.trace("Destination path: " + destinationPath);
+    logger.trace("Checking permissions for destination path: " + destinationPath);
+    if (destinationPath.exists()) {
+      if ((destinationPath.canRead() && destinationPath.canWrite())
+          && destinationPath.canExecute()) {
+        SessionFactory<LsEntry> sessionFactory =
+            delegatingSessionFactory.getSessionFactory(payload.getChannelId());
+        Session session = sessionFactory.getSession();
+        if (!session.exists(payload.getSourceLocation())) {
+          status = HttpStatus.UNAUTHORIZED;
+          connectionLogs.append(newLineChar);
+          connectionLogs
+              .append("Source or destination location may not " + "exists!! or no permissions!!");
+          connectionLogs.append(newLineChar);
+          connectionLogs.append(status);
+        } else {
+          status = HttpStatus.OK;
+          connectionLogs.append("Connection successful!!");
+          connectionLogs.append(newLineChar);
+          connectionLogs.append(status);
         }
-      } else {
+        if (session.isOpen()) {
+          session.close();
+        }
+      }
+    } else {
+      try {
         Files.createDirectories(Paths.get(dataPath));
+      } catch (Exception ex) {
+        status = HttpStatus.UNAUTHORIZED;
+        logger.error("Excpetion occurred while creating the directory " + "for destination", ex);
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Exception occured while creating directories");
       }
       status = HttpStatus.OK;
-    } catch (Exception ex) {
-      status = HttpStatus.UNAUTHORIZED;
-      logger.error("Excpetion occurred while creating the directory " + "for destination", ex);
-      connectionLogs.append(newLineChar);
-      connectionLogs.append("Exception occured while creating directories");
-    } finally {
-      if (session != null && session.getSession() != null) {
-        session.getSession().close();
-      }
     }
     logger.trace("Test connection to route ends here");
     return connectionLogs.toString();
   }
+
 
   @Override
   public String immediateConnectChannel(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
     logger.trace("Test connection to channel starts here.");
     HttpStatus status = null;
+
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
     SftpSession sftpSession = null;
     StringBuffer connectionLogs = new StringBuffer();
@@ -398,28 +389,27 @@ public class SftpServiceImpl extends SipPluginContract {
         + "& route Id " + payload.getRouteId());
     List<BisDataMetaInfo> transferredFiles = new ArrayList<>();
     DefaultSftpSessionFactory defaultSftpSessionFactory = null;
-    try {
-      defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
-      defaultSftpSessionFactory.setHost(payload.getHostName());
-      defaultSftpSessionFactory.setPort(payload.getPortNo());
-      defaultSftpSessionFactory.setUser(payload.getUserName());
-      defaultSftpSessionFactory.setPassword(payload.getPassword());
-      defaultSftpSessionFactory.setAllowUnknownKeys(true);
-      Properties prop = new Properties();
-      prop.setProperty("StrictHostKeyChecking", "no");
-      defaultSftpSessionFactory.setSessionConfig(prop);
-      if (defaultSftpSessionFactory.getSession().isOpen()) {
-        logger.trace("session opened starts here ");
-        SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
-        logger.trace("invocation of method immediatelistOfAll with location starts here "
-            + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-        transferredFiles = immediatelistOfAll(template, payload.getSourceLocation(),
-            payload.getFilePattern(), payload);
-        logger.trace("invocation of method immediatelistOfAll with location ends here "
-            + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
-        defaultSftpSessionFactory.getSession().close();
-        logger.trace("session opened closes here ");
-      }
+    defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
+    defaultSftpSessionFactory.setHost(payload.getHostName());
+    defaultSftpSessionFactory.setPort(payload.getPortNo());
+    defaultSftpSessionFactory.setUser(payload.getUserName());
+    defaultSftpSessionFactory.setPassword(payload.getPassword());
+    defaultSftpSessionFactory.setAllowUnknownKeys(true);
+    Properties prop = new Properties();
+    prop.setProperty("StrictHostKeyChecking", "no");
+    defaultSftpSessionFactory.setSessionConfig(prop);
+    try (Session session = defaultSftpSessionFactory.getSession()) {
+      logger.trace("session opened starts here ");
+      SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
+      logger.trace("invocation of method immediatelistOfAll with location starts here "
+          + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
+      transferredFiles = immediatelistOfAll(template, payload.getSourceLocation(),
+          payload.getFilePattern(), payload);
+      logger.trace("invocation of method immediatelistOfAll with location ends here "
+          + payload.getSourceLocation() + " & file pattern " + payload.getFilePattern());
+      session.close();
+      template.getSession().close();
+      logger.trace("session opened closes here ");
     } catch (Exception ex) {
       logger.error("Exception triggered while transferring the file", ex);
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
@@ -534,9 +524,8 @@ public class SftpServiceImpl extends SipPluginContract {
         "transferData file starts here with the channel id " + channelId + "& route Id " + routeId);
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
-    SessionFactory<LsEntry> sesionFactory = null;
-    try {
-      sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
+    SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
+    try (Session session = sesionFactory.getSession()) {
       if (sesionFactory != null & sesionFactory.getSession().isOpen()) {
         logger.info("connected successfully " + channelId);
         logger.trace("session opened starts here ");
@@ -578,8 +567,8 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("invocation of method transferData when "
               + "directory is availble in destination with location ends here " + sourceLocation
               + " & file pattern " + filePattern);
-          if (sesionFactory.getSession() != null) {
-            sesionFactory.getSession().close();
+          if (session.isOpen()) {
+            session.close();
           }
           logger.trace("opened session has been closed here.");
         } else {
@@ -591,13 +580,6 @@ public class SftpServiceImpl extends SipPluginContract {
     } catch (Exception ex) {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
-    } finally {
-      if (sesionFactory != null && sesionFactory.getSession() != null) {
-        if (sesionFactory.getSession().isOpen()) {
-          logger.trace("session opened closes here in final block ");
-          sesionFactory.getSession().close();
-        }
-      }
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
@@ -606,14 +588,15 @@ public class SftpServiceImpl extends SipPluginContract {
   /**
    * Transfer files from given directory, recursing into each subdirectory.
    */
-  private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
-      String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions) throws IOException, ParseException {
+  private synchronized List<BisDataMetaInfo> transferDataFromChannel(
+      SftpRemoteFileTemplate template, String sourcelocation, String pattern,
+      String destinationLocation, Long channelId, Long routeId, String exclusions)
+      throws IOException, ParseException {
     logger.debug("Transfer files from directory recursively: {}, {}", sourcelocation, pattern);
     List<BisDataMetaInfo> list = new ArrayList<>();
     /* First transfer the files from the directory */
     list.addAll(transferDataFromChannelDirectory(template, sourcelocation, pattern,
-        destinationLocation, channelId, routeId, exclusions));
+        destinationLocation, channelId, routeId, exclusions, getBatchId()));
     /* Then iterate through directory looking for subdirectories */
     LsEntry[] entries = template.list(sourcelocation);
     for (LsEntry entry : entries) {
@@ -637,7 +620,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions) throws IOException, ParseException {
+      Long routeId, String exclusions, String batchId) throws IOException, ParseException {
     ZonedDateTime startTime = ZonedDateTime.now();
     logger.trace("Starting transfer data......start time::" + startTime);
     List<BisDataMetaInfo> list = new ArrayList<>();
@@ -723,7 +706,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     if (entry.getAttrs().getSize() != 0 && !sipLogService.checkDuplicateFile(
                         sourcelocation + File.separator + entry.getFilename())) {
                       localDirectory = new File(defaultDestinationLocation + File.separator
-                          + destinationLocation + File.separator + getBatchId() + File.separator);
+                          + destinationLocation + File.separator + batchId + File.separator);
                       if (localDirectory != null && !localDirectory.exists()) {
                         logger.trace("directory where the file will be"
                             + " downnloaded does not exist so it will be created :"
@@ -770,9 +753,8 @@ public class SftpServiceImpl extends SipPluginContract {
                                   // localFile);
                                   java.nio.file.Files.copy(stream, localFile.toPath(),
                                       StandardCopyOption.REPLACE_EXISTING);
-                                  logger.trace(
-                                      "Streaming the content of the file in the directory ends "
-                                          + "here " + entry.getFilename());
+                                  logger.trace("Streaming the content of the file in the directory "
+                                      + "ends here " + entry.getFilename());
                                   IOUtils.closeQuietly(stream);
                                   logger.trace(
                                       "closing the stream for the file " + entry.getFilename());
@@ -852,6 +834,7 @@ public class SftpServiceImpl extends SipPluginContract {
           } // time it should iterate
         } else {
           logger.info("On this current pull no data found on the source.");
+
         }
       } else {
         logger.info(
@@ -884,7 +867,7 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
-    int totalNoOfPages = countOfRecords % retryPageSize;
+    int totalNoOfPages = IntegrationUtils.calculatePages(countOfRecords, retryPageSize);
     logger.info("totalNoOfPages :" + totalNoOfPages);
     for (int i = pageStart; i < totalNoOfPages; i++) {
       List<BisFileLog> logs =
@@ -910,7 +893,17 @@ public class SftpServiceImpl extends SipPluginContract {
               fileDelete.delete();
             } else {
               logger.trace("Parent Directory deleted :", fileDelete);
-              fileDelete.getParentFile().delete();
+              File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                  return !file.isHidden();
+                }
+              });
+              if (files.length > 1) {
+                fileDelete.delete();
+              } else {
+                IntegrationUtils.removeDirectory(fileDelete.getParentFile());
+              }
 
             }
           }
@@ -921,4 +914,5 @@ public class SftpServiceImpl extends SipPluginContract {
     }
     logger.info("recoverFromInconsistentState execution ends here");
   }
+
 }

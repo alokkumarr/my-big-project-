@@ -23,7 +23,7 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
 
   List<BisFileLog> findByRouteSysId(long routeSysId);
 
-  @Query("SELECT Logs from BisFileLog Logs where TIMESTAMPDIFF(MINUTE,Logs.createdDate,NOW()) "
+  @Query("SELECT Logs from BisFileLog Logs where (TIMEDIFF(NOW(), Logs.checkpointDate))/60 "
       + "> :noOfMinutes and (Logs.mflFileStatus != 'SUCCESS' and Logs.mflFileStatus != 'FAILED') ")
   Page<BisFileLog> retryIds(@Param("noOfMinutes") Integer noOfMinutes, Pageable pageable);
 
@@ -31,9 +31,8 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Query("UPDATE BisFileLog Logs SET Logs.mflFileStatus = :status WHERE Logs.pid = :pid")
   Integer updateBislogsStatus(@Param("status") String status, @Param("pid") String pid);
 
-  @Query("SELECT COUNT(pid) from BisFileLog Logs where TIMESTAMPDIFF(MINUTE,Logs.createdDate,"
-      + "NOW()) "
-      + "> :noOfMinutes and (Logs.mflFileStatus != 'SUCCESS' and Logs.mflFileStatus != 'FAILED') ")
+  @Query("SELECT COUNT(pid) from BisFileLog Logs where (TIMEDIFF(NOW(),Logs.checkpointDate))/60 "
+      + " > :noOfMinutes and (Logs.mflFileStatus != 'SUCCESS' and Logs.mflFileStatus != 'FAILED') ")
   Integer countOfRetries(@Param("noOfMinutes") Integer noOfMinutes);
 
 

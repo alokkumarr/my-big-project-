@@ -12,13 +12,14 @@ import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactoryLocator;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
@@ -32,26 +33,24 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
   private static final Logger logger = 
       LoggerFactory.getLogger(RuntimeSessionFactoryLocator.class);
-  
+  private Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
-    
-    
+
   @Override
   public SessionFactory<LsEntry> getSessionFactory(Object key) {
     Long id = Long.valueOf(key.toString());
-    DefaultSftpSessionFactory sessionFactory = null;
+    DefaultSftpSessionFactory sessionFactory = sessionFactoryMap.get(id);
     if (sessionFactory == null) {
       try {
         sessionFactory = generateSessionFactory(id);
       } catch (Exception e) {
         logger.error("Exception occurred while generating the session", e);
       }
+      sessionFactoryMap.put(id, sessionFactory);
     }
-    CachingSessionFactory<LsEntry> cache = new CachingSessionFactory<>(sessionFactory, 10);
-    cache.setSessionWaitTimeout(5000);
-    return cache;
+    return sessionFactory;
   }
 
   private DefaultSftpSessionFactory generateSessionFactory(Long key) throws Exception {
@@ -72,18 +71,16 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String portNumber = rootNode.get("portNo").asText();
         SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
         String password = obfuscator.decrypt(rootNode.get("password").asText());
-        //String password = rootNode.get("password").asText();
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         String userName = rootNode.get("userName").asText();        
         defaultSftpSessionFactory.setUser(userName);
         defaultSftpSessionFactory.setPassword(password);
         defaultSftpSessionFactory.setAllowUnknownKeys(true);
-        defaultSftpSessionFactory.setTimeout(6000);
+        defaultSftpSessionFactory.setTimeout(60000);
         Properties prop = new Properties();
         prop.setProperty("StrictHostKeyChecking", "no");
         prop.setProperty("bufferSize", "100000");
-        //prop.setProperty("PreferredAuthentications", "password");
         defaultSftpSessionFactory.setSessionConfig(prop);
       } catch (IOException e) {
         throw new SftpProcessorException("for the given id + " + key + ""
@@ -95,4 +92,5 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
     }
     return defaultSftpSessionFactory;
   }
+
 }

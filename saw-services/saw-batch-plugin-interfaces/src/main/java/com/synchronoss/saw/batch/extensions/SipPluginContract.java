@@ -111,9 +111,9 @@ public abstract class SipPluginContract {
   /**
    * This method gives the batch id.
    */
-  protected String getBatchId() {
-    DateFormat dtFormat = new SimpleDateFormat("MMddyyyyhhmmss");
-    return dtFormat.format(new Date());
+  protected synchronized String getBatchId() {
+    DateFormat dtFormat = new SimpleDateFormat("MMddyyyyhhmmssSSS");
+    return dtFormat.format(new Date()) + Thread.currentThread().getId();
   }
 
   public Integer getBatchSize() {

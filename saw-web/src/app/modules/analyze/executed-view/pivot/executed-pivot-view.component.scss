@@ -1,0 +1,6 @@
+::ng-deep .executed-view-pivot {
+  overflow: hidden !important;
+  dx-pivot-grid {
+    height: calc(100vh - 300px) !important;
+  }
+}

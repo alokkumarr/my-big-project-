@@ -30,7 +30,7 @@ public final class IntegrationUtils {
 
   }
 
-  public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-HH-mm-ss";
+  public static final String RENAME_DATE_FORMAT = "MM-dd-yyyy-HH-mm-ss-SSS";
   public static final String TAR_GZIP_FILE_EXTENSION = "gz";
   public static final String ZIP_FILE_EXTENSION = "zip";
   public static final String TAR_FILE_EXTENSION = "tar";
@@ -46,7 +46,7 @@ public final class IntegrationUtils {
   public static String getRenameDateFormat() {
     return RENAME_DATE_FORMAT;
   }
-  
+
   /**
    * This method helps to transpose list of file patterns.
    */
@@ -67,15 +67,16 @@ public final class IntegrationUtils {
   /**
    * This method is used when renaming a file is necessary.
    */
-  public static String renameFileAppender() {
+  public static synchronized String renameFileAppender() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RENAME_DATE_FORMAT);
-    return simpleDateFormat.format(new Date());
+    return simpleDateFormat.format(new Date()) + Thread.currentThread().getId();
   }
 
 
   /**
    * This method is used to copy the files from source to destination directories<br>
    * compare to other approaches, it is the fastest way to acheive the same using Java NIO.
+   * 
    * @param source String.
    * @param destination String.
    * @throws Exception Exception.
@@ -145,4 +146,37 @@ public final class IntegrationUtils {
     }
 
   }
+
+  /**
+   * This is to remove directory.
+   */
+  public static void removeDirectory(File dir) {
+    if (dir.isDirectory()) {
+      File[] files = dir.listFiles();
+      if (files != null && files.length > 0) {
+        for (File file : files) {
+          removeDirectory(file);
+        }
+      }
+      dir.delete();
+    } else {
+      dir.delete();
+    }
+  }
+
+  /**
+   * This is to calculate page number.
+   */
+  public static int calculatePages(int totalNumberOfRecords, int retryPageSize) {
+    int maxPages = 0;
+    if (retryPageSize > 0) {
+      if (totalNumberOfRecords % retryPageSize == 0) {
+        maxPages = totalNumberOfRecords / retryPageSize;
+      } else {
+        maxPages = (totalNumberOfRecords / retryPageSize) + 1;
+      }
+    }
+    return maxPages;
+  }
+
 }

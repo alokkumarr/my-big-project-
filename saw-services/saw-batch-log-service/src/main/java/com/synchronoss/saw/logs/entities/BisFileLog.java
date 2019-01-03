@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -56,7 +58,8 @@ public class BisFileLog implements Serializable {
   @Column(name = "CREATED_DATE")
   private Date createdDate;
 
-  @Column(name = "CHECKPOINT_DATE")
+  @Column(name = "CHECKPOINT_TIMESTAMP")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date checkpointDate;
 
   public String getPid() {
@@ -165,6 +168,7 @@ public class BisFileLog implements Serializable {
     this.createdDate = createdDate;
   }
 
+  @Temporal(TemporalType.TIMESTAMP)
   public Date getCheckpointDate() {
     return checkpointDate;
   }

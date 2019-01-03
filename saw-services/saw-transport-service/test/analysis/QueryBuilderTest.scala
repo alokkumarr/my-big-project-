@@ -103,6 +103,10 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT)(sqlBuilderPrep(dataFields("t")("a")("b","c")("SUM"))
       ) must be ("SELECT SUM(t.a), t.b, t.c FROM t GROUP BY t.b, t.c")
     }
+    it("with percentage should have aggregate function in FROM clause") {
+      query(artifactT)(sqlBuilderPrep(dataFields("t")("a")("b","c")("percentage"))
+      ) must be ("SELECT (t.a*100)/(Select sum(t.a) FROM t) as a, t.b, t.c FROM t GROUP BY t.a, t.b, t.c")
+    }
     it("with avg should have aggregate function in FROM clause") {
       query(artifactT)(sqlBuilderPrep(dataFields("t")("b")("a")("AVG"))
       ) must be ("SELECT AVG(t.b), t.a FROM t GROUP BY t.a")

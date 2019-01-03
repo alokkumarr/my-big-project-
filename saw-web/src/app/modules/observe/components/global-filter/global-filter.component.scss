@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 $range-handle-dimension: 20px;
 
@@ -66,20 +66,20 @@ nouislider {
   width: calc(100% - #{$range-handle-dimension});
 }
 
-.noUi-target.noUi-horizontal {
+::ng-deep .noUi-target.noUi-horizontal {
   border: none;
   box-shadow: none;
   background-color: $primary-grey-g1;
   height: 5px;
 
-  .noUi-connect {
+  ::ng-deep .noUi-connect {
     background-color: $primary-blue-b2;
   }
 
-  .noUi-origin {
+  ::ng-deep .noUi-origin {
     top: -2px;
 
-    .noUi-handle {
+    ::ng-deep .noUi-handle {
       outline: none;
       width: $range-handle-dimension;
       height: $range-handle-dimension;
