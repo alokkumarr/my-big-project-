@@ -1,11 +1,15 @@
 package com.synchronoss.saw.batch.sftp.integration;
 
+import com.jcraft.jsch.ChannelSftp;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
+
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,8 +81,27 @@ public class SipLogging {
   }
 
   /**
+   * verify duplicate check enabled and is duplicate
+   * or if duplicate check disabled.
+   *
+   * @param isDisableDuplicate disabled duplicate check flag
+   * @param sourcelocation source path
+   * @param entry file entry
+   * @return true or false
+   */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean duplicateCheck(boolean isDisableDuplicate,
+      String sourcelocation, ChannelSftp.LsEntry entry) {
+    return (!isDisableDuplicate && !checkDuplicateFile(sourcelocation + File.separator
+        + entry.getFilename())) || isDisableDuplicate;
+
+  }
+
+  /**
    * This method is used retry id.
-   * 
+   *
    * @param numberOfMinutes in minutes
    * @param pageNumber page number
    * @param pageSize page size
@@ -112,4 +135,3 @@ public class SipLogging {
   }
 
 }
-

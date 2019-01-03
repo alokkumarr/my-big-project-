@@ -345,8 +345,14 @@ Entity BIS_FILE_LOGS is used to log details related to the files or data retriev
 .Figure: SAW Batch Ingestion Component Diagram
 plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
 
-.Figure: SAW Batch Ingestion Flow Diagram
-image::sip-design/bis-flow-diagram.png[flowChart,400,400]
+High Availability & Resiliency
+
+SAW Batch Ingestion Services provides HA providing multiple instances of services up & running if one goes down
+& other available services will serves the request. BIS also monitors it's dependent services such as scheduler services etc.
+BIS API's provides resiliency to failure providing configurable retry techniques using circuit breaker pattern which triggers on the occasion
+of network glitches. If transferring gets interrupted due to network glitches. It automatically heals inconsistent state,
+reinitiate the transfer again & make sure data has been received. It also takes care of partial data or corrupted data on destination host to be removed.
+
 
 === SAW Semantic Service
 
@@ -465,4 +471,3 @@ into platform.
 plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
 
 ==== SIP DSL Example :
-

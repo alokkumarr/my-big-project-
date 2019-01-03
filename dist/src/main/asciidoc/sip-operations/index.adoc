@@ -638,6 +638,17 @@ Service to use the required number of session, add the below to the
 After that run `systemctl reload sshd` to reload the SSH daemon
 configuration.
 
+== Batch Ingestion : Retry parameters
+
+The below parameters in Batch Ingestion Service gives the control the configurations
+related to resiliency. To change this parameters in the environment please go to below path
+
+/opt/bda/saw-batch-ingestion/conf/application.yml
+
+max.attempts : 3 (maximum number of retries then it will declare it as failure)
+retry.delay: 5000 (Interval between the retries in milliseconds)
+retry.diff.mins: 1 (Interval between the retries to recover from inconsistent state of transfer in minutes)
+
 == Loading semantic metadata
 
 To enable creating analyses in SAW, load semantic metadata as follows:
