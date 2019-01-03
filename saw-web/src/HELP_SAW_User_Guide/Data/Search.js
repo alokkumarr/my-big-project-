@@ -1,1 +1,1 @@
-define({r:0.5,st:'Stem',n:1,t:[0,84],u:['../content/_all_pdf_files/user_guide/pdf_links_user_guide.htm'],s:['$','log'],p:[['$',105],['bar',36],['deployment',115],['identification',73],['of',73],['rta',66],['the',41],['you',36]]});
+define({r:0.5,st:'Stem',n:1,t:[0,72,171,276],u:['../Content/Company Information.htm'],s:['+','launch'],p:[['+',27],['access',264],['button',4],['data',136],['figure',236],['item',95],['on',93],['replace',172],['slide',73],['to',75]]});
