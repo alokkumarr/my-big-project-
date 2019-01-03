@@ -1,11 +1,14 @@
 $header-padding-top: 12px;
 $header-padding-bottom: 12px;
 $header-font-size: 18px;
-$pivot-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size});
+$pivot-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size} - 7px);
 
 :host {
   display: block;
   height: 100%;
+  pivot-grid {
+    overflow: hidden !important;
+  }
 }
 
 .pivot-title {
