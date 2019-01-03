@@ -1,3 +1,9 @@
+- name: Install EPEL repository (for NGINX)
+  yum_repository:
+    name: epel
+    description: Extra Packages for Enterprise Linux 7 - $basearch
+    baseurl: "{{ sip_epel_yum_url | default('https://download.fedoraproject.org/pub/epel/7/$basearch') }}"
+  when: sip_epel_yum_provided | default('false') == 'false'
 # Note: Installation of the NGINX package needs to come before the
 # stopping below, so that the service exists in environments that are
 # getting fresh installs (not upgrades that already have NGINX
@@ -25,14 +31,6 @@
   template: src=503.http dest=/etc/haproxy/errors
 - name: Enable and start HAProxy service
   systemd: name=haproxy enabled=true state=started
-- name: Install EPEL release package (for NGINX)
-  yum:
-    name: "{{ sip_epel_rpm_url | default('https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm') }}"
-    state: present
-  register: result
-  until: result is success
-  retries: 5
-  delay: 10
 - name: Install NGINX configuration
   template: src=nginx.conf dest=/etc/nginx
 - name: Install NGINX SAW proxy configuration
