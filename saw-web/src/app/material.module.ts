@@ -34,6 +34,8 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ReactiveFormsModule } from '@angular/forms';
 
+import './material-style.scss';
+
 const MODULES = [
   ReactiveFormsModule,
   MatButtonModule,
