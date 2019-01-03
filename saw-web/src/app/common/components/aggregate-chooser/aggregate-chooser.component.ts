@@ -61,7 +61,13 @@ export class AggregateChooserComponent implements OnInit {
     }
     const isGroupBy = this.getGroupByPresent(sqlBuilder);
     if (['column', 'bar', 'stack', 'combo'].includes(this.analysisSubtype)) {
-      enableByRowPercentage = true;
+      if (isGroupBy) {
+        enableByRowPercentage = true;
+      }
+    } else {
+      if (value === 'percentageByRow') {
+        return false;
+      }
     }
     if (!isGroupBy && this.aggregate === 'percentageByRow') {
       this.aggregate = 'percentage';
