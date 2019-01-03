@@ -472,7 +472,6 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to test a connectivity route in batch Ingestion.
    */
-  @Ignore
   @Test
   public void connectChannel() throws JsonProcessingException {
     String username = "user";
