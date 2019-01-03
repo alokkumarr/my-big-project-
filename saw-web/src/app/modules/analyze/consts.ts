@@ -228,12 +228,6 @@ export const ANALYSIS_METHODS = [
             icon: { font: 'icon-Candlestick-icon' },
             type: 'chart:tsPane',
             typeOnBackEnd: 'chart:tsareaspline'
-          },
-          {
-            label: 'Geolocation',
-            icon: { font: 'icon-geo-chart' },
-            type: 'chart:geo',
-            typeOnBackEnd: 'chart:geo'
           }
         ]
       },
@@ -247,6 +241,17 @@ export const ANALYSIS_METHODS = [
         icon: { font: 'icon-report' },
         type: 'table:report',
         supportedTypes: ['table:report', 'table:esReport']
+      },
+      {
+        label: 'Geolocation',
+        icon: { font: 'icon-geo-chart' },
+        type: '',
+        children: [{
+          label: 'Geolocation',
+          icon: { font: 'icon-geo-chart' },
+          type: 'chart:geo',
+          typeOnBackEnd: 'chart:geo'
+        }]
       }
     ]
   }

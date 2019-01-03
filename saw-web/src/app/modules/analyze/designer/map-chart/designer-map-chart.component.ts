@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import * as debounce from 'lodash/debounce';
 import * as map from 'lodash/map';
 import * as split from 'lodash/split';
@@ -25,7 +25,7 @@ export enum MapChartStates {
   templateUrl: 'designer-map-chart.component.html',
   styleUrls: ['designer-map-chart.component.scss']
 })
-export class DesignerMapChartComponent {
+export class DesignerMapChartComponent implements OnInit {
   _fields: any;
   _data: Array<any>;
   _auxSettings: any = {};
@@ -87,9 +87,12 @@ export class DesignerMapChartComponent {
     private _mapDataService: MapDataService
   ) {
     this.setSeries = debounce(this.setSeries, 50);
-    this.setChartConfig();
   }
 
+  ngOnInit() {
+    const legend = this._chartService.analysisLegend2ChartLegend(this._auxSettings.legend);
+    this.setChartConfig(legend);
+  }
 
   setSeries() {
     const mapData$ = this._mapData;
@@ -115,7 +118,7 @@ export class DesignerMapChartComponent {
     }
   }
 
-  setChartConfig() {
+  setChartConfig(legend) {
     const colorAxis = {
       min: 1,
       type: 'logarithmic',
@@ -123,23 +126,26 @@ export class DesignerMapChartComponent {
       maxColor: '#1A89D4'
     };
 
-    this.chartOptions = {
+    this.chartOptions = omitBy({
       mapNavigation: {
         enabled: true
       },
-      colorAxis
-    };
+      colorAxis,
+      legend
+    }, isNil);
   }
 
   updateSettings(auxSettings) {
+    if (!this.chartUpdater) {
+      return;
+    }
+
     const legend = this._chartService.analysisLegend2ChartLegend(auxSettings.legend);
 
-    const updateObj = omitBy({
-      legend,
-
-    }, isNil);
-    setTimeout(() => {
-      this.chartUpdater.next(updateObj);
-    });
+    if (!legend) {
+      return;
+    }
+    const updateObj = omitBy({ legend }, isNil);
+    this.chartUpdater.next(updateObj);
   }
 }
