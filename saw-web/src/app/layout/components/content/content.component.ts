@@ -37,6 +37,8 @@ const TIMEOUT_TRIGGER = 60;
 // nr of seconds before the user is timed out
 const TIMEOUT = 20 * 60;
 
+const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
+
 @Component({
   selector: 'layout-content',
   templateUrl: 'content.component.html'
@@ -60,6 +62,13 @@ export class LayoutContentComponent implements OnInit {
   ngOnInit() {
     const loadExternalModulesOnce = once(() => this.loadExternalModules());
 
+    this._user.loginChange$.subscribe((hasLoginChanged: boolean) => {
+      if (!hasLoginChanged) {
+        return;
+      }
+      this.loadInternalModules();
+    });
+
     this._router.events.subscribe((event: Event) => {
       if (event instanceof NavigationStart) {
         this.removeExclamationMarkFromUrl(event);
@@ -78,10 +87,9 @@ export class LayoutContentComponent implements OnInit {
     });
   }
 
-  loadExternalModules() {
+  loadInternalModules(): any[] {
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
-    const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
     const modules = map(
       product.productModules,
       ({ productModName, moduleURL }) => {
@@ -95,13 +103,20 @@ export class LayoutContentComponent implements OnInit {
         };
       }
     );
-    const baseModules = filter(modules, ({ label }) => baseModuleNames.includes(label));
+    const baseModules = filter(modules, ({ label }) =>
+      baseModuleNames.includes(label)
+    );
+    this.modules = baseModules;
+    return modules;
+  }
+
+  loadExternalModules() {
+    const modules = this.loadInternalModules();
     const externalModules = filter(
       modules,
       ({ label }) => !baseModuleNames.includes(label)
     );
 
-    this.modules = baseModules;
     forEach(externalModules, externalModule => {
       this._dynamicModuleService.loadModuleSystemJs(externalModule).then(
         success => {
