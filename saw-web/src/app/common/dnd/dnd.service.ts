@@ -127,20 +127,18 @@ export class DragnDropService {
       } = this._moveEventAccumulator.to;
       // remove from old group, if it was dragged from a group
       // do nothing if it was dragged from the unselected fields
-      setTimeout(() => {
-        if (fromContainer && isFunction(removeFromCallback)) {
-          removeFromCallback(fromPayload, fromIndex, fromContainer);
-        }
-        // add to new group
-        if (toContainer && isFunction(addToCallback)) {
-          addToCallback(toPayload, toIndex, toContainer);
-        }
-        // clear event Acumulator
-        this._moveEventAccumulator = {
-          to: null,
-          from: null
-        };
-      }, 200);
+      if (fromContainer && isFunction(removeFromCallback)) {
+        removeFromCallback(fromPayload, fromIndex, fromContainer);
+      }
+      // add to new group
+      if (toContainer && isFunction(addToCallback)) {
+        addToCallback(toPayload, toIndex, toContainer);
+      }
+      // clear event Acumulator
+      this._moveEventAccumulator = {
+        to: null,
+        from: null
+      };
     }
   }
 }
