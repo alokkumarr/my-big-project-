@@ -12,9 +12,11 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
+import scala.Tuple2;
 import sncr.bda.conf.ESLoader;
 import sncr.bda.conf.Input;
 import sncr.xdf.esloader.XDFTimestampconverter;
+import sncr.xdf.exceptions.XDFException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +78,10 @@ public class ElasticSearchLoader {
         this.sparkSession.udf().register("_XdfDateToString", new XDFTimestampconverter(), DataTypes.StringType);
     }
 
+    public ESHttpClient getHttpClient() {
+        return this.esClient;
+    }
+
     public static Map<String, String> generateESParamMap(ESConfig config) {
         Map<String, String> configMap = new HashMap<>();
 
@@ -97,14 +103,24 @@ public class ElasticSearchLoader {
         return configMap;
     }
 
-    public Long loadSingleObject(String objectName,
-                                 Dataset<Row> originalFrame, String inputDataFormat) throws Exception {
+    /**
+     *
+     * @param objectName Name of the dataset object
+     * @param originalFrame Dataframe which needs to be loaded into the ES index
+     * @param inputDataFormat Dataset format
+     *
+     * @return tuple2 Contains the return code (status of 0 - SUCCESS and -1 - FAULURE)
+     *         and a map of dataset objects and their respective indexes
+     * @throws Exception In case of invalid configuration or loading failure
+     */
+    public Tuple2<Integer, Map<String, String>> loadSingleObject(String objectName, Dataset<Row> originalFrame,
+                                String inputDataFormat) throws Exception {
         // Parse index/type name
         ElasticSearchStructureManager essm = new ElasticSearchStructureManager(this.esLoader);
         //long totalRecordCount = 0;
 
         if(!essm.elasticSearchLoaderConfigured()){
-            return -1L;
+            throw new XDFException(XDFException.ErrorCodes.ConfigError);
         }
 
         // In case of partitioned data, each partition will be loaded separately
@@ -214,7 +230,7 @@ public class ElasticSearchLoader {
         logger.debug("Indices = " + newIndices);
 
         essm.ProcessAliases(esClient, newIndices.toArray(new String[newIndices.size()]));
-        return 0L;
+        return new Tuple2<>(0, locationList);
     }
 
     public Dataset<Row> filterData(Dataset<Row> dataSet, String condition) {
