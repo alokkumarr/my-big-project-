@@ -39,7 +39,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
 import com.mapr.db.MapRDB;
 import com.synchronoss.saw.inspect.SAWDelimitedInspector;
 import com.synchronoss.saw.inspect.SAWDelimitedReader;
@@ -363,8 +362,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     for (String item : dataSetsString){
       logger.trace("item from datasets store {} ", item);
       dataSet = objectMapper.readValue(item, DataSet.class);
-      dataSet.setJoinEligible(true);
-      dataSet.setStorageType(StorageType.DL.name());
       dataSetsJSON.add(dataSet);
     }
     //dataSetsJSON.addAll(listOfDataSetAvailableInESStore(project));
@@ -380,7 +377,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  private List<DataSet> listOfDataSetAvailableInESStore (Project project) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException{
+  public List<DataSet> listOfDataSetAvailableInESStore (Project project) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException{
     logger.trace("listOfDataSetFromESStore  starts here : ", project);
     List <DataSet>  dataSets = new ArrayList<>();
     String storageEndpoints = "/internal/proxy/storage";
