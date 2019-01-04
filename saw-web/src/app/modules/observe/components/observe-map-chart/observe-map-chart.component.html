@@ -1,3 +1,7 @@
+<div fxLayout="row" fxLayoutAlign="center center">
+  <h1 class="title" [textContent]="analysis.chartTitle || analysis.name"></h1>
+</div>
+
 <map-chart-viewer [chartType]="analysis.chartType"
                   [data]="data"
                   [analysis]="analysis"
