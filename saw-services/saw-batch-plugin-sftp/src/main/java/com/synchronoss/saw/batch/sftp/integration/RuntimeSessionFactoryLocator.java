@@ -33,7 +33,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
   private static final Logger logger = 
       LoggerFactory.getLogger(RuntimeSessionFactoryLocator.class);
-  private Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
+  private Map<String, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
@@ -41,14 +41,15 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
   @Override
   public SessionFactory<LsEntry> getSessionFactory(Object key) {
     Long id = Long.valueOf(key.toString());
-    DefaultSftpSessionFactory sessionFactory = sessionFactoryMap.get(id);
+    String connectionId = getChannelConnectionIdentifier(id);
+    DefaultSftpSessionFactory sessionFactory = sessionFactoryMap.get(connectionId);
     if (sessionFactory == null) {
       try {
         sessionFactory = generateSessionFactory(id);
       } catch (Exception e) {
         logger.error("Exception occurred while generating the session", e);
       }
-      sessionFactoryMap.put(id, sessionFactory);
+      sessionFactoryMap.put(connectionId, sessionFactory);
     }
     return sessionFactory;
   }
@@ -91,6 +92,40 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
        + "" + key + " details does not exist");
     }
     return defaultSftpSessionFactory;
+  }
+  
+  /**
+   * Generate unique identifier for connection object of a channel
+   * It is a combination of "channel ID : host name". This is 
+   * to make sure connections are established to correct host
+   * event after updating host name.
+   * 
+   * @param channelId Identifer of channel
+   * @return unique identifier
+   */
+  public String getChannelConnectionIdentifier(Long channelId) {
+    Optional<BisChannelEntity> entity = bisChannelDataRestRepository.findById(channelId);
+    String hostname = null;
+    if (entity.isPresent()) {
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      BisChannelEntity bisChannelEntity = entity.get();
+      JsonNode nodeEntity = null;
+      ObjectNode rootNode = null;
+     
+      try {
+        nodeEntity = objectMapper.readTree(bisChannelEntity.getChannelMetadata());
+        rootNode = (ObjectNode) nodeEntity;
+        hostname = rootNode.get("hostName").asText();
+      } catch (IOException  exception) {
+        throw new SftpProcessorException("for the given id + " + channelId + ""
+            + " details does not exist");
+      }
+  
+    }
+    return channelId + ":" + hostname;
+    
   }
 
 }
