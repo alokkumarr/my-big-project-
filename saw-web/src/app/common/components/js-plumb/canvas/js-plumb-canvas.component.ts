@@ -9,6 +9,8 @@ import {
 } from '@angular/core';
 import * as jsPlumb from 'jsplumb';
 import * as find from 'lodash/find';
+import * as isEqual from 'lodash/isEqual';
+import * as findIndex from 'lodash/findIndex';
 
 import {
   Artifact,
@@ -24,9 +26,11 @@ import {
   selector: 'js-plumb-canvas-u',
   templateUrl: './js-plumb-canvas.component.html',
   styles: [
-    `:host {
-    position: relative;
-  }`
+    `
+      :host {
+        position: relative;
+      }
+    `
   ]
 })
 export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
@@ -59,11 +63,11 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   }
 
   onConnection(info) {
-    const sourcePayload = <EndpointPayload>info.sourceEndpoint.getParameter(
-      'endpointPayload'
+    const sourcePayload = <EndpointPayload>(
+      info.sourceEndpoint.getParameter('endpointPayload')
     );
-    const targetPayload = <EndpointPayload>info.targetEndpoint.getParameter(
-      'endpointPayload'
+    const targetPayload = <EndpointPayload>(
+      info.targetEndpoint.getParameter('endpointPayload')
     );
 
     if (sourcePayload && targetPayload) {
@@ -109,8 +113,8 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   }
 
   onConnectionDetached(info) {
-    const connectionPayload = <ConnectionPayload>info.connection.getParameter(
-      'connectionPayload'
+    const connectionPayload = <ConnectionPayload>(
+      info.connection.getParameter('connectionPayload')
     );
     this.removeJoin(connectionPayload.join);
   }
@@ -188,9 +192,9 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   }
 
   removeJoin(join) {
-    const index = this.joins.indexOf(join);
+    const index = findIndex(this.joins, j => isEqual(j, join));
 
-    if (index !== -1) {
+    if (index >= 0) {
       this.joins.splice(index, 1);
     }
     this.onChange({ subject: 'joins' });
