@@ -50,12 +50,13 @@ export class ValidateSemanticComponent implements OnDestroy {
    */
   injectFieldProperties(dsData) {
     forIn(dsData, value => {
-      this.isJoinEligible = value.joinEligible;
+      this.isJoinEligible = value.storageType === 'ES' ? false : true;
       const artifactName = value.system.name;
       value.schema.fields = map(value.schema.fields, val => {
+        const colName = val.isKeyword ? `${val.name}.keyword` : val.name;
         return {
           aliasName: val.name,
-          columnName: val.name,
+          columnName: colName,
           displayName: val.name,
           filterEligible: true,
           joinEligible: false,
@@ -86,7 +87,7 @@ export class ValidateSemanticComponent implements OnDestroy {
       width: '350px'
     });
 
-    dialogRef.afterClosed().subscribe(({name, category}) => {
+    dialogRef.afterClosed().subscribe(({ name, category }) => {
       if (trim(name).length > 0) {
         const payload = {
           category,
@@ -109,7 +110,7 @@ export class ValidateSemanticComponent implements OnDestroy {
           if (ds.storageType === 'ES') {
             payload.esRepository.indexName = ds.system.name;
             payload.esRepository.storageType = 'ES';
-            payload.esRepository.type = 'session';
+            payload.esRepository.type = ds.system.esIndexType;
           }
           payload.artifacts.push({
             artifactName: ds.system.name,

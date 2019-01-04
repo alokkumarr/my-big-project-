@@ -103,9 +103,10 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   injectFieldProperties(dsData) {
     const artifactName = dsData.system.name;
     dsData.schema.fields = map(dsData.schema.fields, value => {
+      const colName = value.isKeyword ? `${value.name}.keyword` : value.name;
       return {
         aliasName: value.name,
-        columnName: value.name,
+        columnName: colName,
         displayName: value.name,
         filterEligible: true,
         joinEligible: false,
