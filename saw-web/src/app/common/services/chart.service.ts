@@ -466,7 +466,7 @@ export class ChartService {
 
     const splinifiedChartType = this.splinifyChartType(comboType);
     const zIndex = this.getZIndex(comboType);
-    if (aggregate === 'percentage') {
+    if (aggregate === 'percentage' || aggregate === 'percentageByRow') {
       aggrSymbol = '%';
     }
     return {
@@ -533,7 +533,7 @@ export class ChartService {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
     let comboType = fields.y[0].comboType;
     let aggrsymbol = '';
-    if (fields.y[0].aggregate === 'percentage') {
+    if (fields.y[0].aggregate === 'percentage' || fields.y[0].aggregate === 'percentageByRow') {
       aggrsymbol = '%';
     }
     if (!isUndefined(comboType)) {
@@ -993,7 +993,7 @@ export class ChartService {
      * @returns {undefined}
      */
     const getPrecision = (aggregate, type) => {
-      return ['percentage', 'avg'].includes(aggregate) ||
+      return ['percentage', 'avg', 'percentageByRow'].includes(aggregate) ||
         FLOAT_TYPES.includes(type)
         ? 2
         : 0;
@@ -1044,7 +1044,7 @@ export class ChartService {
         <td>${
           point
             ? round(
-                point.y,
+                options.aggregate === 'percentageByRow' ? round(point.percentage, 2) : point.y,
                 getPrecision(options.aggregate, options.dataType)
               ).toLocaleString()
             : '{point.y:,.2f}'

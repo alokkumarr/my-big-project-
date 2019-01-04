@@ -14,7 +14,7 @@ export interface ArtifactColumn {
   format: Format | string | null;
   aliasName: string;
   alias?: string;
-  aggregate?: 'sum' | 'avg' | 'min' | 'max' | 'count' | 'percentage';
+  aggregate?: 'sum' | 'avg' | 'min' | 'max' | 'count' | 'percentage' | 'percentageByRow';
   name?: string;
 }
 

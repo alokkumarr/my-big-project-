@@ -1,10 +1,17 @@
 package com.synchronoss.saw.batch.sftp.integration;
 
+import com.jcraft.jsch.ChannelSftp;
+import com.synchronoss.saw.batch.entities.BisRouteEntity;
+import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
+
+import java.io.File;
 import java.util.Date;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +24,11 @@ public class SipLogging {
 
   @Autowired
   private BisFileLogsRepository bisFileLogsRepository;
+  
 
+  @Autowired
+  private BisRouteDataRestRepository bisRouteDataRestRepository;
+  
   /**
    * To make an entry to a log table. 
    */
@@ -58,6 +69,22 @@ public class SipLogging {
   public void deleteLog(String pid) throws SipNestedRuntimeException {
     logger.trace("Delete an entry with logging API :" + pid);
     bisFileLogsRepository.deleteById(pid);
+  }
+  
+  /**
+   * verify duplicate check enabled and is duplicate
+   * or if duplicate check disabled.
+   * 
+   * @param isDisableDuplicate disabled duplicate check flag
+   * @param sourcelocation source path
+   * @param entry file entry
+   * @return true or false
+   */
+  public boolean duplicateCheck(boolean isDisableDuplicate, 
+      String sourcelocation, ChannelSftp.LsEntry entry) {
+    return (!isDisableDuplicate && !checkDuplicateFile(sourcelocation + File.separator 
+        + entry.getFilename())) || isDisableDuplicate;
+    
   }
 
 }

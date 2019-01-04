@@ -332,6 +332,25 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
+  formulateChartRequest(analysis) {
+    let isGroupByPresent = false;
+    forEach(analysis.sqlBuilder.nodeFields, node => {
+      if (node.checked === 'g') {
+        isGroupByPresent = true;
+      }
+    });
+    if (!isGroupByPresent) {
+      forEach(analysis.sqlBuilder.dataFields, dataField => {
+        dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
+      });
+
+      forEach(this.artifacts[0].columns, col => {
+        col.aggregate = col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+      });
+    }
+    return analysis;
+  }
+
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
@@ -361,6 +380,8 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
+
+    this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -574,6 +595,14 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
+  checkifSortsApplied(event) {
+    forEach(this.analysis.sqlBuilder.orderByColumns, field => {
+      if (event.column.columnName === field.columnName) {
+        field.aggregate = event.column.aggregate;
+      }
+    });
+  }
+
   onSettingsChange(event: DesignerChangeEvent) {
     /* prettier-ignore */
     switch (this.analysis.type) {
@@ -624,6 +653,11 @@ export class DesignerContainerComponent implements OnInit {
         });
       }
       this.data = cloneDeep(this.data);
+
+      // Need this fucntion to check if aggregation is applied for the same sorted column.
+      // Need to remove this function once backend moves all logic of aggrregation to datafields.
+      this.checkifSortsApplied(event);
+
       this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;

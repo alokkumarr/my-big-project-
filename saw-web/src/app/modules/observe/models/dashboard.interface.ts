@@ -22,7 +22,9 @@ export interface Dashboard {
   name: string;
   description: string;
   createdBy?: string;
+  createdByName?: string;
   updatedBy?: string;
+  updatedByName?: string;
   createdAt?: string;
   updatedAt?: string;
   tiles: Array<Tile>;

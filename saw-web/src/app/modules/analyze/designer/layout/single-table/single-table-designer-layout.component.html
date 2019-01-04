@@ -1,22 +1,28 @@
-<designer-settings-single-table class="designer__data-settings"
-                   [analysisType]="analysisType"
-                   [analysisSubtype]="analysisSubtype"
-                   (change)="change.emit($event)"
-                   [fieldCount]="fieldCount"
-                   [artifacts]="artifacts">
+<designer-settings-single-table
+  class="designer__data-settings"
+  [analysisType]="analysisType"
+  [analysisSubtype]="analysisSubtype"
+  (change)="change.emit($event)"
+  [fieldCount]="fieldCount"
+  [sqlBuilder]="sqlBuilder"
+  [artifacts]="artifacts"
+>
 </designer-settings-single-table>
 
-<div fxLayout="column">
-  <designer-settings-aux class="designer__content"
-                         [auxSettings]="auxSettings"
-                         [analysisType]="analysisType"
-                         [analysisSubtype]="analysisSubtype"
-                         [chartTitle]="chartTitle"
-                         (change)="change.emit($event)"></designer-settings-aux>
+<div class="designer__content">
+  <designer-settings-aux
+    class="designer__aux-settings"
+    [auxSettings]="auxSettings"
+    [analysisType]="analysisType"
+    [analysisSubtype]="analysisSubtype"
+    [chartTitle]="chartTitle"
+    (change)="change.emit($event)"
+  ></designer-settings-aux>
 
   <ng-container [ngSwitch]="">
 
     <filter-chips-u *ngIf="filters.length > 0"
+                    class="designer__filters"
                     (remove)="onRemoveFilter($event)"
                     (removeAll)="onRemoveFilterAll()"
                     [filters]="filters"
@@ -62,20 +68,20 @@
       </div>
 
       <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA">
-        <designer-pivot class="designer__content"
+        <designer-pivot class="designer__data"
                         *ngIf="analysisType === 'pivot'"
                         [data]="data"
                         [sorts]="sorts"
                         [artifacts]="artifacts">
         </designer-pivot>
-        <designer-map-chart class="designer__content"
+        <designer-map-chart class="designer__data"
                         *ngIf="analysisType ==='chart' && analysisSubtype === 'geo'"
                         [chartType]="analysisSubtype"
                         [auxSettings]="auxSettings"
                         [data]="data"
                         [sqlBuilder]="sqlBuilder">
         </designer-map-chart>
-        <designer-chart class="designer__content"
+        <designer-chart class="designer__data"
                         *ngIf="analysisType ==='chart' && analysisSubtype !== 'geo'"
                         [chartType]="analysisSubtype"
                         [sorts]="sorts"
