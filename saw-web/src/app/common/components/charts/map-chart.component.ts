@@ -78,7 +78,7 @@ export class MapChartComponent {
     // set the appropriate config based on chart type
     this.config = defaultsDeep(
       options,
-      this.isExportEnabled ? this.getExportConfig() : {},
+      this.isExportEnabled ? this.getExportConfig(options.fileName) : {},
       geoChartOptions
     );
 
@@ -126,13 +126,12 @@ export class MapChartComponent {
     }
   }
 
-  getExportConfig() {
-    const filename = 'chart';
+  getExportConfig(fileName) {
     return {
       enabled: true,
       allowHTML: false,
       fallbackToExportServer: false,
-      filename,
+      fileName,
       chartOptions: {
         legend: {
           navigation: {
@@ -167,7 +166,7 @@ export class MapChartComponent {
   onExport() {
     this.chart.exportChartLocal({
       type: 'application/pdf',
-      filename: get(this.config, 'title.exportFilename') || 'chart'
+      filename: get(this.config, 'fileName') || 'chart'
     });
   }
 }

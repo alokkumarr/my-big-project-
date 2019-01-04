@@ -45,7 +45,7 @@ export class MapChartViewerComponent {
       this.setSeries();
     }
 
-    this.setChartConfig(analysis.legend);
+    this.setChartConfig(analysis.legend, analysis.chartTitle || analysis.name);
   }
 
   @Input()
@@ -100,7 +100,7 @@ export class MapChartViewerComponent {
     }
   }
 
-  setChartConfig(analysisLegend) {
+  setChartConfig(analysisLegend, fileName) {
     const colorAxis = {
       min: 1,
       type: 'logarithmic',
@@ -109,13 +109,13 @@ export class MapChartViewerComponent {
     };
 
     const legend = this._chartService.analysisLegend2ChartLegend(analysisLegend);
-    console.log('legend', legend);
 
     this.chartOptions = {
       mapNavigation: {
         enabled: true
       },
-      colorAxis
+      colorAxis,
+      fileName
     };
 
     if (legend) {
