@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material';
 import * as forIn from 'lodash/forIn';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
+import * as split from 'lodash/split';
 import * as filter from 'lodash/filter';
 import * as trim from 'lodash/trim';
 
@@ -115,7 +116,8 @@ export class ValidateSemanticComponent implements OnDestroy {
             columns: filter(ds.schema.fields, 'include')
           });
           payload.parentDataSetNames.push(ds.system.name);
-          payload.parentDataSetIds.push(ds._id);
+          payload.parentDataSetIds.push(split(ds._id, '::')[1]);
+          console.log(ds._id)
         });
 
         this.workBench.createSemantic(payload).subscribe((data: any[]) => {
