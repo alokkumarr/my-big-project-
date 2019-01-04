@@ -127,5 +127,22 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
     return channelId + ":" + hostname;
     
   }
+  
+  /**
+   * Remove connection object from pool.
+   * 
+   * @param channelId channel Id
+   */
+  public void removeChannelConnFromPool(Long channelId) {
+    String key = getChannelConnectionIdentifier(channelId);
+    if (sessionFactoryMap.get(key) != null) {
+      logger.info("Before remove connections size " + sessionFactoryMap.size());
+      sessionFactoryMap.remove(key);
+      logger.info("After remove connections size " + sessionFactoryMap.size());
+    }
+      
+     
+  }
+  
 
 }
