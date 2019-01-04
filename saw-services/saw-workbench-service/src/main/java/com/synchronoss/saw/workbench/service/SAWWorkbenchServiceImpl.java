@@ -367,7 +367,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       dataSet.setStorageType(StorageType.DL.name());
       dataSetsJSON.add(dataSet);
     }
-    dataSetsJSON.addAll(listOfDataSetAvailableInESStore(project));
+    //dataSetsJSON.addAll(listOfDataSetAvailableInESStore(project));
     logger.trace("response structure {}", objectMapper.writeValueAsString(dataSetsJSON));
     return dataSetsJSON;
   }
