@@ -117,19 +117,33 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append(newLineChar);
         connectionLogs.append("Establishing connection to host");
         File destinationPath = new File(destinationLocation);
+        logger.info("Is destination directories exists>:: " + destinationPath.exists());
+        if (!destinationPath.exists()) {
+          connectionLogs.append(newLineChar);
+          logger.info("Destination directories doesnt exists. Creating..." 
+                + destinationPath.exists());
+          connectionLogs.append("Destination directories doesnt exists. Creating...");
+          Files.createDirectories(Paths.get(destinationLocation));
+          connectionLogs.append(newLineChar);
+          connectionLogs.append("Destination directories created scucessfully!!");
+          connectionLogs.append("Destination directories created scucessfully!!");
+        }
         if (destinationPath.exists()) {
           if ((destinationPath.canRead() && destinationPath.canWrite())
               && destinationPath.canExecute()) {
             String sourceLocation = (rootNode.get("sourceLocation").asText());
             connectionLogs.append(newLineChar);
             connectionLogs.append("Connecting to source location " + sourceLocation);
+            logger.info("Connecting to source location " + sourceLocation);
             connectionLogs.append(newLineChar);
+            logger.info("Connecting to destination location " + destinationLocation);
             connectionLogs.append("Connecting to destination location " + destinationLocation);
             connectionLogs.append(newLineChar);
             connectionLogs.append("Connecting...");
             if (session
                 .exists(sourceLocation)) {
               connectionLogs.append("Connection successful!!");
+              logger.info("Connection successful!!");
               status = HttpStatus.OK;
               connectionLogs.append(newLineChar);
               connectionLogs.append(status);
