@@ -117,7 +117,6 @@ export class ValidateSemanticComponent implements OnDestroy {
           });
           payload.parentDataSetNames.push(ds.system.name);
           payload.parentDataSetIds.push(split(ds._id, '::')[1]);
-          console.log(ds._id)
         });
 
         this.workBench.createSemantic(payload).subscribe((data: any[]) => {
