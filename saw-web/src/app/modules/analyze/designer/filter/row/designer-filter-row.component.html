@@ -3,7 +3,6 @@
 >
   <div fxLayout="row wrap"
        fxFlex="grow"
-       [ngSwitch]="TYPE_MAP[filter.type]"
        class="filter__data__space"
        fxLayoutAlign="start"
   >
@@ -24,7 +23,9 @@
       </mat-autocomplete>
     </mat-form-field>
 
-    <div *ngIf="isInRuntimeMode ? filter.isRuntimeFilter : (!filter.isRuntimeFilter && !filter.isGlobalFilter)" style="margin-left: 10px;">
+    <div *ngIf="isInRuntimeMode ? filter.isRuntimeFilter : (!filter.isRuntimeFilter && !filter.isGlobalFilter)"
+         style="margin-left: 10px;"
+         [ngSwitch]="TYPE_MAP[filter.type]">
       <designer-string-filter *ngSwitchCase="'string'"
                               (filterModelChange)="onFilterModelChange($event)"
                               [filterModel]="filter.model">

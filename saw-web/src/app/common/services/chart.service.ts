@@ -33,10 +33,11 @@ import * as values from 'lodash/values';
 import * as toString from 'lodash/toString';
 import * as replace from 'lodash/replace';
 import * as isUndefined from 'lodash/isUndefined';
+import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import { flattenChartData } from '../../../common/utils/dataFlattener';
+import { flattenChartData } from '../utils/dataFlattener';
 
 import {
   NUMBER_TYPES,
@@ -44,7 +45,7 @@ import {
   DATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   CHART_COLORS
-} from '../consts';
+} from '../../modules/analyze/consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -150,6 +151,24 @@ export class ChartService {
       break;
     }
     return analysis;
+  }
+
+  analysisLegend2ChartLegend(legend) {
+    const align = LEGEND_POSITIONING[
+      get(legend, 'align')
+    ];
+    const layout = LAYOUT_POSITIONS[
+      get(legend, 'layout')
+    ];
+
+    if (!align || !layout) {
+      return null;
+    }
+    return {
+      align: align.align,
+      verticalAlign: align.verticalAlign,
+      layout: layout.layout
+    };
   }
 
   initLegend(analysis) {
@@ -289,32 +308,38 @@ export class ChartService {
     }
   }
 
-  splitToSeriesAndCategories(parsedData, fields, { sorts }, chartType) {
-    let series = [];
-    const categories = {};
+  splitToSeries(parsedData, fields, chartType) {
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
-    const isHighStock = chartType.substring(0, 2) === 'ts';
 
+    if (areMultipleYAxes) {
+      return this.splitSeriesByYAxes(parsedData, fields, chartType);
+    }
+
+    if (isGrouped) {
+      return this.splitSeriesByGroup(parsedData, fields);
+    }
+
+    const axesFieldNameMap = this.getAxesFieldNameMap(fields);
+    const yField = isArray(fields.y) ? fields.y[0] : fields.y;
+    return [{
+      ...this.getSerie(yField, 0, fields.y, chartType),
+      data: map(parsedData, dataPoint =>
+        mapValues(axesFieldNameMap, val => dataPoint[val]))
+    }];
+  }
+
+  splitToSeriesAndCategories(parsedData, fields, { sorts }, chartType) {
+    const categories = {};
+    const isHighStock = chartType.substring(0, 2) === 'ts';
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
+    const series = this.splitToSeries(parsedData, fields, chartType);
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
       const dateFields = filter(fieldsArray, ({ type }) =>
         DATE_TYPES.includes(type)
       );
       this.formatDatesIfNeeded(parsedData, dateFields);
-    }
-    if (areMultipleYAxes) {
-      series = this.splitSeriesByYAxes(parsedData, fields, chartType);
-    } else if (isGrouped) {
-      series = this.splitSeriesByGroup(parsedData, fields);
-    } else {
-      const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-      const yField = fields.y[0];
-      series = [this.getSerie(yField, 0, fields.y, chartType)];
-      series[0].data = map(parsedData, dataPoint =>
-        mapValues(axesFieldNameMap, val => dataPoint[val])
-      );
     }
     // split out categories frem the data
     forEach(series, serie => {

@@ -1,4 +1,9 @@
-export { AnalysisType } from '../models';
+export {
+  AnalysisType,
+  AnalysisChart,
+  ArtifactColumnReport,
+  SqlBuilderChart
+} from '../models';
 export interface ConfirmDialogData {
   title: string;
   content: string;

@@ -3,7 +3,10 @@ export {
   DEFAULT_PRECISION,
   DATE_TYPES,
   NUMBER_TYPES,
-  CHART_TYPES_OBJ
+  CHART_TYPES_OBJ,
+  TYPE_ICONS_OBJ,
+  TYPE_ICONS,
+  TYPE_MAP
 } from '../consts';
 
 export enum DesignerStates {

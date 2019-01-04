@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'icomoon';
   src:
-    url('icomoon.ttf?up1fxn') format('truetype'),
-    url('icomoon.woff?up1fxn') format('woff'),
-    url('icomoon.svg?up1fxn#icomoon') format('svg');
+    url('icomoon.ttf?lemiuu') format('truetype'),
+    url('icomoon.woff?lemiuu') format('woff'),
+    url('icomoon.svg?lemiuu#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -23,6 +23,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-geo-chart:before {
+  content: "\e9fb";
+}
+.icon-ic-average:before {
+  content: "\e98b";
+  color: #727272;
+}
+.icon-ic-max:before {
+  content: "\e9f9";
+  color: #727272;
+}
+.icon-ic-min:before {
+  content: "\e9fa";
+  color: #727272;
+}
 .icon-Candlestick-icon:before {
   content: "\e98c";
 }
@@ -203,8 +218,14 @@
 .icon-vert-bar-chart:before {
   content: "\e9c7";
 }
+.icon-AVG:before {
+  content: "\e9c8";
+}
 .icon-query-mode:before {
   content: "\e9c9";
+}
+.icon-MIN:before {
+  content: "\e9ca";
 }
 .icon-Sum:before {
   content: "\e9cb";
@@ -257,15 +278,6 @@
 .icon-filter:before {
   content: "\e9db";
 }
-.icon-MIN:before {
-  content: "\e9fa";
-}
-.icon-MAX:before {
-  content: "\e9f9";
-}
-.icon-AVG:before {
-  content: "\e98b";
-}
 .icon-search2:before {
   content: "\e9dc";
 }
@@ -274,6 +286,9 @@
 }
 .icon-uniE9222:before {
   content: "\e9de";
+}
+.icon-MAX:before {
+  content: "\e9df";
 }
 .icon-uniE921:before {
   content: "\e9e0";

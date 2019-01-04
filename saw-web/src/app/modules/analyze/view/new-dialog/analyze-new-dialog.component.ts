@@ -1,6 +1,8 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as get from 'lodash/get';
+import * as some from 'lodash/some';
+import * as startsWith from 'lodash/startsWith';
 import * as fpValues from 'lodash/values';
 import * as startCase from 'lodash/startCase';
 import * as fpFilter from 'lodash/fp/filter';
@@ -71,6 +73,10 @@ export class AnalyzeNewDialogComponent {
 
     this.supportedMetricCategories = fpPipe(
       fpFilter(metric => {
+        if (startsWith(method.type, 'chart:geo')) {
+          const doesSupportsChartMap = some(metric.supports, ({category}) => category === 'mapChart');
+          return doesSupportsChartMap;
+        }
         const isEsMetric = get(metric, 'esRepository.storageType') === 'ES';
         return isEsMetric || method.type === 'table:report';
       }),

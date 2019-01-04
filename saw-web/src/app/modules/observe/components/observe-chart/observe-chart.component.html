@@ -1,33 +1,4 @@
-<div [ngClass]="{'grid-view': toggleToGrid === true, 'chart-view': !toggleToGrid}">
-  <div class="analysis-header">
-    <h1 class="chart report-title flex-container" [textContent]="analysis.chartTitle || analysis.name"></h1>
-    <div class="flex-icon-container">
-      <div *ngIf="toggleToGrid"  class="mat-icon material-icons icon-grid-export" role="img" (click)="exportGridToExcel()"
-        matTooltip="Export Grid Data">
-      </div>
-      <div *ngIf="ViewMode" class="toggle-icons">
-        <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="toggleToGrid = true" [ngClass]="{'active': toggleToGrid}"
-          matTooltip="Toggle to Grid">
-        </mat-icon>
-
-        <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" (click)="toggleToGrid = false" [ngClass]="{'active': !toggleToGrid}"
-          matTooltip="Toggle to Chart">
-        </mat-icon>
-      </div>
-    </div>
-  </div>
-</div>
-
-<dx-data-grid *ngIf="toggleToGrid" #dataGrid [customizeColumns]="customizeColumns" [columnMinWidth]="150" [columnResizingMode]="'widget'" [allowColumnReordering]="true"
-[allowColumnResizing]="true" [showColumnHeaders]="true" [showColumnLines]="false"
-[showRowLines]="false" [showBorders]="false" [rowAlternationEnabled]="true" [hoverStateEnabled]="true"
-[wordWrapEnabled]="false" [dataSource]="chartToggleData" style="height: calc(100% - 70px);">
-<dxo-scrolling showScrollbar="always" [useNative]="false"></dxo-scrolling>
-<dxo-paging [pageSize]="25"></dxo-paging>
-<dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[25,50,75,100]"></dxo-pager>
-<dxo-export [enabled]="false" [fileName]="analysis.name"></dxo-export>
-</dx-data-grid>
-
-<div *ngIf="!toggleToGrid">
-  <chart [updater]="chartUpdater" [options]="chartOptions" [isStockChart]="isStockChart" [enableExport]="enableChartDownload"></chart>
-</div>
+<chart-grid [analysis]="analysis"
+            [data]="data"
+            [updater]="updater">
+</chart-grid>

@@ -42,7 +42,7 @@ import {
   DATE_TYPES
 } from '../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from '../../../../common/services/chart.service';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
@@ -177,7 +177,6 @@ export class DesignerContainerComponent implements OnInit {
       this._chartService.updateAnalysisModel(this.analysis);
       if (this.designerMode === 'new') {
         (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
-        (<any>this.analysis).isStockChart = (<any>this.analysis).chartType.substring(0, 2) === 'ts';
       }
       this.chartTitle = this.analysis.chartTitle || this.analysis.name;
 
@@ -771,6 +770,10 @@ export class DesignerContainerComponent implements OnInit {
     case 'fetchLimit':
       this.analysis.sqlBuilder = this.getSqlBuilder();
       this.requestDataIfPossible();
+      break;
+    case 'region':
+      this.updateAnalysis();
+      this.refreshDataObject();
       break;
     }
   }

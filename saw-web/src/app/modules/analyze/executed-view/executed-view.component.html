@@ -107,17 +107,29 @@
           <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                                 [analysis]="executedAnalysis"
                                 [dataLoader]="dataLoader"
-                                ></executed-report-view>
-            <executed-pivot-view *ngSwitchCase="'pivot'"
+                                >
+          </executed-report-view>
+          <executed-pivot-view *ngSwitchCase="'pivot'"
+                                [analysis]="executedAnalysis"
+                                [data]="data"
+                                [updater]="pivotUpdater$"
+                                >
+          </executed-pivot-view>
+          <div *ngSwitchCase="'chart'">
+            <executed-chart-view *ngIf="analysis.chartType !== 'geo'"
                                  [analysis]="executedAnalysis"
                                  [data]="data"
-                                 [updater]="pivotUpdater$"
-                                 ></executed-pivot-view>
-              <executed-chart-view *ngSwitchCase="'chart'"
-                                   [analysis]="executedAnalysis"
-                                   [data]="data"
-                                   [updater]="chartUpdater$"
-                                   ></executed-chart-view>
+                                 [updater]="chartUpdater$"
+            >
+            </executed-chart-view>
+            <executed-map-chart-view *ngIf="analysis.chartType === 'geo'"
+                                  [analysis]="executedAnalysis"
+                                  [data]="data"
+                                  [updater]="chartUpdater$"
+                                  [actionBus]="chartActionBus$"
+            >
+            </executed-map-chart-view>
+          </div>
         </div>
       </mat-card>
     </div>

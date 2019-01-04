@@ -2,7 +2,6 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
-import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
@@ -16,7 +15,8 @@ import {
   ArtifactColumnFilter,
   DesignerChangeEvent
 } from '../../types';
-import { TYPE_ICONS_OBJ, TYPE_ICONS, TYPE_MAP } from '../../../consts';
+import { TYPE_ICONS_OBJ, TYPE_ICONS } from '../../consts';
+import { getArtifactColumnTypeIcon, getArtifactColumnGeneralType } from '../../utils';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -47,13 +47,13 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
-  public isEmpty = isEmpty;
+  public isEmpty: Function = isEmpty;
   public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
-    types: ['number', 'date', 'string']
+    types: ['number', 'date', 'string', 'geo']
   };
   constructor(private _designerService: DesignerService) {
     // we have to debounce settings change
@@ -132,10 +132,11 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   getUnselectedArtifactColumns() {
     const { types, keyword } = this.filterObj;
     return fpPipe(
-      fpFilter(({ checked, type, alias, displayName }) => {
+      fpFilter(artifactColumn => {
+        const { checked, alias, displayName } = artifactColumn;
         return (
           !checked &&
-          this.hasType(type, types) &&
+          this.hasAllowedType(artifactColumn, types) &&
           this.hasKeyword(alias || displayName, keyword)
         );
       }),
@@ -143,18 +144,18 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     )(this.artifactColumns);
   }
 
-  hasType(type, filterTypes) {
+  hasAllowedType(artifactColumn, filterTypes) {
+    const generalType = this.getGeneralType(artifactColumn);
     /* prettier-ignore */
-    switch (TYPE_MAP[type]) {
-    case 'number':
-      return filterTypes.includes('number');
-    case 'date':
-      return filterTypes.includes('date');
-    case 'string':
-      return filterTypes.includes('string');
-    default:
-      return true;
-    }
+    return filterTypes.includes(generalType);
+  }
+
+  getGeneralType(artifactColumn) {
+    return getArtifactColumnGeneralType(artifactColumn);
+  }
+
+  getArtifactColumnTypeIcon(artifactColumn) {
+    return getArtifactColumnTypeIcon(artifactColumn);
   }
 
   hasKeyword(name, keyword) {
@@ -170,18 +171,8 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
-  onTypeFilterChange(event) {
-    const value = event.value;
-    const checked = event.source.checked;
-
-    if (!checked) {
-      this.filterObj.types = filter(
-        this.filterObj.types,
-        type => type !== value
-      );
-    } else {
-      this.filterObj.types = [...this.filterObj.types, value];
-    }
+  onTypeFilterChange(value) {
+    this.filterObj.types = value;
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 

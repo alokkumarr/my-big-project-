@@ -12,6 +12,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as isEmpty from 'lodash/isEmpty';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as compact from 'lodash/compact';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -29,6 +30,7 @@ import {
 import {
   NUMBER_TYPES,
   DATE_TYPES,
+  GEO_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   DEFAULT_DATE_INTERVAL,
   CHART_DEFAULT_DATE_FORMAT
@@ -226,6 +228,18 @@ export class DesignerService {
       return DATE_TYPES.includes(type);
     };
 
+    const canAcceptGeoType = (
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      groupAdapters: Array<IDEsignerSettingGroupAdapter>
+    ) => ({ geoType }: ArtifactColumnChart) => {
+      const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+      if (groupAdapter.artifactColumns.length >= maxAllowed) {
+        return false;
+      }
+
+      return GEO_TYPES.includes(geoType);
+    };
+
     const canAcceptAnyType = (
       groupAdapter: IDEsignerSettingGroupAdapter,
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
@@ -254,80 +268,105 @@ export class DesignerService {
       }
     };
 
-    const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
-      {
-        title: chartType === 'pie' ? 'Angle' : 'Metrics',
-        type: 'chart',
-        marker: 'y',
-        maxAllowed: () =>
-          ['pie', 'bubble', 'stack'].includes(chartType) ? 1 : Infinity,
-        artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptNumberType,
-        transform(artifactColumn: ArtifactColumnChart) {
-          artifactColumn.area = 'y';
-          artifactColumn.checked = true;
-          applyDataFieldDefaults(artifactColumn);
-        },
-        reverseTransform: chartReverseTransform,
-        onReorder
+    const defaultMetricAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Metrics',
+      type: 'chart',
+      marker: 'y',
+      maxAllowed: () => Infinity,
+      artifactColumns: [],
+      canAcceptArtifactColumn: canAcceptNumberType,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'y';
+        artifactColumn.checked = true;
+        applyDataFieldDefaults(artifactColumn);
       },
-      {
-        title: chartType === 'pie' ? 'Color By' : 'Dimension',
-        type: 'chart',
-        marker: 'x',
-        maxAllowed: () => 1,
-        artifactColumns: [],
-        canAcceptArtifactColumn: isStockChart
-          ? canAcceptDateType
-          : canAcceptAnyType,
-        transform(artifactColumn: ArtifactColumnChart) {
-          artifactColumn.area = 'x';
-          artifactColumn.checked = true;
-          applyNonDatafieldDefaults(artifactColumn);
-        },
-        reverseTransform: chartReverseTransform,
-        onReorder
+      reverseTransform: chartReverseTransform,
+      onReorder
+    };
+
+    const metricAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultMetricAdapter,
+      title: chartType === 'pie' ? 'Angle' : 'Metrics',
+      maxAllowed: () =>
+        ['pie', 'bubble', 'stack', 'geo'].includes(chartType) ? 1 : Infinity
+    };
+
+    const defaultDimensionAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Dimension',
+      type: 'chart',
+      marker: 'x',
+      maxAllowed: () => 1,
+      artifactColumns: [],
+      canAcceptArtifactColumn: canAcceptAnyType,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'x';
+        artifactColumn.checked = true;
+        applyNonDatafieldDefaults(artifactColumn);
       },
+      reverseTransform: chartReverseTransform,
+      onReorder
+    };
+
+    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultDimensionAdapter,
+      title: chartType === 'pie' ? 'Color By' : 'Dimension',
+      canAcceptArtifactColumn: isStockChart
+        ? canAcceptDateType
+        : chartType === 'geo' ? canAcceptGeoType : canAcceptAnyType,
+    };
+
+    const sizeAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Size',
+      type: 'chart' as AnalysisType,
+      marker: 'z',
+      maxAllowed: () => 1,
+      artifactColumns: [],
+      canAcceptArtifactColumn: canAcceptNumberType,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'z';
+        artifactColumn.checked = true;
+        applyDataFieldDefaults(artifactColumn);
+      },
+      reverseTransform: chartReverseTransform,
+      onReorder
+    };
+
+    const defaultGroupByAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Group By',
+      type: 'chart',
+      marker: 'g',
+      maxAllowed: (_, groupAdapters) => {
+        /* Don't allow columns in 'group by' if more than one column on y axis */
+        return find(groupAdapters, ad => ad.marker === 'y').artifactColumns
+          .length > 1
+          ? 0
+          : 1;
+      },
+      artifactColumns: [],
+      canAcceptArtifactColumn: canAcceptAnyType,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'g';
+        artifactColumn.checked = true;
+        applyNonDatafieldDefaults(artifactColumn);
+      },
+      reverseTransform: chartReverseTransform,
+      onReorder
+    };
+
+    const groupByAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultGroupByAdapter,
+      title: chartType === 'bubble' ? 'Color By' : 'Group By'
+    };
+
+    const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
+      metricAdapter,
+      dimensionAdapter,
       /* prettier-ignore */
-      ...(chartType === 'bubble' ? [
-        {
-          title: 'Size',
-          type: 'chart' as AnalysisType,
-          marker: 'z',
-          maxAllowed: () => 1,
-          artifactColumns: [],
-          canAcceptArtifactColumn: canAcceptNumberType,
-          transform(artifactColumn: ArtifactColumnChart) {
-            artifactColumn.area = 'z';
-            artifactColumn.checked = true;
-            applyDataFieldDefaults(artifactColumn);
-          },
-          reverseTransform: chartReverseTransform,
-          onReorder
-        }
-      ] : []),
-      {
-        title: chartType === 'bubble' ? 'Color By' : 'Group By',
-        type: 'chart',
-        marker: 'g',
-        maxAllowed: (_, groupAdapters) => {
-          /* Don't allow columns in 'group by' if more than one column on y axis */
-          return find(groupAdapters, ad => ad.marker === 'y').artifactColumns
-            .length > 1
-            ? 0
-            : 1;
-        },
-        artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptAnyType,
-        transform(artifactColumn: ArtifactColumnChart) {
-          artifactColumn.area = 'g';
-          artifactColumn.checked = true;
-          applyNonDatafieldDefaults(artifactColumn);
-        },
-        reverseTransform: chartReverseTransform,
-        onReorder
-      }
-    ];
+      chartType === 'bubble' ?
+        sizeAdapter : null,
+      chartType === 'geo' ?
+        null : groupByAdapter
+    ]);
 
     this._distributeArtifactColumnsIntoGroups(
       artifactColumns,
@@ -459,14 +498,16 @@ export class DesignerService {
             alias: artifactColumn.aliasName,
             checked: artifactColumn.area,
             columnName: artifactColumn.columnName,
+            name: artifactColumn.columnName,
             comboType: artifactColumn.comboType,
             displayName: artifactColumn.displayName,
             table: artifactColumn.table,
             tableName: artifactColumn.table,
-            name: artifactColumn.columnName,
             type: artifactColumn.type,
             limitValue: artifactColumn.limitValue,
             limitType: artifactColumn.limitType,
+            geoType: artifactColumn.geoType,
+            region: artifactColumn.region,
             // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {

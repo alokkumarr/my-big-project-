@@ -1,12 +1,24 @@
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as fpToPairs from 'lodash/fp/toPairs';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as map from 'lodash/map';
 
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;
 export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
+const GEO_TYPES_WITH_IDENTIFIER = {
+  state: ['name', 'postal-code'],
+  country: ['name', 'fips'],
+  zip: []
+};
+export const GEO_TYPES = fpPipe(
+  fpToPairs,
+  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => `${geoType}:${identifier}`))
+)(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
 
@@ -44,38 +56,31 @@ export const CHART_COLORS = [
   '#DFB2B2'
 ];
 
-export const DATE_FORMATS = [
-  {
-    label: 'Default',
-    value: 'yyyy-MM-dd',
-    momentValue: 'YYYY-MM-DD'
-  },
-  {
-    label: 'September 1, 2017',
-    value: 'longDate',
-    momentValue: 'MMMM D, YYYY'
-  },
-  {
-    label: '09/01/2017 (MM/DD/YYYY)',
-    value: 'shortDate',
-    momentValue: 'MM/DD/YYYY'
-  },
-  {
-    label: '01/09/2017 (DD/MM/YYYY)',
-    value: 'dd/MM/yyyy',
-    momentValue: 'DD/MM/YYYY'
-  },
-  {
-    label: 'September 2017',
-    value: 'monthAndYear',
-    momentValue: 'MMMM YYYY'
-  },
-  {
-    label: 'September 1',
-    value: 'monthAndDay',
-    momentValue: 'MMMM D'
-  }
-];
+export const DATE_FORMATS = [{
+  label: 'Default',
+  value: 'yyyy-MM-dd',
+  momentValue: 'YYYY-MM-DD'
+}, {
+  label: 'September 1, 2017',
+  value: 'longDate',
+  momentValue: 'MMMM D, YYYY'
+}, {
+  label: '09/01/2017 (MM/DD/YYYY)',
+  value: 'shortDate',
+  momentValue: 'MM/DD/YYYY'
+}, {
+  label: '01/09/2017 (DD/MM/YYYY)',
+  value: 'dd/MM/yyyy',
+  momentValue: 'DD/MM/YYYY'
+}, {
+  label: 'September 2017',
+  value: 'monthAndYear',
+  momentValue: 'MMMM YYYY'
+}, {
+  label: 'September 1',
+  value: 'monthAndDay',
+  momentValue: 'MMMM D'
+}];
 
 export const CUSTOM_HEADERS = {
   SKIP_TOAST: 'SIP-Skip-Error-Toast'

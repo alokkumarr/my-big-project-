@@ -23,6 +23,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
   public previewData = null;
   public artifactColumns: ArtifactColumns;
   public analysis: Analysis;
+  public chartType: string;
   public state = DesignerStates.SELECTION_WITH_DATA;
   public dataLoader: (
     options: {}
@@ -34,6 +35,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
     public _designerService: DesignerService
   ) {
     this.analysis = data.analysis;
+    this.chartType = this.analysis['chartType'];
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':

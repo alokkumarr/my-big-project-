@@ -26,7 +26,8 @@ import {
   IToolbarActionResult,
   Artifact,
   Format,
-  AnalysisDialogData
+  AnalysisDialogData,
+  Region
 } from '../types';
 
 export {
@@ -55,12 +56,13 @@ export {
   Format,
   Join,
   JsPlumbCanvasChangeEvent,
-  AnalysisDialogData
+  AnalysisDialogData,
+  Region
 };
 
 export interface ArtifactColumnFilter {
   keyword: string;
-  types: ('number' | 'date' | 'string')[];
+  types: ('number' | 'date' | 'string' | 'geo')[];
 }
 
 export type PivotArea = 'data' | 'row' | 'column';
@@ -109,7 +111,8 @@ export interface DesignerChangeEvent {
     | 'submitQuery'
     | 'chartTitle'
     | 'fetchLimit'
-    | 'changeQuery';
+    | 'changeQuery'
+    | 'region';
   column?: ArtifactColumn;
   data?: any;
 }

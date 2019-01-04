@@ -6,7 +6,6 @@ import {
   DesignerChangeEvent
 } from '../../types';
 import {
-  TYPE_ICONS_OBJ,
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   COMBO_TYPES,
@@ -14,6 +13,7 @@ import {
   TSCOMBO_TYPES,
   TSCOMBO_TYPES_OBJ
 } from '../../../consts';
+import { getArtifactColumnTypeIcon } from '../../utils';
 import * as filter from 'lodash/filter';
 
 @Component({
@@ -30,9 +30,8 @@ export class ExpandableFieldComponent {
   @Input() public fieldCount: any;
   @Input() public sqlBuilder;
   @Input() analysisSubtype: string;
-  public enablePercentByRow: boolean = true;
+  public enablePercentByRow = true;
 
-  TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;
   AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public isExpanded = false;
@@ -61,6 +60,10 @@ export class ExpandableFieldComponent {
    */
   asChartColumn(column): ArtifactColumnChart {
     return column;
+  }
+
+  getArtifactColumnTypeIcon(artifactColumn) {
+    return getArtifactColumnTypeIcon(artifactColumn);
   }
 
   toggleExpansion() {
