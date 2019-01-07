@@ -131,11 +131,11 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
       }
   
     }
-    logger.trace("Connction identifier from map:: "+ channelId + ":" + hostname + ":" + userName  
-    		+ ":" + password  + ":" + portNumber );
+    logger.trace("Connction identifier from map:: " + channelId + ":" + hostname + ":" + userName  
+          + ":" + password  + ":" + portNumber);
     
     return channelId + ":" + hostname + ":" + userName  
-    		+ ":" + password  + ":" + portNumber;
+           + ":" + password  + ":" + portNumber;
     
   }
   
