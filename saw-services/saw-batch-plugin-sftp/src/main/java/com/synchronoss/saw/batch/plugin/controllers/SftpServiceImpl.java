@@ -902,23 +902,18 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("Delete the corrupted file :", fileName);
           File fileDelete = new File(fileName);
           if (fileDelete != null) {
-            if (fileDelete.isDirectory()) {
-              logger.trace("Directory deleted :", fileDelete);
+            logger.trace("Parent Directory deleted :", fileDelete);
+            File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
+              @Override
+              public boolean accept(File file) {
+                return !file.isHidden();
+              }
+            });
+            if (files.length > 1) {
               fileDelete.delete();
             } else {
-              logger.trace("Parent Directory deleted :", fileDelete);
-              File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                  return !file.isHidden();
-                }
-              });
-              if (files.length > 1) {
-                fileDelete.delete();
-              } else {
-                IntegrationUtils.removeDirectory(fileDelete.getParentFile());
-              }
-
+              logger.trace("Directory deleted :", fileDelete);
+              IntegrationUtils.removeDirectory(fileDelete.getParentFile());
             }
           }
         } else {

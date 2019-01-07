@@ -648,9 +648,6 @@ to declare a data in the system is corrupted, & needs to be downloaded again (de
 
 sip_bis_retry_diffs_in_minutes=5
 
-To control where to verify the partial file check on the source or not. Default is true.
-sip_bis_recheck_file_modified=true
-
 == Loading semantic metadata
 
 To enable creating analyses in SAW, load semantic metadata as follows:
