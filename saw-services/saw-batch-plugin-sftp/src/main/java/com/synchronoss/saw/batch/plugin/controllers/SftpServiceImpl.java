@@ -158,10 +158,7 @@ public class SftpServiceImpl extends SipPluginContract {
               session.close();
             }
           }
-        } else {
-          Files.createDirectories(Paths.get(destinationLocation));
-          status = HttpStatus.OK;
-        }
+        } 
       } catch (AccessDeniedException e) {
         status = HttpStatus.UNAUTHORIZED;
         connectionLogs.append(newLineChar);
