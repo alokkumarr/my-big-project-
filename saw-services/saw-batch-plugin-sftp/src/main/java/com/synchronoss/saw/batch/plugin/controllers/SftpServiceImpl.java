@@ -123,7 +123,15 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.info("Destination directories doesnt exists. Creating..." 
                 + destinationPath.exists());
           connectionLogs.append("Destination directories doesnt exists. Creating...");
-          Files.createDirectories(Paths.get(destinationLocation));
+          try {
+        	  Files.createDirectories(Paths.get(destinationLocation));
+          } catch (Exception ex) {
+              status = HttpStatus.UNAUTHORIZED;
+              logger.error("Excpetion occurred while creating the directory " + "for destination", ex);
+              connectionLogs.append(newLineChar);
+              connectionLogs.append("Exception occured while creating directories");
+          }
+         
           connectionLogs.append(newLineChar);
           connectionLogs.append("Destination directories created scucessfully!!");
           logger.info("Destination directories created scucessfully!!");
