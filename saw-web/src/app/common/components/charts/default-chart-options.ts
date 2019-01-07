@@ -48,7 +48,7 @@ export const chartOptions = defaultsDeep({
         // fillColor: null,
         // lineWidth: 2,
         // lineColor: null // inherit from series
-        enabled: true
+        enabled: false
       }
     }
   },
