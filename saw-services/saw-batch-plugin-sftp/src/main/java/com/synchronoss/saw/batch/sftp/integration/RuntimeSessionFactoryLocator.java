@@ -106,6 +106,10 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
   public String getChannelConnectionIdentifier(Long channelId) {
     Optional<BisChannelEntity> entity = bisChannelDataRestRepository.findById(channelId);
     String hostname = null;
+    String userName = null;
+    String password = null;
+    String portNumber = null;
+    
     if (entity.isPresent()) {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -118,30 +122,21 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         nodeEntity = objectMapper.readTree(bisChannelEntity.getChannelMetadata());
         rootNode = (ObjectNode) nodeEntity;
         hostname = rootNode.get("hostName").asText();
+        userName = rootNode.get("userName").asText();
+        password = rootNode.get("password").asText();
+        portNumber = rootNode.get("portNo").asText();
       } catch (IOException  exception) {
         throw new SftpProcessorException("for the given id + " + channelId + ""
             + " details does not exist");
       }
   
     }
-    return channelId + ":" + hostname;
+    logger.trace("Connction identifier from map:: "+ channelId + ":" + hostname + ":" + userName  
+    		+ ":" + password  + ":" + portNumber );
     
-  }
-  
-  /**
-   * Remove connection object from pool.
-   * 
-   * @param channelId channel Id
-   */
-  public void removeChannelConnFromPool(Long channelId) {
-    String key = getChannelConnectionIdentifier(channelId);
-    if (sessionFactoryMap.get(key) != null) {
-      logger.info("Before remove connections size " + sessionFactoryMap.size());
-      sessionFactoryMap.remove(key);
-      logger.info("After remove connections size " + sessionFactoryMap.size());
-    }
-      
-     
+    return channelId + ":" + hostname + ":" + userName  
+    		+ ":" + password  + ":" + portNumber;
+    
   }
   
 
