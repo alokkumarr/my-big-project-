@@ -117,7 +117,7 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append(newLineChar);
         connectionLogs.append("Establishing connection to host");
         File destinationPath = new File(destinationLocation);
-        logger.info("Is destination directories exists>:: " + destinationPath.exists());
+        logger.info("Is destination directories exists?:: " + destinationPath.exists());
         if (!destinationPath.exists()) {
           connectionLogs.append(newLineChar);
           logger.info("Destination directories doesnt exists. Creating..." 
@@ -126,7 +126,7 @@ public class SftpServiceImpl extends SipPluginContract {
           Files.createDirectories(Paths.get(destinationLocation));
           connectionLogs.append(newLineChar);
           connectionLogs.append("Destination directories created scucessfully!!");
-          connectionLogs.append("Destination directories created scucessfully!!");
+          logger.info("Destination directories created scucessfully!!");
         }
         if (destinationPath.exists()) {
           if ((destinationPath.canRead() && destinationPath.canWrite())
@@ -262,6 +262,24 @@ public class SftpServiceImpl extends SipPluginContract {
     File destinationPath = new File(dataPath);
     logger.trace("Destination path: " + destinationPath);
     logger.trace("Checking permissions for destination path: " + destinationPath);
+    connectionLogs.append(newLineChar);
+    connectionLogs.append("Destination directory exists? :: " + destinationPath.exists());
+    if (!destinationPath.exists()) {
+      try {
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Creating directories");
+        Files.createDirectories(Paths.get(dataPath));
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Created directories");
+      } catch (Exception ex) {
+        status = HttpStatus.UNAUTHORIZED;
+        logger.error("Excpetion occurred while creating the directory " + "for destination", ex);
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Exception occured while creating directories");
+      }
+      status = HttpStatus.OK;
+    }
+    
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
@@ -278,6 +296,7 @@ public class SftpServiceImpl extends SipPluginContract {
           connectionLogs.append(status);
         } else {
           status = HttpStatus.OK;
+          connectionLogs.append(newLineChar);
           connectionLogs.append("Connection successful!!");
           connectionLogs.append(newLineChar);
           connectionLogs.append(status);
@@ -286,16 +305,6 @@ public class SftpServiceImpl extends SipPluginContract {
           session.close();
         }
       }
-    } else {
-      try {
-        Files.createDirectories(Paths.get(dataPath));
-      } catch (Exception ex) {
-        status = HttpStatus.UNAUTHORIZED;
-        logger.error("Excpetion occurred while creating the directory " + "for destination", ex);
-        connectionLogs.append(newLineChar);
-        connectionLogs.append("Exception occured while creating directories");
-      }
-      status = HttpStatus.OK;
     }
     logger.trace("Test connection to route ends here");
     return connectionLogs.toString();
