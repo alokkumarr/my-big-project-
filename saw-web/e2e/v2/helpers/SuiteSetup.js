@@ -258,6 +258,7 @@ class SuiteSetup {
 
         xmlDocument += testSuiteEnd;
         xmlDocument += testSuitesEnd;
+        console.log('xmlDocument totalTests: e2e'+xmlDocument)
 
         fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/myjunit.xml', xmlDocument, { encoding: 'utf8' });
 
