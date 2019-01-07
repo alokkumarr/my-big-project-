@@ -1,13 +1,14 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import * as get from 'lodash/get';
 
 import {
   Artifact,
   DesignerChangeEvent,
   Sort,
   Filter,
-  SqlBuilder
+  SqlBuilder,
 } from '../../types';
-import { DesignerStates } from '../../consts';
+import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 
 @Component({
   selector: 'single-table-designer-layout',
@@ -28,6 +29,8 @@ export class SingleTableDesignerLayoutComponent {
   @Input() chartTitle: string;
   @Input() fieldCount: number;
 
+  public DesignerStates = DesignerStates;
+
   onRemoveFilter(index) {
     this.filters.splice(index, 1);
     this.change.emit({ subject: 'filter' });
@@ -36,5 +39,15 @@ export class SingleTableDesignerLayoutComponent {
   onRemoveFilterAll() {
     this.filters.splice(0, this.filters.length);
     this.change.emit({ subject: 'filter' });
+  }
+
+  getNonIdealStateIcon() {
+    switch (this.analysisType) {
+    case 'chart':
+      const chartTypeObj = CHART_TYPES_OBJ['chart:' + this.analysisSubtype];
+      return get(chartTypeObj, 'icon.font');
+    case 'pivot':
+      return 'icon-pivot';
+    }
   }
 }

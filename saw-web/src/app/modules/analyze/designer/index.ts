@@ -6,6 +6,7 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
 import { DesignerChartComponent } from './chart';
+import { DesignerMapChartComponent } from './map-chart';
 import { DesignerReportComponent } from './report';
 import {
   DesignerSettingsSingleTableComponent,
@@ -14,6 +15,7 @@ import {
   DesignerSettingsGroupComponent,
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent,
+  DesignerSettingsAuxMapChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent
@@ -39,6 +41,7 @@ export {
   DesignerToolbarComponent,
   DesignerPivotComponent,
   DesignerChartComponent,
+  DesignerMapChartComponent,
   DesignerReportComponent,
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
@@ -46,6 +49,7 @@ export {
   DesignerSettingsGroupComponent,
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent,
+  DesignerSettingsAuxMapChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent,

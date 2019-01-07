@@ -136,3 +136,11 @@ sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
 [sip-rtps]
 sip-app1
 sip-app2
+
+[sip-bis]
+# The below parameter to configure whether to activate the partial file check or not
+sip_bis_recheck_file_modified=false
+
+# The below parameter is to control what should be the time difference
+# to declare a file in the system is corrupted needs to be downloaded again
+sip_bis_retry_in_minutes=5

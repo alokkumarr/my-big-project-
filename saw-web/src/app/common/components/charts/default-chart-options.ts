@@ -1,4 +1,5 @@
-import { CHART_COLORS } from '../../consts';
+import * as defaultsDeep from 'lodash/defaultsDeep';
+import {CHART_COLORS} from '../../consts';
 
 export const globalChartOptions = {
   lang: {
@@ -15,8 +16,29 @@ export const globalChartOptions = {
   }
 };
 
-export const chartOptions = {
+const baseChartOptions = {
   colors: CHART_COLORS,
+  title: {
+    text: '',
+    y: 5
+  },
+  lang: {
+    noData: 'No data to display'
+  },
+  noData: {
+    style: {
+      fontWeight: 'bold',
+      fontSize: '15px',
+      color: '#303030'
+    }
+  },
+  exporting: {
+    enabled: false
+  },
+  credits: false
+};
+
+export const chartOptions = defaultsDeep({
   plotOptions: {
     series: {
       // disable turboTreshold for biggger datasets
@@ -28,9 +50,6 @@ export const chartOptions = {
         lineColor: null // inherit from series
       }
     }
-  },
-  exporting: {
-    enabled: false
   },
   legend: {
     verticalAlign: 'top',
@@ -50,26 +69,23 @@ export const chartOptions = {
     pointFormat:
       '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
       'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
-  },
-  title: {
-    text: '',
-    y: 5
-  },
-  lang: {
-    noData: 'No data to display'
-  },
-  noData: {
-    style: {
-      fontWeight: 'bold',
-      fontSize: '15px',
-      color: '#303030'
+  }
+}, baseChartOptions);
+
+export const geoChartOptions = defaultsDeep({}, baseChartOptions);
+
+export const stockChartOptions = defaultsDeep({
+  plotOptions: {
+    series: {
+      turboThreshold: 5000,
+      dataGrouping: {
+        enabled: false
+      }
     }
   },
-  credits: false
-};
-
-export const stockChartOptions = {
-  colors: CHART_COLORS,
+  tooltip: {
+    enabled: true
+  },
   scrollbar: {
     barBackgroundColor: '#c1c1c1',
     barBorderRadius: 3,
@@ -120,60 +136,8 @@ export const stockChartOptions = {
       x: 0,
       y: 0
     }
-  },
-  plotOptions: {
-    series: {
-      barBgColor: '#f3f5f8',
-      marker: {
-        fillColor: null,
-        lineWidth: 2,
-        lineColor: null // inherit from series
-      },
-      dataGrouping: {
-        enabled: false
-      },
-      turboThreshold: 5000
-    }
-  },
-  exporting: {
-    enabled: false
-  },
-  legend: {
-    verticalAlign: 'top',
-    layout: 'vertical',
-    itemMarginTop: 5,
-    maxHeight: 200,
-    itemMarginBottom: 5,
-    itemStyle: {
-      lineHeight: '14px'
-    }
-  },
-  tooltip: {
-    enabled: true,
-    useHTML: true,
-    valueDecimals: 2,
-    split: false,
-    headerFormat:
-      '<span style="font-size: 12px; opacity: 0.8;">{point.key}</span><br/>',
-    pointFormat:
-      '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
-      'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
-  },
-  title: {
-    text: ''
-  },
-  lang: {
-    noData: 'No data to display'
-  },
-  noData: {
-    style: {
-      fontWeight: 'bold',
-      fontSize: '15px',
-      color: '#303030'
-    }
-  },
-  credits: false
-};
+  }
+}, chartOptions);
 
 export const bulletChartOptions = {
   chart: {

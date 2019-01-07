@@ -641,13 +641,15 @@ configuration.
 == Batch Ingestion : Retry parameters
 
 The below parameters in Batch Ingestion Service gives the control the configurations
-related to resiliency. To change this parameters in the environment please go to below path
+related to resiliency. To change this parameters in the environment which are as follows
 
-/opt/bda/saw-batch-ingestion/conf/application.yml
+To control what should be the time difference
+to declare a data in the system is corrupted, & needs to be downloaded again (default is 5 mins)
 
-max.attempts : 3 (maximum number of retries then it will declare it as failure)
-retry.delay: 5000 (Interval between the retries in milliseconds)
-retry.diff.mins: 1 (Interval between the retries to recover from inconsistent state of transfer in minutes)
+sip_bis_retry_diffs_in_minutes=5
+
+To control where to verify the partial file check on the source or not. Default is true.
+sip_bis_recheck_file_modified=true
 
 == Loading semantic metadata
 

@@ -7,7 +7,7 @@
   padding: 0 10px;
   height: 100%;
   grid-template:
-    "filters" 60px
+    "filters" 74px
     "unselected-fields" 1fr
     "selected-fields" 1fr
     / 100%;
@@ -29,7 +29,7 @@
   }
 
   .settings__artifacts__filter__field {
-    width: calc(100% - 180px);
+    width: 43%;
   }
 }
 

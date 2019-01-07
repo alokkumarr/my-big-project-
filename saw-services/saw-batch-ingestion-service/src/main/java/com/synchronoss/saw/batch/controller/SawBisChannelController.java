@@ -15,6 +15,7 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.service.BisChannelService;
+import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
 import io.swagger.annotations.Api;
@@ -22,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,6 +69,9 @@ public class SawBisChannelController {
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+
+  @Autowired
+  private RuntimeSessionFactoryLocator delegatingSessionFactory;
 
   @Autowired
   private BisChannelService bisChannelService;
@@ -292,29 +297,30 @@ public class SawBisChannelController {
     secretPhrase = obfuscator.encrypt(secretPhrase);
     rootNode.put("password", secretPhrase);
     requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-    BisChannelDto optionalChannel =
-        retryTemplate.execute((RetryCallback<BisChannelDto, ResourceNotFoundException>) context -> {
-          Optional<BisChannelEntity> retryChannelEntity =
-              bisChannelDataRestRepository.findById(channelId);
-          if (retryChannelEntity == null) {
-            throw new ResourceNotFoundException("retryChannelEntity must not be null");
-          }
-          BisChannelEntity channel = retryChannelEntity.get();
-          logger.trace("Channel updated :" + channel);
-          requestBody.setBisChannelSysId(channelId);
-          BeanUtils.copyProperties(requestBody, channel, "modifiedDate", "createdDate");
-          channel.setModifiedDate(new Date());
-          if (channel.getStatus() == null) {
-            channel.setStatus(STATUS_ACTIVE);
-          }
-          channel = bisChannelDataRestRepository.save(channel);
-          channel = bisChannelDataRestRepository.findById(channelId).get();
-          BeanUtils.copyProperties(channel, requestBody);
-          requestBody.setCreatedDate(channel.getCreatedDate().getTime());
-          requestBody.setModifiedDate(channel.getModifiedDate().getTime());
-          return requestBody;
-        });
-    return ResponseEntity.ok(optionalChannel);
+
+    //remove old connection from pool before update
+    this.delegatingSessionFactory.removeChannelConnFromPool(channelId);
+
+    Optional<BisChannelEntity> optionalChannel = bisChannelDataRestRepository.findById(channelId);
+    if (optionalChannel.isPresent()) {
+      BisChannelEntity channel = optionalChannel.get();
+      logger.trace("Channel updated :" + channel);
+      requestBody.setBisChannelSysId(channelId);
+      BeanUtils.copyProperties(requestBody, channel, "modifiedDate", "createdDate");
+      channel.setModifiedDate(new Date());
+      if (channel.getStatus() == null) {
+        channel.setStatus(STATUS_ACTIVE);
+      }
+      channel = bisChannelDataRestRepository.save(channel);
+      channel = bisChannelDataRestRepository.findById(channelId).get();
+      BeanUtils.copyProperties(channel, requestBody);
+      requestBody.setCreatedDate(channel.getCreatedDate().getTime());
+      requestBody.setModifiedDate(channel.getModifiedDate().getTime());
+    } else {
+      throw new ResourceNotFoundException("channelId " + channelId + " not found");
+    }
+
+    return ResponseEntity.ok(requestBody);
   }
 
   /**
@@ -384,7 +390,7 @@ public class SawBisChannelController {
 
   /**
    * checks is there a route with given route name.
-   * 
+   *
    * @param channelId channe identifier
    * @return ok
    */
@@ -400,7 +406,7 @@ public class SawBisChannelController {
 
   /**
    * checks is there a route with given route name.
-   * 
+   *
    * @param channelId channe identifier
    * @return ok
    */

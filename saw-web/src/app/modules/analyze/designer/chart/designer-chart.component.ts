@@ -1,6 +1,7 @@
 import {
   Component,
   AfterViewInit,
+  OnInit,
   Input,
   ViewChild,
   ElementRef
@@ -11,20 +12,19 @@ import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
 import * as filter from 'lodash/filter';
 
-import { DesignerStates, CHART_TYPES_OBJ } from '../consts';
+import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from '../../../../common/services/chart.service';
 
 @Component({
   selector: 'designer-chart',
   templateUrl: './designer-chart.component.html',
   styleUrls: ['./designer-chart.component.scss']
 })
-export class DesignerChartComponent implements AfterViewInit {
+export class DesignerChartComponent implements AfterViewInit, OnInit {
   _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
   _auxSettings: any = {};
-  DesignerStates = DesignerStates;
   CHART_TYPES_OBJ = CHART_TYPES_OBJ;
 
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
@@ -35,11 +35,8 @@ export class DesignerChartComponent implements AfterViewInit {
   chartHgt = {
     height: 500
   };
-  isStockChart: boolean;
 
-  @Input() designerState: DesignerStates;
-
-  @Input() chartType: string;
+  @Input() public chartType: string;
 
   @Input() sorts: Array<Sort> = [];
 
@@ -85,9 +82,7 @@ export class DesignerChartComponent implements AfterViewInit {
 
   constructor(private _chartService: ChartService) {}
 
-  ngAfterViewInit() {
-    this.isStockChart = this.chartType.substring(0, 2) === 'ts';
-    this.chartHgt.height = this.getChartHeight();
+  ngOnInit() {
     this.chartOptions = this._chartService.getChartConfigFor(this.chartType, {
       chart: this.chartHgt,
       legend: this._chartService.initLegend({
@@ -95,6 +90,10 @@ export class DesignerChartComponent implements AfterViewInit {
         chartType: this.chartType
       })
     });
+  }
+
+  ngAfterViewInit() {
+    this.chartHgt.height = this.getChartHeight();
   }
 
   /**

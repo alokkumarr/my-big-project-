@@ -38,14 +38,17 @@
     [isEditable]="false"
   >
   </report-grid-upgraded>
-  <designer-chart
-    *ngIf="analysis.type === 'chart'"
-    [chartType]="analysis.chartType"
-    [sorts]="analysis.sqlBuilder.sorts"
-    [auxSettings]="{ isInverted: analysis.isInverted, legend: analysis.legend }"
-    [data]="previewData"
-    [designerState]="state"
-    [sqlBuilder]="analysis.sqlBuilder"
-  >
+  <designer-map-chart *ngIf="analysis.type === 'chart' && chartType === 'geo'"
+                  [chartType]="chartType"
+                  [data]="previewData"
+                  [auxSettings]="{legend: analysis.legend}"
+                  [sqlBuilder]="analysis.sqlBuilder">
+  </designer-map-chart>
+  <designer-chart *ngIf="analysis.type === 'chart' && chartType !== 'geo'"
+                  [chartType]="chartType"
+                  [sorts]="analysis.sqlBuilder.sorts"
+                  [auxSettings]="{isInverted: analysis.isInverted, legend: analysis.legend}"
+                  [data]="previewData"
+                  [sqlBuilder]="analysis.sqlBuilder">
   </designer-chart>
 </div>

@@ -6,7 +6,7 @@
     </button>
     <div class="expandable-field__name" fxLayout="row" fxLayoutAlign="space-between center">
       {{ artifactColumn.alias || artifactColumn.displayName }}
-      <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon" class="expandable-field__icon">
+      <mat-icon [fontIcon]="getArtifactColumnTypeIcon(artifactColumn)" class="expandable-field__icon">
       </mat-icon>
     </div>
   </div>

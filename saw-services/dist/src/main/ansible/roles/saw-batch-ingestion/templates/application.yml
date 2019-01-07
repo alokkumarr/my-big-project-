@@ -53,11 +53,11 @@ sip:
     index: {{ groups['saw-services'].index(inventory_hostname) }}
     max.attempts : 3
     retry.delay: 5000
-    retry.diff.mins: 5
+    retry.diff.mins: {{ sip_bis_retry_diffs_in_minutes  | default(5) }}
     retry.page.size: 20
 bis:
   transfer-batch-size: 10
   modified-retries: 3
   default-data-drop-location: "{{ '/dfs/' + sip_var_path + '/workbench'  | default('/dfs/var/sip/workbench') }}"
   scheduler-url: http://localhost:9600
-  recheck-file-modified: {{ sip_bis_recheck_file_modified  | default('false') }}
+  recheck-file-modified: {{ sip_bis_recheck_file_modified  | default('true') }}

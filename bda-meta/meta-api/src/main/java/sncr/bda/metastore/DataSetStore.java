@@ -114,7 +114,13 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         }
         QueryCondition cond = MapRDB.newCondition();
         cond.and();
-        cond.is("system.project", QueryCondition.Op.EQUAL, project);
+        
+        // The below has been commented for the JIRA-ID SIP-5727 & it will be activated when workbench module
+        // will start using project metadata store & dynamically retrieve the project store
+        //cond.is("system.project", QueryCondition.Op.EQUAL, project);
+        
+        // The below code is to skip filters irrespective of any project
+        cond.like("system.project", "%");
         if ( category != null && !category.isEmpty()) cond = addEqOrLikeClause(cond, "userData.category", category);
 
         if ( subCategory != null && !subCategory.isEmpty()

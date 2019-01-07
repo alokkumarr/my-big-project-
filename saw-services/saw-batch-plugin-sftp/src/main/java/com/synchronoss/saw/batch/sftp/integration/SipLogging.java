@@ -1,7 +1,9 @@
 package com.synchronoss.saw.batch.sftp.integration;
 
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.jcraft.jsch.ChannelSftp;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
+import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
@@ -27,6 +29,7 @@ public class SipLogging {
 
   @Autowired
   private BisFileLogsRepository bisFileLogsRepository;
+
 
   /**
    * To make an entry to a log table.
@@ -79,6 +82,26 @@ public class SipLogging {
     logger.trace("Delete an entry with logging API :" + pid);
     bisFileLogsRepository.deleteById(pid);
   }
+
+
+  /**
+   * Adds entry to log table with given status.
+   */
+  public  void updateLogs(Long channelId, Long routeId, String reasonCode) {
+
+    BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+    bisDataMetaInfo
+        .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setDataSizeInBytes(0L);
+    bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+    bisDataMetaInfo.setProcessState(reasonCode);
+    bisDataMetaInfo.setComponentState(reasonCode);
+    bisDataMetaInfo.setActualReceiveDate(new Date());
+    bisDataMetaInfo.setChannelId(channelId);
+    bisDataMetaInfo.setRouteId(routeId);
+    this.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+  }
+
 
   /**
    * verify duplicate check enabled and is duplicate

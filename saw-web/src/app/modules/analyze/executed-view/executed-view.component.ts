@@ -63,6 +63,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   executionId: string;
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
+  chartActionBus$: Subject<Object> = new Subject<Object>();
 
   @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
 
@@ -240,6 +241,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     }
     this.detailsSidenav && this.detailsSidenav.close();
     window['siden'] = this.detailsSidenav;
+    this.onetimeExecution = false;
     this._router.navigate(
       ['analyze', 'analysis', this.analysis.id, 'executed'],
       {
@@ -528,6 +530,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       break;
     case 'chart':
       this.chartUpdater$.next({ export: true });
+      this.chartActionBus$.next({ export: true });
       break;
     default:
       const executionType = this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL;

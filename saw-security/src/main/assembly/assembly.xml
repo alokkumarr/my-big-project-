@@ -20,5 +20,9 @@
       <directory>saw-security/src/main/ansible</directory>
       <outputDirectory>ansible</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>saw-security/db/customer-onboard-script</directory>
+      <outputDirectory>customer-onboard-script</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>

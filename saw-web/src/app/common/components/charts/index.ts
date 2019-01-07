@@ -1,4 +1,5 @@
 import Highstock from 'highcharts/highstock';
+import Highmaps from 'highcharts/highmaps';
 import Highcharts from 'highcharts/highcharts';
 
 import { NgModule } from '@angular/core';
@@ -16,18 +17,28 @@ import HighChartsNoData from 'highcharts/modules/no-data-to-display';
 import HighChartsBullet from 'highcharts/modules/bullet';
 
 HighChartsMore(Highcharts);
-HighChartsExporting(Highcharts);
 HighChartsBullet(Highcharts);
 HighChartsNoData(Highcharts);
+HighChartsExporting(Highcharts);
 HighChartsOfflineExporting(Highcharts);
 
+HighChartsExporting(Highmaps);
+HighChartsOfflineExporting(Highmaps);
+
 import { ChartComponent } from './chart.component';
+import { MapChartComponent } from './map-chart.component';
+import { MapChartViewerComponent } from './map-chart-viewer';
 
 export const ChartsModule = 'components.charts';
 
+const COMPONENTS = [
+  ChartComponent,
+  MapChartComponent,
+  MapChartViewerComponent
+];
 @NgModule({
-  declarations: [ChartComponent],
-  entryComponents: [ChartComponent],
-  exports: [ChartComponent]
+  declarations: COMPONENTS,
+  entryComponents: COMPONENTS,
+  exports: COMPONENTS
 })
 export class UChartModule {}

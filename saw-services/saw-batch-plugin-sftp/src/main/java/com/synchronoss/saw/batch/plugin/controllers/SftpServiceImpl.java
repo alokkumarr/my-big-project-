@@ -68,6 +68,7 @@ import org.springframework.util.StreamUtils;
 public class SftpServiceImpl extends SipPluginContract {
 
   private static final Logger logger = LoggerFactory.getLogger(SftpServiceImpl.class);
+  private static final String UNREACHABLE_HOST = "HOST NOT REACHABLE";
 
   @Autowired
   private RuntimeSessionFactoryLocator delegatingSessionFactory;
@@ -414,6 +415,8 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("session opened closes here ");
     } catch (Exception ex) {
       logger.error("Exception triggered while transferring the file", ex);
+      sipLogService.updateLogs(Long.valueOf(payload.getChannelId()), Long.valueOf(
+          payload.getRouteId()),UNREACHABLE_HOST);
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
       if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
@@ -586,6 +589,7 @@ public class SftpServiceImpl extends SipPluginContract {
     } catch (Exception ex) {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
+      sipLogService.updateLogs(channelId, routeId, UNREACHABLE_HOST);
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
@@ -804,7 +808,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         bisDataMetaInfo = new BisDataMetaInfo();
                         bisDataMetaInfo.setProcessId(
                             new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-                        bisDataMetaInfo.setDataSizeInBytes(entry.getAttrs().getSize());
+                        bisDataMetaInfo.setDataSizeInBytes(0L);
                         bisDataMetaInfo.setActualDataName(
                             sourcelocation + File.separator + entry.getFilename());
                         bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
@@ -813,8 +817,10 @@ public class SftpServiceImpl extends SipPluginContract {
                             new Date(((long) entry.getAttrs().getATime()) * 1000L));
                         bisDataMetaInfo.setChannelId(channelId);
                         bisDataMetaInfo.setRouteId(routeId);
+                        bisDataMetaInfo.setFilePattern(pattern);
                         bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
-                        bisDataMetaInfo.setReasonCode(BisProcessState.DUPLICATE.value());
+                        bisDataMetaInfo.setComponentState(BisProcessState.DUPLICATE.value());
+                        sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                         list.add(bisDataMetaInfo);
                       }
                     }
@@ -864,6 +870,7 @@ public class SftpServiceImpl extends SipPluginContract {
     }
     return list;
   }
+  
 
   /**
    * This is method to handle inconsistency during failure.
