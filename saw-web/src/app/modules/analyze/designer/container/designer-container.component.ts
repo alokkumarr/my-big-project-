@@ -42,7 +42,7 @@ import {
   DATE_TYPES
 } from '../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from '../../../../common/services/chart.service';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
@@ -177,7 +177,6 @@ export class DesignerContainerComponent implements OnInit {
       this._chartService.updateAnalysisModel(this.analysis);
       if (this.designerMode === 'new') {
         (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
-        (<any>this.analysis).isStockChart = (<any>this.analysis).chartType.substring(0, 2) === 'ts';
       }
       this.chartTitle = this.analysis.chartTitle || this.analysis.name;
 
@@ -333,6 +332,25 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
+  formulateChartRequest(analysis) {
+    let isGroupByPresent = false;
+    forEach(analysis.sqlBuilder.nodeFields, node => {
+      if (node.checked === 'g') {
+        isGroupByPresent = true;
+      }
+    });
+    if (!isGroupByPresent) {
+      forEach(analysis.sqlBuilder.dataFields, dataField => {
+        dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
+      });
+
+      forEach(this.artifacts[0].columns, col => {
+        col.aggregate = col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+      });
+    }
+    return analysis;
+  }
+
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
@@ -362,6 +380,8 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
+
+    this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -575,6 +595,14 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
+  checkifSortsApplied(event) {
+    forEach(this.analysis.sqlBuilder.orderByColumns, field => {
+      if (event.column.columnName === field.columnName) {
+        field.aggregate = event.column.aggregate;
+      }
+    });
+  }
+
   onSettingsChange(event: DesignerChangeEvent) {
     /* prettier-ignore */
     switch (this.analysis.type) {
@@ -625,6 +653,11 @@ export class DesignerContainerComponent implements OnInit {
         });
       }
       this.data = cloneDeep(this.data);
+
+      // Need this fucntion to check if aggregation is applied for the same sorted column.
+      // Need to remove this function once backend moves all logic of aggrregation to datafields.
+      this.checkifSortsApplied(event);
+
       this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
@@ -737,6 +770,10 @@ export class DesignerContainerComponent implements OnInit {
     case 'fetchLimit':
       this.analysis.sqlBuilder = this.getSqlBuilder();
       this.requestDataIfPossible();
+      break;
+    case 'region':
+      this.updateAnalysis();
+      this.refreshDataObject();
       break;
     }
   }

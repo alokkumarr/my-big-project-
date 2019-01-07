@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material';
 import * as forIn from 'lodash/forIn';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
+import * as split from 'lodash/split';
 import * as filter from 'lodash/filter';
 import * as trim from 'lodash/trim';
 
@@ -49,12 +50,13 @@ export class ValidateSemanticComponent implements OnDestroy {
    */
   injectFieldProperties(dsData) {
     forIn(dsData, value => {
-      this.isJoinEligible = value.joinEligible;
+      this.isJoinEligible = value.storageType === 'ES' ? false : true;
       const artifactName = value.system.name;
       value.schema.fields = map(value.schema.fields, val => {
+        const colName = val.isKeyword ? `${val.name}.keyword` : val.name;
         return {
           aliasName: val.name,
-          columnName: val.name,
+          columnName: colName,
           displayName: val.name,
           filterEligible: true,
           joinEligible: false,
@@ -81,13 +83,14 @@ export class ValidateSemanticComponent implements OnDestroy {
       autoFocus: true,
       closeOnNavigation: true,
       disableClose: true,
-      height: '250px',
+      height: 'auto',
       width: '350px'
     });
 
-    dialogRef.afterClosed().subscribe(name => {
+    dialogRef.afterClosed().subscribe(({ name, category }) => {
       if (trim(name).length > 0) {
         const payload = {
+          category,
           customerCode: '',
           username: '',
           projectCode: '',
@@ -107,14 +110,14 @@ export class ValidateSemanticComponent implements OnDestroy {
           if (ds.storageType === 'ES') {
             payload.esRepository.indexName = ds.system.name;
             payload.esRepository.storageType = 'ES';
-            payload.esRepository.type = 'session';
+            payload.esRepository.type = ds.system.esIndexType;
           }
           payload.artifacts.push({
             artifactName: ds.system.name,
             columns: filter(ds.schema.fields, 'include')
           });
           payload.parentDataSetNames.push(ds.system.name);
-          payload.parentDataSetIds.push(ds._id);
+          payload.parentDataSetIds.push(split(ds._id, '::')[1]);
         });
 
         this.workBench.createSemantic(payload).subscribe((data: any[]) => {

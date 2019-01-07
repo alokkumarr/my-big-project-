@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 $designer-header-height: 57px;
 
@@ -8,8 +8,9 @@ $designer-header-height: 57px;
   max-width: 100%;
   display: grid;
   grid-template:
-    "header" $designer-header-height
-    "content" calc(100% - #{$designer-header-height});
+    'header' $designer-header-height
+    'content' calc(100% - #{$designer-header-height}) / 100%;
+  gap: 0;
 }
 
 .designer__header {

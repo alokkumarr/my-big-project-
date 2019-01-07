@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import * as map from 'lodash/fp/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as get from 'lodash/get';
@@ -9,6 +10,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as isNumber from 'lodash/isNumber';
 import * as values from 'lodash/values';
 import * as find from 'lodash/find';
+import { Location } from '@angular/common';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
 
@@ -37,7 +39,11 @@ export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 
 @Injectable()
 export class FilterService {
-  constructor(public _dialog: AnalyzeDialogService) {}
+  constructor(
+    public _dialog: AnalyzeDialogService,
+    private router: Router,
+    private locationService: Location
+  ) {}
 
   getType(inputType) {
     if (inputType === FILTER_TYPES.STRING) {
@@ -195,7 +201,7 @@ export class FilterService {
     return filter(f => f.isRuntimeFilter, filters);
   }
 
-  openRuntimeModal(analysis, filters = []) {
+  openRuntimeModal(analysis, filters = [], navigateBack: string) {
     return new Promise(resolve => {
       this._dialog
         .openFilterPromptDialog(filters, analysis)
@@ -221,6 +227,11 @@ export class FilterService {
           // );
 
           resolve(analysis);
+          if (navigateBack === 'home') {
+            this.router.navigate(['analyze', analysis.categoryId]);
+          } else if (navigateBack === 'back') {
+            this.locationService.back();
+          }
         });
     });
   }
@@ -246,7 +257,7 @@ export class FilterService {
     };
   }
 
-  getRuntimeFilterValues(analysis) {
+  getRuntimeFilterValues(analysis, navigateBack: string = null) {
     const clone = cloneDeep(analysis);
     const runtimeFilters = this.getRuntimeFiltersFrom(
       get(clone, 'sqlBuilder.filters', [])
@@ -255,6 +266,6 @@ export class FilterService {
     if (!runtimeFilters.length) {
       return Promise.resolve(clone);
     }
-    return this.openRuntimeModal(clone, runtimeFilters);
+    return this.openRuntimeModal(clone, runtimeFilters, navigateBack);
   }
 }

@@ -33,23 +33,23 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
   private static final Logger logger = 
       LoggerFactory.getLogger(RuntimeSessionFactoryLocator.class);
-  private final Map<Long, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
+  private Map<String, DefaultSftpSessionFactory> sessionFactoryMap = new HashMap<>();
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
-    
-    
+
   @Override
   public SessionFactory<LsEntry> getSessionFactory(Object key) {
     Long id = Long.valueOf(key.toString());
-    DefaultSftpSessionFactory sessionFactory = sessionFactoryMap.get(id);
+    String connectionId = getChannelConnectionIdentifier(id);
+    DefaultSftpSessionFactory sessionFactory = sessionFactoryMap.get(connectionId);
     if (sessionFactory == null) {
       try {
         sessionFactory = generateSessionFactory(id);
       } catch (Exception e) {
         logger.error("Exception occurred while generating the session", e);
       }
-      sessionFactoryMap.put(id, sessionFactory);
+      sessionFactoryMap.put(connectionId, sessionFactory);
     }
     return sessionFactory;
   }
@@ -72,7 +72,6 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String portNumber = rootNode.get("portNo").asText();
         SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
         String password = obfuscator.decrypt(rootNode.get("password").asText());
-        //String password = rootNode.get("password").asText();
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         String userName = rootNode.get("userName").asText();        
@@ -83,7 +82,6 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         Properties prop = new Properties();
         prop.setProperty("StrictHostKeyChecking", "no");
         prop.setProperty("bufferSize", "100000");
-        //prop.setProperty("PreferredAuthentications", "password");
         defaultSftpSessionFactory.setSessionConfig(prop);
       } catch (IOException e) {
         throw new SftpProcessorException("for the given id + " + key + ""
@@ -95,12 +93,56 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
     }
     return defaultSftpSessionFactory;
   }
-
-  public void invalidateSessionFactoryMap() {
-    sessionFactoryMap.clear();
+  
+  /**
+   * Generate unique identifier for connection object of a channel
+   * It is a combination of "channel ID : host name". This is 
+   * to make sure connections are established to correct host
+   * event after updating host name.
+   * 
+   * @param channelId Identifer of channel
+   * @return unique identifier
+   */
+  public String getChannelConnectionIdentifier(Long channelId) {
+    Optional<BisChannelEntity> entity = bisChannelDataRestRepository.findById(channelId);
+    String hostname = null;
+    if (entity.isPresent()) {
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      BisChannelEntity bisChannelEntity = entity.get();
+      JsonNode nodeEntity = null;
+      ObjectNode rootNode = null;
+     
+      try {
+        nodeEntity = objectMapper.readTree(bisChannelEntity.getChannelMetadata());
+        rootNode = (ObjectNode) nodeEntity;
+        hostname = rootNode.get("hostName").asText();
+      } catch (IOException  exception) {
+        throw new SftpProcessorException("for the given id + " + channelId + ""
+            + " details does not exist");
+      }
+  
+    }
+    return channelId + ":" + hostname;
+    
   }
-
-  public void remove(Object key) {
-    sessionFactoryMap.remove(key);
+  
+  /**
+   * Remove connection object from pool.
+   * 
+   * @param channelId channel Id
+   */
+  public void removeChannelConnFromPool(Long channelId) {
+    String key = getChannelConnectionIdentifier(channelId);
+    if (sessionFactoryMap.get(key) != null) {
+      logger.info("Before remove connections size " + sessionFactoryMap.size());
+      sessionFactoryMap.remove(key);
+      logger.info("After remove connections size " + sessionFactoryMap.size());
+    }
+      
+     
   }
+  
+
 }

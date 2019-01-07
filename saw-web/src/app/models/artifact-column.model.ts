@@ -1,7 +1,8 @@
 import { Format } from './format.model';
+import { Region } from './region.model';
 
 export interface ArtifactColumn {
-  checked?: null | boolean | 'x';
+  checked?: null | boolean | 'x' | 'y' | 'z' | 'g';
   y;
   z;
   g;
@@ -13,7 +14,7 @@ export interface ArtifactColumn {
   format: Format | string | null;
   aliasName: string;
   alias?: string;
-  aggregate?: 'sum' | 'avg' | 'min' | 'max' | 'count' | 'percentage';
+  aggregate?: 'sum' | 'avg' | 'min' | 'max' | 'count' | 'percentage' | 'percentageByRow';
   name?: string;
 }
 
@@ -24,6 +25,8 @@ export interface ArtifactColumnChart extends ArtifactColumn {
   limitType?: string;
   dateFormat?: string;
   dateInterval?: string;
+  geoType?: string;
+  region?: Region;
 }
 
 export interface ArtifactColumnPivot extends ArtifactColumn {

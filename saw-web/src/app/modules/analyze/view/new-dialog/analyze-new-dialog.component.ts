@@ -1,13 +1,16 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as get from 'lodash/get';
-import * as values from 'lodash/values';
-import * as fpForEach from 'lodash/fp/forEach';
+import * as some from 'lodash/some';
+import * as startsWith from 'lodash/startsWith';
+import * as fpValues from 'lodash/values';
+import * as startCase from 'lodash/startCase';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
+import * as fpReduce from 'lodash/fp/reduce';
 
-import { ANALYSIS_METHODS } from '../../consts';
+import { ANALYSIS_METHODS, DATAPOD_CATEGORIES_OBJ } from '../../consts';
 import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { MatHorizontalStepper } from '@angular/material/stepper';
@@ -65,39 +68,31 @@ export class AnalyzeNewDialogComponent {
       .length;
   }
 
-  /**
-   * Adds metric to a category or default category if none is
-   * present
-   */
-  categoriseMetric(
-    metric,
-    categories: { [key: string]: { label: string; metrics: Array<any> } }
-  ) {
-    const category = metric.category || 'Default';
-    categories[category] = categories[category] || {
-      label: category,
-      metrics: []
-    };
-    categories[category].metrics.push(metric);
-    return categories;
-  }
-
   setSupportedMetrics(method) {
     this._sortOrder = 'asc';
-    let supportedMetrics = {};
 
-    fpPipe(
+    this.supportedMetricCategories = fpPipe(
       fpFilter(metric => {
+        if (startsWith(method.type, 'chart:geo')) {
+          const doesSupportsChartMap = some(metric.supports, ({category}) => category === 'mapChart');
+          return doesSupportsChartMap;
+        }
         const isEsMetric = get(metric, 'esRepository.storageType') === 'ES';
         return isEsMetric || method.type === 'table:report';
       }),
       fpOrderBy(['metricName'], [this._sortOrder]),
-      fpForEach(metric => {
-        supportedMetrics = this.categoriseMetric(metric, supportedMetrics);
-      })
+      fpReduce((acc, metric) => {
+        const category = startCase(metric.category || 'Default');
+        acc[category] = acc[category] || {
+          label: category,
+          metrics: []
+        };
+        acc[category].metrics.push(metric);
+        return acc;
+      }, {}),
+      fpValues
     )(this.data.metrics);
 
-    this.supportedMetricCategories = values(supportedMetrics);
     this.selectedMetric = null;
     this.searchMetric = '';
   }
@@ -168,5 +163,17 @@ export class AnalyzeNewDialogComponent {
       this._analyzeDialogService.openNewAnalysisDialog(model);
     });
     this._dialogRef.close();
+  }
+
+  getCategoryIcon(metricCategory) {
+    const name = startCase(metricCategory.label);
+    const icon = get(DATAPOD_CATEGORIES_OBJ[name], 'icon');
+    return icon || '';
+  }
+
+  getMetricCategoryLabel(metricCategory) {
+    const metricCount = this.searchCount(metricCategory.metrics);
+    const label = metricCategory.label;
+    return `${label} (${metricCount})`;
   }
 }

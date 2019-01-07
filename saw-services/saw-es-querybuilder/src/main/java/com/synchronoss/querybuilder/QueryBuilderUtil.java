@@ -218,6 +218,7 @@ public class QueryBuilderUtil {
 				case MIN: aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
 				case MAX: aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
 				case COUNT: aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+                case PERCENTAGE_BY_ROW: aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
 				case PERCENTAGE:
 					Script script = new Script("_value*100/"+data.getAdditionalProperties().get(data.getColumnName()
                             +"_sum"));

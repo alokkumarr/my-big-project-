@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { MaterialModule } from '../material.module';
-import { JwtService, UserService } from '../common/services';
 import { IsUserNotLoggedInGuard } from './guards';
 
 import {
@@ -25,8 +24,6 @@ const COMPONENTS = [
   PasswordResetComponent
 ];
 
-const SERVICES = [JwtService, UserService];
-
 const GUARDS = [IsUserNotLoggedInGuard];
 @NgModule({
   imports: [
@@ -38,7 +35,7 @@ const GUARDS = [IsUserNotLoggedInGuard];
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [...SERVICES, ...GUARDS],
+  providers: [...GUARDS],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: COMPONENTS
 })

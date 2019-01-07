@@ -6,7 +6,6 @@ import {
   DesignerChangeEvent
 } from '../../types';
 import {
-  TYPE_ICONS_OBJ,
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   COMBO_TYPES,
@@ -14,6 +13,8 @@ import {
   TSCOMBO_TYPES,
   TSCOMBO_TYPES_OBJ
 } from '../../../consts';
+import { getArtifactColumnTypeIcon } from '../../utils';
+import * as filter from 'lodash/filter';
 
 @Component({
   selector: 'expandable-field',
@@ -27,8 +28,10 @@ export class ExpandableFieldComponent {
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
   @Input() public fieldCount: any;
+  @Input() public sqlBuilder;
+  @Input() analysisSubtype: string;
+  public enablePercentByRow = true;
 
-  TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;
   AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public isExpanded = false;
@@ -59,16 +62,29 @@ export class ExpandableFieldComponent {
     return column;
   }
 
+  getArtifactColumnTypeIcon(artifactColumn) {
+    return getArtifactColumnTypeIcon(artifactColumn);
+  }
+
   toggleExpansion() {
     this.isExpanded = !this.isExpanded;
   }
 
   onAggregateChange(value) {
+    this.comboTypes = filter(COMBO_TYPES, type => {
+      if (value === 'percentageByRow' && type.value === 'column') {
+        return true;
+      }
+      if (value !== 'percentageByRow') {
+        return true;
+      }
+    });
     this.artifactColumn.aggregate = value;
     this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
   }
 
   onComboTypeChange(comboType) {
+    this.enablePercentByRow = comboType === 'column' ? true : false;
     (this.artifactColumn as ArtifactColumnChart).comboType = comboType;
     this.change.emit({ subject: 'comboType', column: this.artifactColumn });
   }

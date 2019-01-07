@@ -235,20 +235,26 @@ public interface WithDataSetService {
         Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
                 DLDataSetOperations.getPartitioningInfo(location);
 
+        DataSetServiceAux.logger.debug("Dataset partitioning = " + trgDSPartitioning);
+
         //Check partitioning structure and match it with metadata/input
         if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
                 trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
             throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
         }
 
-        List<String> system = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
+        List<String> partitionKeys =
+            (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
 
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
-            if (system != null) {
-                if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && trgDSPartitioning._2() != null) {
-                    for (int i = 0; i < system.size(); i++)
-                        if (!system.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
-                            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
+            if (partitionKeys != null) {
+                if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE
+                    && trgDSPartitioning._2() != null) {
+                    for (int i = 0; i < partitionKeys.size(); i++)
+                        if (!partitionKeys.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
+                            throw new XDFException(XDFException.ErrorCodes.ConfigError,
+                                "Order and/or set of partitioning keys in Metadata" +
+                                    " and in dataset does not match");
                         }
                 }
             } else  //No key were provided in Output Dataset configuration: add them from existing dataset
@@ -337,7 +343,7 @@ public interface WithDataSetService {
     class DataSetServiceAux {
         private static final Logger logger = Logger.getLogger(WithDataSetService.class);
         Context ctx;
-        DLDataSetService dl;
+        public DLDataSetService dl;
 
 
         public DataSetServiceAux(Context c, DLDataSetService md){

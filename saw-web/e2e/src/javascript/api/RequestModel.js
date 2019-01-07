@@ -199,7 +199,6 @@ class RequestModel {
                     'title': null
                   },
                   'isInverted': false,
-                  'isStockChart': false,
                   'legend': {
                     'align': 'right',
                     'layout': 'vertical'
@@ -1814,7 +1813,6 @@ class RequestModel {
                 ]
               },
               'isInverted': false,
-              'isStockChart': false,
               'edit': false,
               'legend': {
                 'align': 'right',
@@ -2010,7 +2008,6 @@ class RequestModel {
                 ]
               },
               'isInverted': false,
-              'isStockChart': false,
               'edit': false,
               'legend': {
                 'align': 'right',

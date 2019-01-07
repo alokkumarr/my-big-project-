@@ -16,14 +16,14 @@ public class SparkOps {
     public static void setSparkConfig(SparkConf sparkConf,
                                       List<sncr.bda.conf.Parameter> sysParams) {
         for (sncr.bda.conf.Parameter param : sysParams) {
-            logger.warn("Process parameter: " + param.getName() + " value: " + param.getValue());
+            logger.debug("Process parameter: " + param.getName() + " value: " + param.getValue());
             if ((param.getValue() == null || param.getValue().isEmpty())) {
                 logger.error("Cannot set parameter: " + param.getName() + " value is Empty or null, skip it");
             }
             else
             {
                 if(param.getName().toLowerCase().startsWith("spark")){
-                    logger.warn("Set parameter: " + param.getName() + " value " + param.getValue());
+                    logger.debug("Set parameter: " + param.getName() + " value " + param.getValue());
                     sparkConf.set(param.getName(), param.getValue());
                 }
             }

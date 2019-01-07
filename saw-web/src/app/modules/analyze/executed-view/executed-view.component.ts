@@ -36,6 +36,7 @@ import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
+import { isUndefined } from 'util';
 
 @Component({
   selector: 'executed-view',
@@ -62,6 +63,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   executionId: string;
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
+  chartActionBus$: Subject<Object> = new Subject<Object>();
 
   @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
 
@@ -98,6 +100,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.executionId = executionId;
 
     this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
+      this.analysis = analysis;
       this.setPrivileges(analysis);
 
       /* If an execution is not already going on, create a new execution
@@ -175,7 +178,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (state) {
     case EXECUTION_STATES.SUCCESS:
-      this.onExecutionSuccess(response);
+      setTimeout(() => {
+        this.onExecutionSuccess(response);
+      }, 500);
       break;
     case EXECUTION_STATES.ERROR:
       this.onExecutionError();
@@ -187,8 +192,11 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   onExecutionSuccess(response) {
+    if (isUndefined(this.analysis)) {
+      return;
+    }
     const thereIsDataLoaded = this.data || this.dataLoader;
-    const isDataLakeReport = this.analysis.type === 'report';
+    const isDataLakeReport = get(this.analysis, 'type') === 'report';
     this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
@@ -200,18 +208,18 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           closeButton: true,
           onclick: () =>
             this.loadExecutedAnalysesAndExecutionData(
-              this.analysis.id,
+              get(this.analysis, 'id'),
               response.executionId,
-              this.analysis.type,
+              get(this.analysis, 'type'),
               response
             )
         }
       );
     } else {
       this.loadExecutedAnalysesAndExecutionData(
-        this.analysis.id,
+        get(this.analysis, 'id'),
         response.executionId,
-        this.analysis.type,
+        get(this.analysis, 'type'),
         response
       );
     }
@@ -233,6 +241,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     }
     this.detailsSidenav && this.detailsSidenav.close();
     window['siden'] = this.detailsSidenav;
+    this.onetimeExecution = false;
     this._router.navigate(
       ['analyze', 'analysis', this.analysis.id, 'executed'],
       {
@@ -521,6 +530,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       break;
     case 'chart':
       this.chartUpdater$.next({ export: true });
+      this.chartActionBus$.next({ export: true });
       break;
     default:
       const executionType = this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL;

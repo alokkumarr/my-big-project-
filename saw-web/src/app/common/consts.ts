@@ -1,12 +1,24 @@
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as fpToPairs from 'lodash/fp/toPairs';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as map from 'lodash/map';
 
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;
 export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
+const GEO_TYPES_WITH_IDENTIFIER = {
+  state: ['name', 'postal-code'],
+  country: ['name', 'fips'],
+  zip: []
+};
+export const GEO_TYPES = fpPipe(
+  fpToPairs,
+  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => `${geoType}:${identifier}`))
+)(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
 
@@ -44,38 +56,31 @@ export const CHART_COLORS = [
   '#DFB2B2'
 ];
 
-export const DATE_FORMATS = [
-  {
-    label: 'Default',
-    value: 'yyyy-MM-dd',
-    momentValue: 'YYYY-MM-DD'
-  },
-  {
-    label: 'September 1, 2017',
-    value: 'longDate',
-    momentValue: 'MMMM D, YYYY'
-  },
-  {
-    label: '09/01/2017 (MM/DD/YYYY)',
-    value: 'shortDate',
-    momentValue: 'MM/DD/YYYY'
-  },
-  {
-    label: '01/09/2017 (DD/MM/YYYY)',
-    value: 'dd/MM/yyyy',
-    momentValue: 'DD/MM/YYYY'
-  },
-  {
-    label: 'September 2017',
-    value: 'monthAndYear',
-    momentValue: 'MMMM YYYY'
-  },
-  {
-    label: 'September 1',
-    value: 'monthAndDay',
-    momentValue: 'MMMM D'
-  }
-];
+export const DATE_FORMATS = [{
+  label: 'Default',
+  value: 'yyyy-MM-dd',
+  momentValue: 'YYYY-MM-DD'
+}, {
+  label: 'September 1, 2017',
+  value: 'longDate',
+  momentValue: 'MMMM D, YYYY'
+}, {
+  label: '09/01/2017 (MM/DD/YYYY)',
+  value: 'shortDate',
+  momentValue: 'MM/DD/YYYY'
+}, {
+  label: '01/09/2017 (DD/MM/YYYY)',
+  value: 'dd/MM/yyyy',
+  momentValue: 'DD/MM/YYYY'
+}, {
+  label: 'September 2017',
+  value: 'monthAndYear',
+  momentValue: 'MMMM YYYY'
+}, {
+  label: 'September 1',
+  value: 'monthAndDay',
+  momentValue: 'MMMM D'
+}];
 
 export const CUSTOM_HEADERS = {
   SKIP_TOAST: 'SIP-Skip-Error-Toast'
@@ -118,48 +123,57 @@ export const CHART_DATE_FORMATS_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(CHART_DATE_FORMATS);
 
-export const AGGREGATE_TYPES = [
-  {
-    label: 'Total',
-    value: 'sum',
-    icon: 'icon-Sum'
-  },
-  {
-    label: 'Average',
-    value: 'avg',
-    icon: 'icon-AVG'
-  },
-  {
-    label: 'Mininum',
-    value: 'min',
-    icon: 'icon-MIN'
-  },
-  {
-    label: 'Maximum',
-    value: 'max',
-    icon: 'icon-MAX'
-  },
-  {
-    label: 'Count',
-    value: 'count',
-    icon: 'icon-Count',
-    type: 'long'
-  },
-  {
-    label: 'Percentage',
-    value: 'percentage',
-    icon: 'icon-Percentage',
-    type: 'float'
-  }
-];
+export const AGGREGATE_TYPES = [{
+  label: 'Total',
+  value: 'sum',
+  icon: 'icon-Sum',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Average',
+  value: 'avg',
+  icon: 'icon-AVG',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Mininum',
+  value: 'min',
+  icon: 'icon-MIN',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Maximum',
+  value: 'max',
+  icon: 'icon-MAX',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Count',
+  value: 'count',
+  icon: 'icon-Count',
+  type: 'long',
+  valid: ['chart', 'pivot', 'report', 'esReport']
+}, {
+  label: 'Percentage',
+  value: 'percentage',
+  icon: 'icon-Percentage',
+  type: 'float',
+  valid: ['pivot', 'report', 'esReport']
+}, {
+  label: 'Percentage By Row',
+  value: 'percentageByRow',
+  icon: 'icon-Percentage',
+  type: 'float',
+  valid: ['chart']
+}, {
+  label: 'Percentage by Column',
+  value: 'percentage',
+  icon: 'icon-Percentage',
+  type: 'float',
+  valid: ['chart']
+}];
 
-export const AGGREGATE_STRING_TYPES = [
-  {
-    label: 'Count',
-    value: 'count',
-    icon: 'icon-Count'
-  }
-];
+export const AGGREGATE_STRING_TYPES = [{
+  label: 'Count',
+  value: 'count',
+  icon: 'icon-Count'
+}];
 
 export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
 
@@ -168,47 +182,70 @@ export const AGGREGATE_TYPES_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(AGGREGATE_TYPES);
 
-export const COMBO_TYPES = [
-  {
-    label: 'line',
-    value: 'line',
-    icon: 'icon-line-chart'
-  },
-  {
-    label: 'column',
-    value: 'column',
-    icon: 'icon-vert-bar-chart'
-  },
-  {
-    label: 'area',
-    value: 'area',
-    icon: 'icon-area-chart'
-  }
-];
+export const COMBO_TYPES = [{
+  label: 'line',
+  value: 'line',
+  icon: 'icon-line-chart'
+}, {
+  label: 'column',
+  value: 'column',
+  icon: 'icon-vert-bar-chart'
+}, {
+  label: 'area',
+  value: 'area',
+  icon: 'icon-area-chart'
+}];
 
-export const SCHEDULE_TYPES = [
-  {
-    label: 'Immediate',
-    value: 'immediate'
-  },
-  {
-    label: 'Hourly',
-    value: 'hourly'
-  },
-  {
-    label: 'Daily',
-    value: 'daily'
-  },
-  {
-    label: 'Weekly',
-    value: 'weeklybasis'
-  },
-  {
-    label: 'Monthly',
-    value: 'monthly'
-  },
-  {
-    label: 'Yearly',
-    value: 'yearly'
-  }
-];
+export const SCHEDULE_TYPES = [{
+  label: 'Immediate',
+  value: 'immediate'
+}, {
+  label: 'Hourly',
+  value: 'hourly'
+}, {
+  label: 'Daily',
+  value: 'daily'
+}, {
+  label: 'Weekly',
+  value: 'weeklybasis'
+}, {
+  label: 'Monthly',
+  value: 'monthly'
+}, {
+  label: 'Yearly',
+  value: 'yearly'
+}];
+
+export const DATAPOD_CATEGORIES = [{
+  name: 'Default',
+  icon: 'category-default'
+}, {
+  name: 'Errors',
+  icon: 'category-errors'
+}, {
+  name: 'Orders',
+  icon: 'category-orders'
+}, {
+  name: 'Sessions',
+  icon: 'category-sessions'
+}, {
+  name: 'Subscribers',
+  icon: 'category-subscribers'
+}, {
+  name: 'Usage',
+  icon: 'category-usage'
+}, {
+  name: 'Events',
+  icon: 'calendar-events'
+}, {
+  name: 'Retention',
+  icon: 'calendar-retention'
+}, {
+  name: 'Funnel',
+  icon: 'calendar-funnel'
+}];
+
+export const DATAPOD_CATEGORIES_OBJ = fpPipe(
+  fpGroupBy('name'),
+  fpMapValues(v => v[0])
+)(DATAPOD_CATEGORIES);

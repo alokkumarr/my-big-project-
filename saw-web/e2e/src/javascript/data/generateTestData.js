@@ -438,7 +438,6 @@ function generateChart(semanticId, dataSetName, user, subCategory, token) {
           'xAxis': {'title': null},
           'yAxis': {'title': null},
           'isInverted': false,
-          'isStockChart': false,
           'legend': {'align': 'right', 'layout': 'vertical'},
           'saved': true
         }]

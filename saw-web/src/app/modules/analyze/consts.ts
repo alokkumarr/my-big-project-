@@ -9,6 +9,7 @@ import {
   FLOAT_TYPES,
   INT_TYPES,
   DATE_TYPES,
+  GEO_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
   DATE_FORMATS,
@@ -23,11 +24,14 @@ import {
   DEFAULT_PRECISION
 } from '../../common/consts';
 
+export { DATAPOD_CATEGORIES_OBJ } from '../../common/consts';
+
 export {
   NUMBER_TYPES,
   FLOAT_TYPES,
   INT_TYPES,
   DATE_TYPES,
+  GEO_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
   DATE_FORMATS,
@@ -63,7 +67,7 @@ export const TYPE_MAP = reduce(
   [
     ...map(NUMBER_TYPES, type => ({ type, generalType: 'number' })),
     ...map(DATE_TYPES, type => ({ type, generalType: 'date' })),
-    { type: 'string', generalType: 'string' }
+    { type: 'string', generalType: 'string' },
   ],
   (typeMap, { type, generalType }) => {
     typeMap[type] = generalType;
@@ -72,31 +76,28 @@ export const TYPE_MAP = reduce(
   {}
 );
 
-export const TYPE_ICONS = [
-  {
-    icon: 'icon-number-type',
-    label: 'Number',
-    value: 'number'
-  },
-  {
-    icon: 'icon-string-type',
-    label: 'String',
-    value: 'string'
-  },
-  {
-    icon: 'icon-calendar',
-    label: 'Date',
-    value: 'date'
-  }
-];
+export const TYPE_ICONS = [{
+  icon: 'icon-number-type',
+  label: 'Number',
+  value: 'number'
+}, {
+  icon: 'icon-string-type',
+  label: 'String',
+  value: 'string'
+}, {
+  icon: 'icon-geo-chart',
+  label: 'Geo',
+  value: 'geo'
+}, {
+  icon: 'icon-calendar',
+  label: 'Date',
+  value: 'date'
+}];
 
-export const TYPE_ICONS_OBJ = fpPipe(fpGroupBy('type'), fpMapValues(v => v[0]))(
-  [
-    ...map(NUMBER_TYPES, type => ({ type, icon: 'icon-number-type' })),
-    ...map(DATE_TYPES, type => ({ type, icon: 'icon-calendar' })),
-    { type: 'string', icon: 'icon-string-type' }
-  ]
-);
+export const TYPE_ICONS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(TYPE_ICONS);
 
 export const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
@@ -242,6 +243,17 @@ export const ANALYSIS_METHODS = [
         icon: { font: 'icon-report' },
         type: 'table:report',
         supportedTypes: ['table:report', 'table:esReport']
+      },
+      {
+        label: 'Geolocation',
+        icon: { font: 'icon-geo-chart' },
+        type: '',
+        children: [{
+          label: 'Geolocation',
+          icon: { font: 'icon-geo-chart' },
+          type: 'chart:geo',
+          typeOnBackEnd: 'chart:geo'
+        }]
       }
     ]
   }

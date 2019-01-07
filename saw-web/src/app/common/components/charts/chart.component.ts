@@ -17,6 +17,7 @@ import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
 import * as find from 'lodash/find';
 
@@ -32,26 +33,34 @@ export const UPDATE_PATHS = {
   X_AXIS: 'xAxis'
 };
 
-export const CHART_SETTINGS_OBJ = [
-  { type: 'default', config: chartOptions },
-  { type: 'highStock', config: stockChartOptions },
-  { type: 'bullet', config: bulletChartOptions }
-];
-
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'chart',
-  template: `<div #container></div>`
+  template: `
+    <div #container></div>
+  `
 })
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   updater: any;
-  @Input()
-  isStockChart: boolean;
+  @Input() chartType: string;
   @Input()
   enableExport: boolean;
   @ViewChild('container')
   container: ElementRef;
+
+  /**
+   * Cloning all the options to create a new copy per object.
+   * Otherwise, any changes to these options will be shared between
+   * all instances of chart.
+   *
+   * @memberof ChartComponent
+   */
+  chartSettings = [
+    { type: 'default', config: cloneDeep(chartOptions) },
+    { type: 'highStock', config: cloneDeep(stockChartOptions) },
+    { type: 'bullet', config: cloneDeep(bulletChartOptions) }
+  ];
 
   public highcharts: any = Highcharts;
   public highstocks: any = Highstock;
@@ -60,10 +69,10 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   public config: any = {};
   public subscription: any;
   public clonedConfig: any = {};
-  public cType: string;
+  public chartSettingsType: string;
 
   constructor() {
-    this.highcharts.setOptions(globalChartOptions);
+    this.highcharts.setOptions(cloneDeep(globalChartOptions));
   }
 
   @Input()
@@ -88,19 +97,29 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  getChartSettingsType(chartType) {
+    if (chartType.substring(0, 2) === 'ts') {
+      return 'highStock';
+    }
+    if (chartType === 'bullet') {
+      return 'bullet';
+    }
+    return 'default';
+  }
+
   updateOptions(options) {
     if (!options) {
       return;
     }
     // set the appropriate config based on chart type
-    this.cType = this.isStockChart ? 'highStock' : options.chart.type;
+    this.chartSettingsType = this.getChartSettingsType(this.chartType);
     this.config = defaultsDeep(
       options,
       this.config,
       get(
-        find(CHART_SETTINGS_OBJ, ['type', this.cType]),
+        find(this.chartSettings, ['type', this.chartSettingsType]),
         'config',
-        chartOptions
+        cloneDeep(chartOptions)
       )
     );
     if (this.enableExport) {
@@ -178,7 +197,9 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Not using chart.update due to a bug with navigation
     // update and bar styles.
-    if (this.isStockChart) {
+    const chartSettingsType = this.getChartSettingsType(this.chartType);
+    switch (chartSettingsType) {
+    case 'highStock':
       set(
         this.config,
         'xAxis.0.title.text',
@@ -202,13 +223,20 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.config = clone(this.clonedConfig);
       this.addExportSize(this.config);
       this.clonedConfig = {};
-    } else {
+      break;
+    default:
       this.addExportConfig(this.config);
+      const requestConfig = cloneDeep(this.config);
+      forEach(this.config.series, seriesOptions => {
+        if (['percentageByRow'].includes(seriesOptions.aggregate)) {
+          set(requestConfig, 'plotOptions.column.stacking', 'percent');
+        }
+      });
       this.chart = this.highcharts.chart(
         this.container.nativeElement,
-        this.config
+        requestConfig
       );
-      this.addExportSize(this.config);
+      this.addExportSize(requestConfig);
     }
 
     // This is causing more problems than it solves. Updating the defaultsDeep

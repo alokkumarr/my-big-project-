@@ -64,6 +64,14 @@ import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { ClickToCopyDirective, E2eDirective } from './directives';
 import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-schedular';
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
+import { ChartGridComponent } from './components/chart-grid';
+
+import { UChartModule } from './components/charts';
+
+import {
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
+} from './components/remote-folder-selector';
 
 import {
   DxDataGridService,
@@ -78,7 +86,8 @@ import {
   SideNavService,
   WindowService,
   HeaderProgressService,
-  DynamicModuleService
+  DynamicModuleService,
+  CustomIconService
 } from './services';
 
 const MODULES = [
@@ -96,7 +105,8 @@ const MODULES = [
   CommonPipesModule,
   HttpClientModule,
   OwlDateTimeModule,
-  OwlNativeDateTimeModule
+  OwlNativeDateTimeModule,
+  UChartModule
 ];
 
 const COMPONENTS = [
@@ -122,7 +132,10 @@ const COMPONENTS = [
   SearchBoxComponent,
   FieldDetailsComponent,
   CronDatePickerComponent,
-  CronJobSchedularComponent
+  CronJobSchedularComponent,
+  ChartGridComponent,
+  RemoteFolderSelectorComponent,
+  CreatefolderDialogComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
@@ -148,7 +161,8 @@ const SERVICES = [
   SidenavMenuService,
   ToastService,
   UserService,
-  WindowService
+  WindowService,
+  CustomIconService
 ];
 
 const INTERCEPTORS = [
@@ -181,10 +195,14 @@ const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
     ...COMPONENTS,
     ...DIRECTIVES
   ],
-  providers: [...INTERCEPTORS, ...GUARDS],
+  providers: [...INTERCEPTORS, ...GUARDS, CustomIconService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class CommonModuleTs {}
+export class CommonModuleTs {
+  constructor(private _customIconService: CustomIconService) {
+    this._customIconService.init();
+  }
+}
 
 /* CommonModuleGlobal exposes services that are shared for lazy loaded components as well */
 @NgModule({})

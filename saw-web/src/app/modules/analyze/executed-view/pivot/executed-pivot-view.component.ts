@@ -10,7 +10,8 @@ import * as find from 'lodash/find';
 
 @Component({
   selector: 'executed-pivot-view',
-  templateUrl: 'executed-pivot-view.component.html'
+  templateUrl: 'executed-pivot-view.component.html',
+  styleUrls: ['./executed-pivot-view.component.scss']
 })
 export class ExecutedPivotViewComponent {
   @Input('analysis')

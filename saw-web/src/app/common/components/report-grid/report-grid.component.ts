@@ -19,7 +19,7 @@ import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
 import * as isEmpty from 'lodash/isEmpty';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import DataSource from 'devextreme/data/data_source';
+import CustomStore from 'devextreme/data/custom_store';
 import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
@@ -144,7 +144,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     // setup pagination for paginated data
     if (isFunction(dataLoader)) {
       this.dataLoader = dataLoader;
-      this.data = new DataSource({
+      this.data = new CustomStore({
         load: options => this.dataLoader(options)
       });
       this.remoteOperations = { paging: true };
@@ -243,6 +243,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     this.listeners.forEach(sub => sub.unsubscribe());
   }
 
+  isAggregateEligible() {
+    return filter(AGGREGATE_TYPES, aggregate => {
+      if (aggregate.valid.includes(this.analysis.type)) {
+        return true;
+      }
+    });
+  }
+
   onContentReady({ component }) {
     if (this.isEditable) {
       this.updateVisibleIndices(component);
@@ -303,7 +311,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   fetchAggregation(type) {
     if (NUMBER_TYPES.includes(type)) {
-      this.aggregates = AGGREGATE_TYPES;
+      this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, t => {
         return t.value === 'count';

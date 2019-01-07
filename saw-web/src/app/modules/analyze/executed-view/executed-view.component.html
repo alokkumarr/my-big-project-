@@ -58,8 +58,8 @@
             <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
           </button>
           <div fxLayout="column" fxLayoutAlign="center center">
-            <div>
-              <span *ngIf="analysis" class="analysis__title">{{analysis.name}}</span>
+            <div *ngIf="analysis">
+              <span class="analysis__title">{{analysis.name}}</span>
               <label *ngIf="isExecuting" class="execution-tag" i18n>Executing</label>
             </div>
             <div *ngIf="analysis" class="analysis__subheader">{{analysis.metrics}}</div>
@@ -88,7 +88,7 @@
                                   (afterExport)="exportData()"></analyze-actions-menu-u>
         </div>
       </mat-toolbar>
-      <mat-card>
+      <mat-card class="executed-view-analysis">
         <filter-chips-u *ngIf="analysis && !(analysis.type === 'report' && analysis.edit) && executedAnalysis.sqlBuilder.filters.length > 0"
                         [filters]="executedAnalysis.sqlBuilder.filters"
                         [readonly]="true"
@@ -107,17 +107,29 @@
           <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                                 [analysis]="executedAnalysis"
                                 [dataLoader]="dataLoader"
-                                ></executed-report-view>
-            <executed-pivot-view *ngSwitchCase="'pivot'"
+                                >
+          </executed-report-view>
+          <executed-pivot-view *ngSwitchCase="'pivot'"
+                                [analysis]="executedAnalysis"
+                                [data]="data"
+                                [updater]="pivotUpdater$"
+                                >
+          </executed-pivot-view>
+          <div *ngSwitchCase="'chart'">
+            <executed-chart-view *ngIf="analysis.chartType !== 'geo'"
                                  [analysis]="executedAnalysis"
                                  [data]="data"
-                                 [updater]="pivotUpdater$"
-                                 ></executed-pivot-view>
-              <executed-chart-view *ngSwitchCase="'chart'"
-                                   [analysis]="executedAnalysis"
-                                   [data]="data"
-                                   [updater]="chartUpdater$"
-                                   ></executed-chart-view>
+                                 [updater]="chartUpdater$"
+            >
+            </executed-chart-view>
+            <executed-map-chart-view *ngIf="analysis.chartType === 'geo'"
+                                  [analysis]="executedAnalysis"
+                                  [data]="data"
+                                  [updater]="chartUpdater$"
+                                  [actionBus]="chartActionBus$"
+            >
+            </executed-map-chart-view>
+          </div>
         </div>
       </mat-card>
     </div>

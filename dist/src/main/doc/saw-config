@@ -9,6 +9,12 @@
 sip-host1
 sip-host2
 
+[saw-proxy:vars]
+# Alternative EPEL YUM repository URL
+#sip_epel_yum_url = https://download.fedoraproject.org/pub/epel/$releasever/$basearch
+# Mark EPEL already being provided to avoid adding it to repositories
+#sip_epel_yum_provided = true
+
 [saw-web]
 sip-host1
 sip-host2
@@ -27,9 +33,10 @@ sip_var_path=/var/sip
 #
 # MapR configuration
 #
-# If the MapR cluster "mapr" user ID differs from the expected default
-# of 500, use the variable below to set it
+# If the MapR cluster "mapr" user or group ID differs from the
+# expected default, use the variable below to set it
 #saw_mapr_user_id=500
+#saw_mapr_group_id=5000
 
 #
 # Spark configuration
@@ -129,6 +136,9 @@ sip-host1
 sip-host2
 
 [saw-security:vars]
+# Alternative MariaDB YUM repository URL
+#sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+
 #
 # Outgoing email configuration
 #
@@ -144,6 +154,10 @@ saw_security_sso_secret=Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U
 
 [saw-security-arbitrator]
 sip-host3
+
+[saw-security-arbitrator:vars]
+# Alternative MariaDB YUM repository URL
+#sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
 
 [sip-rtis]
 sip-host1

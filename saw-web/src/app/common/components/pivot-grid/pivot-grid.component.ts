@@ -3,7 +3,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnInit,
   OnDestroy
 } from '@angular/core';
 import * as isArray from 'lodash/isArray';
@@ -56,7 +55,7 @@ export interface IPivotGridUpdate {
   templateUrl: './pivot-grid.component.html',
   styleUrls: ['./pivot-grid.component.scss']
 })
-export class PivotGridComponent implements OnInit, OnDestroy {
+export class PivotGridComponent implements OnDestroy {
   @Input() updater: Subject<IPivotGridUpdate>;
   @Input() mode: string | 'designer';
   @Input() showFieldDetails;
@@ -113,20 +112,6 @@ export class PivotGridComponent implements OnInit, OnDestroy {
   public _preExportState: any;
   public _subscription: any;
 
-  ngOnInit() {
-    setTimeout(() => {
-      // have to repaint the grid because of the animation of the modal
-      // if it's not repainted it appears smaller
-      this._gridInstance.repaint();
-      if (this.updater) {
-        this._subscription = this.updater.subscribe(updates => {
-          this._gridInstance.repaint();
-          return this.update(updates);
-        });
-      }
-    }, 500);
-  }
-
   ngOnDestroy() {
     if (this._subscription) {
       this._subscription.unsubscribe();
@@ -135,6 +120,15 @@ export class PivotGridComponent implements OnInit, OnDestroy {
   // pivot grid events
   onInitialized(e) {
     this._gridInstance = e.component;
+    // have to repaint the grid because of the animation of the modal
+    // if it's not repainted it appears smaller
+    this._gridInstance.repaint();
+    if (this.updater) {
+      this._subscription = this.updater.subscribe(updates => {
+        this._gridInstance.repaint();
+        return this.update(updates);
+      });
+    }
   }
 
   onPivotContentReady() {

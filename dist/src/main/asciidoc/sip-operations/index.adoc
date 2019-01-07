@@ -22,7 +22,8 @@ provided in the environment:
   the MapR cluster, and set `livy.file.upload.max.size = 500000000`
   and `livy.spark.master` in `livy.conf`
 
-. Provision a MapR user in the MapR cluster (with user ID 500)
+. Provision a MapR user in the MapR cluster (with user ID 500 and
+  group ID 5000)
 
 . Optionally create a MapR volume to hold the SIP data (at the
   location specified by the `sip_var_path` variable in the SIP
@@ -97,6 +98,26 @@ TIP: Configure passwordless SSH access to the SAW target host for a
 smoother installation experience.  The deploy command should be run as
 a normal user.  The deploy command will use sudo to request privileges
 for relevant operations.
+
+==== Offline installation
+
+To support offline installation SIP allows specifying alternative URLs
+for used YUM repositories and RPM packages, for example local mirrors.
+These can be configured in the SIP environment configuration
+(`saw-config`) as follows:
+
+        [saw-proxy:vars]
+        sip_epel_yum_url = https://download.fedoraproject.org/pub/epel/$releasever/$basearch
+        [saw-security:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+        [saw-security-arbitrator:vars]
+        sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+
+TIP: If the EPEL repository is already provided on the system by other
+means, installation of the EPEL repository file in `/etc/yum.repos.d`
+by SIP can be skipped by adding `sip_epel_yum_provided = true` under
+the `saw-proxy:vars` section in the SIP environment configuration
+`saw-config`.
 
 ==== Upgrading
 
@@ -303,6 +324,23 @@ NOTE: Downgrading to an older RTIS version is not supported.  If
 needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTIS versions.
+
+== Installing SIP product modules
+
+Execute the following steps to install SIP product modules:
+
+. Get the SIP product module package (`sip-module-*.tgz`)
+
+. Copy the SIP product module package to the SIP deploy host, where
+  the SIP package and SIP environment configuration (`saw-config`) is
+  located
+
+. Execute the product module deploy command, giving it the path to the
+  SIP environment configuration file as the first argument and the SIP
+  product module package as the second argument:
+
+        cd saw
+        ./sip-deploy-module <sip-config> <sip-module-package>
 
 == Monitoring
 
@@ -584,6 +622,21 @@ preview in directory name.
 Automatically generated credentials, such as for internal service and
 administrator accounts, can be found in the `/etc/bda` directory on
 the respective host.
+
+=== Batch ingestion: SFTP
+
+The Batch Ingestion Service can connect to SFTP sources to ingest
+files.  Ingesting a large number of files requires the Batch Ingestion
+Service to be able to use a large number of sessions per SFTP
+connection.  The default settings of OpenSSH only allows ten
+concurrent sessions per SFTP connection.  To allow Batch Ingestion
+Service to use the required number of session, add the below to the
+`/etc/ssh/sshd_config` file:
+
+    MaxSessions 5000
+
+After that run `systemctl reload sshd` to reload the SSH daemon
+configuration.
 
 == Loading semantic metadata
 

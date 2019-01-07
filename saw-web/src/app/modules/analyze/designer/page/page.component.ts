@@ -1,11 +1,17 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { AnalyzeService } from '../../services/analyze.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  AnalyzeService,
+  EXECUTION_MODES
+} from '../../services/analyze.service';
 import { DesignerSaveEvent, DesignerMode } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
 import { MatDialog, MatDialogConfig } from '@angular/material';
+import { ExecuteService } from '../../services/execute.service';
+import * as filter from 'lodash/fp/filter';
+import * as get from 'lodash/get';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -44,7 +50,9 @@ export class DesignerPageComponent implements OnInit {
     private locationService: Location,
     private analyzeService: AnalyzeService,
     private dialogService: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router,
+    public _executeService: ExecuteService
   ) {}
 
   ngOnInit() {
@@ -75,8 +83,25 @@ export class DesignerPageComponent implements OnInit {
   }
 
   onSave({ analysis, requestExecution }: DesignerSaveEvent) {
+    const navigateBackTo = this.designerMode === 'fork' ? 'home' : 'back';
     if (requestExecution) {
-      this.locationService.back();
+      this._executeService.executeAnalysis(
+        analysis,
+        EXECUTION_MODES.PUBLISH,
+        navigateBackTo
+      );
+
+      const navigateToList = !filter(
+        f => f.isRuntimeFilter,
+        get(analysis, 'sqlBuilder.filters', [])
+      ).length;
+      if (navigateToList) {
+        if (navigateBackTo === 'home') {
+          this.router.navigate(['analyze', analysis.categoryId]);
+        } else {
+          this.locationService.back();
+        }
+      }
     }
   }
 

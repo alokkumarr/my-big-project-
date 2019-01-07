@@ -1,35 +1,4 @@
-<div [ngClass]="{'grid-view': toggleToGrid === true, 'chart-view': !toggleToGrid}">
-  <div class="analysis-header">
-    <h1 class="chart report-title flex-container" [textContent]="analysis.chartTitle || analysis.name"></h1>
-    <div class="flex-icon-container">
-      <div *ngIf="ViewMode" class="toggle-icons">
-        <mat-icon *ngIf="toggleToGrid"  class="mat-icon material-icons" role="img" (click)="exportGridToExcel()"
-          matTooltip="Export Grid Data">
-          <img src="./../../../../../assets/img/excel.png" style="width: 15px;">
-        </mat-icon>
-        <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="toggleToGrid = true" [ngClass]="{'active': toggleToGrid}"
-          matTooltip="Toggle to Grid">
-        </mat-icon>
-
-        <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" (click)="toggleToGrid = false" [ngClass]="{'active': !toggleToGrid}"
-          matTooltip="Toggle to Chart">
-        </mat-icon>
-      </div>
-    </div>
-  </div>
-
-  <div class="toggle-grid" *ngIf="toggleToGrid">
-    <dx-data-grid #dataGrid [customizeColumns]="customizeColumns" [columnMinWidth]="150" [columnResizingMode]="'widget'" [allowColumnReordering]="true"
-      [allowColumnResizing]="true" [showColumnHeaders]="true" [showColumnLines]="false" [height]="'100%'"
-      [showRowLines]="false" [showBorders]="false" [rowAlternationEnabled]="true" [hoverStateEnabled]="true"
-      [wordWrapEnabled]="false" [dataSource]="chartToggleData">
-      <dxo-scrolling showScrollbar="always" [useNative]="false"></dxo-scrolling>
-      <dxo-paging [pageSize]="25"></dxo-paging>
-      <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[25,50,75,100]"></dxo-pager>
-      <dxo-export [enabled]="false" [fileName]="analysis.name"></dxo-export>
-    </dx-data-grid>
-  </div>
-  <div *ngIf="!toggleToGrid">
-    <chart [updater]="chartUpdater" [options]="chartOptions" [isStockChart]="isStockChart" [enableExport]="enableChartDownload"></chart>
-  </div>
-</div>
+<chart-grid [analysis]="analysis"
+            [data]="data"
+            [updater]="updater">
+</chart-grid>
