@@ -1,13 +1,29 @@
-<button mat-icon-button e2e="open-sql-editor-btn" class="triggerbtn" [matMenuTriggerFor]="datasetmenu">
-    <mat-icon fontIcon="icon-action-solid"></mat-icon>
+<button
+  mat-icon-button
+  e2e="open-sql-editor-btn"
+  class="triggerbtn"
+  [matMenuTriggerFor]="datasetmenu"
+>
+  <mat-icon fontIcon="icon-action-solid"></mat-icon>
+</button>
+<mat-menu #datasetmenu="matMenu">
+  <button
+    e2e="execute-sql-btn"
+    mat-menu-item
+    [disabled]="dsMetadata?.asOfNow?.status !== 'SUCCESS'"
+    (click)="openSQLEditor()"
+  >
+    <mat-icon
+      style="margin-right: 0px !important; vertical-align: baseline;"
+      fontIcon="icon-query-mode"
+    ></mat-icon>
+    <span>Execute SQL</span>
   </button>
-  <mat-menu #datasetmenu="matMenu">
-    <button e2e="execute-sql-btn" mat-menu-item [disabled]="dsMetadata.asOfNow.status !== 'SUCCESS'" (click)="openSQLEditor()">
-      <mat-icon style="margin-right: 0px !important; vertical-align: baseline;" fontIcon="icon-query-mode"></mat-icon>
-      <span>Execute SQL</span>
-    </button>
-    <button mat-menu-item disabled>
-      <mat-icon style="margin-right: 0px; vertical-align: baseline;" fontIcon="icon-delete"></mat-icon>
-      <span>delete</span>
-    </button>
-  </mat-menu>
+  <button mat-menu-item disabled>
+    <mat-icon
+      style="margin-right: 0px; vertical-align: baseline;"
+      fontIcon="icon-delete"
+    ></mat-icon>
+    <span>delete</span>
+  </button>
+</mat-menu>

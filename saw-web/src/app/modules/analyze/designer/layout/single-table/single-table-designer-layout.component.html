@@ -19,36 +19,77 @@
     (change)="change.emit($event)"
   ></designer-settings-aux>
 
-  <ng-container [ngSwitch]="analysisType">
-    <filter-chips-u
-      *ngIf="filters.length > 0"
-      class="designer__filters"
-      (remove)="onRemoveFilter($event)"
-      (removeAll)="onRemoveFilterAll()"
-      [filters]="filters"
-      [artifacts]="artifacts"
-    >
+  <ng-container [ngSwitch]="">
+
+    <filter-chips-u *ngIf="filters.length > 0"
+                    class="designer__filters"
+                    (remove)="onRemoveFilter($event)"
+                    (removeAll)="onRemoveFilterAll()"
+                    [filters]="filters"
+                    [artifacts]="artifacts">
     </filter-chips-u>
 
-    <designer-pivot
-      class="designer__data"
-      *ngSwitchCase="'pivot'"
-      [data]="data"
-      [sorts]="sorts"
-      [artifacts]="artifacts"
-      [designerState]="designerState"
-    >
-    </designer-pivot>
-    <designer-chart
-      class="designer__data"
-      *ngSwitchCase="'chart'"
-      [chartType]="analysisSubtype"
-      [sorts]="sorts"
-      [auxSettings]="auxSettings"
-      [data]="data"
-      [designerState]="designerState"
-      [sqlBuilder]="sqlBuilder"
-    >
-    </designer-chart>
+    <div [ngSwitch]="designerState" fxLayout="column">
+
+      <div *ngSwitchCase="DesignerStates.NO_SELECTION"
+            fxLayout="column"
+            fxLayoutAlign="space-between center"
+            class="non-ideal-state__container">
+        <span i18n class="non-ideal-state__message">
+          Add some fields to visualize, by dragging, or using the add button
+        </span>
+        <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
+      </div>
+
+      <div *ngSwitchCase="DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA"
+           fxLayout="column"
+           fxLayoutAlign="space-between center"
+           class="non-ideal-state__container">
+          <span class="non-ideal-state__message" i18n>
+            At least one data field needs to be selected
+          </span>
+          <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
+      </div>
+
+      <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA"
+           fxLayout="column"
+           fxLayoutAlign="space-between center"
+           class="non-ideal-state__container">
+        <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
+      </div>
+
+      <div *ngSwitchCase="DesignerStates.SELECTION_WITH_NO_DATA"
+           fxLayout="column"
+           fxLayoutAlign="space-between center"
+           class="non-ideal-state__container">
+        <span class="non-ideal-state__message" i18n>
+          There is no data for the fields selected
+        </span>
+      </div>
+
+      <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA">
+        <designer-pivot class="designer__data"
+                        *ngIf="analysisType === 'pivot'"
+                        [data]="data"
+                        [sorts]="sorts"
+                        [artifacts]="artifacts">
+        </designer-pivot>
+        <designer-map-chart class="designer__data"
+                        *ngIf="analysisType ==='chart' && analysisSubtype === 'geo'"
+                        [chartType]="analysisSubtype"
+                        [auxSettings]="auxSettings"
+                        [data]="data"
+                        [sqlBuilder]="sqlBuilder">
+        </designer-map-chart>
+        <designer-chart class="designer__data"
+                        *ngIf="analysisType ==='chart' && analysisSubtype !== 'geo'"
+                        [chartType]="analysisSubtype"
+                        [sorts]="sorts"
+                        [auxSettings]="auxSettings"
+                        [data]="data"
+                        [sqlBuilder]="sqlBuilder">
+        </designer-chart>
+      </div>
+    </div>
   </ng-container>
 </div>

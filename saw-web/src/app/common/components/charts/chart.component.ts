@@ -43,8 +43,7 @@ export const UPDATE_PATHS = {
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   updater: any;
-  @Input()
-  isStockChart: boolean;
+  @Input() chartType: string;
   @Input()
   enableExport: boolean;
   @ViewChild('container')
@@ -70,7 +69,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   public config: any = {};
   public subscription: any;
   public clonedConfig: any = {};
-  public cType: string;
+  public chartSettingsType: string;
 
   constructor() {
     this.highcharts.setOptions(cloneDeep(globalChartOptions));
@@ -98,17 +97,27 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  getChartSettingsType(chartType) {
+    if (chartType.substring(0, 2) === 'ts') {
+      return 'highStock';
+    }
+    if (chartType === 'bullet') {
+      return 'bullet';
+    }
+    return 'default';
+  }
+
   updateOptions(options) {
     if (!options) {
       return;
     }
     // set the appropriate config based on chart type
-    this.cType = this.isStockChart ? 'highStock' : options.chart.type;
+    this.chartSettingsType = this.getChartSettingsType(this.chartType);
     this.config = defaultsDeep(
       options,
       this.config,
       get(
-        find(this.chartSettings, ['type', this.cType]),
+        find(this.chartSettings, ['type', this.chartSettingsType]),
         'config',
         cloneDeep(chartOptions)
       )
@@ -188,7 +197,9 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Not using chart.update due to a bug with navigation
     // update and bar styles.
-    if (this.isStockChart) {
+    const chartSettingsType = this.getChartSettingsType(this.chartType);
+    switch (chartSettingsType) {
+    case 'highStock':
       set(
         this.config,
         'xAxis.0.title.text',
@@ -212,7 +223,8 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.config = clone(this.clonedConfig);
       this.addExportSize(this.config);
       this.clonedConfig = {};
-    } else {
+      break;
+    default:
       this.addExportConfig(this.config);
       const requestConfig = cloneDeep(this.config);
       forEach(this.config.series, seriesOptions => {

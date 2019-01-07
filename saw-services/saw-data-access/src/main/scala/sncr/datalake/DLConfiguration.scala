@@ -91,6 +91,9 @@ object DLConfiguration {
     setIfPathExists(sparkConf, "spark.yarn.queue", cfg, getPathByExecutor("yarn.queue", executor))
     sparkConf.set ("spark.executor.memory", cfg.getString(getPathByExecutor("executor.memory", executor)))
     sparkConf.set ("spark.cores.max", cfg.getString(getPathByExecutor("cores.max", executor)))
+    // Added to support for Spark core setting with YARN, it will be handled later on with additional
+    // spark parameter. Currently being handled using existing parameter configuration cores.max.
+    sparkConf.set ("spark.executor.cores", cfg.getString(getPathByExecutor("cores.max", executor)))
     sparkConf.set ("driver.memory", cfg.getString ("driver.memory"))
     setIfPathExists(sparkConf,"spark.hadoop.yarn.resourcemanager.hostname",cfg,"yarn.resourcemanager.hostname")
     setIfPathExists(sparkConf,"spark.yarn.jars",cfg,"yarn.spark.jars")

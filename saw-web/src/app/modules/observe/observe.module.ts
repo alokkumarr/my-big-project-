@@ -29,6 +29,7 @@ import { UChartModule } from '../../common/components/charts';
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import { ObserveMapChartComponent } from './components/observe-map-chart/observe-map-chart.component';
 import { ObserveReportComponent } from './components/observe-report/observe-report.component';
 import { ObservePivotComponent } from './components/observe-pivot/observe-pivot.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
@@ -60,6 +61,7 @@ const components = [
   GlobalStringFilterComponent,
   CreateDashboardComponent,
   ObserveChartComponent,
+  ObserveMapChartComponent,
   ObserveReportComponent,
   ObservePivotComponent,
   ObserveKPIComponent,

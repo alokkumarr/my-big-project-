@@ -28,5 +28,6 @@ export {
   SqlBuilderChart,
   SqlBuilderReport,
   AnalysisType,
-  SqlBuilderEsReport
+  SqlBuilderEsReport,
+  Region
 } from '../../../models';
