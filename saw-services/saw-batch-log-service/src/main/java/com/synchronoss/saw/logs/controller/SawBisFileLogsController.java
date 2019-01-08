@@ -38,6 +38,8 @@ import org.springframework.web.client.RestTemplate;
 public class SawBisFileLogsController {
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
+  
+  private String scheduleUri = "/scheduler/bisscheduler";
 
   RestTemplate restTemplate = new RestTemplate();
   private static final Logger logger = LoggerFactory.getLogger(SawBisFileLogsController.class);
@@ -106,7 +108,7 @@ public class SawBisFileLogsController {
         + "values. URL :  " + bisSchedulerUrl + "/jobs?categoryId=" 
         + channelId + "&groupkey=" + routeId);
     String response = restTemplate
-        .getForObject(bisSchedulerUrl + "/jobs?categoryId=" 
+        .getForObject(bisSchedulerUrl + scheduleUri + "/jobs?categoryId=" 
             + channelId + "&groupkey=" + routeId, String.class);
 
     logger.trace("response from scheduler on last fire, next fire" + response);
