@@ -641,18 +641,21 @@ configuration.
 == Batch Ingestion : High Availability
 
 The below parameters in Batch Ingestion Service gives the control the configurations
-related to resiliency & avoid inconsistency across bis instances. To control what should be the time difference
-to declare a data in the system is corrupted, & needs to be downloaded again (default is 5 mins). While configuring this parameter we need
+related to resiliency & avoid inconsistency across bis instances. To control what
+should be the time difference to declare a data in the system is corrupted, & needs
+to be downloaded again (default is 5 mins). While configuring this parameter we need
 account for all customers using the BIS & routes is being configured.
 
 Specifically a use case which needs to be taken into account as follows:
-Let's say, we have a daily schedule at 5:00 PM for all `*.txt` files and as clean up job customers have a
-scheduled job on the customer data location to archive those files daily at 10:00 PM. then if there is a failure or network glitches or may be
-due to some other reasons data source is not available until 10:00 PM and we just marked status as failed
-there might be chances of data loss as` *.txt` file which has been archived before next schedule. The reason to mention this scenario so that we can
-configure the sip_bis_retry_diffs_in_minutes accordingly.
+Let's say, we have a daily schedule at `5:00` PM for all `*.txt` files and as clean
+up job customers have a scheduled job on the customer data location to archive those
+files daily at `10:00 PM`. then if there is a failure or network glitches or may be
+due to some other reasons data source is not available until `10:00 PM` and we just
+marked status as failed there might be chances of data loss as `*.txt` file which
+has been archived before next schedule. The reason to mention this scenario so that we can
+configure the `sip_bis_retry_diffs_in_minutes` accordingly.
 
-sip_bis_retry_diffs_in_minutes=5
+    sip_bis_retry_diffs_in_minutes=5
 
 == Loading semantic metadata
 

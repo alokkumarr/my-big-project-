@@ -43,7 +43,6 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
     retryTemplate.execute(context -> restTemplate.postForLocation(bisTransferUrl, jobDetails)
     );
-    // restTemplate.postForLocation(bisTransferUrl, jobDetails);
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 
