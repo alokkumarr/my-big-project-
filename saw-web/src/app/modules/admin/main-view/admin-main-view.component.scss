@@ -1,5 +1,9 @@
 @import "src/themes/base/colors";
 
+:host {
+  overflow: hidden;
+}
+
 .mat-toolbar {
   background-color: transparent;
 
