@@ -11,11 +11,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
+import com.sncr.saw.security.app.repository.ModulePrivilegeRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.*;
+import com.sncr.saw.security.common.bean.repo.ModulePrivileges;
+import com.sncr.saw.security.common.bean.repo.PrivilegesForModule;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.*;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
@@ -33,9 +36,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -50,7 +51,6 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -77,6 +77,9 @@ public class SecurityController {
 
 	@Autowired
     DataSecurityKeyRepository dataSecurityKeyRepository;
+
+	@Autowired
+    ModulePrivilegeRepository modulePrivilegeRepository;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -1410,8 +1413,53 @@ public class SecurityController {
 		}
 		return modules;
 	}
-	
-	/**
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/auth/admin/cust/manage/module-privileges", method = RequestMethod.GET)
+    public List<ModulePrivileges> getModulePrivilegeList(HttpServletRequest request, HttpServletResponse response)  {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
+            ModulePrivileges modulePrivileges = new ModulePrivileges();
+            response.setStatus(400);
+            modulePrivileges.setValid(false);
+            modulePrivileges.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
+            return (List<ModulePrivileges>) modulePrivileges;
+        }
+        List<ModulePrivileges> modulePrivilegesList = modulePrivilegeRepository.getModulePrivileges();
+        return modulePrivilegesList;
+    }
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @param moduleSysId
+     * @return
+     */
+    @RequestMapping(value = "/auth/admin/cust/manage/module-privileges/{moduleSysId}", method = RequestMethod.GET)
+    public PrivilegesForModule getModulePrivileges(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "moduleSysId", required = true) Long moduleSysId)    {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String roleType = extractValuesFromToken[3];
+        if (!roleType.equalsIgnoreCase(AdminRole)) {
+            PrivilegesForModule privilegesForModule = new PrivilegesForModule();
+            response.setStatus(400);
+            privilegesForModule.setValid(false);
+            privilegesForModule.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
+            return privilegesForModule;
+        }
+        return (modulePrivilegeRepository.getPrivilegeByModule(moduleSysId));
+    }
+
+
+    /**
 	 * 
 	 * @param cpm
 	 * @return
