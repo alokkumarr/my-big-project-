@@ -6,6 +6,7 @@ var convert = require('xml-js');
 const globalVariables = require('../helpers/data-generation/globalVariables');
 const logger = require('../conf/logger')(__filename);
 const Constants = require('../helpers/Constants');
+const Utils = require('./Utils');
 class SuiteSetup {
   /* Return true if end-to-end tests are run against distribution
  * package built with Maven and deployed to a local Docker container
@@ -133,7 +134,7 @@ class SuiteSetup {
     if (fs.existsSync(Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json')) {
       fs.renameSync(Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json', Constants.E2E_OUTPUT_BASE_DIR + '/failedTestDataForRetry.json');
       logger.debug('Old failures json file is deleted and converted to failure data set ' +
-        'i.e. ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json converted to ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestDataForRetry.jsons');
+        'i.e. ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json converted to ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestDataForRetry.json');
     } else {
       logger.info('Yahooo....!!! There are no failures!');
     }
@@ -232,21 +233,20 @@ class SuiteSetup {
 
           if (testResultStatus[key].status.toLowerCase() === 'failed') {
             failedCount++;
-            failedTests += `<testcase time="0.001" name="${testResultStatus[key].description}">
-                                    <failure type="exception" message="${testResultStatus[key].failedExpectations[0].message}">
+            failedTests += `<testcase time="0.001" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}">
+                                    <failure type="exception" message="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].failedExpectations[0].message)}">
+                                     <![CDATA[${testResultStatus[key].failedExpectations[0].stack}]]>
                                     </failure>
                                 </testcase>`;
 
           } else if (testResultStatus[key].status.toLowerCase() === 'passed') {
-            passedTests += `<testcase time="0.001" name="${testResultStatus[key].description}" />`
+            passedTests += `<testcase time="0.001" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}" />`
           }
         }
       }
       if (totalTests > 0) {
-        let testSuitesStart = `<testsuites name="End to end suite report" failures="${failedCount}" tests="${totalTests}">`;
-        let testSuitesEnd = `</testsuites>`;
         let suiteName = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/suite.json', 'utf8')).suiteName;
-        let testSuiteStart = `	<testsuite time="0.33" failures="${failedCount}" tests="${totalTests}">`;
+        let testSuiteStart = `	<testsuite name="executed suite: ${suiteName}" timestamp="${new Date()}" failures="${failedCount}" tests="${totalTests}">`;
         let testSuiteEnd = `</testsuite>`;
         let xmlDocument = `<?xml version="1.0" encoding="UTF-8" ?>`;
         xmlDocument += testSuiteStart;
