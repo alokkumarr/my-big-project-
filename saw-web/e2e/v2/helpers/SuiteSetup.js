@@ -233,14 +233,14 @@ class SuiteSetup {
 
           if (testResultStatus[key].status.toLowerCase() === 'failed') {
             failedCount++;
-            failedTests += `<testcase time="0.001" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}">
+            failedTests += `<testcase classname="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].fullName)}" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}">
                                     <failure type="exception" message="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].failedExpectations[0].message)}">
                                      <![CDATA[${testResultStatus[key].failedExpectations[0].stack}]]>
                                     </failure>
                                 </testcase>`;
 
           } else if (testResultStatus[key].status.toLowerCase() === 'passed') {
-            passedTests += `<testcase time="0.001" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}" />`
+            passedTests += `<testcase classname="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].fullName)}" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}" />`
           }
         }
       }
