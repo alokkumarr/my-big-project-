@@ -11,6 +11,11 @@ ansible_ssh_pass=root
 # as provided
 sip_epel_yum_provided=true
 
+# Allow developers that run SIP web on their local machine to connect
+# to remote SIP environments by setting localhost to an allowed origin
+# for CORS
+sip_cors_allow_origin=http://localhost:3000
+
 [saw-proxy]
 sip-proxy
 
