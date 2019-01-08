@@ -46,6 +46,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -98,6 +99,7 @@ public class GatewayController {
    * @throws ServletException 
    * @throws FileUploadException 
  */
+  @CrossOrigin(origins = "*")
 @RequestMapping(value = "/{path:^(?!actuator).*$}/**", method = {GET, POST, DELETE, OPTIONS, PUT})
   @ResponseBody
   /* Note: Spring Boot Actuator paths are excluded from proxying above
