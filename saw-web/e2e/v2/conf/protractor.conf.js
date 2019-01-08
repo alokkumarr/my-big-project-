@@ -165,12 +165,7 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: () => {
-    // Delete old e2e unique id.
     logger.info('Doing cleanup and setting up test data for e2e tests....');
-    if (fs.existsSync('target/e2e/e2eId.json')) {
-      // delete and create new always
-      fs.unlinkSync('target/e2e/e2eId.json');
-    }
     // Generate test data
     let appUrl = SuiteSetup.getSawWebUrl();
 
@@ -202,6 +197,11 @@ exports.config = {
     }
   },
   afterLaunch: () => {
+    // Delete old e2e unique id.
+    if (fs.existsSync('target/e2e/e2eId.json')) {
+      // delete and create new always
+      fs.unlinkSync('target/e2e/e2eId.json');
+    }
 
     SuiteSetup.failedTestDataForRetry();
 

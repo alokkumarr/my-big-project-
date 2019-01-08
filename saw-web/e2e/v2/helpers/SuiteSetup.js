@@ -232,14 +232,13 @@ class SuiteSetup {
 
           if (testResultStatus[key].status.toLowerCase() === 'failed') {
             failedCount++;
-            failedTests += `<testcase classname="${testResultStatus[key].fullName}" name="${testResultStatus[key].description}">
+            failedTests += `<testcase time="0.001" name="${testResultStatus[key].description}">
                                     <failure type="exception" message="${testResultStatus[key].failedExpectations[0].message}">
-                                        <![CDATA[${testResultStatus[key].failedExpectations[0].stack}]]>
                                     </failure>
                                 </testcase>`;
 
           } else if (testResultStatus[key].status.toLowerCase() === 'passed') {
-            passedTests += `<testcase classname="${testResultStatus[key].fullName}" name="${testResultStatus[key].description}" />`
+            passedTests += `<testcase time="0.001" name="${testResultStatus[key].description}" />`
           }
         }
       }
@@ -247,20 +246,17 @@ class SuiteSetup {
         let testSuitesStart = `<testsuites name="End to end suite report" failures="${failedCount}" tests="${totalTests}">`;
         let testSuitesEnd = `</testsuites>`;
         let suiteName = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/suite.json', 'utf8')).suiteName;
-        let testSuiteStart = `	<testsuite name="executed suite: ${suiteName}" timestamp="${new Date().getTime()}" failures="${failedCount}" tests="${totalTests}">`;
+        let testSuiteStart = `	<testsuite time="0.33" failures="${failedCount}" tests="${totalTests}">`;
         let testSuiteEnd = `</testsuite>`;
         let xmlDocument = `<?xml version="1.0" encoding="UTF-8" ?>`;
-
-        xmlDocument += testSuitesStart;
         xmlDocument += testSuiteStart;
         xmlDocument += failedTests;
         xmlDocument += passedTests;
 
         xmlDocument += testSuiteEnd;
-        xmlDocument += testSuitesEnd;
-        console.log('xmlDocument totalTests: e2e'+xmlDocument)
+        logger.debug('xmlDocument e2e tests: ' + xmlDocument)
 
-        fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/myjunit.xml', xmlDocument, { encoding: 'utf8' });
+        fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/myjunit.xml', xmlDocument, {encoding: 'utf8'});
 
       }
     }
