@@ -15,7 +15,6 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.service.BisChannelService;
-import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
 import io.swagger.annotations.Api;
@@ -69,9 +68,6 @@ public class SawBisChannelController {
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
-
-  @Autowired
-  private RuntimeSessionFactoryLocator delegatingSessionFactory;
 
   @Autowired
   private BisChannelService bisChannelService;
@@ -297,10 +293,6 @@ public class SawBisChannelController {
     secretPhrase = obfuscator.encrypt(secretPhrase);
     rootNode.put("password", secretPhrase);
     requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-
-    //remove old connection from pool before update
-    this.delegatingSessionFactory.removeChannelConnFromPool(channelId);
-
     Optional<BisChannelEntity> optionalChannel = bisChannelDataRestRepository.findById(channelId);
     if (optionalChannel.isPresent()) {
       BisChannelEntity channel = optionalChannel.get();
