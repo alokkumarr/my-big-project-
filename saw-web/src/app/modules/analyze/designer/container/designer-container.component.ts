@@ -511,6 +511,7 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   openSaveDialog(): Promise<any> {
+    this.analysis.categoryId = (this.designerMode === 'new' || this.designerMode === 'fork') ? 5 : this.analysis.categoryId;
     return this._analyzeDialogService
       .openSaveDialog(this.analysis)
       .afterClosed()

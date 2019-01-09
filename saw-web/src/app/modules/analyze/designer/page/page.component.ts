@@ -83,7 +83,7 @@ export class DesignerPageComponent implements OnInit {
   }
 
   onSave({ analysis, requestExecution }: DesignerSaveEvent) {
-    const navigateBackTo = this.designerMode === 'fork' ? 'home' : 'back';
+    const navigateBackTo = this.designerMode === 'fork' || this.designerMode === 'new'  ? 'home' : 'back';
     if (requestExecution) {
       this._executeService.executeAnalysis(
         analysis,
