@@ -17,8 +17,6 @@ import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.*;
-import com.sncr.saw.security.common.bean.repo.ModulePrivileges;
-import com.sncr.saw.security.common.bean.repo.PrivilegesForModule;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.*;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
@@ -1413,51 +1411,6 @@ public class SecurityController {
 		}
 		return modules;
 	}
-
-    /**
-     *
-     * @param request
-     * @param response
-     * @return
-     */
-    @RequestMapping(value = "/auth/admin/cust/manage/module-privileges", method = RequestMethod.GET)
-    public List<ModulePrivileges> getModulePrivilegeList(HttpServletRequest request, HttpServletResponse response)  {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            ModulePrivileges modulePrivileges = new ModulePrivileges();
-            response.setStatus(400);
-            modulePrivileges.setValid(false);
-            modulePrivileges.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-            return (List<ModulePrivileges>) modulePrivileges;
-        }
-        List<ModulePrivileges> modulePrivilegesList = modulePrivilegeRepository.getModulePrivileges();
-        return modulePrivilegesList;
-    }
-
-    /**
-     *
-     * @param request
-     * @param response
-     * @param moduleSysId
-     * @return
-     */
-    @RequestMapping(value = "/auth/admin/cust/manage/module-privileges/{moduleSysId}", method = RequestMethod.GET)
-    public PrivilegesForModule getModulePrivileges(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "moduleSysId", required = true) Long moduleSysId)    {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            PrivilegesForModule privilegesForModule = new PrivilegesForModule();
-            response.setStatus(400);
-            privilegesForModule.setValid(false);
-            privilegesForModule.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-            return privilegesForModule;
-        }
-        return (modulePrivilegeRepository.getPrivilegeByModule(moduleSysId));
-    }
-
 
     /**
 	 * 

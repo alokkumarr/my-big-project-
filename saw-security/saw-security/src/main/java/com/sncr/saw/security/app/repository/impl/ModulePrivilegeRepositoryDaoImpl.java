@@ -30,6 +30,7 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
             " inner join privilege_codes pc on " +
             " (mp.PRIVILEGE_CODES_SYS_ID = pc.PRIVILEGE_CODES_SYS_ID) ";
 
+        logger.trace("Prepared Sql : "+ fetchSql);
         List<ModulePrivileges> modulePrivilegesList = new ArrayList<>();
         try{
             modulePrivilegesList = jdbcTemplate.query(fetchSql, ps -> {}, resultSet -> {
@@ -47,6 +48,7 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
             });
         }
         catch (Exception e){
+            logger.error("Exception thrown while executing sql : "+ fetchSql);
             logger.error(e.getMessage());
         }
 
@@ -60,6 +62,8 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
             " Inner Join Modules m on (mp.MODULE_SYS_ID = m.MODULE_SYS_ID ) " +
             " inner join privilege_codes pc on (mp.PRIVILEGE_CODES_SYS_ID = pc.PRIVILEGE_CODES_SYS_ID) " +
             " where m.MODULE_SYS_ID=? ";
+
+        logger.trace("Prepared Sql : "+ fetchSql);
         HashMap<Long,String>  privilegeList = null;
         try{
             privilegeList = jdbcTemplate.query(fetchSql, ps -> { ps.setLong(1,moduleSysId); }, resultSet -> {
@@ -72,6 +76,7 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
             });
         }
         catch (Exception e){
+            logger.error("Exception thrown while executing sql : "+ fetchSql);
             logger.error(e.getMessage());
         }
         privilegesForModule.setPriviliges(privilegeList);
