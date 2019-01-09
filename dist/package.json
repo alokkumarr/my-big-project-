@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "webdriver-manager": "webdriver-manager update --versions.chrome 2.44 --gecko=false",
-    "protractor": "p() { protractor $* ../saw-web/e2e/v2/conf/protractor.conf.js; rv=$?; test $rv -ne 0 -a $rv -ne 1 && exit $rv || exit 0; }; p",
+    "protractor": "p() { protractor $* ../saw-web/e2e/protractor.conf.js; rv=$?; test $rv -ne 0 -a $rv -ne 1 && exit $rv || exit 0; }; p",
     "generate-report": "allure generate target/allure-results --clean -o target/allure-report || true"
   },
   "devDependencies": {
