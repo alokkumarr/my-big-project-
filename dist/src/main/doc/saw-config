@@ -5,6 +5,11 @@
 # environment.
 #
 
+[all:vars]
+# Set allowed origins for CORS when to allow third-party applications
+# to integrate with the SIP REST API
+#sip_cors_allow_origin=https://example.com
+
 [saw-proxy]
 sip-host1
 sip-host2

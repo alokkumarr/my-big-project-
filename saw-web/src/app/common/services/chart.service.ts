@@ -333,7 +333,6 @@ export class ChartService {
     const categories = {};
     const isHighStock = chartType.substring(0, 2) === 'ts';
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
-    const series = this.splitToSeries(parsedData, fields, chartType);
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
       const dateFields = filter(fieldsArray, ({ type }) =>
@@ -341,6 +340,7 @@ export class ChartService {
       );
       this.formatDatesIfNeeded(parsedData, dateFields);
     }
+    const series = this.splitToSeries(parsedData, fields, chartType);
     // split out categories frem the data
     forEach(series, serie => {
       serie.data = map(serie.data, point => {
