@@ -2,17 +2,17 @@
   mat-icon-button
   [matMenuTriggerFor]="aggregatemenu"
   class="aggregate-chooser__btn"
+  [e2e]="AGGREGATE_TYPES_OBJ[aggregate].value"
 >
   <mat-icon
     [style.width.px]="40"
-    [e2e]="AGGREGATE_TYPES_OBJ[aggregate].value"
     [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate].icon : 'icon-more'"
   ></mat-icon>
 </button>
 <mat-menu #aggregatemenu="matMenu">
   <div *ngFor="let aggregateType of aggregates; trackBy: trackByIndex">
     <button
-      [e2e]="AGGREGATE_TYPES_OBJ[aggregate].value"
+      [e2e]="aggregateType.value"
       mat-menu-item
       (click)="onAggregateChange(aggregateType.value)"
       *ngIf="checkColumn(aggregateType.value, sqlBuilder)"
