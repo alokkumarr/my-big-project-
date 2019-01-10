@@ -147,10 +147,11 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openSaveDialog(analysis: Analysis) {
-    const data: IToolbarActionData = {
+  openSaveDialog(analysis: Analysis, designerMode) {
+    const data = {
       action: 'save',
-      analysis
+      analysis,
+      designerMode
     };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',

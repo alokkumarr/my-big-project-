@@ -20,14 +20,15 @@
               matAutosizeMaxRows="10">
     </textarea>
   </mat-form-field>
-  <mat-form-field>
+  <!-- <mat-form-field>
     <input matInput placeholder="Category" value="Drafts" [disabled]="true">
-  </mat-form-field>
-  <!-- <mat-form-field class="select-form-field" appearance="outline">
+  </mat-form-field> -->
+
+  <mat-form-field class="select-form-field" appearance="outline">
     <mat-label>Category</mat-label>
     <mat-select (selectionChange)="onCategorySelected($event.value)"
                 e2e="save-dialog-selected-category"
-                [value]="analysis.categoryId">
+                [value]="analysis.categoryId" [disabled]="designerMode === 'new'">
       <mat-optgroup *ngFor="let category of categories"
                     [label]="category.name">
         <mat-option *ngFor="let subCategory of category.children"
@@ -36,5 +37,5 @@
         </mat-option>
       </mat-optgroup>
     </mat-select>
-  </mat-form-field> -->
+  </mat-form-field>
 </div>
