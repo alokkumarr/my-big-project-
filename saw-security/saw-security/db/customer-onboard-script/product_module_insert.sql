@@ -4,9 +4,9 @@ DROP PROCEDURE product_module_insert ;
 DELIMITER //
 CREATE PROCEDURE product_module_insert (IN l_customer_code varchar(50) , IN l_product_name varchar(50), IN l_product_code varchar(50), IN l_module_name varchar(50), IN l_module_code varchar(50), IN l_module_desc varchar(50))
 
- BEGIN
+  BEGIN
 
-	DECLARE l_customer_sys_id  INT ;
+    DECLARE l_customer_sys_id  INT ;
   	DECLARE l_product_sys_id  INT ;
    	DECLARE l_module_sys_id_analyze  INT ;
    	DECLARE l_incremental_product_sys_id INT;
@@ -19,6 +19,25 @@ CREATE PROCEDURE product_module_insert (IN l_customer_code varchar(50) , IN l_pr
     DECLARE l_cust_prod_mod_feature_sys_id INT;
     DECLARE l_privilege_sys_id INT;
     DECLARE l_role_sys_id INT;
+
+
+  DECLARE exit handler for sqlexception
+
+  BEGIN
+      -- ERROR
+    ROLLBACK;
+
+  END;
+
+  DECLARE exit handler for sqlwarning
+
+  BEGIN
+    -- WARNING
+    ROLLBACK;
+
+  END;
+
+  START TRANSACTION;
 
 
 SELECT max(PRODUCT_SYS_ID)+1 into l_incremental_product_sys_id from PRODUCTS;
@@ -465,6 +484,8 @@ INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID,
  Select l_privilege_sys_id;
 
 END IF;
+
+COMMIT;
 
 END;
 //
