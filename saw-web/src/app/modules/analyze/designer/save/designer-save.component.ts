@@ -15,7 +15,6 @@ export class DesignerSaveComponent implements OnInit {
   @Input() public analysis: Analysis;
   @Input() public designerMode: string;
 
-  public categorySelect: boolean;
   public categories;
 
   constructor(private _designerService: DesignerService) {}
@@ -26,7 +25,6 @@ export class DesignerSaveComponent implements OnInit {
       this.setDefaultCategory();
     });
     this.analysis.categoryId = this.designerMode === 'new' ? 5 : this.analysis.categoryId;
-    this.categorySelect = this.designerMode === 'new' ? false : true;
   }
 
   setDefaultCategory() {
