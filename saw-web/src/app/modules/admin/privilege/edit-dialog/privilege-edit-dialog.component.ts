@@ -8,6 +8,8 @@ import * as isEmpty from 'lodash/isEmpty';
 import { getPrivilegeDescription } from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
+import { first, tap } from 'rxjs/operators';
+import * as values from 'lodash/values';
 
 @Component({
   selector: 'privilege-edit-dialog',
@@ -19,6 +21,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   subCategoryFormGroup: FormGroup;
   formIsValid = false;
   privilegeId: number;
+  allowedPrivileges;
   products$;
   roles$;
   modules$;
@@ -43,6 +46,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       this.formIsValid = true;
       const { productId, moduleId, roleId, categoryCode } = this.data.model;
       this.modules$ = this.loadModules(productId);
+      this.loadAllowedPrivilegesForModule(moduleId);
       this.loadCategories(moduleId);
       this.loadSubCategories(moduleId, roleId, productId, categoryCode);
     }
@@ -100,7 +104,10 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     return map(
       subCategories,
       ({ privilegeCode, subCategoryId, privilegeId }) => {
-        const privilegeDesc = getPrivilegeDescription(privilegeCode);
+        const privilegeDesc = getPrivilegeDescription(
+          privilegeCode,
+          values(this.allowedPrivileges.priviliges)
+        );
         return {
           privilegeCode,
           privilegeDesc,
@@ -185,6 +192,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
     moduleIdControl.valueChanges.subscribe(mId => {
       this.loadCategories(mId);
+      this.loadAllowedPrivilegesForModule(mId);
       this.formGroup.controls.categoryCode.reset('');
       this.subCategories = [];
     });
@@ -206,6 +214,24 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       this.formGroup.controls.moduleId.enable({ emitEvent: false });
       return modules;
     });
+  }
+
+  /**
+   * Loads allowed provileges for selected module
+   *
+   * @param {*} moduleId
+   * @memberof PrivilegeEditDialogComponent
+   */
+  loadAllowedPrivilegesForModule(moduleId) {
+    this._privilegeService
+      .getModulePrivilegeMap(moduleId)
+      .pipe(
+        first(),
+        tap(allowedPrivileges => {
+          this.allowedPrivileges = allowedPrivileges;
+        })
+      )
+      .subscribe();
   }
 
   loadCategories(moduleId) {

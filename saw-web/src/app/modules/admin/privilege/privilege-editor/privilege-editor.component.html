@@ -13,6 +13,7 @@
     *ngFor="let subCategory of subCategories; let i = index"
     [class.active]="subCategory.privilegeId === activePrivilegeId"
     privilege-row
+    [allowedPrivileges]="allowedPrivileges"
     (categoryChange)="onCategoryChange(i, $event)"
     [subCategory]="subCategory"
   ></tr>
