@@ -4,9 +4,9 @@ DROP PROCEDURE product_module_insert ;
 DELIMITER //
 CREATE PROCEDURE product_module_insert (IN l_customer_code varchar(50) , IN l_product_name varchar(50), IN l_product_code varchar(50), IN l_module_name varchar(50), IN l_module_code varchar(50), IN l_module_desc varchar(50))
 
-  BEGIN
+ BEGIN
 
-    DECLARE l_customer_sys_id  INT ;
+	  DECLARE l_customer_sys_id  INT ;
   	DECLARE l_product_sys_id  INT ;
    	DECLARE l_module_sys_id_analyze  INT ;
    	DECLARE l_incremental_product_sys_id INT;
@@ -20,21 +20,19 @@ CREATE PROCEDURE product_module_insert (IN l_customer_code varchar(50) , IN l_pr
     DECLARE l_privilege_sys_id INT;
     DECLARE l_role_sys_id INT;
 
-
-  DECLARE exit handler for sqlexception
+    DECLARE exit handler for sqlexception
 
   BEGIN
-      -- ERROR
+    -- ERROR
     ROLLBACK;
-
+    SELECT 'Error occured';
   END;
 
   DECLARE exit handler for sqlwarning
-
   BEGIN
     -- WARNING
     ROLLBACK;
-
+    SELECT 'Warning occured';
   END;
 
   START TRANSACTION;
@@ -122,6 +120,8 @@ INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_FEATURE_SYS_ID,CUST_
 
  Select max(privilege_sys_id)+1 into l_privilege_sys_id from privileges;
  Select l_privilege_sys_id;
+
+ Select min(ROLE_SYS_ID) into l_role_sys_id from Roles where CUSTOMER_SYS_ID = l_customer_sys_id;
 
 INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID, CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY)
   SELECT l_privilege_sys_id PRIVILEGE_SYS_ID,
@@ -231,6 +231,8 @@ INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_FEATURE_SYS_ID,CUST_
  Select max(privilege_sys_id)+1 into l_privilege_sys_id from privileges;
  Select l_privilege_sys_id;
 
+ Select min(ROLE_SYS_ID) into l_role_sys_id from Roles where CUSTOMER_SYS_ID = l_customer_sys_id;
+
 INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID, CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY)
   SELECT l_privilege_sys_id PRIVILEGE_SYS_ID,
  l_cust_prod_sys_id CUST_PROD_SYS_ID,
@@ -336,6 +338,8 @@ INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_FEATURE_SYS_ID,CUST_
 
  Select max(privilege_sys_id)+1 into l_privilege_sys_id from privileges;
  Select l_privilege_sys_id;
+
+ Select min(ROLE_SYS_ID) into l_role_sys_id from Roles where CUSTOMER_SYS_ID = l_customer_sys_id;
 
 INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID, CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY)
   SELECT l_privilege_sys_id PRIVILEGE_SYS_ID,
@@ -485,8 +489,7 @@ INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID,
 
 END IF;
 
-COMMIT;
-
+COMMIT ;
 END;
 //
 DELIMITER ;

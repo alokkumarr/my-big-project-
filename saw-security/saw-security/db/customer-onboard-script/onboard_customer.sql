@@ -30,12 +30,14 @@ CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product
   BEGIN
     -- ERROR
     ROLLBACK;
+    SELECT 'Error occured';
   END;
 
   DECLARE exit handler for sqlwarning
   BEGIN
     -- WARNING
     ROLLBACK;
+    SELECT 'Warning occured';
   END;
 
   START TRANSACTION;
