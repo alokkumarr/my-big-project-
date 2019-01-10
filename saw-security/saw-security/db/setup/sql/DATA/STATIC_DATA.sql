@@ -13,6 +13,8 @@ INSERT INTO schema_version VALUES ('6', '6', '<< Flyway Baseline >>', 'BASELINE'
 INSERT INTO schema_version VALUES ('7', '7', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('8', '8', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('9', '9', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+INSERT INTO schema_version VALUES ('10', '10', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+INSERT INTO schema_version VALUES ('11', '11', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 
 
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
@@ -158,6 +160,23 @@ INSERT INTO `PRIVILEGES` (`PRIVILEGE_SYS_ID`, `CUST_PROD_SYS_ID`, `CUST_PROD_MOD
 ('136', '1', '4', '36', '1', '0', '128', 'All', '1', NOW(), 'admin'),
 ('137', '1', '4', '37', '1', '0', '128', 'All', '1', NOW(), 'admin'),
 ('138', '1', '4', '38', '1', '0', '128', 'All', '1', NOW(), 'admin');
+
+INSERT INTO `MODULE_PRIVILEGES` (`MODULE_PRIV_SYS_ID`,`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) VALUES
+('1', '1', '3'),
+('2', '1', '5'),
+('3', '1', '7'),
+('4', '1', '9'),
+('5', '1', '11'),
+('6', '1', '13'),
+('7', '1', '15'),
+('8', '1', '17'),
+('9', '2', '3'),
+('10', '2', '5'),
+('11', '2', '11'),
+('12', '2', '13'),
+('13', '2', '15'),
+('14', '2', '17');
+
 
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(4,123456785420,'Order Revenue by Customers',1,now(),'admin');
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(4,123456785431,'Incident density by States',1,now(),'admin');

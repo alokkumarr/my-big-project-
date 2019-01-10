@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
+import com.sncr.saw.security.app.repository.ModulePrivilegeRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
@@ -33,9 +34,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -50,7 +49,6 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -77,6 +75,9 @@ public class SecurityController {
 
 	@Autowired
     DataSecurityKeyRepository dataSecurityKeyRepository;
+
+	@Autowired
+    ModulePrivilegeRepository modulePrivilegeRepository;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -1410,8 +1411,8 @@ public class SecurityController {
 		}
 		return modules;
 	}
-	
-	/**
+
+    /**
 	 * 
 	 * @param cpm
 	 * @return
