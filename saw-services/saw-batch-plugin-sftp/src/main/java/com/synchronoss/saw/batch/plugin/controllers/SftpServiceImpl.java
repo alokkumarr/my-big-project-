@@ -309,6 +309,12 @@ public class SftpServiceImpl extends SipPluginContract {
         if (session.isOpen()) {
           session.close();
         }
+      } else {
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Destination directories "
+            + "exists but no permission to `Read/Write/Execute'");
+        logger.info("Destination directories "
+            + "exists but no permission to `Read/Write/Execute'");
       }
     }
     logger.trace("Test connection to route ends here");
