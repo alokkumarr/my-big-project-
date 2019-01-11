@@ -686,28 +686,28 @@
         "Number_Greater_than_Aggregate_function_Average_as_admin": {
           "user": "admin",
           "fieldType": "number",
-          "aggregateFunction": "AVG",
+          "aggregateFunction": "avg",
           "operator": "Greater than",
           "value": 10
         },
         "Number_Less_than_Aggregate_function_Minimum_as_admin": {
           "user": "admin",
           "fieldType": "number",
-          "aggregateFunction": "MIN",
+          "aggregateFunction": "min",
           "operator": "Less than",
           "value": 10
         },
         "Number_Greater_than_or_equal_to_Aggregate_function_Maximum_as_admin": {
           "user": "admin",
           "fieldType": "number",
-          "aggregateFunction": "MAX",
+          "aggregateFunction": "max",
           "operator": "Greater than or equal to",
           "value": 10
         },
         "Number_Less_than_or_equal_to_Aggregate_function_Count_as_admin": {
           "user": "admin",
           "fieldType": "number",
-          "aggregateFunction": "Count",
+          "aggregateFunction": "count",
           "operator": "Less than or equal to",
           "value": 10
         },
