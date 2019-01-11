@@ -42,18 +42,23 @@ public class QueryBuilderUtil {
 
 	{
 		AggregationBuilder aggregationBuilder = null;
+        String dateFormat = columnField.getDateFormat();
+        if ( dateFormat == null )
+        {
+            dateFormat = DATE_FORMAT;
+        }
 		
 		if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) 
 		    || columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name()))
 		{
 		  if (columnField.getGroupInterval()!=null){
-			aggregationBuilder = AggregationBuilders.
-					dateHistogram(aggregationName).field(columnField.getColumnName()).format(columnField.getDateFormat()).
+		      aggregationBuilder = AggregationBuilders.
+					dateHistogram(aggregationName).field(columnField.getColumnName()).format(dateFormat).
 					dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
 			}
 		  else {
 		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-		        .format(columnField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+		        .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 		  }
 		}
 		else {
@@ -68,16 +73,20 @@ public class QueryBuilderUtil {
 
 		{
 			AggregationBuilder aggregationBuilder = null;
-			
+            String dateFormat = rowField.getDateFormat();
+            if ( dateFormat == null )
+            {
+                dateFormat = DATE_FORMAT;
+            }
 			if (rowField.getType().name().equals(ColumnField.Type.DATE.name()) || rowField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
 			  if (rowField.getGroupInterval()!=null){
 	            aggregationBuilder = AggregationBuilders.
-	                    dateHistogram(aggregationName).field(rowField.getColumnName()).format(rowField.getDateFormat()).
+	                    dateHistogram(aggregationName).field(rowField.getColumnName()).format(dateFormat).
 	                    dateHistogramInterval(groupInterval(rowField.getGroupInterval().value())).order(BucketOrder.key(false));
 	            }
 	          else {
 	            aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName())
-	                .format(rowField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+	                .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 	          }
 			}
 			else {
@@ -127,17 +136,22 @@ public class QueryBuilderUtil {
 
     {
         AggregationBuilder aggregationBuilder = null;
+        String dateFormat = columnField.getDateFormat();
+        if ( dateFormat == null )
+        {
+            dateFormat = DATE_FORMAT;
+        }
 
         if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) ||
             columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
             if (columnField.getGroupInterval()!=null){
                 aggregationBuilder = AggregationBuilders.
-                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(columnField.getDateFormat()).
+                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(dateFormat).
                     dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
             }
             else {
                 aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-                    .format(columnField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+                    .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
             }
         }
         else {
@@ -231,17 +245,22 @@ public class QueryBuilderUtil {
 	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName)
 	{
 		AggregationBuilder aggregationBuilder = null;
+        String dateFormat = nodeField.getDateFormat();
+        if ( dateFormat == null )
+        {
+            dateFormat = DATE_FORMAT;
+        }
 		
 		if (nodeField.getType().name().equals(NodeField.Type.DATE.name()) || nodeField.getType().name().equals(NodeField.Type.TIMESTAMP.name()) ){
 		  nodeField = setGroupIntervalChart(nodeField);
   		  if (nodeField.getGroupInterval()!=null){
               aggregationBuilder = AggregationBuilders.
-                      dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
+                      dateHistogram(nodeName).field(nodeField.getColumnName()).format(dateFormat).
                       dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(BucketOrder.key(false));
               }
             else {
               aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                  .format(nodeField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+                  .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
             }
 		}
 		else{
@@ -252,7 +271,12 @@ public class QueryBuilderUtil {
 
   public static com.synchronoss.querybuilder.model.chart.NodeField setGroupIntervalChart(
       com.synchronoss.querybuilder.model.chart.NodeField nodeField) {
-    String interval = dateFormats.get(nodeField.getDateFormat().replaceAll(SPACE_REGX, EMPTY_STRING));
+      String dateFormat = nodeField.getDateFormat();
+      if ( dateFormat == null )
+      {
+          dateFormat = DATE_FORMAT;
+      }
+    String interval = dateFormats.get(dateFormat.replaceAll(SPACE_REGX, EMPTY_STRING));
     switch (interval) {
       case "month":
         nodeField.setGroupInterval(
