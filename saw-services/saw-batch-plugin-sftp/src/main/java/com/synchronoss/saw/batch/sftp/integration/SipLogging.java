@@ -79,7 +79,6 @@ public class SipLogging {
         .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
     bisDataMetaInfo.setDataSizeInBytes(0L);
     bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-    bisDataMetaInfo.setProcessState(reasonCode);
     bisDataMetaInfo.setComponentState(reasonCode);
     bisDataMetaInfo.setActualReceiveDate(new Date());
     bisDataMetaInfo.setChannelId(channelId);
