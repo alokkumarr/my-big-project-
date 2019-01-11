@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 .aggregate-chooser__btn {
   width: auto;
@@ -15,4 +15,11 @@
       }
     }
   }
+}
+
+//Global styles to align with other aggregate icons
+.icon-ic-max,
+.icon-ic-average,
+.icon-ic-min {
+  font-size: 20px;
 }
