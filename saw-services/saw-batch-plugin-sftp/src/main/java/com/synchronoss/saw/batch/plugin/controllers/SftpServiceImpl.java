@@ -64,7 +64,6 @@ import org.springframework.util.StreamUtils;
 public class SftpServiceImpl extends SipPluginContract {
 
   private static final Logger logger = LoggerFactory.getLogger(SftpServiceImpl.class);
-  private static final String UNREACHABLE_HOST = "HOST NOT REACHABLE";
 
   @Autowired
   private RuntimeSessionFactoryLocator delegatingSessionFactory;
@@ -398,7 +397,7 @@ public class SftpServiceImpl extends SipPluginContract {
     } catch (Exception ex) {
       logger.error("Exception triggered while transferring the file", ex);
       sipLogService.updateLogs(Long.valueOf(payload.getChannelId()), Long.valueOf(
-          payload.getRouteId()),UNREACHABLE_HOST);
+          payload.getRouteId()), BisComponentState.HOST_NOT_REACHABLE.value());
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
       if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
@@ -571,7 +570,7 @@ public class SftpServiceImpl extends SipPluginContract {
     } catch (Exception ex) {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
-      sipLogService.updateLogs(channelId, routeId, UNREACHABLE_HOST);
+      sipLogService.updateLogs(channelId, routeId, BisComponentState.HOST_NOT_REACHABLE.value());
     }
     logger.trace("Transfer ends here with an channel " + channelId + " and routeId " + routeId);
     return listOfFiles;
