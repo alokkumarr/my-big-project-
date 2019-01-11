@@ -8,9 +8,9 @@ module.exports = {
 
   // available functions: Sum, AVG, MIN, MAX, Count
   aggregateFunctionButton: aggregateFunction =>
-    element(by.css(`[ng-reflect-e2e="${aggregateFunction}"]`)),
+    element(by.css(`[e2e="${aggregateFunction}"]`)),
   aggregateFunctionMenuItem: aggregateFunction =>
-    element(by.css(`[ng-reflect-e2e="${aggregateFunction}"]`)),
+    element(by.css(`[e2e="${aggregateFunction}"]`)),
   filterWindow: {
     addFilter: tableName =>
       element(by.css(`[e2e="filter-add-btn-${tableName}"]`)),
