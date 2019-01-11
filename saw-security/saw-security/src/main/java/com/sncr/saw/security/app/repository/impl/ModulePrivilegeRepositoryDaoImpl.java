@@ -23,12 +23,18 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
     @Autowired
     public ModulePrivilegeRepositoryDaoImpl(JdbcTemplate jdbcTemplate){this.jdbcTemplate = jdbcTemplate;}
 
+    /**
+     * Function will return the list of Privileges for every module in the system.
+     * @return
+     */
     @Override
     public List<ModulePrivileges> getModulePrivileges() {
         String fetchSql = "Select mp.MODULE_PRIV_SYS_ID, m.MODULE_NAME, pc.PRIVILEGE_CODES_SYS_ID, pc.PRIVILEGE_CODES_NAME FROM MODULE_PRIVILEGES mp Inner Join Modules m on " +
             " (mp.MODULE_SYS_ID = m.MODULE_SYS_ID ) " +
             " inner join privilege_codes pc on " +
             " (mp.PRIVILEGE_CODES_SYS_ID = pc.PRIVILEGE_CODES_SYS_ID) ";
+        /** The above sql fetches modules having privileges.
+         If any new module is coming into the system then corresponding privileges to be added into mod_priv table **/
 
         logger.trace("Prepared Sql : "+ fetchSql);
         List<ModulePrivileges> modulePrivilegesList = new ArrayList<>();
@@ -55,6 +61,11 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
         return modulePrivilegesList;
     }
 
+    /**
+     * This function returns all associated privileges for a given module.
+     * @param moduleSysId
+     * @return
+     */
     @Override
     public PrivilegesForModule getPrivilegeByModule(Long moduleSysId) {
         PrivilegesForModule privilegesForModule = new PrivilegesForModule();
@@ -63,6 +74,7 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
             " inner join privilege_codes pc on (mp.PRIVILEGE_CODES_SYS_ID = pc.PRIVILEGE_CODES_SYS_ID) " +
             " where m.MODULE_SYS_ID=? ";
 
+        // The sql selects all the privileges for any given module
         logger.trace("Prepared Sql : "+ fetchSql);
         HashMap<Long,String>  privilegeList = null;
         try{
