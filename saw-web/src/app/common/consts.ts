@@ -88,6 +88,11 @@ export const DATE_FORMATS = [
     label: 'September 1',
     value: 'monthAndDay',
     momentValue: 'MMMM D'
+  },
+  {
+    label: '09/01/2017 11:20:36',
+    value: 'MM/dd/yyyy HH:mm:ss',
+    momentValue: 'MM/DD/YYYY HH:mm:ss'
   }
 ];
 
