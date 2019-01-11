@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
-import com.sncr.saw.security.app.repository.ModulePrivilegeRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
@@ -76,9 +75,6 @@ public class SecurityController {
 	@Autowired
     DataSecurityKeyRepository dataSecurityKeyRepository;
 
-	@Autowired
-    ModulePrivilegeRepository modulePrivilegeRepository;
-
 	private final ObjectMapper mapper = new ObjectMapper();
 
     private final String AdminRole = "ADMIN";
@@ -119,7 +115,7 @@ public class SecurityController {
 			rToken.setMasterLoginId(loginDetails.getMasterLoginId());
 			rToken.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
 							? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
-			
+
 		} catch (DataAccessException de) {
 			logger.error("Exception occured creating ticket ", de, null);
 			ticket.setValidityReason("Database error. Please contact server Administrator.");
@@ -178,7 +174,7 @@ public class SecurityController {
         response.setHeader("Cache-Control","private");
        return ssoRequestHandler.processSSORequest(token);
 	}
-	
+
 	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
 	public LoginResponse accessToken(@RequestBody String rToken) throws ServletException {
 
@@ -282,7 +278,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param ticketID
 	 * @return
 	 */
@@ -298,7 +294,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param changePasswordDetails
 	 * @return
 	 */
@@ -348,7 +344,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param resetPwdDtls
 	 * @return
 	 */
@@ -393,7 +389,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param randomHashcode
 	 * @return
 	 */
@@ -431,7 +427,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param changePasswordDetails
 	 * @return
 	 */
@@ -489,7 +485,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param ticketId
 	 * @return
 	 */
@@ -505,12 +501,12 @@ public class SecurityController {
 
 	@SuppressWarnings("unused")
 	private static class LoginResponse {
-		
+
 		public String aToken;
 		public String rToken;
 		public boolean validity;
 		public String message;
-		
+
 		public LoginResponse(final String aToken) {
 			this.aToken = aToken;
 		}
@@ -599,7 +595,7 @@ public class SecurityController {
 
 	/**
 	 * This method return whether the token is valid or not
-	 * 
+	 *
 	 * @param
 	 * @return
 	 */
@@ -612,7 +608,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param analysis
 	 * @return
 	 */
@@ -648,7 +644,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param analysis
 	 * @return
 	 */
@@ -684,7 +680,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param analysis
 	 * @return
 	 */
@@ -719,7 +715,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param featureId
 	 * @return
 	 */
@@ -729,7 +725,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param customerId
 	 * @return
 	 */
@@ -1016,7 +1012,7 @@ public class SecurityController {
 
 
     /**
-	 * 
+	 *
 	 * @param user
 	 * @return
 	 */
@@ -1075,7 +1071,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param user
 	 * @return
 	 */
@@ -1132,7 +1128,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param deleteUser
 	 * @return
 	 */
@@ -1164,7 +1160,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param customerId
 	 * @return
 	 */
@@ -1190,7 +1186,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param customerId
 	 * @return
 	 */
@@ -1217,8 +1213,8 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
-	 * @param 
+	 *
+	 * @param
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/types/list", method = RequestMethod.POST)
@@ -1238,7 +1234,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param role
 	 * @return
 	 */
@@ -1271,7 +1267,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param deleteRole
 	 * @return
 	 */
@@ -1287,14 +1283,14 @@ public class SecurityController {
 					roleList.setValidityMessage("Role could not be deleted as User(s) exists in this role.");
 				} else if (userRepository.checkPrivExists(deleteRole.getRoleId())) {
 						roleList.setValid(false);
-						roleList.setValidityMessage("Role could not be deleted as Privileges(s) exists for this role");				
+						roleList.setValidityMessage("Role could not be deleted as Privileges(s) exists for this role");
 				}
-				
+
 				if (roleList.getValid()) {
 					if (userRepository.deleteRole(deleteRole.getRoleId(), deleteRole.getMasterLoginId())) {
 						roleList.setRoles(userRepository.getRoles(deleteRole.getCustomerId()));
 						roleList.setValid(true);
-					} 
+					}
 				}
 			} else {
 				roleList.setValid(false);
@@ -1311,7 +1307,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param role
 	 * @return
 	 */
@@ -1342,9 +1338,9 @@ public class SecurityController {
 		}
 		return roleList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param customerId
 	 * @return
 	 */
@@ -1369,9 +1365,9 @@ public class SecurityController {
 
 		return privList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param customerId
 	 * @return
 	 */
@@ -1390,9 +1386,9 @@ public class SecurityController {
 		}
 		return products;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param cpm
 	 * @return
 	 */
@@ -1412,7 +1408,7 @@ public class SecurityController {
 		return modules;
 	}
 
-    /**
+	/**
 	 * 
 	 * @param cpm
 	 * @return

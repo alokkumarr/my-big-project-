@@ -40,11 +40,11 @@ public class SecurityIT extends BaseIT {
   @Test
   public void testModulePrivileges() {
     given(authSpec)
-      .when().get("/security/auth/admin/cust/manage/module-privileges")
+      .when().get("/security/auth/admin/modules/module-privileges")
       .then().assertThat().statusCode(200);
 
     given(authSpec)
-      .when().get("/security/auth/admin/cust/manage/module-privileges/1")
+      .when().get("/security/auth/admin/modules/module-privileges/1")
       .then().assertThat().statusCode(200);
 
   }
