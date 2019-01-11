@@ -1,28 +1,21 @@
 package com.synchronoss.querybuilder;
 
-import java.util.*;
-
+import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.DataField;
+import com.synchronoss.querybuilder.model.chart.Filter;
+import com.synchronoss.querybuilder.model.chart.NodeField;
+import com.synchronoss.querybuilder.model.pivot.ColumnField;
+import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.report.Column;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.PrefixQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.index.query.WildcardQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-
-import com.synchronoss.BuilderUtil;
-import com.synchronoss.querybuilder.model.chart.Filter;
-import com.synchronoss.querybuilder.model.chart.NodeField;
-import com.synchronoss.querybuilder.model.pivot.ColumnField;
-import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import java.util.*;
 
 import static com.synchronoss.AggregationConstants.*;
 
@@ -55,12 +48,12 @@ public class QueryBuilderUtil {
 		{
 		  if (columnField.getGroupInterval()!=null){
 			aggregationBuilder = AggregationBuilders.
-					dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
+					dateHistogram(aggregationName).field(columnField.getColumnName()).format(columnField.getDateFormat()).
 					dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
 			}
 		  else {
 		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-		        .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+		        .format(columnField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 		  }
 		}
 		else {
@@ -79,12 +72,12 @@ public class QueryBuilderUtil {
 			if (rowField.getType().name().equals(ColumnField.Type.DATE.name()) || rowField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
 			  if (rowField.getGroupInterval()!=null){
 	            aggregationBuilder = AggregationBuilders.
-	                    dateHistogram(aggregationName).field(rowField.getColumnName()).format(DATE_FORMAT).
+	                    dateHistogram(aggregationName).field(rowField.getColumnName()).format(rowField.getDateFormat()).
 	                    dateHistogramInterval(groupInterval(rowField.getGroupInterval().value())).order(BucketOrder.key(false));
 	            }
 	          else {
 	            aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName())
-	                .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+	                .format(rowField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 	          }
 			}
 			else {
@@ -139,12 +132,12 @@ public class QueryBuilderUtil {
             columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
             if (columnField.getGroupInterval()!=null){
                 aggregationBuilder = AggregationBuilders.
-                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
+                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(columnField.getDateFormat()).
                     dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
             }
             else {
                 aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-                    .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+                    .format(columnField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
             }
         }
         else {
