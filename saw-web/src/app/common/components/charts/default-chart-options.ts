@@ -62,6 +62,11 @@ export const chartOptions = defaultsDeep(
           enabled: false
         }
       },
+      area: {
+        marker: {
+          enabled: false
+        }
+      },
       bubble: {
         marker: {
           fillOpacity: 0.2

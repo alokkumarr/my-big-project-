@@ -1,16 +1,27 @@
-<button mat-icon-button
-        [matMenuTriggerFor]="aggregatemenu"
-        class="aggregate-chooser__btn">
-  <mat-icon [style.width.px]="40" [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate].icon : 'icon-more'"></mat-icon>
+<button
+  mat-icon-button
+  [matMenuTriggerFor]="aggregatemenu"
+  class="aggregate-chooser__btn"
+  [attr.e2e]="AGGREGATE_TYPES_OBJ[aggregate].value"
+>
+  <mat-icon
+    [style.width.px]="40"
+    [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate].icon : 'icon-more'"
+  ></mat-icon>
 </button>
 <mat-menu #aggregatemenu="matMenu">
   <div *ngFor="let aggregateType of aggregates; trackBy: trackByIndex">
-      <button mat-menu-item
+    <button
+      [attr.e2e]="aggregateType.value"
+      mat-menu-item
       (click)="onAggregateChange(aggregateType.value)"
-      *ngIf="checkColumn(aggregateType.value, sqlBuilder)" [ngStyle]="{'color': aggregate ===  aggregateType.value ? '#0077BE' : '#737373'}">
-        <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
-        <span style="margin-left: 20px;">{{aggregateType.label}}</span>
-      </button>
+      *ngIf="checkColumn(aggregateType.value, sqlBuilder)"
+      [ngStyle]="{
+        color: aggregate === aggregateType.value ? '#0077BE' : '#737373'
+      }"
+    >
+      <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
+      <span style="margin-left: 20px;">{{ aggregateType.label }}</span>
+    </button>
   </div>
-
 </mat-menu>

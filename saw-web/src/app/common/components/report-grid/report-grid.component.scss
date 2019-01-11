@@ -1,6 +1,6 @@
 .report-dx-grid {
   max-width: 100% !important;
-  border: 1px solid #DEDEDE;
+  border: 1px solid #dedede;
 
   .dx-datagrid-table {
     .dx-row {
@@ -10,7 +10,7 @@
       }
 
       &.dx-header-row {
-        background-color: #F3F5F8;
+        background-color: #f3f5f8;
 
         > td {
           border-bottom: none;
@@ -18,10 +18,10 @@
       }
 
       &.dx-data-row {
-        background-color: #FFF;
+        background-color: #fff;
 
         &.dx-row-alt {
-          background-color: #F7F9FC;
+          background-color: #f7f9fc;
         }
       }
     }
@@ -43,7 +43,7 @@
 }
 
 .selected-aggregate.icon-Count,
-.selected-aggregate.icon-Percentage, {
+.selected-aggregate.icon-Percentage {
   margin-top: -6px;
 }
 
@@ -74,13 +74,14 @@ button.report-options {
 }
 
 //Global styles to align with other aggregate icons
-.icon-MAX,
-.icon-MIN,
-.icon-AVG {
+.icon-ic-max,
+.icon-ic-average,
+.icon-ic-min {
   padding-top: 2px;
   font-size: 20px;
 }
 
-.report-options .icon-Count, .report-options .icon-Percentage {
+.report-options .icon-Count,
+.report-options .icon-Percentage {
   margin-bottom: 17px;
 }
