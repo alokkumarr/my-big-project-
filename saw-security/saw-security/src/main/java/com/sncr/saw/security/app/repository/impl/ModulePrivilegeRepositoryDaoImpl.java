@@ -29,7 +29,8 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
      */
     @Override
     public List<ModulePrivileges> getModulePrivileges() {
-        String fetchSql = "Select mp.MODULE_PRIV_SYS_ID, m.MODULE_NAME, pc.PRIVILEGE_CODES_SYS_ID, pc.PRIVILEGE_CODES_NAME FROM MODULE_PRIVILEGES mp Inner Join Modules m on " +
+        String fetchSql = "Select mp.MODULE_PRIV_SYS_ID, m.MODULE_NAME, m.MODULE_SYS_ID, pc.PRIVILEGE_CODES_SYS_ID," +
+            " pc.PRIVILEGE_CODES_NAME FROM MODULE_PRIVILEGES mp Inner Join Modules m on " +
             " (mp.MODULE_SYS_ID = m.MODULE_SYS_ID ) " +
             " inner join privilege_codes pc on " +
             " (mp.PRIVILEGE_CODES_SYS_ID = pc.PRIVILEGE_CODES_SYS_ID) ";
@@ -43,6 +44,7 @@ public class ModulePrivilegeRepositoryDaoImpl implements ModulePrivilegeReposito
                 List<ModulePrivileges> tempModulePrivilegesList = new ArrayList<>();
                 while (resultSet.next())    {
                     ModulePrivileges modulePrivileges = new ModulePrivileges();
+                    modulePrivileges.setModuleSysId(resultSet.getLong("MODULE_SYS_ID"));
                     modulePrivileges.setModulePrivSysId(resultSet.getLong("MODULE_PRIV_SYS_ID"));
                     modulePrivileges.setModuleName(resultSet.getString("MODULE_NAME"));
                     modulePrivileges.setPrivilegeCodeSysId(resultSet.getLong("PRIVILEGE_CODES_SYS_ID"));
