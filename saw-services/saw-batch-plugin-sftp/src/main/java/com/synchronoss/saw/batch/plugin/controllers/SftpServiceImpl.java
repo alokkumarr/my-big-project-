@@ -749,7 +749,7 @@ public class SftpServiceImpl extends SipPluginContract {
                                       + fileTransEndTime);
                                   logger.trace(
                                       "closing the stream for the file " + entry.getFilename());
-                                  logger.trace("File transfer duration :: " + fileTransDuration);
+                                 
                                   
                                   bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
                                   bisDataMetaInfo.setComponentState(
@@ -761,6 +761,7 @@ public class SftpServiceImpl extends SipPluginContract {
                                   bisDataMetaInfo.setFileTransferDuration(
                                       Duration.between(fileTransStartTime, 
                                           fileTransEndTime).toMillis());
+                                  logger.trace("File transfer duration :: " + bisDataMetaInfo.getFileTransferDuration());
                                   sipLogService.upsert(
                                       bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                                   list.add(bisDataMetaInfo);
@@ -793,6 +794,10 @@ public class SftpServiceImpl extends SipPluginContract {
                             + "privileges to write on the location :"
                             + userHasPermissionsToWriteFile);
                       }
+                      bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
+                      bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
+                      sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                      list.add(bisDataMetaInfo);
                      
                     } else {
                       if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
@@ -804,7 +809,6 @@ public class SftpServiceImpl extends SipPluginContract {
                             sourcelocation + File.separator 
                             +  entry.getFilename(), channelId, routeId,
                             localDirectory.getPath());
-                        bisDataMetaInfo.setFilePattern(pattern);
                         bisDataMetaInfo.setProcessId(
                             new UUIDGenerator().generateId(bisDataMetaInfo).toString());
                         bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
