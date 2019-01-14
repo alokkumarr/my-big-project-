@@ -471,6 +471,25 @@ return errors, before they are fully restored again.
 
 == Maintenance and troubleshooting
 
+=== Restarting SIP nodes
+
+SIP nodes can be restarted one at a time and will automatically come
+back into service when starting up.  However, if multiple SIP nodes
+need to be restarted or stopped simultaneously, stop them in the
+following specific order:
+
+1. First stop any nodes in the `saw-security-arbitrator` role
+
+2. Then stop nodes in all remaining roles
+
+Applying the above order allows the MariaDB Galera Cluster to start up
+automatically when the SIP nodes are started again.
+
+NOTE: If SIP nodes were stopped in another order and the MariaDB
+Galera Cluster is unable to start automatically, please see
+<<Bootstrapping the MariaDB Galera cluster>> for instructions on how
+to start the cluster manually.
+
 === Accessing application logs
 
 The SAW systemd services system logs can be accessed using the `sudo
@@ -570,20 +589,23 @@ cluster.
 
 === Bootstrapping the MariaDB Galera cluster
 
-If all MariaDB server instances in the SIP environment are shut down,
-the MariaDB Galera Cluster might not be able to start up itself
-automatically.  In such cases bootstrap the cluster manually using the
-following command on one of the hosts:
+If the MariaDB Galera cluster is unable to determine that it can start
+up automatically, it can be started manually instead.  In such cases
+bootstrap the cluster manually using the following command:
 
         $ sudo galera_new_cluster
 
 The host to run that command on should be the host that has
 `safe_to_bootstrap: 1` in its `/var/lib/mysql/grastate.dat` file.
 
+NOTE: If no node has `safe_to_bootstrap: 1`, find the node that was
+shut down last and edit its `/var/lib/mysql/grastate.dat` file to say
+`safe_to_bootstrap: 1`.
+
 :mariadb_doc: https://mariadb.com/kb/en/library
 :galera_doc: {mariadb_doc}/getting-started-with-mariadb-galera-cluster
 
-NOTE: For more information, see the
+For more information, see the
 {galera_doc}#restarting-the-cluster[restarting the cluster] section in
 the MariaDB Galera Cluster documentation.
 
