@@ -67,6 +67,9 @@
                     [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
       >
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+        <dxi-column caption="Transfer Start" dataField="transferStartTime" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer End" dataField="transferEndTime" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer Duration" dataField="transferDuration" alignment="left"></dxi-column>
         <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
         <dxi-column caption="File Name" dataField="fileName" alignment="left"></dxi-column>
         <dxi-column caption="Actual File Rec Date" dataField="actualFileRecDate" cellTemplate="dateTypeTemplate"></dxi-column>
