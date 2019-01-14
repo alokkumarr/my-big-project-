@@ -32,7 +32,8 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Query("SELECT Logs from BisFileLog Logs where (TIMEDIFF(NOW(), Logs.checkpointDate))/60 "
       + "> :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
       + "and Logs.bisProcessState = 'DATA_IN_PROGRESS')  "
-      + "or (Logs.mflFileStatus = 'FAILED' and Logs.bisProcessState = 'DATA_REMOVED')) ")
+      + "or (Logs.mflFileStatus = 'FAILED' and (Logs.bisProcessState = 'DATA_REMOVED' "
+      + "or Logs.bisProcessState = 'HOST_NOT_REACHABLE'))) ")
   Page<BisFileLog> retryIds(@Param("noOfMinutes") Integer noOfMinutes, Pageable pageable);
 
   @Modifying(clearAutomatically = true)
@@ -44,7 +45,8 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Query("SELECT COUNT(pid) from BisFileLog Logs where (TIMEDIFF(NOW(),Logs.checkpointDate))/60 "
       + " > :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
       + "and Logs.bisProcessState = 'DATA_IN_PROGRESS') "
-      + " or (Logs.mflFileStatus = 'FAILED' and Logs.bisProcessState = 'DATA_REMOVED') )")
+      + "or (Logs.mflFileStatus = 'FAILED' and (Logs.bisProcessState = 'DATA_REMOVED' "
+      + "or Logs.bisProcessState = 'HOST_NOT_REACHABLE') ) )")
   Integer countOfRetries(@Param("noOfMinutes") Integer noOfMinutes);
 
 
