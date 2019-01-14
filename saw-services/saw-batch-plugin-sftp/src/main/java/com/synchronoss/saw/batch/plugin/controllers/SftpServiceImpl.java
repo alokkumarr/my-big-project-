@@ -714,10 +714,6 @@ public class SftpServiceImpl extends SipPluginContract {
                           + IntegrationUtils.renameFileAppender() + "."
                           + FilenameUtils.getExtension(entry.getFilename()));
                       fileTobeDeleted = localFile;
-                     
-                      Date actualRecDate = 
-                              new Date(((long) entry.getAttrs().getATime()) * 1000L);
-                      
                       BisDataMetaInfo bisDataMetaInfo = prepareLogInfo(pattern, 
                           getFilePath(localDirectory, entry),
                           getActualRecDate(entry), entry.getAttrs().getSize(),
@@ -727,7 +723,6 @@ public class SftpServiceImpl extends SipPluginContract {
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                       logger.trace("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
-                      Long fileTransDuration = null;
                       
                       template.get(sourcelocation + File.separator + entry.getFilename(),
                           new InputStreamCallback() {
