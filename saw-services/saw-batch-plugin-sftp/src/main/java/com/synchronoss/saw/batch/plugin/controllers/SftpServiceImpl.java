@@ -900,10 +900,12 @@ public class SftpServiceImpl extends SipPluginContract {
             if (isDisable) {
               if (sipLogService.isRouteAndChannelExists(routeId, channelId)) {
                 updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
+                transferData(channelId, routeId);
               }
             }
           } else {
             updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
+            transferData(channelId, routeId);
           }
         } catch (IOException e) {
           logger.error("Exception occurred while reading duplicate attribute ", e);
