@@ -94,10 +94,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
        commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
        save.nameInput.clear().sendKeys(chartName);
        save.descriptionInput.clear().sendKeys(chartDescription);
-       commonFunctions.waitFor.elementToBeClickable(save.selectedCategoryUpdated);
-       save.selectedCategoryUpdated.click();
-       commonFunctions.waitFor.elementToBeClickable(save.selectCategoryToSave(subCategoryName));
-       save.selectCategoryToSave(subCategoryName).click();
        commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
        save.saveBtn.click();
        browser.sleep(1000);
