@@ -761,7 +761,8 @@ public class SftpServiceImpl extends SipPluginContract {
                                   bisDataMetaInfo.setFileTransferDuration(
                                       Duration.between(fileTransStartTime, 
                                           fileTransEndTime).toMillis());
-                                  logger.trace("File transfer duration :: " + bisDataMetaInfo.getFileTransferDuration());
+                                  logger.trace("File transfer duration :: " 
+                                          + bisDataMetaInfo.getFileTransferDuration());
                                   sipLogService.upsert(
                                       bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                                   list.add(bisDataMetaInfo);
