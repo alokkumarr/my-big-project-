@@ -647,7 +647,6 @@ public class SftpServiceImpl extends SipPluginContract {
               (filteredFiles.length + iterationOfBatches - 1) / iterationOfBatches;
 
           logger.trace("partitionSize :" + partitionSize);
-          //BisDataMetaInfo bisDataMetaInfo = null;
           List<LsEntry> filesArray = Arrays.asList(filteredFiles);
           logger.trace("number of files on this pull :" + filesArray.size());
           List<List<LsEntry>> result = IntStream.range(0, partitionSize)
@@ -728,11 +727,6 @@ public class SftpServiceImpl extends SipPluginContract {
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                       logger.trace("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
-                      Date recDate = 
-                              new Date(((long) entry.getAttrs().getATime()) * 1000L);
-                      
-                      ZonedDateTime fileTransStartTime = null;
-                      ZonedDateTime fileTransEndTime = null;
                       Long fileTransDuration = null;
                       
                       template.get(sourcelocation + File.separator + entry.getFilename(),
@@ -836,7 +830,6 @@ public class SftpServiceImpl extends SipPluginContract {
 
                       logger.trace(" files or directory to be deleted on exception " 
                           + fileTobeDeleted);
-                      bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
                       bisDataMetaInfo.setComponentState(BisComponentState.DATA_REMOVED.value());
                       bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
