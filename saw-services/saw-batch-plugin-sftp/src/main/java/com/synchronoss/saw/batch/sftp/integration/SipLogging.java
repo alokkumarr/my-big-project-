@@ -5,6 +5,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
+import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 
@@ -94,6 +95,7 @@ public class SipLogging {
         .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
     bisDataMetaInfo.setDataSizeInBytes(0L);
     bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+    bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
     bisDataMetaInfo.setComponentState(reasonCode);
     bisDataMetaInfo.setActualReceiveDate(new Date());
     bisDataMetaInfo.setChannelId(channelId);
@@ -121,6 +123,22 @@ public class SipLogging {
 
   }
 
+
+  /**
+   * verify the routeId & channelId exists with
+   * data received & success.
+   * @param routeId route id to be validated
+   * @param channelId channel id to be validated
+   * @return true or false
+   */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean isRouteAndChannelExists(Long routeId, Long channelId) {
+    return bisFileLogsRepository.isChannelAndRouteIdExists(routeId, channelId);
+
+  }
+  
   /**
    * This method is used retry id.
    *
@@ -151,8 +169,8 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public Integer updateStatusFailed(String status, String pid) {
-    Integer countOfRows = bisFileLogsRepository.updateBislogsStatus(status, pid);
+  public Integer updateStatusFailed(String fileStatus, String processStatus, String pid) {
+    Integer countOfRows = bisFileLogsRepository.updateBislogsStatus(fileStatus, processStatus, pid);
     return countOfRows;
   }
 

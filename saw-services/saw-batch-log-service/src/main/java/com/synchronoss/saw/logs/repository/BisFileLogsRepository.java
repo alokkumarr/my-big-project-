@@ -18,21 +18,33 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   BisFileLog findByPid(String pid);
 
   @Query("SELECT COUNT(pid)>0 from BisFileLog Logs where Logs.fileName = :fileName "
-      + "and Logs.mflFileStatus != 'FAILED' ")
+      + "and (Logs.mflFileStatus = 'SUCCESS' and Logs.bisProcessState = 'DATA_RECEIVED') ")
   boolean isFileNameExists(@Param("fileName") String fileName);
+
+  @Query("SELECT COUNT(pid)>0 from BisFileLog Logs where Logs.routeSysId = :routeId "
+      + "and Logs.channelSysId = :channelSysId "
+      + "and (Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = 'DATA_IN_PROGRESS')")
+  boolean isChannelAndRouteIdExists(@Param("routeId") Long routeId,
+      @Param("channelSysId") Long channelSysId);
 
   List<BisFileLog> findByRouteSysId(long routeSysId);
 
   @Query("SELECT Logs from BisFileLog Logs where (TIMEDIFF(NOW(), Logs.checkpointDate))/60 "
-      + "> :noOfMinutes and (Logs.mflFileStatus != 'SUCCESS' and Logs.mflFileStatus != 'FAILED') ")
+      + "> :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
+      + "and Logs.bisProcessState = 'DATA_IN_PROGRESS')  "
+      + "or (Logs.mflFileStatus = 'FAILED' and Logs.bisProcessState = 'DATA_REMOVED')) ")
   Page<BisFileLog> retryIds(@Param("noOfMinutes") Integer noOfMinutes, Pageable pageable);
 
   @Modifying(clearAutomatically = true)
-  @Query("UPDATE BisFileLog Logs SET Logs.mflFileStatus = :status WHERE Logs.pid = :pid")
-  Integer updateBislogsStatus(@Param("status") String status, @Param("pid") String pid);
+  @Query("UPDATE BisFileLog Logs SET Logs.mflFileStatus = :fileStatus, "
+      + "Logs.bisProcessState = :processStatus WHERE Logs.pid = :pid")
+  Integer updateBislogsStatus(@Param("fileStatus") String fileStatus,
+      @Param("processStatus") String processStatus, @Param("pid") String pid);
 
   @Query("SELECT COUNT(pid) from BisFileLog Logs where (TIMEDIFF(NOW(),Logs.checkpointDate))/60 "
-      + " > :noOfMinutes and (Logs.mflFileStatus != 'SUCCESS' and Logs.mflFileStatus != 'FAILED') ")
+      + " > :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
+      + "and Logs.bisProcessState = 'DATA_IN_PROGRESS') "
+      + " or (Logs.mflFileStatus = 'FAILED' and Logs.bisProcessState = 'DATA_REMOVED') )")
   Integer countOfRetries(@Param("noOfMinutes") Integer noOfMinutes);
 
 
