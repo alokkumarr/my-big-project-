@@ -67,9 +67,6 @@
                     [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
       >
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
-        <dxi-column caption="Transfer Start" dataField="transferStartTime" alignment="left"></dxi-column>
-        <dxi-column caption="Transfer End" dataField="transferEndTime" alignment="left"></dxi-column>
-        <dxi-column caption="Transfer Duration" dataField="transferDuration" alignment="left"></dxi-column>
         <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
         <dxi-column caption="File Name" dataField="fileName" alignment="left"></dxi-column>
         <dxi-column caption="Actual File Rec Date" dataField="actualFileRecDate" cellTemplate="dateTypeTemplate"></dxi-column>
@@ -77,10 +74,16 @@
         <dxi-column caption="Rec File Size" dataField="recdFileSize" alignment="left"></dxi-column>
         <dxi-column caption="File Status" dataField="mflFileStatus" alignment="left"></dxi-column>
         <dxi-column caption="Process State" dataField="bisProcessState" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer Start" dataField="transferStartTime" cellTemplate="timeTypeTemplate" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer End (ms)" dataField="transferEndTime" cellTemplate="timeTypeTemplate" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer Duration" dataField="transferDuration" alignment="left"></dxi-column>
         <dxi-column caption="Modified at" dataField="modifiedDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
         <dxi-column caption="Created at" dataField="createdDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
         <div *dxTemplate="let data of 'dateTypeTemplate'">
           {{data.value | date: 'short'}}
+        </div>
+        <div *dxTemplate="let data of 'timeTypeTemplate'">
+          {{data.value | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}
         </div>
       </dx-data-grid>
     </div>
