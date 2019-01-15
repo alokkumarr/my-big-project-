@@ -101,6 +101,7 @@ export class CronJobSchedularComponent implements OnInit {
       new Date(
         moment()
           .local()
+          .seconds(0)
           .format()
       )
     );
@@ -304,17 +305,10 @@ export class CronJobSchedularComponent implements OnInit {
   }
 
   cronChange() {
-    this.startDate = '';
-    this.endDate = '';
+    console.log('selectedMoments', this.selectedMoments);
     if (this.scheduleType !== 'immediate') {
-      this.startDate =
-        isUndefined(this.selectedMoments[0]) || this.selectedMoments[1] === null
-          ? moment.utc()
-          : this.selectedMoments[0];
-      this.endDate =
-        isUndefined(this.selectedMoments[1]) || this.selectedMoments[1] === null
-          ? ''
-          : this.selectedMoments[1];
+      this.startDate = this.selectedMoments[0] || moment.utc().seconds(0);
+      this.endDate = this.selectedMoments[1] || '';
     }
     this.crondetails = {
       cronexp: this.CronExpression,
@@ -336,6 +330,7 @@ export class CronJobSchedularComponent implements OnInit {
       new Date(
         moment(this.crondetails.startDate)
           .local()
+          .seconds(0)
           .format()
       )
     );
@@ -347,6 +342,7 @@ export class CronJobSchedularComponent implements OnInit {
         new Date(
           moment(this.crondetails.endDate)
             .local()
+            .seconds(0)
             .format()
         )
       );
