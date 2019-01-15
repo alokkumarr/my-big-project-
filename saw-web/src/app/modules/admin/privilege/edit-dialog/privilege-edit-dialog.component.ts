@@ -9,7 +9,6 @@ import { getPrivilegeDescription } from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 import { first, tap } from 'rxjs/operators';
-import * as values from 'lodash/values';
 
 @Component({
   selector: 'privilege-edit-dialog',
@@ -21,7 +20,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   subCategoryFormGroup: FormGroup;
   formIsValid = false;
   privilegeId: number;
-  allowedPrivileges;
+  allowedPrivileges: string[];
   products$;
   roles$;
   modules$;
@@ -44,6 +43,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
     if (this.data.mode === 'edit') {
       this.formIsValid = true;
+      console.log(this.data);
       const { productId, moduleId, roleId, categoryCode } = this.data.model;
       this.modules$ = this.loadModules(productId);
       this.loadAllowedPrivilegesForModule(moduleId);
@@ -106,7 +106,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       ({ privilegeCode, subCategoryId, privilegeId }) => {
         const privilegeDesc = getPrivilegeDescription(
           privilegeCode,
-          values(this.allowedPrivileges.priviliges)
+          this.allowedPrivileges
         );
         return {
           privilegeCode,
@@ -224,11 +224,11 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
    */
   loadAllowedPrivilegesForModule(moduleId) {
     this._privilegeService
-      .getModulePrivilegeMap(moduleId)
+      .getPrivilegesForModule(moduleId)
       .pipe(
         first(),
-        tap(allowedPrivileges => {
-          this.allowedPrivileges = allowedPrivileges;
+        tap(privileges => {
+          this.allowedPrivileges = privileges;
         })
       )
       .subscribe();

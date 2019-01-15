@@ -8,8 +8,6 @@ import {
   getPrivilegeFromBoolArray
 } from '../privilege-code-transformer';
 
-import * as values from 'lodash/values';
-
 /** privilegeCode privilegeDesc
  * 0 => No access
  * 128 => All
@@ -49,11 +47,11 @@ export class PrivilegeRowComponent {
     }),
     {}
   );
-  @Input('allowedPrivileges') set _allowedPrivileges(allowedPrivileges) {
-    if (!allowedPrivileges) {
+  @Input('allowedPrivileges') set _allowedPrivileges(privileges: string[]) {
+    if (!privileges) {
       return;
     }
-    const allowedPrivilegeList: string[] = values(allowedPrivileges.priviliges);
+    const allowedPrivilegeList: string[] = privileges;
     this.allowedPrivileges = allowedPrivilegeList.reduce(
       (accum, privilegeName: string) => ({
         ...accum,
