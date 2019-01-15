@@ -130,6 +130,7 @@ export class AnalyzeNewDialogComponent {
     const [first, second] = method.type.split(':');
     switch (first) {
       case 'chart':
+      case 'map':
         return {
           type: first,
           chartType: second

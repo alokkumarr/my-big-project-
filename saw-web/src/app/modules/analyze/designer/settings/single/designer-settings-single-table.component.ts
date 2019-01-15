@@ -82,6 +82,11 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       this.groupAdapters = this._designerService.getChartGroupAdapters(
         this.artifactColumns, this.analysisSubtype
       );
+      break;
+    case 'map':
+      this.groupAdapters = this._designerService.getMapGroupAdapters(
+        this.artifactColumns
+      );
     }
   }
 

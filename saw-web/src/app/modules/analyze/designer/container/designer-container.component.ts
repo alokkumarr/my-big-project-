@@ -132,6 +132,7 @@ export class DesignerContainerComponent implements OnInit {
       return 'multi';
     case 'pivot':
     case 'chart':
+    case 'map':
     default:
       return 'single';
     }
@@ -324,6 +325,7 @@ export class DesignerContainerComponent implements OnInit {
     switch (this.analysis.type) {
       case 'pivot':
       case 'chart':
+      case 'map':
         return [];
 
       case 'report':
@@ -381,6 +383,7 @@ export class DesignerContainerComponent implements OnInit {
       }
     });
 
+    this.analysis.type = 'chart';
     this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
@@ -422,6 +425,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'esReport':
       return data;
     case 'chart':
+    case 'map':
       return flattenChartData(
         data,
         analysis.sqlBuilder
@@ -531,6 +535,7 @@ export class DesignerContainerComponent implements OnInit {
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'chart':
+    case 'map':
       partialSqlBuilder = this._designerService.getPartialChartSqlBuilder(this.artifacts[0].columns);
       sortProp = 'sorts';
       break;
@@ -586,6 +591,7 @@ export class DesignerContainerComponent implements OnInit {
       }
       return isDataEmpty;
     case 'chart':
+    case 'map':
       const parsedData = flattenChartData(data, sqlBuilder);
       return isEmpty(parsedData);
     // TODO verify if the object returned is empty
@@ -612,6 +618,7 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'pivot':
     case 'chart':
+    case 'map':
       this.handleOtherChangeEvents(event);
       break;
     }
@@ -796,6 +803,13 @@ export class DesignerContainerComponent implements OnInit {
     case 'pivot':
       const length = get(this.analysis, 'sqlBuilder.dataFields.length');
       return isNumber(length) ? length > 0 : false;
+    case 'map':
+      const sqlB = get(this.analysis, 'sqlBuilder') || {};
+      const requestConditions = [
+        find(sqlB.nodeFields || [], field => field.checked === 'x'),
+        find(sqlB.dataFields || [], field => field.checked === 'y')
+      ];
+      return every(requestConditions, Boolean);
     case 'chart':
       /* At least one y and x field needs to be present. If this is a bubble chart,
        * at least one z axis field is also needed */

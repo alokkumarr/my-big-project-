@@ -24,8 +24,10 @@ import * as Nouslider from 'nouislider';
 import * as RxJsCompat from 'rxjs-compat';
 import * as Lodash from 'lodash';
 import * as LodashFp from 'lodash/fp';
-import * as Rxjs from 'rxjs';
 import * as RxjsOperators from 'rxjs/operators';
+import * as Rxjs from 'rxjs';
+import * as mapboxgl from 'mapbox-gl';
+import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import * as get from 'lodash/get';
 import APP_CONFIG from '../../../../appConfig';
 
@@ -55,7 +57,9 @@ const dependencies = {
   'rxjs': Rxjs,
   'rxjs/operators': RxjsOperators,
   'lodash': Lodash,
-  'lodash/fp': LodashFp
+  'lodash/fp': LodashFp,
+  'mapbox-gl': mapboxgl,
+  '@mapbox/mapbox-gl-geocoder': MapboxGeocoder
 };
 
 interface ModuleInfo {
@@ -79,7 +83,8 @@ export class DynamicModuleService {
     // Eg: If Insights plugin code is in "insights.umd.js", then moduleURL="insights"
     // Also it is expected that plugin code should be placed in saw/web folder in server
 
-    const moduleServerURL = `${this.api}/${moduleInfo.moduleURL}.umd.js`;
+    const moduleServerURL = 'http://localhost:4200/assets/insights.umd.js';
+    // const moduleServerURL = `${this.api}/${moduleInfo.moduleURL}.umd.js`;
     forEach(dependencies, (dep, key) =>
       SystemJS.set(key, SystemJS.newModule(dep))
     );

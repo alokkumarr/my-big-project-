@@ -67,6 +67,7 @@ import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-p
 import { ChartGridComponent } from './components/chart-grid';
 
 import { UChartModule } from './components/charts';
+import { MapBoxModule } from './map-box/map-box.module';
 
 import {
   RemoteFolderSelectorComponent,
@@ -106,7 +107,8 @@ const MODULES = [
   HttpClientModule,
   OwlDateTimeModule,
   OwlNativeDateTimeModule,
-  UChartModule
+  UChartModule,
+  MapBoxModule
 ];
 
 const COMPONENTS = [

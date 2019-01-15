@@ -1,0 +1,17 @@
+<mgl-map *ngIf="data"
+    [style]="'mapbox://styles/mapbox/streets-v9'"
+    [zoom]="[6]"
+    [center]="center"
+>
+  <mgl-control mglNavigation>
+  </mgl-control>
+  <mgl-control mglGeocoder
+               position="top-left">
+  </mgl-control>
+
+  <mgl-marker *ngFor="let datum of data" [lngLat]="datum.lnglat"
+  >
+    <sncr-marker [fields]="dataFields" [data]="datum"
+    ></sncr-marker>
+  </mgl-marker>
+</mgl-map>

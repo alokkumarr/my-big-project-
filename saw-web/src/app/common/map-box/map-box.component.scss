@@ -1,0 +1,8 @@
+:host {
+  display: block;
+
+  mgl-map {
+    height: calc(100vh - 54px - 64px - 65px);
+    width: 100%;
+  }
+}

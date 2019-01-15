@@ -254,6 +254,11 @@ export const ANALYSIS_METHODS = [
           type: 'chart:geo',
           typeOnBackEnd: 'chart:geo'
         }]
+      },
+      {
+        label: 'Map-box',
+        icon: { font: 'icon-geo-chart' },
+        type: 'map:map'
       }
     ]
   }

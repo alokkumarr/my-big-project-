@@ -9,6 +9,8 @@ if (environment.production) {
 } else {
   // Note: To run against a local Docker environment, use localhost
   apiUrl = 'http://saw-rd601.ana.dev.vaste.sncrcorp.net';
+  // apiUrl = 'http://saw-rd602.ana.dev.vaste.sncrcorp.net';
+  // apiUrl = 'https://saw-pac-sip-vaste.sncrcorp.net';
 }
 /* eslint-enable */
 apiUrl += '/saw';
