@@ -101,11 +101,16 @@ public class SftpServiceImpl extends SipPluginContract {
   @PostConstruct
   private void init() throws Exception {
     File file = new File(defaultDataDropLocation);
-    Boolean isSourceLoc = file.exists() && file.canRead() 
+    Boolean isDestinationLoc = file.exists() && file.canRead() 
         && file.canWrite() && file.canExecute();
     
-    if (!isSourceLoc) {
-      file.mkdir();
+    if (!isDestinationLoc) {
+      logger.info("Defautl drop location not found");
+      logger.info("Creating folders for default drop location :: " 
+          + defaultDataDropLocation);
+      boolean isDefaultDropCreated = file.mkdir();
+      logger.info("Default drop location folders created? :: " 
+        + isDefaultDropCreated);
     }
   }
   

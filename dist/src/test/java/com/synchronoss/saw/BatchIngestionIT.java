@@ -11,9 +11,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
@@ -23,6 +30,13 @@ import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
+import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
+import org.springframework.integration.sftp.session.SftpSession;
+
+
+
+
 
 /**
  * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
@@ -35,7 +49,8 @@ public class BatchIngestionIT extends BaseIT {
 
   private static final String BATCH_PATH = "/services/ingestion/batch";
   
-  private static final String TRANSFER_DATA_PATH = "/channel/transfers/data";
+  private static final String TRANSFER_DATA_PATH = 
+      "/services/ingestion/batch/sftp/channel/transfers/data";
   
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -513,9 +528,35 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void transferData() throws JsonProcessingException {
+    
+    DefaultSftpSessionFactory defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
+    String password = "root";
+    defaultSftpSessionFactory.setHost("sip-admin");
+    defaultSftpSessionFactory.setPort(22);
+    defaultSftpSessionFactory.setUser("root");
+    defaultSftpSessionFactory.setPassword("root");
+    defaultSftpSessionFactory.setAllowUnknownKeys(true);
+    defaultSftpSessionFactory.setTimeout(60000);
+    Properties prop = new Properties();
+    prop.setProperty("StrictHostKeyChecking", "no");
+    prop.setProperty("bufferSize", "100000");
+    defaultSftpSessionFactory.setSessionConfig(prop);
+    SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
+    String content = "some text";
+    InputStream stream = new ByteArrayInputStream(content.getBytes());
+    File file = new File("test.log");
+    try {
+      template.getSession().write(new FileInputStream(file), "/root");
+      template.getSession().append(stream, "/root");
+    } catch (IOException exception) {
+      log.error("Exception while writing file to source location " +  exception.getMessage());
+    }
+    
+    
+    
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("channelName", "Messaging");
-    childNode.put("channelType", "SCP");
+    //childNode.put("channelType", "SCP");
     childNode.put("hostName", "sip-admin");
     childNode.put("portNo", 22);
     childNode.put("accessType", "read");
@@ -535,9 +576,10 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("routeName", "route123");
     childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
     childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-    childNode.put("sourceLocation", "/data");
+    childNode.put("sourceLocation", "/root");
     childNode.put("destinationLocation", "/tmp");
-    childNode.put("filePattern", "*.csv");
+    childNode.put("filePattern", "sample.log");
+    childNode.put("batchSize", 10);
     childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "file");
     ObjectNode routeNode = mapper.createObjectNode();
