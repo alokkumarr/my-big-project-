@@ -27,16 +27,10 @@ describe('Executing logout tests from logout.test.js', () => {
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['LOGOUT']['positiveTests'] ? testDataReader.testData['LOGOUT']['positiveTests'] : {}, (data, id) => {
-    it(`${id}:${data.description}`, () => {
+  using(testDataReader.testData['LOGOUT']['positiveTests'] ? testDataReader.testData['LOGOUT']['positiveTests'] : {},
+    (data, id) => {
+      it(`${id}:${data.description}`, () => {
 
-      let loginPage = new LoginPage();
-      loginPage.loginAs(data.user, /analyze/);
-      let header = new Header();
-      header.verifyLogo();
-      // DO the logout
-      header.doLogout();
-
-    }).result.testInfo = { testId: id, data: data, feature: 'LOGOUT', dataProvider: 'positiveTests' };
-  });
+      });
+    });
 });

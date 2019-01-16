@@ -1,10 +1,10 @@
-var testDataReader = require('../../testdata/testDataReader.js');
+const testDataReader = require('../../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const LoginPage = require('../../pages/LoginPage');
 const Header = require('../../pages/components/Header');
-const commonFunctions = require('../../pages/utils/commonFunctions')
+const commonFunctions = require('../../pages/utils/commonFunctions');
 
 describe('Executing login tests from login.test.js', () => {
 

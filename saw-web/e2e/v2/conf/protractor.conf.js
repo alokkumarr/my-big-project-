@@ -203,6 +203,10 @@ exports.config = {
   },
   afterLaunch: () => {
 
+    if (fs.existsSync('target/e2e/e2eId.json')) {
+      // delete and create new always
+      fs.unlinkSync('target/e2e/e2eId.json');
+    }
     SuiteSetup.failedTestDataForRetry();
 
     let retryStatus = retry.afterLaunch(maxRetriesForFailedTests);
