@@ -94,7 +94,7 @@ public class SemanticNode {
    *
    */
   @JsonProperty("module")
-  private SemanticNode.Module module = SemanticNode.Module.fromValue("ANALYZE");
+  private SemanticNode.Module module = null;
   /**
    * The Metricname Schema
    * <p>

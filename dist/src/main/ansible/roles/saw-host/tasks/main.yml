@@ -14,6 +14,10 @@
   file:
     path: /etc/sip
     state: directory
+- name: Create SIP opt libexec directory
+  file:
+    path: /opt/sip/libexec
+    state: directory
 # Create old /etc/bda directory for backwards compatibility
 - name: Create the /etc/bda directory
   file:

@@ -1,16 +1,10 @@
 
 package com.synchronoss.querybuilder.model.pivot;
 
+import com.fasterxml.jackson.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -27,6 +21,20 @@ public class ColumnField {
      */
     @JsonProperty("columnName")
     private String columnName;
+
+    @JsonProperty("dateFormat")
+    private String dateFormat;
+
+    @JsonProperty("dateFormat")
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    @JsonProperty("dateFormat")
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
     @JsonProperty("groupInterval")
     private ColumnField.GroupInterval groupInterval;
     /**

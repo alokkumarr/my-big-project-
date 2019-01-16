@@ -7,6 +7,6 @@ wsrep_on=ON
 wsrep_provider=/usr/lib64/galera/libgalera_smm.so
 wsrep_cluster_name=sip
 wsrep_cluster_address=gcomm://
-{%- for host in groups['saw-security'] -%}
+{%- for host in groups['saw-security'] + groups['saw-security-arbitrator'] -%}
   {{ host }}{% if not loop.last %},{% endif %}
 {%- endfor %}
