@@ -110,7 +110,7 @@ public class SftpServiceImpl extends SipPluginContract {
           + defaultDataDropLocation);
       boolean isDefaultDropCreated = file.mkdir();
       logger.info("Default drop location folders created? :: " 
-        + isDefaultDropCreated);
+          + isDefaultDropCreated);
     }
   }
   
