@@ -9,8 +9,9 @@ import {
 } from './expandable-field';
 import {
   DesignerSettingsAuxComponent,
+  DesignerSettingsAuxMapComponent,
   DesignerSettingsAuxChartComponent,
-  DesignerSettingsAuxMapChartComponent
+  DesignerSettingsAuxMapChartComponent,
 } from './aux-settings';
 export {
   DesignerSettingsSingleTableComponent,
@@ -19,6 +20,7 @@ export {
   DesignerSettingsGroupComponent,
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent,
+  DesignerSettingsAuxMapComponent,
   DesignerSettingsAuxMapChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,

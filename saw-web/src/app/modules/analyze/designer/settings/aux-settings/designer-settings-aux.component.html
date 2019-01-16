@@ -14,5 +14,9 @@
       (change)="change.emit($event)">
     </designer-settings-aux-map-chart>
   </div>
+  <designer-settings-aux-map *ngSwitchCase="'map'"
+                             [mapSettings]="auxSettings"
+                             (change)="change.emit($event)">
+  </designer-settings-aux-map>
 
 </ng-container>

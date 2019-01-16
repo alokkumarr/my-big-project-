@@ -9,7 +9,7 @@ import { Subject } from 'rxjs';
 export class DesignerMapComponent implements OnInit {
   data: Array<any>;
   sqlBuilder;
-  _auxSettings: any = {};
+  auxSettings: any = {};
 
   public chartOptions = {};
   public chartUpdater = new Subject();
@@ -21,9 +21,9 @@ export class DesignerMapComponent implements OnInit {
     this.sqlBuilder = sqlBuilder;
   }
 
-  @Input()
-  set auxSettings(settings) {
-    this._auxSettings = settings;
+  @Input('auxSettings')
+  set setAuxSettings(settings) {
+    this.auxSettings = settings;
   }
 
   @Input('data')

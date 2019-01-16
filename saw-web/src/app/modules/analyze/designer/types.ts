@@ -60,6 +60,10 @@ export {
   Region
 };
 
+export interface IMapSettings {
+  mapStyle: string;
+}
+
 export interface ArtifactColumnFilter {
   keyword: string;
   types: ('number' | 'date' | 'string' | 'geo')[];
@@ -112,7 +116,8 @@ export interface DesignerChangeEvent {
     | 'chartTitle'
     | 'fetchLimit'
     | 'changeQuery'
-    | 'region';
+    | 'region'
+    | 'mapSettings';
   column?: ArtifactColumn;
   data?: any;
 }

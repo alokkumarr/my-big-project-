@@ -1,0 +1,10 @@
+<div fxLayout="column">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Map Style</mat-label>
+    <mat-select [(ngModel)]="mapSettings.mapStyle" (selectionChange)="onMapStyleChange($event.value)">
+      <mat-option *ngFor="let style of MAP_STYLES" [value]="style.value">
+        {{ style.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>

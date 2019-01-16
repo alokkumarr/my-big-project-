@@ -12,10 +12,12 @@ export class MapBoxComponent implements OnInit {
 
   data: any[];
   dataFields: any[];
-  center: [];
+  center;
+  mapStyle: string;
 
-  // TODO dropwdown to select map-box style
-  // set center at first coordinate form data
+  @Input('mapSettings') set setMapSettings(settings) {
+    this.mapStyle = settings.mapStyle;
+  }
 
   @Input('sqlBuilder') set setSqlBuilder(sqlBuilder) {
     console.log('sqlBuilder', sqlBuilder);

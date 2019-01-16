@@ -33,13 +33,15 @@ import {
   IToolbarActionResult,
   DesignerChangeEvent,
   DesignerSaveEvent,
-  AnalysisReport
+  AnalysisReport,
+  IMapSettings
 } from '../types';
 import {
   DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES
+  DATE_TYPES,
+  DEFAULT_MAP_SETTINGS
 } from '../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
@@ -181,13 +183,22 @@ export class DesignerContainerComponent implements OnInit {
       }
       this.chartTitle = this.analysis.chartTitle || this.analysis.name;
 
+      const chartOnlySettings = {
+        legend: (<any>this.analysis).legend,
+        labelOptions: (<any>this.analysis).labelOptions || {},
+        isInverted: (<any>this.analysis).isInverted
+      };
+
       this.auxSettings = {
         ...this.auxSettings,
-        ...(this.analysis.type === 'chart' ? {
-          legend: (<any>this.analysis).legend,
-          labelOptions: (<any>this.analysis).labelOptions || {},
-          isInverted: (<any>this.analysis).isInverted
-        } : {})
+        ...chartOnlySettings
+      };
+      break;
+    case 'map':
+      const mapOnlySettings: IMapSettings = DEFAULT_MAP_SETTINGS;
+      this.auxSettings = {
+        ...this.auxSettings,
+        ...mapOnlySettings
       };
       break;
     }
@@ -773,6 +784,9 @@ export class DesignerContainerComponent implements OnInit {
       this.analysis.chartTitle = event.data.title;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
+      break;
+    case 'mapSettings':
+      this.auxSettings = event.data.mapSettings;
       break;
     case 'fetchLimit':
       this.analysis.sqlBuilder = this.getSqlBuilder();

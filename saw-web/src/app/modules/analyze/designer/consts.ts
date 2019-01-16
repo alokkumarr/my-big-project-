@@ -1,3 +1,5 @@
+import * as startCase from 'lodash/startCase';
+
 export {
   FLOAT_TYPES,
   DEFAULT_PRECISION,
@@ -9,6 +11,8 @@ export {
   TYPE_MAP
 } from '../consts';
 
+import { IMapSettings } from './types';
+
 export enum DesignerStates {
   WAITING_FOR_COLUMNS,
   NO_SELECTION,
@@ -18,3 +22,12 @@ export enum DesignerStates {
   SELECTION_OUT_OF_SYNCH_WITH_DATA
 }
 
+export const DEFAULT_MAP_SETTINGS: IMapSettings = {
+  mapStyle: 'mapbox://styles/mapbox/streets-v9'
+};
+
+export const MAP_STYLES = ['basic', 'streets', 'bright', 'light', 'dark', 'satellite']
+  .map(style => ({
+    label: startCase(style),
+    value: `mapbox://styles/mapbox/${style}-v9`
+  }));
