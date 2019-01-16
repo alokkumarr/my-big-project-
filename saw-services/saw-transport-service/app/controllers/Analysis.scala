@@ -696,7 +696,10 @@ class Analysis extends BaseController {
 
       return (getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray),analysisResultNodeID)
     }
-    if (typeInfo.equals("chart")) {
+    // The type 'map' has been added to support analysis type map which is equivalent to chart
+    // It has not been bifurcated to separate type because once we start supporting geo-json
+    // sip-dsl has to be improved to support geo spatial queries
+    if (typeInfo.equals("chart") || typeInfo.equals("map")) {
       var data: String = null
       if (dataSecurityKeyStr != null) {
         m_log.trace("dataSecurityKeyStr dataset inside chart block: {}", dataSecurityKeyStr);
