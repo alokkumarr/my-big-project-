@@ -33,6 +33,7 @@ import {
   GEO_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   DEFAULT_DATE_INTERVAL,
+  DEFAULT_DATE_FORMAT,
   CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
 
@@ -466,7 +467,13 @@ export class DesignerService {
             aggregate: isDataArea ? artifactColumn.aggregate : null,
             // the name propertie is needed for the elastic search
             name: isDataArea ? artifactColumn.columnName : null,
-            dateInterval: isDateType ? artifactColumn.dateInterval : null
+            dateInterval: isDateType ? artifactColumn.dateInterval : null,
+            // the name propert is needed for the elastic search
+            /* prettier-ignore */
+            ...(isDateType ? {
+              dateFormat:
+                artifactColumn.dateFormat || artifactColumn.format || DEFAULT_DATE_FORMAT.value
+            } : {format: artifactColumn.format})
           };
         })
       )
