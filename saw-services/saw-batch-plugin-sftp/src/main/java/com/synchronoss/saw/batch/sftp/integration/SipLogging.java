@@ -53,15 +53,13 @@ public class SipLogging {
     bisLog.setMflFileStatus(entity.getProcessState());
     bisLog.setActualFileRecDate(entity.getActualReceiveDate());
     bisLog.setBisProcessState(entity.getComponentState());
+    bisLog.setCheckpointDate(new Date());
+    bisLog.setCreatedDate(new Date());
     if (bisFileLogsRepository.existsById(pid)) {
-      bisLog.setCreatedDate(new Date());
       bisLog.setModifiedDate(new Date());
-      bisLog.setCheckpointDate(new Date());
       bisFileLogsRepository.deleteById(pid);
       bisFileLogsRepository.save(bisLog);
     } else {
-      bisLog.setCreatedDate(new Date());
-      bisLog.setCheckpointDate(new Date());
       bisFileLogsRepository.save(bisLog);
     }
     logger.trace("Integrate with logging API to update with a status ends here : "

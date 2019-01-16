@@ -80,8 +80,8 @@ public abstract class SipPluginContract {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public List<BisDataMetaInfo> transferData(Long channelId, Long routeId)
-      throws SipNestedRuntimeException {
+  public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
+      boolean isDisable) throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because it "
         + "will be overriden on the respective plugin module if required");
     return new ArrayList<>();

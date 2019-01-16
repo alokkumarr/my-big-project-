@@ -101,20 +101,14 @@ export class MapChartViewerComponent {
   }
 
   setChartConfig(analysisLegend, fileName) {
-    const colorAxis = {
-      min: 1,
-      type: 'logarithmic',
-      minColor: '#FFFFFF',
-      maxColor: '#1A89D4'
-    };
-
-    const legend = this._chartService.analysisLegend2ChartLegend(analysisLegend);
+    const legend = this._chartService.analysisLegend2ChartLegend(
+      analysisLegend
+    );
 
     this.chartOptions = {
       mapNavigation: {
         enabled: true
       },
-      colorAxis,
       fileName
     };
 

@@ -22,7 +22,7 @@ spring:
 
 logging:
   level:
-    com.synchronoss.saw: INFO
+    com.synchronoss.saw: TRACE
     org.springframework: INFO
     org.hibernate.type.descriptor.sql.BasicBinder : INFO
     org.hibernate.SQL: INFO

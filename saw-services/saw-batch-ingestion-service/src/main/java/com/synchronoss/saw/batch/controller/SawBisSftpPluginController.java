@@ -146,7 +146,7 @@ public class SawBisSftpPluginController {
       value = "Payload structure which " + "to be used to " + "initiate the transfer",
       required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
     List<BisDataMetaInfo> response = null;
-    
+
     try {
       if (requestBody.getBatchSize() > 0) {
         sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
@@ -154,7 +154,7 @@ public class SawBisSftpPluginController {
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
         response = sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
-            Long.valueOf(requestBody.getRouteId()));
+            Long.valueOf(requestBody.getRouteId()), null, false);
       } else {
         response = sftpServiceImpl.immediateTransfer(requestBody);
       }
@@ -214,7 +214,7 @@ public class SawBisSftpPluginController {
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
       CompletableFuture
           .supplyAsync(() -> sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
-              Long.valueOf(requestBody.getRouteId())), transactionPostExecutor)
+              Long.valueOf(requestBody.getRouteId()), null, false), transactionPostExecutor)
           .whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {

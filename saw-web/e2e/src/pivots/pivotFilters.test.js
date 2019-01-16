@@ -95,8 +95,8 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
         // Scenario for aggregate functions
         if (data.aggregateFunction) {
-          commonFunctions.waitFor.elementToBeClickable(designModePage.aggregateFunctionButton("Sum"));
-          designModePage.aggregateFunctionButton("Sum").click();
+          commonFunctions.waitFor.elementToBeClickable(designModePage.aggregateFunctionButton("sum"));
+          designModePage.aggregateFunctionButton("sum").click();
           // Have to add sleep for elements to be rendered. They appear in DOM faster than they can be actually clicked
           commonFunctions.waitFor.elementToBeVisible(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
           commonFunctions.waitFor.elementToBeClickable(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
