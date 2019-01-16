@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class ModulePrivileges implements Serializable {
     private static final long serialVersionUID = 7684700543251635559L;
 
+    private long moduleSysId;
     private long modulePrivSysId;
 
     public boolean isValid() {
@@ -26,6 +27,14 @@ public class ModulePrivileges implements Serializable {
     private boolean valid;
 
     private String message;
+
+    public long getModuleSysId() {
+        return this.moduleSysId;
+    }
+
+    public void setModuleSysId(long moduleSysId) {
+        this.moduleSysId = moduleSysId;
+    }
 
     public long getModulePrivSysId() {
         return modulePrivSysId;
