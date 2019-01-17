@@ -445,6 +445,7 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("file from the source is downnloaded in the location :" + destination);
           File localDirectory =
               new File(destination + File.separator + getBatchId() + File.separator);
+          logger.trace("Initializing local directory ::" + localDirectory);
           logger.trace(
               "directory where the file will be downnloaded  :" + localDirectory.getAbsolutePath());
           if (!localDirectory.exists()) {
@@ -694,11 +695,12 @@ public class SftpServiceImpl extends SipPluginContract {
                       + channelId + " & route Id" + routeId);
                 } else {
                   File fileTobeDeleted = null;
+                  localDirectory = new File(defaultDestinationLocation + File.separator
+                      + destinationLocation + File.separator + batchId + File.separator);
                   try {
                     if (entry.getAttrs().getSize() != 0 && sipLogService
                         .duplicateCheck(isDisableDuplicate,sourcelocation,entry)) {
-                      localDirectory = new File(defaultDestinationLocation + File.separator
-                          + destinationLocation + File.separator + batchId + File.separator);
+                      
                       if (localDirectory != null && !localDirectory.exists()) {
                         logger.trace("directory where the file will be"
                             + " downnloaded does not exist so it will be created :"
@@ -803,7 +805,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     } else {
                       if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
                           sourcelocation + File.separator + entry.getFilename())) {
-
+                        logger.info("local Directory before calling getPath() ::" + localDirectory);
                         BisDataMetaInfo bisDataMetaInfo = prepareLogInfo(
                             pattern, getFilePath(localDirectory, entry),
                             getActualRecDate(entry), entry.getAttrs().getSize(),
