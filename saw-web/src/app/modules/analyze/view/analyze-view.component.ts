@@ -37,7 +37,6 @@ export class AnalyzeViewComponent implements OnInit {
   public LIST_VIEW = 'list';
   public CARD_VIEW = 'card';
   public analysisId: string;
-  public canUserCreate: boolean;
   public viewMode = this.LIST_VIEW;
   public analysisTypes = [
     ['all', 'All'],
@@ -75,10 +74,6 @@ export class AnalyzeViewComponent implements OnInit {
 
   onParamsChange(params) {
     this.analysisId = params.id;
-
-    this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
-      subCategoryId: this.analysisId
-    });
 
     this.categoryName = this._analyzeService
       .getCategory(this.analysisId)
@@ -221,11 +216,15 @@ export class AnalyzeViewComponent implements OnInit {
       .getAllCronJobs(requestModel)
       .then((response: any) => {
         if (response.statusCode === 200) {
-          this.cronJobs = reduce(response.data, (accumulator, cron) => {
-            const { analysisID } = cron.jobDetails;
-            accumulator[analysisID] = cron;
-            return accumulator;
-          }, {});
+          this.cronJobs = reduce(
+            response.data,
+            (accumulator, cron) => {
+              const { analysisID } = cron.jobDetails;
+              accumulator[analysisID] = cron;
+              return accumulator;
+            },
+            {}
+          );
         } else {
           this.cronJobs = {};
         }
