@@ -36,17 +36,20 @@ public class QueryBuilderUtil {
       formats.put("MMMMdYYYY,h:mm:ssa", "hour");
       dateFormats = Collections.unmodifiableMap(formats);
   }
+
+  public static String ifDateFormatNull(String format)  {
+	    if ( format == null )   {
+	        format = DATE_FORMAT;
+        }
+        return format;
+  }
 	
 	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
 	     String aggregationName)
 
 	{
 		AggregationBuilder aggregationBuilder = null;
-        String dateFormat = columnField.getDateFormat();
-        if ( dateFormat == null )
-        {
-            dateFormat = DATE_FORMAT;
-        }
+        String dateFormat = ifDateFormatNull(columnField.getDateFormat());
 		
 		if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) 
 		    || columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name()))
@@ -73,11 +76,8 @@ public class QueryBuilderUtil {
 
 		{
 			AggregationBuilder aggregationBuilder = null;
-            String dateFormat = rowField.getDateFormat();
-            if ( dateFormat == null )
-            {
-                dateFormat = DATE_FORMAT;
-            }
+            String dateFormat = ifDateFormatNull(rowField.getDateFormat());
+
 			if (rowField.getType().name().equals(ColumnField.Type.DATE.name()) || rowField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
 			  if (rowField.getGroupInterval()!=null){
 	            aggregationBuilder = AggregationBuilders.
@@ -136,11 +136,7 @@ public class QueryBuilderUtil {
 
     {
         AggregationBuilder aggregationBuilder = null;
-        String dateFormat = columnField.getDateFormat();
-        if ( dateFormat == null )
-        {
-            dateFormat = DATE_FORMAT;
-        }
+        String dateFormat = ifDateFormatNull(columnField.getDateFormat());
 
         if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) ||
             columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
@@ -245,11 +241,7 @@ public class QueryBuilderUtil {
 	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName)
 	{
 		AggregationBuilder aggregationBuilder = null;
-        String dateFormat = nodeField.getDateFormat();
-        if ( dateFormat == null )
-        {
-            dateFormat = DATE_FORMAT;
-        }
+        String dateFormat = ifDateFormatNull(nodeField.getDateFormat());
 		
 		if (nodeField.getType().name().equals(NodeField.Type.DATE.name()) || nodeField.getType().name().equals(NodeField.Type.TIMESTAMP.name()) ){
 		  nodeField = setGroupIntervalChart(nodeField);
@@ -271,11 +263,8 @@ public class QueryBuilderUtil {
 
   public static com.synchronoss.querybuilder.model.chart.NodeField setGroupIntervalChart(
       com.synchronoss.querybuilder.model.chart.NodeField nodeField) {
-      String dateFormat = nodeField.getDateFormat();
-      if ( dateFormat == null )
-      {
-          dateFormat = DATE_FORMAT;
-      }
+      String dateFormat = ifDateFormatNull(nodeField.getDateFormat());
+
     String interval = dateFormats.get(dateFormat.replaceAll(SPACE_REGX, EMPTY_STRING));
     switch (interval) {
       case "month":
