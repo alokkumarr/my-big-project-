@@ -679,6 +679,16 @@
           <attributes>
             <project-version>${project.version}</project-version>
           </attributes>
+          <logHandler>
+            <outputToConsole>true</outputToConsole>
+            <!-- Note: When invoking the plug-in directly during
+                 development, snippets might not have been generated,
+                 so do not configure to fail on warning messages.
+                 Instead do that in the specific execution
+                 configurations further below that are used during the
+                 full build which includes generating all snippets in
+                 integration tests.  -->
+          </logHandler>
           <preserveDirectories>true</preserveDirectories>
           <requires>
             <require>asciidoctor-diagram</require>
@@ -698,6 +708,11 @@
             </goals>
             <configuration>
               <backend>html</backend>
+              <logHandler>
+                <failIf>
+                  <severity>WARN</severity>
+                </failIf>
+              </logHandler>
             </configuration>
           </execution>
           <execution>
@@ -708,6 +723,11 @@
             </goals>
             <configuration>
               <backend>pdf</backend>
+              <logHandler>
+                <failIf>
+                  <severity>WARN</severity>
+                </failIf>
+              </logHandler>
             </configuration>
           </execution>
         </executions>
