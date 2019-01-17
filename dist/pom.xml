@@ -638,19 +638,100 @@
         <artifactId>swagger2markup-maven-plugin</artifactId>
         <version>1.3.7</version>
         <configuration>
-          <swaggerInput>dist/target/apidoc-input</swaggerInput>
-          <outputDir>target/generated-snippets</outputDir>
           <config>
             <swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
             <swagger2markup.basePathPrefixEnabled>true</swagger2markup.basePathPrefixEnabled>
           </config>
         </configuration>
         <executions>
+          <!-- Note: The Swagger2Markup plugin supports reading
+               multiple input files from a single input directory, but
+               the generated anchors will collide.  To ensure anchors
+               are unique, use a separate execution for each service
+               as a workaround. -->
           <execution>
+            <id>apidoc-security</id>
             <phase>post-integration-test</phase>
             <goals>
               <goal>convertSwagger2markup</goal>
             </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-security.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-security</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_security_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-semantic</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-semantic.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-semantic</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_semantic_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-scheduler</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-scheduler.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-scheduler</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_scheduler_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-observe</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-observe.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-observe</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_observe_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-proxy</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-proxy.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-proxy</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_proxy_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-workbench</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-workbench.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-workbench</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_workbench_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
           </execution>
         </executions>
       </plugin>
