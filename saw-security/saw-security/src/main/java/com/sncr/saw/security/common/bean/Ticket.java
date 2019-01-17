@@ -37,7 +37,7 @@ public class Ticket implements Serializable {
 	private String roleCode;
 	private String roleType;
 	private Long createdTime;	
-	private List<DSKDetails> dataSecurityKey;
+	private List<TicketDSKDetails> dataSecurityKey;
 
     /**
      * CustomConfig provides feature for additional configurable properties for the SAW.
@@ -111,11 +111,11 @@ public class Ticket implements Serializable {
 	 */
 	private String validityReason;	
 	
-	public List<DSKDetails> getDataSecurityKey() {
+	public List<TicketDSKDetails> getDataSecurityKey() {
 		return dataSecurityKey;
 	}
 
-	public void setDataSecurityKey(List<DSKDetails> dataSecurityKey) {
+	public void setDataSecurityKey(List<TicketDSKDetails> dataSecurityKey) {
 		this.dataSecurityKey = dataSecurityKey;
 	}
 

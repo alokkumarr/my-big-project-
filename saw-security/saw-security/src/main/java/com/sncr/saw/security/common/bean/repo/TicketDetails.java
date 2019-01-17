@@ -3,7 +3,7 @@
  */
 package com.sncr.saw.security.common.bean.repo;
 
-import com.sncr.saw.security.common.bean.DSKDetails;
+import com.sncr.saw.security.common.bean.TicketDSKDetails;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class TicketDetails implements Serializable {
 	private String compName;
 	private String roleCode;
 	private String roleType;
-	private List<DSKDetails> dataSKey;
+	private List<TicketDSKDetails> dataSKey;
     private List<String> CustomConfig;
 	private Long userId;
 	private ArrayList<Products> products;
@@ -67,11 +67,11 @@ public class TicketDetails implements Serializable {
 		this.custID = custID;
 	}
 
-	public List<DSKDetails> getDataSKey() {
+	public List<TicketDSKDetails> getDataSKey() {
 		return dataSKey;
 	}
 
-	public void setDataSKey(List<DSKDetails> dataSKey) {
+	public void setDataSKey(List<TicketDSKDetails> dataSKey) {
 		this.dataSKey = dataSKey;
 	}
 
