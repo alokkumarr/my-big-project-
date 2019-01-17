@@ -305,7 +305,6 @@ export class CronJobSchedularComponent implements OnInit {
   }
 
   cronChange() {
-    console.log('selectedMoments', this.selectedMoments);
     if (this.scheduleType !== 'immediate') {
       this.startDate = this.selectedMoments[0] || moment.utc().seconds(0);
       this.endDate = this.selectedMoments[1] || '';
