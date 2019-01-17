@@ -38,6 +38,14 @@ class Utils {
     return serverResponse;
   }
 
+  static replaceSpecialCharsNotAllowedInXml(input) {
+    return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+  }
+
 }
 
 module.exports = Utils;

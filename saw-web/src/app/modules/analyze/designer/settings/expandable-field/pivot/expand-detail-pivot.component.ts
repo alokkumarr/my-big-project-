@@ -66,6 +66,11 @@ export class ExpandDetailPivotComponent implements OnInit {
 
   onFormatChange(format: Format | string) {
     if (format) {
+      if (this.hasDateInterval) {
+        this.artifactColumn.dateFormat = (this.artifactColumn.dateFormat ||
+          this.artifactColumn.format ||
+          format) as string;
+      }
       this.artifactColumn.format = format;
       this.changeSample();
       this.change.emit({ subject: 'format' });
@@ -84,7 +89,10 @@ export class ExpandDetailPivotComponent implements OnInit {
 
   openDateFormatDialog() {
     this._analyzeDialogService
-      .openDateFormatDialog(<string>this.artifactColumn.format, DATE_FORMATS)
+      .openDateFormatDialog(
+        <string>(this.artifactColumn.format || this.artifactColumn.dateFormat),
+        DATE_FORMATS
+      )
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }

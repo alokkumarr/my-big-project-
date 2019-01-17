@@ -199,6 +199,13 @@ public class GatewayController {
       }
     }
     else {
+      /* If accessing REST API definition, pass the request through */
+      if (request.getRequestURI().endsWith(URLRequestTransformer.API_DOCS_PATH)) {
+          proxiedRequest = createHttpUriRequest(request, new UserCustomerMetaData());
+          proxiedResponse = httpClient.execute(proxiedRequest);
+          return new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()), 
+              makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
+        }
     	responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
     }
     logger.debug("Response {}", responseEntity.getStatusCode());

@@ -321,9 +321,13 @@ export class PivotGridComponent implements OnDestroy {
     }
   }
 
-  getMomentFormat(format) {
+  getMomentFormat(format: string) {
     const formatObj = DATE_FORMATS_OBJ[format];
-    return formatObj ? formatObj.momentValue : DEFAULT_DATE_FORMAT.momentValue;
+    return formatObj
+      ? formatObj.momentValue
+      : isEmpty(format)
+      ? DEFAULT_DATE_FORMAT.momentValue
+      : format.replace(/d/g, 'D').replace(/y/g, 'Y');
   }
 
   artifactColumn2PivotField(): any {
