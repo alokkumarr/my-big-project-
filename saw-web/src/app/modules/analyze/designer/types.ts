@@ -5,7 +5,8 @@ import {
   SqlBuilderReport,
   SqlBuilderEsReport,
   Join,
-  AnalysisType
+  AnalysisType,
+  MapSettings
 } from '../models';
 import { JsPlumbCanvasChangeEvent } from '../../../common/components/js-plumb/types';
 import {
@@ -57,12 +58,9 @@ export {
   Join,
   JsPlumbCanvasChangeEvent,
   AnalysisDialogData,
-  Region
+  Region,
+  MapSettings
 };
-
-export interface IMapSettings {
-  mapStyle: string;
-}
 
 export interface ArtifactColumnFilter {
   keyword: string;

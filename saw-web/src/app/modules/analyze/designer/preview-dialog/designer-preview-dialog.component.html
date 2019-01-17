@@ -51,4 +51,9 @@
                   [data]="previewData"
                   [sqlBuilder]="analysis.sqlBuilder">
   </designer-chart>
+  <designer-map *ngIf="analysis.type === 'map'"
+                  [auxSettings]="analysis.mapSettings"
+                  [data]="previewData"
+                  [sqlBuilder]="analysis.sqlBuilder">
+  </designer-map>
 </div>

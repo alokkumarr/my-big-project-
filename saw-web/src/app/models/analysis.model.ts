@@ -8,6 +8,7 @@ import { LabelOptions } from './label-options.model';
 import { Legend } from './legend.model';
 import { Axis } from './axis.model';
 import { AnalysisType } from './analysis-type.model';
+import { MapSettings } from './map-settings.model';
 
 export interface Analysis {
   description: string;
@@ -43,6 +44,7 @@ export interface Analysis {
   groupByColumns?: any[];
   crondetails?: any;
   chartTitle: string;
+  mapSettings?: MapSettings;
   // groupByColumns should be deprecated
 }
 

@@ -29,5 +29,6 @@ export {
   SqlBuilderReport,
   AnalysisType,
   SqlBuilderEsReport,
-  Region
+  Region,
+  MapSettings
 } from '../../../models';

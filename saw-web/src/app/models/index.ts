@@ -31,3 +31,4 @@ export {
 } from './sql-builder.model';
 export { AnalysisType } from './analysis-type.model';
 export { Region } from './region.model';
+export { MapSettings } from './map-settings.model';

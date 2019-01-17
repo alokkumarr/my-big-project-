@@ -11,7 +11,7 @@ export {
   TYPE_MAP
 } from '../consts';
 
-import { IMapSettings } from './types';
+import { MapSettings } from './types';
 
 export enum DesignerStates {
   WAITING_FOR_COLUMNS,
@@ -22,7 +22,7 @@ export enum DesignerStates {
   SELECTION_OUT_OF_SYNCH_WITH_DATA
 }
 
-export const DEFAULT_MAP_SETTINGS: IMapSettings = {
+export const DEFAULT_MAP_SETTINGS: MapSettings = {
   mapStyle: 'mapbox://styles/mapbox/streets-v9'
 };
 

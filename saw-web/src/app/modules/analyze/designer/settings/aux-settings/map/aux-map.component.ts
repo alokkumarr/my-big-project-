@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { IMapSettings } from '../../../types';
+import { MapSettings } from '../../../types';
 import { MAP_STYLES } from '../../../consts';
 
 @Component({
@@ -12,7 +12,7 @@ export class DesignerSettingsAuxMapComponent {
 
   @Output() change = new EventEmitter();
 
-  public mapSettings: IMapSettings;
+  public mapSettings: MapSettings;
   public editMode: false;
   public MAP_STYLES = MAP_STYLES;
 

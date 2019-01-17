@@ -34,7 +34,7 @@ import {
   DesignerChangeEvent,
   DesignerSaveEvent,
   AnalysisReport,
-  IMapSettings
+  MapSettings
 } from '../types';
 import {
   DesignerStates,
@@ -195,7 +195,7 @@ export class DesignerContainerComponent implements OnInit {
       };
       break;
     case 'map':
-      const mapOnlySettings: IMapSettings = DEFAULT_MAP_SETTINGS;
+      const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
       this.auxSettings = {
         ...this.auxSettings,
         ...mapOnlySettings
@@ -394,7 +394,6 @@ export class DesignerContainerComponent implements OnInit {
       }
     });
 
-    this.analysis.type = 'chart';
     this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
