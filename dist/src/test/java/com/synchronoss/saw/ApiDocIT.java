@@ -33,22 +33,31 @@ public class ApiDocIT extends BaseIT {
     /* Request REST API documentation for services, for use in later
      * stages of build while rendering SIP Developer Guide
      * documentation */
-    writeApiDoc("observe", "/services/observe");
-    writeApiDoc("scheduler", "/services/scheduler");
-    writeApiDoc("security", "/security");
-    writeApiDoc("semantic", "/services/internal/semantic");
-    writeApiDoc("proxy", "/services/internal/proxy");
-    writeApiDoc("workbench", "/services/internal/workbench");
+    writeApiDoc("observe", servicePath("observe"));
+    writeApiDoc("proxy", servicePath("internal/proxy"));
+    writeApiDoc("rtis", "/sip/rtis/api-docs");
+    writeApiDoc("scheduler", servicePath("scheduler"));
+    writeApiDoc("security", "/saw/security/v2/api-docs");
+    writeApiDoc("semantic", servicePath("internal/semantic"));
+    writeApiDoc("workbench", servicePath("internal/workbench"));
+  }
+
+  /**
+   * Generate path to API definition for typical service
+   * configuration.
+   */
+  private String servicePath(String name) {
+    return "/saw/services/" + name + "/v2/api-docs";
   }
 
   /**
    * Write the REST API definition of the given service to a JSON
    * file.
    */
-  private void writeApiDoc(String name, String pathPrefix)
+  private void writeApiDoc(String name, String path)
       throws IOException {
     Response response = given(spec).accept("application/json")
-        .when().get(pathPrefix + "/v2/api-docs")
+        .when().get(path)
         .then().statusCode(200)
         .extract().response();
     String spec = response.getBody().asString();
