@@ -54,7 +54,7 @@
 	/*******************************************************************************
 	 INSERT Table Scripts Starts..
 	 Here the reason for doing inner join is to fetch the correct module sys id being referenced in existing installations.
-	 FYI : We were having a duplicate instance of Observe module in our STATIC_DATA.sql
+	 FYI : We were having a duplicate instance of Observe module in our STATIC_DATA.sql and we are removing the duplicate as part of SIP-5373.
 	********************************************************************************/
 
 	INSERT INTO `MODULE_PRIVILEGES` (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) VALUES (
