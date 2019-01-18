@@ -73,6 +73,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor() {
     this.highcharts.setOptions(cloneDeep(globalChartOptions));
+    this.highstocks.setOptions(cloneDeep(globalChartOptions));
   }
 
   @Input()
@@ -199,44 +200,44 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // update and bar styles.
     const chartSettingsType = this.getChartSettingsType(this.chartType);
     switch (chartSettingsType) {
-    case 'highStock':
-      set(
-        this.config,
-        'xAxis.0.title.text',
-        get(this.config, 'xAxis.title.text')
-      ); // Highstocks adding a default xAxis settings objects with title & categories.
-      // So have to populate them inorder the title to display.
-      set(
-        this.config,
-        'xAxis.0.categories',
-        get(this.config, 'xAxis.categories')
-      );
+      case 'highStock':
+        set(
+          this.config,
+          'xAxis.0.title.text',
+          get(this.config, 'xAxis.title.text')
+        ); // Highstocks adding a default xAxis settings objects with title & categories.
+        // So have to populate them inorder the title to display.
+        set(
+          this.config,
+          'xAxis.0.categories',
+          get(this.config, 'xAxis.categories')
+        );
 
-      // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
-      // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
-      this.clonedConfig = clone(this.config);
-      this.addExportConfig(this.config);
-      this.chart = this.highstocks.stockChart(
-        this.container.nativeElement,
-        this.config
-      );
-      this.config = clone(this.clonedConfig);
-      this.addExportSize(this.config);
-      this.clonedConfig = {};
-      break;
-    default:
-      this.addExportConfig(this.config);
-      const requestConfig = cloneDeep(this.config);
-      forEach(this.config.series, seriesOptions => {
-        if (['percentageByRow'].includes(seriesOptions.aggregate)) {
-          set(requestConfig, 'plotOptions.column.stacking', 'percent');
-        }
-      });
-      this.chart = this.highcharts.chart(
-        this.container.nativeElement,
-        requestConfig
-      );
-      this.addExportSize(requestConfig);
+        // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
+        // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
+        this.clonedConfig = clone(this.config);
+        this.addExportConfig(this.config);
+        this.chart = this.highstocks.stockChart(
+          this.container.nativeElement,
+          this.config
+        );
+        this.config = clone(this.clonedConfig);
+        this.addExportSize(this.config);
+        this.clonedConfig = {};
+        break;
+      default:
+        this.addExportConfig(this.config);
+        const requestConfig = cloneDeep(this.config);
+        forEach(this.config.series, seriesOptions => {
+          if (['percentageByRow'].includes(seriesOptions.aggregate)) {
+            set(requestConfig, 'plotOptions.column.stacking', 'percent');
+          }
+        });
+        this.chart = this.highcharts.chart(
+          this.container.nativeElement,
+          requestConfig
+        );
+        this.addExportSize(requestConfig);
     }
 
     // This is causing more problems than it solves. Updating the defaultsDeep
