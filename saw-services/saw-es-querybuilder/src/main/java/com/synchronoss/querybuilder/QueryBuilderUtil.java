@@ -202,7 +202,7 @@ public class QueryBuilderUtil {
                     aggregationBuilder = AggregationBuilders.count(data.getName()+_COUNT).field(data.getColumnName());
                     break;
                 case DISTINCT_COUNT:
-                    aggregationBuilder = AggregationBuilders.cardinality(data.getName()+_COUNT).field(data.getColumnName());
+                    aggregationBuilder = AggregationBuilders.cardinality(data.getName()+_DISTINCTCOUNT).field(data.getColumnName());
                     break;
                 case PERCENTAGE:
                     Script script = new Script("_value*100/" + data.getAdditionalProperties().get(data.getColumnName()
