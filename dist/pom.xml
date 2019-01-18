@@ -650,6 +650,48 @@
                are unique, use a separate execution for each service
                as a workaround. -->
           <execution>
+            <id>apidoc-observe</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-observe.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-observe</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_observe_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-proxy</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-proxy.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-proxy</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_proxy_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-rtis</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-rtis.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-rtis</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_rtis_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
             <id>apidoc-security</id>
             <phase>post-integration-test</phase>
             <goals>
@@ -688,34 +730,6 @@
               <outputDir>target/generated-snippets/apidoc-scheduler</outputDir>
               <config>
                 <swagger2markup.anchorPrefix>apidoc_scheduler_</swagger2markup.anchorPrefix>
-              </config>
-            </configuration>
-          </execution>
-          <execution>
-            <id>apidoc-observe</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>convertSwagger2markup</goal>
-            </goals>
-            <configuration>
-              <swaggerInput>dist/target/apidoc-input/apidoc-observe.json</swaggerInput>
-              <outputDir>target/generated-snippets/apidoc-observe</outputDir>
-              <config>
-                <swagger2markup.anchorPrefix>apidoc_observe_</swagger2markup.anchorPrefix>
-              </config>
-            </configuration>
-          </execution>
-          <execution>
-            <id>apidoc-proxy</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>convertSwagger2markup</goal>
-            </goals>
-            <configuration>
-              <swaggerInput>dist/target/apidoc-input/apidoc-proxy.json</swaggerInput>
-              <outputDir>target/generated-snippets/apidoc-proxy</outputDir>
-              <config>
-                <swagger2markup.anchorPrefix>apidoc_proxy_</swagger2markup.anchorPrefix>
               </config>
             </configuration>
           </execution>
