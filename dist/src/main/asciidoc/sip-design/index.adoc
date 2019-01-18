@@ -505,6 +505,8 @@ plantuml::sip-design/figure-ha-mariadb.pum[]
 
 = Modules
 
+== Modules overview
+
 SIP provides end users three modules: Analyze, Observe and Workbench.
 Additionally SIP is organized into three implementation layers: Web,
 Services and Security.  The figure below explains the relation between
