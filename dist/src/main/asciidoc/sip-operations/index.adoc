@@ -194,9 +194,9 @@ accessibility and other ports are blocked for security reasons. SIP executors re
 to be allocated with reserved series of port to SIP Executors to work properly.
 sip_executors_reserved_port properties can be set in `saw-config` file for starting port
 number and SIP will auto calculate the number of required port based on number of SIP-Nodes,
-like Number of open series ports required as (Number of SIP-node * 5 port).
-For example: if we have assigned 9801 is starting port and number of sip-node is 2 then (2* 5)
-, so 9801 to 9810 port will be used by spark executors.
+like Number of open series ports required as (Number of SIP-node * 4 port).
+For example: if we have assigned 9801 is starting port and number of sip-node is 2 then (2* 4)
+, so 9801 to 9808 port will be used by spark executors.
 
 ==== Upgrading to SIP 3.0
 
