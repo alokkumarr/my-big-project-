@@ -554,53 +554,7 @@ public class BatchIngestionIT extends BaseIT {
     
     
     
-    ObjectNode childNode = mapper.createObjectNode();
-    childNode.put("channelName", "Messaging");
-    //childNode.put("channelType", "SCP");
-    childNode.put("hostName", "sip-admin");
-    childNode.put("portNo", 22);
-    childNode.put("accessType", "read");
-    childNode.put("userName", "root");
-    childNode.put("password", "root");
-    childNode.put("description", "file");
-    ObjectNode channelRoot = mapper.createObjectNode();
-    channelRoot.put("createdBy", "sysadmin@synchronoss.com");
-    channelRoot.put("productCode", "SIP");
-    channelRoot.put("customerCode", "SNCR");
-    channelRoot.put("projectCode", "workbench");
-    channelRoot.put("channelType", "SFTP");
-    channelRoot.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));
-    
-    ObjectNode routeRoot = mapper.createObjectNode();
-    childNode.put("status", "active");
-    childNode.put("routeName", "route123");
-    childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-    childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-    childNode.put("sourceLocation", "/root");
-    childNode.put("destinationLocation", "/tmp");
-    childNode.put("filePattern", "sample.log");
-    childNode.put("batchSize", 10);
-    childNode.set("schedulerExpression", prepareSchedulerNode());
-    childNode.put("description", "file");
-    ObjectNode routeNode = mapper.createObjectNode();
-    routeNode.put("createdBy", "sysadmin@synchronoss.com");
-    routeNode.put("routeMetadata", new ObjectMapper().writeValueAsString(childNode));
-    
-    Long bisChannelSysId = given(authSpec).body(channelRoot).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
-    
-    String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
-    
-    given(authSpec).body(routeNode).when().post(routeUri).then().assertThat()
-        .statusCode(200);
-    
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat()
-        .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
-    given(authSpec).when().body(prepareTransferNode(bisChannelSysId, routeId)).when()
-      .post(TRANSFER_DATA_PATH).then().assertThat().statusCode(200);
-    this.tearDownRoute();
-    this.tearDownChannel();
+   
   }
 
   /**
