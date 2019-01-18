@@ -118,6 +118,8 @@ object QueryBuilder extends {
     if((aggregate !=JNothing) && aggregate.extract[String].equalsIgnoreCase("percentage"))
       "("+(artifactName + "." + (column \ "columnName").extract[String])+"*100)/(Select sum("+
         (artifactName + "." + (column \ "columnName").extract[String])+") FROM "+ artifactName +") as " + (column \ "columnName").extract[String]
+    else if ((aggregate !=JNothing) && aggregate.extract[String].equalsIgnoreCase("distinctCount"))
+      "count(distinct "+artifactName + "." + (column \ "columnName").extract[String]+")"
     else if (!(aggregate ==JNothing))
       aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
     else
