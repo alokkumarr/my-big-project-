@@ -21,5 +21,7 @@ Imports:
     DBI,
 Suggests:
     testthat,
+    knitr,
     rmarkdown
 RoxygenNote: 6.1.1
+VignetteBuilder: knitr
