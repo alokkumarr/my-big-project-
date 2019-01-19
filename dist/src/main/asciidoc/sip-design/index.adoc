@@ -522,3 +522,10 @@ Java library.
 NOTE: The Analysis and Execution Services shown above are currently
 bundled together as the Transport Service, implemented in Scala and
 Play.
+
+== Product modules
+
+The SIP platform additionally supports so called _product modules_.
+They are independently developed and released modules providing
+product-specific analytics functionality, that are deployed on top
+of SIP.  They build on the capabilities provided by the SIP REST API.
