@@ -24,7 +24,7 @@ RUN yum -q -y install R-3.5.1
 
 # Install dependencies for SIP Advanced Analytics R packages
 RUN yum -q -y install openssl-devel libcurl-devel libxml2-devel \
-  libX11-devel libpng-devel mesa-libGLU-devel
+  libX11-devel libpng-devel mesa-libGLU-devel pandoc pandoc-citeproc
 
 # Execute script to preinstall R package dependencies, to speed up
 # repeated builds with the help of Docker image build cache
