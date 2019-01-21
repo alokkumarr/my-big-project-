@@ -404,6 +404,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           );
         };
       } else {
+        /* Mark hasExecution temporarily as true to allow fetch of data.
+           It'll be marked false if data is not found (no execution exists).
+        */
+        this.hasExecution = true;
         this.dataLoader = options => {
           return this.loadExecutionData(
             analysisId,
