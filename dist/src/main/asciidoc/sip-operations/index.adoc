@@ -174,7 +174,7 @@ this parameter can be set lower value.
      saw_export_chunk_size=10000
 
 
-==== Running SAW on YARN.
+==== Running SAW on YARN
 
 Support for running SAW-executors on YARN (Hadoop NextGen) was added to SAW
 in version v2.6.0.
@@ -404,6 +404,10 @@ To ensure a highly available SIP environment, each role in the SIP
 environment configuration (`saw-config`) must have at least two hosts.
 Additionally the `saw-security-arbitrator` role should have a separate
 third host (required for the MariaDB Galera Cluster).
+
+NOTE: The `saw-security-arbitrator` role is only needed if there are
+two MariaDB hosts.  It is not needed if there are three or more
+MariaDB hosts.
 
 The sample configuration provided in the SIP package contains the
 hosts `sip-host1` and `sip-host2` in each role, plus `sip-host3` in
