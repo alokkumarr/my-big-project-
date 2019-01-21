@@ -197,7 +197,7 @@
   <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="30px" fxLayoutAlign="start start" class="date-group" *ngIf="scheduleType !== 'immediate'">
     <div fxFlex="40" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
       <span class="text-content">Start Date: </span>
-      <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12" [max]="selectedMoments[1]" class="date-input" [(ngModel)]="selectedMoments"
+      <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12" [min]="today" [max]="selectedMoments[1]" class="date-input" [(ngModel)]="selectedMoments"
         [selectMode]="'rangeFrom'" #startDateInput (ngModelChange)="cronChange()" />
       <owl-date-time #dt12 (afterPickerClosed)="afterPickerClosed(startDateInput)"></owl-date-time>
     </div>

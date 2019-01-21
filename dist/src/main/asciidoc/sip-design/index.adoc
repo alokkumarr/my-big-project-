@@ -353,7 +353,7 @@ plantuml::sip-design/figure-proxy-sequence.pum[]
 The request (link:sip-developer/index.html[SIP Developer Guide]) body shall provide the query,
 storage type & other details. The below are salient feature for the service which are as follows:
 
-[[goals]]
+[[proxy-goals]]
 [role="incremental"]
 * It will return either in JSON or Tabular Format.
    ES returns in JSON format in terms of search, it should be converted into Tabular format if in
@@ -381,7 +381,7 @@ plantuml::sip-design/figure-batch-sequence.pum[]
 
 Below are the salient feature which are as follows:
 
-[[goals]]
+[[batch-ingestion-goals]]
 [role="incremental"]
 * Ability to setup a channel and provide channel information
 * Ability to setup a route and provide route information
@@ -403,7 +403,7 @@ Entity BIS_FILE_LOGS is used to log details related to the files or data retriev
 plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
 
 .Figure: SAW Batch Ingestion Flow Diagram
-image::sip-design/bis-flow-diagram.png[flowChart,400,400]
+image::../sip-design/bis-flow-diagram.png[flowChart,400,400]
 
 === SAW Semantic Service
 
@@ -521,5 +521,5 @@ into platform.
 .Figure: SIP-DSL sequence Diagram with platform integration
 plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
 
-==== SIP DSL Example :
+=== SIP DSL Example
 
