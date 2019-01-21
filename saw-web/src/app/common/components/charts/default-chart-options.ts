@@ -112,7 +112,6 @@ export const geoChartOptions = defaultsDeep(
     },
     colorAxis: {
       min: 1,
-      type: 'logarithmic',
       minColor: '#0096D5',
       maxColor: '#914191',
       stops: [
