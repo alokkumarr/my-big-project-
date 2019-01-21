@@ -92,7 +92,8 @@ export const KPI_AGGREGATIONS = [
   { name: 'Average', value: 'avg' },
   { name: 'Minimum', value: 'min' },
   { name: 'Maximum', value: 'max' },
-  { name: 'Count', value: 'count' }
+  { name: 'Count', value: 'count' },
+  { name: 'Distinct count', value: 'distinctCount' }
 ];
 
 export const BULLET_CHART_OPTIONS = {
