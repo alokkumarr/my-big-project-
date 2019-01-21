@@ -119,6 +119,10 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT)(sqlBuilderPrep(dataFields("t")("b")()("MAX"))
       ) must be ("SELECT MAX(t.b) FROM t")
     }
+    it("with distinctCount should have aggregate function in FROM clause") {
+      query(artifactT)(sqlBuilderPrep(dataFields("t")("b")()("distinctCount"))
+      ) must be ("SELECT count(distinct t.b) FROM t")
+    }
     it("with multiple columns should have aggregates in FROM clause") {
       query(artifactW)(sqlBuilderPrep(dataFields("w")("a")("b","c")("AVG"),
         dataFields("w")("d")("e","f")("COUNT"))
