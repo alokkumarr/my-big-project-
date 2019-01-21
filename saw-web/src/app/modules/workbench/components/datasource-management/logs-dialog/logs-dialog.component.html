@@ -62,7 +62,7 @@
 
     <div>
       <dx-data-grid #channelsGrid class="mat-elevation-z3"
-                    height="300px" width="760px"
+                    height="300px" width="760px" [allowColumnResizing]="true"
                     [dataSource]="logs" [showBorders]="false" [columnAutoWidth]="true"
                     [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
       >
