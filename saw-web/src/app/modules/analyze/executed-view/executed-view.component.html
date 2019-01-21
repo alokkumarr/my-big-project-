@@ -115,6 +115,11 @@
                                 [updater]="pivotUpdater$"
                                 >
           </executed-pivot-view>
+          <executed-map-view *ngSwitchCase="'map'"
+                             [analysis]="executedAnalysis"
+                             [data]="data"
+                             >
+          </executed-map-view>
           <div *ngSwitchCase="'chart'">
             <executed-chart-view *ngIf="analysis.chartType !== 'geo'"
                                  [analysis]="executedAnalysis"

@@ -13,11 +13,17 @@ export const DATE_TYPES = ['timestamp', 'date'];
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
   country: ['name', 'fips'],
+  lngLat: [''],
   zip: []
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => `${geoType}:${identifier}`))
+  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
+    if (!identifier) {
+      return geoType;
+    }
+    return `${geoType}:${identifier}`;
+  }))
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';

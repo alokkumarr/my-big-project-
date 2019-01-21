@@ -393,7 +393,7 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
-
+    this.analysis.type = 'chart';
     this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {

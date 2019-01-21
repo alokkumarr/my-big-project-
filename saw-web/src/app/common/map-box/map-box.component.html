@@ -1,4 +1,4 @@
-<mgl-map *ngIf="data"
+<mgl-map *ngIf="source"
     [style]="mapStyle"
     [zoom]="[6]"
     [center]="center"
@@ -9,9 +9,32 @@
                position="top-left">
   </mgl-control>
 
-  <mgl-marker *ngFor="let datum of data" [lngLat]="datum.lnglat"
+  <!-- <mgl-marker *ngFor="let datum of data" [lngLat]="datum.lnglat"
   >
     <sncr-marker [fields]="dataFields" [data]="datum"
     ></sncr-marker>
-  </mgl-marker>
+  </mgl-marker> -->
+
+  <mgl-marker-cluster *ngIf="source"
+                      [data]="source"
+                      [maxZoom]="14"
+                      [radius]="50"
+  >
+    <ng-template mglPoint let-feature>
+      <div
+        class="marker"
+        title="Whatever"
+      >
+      {{ feature.properties?.label }}
+      </div>
+    </ng-template>
+    <ng-template mglClusterPoint let-feature>
+      <div
+        class="marker-cluster"
+        (click)="selectCluster($event, feature)"
+      >
+        {{ feature.properties?.point_count }}
+      </div>
+    </ng-template>
+  </mgl-marker-cluster>
 </mgl-map>
