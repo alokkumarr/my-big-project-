@@ -146,15 +146,17 @@ object DLConfiguration {
   private def setAdditionalSparkProperties (sparkConf: SparkConf, executor : String): Unit =
   {
     val iterator = cfg.entrySet().iterator()
+    val executorList : (String,String) = ("fast","regular")
+    val executorType = if (executor.startsWith("fast-")) executorList._1 else executorList._2
     while (iterator.hasNext) {
       val property = iterator.next()
-      if (property.getKey.startsWith("spark.") && property.getKey.endsWith(executor)
-        && property.getValue.isInstanceOf[String])
-        sparkConf.set (property.getKey.replace("."+executor,""),
-          property.getValue.asInstanceOf[String])
-      else if (property.getKey.startsWith("spark.") && property.getValue.isInstanceOf[String])
-        sparkConf.set (property.getKey,
-          property.getValue.asInstanceOf[String])
+      if (property.getKey.startsWith("spark.") && property.getKey.endsWith(executorType))
+        sparkConf.set (property.getKey.replace("."+executorType,""),
+          cfg.getString(property.getKey))
+      else if (property.getKey.startsWith("spark.") && !(property.getKey.endsWith(executorList._1)
+        || property.getKey.endsWith(executorList._2)))
+        sparkConf.set(property.getKey,
+          cfg.getString(property.getKey))
     }
   }
   /**
