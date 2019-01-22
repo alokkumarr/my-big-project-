@@ -103,6 +103,7 @@ object DLConfiguration {
     setIfPathExists(sparkConf, "spark.driver.host", cfg, "driver.host")
     setIfPathExists(sparkConf, "spark.driver.bindAddress", cfg, "driver.bindAddress")
     setIfPathExists(sparkConf, "spark.driver.blockManager.port", cfg, "driver.blockManager.port")
+    setAdditionalSparkProperties(sparkConf,executor)
     sparkConf.set ("spark.sql.inMemoryColumnarStorage.compressed", "true")
     sparkConf.set ("spark.sql.inMemoryColumnarStorage.batchSize", String.valueOf (rowLimit) )
     sparkConf.set ("spark.sql.caseSensitive", "false")
@@ -128,6 +129,36 @@ object DLConfiguration {
     }
   }
 
+  /**
+    * This properties blocks can be used, if any additional spark properties require to be set on
+    *  regular and fast spark executors.
+    * In case of specific executor (Fast or Regular) based setting can be set as below
+    *  1) Properties Name should be start with "spark."
+    *  2) Properties Name should be ended by executor name. ".fast" or ".regular"
+    *  For example : spark.driver.port.fast = "9801"
+    * In case of generic executor (Applicable for both Fast and Regular executors) setting can be set as below
+    *  1) Properties Name should be start with "spark."
+    *  For example : spark.rpc.retry.wait = "10s"
+    *
+    * @param sparkConf
+    * @param executor
+    */
+  private def setAdditionalSparkProperties (sparkConf: SparkConf, executor : String): Unit =
+  {
+    val iterator = cfg.entrySet().iterator()
+    val executorList : (String,String) = ("fast","regular")
+    val executorType = if (executor.startsWith("fast-")) executorList._1 else executorList._2
+    while (iterator.hasNext) {
+      val property = iterator.next()
+      if (property.getKey.startsWith("spark.") && property.getKey.endsWith(executorType))
+        sparkConf.set (property.getKey.replace("."+executorType,""),
+          cfg.getString(property.getKey))
+      else if (property.getKey.startsWith("spark.") && !(property.getKey.endsWith(executorList._1)
+        || property.getKey.endsWith(executorList._2)))
+        sparkConf.set(property.getKey,
+          cfg.getString(property.getKey))
+    }
+  }
   /**
     * Create zip file to set the spark.yarn.archive properties.
     * @param jarLocation

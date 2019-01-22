@@ -16,6 +16,10 @@ import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
 
 public class URLRequestTransformer extends ProxyRequestTransformer {
+  /**
+   * Request path to REST API definition in OpenAPI format.
+   */
+  public static final String API_DOCS_PATH = "/v2/api-docs";
 
   private ApiGatewayProperties apiGatewayProperties;
 
@@ -44,6 +48,13 @@ public class URLRequestTransformer extends ProxyRequestTransformer {
             apiGatewayProperties.getEndpoints().stream()
                     .filter(e ->requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
                     ).findFirst();
-    return endpoint.get().getLocation() + requestURI;
+    String uri = requestURI;
+    /* If accessing REST API definition, remove external path prefix
+     * before forwarding as it is at the root path of the upstream
+     * service */
+    if (uri.endsWith(API_DOCS_PATH)) {
+      uri = API_DOCS_PATH;
+    }
+    return endpoint.get().getLocation() + uri;
   }
 }

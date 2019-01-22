@@ -5,6 +5,7 @@ CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product
 
  BEGIN
 
+
    DECLARE l_customer_sys_id  INT ;
    DECLARE l_product_sys_id  INT ;
    DECLARE l_module_sys_id_analyze  INT ;
@@ -23,6 +24,23 @@ CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product
    DECLARE l_privilege_sys_id INT;
    DECLARE l_incremental_product_sys_id INT;
    DECLARE l_incremental_prod_mod_sys_id INT ;
+
+ DECLARE exit handler for sqlexception
+
+  BEGIN
+    -- ERROR
+    ROLLBACK;
+    SELECT 'Error occured';
+  END;
+
+  DECLARE exit handler for sqlwarning
+  BEGIN
+    -- WARNING
+    ROLLBACK;
+    SELECT 'Warning occured';
+  END;
+
+  START TRANSACTION;
 
 
 SELECT max(PRODUCT_SYS_ID)+1 into l_incremental_product_sys_id from PRODUCTS;
@@ -324,7 +342,7 @@ INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID,
  now() CREATED_DATE,
  'onboard' CREATED_BY;
 
-
+ COMMIT;
  END;
 //
 DELIMITER ;

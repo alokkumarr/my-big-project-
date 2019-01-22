@@ -60,7 +60,7 @@ export class LayoutContentComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const loadExternalModulesOnce = once(() => this.loadExternalModules());
+    let loadExternalModulesOnce = once(() => this.loadExternalModules());
 
     this._user.loginChange$.subscribe((hasLoginChanged: boolean) => {
       if (!hasLoginChanged) {
@@ -78,6 +78,8 @@ export class LayoutContentComponent implements OnInit {
         this.loadMenuForProperModule(event);
         if (this.isUserLoggedIn) {
           loadExternalModulesOnce();
+        } else {
+          loadExternalModulesOnce = once(() => this.loadExternalModules());
         }
       } else if (event instanceof RouteConfigLoadStart) {
         this._headerProgress.show();

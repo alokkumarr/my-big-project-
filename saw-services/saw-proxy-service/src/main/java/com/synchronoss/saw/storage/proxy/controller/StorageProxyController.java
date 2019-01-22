@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,8 +39,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
 
 /**
  * @author spau0004
@@ -70,7 +67,6 @@ import io.swagger.annotations.AuthorizationScope;
 }
 }"
  */
-@CrossOrigin(origins = "*")
 @RestController
 @Api(value="The controller provides operations pertaining to polyglot persistence layer of synchronoss analytics platform ")
 public class StorageProxyController {
@@ -149,12 +145,7 @@ public class StorageProxyController {
    */
   
   @ApiOperation(value = "Provides an access to persistence using commmon specification", nickname = "actionStorage", 
-      notes = "", authorizations = {
-      @Authorization(value = "petstore_auth", scopes = {
-          @AuthorizationScope(scope = "write:storage", description = "write to storage depending on storage type"),
-          @AuthorizationScope(scope = "read:storage", description = "read from storage depending on the storage type")
-          })
-  }, response = StorageProxy.class)
+                notes = "", response = StorageProxy.class)
   @ApiResponses(value = {
       @ApiResponse(code = 202, message = "Request has been accepted without any error"),
       @ApiResponse(code = 401, message = "You are not authorized to view the resource"),

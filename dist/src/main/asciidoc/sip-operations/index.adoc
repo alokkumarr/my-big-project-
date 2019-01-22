@@ -174,7 +174,7 @@ this parameter can be set lower value.
      saw_export_chunk_size=10000
 
 
-==== Running SAW on YARN.
+==== Running SAW on YARN
 
 Support for running SAW-executors on YARN (Hadoop NextGen) was added to SAW
 in version v2.6.0.
@@ -186,6 +186,17 @@ option since SparkConf loads defaults from system properties(start with spark.*)
 and the classpath.'
 
   Ex: export _JAVA_OPTIONS='-Dspark.executor.instances=5'
+
+===== SIP executors reserved ports
+SIP executors uses random ports for flexibility to increase the number of
+sip executors in future if required, but in case any SIP enviroment has limited port
+accessibility and other ports are blocked for security reasons. SIP executors required
+to be allocated with reserved series of port to SIP Executors to work properly.
+sip_executors_reserved_port properties can be set in `saw-config` file for starting port
+number and SIP will auto calculate the number of required port based on number of SIP-Nodes,
+like Number of open series ports required as (Number of SIP-node * 4 port).
+For example: if we have assigned 9801 is starting port and number of sip-node is 2 then (2* 4)
+, so 9801 to 9808 port will be used by spark executors.
 
 ==== Upgrading to SIP 3.0
 
@@ -394,6 +405,10 @@ environment configuration (`saw-config`) must have at least two hosts.
 Additionally the `saw-security-arbitrator` role should have a separate
 third host (required for the MariaDB Galera Cluster).
 
+NOTE: The `saw-security-arbitrator` role is only needed if there are
+two MariaDB hosts.  It is not needed if there are three or more
+MariaDB hosts.
+
 The sample configuration provided in the SIP package contains the
 hosts `sip-host1` and `sip-host2` in each role, plus `sip-host3` in
 the arbitrator role, which makes it a highly available configuration.
@@ -470,6 +485,25 @@ period after a failure, services might be temporarily unavailable or
 return errors, before they are fully restored again.
 
 == Maintenance and troubleshooting
+
+=== Restarting SIP nodes
+
+SIP nodes can be restarted one at a time and will automatically come
+back into service when starting up.  However, if multiple SIP nodes
+need to be restarted or stopped simultaneously, stop them in the
+following specific order:
+
+1. First stop any nodes in the `saw-security-arbitrator` role
+
+2. Then stop nodes in all remaining roles
+
+Applying the above order allows the MariaDB Galera Cluster to start up
+automatically when the SIP nodes are started again.
+
+NOTE: If SIP nodes were stopped in another order and the MariaDB
+Galera Cluster is unable to start automatically, please see
+<<Bootstrapping the MariaDB Galera cluster>> for instructions on how
+to start the cluster manually.
 
 === Accessing application logs
 
@@ -570,20 +604,23 @@ cluster.
 
 === Bootstrapping the MariaDB Galera cluster
 
-If all MariaDB server instances in the SIP environment are shut down,
-the MariaDB Galera Cluster might not be able to start up itself
-automatically.  In such cases bootstrap the cluster manually using the
-following command on one of the hosts:
+If the MariaDB Galera cluster is unable to determine that it can start
+up automatically, it can be started manually instead.  In such cases
+bootstrap the cluster manually using the following command:
 
         $ sudo galera_new_cluster
 
 The host to run that command on should be the host that has
 `safe_to_bootstrap: 1` in its `/var/lib/mysql/grastate.dat` file.
 
+NOTE: If no node has `safe_to_bootstrap: 1`, find the node that was
+shut down last and edit its `/var/lib/mysql/grastate.dat` file to say
+`safe_to_bootstrap: 1`.
+
 :mariadb_doc: https://mariadb.com/kb/en/library
 :galera_doc: {mariadb_doc}/getting-started-with-mariadb-galera-cluster
 
-NOTE: For more information, see the
+For more information, see the
 {galera_doc}#restarting-the-cluster[restarting the cluster] section in
 the MariaDB Galera Cluster documentation.
 
