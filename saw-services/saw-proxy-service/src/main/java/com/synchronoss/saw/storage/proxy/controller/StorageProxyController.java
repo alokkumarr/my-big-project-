@@ -39,8 +39,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
 
 /**
  * @author spau0004
@@ -147,12 +145,7 @@ public class StorageProxyController {
    */
   
   @ApiOperation(value = "Provides an access to persistence using commmon specification", nickname = "actionStorage", 
-      notes = "", authorizations = {
-      @Authorization(value = "petstore_auth", scopes = {
-          @AuthorizationScope(scope = "write:storage", description = "write to storage depending on storage type"),
-          @AuthorizationScope(scope = "read:storage", description = "read from storage depending on the storage type")
-          })
-  }, response = StorageProxy.class)
+                notes = "", response = StorageProxy.class)
   @ApiResponses(value = {
       @ApiResponse(code = 202, message = "Request has been accepted without any error"),
       @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
