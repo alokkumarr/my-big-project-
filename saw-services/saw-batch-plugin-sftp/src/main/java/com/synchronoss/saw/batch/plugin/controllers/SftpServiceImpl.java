@@ -270,8 +270,15 @@ public class SftpServiceImpl extends SipPluginContract {
     connectionLogs.append(newLineChar);
     connectionLogs.append("Connecting...");
     HttpStatus status = null;
+    String destinationLoc = payload.getDestinationLocation();
+    if (destinationLoc != null) {
+      if (!destinationLoc.startsWith("/")) {
+        destinationLoc = "/" + destinationLoc;
+      }
+    }
+  
     String dataPath = payload.getDestinationLocation() != null
-        ? defaultDestinationLocation + payload.getDestinationLocation()
+        ? defaultDestinationLocation + destinationLoc
         : defaultDestinationLocation;
     File destinationPath = new File(dataPath);
     logger.trace("Destination path: " + destinationPath);
