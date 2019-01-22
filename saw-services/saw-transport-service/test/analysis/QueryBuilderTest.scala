@@ -121,7 +121,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     }
     it("with distinctCount should have aggregate function in FROM clause") {
       query(artifactT)(sqlBuilderPrep(dataFields("t")("b")()("distinctCount"))
-      ) must be ("SELECT count(distinct t.b) FROM t")
+      ) must be ("SELECT count(distinct t.b) as b FROM t")
     }
     it("with multiple columns should have aggregates in FROM clause") {
       query(artifactW)(sqlBuilderPrep(dataFields("w")("a")("b","c")("AVG"),
