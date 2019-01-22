@@ -26,10 +26,6 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
-
-
 /**
  * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
  */
@@ -621,19 +617,5 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
     
     
-  }
-  
-  /**
-   * test transfer data.
-   * @param args arguments
-   */
-  public static void main(String []args) {
-    BatchIngestionIT bit = new BatchIngestionIT();
-    try {
-      bit.transferData();
-    } catch (JsonProcessingException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
   }
 }
