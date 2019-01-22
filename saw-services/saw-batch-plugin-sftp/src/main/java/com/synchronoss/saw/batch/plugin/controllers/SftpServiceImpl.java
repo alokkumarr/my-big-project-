@@ -112,8 +112,8 @@ public class SftpServiceImpl extends SipPluginContract {
         String destinationLoc = rootNode.get("destinationLocation").asText();
         logger.trace("destination location configured:: " + destinationLoc);
         if (destinationLoc != null) {
-          if (!destinationLoc.startsWith("/")) {
-            destinationLoc = "/" + destinationLoc;
+          if (!destinationLoc.startsWith(File.separator)) {
+            destinationLoc = File.separator + destinationLoc;
           }
         }
         
@@ -272,8 +272,8 @@ public class SftpServiceImpl extends SipPluginContract {
     HttpStatus status = null;
     String destinationLoc = payload.getDestinationLocation();
     if (destinationLoc != null) {
-      if (!destinationLoc.startsWith("/")) {
-        destinationLoc = "/" + destinationLoc;
+      if (!destinationLoc.startsWith(File.separator)) {
+        destinationLoc = File.separator + destinationLoc;
       }
     }
   
