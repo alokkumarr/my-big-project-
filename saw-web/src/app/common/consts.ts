@@ -170,7 +170,7 @@ export const AGGREGATE_TYPES = [
     valid: ['chart', 'pivot', 'report', 'esReport']
   },
   {
-    label: 'Distinct count',
+    label: 'Distinct Count',
     value: 'distinctCount',
     icon: 'icon-Count',
     type: 'long',
