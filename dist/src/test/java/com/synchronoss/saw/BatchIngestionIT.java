@@ -12,17 +12,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
@@ -31,9 +24,6 @@ import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
-import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
-import org.springframework.integration.sftp.session.SftpSession;
 
 
 
@@ -527,31 +517,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to test a connectivity route in batch Ingestion.
    */
-  @Ignore
   public void transferData() throws JsonProcessingException {
-    
-    DefaultSftpSessionFactory defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
-    String password = "root";
-    defaultSftpSessionFactory.setHost("sip-admin");
-    defaultSftpSessionFactory.setPort(22);
-    defaultSftpSessionFactory.setUser("root");
-    defaultSftpSessionFactory.setPassword("root");
-    defaultSftpSessionFactory.setAllowUnknownKeys(true);
-    defaultSftpSessionFactory.setTimeout(60000);
-    Properties prop = new Properties();
-    prop.setProperty("StrictHostKeyChecking", "no");
-    prop.setProperty("bufferSize", "100000");
-    defaultSftpSessionFactory.setSessionConfig(prop);
-    SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(defaultSftpSessionFactory);
-    String content = "some text";
-    InputStream stream = new ByteArrayInputStream(content.getBytes());
-    File file = new File("test.log");
-    try {
-      template.getSession().write(new FileInputStream(file), "/root");
-      template.getSession().append(stream, "/root");
-    } catch (IOException exception) {
-      log.error("Exception while writing file to source location " +  exception.getMessage());
-    }
     
     
     ObjectNode channelMetadata = mapper.createObjectNode();
@@ -574,9 +540,9 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
     routeMetadata.put("routeName", "route123");
-    routeMetadata.put("sourceLocation", "/data");
+    routeMetadata.put("sourceLocation", "/root/saw-batch-samples/small");
     routeMetadata.put("destinationLocation", "/data");
-    routeMetadata.put("filePattern", "*.log");
+    routeMetadata.put("filePattern", "*.csv");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
