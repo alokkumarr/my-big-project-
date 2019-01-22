@@ -1,6 +1,7 @@
 package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -42,6 +43,8 @@ public class BatchIngestionIT extends BaseIT {
   
   private static final String TRANSFER_DATA_PATH = 
       "/services/ingestion/batch/sftp/channel/transfers/data";
+  
+  private static final String ROUTE_HISTORY_PATH = "/services/ingestion/batch/logs/";
   
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -111,25 +114,6 @@ public class BatchIngestionIT extends BaseIT {
     return childNode;
   }
   
-  private ObjectNode prepareTransferNode(Long bisChannelSysId, Long routeId) {
-    ObjectNode transferNode = mapper.createObjectNode();
-    transferNode.put("batchSize", "10");
-    transferNode.put("channelId", bisChannelSysId);
-    transferNode.put("channelType", "sftp");
-    transferNode.put("destinationLocation", "/tmp");
-    transferNode.put("filePattern", "test.log");
-    transferNode.put("hostName", "sip-admin");
-    transferNode.put("userName", "root");
-    transferNode.put("password", "root");
-    transferNode.put("portNo", "22");
-    transferNode.put("password", "root");
-    transferNode.put("routeId", routeId);
-    transferNode.put("password", "root");
-    transferNode.put("sourceLocation", "/root");
-    
-    return transferNode;
-  }
-
   private ObjectNode prepareUpdateRouteDataSet() throws JsonProcessingException {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("status", "active");
@@ -517,6 +501,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * The test case is to test a connectivity route in batch Ingestion.
    */
+  @Test
   public void transferData() throws JsonProcessingException {
     
     
@@ -536,13 +521,16 @@ public class BatchIngestionIT extends BaseIT {
     channel.put("projectCode", "workbench");
     channel.put("channelType", "SFTP");
     channel.put("channelMetadata", new ObjectMapper()
-             .writeValueAsString(channelMetadata));;
+             .writeValueAsString(channelMetadata));
+    
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
     routeMetadata.put("routeName", "route123");
     routeMetadata.put("sourceLocation", "/root/saw-batch-samples/small");
     routeMetadata.put("destinationLocation", "/data");
     routeMetadata.put("filePattern", "*.csv");
+    routeMetadata.put("fileExclusions", "");
+    routeMetadata.put("disableDuplicate", "false");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -571,7 +559,11 @@ public class BatchIngestionIT extends BaseIT {
     given(authSpec).when().body(transferNode).when()
     .post(TRANSFER_DATA_PATH).then().assertThat().statusCode(200);
     
-    
+    String result = given(authSpec).when()
+        .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId).then().assertThat()
+        .statusCode(200).extract().response().jsonPath().getString("logs[0].mflFileStatus");
+    assertEquals("SUCCESS",result);
+   
     this.tearDownRoute();
     this.tearDownChannel();
     
