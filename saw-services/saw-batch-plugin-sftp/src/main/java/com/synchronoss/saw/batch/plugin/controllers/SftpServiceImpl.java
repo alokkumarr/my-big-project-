@@ -110,14 +110,14 @@ public class SftpServiceImpl extends SipPluginContract {
         nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
         rootNode = (ObjectNode) nodeEntity;
         String destinationLoc = rootNode.get("destinationLocation").asText();
-        logger.info("destination location configured:: " + destinationLoc);
+        logger.trace("destination location configured:: " + destinationLoc);
         if (destinationLoc != null) {
           if (!destinationLoc.startsWith("/")) {
             destinationLoc = "/" + destinationLoc;
           }
         }
         
-        logger.info("destination location resolved:: " + destinationLoc);
+        logger.trace("destination location resolved:: " + destinationLoc);
         connectionLogs.append("Starting Test connectivity....");
         connectionLogs.append(newLineChar);
         connectionLogs.append("Establishing connection to host");
