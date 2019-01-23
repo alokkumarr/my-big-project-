@@ -405,7 +405,7 @@ public class SftpServiceImpl extends SipPluginContract {
       if (sftpSession != null && sftpSession.isOpen()) {
         logger.trace("closing connection from finally block");
         connectionLogs.append(newLineChar);
-        connectionLogs.append("closing connection");
+        connectionLogs.append("Disconnected....");
         sftpSession.close();
       }
     }
