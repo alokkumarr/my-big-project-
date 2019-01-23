@@ -523,7 +523,7 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("status", "active");
     routeMetadata.put("routeName", "route123");
     routeMetadata.put("sourceLocation", "/root/saw-batch-samples/small");
-    routeMetadata.put("destinationLocation", "/data");
+    routeMetadata.put("destinationLocation", "/");
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "");
     routeMetadata.put("disableDuplicate", "false");
