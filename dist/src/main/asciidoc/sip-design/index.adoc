@@ -99,7 +99,7 @@ known paths exposed by each service.
 ----
 GET /actuator/health HTTP/1.1
 
-HTTP/1.1 200 
+HTTP/1.1 200
 Content-Type: application/json
 
 {
@@ -391,8 +391,11 @@ Below are the salient feature which are as follows:
 * Scheduling the data retrieval from the source.
 * Supports various protocol to pull data.
 
+
+High Level Entity Relationship Diagram
 .Figure: SAW Batch Ingestion ER Diagram
-plantuml::sip-design/figure-batch-er-diagram.pum[format=svg]
+plantuml::sip-design/figure-batch-er-diagram.pum[]
+
 
 The above entities are used to hold the base of Batch Ingestion module.
 Entity BIS_ROUTE is used to hold the details of route i.e it holds the details of destination, frequency etc etc.
@@ -522,4 +525,3 @@ into platform.
 plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
 
 === SIP DSL Example
-

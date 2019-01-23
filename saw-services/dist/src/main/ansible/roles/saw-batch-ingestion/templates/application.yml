@@ -28,7 +28,7 @@ logging:
 
 server:
   address: localhost
-  port: 9651
+  port: 9904
   servlet:
     context-path: ''
   maxHttpHeaderSize: 65536
@@ -52,6 +52,6 @@ sip:
 bis:
   transfer-batch-size: 10
   modified-retries: 3
-  default-data-drop-location: "{{ '/dfs/' + sip_var_path + '/workbench'  | default('/dfs/var/sip/workbench') }}"
+  default-data-drop-location: "{{ '/dfs' + sip_var_path + '/workbench'  | default('/dfs/var/sip/workbench') }}"
   scheduler-url: http://localhost:9600/scheduler/bisscheduler
   recheck-file-modified: {{ sip_bis_recheck_file_modified  | default('false') }}

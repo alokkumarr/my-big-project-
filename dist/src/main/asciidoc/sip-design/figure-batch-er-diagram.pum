@@ -1,24 +1,11 @@
 @startuml
-
 object BIS_CHANNEL {
 }
-
-@enduml
-
-@startuml
-
 object BIS_ROUTE {
 }
-
-@enduml
-
-@startuml
-
 object BIS_LOGS {
 }
-
-@enduml
-
 BIS_CHANNEL o-- "n" BIS_ROUTE : "1..n"
 BIS_LOGS *-- BIS_CHANNEL
 BIS_LOGS *-- BIS_ROUTE
+@enduml

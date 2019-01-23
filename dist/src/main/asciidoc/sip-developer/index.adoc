@@ -276,3 +276,12 @@ ingestion.
 include::{snippets}/apidoc-rtis/paths.adoc[]
 include::{snippets}/apidoc-rtis/definitions.adoc[]
 include::{snippets}/apidoc-rtis/security.adoc[]
+
+= Batch Ingestion Service API
+
+The Batch Ingestion Service allows clients to CRUD & schedule events for
+ingestion.
+
+include::{snippets}/apidoc-batch/paths.adoc[]
+include::{snippets}/apidoc-batch/definitions.adoc[]
+include::{snippets}/apidoc-batch/security.adoc[]

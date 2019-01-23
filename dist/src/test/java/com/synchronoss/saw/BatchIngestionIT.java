@@ -39,13 +39,13 @@ public class BatchIngestionIT extends BaseIT {
 
   private ObjectNode prepareChannelDataSet() throws JsonProcessingException {
     ObjectNode childNode = mapper.createObjectNode();
-    childNode.put("channelName", "Messaging");
+    childNode.put("channelName", "docker-channel");
     childNode.put("channelType", "SCP");
-    childNode.put("hostName", "localhost");
-    childNode.put("portNo", 21);
+    childNode.put("hostName", "sip-admin");
+    childNode.put("portNo", 22);
     childNode.put("accessType", "read");
-    childNode.put("userName", "user");
-    childNode.put("password", "saw123");
+    childNode.put("userName", "root");
+    childNode.put("password", "root");
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -60,11 +60,11 @@ public class BatchIngestionIT extends BaseIT {
   private ObjectNode prepareRouteDataSet() throws JsonProcessingException {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("status", "active");
-    childNode.put("routeName", "route123");
+    childNode.put("routeName", "docker-route");
     childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
     childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-    childNode.put("sourceLocation", "/data");
-    childNode.put("destinationLocation", "/tmp");
+    childNode.put("sourceLocation", "/root/saw-batch-samples");
+    childNode.put("destinationLocation", "/log");
     childNode.put("filePattern", "*.csv");
     childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "file");
@@ -76,13 +76,13 @@ public class BatchIngestionIT extends BaseIT {
 
   private ObjectNode prepareUpdateChannelDataSet() throws JsonProcessingException {
     ObjectNode childNode = mapper.createObjectNode();
-    childNode.put("channelName", "Messaging");
+    childNode.put("channelName", "docker-channel");
     childNode.put("channelType", "SCP");
-    childNode.put("hostName", "localhost");
-    childNode.put("portNo", 21);
+    childNode.put("hostName", "sip-admin");
+    childNode.put("portNo", 22);
     childNode.put("accessType", "read");
-    childNode.put("userName", "user");
-    childNode.put("password", "saw123");
+    childNode.put("userName", "root");
+    childNode.put("password", "root");
     childNode.put("description", "file");
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
@@ -109,12 +109,12 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("routeName", "route456");
     childNode.put("startDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
     childNode.put("endDate", new SimpleDateFormat("yyyy-mm-dd").format(new Date()));
-    childNode.put("sourceLocation", "/tmp");
-    childNode.put("destinationLocation", "/tmp");
+    childNode.put("sourceLocation", "/root/saw-batch-samples");
+    childNode.put("destinationLocation", "/log/updated");
     childNode.put("filePattern", "*.csv");
     childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "file");
-    
+
     ObjectNode root = mapper.createObjectNode();
     root.put("createdBy", "sysadmin@synchronoss.com");
     root.put("modifiedBy", "dataAdmin@synchronoss.com");
@@ -123,32 +123,20 @@ public class BatchIngestionIT extends BaseIT {
     return root;
   }
 
-  private FakeFtpServer createFileOnFakeFtp(String username, String password, String homeDirectory,
-      String filename) {
-    FakeFtpServer fakeFtpServer = new FakeFtpServer();
-    fakeFtpServer.setServerControlPort(0);
-    fakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
-    FileSystem fileSystem = new UnixFakeFileSystem();
-    fileSystem.add(new DirectoryEntry("/data"));
-    fakeFtpServer.setFileSystem(fileSystem);
-    fakeFtpServer.start();
-    return fakeFtpServer;
-  }
-
   /**
    * The test case is to create a channel in batch Ingestion.
    */
   @Test
   public void createChannel() throws JsonProcessingException {
-    
+
     ValidatableResponse response = given(authSpec).body(prepareChannelDataSet()).when()
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);
     log.debug("createChannel () " + response.log());
-    
+
     //delete channel after testing
     this.tearDownChannel();
   }
-  
+
   /**
    * The test case is to create a channel in batch Ingestion.
    */
@@ -157,18 +145,18 @@ public class BatchIngestionIT extends BaseIT {
     ValidatableResponse response = given(authSpec).body(prepareChannelDataSet()).when()
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);
     log.debug("createChannel () " + response.log());
-    
+
     Integer bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
         .get(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .path("[0].bisChannelSysId");
-    
+
     Response duplicateResp = given(authSpec).queryParam("channelName", "messaging")
         .body(prepareChannelDataSet()).when()
-        .get(BATCH_CHANNEL_PATH 
+        .get(BATCH_CHANNEL_PATH
             + "/duplicate");
     log.debug("duplicateResp () " + duplicateResp.body());
     //Assert.assertEquals(duplicateResp.body().asString(),"true");
-    
+
     //delete channel after testing
     this.tearDownChannel();
   }
@@ -187,14 +175,14 @@ public class BatchIngestionIT extends BaseIT {
     ValidatableResponse response = given(authSpec).body(prepareRouteDataSet()).when().post(routeUri)
         .then().assertThat().statusCode(200);
     log.debug("createRoute () " + response.log());
-    
-    
+
+
     //delete route after testing
     this.tearDownRoute();
     this.tearDownChannel();
   }
 
-  
+
   /**
    * The test case is to create a channel in batch Ingestion.
    */
@@ -204,26 +192,26 @@ public class BatchIngestionIT extends BaseIT {
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .jsonPath().getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
-    
+
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     ValidatableResponse response = given(authSpec).body(prepareRouteDataSet()).when().post(routeUri)
         .then().assertThat().statusCode(200);
     log.debug("createRoute () " + response.log());
- 
-    
+
+
     Response duplicateResp = given(authSpec).queryParam("routeName", "route123")
         .body(prepareChannelDataSet()).when()
-        .get(BATCH_CHANNEL_PATH 
+        .get(BATCH_CHANNEL_PATH
             + "/" + bisChannelSysId + "/duplicate-route");
     log.debug("duplicateResp () " + duplicateResp.body());
     //Assert.assertEquals(duplicateResp.body().asString(),"true");
-    
+
     //delete channel after testing
     this.tearDownRoute();
     this.tearDownChannel();
-    
+
   }
-  
+
   /**
    * The test case is to create a channel in batch Ingestion.
    */
@@ -233,23 +221,23 @@ public class BatchIngestionIT extends BaseIT {
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .jsonPath().getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
-    
-    
-    
+
+
+
     String channelDeActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "deactivate";
     given(authSpec).when().put(channelDeActivateUri)
         .then().assertThat().statusCode(200);
-    
+
     String channelActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "activate";
     given(authSpec).when().put(channelActivateUri)
         .then().assertThat().statusCode(200);
- 
-    
+
+
     //delete channel after testing
     this.tearDownChannel();
-    
+
   }
-  
+
   /**
    * The test case is to create a channel in batch Ingestion.
    */
@@ -259,33 +247,33 @@ public class BatchIngestionIT extends BaseIT {
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .jsonPath().getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
-    
+
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     ValidatableResponse response = given(authSpec).body(prepareRouteDataSet()).when().post(routeUri)
         .then().assertThat().statusCode(200);
     log.debug("createRoute () " + response.log());
-   
+
     Long routeId = given(authSpec).when().get(routeUri).then().assertThat()
         .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
     log.debug(" updateRoute bisRouteSysId : " + routeId);
-    String activateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" 
+    String activateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/"
         + BATCH_ROUTE + "/" + routeId + "/activate";
-    String deActivateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" 
+    String deActivateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/"
         + BATCH_ROUTE + "/" + routeId + "/deactivate";
-  
+
     given(authSpec).body(prepareUpdateRouteDataSet()).when()
         .put(activateUrl).then().assertThat().statusCode(200);
-  
+
     given(authSpec).body(prepareUpdateRouteDataSet()).when()
       .put(deActivateUrl).then().assertThat().statusCode(200);
 
- 
-    
+
+
     this.tearDownRoute();
     this.tearDownChannel();
-    
+
   }
-  
+
   /**
    * The test case is to read a channel in batch Ingestion.
    */
@@ -295,14 +283,14 @@ public class BatchIngestionIT extends BaseIT {
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .jsonPath().getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
-    
+
     given(authSpec).body(prepareChannelDataSet()).when().get(BATCH_CHANNEL_PATH).then()
         .assertThat().statusCode(200);
     List<?> listOfChannel = given(authSpec).when().get(BATCH_CHANNEL_PATH).then().assertThat()
         .statusCode(200).extract().response().jsonPath().getList("$");
     log.debug("readChannel :" + listOfChannel);
     assertTrue(listOfChannel.size() > 0);
-    
+
     this.tearDownChannel();
   }
 
@@ -323,10 +311,10 @@ public class BatchIngestionIT extends BaseIT {
         .extract().response().jsonPath().getList("$");
     log.debug("readRoute :" + listOfRoutes);
     assertTrue(listOfRoutes.size() > 0);
-    
+
     this.tearDownRoute();
     this.tearDownChannel();
-   
+
   }
 
   /**
@@ -346,7 +334,7 @@ public class BatchIngestionIT extends BaseIT {
         .jsonPath().getJsonObject("modifiedBy");
     log.debug("updateChannel :" + modifiedBy);
     assertNotNull(modifiedBy);
-    
+
     this.tearDownChannel();
   }
 
@@ -355,11 +343,6 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void updateRoute() throws JsonProcessingException {
-    String username = "user";
-    String password = "password";
-    String homeDirectory = "/";
-    String filename = "report.csv";
-    createFileOnFakeFtp(username, password, homeDirectory, filename);
     Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .jsonPath().getLong("bisChannelSysId");
@@ -380,8 +363,8 @@ public class BatchIngestionIT extends BaseIT {
         .body().jsonPath().getJsonObject("modifiedBy");
     log.debug("updateRoute :" + modifiedBy);
     assertNotNull(modifiedBy);
-    
-   
+
+
     this.tearDownRoute();
     this.tearDownChannel();
   }
@@ -407,7 +390,7 @@ public class BatchIngestionIT extends BaseIT {
     String urlForThatRouteUpdateById =
         BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
     given(authSpec).when().delete(urlForThatRouteUpdateById).then().assertThat().statusCode(200);
-    
+
     this.tearDownChannel();
   }
 
@@ -416,8 +399,8 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void deleteChannel() throws JsonProcessingException {
-    
-   
+
+
     Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .jsonPath().getLong("bisChannelSysId");
@@ -427,7 +410,7 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("deleteChannel urlForThetoUpdate : " + urlForThatoUpdate);
     given(authSpec).when().delete(urlForThatoUpdate).then().assertThat().statusCode(200);
   }
-  
+
   /**
    * The method cleansup channel in batch Ingestion.
    */
@@ -441,7 +424,7 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("deleteChannel urlForThetoUpdate : " + urlForThatoUpdate);
     given(authSpec).when().delete(urlForThatoUpdate).then().assertThat().statusCode(200);
   }
-  
+
   /**
    * he method cleansup riyte in batch Ingestion.
    * @throws JsonProcessingException exception
@@ -472,11 +455,6 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void connectChannel() throws JsonProcessingException {
-    String username = "user";
-    String password = "password";
-    String homeDirectory = "/";
-    String filename = "report.csv";
-    createFileOnFakeFtp(username, password, homeDirectory, filename);
     Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
         .jsonPath().getLong("bisChannelSysId");
@@ -494,7 +472,7 @@ public class BatchIngestionIT extends BaseIT {
   public void testImmediateRoute() throws JsonProcessingException {
     String name = "test-immediate-" + testId();
     ObjectNode channelMetadata = mapper.createObjectNode();
-    channelMetadata.put("channelName", "Messaging");
+    channelMetadata.put("channelName", "channel-" + name);
     channelMetadata.put("channelType", "SCP");
     channelMetadata.put("hostName", "sip-admin");
     channelMetadata.put("portNo", 22);
@@ -512,10 +490,10 @@ public class BatchIngestionIT extends BaseIT {
              .writeValueAsString(channelMetadata));;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
-    routeMetadata.put("routeName", "route123");
-    routeMetadata.put("sourceLocation", "/data");
-    routeMetadata.put("destinationLocation", "/data");
-    routeMetadata.put("filePattern", "*.log");
+    routeMetadata.put("routeName", "route-" + name);
+    routeMetadata.put("sourceLocation", "/root/saw-batch-samples");
+    routeMetadata.put("destinationLocation", "/log/immediate");
+    routeMetadata.put("filePattern", "*.csv");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -531,10 +509,10 @@ public class BatchIngestionIT extends BaseIT {
     ValidatableResponse response = given(authSpec)
         .body(route).when().post(routeUri)
         .then().assertThat().statusCode(200);
-    
+
     this.tearDownRoute();
     this.tearDownChannel();
-    
-    
+
+
   }
 }

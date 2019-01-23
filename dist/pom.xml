@@ -747,6 +747,20 @@
               </config>
             </configuration>
           </execution>
+          <execution>
+            <id>apidoc-batch</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-batch.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-batch</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_batch_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

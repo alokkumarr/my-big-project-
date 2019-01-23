@@ -10,6 +10,10 @@
 # Requirements" section in the Ansible Installation Guide
 - name: Install SELinux Python bindings for Ansible
   yum: name=libselinux-python
+- name: Create SIP default batch dump folder directory
+  file:
+    path: /dfs
+    state: directory
 - name: Create SIP configuration directory
   file:
     path: /etc/sip

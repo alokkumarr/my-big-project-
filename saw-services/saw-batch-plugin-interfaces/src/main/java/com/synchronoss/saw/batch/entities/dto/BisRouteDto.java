@@ -6,39 +6,38 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 
-import javax.persistence.Column;
-
-
 @ApiModel("This model payload holds the details to create a route in the system")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BisRouteDto implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "This property is unique identifier for route resource")
+  @ApiModelProperty(value = "Unique identifier for route resource", dataType = "Long")
   @JsonProperty("bisRouteSysId")
   private Long bisRouteSysId;
-  @ApiModelProperty(value = "This property used by consumer while updating the route resource")
+  @ApiModelProperty(value = "Consumer while updating the route resource", dataType = "String")
   @JsonProperty("modifiedBy")
   private String modifiedBy;
-  @ApiModelProperty(value = "This property used by consumer while creating the route resource")
+  @ApiModelProperty(value = "Consumer while creating the route resource", dataType = "String")
   @JsonProperty("createdBy")
   private String createdBy;
-  @ApiModelProperty(required = true, value = "It holds json string, it needs to escaped")
+  @ApiModelProperty(required = true, value = "It holds json string, it needs to escaped",
+      dataType = "String")
   @JsonProperty("routeMetadata")
   private String routeMetadata;
-  @ApiModelProperty(value = "This property is unique identifier for channel resource")
+  @ApiModelProperty(value = "Unique identifier for channel resource", dataType = "Long")
   @JsonProperty("bisChannelSysId")
   private Long bisChannelSysId;
-  
+
+  @ApiModelProperty(value = "To indicates Activate or inactive", dataType = "Long")
   @JsonProperty("status")
   private Long status;
 
-
-
+  @ApiModelProperty(value = "Resource modification date", dataType = "Date")
   @JsonProperty("modifiedDate")
   private Long modifiedDate;
 
+  @ApiModelProperty(value = "Resource creation date", dataType = "Date")
   @JsonProperty("createdDate")
   private Long createdDate;
 
@@ -111,17 +110,17 @@ public class BisRouteDto implements Serializable {
   public void setBisChannelSysId(Long bisChannelSysId) {
     this.bisChannelSysId = bisChannelSysId;
   }
-  
+
   @JsonProperty("status")
   public Long getStatus() {
     return status;
   }
-  
+
   @JsonProperty("status")
   public void setStatus(Long status) {
     this.status = status;
   }
-  
+
 
   @Override
   public int hashCode() {

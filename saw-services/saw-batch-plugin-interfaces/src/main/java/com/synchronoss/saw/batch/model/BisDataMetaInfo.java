@@ -5,11 +5,14 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@ApiModel("This model payload holds the details to intiate & check status "
+    + "of the source & destination system.")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BisDataMetaInfo {
 
@@ -25,30 +28,45 @@ public class BisDataMetaInfo {
   @JsonProperty("channelId")
   private Long channelId;
 
+  @ApiModelProperty(value = "Channel Type", allowableValues = "SFTP")
   @JsonProperty("channelType")
   private BisChannelType channelType = BisChannelType.SFTP;
 
+  @ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
+      allowEmptyValue = false)
   @JsonProperty("actualDataName")
   private String actualDataName;
 
+  @ApiModelProperty(value = "Indicates the status of the component process", dataType = "Long",
+      allowEmptyValue = false, allowableValues = "DATA_RECEIVED, DATA_REMOVED, HOST_NOT_REACHABLE")
   @JsonProperty("componentState")
   private String componentState;
 
+  @ApiModelProperty(value = "Indicates the file name at the destination location",
+      dataType = "String", allowEmptyValue = false)
   @JsonProperty("receivedDataName")
   private String receivedDataName;
 
+  @ApiModelProperty(value = "Indicates the file size at the destination location",
+      dataType = "Long", allowEmptyValue = false)
   @JsonProperty("dataSizeInBytes")
   private Long dataSizeInBytes;
 
+  @ApiModelProperty(value = "Indicates the file status while downloading the file",
+      dataType = "String", allowEmptyValue = false, allowableValues = "SUCCESS, FAILED, INPROGRESS")
   @JsonProperty("processState")
   private String processState;
 
   @JsonProperty("reasonCode")
   private String reasonCode;
 
+  @ApiModelProperty(value = "Indicates the file pattern being accepted by the route",
+      dataType = "String", allowEmptyValue = false)
   @JsonProperty("filePattern")
   private String filePattern;
 
+  @ApiModelProperty(value = "Indicates the actual date when file has been received",
+      dataType = "String", allowEmptyValue = false)
   @JsonProperty("actualReceiveDate")
   private Date actualReceiveDate;
 

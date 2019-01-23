@@ -11,35 +11,39 @@ public class BisChannelDto implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "This property is unique identifier for channel resource")
+  @ApiModelProperty(value = "Unique identifier for channel resource",
+      dataType = "Long")
   @JsonProperty("bisChannelSysId")
   private Long bisChannelSysId;
-  @ApiModelProperty(value = "This property used by consumer while updating the channel resource")
+  @ApiModelProperty(value = "Consumer while updating the channel resource",
+      dataType = "String")
   @JsonProperty("modifiedBy")
   private String modifiedBy;
-  @ApiModelProperty(value = "This property used by consumer while creating the channel resource")
+  @ApiModelProperty(value = "Consumer while creating the channel resource",
+      dataType = "String")
   @JsonProperty("createdBy")
   private String createdBy;
   @ApiModelProperty(
-      value = "This property used by consumer to set the product code for that application",
-      example = "SAWD000001")
+      value = "Consumer to set the product code for that application",
+      example = "SAWD000001", dataType = "String")
   @JsonProperty("productCode")
   private String productCode = "SAWD000001";
   @ApiModelProperty(
-      value = "This property used by consumer to set the project code for that application",
-      example = "workbench")
+      value = "Consumer to set the project code for that application",
+      example = "workbench", dataType = "String")
   @JsonProperty("projectCode")
   private String projectCode = "workbench";
   @ApiModelProperty(
-      value = "This property used by consumer to set the customer code for that application",
+      value = "Consumer to set the customer code for that application",
       example = "SYNCHRONOSS")
   @JsonProperty("customerCode")
   private String customerCode = "SYNCHRONOSS";
-  @ApiModelProperty(value = "This property used by consumer to set the channel type ",
-      example = "sftp")
+  @ApiModelProperty(value = "Consumer to set the channel type ",
+      example = "sftp", dataType = "String")
   @JsonProperty("channelType")
   private String channelType = "sftp";
-  @ApiModelProperty(value = "This property used by consumer to set the channel related metadata ")
+  @ApiModelProperty(value = "Consumer to set the channel related metadata ",
+      dataType = "String")
   @JsonProperty("channelMetadata")
   private String channelMetadata;
 
@@ -48,12 +52,12 @@ public class BisChannelDto implements Serializable {
 
   @JsonProperty("createdDate")
   private Long createdDate;
-  
+
 
   @JsonProperty("status")
   private Long status;
 
-  
+
 
   @JsonProperty("modifiedDate")
   public Long getModifiedDate() {
@@ -154,7 +158,7 @@ public class BisChannelDto implements Serializable {
   public void setChannelType(String channelType) {
     this.channelType = channelType;
   }
-  
+
   @JsonProperty("status")
   public Long getStatus() {
     return status;

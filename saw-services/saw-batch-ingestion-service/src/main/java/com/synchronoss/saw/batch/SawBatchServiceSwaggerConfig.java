@@ -26,13 +26,21 @@ public class SawBatchServiceSwaggerConfig extends WebMvcConfigurationSupport {
   @Bean
   public Docket api() {
     return new Docket(DocumentationType.SWAGGER_2)
-    .groupName("Batch Ingestion")
     .apiInfo(getApiInfo()).select()
         .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw"))
         .paths(PathSelectors.any()).build();
 
   }
 
+  @Override
+  protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("swagger-ui.html")
+        .addResourceLocations("classpath:/META-INF/resources/");
+
+    registry.addResourceHandler("/webjars/**")
+        .addResourceLocations("classpath:/META-INF/resources/webjars/");
+  }
+  
   private ApiInfo getApiInfo() {
     return new ApiInfoBuilder().title("Synchronoss Analytics Batch Service").description(
         "This REST API has been developed to provision creating channel & set up routes to "
@@ -41,14 +49,5 @@ public class SawBatchServiceSwaggerConfig extends WebMvcConfigurationSupport {
         .version("1.0.0").contact(new Contact("Synchronoss Technologies",
             "http://www.synchronoss.com", "suren.nathan@synchronoss.com"))
         .build();
-  }
-  
-  @Override
-  protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("swagger-ui.html")
-        .addResourceLocations("classpath:/META-INF/resources/");
-
-    registry.addResourceHandler("/webjars/**")
-        .addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 }
