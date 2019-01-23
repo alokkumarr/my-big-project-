@@ -1,1 +1,1 @@
-define({r:0.5,st:'Stem',n:1,t:[0,72,171,276],u:['../Content/Company Information.htm'],s:['+','launch'],p:[['+',27],['access',264],['button',4],['data',136],['figure',236],['item',95],['on',93],['replace',172],['slide',73],['to',75]]});
+define({r:0.5,st:'Stem',n:1,t:[0,72,167,271],u:['../Content/4.6  Package Utility.htm'],s:['+','icon','w'],p:[['+',27],['a',260],['available',2],['continue',36],['edit',31],['header',12],['menu',16],['or',67],['right',64],['step',263],['to',74],['you',65]]});
