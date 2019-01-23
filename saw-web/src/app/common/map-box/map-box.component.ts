@@ -36,7 +36,7 @@ export class MapBoxComponent {
       return;
     }
     setTimeout(() => {
-      const features = this.data2geoJsonFeatures(data);
+      const features = this.data2geoJsonFeatures(data, this.coordinateField);
       this.geoJson = {
         type: 'FeatureCollection',
         features
@@ -56,9 +56,9 @@ export class MapBoxComponent {
     this.selectedPoint = { ...point };
   }
 
-  data2geoJsonFeatures(data): Array<GeoJSON.Feature> {
+  data2geoJsonFeatures(data, coordinateField): Array<GeoJSON.Feature> {
     return map(data, datum => {
-      const coordinatesKey = this.coordinateField.columnName;
+      const coordinatesKey = coordinateField.columnName;
       const [lng, lat] = split(datum[coordinatesKey], ',');
       const lnglat = [parseFloat(lng), parseFloat(lat)];
       const aggregates = fpPipe(
