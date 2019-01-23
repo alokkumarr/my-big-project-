@@ -16,6 +16,7 @@ export interface Analysis {
   categoryId: number;
   artifacts: Artifact[];
   createdTimestamp: number;
+  updatedTimestamp?: number;
   disabled: null | boolean | string;
   id: string;
   isScheduled: string;

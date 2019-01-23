@@ -5,6 +5,9 @@ import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as map from 'lodash/map';
 
+export const USER_ANALYSIS_CATEGORY_NAME = 'My Analysis';
+export const USER_ANALYSIS_SUBCATEGORY_NAME = 'DRAFTS';
+
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;

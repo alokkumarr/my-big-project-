@@ -5,6 +5,7 @@ import {
   AnalyzeService,
   EXECUTION_MODES
 } from '../../services/analyze.service';
+import { JwtService } from '../../../../common/services/jwt.service';
 import { DesignerSaveEvent, DesignerMode } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
@@ -52,6 +53,7 @@ export class DesignerPageComponent implements OnInit {
     private dialogService: MatDialog,
     private route: ActivatedRoute,
     private router: Router,
+    private jwtService: JwtService,
     public _executeService: ExecuteService
   ) {}
 
@@ -128,14 +130,48 @@ export class DesignerPageComponent implements OnInit {
       this.analyzeService
         .readAnalysis(existingAnalysisParams.analysisId)
         .then(analysis => {
-          this.analysis = {
+          this.analysis = this.forkIfNecessary({
             ...analysis,
             name:
               this.designerMode === 'fork'
                 ? `${analysis.name} Copy`
                 : analysis.name
-          };
+          });
         });
+    }
+  }
+
+  /**
+   * If analysis is being edited and is from a public category,
+   * fork it to user's private folder and add reference to original analysis.
+   * User doesn't edit public analyses directly.
+   *
+   * This will be later used to overwrite the analysis in public folder
+   * when publishing this new fork.
+   *
+   * @param {*} analysis
+   * @returns
+   * @memberof DesignerPageComponent
+   */
+  forkIfNecessary(analysis) {
+    const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId;
+    if (
+      userAnalysisCategoryId === analysis.categoryId ||
+      this.designerMode !== 'edit'
+    ) {
+      /* Analysis is from user's private folder or action is not edit.
+         No special steps needed. for this.
+      */
+      return analysis;
+    } else {
+      this.designerMode = 'fork';
+      return {
+        ...analysis,
+        categoryId: userAnalysisCategoryId,
+        parentAnalysisId: analysis.id,
+        parentCategoryId: analysis.categoryId,
+        parentLastModified: analysis.updatedTimestamp || 0
+      };
     }
   }
 }
