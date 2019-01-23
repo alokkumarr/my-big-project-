@@ -116,6 +116,12 @@
     <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
   </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>synchronoss</id>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+    </pluginRepository>
+  </pluginRepositories>
   <profiles>
     <!-- Define modules in a default profile, instead of at the top
          level, to allow limiting modules built in different profiles.

@@ -264,7 +264,7 @@ class Analysis extends BaseController {
         }
         m_log.debug("search key" + keys);
         val categoryId = extractKey(json, "categoryId")
-        if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product, categoryId) && !ticket.get.roleType.equalsIgnoreCase("Admin"))
+        if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product, categoryId))
           json merge contentsAnalyze(searchAnalysisJson(keys), ticket.get.userId.toString)
         else
           json merge contentsAnalyze(searchAnalysisJson(keys))

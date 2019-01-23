@@ -123,10 +123,15 @@ public class SawBisFileLogsController {
       logger.trace("data node from response " + dataNode);
       if (dataNode.isArray() && dataNode.size() > 0) {
         JsonNode objNode = dataNode.get(0);
-        latFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-            .parse(objNode.get("lastFiredTime").asText()).getTime();
-        nextFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-            .parse(objNode.get("nextFireTime").asText()).getTime();
+        if (!objNode.get("lastFiredTime").isNull()) {
+          latFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+                    .parse(objNode.get("lastFiredTime").asText()).getTime();
+        }
+        if (!objNode.get("nextFireTime").isNull()) {
+          nextFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+                    .parse(objNode.get("nextFireTime").asText()).getTime();
+        }
+        
         logger.trace("latFired from response after parsing in long" + latFired);
         logger.trace("nextFired from response after parsing in long" + nextFired);
 

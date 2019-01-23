@@ -4,12 +4,12 @@ package com.sncr.saw.security.app.repository.impl;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
-import com.sncr.saw.security.common.bean.DSKDetails;
 import com.sncr.saw.security.common.bean.Module;
 import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.Ticket;
+import com.sncr.saw.security.common.bean.TicketDSKDetails;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.CustomerProductModuleFeature;
@@ -633,9 +633,9 @@ public class UserRepositoryImpl implements UserRepository {
 				  }
 			  }, new UserRepositoryImpl.DSKValuesExtractor());
                // DSK values should be array in JSON object hence converting into list.
-              List<DSKDetails> dskList = new ArrayList<>();
+              List<TicketDSKDetails> dskList = new ArrayList<>();
 				for (String key : dskValueMapping.keySet()) {
-					DSKDetails dskDetails = new DSKDetails();
+					TicketDSKDetails dskDetails = new TicketDSKDetails();
 					dskDetails.setName(key);
 					dskDetails.setValues(dskValueMapping.get(key));
 					dskList.add(dskDetails);
