@@ -56,6 +56,19 @@ const canAcceptGeoType = (
 
   return GEO_TYPES.includes(geoType);
 };
+
+const canAcceptLngLat = (
+  groupAdapter: IDEsignerSettingGroupAdapter,
+  groupAdapters: Array<IDEsignerSettingGroupAdapter>
+) => ({ geoType }: ArtifactColumnChart) => {
+  const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+  if (groupAdapter.artifactColumns.length >= maxAllowed) {
+    return false;
+  }
+
+  return geoType === 'lngLat';
+};
+
 @Injectable()
 export class DesignerService {
   constructor(private _analyzeService: AnalyzeService) {}
@@ -227,12 +240,12 @@ export class DesignerService {
       reverseTransform: mapReverseTransform,
       onReorder
     }, {
-      title: 'Dimension',
+      title: 'Coordinates',
       type: 'map',
       marker: 'x',
       maxAllowed: () => 1,
       artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptGeoType,
+      canAcceptArtifactColumn: canAcceptLngLat,
       transform(artifactColumn: ArtifactColumnChart) {
         artifactColumn.area = 'x';
         artifactColumn.checked = true;
@@ -427,7 +440,8 @@ export class DesignerService {
   ) {
     const groupByProps = {
       chart: 'area',
-      pivot: 'area'
+      pivot: 'area',
+      map: 'area'
     };
     fpPipe(
       fpFilter('checked'),

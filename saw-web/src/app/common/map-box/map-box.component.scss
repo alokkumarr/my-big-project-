@@ -21,14 +21,7 @@
 }
 
 .marker {
-  width: auto;
-  height: auto;
-  padding: 10px;
-  border-radius: 5%;
-  background-color: #7d7d7d;
-  display: flex;
-  color: red;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid #C9C9C9
+  width: 25px;
+  height: 41px;
+  background-image: url('/assets/img/additional-icons/marker-icon.png');
 }

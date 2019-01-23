@@ -1,0 +1,8 @@
+<div fxLayout="row" fxLayoutAlign="center center">
+  <h1 class="title" [textContent]="analysis.chartTitle || analysis.name"></h1>
+</div>
+
+<map-box [data]="data"
+         [sqlBuilder]="analysis.sqlBuilder"
+         [mapSettings]="analysis.mapSettings"
+></map-box>

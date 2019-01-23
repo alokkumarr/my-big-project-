@@ -200,6 +200,7 @@ export class DesignerContainerComponent implements OnInit {
         ...this.auxSettings,
         ...mapOnlySettings
       };
+      this.analysis.mapSettings = this.auxSettings;
       break;
     }
   }
@@ -393,8 +394,8 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
-    this.analysis.type = 'chart';
     this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
+
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -786,6 +787,7 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'mapSettings':
       this.auxSettings = event.data.mapSettings;
+      this.analysis.mapSettings = this.auxSettings;
       break;
     case 'fetchLimit':
       this.analysis.sqlBuilder = this.getSqlBuilder();

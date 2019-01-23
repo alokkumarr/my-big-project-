@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import map from 'lodash/map';
 import first from 'lodash/first';
 import split from 'lodash/split';
@@ -6,69 +6,77 @@ import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
 import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
-import fpJoin from 'lodash/fp/join';
 
 @Component({
   selector: 'map-box',
   templateUrl: './map-box.component.html',
   styleUrls: ['./map-box.component.scss']
 })
-export class MapBoxComponent implements OnInit {
+export class MapBoxComponent {
 
+  public selectedPoint: GeoJSON.Feature<GeoJSON.Point>;
   data: any[];
   dataFields: any[];
   coordinateField: any;
-  center;
+  center: number[];
   mapStyle: string;
-  source: any;
+  geoJson: GeoJSON.GeoJSON;
 
   @Input('mapSettings') set setMapSettings(settings) {
     this.mapStyle = settings.mapStyle;
   }
 
   @Input('sqlBuilder') set setSqlBuilder(sqlBuilder) {
-    console.log('sqlBuilder', sqlBuilder);
     this.dataFields = sqlBuilder.dataFields;
     this.coordinateField = first(sqlBuilder.nodeFields);
   }
 
   @Input('data') set setData(data) {
+    if (!data) {
+      return;
+    }
     setTimeout(() => {
-      const features = map(data, datum => {
-        const coordinatesKey = this.coordinateField.columnName;
-        const [lng, lat] = split(datum[coordinatesKey], ',');
-        const lnglat = [parseFloat(lng), parseFloat(lat)];
-        const label = fpPipe(
-          fpToPairs,
-          fpFilter(([key]) => key !== coordinatesKey),
-          fpMap(([key, val]) => `${key}: ${val}`),
-          fpJoin('\n')
-        )(datum);
-
-        return {
-          type: 'Feature',
-          properties: {
-            label
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: lnglat
-          }
-        };
-      });
-
-      this.source = {
+      const features = this.data2geoJsonFeatures(data);
+      this.geoJson = {
         type: 'FeatureCollection',
         features
       };
-      const centerIndex = features.length / 2;
-      this.center = features[centerIndex].geometry.coordinates;
+
+      // set center if possible
+      if (features.length > 0) {
+        const centerIndex = features.length / 2;
+        this.center = features[centerIndex].geometry['coordinates'];
+      }
     }, 10);
   }
 
-  ngOnInit() {
+  selectPoint(event: MouseEvent, point) {
+    event.stopPropagation(); // This is needed, otherwise the popup will close immediately
+    // Change the ref, to trigger mgl-popup onChanges (when the user click on the same cluster)
+    this.selectedPoint = { ...point };
   }
 
-  selectCluster() {
+  data2geoJsonFeatures(data): Array<GeoJSON.Feature> {
+    return map(data, datum => {
+      const coordinatesKey = this.coordinateField.columnName;
+      const [lng, lat] = split(datum[coordinatesKey], ',');
+      const lnglat = [parseFloat(lng), parseFloat(lat)];
+      const aggregates = fpPipe(
+        fpToPairs,
+        fpFilter(([key]) => key !== coordinatesKey),
+        fpMap(([key, value]) => ({key, value}))
+      )(datum);
+
+      return {
+        type: 'Feature',
+        properties: {
+          aggregates
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: lnglat
+        }
+      };
+    });
   }
 }

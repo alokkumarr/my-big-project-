@@ -54,6 +54,7 @@ export const AnalyseTypes = {
   Report: 'report',
   ESReport: 'esReport',
   Chart: 'chart',
+  Map: 'map',
   Pivot: 'pivot'
 };
 

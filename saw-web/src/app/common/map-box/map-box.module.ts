@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { NgxMapboxGLModule } from 'ngx-mapbox-gl';
 import { MapBoxComponent } from './map-box.component';
-import { SncrMarkerComponent } from './marker';
+import { MarkerPopupComponent } from './marker-popup';
 
 const COMPONENTS = [
   MapBoxComponent,
-  SncrMarkerComponent
+  MarkerPopupComponent
 ];
 
 @NgModule({
