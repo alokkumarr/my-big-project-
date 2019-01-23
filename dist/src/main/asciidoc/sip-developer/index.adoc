@@ -1,7 +1,30 @@
 = SIP Developer Guide
 include::header.adoc[]
+// Show only one level of sections due to the large amount of sections
+// coming from the automatically generated REST API documentation
+:toclevels: 1
 
-== Authenticate
+This guide explains the Synchronoss Insights Platform (SIP)
+application programming interface (API).  It describes available
+operations, request and response structures and other information
+required to integrate with SIP.
+
+The SIP API consists of a number of separate services, each of which
+is documented in its own section below.  The REST API is accessed over
+HTTP and request and response bodies are mostly in JSON format.
+Requests to SIP require authentication, as described in the
+<<Authentication>> section.
+
+= Authentication
+
+This section describes different ways clients can authenticate
+themselves to SIP.
+
+== Authenticate using credentials
+
+To authenticate a client, the client needs to provide credentials.  In
+response it will receive a token which can be used with subsequent
+requests to the SIP API.
 
 The HTTP request:
 
@@ -11,51 +34,62 @@ The HTTP response:
 
 include::{snippets}/authenticate/http-response.adoc[]
 
-== List metrics
+== Authenticate using single sign-on JSON Web Tokens
 
-The HTTP request:
+SIP supports single sign-on authentication integration using JSON Web
+Tokens (JWT).  A third party system can provide a token to a client
+that authenticates it to SIP.  This relieves the client from having to
+authenticate itself to SIP using credentials.
 
-include::{snippets}/list-metrics/http-request.adoc[]
+=== Creating a JSON Web Token for single sign-on
 
-The HTTP response:
+The third party system that already has authenticated the client
+constructs a JSON Web Token as shown in the sample Java code below.
 
-include::{snippets}/list-metrics/http-response.adoc[]
+.Sample Java code for creating a JSON Web Token for single sign-on
+[source,java]
+----
+public String createToken() {
+    Long tokenValid = 5 l;
+    String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U="
+    Map < String, Object > map = new HashMap();
+    map.put("valid", true);
+    map.put("validUpto", System.currentTimeMillis() + tokenValid * 60 * 1000);
+    map.put("validityReason", "");
+    map.put("masterLoginId", "sawadmin@synchronoss.com");
+    logger.info("Request received to process single sign-on");
+    String jwt = Jwts.builder()
+        .setSubject("sawadmin@synchronoss.com")
+        .claim("ticket", map)
+        .setIssuedAt(new Date())
+        .signWith(SignatureAlgorithm.HS256, secretKey)
+        .compact();
+    return jwt;
+}
+----
 
-== SSO Authentication using jwt token
+=== Guidelines for single sign-on requests
 
-=== JWT token preparation for request
+- The secret key to use for signing the JSON Web Token is generated
+  and set by the SIP administrator in the environment configuration,
+  as described in the SIP Operations Guide
+- The algorithm to be used for signing the JSON Web Token is HS256
+  symmetric
+- Clients should set "Cache-Control: no-store" header in their
+  requests
+- Clients should set the token expiration ("validUpto" claim in the
+  JWT) to a low value, to ensure tickets have a limited lifetime
 
- sample java code
- public String createToken() {
-     Long tokenValid = 5 l;
-     String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U="
-     Map < String, Object > map = new HashMap();
-     map.put("valid", true);
-     map.put("validUpto", System.currentTimeMillis() + tokenValid * 60 * 1000);
-     map.put("validityReason", "");
-     map.put("masterLoginId", "sawadmin@synchronoss.com");
-     logger.info("Request received to process single sign-on");
-     String jwt = Jwts.builder()
-         .setSubject("sawadmin@synchronoss.com")
-         .claim("ticket", map)
-         .setIssuedAt(new Date())
-         .signWith(SignatureAlgorithm.HS256, secretKey)
-         .compact();
-     return jwt;
- }
+=== Sample single-sign on URL and request flow
 
-=== General guideline for SSO request:
-- The JWT secret key to use is generated and set by the SAW administrator in the environment configuration, as described in the SAW Operations Guide.
-- Signature algorithm should be used as (HS256, symmetric) to generate JWT token.
-- Clients should set "Cache-Control: no-store" to their header requests.
-- Clients should set the token expiration ("validUpto" claim in the JWT) to a low value,
-ensure tickets have a limited lifetime.
+The third party system that has already authenticated the user should
+send an HTTP redirect to SIP as shown below, which includes the JSON
+Web Token that will authenticate the user to SIP.
 
-
-
-=== SSO request sample URL:
-
+[source,http]
+----
 http://localhost/web/#!/authenticate?jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYXdhZG1pbkBzeW5jaHJvbm9zcy5jb20iLCJ0aWNrZXQiOnsidmFsaWRVcHRvIjoxNTE5MTI3NjkwNzUzLCJ2YWxpZCI6dHJ1ZSwidmFsaWRpdHlSZWFzb24iOm51bGwsIm1hc3RlckxvZ2luSWQiOiJzYXdhZG1pbkBzeW5jaHJvbm9zcy5jb20ifSwiaWF0IjoxNTE5MDQxMjkwfQ.KPQ-tairJG7c7iWPZ-qxwTVwjPd4yo4kBRsNHwenLCw
+----
 
 The HTTP request:
 
@@ -65,9 +99,35 @@ The HTTP response:
 
 include::{snippets}/sso-authentication/http-response.adoc[]
 
-== SAW scheduler API :
+= Example requests and responses
+
+This section shows example request and responses from the SIP API.
+
+== Semantic Service
+
+Clients can use the Semantic service to discover available metrics.
+
+=== List metrics
+
+A client can list the metrics available in the Semantic Service.
+Metrics can be used to create analyses.
+
+The HTTP request:
+
+include::{snippets}/list-metrics/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/list-metrics/http-response.adoc[]
+
+== Scheduler Service
+
+Clients can schedule analyses for export using the Scheduler Service.
 
 === Create schedule
+
+Create a schedule to start exporting an analysis on specific times.
+
 The HTTP request:
 
 include::{snippets}/create-schedule/http-request.adoc[]
@@ -77,6 +137,10 @@ The HTTP response:
 include::{snippets}/create-schedule/http-response.adoc[]
 
 === Update schedule
+
+Update a schedule to change the times at which an analysis is
+exported.
+
 The HTTP request:
 
 include::{snippets}/update-schedule/http-request.adoc[]
@@ -87,6 +151,9 @@ include::{snippets}/update-schedule/http-response.adoc[]
 
 === List schedule
 
+List existing schedules of analyses that are to be exported at given
+times.
+
 The HTTP request:
 
 include::{snippets}/list-schedule/http-request.adoc[]
@@ -96,13 +163,15 @@ The HTTP response:
 include::{snippets}/list-schedule/http-response.adoc[]
 
 == Enable case insensitive filter
-SAW supports the case insensitive filter options for data lake and elasticsearch
-data sources.
+
+SIP supports the case insensitive filter options for data lake and
+Elasticsearch data sources.
 
 === Elasticsearch
-To support case insensitive filter in elasticsearch type analysis below settings
-needs to be included, while creating the elasticsearch index mapping to allow the
-search as case insensitive.
+
+To support case insensitive filter in elasticsearch type analysis
+below settings needs to be included, while creating the elasticsearch
+index mapping to allow the search as case insensitive:
 
     "settings": {
         "analysis": {
@@ -118,8 +187,9 @@ search as case insensitive.
         }
       }
 
-Update the ES fields mapping with custom analyzer as below for those fields,
-which are all eligible for case insensitive (String type fields)
+Update the Elasticsearch fields mapping with custom analyzer as below
+for those fields, which are all eligible for case insensitive (string
+type fields):
 
     "product" : {
            "type" : "keyword",
@@ -136,12 +206,73 @@ which are all eligible for case insensitive (String type fields)
          }
        }
 
-NOTE: The above settings are optional to support case insensitive filtering.
- If these settings are not applied, elasticsearch analysis filters will be case
-  sensitive.
+NOTE: The above settings are optional to support case insensitive
+filtering.  If these settings are not applied, elasticsearch analysis
+filters will be case sensitive.
 
 === Data Lake
-To support case insensitive filter for data lake analysis, there are no
-additional setting required. By default saw has native support for this option.
 
+To support case insensitive filter for data lake analysis, there are
+no additional setting required. By default SIP has native support for
+this option.
 
+= Security Service API
+
+The Security Service provides authentication, role and category
+information.
+
+include::{snippets}/apidoc-security/paths.adoc[]
+include::{snippets}/apidoc-security/definitions.adoc[]
+include::{snippets}/apidoc-security/security.adoc[]
+
+= Semantic Service API
+
+The Semantic Service provides a catalogue of datasets that clients can
+use to create analyses.
+
+include::{snippets}/apidoc-semantic/paths.adoc[]
+include::{snippets}/apidoc-semantic/definitions.adoc[]
+include::{snippets}/apidoc-semantic/security.adoc[]
+
+= Scheduler Service API
+
+The Scheduler Service allows scheduling analyses to be executed at
+given times.
+
+include::{snippets}/apidoc-scheduler/paths.adoc[]
+include::{snippets}/apidoc-scheduler/definitions.adoc[]
+include::{snippets}/apidoc-scheduler/security.adoc[]
+
+= Observe Service API
+
+The Observe Service allows clients to follow key metrics.
+
+include::{snippets}/apidoc-observe/paths.adoc[]
+include::{snippets}/apidoc-observe/definitions.adoc[]
+include::{snippets}/apidoc-observe/security.adoc[]
+
+= Proxy Service API
+
+The Proxy Service provides clients a unified interface to storage.
+
+include::{snippets}/apidoc-proxy/paths.adoc[]
+include::{snippets}/apidoc-proxy/definitions.adoc[]
+include::{snippets}/apidoc-proxy/security.adoc[]
+
+= Workbench Service API
+
+The Workbench Service allows clients to create transformations on
+datasets.
+
+include::{snippets}/apidoc-workbench/paths.adoc[]
+include::{snippets}/apidoc-workbench/definitions.adoc[]
+include::{snippets}/apidoc-workbench/security.adoc[]
+
+= Realtime Ingestion Service API
+
+The Realtime Ingestion Service allows clients to submit events for
+ingestion.
+
+include::{snippets}/apidoc-rtis/paths.adoc[]
+include::{snippets}/apidoc-rtis/definitions.adoc[]
+include::{snippets}/apidoc-rtis/security.adoc[]

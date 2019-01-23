@@ -97,5 +97,10 @@ module.exports = {
         return /saw/.test(url);
       });
     }, protractorConf.timeouts.fluentWait);
+  },
+  hasClass(element, cls) {
+    return element
+      .getAttribute('class')
+      .then(classes => classes.split(' ').includes(cls));
   }
 };

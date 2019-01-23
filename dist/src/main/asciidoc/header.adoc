@@ -1,6 +1,9 @@
 Version {project-version}
-:toc:
+:toc: left
+:sectanchors:
+:sectnums:
 :nofooter:
+:doctype: book
 :docinfo: shared
 :plantuml-config: plantuml-config
 :plantuml-format: svg

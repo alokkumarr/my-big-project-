@@ -1,7 +1,7 @@
 {
   "PRIVILEGES": {
-    "privilegeDataProvider": {
-      "AllPrivilegesForUser": {
+    "positiveTests": {
+      "PRIVIL001": {
         "user": "userOne",
         "subCategory": "all",
         "cardOptions": true,
@@ -13,9 +13,10 @@
         "schedule": true,
         "execute": true,
         "export": true,
-        "delete": true
+        "delete": true,
+        "description": "userOne should able to see all the permissions"
       },
-      "CreatePrivilegeForUser": {
+      "PRIVIL002": {
         "user": "userOne",
         "subCategory": "create",
         "cardOptions": false,
@@ -27,107 +28,115 @@
         "schedule": false,
         "execute": false,
         "export": false,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see create permissions"
       },
-      "EditPrivilegeForUser": {
+      "PRIVIL003": {
         "user": "userOne",
         "subCategory": "edit",
         "cardOptions": true,
         "viewOptions": true,
-        "create": false,
+        "create": true,
         "edit": true,
         "fork": false,
         "publish": false,
         "schedule": false,
         "execute": false,
         "export": false,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see edit permissions"
       },
-      "ForkPrivilegeForUser": {
+      "PRIVIL004": {
         "user": "userOne",
         "subCategory": "fork",
         "cardOptions": false,
         "viewOptions": true,
-        "create": false,
+        "create": true,
         "edit": false,
         "fork": true,
         "publish": false,
         "schedule": false,
         "execute": false,
         "export": false,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see fork permissions"
       },
-      "PublishPrivilegeForUser": {
+      "PRIVIL005": {
         "user": "userOne",
         "subCategory": "publish",
         "cardOptions": true,
         "viewOptions": true,
-        "create": false,
+        "create": true,
         "edit": false,
         "fork": false,
         "publish": true,
         "schedule": true,
         "execute": false,
         "export": false,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see publish permissions"
       },
-      "ExecutePrivilegeForUser": {
+      "PRIVIL006": {
         "user": "userOne",
         "subCategory": "execute",
         "cardOptions": true,
         "viewOptions": true,
-        "create": false,
+        "create": true,
         "edit": false,
         "fork": false,
         "publish": false,
         "schedule": false,
         "execute": true,
         "export": false,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see execute permissions"
       },
-      "ExportPrivilegeForUser": {
+      "PRIVIL007": {
         "user": "userOne",
         "subCategory": "export",
         "cardOptions": false,
         "viewOptions": true,
-        "create": false,
+        "create": true,
         "edit": false,
         "fork": false,
         "publish": false,
         "schedule": false,
         "execute": false,
         "export": true,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see export permissions"
       },
-      "DeletePrivilegeForUser": {
+      "PRIVIL008": {
         "user": "userOne",
         "subCategory": "delete",
         "cardOptions": true,
         "viewOptions": true,
-        "create": false,
+        "create": true,
         "edit": false,
         "fork": false,
         "publish": false,
         "schedule": false,
         "execute": false,
         "export": false,
-        "delete": true
+        "delete": true,
+        "description": "userOne should able to see delete permissions"
       },
-      "ViewPrivilegeForUser": {
+      "PRIVIL009": {
         "user": "userOne",
         "subCategory": "view",
         "cardOptions": false,
         "viewOptions": true,
-        "create": false,
+        "create": true,
         "edit": false,
         "fork": false,
         "publish": false,
         "schedule": false,
         "execute": false,
         "export": false,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see view permissions"
       },
-      "MultiplePrivilegesForUser": {
+      "PRIVIL010": {
         "user": "userOne",
         "subCategory": "multiple",
         "cardOptions": true,
@@ -139,9 +148,10 @@
         "schedule": true,
         "execute": false,
         "export": false,
-        "delete": false
+        "delete": false,
+        "description": "userOne should able to see multiple permissions"
       },
-      "AllPrivilegesForAdmin": {
+      "PRIVIL011": {
         "user": "admin",
         "subCategory": "all",
         "cardOptions": true,
@@ -153,7 +163,8 @@
         "schedule": true,
         "execute": true,
         "export": true,
-        "delete": true
+        "delete": true,
+        "description": "Admin should able to see all permissions"
       }
     }
   }

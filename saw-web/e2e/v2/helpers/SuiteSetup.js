@@ -6,6 +6,7 @@ var convert = require('xml-js');
 const globalVariables = require('../helpers/data-generation/globalVariables');
 const logger = require('../conf/logger')(__filename);
 const Constants = require('../helpers/Constants');
+const Utils = require('./Utils');
 class SuiteSetup {
   /* Return true if end-to-end tests are run against distribution
  * package built with Maven and deployed to a local Docker container
@@ -101,7 +102,7 @@ class SuiteSetup {
     } else {
       logger.silly('first test result... ');
     }
-    testResultStatus[currentResult.testInfo.testId ]= currentResult;
+    testResultStatus[currentResult.testInfo.testId] = currentResult;
     fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json', JSON.stringify(testResultStatus), { encoding: 'utf8' });
 
   }
@@ -133,7 +134,7 @@ class SuiteSetup {
     if (fs.existsSync(Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json')) {
       fs.renameSync(Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json', Constants.E2E_OUTPUT_BASE_DIR + '/failedTestDataForRetry.json');
       logger.debug('Old failures json file is deleted and converted to failure data set ' +
-        'i.e. ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json converted to ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestDataForRetry.jsons');
+        'i.e. ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestData.json converted to ' + Constants.E2E_OUTPUT_BASE_DIR + '/failedTestDataForRetry.json');
     } else {
       logger.info('Yahooo....!!! There are no failures!');
     }
@@ -161,7 +162,7 @@ class SuiteSetup {
         if (val.includes('--baseUrl')) {
           url = val.split('=')[1];
           let urlObject = {
-            baseUrl: url, e2eId: globalVariables.generateE2eId
+            baseUrl: url
           };
           fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/url.json', JSON.stringify(urlObject), {
             encoding: 'utf8'
@@ -213,6 +214,50 @@ class SuiteSetup {
         //let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.json', 'utf8'));
         let data = SuiteSetup.readAllData();
         return data;
+      }
+    }
+  }
+
+  static convertJsonToJunitXml() {
+
+    if (fs.existsSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json')) {
+      let testResultStatus = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/testResult.json', 'utf8'));
+
+      let totalTests = Object.keys(testResultStatus).length;
+      let failedCount = 0;
+      let failedTests = '';
+      let passedTests = '';
+
+      for (let key in testResultStatus) {
+        if (testResultStatus.hasOwnProperty(key)) {
+
+          if (testResultStatus[key].status.toLowerCase() === 'failed') {
+            failedCount++;
+            failedTests += `<testcase classname="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].fullName)}" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}">
+                                    <failure type="exception" message="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].failedExpectations[0].message)}">
+                                     <![CDATA[${testResultStatus[key].failedExpectations[0].stack}]]>
+                                    </failure>
+                                </testcase>`;
+
+          } else if (testResultStatus[key].status.toLowerCase() === 'passed') {
+            passedTests += `<testcase classname="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].fullName)}" name="${Utils.replaceSpecialCharsNotAllowedInXml(testResultStatus[key].description)}" />`
+          }
+        }
+      }
+      if (totalTests > 0) {
+        let suiteName = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/suite.json', 'utf8')).suiteName;
+        let testSuiteStart = `	<testsuite name="executed suite: ${suiteName}" timestamp="${new Date()}" failures="${failedCount}" tests="${totalTests}">`;
+        let testSuiteEnd = `</testsuite>`;
+        let xmlDocument = `<?xml version="1.0" encoding="UTF-8" ?>`;
+        xmlDocument += testSuiteStart;
+        xmlDocument += failedTests;
+        xmlDocument += passedTests;
+
+        xmlDocument += testSuiteEnd;
+        logger.debug('xmlDocument e2e tests: ' + xmlDocument)
+
+        fs.writeFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/myjunit.xml', xmlDocument, {encoding: 'utf8'});
+
       }
     }
   }

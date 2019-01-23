@@ -13,7 +13,7 @@ TEST_BASE_DIR + 'charts/createAndDeleteCharts.test.js',
 ];
 // ALL the test with minimal data set so that all the functionality is touched
 const CRITICAL = [...SANITY,
-TEST_BASE_DIR + 'privileges.test.js',
+TEST_BASE_DIR + 'privilege/privilege.test.js',
 TEST_BASE_DIR + 'analyze.test.js',
 TEST_BASE_DIR + 'charts/applyFiltersToCharts.js',
 TEST_BASE_DIR + 'charts/previewForCharts.test.js',
