@@ -1,11 +1,13 @@
-component [MariaDB Client] as MariaDbClient
+component [MariaDB Client] as MariaDbClient1
+component [MariaDB Client] as MariaDbClient2
+component [MariaDB Client] as MariaDbClientN
 
-component [MariaDB (instance #1)] as MariaDb1
-component [MariaDB (instance #2)] as MariaDb2
-component [MariaDB (instance #N)] as MariaDbN
-MariaDb1 <-> MariaDb2 : replicate
-MariaDb2 <-> MariaDbN : replicate
+component [MariaDB Server #1] as MariaDb1
+component [MariaDB Server #2] as MariaDb2
+component [MariaDB Server #N] as MariaDbN
+MariaDb1 <.> MariaDb2 : replicate
+MariaDb2 <.> MariaDbN : replicate
 
-MariaDbClient ..> MariaDb1 : use
-MariaDbClient ..> MariaDb2 : use
-MariaDbClient ..> MariaDbN : use
+MariaDbClient1 ..> MariaDb1 : use
+MariaDbClient2 ..> MariaDb2 : use
+MariaDbClientN ..> MariaDbN : use
