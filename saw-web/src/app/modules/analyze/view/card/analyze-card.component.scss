@@ -75,6 +75,10 @@
   &.m-chart-tsPane {
     background-image: url('/assets/img/charts/timeseries-multi-chart.png');
   }
+
+  &.m-map-map {
+    background-image: url('/assets/img/charts/chart-geo-location.png');
+  }
 }
 
 mat-card-title.mat-card-title {
