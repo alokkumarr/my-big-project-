@@ -21,6 +21,7 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +43,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -89,7 +93,27 @@ public class SftpServiceImpl extends SipPluginContract {
   @Value("${bis.recheck-file-modified}")
   @NotNull
   private Boolean recheckFileModified;
-
+  
+  @Value("${bis.default-data-drop-location}")
+  @NotNull
+  private String defaultDataDropLocation;
+  
+  @PostConstruct
+  private void init() throws Exception {
+    File file = new File(defaultDataDropLocation);
+    Boolean isDestinationLoc = file.exists() && file.canRead() 
+        && file.canWrite() && file.canExecute();
+    
+    if (!isDestinationLoc) {
+      logger.info("Defautl drop location not found");
+      logger.info("Creating folders for default drop location :: " 
+          + defaultDataDropLocation);
+      boolean isDefaultDropCreated = file.mkdirs();
+      logger.info("Default drop location folders created? :: " 
+          + isDefaultDropCreated);
+    }
+  }
+  
   @Override
   public String connectRoute(Long entityId) throws SftpProcessorException {
     logger.trace("connection test for the route with entity id starts here :" + entityId);
