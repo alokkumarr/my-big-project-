@@ -4,6 +4,7 @@ import * as find from 'lodash/find';
 import { Analysis } from '../types';
 import { PRIVILEGES } from '../../consts';
 import { DesignerService } from '../designer.service';
+import { DRAFT_CATEGORY_ID } from './../../consts';
 
 @Component({
   selector: 'designer-save',
@@ -24,7 +25,7 @@ export class DesignerSaveComponent implements OnInit {
       this.categories = response;
       this.setDefaultCategory();
     });
-    this.analysis.categoryId = this.designerMode === 'new' ? 5 : this.analysis.categoryId;
+    this.analysis.categoryId = this.designerMode === 'new' ? DRAFT_CATEGORY_ID : this.analysis.categoryId;
   }
 
   setDefaultCategory() {

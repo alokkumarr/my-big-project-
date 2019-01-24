@@ -39,8 +39,10 @@ import {
   DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES
+  DATE_TYPES,
 } from '../consts';
+
+import { DRAFT_CATEGORY_ID } from './../../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
 
@@ -511,7 +513,7 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   openSaveDialog(): Promise<any> {
-    this.analysis.categoryId = (this.designerMode === 'new' || this.designerMode === 'fork') ? 5 : this.analysis.categoryId;
+    this.analysis.categoryId = (this.designerMode === 'new' || this.designerMode === 'fork') ? DRAFT_CATEGORY_ID : this.analysis.categoryId;
     return this._analyzeDialogService
       .openSaveDialog(this.analysis, this.designerMode)
       .afterClosed()
