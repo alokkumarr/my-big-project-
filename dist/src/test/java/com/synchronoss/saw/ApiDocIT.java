@@ -40,7 +40,7 @@ public class ApiDocIT extends BaseIT {
     writeApiDoc("security", "/saw/security/v2/api-docs");
     writeApiDoc("semantic", servicePath("internal/semantic"));
     writeApiDoc("workbench", servicePath("internal/workbench"));
-    writeApiDoc("batch", servicePath("internal/batch"));
+    writeApiDoc("batch", servicePath("ingestion/batch"));
   }
 
   /**
