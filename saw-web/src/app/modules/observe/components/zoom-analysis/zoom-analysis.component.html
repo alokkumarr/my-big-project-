@@ -1,0 +1,59 @@
+<header class="dialog__header">
+    <div fxLayout="row" fxLayoutAlign="end">
+      <mat-icon (click)="close()" fontIcon="icon-close"></mat-icon>
+    </div>
+</header>
+
+<div class="dialog__content" fxLayout="column">
+
+  <div fxLayout="row" fxLayoutAlign="start center" *ngIf="data.analysis.sqlBuilder.filters.length > 0">
+    <div fxLayout="column">
+      <span class="filter-counter" i18n>{data.analysis.sqlBuilder.filters.length, plural, =1 {1 Filter} other {{{data.analysis.sqlBuilder.filters.length}} Filters} } Applied</span>
+    </div>
+
+    <mat-chip-list #chipList>
+      <mat-chip *ngFor="let filter of data.analysis.sqlBuilder.filters; let i = index;"
+                style="padding-bottom: 1px;padding-top: 3px;">
+        {{getDisplayName(filter)}}{{getFilterValue(filter)}}
+      </mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <div *ngIf="data.analysis" [ngSwitch]="data.analysis.type">
+    <observe-chart
+      *ngIf="
+        data.analysis.type === 'chart' && data.analysis.chartType !== 'geo'
+      "
+      class="analysis-container"
+      [item]="data"
+      (onRefresh)="refreshTile($event)"
+      [analysis]="data.analysis"
+      [enableChartDownload]="true"
+      [updater]="data.updater"
+      [ViewMode]="true"
+    >
+    </observe-chart>
+
+    <observe-pivot
+        *ngIf="data.analysis.type === 'pivot'"
+        class="analysis-container"
+        [item]="data"
+        (onRefresh)="refreshTile($event)"
+        [analysis]="data.analysis"
+        [updater]="data.updater">
+      </observe-pivot>
+
+    <observe-report
+        *ngIf="['report', 'esReport'].includes(data.analysis.type)"
+        class="analysis-container"
+        [item]="data"
+        (onRefresh)="refreshTile($event)"
+        [analysis]="data.analysis"
+        [updater]="data.updater"
+      >
+      </observe-report>
+  </div>
+</div>
+<div class="dialog__actions">
+</div>
+
