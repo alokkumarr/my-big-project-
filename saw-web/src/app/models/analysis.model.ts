@@ -44,6 +44,9 @@ export interface Analysis {
   groupByColumns?: any[];
   crondetails?: any;
   chartTitle: string;
+  parentAnalysisId?: string;
+  parentCategoryId?: string | number;
+  parentLastModified?: number;
   // groupByColumns should be deprecated
 }
 

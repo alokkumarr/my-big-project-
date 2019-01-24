@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material';
-import * as clone from 'lodash/clone';
+import { MatDialog, MatDialogRef, MatDialogConfig } from '@angular/material';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
 import { AnalyzeDialogService } from '../services/analyze-dialog.service';
@@ -10,6 +9,10 @@ import { PublishService } from '../services/publish.service';
 import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish';
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
+import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
+
+import * as clone from 'lodash/clone';
+import * as omit from 'lodash/omit';
 
 import {
   EXECUTION_MODES,
@@ -82,6 +85,81 @@ export class AnalyzeActionsService {
     }
   }
 
+  overwrite(parentAnalysis: Analysis, childAnalysis: Analysis): Analysis {
+    const preserveFields = [
+      'id',
+      'createdBy',
+      'createdTimestamp',
+      'parentAnalysisId',
+      'parentCategoryId',
+      'parentLastModfied'
+    ];
+    return { ...parentAnalysis, ...omit(childAnalysis, preserveFields) };
+  }
+
+  showPublishOverwriteConfirmation(): MatDialogRef<
+    ConfirmDialogComponent,
+    any
+  > {
+    return this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Original analysis has been modified.',
+        content:
+          'Do you want to overwrite original analysis with your changes?',
+        negativeActionLabel: 'Cancel',
+        positiveActionLabel: 'Publish'
+      }
+    });
+  }
+
+  publishAnalysis(analysis: Analysis, execute, type) {
+    const publish = (a = analysis) =>
+      this._publishService.publishAnalysis(a, execute, type);
+
+    const overwriteParent = (parent, child) => {
+      /* Update parent analysis with child's changes, then delete child. */
+      const modifiedParent = this.overwrite(parent, child);
+      return publish(modifiedParent)
+        .then(() => {
+          return this._analyzeService.deleteAnalysis(child);
+        })
+        .then(() => modifiedParent);
+    };
+
+    /* This is not a fork-to-edit analysis. Publish this normally */
+    if (!analysis.parentAnalysisId) {
+      publish();
+    }
+
+    return this._analyzeService
+      .readAnalysis(analysis.parentAnalysisId)
+      .then(parentAnalysis => {
+        /* The destination category is different from parent analysis's category. Publish it normally */
+        if (
+          parentAnalysis.categoryId.toString() !==
+          analysis.categoryId.toString()
+        ) {
+          return publish();
+        }
+
+        /* If the parent has been modified since fork/editing, allow user to choose whether
+           they want to overwrite the parent analysis */
+        if (analysis.parentLastModified !== parentAnalysis.updatedTimestamp) {
+          return this.showPublishOverwriteConfirmation()
+            .afterClosed()
+            .toPromise()
+            .then(shouldPublish => {
+              if (shouldPublish) {
+                return overwriteParent(parentAnalysis, analysis);
+              } else {
+                return null;
+              }
+            });
+        }
+        return overwriteParent(parentAnalysis, analysis);
+      });
+  }
+
   openPublishModal(analysis, type) {
     switch (type) {
       case 'publish':
@@ -96,21 +174,22 @@ export class AnalyzeActionsService {
             .subscribe(modifiedAnalysis => {
               if (analysis) {
                 const execute = true;
-                this._publishService
-                  .publishAnalysis(modifiedAnalysis, execute, type)
-                  .then(
-                    publishedAnalysis => {
-                      this._toastMessage.info(
-                        execute
-                          ? 'Analysis has been updated.'
-                          : 'Analysis schedule changes have been updated.'
-                      );
-                      resolve(publishedAnalysis);
-                    },
-                    () => {
-                      reject();
+                this.publishAnalysis(modifiedAnalysis, execute, type).then(
+                  publishedAnalysis => {
+                    if (!publishedAnalysis) {
+                      return reject();
                     }
-                  );
+                    this._toastMessage.info(
+                      execute
+                        ? 'Analysis has been updated.'
+                        : 'Analysis schedule changes have been updated.'
+                    );
+                    resolve(publishedAnalysis);
+                  },
+                  () => {
+                    reject();
+                  }
+                );
               }
             });
         });
