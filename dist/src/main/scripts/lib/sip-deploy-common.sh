@@ -31,14 +31,19 @@ if [ "${service:-}" != "1" ]; then
     exec > >(tee >(systemd-cat -t sip-deploy)) 2>&1
 fi
 
-# Ensure that SIP environment configuration file contains the
-# "sip-rtis" role, as is required for the HAProxy configuration to
-# render properly.  It can however be left empty if RTIS is not going
-# to be installed.  Previous versions of SIP did not have the
-# "sip-rtis" role, so older environments might not have this role in
-# their configuration files.
-if ! grep -e '^\[sip-rtis\]$' $config; then
-    echo "Error: Configuration file must contain role \"[sip-rtis]\""
-    echo "(But the role can be left empty if not installing RTIS)"
-    exit 1
-fi
+# Ensure that SIP environment configuration file contains the expected
+# roles, as they are required for certain configurations to render
+# properly.  They can however be left empty with no hosts if that role
+# is not going to be installed.  Previous versions of SIP did not have
+# all current roles, so older environments might not have all of these
+# roles in their configuration files.
+ensure_role() {
+    role=$1
+    if ! grep -e "^\[$role\]$" $config; then
+        echo "Error: Configuration file must contain role \"[$role]\""
+        echo "(But the role can be left empty without hosts)"
+        exit 1
+    fi
+}
+ensure_role sip-rtis
+ensure_role saw-security-arbitrator

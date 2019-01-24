@@ -1,28 +1,21 @@
 package com.synchronoss.querybuilder;
 
-import java.util.*;
-
+import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.DataField;
+import com.synchronoss.querybuilder.model.chart.Filter;
+import com.synchronoss.querybuilder.model.chart.NodeField;
+import com.synchronoss.querybuilder.model.pivot.ColumnField;
+import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.report.Column;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.PrefixQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.index.query.WildcardQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-
-import com.synchronoss.BuilderUtil;
-import com.synchronoss.querybuilder.model.chart.Filter;
-import com.synchronoss.querybuilder.model.chart.NodeField;
-import com.synchronoss.querybuilder.model.pivot.ColumnField;
-import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import java.util.*;
 
 import static com.synchronoss.AggregationConstants.*;
 
@@ -43,24 +36,32 @@ public class QueryBuilderUtil {
       formats.put("MMMMdYYYY,h:mm:ssa", "hour");
       dateFormats = Collections.unmodifiableMap(formats);
   }
+
+  public static String ifDateFormatNull(String format)  {
+	    if ( format == null )   {
+	        format = DATE_FORMAT;
+        }
+        return format;
+  }
 	
 	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
 	     String aggregationName)
 
 	{
 		AggregationBuilder aggregationBuilder = null;
+        String dateFormat = ifDateFormatNull(columnField.getDateFormat());
 		
 		if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) 
 		    || columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name()))
 		{
 		  if (columnField.getGroupInterval()!=null){
-			aggregationBuilder = AggregationBuilders.
-					dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
+		      aggregationBuilder = AggregationBuilders.
+					dateHistogram(aggregationName).field(columnField.getColumnName()).format(dateFormat).
 					dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
 			}
 		  else {
 		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-		        .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+		        .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 		  }
 		}
 		else {
@@ -75,16 +76,17 @@ public class QueryBuilderUtil {
 
 		{
 			AggregationBuilder aggregationBuilder = null;
-			
+            String dateFormat = ifDateFormatNull(rowField.getDateFormat());
+
 			if (rowField.getType().name().equals(ColumnField.Type.DATE.name()) || rowField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
 			  if (rowField.getGroupInterval()!=null){
 	            aggregationBuilder = AggregationBuilders.
-	                    dateHistogram(aggregationName).field(rowField.getColumnName()).format(DATE_FORMAT).
+	                    dateHistogram(aggregationName).field(rowField.getColumnName()).format(dateFormat).
 	                    dateHistogramInterval(groupInterval(rowField.getGroupInterval().value())).order(BucketOrder.key(false));
 	            }
 	          else {
 	            aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName())
-	                .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+	                .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 	          }
 			}
 			else {
@@ -134,17 +136,18 @@ public class QueryBuilderUtil {
 
     {
         AggregationBuilder aggregationBuilder = null;
+        String dateFormat = ifDateFormatNull(columnField.getDateFormat());
 
         if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) ||
             columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
             if (columnField.getGroupInterval()!=null){
                 aggregationBuilder = AggregationBuilders.
-                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
+                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(dateFormat).
                     dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
             }
             else {
                 aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-                    .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+                    .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
             }
         }
         else {
@@ -238,17 +241,18 @@ public class QueryBuilderUtil {
 	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName)
 	{
 		AggregationBuilder aggregationBuilder = null;
+        String dateFormat = ifDateFormatNull(nodeField.getDateFormat());
 		
 		if (nodeField.getType().name().equals(NodeField.Type.DATE.name()) || nodeField.getType().name().equals(NodeField.Type.TIMESTAMP.name()) ){
 		  nodeField = setGroupIntervalChart(nodeField);
   		  if (nodeField.getGroupInterval()!=null){
               aggregationBuilder = AggregationBuilders.
-                      dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
+                      dateHistogram(nodeName).field(nodeField.getColumnName()).format(dateFormat).
                       dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(BucketOrder.key(false));
               }
             else {
               aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                  .format(nodeField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+                  .format(dateFormat).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
             }
 		}
 		else{
@@ -259,7 +263,9 @@ public class QueryBuilderUtil {
 
   public static com.synchronoss.querybuilder.model.chart.NodeField setGroupIntervalChart(
       com.synchronoss.querybuilder.model.chart.NodeField nodeField) {
-    String interval = dateFormats.get(nodeField.getDateFormat().replaceAll(SPACE_REGX, EMPTY_STRING));
+      String dateFormat = ifDateFormatNull(nodeField.getDateFormat());
+
+    String interval = dateFormats.get(dateFormat.replaceAll(SPACE_REGX, EMPTY_STRING));
     switch (interval) {
       case "month":
         nodeField.setGroupInterval(

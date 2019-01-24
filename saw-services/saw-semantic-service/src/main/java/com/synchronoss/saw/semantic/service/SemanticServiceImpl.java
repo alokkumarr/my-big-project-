@@ -10,7 +10,6 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonParser;
@@ -277,13 +276,6 @@ public class SemanticServiceImpl implements SemanticService {
         filterMetricName.setValue(node.getMetricName());
         filters.add(filterMetricName);
       }
-      Filter filterProjectCode = new Filter();
-      if (node.getProjectCode() != null) {
-        filterProjectCode.setFieldPath("projectCode");
-        filterProjectCode.setCondition(Condition.EQ);
-        filterProjectCode.setValue(node.getProjectCode());
-        filters.add(filterProjectCode);
-      }
       query.setFilter(filters);
       String searchQuery = SAWSemanticUtils.node2JsonString(node, basePath, node.get_id(),
           Action.search, Category.Semantic, query);
@@ -380,13 +372,6 @@ public class SemanticServiceImpl implements SemanticService {
         filterMetricName.setCondition(Condition.EQ);
         filterMetricName.setValue(node.getMetricName());
         filters.add(filterMetricName);
-      }
-      Filter filterProjectCode = new Filter();
-      if (node.getProjectCode()!= null) {
-        filterProjectCode.setFieldPath("projectCode");
-        filterProjectCode.setCondition(Condition.EQ);
-        filterProjectCode.setValue(node.getProjectCode());
-        filters.add(filterProjectCode);
       }
       query.setFilter(filters);
       String searchQuery = SAWSemanticUtils.node2JsonString(node, basePath, node.get_id(),

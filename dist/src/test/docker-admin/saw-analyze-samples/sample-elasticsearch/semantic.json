@@ -137,6 +137,7 @@
               {
                 "name": "date",
                 "type": "date",
+                "format" : "yyyy-MM-dd HH:mm:ss",
                 "columnName": "date",
                 "displayName": "Date",
                 "aliasName": "",

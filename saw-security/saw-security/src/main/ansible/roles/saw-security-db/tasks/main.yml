@@ -37,7 +37,7 @@
 - name: Install MariaDB Galera cluster initialization script
   template:
     src: sip-mariadb-cluster-init
-    dest: /root/sip-mariadb-cluster-init
+    dest: /opt/sip/libexec/sip-mariadb-cluster-init
     mode: a+x
 - name: Install MariaDB Galera cluster initialization service
   template:
