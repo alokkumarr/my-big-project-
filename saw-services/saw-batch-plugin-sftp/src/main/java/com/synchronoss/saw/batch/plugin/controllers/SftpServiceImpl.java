@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
@@ -108,6 +109,25 @@ public class SftpServiceImpl extends SipPluginContract {
   private final String fileStatus = "FAILED";
   private final String procesStatus = "DATA_REMOVED";
 
+  @Value("${bis.default-data-drop-location}")
+  @NotNull
+  private String defaultDataDropLocation;
+
+  @PostConstruct
+  private void init() throws Exception {
+    File file = new File(defaultDataDropLocation);
+    Boolean isDestinationLoc = file.exists() && file.canRead()
+        && file.canWrite() && file.canExecute();
+
+    if (!isDestinationLoc) {
+      logger.info("Defautl drop location not found");
+      logger.info("Creating folders for default drop location :: "
+          + defaultDataDropLocation);
+      boolean isDefaultDropCreated = file.mkdirs();
+      logger.info("Default drop location folders created? :: "
+          + isDefaultDropCreated);
+    }
+  }
 
   @Override
   public String connectRoute(Long entityId) throws SftpProcessorException {
@@ -138,19 +158,19 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.info("Is destination directories exists?:: " + destinationPath.exists());
         if (!destinationPath.exists()) {
           connectionLogs.append(newLineChar);
-          logger.info("Destination directories doesnt exists. Creating..." 
+          logger.info("Destination directories doesnt exists. Creating..."
                 + destinationPath.exists());
           connectionLogs.append("Destination directories doesnt exists. Creating...");
           try {
             Files.createDirectories(Paths.get(destinationLocation));
           } catch (Exception ex) {
             status = HttpStatus.UNAUTHORIZED;
-            logger.error("Excpetion occurred while creating the directory " 
+            logger.error("Excpetion occurred while creating the directory "
                 + "for destination", ex);
             connectionLogs.append(newLineChar);
             connectionLogs.append("Exception occured while creating directories");
           }
-         
+
           connectionLogs.append(newLineChar);
           connectionLogs.append("Destination directories created scucessfully!!");
           logger.info("Destination directories created scucessfully!!");
@@ -184,7 +204,7 @@ public class SftpServiceImpl extends SipPluginContract {
               session.close();
             }
           }
-        } 
+        }
       } catch (AccessDeniedException e) {
         status = HttpStatus.UNAUTHORIZED;
         connectionLogs.append(newLineChar);
@@ -302,7 +322,7 @@ public class SftpServiceImpl extends SipPluginContract {
       }
       status = HttpStatus.OK;
     }
-    
+
     if (destinationPath.exists()) {
       if ((destinationPath.canRead() && destinationPath.canWrite())
           && destinationPath.canExecute()) {
@@ -978,7 +998,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   /**
    * This is a common method to update the status.
-   * 
+   *
    * @param log log instance which has the details.
    * @param fileStatus file status to be entered
    * @param procesStatus component status to be updated
