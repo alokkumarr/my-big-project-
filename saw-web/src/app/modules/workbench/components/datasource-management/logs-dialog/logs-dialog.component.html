@@ -62,8 +62,8 @@
 
     <div>
       <dx-data-grid #channelsGrid class="mat-elevation-z3"
-                    height="300px" width="760px"
-                    [dataSource]="logs" [showBorders]="false" [columnAutoWidth]="true"
+                    height="300px" width="760px" [allowColumnResizing]="true" [columnMinWidth]="50"
+                    [dataSource]="logs" [showBorders]="false" [columnAutoWidth]="true" [showColumnLines]="true"
                     [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
       >
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
@@ -74,10 +74,16 @@
         <dxi-column caption="Rec File Size" dataField="recdFileSize" alignment="left"></dxi-column>
         <dxi-column caption="File Status" dataField="mflFileStatus" alignment="left"></dxi-column>
         <dxi-column caption="Process State" dataField="bisProcessState" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer Start" dataField="transferStartTime" cellTemplate="timeTypeTemplate" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer End" dataField="transferEndTime" cellTemplate="timeTypeTemplate" alignment="left"></dxi-column>
+        <dxi-column caption="Transfer Duration (ms)" dataField="transferDuration" alignment="left"></dxi-column>
         <dxi-column caption="Modified at" dataField="modifiedDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
         <dxi-column caption="Created at" dataField="createdDate" alignment="left" cellTemplate="dateTypeTemplate"></dxi-column>
         <div *dxTemplate="let data of 'dateTypeTemplate'">
           {{data.value | date: 'short'}}
+        </div>
+        <div *dxTemplate="let data of 'timeTypeTemplate'">
+          {{data.value | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}
         </div>
       </dx-data-grid>
     </div>
