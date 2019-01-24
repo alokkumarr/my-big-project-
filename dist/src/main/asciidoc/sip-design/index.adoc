@@ -260,11 +260,6 @@ BIS API's provides resiliency to failure providing configurable retry techniques
 of network glitches. If transferring gets interrupted due to network glitches. It automatically heals inconsistent state,
 reinitiate the transfer again & make sure data has been received. It also takes care of partial data or corrupted data on destination host to be removed.
 
-
-.Figure: SAW Batch Ingestion Flow Diagram
-image::../sip-design/bis-flow-diagram.png[flowChart,400,400]
-
-
 === SAW Semantic Service
 
 The SAW Semantic Service enables the consumer to store the semantic metadata of SIP. The intention of this services
