@@ -101,6 +101,7 @@
         <artifactId>rpm-maven-plugin</artifactId>
         <version>2.1.5</version>
         <configuration>
+          <classifier>rpm</classifier>
           <license>Synchronoss proprietary code</license>
           <distribution>XDF-${rpm.version}</distribution>
           <needarch>false</needarch>
@@ -301,6 +302,27 @@ echo PreRemove done: ${app.nameVer}
         </configuration>
       </plugin>
       <!-- RPM plugin : end -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
+              </descriptors>
+              <finalName>sip-xdf-${project.version}</finalName>
+              <!-- Enable long file names without Maven warning -->
+              <tarLongFileMode>posix</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <!-- Workaround: This project uses the rpm-maven-plugin, which
@@ -327,7 +349,7 @@ echo PreRemove done: ${app.nameVer}
               <execution>
                 <id>xdf-rpm-build</id>
                 <goals>
-                  <goal>rpm</goal>
+                  <goal>attached-rpm</goal>
                 </goals>
               </execution>
             </executions>

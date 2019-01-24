@@ -175,6 +175,10 @@ sip-host3
 # Alternative MariaDB YUM repository URL
 #sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
 
+[sip-xdf]
+sip-host1
+sip-host2
+
 [sip-rtis]
 sip-host1
 sip-host2

@@ -18,6 +18,7 @@
         <include>com.sncr:saw-security-parent</include>
         <include>com.synchronoss:bda-rtis</include>
         <include>com.synchronoss:rtps</include>
+        <include>com.synchronoss.bda:xdf</include>
       </includes>
       <binaries>
         <attachmentClassifier>bin</attachmentClassifier>
