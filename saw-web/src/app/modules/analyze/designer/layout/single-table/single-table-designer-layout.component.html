@@ -67,7 +67,7 @@
         </span>
       </div>
 
-      <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA">
+      <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA" class="designer-analysis">
         <designer-pivot class="designer__data"
                         *ngIf="analysisType === 'pivot'"
                         [data]="data"
