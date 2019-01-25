@@ -10,9 +10,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -503,7 +506,7 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("sourceLocation", "/root/saw-batch-samples/small");
     routeMetadata.put("destinationLocation", "/");
     routeMetadata.put("filePattern", "*.csv");
-    routeMetadata.put("fileExclusions", "");
+    routeMetadata.put("fileExclusions", "log");
     routeMetadata.put("disableDuplicate", "false");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
@@ -532,18 +535,30 @@ public class BatchIngestionIT extends BaseIT {
     
     given(authSpec).when().body(transferNode).when()
     .post(TRANSFER_DATA_PATH).then().assertThat().statusCode(200);
-    
-    String result = given(authSpec).when()
+
+    JsonPath path = given(authSpec).when()
         .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId).then().assertThat()
-        .statusCode(200).extract().response().jsonPath().getString("logs[0].mflFileStatus");
+        .statusCode(200).extract().response().jsonPath();
+    String result = path.getString("logs[0].mflFileStatus");
+    String fileName = path.getString("logs[0].recdFileName");
+    File existFileName = new File(fileName);
+
+    // Checking once file has been transferred successfully from status perspective
     assertEquals("SUCCESS",result);
-   
+
+    // Checking whether file physical exists on the destination or not
+    assertTrue(existFileName.exists());
+
+    // Checking for not existing of excluded file extension
+    File parentFileName = new File(existFileName.getParent());
+    final String exclusion = routeMetadata.get("fileExclusions").asText();
+    int size = parentFileName.list((directory,localfileName) ->
+            localfileName.endsWith(exclusion)).length;
+
+    assertTrue(size == 0);
+
     this.tearDownRoute();
     this.tearDownChannel();
-    
-    
-    
-   
   }
 
   /**
