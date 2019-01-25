@@ -8,6 +8,7 @@ import { JwtService } from '../../../../../common/services';
 import { BaseDialogComponent } from '../../../../../common/base-dialog/base-dialog.component';
 import { Analysis } from '../../../types';
 import { PRIVILEGES } from '../../../consts';
+import { USER_ANALYSIS_CATEGORY_NAME } from '../../../../../common/consts';
 
 @Component({
   selector: 'analyze-publish-dialog',
@@ -33,10 +34,14 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
 
   ngOnInit() {
     this.token = this._jwt.getTokenObj();
-    this._analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {
-      this.categories = response;
-      this.setDefaultCategory();
-    });
+    this._analyzeService
+      .getCategories(PRIVILEGES.PUBLISH)
+      .then((response: any[]) => {
+        this.categories = response.filter(
+          category => category.name !== USER_ANALYSIS_CATEGORY_NAME
+        );
+        this.setDefaultCategory();
+      });
   }
 
   onCategorySelected(value) {
