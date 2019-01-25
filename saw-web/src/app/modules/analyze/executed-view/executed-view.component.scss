@@ -60,6 +60,9 @@ filter-chips-u {
     }
   }
 }
+.mat-drawer-content.executed-view {
+  overflow: hidden;
+}
 
 .execution-tag {
   padding: 0 2px;
