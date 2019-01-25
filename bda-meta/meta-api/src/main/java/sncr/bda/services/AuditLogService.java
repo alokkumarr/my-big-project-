@@ -10,6 +10,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.metastore.AuditLogStore;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * The class provides functionality to
@@ -80,7 +81,16 @@ public class AuditLogService {
     }
 
     public String createAuditLog(ContextMetadata ctx, JsonObject ale) throws Exception {
-        String ale_id = ctx.applicationID + MetadataStore.delimiter + System.currentTimeMillis();
+        /* Audit log entry (ALE) id is a combination of the following:
+         * <applicationId>::<UUID>_<time in nanoseconds>
+         *
+         *
+         * applicationID - ID of the application (project id)
+         * UUID - Random UUID for uniqueness of the ALE id across components
+         * milliseconds - Record the time of the log entry (Can be used for sorting purpose)
+         *
+         */
+        String ale_id = ctx.applicationID + MetadataStore.delimiter + UUID.randomUUID() + "_" + System.currentTimeMillis();
         als.create(ale_id, ale.toString());
         return ale_id;
     }

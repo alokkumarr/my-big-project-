@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by pman0003 on 10/3/2017.
  */
-public class DSKDetails {
+public class TicketDSKDetails {
 
     private String name ;
     private List<String > values;
