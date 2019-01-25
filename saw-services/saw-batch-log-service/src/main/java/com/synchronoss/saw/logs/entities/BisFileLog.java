@@ -76,6 +76,15 @@ public class BisFileLog implements Serializable {
   @Column(name = "CREATED_DATE")
   private Date createdDate;
 
+  @Column(name = "BIS_TRANSFER_START_TIME")
+  private Date transferStartTime;
+
+  @Column(name = "BIS_TRANSFER_END_TIME")
+  private Date transferEndTime;
+
+  @Column(name = "BIS_TRANSFER_DURATION")
+  private Long transferDuration;
+
 
   public String getPid() {
     return pid;
@@ -183,5 +192,28 @@ public class BisFileLog implements Serializable {
     this.createdDate = createdDate;
   }
 
+  public Date getTransferStartTime() {
+    return transferStartTime;
+  }
+
+  public void setTransferStartTime(Date transferStartTime) {
+    this.transferStartTime = transferStartTime;
+  }
+
+  public Date getTransferEndTime() {
+    return transferEndTime;
+  }
+
+  public void setTransferEndTime(Date transferEndTime) {
+    this.transferEndTime = transferEndTime;
+  }
+
+  public Long getTransferDuration() {
+    return transferDuration;
+  }
+
+  public void setTransferDuration(Long transferDuration) {
+    this.transferDuration = transferDuration;
+  }
 
 }

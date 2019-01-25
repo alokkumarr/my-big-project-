@@ -1,6 +1,7 @@
 package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +36,12 @@ public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_CHANNEL_PATH = "/services/ingestion/batch/" + BATCH_CHANNEL;
 
   private static final String BATCH_PATH = "/services/ingestion/batch";
-
+  
+  private static final String TRANSFER_DATA_PATH = 
+      "/services/ingestion/batch/sftp/channel/transfers/data";
+  
+  private static final String ROUTE_HISTORY_PATH = "/services/ingestion/batch/logs/";
+  
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
   private ObjectNode prepareChannelDataSet() throws JsonProcessingException {
@@ -102,7 +109,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("activeTab", "monthly");
     return childNode;
   }
-
+  
   private ObjectNode prepareUpdateRouteDataSet() throws JsonProcessingException {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("status", "active");
@@ -463,6 +470,80 @@ public class BatchIngestionIT extends BaseIT {
         BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
     this.tearDownChannel();
+  }
+  
+  /**
+   * The test case is to test a connectivity route in batch Ingestion.
+   */
+  @Test
+  public void transferData() throws JsonProcessingException {
+    
+    
+    ObjectNode channelMetadata = mapper.createObjectNode();
+    channelMetadata.put("channelName", "Messaging");
+    channelMetadata.put("channelType", "SCP");
+    channelMetadata.put("hostName", "sip-admin");
+    channelMetadata.put("portNo", 22);
+    channelMetadata.put("accessType", "read");
+    channelMetadata.put("userName", "root");
+    channelMetadata.put("password", "root");
+    channelMetadata.put("description", "Test");
+    ObjectNode channel = mapper.createObjectNode();
+    channel.put("createdBy", "admin@synchronoss.com");
+    channel.put("productCode", "SIP");
+    channel.put("customerCode", "SNCR");
+    channel.put("projectCode", "workbench");
+    channel.put("channelType", "SFTP");
+    channel.put("channelMetadata", new ObjectMapper()
+             .writeValueAsString(channelMetadata));
+    
+    ObjectNode routeMetadata = mapper.createObjectNode();
+    routeMetadata.put("status", "active");
+    routeMetadata.put("routeName", "route123");
+    routeMetadata.put("sourceLocation", "/root/saw-batch-samples/small");
+    routeMetadata.put("destinationLocation", "/");
+    routeMetadata.put("filePattern", "*.csv");
+    routeMetadata.put("fileExclusions", "");
+    routeMetadata.put("disableDuplicate", "false");
+    ObjectNode schedulerNode = mapper.createObjectNode();
+    schedulerNode.put("activeTab", "immediate");
+    routeMetadata.set("schedulerExpression", schedulerNode);
+    routeMetadata.put("description", "file");
+    ObjectNode route = mapper.createObjectNode();
+    route.put("createdBy", "admin@synchronoss.com");
+    route.put("routeMetadata", new ObjectMapper()
+             .writeValueAsString(routeMetadata));
+    Long channelId = given(authSpec).body(channel).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200)
+        .extract().response().getBody().jsonPath().getLong("bisChannelSysId");
+ 
+    
+    String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
+    ValidatableResponse response = given(authSpec).body(route).when().post(routeUri)
+        .then().assertThat().statusCode(200);
+    log.debug("createRoute () " + response.log());
+   
+    Long routeId = given(authSpec).when().get(routeUri).then().assertThat()
+        .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    
+    ObjectNode transferNode = mapper.createObjectNode();
+    transferNode.put("channelId", channelId);
+    transferNode.put("routeId", routeId);
+    
+    given(authSpec).when().body(transferNode).when()
+    .post(TRANSFER_DATA_PATH).then().assertThat().statusCode(200);
+    
+    String result = given(authSpec).when()
+        .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId).then().assertThat()
+        .statusCode(200).extract().response().jsonPath().getString("logs[0].mflFileStatus");
+    assertEquals("SUCCESS",result);
+   
+    this.tearDownRoute();
+    this.tearDownChannel();
+    
+    
+    
+   
   }
 
   /**

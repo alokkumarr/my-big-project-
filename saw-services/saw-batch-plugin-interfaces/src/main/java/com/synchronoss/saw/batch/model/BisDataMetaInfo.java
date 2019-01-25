@@ -69,6 +69,39 @@ public class BisDataMetaInfo {
       dataType = "String", allowEmptyValue = false)
   @JsonProperty("actualReceiveDate")
   private Date actualReceiveDate;
+  
+  @JsonProperty("fileTransferStartTime")
+  private Date fileTransferStartTime;
+  
+  @JsonProperty("fileTransferEndTime")
+  private Date fileTransferEndTime;
+  
+  @JsonProperty("fileTransferDuration")
+  private Long fileTransferDuration;
+
+  public Date getFileTransferStartTime() {
+    return fileTransferStartTime;
+  }
+
+  public void setFileTransferStartTime(Date fileTransferStartTime) {
+    this.fileTransferStartTime = fileTransferStartTime;
+  }
+
+  public Date getFileTransferEndTime() {
+    return fileTransferEndTime;
+  }
+
+  public void setFileTransferEndTime(Date fileTransferEndTime) {
+    this.fileTransferEndTime = fileTransferEndTime;
+  }
+
+  public Long getFileTransferDuration() {
+    return fileTransferDuration;
+  }
+
+  public void setFileTransferDuration(Long fileTransferDuration) {
+    this.fileTransferDuration = fileTransferDuration;
+  }
 
   @JsonIgnore
   private String destinationPath;
