@@ -28,8 +28,6 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
   @Value("${bis-transfer-url}")
   private String bisTransferUrl;
 
-  @Autowired
-  RetryTemplate retryTemplate;
   RestTemplate restTemplate = new RestTemplate();
 
 
@@ -49,7 +47,7 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
     JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
     String myValue = dataMap.getString("myKey");
     logger.info("Value:" + myValue);
-    retryTemplate.execute(context -> restTemplate.postForLocation(bisTransferUrl, jobRequest));
+    restTemplate.postForLocation(bisTransferUrl, jobRequest);
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

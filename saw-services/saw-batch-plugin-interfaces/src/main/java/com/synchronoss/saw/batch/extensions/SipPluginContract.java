@@ -77,9 +77,6 @@ public abstract class SipPluginContract {
   /**
    * * This method is to test connect the source.
    */
-  @Retryable(value = {RuntimeException.class},
-      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
-      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
       boolean isDisable) throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because it "

@@ -116,16 +116,14 @@ public class SftpServiceImpl extends SipPluginContract {
   @PostConstruct
   private void init() throws Exception {
     File file = new File(defaultDataDropLocation);
-    Boolean isDestinationLoc = file.exists() && file.canRead()
-        && file.canWrite() && file.canExecute();
+    Boolean isDestinationLoc =
+        file.exists() && file.canRead() && file.canWrite() && file.canExecute();
 
     if (!isDestinationLoc) {
       logger.info("Defautl drop location not found");
-      logger.info("Creating folders for default drop location :: "
-          + defaultDataDropLocation);
+      logger.info("Creating folders for default drop location :: " + defaultDataDropLocation);
       boolean isDefaultDropCreated = file.mkdirs();
-      logger.info("Default drop location folders created? :: "
-          + isDefaultDropCreated);
+      logger.info("Default drop location folders created? :: " + isDefaultDropCreated);
     }
   }
 
@@ -158,15 +156,15 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.info("Is destination directories exists?:: " + destinationPath.exists());
         if (!destinationPath.exists()) {
           connectionLogs.append(newLineChar);
-          logger.info("Destination directories doesnt exists. Creating..."
-                + destinationPath.exists());
+          logger.info(
+              "Destination directories doesnt exists. Creating..." + destinationPath.exists());
           connectionLogs.append("Destination directories doesnt exists. Creating...");
           try {
             Files.createDirectories(Paths.get(destinationLocation));
           } catch (Exception ex) {
             status = HttpStatus.UNAUTHORIZED;
-            logger.error("Excpetion occurred while creating the directory "
-                + "for destination", ex);
+            logger.error("Excpetion occurred while creating the directory " + "for destination",
+                ex);
             connectionLogs.append(newLineChar);
             connectionLogs.append("Exception occured while creating directories");
           }
@@ -348,10 +346,10 @@ public class SftpServiceImpl extends SipPluginContract {
         }
       } else {
         connectionLogs.append(newLineChar);
-        connectionLogs.append("Destination directories "
-            + "exists but no permission to `Read/Write/Execute'");
-        logger.info("Destination directories "
-            + "exists but no permission to `Read/Write/Execute'");
+        connectionLogs.append(
+            "Destination directories " + "exists but no permission to `Read/Write/Execute'");
+        logger
+            .info("Destination directories " + "exists but no permission to `Read/Write/Execute'");
       }
     }
     logger.trace("Test connection to route ends here");
@@ -966,17 +964,22 @@ public class SftpServiceImpl extends SipPluginContract {
             String disableDupFlag = rootNode.get("disableDuplicate").asText();
             Boolean isDisable = Boolean.valueOf(disableDupFlag);
             if (isDisable) {
+              logger.trace("Inside isDisable starts here");
               if (sipLogService.isRouteAndChannelExists(routeId, channelId)) {
                 updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
                 // To retry only specific file instead of downloading all files
                 // in the source folder
                 if (log.getFileName() != null) {
+                  logger.trace("Inside isDisable transferData starts here");
                   transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
                       isDisable);
                 } else {
+                  logger.trace("Inside isDisable transferData when starts here "
+                      + "log.getFileName() is null");
                   transferData(channelId, routeId, null, isDisable);
                 }
               }
+              logger.trace("Inside isDisable ends here");
             } else {
               updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
               // To retry only specific file instead of downloading all files in
