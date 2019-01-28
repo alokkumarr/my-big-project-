@@ -44,6 +44,9 @@ public class SipLogging {
     bisLog.setMflFileStatus(entity.getProcessState());
     bisLog.setActualFileRecDate(entity.getActualReceiveDate());
     bisLog.setBisProcessState(entity.getComponentState());
+    bisLog.setTransferStartTime(entity.getFileTransferStartTime());
+    bisLog.setTransferEndTime(entity.getFileTransferEndTime());
+    bisLog.setTransferDuration(entity.getFileTransferDuration());
     if (bisFileLogsRepository.existsById(pid)) {
       bisLog.setCreatedDate(new Date());
       bisLog.setModifiedDate(new Date());

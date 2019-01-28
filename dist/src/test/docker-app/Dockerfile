@@ -22,3 +22,9 @@ FROM sip-base-maprclient:${project.version}
 # disable preinstalling for now and reenable when CentOS defaults to
 # MariaDB 10 or higher.
 #RUN yum -y -q install mariadb-server
+
+# Workaround: While the Batch Ingestion Service does not support               
+# MapR-FS, and the cloud environment does not have the MapR-FS NFS             
+# Gateway mount on "/dfs", create the directory here to support                
+# integration tests                                                            
+RUN install -o mapr -d /dfs 
