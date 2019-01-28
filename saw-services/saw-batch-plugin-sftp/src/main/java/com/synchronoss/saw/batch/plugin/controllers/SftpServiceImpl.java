@@ -516,6 +516,7 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("file from the source is downnloaded in the location :" + destination);
           File localDirectory =
               new File(destination + File.separator + getBatchId() + File.separator);
+          logger.trace("Initializing local directory ::" + localDirectory);
           logger.trace(
               "directory where the file will be downnloaded  :" + localDirectory.getAbsolutePath());
           if (!localDirectory.exists()) {
@@ -728,7 +729,6 @@ public class SftpServiceImpl extends SipPluginContract {
               (filteredFiles.length + iterationOfBatches - 1) / iterationOfBatches;
 
           logger.trace("partitionSize :" + partitionSize);
-          BisDataMetaInfo bisDataMetaInfo = null;
           List<LsEntry> filesArray = Arrays.asList(filteredFiles);
           logger.trace("number of files on this pull :" + filesArray.size());
           List<List<LsEntry>> result = IntStream.range(0, partitionSize)
@@ -743,6 +743,7 @@ public class SftpServiceImpl extends SipPluginContract {
           long lastModifiedDate = 0L;
           for (List<LsEntry> entries : result) {
             for (LsEntry entry : entries) {
+
               logger.trace("entry :" + entry.getFilename());
               long modifiedDate = new Date(entry.getAttrs().getMTime() * 1000L).getTime();
               logger.trace("modifiedDate :" + modifiedDate);
@@ -775,11 +776,12 @@ public class SftpServiceImpl extends SipPluginContract {
                       + channelId + " & route Id" + routeId);
                 } else {
                   File fileTobeDeleted = null;
+                  localDirectory = new File(defaultDestinationLocation + File.separator
+                      + destinationLocation + File.separator + batchId + File.separator);
                   try {
                     if (entry.getAttrs().getSize() != 0 && sipLogService
-                        .duplicateCheck(isDisableDuplicate, sourcelocation, entry)) {
-                      localDirectory = new File(defaultDestinationLocation + File.separator
-                          + destinationLocation + File.separator + batchId + File.separator);
+                        .duplicateCheck(isDisableDuplicate,sourcelocation,entry)) {
+
                       if (localDirectory != null && !localDirectory.exists()) {
                         logger.trace("directory where the file will be"
                             + " downnloaded does not exist so it will be created :"
@@ -795,25 +797,16 @@ public class SftpServiceImpl extends SipPluginContract {
                           + IntegrationUtils.renameFileAppender() + "."
                           + FilenameUtils.getExtension(entry.getFilename()));
                       fileTobeDeleted = localFile;
-                      bisDataMetaInfo = new BisDataMetaInfo();
-                      bisDataMetaInfo.setFilePattern(pattern);
-                      bisDataMetaInfo
-                          .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-                      bisDataMetaInfo.setReceivedDataName(localFile.getPath());
-                      bisDataMetaInfo.setDataSizeInBytes(entry.getAttrs().getSize());
-                      bisDataMetaInfo
-                          .setActualDataName(sourcelocation + File.separator + entry.getFilename());
-                      bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-                      bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
-                      bisDataMetaInfo.setComponentState(BisComponentState.DATA_INPROGRESS.value());
-                      bisDataMetaInfo.setActualReceiveDate(
-                          new Date(((long) entry.getAttrs().getATime()) * 1000L));
-                      bisDataMetaInfo.setChannelId(channelId);
-                      bisDataMetaInfo.setRouteId(routeId);
+                      BisDataMetaInfo bisDataMetaInfo = prepareLogInfo(pattern,
+                          getFilePath(localDirectory, entry),
+                          getActualRecDate(entry), entry.getAttrs().getSize(),
+                          sourcelocation + File.separator + entry.getFilename(), channelId, routeId,
+                          localDirectory.getPath());
+
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                      bisDataMetaInfo.setDestinationPath(localDirectory.getPath());
                       logger.trace("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
+
                       template.get(sourcelocation + File.separator + entry.getFilename(),
                           new InputStreamCallback() {
                             @Override
@@ -821,6 +814,9 @@ public class SftpServiceImpl extends SipPluginContract {
                               logger.trace(
                                   "Streaming the content of the file in the directory starts here "
                                       + entry.getFilename());
+                              ZonedDateTime fileTransStartTime = ZonedDateTime.now();
+                              logger.trace("File" + entry.getFilename() + " transfer strat time:: "
+                                  + fileTransStartTime);
                               try {
                                 if (stream != null) {
                                   // FileCopyUtils.copy(StreamUtils.copyToByteArray(stream),
@@ -830,8 +826,29 @@ public class SftpServiceImpl extends SipPluginContract {
                                   logger.trace("Streaming the content of the file in the directory "
                                       + "ends here " + entry.getFilename());
                                   IOUtils.closeQuietly(stream);
+                                  ZonedDateTime fileTransEndTime = ZonedDateTime.now();
+                                  logger.trace("File" + entry.getFilename()
+                                      + "transfer end time:: "
+                                      + fileTransEndTime);
                                   logger.trace(
                                       "closing the stream for the file " + entry.getFilename());
+
+
+                                  bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
+                                  bisDataMetaInfo.setComponentState(
+                                      BisComponentState.DATA_RECEIVED.value());
+                                  bisDataMetaInfo.setFileTransferStartTime(
+                                      Date.from(fileTransStartTime.toInstant()));
+                                  bisDataMetaInfo.setFileTransferEndTime(
+                                      Date.from(fileTransEndTime.toInstant()));
+                                  bisDataMetaInfo.setFileTransferDuration(
+                                      Duration.between(fileTransStartTime,
+                                          fileTransEndTime).toMillis());
+                                  logger.trace("File transfer duration :: "
+                                          + bisDataMetaInfo.getFileTransferDuration());
+                                  sipLogService.upsert(
+                                      bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                                  list.add(bisDataMetaInfo);
                                 }
                               } catch (Exception ex) {
                                 logger.error("Exception occurred while writting to file system ",
@@ -865,21 +882,19 @@ public class SftpServiceImpl extends SipPluginContract {
                       bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                       list.add(bisDataMetaInfo);
+
                     } else {
                       if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
                           sourcelocation + File.separator + entry.getFilename())) {
-                        bisDataMetaInfo = new BisDataMetaInfo();
+                        logger.info("local Directory before calling getPath() ::" + localDirectory);
+                        BisDataMetaInfo bisDataMetaInfo = prepareLogInfo(
+                            pattern, getFilePath(localDirectory, entry),
+                            getActualRecDate(entry), entry.getAttrs().getSize(),
+                            sourcelocation + File.separator
+                            +  entry.getFilename(), channelId, routeId,
+                            localDirectory.getPath());
                         bisDataMetaInfo.setProcessId(
                             new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-                        bisDataMetaInfo.setDataSizeInBytes(0L);
-                        bisDataMetaInfo.setActualDataName(
-                            sourcelocation + File.separator + entry.getFilename());
-                        bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-                        bisDataMetaInfo.setActualReceiveDate(
-                            new Date(((long) entry.getAttrs().getATime()) * 1000L));
-                        bisDataMetaInfo.setChannelId(channelId);
-                        bisDataMetaInfo.setRouteId(routeId);
-                        bisDataMetaInfo.setFilePattern(pattern);
                         bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                         bisDataMetaInfo.setComponentState(BisComponentState.DUPLICATE.value());
                         sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
@@ -887,18 +902,24 @@ public class SftpServiceImpl extends SipPluginContract {
                       }
                     }
                   } catch (Exception ex) {
+
                     logger.error("Exception occurred while transferring the file from channel", ex);
                     if (fileTobeDeleted.exists()) {
-                      logger.trace(
-                          " files or directory to be deleted on exception " + fileTobeDeleted);
-                      if (bisDataMetaInfo.getProcessId() != null) {
-                        bisDataMetaInfo.setComponentState(BisComponentState.DATA_REMOVED.value());
-                        bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
-                        sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                        sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
-                      }
-                      fileTobeDeleted.delete();
+                      BisDataMetaInfo bisDataMetaInfo = prepareLogInfo(
+                          pattern, getFilePath(localDirectory, entry),
+                          getActualRecDate(entry), entry.getAttrs().getSize(),
+                          sourcelocation + File.separator + entry.getFilename(), channelId, routeId,
+                          localDirectory.getPath());
+
+                      logger.trace(" files or directory to be deleted on exception "
+                          + fileTobeDeleted);
+                      bisDataMetaInfo.setComponentState(BisComponentState.DATA_REMOVED.value());
+                      bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
+                      sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                      sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
                     }
+                    fileTobeDeleted.delete();
+                    // }
                     if (template.getSession() != null) {
                       template.getSession().close();
                     }
@@ -924,6 +945,40 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error("Exception occurred while transferring the file from channel", ex);
     }
     return list;
+  }
+
+  private BisDataMetaInfo prepareLogInfo(String pattern, String localFilePath,
+      Date recieveDate, Long size,
+      String actualDataName, Long channelId, Long routeId, String destinationPath) {
+    BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+    new BisDataMetaInfo();
+    bisDataMetaInfo.setFilePattern(pattern);
+    bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setReceivedDataName(localFilePath);
+    bisDataMetaInfo.setDataSizeInBytes(size);
+    bisDataMetaInfo.setActualDataName(actualDataName);
+    bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+    bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
+    bisDataMetaInfo.setActualReceiveDate(recieveDate);
+    bisDataMetaInfo.setChannelId(channelId);
+    bisDataMetaInfo.setRouteId(routeId);
+    // sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+    bisDataMetaInfo.setDestinationPath(destinationPath);
+
+    return bisDataMetaInfo;
+
+  }
+
+  private String getFilePath(File localDirectory, LsEntry entry) {
+    File file = new File(localDirectory.getPath() + File.separator
+            +  FilenameUtils.getBaseName(entry.getFilename())
+            + "." + IntegrationUtils.renameFileAppender() + "."
+            + FilenameUtils.getExtension(entry.getFilename()));
+    return file.getPath();
+  }
+
+  private Date getActualRecDate(LsEntry entry) {
+    return new Date(((long) entry.getAttrs().getATime()) * 1000L);
   }
 
 

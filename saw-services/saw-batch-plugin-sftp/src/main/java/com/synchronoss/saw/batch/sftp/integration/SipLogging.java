@@ -53,6 +53,9 @@ public class SipLogging {
     bisLog.setMflFileStatus(entity.getProcessState());
     bisLog.setActualFileRecDate(entity.getActualReceiveDate());
     bisLog.setBisProcessState(entity.getComponentState());
+    bisLog.setTransferStartTime(entity.getFileTransferStartTime());
+    bisLog.setTransferEndTime(entity.getFileTransferEndTime());
+    bisLog.setTransferDuration(entity.getFileTransferDuration());
     bisLog.setCheckpointDate(new Date());
     bisLog.setCreatedDate(new Date());
     if (bisFileLogsRepository.existsById(pid)) {
@@ -136,7 +139,7 @@ public class SipLogging {
     return bisFileLogsRepository.isChannelAndRouteIdExists(routeId, channelId);
 
   }
-  
+
   /**
    * This method is used retry id.
    *
