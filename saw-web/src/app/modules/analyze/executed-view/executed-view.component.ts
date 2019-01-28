@@ -101,6 +101,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
     this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
       this.analysis = analysis;
+      console.log(this.analysis);
       this.setPrivileges(analysis);
 
       /* If an execution is not already going on, create a new execution

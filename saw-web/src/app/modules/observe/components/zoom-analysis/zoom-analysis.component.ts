@@ -29,7 +29,7 @@ export class ZoomAnalysisComponent implements OnInit {
 
   ngOnInit() {
     this.nameMap = reduce(
-      this.data.analysis.artifacts,
+      this.data.origAnalysis.artifacts,
       (acc, artifact: Artifact) => {
         acc[artifact.artifactName] = reduce(
           artifact.columns,
@@ -88,5 +88,9 @@ export class ZoomAnalysisComponent implements OnInit {
 
   close() {
     this._dialogRef.close();
+  }
+
+  refreshTile(e) {
+    return;
   }
 }
