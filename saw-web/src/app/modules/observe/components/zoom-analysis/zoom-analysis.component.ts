@@ -46,10 +46,6 @@ export class ZoomAnalysisComponent implements OnInit {
   }
 
   getDisplayName(filter: Filter) {
-    if (filter.isGlobalFilter) {
-      console.log(filter);
-    }
-
     return this.nameMap[filter.tableName][filter.columnName];
   }
 
