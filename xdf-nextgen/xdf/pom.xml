@@ -211,37 +211,4 @@
       </plugin>
     </plugins>
   </build>
-  <!-- Workaround: This project uses the rpm-maven-plugin, which
-       requires RPM tools to be installed.  It should be migrated to
-       using the Java RPM builder.  Until then, put building RPMs
-       behind a profile actived only for continuous integration buils.
-       -->
-  <profiles>
-    <profile>
-      <id>all-modules</id>
-      <activation>
-        <property>
-          <name>sip.modules</name>
-          <value>all</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>rpm-maven-plugin</artifactId>
-            <version>2.1.5</version>
-            <executions>
-              <execution>
-                <id>xdf-rpm-build</id>
-                <goals>
-                  <goal>attached-rpm</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
