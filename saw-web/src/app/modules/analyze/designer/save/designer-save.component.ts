@@ -4,6 +4,7 @@ import * as find from 'lodash/find';
 import { Analysis } from '../types';
 import { PRIVILEGES } from '../../consts';
 import { DesignerService } from '../designer.service';
+import { DRAFT_CATEGORY_ID } from './../../consts';
 
 @Component({
   selector: 'designer-save',
@@ -13,6 +14,7 @@ export class DesignerSaveComponent implements OnInit {
   @Output() public nameChange: EventEmitter<string> = new EventEmitter();
   @Output() public descriptionChange: EventEmitter<string> = new EventEmitter();
   @Input() public analysis: Analysis;
+  @Input() public designerMode: string;
 
   public categories;
 
@@ -23,6 +25,7 @@ export class DesignerSaveComponent implements OnInit {
       this.categories = response;
       this.setDefaultCategory();
     });
+    this.analysis.categoryId = this.designerMode === 'new' ? DRAFT_CATEGORY_ID : this.analysis.categoryId;
   }
 
   setDefaultCategory() {

@@ -156,23 +156,11 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
           commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
           save.nameInput.clear().sendKeys(forkedName);
           save.descriptionInput.clear().sendKeys(forkedDescription);
-          commonFunctions.waitFor.elementToBeClickable(save.selectedCategoryUpdated);
-          save.selectedCategoryUpdated.click();
-          commonFunctions.waitFor.elementToBeClickable(save.selectCategoryToSave(subCategoryName));
-          save.selectCategoryToSave(subCategoryName).click();
 
-          commonFunctions.waitFor.elementToBeVisible(save.saveBtn);
+          // commonFunctions.waitFor.elementToBeVisible(save.saveBtn);
           commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
           save.saveBtn.click();
-          browser.waitForAngular();
-          browser.sleep(1000);
           commonFunctions.waitFor.elementToBeNotVisible(analyzePage.designerDialog.chart.filterBtn);
-          browser.ignoreSynchronization = false;
-          analyzePage.navigateToHome();
-          browser.ignoreSynchronization = true;
-          browser.sleep(500);
-          homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-
           element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
             if(isPresent) {
               //console.log('Already in card view..')
