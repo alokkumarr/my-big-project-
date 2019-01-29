@@ -1,9 +1,28 @@
 :host {
-  .dialog__content div observe-pivot {
-    height: calc(100vh - 200px);
+  .dialog-container {
+    overflow: hidden;
+    margin-bottom: 50px;
+
+    .dialog__content div observe-pivot {
+      height: calc(100vh - 200px);
+    }
+
+    .dialog__content div observe-chart {
+      height: calc(100vh - 240px);
+    }
   }
 }
 
 .observe-analysis {
-  height: calc(100vh - 230px) !important;
+  height: calc(100vh - 180px) !important;
+
+  .analysis-container {
+    float: left;
+    width: 96%;
+  }
+
+  .close-icon {
+    margin-top: 12px;
+  }
 }
+
