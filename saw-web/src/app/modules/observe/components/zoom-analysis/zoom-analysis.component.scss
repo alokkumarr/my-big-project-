@@ -1,14 +1,13 @@
 :host {
   .dialog-container {
     overflow: hidden;
-    margin-bottom: 50px;
 
     .dialog__content div observe-pivot {
       height: calc(100vh - 200px);
     }
 
     .dialog__content div observe-chart {
-      height: calc(100vh - 240px);
+      height: calc(100vh - 180px);
     }
   }
 }
@@ -23,6 +22,7 @@
 
   .close-icon {
     margin-top: 12px;
+    cursor: pointer;
   }
 }
 
