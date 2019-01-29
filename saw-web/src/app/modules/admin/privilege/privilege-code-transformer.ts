@@ -2,6 +2,7 @@ import * as map from 'lodash/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpCompact from 'lodash/fp/compact';
 import * as fpJoin from 'lodash/fp/join';
+import * as fpFilter from 'lodash/fp/filter';
 
 const ALL_PRIVILEGES_DECIMAL = 128;
 export const NO_PRIVILEGES_STR = '0000000000000000';
@@ -111,7 +112,10 @@ export function getPrivilegeFromBoolArray(
   };
 }
 
-export function getPrivilegeDescription(privilegeCode: number): string {
+export function getPrivilegeDescription(
+  privilegeCode: number,
+  allowedPrivileges: string[] = PRIVILEGE_NAMES
+): string {
   switch (privilegeCode) {
     case 0:
       return 'No-Access';
@@ -123,11 +127,20 @@ export function getPrivilegeDescription(privilegeCode: number): string {
        * calculate description matches meaning of corresponding bits.
        */
       const PRIVILEGES = ['View', ...PRIVILEGE_NAMES, 'All'];
+      const ALLOWED_PRIVILEGES = ['View', ...allowedPrivileges, 'All'].map(a =>
+        a.toUpperCase()
+      );
       const privilegeCodeList = decimal2BoolArray(privilegeCode);
-      return fpPipe(fpCompact, fpJoin(', '))(
-        map(
-          privilegeCodeList,
-          (privilege, index) => (privilege ? PRIVILEGES[index] : null)
+      return fpPipe(
+        fpCompact,
+        /* Filter out any privileges that are not supported */
+        fpFilter(privilegeName => {
+          return ALLOWED_PRIVILEGES.includes(privilegeName.toUpperCase());
+        }),
+        fpJoin(', ')
+      )(
+        map(privilegeCodeList, (privilege, index) =>
+          privilege ? PRIVILEGES[index] : null
         )
       );
   }
