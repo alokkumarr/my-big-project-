@@ -19,6 +19,7 @@
         <include>com.synchronoss:bda-rtis</include>
         <include>com.synchronoss:rtps</include>
         <include>com.synchronoss.bda:xdf</include>
+        <include>com.synchronoss.saw:a2modules</include>
       </includes>
       <binaries>
         <attachmentClassifier>bin</attachmentClassifier>
