@@ -8,6 +8,7 @@ import * as isFunction from 'lodash/isFunction';
 import * as range from 'lodash/range';
 
 import * as moment from 'moment';
+import { timezones } from '../../../utils/timezones';
 
 import {
   getLocalMinute,
@@ -35,6 +36,8 @@ export class CronJobSchedularComponent implements OnInit {
   @Output()
   onCronChanged: EventEmitter<any> = new EventEmitter();
   public startAt = new Date();
+  public timezones = timezones;
+
   NumberMapping: any = { '=1': '#st', '=2': '#nd', '=3': '#rd', other: '#th' };
   DayMapping: any = {
     '=TUE': 'TUESDAY',

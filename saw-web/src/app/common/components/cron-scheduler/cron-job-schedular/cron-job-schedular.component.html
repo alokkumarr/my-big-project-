@@ -211,4 +211,13 @@
       <button mat-button color="warn" (click)="selectedMoments = []">Clear</button>
     </div>
   </div>
+  <div fxFlex="1 1 40px">
+    <mat-form-field fxFlex="50" appearance="outline" class="form-select">
+      <mat-select placeholder="Timezone" (selectionChange)="console.log($event)">
+        <mat-option *ngFor="let zone of timezones" [value]="zone.name">
+          {{zone.label}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 </div>
