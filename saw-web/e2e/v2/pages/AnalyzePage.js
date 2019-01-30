@@ -3,9 +3,11 @@ const commonFunctions = require('./utils/commonFunctions');
 const protractorConf = require('../conf/protractor.conf');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
+const CreateAnalysisModel = require('./components/CreateAnalysisModel');
 
-class AnalyzePage {
+class AnalyzePage extends CreateAnalysisModel {
   constructor() {
+    super();
     this._addAnalysisButton = element(
       by.css(`[e2e="open-new-analysis-modal"]`)
     );

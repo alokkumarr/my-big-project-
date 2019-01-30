@@ -11,7 +11,7 @@ const testSuites = require('./testSuites');
  * page loads may be indefinite.
  * maximum time to wait for a page load i.e. when user refresh page/ first time open browser and type saw app url
  */
-const pageLoadTimeout = 30000;  //-- !!!DON'T CHANGE because it will increase overall test execution time
+const pageLoadTimeout = 30000; //-- !!!DON'T CHANGE because it will increase overall test execution time
 
 const implicitlyWait = 1000; //should not be more than 5 seconds, this will impact over all execution time
 
@@ -21,7 +21,7 @@ const implicitlyWait = 1000; //should not be more than 5 seconds, this will impa
  * and continue to execute other test.
  * 30 seconds in docker and 20 seconds in local
  */
-const fluentWait = SuiteSetup.distRun() ? 30000 : 20000;  //-- !!!DON'T CHANGE because it will impact overall test execution time
+const fluentWait = SuiteSetup.distRun() ? 30000 : 20000; //-- !!!DON'T CHANGE because it will impact overall test execution time
 
 /**
  * Before performing any action, Protractor waits until there are no pending asynchronous tasks in your Angular
@@ -58,7 +58,7 @@ const customerCode = 'SYNCHRONOSS';
 exports.timeouts = {
   fluentWait: fluentWait,
   pageResolveTimeout: pageResolveTimeout,
-  timeoutInterval: timeoutInterval,
+  timeoutInterval: timeoutInterval
 };
 
 exports.config = {
@@ -94,7 +94,6 @@ exports.config = {
     showColors: true
   },
   suites: {
-
     smoke: testSuites.SMOKE,
     sanity: testSuites.SANITY,
     /**
@@ -112,15 +111,21 @@ exports.config = {
      */
     development: testSuites.DEVELOPMENT
   },
-  onCleanUp: (results) => {
+  onCleanUp: results => {
     retry.onCleanUp(results);
   },
   onPrepare: () => {
     retry.onPrepare();
 
-    browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
+    browser
+      .manage()
+      .timeouts()
+      .pageLoadTimeout(pageLoadTimeout);
 
-    browser.manage().timeouts().implicitlyWait(implicitlyWait);
+    browser
+      .manage()
+      .timeouts()
+      .implicitlyWait(implicitlyWait);
 
     // Allure reporter start
     let AllureReporter = require('jasmine-allure-reporter');
@@ -130,11 +135,11 @@ exports.config = {
       })
     );
     // Add screenshot to allure report. screenshot are taken after each test
-    jasmine.getEnv().afterEach(function (done) {
-      browser.takeScreenshot().then(function (png) {
+    jasmine.getEnv().afterEach(function(done) {
+      browser.takeScreenshot().then(function(png) {
         allure.createAttachment(
           'Screenshot',
-          function () {
+          function() {
             return new Buffer(png, 'base64');
           },
           'image/png'
@@ -145,17 +150,19 @@ exports.config = {
     // Allure reporter done
 
     // Get failed test data
-    jasmine.getEnv().addReporter(new function () {
-      this.specDone = function (result) {
-        if (result.status !== 'passed') {
-          logger.debug('Test is failed: ' + JSON.stringify(result.testInfo));
-          new SuiteSetup().failedTestData(result.testInfo)
-        }
-        // Add executed test status in a result.json file which contains pass and fail tests
-        // This fill be used for converting to junit xml so that e2e results can display under test status in bamboo
-        new SuiteSetup().addToExecutedTests(result);
-      };
-    });
+    jasmine.getEnv().addReporter(
+      new function() {
+        this.specDone = function(result) {
+          if (result.status !== 'passed') {
+            logger.debug('Test is failed: ' + JSON.stringify(result.testInfo));
+            new SuiteSetup().failedTestData(result.testInfo);
+          }
+          // Add executed test status in a result.json file which contains pass and fail tests
+          // This fill be used for converting to junit xml so that e2e results can display under test status in bamboo
+          new SuiteSetup().addToExecutedTests(result);
+        };
+      }()
+    );
 
     browser.get(browser.baseUrl);
     return browser.wait(() => {
@@ -170,8 +177,11 @@ exports.config = {
     let appUrl = SuiteSetup.getSawWebUrl();
 
     if (!appUrl) {
-      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' + appUrl
-        + ', hence exiting test suite and failing it...');
+      logger.error(
+        'appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' +
+          appUrl +
+          ', hence exiting test suite and failing it...'
+      );
       process.exit(1);
     }
 
@@ -184,15 +194,22 @@ exports.config = {
       let token = APICommonHelpers.generateToken(apiBaseUrl);
 
       if (!token) {
-        logger.error('cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.');
+        logger.error(
+          'cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.'
+        );
         process.exit(1);
       }
       let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
-      new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
-
+      new TestDataGenerator().generateUsersRolesPrivilegesCategories(
+        apiBaseUrl,
+        token
+      );
     } catch (e) {
-      logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
-        'hence exiting test suite and failing it....' + e);
+      logger.error(
+        'There is some error during cleanup and setting up test data for e2e tests, ' +
+          'hence exiting test suite and failing it....' +
+          e
+      );
       process.exit(1);
     }
   },
@@ -211,7 +228,6 @@ exports.config = {
       // TODO: Convert testResult json to junit.xml file
       SuiteSetup.convertJsonToJunitXml();
       process.exit(1); // this will mark build failure as well
-
     } else if (retryStatus === 0) {
       // retryStatus 0 means there are no failures
       // TODO: Convert testResult json to junit.xml file

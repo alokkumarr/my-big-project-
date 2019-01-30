@@ -1,8 +1,8 @@
 'use strict';
 
-const ES_REPORT = 'esReport';// ES
+const ES_REPORT = 'esReport'; // ES
 const PIVOT = 'pivot';
-const REPORT = 'report';// DL
+const REPORT = 'report'; // DL
 const CHART = 'chart';
 const API_ROUTES = {
   AUTH: '/saw/security/doAuthenticate',
@@ -13,7 +13,7 @@ const API_ROUTES = {
   USERS: '/saw/security/auth/admin/cust/manage/users/add',
   ADD_CATEGORIES: '/saw/security/auth/admin/cust/manage/categories/add',
   PRIVILEGES: '/saw/security/auth/admin/cust/manage/privileges/upsert',
-  DELETE_DASHBOARD:'/saw/services/observe/dashboards'
+  DELETE_DASHBOARD: '/saw/services/observe/dashboards'
 };
 
 const LOG_LEVELS = {
@@ -31,10 +31,17 @@ const CRITICAL = 'critical';
 const REGRESSION = 'regression';
 const DEVELOPMENT = 'development';
 
-const E2E_OUTPUT_BASE_DIR='target/e2e';
+const E2E_OUTPUT_BASE_DIR = 'target/e2e';
 
 module.exports = {
-  ES_REPORT, PIVOT, REPORT, CHART, API_ROUTES,LOG_LEVELS,E2E_OUTPUT_BASE_DIR,SMOKE,
+  ES_REPORT,
+  PIVOT,
+  REPORT,
+  CHART,
+  API_ROUTES,
+  LOG_LEVELS,
+  E2E_OUTPUT_BASE_DIR,
+  SMOKE,
   SANITY,
   CRITICAL,
   REGRESSION,

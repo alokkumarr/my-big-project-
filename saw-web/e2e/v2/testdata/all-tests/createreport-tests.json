@@ -1,0 +1,14 @@
+{
+  "CREATEREPORT": {
+    "positiveTests": {
+      "REPOR001": {
+        "user": "userOne",
+        "description": "userOne should be able create report"
+      },
+      "REPOR002": {
+        "user": "admin",
+        "description": "Admin should be able to create report"
+      }
+    }
+  }
+}

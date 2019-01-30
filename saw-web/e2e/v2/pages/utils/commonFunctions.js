@@ -9,20 +9,45 @@ const fluentWait = protractorConf.timeouts.fluentWait;
 module.exports = {
   waitFor: {
     elementToBeClickable: (element, wait = null) => {
-      return browser.wait(EC.elementToBeClickable(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not clickable");
+      return browser.wait(
+        EC.elementToBeClickable(element),
+        wait ? wait : fluentWait,
+        'Element "' + element.locator() + '" is not clickable'
+      );
     },
     elementToBeVisible: (element, wait = null) => {
-      return browser.wait(EC.visibilityOf(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not visible");
+      return browser.wait(
+        EC.visibilityOf(element),
+        wait ? wait : fluentWait,
+        'Element "' + element.locator() + '" is not visible'
+      );
     },
     elementToBePresent: (element, wait = null) => {
-      return browser.wait(EC.presenceOf(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not present");
+      return browser.wait(
+        EC.presenceOf(element),
+        wait ? wait : fluentWait,
+        'Element "' + element.locator() + '" is not present'
+      );
     },
     elementToBeEnabledAndVisible: (element, wait = null) => {
-      browser.wait(EC.elementToBeClickable(element), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-    }, elementToBeNotVisible: (element, wait = null) => {
-      return browser.wait(EC.not(EC.presenceOf(element)), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is present");
-    }, textToBePresent: (element, value, wait = null) => {
-      return browser.wait(EC.textToBePresentInElement(element, value), wait ? wait : fluentWait);
+      browser.wait(
+        EC.elementToBeClickable(element),
+        wait ? wait : fluentWait,
+        'Element "' + element.locator() + '" is not clickable'
+      );
+    },
+    elementToBeNotVisible: (element, wait = null) => {
+      return browser.wait(
+        EC.not(EC.presenceOf(element)),
+        wait ? wait : fluentWait,
+        'Element "' + element.locator() + '" is present'
+      );
+    },
+    textToBePresent: (element, value, wait = null) => {
+      return browser.wait(
+        EC.textToBePresentInElement(element, value),
+        wait ? wait : fluentWait
+      );
     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
@@ -31,8 +56,16 @@ module.exports = {
     },
     //Deprecated. Should eliminate error: is not clickable at point - but does not work
     elementToBeClickableAndClickByMouseMove: (element, wait = null) => {
-      browser.wait(EC.elementToBeClickable(element, wait = null), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-      browser.actions().mouseMove(element).click().perform();
+      browser.wait(
+        EC.elementToBeClickable(element, (wait = null)),
+        wait ? wait : fluentWait,
+        'Element "' + element.locator() + '" is not clickable'
+      );
+      browser
+        .actions()
+        .mouseMove(element)
+        .click()
+        .perform();
     },
     // Possible options: /analyze/ , /login/
     pageToBeReady: pageName => {
@@ -46,7 +79,7 @@ module.exports = {
       browser.wait(() => {
         return cards.then(() => {
           return cards.count().then(text => {
-            return text === (count - 1);
+            return text === count - 1;
           });
         });
       }, fluentWait);
@@ -63,7 +96,11 @@ module.exports = {
   },
   dragAndDrop(dragElement, dropElement) {
     // You can also use the `dragAndDrop` convenience action.
-    browser.actions().dragAndDrop(dragElement, dropElement).mouseUp().perform();
+    browser
+      .actions()
+      .dragAndDrop(dragElement, dropElement)
+      .mouseUp()
+      .perform();
   },
   openBaseUrl() {
     browser.get(protractorConf.config.baseUrl);
@@ -82,13 +119,14 @@ module.exports = {
     stream.end();
   },
   getAnalysisIdFromUrl(url) {
-    let ulrParts = url.split("analyze/analysis/")[1];
-    return ulrParts.split("/")[0];
-  }, slideHorizontally(element, x_axis) {
-    browser.actions().dragAndDrop(
-      element,
-      { x: x_axis, y: 0 }
-    ).perform();
+    let ulrParts = url.split('analyze/analysis/')[1];
+    return ulrParts.split('/')[0];
+  },
+  slideHorizontally(element, x_axis) {
+    browser
+      .actions()
+      .dragAndDrop(element, { x: x_axis, y: 0 })
+      .perform();
   },
   goToHome() {
     browser.get(browser.baseUrl);
