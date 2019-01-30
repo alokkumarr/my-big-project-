@@ -373,10 +373,10 @@ Below are the salient feature which are as follows:
 * Scheduling the data retrieval from the source.
 * Supports various protocol to pull data.
 
+High level Entity Relationship diagram
 
-High Level Entity Relationship Diagram
 .Figure: SAW Batch Ingestion ER Diagram
-plantuml::sip-design/figure-batch-er-diagram.pum[]
+plantuml::sip-design/figure-batch-er-diagram.pum[format=svg]
 
 
 The above entities are used to hold the base of Batch Ingestion module.

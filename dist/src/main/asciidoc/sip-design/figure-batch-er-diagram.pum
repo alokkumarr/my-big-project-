@@ -1,10 +1,7 @@
 @startuml
-object BIS_CHANNEL {
-}
-object BIS_ROUTE {
-}
-object BIS_LOGS {
-}
+object BIS_CHANNEL
+object BIS_ROUTE
+object BIS_LOGS
 BIS_CHANNEL o-- "n" BIS_ROUTE : "1..n"
 BIS_LOGS *-- BIS_CHANNEL
 BIS_LOGS *-- BIS_ROUTE
