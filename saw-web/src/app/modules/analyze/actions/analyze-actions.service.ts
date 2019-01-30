@@ -89,6 +89,7 @@ export class AnalyzeActionsService {
     const preserveFields = [
       'id',
       'createdBy',
+      'userFullName',
       'createdTimestamp',
       'parentAnalysisId',
       'parentCategoryId',
