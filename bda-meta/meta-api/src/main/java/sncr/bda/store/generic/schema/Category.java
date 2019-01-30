@@ -1,9 +1,10 @@
 package sncr.bda.store.generic.schema;
 
-import java.util.HashMap;
-import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public enum Category {
   
@@ -15,6 +16,7 @@ public enum Category {
   Project("Project"),
   AuditLog("AuditLog"),
   StorageProxy("StorageProxy"),
+  ProductModuleMetaStore("ProductModuleMetaStore"),
   Semantic("Semantic");  
 private final String value;
 private final static Map<String, Category> CONSTANTS = new HashMap<String, Category>();

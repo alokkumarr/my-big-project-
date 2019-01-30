@@ -1,35 +1,29 @@
 package sncr.bda.cli;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.*;
+import com.mapr.db.MapRDB;
 import org.joda.time.DateTime;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.mapr.db.MapRDB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.admin.ProjectAdmin;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.bda.metastore.DataSetStore;
-import sncr.bda.metastore.SemanticDataSetStore;
-import sncr.bda.metastore.StorageProxyMetaDataStore;
-import sncr.bda.metastore.TransformationStore;
+import sncr.bda.metastore.*;
 import sncr.bda.metastore.exception.MetaStoreEntityException;
 import sncr.bda.metastore.exception.MetaStoreSearchNotFoundException;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The class handles basic requests to Metadata Store
@@ -247,6 +241,10 @@ public class MetaDataStoreRequestAPI {
                           StorageProxyMetaDataStore spmds = new StorageProxyMetaDataStore(xdfRoot);
                           searchResult = spmds.search(maprDBCondition);
                           break;
+            case ProductModuleMetaStore :
+                          ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore("productModules", xdfRoot);
+                          searchResult = productModuleMetaStore.search(maprDBCondition);
+                          break;
             case DataPod: 
                           logger.warn("Not implemented yet");
                           break;
@@ -374,6 +372,19 @@ public class MetaDataStoreRequestAPI {
                             default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
                         }
                         break;
+
+            case ProductModuleMetaStore:
+                        ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore("productModules",xdfRoot);
+                        switch (action){
+                            case create: productModuleMetaStore.create(id,src);break;
+                            case delete: productModuleMetaStore.delete(id); break;
+                            case update: productModuleMetaStore.update(id, src); break;
+                            case read: result = productModuleMetaStore.read(id); break;
+                            case search : doSearch(); break;
+                            default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
+                        }
+                        break;
+
             case DataPod: logger.warn("Not implemented yet"); break;
             
             case DataSegment: logger.warn("Not implemented yet");break;
