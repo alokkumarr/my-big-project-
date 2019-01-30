@@ -1,0 +1,104 @@
+{
+  "type": "chart",
+  "semanticId": "d23c6142-2c10-459e-b1f6-29edd1b2ccfe",
+  "name": "Untitled Analysis",
+  "id": "f37cde24-b833-46ba-ae2d-42e286c3fc39",
+  "customerCode": "SYNCHRONOSS",
+  "projectCode": "sip-sample",
+  "module": "productSpecific/ANALYZE",
+  "createdTime": 1543921879,
+  "createdBy": "sipadmin@synchronoss.com",
+  "modifiedTime": 1543921879,
+  "modifiedBy": "sipadmin@synchronoss.com",
+  "sipQuery": {
+    "artifacts": [
+      {
+        "artifactsName": "sample",
+        "fields": [
+          {
+            "dataField": "string",
+            "area": "x-axis",
+            "alias": "String",
+            "columnName": "string.keyword",
+            "name": "string",
+            "displayName": "String",
+            "type": "string"
+          },
+          {
+            "dataField": "integer",
+            "area": "y-axis",
+            "columnName": "integer",
+            "name": "integer",
+            "displayName": "Integer",
+            "type": "integer",
+            "aggregate": "avg"
+          },
+          {
+            "dataField": "long",
+            "area": "z-axis",
+            "columnName": "long",
+            "name": "long",
+            "displayName": "Long",
+            "type": "long",
+            "aggregate": "avg"
+          },
+          {
+            "dataField": "date",
+            "area": "g-axis",
+            "columnName": "date",
+            "name": "date",
+            "displayName": "Date",
+            "type": "date",
+            "groupInterval": "year"
+          },
+          {
+            "dataField": "double",
+            "area": "m-axis",
+            "columnName": "double",
+            "name": "double",
+            "displayName": "Double",
+            "type": "double",
+            "aggregate": "avg"
+          },
+          {
+            "dataField": "float",
+            "area": "m-axis",
+            "columnName": "float",
+            "name": "float",
+            "displayName": "Float",
+            "type": "double",
+            "aggregate": "avg"
+          }
+        ]
+      }
+    ],
+    "booleanCriteria": "AND",
+    "filters": [
+      {
+        "type": "long",
+        "artifactsName": "sample",
+        "isOptional": false,
+        "columnName": "long",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "operator": "EQ",
+          "value": 1000
+        }
+      }
+    ],
+    "sorts": [
+      {
+        "artifacts": "sample",
+        "aggregate": "sum",
+        "columnName": "long",
+        "type": "long",
+        "order": "asc"
+      }
+    ],
+    "store": {
+      "dataStore": "sampleAlias/sample",
+      "storageType": "ES"
+    }
+  }
+}

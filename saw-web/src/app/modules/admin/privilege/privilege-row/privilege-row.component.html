@@ -1,29 +1,39 @@
 <td>
-  <div class="sub-category-label" [matTooltip]="subCategory.subCategoryName">{{subCategory.subCategoryName | truncate: 30}}</div>
+  <div class="sub-category-label" [matTooltip]="subCategory.subCategoryName">
+    {{ subCategory.subCategoryName | truncate: 30 }}
+  </div>
 </td>
 <td>
-<mat-slide-toggle [checked]="privilegeCodeList[0]"
-                  (change)="onAccessClicked()">
-</mat-slide-toggle>
+  <mat-slide-toggle
+    [checked]="privilegeCodeList[0]"
+    (change)="onAccessClicked()"
+  >
+  </mat-slide-toggle>
 </td>
 <td>
-<span *ngIf="privilegeCodeList[0]">
-    <div fxLayout="row" fxLayoutAlign="space-between center" class="privilege-options-row-container">
-      <mat-checkbox type="checkbox"
-                    (change)="onAllClicked()"
-                    [checked]="privilegeCodeList[8]"
+  <span *ngIf="privilegeCodeList[0]">
+    <div
+      fxLayout="row"
+      fxLayoutAlign="space-between center"
+      class="privilege-options-row-container"
+    >
+      <mat-checkbox
+        type="checkbox"
+        (change)="onAllClicked()"
+        [checked]="privilegeCodeList[8]"
       >
         <label i18n>All</label>
       </mat-checkbox>
-      <mat-checkbox *ngFor="let privilegeName of PRIVILEGE_NAMES; let i = index"
-                    type="checkbox"
-                    (change)="onPrivilegeClicked(i + 1)"
-                    [disabled]="privilegeCodeList[8]"
-                    [checked]="privilegeCodeList[i + 1]"
+      <mat-checkbox
+        *ngFor="let privilegeName of PRIVILEGE_NAMES; let i = index"
+        type="checkbox"
+        [hidden]="!allowedPrivileges[privilegeName.toUpperCase()]"
+        (change)="onPrivilegeClicked(i + 1)"
+        [disabled]="privilegeCodeList[8]"
+        [checked]="privilegeCodeList[i + 1]"
       >
-        <label>{{privilegeName}}</label>
+        <label>{{ privilegeName }}</label>
       </mat-checkbox>
-
     </div>
-</span>
+  </span>
 </td>
