@@ -1,10 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import {
   PRIVILEGE_NAMES,
@@ -29,17 +23,42 @@ interface Privilege {
   templateUrl: './privilege-row.component.html',
   styleUrls: ['./privilege-row.component.scss']
 })
-export class PrivilegeRowComponent implements OnChanges {
+export class PrivilegeRowComponent {
   @Output() categoryChange: EventEmitter<Privilege> = new EventEmitter();
-  @Input() subCategory;
 
-  privilegeCodeList: Boolean[];
   PRIVILEGE_NAMES = PRIVILEGE_NAMES;
-
-  ngOnChanges(changes) {
-    const subCategory = changes.subCategory.currentValue;
+  privilegeCodeList: Boolean[];
+  subCategory;
+  @Input('subCategory') set _subCategory(subCategory) {
+    if (!subCategory) {
+      return;
+    }
+    this.subCategory = subCategory;
     const { privilegeCode } = subCategory;
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
+  }
+
+  allowedPrivileges: {
+    [privilegeName: string]: boolean;
+  } = PRIVILEGE_NAMES.reduce(
+    (accum, privilegeName: string) => ({
+      ...accum,
+      [privilegeName.toUpperCase()]: true
+    }),
+    {}
+  );
+  @Input('allowedPrivileges') set _allowedPrivileges(privileges: string[]) {
+    if (!privileges) {
+      return;
+    }
+    const allowedPrivilegeList: string[] = privileges;
+    this.allowedPrivileges = allowedPrivilegeList.reduce(
+      (accum, privilegeName: string) => ({
+        ...accum,
+        [privilegeName.toUpperCase()]: true
+      }),
+      {}
+    );
   }
 
   onPrivilegeClicked(index) {
@@ -63,4 +82,3 @@ export class PrivilegeRowComponent implements OnChanges {
     this.categoryChange.emit(privilege);
   }
 }
-
