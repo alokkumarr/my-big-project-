@@ -330,7 +330,10 @@ export class AnalyzeService {
   updateAnalysis(model): Promise<Analysis> {
     delete model.isScheduled;
     delete model.executionType;
+    /* Add update info */
     model.updatedTimestamp = Date.now();
+    model.updatedUserName = this._jwtService.getUserName();
+
     const payload = this.getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
