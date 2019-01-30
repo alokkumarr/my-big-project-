@@ -120,7 +120,7 @@
           [artifacts]="analysis.artifacts"
         ></filter-chips-u>
 
-        <div *ngIf="analyses && !analyses.length && !onetimeExecution">
+        <div *ngIf="!executionId && !hasExecution && noPreviousExecution">
           <div
             class="prompt-execution-container"
             fxLayout="column"
@@ -142,7 +142,10 @@
           </div>
         </div>
 
-        <div *ngIf="analysis" [ngSwitch]="analysis.type">
+        <div
+          *ngIf="analysis && (executionId || hasExecution)"
+          [ngSwitch]="analysis.type"
+        >
           <executed-report-view
             *ngSwitchCase="
               analysis.type === 'report' || analysis.type === 'esReport'
