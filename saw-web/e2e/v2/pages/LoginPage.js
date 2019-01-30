@@ -24,7 +24,7 @@ class LoginPage {
     commonFunctions.waitFor.elementToBeVisible(this._password);
     this._password.clear().sendKeys(password);
   }
-ßßß
+
   clickOnLoginButton() {
     logger.debug('Click on login button');
     commonFunctions.waitFor.elementToBeVisible(this._loginButton);
