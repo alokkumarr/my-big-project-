@@ -62,8 +62,9 @@ mat-toolbar {
       }
 
       ::ng-deep .ngxp__inner {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, 90px);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
         max-width: 270px; // if a grid gap is applied, be sure to account for that here.
       }
     }
