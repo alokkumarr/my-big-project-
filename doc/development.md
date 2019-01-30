@@ -282,31 +282,35 @@ integration:
 
 To make a release of the project, execute the following steps:
 
-1. Find the Git revision to be used for the release.  This will
+1. Identify the Git revision to be used for the release.  This will
    typically be `origin/master` after all required pull requests have
-   been merged and your local repository has been updated to include
-   the latest merges.
+   been merged.
+   
+2. Update your local repository to include the latest merges for the
+   remote master branch:
 
-2. Tag the revision using Git and push the tag to the central
+        $ git fetch
+
+3. Tag the revision using Git and push the tag to the central
    repository:
 
         $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
         $ git push --tags
 
-3. Note: The placeholder `<commit>` refers to the revision that has
+4. Note: The placeholder `<commit>` refers to the revision that has
    been selected for the release.
 
-4. Start a customized build of the [project] on the continuous
+5. Start a customized build of the [project] on the continuous
    integration server using the newly created release tag (click the
    "Run" dropdown menu and select "Run customized..." and enter the
    release tag, for example `v1.0.0`, in the Revision field).
 
-5. After starting the build, go to the Build result summary page and
+6. After starting the build, go to the Build result summary page and
    add the label "release" (which ensures it will be available for
    download indefinitely, instead of eventually being expired and
    deleted by the continuous integration server).
 
-6. When the build finishes successfully, announce it by publishing a
+7. When the build finishes successfully, announce it by publishing a
    link to the artifacts page in the project Slack channel.  Also add
    the link to the corresponding [release notes] in Confluence.
 

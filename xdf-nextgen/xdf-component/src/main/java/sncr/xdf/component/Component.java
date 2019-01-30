@@ -188,14 +188,18 @@ public abstract class Component {
 
           String step = "Could not create activity log entry for DataSet: " + o.getDataSet();
           try {
+            logger.info("Generating audit log entry");
             JsonObject ale = als.generateDSAuditLogEntry(ctx, "INIT",
                 inputDataSets, outputDataSets);
             String aleId = als.createAuditLog(ctx, ale);
+            logger.debug("ALE ID = " + aleId + " ALE = " + ale);
+
             step = "Could not update metadata of DataSet: " + o.getDataSet();
             md.getDSStore().updateStatus(id, "INIT", ctx.startTs, null, aleId, ctx.batchID);
           } catch (Exception e) {
             error = step;
-            logger.error(error, e);
+            logger.error(error);
+            logger.error(e);
             rc[0] = -1;
             return;
           }
@@ -402,8 +406,11 @@ public abstract class Component {
         try {
             md.writeDLFSMeta(ctx);
             ctx.setFinishTS();
+            logger.info("Generating audit log entry");
             JsonObject ale = als.generateDSAuditLogEntry(ctx, status, inputDataSets, outputDataSets);
             String aleId = als.createAuditLog(ctx, ale);
+            logger.debug("ALE ID = " + aleId + " ALE = " + ale);
+
             mdOutputDataSetMap.forEach((id, ds) -> {
                 try {
                     //TODO:: move it after merge to appropriate place
@@ -452,6 +459,9 @@ public abstract class Component {
                     return;
                 }
             });
+
+            logger.debug("Transformation ID = " + transformationId +
+                " Audit log entry ID = " + aleId + " Batch ID = " + ctx.batchID);
             transformationMd.updateStatus(transformationId, status, ctx.startTs,
                 ctx.finishedTs, aleId, ctx.batchID);
         } catch (Exception e) {

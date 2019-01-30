@@ -373,7 +373,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         if (response.get("aggregations")!=null)
          result = esResponseParser.parseData(response.get("aggregations"));
         else
-            result = QueryBuilderUtil.buildReportData(response);
+            result = QueryBuilderUtil.buildReportData(response, dataFields);
         return result;
     }
 

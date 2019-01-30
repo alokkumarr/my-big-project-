@@ -1,0 +1,57 @@
+<!--
+  Styling for SIP project documentation rendered into HTML format
+  by continuous integration then included from Confluence pages using
+  the HTML directive.
+-->
+
+<style>
+/* Restore TOC background to white */
+div#header {
+    background-color: white !important
+}
+span#author {
+    color: grey !important;
+}
+/* Table of contents */
+#toctitle {
+    font-size: large !important;
+}
+a {
+    color: rgb(59, 115, 175) !important;
+}
+/* Hide duplicate title */
+div#header h1 {
+    display: none !important;
+}
+#header, #content, #footnotes, #footer {
+    max-width: 62em;
+}
+/* Headers */
+h1, h2, h3, h4 { color: rgb(40, 130, 210) !important; }
+/* All blocks */
+div#main-content div {
+    margin-top: 1em !important;
+}
+/* Figure captions */
+div.imageblock div.title {
+    font-style: italic !important;
+    color: rgb(122, 37, 24) !important;
+}
+/* Admonitions */
+div.admonitionblock td.content {
+    border-left: 1px solid rgb(221, 221, 216);
+    color: rgba(0, 0, 0, 0.6);
+    padding: 1em;
+}
+div.admonitionblock td.icon div.title {
+    font-size: 10pt;
+    text-align: center;
+    text-transform: uppercase; 
+    width: 5em;
+}
+/* Code blocks */
+pre {
+    background-color: rgb(247, 247, 248);
+    padding: 1em;
+}
+</style>
