@@ -36,7 +36,9 @@
           <a
             class="header__module-launcher-option"
             [ngClass]="'module-' + module.name"
+            (click)="moduleLauncherContent.hide()"
             [routerLink]="module.path"
+            [routerLinkActive]="'m-active'"
             *ngFor="let module of modules"
           >
             <div class="option-image"></div>

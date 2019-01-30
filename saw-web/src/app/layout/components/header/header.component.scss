@@ -27,6 +27,10 @@ mat-toolbar {
     }
   }
 
+  .m-active {
+    pointer-events: none;
+  }
+
   .alert-bell-icon {
     background-image: url('/assets/img/alert-bell.png');
     background-size: 85% 85%;
