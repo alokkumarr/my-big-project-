@@ -63,6 +63,8 @@ const pageResolveTimeout = 1000;
  */
 const testBaseDir = appRoot + '/e2e/src/';
 
+const testBaseDir1 = appRoot + '/e2e/v2/tests';
+
 /**
  * Output path for the junit reports. Folder should be created in advance
  */
@@ -108,7 +110,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+        //'--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -207,8 +209,7 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'dummyDevelopmentTests1.js',
-      testBaseDir + 'dummyDevelopmentTests2.js'
+      testBaseDir1 + 'ForgotPassword/forgotpassword.test.js'
     ]
   },
   onCleanUp: function (results) {

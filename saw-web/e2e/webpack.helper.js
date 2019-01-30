@@ -12,6 +12,9 @@ var processedFiles = [];
  * server), as opposed to a local saw-web front-end development
  * server */
 function distRun() {
+  if (!process.env.PWD) {
+    process.env.PWD = process.cwd();
+  }
   return process.env.PWD.endsWith('/dist');
 }
 
