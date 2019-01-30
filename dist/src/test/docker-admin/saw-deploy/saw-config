@@ -146,6 +146,10 @@ sip-app3
 sip-app1
 sip-app2
 
+[sip-a2]
+sip-app1
+sip-app2
+
 [sip-rtis]
 sip-app1
 sip-app2

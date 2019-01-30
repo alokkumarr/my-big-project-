@@ -1,5 +1,5 @@
 - name: A2
-  hosts: sip-xdf
+  hosts: sip-a2
   become: true
   roles:
     - sip-a2

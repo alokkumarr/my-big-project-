@@ -179,6 +179,10 @@ sip-host3
 sip-host1
 sip-host2
 
+[sip-a2]
+sip-host1
+sip-host2
+
 [sip-rtis]
 sip-host1
 sip-host2
