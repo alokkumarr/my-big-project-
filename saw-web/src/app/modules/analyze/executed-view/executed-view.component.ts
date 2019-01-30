@@ -519,6 +519,12 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.goBackToMainPage(analysis);
   }
 
+  afterPublish(analysis) {
+    if (analysis) {
+      this.goBackToMainPage(analysis);
+    }
+  }
+
   exportData() {
     /* prettier-ignore */
     switch (this.analysis.type) {
