@@ -2,8 +2,14 @@ import * as moment from 'moment-timezone';
 import * as pad from 'lodash/padStart';
 import { timezoneData } from './timezone-data';
 
+interface Timezone {
+  name: string;
+  utcOffset: number;
+  label: string;
+}
+
 const currentDate = Date.now();
-export const timezones = timezoneData
+export const timezones: Timezone[] = timezoneData
   .map(({ text, utc }) => {
     const name = utc[0];
     const timezoneLabel = text.replace(/\(.*?\)\s*/, '');

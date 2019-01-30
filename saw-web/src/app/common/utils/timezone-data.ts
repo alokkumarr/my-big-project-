@@ -1,4 +1,12 @@
-export const timezoneData = [
+interface TimezoneData {
+  value: string;
+  abbr: string;
+  offset: number;
+  isdst: boolean;
+  text: string;
+  utc: string[];
+}
+export const timezoneData: TimezoneData[] = [
   {
     value: 'Dateline Standard Time',
     abbr: 'DST',
