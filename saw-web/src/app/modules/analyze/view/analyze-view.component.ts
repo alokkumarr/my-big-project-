@@ -38,6 +38,10 @@ export class AnalyzeViewComponent implements OnInit {
   public CARD_VIEW = 'card';
   public analysisId: string;
   public viewMode = this.LIST_VIEW;
+  public privileges = {
+    create: false
+  };
+  public subCategoryId: string;
   public analysisTypes = [
     ['all', 'All'],
     ['chart', 'Chart'],
@@ -81,6 +85,23 @@ export class AnalyzeViewComponent implements OnInit {
 
     this.loadAnalyses(this.analysisId);
     this.getCronJobs(this.analysisId);
+    const snapshot = this._route.snapshot;
+    const { id } = snapshot.params;
+    this.subCategoryId = id;
+    this.loadPrivileges();
+  }
+
+  loadPrivileges(): void {
+    if (!this.subCategoryId) {
+      return;
+    }
+
+    const moduleName = 'ANALYZE';
+
+    this.privileges.create = this._jwt.hasPrivilege('CREATE', {
+      module: moduleName,
+      subCategoryId: this.subCategoryId
+    });
   }
 
   onAction(event: AnalyzeViewActionEvent) {

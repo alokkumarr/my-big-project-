@@ -98,6 +98,7 @@
           mat-raised-button
           e2e="dashboard-new-dashboard-button"
           color="primary"
+          *ngIf="privileges.create"
           (click)="createDashboard()"
         >
           + DASHBOARD
