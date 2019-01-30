@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzeService } from '../../services/analyze.service';
 import { ExecuteService } from '../../services/execute.service';
+import { JwtService } from '../../../../common/services';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DesignerPageComponent } from './page.component';
@@ -22,6 +23,8 @@ class ExecuteServiceStub {
   executeAnalysis() {}
 }
 
+class JwtServiceStub {}
+
 class MatDialogStub {}
 
 describe('DesignerPageComponent', () => {
@@ -38,6 +41,7 @@ describe('DesignerPageComponent', () => {
         { provide: ActivatedRoute, useValue: new ActivatedRouteStub() },
         { provide: Router, useValue: new RouterStub() },
         { provide: ExecuteService, useValue: new ExecuteServiceStub() },
+        { provide: JwtService, useValue: new JwtServiceStub() },
         { provide: MatDialog, useValue: new MatDialogStub() }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
