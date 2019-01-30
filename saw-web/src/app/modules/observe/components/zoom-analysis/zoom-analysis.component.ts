@@ -10,7 +10,7 @@ import {
   STRING_FILTER_OPERATORS_OBJ,
   NUMBER_FILTER_OPERATORS_OBJ
 } from './../../../analyze/consts';
-import * as reduce from 'lodash/reduce';
+import { reduce } from 'lodash';
 
 @Component({
   selector: 'zoom-analysis',
