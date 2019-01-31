@@ -30,12 +30,12 @@ public class ProductSpecificModuleController {
     private static String tableName = "productModules";
 
     private static JsonElement toJsonElement(String js){
-        logger.debug("toJsonElement Called: String = ",js);
+        logger.info("toJsonElement Called: String = ",js);
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement;
         try {
             jsonElement = jsonParser.parse(js);
-            logger.debug("Parsed String = ",jsonElement);
+            logger.info("Parsed String = ",jsonElement);
             return jsonElement;
         }
         catch (JsonParseException jse)  {
@@ -61,7 +61,7 @@ public class ProductSpecificModuleController {
     @RequestMapping(value = "/product-module/{id}", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Valid addDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id, @RequestBody ObjectNode jse) {
-        logger.debug("Request Body String:{}", jse);
+        logger.info("Request Body String:{}", jse);
 
         /* Extract input parameters */
         final String js = jse.path("source").asText();
@@ -98,7 +98,7 @@ public class ProductSpecificModuleController {
     @RequestMapping(value = "/product-module/{id}", method = RequestMethod.PUT, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Valid updateDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id, @RequestBody ObjectNode jse) {
-        logger.debug("Request Body String:{}", jse);
+        logger.info("Request Body String:{}", jse);
 
         /* Extract input parameters */
         final String js = jse.path("source").asText();
@@ -158,11 +158,13 @@ public class ProductSpecificModuleController {
     })
     @RequestMapping(value = "/product-module/{id}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public JsonElement readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
+    public String readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         if (id == null){
             logger.error("ID can't be null or empty");
             response.setStatus(400);
         }
-        return pms.getDocument(tableName,id);
+        logger.trace("Json returned : ",pms.getDocument(tableName,id));
+        return pms.getDocument(tableName,id).toString();
+
     }
 }
