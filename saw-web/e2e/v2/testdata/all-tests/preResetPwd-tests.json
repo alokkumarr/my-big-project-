@@ -1,0 +1,23 @@
+{
+  "PRERESETPASSWORD": {
+    "positiveTests": {
+      "PRERESETPASSWORD001": {
+        "user": "userOne",
+        "description": "Mail should be sent to userOne for resetting password "
+      },
+      "PRERESETPASSWORD002": {
+        "user": "admin",
+        "description": "Mail should be sent to admin for resetting password"
+      }
+    },
+    "negativeTests": {
+      "PRERESETPASSWORD003": {
+        "user": "admin1",
+        "description": "Error message saying Invalid user ID should come",
+        "expected":{
+          "message":"Invalid user Id"
+        }
+      }
+    }
+  }
+}
