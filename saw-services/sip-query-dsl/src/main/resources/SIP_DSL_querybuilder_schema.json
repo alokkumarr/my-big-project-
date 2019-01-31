@@ -2,11 +2,25 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {},
   "id": "sip-query-dsl",
-  "semanticID": "/properties/semanticNode",
   "properties": {
     "sipQuery": {
       "id": "/properties/sipQuery",
       "properties": {
+          "aggSize":  {
+            "id": "/properties/sipQuery/aggSize",
+            "type": "number"
+          },
+          "page":  {
+            "id": "/properties/sipQuery/page",
+            "type": "number"
+          },
+          "pageSize":  {
+            "id": "/properties/sipQuery/pageSize",
+            "type": "number"
+          },
+          "semanticId": {
+            "type": "string"
+          },
         "artifacts": {
           "type": "array",
           "id": "/properties/artifacts",
@@ -190,6 +204,49 @@
             },
             "type": "array"
           },
+        "joins": {
+          "id": "/properties/joins",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "join": {
+                "id": "/properties/joins/items/join",
+                "type": "string"
+              },
+              "criteria": {
+                "id": "/properties/joins/criteria",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "artifactsName": {
+                      "id": "/properties/joins/criteria/artifactsName",
+                      "type": "string"
+                    },
+                    "columnName": {
+                      "id": "/properties/joins/criteria/columnName",
+                      "type": "string"
+                    },
+                    "side": {
+                      "id": "/properties/joins/criteria/side",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "artifactsName",
+                    "columnName",
+                    "side"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "join",
+              "criteria"
+            ]
+          }
+        },
           "sorts": {
             "id": "/properties/sipQuery/properties/sort",
             "items": {
@@ -252,6 +309,7 @@
       ]
       }
     },
+    "additionalProperties": false,
     "required": [
       "sipQuery"
     ]
