@@ -55,6 +55,8 @@ mat-toolbar {
       background-repeat: no-repeat;
     }
 
+    $module-launcher-option-width: 90px;
+
     &__module-launcher-content {
       ::ng-deep .ngxp__container {
         z-index: 10;
@@ -64,8 +66,7 @@ mat-toolbar {
       ::ng-deep .ngxp__inner {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-evenly;
-        max-width: 270px; // if a grid gap is applied, be sure to account for that here.
+        max-width: $module-launcher-option-width * 3;
       }
     }
 
@@ -74,6 +75,8 @@ mat-toolbar {
       font-size: 14px;
       cursor: pointer;
       padding: 10px;
+      box-sizing: border-box;
+      width: $module-launcher-option-width;
 
       &:hover {
         background: whitesmoke;
