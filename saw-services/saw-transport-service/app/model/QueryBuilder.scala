@@ -397,12 +397,26 @@ object QueryBuilder extends {
 
     val aggregate = (orderBy \ "aggregate")
     if (aggregate != null && aggregate != JNothing) {
-      "%s(%s.%s) %s".format(
-        property("aggregate"),
-        property("tableName"),
-        property("columnName"),
-        property("order")
-      )
+      if(aggregate.extract[String].equalsIgnoreCase("distinctCount"))
+        {
+          val agg = "count"
+          val const = "distinct"
+          "%s(%s %s.%s) %s".format(
+            agg,
+            const,
+            property("tableName"),
+            property("columnName"),
+            property("order")
+          )
+        }
+      else {
+        "%s(%s.%s) %s".format(
+          property("aggregate"),
+          property("tableName"),
+          property("columnName"),
+          property("order")
+        )
+      }
     } else {
       "%s.%s %s".format(
         property("tableName"),
