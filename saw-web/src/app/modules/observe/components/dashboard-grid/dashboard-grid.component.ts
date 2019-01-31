@@ -40,6 +40,9 @@ import { DashboardService } from '../../services/dashboard.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
+import { MatDialog, MatDialogConfig } from '@angular/material';
+import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component'
+
 const MARGIN_BETWEEN_TILES = 10;
 
 export const DASHBOARD_MODES = {
@@ -85,7 +88,8 @@ export class DashboardGridComponent
     private filters: GlobalFilterService,
     private dashboardService: DashboardService,
     private windowService: WindowService,
-    private sidenav: SideNavService
+    private sidenav: SideNavService,
+    private _dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -553,5 +557,15 @@ export class DashboardGridComponent
         }
       ]
     };
+  }
+
+  zoomAnalysis(item) {
+    const data = item;
+    return this._dialog.open(ZoomAnalysisComponent, {
+      width: '80%',
+      height: 'auto',
+      autoFocus: false,
+      data
+    } as MatDialogConfig);
   }
 }

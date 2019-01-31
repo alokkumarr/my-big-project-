@@ -11,6 +11,7 @@ export class PrivilegeEditorComponent {
     index: number;
     privilege: any;
   }> = new EventEmitter();
+  @Input() allowedPrivileges;
   @Input() subCategories;
   @Input() activePrivilegeId;
   constructor() {}
