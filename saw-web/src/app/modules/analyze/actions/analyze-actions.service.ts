@@ -129,7 +129,7 @@ export class AnalyzeActionsService {
 
     /* This is not a fork-to-edit analysis. Publish this normally */
     if (!analysis.parentAnalysisId) {
-      publish();
+      return publish();
     }
 
     return this._analyzeService
