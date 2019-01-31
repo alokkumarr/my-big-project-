@@ -117,7 +117,7 @@ export class CreateRouteDialogComponent {
         panelClass: ['mat-elevation-z9', 'testConnectivityClass']
       }
     );
- 
+
     snackBarRef.afterDismissed().subscribe(() => {
       this.dialogRef.updatePosition({ top: '' });
     });

@@ -29,12 +29,29 @@ div#header h1 {
 /* Headers */
 h1, h2, h3, h4 { color: rgb(40, 130, 210) !important; }
 /* All blocks */
-div {
+div#main-content div {
     margin-top: 1em !important;
 }
 /* Figure captions */
-div.title {
+div.imageblock div.title {
     font-style: italic !important;
     color: rgb(122, 37, 24) !important;
+}
+/* Admonitions */
+div.admonitionblock td.content {
+    border-left: 1px solid rgb(221, 221, 216);
+    color: rgba(0, 0, 0, 0.6);
+    padding: 1em;
+}
+div.admonitionblock td.icon div.title {
+    font-size: 10pt;
+    text-align: center;
+    text-transform: uppercase; 
+    width: 5em;
+}
+/* Code blocks */
+pre {
+    background-color: rgb(247, 247, 248);
+    padding: 1em;
 }
 </style>

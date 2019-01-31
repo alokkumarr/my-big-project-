@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.Tuple2;
+import sncr.bda.base.MetadataStore;
 import sncr.bda.conf.Alias;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.ESLoader;
@@ -126,7 +127,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
      * @throws Exception In case of failures during metadata retrival
      */
     private int registerOrUpdateESDataset(String indexType, ESHttpClient esHttpClient) throws Exception {
-        String datasetId = ctx.applicationID + "::" + ESLOADER_DATASET;
+        String datasetId = ctx.applicationID + MetadataStore.delimiter + ESLOADER_DATASET;
 
         // Append '_esdata' to the dataset id to identify this as ES dataset
         String esDatasetId = datasetId + "_esdata";
