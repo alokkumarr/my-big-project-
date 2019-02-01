@@ -21,11 +21,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
-import org.mockftpserver.fake.FakeFtpServer;
-import org.mockftpserver.fake.UserAccount;
-import org.mockftpserver.fake.filesystem.DirectoryEntry;
-import org.mockftpserver.fake.filesystem.FileSystem;
-import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +34,12 @@ public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_CHANNEL_PATH = "/services/ingestion/batch/" + BATCH_CHANNEL;
 
   private static final String BATCH_PATH = "/services/ingestion/batch";
-  
-  private static final String TRANSFER_DATA_PATH = 
+
+  private static final String TRANSFER_DATA_PATH =
       "/services/ingestion/batch/sftp/channel/transfers/data";
-  
+
   private static final String ROUTE_HISTORY_PATH = "/services/ingestion/batch/logs/";
-  
+
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
   private ObjectNode prepareChannelDataSet() throws JsonProcessingException {
@@ -112,7 +107,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("activeTab", "monthly");
     return childNode;
   }
-  
+
   private ObjectNode prepareUpdateRouteDataSet() throws JsonProcessingException {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("status", "active");
@@ -474,14 +469,14 @@ public class BatchIngestionIT extends BaseIT {
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
     this.tearDownChannel();
   }
-  
+
   /**
    * The test case is to test a connectivity route in batch Ingestion.
    */
   @Test
   public void transferData() throws JsonProcessingException {
-    
-    
+
+
     ObjectNode channelMetadata = mapper.createObjectNode();
     channelMetadata.put("channelName", "Messaging");
     channelMetadata.put("channelType", "SCP");
@@ -499,7 +494,7 @@ public class BatchIngestionIT extends BaseIT {
     channel.put("channelType", "SFTP");
     channel.put("channelMetadata", new ObjectMapper()
              .writeValueAsString(channelMetadata));
-    
+
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
     routeMetadata.put("routeName", "route123");
@@ -519,20 +514,20 @@ public class BatchIngestionIT extends BaseIT {
     Long channelId = given(authSpec).body(channel).when()
         .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200)
         .extract().response().getBody().jsonPath().getLong("bisChannelSysId");
- 
-    
+
+
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
     ValidatableResponse response = given(authSpec).body(route).when().post(routeUri)
         .then().assertThat().statusCode(200);
     log.debug("createRoute () " + response.log());
-   
+
     Long routeId = given(authSpec).when().get(routeUri).then().assertThat()
         .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
-    
+
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-    
+
     given(authSpec).when().body(transferNode).when()
     .post(TRANSFER_DATA_PATH).then().assertThat().statusCode(200);
 

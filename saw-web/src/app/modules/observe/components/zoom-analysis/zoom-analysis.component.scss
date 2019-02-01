@@ -1,0 +1,27 @@
+:host {
+  .dialog-container {
+    overflow: hidden;
+    .dialog__content div observe-pivot {
+      height: calc(100vh - 120px);
+    }
+
+    .dialog__content div observe-chart {
+      height: calc(100vh - 180px);
+    }
+  }
+}
+
+.observe-analysis {
+  height: calc(100vh - 110px) !important;
+
+  .analysis-container {
+    float: left;
+    width: 96%;
+  }
+
+  .close-icon {
+    margin-top: 12px;
+    cursor: pointer;
+  }
+}
+

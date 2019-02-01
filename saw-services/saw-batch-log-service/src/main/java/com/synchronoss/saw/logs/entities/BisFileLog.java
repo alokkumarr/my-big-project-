@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -85,6 +87,9 @@ public class BisFileLog implements Serializable {
   @Column(name = "BIS_TRANSFER_DURATION")
   private Long transferDuration;
 
+  @Column(name = "CHECKPOINT_TIMESTAMP")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date checkpointDate;
 
   public String getPid() {
     return pid;
@@ -214,6 +219,16 @@ public class BisFileLog implements Serializable {
 
   public void setTransferDuration(Long transferDuration) {
     this.transferDuration = transferDuration;
+  }
+
+
+  @Temporal(TemporalType.TIMESTAMP)
+  public Date getCheckpointDate() {
+    return checkpointDate;
+  }
+
+  public void setCheckpointDate(Date checkpointDate) {
+    this.checkpointDate = checkpointDate;
   }
 
 }

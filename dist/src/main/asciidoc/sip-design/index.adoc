@@ -46,138 +46,6 @@ database managed by the SIP Security Service.  The database stores
 users, their credentials and privileges.  Examples of privileges are
 permissions to view folders, access SIP modules and so on.
 
-= High availability
-
-SIP is required to provide high availability of its services.  If one
-node in the SIP environment fails or becomes unavailable, services are
-expected to keep working normally.
-
-== Health checks
-
-High availability is achieved using different techniques based on the
-type of the service.  Common to all services are the use of health
-checks.  Services provide health checks to indicate if they:
-
-* Are able reachable over the network
-* Have been successfully configured
-* Are able to respond to service requests
-* Have all service dependencies healthy
-
-Clients of a service use health checks to find out of an upstream
-service is healthy.
-
-.Clients check health of upstream service
-[plantuml]
-----
-[Client] .> health
-health - [Service]
-----
-
-Health checks are implemented using HTTP requests and responses at
-known paths exposed by each service.
-
-.Health check HTTP request and response example
-[source, http]
-----
-GET /actuator/health HTTP/1.1
-
-HTTP/1.1 200
-Content-Type: application/json
-
-{
-  "status": "UP",
-  "details": ...
-}
-----
-
-Health checks enable service clients (which can be external or other
-SIP services) to only route requests to service instances which are
-indicated as being healthy.  See the SIP Operations Guide for more
-details on service health checks.
-
-.Routing HTTP requests by service health
-[plantuml]
-----
-component [HAProxy] as HaProxy
-
-component [Gateway #1] as Gateway1
-component [Gateway #2] as Gateway2
-component [Gateway #N] as GatewayN
-
-component [Service #1] as Service1
-component [Service #2] as Service2
-component [Service #N] as ServiceN
-
-HaProxy ..> Gateway1 : proxy
-HaProxy ..> Gateway2 : proxy
-HaProxy ..> GatewayN : proxy
-
-Gateway1 ..> Service1 : proxy
-Gateway2 ..> Service2 : proxy
-GatewayN ..> ServiceN : proxy
-----
-
-== High availability proxy
-
-SIP provides a high availability proxy by default, which allows
-external clients to connect to a single host, which in turn routes the
-request to the appropriate service instance based on health checks.
-This is implemented using http://www.haproxy.org/[HAProxy].
-
-Using the high availability proxy simplifies SIP client requirements,
-because it removes the need for clients to keep track of multiple SIP
-service instances and their health statuses.  The downside of using it
-is that if the high availability proxy itself becomes unavailable, for
-example due to the node that it is running on failing, clients will
-not be able to connect at all.  To make also the HAProxy service
-highly available, configure redundant HAProxy nodes that listen to a
-virtual IP maintained by Keepalived.
-
-.High availability proxy for services
-plantuml::sip-design/figure-ha-proxy.pum[]
-
-== High availability for stateless services
-
-SIP provides high availability for stateless services by running
-multiple redundant instances of them on separate nodes.  If one node
-fails and makes the service running on that node unavailable, the
-service instance on the other node can keep serving requests.
-
-:quartz_doc: http://www.quartz-scheduler.org/documentation/
-:quartz_cluster: quartz-2.x/configuration/ConfigJDBCJobStoreClustering.html
-
-The Scheduler Service additionally runs the Quartz scheduler in
-{quartz_doc}/{quartz_cluster}[clustered mode], which ensures that
-scheduled tasks continue to be executed even if one of the Scheduler
-Service instances becomes unavailable.  The clustered mode setting
-ensures that each scheduled task is executed by only one of the
-instances.  The Quartz scheduler is configured to use MariaDB as its
-job store, which itself is highly available through the use of a
-MariaDB Galera cluster setup.
-
-.High availability for Scheduler Service
-plantuml::sip-design/figure-ha-scheduler.pum[]
-
-== High availability for stateful services
-
-Services that store some kind of state, such as a database, require
-each their own solutions to provide high availability.  The only
-stateful service is the SIP Security Service, which manages a MariaDB
-database.
-
-The SIP Security Service provides high availability by running the
-database in a multi-master mode using a MariaDB Galera cluster setup.
-In case a single cluster member becomes unavailable, the rest of the
-cluster members will continue providing service.  All cluster members
-are equal and can be used for both read and write operations.  Clients
-can therefore connect to any cluster member, and do not need to
-contain logic for following or failing over to a specific member.  All
-writes are replicated synchronously across the entire cluster to
-ensure consistency and availability.
-
-.High availability for MariaDB
-plantuml::sip-design/figure-ha-mariadb.pum[]
-
 = Services
 
 == SAW Web
@@ -387,8 +255,13 @@ Entity BIS_FILE_LOGS is used to log details related to the files or data retriev
 .Figure: SAW Batch Ingestion Component Diagram
 plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
 
-.Figure: SAW Batch Ingestion Flow Diagram
-image::../sip-design/bis-flow-diagram.png[flowChart,400,400]
+High Availability & Resiliency
+
+SAW Batch Ingestion Services provides HA providing multiple instances of services up & running if one goes down
+& other available services will serves the request. BIS also monitors it's dependent services such as scheduler services etc.
+BIS API's provides resiliency to failure providing configurable retry techniques using circuit breaker pattern which triggers on the occasion
+of network glitches. If transferring gets interrupted due to network glitches. It automatically heals inconsistent state,
+reinitiate the transfer again & make sure data has been received. It also takes care of partial data or corrupted data on destination host to be removed.
 
 === SAW Semantic Service
 
