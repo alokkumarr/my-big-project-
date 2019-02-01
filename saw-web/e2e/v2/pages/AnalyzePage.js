@@ -2,7 +2,7 @@
 let Header = require('./components/Header');
 
 class AnalyzePage extends Header {
-  constructor(){
+  constructor() {
     super();
   }
 }

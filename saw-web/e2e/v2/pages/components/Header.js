@@ -1,13 +1,16 @@
 'use strict';
 
 const logger = require('../../conf/logger')(__filename);
-const commonFunctions = require('../utils/commonFunctions')
+const commonFunctions = require('../utils/commonFunctions');
 
 class Header {
-
   constructor() {
-    this._accountSettingIcon = element(by.css(`[e2e='account-settings-menu-btn']`));
-    this._accountLogoutLink = element(by.css(`[e2e='account-settings-selector-logout']`));
+    this._accountSettingIcon = element(
+      by.css(`[e2e='account-settings-menu-btn']`)
+    );
+    this._accountLogoutLink = element(
+      by.css(`[e2e='account-settings-selector-logout']`)
+    );
     this._companyLogo = element(by.css('.company-logo'));
   }
 
