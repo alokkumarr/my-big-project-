@@ -312,6 +312,40 @@
         "fieldType": "date",
         "value": "This Week",
         "fieldName": "Date"
+      },
+      "DateDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "NumberDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "NumberDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "StringDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      },
+      "StringDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
       }
     }
   },
