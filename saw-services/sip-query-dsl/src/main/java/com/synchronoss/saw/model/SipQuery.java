@@ -16,6 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "booleanCriteria",
     "filters",
     "sorts",
+    "joins",
     "store"
 })
 public class SipQuery {
@@ -28,6 +29,8 @@ public class SipQuery {
     private List<Filter> filters = null;
     @JsonProperty("sorts")
     private List<Sort> sorts = null;
+    @JsonProperty("joins")
+    private List<Join> joins = null;
     @JsonProperty("store")
     private Store store;
     @JsonIgnore
@@ -71,6 +74,16 @@ public class SipQuery {
     @JsonProperty("sorts")
     public void setSorts(List<Sort> sorts) {
         this.sorts = sorts;
+    }
+
+    @JsonProperty("joins")
+    public List<Join> getJoins() {
+        return joins;
+    }
+
+    @JsonProperty("joins")
+    public void setJoins(List<Join> joins) {
+        this.joins = joins;
     }
 
     @JsonProperty("store")
@@ -129,19 +142,18 @@ public class SipQuery {
                 return constant;
             }
         }
-
     }
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("artifacts", artifacts).append("booleanCriteria", booleanCriteria)
-        		.append("filters", filters).append("sorts", sorts).append("store", store)
+        		.append("filters", filters).append("sorts", sorts).append("joins",joins).append("store", store)
         		.append("additionalProperties", additionalProperties).toString();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(store).append(additionalProperties).append(booleanCriteria)
-        		.append(sorts).append(filters).append(artifacts).toHashCode();
+        		.append(sorts).append(filters).append(joins).append(artifacts).toHashCode();
     }
 
     @Override
@@ -154,7 +166,7 @@ public class SipQuery {
         }
         SipQuery rhs = ((SipQuery) other);
         return new EqualsBuilder().append(store, rhs.store).append(additionalProperties, rhs.additionalProperties)
-        		.append(booleanCriteria, rhs.booleanCriteria).append(sorts, rhs.sorts).append(filters, rhs.filters)
+        		.append(booleanCriteria, rhs.booleanCriteria).append(sorts, rhs.sorts).append(joins,rhs.joins).append(filters, rhs.filters)
         		.append(artifacts, rhs.artifacts).isEquals();
     }
 
