@@ -101,6 +101,12 @@ saw_workbench_livy_uri=http://sip-mapr:8998/
 saw_storage_proxy_uri=http://localhost:9800/
 
 
+# The below parameter is to control what should be the time difference
+# to declare a file in the system is corrupted needs to be downloaded again
+# Default is 5 minutes
+sip_bis_retry_diffs_in_minutes=5
+
+
 #Default configuration is set preview limit is 100, if it not set in config file.
 saw_preview_rows_limit=10000
 # Publish row limit is optional parameter and only get considered if it has been
@@ -148,7 +154,3 @@ sip-app2
 
 [sip-rtis:vars]
 sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
-
-[sip-rtps]
-sip-app1
-sip-app2
