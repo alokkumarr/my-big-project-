@@ -1,0 +1,258 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "sip-query-dsl",
+  "semanticID": "/properties/semanticNode",
+  "properties": {
+    "sipQuery": {
+      "id": "/properties/sipQuery",
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "id": "/properties/artifacts",
+          "items": {
+            "type": "object",
+            "required": [
+              "artifactsName"
+            ],
+            "id": "/properties/artifacts/items",
+            "properties": {
+              "artifactsName": {
+                "type": "string"
+              },
+              "fields": {
+                "type": "array",
+                "id": "/properties/artifacts/properties/fields",
+                "items": {
+                  "id": "/properties/artifacts/properties/fields/items",
+                  "properties": {
+                    "aggregate": {
+                      "enum": [
+                        "avg",
+                        "sum",
+                        "min",
+                        "max",
+                        "count",
+                        "percentage"
+                      ],
+                      "id": "/properties/artifacts/properties/fields/items/properties/aggregate",
+                      "type": "string"
+                    },
+                    "columnName": {
+                      "id": "/properties/sipQuery/properties/fields/items/properties/columnName",
+                      "type": "string"
+                    },
+                    "name": {
+                      "id": "/properties/sipQuery/properties/fields/items/properties/name",
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "date",
+                        "timestamp",
+                        "long",
+                        "double",
+                        "float",
+                        "integer",
+                        "string"
+                      ],
+                      "id": "/properties/sipQuery/properties/fields/items/properties/type",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "columnName",
+                    "type",
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+          "booleanCriteria": {
+            "enum": [
+              "AND",
+              "OR"
+            ],
+            "id": "/properties/filters/model/properties/booleanCriteria",
+            "type": "string"
+          },
+          "filters": {
+            "id": "/properties/filters",
+            "items": {
+              "id": "/properties/filters/items",
+              "properties": {
+                "columnName": {
+                  "id": "/properties/filters/items/properties/columnName",
+                  "type": "string"
+                },
+                "isRuntimeFilter": {
+                  "enum": [
+                    false,
+                    true
+                  ],
+                  "id": "/properties/filters/items/properties/isRuntimeFilter",
+                  "type": "boolean"
+                },
+                "model": {
+                  "properties": {
+                    "operator": {
+                      "enum": [
+                        "GT",
+                        "LT",
+                        "GTE",
+                        "LTE",
+                        "EQ",
+                        "NEQ",
+                        "BTW",
+                        "SW",
+                        "EW",
+                        "CONTAINS",
+                        "ISIN",
+                        "ISNOTIN"
+                      ],
+                      "id": "/properties/filters/model/properties/booleanCriteria",
+                      "type": "string"
+                    },
+                    "value": {
+                      "id": "/properties/filters/model/properties/value",
+                      "type": "number"
+                    },
+                    "otherValue": {
+                      "id": "/properties/filters/model/properties/otherValue",
+                      "type": "number"
+                    },
+                    "stringValue": {
+                      "id": "/properties/filters/model/properties/stringValue",
+                      "type": "string"
+                    },
+                    "gte": {
+                      "id": "/properties/filters/model/properties/gte",
+                      "type": "string"
+                    },
+                    "lte": {
+                      "id": "/properties/filters/model/properties/lte",
+                      "type": "string"
+                    },
+                    "preset": {
+                      "id": "/properties/filters/model/properties/preset",
+                      "type": "string",
+                      "enum": [
+                        "Yesterday",
+                        "Today",
+                        "YTD",
+                        "MTD",
+                        "LTM",
+                        "LSM",
+                        "LM",
+                        "LQ",
+                        "LY",
+                        "LW",
+                        "TW",
+                        "LTW",
+                        "LSW",
+                        "NA"
+                      ]
+                    },
+                    "format": {
+                      "id": "/properties/filters/model/properties/format",
+                      "type": "string"
+                    },
+                    "modelValues": {
+                      "id": "/properties/filters/model/properties/modelValues",
+                      "type": "array"
+                    }
+                  },
+                  "id": "/properties/filters/items/properties/model",
+                  "type": "object"
+                },
+                "tableName": {
+                  "id": "/properties/filters/items/properties/tableName",
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "long",
+                    "string",
+                    "integer",
+                    "double",
+                    "date",
+                    "timestamp",
+                    "float"
+                  ],
+                  "id": "/properties/filters/items/properties/type",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sorts": {
+            "id": "/properties/sipQuery/properties/sort",
+            "items": {
+              "id": "/properties/sipQuery/properties/sort/items",
+              "properties": {
+                "columnName": {
+                  "id": "/properties/sipQuery/properties/sort/items/properties/columnName",
+                  "type": "string"
+                },
+                "order": {
+                  "enum": [
+                    "desc",
+                    "asc"
+                  ],
+                  "id": "/properties/sipQuery/properties/sort/items/properties/order",
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "date",
+                    "timestamp",
+                    "long",
+                    "double",
+                    "integer",
+                    "string",
+                    "float"
+                  ],
+                  "id": "/properties/sipQuery/properties/sort/items/properties/type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "columnName",
+                "type",
+                "order"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+        "store" : {
+          "id": "/properties/sipQuery/properties/store",
+          "properties": {
+            "dataStore":{
+              "id": "/properties/sipQuery/properties/store/dataStore",
+              "type": "string"
+            },
+            "storageType":{
+              "id": "/properties/sipQuery/properties/store/storageType",
+              "type": "string"
+            }
+          }
+        }
+        },
+      "additionalProperties": false,
+      "required": [
+        "sorts",
+        "filters",
+        "artifacts"
+      ]
+      }
+    },
+    "required": [
+      "sipQuery"
+    ]
+  }

@@ -6,7 +6,14 @@ import AppConfig from '../../../../../appConfig';
 
 interface RequestOptions {
   toast?: { successMsg: string; errorMsg?: string };
-  forWhat?: 'export' | 'import' | 'user' | 'role' | 'privilege' | 'category';
+  forWhat?:
+    | 'export'
+    | 'import'
+    | 'user'
+    | 'role'
+    | 'privilege'
+    | 'category'
+    | 'newScheme';
 }
 
 const loginUrl = AppConfig.login.url;
@@ -57,6 +64,8 @@ export class AdminService {
       case 'export':
       case 'import':
         return '';
+      case 'newScheme':
+        return 'auth/admin/';
       default:
         return 'auth/admin/cust/manage/';
     }

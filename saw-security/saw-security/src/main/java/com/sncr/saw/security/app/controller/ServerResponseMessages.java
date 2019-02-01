@@ -8,6 +8,7 @@ public class ServerResponseMessages {
     public static final String MODIFY_ATTRIBUTES_WITH_NON_ADMIN_ROLE = "Only Admin's can Modify Attributes ";
     public static final String DELETE_ATTRIBUTES_WITH_NON_ADMIN_ROLE = "Only Admin's can DELETE Attributes ";
     public static final String MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE = "Only Admin's can Modify user - groups ";
+    public static final String WITH_NON_ADMIN_ROLE = "Only Admin's can read module privieges";
 
 
     public static final String SEC_GROUP_ADDED = "Security Group Created Successfully";

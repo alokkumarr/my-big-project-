@@ -1,6 +1,5 @@
 package com.synchronoss.saw.scheduler;
 
-import info.faljse.SDNotify.SDNotify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -12,7 +11,10 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.retry.annotation.EnableRetry;
+import info.faljse.SDNotify.SDNotify;
 
+@EnableRetry
 @SpringBootApplication
 public class SAWSchedulerServiceApplication extends SpringBootServletInitializer {
 
