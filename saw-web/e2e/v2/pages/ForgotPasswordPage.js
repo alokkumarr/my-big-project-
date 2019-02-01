@@ -21,9 +21,6 @@ class ForgotPasswordPage {
   }
 
   doClickOnForgotPassword() {
-    browser.ignoreSynchronization = false;
-    commonFunctions.goToHome();
-    browser.ignoreSynchronization = true;
     this.clickOnForgotPasswordButton();
     commonFunctions.waitFor.pageToBeReady(/preResetPwd/);
   }

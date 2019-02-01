@@ -76,7 +76,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+      //  '--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]

@@ -37,7 +37,7 @@ TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithESReport.test.js',
 const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
-  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
+  TEST_BASE_DIR + 'ForgotPassword/preResetPwd.test.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',
 ];
 

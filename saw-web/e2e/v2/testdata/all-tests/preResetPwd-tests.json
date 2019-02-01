@@ -3,11 +3,17 @@
     "positiveTests": {
       "PRERESETPASSWORD001": {
         "user": "userOne",
-        "description": "Mail should be sent to userOne for resetting password "
+        "description": "Mail should be sent to userOne for resetting password ",
+        "expected":{
+          "message":"Mail sent successfully to"
+        }
       },
       "PRERESETPASSWORD002": {
         "user": "admin",
-        "description": "Mail should be sent to admin for resetting password"
+        "description": "Mail should be sent to admin for resetting password",
+        "expected":{
+          "message":"Mail sent successfully to"
+        }
       }
     },
     "negativeTests": {

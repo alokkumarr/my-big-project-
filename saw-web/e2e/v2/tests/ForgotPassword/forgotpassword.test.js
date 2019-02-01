@@ -1,4 +1,3 @@
-import {it} from "@angular/core/testing/src/testing_internal";
 
 var testDataReader = require('../../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
