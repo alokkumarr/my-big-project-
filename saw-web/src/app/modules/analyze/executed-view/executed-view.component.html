@@ -162,7 +162,7 @@
             [updater]="pivotUpdater$"
           >
           </executed-pivot-view>
-          <div *ngSwitchCase="'chart'">
+          <div *ngSwitchCase="'chart'" class="executed-chart-analysis">
             <executed-chart-view
               *ngIf="analysis.chartType !== 'geo'"
               [analysis]="executedAnalysis"
