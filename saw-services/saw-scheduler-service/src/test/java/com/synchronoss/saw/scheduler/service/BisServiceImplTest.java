@@ -71,6 +71,7 @@ public class BisServiceImplTest {
 		schJobDetail.setJobScheduleTime(new Date());
 		schJobDetail.setUserFullName("DDDD");
 		schJobDetail.setChannelId("123");
+		schJobDetail.setTimezone("UTC");
 
 		
 		scheduleKeys = new ScheduleKeys();

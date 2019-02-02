@@ -6,17 +6,24 @@ import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 class JobUtil {
 
+    private static Logger logger = LoggerFactory.getLogger(JobUtil.class);
     protected final static String JOB_DATA_MAP_ID="JOB_DATA_MAP";
+
+    private final static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm";
 	/**
 	 * Create Quartz Job.
 	 * 
@@ -36,7 +43,60 @@ class JobUtil {
 	    factoryBean.setApplicationContext(context);
 	    factoryBean.setName(job.getJobName());
 	    factoryBean.setGroup(jobGroup);
-        
+
+	    // Convert job schedule time and end date to current system time using
+        // the timezone in ScheduleJobDetail
+
+
+//        SimpleDateFormat dateTimeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+//        dateTimeFormat.setTimeZone(TimeZone.getTimeZone("Asia/Calcutta"));
+//        Date date = new Date();
+//        SimpleDateFormat timeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+//        timeFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+//        String estTime = timeFormat.format(date);
+
+        logger.debug(job.toString());
+
+        // TODO: should be enabled later
+//        SimpleDateFormat userTimeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+//        String userTimeZoneStr = job.getTimezone();
+//        TimeZone userTimeZone = TimeZone.getTimeZone(userTimeZoneStr);
+//
+//        logger.debug("User timezone = " + userTimeZone);
+//        userTimeFormat.setTimeZone(userTimeZone);
+//
+//
+//        SimpleDateFormat systemTimeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+//        TimeZone systemTimeZone = TimeZone.getDefault();
+//
+//        logger.debug("System timezone = " + systemTimeZone);
+//        systemTimeFormat.setTimeZone(systemTimeZone);
+//
+//
+//        String scheduleTimeStr = null, endDateStr = null;
+//
+//        scheduleTimeStr = userTimeFormat.format(job.getJobScheduleTime());
+//
+//
+//        try {
+//            // Update scheduleDate
+//            logger.debug("Schedule time before = " + job.getJobScheduleTime());
+//            Date scheduleDate = systemTimeFormat.parse(scheduleTimeStr);
+//            job.setJobScheduleTime(scheduleDate);
+//            logger.debug("Schedule time after = " + job.getJobScheduleTime());
+//
+//            // Update endDate
+//            if (job.getEndDate() != null) {
+//                logger.debug("End time before = " + job.getEndDate());
+//                endDateStr = userTimeFormat.format(job.getEndDate());
+//                Date endDate = systemTimeFormat.parse(endDateStr);
+//                job.setEndDate(endDate);
+//                logger.debug("End time before = " + job.getEndDate());
+//            }
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
 	    // set job data map
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(JOB_DATA_MAP_ID,job);
@@ -85,22 +145,34 @@ class JobUtil {
 	 * @param startTime Trigger start time.
 	 * @param cronExpression Cron expression.
 	 * @param misFireInstruction Misfire instruction (what to do in case of misfire happens).
+     * @param timezone Timezone value in simple format. (E.g.: PST, JST)
 	 *  
 	 * @return Trigger
 	 */
-	protected static Trigger createCronTrigger(String triggerName, Date startTime, Date endTime,  String cronExpression, int misFireInstruction){
+	protected static Trigger createCronTrigger(String triggerName, Date startTime, Date endTime,
+                                               String cronExpression, int misFireInstruction,
+                                               String timezone){
 		PersistableCronTriggerFactoryBean factoryBean = new PersistableCronTriggerFactoryBean();
 	    factoryBean.setName(triggerName);
 	    factoryBean.setStartTime(startTime);
 	    factoryBean.setCronExpression(cronExpression);
 	    factoryBean.setMisfireInstruction(misFireInstruction);
-	    try {
+
+        logger.debug("Cron Expression = " + cronExpression);
+
+        logger.debug("TimeZone = " + timezone);
+
+	    TimeZone t = TimeZone.getTimeZone(timezone);
+
+        factoryBean.setTimeZone(t);
+
+        try {
 	        factoryBean.afterPropertiesSet();
 	    } catch (ParseException e) {
 	        e.printStackTrace();
 	    }
-	    if(endTime!=null)
-	    return factoryBean.getObject().getTriggerBuilder().endAt(endTime).build();
+	    if(endTime != null)
+	        return factoryBean.getObject().getTriggerBuilder().endAt(endTime).build();
 	    else
 	        return factoryBean.getObject();
 	}

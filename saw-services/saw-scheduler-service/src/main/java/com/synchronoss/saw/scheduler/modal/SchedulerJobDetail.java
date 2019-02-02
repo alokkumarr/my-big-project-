@@ -42,6 +42,7 @@ public class SchedulerJobDetail implements Serializable {
 
    private String categoryID;
 
+    // TODO: DateTimrFormat has no effect here, can be removed.
    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
    private Date jobScheduleTime;
 
@@ -57,8 +58,11 @@ public class SchedulerJobDetail implements Serializable {
 
    private String fileType ;
 
-    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
+   // TODO: DateTimrFormat has no effect here, can be removed.
+   @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
    private Date endDate;
+
+    private String timezone;
 
     /**
      * Gets analysisID
@@ -324,6 +328,25 @@ public class SchedulerJobDetail implements Serializable {
         this.endDate = endDate;
     }
 
+
+    /**
+     * Gives the currently set timezone
+     *
+     * @return timezone
+     */
+    public String getTimezone() {
+        return timezone;
+    }
+
+    /**
+     * Sets the timezone
+     *
+     * @param timezone Value for the timezone
+     */
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
     /**
      *
      * @param out
@@ -341,7 +364,7 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(emailList);
         out.writeObject(fileType);
         if (ftp!=null && ftp.size()>0)
-        out.writeObject(ftp);
+            out.writeObject(ftp);
         out.writeObject(jobGroup);
         out.writeObject(jobName);
         out.writeObject(jobScheduleTime);
@@ -351,6 +374,7 @@ public class SchedulerJobDetail implements Serializable {
         if(endDate!=null)
             out.writeObject(endDate);
 
+        out.writeObject(timezone);
     }
 
     /**
@@ -399,5 +423,29 @@ public class SchedulerJobDetail implements Serializable {
         catch (OptionalDataException e)
         {/* catch block to avoid serialization for newly added fields.*/ }
 
+    }
+
+    @Override
+    public String toString() {
+        return "SchedulerJobDetail{" +
+            "analysisID='" + analysisID + '\'' +
+            ", analysisName='" + analysisName + '\'' +
+            ", description='" + description + '\'' +
+            ", metricName='" + metricName + '\'' +
+            ", userFullName='" + userFullName + '\'' +
+            ", type='" + type + '\'' +
+            ", jobName='" + jobName + '\'' +
+            ", jobGroup='" + jobGroup + '\'' +
+            ", categoryID='" + categoryID + '\'' +
+            ", jobScheduleTime=" + jobScheduleTime +
+            ", cronExpression='" + cronExpression + '\'' +
+            ", activeTab='" + activeTab + '\'' +
+            ", activeRadio='" + activeRadio + '\'' +
+            ", emailList=" + emailList +
+            ", ftp=" + ftp +
+            ", fileType='" + fileType + '\'' +
+            ", endDate=" + endDate +
+            ", timezone='" + timezone + '\'' +
+            '}';
     }
 }

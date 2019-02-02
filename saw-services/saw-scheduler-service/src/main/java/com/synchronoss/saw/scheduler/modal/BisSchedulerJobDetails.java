@@ -35,13 +35,18 @@ public class BisSchedulerJobDetails implements Serializable {
   private String jobName;
   private String jobGroup;
 
+  // TODO: DateTimrFormat has no effect here, can be removed.
   @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
   private Date jobScheduleTime;
   private String cronExpression;
   private List<String> emailList;
   private String fileType;
+
+  // TODO: DateTimrFormat has no effect here, can be removed.
   @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
   private Date endDate;
+
+  private String timezone;
 
   public String getEntityId() {
     return entityId;
@@ -141,11 +146,19 @@ public class BisSchedulerJobDetails implements Serializable {
 	this.routeId = routeId;
   }
 
-public String getChannelId() {
+  public String getChannelId() {
 	return channelId;
-}
+  }
 
-public void setChannelId(String channelId) {
-	this.channelId = channelId;
-}
+  public void setChannelId(String channelId) {
+    this.channelId = channelId;
+  }
+
+  public void setTimezone(String timeone) {
+      this.timezone = timeone;
+  }
+
+  public String getTimezone() {
+      return this.timezone;
+  }
 }
