@@ -120,6 +120,7 @@ module.exports = {
   },
   getAnalysisIdFromUrl(url) {
     let ulrParts = url.split('analyze/analysis/')[1];
+    console.log("ulrParts.split('/')[0]---" + ulrParts.split('/')[0]);
     return ulrParts.split('/')[0];
   },
   slideHorizontally(element, x_axis) {
@@ -140,5 +141,9 @@ module.exports = {
     return element
       .getAttribute('class')
       .then(classes => classes.split(' ').includes(cls));
+  },
+  clickOnElement(el) {
+    this.waitFor.elementToBeClickable(el);
+    el.click();
   }
 };

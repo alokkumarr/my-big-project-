@@ -1,5 +1,5 @@
 'use-strict';
-const commonFunctions = require('../../../helpers/commonFunctions');
+const commonFunctions = require('../utils/commonFunctions');
 
 class CreateAnalysisModel {
   constructor() {
