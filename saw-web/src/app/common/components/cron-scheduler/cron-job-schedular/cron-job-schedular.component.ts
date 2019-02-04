@@ -312,17 +312,47 @@ export class CronJobSchedularComponent implements OnInit {
     }
   }
 
-  toSelectedTimezone(dateObject) {
-    if (!this.timezone) {
+  /**
+   * Parses a date object in specific timezone. For example, if selected time zone is
+   * America/Los_Angeles, then 5.30 local will become 5.30 American.
+   *
+   * @param {*} dateObject
+   * @returns
+   * @memberof CronJobSchedularComponent
+   */
+  toSelectedTimezone(timezone: string, dateObject: Date): string | Date {
+    if (!timezone || !dateObject) {
       return dateObject;
     }
     return moment
       .tz(
         moment(dateObject).format(MOMENT_FORMAT),
         MOMENT_FORMAT,
-        this.timezone || 'UTC'
+        timezone || 'UTC'
       )
       .format();
+  }
+
+  /**
+   * Coverts a UTC date string to a timezone specific object.
+   * So 5.30 in supplied timezone will become 5.30 in local
+   *
+   * @param {string} timezone
+   * @param {string} datetime
+   * @memberof CronJobSchedularComponent
+   */
+  fromSelectedTimezone(timezone: string, datetime: string): Date {
+    if (!timezone) {
+      return new Date(
+        moment(datetime)
+          .local()
+          .seconds(0)
+          .format()
+      );
+    }
+
+    const datetimestring = moment.tz(datetime, timezone).format(MOMENT_FORMAT);
+    return new Date(moment(datetimestring, MOMENT_FORMAT).format());
   }
 
   cronChange() {
@@ -335,8 +365,8 @@ export class CronJobSchedularComponent implements OnInit {
       cronexp: this.CronExpression,
       activeTab: this.scheduleType,
       activeRadio: this.activeRadio,
-      startDate: this.startDate,
-      endDate: this.endDate,
+      startDate: this.toSelectedTimezone(this.timezone, this.startDate),
+      endDate: this.toSelectedTimezone(this.timezone, this.endDate),
       timezone: this.timezone
     };
     this.onCronChanged.emit(this.crondetails);
@@ -350,24 +380,14 @@ export class CronJobSchedularComponent implements OnInit {
     this.timezone = this.crondetails.timezone || this.timezone;
     this.selectedMoments = [];
     this.selectedMoments.push(
-      new Date(
-        moment(this.crondetails.startDate)
-          .local()
-          .seconds(0)
-          .format()
-      )
+      this.fromSelectedTimezone(this.timezone, this.crondetails.startDate)
     );
     if (
       !isUndefined(this.crondetails.endDate) &&
       this.crondetails.endDate !== null
     ) {
       this.selectedMoments.push(
-        new Date(
-          moment(this.crondetails.endDate)
-            .local()
-            .seconds(0)
-            .format()
-        )
+        this.fromSelectedTimezone(this.timezone, this.crondetails.endDate)
       );
     }
 
