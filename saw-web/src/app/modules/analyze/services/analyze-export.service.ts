@@ -53,7 +53,7 @@ export class AnalyzeExportService {
                 'There was an error while exporting, please try again witha different dataset.'
               );
             }
-            const csvWithDisplayNames = this.replaceCSVHeader(csv, fields);
+            const csvWithDisplayNames = this.replaceCSVHeader(csv, fields, analysis);
             this.exportCSV(csvWithDisplayNames, analysis.name);
           },
           exportOptions
@@ -61,7 +61,7 @@ export class AnalyzeExportService {
       });
   }
 
-  replaceCSVHeader(csv, fields) {
+  replaceCSVHeader(csv, fields, analysis) {
     const firstNewLine = indexOf(csv, '\n');
     const firstRow = slice(csv, 0, firstNewLine).join('');
     const firstRowColumns = firstRow
@@ -77,7 +77,7 @@ export class AnalyzeExportService {
         if (!field) {
           return columnName;
         }
-        if (field.aggregate === 'distinctCount') {
+        if (field.aggregate === 'distinctCount' && analysis.type === 'report') {
           return `distinctCount(${field.aliasName || field.displayName})`;
         }
         return field.aliasName || field.displayName;
