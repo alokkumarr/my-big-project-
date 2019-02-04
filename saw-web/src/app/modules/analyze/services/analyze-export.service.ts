@@ -77,6 +77,9 @@ export class AnalyzeExportService {
         if (!field) {
           return columnName;
         }
+        if (field.aggregate === 'distinctCount') {
+          return `distinctCount(${field.aliasName || field.displayName})`;
+        }
         return field.aliasName || field.displayName;
       })
       .join(',');
@@ -87,7 +90,7 @@ export class AnalyzeExportService {
     /* If report was using designer mode, find checked columns */
     if (!analysis.edit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
-        fpPipe(fpMap(fpPick(['columnName', 'aliasName', 'displayName'])))(
+        fpPipe(fpMap(fpPick(['columnName', 'aliasName', 'displayName', 'aggregate'])))(
           artifact.columns
         )
       );
