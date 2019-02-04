@@ -94,9 +94,11 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     });
 
     this.isReport = ['report', 'esReport'].includes(
-      get(this.data.analysis, 'type'));
+      get(this.data.analysis, 'type')
+    );
 
-    this.fileType = get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
+    this.fileType =
+      get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
   }
 
   trackByIndex(index) {
@@ -145,6 +147,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               activeRadio,
               jobScheduleTime,
               endDate,
+              timezone,
               analysisID,
               emailList,
               fileType,
@@ -155,7 +158,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               startDate: jobScheduleTime,
               activeTab,
               activeRadio,
-              endDate
+              endDate,
+              timezone
             };
             if (analysisID) {
               this.scheduleState = 'exist';
@@ -237,6 +241,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         type: analysis.type,
         userFullName: analysis.userFullName,
         jobScheduleTime: crondetails.startDate,
+        timezone: crondetails.timezone,
         categoryID: analysis.categoryId,
         jobGroup: this.token.ticket.custCode
       };

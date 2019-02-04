@@ -7,9 +7,10 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as isFunction from 'lodash/isFunction';
 import * as range from 'lodash/range';
 
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { timezones } from '../../../utils/timezones';
 
+window['moment'] = moment;
 import {
   getLocalMinute,
   generateHourlyCron,
@@ -21,6 +22,7 @@ import {
   convertToLocal
 } from '../../../../common/utils/cronFormatter';
 
+const MOMENT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 import { SCHEDULE_TYPES } from '../../../../common/consts';
 
 @Component({
@@ -37,6 +39,7 @@ export class CronJobSchedularComponent implements OnInit {
   onCronChanged: EventEmitter<any> = new EventEmitter();
   public startAt = new Date();
   public timezones = timezones;
+  public timezone = moment.tz.guess() || timezones[0].name;
 
   NumberMapping: any = { '=1': '#st', '=2': '#nd', '=3': '#rd', other: '#th' };
   DayMapping: any = {
@@ -309,17 +312,32 @@ export class CronJobSchedularComponent implements OnInit {
     }
   }
 
+  toSelectedTimezone(dateObject) {
+    if (!this.timezone) {
+      return dateObject;
+    }
+    return moment
+      .tz(
+        moment(dateObject).format(MOMENT_FORMAT),
+        MOMENT_FORMAT,
+        this.timezone || 'UTC'
+      )
+      .format();
+  }
+
   cronChange() {
     if (this.scheduleType !== 'immediate') {
       this.startDate = this.selectedMoments[0] || moment.utc().seconds(0);
       this.endDate = this.selectedMoments[1] || '';
     }
+
     this.crondetails = {
       cronexp: this.CronExpression,
       activeTab: this.scheduleType,
       activeRadio: this.activeRadio,
       startDate: this.startDate,
-      endDate: this.endDate
+      endDate: this.endDate,
+      timezone: this.timezone
     };
     this.onCronChanged.emit(this.crondetails);
   }
@@ -329,6 +347,7 @@ export class CronJobSchedularComponent implements OnInit {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     this.activeRadio = this.crondetails.activeRadio;
+    this.timezone = this.crondetails.timezone || this.timezone;
     this.selectedMoments = [];
     this.selectedMoments.push(
       new Date(
