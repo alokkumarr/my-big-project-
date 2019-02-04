@@ -76,7 +76,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+       // '--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -110,7 +110,8 @@ exports.config = {
     /**
      * This suite is for developing new tests and quickly debug if something breaking
      */
-    development: testSuites.DEVELOPMENT
+    development: testSuites.DEVELOPMENT,
+    test: testSuites.TEST
   },
   onCleanUp: (results)=> {
     retry.onCleanUp(results);
