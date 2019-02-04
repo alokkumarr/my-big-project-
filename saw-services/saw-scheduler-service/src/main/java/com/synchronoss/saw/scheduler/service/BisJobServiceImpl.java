@@ -101,6 +101,7 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     String groupKey = job.getJobGroup();
 
     String timezone = job.getTimezone();
+    logger.trace("Timezone :" + timezone);
 
     JobDetail jobDetail = JobUtil.createBatchIngestionJob(jobClass, false, context, job, groupKey);
 

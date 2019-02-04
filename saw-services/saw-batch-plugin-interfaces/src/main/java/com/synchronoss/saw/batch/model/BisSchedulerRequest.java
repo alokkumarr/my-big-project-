@@ -19,6 +19,7 @@ public class BisSchedulerRequest implements Serializable {
   private String channelType;
   private String jobName;
   private String jobGroup;
+  private String timezone;
 
   private Date jobScheduleTime;
   private String cronExpression;
@@ -105,6 +106,14 @@ public class BisSchedulerRequest implements Serializable {
   public void setJobGroup(String jobGroup) {
     this.jobGroup = jobGroup;
   }
+  
+  public String getTimezone() {
+    return timezone;
+  }
+
+  public void setTimezone(String timezone) {
+    this.timezone = timezone;
+  }
 
   /**
    * Customiation during Serialization write process.
@@ -127,6 +136,7 @@ public class BisSchedulerRequest implements Serializable {
     out.writeObject(jobName);
     out.writeObject(jobScheduleTime);
     out.writeObject(userFullName);
+    out.writeObject(timezone);
   }
 
   /**
@@ -161,6 +171,7 @@ public class BisSchedulerRequest implements Serializable {
     jobName = (String) in.readObject();
     jobScheduleTime = (Date) in.readObject();
     userFullName = (String) in.readObject();
+    timezone = (String) in.readObject();
 
   }
 

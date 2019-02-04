@@ -197,6 +197,7 @@ public class SawBisRouteController {
           JsonNode cronExp = schedulerExpn.get("cronexp");
           JsonNode startDate = schedulerExpn.get("startDate");
           JsonNode endDate = schedulerExpn.get("endDate");
+          JsonNode timezone = schedulerExpn.get("timezone");
           if (cronExp != null) {
             schedulerRequest.setCronExpression(cronExp.asText());
           }
@@ -207,6 +208,9 @@ public class SawBisRouteController {
             }
             if (endDate != null) {
               schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            }
+            if (timezone != null) {
+              schedulerRequest.setTimezone(timezone.asText());
             }
           } catch (ParseException e) {
             logger.error(e.getMessage());
@@ -388,6 +392,7 @@ public class SawBisRouteController {
           JsonNode cronExp = schedulerData.get("cronexp");
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
+          JsonNode timezone = schedulerData.get("timezone");
           if (cronExp != null) {
             schedulerRequest.setCronExpression(cronExp.asText());
           }
@@ -398,6 +403,9 @@ public class SawBisRouteController {
             }
             if (endDate != null) {
               schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            }
+            if (timezone != null) {
+              schedulerRequest.setTimezone(timezone.asText());
             }
           } catch (ParseException e) {
             logger.error(e.getMessage());
