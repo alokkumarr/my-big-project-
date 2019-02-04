@@ -1,6 +1,6 @@
 - name: Install Prometheus package repository
   yum_repository:
-    name: mariadb
+    name: prometheus
     description: Prometheus repository
     baseurl: "{{ sip_prometheus_yum_url | default('https://packagecloud.io/prometheus-rpm/release/el/7/$basearch') }}"
     gpgcheck: no
