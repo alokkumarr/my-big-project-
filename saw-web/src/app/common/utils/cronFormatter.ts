@@ -14,7 +14,7 @@ export function convertToUtc(hourValue, minutes) {
   date.setHours(hourValue);
   date.setMinutes(minutes);
   return moment(date)
-    .utc()
+    .local()
     .format('mm HH');
 }
 
@@ -55,12 +55,12 @@ export function hourToCron(hour, hourType, minutes) {
 }
 
 export function generateHourlyCron(hours, minutes) {
-  const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
-  const UTCMinute = fetchUTCMinute.split(' ');
+  //const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
+  //const UTCMinute = fetchUTCMinute.split(' ');
   if (parseInt(hours, 10) === 0) {
     cronExpression = `0 0/${minutes} * 1/1 * ? *`;
   } else {
-    cronExpression = `0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
+    cronExpression = `0 ${minutes} 0/${hours} 1/1 * ? *`;
   }
   return isValid(cronExpression) ? cronExpression : '';
 }

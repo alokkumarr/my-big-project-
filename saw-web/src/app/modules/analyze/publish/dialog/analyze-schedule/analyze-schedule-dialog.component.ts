@@ -221,7 +221,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         this.scheduleState = 'new';
         cronJobName = cronJobName + '-' + this.alphanumericUnique();
         crondetails.cronexp = '';
-        crondetails.startDate = moment.utc().format();
+        crondetails.startDate = moment().local().format();
       }
 
       analysis.schedule = {
