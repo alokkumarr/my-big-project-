@@ -18,18 +18,31 @@
           {{ analysis.userFullName | changeCase: 'title' }}
         </div>
         <div>
-          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
-          {{ analysis.scheduleHuman }}
+          <strong *ngIf="analysis.createdTimestamp">Created Time:</strong>
+          {{ utcToLocal(analysis.createdTimestamp) }}
         </div>
         <div>
-          <strong *ngIf="executedBy">Executed By:</strong> {{ executedBy }}
+          <strong *ngIf="analysis.updatedUserName">Last Modified By:</strong>
+          {{ analysis.updatedUserName }}
         </div>
         <div>
-          <strong *ngIf="executedAt">Executed At:</strong> {{ executedAt }}
+          <strong *ngIf="analysis.updatedTimestamp">Last Modified Time:</strong>
+          {{ utcToLocal(analysis.updatedTimestamp) }}
+        </div>
+        <div>
+          <strong *ngIf="executedBy">Last Executed By:</strong> {{ executedBy }}
+        </div>
+        <div>
+          <strong *ngIf="executedAt">Last Executed Time:</strong>
+          {{ executedAt }}
         </div>
         <div class="analysis-detail-description">
           <strong *ngIf="analysis.description">Description</strong>
           <p>{{ analysis.description }}</p>
+        </div>
+        <div>
+          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
+          {{ analysis.scheduleHuman }}
         </div>
       </mat-expansion-panel>
     </mat-card>

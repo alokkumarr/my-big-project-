@@ -109,7 +109,7 @@ export class AnalyzeListViewComponent implements OnInit {
       {
         caption: 'METRICS',
         dataField: 'metrics',
-        width: '21%',
+        width: '20%',
         calculateCellValue: rowData =>
           rowData.metricName || (rowData.metrics || []).join(', '),
         cellTemplate: 'highlightCellTemplate'
@@ -136,25 +136,17 @@ export class AnalyzeListViewComponent implements OnInit {
         cellTemplate: 'typeCellTemplate'
       },
       {
-        caption: 'CREATOR',
-        dataField: 'userFullName',
+        caption: 'LAST MODIFIED BY',
         width: '20%',
         calculateCellValue: rowData =>
-          (rowData.userFullName || '').toUpperCase(),
+          (rowData.updatedUserName || rowData.userFullName || '').toUpperCase(),
         cellTemplate: 'highlightCellTemplate'
       },
       {
-        caption: 'UPDATED BY',
-        dataField: 'updatedUserName',
-        width: '16%',
+        caption: 'LAST MODIFIED ON',
+        width: '10%',
         calculateCellValue: rowData =>
-          (rowData.updatedUserName || '').toUpperCase(),
-        cellTemplate: 'highlightCellTemplate'
-      },
-      {
-        caption: 'CREATED',
-        dataField: 'createdTimestamp',
-        width: '8%',
+          rowData.updatedTimestamp || rowData.createdTimestamp || null,
         cellTemplate: 'dateCellTemplate'
       },
       {
