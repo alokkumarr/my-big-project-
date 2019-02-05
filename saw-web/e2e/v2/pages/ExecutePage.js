@@ -23,6 +23,7 @@ class ExecutePage extends ConfirmationModel {
   }
 
   verifyTitle(title) {
+    commonFunctions.waitFor.elementToBeVisible(this._analysisTitle);
     element(
       this._analysisTitle.getText().then(value => {
         if (value) {
@@ -50,6 +51,7 @@ class ExecutePage extends ConfirmationModel {
   }
 
   closeActionMenu() {
+    commonFunctions.waitFor.elementToBeVisible(this._drawer);
     element(
       this._drawer.isPresent().then(isPresent => {
         if (isPresent) {
@@ -62,6 +64,7 @@ class ExecutePage extends ConfirmationModel {
   }
 
   clickOnDelete() {
+    browser.sleep(2000);
     commonFunctions.clickOnElement(this._delete);
   }
 

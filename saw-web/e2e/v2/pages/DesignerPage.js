@@ -1,4 +1,6 @@
 'use strict';
+const chai = require('chai');
+const assert = chai.assert;
 const commonFunctions = require('./utils/commonFunctions');
 const protractorConf = require('../conf/protractor.conf');
 const protractor = require('protractor');
@@ -15,10 +17,13 @@ class DesignerPage extends SaveDialog {
     this._reportFieldCheckbox = (tableName, fieldName) =>
       this._reportField(tableName, fieldName).element(by.css('mat-checkbox'));
     this._saveButton = element(by.css(`[e2e="designer-save-btn"]`));
+    this._selectedField = name =>
+      element(by.xpath(`//span[@class="column-name" and text()="${name}"]`));
+    this._reportGrid = element(by.xpath(`//report-grid-upgraded`));
   }
 
   verifyOnDesignerPage() {
-    expect(this._designerButton.isDisplayed()).toBeTruthy();
+    commonFunctions.waitFor.elementToBeVisible(this._designerButton);
   }
 
   clickOnDesignerButton() {
@@ -40,6 +45,18 @@ class DesignerPage extends SaveDialog {
   clickOnSave() {
     commonFunctions.waitFor.elementToBeClickable(this._saveButton);
     this._saveButton.click();
+  }
+
+  verifyDisplayedColumns(tables) {
+    commonFunctions.waitFor.elementToBeVisible(this._reportGrid);
+    tables.forEach(table => {
+      table.fields.forEach(field => {
+        expect(this._selectedField(field).isDisplayed()).toBe(
+          true,
+          field + ' should be displayed'
+        );
+      });
+    });
   }
 }
 module.exports = DesignerPage;

@@ -57,17 +57,21 @@
       }
     },
     "esreport": {
-      "REPOR002": {
+      "REPOR007": {
         "user": "admin",
-        "description": "Admin should be able to create dl report"
+        "description": "Admin should be able to create es report",
+        "tables": [{
+          "name": "sample",
+          "fields": ["Integer", "String", "Date"]
+        }]
       },
-      "REPOR003": {
+      "REPOR008": {
         "user": "userOne",
-        "description": "userOne should be able create es report"
-      },
-      "REPOR004": {
-        "user": "admin",
-        "description": "Admin should be able to create es report"
+        "description": "userOne should be able create es report",
+        "tables": [{
+          "name": "sample",
+          "fields": ["Long", "Float", "Double"]
+        }]
       }
     }
   }
