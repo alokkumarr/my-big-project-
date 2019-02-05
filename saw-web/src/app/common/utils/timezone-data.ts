@@ -214,6 +214,7 @@ export const timezoneData: TimezoneData[] = [
     isdst: true,
     text: '(UTC-05:00) Eastern Time (US & Canada)',
     utc: [
+      'America/New_York',
       'America/Detroit',
       'America/Havana',
       'America/Indiana/Petersburg',
@@ -224,7 +225,6 @@ export const timezoneData: TimezoneData[] = [
       'America/Louisville',
       'America/Montreal',
       'America/Nassau',
-      'America/New_York',
       'America/Nipigon',
       'America/Pangnirtung',
       'America/Port-au-Prince',
@@ -914,7 +914,7 @@ export const timezoneData: TimezoneData[] = [
     offset: 5.5,
     isdst: false,
     text: '(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi',
-    utc: ['Asia/Kolkata']
+    utc: ['Asia/Calcutta']
   },
   {
     value: 'Sri Lanka Standard Time',
@@ -1062,9 +1062,9 @@ export const timezoneData: TimezoneData[] = [
     isdst: false,
     text: '(UTC+09:00) Osaka, Sapporo, Tokyo',
     utc: [
+      'Asia/Tokyo',
       'Asia/Dili',
       'Asia/Jayapura',
-      'Asia/Tokyo',
       'Etc/GMT-9',
       'Pacific/Palau'
     ]

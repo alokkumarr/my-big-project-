@@ -39,7 +39,7 @@ export class CronJobSchedularComponent implements OnInit {
   onCronChanged: EventEmitter<any> = new EventEmitter();
   public startAt = new Date();
   public timezones = timezones;
-  public timezone = moment.tz.guess() || timezones[0].name;
+  public timezone = moment.tz.guess();
 
   NumberMapping: any = { '=1': '#st', '=2': '#nd', '=3': '#rd', other: '#th' };
   DayMapping: any = {

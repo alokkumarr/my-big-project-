@@ -437,6 +437,8 @@
       <mat-select
         placeholder="Timezone"
         [(ngModel)]="timezone"
+        [(value)]="timezone"
+        [disabled]="true"
         (selectionChange)="cronChange()"
       >
         <mat-option *ngFor="let zone of timezones" [value]="zone.name">
