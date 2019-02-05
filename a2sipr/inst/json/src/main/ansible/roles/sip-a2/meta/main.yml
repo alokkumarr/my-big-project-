@@ -1,4 +1,0 @@
-dependencies:
-  # The a2sipr module depends on functionality of XDF, so require the
-  # sip-xdf role
-  - role: sip-xdf

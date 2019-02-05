@@ -180,6 +180,8 @@ sip-host1
 sip-host2
 
 [sip-a2]
+# Note: A2 depends on XDF, so all hosts in the "sip-a2" role should
+# also be in the "sip-xdf" role
 sip-host1
 sip-host2
 
