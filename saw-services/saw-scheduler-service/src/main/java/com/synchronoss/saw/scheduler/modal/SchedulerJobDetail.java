@@ -423,6 +423,13 @@ public class SchedulerJobDetail implements Serializable {
         catch (OptionalDataException e)
         {/* catch block to avoid serialization for newly added fields.*/ }
 
+        try {
+            Object tzObj = in.readObject();
+            if (tzObj instanceof  String) {
+                timezone = (String)in.readObject();
+            }
+        } catch(OptionalDataException e) {}
+
     }
 
     @Override
