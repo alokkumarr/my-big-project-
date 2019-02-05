@@ -853,6 +853,9 @@ public class SftpServiceImpl extends SipPluginContract {
 
                                   processor.transferFile(stream, localFile,
                                       defaultDestinationLocation, mapRfsUser);
+                                  if (!processor.isDestinationMapR(defaultDestinationLocation)) {
+                                    processor.closeStream(stream);
+                                  }
                                   
                                   logger.trace("Streaming the content of the file in the directory "
                                       + "ends here " + entry.getFilename());
@@ -889,7 +892,10 @@ public class SftpServiceImpl extends SipPluginContract {
                                 if (stream != null) {
                                   logger.trace("closing the stream for the file in finally block "
                                       + entry.getFilename());
-                                  // processor.closeStream(stream);
+                                  if (!processor.isDestinationMapR(defaultDestinationLocation)) {
+                                    processor.closeStream(stream);
+                                  }
+                                   
                                 }
                               }
                             }
