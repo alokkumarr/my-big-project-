@@ -32,9 +32,7 @@ function extractMinute(CronUTC) {
   const date = new Date();
   const hour = parseInt(moment().format('HH'), 10);
   date.setUTCHours(hour, splitArray[1]);
-  const UtcTime = moment
-    .utc(date)
-    .local()
+  const UtcTime = moment(date)
     .format('mm')
     .split(' ');
   splitArray[1] = UtcTime[0];
@@ -49,9 +47,7 @@ function convertToLocal(CronUTC) {
   const splitArray = CronUTC.split(' ');
   const date = new Date();
   date.setUTCHours(splitArray[2], splitArray[1]);
-  const UtcTime = moment
-    .utc(date)
-    .local()
+  const UtcTime = moment(date)
     .format('mm HH')
     .split(' ');
   splitArray[1] = UtcTime[0];
