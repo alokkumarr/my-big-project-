@@ -1,38 +1,52 @@
 <header class="base-dialog__header">
   <strong i18n>Publish Analysis</strong>
 </header>
-<div class="base-dialog__content dialog__content"
-     fxLayout="column">
-
-    <div class="ars-content" layout-padding>
-      <div class="form-container" layout="column">
-        <label class="field-label" i18n>Publish to</label>
-        <div style="max-width: 200px;">
-          <mat-form-field class="select-form-field" appearance="outline">
-            <mat-label>Category</mat-label>
-            <mat-select class="publish-select"
-                        (selectionChange)="onCategorySelected($event.value)"
-                        [value]="data.analysis.categoryId">
-              <mat-optgroup *ngFor="let category of categories" [label]="category.name">
-                <mat-option *ngFor="let subCategory of category.children"
-                            [value]="subCategory.id"
-                >{{ subCategory.name }}</mat-option>
-              </mat-optgroup>
-            </mat-select>
-          </mat-form-field>
-        </div>
+<div class="base-dialog__content dialog__content" fxLayout="column">
+  <div class="ars-content" layout-padding>
+    <div
+      class="form-container"
+      layout="column"
+      *ngIf="categories.length; else noCategoryMessage"
+    >
+      <label class="field-label" i18n>Publish to</label>
+      <div style="max-width: 200px;">
+        <mat-form-field class="select-form-field" appearance="outline">
+          <mat-label>Category</mat-label>
+          <mat-select
+            class="publish-select"
+            (selectionChange)="onCategorySelected($event.value)"
+            [value]="data.analysis.categoryId"
+          >
+            <mat-optgroup
+              *ngFor="let category of categories"
+              [label]="category.name"
+            >
+              <mat-option
+                *ngFor="let subCategory of category.children"
+                [value]="subCategory.id"
+                >{{ subCategory.name }}</mat-option
+              >
+            </mat-optgroup>
+          </mat-select>
+        </mat-form-field>
       </div>
     </div>
-
+    <ng-template #noCategoryMessage>
+      <h4>There are no categories available for publishing to.</h4>
+    </ng-template>
+  </div>
 </div>
 <div class="base-dialog__actions">
-  <div fxLayout="row"
-       fxLayoutAlign="start center">
-    <button (click)="publish()"
-            mat-raised-button color="primary" i18n>
+  <div fxLayout="row" fxLayoutAlign="start center">
+    <button
+      (click)="publish()"
+      [disabled]="!categories.length"
+      mat-raised-button
+      color="primary"
+      i18n
+    >
       Publish
     </button>
     <button mat-button i18n (click)="close()">Cancel</button>
   </div>
 </div>
-
