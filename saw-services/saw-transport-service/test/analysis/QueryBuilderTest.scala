@@ -105,7 +105,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     }
     it("with percentage should have aggregate function in FROM clause") {
       query(artifactT)(sqlBuilderPrep(dataFields("t")("a")("b","c")("percentage"))
-      ) must be ("SELECT (t.a*100)/(Select sum(t.a) FROM t) as a, t.b, t.c FROM t GROUP BY t.a, t.b, t.c")
+      ) must be ("SELECT (t.a*100)/(Select sum(t.a) FROM t) as `percentage(a)`, t.b, t.c FROM t GROUP BY t.a, t.b, t.c")
     }
     it("with avg should have aggregate function in FROM clause") {
       query(artifactT)(sqlBuilderPrep(dataFields("t")("b")("a")("AVG"))
@@ -121,7 +121,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     }
     it("with distinctCount should have aggregate function in FROM clause") {
       query(artifactT)(sqlBuilderPrep(dataFields("t")("b")()("distinctCount"))
-      ) must be ("SELECT count(distinct t.b) as b FROM t")
+      ) must be ("SELECT count(distinct t.b) as `distinctCount(b)` FROM t")
     }
     it("with multiple columns should have aggregates in FROM clause") {
       query(artifactW)(sqlBuilderPrep(dataFields("w")("a")("b","c")("AVG"),

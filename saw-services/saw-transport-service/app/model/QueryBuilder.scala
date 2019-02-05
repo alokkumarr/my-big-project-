@@ -117,9 +117,9 @@ object QueryBuilder extends {
     val aggregate = (column \ "aggregate")
     if((aggregate !=JNothing) && aggregate.extract[String].equalsIgnoreCase("percentage"))
       "("+(artifactName + "." + (column \ "columnName").extract[String])+"*100)/(Select sum("+
-        (artifactName + "." + (column \ "columnName").extract[String])+") FROM "+ artifactName +") as " + (column \ "columnName").extract[String]
+        (artifactName + "." + (column \ "columnName").extract[String])+") FROM "+ artifactName +") as `percentage(" + (column \ "columnName").extract[String] + ")`"
     else if ((aggregate !=JNothing) && aggregate.extract[String].equalsIgnoreCase("distinctCount"))
-      "count(distinct "+artifactName + "." + (column \ "columnName").extract[String]+") as " + (column \ "columnName").extract[String]
+      "count(distinct "+artifactName + "." + (column \ "columnName").extract[String]+") as `distinctCount(" + (column \ "columnName").extract[String] + ")`"
     else if (!(aggregate ==JNothing))
       aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
     else
