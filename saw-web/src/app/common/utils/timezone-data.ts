@@ -214,8 +214,8 @@ export const timezoneData: TimezoneData[] = [
     isdst: true,
     text: '(UTC-05:00) Eastern Time (US & Canada)',
     utc: [
-      'America/New_York',
       'America/Detroit',
+      'America/New_York',
       'America/Havana',
       'America/Indiana/Petersburg',
       'America/Indiana/Vincennes',
