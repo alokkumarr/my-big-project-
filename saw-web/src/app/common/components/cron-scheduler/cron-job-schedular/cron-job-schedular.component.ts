@@ -13,7 +13,6 @@ import { generateSchedule } from '../../../../common/utils/cron2Readable';
 
 window['moment'] = moment;
 import {
-  getLocalMinute,
   generateHourlyCron,
   generateDailyCron,
   generateWeeklyCron,
@@ -378,8 +377,9 @@ export class CronJobSchedularComponent implements OnInit {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     this.activeRadio = this.crondetails.activeRadio;
-    this.timezone = this.crondetails.timezone;
+    this.timezone = moment.tz.guess();
     this.selectedMoments = [];
+    this.crondetails.startDate = moment(this.crondetails.startDate).toDate() < new Date() ? new Date() : this.crondetails.startDate;
     this.selectedMoments.push(
       this.fromSelectedTimezone(this.timezone, this.crondetails.startDate)
     );
@@ -397,9 +397,9 @@ export class CronJobSchedularComponent implements OnInit {
     let parseCronValue;
     let modelDate;
     if (this.scheduleType === 'hourly') {
-      parseCronValue = generateSchedule(this.crondetails.cronexp, this.scheduleType, this.timezone).split(' ');
+      parseCronValue = generateSchedule(this.crondetails.cronexp, this.scheduleType, this.crondetails.timezone).split(' ');
     } else {
-      const localCronExpression = convertToLocal(this.crondetails.cronexp, this.timezone);
+      const localCronExpression = convertToLocal(this.crondetails.cronexp, this.crondetails.timezone);
       parseCronValue = cronstrue.toString(localCronExpression).split(' ');
       const fetchTime = parseCronValue[1].split(':');
       const meridium = parseCronValue[2].split(',');
@@ -427,7 +427,7 @@ export class CronJobSchedularComponent implements OnInit {
             : parseInt(parseCronValue[7], 10);
           this.hourly.minutes = isNaN(parseInt(parseCronValue[1], 10))
             ? 0
-            : getLocalMinute(parseInt(parseCronValue[1], 10), this.timezone);
+            : parseInt(parseCronValue[1], 10);
         }
         break;
       case 'daily':

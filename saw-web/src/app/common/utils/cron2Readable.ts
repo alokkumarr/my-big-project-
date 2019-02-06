@@ -20,37 +20,17 @@ export function generateSchedule(cronExpression, activeTab, timezone) {
   }
   if (activeTab === 'hourly') {
     // there is no time stamp in hourly cron hence converting to utc and local is not required.
-    const localMinuteCron = extractMinute(cronExpression, timezone);
-    return cronstrue.toString(localMinuteCron);
+    return cronstrue.toString(cronExpression);
   }
   const localCron = convertToLocal(cronExpression, timezone);
   return cronstrue.toString(localCron);
 }
 
-function extractMinute(CronUTC, timezone) {
-  const splitArray = CronUTC.split(' ');
-  const date = new Date();
-  const hour = parseInt(moment().format('HH'), 10);
-  date.setHours(hour, splitArray[1]);
-  const UtcTime = moment(date)
-    .format('mm HH');
-  const timeInLocal = moment(UtcTime).tz(timezone).format('mm HH').split(' ');
-  splitArray[1] = timeInLocal[0];
-  if (UtcTime[0] === 'Invalid') {
-    return CronUTC;
-  } else {
-    return splitArray.join(' ');
-  }
-}
-
-function convertToLocal(CronUTC, timezone) {
-  const splitArray = CronUTC.split(' ');
-  const date = new Date();
-  date.setHours(splitArray[2], splitArray[1]);
-  const UtcTime = moment(date)
-    .format('mm HH');
-    const timeInLocal = moment(UtcTime).tz(timezone).format('mm HH').split(' ');
-  splitArray[1] = timeInLocal[0];
-  splitArray[2] = timeInLocal[1];
+export function convertToLocal(cronUTC, timezone) {
+  const splitArray = cronUTC.split(' ');
+  const timeInLocal = moment.tz(`${splitArray[1]} ${splitArray[2]}`, 'mm HH', timezone || 'Etc/GMT').toDate();
+  const extractMinuteHour = moment(timeInLocal).format('mm HH').split(' ');
+  splitArray[1] = extractMinuteHour[0];
+  splitArray[2] = extractMinuteHour[1];
   return splitArray.join(' ');
 }
