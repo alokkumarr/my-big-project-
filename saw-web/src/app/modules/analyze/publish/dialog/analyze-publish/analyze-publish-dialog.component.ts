@@ -19,6 +19,7 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
   implements OnInit {
   categories: any[] = [];
   token: any;
+  hasPublishableCategories = true;
 
   constructor(
     public _dialogRef: MatDialogRef<AnalyzePublishDialogComponent>,
@@ -40,8 +41,17 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
         this.categories = response.filter(
           category => category.name !== USER_ANALYSIS_CATEGORY_NAME
         );
+        this.checkPublishableCategoriesPresent();
         this.setDefaultCategory();
       });
+  }
+
+  checkPublishableCategoriesPresent() {
+    let publishableCategoriesCount = 0;
+    this.categories.forEach(
+      ({ children }) => (publishableCategoriesCount += children.length)
+    );
+    this.hasPublishableCategories = publishableCategoriesCount > 0;
   }
 
   onCategorySelected(value) {

@@ -6,7 +6,7 @@
     <div
       class="form-container"
       layout="column"
-      *ngIf="categories.length; else noCategoryMessage"
+      *ngIf="hasPublishableCategories; else noCategoryMessage"
     >
       <label class="field-label" i18n>Publish to</label>
       <div style="max-width: 200px;">
@@ -40,7 +40,7 @@
   <div fxLayout="row" fxLayoutAlign="start center">
     <button
       (click)="publish()"
-      [disabled]="!categories.length"
+      [disabled]="!hasPublishableCategories"
       mat-raised-button
       color="primary"
       i18n

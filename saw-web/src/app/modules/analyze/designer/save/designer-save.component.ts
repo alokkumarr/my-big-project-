@@ -1,10 +1,10 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import * as first from 'lodash/first';
-import * as find from 'lodash/find';
 import { Analysis } from '../types';
-import { PRIVILEGES } from '../../consts';
-import { DesignerService } from '../designer.service';
 import { DRAFT_CATEGORY_ID } from './../../consts';
+import {
+  USER_ANALYSIS_CATEGORY_NAME,
+  USER_ANALYSIS_SUBCATEGORY_NAME
+} from '../../../../common/consts';
 
 @Component({
   selector: 'designer-save',
@@ -16,29 +16,18 @@ export class DesignerSaveComponent implements OnInit {
   @Input() public analysis: Analysis;
   @Input() public designerMode: string;
 
+  userCategoryName = USER_ANALYSIS_CATEGORY_NAME;
+  userSubCategoryName = USER_ANALYSIS_SUBCATEGORY_NAME;
+
   public categories;
 
-  constructor(private _designerService: DesignerService) {}
+  constructor() {}
 
   ngOnInit() {
-    this._designerService.getCategories(PRIVILEGES.CREATE).then(response => {
-      this.categories = response;
-      this.setDefaultCategory();
-    });
-    this.analysis.categoryId = this.designerMode === 'new' ? DRAFT_CATEGORY_ID : this.analysis.categoryId;
-  }
-
-  setDefaultCategory() {
-    if (!this.analysis.categoryId) {
-      const defaultCategory = find(
-        this.categories,
-        category => category.children.length > 0
-      );
-
-      if (defaultCategory) {
-        this.analysis.categoryId = first(defaultCategory.children).id;
-      }
-    }
+    this.analysis.categoryId =
+      this.designerMode === 'new'
+        ? DRAFT_CATEGORY_ID
+        : this.analysis.categoryId;
   }
 
   onNameChange(description) {
@@ -47,9 +36,5 @@ export class DesignerSaveComponent implements OnInit {
 
   onDescriptionChange(description) {
     this.descriptionChange.emit(description);
-  }
-
-  onCategorySelected(categoryId) {
-    this.analysis.categoryId = categoryId;
   }
 }
