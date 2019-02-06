@@ -24,22 +24,30 @@ export function convertToLocal(cronUTC, timezone) {
   const date = new Date();
   date.setHours(splitArray[2], splitArray[1]);
   const UtcTime = moment(date)
-    .tz(timezone)
-    .format('mm HH')
-    .split(' ');
-  splitArray[1] = UtcTime[0];
-  splitArray[2] = UtcTime[1];
+    .format('mm HH');
+  const timeInLocal = moment(UtcTime).tz(timezone).format('mm HH').split(' ');
+  splitArray[1] = timeInLocal[0];
+  splitArray[2] = timeInLocal[1];
   return splitArray.join(' ');
 }
 
 export function getLocalMinute(minute, timezone) {
   const date = new Date();
   const hour = parseInt(moment().format('HH'), 10);
+  // date.setHours(hour, minute);
+  // const UtcTime = moment(date).tz(timezone)
+  //   .format('mm HH')
+  //   .split(' ');
+  // return parseInt(UtcTime[0], 10);
+
+
   date.setHours(hour, minute);
-  const UtcTime = moment(date).tz(timezone || moment.tz.guess())
-    .format('mm HH')
-    .split(' ');
-  return parseInt(UtcTime[0], 10);
+  const UtcTime = moment(date)
+    .format('mm HH');
+  const timeInLocal = moment(UtcTime).tz(timezone).format('mm HH').split(' ');
+  return parseInt(timeInLocal[0], 10);
+
+
 }
 
 export function hourToCron(hour, hourType, minutes) {
