@@ -371,10 +371,8 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(metricName);
         out.writeObject(type);
         out.writeObject(userFullName);
-        if(endDate!=null)
-            out.writeObject(endDate);
-        if (timezone != null)         
-            out.writeObject(timezone);
+        out.writeObject(endDate);
+        out.writeObject(timezone);
     }
 
     /**
