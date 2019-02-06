@@ -373,8 +373,8 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(userFullName);
         if(endDate!=null)
             out.writeObject(endDate);
-
-        out.writeObject(timezone);
+        if (timezone != null)         
+            out.writeObject(timezone);
     }
 
     /**
@@ -421,14 +421,17 @@ public class SchedulerJobDetail implements Serializable {
             endDate = (Date) endDt;
         }
         catch (OptionalDataException e)
-        {/* catch block to avoid serialization for newly added fields.*/ }
+         {/* catch block to avoid serialization for newly added fields.*/ }
 
         try {
-            Object tzObj = in.readObject();
-            if (tzObj instanceof  String) {
-                timezone = (String)in.readObject();
+	    /* Considering timezone is optional data field since it will contains null value for existing schedules                                                                            
+            generated prior to sip v3.2.2 , handle the Optional Data Exception explicitly to identify the end of stream*/
+	    Object tzObj = in.readObject();
+	     if (tzObj instanceof  String) {
+              timezone = (String) tzObj;
             }
-        } catch(OptionalDataException e) {}
+        } catch(OptionalDataException e)
+	    { /* catch block to avoid serialization for newly added fields.*/ }
 
     }
 
