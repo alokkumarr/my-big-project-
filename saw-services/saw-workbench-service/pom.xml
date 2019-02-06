@@ -283,6 +283,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

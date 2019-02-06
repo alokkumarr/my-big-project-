@@ -82,6 +82,11 @@
             <artifactId>commons-lang</artifactId>
             <version>${common.lang}</version>
         </dependency>
+        <dependency>
+          <groupId>com.synchronoss.bda.sip</groupId>
+          <artifactId>sip-common-components</artifactId>
+          <version>${revision}</version>
+        </dependency>
     </dependencies>
     <build>
         <!-- sourceDirectory>${project.basedir}/src/main/java</sourceDirectory -->

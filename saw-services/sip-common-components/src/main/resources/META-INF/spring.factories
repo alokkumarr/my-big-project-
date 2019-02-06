@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+ com.synchronoss.bda.sip.HealthMetricsConfiguration

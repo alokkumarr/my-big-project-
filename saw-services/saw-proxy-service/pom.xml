@@ -191,6 +191,11 @@
 			<scope>provided</scope>
 		</dependency>
 
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
 	</dependencies>
 	<build>
 	<pluginManagement>
