@@ -9,6 +9,7 @@ import * as range from 'lodash/range';
 
 import * as moment from 'moment-timezone';
 import { timezones } from '../../../utils/timezones';
+import { generateSchedule } from '../../../../common/utils/cron2Readable';
 
 window['moment'] = moment;
 import {
@@ -396,10 +397,7 @@ export class CronJobSchedularComponent implements OnInit {
     let parseCronValue;
     let modelDate;
     if (this.scheduleType === 'hourly') {
-      console.log(this.crondetails.cronexp);
-      console.log(cronstrue.toString(this.crondetails.cronexp));
-      parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
-      console.log(parseCronValue);
+      parseCronValue = generateSchedule(this.crondetails.cronexp, this.scheduleType, this.timezone).split(' ');
     } else {
       const localCronExpression = convertToLocal(this.crondetails.cronexp, this.timezone);
       parseCronValue = cronstrue.toString(localCronExpression).split(' ');

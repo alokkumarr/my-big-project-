@@ -5,9 +5,6 @@ import * as isString from 'lodash/isString';
 import * as moment from 'moment-timezone';
 
 export function generateSchedule(cronExpression, activeTab, timezone) {
-  if (isUndefined(timezone)) {
-    timezone = moment.tz.guess();
-  }
   if (isUndefined(cronExpression) && isUndefined(activeTab)) {
     return '';
   } else if (activeTab === 'immediate') {
@@ -24,6 +21,7 @@ export function generateSchedule(cronExpression, activeTab, timezone) {
   if (activeTab === 'hourly') {
     // there is no time stamp in hourly cron hence converting to utc and local is not required.
     const localMinuteCron = extractMinute(cronExpression, timezone);
+    console.log(cronstrue.toString(localMinuteCron));
     return cronstrue.toString(localMinuteCron);
   }
   const localCron = convertToLocal(cronExpression, timezone);
