@@ -122,6 +122,12 @@ api:
         -   location: ${proxy.service.host}
             method: POST
             path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: PUT
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: DELETE
+            path: '[/]internal/proxy.*'
         -   location: ${datapod.service.host}
             method: POST
             path: '[/]internal/semantic.*'

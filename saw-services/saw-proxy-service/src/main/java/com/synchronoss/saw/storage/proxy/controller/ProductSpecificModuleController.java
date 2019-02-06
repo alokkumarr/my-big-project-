@@ -1,6 +1,7 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -30,7 +31,7 @@ public class ProductSpecificModuleController {
     private static String tableName = "productModules";
 
     private static JsonElement toJsonElement(String js){
-        logger.info("toJsonElement Called: String = ",js);
+        logger.debug("toJsonElement Called: String = ",js);
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement;
         try {
@@ -58,13 +59,18 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/product-module/{id}", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/product-module/{id}",
+        method = RequestMethod.POST,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Valid addDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id, @RequestBody ObjectNode jse) {
-        logger.info("Request Body String:{}", jse);
+    public Valid addDocument(HttpServletRequest request,
+                             HttpServletResponse response,
+                             @PathVariable(name = "id", required = true) String id,
+                             @RequestBody JsonNode jse) {
+        logger.debug("Request Body String:{}", jse);
 
         /* Extract input parameters */
-        final String js = jse.path("source").asText();
+        final String js = jse.path("source").toString();
         JsonElement jsonElement = toJsonElement(js);
         Valid valid = new Valid();
         if (jsonElement!= null) {
@@ -95,13 +101,17 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/product-module/{id}", method = RequestMethod.PUT, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Valid updateDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id, @RequestBody ObjectNode jse) {
-        logger.info("Request Body String:{}", jse);
+    @RequestMapping(value = "/product-module/{id}",
+        method = RequestMethod.PUT,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Valid updateDocument(HttpServletRequest request, HttpServletResponse response,
+                                @PathVariable(name = "id", required = true) String id,
+                                @RequestBody JsonNode jse) {
+        logger.debug("Request Body String:{}", jse);
 
         /* Extract input parameters */
-        final String js = jse.path("source").asText();
+        final String js = jse.path("source").toString();
         JsonElement jsonElement = toJsonElement(js);
         Valid valid = new Valid();
         if(jsonElement != null) {
@@ -117,6 +127,7 @@ public class ProductSpecificModuleController {
         else {
             valid.setValid(false);
             valid.setError("Input String can't be parsed to JSonElement");
+            logger.error("Request Body Json is null !!");
             return valid;
         }
 
@@ -133,7 +144,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
     @RequestMapping(value = "/product-module/{id}", method = RequestMethod.DELETE, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     public Valid deleteDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         if (id == null){
             Valid valid = new Valid();
@@ -157,14 +168,14 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
     @RequestMapping(value = "/product-module/{id}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     public String readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         if (id == null){
             logger.error("ID can't be null or empty");
             response.setStatus(400);
         }
-        logger.trace("Json returned : ",pms.getDocument(tableName,id));
-        return pms.getDocument(tableName,id).toString();
-
+        logger.debug("Json returned : ",pms.getDocument(tableName,id));
+        Gson gson = new Gson();
+        return gson.toJson(pms.getDocument(tableName,id));
     }
 }
