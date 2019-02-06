@@ -2,9 +2,12 @@ import cronstrue from 'cronstrue';
 import * as isEmpty from 'lodash/isEmpty';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isString from 'lodash/isString';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 
-export function generateSchedule(cronExpression, activeTab) {
+export function generateSchedule(cronExpression, activeTab, timezone) {
+  if (isUndefined(timezone)) {
+    timezone = moment.tz.guess();
+  }
   if (isUndefined(cronExpression) && isUndefined(activeTab)) {
     return '';
   } else if (activeTab === 'immediate') {
@@ -20,20 +23,20 @@ export function generateSchedule(cronExpression, activeTab) {
   }
   if (activeTab === 'hourly') {
     // there is no time stamp in hourly cron hence converting to utc and local is not required.
-    const localMinuteCron = extractMinute(cronExpression);
+    const localMinuteCron = extractMinute(cronExpression, timezone);
     return cronstrue.toString(localMinuteCron);
   }
-  const localCron = convertToLocal(cronExpression);
+  const localCron = convertToLocal(cronExpression, timezone);
   return cronstrue.toString(localCron);
 }
 
-function extractMinute(CronUTC) {
+function extractMinute(CronUTC, timezone) {
   const splitArray = CronUTC.split(' ');
   const date = new Date();
   const hour = parseInt(moment().format('HH'), 10);
   date.setHours(hour, splitArray[1]);
   const UtcTime = moment(date)
-    .local()
+    .tz(timezone || moment.tz.guess())
     .format('mm')
     .split(' ');
   splitArray[1] = UtcTime[0];
@@ -44,12 +47,12 @@ function extractMinute(CronUTC) {
   }
 }
 
-function convertToLocal(CronUTC) {
+function convertToLocal(CronUTC, timezone) {
   const splitArray = CronUTC.split(' ');
   const date = new Date();
   date.setHours(splitArray[2], splitArray[1]);
   const UtcTime = moment(date)
-    .local()
+    .tz(timezone || moment.tz.guess())
     .format('mm HH')
     .split(' ');
   splitArray[1] = UtcTime[0];

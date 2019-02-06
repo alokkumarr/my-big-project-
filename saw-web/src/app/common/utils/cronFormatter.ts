@@ -1,4 +1,5 @@
-import * as moment from 'moment';
+// import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 
 let cronExpression = '';
 
@@ -18,12 +19,12 @@ export function convertToUtc(hourValue, minutes) {
     .format('mm HH');
 }
 
-export function convertToLocal(cronUTC) {
+export function convertToLocal(cronUTC, timezone) {
   const splitArray = cronUTC.split(' ');
   const date = new Date();
   date.setHours(splitArray[2], splitArray[1]);
   const UtcTime = moment(date)
-    .local()
+    .tz(timezone)
     .format('mm HH')
     .split(' ');
   splitArray[1] = UtcTime[0];
@@ -31,12 +32,11 @@ export function convertToLocal(cronUTC) {
   return splitArray.join(' ');
 }
 
-export function getLocalMinute(minute) {
+export function getLocalMinute(minute, timezone) {
   const date = new Date();
   const hour = parseInt(moment().format('HH'), 10);
   date.setHours(hour, minute);
-  const UtcTime = moment(date)
-    .local()
+  const UtcTime = moment(date).tz(timezone || moment.tz.guess())
     .format('mm HH')
     .split(' ');
   return parseInt(UtcTime[0], 10);
@@ -53,8 +53,8 @@ export function hourToCron(hour, hourType, minutes) {
 }
 
 export function generateHourlyCron(hours, minutes) {
-  //const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
-  //const UTCMinute = fetchUTCMinute.split(' ');
+  // const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
+  // const UTCMinute = fetchUTCMinute.split(' ');
   if (parseInt(hours, 10) === 0) {
     cronExpression = `0 0/${minutes} * 1/1 * ? *`;
   } else {

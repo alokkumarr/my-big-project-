@@ -377,7 +377,7 @@ export class CronJobSchedularComponent implements OnInit {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     this.activeRadio = this.crondetails.activeRadio;
-    this.timezone = this.crondetails.timezone || this.timezone;
+    this.timezone = this.crondetails.timezone;
     this.selectedMoments = [];
     this.selectedMoments.push(
       this.fromSelectedTimezone(this.timezone, this.crondetails.startDate)
@@ -390,16 +390,18 @@ export class CronJobSchedularComponent implements OnInit {
         this.fromSelectedTimezone(this.timezone, this.crondetails.endDate)
       );
     }
-
     if (isEmpty(this.crondetails.cronexp)) {
       return;
     }
     let parseCronValue;
     let modelDate;
     if (this.scheduleType === 'hourly') {
+      console.log(this.crondetails.cronexp);
+      console.log(cronstrue.toString(this.crondetails.cronexp));
       parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+      console.log(parseCronValue);
     } else {
-      const localCronExpression = convertToLocal(this.crondetails.cronexp);
+      const localCronExpression = convertToLocal(this.crondetails.cronexp, this.timezone);
       parseCronValue = cronstrue.toString(localCronExpression).split(' ');
       const fetchTime = parseCronValue[1].split(':');
       const meridium = parseCronValue[2].split(',');
@@ -427,7 +429,7 @@ export class CronJobSchedularComponent implements OnInit {
             : parseInt(parseCronValue[7], 10);
           this.hourly.minutes = isNaN(parseInt(parseCronValue[1], 10))
             ? 0
-            : getLocalMinute(parseInt(parseCronValue[1], 10));
+            : getLocalMinute(parseInt(parseCronValue[1], 10), this.timezone);
         }
         break;
       case 'daily':
