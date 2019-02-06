@@ -4,7 +4,7 @@ const commonFunctions = require('./utils/commonFunctions');
 const users = require('../helpers/data-generation/users');
 let PreResetHeader = require('./components/PreResetHeader');
 
-class preResetPwd {
+class PreResetPwd {
 
   constructor() {
     // Initialize all elements
@@ -30,12 +30,14 @@ class preResetPwd {
 
   doReset(userName,message) {
     logger.debug('Doing Reset..');
-    message = message + ' ' + userName;
+    //message = message + ' ' + userName;
     this.fillUserNameField(userName);
     browser.sleep(5000);
     this.clickOnResetButton();
     browser.sleep(5000);
     commonFunctions.waitFor.elementToBeVisible(this._errorMessage);
+    console.log(this._errorMessage.getText());
+    console.log(message);
     expect(this._errorMessage.getText()).toEqual(message);
                    }
 
@@ -69,5 +71,5 @@ class preResetPwd {
   }
 }
 
-module.exports = preResetPwd;
+module.exports = PreResetPwd;
 

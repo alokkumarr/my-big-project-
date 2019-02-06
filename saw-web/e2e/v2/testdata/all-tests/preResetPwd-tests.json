@@ -5,14 +5,14 @@
         "user": "userOne",
         "description": "Mail should be sent to userOne for resetting password ",
         "expected":{
-          "message":"Mail sent successfully to"
+          "message":"Mail sent successfully to e2e@email.com"
         }
       },
       "PRERESETPASSWORD002": {
         "user": "admin",
         "description": "Mail should be sent to admin for resetting password",
         "expected":{
-          "message":"Mail sent successfully to"
+          "message":"Mail sent successfully to e2e@email.com"
         }
       }
     },

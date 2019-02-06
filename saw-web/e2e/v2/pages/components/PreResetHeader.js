@@ -2,7 +2,7 @@
 
 const logger = require('../../conf/logger')(__filename);
 const commonFunctions = require('../utils/commonFunctions')
-const preResetPwd = require('../../pages/preResetPwd');
+const preResetPwd = require('../PreResetPwd');
 
 class PreResetHeader {
   constructor() {
