@@ -313,6 +313,8 @@ export class JwtService {
       return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
     case 'PUBLISH':
       return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
+    case 'SCHEDULE':
+      return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
     case 'FORK':
       return this._isSet(code, PRIVILEGE_INDEX.FORK);
     case 'EDIT':
