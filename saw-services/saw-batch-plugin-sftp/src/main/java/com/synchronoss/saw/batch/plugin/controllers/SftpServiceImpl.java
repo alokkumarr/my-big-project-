@@ -49,7 +49,13 @@ import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +123,8 @@ public class SftpServiceImpl extends SipPluginContract {
   
   
   private  FileProcessor processor;
+  FileSystem fs;
+  Configuration conf;
   
   @PostConstruct
   private void init() throws Exception {
@@ -133,6 +141,12 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.info("Default drop location folders created? :: " 
           + processor.isDestinationExists(defaultDestinationLocation));
     }
+    
+    String location = defaultDestinationLocation
+        .replace(processor.maprFsPrefix, "");
+    conf = new Configuration();
+    conf.set("hadoop.job.ugi", mapRfsUser);
+    fs = FileSystem.get(URI.create(location), conf);
 
     
   }
@@ -569,10 +583,10 @@ public class SftpServiceImpl extends SipPluginContract {
                   } catch (Exception ex) {
                     logger.error("Exception occurred while writing file to the file system", ex);
                   } finally {
-                    if (stream != null) {
-                      logger.trace("in finally block closing the stream");
-                      stream.close();
-                    }
+                    //if (stream != null) {
+                   //   logger.trace("in finally block closing the stream");
+                   //   stream.close();
+                    //}
                   }
                 }
               });
@@ -722,6 +736,7 @@ public class SftpServiceImpl extends SipPluginContract {
     List<BisDataMetaInfo> list = new ArrayList<>();
     LsEntry[] files = null;
     try {
+      logger.info("checking recursive in transferDataFromChannelDirectory");
       if (template.list(sourcelocation + File.separator + pattern) != null) {
         files = template.list(sourcelocation + File.separator + pattern);
         logger.trace("Total files matching pattern " + pattern + " at source location "
@@ -765,6 +780,7 @@ public class SftpServiceImpl extends SipPluginContract {
               .trace("file from the source is downnloaded in the location :" + destinationLocation);
           File localDirectory = null;
           long lastModifiedDate = 0L;
+          
           for (List<LsEntry> entries : result) {
             for (LsEntry entry : entries) {
 
@@ -834,7 +850,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                       logger.trace("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
-
+                     
                       template.get(sourcelocation + File.separator + entry.getFilename(),
                           new InputStreamCallback() {
                             @Override
@@ -850,36 +866,51 @@ public class SftpServiceImpl extends SipPluginContract {
                                   + fileTransStartTime);
                               try {
                                 if (stream != null) {
-
-                                  processor.transferFile(stream, localFile,
-                                      defaultDestinationLocation, mapRfsUser);
-                                  if (!processor.isDestinationMapR(defaultDestinationLocation)) {
-                                    processor.closeStream(stream);
-                                  }
+                                  if (processor.isDestinationMapR(defaultDestinationLocation)) {
+                                    
+                                    
+                                      FSDataOutputStream fos = fs
+                                          .create(new Path(localFile.getPath()));
+                                      org.apache.hadoop.io.IOUtils
+                                        .copyBytes(stream, fos, 5120, false);
+                                    } else {
+                                      processor.transferFile(stream, localFile,
+                                          defaultDestinationLocation, mapRfsUser);
+                                      if (!processor.isDestinationMapR(
+                                           defaultDestinationLocation)) {
+                                        processor.closeStream(stream);
+                                      }
+                                      
+                                      logger.trace("Streaming the content of "
+                                          + "the file in the directory "
+                                          + "ends here " + entry.getFilename());
+                                      ZonedDateTime fileTransEndTime = ZonedDateTime.now();
+                                      logger.trace("File" + entry.getFilename()
+                                          + "transfer end time:: "
+                                          + fileTransEndTime);
+                                      logger.trace(
+                                           "closing the stream for the file " 
+                                          + entry.getFilename());
+                                      bisDataMetaInfo.setProcessState(
+                                          BisProcessState.SUCCESS.value());
+                                      bisDataMetaInfo.setComponentState(
+                                          BisComponentState.DATA_RECEIVED.value());
+                                      bisDataMetaInfo.setFileTransferStartTime(
+                                          Date.from(fileTransStartTime.toInstant()));
+                                      bisDataMetaInfo.setFileTransferEndTime(
+                                          Date.from(fileTransEndTime.toInstant()));
+                                      bisDataMetaInfo.setFileTransferDuration(
+                                          Duration.between(fileTransStartTime,
+                                              fileTransEndTime).toMillis());
+                                      logger.trace("File transfer duration :: "
+                                              + bisDataMetaInfo.getFileTransferDuration());
+                                      sipLogService.upsert(
+                                          bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                                      list.add(bisDataMetaInfo);
+                                    }
                                   
-                                  logger.trace("Streaming the content of the file in the directory "
-                                      + "ends here " + entry.getFilename());
-                                  ZonedDateTime fileTransEndTime = ZonedDateTime.now();
-                                  logger.trace("File" + entry.getFilename()
-                                      + "transfer end time:: "
-                                      + fileTransEndTime);
-                                  logger.trace(
-                                       "closing the stream for the file " + entry.getFilename());
-                                  bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
-                                  bisDataMetaInfo.setComponentState(
-                                      BisComponentState.DATA_RECEIVED.value());
-                                  bisDataMetaInfo.setFileTransferStartTime(
-                                      Date.from(fileTransStartTime.toInstant()));
-                                  bisDataMetaInfo.setFileTransferEndTime(
-                                      Date.from(fileTransEndTime.toInstant()));
-                                  bisDataMetaInfo.setFileTransferDuration(
-                                      Duration.between(fileTransStartTime,
-                                          fileTransEndTime).toMillis());
-                                  logger.trace("File transfer duration :: "
-                                          + bisDataMetaInfo.getFileTransferDuration());
-                                  sipLogService.upsert(
-                                      bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                                  list.add(bisDataMetaInfo);
+
+                                  
                                 }
                               } catch (Exception ex) {
                                 logger.error("Exception occurred while writting to file system ",
@@ -894,6 +925,8 @@ public class SftpServiceImpl extends SipPluginContract {
                                       + entry.getFilename());
                                   if (!processor.isDestinationMapR(defaultDestinationLocation)) {
                                     processor.closeStream(stream);
+                                  } else {
+                                      org.apache.hadoop.io.IOUtils.closeStream(stream);
                                   }
                                    
                                 }
@@ -962,6 +995,8 @@ public class SftpServiceImpl extends SipPluginContract {
               }
             } // end of loop for the number of files to be download at each batch
           } // time it should iterate
+          
+          
         } else {
           logger.info("On this current pull no data found on the source.");
 
@@ -977,6 +1012,11 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("End of data tranfer.....Total time in milliseconds::: " + durationInMillis);
     } catch (Exception ex) {
       logger.error("Exception occurred while transferring the file from channel", ex);
+    } finally {
+      if (processor.isDestinationMapR(defaultDestinationLocation)) {
+        logger.info("$$$$$completed all processing. Closing mapr file system");
+        //   fs.close();
+      }
     }
     return list;
   }
@@ -993,6 +1033,7 @@ public class SftpServiceImpl extends SipPluginContract {
     bisDataMetaInfo.setActualDataName(actualDataName);
     bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
     bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
+    bisDataMetaInfo.setComponentState(BisComponentState.DATA_INPROGRESS.value());
     bisDataMetaInfo.setActualReceiveDate(recieveDate);
     bisDataMetaInfo.setChannelId(channelId);
     bisDataMetaInfo.setRouteId(routeId);
@@ -1048,7 +1089,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   /**
    * This is method to handle inconsistency during failure.
-   */
+  
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   @Transactional
   public void recoverFromInconsistentState() {
@@ -1116,7 +1157,7 @@ public class SftpServiceImpl extends SipPluginContract {
       } // end of second for loop
     } // end of first for loop
     logger.info("recoverFromInconsistentState execution ends here");
-  }
+  } */
 
   /**
    * This is a common method to update the status.
