@@ -177,10 +177,12 @@ public class SawBisRouteController {
           SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           try {
             if (startDate != null) {
-              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()).getTime());
             }
-            if (endDate != null) {
-              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            if (endDate != null && !endDate.asText().equals("")) {
+              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()).getTime());
+            } else {
+              schedulerRequest.setEndDate(Long.MAX_VALUE);
             }
           } catch (ParseException e) {
             logger.error(e.getMessage());
@@ -332,10 +334,12 @@ public class SawBisRouteController {
           SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           try {
             if (startDate != null) {
-              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()).getTime());
             }
-            if (endDate != null) {
-              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            if (endDate != null && !endDate.asText().equals("")) {
+              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()).getTime());
+            } else {
+              schedulerRequest.setEndDate(Long.MAX_VALUE);
             }
           } catch (ParseException e) {
             logger.error(e.getMessage());

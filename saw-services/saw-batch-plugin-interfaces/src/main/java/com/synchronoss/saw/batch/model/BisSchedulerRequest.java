@@ -3,7 +3,6 @@ package com.synchronoss.saw.batch.model;
 import java.io.IOException;
 import java.io.OptionalDataException;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 
@@ -20,11 +19,11 @@ public class BisSchedulerRequest implements Serializable {
   private String jobName;
   private String jobGroup;
 
-  private Date jobScheduleTime;
+  private long jobScheduleTime;
   private String cronExpression;
   private List<String> emailList;
   private String fileType;
-  private Date endDate;
+  private long endDate;
 
   public String getEntityId() {
     return entityId;
@@ -78,19 +77,19 @@ public class BisSchedulerRequest implements Serializable {
     return jobName;
   }
 
-  public Date getJobScheduleTime() {
+  public long getJobScheduleTime() {
     return jobScheduleTime;
   }
 
-  public void setJobScheduleTime(Date jobScheduleTime) {
+  public void setJobScheduleTime(long jobScheduleTime) {
     this.jobScheduleTime = jobScheduleTime;
   }
 
-  public Date getEndDate() {
+  public long getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(Date endDate) {
+  public void setEndDate(long endDate) {
     this.endDate = endDate;
   }
 
@@ -118,9 +117,7 @@ public class BisSchedulerRequest implements Serializable {
     out.writeObject(cronExpression);
     out.writeObject(description);
     out.writeObject(emailList);
-    if (endDate != null) {
-      out.writeObject(endDate);
-    }
+    out.writeObject(endDate);
     out.writeObject(entityId);
     out.writeObject(fileType);
     out.writeObject(jobGroup);
@@ -147,10 +144,10 @@ public class BisSchedulerRequest implements Serializable {
        * generated prior to sip v2.6.0 , handle the Optional Data Exception explicitly to identify
        * the end of stream
        */
-      Object endDt = in.readObject();
-      if (endDt instanceof Date) {
-        endDate = (Date) endDt;
-      }
+      //Object endDt = in.readObject();
+      // if (endDt instanceof Date) {
+      endDate = in.readLong();
+      // }
 
     } catch (OptionalDataException e) {
       /* catch block to avoid serialization for newly added fields. */
@@ -159,7 +156,7 @@ public class BisSchedulerRequest implements Serializable {
     fileType = (String) in.readObject();
     jobGroup = (String) in.readObject();
     jobName = (String) in.readObject();
-    jobScheduleTime = (Date) in.readObject();
+    jobScheduleTime = in.readLong();
     userFullName = (String) in.readObject();
 
   }
