@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -74,7 +75,7 @@
 			<artifactId>spring-context-support</artifactId>
 		</dependency>
 
-		<!-- Joda time is a utility to manage data/time in java-->
+		<!-- Joda time is a utility to manage data/time in java -->
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
@@ -86,43 +87,52 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		   <groupId>com.github.tomakehurst</groupId>
-		<artifactId>wiremock</artifactId>
-		<version>2.7.1</version>
-		<scope>test</scope>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>2.7.1</version>
+			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>4.2.3.RELEASE</version>
-        </dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>4.2.3.RELEASE</version>
+		</dependency>
 		<dependency>
 			<groupId>org.immutables</groupId>
 			<artifactId>value</artifactId>
 			<version>2.5.3</version>
 			<scope>provided</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>4.5</version>
-        </dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>4.5</version>
+		</dependency>
 		<dependency>
 			<groupId>info.faljse</groupId>
 			<artifactId>SDNotify</artifactId>
 			<version>1.1</version>
 		</dependency>
-    </dependencies>
+		<dependency>
+			<groupId>org.springframework.retry</groupId>
+			<artifactId>spring-retry</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -156,26 +166,27 @@
 						<phase>test</phase>
 						<configuration>
 							<sourceDirectories>
-	                           <sourceDirectory>src/main/java</sourceDirectory>
-                            </sourceDirectories>
+								<sourceDirectory>src/main/java</sourceDirectory>
+							</sourceDirectories>
 							<configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<violationSeverity>warning</violationSeverity>
-							<!-- Exclude files that were added before Checkstyle was enabled.  Gradually
-								make also these files conform to checkstyle rules and remove the exclusions -->
+							<!-- Exclude files that were added before Checkstyle was enabled. 
+								Gradually make also these files conform to checkstyle rules and remove the 
+								exclusions -->
 							<excludes>**/*Config*,**/AutowiringSpringBeanJobFactory*,**/*Bean*,
-							**/SAWSchedulerServiceApplication*,**/JobController*,**/SimpleJob*,
-							**/CronJob*,**/JobService*,**/JobServiceImpl*,**/TriggerListner*,
-							**/JobUtil*/,**/JobsListener*,**/ServerResponseCode/*,**/AnalysisExecution*,
-							**/AnalysisServiceImpl*,**/SchedulerResponse*,**/ScheduleKeys*,
-							**/ServerResponseCode*,**/AnalysisService*,**/*Test*,**/modal/**/*</excludes>
+								**/SAWSchedulerServiceApplication*,**/JobController*,**/SimpleJob*,
+								**/CronJob*,**/JobService*,**/JobServiceImpl*,**/TriggerListner*,
+								**/JobUtil*/,**/JobsListener*,**/ServerResponseCode/*,**/AnalysisExecution*,
+								**/AnalysisServiceImpl*,**/SchedulerResponse*,**/ScheduleKeys*,
+								**/ServerResponseCode*,**/AnalysisService*,**/*Test*,**/modal/**/*</excludes>
 						</configuration>
 						<goals>
 							<goal>check</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>	
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -247,14 +258,14 @@
 								<entry>
 									<name>/opt/bda/saw-scheduler-service/db-setup/init</name>
 									<file>src/db-setup/init</file>
-                                    <mode>0755</mode>
+									<mode>0755</mode>
 								</entry>
 							</entries>
 							<afterInstallation>
-							  <script>systemctl daemon-reload</script>
+								<script>systemctl daemon-reload</script>
 							</afterInstallation>
 							<afterRemoval>
-							  <script>systemctl daemon-reload</script>
+								<script>systemctl daemon-reload</script>
 							</afterRemoval>
 							<signature>
 								<skip>true</skip>
