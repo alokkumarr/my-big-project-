@@ -412,14 +412,13 @@ export class CronJobSchedularComponent implements OnInit {
 
     switch (this.scheduleType) {
       case 'hourly':
-        let fetchLocalMinute;
         this.selectedTab = 1;
         if (this.crondetails.cronexp.match(/\d+ 0\/\d+ \* 1\/1 \* \? \*/)) {
           this.hourly.hours = 0;
-          fetchLocalMinute = parseCronValue[1].split('/');
-          this.hourly.minutes = isNaN(parseInt(fetchLocalMinute[0], 10))
-            ? 1
-            : parseInt(fetchLocalMinute[0], 10);
+          const extractHour = parseCronValue[1].split('/');
+          this.hourly.minutes = isNaN(parseInt(extractHour[1], 10))
+          ? 0
+          : parseInt(extractHour[1], 10);
         } else {
           // Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
           const extractHour = parseCronValue[2].split('/');
