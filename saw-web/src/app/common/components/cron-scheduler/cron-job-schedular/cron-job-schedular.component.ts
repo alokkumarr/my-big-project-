@@ -9,7 +9,6 @@ import * as range from 'lodash/range';
 
 import * as moment from 'moment-timezone';
 import { timezones } from '../../../utils/timezones';
-import { generateSchedule } from '../../../../common/utils/cron2Readable';
 
 window['moment'] = moment;
 import {
@@ -380,6 +379,7 @@ export class CronJobSchedularComponent implements OnInit {
     this.timezone = moment.tz.guess();
     this.selectedMoments = [];
     this.crondetails.startDate = moment(this.crondetails.startDate).toDate() < new Date() ? new Date() : this.crondetails.startDate;
+    // this.crondetails.endDate = moment(this.crondetails.endDate).toDate() < '' ? new Date() : this.crondetails.endDate;
     this.selectedMoments.push(
       this.fromSelectedTimezone(this.timezone, this.crondetails.startDate)
     );
@@ -397,7 +397,7 @@ export class CronJobSchedularComponent implements OnInit {
     let parseCronValue;
     let modelDate;
     if (this.scheduleType === 'hourly') {
-      parseCronValue = generateSchedule(this.crondetails.cronexp, this.scheduleType, this.crondetails.timezone).split(' ');
+      parseCronValue = this.crondetails.cronexp.split(' ');
     } else {
       const localCronExpression = convertToLocal(this.crondetails.cronexp, this.crondetails.timezone);
       parseCronValue = cronstrue.toString(localCronExpression).split(' ');
@@ -422,9 +422,10 @@ export class CronJobSchedularComponent implements OnInit {
             : parseInt(fetchLocalMinute[0], 10);
         } else {
           // Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
-          this.hourly.hours = isNaN(parseInt(parseCronValue[7], 10))
+          const extractHour = parseCronValue[2].split('/');
+          this.hourly.hours = isNaN(parseInt(extractHour[1], 10))
             ? 1
-            : parseInt(parseCronValue[7], 10);
+            : parseInt(extractHour[1], 10);
           this.hourly.minutes = isNaN(parseInt(parseCronValue[1], 10))
             ? 0
             : parseInt(parseCronValue[1], 10);
