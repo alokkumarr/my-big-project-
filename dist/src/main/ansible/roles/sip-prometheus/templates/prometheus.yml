@@ -19,6 +19,12 @@ scrape_configs:
           - '{{ host }}:9700'
           - '{{ host }}:9900'
 {% endfor %}
+{% for host in groups['saw-security'] %}
+          # Note: Enable the Security Service Prometheus endpoint
+          # after it has been upgraded to Spring Boot 2.x
+          # (https://jira.synchronoss.net:8443/jira/browse/SIP-3326)
+          #- '{{ host }}:9000'
+{% endfor %}
   - job_name: 'haproxy'
     metrics_path: '/metrics'
     static_configs:
