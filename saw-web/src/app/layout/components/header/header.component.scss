@@ -27,6 +27,10 @@ mat-toolbar {
     }
   }
 
+  .m-active {
+    pointer-events: none;
+  }
+
   .alert-bell-icon {
     background-image: url('/assets/img/alert-bell.png');
     background-size: 85% 85%;
@@ -38,6 +42,80 @@ mat-toolbar {
 
   md-menu-bar {
     padding: 0;
+  }
+
+  .header {
+    &__module-launcher-button {
+      width: 20px;
+      height: 20px;
+      margin: 3px 16px 0;
+      cursor: pointer;
+      background-image: url('/assets/img/module-icons/launcher.svg');
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    $module-launcher-option-width: 90px;
+
+    &__module-launcher-content {
+      ::ng-deep .ngxp__container {
+        z-index: 10;
+        background: white;
+      }
+
+      ::ng-deep .ngxp__inner {
+        display: flex;
+        flex-wrap: wrap;
+        max-width: $module-launcher-option-width * 3;
+      }
+    }
+
+    &__module-launcher-option {
+      text-align: center;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 10px;
+      box-sizing: border-box;
+      width: $module-launcher-option-width;
+
+      &:hover {
+        background: whitesmoke;
+      }
+
+      .option-image {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto;
+        background-size: cover;
+        background-repeat: no-repeat;
+        margin-bottom: 5px;
+        background-image: url('/assets/img/module-icons/campaign-insights.svg');
+      }
+
+      &.module-analyze > .option-image {
+        background-image: url('/assets/img/module-icons/analyze.svg');
+      }
+
+      &.module-observe > .option-image {
+        background-image: url('/assets/img/module-icons/observe.svg');
+      }
+
+      &.module-workbench > .option-image {
+        background-image: url('/assets/img/module-icons/workbench.svg');
+      }
+
+      &.module-admin > .option-image {
+        background-image: url('/assets/img/module-icons/admin.svg');
+      }
+
+      &.module-insights > .option-image {
+        background-image: url('/assets/img/module-icons/insights.svg');
+      }
+
+      &.module-ratings > .option-image {
+        background-image: url('/assets/img/module-icons/ratings.svg');
+      }
+    }
   }
 
   .active-module {
