@@ -57,6 +57,7 @@
       </div>
       <span *ngIf="emailValidateFlag" class="errorTextMsg" i18n>Invalid Email-Id Found: Please provide valid Email-Id's
         in list</span>
+        <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n>Start date set is an old Date. Please set a Correct Start Date</span>
       <span *ngIf="errorFlagMsg" class="errorTextMsg" i18n>Please enter valid Email ids or Select option for Publish</span>
       <span *ngIf="cronValidateField" class="errorTextMsg" i18n>Please Select a valid Schedule</span>
     </div>

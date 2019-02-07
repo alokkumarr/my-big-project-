@@ -378,8 +378,6 @@ export class CronJobSchedularComponent implements OnInit {
     this.activeRadio = this.crondetails.activeRadio;
     this.timezone = moment.tz.guess();
     this.selectedMoments = [];
-    this.crondetails.startDate = moment(this.crondetails.startDate).toDate() < new Date() ? new Date() : this.crondetails.startDate;
-    // this.crondetails.endDate = moment(this.crondetails.endDate).toDate() < '' ? new Date() : this.crondetails.endDate;
     this.selectedMoments.push(
       this.fromSelectedTimezone(this.timezone, this.crondetails.startDate)
     );

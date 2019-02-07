@@ -73,6 +73,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   emailValidateFlag = false;
   isReport: boolean;
   fileType: string;
+  startDateCorrectFlag = true;
 
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
@@ -259,10 +260,12 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.cronValidateField = false;
     let validationCheck = true;
 
+    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().startOf('day');
     const validateFields = {
       emails: this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
-      publish: this.validatePublishSelection()
+      publish: this.validatePublishSelection(),
+      startDate: moment(this.crondetails.startDate) > moment().startOf('day')
     };
     fpPipe(
       fpMap(check => {
