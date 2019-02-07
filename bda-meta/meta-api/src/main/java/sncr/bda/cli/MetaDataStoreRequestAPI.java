@@ -241,11 +241,7 @@ public class MetaDataStoreRequestAPI {
                           StorageProxyMetaDataStore spmds = new StorageProxyMetaDataStore(xdfRoot);
                           searchResult = spmds.search(maprDBCondition);
                           break;
-            case ProductModuleMetaStore :
-                          ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore("productModules", xdfRoot);
-                          searchResult = productModuleMetaStore.search(maprDBCondition);
-                          break;
-            case DataPod: 
+            case DataPod:
                           logger.warn("Not implemented yet");
                           break;
             case DataSegment: 
@@ -368,18 +364,6 @@ public class MetaDataStoreRequestAPI {
                             case delete: spmds.delete(id); break;
                             case update: spmds.update(id, src); break;
                             case read: result = spmds.read(id); break;
-                            case search : doSearch(); break;
-                            default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
-                        }
-                        break;
-
-            case ProductModuleMetaStore:
-                        ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore("productModules",xdfRoot);
-                        switch (action){
-                            case create: productModuleMetaStore.create(id,src);break;
-                            case delete: productModuleMetaStore.delete(id); break;
-                            case update: productModuleMetaStore.update(id, src); break;
-                            case read: result = productModuleMetaStore.read(id); break;
                             case search : doSearch(); break;
                             default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
                         }

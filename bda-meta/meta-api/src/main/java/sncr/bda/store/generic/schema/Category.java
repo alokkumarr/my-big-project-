@@ -16,8 +16,7 @@ public enum Category {
   Project("Project"),
   AuditLog("AuditLog"),
   StorageProxy("StorageProxy"),
-  ProductModuleMetaStore("ProductModuleMetaStore"),
-  Semantic("Semantic");  
+  Semantic("Semantic");
 private final String value;
 private final static Map<String, Category> CONSTANTS = new HashMap<String, Category>();
 

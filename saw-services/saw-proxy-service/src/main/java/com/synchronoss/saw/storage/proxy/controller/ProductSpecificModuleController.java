@@ -1,7 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @RestController
 @Api(value="The controller provides operations pertaining to interacting with MapperDB meta-store used for Product-specific-modules")
@@ -175,7 +175,42 @@ public class ProductSpecificModuleController {
             response.setStatus(400);
         }
         logger.debug("Json returned : ",pms.getDocument(tableName,id));
-        Gson gson = new Gson();
-        return gson.toJson(pms.getDocument(tableName,id));
+        return pms.getDocument(tableName,id).toString();
     }
+
+    @ApiOperation(value = "Provides ability to fetch all documents from ProductSpecificModules ", nickname = "getAllProductModuleDocs",
+        notes = "", response = JsonElement.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
+    })
+    @RequestMapping(value = "/product-modules", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public String readAllDocuments(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("Json returned : ",pms.getAllDocs(tableName));
+        return pms.getAllDocs(tableName).toString();
+    }
+
+    @ApiOperation(value = "Provides ability to fetch filtered document/'s from ProductSpecificModules ", nickname = "getAllProductModuleDocs",
+        notes = "", response = JsonElement.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
+    })
+    //The request type is POST since we need request body to accept list of attribute-values to filter documents.
+    @RequestMapping(value = "/product-modules", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public String readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String,String> keyValues) {
+        logger.debug("Json returned : ",pms.getAllDocs(tableName,keyValues));
+        return pms.getAllDocs(tableName,keyValues).toString();
+    }
+
 }
