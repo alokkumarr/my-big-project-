@@ -391,6 +391,58 @@ healthy state:
             "status": "UP"
         }
 
+=== Monitoring interface
+
+The health status of SIP services can be accessed programmatically
+through a monitoring REST API.  The health status of each service
+instance is available as a separate monitoring metric.  It is also
+possible to query for an aggregation of health statuses, providing a
+single result indicating the combined health status of all SIP service
+instances.
+
+:prometheus: https://prometheus.io/
+:prometheus_query: https://prometheus.io/docs/prometheus/latest/querying/basics/
+
+The service instance health statuses are available in the metric
+`spring_boot_actuator_health_status`.  Its value is zero if the health
+check is successful and a non-zero value if the health check is
+failing.  This allows constructing a query that aggregates all health
+statuses by summing them together, knowing that a zero sum will
+indicate all services are healthy while a non-zero sum indicates at
+least one service in failing its health check.  The following shows an
+example of a query aggregating the health statuses of all service
+instances:
+
+        $ curl http://<sip-admin>/prometheus/api/v1/query?query=sum(spring_boot_actuator_health_status)
+        {
+          "status": "success",
+          "data": {
+            "resultType": "vector",
+            "result": [
+              {
+                "metric": {},
+                "value": [
+                  1549911414.824,
+                  "0"
+                ]
+              }
+            ]
+          }
+        }
+
+Note that the value is zero (value `0`), indicating that all SIP
+service instances are healthy.
+
+NOTE: For the monitoring REST API to be available in the SIP
+environment, there needs to be at least one node in the `sip-admin`
+role in the SIP environment configuration.
+
+The monitoring REST API is provided by {prometheus}[Prometheus].  It
+is available at the URL `http://<sip-admin>/prometheus/api/v1`, where
+`<sip-admin>` refers to a node configured in in the `sip-admin` role.
+The {prometheus_query}[Prometheus querying] documentation describes
+the full range of querying expressions available.
+
 == High availability
 
 SIP supports high availability, so that if a single node in the
