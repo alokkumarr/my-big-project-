@@ -583,10 +583,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   } catch (Exception ex) {
                     logger.error("Exception occurred while writing file to the file system", ex);
                   } finally {
-                    //if (stream != null) {
-                   //   logger.trace("in finally block closing the stream");
-                   //   stream.close();
-                    //}
+                      logger.trace("in finally block closing the stream");
                   }
                 }
               });
@@ -1015,12 +1012,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("End of data tranfer.....Total time in milliseconds::: " + durationInMillis);
     } catch (Exception ex) {
       logger.error("Exception occurred while transferring the file from channel", ex);
-    } finally {
-      if (processor.isDestinationMapR(defaultDestinationLocation)) {
-        logger.info("$$$$$completed all processing. Closing mapr file system");
-        //   fs.close();
-      }
-    }
+    } 
     return list;
   }
 

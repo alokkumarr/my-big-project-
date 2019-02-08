@@ -28,7 +28,7 @@ public class NioFileProcessor implements FileProcessor{
   @Override
   public void transferFile(InputStream stream, File localFile, String defaultLoc, String user) throws Exception {
     java.nio.file.Files.copy(stream, localFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    this.closeStream(stream);
+   // this.closeStream(stream);
     
   }
 

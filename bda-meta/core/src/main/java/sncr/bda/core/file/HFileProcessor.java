@@ -44,9 +44,9 @@ public class HFileProcessor implements FileProcessor {
     conf.set("hadoop.job.ugi", user);
     FileSystem fs = FileSystem.get(URI.create(location), conf);
     FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
-    IOUtils.copyBytes(stream, fos, 8192, true);
+    IOUtils.copyBytes(stream, fos, 8192, false);
+    fos.close();
     fs.close();
-   // IOUtils.closeStream(stream);
 
   }
 
