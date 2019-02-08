@@ -187,15 +187,16 @@ public class SawBisRouteController {
 
               Date startDate = dateFormat.parse(startDateStr.asText());
               logger.debug("Start Date in system timezone = " + startDate);
-              schedulerRequest.setJobScheduleTime(startDate);
-
+              schedulerRequest.setJobScheduleTime(startDate.getTime());
             }
-            if (endDateStr != null) {
+            if (endDateStr != null && !endDateStr.asText().equals("")) {
               logger.debug("End Date = " + endDateStr.asText());
 
               Date endDate = dateFormat.parse(endDateStr.asText());
               logger.debug("End Date system timezone = " + endDate);
-              schedulerRequest.setEndDate(endDate);
+              schedulerRequest.setEndDate(endDate.getTime());
+            } else {
+              schedulerRequest.setEndDate(Long.MAX_VALUE);
             }
             if (timezone != null) {
               schedulerRequest.setTimezone(timezone.asText());
@@ -351,10 +352,12 @@ public class SawBisRouteController {
           SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
           try {
             if (startDate != null) {
-              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()).getTime());
             }
-            if (endDate != null) {
-              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            if (endDate != null && !endDate.asText().equals("")) {
+              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()).getTime());
+            } else {
+              schedulerRequest.setEndDate(Long.MAX_VALUE);
             }
             if (timezone != null) {
               schedulerRequest.setTimezone(timezone.asText());

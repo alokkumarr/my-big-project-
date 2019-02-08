@@ -975,6 +975,7 @@ public class SftpServiceImpl extends SipPluginContract {
     bisDataMetaInfo.setActualDataName(actualDataName);
     bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
     bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
+    bisDataMetaInfo.setProcessState(BisComponentState.DATA_INPROGRESS.value());
     bisDataMetaInfo.setActualReceiveDate(recieveDate);
     bisDataMetaInfo.setChannelId(channelId);
     bisDataMetaInfo.setRouteId(routeId);
