@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140">
+    <g fill="none" fill-rule="evenodd">
+        <circle cx="70" cy="70" r="70" fill="#D93E00" fill-rule="nonzero"/>
+        <path fill="#FFF" d="M55.505 93.946H42.557c-.394-4.48-4.934-10.258-4.934-10.258l.01-.012C34.18 79.723 32 74.36 32 69.494 32 60.384 39.61 53 49 53c9.389 0 17 7.385 17 16.494 0 4.857-2.171 10.21-5.615 14.16 0 0-4.49 5.809-4.88 10.292zm-13.79 1.807h15.178v10.853h-3.134L51.245 109h-3.882l-2.514-2.394h-3.135V95.753zm6.07-20.473v18.666h2.43V75.28h-2.43z" opacity=".5"/>
+        <ellipse cx="106.055" cy="33.207" fill="#FFF" stroke="#FFF" stroke-width="5.283" rx="6.251" ry="5.927"/>
+        <ellipse cx="83.605" cy="96.399" fill="#FFF" stroke="#FFF" stroke-width="5.283" rx="6.251" ry="5.927"/>
+        <path stroke="#FFF" stroke-width="5.283" d="M80.916 58.223l20.768-20.87M77.081 72.113l4.983 18.549"/>
+        <ellipse cx="112.653" cy="84.575" fill="#FFF" stroke="#FFF" stroke-width="5.283" rx="4.283" ry="4.061"/>
+        <ellipse cx="51.34" cy="77.186" fill="#FFF" stroke="#FFF" stroke-width="5.283" rx="4.283" ry="4.061"/>
+        <ellipse cx="56.32" cy="31.249" fill="#FFF" stroke="#FFF" stroke-width="5.283" rx="4.283" ry="4.061"/>
+        <path stroke="#FFF" stroke-width="5.283" d="M58.159 34.903l1.678 2.913"/>
+        <path stroke="#FFF" stroke-dasharray="2.448679208755493,2.448679208755493" stroke-width="5.283" d="M62.949 43.215l4.667 8.1"/>
+        <path stroke="#FFF" stroke-width="5.283" d="M69.172 54.014l1.679 2.913M108.909 82.636l-3.035-1.653"/>
+        <path stroke="#FFF" stroke-dasharray="2.955848945761626,2.955848945761626" stroke-width="5.283" d="M99.081 77.284l-10.188-5.55"/>
+        <path stroke="#FFF" stroke-width="5.283" d="M85.496 69.885l-3.035-1.653M55.08 75.244l5.988-3.438M61.305 71.67l5.988-3.438"/>
+        <ellipse cx="74.946" cy="64.162" fill="#FFF" stroke="#FFF" stroke-width="5.283" rx="8.659" ry="8.211"/>
+        <path stroke="#FFF" stroke-width="4" d="M39.642 48.119L35 41.237M19 69h8.897M22 83.601L30.508 81M30.245 58.85L23 52" opacity=".5"/>
+    </g>
+</svg>
