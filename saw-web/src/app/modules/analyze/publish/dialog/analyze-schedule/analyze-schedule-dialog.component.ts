@@ -265,7 +265,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       emails: this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
       publish: this.validatePublishSelection(),
-      startDate: moment(this.crondetails.startDate) > moment().startOf('day')
+      startDate: moment(this.crondetails.startDate) > moment().subtract(1, 'minutes')
     };
     fpPipe(
       fpMap(check => {
