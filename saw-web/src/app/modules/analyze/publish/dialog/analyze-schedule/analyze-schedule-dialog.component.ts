@@ -260,7 +260,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.cronValidateField = false;
     let validationCheck = true;
 
-    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().startOf('day');
+    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(1, 'minutes');
     const validateFields = {
       emails: this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
@@ -297,6 +297,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       this.cronValidateField = true;
       return false;
     }
+    return true;
   }
 
   validateEmails(emails) {
