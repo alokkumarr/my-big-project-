@@ -16,7 +16,7 @@ import org.springframework.context.event.EventListener;
 import info.faljse.SDNotify.SDNotify;
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss")
+@ComponentScan("com.synchronoss.saw.semantic")
 public class SAWSemanticServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SAWSemanticServiceApplication.class);
   public static void main(String[] args) {
