@@ -51,6 +51,7 @@ import {
 import { DashboardService } from './services/dashboard.service';
 import { CommonModuleTs } from '../../common';
 import { FirstDashboardGuard } from './guards';
+import { ZoomAnalysisComponent } from './components/zoom-analysis/zoom-analysis.component';
 
 const components = [
   ObservePageComponent,
@@ -70,7 +71,8 @@ const components = [
   ObserveKPIBulletComponent,
   KPIFilterComponent,
   SaveDashboardComponent,
-  ConfirmDialogComponent
+  ConfirmDialogComponent,
+  ZoomAnalysisComponent
 ];
 
 const GUARDS = [FirstDashboardGuard];

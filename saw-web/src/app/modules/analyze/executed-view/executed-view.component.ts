@@ -61,6 +61,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   executionsSub: Subscription;
   executionSub: Subscription;
   executionId: string;
+  noPreviousExecution = false;
+  hasExecution = false;
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
   chartActionBus$: Subject<Object> = new Subject<Object>();
@@ -326,6 +328,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       .then(
         (analyses: Analysis[]) => {
           this.analyses = analyses;
+          this.noPreviousExecution = !analyses || !analyses.length;
           this.setExecutedAt(this.executionId);
           return analyses;
         },
@@ -401,6 +404,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           );
         };
       } else {
+        /* Mark hasExecution temporarily as true to allow fetch of data.
+           It'll be marked false if data is not found (no execution exists).
+        */
+        this.hasExecution = true;
         this.dataLoader = options => {
           return this.loadExecutionData(
             analysisId,
@@ -459,6 +466,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       : this._analyzeService.getLastExecutionData(analysisId, options)
     ).then(
       ({ data, count, queryBuilder, executedBy }) => {
+        /* Check if a successful execution data is returned. */
+        this.hasExecution =
+          Boolean(data.length) || Boolean(queryBuilder) || Boolean(executedBy);
+        /* If there's no execution id (loading last execution) and there's no
+          execution data as well, then we can deduce there's no previous
+          execution for this analysis present */
+        this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
           this.executedAnalysis.sqlBuilder = queryBuilder;
         }

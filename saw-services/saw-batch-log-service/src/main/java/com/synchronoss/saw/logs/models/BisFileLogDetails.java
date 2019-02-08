@@ -29,6 +29,14 @@ public class BisFileLogDetails {
   String bisProcessState;
 
   private Date modifiedDate;
+  
+  private Date createdDate;
+  
+  private Date transferStartTime;
+  
+  private Date transferEndTime;
+  
+  private Long transferDuration;
 
   public String getPid() {
     return pid;
@@ -133,7 +141,31 @@ public class BisFileLogDetails {
   public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
   }
+  
+  public Date getTransferStartTime() {
+    return transferStartTime;
+  }
 
-  private Date createdDate;
+  public void setTransferStartTime(Date transferStartTime) {
+    this.transferStartTime = transferStartTime;
+  }
+
+  public Date getTransferEndTime() {
+    return transferEndTime;
+  }
+
+  public void setTransferEndTime(Date transferEndTime) {
+    this.transferEndTime = transferEndTime;
+  }
+
+  public Long getTransferDuration() {
+    return transferDuration;
+  }
+
+  public void setTransferDuration(Long transferDuration) {
+    this.transferDuration = transferDuration;
+  }
+
+
 
 }

@@ -11,6 +11,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ModuleWithProviders
 } from '@angular/core';
+import { NgxPopperModule } from 'ngx-popper';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgxsModule } from '@ngxs/store';
 import { CommonState } from './state/common.state';
@@ -99,6 +100,7 @@ const MODULES = [
   DxDataGridModule,
   DxTemplateModule,
   MaterialModule,
+  NgxPopperModule,
   FlexLayoutModule,
   DndModule,
   DxPivotGridModule,

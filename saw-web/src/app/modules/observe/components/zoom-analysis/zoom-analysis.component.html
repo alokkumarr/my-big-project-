@@ -1,0 +1,66 @@
+<div class="dialog-container">
+  <div class="dialog__content" fxLayout="column">
+    <div fxLayout="row" fxLayoutAlign="start center" *ngIf="data.origAnalysis.sqlBuilder.filters.length > 0">
+      <div fxLayout="column">
+        <span class="filter-counter" i18n>{data.origAnalysis.sqlBuilder.filters.length, plural, =1 {1 Filter} other {{{data.origAnalysis.sqlBuilder.filters.length}} Filters} } Applied</span>
+      </div>
+
+      <mat-chip-list #chipList>
+        <mat-chip *ngFor="let filter of data.origAnalysis.sqlBuilder.filters; let i = index;"
+                  style="padding-bottom: 1px;padding-top: 3px;">
+          {{getDisplayName(filter)}}{{getFilterValue(filter)}}
+        </mat-chip>
+      </mat-chip-list>
+    </div>
+
+    <div *ngIf="data.analysis" [ngSwitch]="data.analysis.type" class="observe-analysis">
+        <observe-map-chart
+        *ngIf="
+        data.analysis.type === 'chart' && data.analysis.chartType === 'geo'
+        "
+        class="analysis-container"
+        [item]="data"
+        (onRefresh)="refreshTile($event)"
+        [analysis]="data.analysis"
+        [enableChartDownload]="true"
+        [updater]="data.updater"
+        [ViewMode]="true"
+      >
+      </observe-map-chart>
+
+      <observe-chart
+        *ngIf="
+          data.analysis.type === 'chart' && data.analysis.chartType !== 'geo'
+        "
+        class="analysis-container"
+        [item]="data"
+        (onRefresh)="refreshTile($event)"
+        [analysis]="data.analysis"
+        [enableChartDownload]="true"
+        [updater]="data.updater"
+        [ViewMode]="true"
+      >
+      </observe-chart>
+
+      <observe-pivot
+          *ngIf="data.analysis.type === 'pivot'"
+          class="analysis-container"
+          [item]="data"
+          (onRefresh)="refreshTile($event)"
+          [analysis]="data.analysis"
+          [updater]="data.updater">
+        </observe-pivot>
+
+      <observe-report
+          *ngIf="['report', 'esReport'].includes(data.analysis.type)"
+          class="analysis-container"
+          [item]="data"
+          (onRefresh)="refreshTile($event)"
+          [analysis]="data.analysis"
+          [updater]="data.updater"
+        >
+        </observe-report>
+        <mat-icon (click)="close()" class="close-icon" fontIcon="icon-close"></mat-icon>
+    </div>
+  </div>
+</div>

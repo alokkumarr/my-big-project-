@@ -1,5 +1,6 @@
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { NgxsModule } from '@ngxs/store';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -54,6 +55,7 @@ import {
 import { AnalyzeFilterModule } from './designer/filter';
 
 import { AnalyzePageComponent } from './page';
+import { AnalyzeState } from './state/analyze.state';
 
 const COMPONENTS = [
   AnalyzeReportQueryComponent,
@@ -93,6 +95,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
 
 @NgModule({
   imports: [
+    NgxsModule.forFeature([AnalyzeState]),
     CommonModuleAngular4,
     LocalStorageModule.withConfig({
       prefix: 'symmetra',
