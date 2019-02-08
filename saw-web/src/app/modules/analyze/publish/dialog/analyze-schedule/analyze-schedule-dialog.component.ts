@@ -260,12 +260,12 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.cronValidateField = false;
     let validationCheck = true;
 
-    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(1, 'minutes');
+    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
     const validateFields = {
       emails: this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
       publish: this.validatePublishSelection(),
-      startDate: moment(this.crondetails.startDate) > moment().subtract(1, 'minutes')
+      startDate: moment(this.crondetails.startDate) > moment().subtract(2, 'minutes')
     };
     fpPipe(
       fpMap(check => {
