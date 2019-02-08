@@ -207,7 +207,7 @@ export class DesignerService {
     return pivotGroupAdapters;
   }
 
-  getMapGroupAdapters(artifactColumns): IDEsignerSettingGroupAdapter[] {
+  getMapGroupAdapters(artifactColumns, subType): IDEsignerSettingGroupAdapter[] {
     const mapReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
@@ -226,7 +226,7 @@ export class DesignerService {
       artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
-    const mapGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [{
+    const defaultMetricAdapter: IDEsignerSettingGroupAdapter = {
       title: 'Data',
       type: 'map',
       marker: 'y',
@@ -239,13 +239,15 @@ export class DesignerService {
       },
       reverseTransform: mapReverseTransform,
       onReorder
-    }, {
+    };
+
+    const defaultDimensionAdapter: IDEsignerSettingGroupAdapter = {
       title: 'Coordinates',
       type: 'map',
       marker: 'x',
       maxAllowed: () => 1,
       artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptLngLat,
+      canAcceptArtifactColumn: canAcceptGeoType,
       transform(artifactColumn: ArtifactColumnChart) {
         artifactColumn.area = 'x';
         artifactColumn.checked = true;
@@ -253,7 +255,24 @@ export class DesignerService {
       },
       reverseTransform: mapReverseTransform,
       onReorder
-    }];
+    };
+
+    const metricAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultMetricAdapter,
+      title: subType === 'map' ? 'Data' : 'Metric',
+      canAcceptArtifactColumn: canAcceptData,
+    };
+    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultDimensionAdapter,
+      title: subType === 'map' ? 'Coordinates' : 'Dimension',
+      canAcceptArtifactColumn: subType === 'map ' ?
+        canAcceptLngLat : canAcceptGeoType,
+    };
+
+    const mapGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
+      metricAdapter,
+      dimensionAdapter
+    ]);
 
     this._distributeArtifactColumnsIntoGroups(
       artifactColumns,

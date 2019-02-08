@@ -26,7 +26,7 @@
       </div>
     </div>
     <ng-container *ngIf="item.analysis">
-      <observe-map *ngIf="item.analysis.type === 'map'"
+      <observe-map *ngIf="analysis.type | isAnalysisType:'map':analysis?.chartType"
                    class="analysis-container"
                    [item]="item"
                    (onRefresh)="refreshTile($event)"
@@ -37,9 +37,7 @@
       </observe-map>
 
       <observe-map-chart
-        *ngIf="
-          item.analysis.type === 'chart' && item.analysis.chartType === 'geo'
-        "
+        *ngIf="analysis.type | isAnalysisType:'mapChart':analysis?.chartType"
         class="analysis-container"
         [item]="item"
         (onRefresh)="refreshTile($event)"
@@ -51,9 +49,7 @@
       </observe-map-chart>
 
       <observe-chart
-        *ngIf="
-          item.analysis.type === 'chart' && item.analysis.chartType !== 'geo'
-        "
+        *ngIf="analysis.type | isAnalysisType:'chart'"
         class="analysis-container"
         [item]="item"
         (onRefresh)="refreshTile($event)"

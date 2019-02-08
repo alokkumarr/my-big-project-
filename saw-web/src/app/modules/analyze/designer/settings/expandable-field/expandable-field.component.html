@@ -40,4 +40,7 @@
 
   <expand-detail-chart *ngSwitchCase="'chart'" (change)="change.emit($event)" [artifactColumn]="artifactColumn" [fieldCount]="fieldCount">
   </expand-detail-chart>
+
+  <expand-detail-chart *ngSwitchCase="'map'" (change)="change.emit($event)" [artifactColumn]="artifactColumn" [fieldCount]="fieldCount">
+  </expand-detail-chart>
 </div>

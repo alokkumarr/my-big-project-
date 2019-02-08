@@ -1,5 +1,6 @@
 export {
   AnalysisType,
+  AnalysisTypeFE,
   AnalysisChart,
   ArtifactColumnReport,
   SqlBuilderChart

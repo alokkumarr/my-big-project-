@@ -38,7 +38,7 @@
     [isEditable]="false"
   >
   </report-grid-upgraded>
-  <designer-map-chart *ngIf="analysis.type === 'chart' && chartType === 'geo'"
+  <designer-map-chart *ngIf="analysis.type | isAnalysisType:'mapChart':analysis?.chartType"
                   [chartType]="chartType"
                   [data]="previewData"
                   [auxSettings]="{legend: analysis.legend}"

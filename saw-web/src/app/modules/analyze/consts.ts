@@ -252,14 +252,14 @@ export const ANALYSIS_METHODS = [
         children: [{
           label: 'Geolocation',
           icon: { font: 'icon-geo-chart' },
-          type: 'chart:geo',
-          typeOnBackEnd: 'chart:geo'
+          type: 'map:chart_scale',
+          typeOnBackEnd: 'map:chart_scale'
+        }, {
+          label: 'Map',
+          icon: { font: 'icon-geo-chart' },
+          type: 'map:map',
+          typeOnBackEnd: 'map-map'
         }]
-      },
-      {
-        label: 'Map-box',
-        icon: { font: 'icon-geo-chart' },
-        type: 'map:map'
       }
     ]
   }
