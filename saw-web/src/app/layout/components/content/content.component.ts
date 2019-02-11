@@ -37,7 +37,7 @@ const TIMEOUT_TRIGGER = 60;
 // nr of seconds before the user is timed out
 const TIMEOUT = 20 * 60;
 
-const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
+const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH', 'ADMIN'];
 
 @Component({
   selector: 'layout-content',
@@ -89,12 +89,25 @@ export class LayoutContentComponent implements OnInit {
     });
   }
 
+  get adminModule(): any[] {
+    return this.jwt.isAdmin()
+      ? [
+          {
+            label: 'ADMIN',
+            path: 'admin',
+            name: 'admin',
+            moduleName: 'AdminModule',
+            moduleUrl: '/admin'
+          }
+        ]
+      : [];
+  }
+
   loadInternalModules(): any[] {
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
-    const modules = map(
-      product.productModules,
-      ({ productModName, moduleURL }) => {
+    const modules = [
+      ...map(product.productModules, ({ productModName, moduleURL }) => {
         const lowerCaseName = lowerCase(productModName);
         return {
           label: productModName,
@@ -103,12 +116,15 @@ export class LayoutContentComponent implements OnInit {
           moduleName: `${startCase(lowerCaseName)}Module`,
           moduleURL
         };
-      }
-    );
+      }),
+      ...this.adminModule
+    ];
+
     const baseModules = filter(modules, ({ label }) =>
       baseModuleNames.includes(label)
     );
     this.modules = baseModules;
+
     return modules;
   }
 
