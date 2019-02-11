@@ -35,14 +35,14 @@ public class BisSchedulerJobDetails implements Serializable {
   private String jobName;
   private String jobGroup;
 
-  // TODO: DateTimrFormat has no effect here, can be removed.
+  // TODO: DateTimeFormat has no effect here, can be removed.
   @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
   private Date jobScheduleTime;
   private String cronExpression;
   private List<String> emailList;
   private String fileType;
 
-  // TODO: DateTimrFormat has no effect here, can be removed.
+  // TODO: DateTimeFormat has no effect here, can be removed.
   @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
   private Date endDate;
 
