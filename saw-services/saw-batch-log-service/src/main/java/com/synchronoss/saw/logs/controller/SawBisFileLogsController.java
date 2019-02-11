@@ -13,8 +13,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +57,7 @@ public class SawBisFileLogsController {
           @ApiResponse(code = 415,
               message = "Unsupported Type. " + "Representation not supported for the resource")})
   public List<BisFileLog> retrieveAllLogs() {
-    return this.bisLogsRepository.findAll();
+    return this.bisLogsRepository.findAll(bisLogsRepository.orderByCreatedDate());
   }
 
   @ApiOperation(value = "Retrieve log record by log Id", nickname = "routeLogWithId", notes = "",
@@ -124,12 +122,14 @@ public class SawBisFileLogsController {
       if (dataNode.isArray() && dataNode.size() > 0) {
         JsonNode objNode = dataNode.get(0);
         if (!objNode.get("lastFiredTime").isNull()) {
-          latFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-                    .parse(objNode.get("lastFiredTime").asText()).getTime();
+          logger.trace(
+              "Retreive from Database lastFiredTime :" + objNode.get("lastFiredTime").asLong());
+          latFired = objNode.get("lastFiredTime").asLong();
         }
         if (!objNode.get("nextFireTime").isNull()) {
-          nextFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-                    .parse(objNode.get("nextFireTime").asText()).getTime();
+          logger.trace(
+              "Retreive from Database nextFireTime :" + objNode.get("nextFireTime").asLong());
+          nextFired = objNode.get("nextFireTime").asLong();
         }
         
         logger.trace("latFired from response after parsing in long" + latFired);
@@ -138,11 +138,10 @@ public class SawBisFileLogsController {
       }
     } catch (IOException exception) {
       logger.error(exception.getMessage());
-    } catch (ParseException exception) {
-      logger.error(exception.getMessage());
-    }
+    } 
     
-    List<BisFileLog> bisFileLogs = this.bisLogsRepository.findByRouteSysId(routeId);
+    List<BisFileLog> bisFileLogs =
+        this.bisLogsRepository.findByRouteSysId(routeId, bisLogsRepository.orderByCreatedDate());
     List<BisFileLogDetails> bisFileLogDtos = new ArrayList<BisFileLogDetails>();
     for (BisFileLog bisFIleLog : bisFileLogs) {
       BisFileLogDetails logDto = new BisFileLogDetails();
