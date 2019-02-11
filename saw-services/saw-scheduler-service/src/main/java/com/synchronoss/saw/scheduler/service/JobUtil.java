@@ -43,59 +43,7 @@ class JobUtil {
 	    factoryBean.setApplicationContext(context);
 	    factoryBean.setName(job.getJobName());
 	    factoryBean.setGroup(jobGroup);
-
-	    // Convert job schedule time and end date to current system time using
-        // the timezone in ScheduleJobDetail
-
-
-//        SimpleDateFormat dateTimeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-//        dateTimeFormat.setTimeZone(TimeZone.getTimeZone("Asia/Calcutta"));
-//        Date date = new Date();
-//        SimpleDateFormat timeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-//        timeFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-//        String estTime = timeFormat.format(date);
-
         logger.debug(job.toString());
-
-        // TODO: should be enabled later
-//        SimpleDateFormat userTimeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-//        String userTimeZoneStr = job.getTimezone();
-//        TimeZone userTimeZone = TimeZone.getTimeZone(userTimeZoneStr);
-//
-//        logger.debug("User timezone = " + userTimeZone);
-//        userTimeFormat.setTimeZone(userTimeZone);
-//
-//
-//        SimpleDateFormat systemTimeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-//        TimeZone systemTimeZone = TimeZone.getDefault();
-//
-//        logger.debug("System timezone = " + systemTimeZone);
-//        systemTimeFormat.setTimeZone(systemTimeZone);
-//
-//
-//        String scheduleTimeStr = null, endDateStr = null;
-//
-//        scheduleTimeStr = userTimeFormat.format(job.getJobScheduleTime());
-//
-//
-//        try {
-//            // Update scheduleDate
-//            logger.debug("Schedule time before = " + job.getJobScheduleTime());
-//            Date scheduleDate = systemTimeFormat.parse(scheduleTimeStr);
-//            job.setJobScheduleTime(scheduleDate);
-//            logger.debug("Schedule time after = " + job.getJobScheduleTime());
-//
-//            // Update endDate
-//            if (job.getEndDate() != null) {
-//                logger.debug("End time before = " + job.getEndDate());
-//                endDateStr = userTimeFormat.format(job.getEndDate());
-//                Date endDate = systemTimeFormat.parse(endDateStr);
-//                job.setEndDate(endDate);
-//                logger.debug("End time before = " + job.getEndDate());
-//            }
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
 
 	    // set job data map
         JobDataMap jobDataMap = new JobDataMap();
