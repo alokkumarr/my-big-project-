@@ -42,7 +42,7 @@ public class SchedulerJobDetail implements Serializable {
 
    private String categoryID;
 
-    // TODO: DateTimrFormat has no effect here, can be removed.
+    // TODO: DateTimeFormat has no effect here, can be removed.
    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
    private Date jobScheduleTime;
 
@@ -58,7 +58,7 @@ public class SchedulerJobDetail implements Serializable {
 
    private String fileType ;
 
-   // TODO: DateTimrFormat has no effect here, can be removed.
+   // TODO: DateTimeFormat has no effect here, can be removed.
    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
    private Date endDate;
 

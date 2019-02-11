@@ -105,8 +105,7 @@ public class JobServiceImpl implements JobService<SchedulerJobDetail>{
 	@Override
 	public boolean updateOneTimeJob(SchedulerJobDetail schedulerJobDetail) {
         logger.info("Request received for updating one time job.");
-
-        // TODO: Handle timezone info here
+        
         logger.debug("Schedule time = " + schedulerJobDetail.getJobScheduleTime());
         logger.debug("End date = " + schedulerJobDetail.getEndDate());
 
