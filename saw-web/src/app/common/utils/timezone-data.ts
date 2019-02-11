@@ -914,7 +914,7 @@ export const timezoneData: TimezoneData[] = [
     offset: 5.5,
     isdst: false,
     text: '(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi',
-    utc: ['Asia/Calcutta']
+    utc: ['Asia/Calcutta', 'Asia/Kolkata']
   },
   {
     value: 'Sri Lanka Standard Time',

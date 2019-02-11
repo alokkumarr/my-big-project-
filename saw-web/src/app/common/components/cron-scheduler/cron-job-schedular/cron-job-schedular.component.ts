@@ -82,6 +82,7 @@ export class CronJobSchedularComponent implements OnInit {
 
   ngOnInit() {
     this.today = new Date();
+    this.today.setMinutes(this.today.getMinutes() - 2);
     this.dailyTypeDay = {
       hour: '',
       minute: '',

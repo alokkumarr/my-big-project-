@@ -383,11 +383,10 @@
       <input
         [owlDateTimeTrigger]="dt12"
         [owlDateTime]="dt12"
-        [min]="today"
-        [max]="selectedMoments[1]"
         class="date-input"
         [(ngModel)]="selectedMoments"
         [selectMode]="'rangeFrom'"
+        [min]="today"
         #startDateInput
         (ngModelChange)="cronChange()"
       />
