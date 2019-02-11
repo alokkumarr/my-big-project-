@@ -6,3 +6,4 @@
   # workaround for now.
   register: result
   until: result is success
+  delay: 30
