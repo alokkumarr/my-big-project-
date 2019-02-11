@@ -336,6 +336,19 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTIS versions.
 
+=== System time zone
+
+Nodes can be configured to use any desired system time zone.  To set
+the system time zone, use the following command:
+
+    $ timedatectl set-timezone <timezone>
+
+NOTE: The available time zones can be listed using the `timedatectl
+list-timezones` command.
+
+The configured time zone will be reflected in system and application
+logs viewed using for example the `journalctl` command.
+
 == Installing SIP product modules
 
 Execute the following steps to install SIP product modules:
