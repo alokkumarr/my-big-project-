@@ -387,6 +387,7 @@
         [(ngModel)]="selectedMoments"
         [selectMode]="'rangeFrom'"
         [min]="today"
+        [max]="selectedMoments[1]"
         #startDateInput
         (ngModelChange)="cronChange()"
       />
