@@ -134,7 +134,7 @@ export class CreateRouteDialogComponent {
   }
 
   createRoute(data) {
-    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
+    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment();
     if (!this.startDateCorrectFlag) {
       return false;
     }
