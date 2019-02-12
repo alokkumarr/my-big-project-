@@ -6,16 +6,22 @@ import com.synchronoss.saw.storage.proxy.model.response.Valid;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import sncr.bda.metastore.ProductModuleMetaStore;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 @Component
 public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModuleService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductSpecificModuleServiceRESTImpl.class);
-    private static String xdfRoot = "hdfs:///var/sip";
+
+    @Value("${metastore.base}")
+    @NotNull
+    private String xdfRoot;
+
     Gson gson = new Gson();
 
     /**
@@ -41,7 +47,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
             valid.setError("Failed to add document to table,Exception occurred!");
             logger.error("Failed to add document to table,Exception occurred!");
             valid.setValid(false);
-            e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         }
         return valid;
     }
@@ -68,7 +74,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
             valid.setError("Failed updating document, Exception occurred!");
             logger.error("Failed updating document, Exception occurred!");
             valid.setValid(false);
-            e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         }
 
         return valid;
@@ -95,7 +101,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
             valid.setError("Failed to delete document from table,Exception occurred!");
             logger.error("Failed to delete document from table,Exception occurred!");
             valid.setValid(false);
-            e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         }
 
         return valid;
@@ -118,7 +124,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
             logger.debug("Retrieved Document = ",doc);
         } catch (Exception e) {
             logger.error("Failed to retrieve document,Exception occurred!");
-            e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         }
 
         return gson.toJson(doc);
@@ -138,7 +144,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
             docs = productModuleMetaStore.searchAll(keyValues);
         } catch (Exception e) {
             logger.error("Failed to retrieve document,Exception occurred!");
-            e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         }
             return gson.toJson(docs);
     }
@@ -156,7 +162,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
             return gson.toJson(productModuleMetaStore.searchAll());
         } catch (Exception e) {
             logger.error("Failed to retrieve documents,Exception occurred!");
-            e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
             return null;
         }
 

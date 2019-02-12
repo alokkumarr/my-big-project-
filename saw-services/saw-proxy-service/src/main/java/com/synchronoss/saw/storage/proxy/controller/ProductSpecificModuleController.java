@@ -23,7 +23,7 @@ import java.util.Map;
 
 @RestController
 @Api(value="The controller provides operations pertaining to interacting with MapperDB meta-store used for Product-specific-modules")
-@RequestMapping(value = "/internal/proxy/storage")
+@RequestMapping(value = "/internal/proxy/storage/product-module")
 public class ProductSpecificModuleController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductSpecificModuleController.class);
@@ -59,7 +59,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/product-module/{id}",
+    @RequestMapping(value = "/{id}",
         method = RequestMethod.POST,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -101,7 +101,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/product-module/{id}",
+    @RequestMapping(value = "/{id}",
         method = RequestMethod.PUT,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -143,7 +143,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/product-module/{id}", method = RequestMethod.DELETE, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Valid deleteDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         if (id == null){
@@ -167,7 +167,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/product-module/{id}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public String readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         if (id == null){
@@ -188,7 +188,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/product-modules", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/docs", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public String readAllDocuments(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("Json returned : ",pms.getAllDocs(tableName));
@@ -206,7 +206,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
     //The request type is POST since we need request body to accept list of attribute-values to filter documents.
-    @RequestMapping(value = "/product-modules", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/docs", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public String readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String,String> keyValues) {
         logger.debug("Json returned : ",pms.getAllDocs(tableName,keyValues));
