@@ -925,13 +925,19 @@ class Analysis extends BaseController {
             case obj: java.math.BigInteger => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj: scala.math.BigInt => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj =>
+              if (obj == null ) {
+               JNull
+              }
+              else  {
               throw new RuntimeException(
                 "Unsupported data type in result: " + dataType
                   + ", object class: " + obj.getClass.getName)
+              }
           }
         })
       ).toList
       )
+
     }
     ).toList)
   }

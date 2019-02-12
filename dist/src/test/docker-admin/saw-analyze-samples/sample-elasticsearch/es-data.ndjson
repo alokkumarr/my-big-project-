@@ -1092,3 +1092,17 @@
 {"string": "string 546", "long": 1545, "float": 1008.05, "date": "2018-12-31 00:00:00", "integer": 645, "double": 100004.06}
 { "index" :{}}
 {"string": "string 547", "long": 1546, "float": 1008.06, "date": "2019-01-01 00:00:00", "integer": 646, "double": 100004.07}
+{ "index" :{}}
+{"string": "string 548", "long": 1546, "float": 1008.06, "date": "2019-01-25 00:00:00", "integer": 647, "double": 100004.08}
+{ "index" :{}}
+{"string": null, "long": 1547, "float": null, "date": "2019-01-26 00:00:00", "integer": 648, "double": 100004.09}
+{ "index" :{}}
+{"string": null, "long": 1548, "float": null, "date": "2019-01-27 00:00:00", "integer": 649, "double": 100005.00}
+{ "index" :{}}
+{"string": null, "long": 1549, "float": 1008.07, "date": "2019-01-28 00:00:00", "integer": 650, "double": 100005.01}
+{ "index" :{}}
+{"string": "string 550", "long": 1550, "float": null, "date": "2019-01-29 00:00:00", "integer": 651, "double": 100005.02}
+{ "index" :{}}
+{"string": "", "long": 1551, "float": null, "date": "2019-01-30 00:00:00", "integer": 652, "double": 100005.03}
+{ "index" :{}}
+{"string": "", "long": 1552, "float": null, "date": "2019-01-31 00:00:00", "integer": 653, "double": 100005.04}
