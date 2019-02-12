@@ -39,7 +39,9 @@ const CRITICAL = [
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
-const DEVELOPMENT = [TEST_BASE_DIR + 'reports/createAndDeleteReport.test.js'];
+const DEVELOPMENT = [
+  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
+  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',];
 
 module.exports = {
   SMOKE,
