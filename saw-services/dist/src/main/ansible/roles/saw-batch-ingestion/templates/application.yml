@@ -42,6 +42,10 @@ management:
   endpoint:
     health:
       show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: info, health, prometheus
 
 application:
     async:

@@ -8,12 +8,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -44,6 +47,12 @@ public class WebConfig extends WebMvcConfigurationSupport {
   @Override
   protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
     converters.add(jackson2HttpMessageConverter());
+    StringHttpMessageConverter converter = new StringHttpMessageConverter();
+    converter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
+    /* Workaround: Configure message converter for "text/plain" as
+     * required for Spring Boot Actuator Prometheus or
+     * "/actuator/prometheus" will respond with HTTP 406 */
+    converters.add(converter);
   }
 
 }

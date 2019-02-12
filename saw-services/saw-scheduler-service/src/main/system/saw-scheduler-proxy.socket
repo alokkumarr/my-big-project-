@@ -2,7 +2,7 @@
 Description=SAW Scheduler Proxy Socket
 
 [Socket]
-ListenStream=127.0.0.1:9600
+ListenStream=9600
 
 [Install]
 WantedBy=sockets.target

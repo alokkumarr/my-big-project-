@@ -2,7 +2,7 @@
 Description=SAW Export Proxy Socket
 
 [Socket]
-ListenStream=127.0.0.1:9400
+ListenStream=9400
 
 [Install]
 WantedBy=sockets.target
