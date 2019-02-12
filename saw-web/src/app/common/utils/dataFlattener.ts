@@ -13,6 +13,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as mapKeys from 'lodash/mapKeys';
+import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
 
 export function flattenPivotData(data, sqlBuilder) {
@@ -136,6 +137,13 @@ export function flattenReportData(data, analysis) {
       return accumulator;
     }, {})
   )(analysis.artifacts);
+
+  data = fpPipe(
+    fpMap(fpMapValues(value => {
+      return value === null ? 'null' : value;
+    }))
+  )(data);
+
   return data.map(row => {
     return mapKeys(row, (value, key) => {
       const hasAggregateFunction = key.includes('(') && key.includes(')');
