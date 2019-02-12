@@ -19,7 +19,6 @@ import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
@@ -31,8 +30,7 @@ import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 public class BisCronJobTest {
 
   private static final Logger logger = LoggerFactory.getLogger(BisCronJobTest.class);
-  @Mock
-  RetryTemplate retryTemplate;
+ 
 
   @Mock
   RestTemplate restTemplate;

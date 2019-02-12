@@ -71,6 +71,7 @@ public class BisServiceImplTest {
 		schJobDetail.setJobScheduleTime(new Date());
 		schJobDetail.setUserFullName("DDDD");
 		schJobDetail.setChannelId("123");
+		schJobDetail.setTimezone("UTC");
 
 		
 		scheduleKeys = new ScheduleKeys();
@@ -243,9 +244,9 @@ public class BisServiceImplTest {
 		Map<String, Object> resultMap = value.get(0);
 		Assert.assertEquals(resultMap.size(), 5);
 		Assert.assertEquals(resultMap.get("jobStatus"), "RUNNING");
-		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate());
+		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate().getTime());
 	}
 	
 	
@@ -263,9 +264,9 @@ public class BisServiceImplTest {
 		
 		Assert.assertEquals(resultMap.size(), 5);
 		Assert.assertEquals(resultMap.get("jobStatus"), "RUNNING");
-		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate());
+		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate().getTime());
 	}
 	
 	

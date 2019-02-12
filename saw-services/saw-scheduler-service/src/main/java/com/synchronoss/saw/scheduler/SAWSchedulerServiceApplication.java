@@ -11,10 +11,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
-import org.springframework.retry.annotation.EnableRetry;
 import info.faljse.SDNotify.SDNotify;
 
-@EnableRetry
 @SpringBootApplication
 public class SAWSchedulerServiceApplication extends SpringBootServletInitializer {
 
