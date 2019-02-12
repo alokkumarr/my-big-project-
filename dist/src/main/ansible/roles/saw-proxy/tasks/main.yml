@@ -42,3 +42,12 @@
     insertafter: '^ *application/'
 - name: Enable and start NGINX service
   systemd: name=nginx enabled=true state=started
+- name: Install Prometheus HAProxy exporter
+  yum: name=haproxy_exporter state=present
+- name: Install Prometheus HAProxy exporter environment file
+  template: src=haproxy_exporter dest=/etc/default/haproxy_exporter
+  notify:
+    - restart haproxy_exporter
+- name: Enable and start Prometheus HAProxy exporter
+  systemd: name=haproxy_exporter enabled=true state=started
+

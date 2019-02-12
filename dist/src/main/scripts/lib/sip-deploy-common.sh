@@ -45,6 +45,7 @@ ensure_role() {
         exit 1
     fi
 }
+ensure_role sip-admin
 ensure_role sip-rtis
 ensure_role sip-xdf
 ensure_role sip-a2
