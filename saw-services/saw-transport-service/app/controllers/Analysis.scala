@@ -925,19 +925,23 @@ class Analysis extends BaseController {
             case obj: java.math.BigInteger => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj: scala.math.BigInt => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj =>
-              if (obj == null ) {
-               JNull
+              /* Return NULL back to UI, if exists.
+                 if value is null in row for a column then report formatter unable to find the corresponding datatype,
+                 since null having ambiguity with object type and throws exception Unsupported data type in result.
+                 Use case handled with null check.
+               */
+              if (obj == null) {
+                JNull
               }
-              else  {
-              throw new RuntimeException(
-                "Unsupported data type in result: " + dataType
-                  + ", object class: " + obj.getClass.getName)
+              else {
+                throw new RuntimeException(
+                  "Unsupported data type in result: " + dataType
+                    + ", object class: " + obj.getClass.getName)
               }
           }
         })
       ).toList
       )
-
     }
     ).toList)
   }
