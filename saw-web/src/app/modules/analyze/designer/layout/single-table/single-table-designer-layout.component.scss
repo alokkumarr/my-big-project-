@@ -10,6 +10,10 @@
     / 25% 75%;
 }
 
+.analysis-content {
+  overflow: hidden;
+}
+
 .designer {
   &__data-settings {
     grid-area: data-settings;
