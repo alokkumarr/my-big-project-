@@ -64,10 +64,8 @@
   </properties>
   <repositories>
     <repository>
-      <id>mapr-maven</id>
-      <url>http://repository.mapr.com/maven</url>
-      <releases><enabled>true</enabled></releases>
-      <snapshots><enabled>false</enabled></snapshots>
+      <id>synchronoss</id>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
 

@@ -265,20 +265,13 @@
   <!--/dependencyManagement-->
   <repositories>
     <repository>
+      <id>synchronoss</id>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+    </repository>
+    <repository>
       <id>client-releases</id>
       <name>SNCR Repository</name>
       <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
-    </repository>
-    <repository>
-      <id>mapr-releases</id>
-<!--      <url>http://repository.mapr.com/maven/</url> -->
-      <url>http://repository.mapr.com/maven/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
     </repository>
     <repository>
       <id>typesafe-releases</id>

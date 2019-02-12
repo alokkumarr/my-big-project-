@@ -55,12 +55,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <repositories>
-        <repository>
-            <id>mapr-maven</id>
-            <url>http://repository.mapr.com/maven</url>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-        </repository>
+      <repository>
+        <id>synchronoss</id>
+        <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+      </repository>
         <repository>
             <id>maven2-repo</id>
             <url>http://repo1.maven.apache.org/maven2</url>
