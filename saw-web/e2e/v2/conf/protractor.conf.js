@@ -112,10 +112,10 @@ exports.config = {
      */
     development: testSuites.DEVELOPMENT
   },
-  onCleanUp: (results)=> {
+  onCleanUp: (results) => {
     retry.onCleanUp(results);
   },
-  onPrepare:() =>{
+  onPrepare: () => {
     retry.onPrepare();
 
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
@@ -202,18 +202,17 @@ exports.config = {
       // delete and create new always
       fs.unlinkSync('target/e2e/e2eId.json');
     }
-
     SuiteSetup.failedTestDataForRetry();
 
     let retryStatus = retry.afterLaunch(maxRetriesForFailedTests);
-    if(retryStatus === 1) {
+    if (retryStatus === 1) {
       // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
       logger.error('There are some failures hence marking test suite failed');
       // TODO: Convert testResult json to junit.xml file
       SuiteSetup.convertJsonToJunitXml();
       process.exit(1); // this will mark build failure as well
 
-    } else if(retryStatus === 0) {
+    } else if (retryStatus === 0) {
       // retryStatus 0 means there are no failures
       // TODO: Convert testResult json to junit.xml file
       SuiteSetup.convertJsonToJunitXml();
