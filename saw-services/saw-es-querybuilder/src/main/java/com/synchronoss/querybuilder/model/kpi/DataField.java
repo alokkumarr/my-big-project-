@@ -1,15 +1,14 @@
 
 package com.synchronoss.querybuilder.model.kpi;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.*;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -105,6 +104,7 @@ public class DataField {
         MIN("min"),
         MAX("max"),
         COUNT("count"),
+        DISTINCT_COUNT("distinctCount"),
         PERCENTAGE("percentage");
         private final String value;
         private final static Map<String, DataField.Aggregate> CONSTANTS = new HashMap<String, DataField.Aggregate>();
