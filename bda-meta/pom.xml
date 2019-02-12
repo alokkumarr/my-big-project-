@@ -154,17 +154,6 @@
   <!--/dependencyManagement-->
   <repositories>
     <repository>
-      <id>mapr-releases</id>
-<!--      <url>http://repository.mapr.com/maven/</url> -->
-      <url>http://repository.mapr.com/maven/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
       <id>typesafe-releases</id>
       <url>http://repo.typesafe.com/typesafe/releases/</url>
     </repository>
@@ -186,6 +175,10 @@
         <enabled>true</enabled>
       </snapshots>
       <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+    <repository>
+      <id>synchronoss</id>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
   <modules>
