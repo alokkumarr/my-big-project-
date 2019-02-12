@@ -1,0 +1,67 @@
+<html>
+  <head>
+{{ template "prom_console_head" }}
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-static-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ pathPrefix }}/">Prometheus</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="{{ pathPrefix }}/consoles/index.html">Consoles</a></li>
+            <li><a href="{{ pathPrefix }}/alerts">Alerts</a></li>
+            <li><a href="{{ pathPrefix }}/graph">Graph</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+{{ template "prom_content_head" . }}
+    <h1>Health<h1>
+    <table class="table table-condensed table-striped table-bordered" style="width: 0%">
+      <tr>
+        <th>Instance</th>
+        <th>Status</th>
+      </tr>
+{{ range query "spring_boot_actuator_health_status{job='spring'}" | sortByLabel "instance" }}
+      <tr>
+        <td>{{ .Labels.instance }}</td>
+        <td{{ if eq (. | value) 0.0 }} style="background-color: greenyellow">OK {{ else }} class="alert-danger">FAIL{{ end }} (status: {{ template "prom_query_drilldown" (args (printf "spring_boot_actuator_health_status{job='spring',instance='%s'}" .Labels.instance)) }})</td>
+      </tr>
+{{ end }}
+    </table>
+{{ template "prom_content_tail" . }}
+
+{{ template "prom_content_head" . }}
+    <h1>Load</h1>
+    <div id="queryGraphLoad"></div>
+    <script>
+      new PromConsole.Graph({
+        node: document.querySelector("#queryGraphLoad"),
+        expr: "node_load5"
+      })
+    </script>
+{{ template "prom_content_tail" . }}
+
+{{ template "prom_content_head" . }}
+    <h1>Disk</h1>
+    <div id="queryGraphDiskFree"></div>
+    <script>
+      new PromConsole.Graph({
+	node: document.querySelector("#queryGraphDiskFree"),
+	expr: "node_filesystem_free_bytes{mountpoint='/'}",
+	yTitle: "Free"
+      })
+    </script>
+{{ template "prom_content_tail" . }}
+
+  </body>
+</html>
