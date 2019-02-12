@@ -55,6 +55,16 @@ class AnalyzePage extends CreateAnalysisModel {
           `//*[@class="toast-message" and contains(text(),"${message}")]`
         )
       );
+    this._labelNames = name => element(by.xpath(`//div[text()="${name}"]`));
+    this._analyzeTypeSelector = elemenet(
+      by.xpath(`//*[contains(@class,"select-form-field")]`)
+    ); //[e2e="analyze-type-selector"]
+    this._analysisType = name =>
+      element(
+        by.xpath(
+          `//span[@class="mat-option-text" and contains(text(),"${name}")]`
+        )
+      );
   }
 
   goToView(viewName) {
@@ -101,11 +111,6 @@ class AnalyzePage extends CreateAnalysisModel {
 
   verifyElementPresent(myElement, isExist, message) {
     expect(myElement.isPresent()).toBe(isExist, message);
-    // element(
-    //   myElement.isPresent().then(function(isVisible) {
-    //     expect(isVisible).toBe(isExist, message);
-    //   })
-    // );
   }
 
   closeOpenedActionMenuFromCardView() {
@@ -146,6 +151,22 @@ class AnalyzePage extends CreateAnalysisModel {
   verifyAnalysisDeleted(name) {
     commonFunctions.waitFor.pageToBeReady(/analyze/);
     expect(this._analysisTitleLink(name).isPresent()).toBeFalsy();
+  }
+
+  verifyLabels(labels) {
+    labels.forEach(label => {
+      commonFunctions.waitFor.elementToBeVisible(this._labelNames(label));
+    });
+  }
+
+  clickOnAnalysisTypeSelector() {
+    commonFunctions.clickOnElement(this._analyzeTypeSelector);
+  }
+
+  verifyAnalysisTypeOptions(options) {
+    options.forEach(option => {
+      commonFunctions.waitFor.elementToBeVisible(this._analysisType(option));
+    });
   }
 }
 module.exports = AnalyzePage;
