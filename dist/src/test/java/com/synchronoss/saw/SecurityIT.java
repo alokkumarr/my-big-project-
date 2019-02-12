@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Integration test that test the Security Service.
  */
@@ -36,6 +35,18 @@ public class SecurityIT extends BaseIT {
       .when().post("/security/auth/admin/cust/manage/categories/add")
       .then().assertThat().statusCode(200)
       .body("valid", equalTo(true));
+  }
+
+  @Test
+  public void testModulePrivileges() {
+    given(authSpec)
+      .when().get("/security/auth/admin/modules/module-privileges")
+      .then().assertThat().statusCode(200);
+
+    given(authSpec)
+      .when().get("/security/auth/admin/modules/module-privileges/1")
+      .then().assertThat().statusCode(200);
+
   }
 
   @Test

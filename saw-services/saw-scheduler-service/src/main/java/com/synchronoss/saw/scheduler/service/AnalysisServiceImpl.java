@@ -73,7 +73,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
         String[] latestexection = findLatestExecution(executionBeans);
         Date date = new Date(Long.parseLong(latestexection[1]));
-        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ssZ");
         format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         String formatted = format.format(date);
         DispatchBean execution;

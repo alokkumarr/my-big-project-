@@ -4,3 +4,6 @@ ending in `.pum` are rendered using [PlantUML].
 
 [Asciidoctor]: http://asciidoctor.org/
 [PlantUML]: http://plantuml.com/
+
+To render documentation locally, see the commands in the "Rendering
+documentation" section in `doc/development.md`.

@@ -140,6 +140,7 @@ public class Column {
         MIN("min"),
         MAX("max"),
         COUNT("count"),
+        DISTINCT_COUNT("distinctCount"),
         PERCENTAGE("percentage");
         private final String value;
         private final static Map<String, Column.Aggregate> CONSTANTS = new HashMap<>();

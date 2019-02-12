@@ -2,9 +2,9 @@ import cronstrue from 'cronstrue';
 import * as isEmpty from 'lodash/isEmpty';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isString from 'lodash/isString';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 
-export function generateSchedule(cronExpression, activeTab) {
+export function generateSchedule(cronExpression, activeTab, timezone) {
   if (isUndefined(cronExpression) && isUndefined(activeTab)) {
     return '';
   } else if (activeTab === 'immediate') {
@@ -20,41 +20,17 @@ export function generateSchedule(cronExpression, activeTab) {
   }
   if (activeTab === 'hourly') {
     // there is no time stamp in hourly cron hence converting to utc and local is not required.
-    const localMinuteCron = extractMinute(cronExpression);
-    return cronstrue.toString(localMinuteCron);
+    return cronstrue.toString(cronExpression);
   }
-  const localCron = convertToLocal(cronExpression);
+  const localCron = convertToLocal(cronExpression, timezone);
   return cronstrue.toString(localCron);
 }
 
-function extractMinute(CronUTC) {
-  const splitArray = CronUTC.split(' ');
-  const date = new Date();
-  const hour = parseInt(moment().format('HH'), 10);
-  date.setUTCHours(hour, splitArray[1]);
-  const UtcTime = moment
-    .utc(date)
-    .local()
-    .format('mm')
-    .split(' ');
-  splitArray[1] = UtcTime[0];
-  if (UtcTime[0] === 'Invalid') {
-    return CronUTC;
-  } else {
-    return splitArray.join(' ');
-  }
-}
-
-function convertToLocal(CronUTC) {
-  const splitArray = CronUTC.split(' ');
-  const date = new Date();
-  date.setUTCHours(splitArray[2], splitArray[1]);
-  const UtcTime = moment
-    .utc(date)
-    .local()
-    .format('mm HH')
-    .split(' ');
-  splitArray[1] = UtcTime[0];
-  splitArray[2] = UtcTime[1];
+export function convertToLocal(cronUTC, timezone) {
+  const splitArray = cronUTC.split(' ');
+  const timeInLocal = moment.tz(`${splitArray[1]} ${splitArray[2]}`, 'mm HH', timezone || 'Etc/GMT').toDate();
+  const extractMinuteHour = moment(timeInLocal).format('mm HH').split(' ');
+  splitArray[1] = extractMinuteHour[0];
+  splitArray[2] = extractMinuteHour[1];
   return splitArray.join(' ');
 }

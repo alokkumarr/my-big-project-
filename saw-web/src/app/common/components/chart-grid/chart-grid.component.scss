@@ -22,4 +22,11 @@ $header-font-size: 18px;
   .mat-icon.active {
     color: $primary-blue-b2;
   }
+  .chart-data-grid {
+    height: 100%;
+
+    dx-data-grid {
+      height: calc(100% - 45px);
+    }
+  }
 }
