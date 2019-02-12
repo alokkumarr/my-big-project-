@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss")
+@ComponentScan("com.synchronoss.saw.storage.proxy")
 public class SAWStorageServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SAWStorageServiceApplication.class);
   public static void main(String[] args) {

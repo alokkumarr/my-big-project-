@@ -175,6 +175,11 @@
       <version>0.1.54</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
 	</dependencies>
 
 	<build>

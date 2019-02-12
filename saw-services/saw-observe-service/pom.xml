@@ -140,6 +140,11 @@
       <artifactId>meta-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
 	<build>
 		<plugins>
