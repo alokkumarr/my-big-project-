@@ -1,19 +1,18 @@
 package com.synchronoss.querybuilder.chart;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class ChartJsonStructureUnitTest {
 
@@ -79,6 +78,7 @@ public class ChartJsonStructureUnitTest {
     || (sqlBuilderNodeChart.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("max"))
     || (sqlBuilderNodeChart.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("min")) 
     || (sqlBuilderNodeChart.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("count"))
+    || (sqlBuilderNodeChart.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("distinctCount"))
     || (sqlBuilderNodeChart.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("avg")));
   }
   

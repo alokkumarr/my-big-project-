@@ -97,243 +97,118 @@
       </plugin>
       <!-- RPM plugin -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rpm-maven-plugin</artifactId>
-        <version>2.1.5</version>
-        <configuration>
-          <license>Synchronoss proprietary code</license>
-          <distribution>XDF-${rpm.version}</distribution>
-          <needarch>false</needarch>
-          <targetOS>i386-linux</targetOS>
-          <group>SNCR/BDA</group>
-          <packager>BDA</packager>
-
-          <name>${rpm.name}</name>
-          <!-- version>${rpm.version}</version -->
-          <!--
-            Only applicable to a Mapping if filemode,
-            username, AND groupname are NOT populated.
-          -->
-          <defaultUsername>${app.user}</defaultUsername>
-          <defaultGroupname>${app.group}</defaultGroupname>
-          <defaultDirmode>755</defaultDirmode>
-          <defaultFilemode>444</defaultFilemode>
-          <!-- -->
-          <defineStatements>
-            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-          </defineStatements>
-          <mappings>
-            <!-- dirs -->
-            <mapping>
-              <directory>${app.optDir}</directory>
-            </mapping>
-            <mapping>
-              <directory>${app.optDir}/bin</directory>
-            </mapping>
-            <mapping>
-              <directory>${app.optDir}/conf</directory>
-            </mapping>
-            <mapping>
-              <directory>${app.optDir}/lib</directory>
-            </mapping>
-            <mapping>
-              <directory>${app.optDir}/test</directory>
-            </mapping>
-            <mapping>
-              <directory>${app.varDir}/log</directory>
-            </mapping>
-
-            <!-- bin files -->
-            <mapping>
-              <directory>${app.optDir}/bin</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>755</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>./bin</location>
-                  <includes>
-                    <include>app_env</include>
-                    <include>execute-component.sh</include>
-                    <include>execute-ng-component.sh</include>
-                    <include>test-ng-component.sh</include>
-                    <include>mk_conf.sh</include>
-                    <include>mk_csv.sh</include>
-                    <include>xdf_activate.sh</include>
-                    <include>xdf-mdcli.sh</include>
-                    <include>create-metadata.sh</include>
-                  </includes>
-                </source>
-              </sources>
-            </mapping>
-
-            <!-- bin/templates files with filter -->
-            <mapping>
-              <directory>${app.optDir}/bin/templates</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>0644</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>./bin/templates/xdf_info.template</location>
-                  <filter>true</filter>
-                </source>
-                <source>
-                  <location>./bin/templates/xdf-nextgen.vars.changeme</location>
-                  <destination>${app.name}.vars.changeme</destination>
-                </source>
-              </sources>
-            </mapping>
-
-            <!-- conf files -->
-            <mapping>
-              <directory>${app.optDir}/conf</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>644</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>./conf</location>
-                  <includes>
-                    <include>log4j.*</include>
-                    <include>logback.xml</include>
-                  </includes>
-                </source>
-              </sources>
-            </mapping>
-
-            <!-- lib files -->
-            <mapping>
-              <directory>${app.optDir}/lib</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>444</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources><source>
-                  <location>./target/xdf-${project.version}-full.jar</location>
-              </source></sources>
-            </mapping>
-
-            <!-- test files -->
-            <mapping>
-              <directory>${app.optDir}/test</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>755</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources><source>
-                <location>./test</location>
-                <includes><include>*.sh</include></includes>
-              </source></sources>
-            </mapping>
-            <!-- same dir, different perms -->
-            <mapping>
-              <directory>${app.optDir}/test</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>444</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources><source>
-                <location>./test</location>
-                <excludes><exclude>*.sh</exclude></excludes>
-              </source></sources>
-            </mapping>
-
-          </mappings>
-          <!-- Installation scripts -->
-          <!--preinstallScriptlet>
-            <script>
-echo PreInstall done: ${app.nameVer}
-            </script>
-          </preinstallScriptlet-->
-          <requires>
-	          	<require>
-	          	 jq
-	          	</require>
-          </requires>
-          <postinstallScriptlet>
-            <script>
-echo PostInstall started: ${app.nameVer}
-(
-  cd ${app.optParDir} # /dfs/opt/bda
-  rm -f ${app.name}-current
-  ln -s ${app.name}/${app.nameVer} ${app.name}-current
-)
-echo Soft link created:
-ls -l ${app.optParDir}/${app.name}-current
-#
-tf=( ${app.optDir}/test/* )
-if [[ $tf ]]; then
-  echo Test directory contains ${#tf[*]} files
-fi
-#
-act_cmd='su ${app.user} -c ${app.optDir}/bin/xdf_activate.sh'
-if [[ -f /etc/bda/${app.name}.vars ]] ; then
-  echo '# Activate ${app.nameVer}'
-  $act_cmd || {
-    echo '#NB# Activation completed with error'
-    echo '#    Fix the problem and execute manual activation:'
-    echo &quot;$ $act_cmd&quot;
-  }
-else
-  mkdir -p /etc/bda
-  cp ${app.optDir}/bin/templates/${app.name}.vars.changeme /etc/bda
-  echo '#NB# Activation skipped - no vars file provided'
-  echo '#    Create vars file: /etc/bda/${app.name}.vars'
-  echo '#    from /etc/bda/${app.name}.vars.changeme'
-  echo '#    and execute manual activation:'
-  echo &quot;$ $act_cmd&quot;
-fi
-echo PostInstall done: ${app.nameVer}
-            </script>
-          </postinstallScriptlet>
-          <preremoveScriptlet>
-            <script>
-echo PreRemove started: ${app.nameVer}
-echo Remove soft link
-rm -f ${app.optParDir}/${app.name}-current
-echo PreRemove done: ${app.nameVer}
-            </script>
-          </preremoveScriptlet>
-        </configuration>
+        <groupId>de.dentrassi.maven</groupId>
+        <artifactId>rpm</artifactId>
+        <version>1.1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>rpm</goal>
+            </goals>
+            <configuration>
+              <packageName>sip-xdf</packageName>
+              <version>${revision.nodash}</version>
+              <requires>
+                <require>jq &gt;= 1.5</require>
+              </requires>
+              <rulesets>
+                <ruleset>
+                  <id>default</id>
+                  <rules>
+                    <rule>
+                      <when>
+                        <prefix>/opt/sip/sip-xdf/bin/</prefix>
+                      </when>
+                      <mode>0755</mode>
+                    </rule>
+                    <rule>
+                      <when>
+                        <prefix>/opt/sip/sip-xdf/test/</prefix>
+                      </when>
+                      <mode>0755</mode>
+                    </rule>
+                  </rules>
+                </ruleset>
+              </rulesets>
+              <entries>
+                <entry>
+                  <name>/opt/sip/sip-xdf</name>
+                  <directory>true</directory>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/bin</name>
+                  <directory>true</directory>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/bin</name>
+                  <collect>
+                    <from>bin</from>
+                    <excludes>
+                      <exclude>templates</exclude>
+                      <exclude>xdf_info</exclude>
+                    </excludes>
+                  </collect>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/conf</name>
+                  <directory>true</directory>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/conf</name>
+                  <collect>
+                    <from>conf</from>
+                  </collect>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/lib</name>
+                  <directory>true</directory>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/lib/xdf-${project.version}-full.jar</name>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}-full.jar</file>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/test</name>
+                  <directory>true</directory>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-xdf/test</name>
+                  <collect>
+                    <from>test</from>
+                  </collect>
+                  <ruleset>default</ruleset>
+                </entry>
+              </entries>
+              <signature>
+                <skip>true</skip>
+              </signature>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!-- RPM plugin : end -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
+              </descriptors>
+              <finalName>sip-xdf-${project.version}</finalName>
+              <!-- Enable long file names without Maven warning -->
+              <tarLongFileMode>posix</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-  <!-- Workaround: This project uses the rpm-maven-plugin, which
-       requires RPM tools to be installed.  It should be migrated to
-       using the Java RPM builder.  Until then, put building RPMs
-       behind a profile actived only for continuous integration buils.
-       -->
-  <profiles>
-    <profile>
-      <id>all-modules</id>
-      <activation>
-        <property>
-          <name>sip.modules</name>
-          <value>all</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>rpm-maven-plugin</artifactId>
-            <version>2.1.5</version>
-            <executions>
-              <execution>
-                <id>xdf-rpm-build</id>
-                <goals>
-                  <goal>rpm</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

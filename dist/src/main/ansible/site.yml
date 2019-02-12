@@ -8,6 +8,8 @@
 - import_playbook: modules/saw-security/ansible/site.yml
 - import_playbook: modules/saw-services/ansible/site.yml
 - import_playbook: modules/saw-web/ansible/site.yml
+- import_playbook: modules/sip-xdf/ansible/site.yml
+- import_playbook: modules/sip-a2/ansible/site.yml
 - import_playbook: modules/sip-rtis/ansible/site.yml
 - import_playbook: modules/sip-rtps/ansible/site.yml
 - name: SAW Proxy

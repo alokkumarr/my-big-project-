@@ -16,8 +16,9 @@ module.exports = {
   cardViewButton: element(by.css('[e2e="analyze-card-view"]')),
   cardViewInput: element(by.css('[e2e="analyze-card-view"]')),
   listViewInput: element(by.css('[e2e="analyze-list-view"]')),
-  observeLink: element(by.xpath('//div[contains(text(),"OBSERVE")]')),
   progressbar: element(by.css('mat-progress-bar[mode="indeterminate"]')),
+  launcherButton: element(by.css('[class="header__module-launcher-button"]')),
+  observeLink: element(by.xpath('//a[contains(@class,"module-observe")]')),
 
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {

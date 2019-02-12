@@ -7,7 +7,8 @@ const logger = require('../../../../v2/conf/logger')(__filename);
 class DashboardFunctions {
   goToObserve() {
     try {
-      commonFunctions.waitFor.elementToBeVisible(homePage.observeLink);
+      commonFunctions.waitFor.elementToBeClickable(homePage.launcherButton);
+      homePage.launcherButton.click();
       commonFunctions.waitFor.elementToBeClickable(homePage.observeLink);
       homePage.observeLink.click();
     } catch (e) {

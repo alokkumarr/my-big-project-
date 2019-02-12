@@ -3,6 +3,7 @@ package com.synchronoss.saw.es;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.model.*;
 import com.synchronoss.saw.util.BuilderUtil;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -352,14 +353,22 @@ public class QueryBuilderUtil {
      * @param jsonNode
      * @return
      */
-    public static List<Object> buildReportData(JsonNode jsonNode)
+    public static List<Object> buildReportData(JsonNode jsonNode, List<Field> dataFields)
     {
         Iterator<JsonNode> recordIterator = jsonNode.get(HITS).get(HITS).iterator();
         List<Object> data = new ArrayList<>();
         while(recordIterator.hasNext())
         {
             JsonNode source = recordIterator.next();
-            data.add(source.get(_SOURCE));
+            ObjectNode row = source.get(_SOURCE).deepCopy();
+            // Add the missing columns in response for reports.
+            dataFields.forEach( field -> {
+                // Remove the .keyword if its string fields.
+                String fieldName= field.getColumnName().replace(".keyword","");
+                if (!row.has(fieldName))
+                    row.put(fieldName, "");
+            });
+            data.add(row);
         }
         return data;
     }

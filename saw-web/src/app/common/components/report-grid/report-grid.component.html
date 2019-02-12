@@ -42,7 +42,8 @@
         <mat-menu #aggregations="matMenu">
           <button class="report-options" mat-menu-item
                   *ngFor="let aggregateType of aggregates; trackBy: index"
-                  (click)="aggregateColumn(cell.column.payload, aggregateType.value)">
+                  (click)="aggregateColumn(cell.column.payload, aggregateType.value)"
+                  [ngClass]="cell.column.payload.aggregate === aggregateType.value ? 'highlight-aggregate' : ''">
             <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
             <span style="margin-left: 20px;">{{aggregateType.label}}</span>
           </button>

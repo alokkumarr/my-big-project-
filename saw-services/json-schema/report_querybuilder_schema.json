@@ -28,6 +28,7 @@
                     "min",
                     "max",
                     "count",
+                    "distinctCount",
                     "percentage"
                   ],
                   "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/aggregate",

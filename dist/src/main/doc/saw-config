@@ -175,6 +175,16 @@ sip-host3
 # Alternative MariaDB YUM repository URL
 #sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
 
+[sip-xdf]
+sip-host1
+sip-host2
+
+[sip-a2]
+# Note: A2 depends on XDF, so all hosts in the "sip-a2" role should
+# also be in the "sip-xdf" role
+sip-host1
+sip-host2
+
 [sip-rtis]
 sip-host1
 sip-host2
