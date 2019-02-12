@@ -1,4 +1,5 @@
-import * as moment from 'moment';
+// import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 
 let cronExpression = '';
 
@@ -14,34 +15,17 @@ export function convertToUtc(hourValue, minutes) {
   date.setHours(hourValue);
   date.setMinutes(minutes);
   return moment(date)
-    .utc()
+    .local()
     .format('mm HH');
 }
 
-export function convertToLocal(cronUTC) {
+export function convertToLocal(cronUTC, timezone) {
   const splitArray = cronUTC.split(' ');
-  const date = new Date();
-  date.setUTCHours(splitArray[2], splitArray[1]);
-  const UtcTime = moment
-    .utc(date)
-    .local()
-    .format('mm HH')
-    .split(' ');
-  splitArray[1] = UtcTime[0];
-  splitArray[2] = UtcTime[1];
+  const timeInLocal = moment.tz(`${splitArray[1]} ${splitArray[2]}`, 'mm HH', timezone || 'Etc/GMT').toDate();
+  const extractMinute = moment(timeInLocal).format('mm HH').split(' ');
+  splitArray[1] = extractMinute[0];
+  splitArray[2] = extractMinute[1];
   return splitArray.join(' ');
-}
-
-export function getLocalMinute(minute) {
-  const date = new Date();
-  const hour = parseInt(moment().format('HH'), 10);
-  date.setUTCHours(hour, minute);
-  const UtcTime = moment
-    .utc(date)
-    .local()
-    .format('mm HH')
-    .split(' ');
-  return parseInt(UtcTime[0], 10);
 }
 
 export function hourToCron(hour, hourType, minutes) {
@@ -55,12 +39,12 @@ export function hourToCron(hour, hourType, minutes) {
 }
 
 export function generateHourlyCron(hours, minutes) {
-  const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
-  const UTCMinute = fetchUTCMinute.split(' ');
+  // const fetchUTCMinute = convertToUtc(moment().format('HH'), minutes);
+  // const UTCMinute = fetchUTCMinute.split(' ');
   if (parseInt(hours, 10) === 0) {
     cronExpression = `0 0/${minutes} * 1/1 * ? *`;
   } else {
-    cronExpression = `0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
+    cronExpression = `0 ${minutes} 0/${hours} 1/1 * ? *`;
   }
   return isValid(cronExpression) ? cronExpression : '';
 }

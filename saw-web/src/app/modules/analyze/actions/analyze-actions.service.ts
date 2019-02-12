@@ -153,6 +153,17 @@ export class AnalyzeActionsService {
   }
 
   removeAnalysis(analysis) {
+    // Delete schedule if exists
+    if (analysis.schedule) {
+      const deleteScheduleBody = {
+        scheduleState: 'delete',
+        jobName: analysis.id,
+        groupName: analysis.customerCode,
+        categoryId: analysis.categoryId
+      };
+      analysis.schedule = deleteScheduleBody;
+      this._analyzeService.changeSchedule(analysis);
+    }
     return this._analyzeService.deleteAnalysis(analysis).then(
       () => {
         this._toastMessage.info('Analysis deleted.');
