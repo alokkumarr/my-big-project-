@@ -1,0 +1,5 @@
+- name: Copy A2 package
+  copy: src="{{ item }}" dest=/tmp/sip-a2.rpm
+  with_fileglob: ["../rpms/a2modules-*.rpm"]
+- name: Install A2 package
+  yum: name=/tmp/sip-a2.rpm state=present

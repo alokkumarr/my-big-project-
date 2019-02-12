@@ -148,6 +148,14 @@ saw_security_email_host=sip-admin
 [saw-security-arbitrator]
 sip-app3
 
+[sip-xdf]
+sip-app1
+sip-app2
+
+[sip-a2]
+sip-app1
+sip-app2
+
 [sip-rtis]
 sip-app1
 sip-app2

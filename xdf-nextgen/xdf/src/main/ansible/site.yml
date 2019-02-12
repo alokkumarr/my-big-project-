@@ -1,0 +1,5 @@
+- name: XDF
+  hosts: sip-xdf
+  become: true
+  roles:
+    - sip-xdf
