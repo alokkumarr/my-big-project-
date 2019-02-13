@@ -20,8 +20,7 @@ class PromptFilterFunctions {
   ) {
     try {
       let _self = this;
-      //From analysis listview page
-      //From analysis card page
+      //  From analysis listview page
       browser.ignoreSynchronization = false;
       analyzePage.navigateToHome();
       browser.ignoreSynchronization = true;
@@ -30,15 +29,12 @@ class PromptFilterFunctions {
         subCategoryName,
         defaultCategory
       );
-      //Change to list View.
+      //  Change to list View.
       element(
         utils
           .hasClass(homePage.listViewInput, 'mat-radio-checked')
           .then(function(isPresent) {
-            if (isPresent) {
-              //console.log('Already in list view..')
-            } else {
-              //console.log('Not in list view..')
+            if (!isPresent) {
               commonFunctions.waitFor.elementToBeVisible(
                 analyzePage.analysisElems.listView
               );
@@ -66,7 +62,7 @@ class PromptFilterFunctions {
         );
         savedAlaysisPage.executeMenuOption.click();
       } else {
-        //Open the created analysis.
+        //  Open the created analysis.
         const analysisName = analyzePage.listViewItem(name);
         commonFunctions.waitFor.elementToBeVisible(analysisName);
         commonFunctions.waitFor.elementToBeClickable(analysisName);
@@ -88,7 +84,7 @@ class PromptFilterFunctions {
   ) {
     try {
       let _self = this;
-      //From analysis card page
+      //  From analysis card page
       browser.ignoreSynchronization = false;
       analyzePage.navigateToHome();
       browser.ignoreSynchronization = true;
@@ -97,15 +93,12 @@ class PromptFilterFunctions {
         subCategoryName,
         defaultCategory
       );
-      //Change to Card View.
+      //  Change to Card View.
       element(
         utils
           .hasClass(homePage.cardViewInput, 'mat-radio-checked')
           .then(function(isPresent) {
             if (isPresent) {
-              //console.log('Already in card view..')
-            } else {
-              //console.log('Not in card view..')
               commonFunctions.waitFor.elementToBeVisible(
                 analyzePage.analysisElems.cardView
               );
@@ -133,7 +126,7 @@ class PromptFilterFunctions {
         );
         savedAlaysisPage.executeMenuOption.click();
       } else {
-        //Open the created analysis.
+        //  Open the created analysis.
         const analysisName = analyzePage.main.getCardTitle(name);
         commonFunctions.waitFor.elementToBeVisible(analysisName);
         commonFunctions.waitFor.elementToBeClickable(analysisName);
@@ -155,10 +148,10 @@ class PromptFilterFunctions {
   ) {
     try {
       let _self = this;
-      //Execute the analysis from detail/view page and verify it asks for prompt filter
+      //  Execute the analysis from detail/view page and verify it asks for prompt filter
       browser.waitForAngular();
-      browser.sleep(5000); //This is required
-      //From analysis card page
+      browser.sleep(5000); // This is required
+      //  From analysis card page
       browser.ignoreSynchronization = false;
       analyzePage.navigateToHome();
       browser.ignoreSynchronization = true;
@@ -180,7 +173,7 @@ class PromptFilterFunctions {
               );
               analyzePage.analysisElems.cardView.click();
             }
-            //Open the created analysis.
+            // Open the created analysis.
             const analysisName = analyzePage.main.getCardTitle(name);
             commonFunctions.waitFor.elementToBeVisible(analysisName);
             commonFunctions.waitFor.elementToBeClickable(analysisName);
@@ -238,7 +231,7 @@ class PromptFilterFunctions {
       expect(analyzePage.prompt.selectedField.getAttribute('value')).toEqual(
         data.fieldName
       );
-      //apply filters and execute
+      // apply filters and execute
       _self.setFilterValue(data.fieldType, data.operator, data.value);
     } catch (e) {
       console.log(e);
@@ -247,7 +240,7 @@ class PromptFilterFunctions {
 
   setFilterValue(fieldType, operator, value1) {
     try {
-      // Scenario for dates
+      //  Scenario for dates
       const filterWindow = designModePage.filterWindow;
       if (fieldType === 'date') {
         commonFunctions.waitFor.elementToBeClickable(
@@ -260,7 +253,7 @@ class PromptFilterFunctions {
         filterWindow.date.presetDropDownItem(value1).click();
       }
 
-      // Scenario for numbers
+      //  Scenario for numbers
       if (fieldType === 'number') {
         commonFunctions.waitFor.elementToBeClickable(
           filterWindow.number.operator
@@ -275,7 +268,7 @@ class PromptFilterFunctions {
         filterWindow.number.input.clear().sendKeys(value1);
       }
 
-      // Scenario for strings
+      //  Scenario for strings
       if (fieldType === 'string') {
         commonFunctions.waitFor.elementToBeClickable(
           filterWindow.string.operator
@@ -285,7 +278,7 @@ class PromptFilterFunctions {
           filterWindow.string.operatorDropDownItem(operator)
         );
         filterWindow.string.operatorDropDownItem(operator).click();
-        // Select different input for Is in and Is not in operator TODO: we should be consistent
+        //  Select different input for Is in and Is not in operator TODO: we should be consistent
         if (operator === 'Is in' || operator === 'Is not in') {
           commonFunctions.waitFor.elementToBeVisible(
             filterWindow.string.isInIsNotInInput
@@ -341,7 +334,7 @@ class PromptFilterFunctions {
         subCategoryName,
         defaultCategory
       );
-      //Change to Card View.
+      // Change to Card View.
       commonFunctions.waitFor.elementToBeVisible(
         analyzePage.analysisElems.cardView
       );
@@ -349,18 +342,18 @@ class PromptFilterFunctions {
         analyzePage.analysisElems.cardView
       );
       analyzePage.analysisElems.cardView.click();
-      //Open the created analysis.
+      // Open the created analysis.
       const createdAnalysis = analyzePage.main.getCardTitle(name);
       commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
       commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
       createdAnalysis.click();
-      //get analysis id from current url
+      // get analysis id from current url
       browser.getCurrentUrl().then(url => {
         analysisId = commonFunctions.getAnalysisIdFromUrl(url);
       });
       commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
       savedAlaysisPage.editBtn.click();
-      //apply filters
+      // apply filters
       const filters = analyzePage.filtersDialogUpgraded;
       const filterAC = filters.getFilterAutocomplete(0);
 
@@ -385,7 +378,7 @@ class PromptFilterFunctions {
       commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
       filters.applyBtn.click();
       browser.sleep(1000);
-      //TODO: Need to check that filters applied or not.
+      // TODO: Need to check that filters applied or not.
       commonFunctions.waitFor.elementToBeVisible(
         analyzePage.appliedFiltersDetails.filterText
       );
@@ -396,7 +389,7 @@ class PromptFilterFunctions {
         analyzePage.appliedFiltersDetails.selectedFiltersText
       );
       _self.validateSelectedFilters([fieldName]);
-      //Save
+      // Save
       const save = analyzePage.saveDialog;
       const designer = analyzePage.designerDialog;
       commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
