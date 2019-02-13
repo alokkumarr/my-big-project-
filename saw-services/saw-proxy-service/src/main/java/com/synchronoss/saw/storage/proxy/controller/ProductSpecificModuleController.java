@@ -41,7 +41,7 @@ public class ProductSpecificModuleController {
         }
         catch (JsonParseException jse)  {
             logger.error("Can't parse String to Json, JsonParseException occurred!\n");
-            jse.printStackTrace();
+            logger.error(jse.getStackTrace().toString());
             return null;
         }
     }
