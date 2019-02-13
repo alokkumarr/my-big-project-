@@ -3,7 +3,6 @@
   become: true
   roles:
     - saw-transport
-    - saw-gateway
     - saw-workbench
     - saw-export
     - saw-observe
@@ -11,3 +10,8 @@
     - saw-storage-proxy
     - saw-semantic
     - saw-batch-ingestion
+    # Keep Gateway Service last to avoid starting socket-activated
+    # services from the health check until all Ansible handlers have
+    # been run (which might otherwise cause unnecessary restarts of
+    # services and slow down deployment)
+    - saw-gateway
