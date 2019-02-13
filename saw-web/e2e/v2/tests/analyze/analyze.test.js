@@ -41,14 +41,14 @@ describe('Executing analyze tests from analyze.test.js', () => {
         new LoginPage().loginAs(data.user);
         const analyzePage = new AnalyzePage();
         analyzePage.goToView('list');
-        analyzePage.verifyLabels(data.labels);
+        analyzePage.verifyLabels(data.verification.labels);
         analyzePage.verifyElementPresent(
           analyzePage._addAnalysisButton,
-          true,
+          data.verification.createButton,
           'add analysis button should be displayed'
         );
         analyzePage.clickOnAnalysisTypeSelector();
-        analyzePage.verifyAnalysisTypeOptions(data.options);
+        analyzePage.verifyAnalysisTypeOptions(data.verification.options);
 
         //End the test here
       }).result.testInfo = {

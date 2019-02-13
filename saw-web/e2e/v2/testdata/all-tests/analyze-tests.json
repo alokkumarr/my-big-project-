@@ -6,7 +6,7 @@
         "description": "check if all analysis options are displayed in list view by user",
         "verification": {
           "createButton": true,
-          "labels": ["NAMES","METRICS","SCHEDULE","TYPE","CREATOR","CREATED"],
+          "labels": ["NAME","METRICS","SCHEDULED","TYPE","CREATOR","CREATED"],
           "options": ["All","Chart","Report","Pivot","Scheduled"]
         }
       }

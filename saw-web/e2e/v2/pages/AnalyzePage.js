@@ -56,7 +56,7 @@ class AnalyzePage extends CreateAnalysisModel {
         )
       );
     this._labelNames = name => element(by.xpath(`//div[text()="${name}"]`));
-    this._analyzeTypeSelector = elemenet(
+    this._analyzeTypeSelector = element(
       by.xpath(`//*[contains(@class,"select-form-field")]`)
     ); //[e2e="analyze-type-selector"]
     this._analysisType = name =>
