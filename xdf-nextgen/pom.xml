@@ -268,38 +268,6 @@
       <id>synchronoss</id>
       <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
-    <repository>
-      <id>client-releases</id>
-      <name>SNCR Repository</name>
-      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
-    </repository>
-    <repository>
-      <id>typesafe-releases</id>
-      <url>http://repo.typesafe.com/typesafe/releases/</url>
-    </repository>
-    <repository>
-      <id>sonatype-releases</id>
-      <url>https://oss.sonatype.org/content/repositories/releases</url>
-    </repository>
-    <repository>
-      <id>sonatype-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
-    <repository>
-      <id>Restlet</id>
-      <url>http://maven.restlet.org/</url>
-    </repository>
-    <repository>
-      <id>eaio.com</id>
-      <url>http://eaio.com/maven2</url>
-    </repository>
-    <repository>
-      <id>jsqlparser-snapshots</id>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <url>https://oss.sonatype.org/content/groups/public/</url>
-    </repository>
   </repositories>
   <modules>
     <module>xdf-core</module>
