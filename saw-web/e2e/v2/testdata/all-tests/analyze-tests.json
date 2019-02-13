@@ -6,8 +6,31 @@
         "description": "check if all analysis options are displayed in list view by user",
         "verification": {
           "createButton": true,
-          "labels": ["NAME","METRICS","SCHEDULED","TYPE","CREATOR","CREATED"],
-          "options": ["All","Chart","Report","Pivot","Scheduled"]
+          "labels": [
+            "NAME",
+            "METRICS",
+            "SCHEDULED",
+            "TYPE",
+            "CREATOR",
+            "CREATED"
+          ],
+          "options": ["All", "Chart", "Report", "Pivot", "Scheduled"]
+        }
+      },
+      "ANALY002": {
+        "user": "admin",
+        "description": "check if all analysis options are displayed in list view by amdin",
+        "verification": {
+          "createButton": true,
+          "labels": [
+            "NAME",
+            "METRICS",
+            "SCHEDULED",
+            "TYPE",
+            "CREATOR",
+            "CREATED"
+          ],
+          "options": ["All", "Chart", "Report", "Pivot", "Scheduled"]
         }
       }
     }
