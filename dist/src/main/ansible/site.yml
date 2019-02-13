@@ -23,3 +23,18 @@
   become: true
   roles:
     - saw-proxy
+# Workaround: The Semantic Service binary to JSON migration at service
+# startup fails silently.  Restarting the service seems to allow the
+# migration to succeed on a second attempt.  So add a restart at the
+# end of deployment as a temporary fix.  Remove this when the
+# migration has been properly fixed to succeed on the first
+# attempt. (SIP-6061)
+- name: Restart Semantic Service for binary to JSON migration
+  hosts: saw-services
+  become: true
+  tasks:
+    - name: Restart SAW Semantic Service
+      systemd: name=saw-semantic state=stopped daemon_reload=true
+      register: result
+      until: result is success
+      delay: 30
