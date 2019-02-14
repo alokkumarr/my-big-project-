@@ -353,7 +353,7 @@ included in the main development branch too (see [GitLab flow] for
 more details).
 
 [cherry-picked]: https://www.git-scm.com/docs/git-cherry-pick
-[GitLab flow]: https://docs.gitlab.com/ee/workflow/gitlab_flow.html
+[GitLab flow]: https://docs.gitlab.com/ee/workflow/gitlab_flow.html#release-branches-with-gitlab-flow
 
 # Rebuilding an older release
 
