@@ -17,6 +17,7 @@ import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
+import { checkNullinReportData } from './../../../common/utils/dataFlattener';
 
 @Injectable()
 export class AnalyzeExportService {
@@ -31,7 +32,7 @@ export class AnalyzeExportService {
     this._analyzeActionsService
       .exportAnalysis(analysisId, executionId, analysisType, executionType)
       .then(data => {
-        const exportData = get(data, 'data');
+        let exportData = get(data, 'data');
         let fields = this.getCheckedFieldsForExport(analysis, exportData);
         fields = this.checkColumnName(fields);
         const columnNames = map(fields, 'columnName');
@@ -45,6 +46,9 @@ export class AnalyzeExportService {
           },
           columnNames
         };
+
+        exportData = ['report', 'esReport'].includes(analysisType) ? checkNullinReportData(exportData) : exportData;
+
         json2csv(
           exportData,
           (err, csv) => {

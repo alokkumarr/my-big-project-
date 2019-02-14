@@ -124,6 +124,14 @@ export function flattenChartData(data, sqlBuilder) {
   )(data);
 }
 
+export function checkNullinReportData(data) {
+  return fpPipe(
+    fpMap(fpMapValues(value => {
+      return value === null ? 'null' : value;
+    }))
+  )(data);
+}
+
 export function flattenReportData(data, analysis) {
   if (analysis.edit) {
     return data;
@@ -137,13 +145,7 @@ export function flattenReportData(data, analysis) {
       return accumulator;
     }, {})
   )(analysis.artifacts);
-
-  data = fpPipe(
-    fpMap(fpMapValues(value => {
-      return value === null ? 'null' : value;
-    }))
-  )(data);
-
+  data = checkNullinReportData(data);
   return data.map(row => {
     return mapKeys(row, (value, key) => {
       const hasAggregateFunction = key.includes('(') && key.includes(')');
