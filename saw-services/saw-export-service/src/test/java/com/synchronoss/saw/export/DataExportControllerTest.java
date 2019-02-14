@@ -37,7 +37,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 @RunWith(SpringRunner.class)
 @WebMvcTest(DataExportController.class)
 @TestPropertySource(locations = "application-test.properties")
-@ComponentScan(basePackages = {"com.synchronoss"})
+@ComponentScan(basePackages = {"com.synchronoss.saw.export"})
 public class DataExportControllerTest {
 
 	@Rule

@@ -303,6 +303,27 @@
                </execution>
             </executions>
          </plugin>
+         <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-assembly-plugin</artifactId>
+           <version>3.1.1</version>
+           <executions>
+             <execution>
+               <phase>package</phase>
+               <goals>
+                 <goal>single</goal>
+               </goals>
+               <configuration>
+                 <descriptors>
+                   <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
+                 </descriptors>
+                 <finalName>sip-a2-${project.version}</finalName>
+                 <!-- Enable long file names without Maven warning -->
+                 <tarLongFileMode>posix</tarLongFileMode>
+               </configuration>
+             </execution>
+           </executions>
+         </plugin>
       </plugins>
    </build>
    <repositories>

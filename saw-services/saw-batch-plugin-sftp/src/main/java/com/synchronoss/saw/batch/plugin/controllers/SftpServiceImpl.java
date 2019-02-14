@@ -1092,7 +1092,7 @@ public class SftpServiceImpl extends SipPluginContract {
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
     int totalNoOfPages = IntegrationUtils.calculatePages(countOfRecords, retryPageSize);
-    logger.info("totalNoOfPages :" + totalNoOfPages);
+    logger.debug("totalNoOfPages :" + totalNoOfPages);
     for (int i = pageStart; i < totalNoOfPages; i++) {
       List<BisFileLog> logs =
           sipLogService.listOfRetryIds(retryDiff, i, retryPageSize, "checkpointDate");
@@ -1151,7 +1151,7 @@ public class SftpServiceImpl extends SipPluginContract {
         }
       } // end of second for loop
     } // end of first for loop
-    logger.info("recoverFromInconsistentState execution ends here");
+    logger.debug("recoverFromInconsistentState execution ends here");
   } 
 
   /**

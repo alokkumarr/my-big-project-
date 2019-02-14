@@ -8,7 +8,6 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import scala.Tuple4;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
@@ -21,6 +20,7 @@ import sncr.xdf.context.DSMapKey;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -301,7 +301,7 @@ public interface WithDataSetService {
                  /* Creating a dynamic directory, so that components running is parallel will not
                   * run into conflicts
                   */
-                .append(Path.SEPARATOR + new DateTime().getMillis());
+                .append(Path.SEPARATOR + Instant.now().toEpochMilli());
 
         DataSetServiceAux.logger.debug(String.format("Generated temp location: %s",
             tempLocationBuilder.toString()));

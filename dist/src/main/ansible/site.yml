@@ -5,11 +5,23 @@
   become: true
   roles:
     - saw-host
+    - sip-prometheus-node
 - import_playbook: modules/saw-security/ansible/site.yml
 - import_playbook: modules/saw-services/ansible/site.yml
 - import_playbook: modules/saw-web/ansible/site.yml
+- import_playbook: modules/sip-xdf/ansible/site.yml
+- import_playbook: modules/sip-a2/ansible/site.yml
 - import_playbook: modules/sip-rtis/ansible/site.yml
 - import_playbook: modules/sip-rtps/ansible/site.yml
+# Note: Keep Prometheus at the end to avoid starting socket-activated
+# services during metrics collection until all Ansible handlers have
+# been run (which might otherwise cause unnecessary restarts of
+# services and slow down deployment)
+- name: Admin
+  hosts: sip-admin
+  become: true
+  roles:
+    - sip-prometheus
 - name: SAW Proxy
   hosts: saw-proxy
   become: true
