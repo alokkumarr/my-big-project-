@@ -115,6 +115,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // set the appropriate config based on chart type
     this.chartSettingsType = this.getChartSettingsType(this.chartType);
     this.config = defaultsDeep(
+      {},
       options,
       this.config,
       get(

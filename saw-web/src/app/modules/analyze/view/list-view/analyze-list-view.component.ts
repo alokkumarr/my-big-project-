@@ -121,8 +121,8 @@ export class AnalyzeListViewComponent implements OnInit {
           if (!cron) {
             return '';
           }
-          const {cronExpression, activeTab} = cron.jobDetails;
-          return generateSchedule(cronExpression, activeTab);
+          const {cronExpression, activeTab, timezone} = cron.jobDetails;
+          return generateSchedule(cronExpression, activeTab, timezone);
         },
         width: '12%'
       },

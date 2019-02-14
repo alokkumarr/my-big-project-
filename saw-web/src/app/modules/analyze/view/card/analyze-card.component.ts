@@ -29,8 +29,8 @@ export class AnalyzeCardComponent implements OnInit {
       this.schedule = '';
       return;
     }
-    const {cronExpression, activeTab} = cron.jobDetails;
-    this.schedule = generateSchedule(cronExpression, activeTab);
+    const {cronExpression, activeTab, timezone} = cron.jobDetails;
+    this.schedule = generateSchedule(cronExpression, activeTab, timezone);
   }
 
   placeholderClass: string;

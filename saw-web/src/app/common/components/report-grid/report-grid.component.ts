@@ -314,7 +314,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, t => {
-        return t.value === 'count';
+        return t.value === 'count' || t.value === 'distinctCount';
       });
     }
   }
@@ -398,7 +398,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
         const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
         let type = column.type;
-        if (aggregate && ['count'].includes(aggregate.value)) {
+        if (aggregate && ['count', 'distinctCount'].includes(aggregate.value)) {
           type = aggregate.type || column.type;
           isNumberType = true;
         }

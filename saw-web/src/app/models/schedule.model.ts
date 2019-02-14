@@ -2,8 +2,8 @@ import { RepeatOnDaysOfWeek } from './repeat-on-days-of-week.model';
 
 export interface Schedule {
   repeatOnDaysOfWeek?: RepeatOnDaysOfWeek;
-  repeatInterval?:     number;
-  repeatUnit?:         string;
+  repeatInterval?: number;
+  repeatUnit?: string;
   categoryId?: number;
   groupName?: string;
   jobName?: string;
@@ -18,6 +18,7 @@ export interface Schedule {
   ftp?: string[];
   fileType?: string;
   endDate?: string;
+  timezone?: string;
   metricName?: string;
   type?: string;
   userFullName?: string;

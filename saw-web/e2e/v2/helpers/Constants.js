@@ -25,8 +25,18 @@ const LOG_LEVELS = {
   silly: 5
 };
 
+const SMOKE = 'smoke';
+const SANITY = 'sanity';
+const CRITICAL = 'critical';
+const REGRESSION = 'regression';
+const DEVELOPMENT = 'development';
+
 const E2E_OUTPUT_BASE_DIR='target/e2e';
 
 module.exports = {
-  ES_REPORT, PIVOT, REPORT, CHART, API_ROUTES,LOG_LEVELS,E2E_OUTPUT_BASE_DIR
+  ES_REPORT, PIVOT, REPORT, CHART, API_ROUTES,LOG_LEVELS,E2E_OUTPUT_BASE_DIR,SMOKE,
+  SANITY,
+  CRITICAL,
+  REGRESSION,
+  DEVELOPMENT
 };

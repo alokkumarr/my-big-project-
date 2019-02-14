@@ -238,6 +238,12 @@ following command:
 The output can be inspected in the `dist/target/generated-docs`
 directory.
 
+Note: When rendering the documentation locally, there might be
+warnings about missing files.  These warnings refer to documentation
+snippets generated automatically from integration test runs.  If you
+do not need to view those parts of the documentation, these warning
+can be disregarded.
+
 [dist/src/main/asciidoc]: dist/src/main/asciidoc
 
 # Continuous integration

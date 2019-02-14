@@ -38,9 +38,6 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     const token = this.jwt.getTokenObj();
     this.UserDetails = token;
     this.userInitials = this.getInitials(this.UserDetails.ticket.userFullName);
-    if (this.jwt.isAdmin()) {
-      this.showAdmin = true;
-    }
   }
 
   ngOnDestroy() {

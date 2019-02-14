@@ -33,3 +33,4 @@ bis:
   partial-file-timeDifference: 1000
   default-data-drop-location: /workbench
   recheck-file-modified: false
+  destination-fs-user: mapr

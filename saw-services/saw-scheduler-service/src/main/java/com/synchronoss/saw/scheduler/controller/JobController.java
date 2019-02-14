@@ -151,6 +151,8 @@ public class JobController extends BaseJobController{
 	public SchedulerResponse updateJob(@RequestBody SchedulerJobDetail jobDetail){
 		logger.info("JobController updateJob() method ");
 
+		logger.debug("Job details  = " + jobDetail);
+
 		//Job Name is mandatory
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
