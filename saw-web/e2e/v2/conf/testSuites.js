@@ -41,7 +41,8 @@ const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
-  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',];
+  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',
+];
 
 module.exports = {
   SMOKE,
