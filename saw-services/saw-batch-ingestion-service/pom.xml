@@ -30,6 +30,7 @@
 		<mariadb>2.3.0</mariadb>
 		<snotify>1.1</snotify>
 		<common.io>2.6</common.io>
+                <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -159,6 +160,17 @@
 			<groupId>com.synchronoss.saw</groupId>
 			<artifactId>saw-batch-log-service</artifactId>
 			<version>${revision}</version>
+		</dependency>
+                <dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>core</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+	  		<artifactId>hadoop-common</artifactId>
+	  		<version>${mapr.hadoop.client.version}</version>
+	  		<scope>provided</scope>
 		</dependency>
 
 		<!-- This is automated migration plugin -->
