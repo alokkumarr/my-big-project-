@@ -28,6 +28,10 @@ management:
   endpoint:
     health:
       show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: info, health, prometheus
 internal-analysis:
     service:
         host: http://localhost:9200

@@ -1,0 +1,5 @@
+- name: A2
+  hosts: sip-a2
+  become: true
+  roles:
+    - sip-a2
