@@ -2,6 +2,7 @@ package com.synchronoss.saw.storage.proxy.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.synchronoss.saw.storage.proxy.model.response.ProductModuleDocs;
 import com.synchronoss.saw.storage.proxy.model.response.Valid;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -114,20 +115,32 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
      * @return
      */
     @Override
-    public String getDocument(String tableName, String id) {
+    public ProductModuleDocs getDocument(String tableName, String id) {
         logger.debug("Calling ProductModuleMetaStore obj to read document with id : "+id);
         logger.debug("TableName :",tableName);
         JsonElement doc = null;
+        ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
             ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
             doc = productModuleMetaStore.read(id);
+            if (doc == null)    {
+                productModuleDocs.setValid(false);
+                productModuleDocs.setMessage("id given is not present");
+                logger.error(id," : not present in MaprDB");
+                return productModuleDocs;
+            }
+            productModuleDocs.setDoc(gson.toJson(doc));
+            productModuleDocs.setValid(true);
+            productModuleDocs.setMessage("Document Retrieved successfully");
             logger.debug("Retrieved Document = ",doc);
+            return productModuleDocs;
         } catch (Exception e) {
             logger.error("Failed to retrieve document,Exception occurred!");
             logger.error(e.getStackTrace().toString());
+            productModuleDocs.setValid(false);
+            productModuleDocs.setMessage("Failed to retrieve document!!");
+            return productModuleDocs;
         }
-
-        return gson.toJson(doc);
     }
 
     /**
@@ -137,16 +150,30 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
      * @return
      */
     @Override
-    public String getAllDocs(String tableName, Map<String, String> keyValues) {
+    public ProductModuleDocs getAllDocs(String tableName, Map<String, String> keyValues) {
         Map<String, Document> docs = null;
+        ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
             ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
             docs = productModuleMetaStore.searchAll(keyValues);
+            if (docs.isEmpty()) {
+                productModuleDocs.setValid(true);
+                productModuleDocs.setMessage("No documents present for given filters!!");
+                productModuleDocs.setDoc(gson.toJson((docs)));
+                return productModuleDocs;
+            }
+            productModuleDocs.setDoc(gson.toJson(docs));
+            productModuleDocs.setValid(true);
+            productModuleDocs.setMessage("Document Retrieved successfully!!");
+            return productModuleDocs;
         } catch (Exception e) {
             logger.error("Failed to retrieve document,Exception occurred!");
             logger.error(e.getStackTrace().toString());
+            productModuleDocs.setValid(false);
+            productModuleDocs.setMessage("Failed to retrieve documents!!");
+            return productModuleDocs;
         }
-            return gson.toJson(docs);
+
     }
 
     /**
@@ -155,15 +182,29 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
      * @return
      */
     @Override
-    public String getAllDocs(String tableName) {
+    public ProductModuleDocs getAllDocs(String tableName) {
         ProductModuleMetaStore productModuleMetaStore;
+        Map<String, Document> docs = null;
+        ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
             productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
-            return gson.toJson(productModuleMetaStore.searchAll());
+            docs = productModuleMetaStore.searchAll();
+            if (docs.isEmpty()) {
+                productModuleDocs.setValid(true);
+                productModuleDocs.setMessage("No document present for given table!!");
+                productModuleDocs.setDoc(gson.toJson((docs)));
+                return productModuleDocs;
+            }
+            productModuleDocs.setDoc(gson.toJson(productModuleMetaStore.searchAll()));
+            productModuleDocs.setValid(true);
+            productModuleDocs.setMessage("Document retrieved successfully!! ");
+            return productModuleDocs;
         } catch (Exception e) {
             logger.error("Failed to retrieve documents,Exception occurred!");
             logger.error(e.getStackTrace().toString());
-            return null;
+            productModuleDocs.setValid(false);
+            productModuleDocs.setMessage("Failed to retrieve documents!!");
+            return productModuleDocs;
         }
 
     }

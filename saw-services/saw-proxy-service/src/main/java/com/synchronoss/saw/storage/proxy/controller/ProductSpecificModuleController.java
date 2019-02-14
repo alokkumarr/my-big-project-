@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.synchronoss.saw.storage.proxy.model.response.ProductModuleDocs;
 import com.synchronoss.saw.storage.proxy.model.response.Valid;
 import com.synchronoss.saw.storage.proxy.service.ProductSpecificModuleService;
 import io.swagger.annotations.Api;
@@ -68,11 +69,12 @@ public class ProductSpecificModuleController {
                              @PathVariable(name = "id", required = true) String id,
                              @RequestBody JsonNode jse) {
         logger.debug("Request Body String:{}", jse);
+        Valid valid = new Valid();
 
         /* Extract input parameters */
         final String js = jse.path("source").toString();
         JsonElement jsonElement = toJsonElement(js);
-        Valid valid = new Valid();
+
         if (jsonElement!= null) {
             if (id == null){
                 valid.setValid(false);
@@ -81,11 +83,19 @@ public class ProductSpecificModuleController {
                 logger.error("Id can't be null or empty");
                 return valid;
             }
+            else if (pms.getDocument(tableName,id).getValid() == true) {
+                valid.setValid(false);
+                valid.setError("Given Id is already present in MaprDB!!");
+                valid.setValidityMessage("Try with different ID");
+                response.setStatus(400);
+                return valid;
+            }
             return pms.addDocument(tableName,id,jsonElement);
         }
         else {
             valid.setValid(false);
-            valid.setError("Input String can't be parsed to JSonElement");
+            valid.setError("Request body is not correct!!");
+            response.setStatus(400);
             return valid;
         }
 
@@ -126,8 +136,8 @@ public class ProductSpecificModuleController {
         }
         else {
             valid.setValid(false);
-            valid.setError("Input String can't be parsed to JSonElement");
-            logger.error("Request Body Json is null !!");
+            valid.setError("Request body is not correct!!");
+            response.setStatus(400);
             return valid;
         }
 
@@ -146,15 +156,25 @@ public class ProductSpecificModuleController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Valid deleteDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
+        Valid valid = new Valid();
         if (id == null){
-            Valid valid = new Valid();
             valid.setValid(false);
             valid.setError("ID can't be null or empty");
             logger.error("ID can't be null or empty");
             response.setStatus(400);
             return valid;
         }
-        return pms.deleteDocument(tableName,id);
+        else if (pms.getDocument(tableName,id).getValid() == true)  {
+            return pms.deleteDocument(tableName,id);
+        }
+        else {
+            valid.setValid(false);
+            valid.setError("Given dd is not present in MaprDB");
+            valid.setValidityMessage("Try giving correct id");
+            response.setStatus(400);
+            return valid;
+        }
+
     }
 
     @ApiOperation(value = "Provides ability to read document from ProductSpecificModules ", nickname = "getSpecificProductModuleDoc",
@@ -169,13 +189,16 @@ public class ProductSpecificModuleController {
     })
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public String readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
+    public ProductModuleDocs readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         if (id == null){
             logger.error("ID can't be null or empty");
+            ProductModuleDocs productModuleDocs = new ProductModuleDocs();
+            productModuleDocs.setValid(false);
+            productModuleDocs.setMessage("Id can't be null!!");
             response.setStatus(400);
         }
         logger.debug("Json returned : ",pms.getDocument(tableName,id));
-        return pms.getDocument(tableName,id).toString();
+        return pms.getDocument(tableName,id);
     }
 
     @ApiOperation(value = "Provides ability to fetch all documents from ProductSpecificModules ", nickname = "getAllProductModuleDocs",
@@ -190,9 +213,9 @@ public class ProductSpecificModuleController {
     })
     @RequestMapping(value = "/docs", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public String readAllDocuments(HttpServletRequest request, HttpServletResponse response) {
+    public ProductModuleDocs readAllDocuments(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("Json returned : ",pms.getAllDocs(tableName));
-        return pms.getAllDocs(tableName).toString();
+        return pms.getAllDocs(tableName);
     }
 
     @ApiOperation(value = "Provides ability to fetch filtered document/'s from ProductSpecificModules ", nickname = "getAllProductModuleDocs",
@@ -206,11 +229,11 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
     //The request type is POST since we need request body to accept list of attribute-values to filter documents.
-    @RequestMapping(value = "/docs", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/docs", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public String readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String,String> keyValues) {
+    public ProductModuleDocs readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String,String> keyValues) {
         logger.debug("Json returned : ",pms.getAllDocs(tableName,keyValues));
-        return pms.getAllDocs(tableName,keyValues).toString();
+        return pms.getAllDocs(tableName,keyValues);
     }
 
 }
