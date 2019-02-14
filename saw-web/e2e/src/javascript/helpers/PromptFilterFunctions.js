@@ -98,7 +98,7 @@ class PromptFilterFunctions {
         utils
           .hasClass(homePage.cardViewInput, 'mat-radio-checked')
           .then(function(isPresent) {
-            if (isPresent) {
+            if (!isPresent) {
               commonFunctions.waitFor.elementToBeVisible(
                 analyzePage.analysisElems.cardView
               );
