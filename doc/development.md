@@ -28,14 +28,14 @@ Service gives a "scala.reflect.internal.MissingRequirementError"
 errors when building), so Java 8 specifically must be used.
 
 Note: Instructions for how to set up the above on a Mac can be found
-in the [Mac setup instructions]. Additionally there are [Windows
+in the [Mac setup instructions].  Additionally there are [Windows
 setup instructions].
 
-[docker]: https://www.docker.com/community-edition
-[firefox]: https://getfirefox.com/
-[plantuml]: http://plantuml.com/
-[mac setup instructions]: development-mac.md
-[windows setup instructions]: development-windows.md
+[Docker]: https://www.docker.com/community-edition
+[Firefox]: https://getfirefox.com/
+[PlantUML]: http://plantuml.com/
+[Mac setup instructions]: development-mac.md
+[Windows setup instructions]: development-windows.md
 
 # Building and testing
 
@@ -44,7 +44,7 @@ To build and test the project execute the following commands:
         $ cd sip
         $ mvn verify
 
-This includes running both unit and integration tests. The release
+This includes running both unit and integration tests.  The release
 package will be located at `dist/target/saw-*.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
@@ -61,26 +61,26 @@ execute the following commands to start SAW in Docker containers:
 
 SAW also Support data-lake report execution with YARN.
 To run SAW system locally with YARN execute the following commands:
-
-$ cd sip
+           
+        $ cd sip
         $ mvn package
-\$ mvn -Ddocker-start=local -Dsaw.yarn.enabled=true
+        $ mvn -Ddocker-start=local -Dsaw.yarn.enabled=true
 
 Note: The Docker daemon must be running to be able to build and run
-containers. If you are unable to run Docker containers locally, see
+containers.  If you are unable to run Docker containers locally, see
 instructions for using the Docker Machine [cloud] alternative.
 
 The first run will take longer as Docker downloads and builds images
-that will subsequently be available in the image build cache. After
+that will subsequently be available in the image build cache.  After
 the command has completed the SAW start page can be accessed
 at [http://localhost/](http://localhost/).
 
 To list running containers, execute the following command:
 
         $ docker ps
-
+        
 All SIP containers are named according to the pattern `sip-*`, for
-example `sip-admin`, `sip-app1` and so on. (The `sip-app` containers
+example `sip-admin`, `sip-app1` and so on.  (The `sip-app` containers
 have a numeric suffix, because there can be multiple of them in high
 availability configurations.)
 
@@ -123,8 +123,8 @@ following command:
         $ docker exec sip-admin journalctl -f
 
 The above will show logs from all containers except from the
-`sip-admin` container itself. To follow those logs, simply execute
-`docker exec sip-admin journalctl -f`.
+`sip-admin` container itself.  To follow those logs, simply execute
+`docker exec sip-admin journalctl -f`.  
 
 # Running system tests using local deployment
 
@@ -137,14 +137,14 @@ deployment, run the following command:
         mvn test-compile failsafe:integration-test -Ddocker-start=local
 
 The above command will immediately start executing system tests
-against an existing local SAW deployment. Therefore it is possible to
+against an existing local SAW deployment.  Therefore it is possible to
 edit system tests, run them and get feedback in less than a minute.
 
 # Running SAW Web in development mode using local deployment
 
 When doing front-end development developers typically run the SAW Web
 application using NPM commands out of the `saw-web` source code
-directory. To configure SAW Web to connect to a local SAW deployment,
+directory.  To configure SAW Web to connect to a local SAW deployment,
 edit the `saw-web/appConfig.js` file as follows to replace the second
 occurrence of `apiUrl`:
 
@@ -153,7 +153,7 @@ occurrence of `apiUrl`:
 # Editing datasets in local SAW deployment
 
 When deploying SAW locally, it is possible to edit datasets and have
-changes immediately reflected in analysis executions. This can be
+changes immediately reflected in analysis executions.  This can be
 useful for exploring how different SAW features behave with varying
 data.
 
@@ -172,16 +172,16 @@ To edit the sample report metric and data permanently, edit the
 `data.ndjson` and `semantic.json` files in the source code tree and
 rebuild the container.
 
-The test data is read in using the [Spark JSON datasets] support. The
+The test data is read in using the [Spark JSON datasets] support.  The
 Spark documentation does not seem to specify the mapping from JSON
-data types to Spark data types. However, by knowing the [JSON data
+data types to Spark data types.  However, by knowing the [JSON data
 types], the [Spark data types] and then looking at the [Spark JSON
 reader] source code it is possible to derive the mapping.
 
-[spark json datasets]: https://spark.apache.org/docs/2.1.2/sql-programming-guide.html#json-datasets
-[json data types]: https://tools.ietf.org/html/rfc7159#section-3
-[spark data types]: http://spark.apache.org/docs/2.1.2/sql-programming-guide.html#data-types
-[spark json reader]: https://github.com/apache/spark/blob/branch-2.1/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/json/JacksonParser.scala
+[Spark JSON datasets]: https://spark.apache.org/docs/2.1.2/sql-programming-guide.html#json-datasets
+[JSON data types]: https://tools.ietf.org/html/rfc7159#section-3
+[Spark data types]: http://spark.apache.org/docs/2.1.2/sql-programming-guide.html#data-types
+[Spark JSON reader]: https://github.com/apache/spark/blob/branch-2.1/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/json/JacksonParser.scala
 
 ## Editing pivot and chart datasets
 
@@ -199,13 +199,13 @@ To edit the sample pivot/chart metric and data permanently, edit the
 rebuild the container.
 
 The test data is loaded by sending it in JSON format to the
-Elasticsearch REST API. The [JSON data types] are mapped to
+Elasticsearch REST API.  The [JSON data types] are mapped to
 [Elasticsearch data types] according to the [Elasticsearch dynamic
 field mapping].
 
-[json data types]: https://tools.ietf.org/html/rfc7159#section-3
-[elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
-[elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
+[JSON data types]: https://tools.ietf.org/html/rfc7159#section-3
+[Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
+[Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
 
 # Testing upgrade and migration
 
@@ -223,13 +223,13 @@ which integration tests will be executed on the upgraded environment.
 
 Documentation that describes the SAW implementation and design is
 stored in version control together with the source code (not in
-Confluence). This is required for a number of reasons, including to
+Confluence).  This is required for a number of reasons, including to
 ensure that the documentation accurately reflects the implementation
 taking into account different versions and branches of the product.
 
 The documentation source files are located in the
 [dist/src/main/asciidoc] directory and are automatically rendered
-as part of the project build process. To render the documentation
+as part of the project build process.  To render the documentation
 without running other parts of the project build, execute the
 following command:
 
@@ -250,12 +250,12 @@ can be disregarded.
 
 After a pull request has been merged, the changes will be picked up
 for building and testing in the project's continuous integration
-[Bamboo build plan]. If the build plan succeeds, it will also trigger
+[Bamboo build plan].  If the build plan succeeds, it will also trigger
 automatic deployment of the changes to the shared development
 environment using the related [Bamboo deployment project].
 
-[bamboo build plan]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
-[bamboo deployment project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/deployments
+[Bamboo build plan]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
+[Bamboo deployment project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/deployments
 
 ## Setting up an environment for automatic deployment
 
@@ -264,11 +264,11 @@ integration:
 
 1. Provision the environment according to the requirements in the
    "Installing and Configuring" section of the [SIP Operations Guide]
-
+   
 2. Create a `sip` user on nodes of the environment, to be used for
-   executing the deployment. Add `sip ALL=(ALL) NOPASSWD:ALL` to
+   executing the deployment.  Add `sip ALL=(ALL) NOPASSWD:ALL` to
    `/etc/sudoers.d/sip`, to ensure the deployment has needed
-   privileges. Also set up passwordless authentication for the `sip`
+   privileges.  Also set up passwordless authentication for the `sip`
    user by running `ssh-keygen` to generate a keypair without a
    passphrase and copying the public key at `.ssh/id_rsa.pub` to the
    list of authorized keys at `.ssh/authorized_keys`.
@@ -282,43 +282,43 @@ integration:
    correspond to the new environment, for example hostnames matching
    the environment
 
-[sip operations guide]: ../dist/src/main/asciidoc/sip-operations/index.adoc
+[SIP Operations Guide]: ../dist/src/main/asciidoc/sip-operations/index.adoc
 
 # Making a release
 
 To make a release of the project, execute the following steps:
 
-1.  Identify the Git revision to be used for the release. This will
-    typically be `origin/master` after all required pull requests have
-    been merged.
+1. Identify the Git revision to be used for the release.  This will
+   typically be `origin/master` after all required pull requests have
+   been merged.
+   
+2. Update your local repository to include the latest merges for the
+   remote master branch:
 
-2.  Update your local repository to include the latest merges for the
-    remote master branch:
+        $ git fetch
 
-         $ git fetch
+3. Tag the revision using Git and push the tag to the central
+   repository:
 
-3.  Tag the revision using Git and push the tag to the central
-    repository:
+        $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
+        $ git push --tags
 
-         $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
-         $ git push --tags
+4. Note: The placeholder `<commit>` refers to the revision that has
+   been selected for the release.
 
-4.  Note: The placeholder `<commit>` refers to the revision that has
-    been selected for the release.
+5. Start a customized build of the [project] on the continuous
+   integration server using the newly created release tag (click the
+   "Run" dropdown menu and select "Run customized..." and enter the
+   release tag, for example `v1.0.0`, in the Revision field).
 
-5.  Start a customized build of the [project] on the continuous
-    integration server using the newly created release tag (click the
-    "Run" dropdown menu and select "Run customized..." and enter the
-    release tag, for example `v1.0.0`, in the Revision field).
+6. After starting the build, go to the Build result summary page and
+   add the label "release" (which ensures it will be available for
+   download indefinitely, instead of eventually being expired and
+   deleted by the continuous integration server).
 
-6.  After starting the build, go to the Build result summary page and
-    add the label "release" (which ensures it will be available for
-    download indefinitely, instead of eventually being expired and
-    deleted by the continuous integration server).
-
-7.  When the build finishes successfully, announce it by publishing a
-    link to the artifacts page in the project Slack channel. Also add
-    the link to the corresponding [release notes] in Confluence.
+7. When the build finishes successfully, announce it by publishing a
+   link to the artifacts page in the project Slack channel.  Also add
+   the link to the corresponding [release notes] in Confluence.
 
 If additional fixes are needed after tagging, just repeat the same
 process above but increase the patch component of the version (for
@@ -330,8 +330,8 @@ example 1.0.1, 1.0.2 and so on).
 # Rebuilding an older release
 
 Use the same steps as for making a release generally, but use a Bamboo
-plan branch for building the older release. This avoids automatically
-deploying the older release to the shared development environment.
+plan branch for building the older release.  This avoids automatically
+deploying the older release to the shared develoment environment.
 
 # Troubleshooting
 
