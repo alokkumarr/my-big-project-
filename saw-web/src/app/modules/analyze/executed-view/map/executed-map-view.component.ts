@@ -5,8 +5,11 @@ import { AnalysisChart } from '../../types';
 
 @Component({
   selector: 'executed-map-view',
-  templateUrl: 'executed-map-view.component.html'
-  // styleUrls: ['./executed-map-view.component.scss']
+  templateUrl: 'executed-map-view.component.html',
+  styles: [`:host {
+    display: block;
+    height: calc(100vh - 250px);
+  }`]
 })
 export class ExecutedMapViewComponent {
   @Input() actionBus: Subject<Object[]>;
