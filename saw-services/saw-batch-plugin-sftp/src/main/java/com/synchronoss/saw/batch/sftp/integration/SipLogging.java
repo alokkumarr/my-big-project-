@@ -76,6 +76,7 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  @Transactional(TxType.REQUIRED)
   public boolean checkDuplicateFile(String fileName) throws SipNestedRuntimeException {
     logger.trace("Integrate with logging API & checking for the duplicate files : " + fileName);
     return bisFileLogsRepository.isFileNameExists(fileName);
