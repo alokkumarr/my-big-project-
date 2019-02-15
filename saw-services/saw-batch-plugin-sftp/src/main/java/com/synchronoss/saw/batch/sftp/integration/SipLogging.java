@@ -13,6 +13,9 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  @Transactional(TxType.REQUIRED)
   public void upsert(BisDataMetaInfo entity, String pid) throws SipNestedRuntimeException {
     logger.trace("Integrate with logging API to update with a status start here : "
         + entity.getProcessState());
