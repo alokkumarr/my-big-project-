@@ -25,7 +25,7 @@
         </button>
       </div>
     </div>
-    <ng-container *ngIf="item.analysis">
+    <div *ngIf="item.analysis" style="width: 100%; height: 78%;">
       <mat-icon class="zoom-icon"  fontIcon="icon-full-screen" (click)="zoomAnalysis(item)" matTooltip="View Full Screen"></mat-icon>
 
       <observe-map *ngIf="item.analysis.type | isAnalysisType:'map':item.analysis?.chartType"
@@ -81,7 +81,7 @@
         [updater]="item.updater"
       >
       </observe-pivot>
-    </ng-container>
+    </div>
 
     <ng-container *ngIf="item.kpi">
       <observe-kpi

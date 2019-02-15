@@ -16,7 +16,14 @@ import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 
 @Component({
   selector: 'observe-map',
-  templateUrl: './observe-map.component.html'
+  templateUrl: './observe-map.component.html',
+  styles: [`
+    :host {
+      height: 100%;
+      width: 100%;
+      display: block;
+    }
+  `]
   // styleUrls: ['./observe-map.component.scss']
 })
 
