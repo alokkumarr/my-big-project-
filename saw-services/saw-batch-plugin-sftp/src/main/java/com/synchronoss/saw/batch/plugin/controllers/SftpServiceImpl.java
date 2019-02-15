@@ -973,7 +973,8 @@ public class SftpServiceImpl extends SipPluginContract {
                   } catch (Exception ex) {
 
                     logger.error("Exception occurred while transferring the file from channel", ex);
-                    if (this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
+                    if (fileTobeDeleted != null  
+                        && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
                       BisDataMetaInfo bisDataMetaInfo = prepareLogInfo(
                           pattern, getFilePath(localDirectory, entry),
                           getActualRecDate(entry), entry.getAttrs().getSize(),
