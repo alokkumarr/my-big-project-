@@ -60,7 +60,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/{id}",
+    @RequestMapping(value = "/{id}/configuration",
         method = RequestMethod.POST,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -111,7 +111,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/{id}",
+    @RequestMapping(value = "/{id}/configuration",
         method = RequestMethod.PUT,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -153,7 +153,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{id}/configuration", method = RequestMethod.DELETE, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Valid deleteDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         Valid valid = new Valid();
@@ -187,7 +187,7 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{id}/configuration", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProductModuleDocs readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
         if (id == null){

@@ -21,7 +21,7 @@ public class StorageProxyIT extends BaseIT {
     given(authSpec)
         .contentType(ContentType.JSON)
         .body(root)
-        .when().post("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating")
+        .when().post("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating/configuration")
         .then().assertThat().statusCode(200)
         .body("valid", equalTo(true));
 
@@ -32,12 +32,12 @@ public class StorageProxyIT extends BaseIT {
     given(authSpec)
         .contentType(ContentType.JSON)
         .body(root1)
-        .when().put("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating")
+        .when().put("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating/configuration")
         .then().assertThat().statusCode(200)
         .body("valid", equalTo(true));
 
     given(authSpec)
-        .when().delete("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating")
+        .when().delete("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating/configuration")
         .then().assertThat().statusCode(200);
   }
 
@@ -50,7 +50,7 @@ public class StorageProxyIT extends BaseIT {
     given(authSpec)
         .contentType(ContentType.JSON)
         .body(root)
-        .when().post("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating3")
+        .when().post("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating3/configuration")
         .then().assertThat().statusCode(200)
         .body("valid", equalTo(true));
 
@@ -61,12 +61,12 @@ public class StorageProxyIT extends BaseIT {
     given(authSpec)
         .contentType(ContentType.JSON)
         .body(root1)
-        .when().post("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating4")
+        .when().post("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating4/configuration")
         .then().assertThat().statusCode(200)
         .body("valid", equalTo(true));
 
     given(authSpec)
-        .when().get("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating3")
+        .when().get("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating3/configuration")
         .then().assertThat().statusCode(200);
 
     given(authSpec)
@@ -74,10 +74,10 @@ public class StorageProxyIT extends BaseIT {
         .then().assertThat().statusCode(200);
 
     given(authSpec)
-        .when().delete("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating3")
+        .when().delete("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating3/configuration")
         .then().assertThat().statusCode(200);
     given(authSpec)
-        .when().delete("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating4")
+        .when().delete("/services/internal/proxy/storage/product-module/bda_pc_bt::app_rating4/configuration")
         .then().assertThat().statusCode(200);
   }
 }
