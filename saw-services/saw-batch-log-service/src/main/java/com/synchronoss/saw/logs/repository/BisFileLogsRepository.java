@@ -25,7 +25,6 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
     return new Sort(Sort.Direction.DESC, "createdDate");
   }
   
-  @Lock(LockModeType.PESSIMISTIC_READ)
   @Query("SELECT COUNT(pid)>0 from BisFileLog Logs where Logs.fileName = :fileName "
       + "and (Logs.mflFileStatus = 'SUCCESS' and Logs.bisProcessState = 'DATA_RECEIVED') ")
   boolean isFileNameExists(@Param("fileName") String fileName);
