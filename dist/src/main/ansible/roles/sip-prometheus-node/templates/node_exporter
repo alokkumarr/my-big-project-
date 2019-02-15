@@ -1,0 +1,4 @@
+# Workaround: The Prometheus Node Exporter uses port 9100 by default,
+# which the Gateway Service already listens on.  So use port 8100
+# instead.
+NODE_EXPORTER_OPTS=--web.listen-address=:8100 --collector.systemd

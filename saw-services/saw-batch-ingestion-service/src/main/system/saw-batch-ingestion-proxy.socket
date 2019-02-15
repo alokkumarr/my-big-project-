@@ -2,7 +2,7 @@
 Description=SAW Batch Ingestion Socket
 
 [Socket]
-ListenStream=127.0.0.1:9952
+ListenStream=9952
 
 [Install]
 WantedBy=sockets.target

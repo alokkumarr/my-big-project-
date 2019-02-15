@@ -9,6 +9,13 @@
 # Set allowed origins for CORS when to allow third-party applications
 # to integrate with the SIP REST API
 #sip_cors_allow_origin=https://example.com
+# Alternative Prometheus YUM URL
+#sip_prometheus_yum_url = https://packagecloud.io/prometheus-rpm/release/el/7/$basearch
+# Alternative Grafana YUM URL
+#sip_grafana_yum_url = https://packages.grafana.com/oss/rpm
+
+[sip-admin]
+#sip-host
 
 [saw-proxy]
 sip-host1
