@@ -15,6 +15,7 @@ INSERT INTO schema_version VALUES ('8', '8', '<< Flyway Baseline >>', 'BASELINE'
 INSERT INTO schema_version VALUES ('9', '9', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('10', '10', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('11', '11', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+INSERT INTO schema_version VALUES ('12', '12', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 
 
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
