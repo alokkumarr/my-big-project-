@@ -22,6 +22,7 @@ import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.entities.BisFileLog;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -30,10 +31,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -45,12 +43,13 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -72,7 +71,6 @@ import org.springframework.stereotype.Service;
 
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
-import sncr.bda.core.file.HFileOperations;
 
 @Service("sftpService")
 public class SftpServiceImpl extends SipPluginContract {
@@ -160,7 +158,7 @@ public class SftpServiceImpl extends SipPluginContract {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    Optional<BisRouteEntity> bisRouteEntity = bisRouteDataRestRepository.findById(entityId);
+    Optional<BisRouteEntity> bisRouteEntity = this.findRouteById(entityId);
     JsonNode nodeEntity = null;
     ObjectNode rootNode = null;
     if (bisRouteEntity.isPresent()) {
@@ -607,6 +605,10 @@ public class SftpServiceImpl extends SipPluginContract {
     return list;
   }
 
+  @Transactional(TxType.REQUIRED)
+  private  Optional<BisRouteEntity>  findRouteById(Long routeId) {
+    return bisRouteDataRestRepository.findById(routeId);
+  }
 
   @Override
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
@@ -622,7 +624,7 @@ public class SftpServiceImpl extends SipPluginContract {
       if (session != null & session.isOpen()) {
         logger.info("connected successfully " + channelId);
         logger.trace("session opened starts here ");
-        Optional<BisRouteEntity> routeEntity = bisRouteDataRestRepository.findById(routeId);
+        Optional<BisRouteEntity> routeEntity = this.findRouteById(routeId);
         if (routeEntity.isPresent()) {
           ObjectMapper objectMapper = new ObjectMapper();
           objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -1086,7 +1088,6 @@ public class SftpServiceImpl extends SipPluginContract {
    * This is method to handle inconsistency during failure.
    */
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
-  @Transactional
   public void recoverFromInconsistentState() {
     logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
@@ -1104,7 +1105,7 @@ public class SftpServiceImpl extends SipPluginContract {
         long channelId = log.getBisChannelSysId();
         logger.trace("Channel Id :" + channelId);
         Optional<BisRouteEntity> bisRouteEntityPresent =
-            bisRouteDataRestRepository.findById(routeId);
+            this.findRouteById(routeId);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
