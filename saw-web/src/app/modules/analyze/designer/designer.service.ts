@@ -247,7 +247,7 @@ export class DesignerService {
       marker: 'x',
       maxAllowed: () => 1,
       artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptGeoType,
+      canAcceptArtifactColumn: null,
       transform(artifactColumn: ArtifactColumnChart) {
         artifactColumn.area = 'x';
         artifactColumn.checked = true;
@@ -259,14 +259,14 @@ export class DesignerService {
 
     const metricAdapter: IDEsignerSettingGroupAdapter = {
       ...defaultMetricAdapter,
-      title: subType === 'map' ? 'Data' : 'Metric',
-      canAcceptArtifactColumn: canAcceptData,
+      title: subType === 'map' ? 'Data' : 'Metric'
     };
+
     const dimensionAdapter: IDEsignerSettingGroupAdapter = {
       ...defaultDimensionAdapter,
       title: subType === 'map' ? 'Coordinates' : 'Dimension',
-      canAcceptArtifactColumn: subType === 'map ' ?
-        canAcceptLngLat : canAcceptGeoType,
+      canAcceptArtifactColumn: subType === 'map' ?
+        canAcceptLngLat : canAcceptGeoType
     };
 
     const mapGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([

@@ -6,6 +6,7 @@ import { ChangeCasePipe } from './change-case.pipe';
 import { CheckedArtifactColumnFilterPipe } from './filterArtifactColumns.pipe';
 import { TruncatePipe } from './truncate.pipe';
 import { IsAnalysisTypePipe } from './is-analysis-type.pipe';
+import { RoundPipe } from './round.pipe';
 
 const PIPES = [
   FilterPipe,
@@ -13,7 +14,8 @@ const PIPES = [
   ChangeCasePipe,
   CheckedArtifactColumnFilterPipe,
   TruncatePipe,
-  IsAnalysisTypePipe
+  IsAnalysisTypePipe,
+  RoundPipe
 ];
 
 @NgModule({

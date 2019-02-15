@@ -46,7 +46,7 @@ import {
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
 
-const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
+const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
 @Component({
   selector: 'designer-container',

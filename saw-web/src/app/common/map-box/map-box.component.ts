@@ -1,21 +1,24 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import map from 'lodash/map';
 import first from 'lodash/first';
 import split from 'lodash/split';
+import reduce from 'lodash/reduce';
+import get from 'lodash/get';
 import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
 import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
+import { MarkerDataPoint } from './types';
+
 
 @Component({
   selector: 'map-box',
   templateUrl: './map-box.component.html',
   styleUrls: ['./map-box.component.scss']
 })
-export class MapBoxComponent {
+export class MapBoxComponent implements OnChanges {
 
   public selectedPoint: GeoJSON.Feature<GeoJSON.Point>;
-  data: any[];
   dataFields: any[];
   coordinateField: any;
   center: number[];
@@ -27,27 +30,33 @@ export class MapBoxComponent {
   }
 
   @Input('sqlBuilder') set setSqlBuilder(sqlBuilder) {
-    this.dataFields = sqlBuilder.dataFields;
     this.coordinateField = first(sqlBuilder.nodeFields);
+    this.dataFields = sqlBuilder.dataFields;
   }
 
-  @Input('data') set setData(data) {
-    if (!data) {
-      return;
-    }
-    setTimeout(() => {
-      const features = this.data2geoJsonFeatures(data, this.coordinateField);
-      this.geoJson = {
-        type: 'FeatureCollection',
-        features
-      };
+  @Input() data: any[];
 
-      // set center if possible
-      if (features.length > 0) {
-        const centerIndex = features.length / 2;
-        this.center = features[centerIndex].geometry['coordinates'];
-      }
-    }, 10);
+  ngOnChanges(changes) {
+    if (this.data && this.coordinateField && this.dataFields) {
+      setTimeout(() => {
+        this.setGeoJson(this.data, this.coordinateField, this.dataFields);
+      }, 10);
+    }
+  }
+
+  setGeoJson(data, coordinateField, dataFields) {
+    const features = this.data2geoJsonFeatures(data, coordinateField, dataFields);
+
+    this.geoJson = {
+      type: 'FeatureCollection',
+      features
+    };
+
+    // set center if possible
+    if (features.length > 0) {
+      const centerIndex = features.length / 2;
+      this.center = features[centerIndex].geometry['coordinates'];
+    }
   }
 
   selectPoint(event: MouseEvent, point) {
@@ -56,15 +65,29 @@ export class MapBoxComponent {
     this.selectedPoint = { ...point };
   }
 
-  data2geoJsonFeatures(data, coordinateField): Array<GeoJSON.Feature> {
+  data2geoJsonFeatures(data, coordinateField, dataFields): Array<GeoJSON.Feature> {
+    const allFields = [coordinateField, ...dataFields];
+    const fieldsMap = reduce(allFields, (acc, field) => {
+      acc[field.columnName] = field;
+      return acc;
+    }, {});
     return map(data, datum => {
       const coordinatesKey = coordinateField.columnName;
       const [lng, lat] = split(datum[coordinatesKey], ',');
       const lnglat = [parseFloat(lng), parseFloat(lat)];
-      const aggregates = fpPipe(
+      const aggregates: MarkerDataPoint = fpPipe(
         fpToPairs,
         fpFilter(([key]) => key !== coordinatesKey),
-        fpMap(([key, value]) => ({key, value}))
+        fpMap(([key, value]) => {
+          const alias = get(fieldsMap, `${key}.alias`);
+          const displayName = get(fieldsMap, `${key}.displayName`);
+          const aggregate: MarkerDataPoint = {
+            key,
+            value,
+            label: alias || displayName
+          };
+          return aggregate;
+        })
       )(datum);
 
       return {
