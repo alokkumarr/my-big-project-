@@ -234,4 +234,23 @@ public class SipLogging {
     }
   }
   
+  /**
+   * verify duplicate check enabled and is duplicate
+   * or if duplicate check disabled.
+   *
+   * @param isDisableDuplicate disabled duplicate check flag
+   * @param location source path
+   * @return true or false
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean duplicateCheckFilename(boolean isDisableDuplicate,
+      String location) {
+    return (!isDisableDuplicate && !checkDuplicateFile(location)) || isDisableDuplicate;
+
+  }
+
+  
 }

@@ -1157,7 +1157,7 @@ public class SftpServiceImpl extends SipPluginContract {
               // and to update the process status as DATA_REMOVED when there is a file
               // associated with it.
               if (log.getFileName() != null
-                  && (!sipLogService.checkDuplicateFile(log.getFileName()))) {
+                  && (sipLogService.duplicateCheckFilename(isDisable,log.getFileName()))) {
                 updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
                     BisComponentState.DATA_REMOVED.value());
                 logger
@@ -1171,7 +1171,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
                 logger.trace("Inside the block of retry when process status is :"
                     + BisComponentState.HOST_NOT_REACHABLE.value());
-                transferData(channelId, routeId, null, true);
+                transferData(channelId, routeId, null, false);
               }
             }
           }
