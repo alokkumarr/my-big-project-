@@ -59,3 +59,4 @@ bis:
   default-data-drop-location: /Users/spau0004/Desktop/workbench
   scheduler-url: http://localhost:9601
   recheck-file-modified: false
+  destination-fs-user: mapr
