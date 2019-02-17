@@ -56,6 +56,9 @@ public class SipLogging {
       bisLog.setRouteSysId(Long.valueOf(entity.getRouteId()));
       bisLog.setMflFileStatus(entity.getProcessState());
       bisLog.setBisProcessState(entity.getComponentState());
+      bisLog.setTransferDuration(entity.getFileTransferDuration());
+      bisLog.setTransferEndTime(entity.getFileTransferEndTime());
+      bisLog.setTransferStartTime(entity.getFileTransferStartTime());
       bisFileLogsRepository.save(bisLog);
     } else {
       logger.trace("inserting logs when process Id is not found :" + pid);
