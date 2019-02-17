@@ -22,7 +22,6 @@ import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.entities.BisFileLog;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -43,6 +42,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javassist.NotFoundException;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
@@ -1084,7 +1084,8 @@ public class SftpServiceImpl extends SipPluginContract {
   }
 
 
-
+  // TODO : This below retry related code will be moved separate service
+  // in future as part of refactoring with SIP-6058
   /**
    * This is method to handle inconsistency during failure.
    */
@@ -1143,6 +1144,9 @@ public class SftpServiceImpl extends SipPluginContract {
                   // instead of inserting new one
                   sipLogService.updateStatusFailed(BisProcessState.FAILED.value(),
                       BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
+                  logger.trace("Inside the block of retry when process status is "
+                      + " inside disable block :"
+                      + BisComponentState.HOST_NOT_REACHABLE.value());
                   transferData(channelId, routeId, null, isDisable);
                 }
               }
@@ -1171,16 +1175,89 @@ public class SftpServiceImpl extends SipPluginContract {
                     BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
                 logger.trace("Inside the block of retry when process status is :"
                     + BisComponentState.HOST_NOT_REACHABLE.value());
-                transferData(channelId, routeId, null, false);
+                transferRetry(channelId, routeId, log.getBisChannelType(),isDisable);
               }
             }
           }
-        } catch (IOException e) {
+        } catch (NotFoundException | IOException e) {
           logger.error("Exception occurred while reading duplicate attribute ", e);
         }
       } // end of second for loop
     } // end of first for loop
     logger.debug("recoverFromInconsistentState execution ends here");
+  }
+  
+  private void transferRetry(Long channelId, Long routeId, String channelType, boolean isDisable)
+      throws NotFoundException {
+    logger.trace("inside transfer retry block for channel type " + channelType + "ends here");
+    // This block needs to improved in future with appropriate design pattern like
+    // Abstract factory or switch block when more channel type will be added
+    switch (channelType) {
+      case "sftp":
+        SessionFactory<LsEntry> sesionFactory =
+            delegatingSessionFactory.getSessionFactory(channelId);
+        try (Session<?> session = sesionFactory.getSession()) {
+          if (session != null & session.isOpen()) {
+            Optional<BisRouteEntity> routeEntity = this.findRouteById(routeId);
+            if (routeEntity.isPresent()) {
+              ObjectMapper objectMapper = new ObjectMapper();
+              objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+              objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+              BisRouteEntity bisRouteEntity = routeEntity.get();
+              final BisDataMetaInfo metaInfo = new BisDataMetaInfo();
+              if (bisRouteEntity.getStatus() > 0) {
+                JsonNode nodeEntity = null;
+                ObjectNode rootNode = null;
+                nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+                rootNode = (ObjectNode) nodeEntity;
+                String sourceLocation = rootNode.get("sourceLocation").asText();
+                String fileExclusions = null;
+                if (rootNode.get("fileExclusions") != null) {
+                  fileExclusions = rootNode.get("fileExclusions").asText();
+                }
+                metaInfo.setFilePattern(rootNode.get("filePattern").asText());
+                SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
+                LsEntry[] files = null;
+                LsEntry[] filteredFiles = null;
+                if (template
+                    .list(sourceLocation + File.separator + metaInfo.getFilePattern()) != null) {
+                  files =
+                      template.list(sourceLocation + File.separator + metaInfo.getFilePattern());
+                  if (fileExclusions.isEmpty()) {
+                    filteredFiles = Arrays.copyOf(files, files.length);
+                  } else {
+                    if (fileExclusions != null) {
+                      filteredFiles = Arrays.stream(files)
+                          .filter(
+                              file -> !file.getFilename().endsWith("." + metaInfo.getFilePattern()))
+                          .toArray(LsEntry[]::new);
+                    }
+                  }
+                  for (LsEntry entry : filteredFiles) {
+                    String sourceFileName = sourceLocation + File.separator + entry.getFilename();
+                    logger.trace("sourceFileName inside transferRetry :" + sourceFileName);
+                    if (sipLogService.duplicateCheckFilename(isDisable, sourceFileName)) {
+                      transferData(channelId, routeId, null, isDisable);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (Exception ex) {
+          logger.error(
+              "Exception occurred while connecting to channel with the channel Id:" + channelId,
+              ex);
+          sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
+              BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value());
+        }
+        break;
+      case "jdbc":
+        break;
+      default:
+        throw new NotFoundException("channelType does not support");
+    }
+    logger.trace("inside transfer retry block for channel type " + channelType + "ends here");
   }
 
   /**
