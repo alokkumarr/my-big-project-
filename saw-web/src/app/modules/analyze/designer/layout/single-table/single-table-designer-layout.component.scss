@@ -10,6 +10,10 @@
     / 25% 75%;
 }
 
+.analysis-content {
+  overflow: hidden;
+}
+
 .designer {
   &__data-settings {
     grid-area: data-settings;
@@ -60,4 +64,8 @@
   display: table;
   font-size: 200px;
   width: 200px;
+}
+
+.designer-analysis {
+  height: calc(100vh - 235px);
 }
