@@ -793,15 +793,12 @@ export class DesignerContainerComponent implements OnInit {
     this.sorts = [];
     this.checkNodeForSorts();
     this.designerState = DesignerStates.NO_SELECTION;
-    // this.analysis.sqlBuilder = null;
     const artifactColumns = this.artifacts[0].columns;
     forEach(artifactColumns, col => {
       col.checked = false;
       unset(col, 'area');
     });
     this.artifacts = [...this.artifacts];
-    // this.updateAnalysis();
-    // this.refreshDataObject();
   }
 
   /**

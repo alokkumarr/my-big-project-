@@ -5,6 +5,7 @@
                  [designerState]="designerState"
                  [isInQueryMode]="isInQueryMode"
                  (onBack)="onBack.emit(isInDraftMode)"
+                 (change)="onSettingsChange($event)"
                  (requestAction)="onToolbarAction($event)">
 </designer-header>
 

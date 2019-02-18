@@ -1,6 +1,6 @@
 <div fxLayout="row"
      fxLayout.lt-md="column" fxLayoutGap.lt-md="10px"
-     fxLayoutAlign="space-between"
+     fxLayoutAlign="space-between center"
      class="header__container">
   <div fxLayout="row" fxLayoutAlign="start center">
     <button mat-icon-button (click)="onBack.emit()" style="margin-right: 10px;">
@@ -21,6 +21,12 @@
       </div>
     </div>
   </div>
+
+  <chart-type-chooser *ngIf="analysis.type === 'chart'"
+                      (change)="onChartTypeChange($event)"
+                      [chartType]="analysis.chartType"
+  >
+  </chart-type-chooser>
 
   <div fxLayout="row"
        fxLayoutAlign="space-between center">

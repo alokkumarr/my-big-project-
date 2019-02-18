@@ -12,11 +12,4 @@ export class DesignerSettingsAuxComponent {
   @Input() chartTitle: string;
 
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
-
-  onChartTypeChange(chartType) {
-    this.change.emit({
-      subject: 'chartType',
-      data: chartType
-    });
-  }
 }
