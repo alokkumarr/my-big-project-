@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
@@ -499,9 +500,11 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
                 }
 
-                logger.debug("Writing rejected data to temp directory " + rejectedDatasetLocation
-                    + "temp");
-                writeRdd(rejectedRecords, this.rejectedDatasetLocation + "temp");
+                String tempRejectedLocation = this.rejectedDatasetLocation + "_" + UUID.randomUUID()
+                    + "_" + System.currentTimeMillis();
+                logger.debug("Writing rejected data to temp directory " + tempRejectedLocation);
+
+                writeRdd(rejectedRecords, tempRejectedLocation);
 
 
                 if (HFileOperations.exists(this.rejectedDatasetLocation)) {
@@ -509,7 +512,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                     HFileOperations.deleteEnt(this.rejectedDatasetLocation);
                 }
 
-                this.ctx.fs.rename(new Path(this.rejectedDatasetLocation + "temp"),
+                this.ctx.fs.rename(new Path(tempRejectedLocation),
                     new Path(this.rejectedDatasetLocation));
             }
         } catch (Exception exception) {
