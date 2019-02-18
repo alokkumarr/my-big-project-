@@ -236,6 +236,7 @@
             (onCronChanged)="onCronChanged($event)"
           ></cron-job-schedular>
         </div>
+        <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n>Start date cannot be in past. Please select a Date that is current or in future.</span>
         <mat-divider></mat-divider>
         <div
           fxFlex

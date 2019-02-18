@@ -52,7 +52,7 @@
       </mat-expansion-panel>
     </mat-card>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''">
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
         <div fxLayout="row">
@@ -163,7 +163,7 @@
             [updater]="pivotUpdater$"
           >
           </executed-pivot-view>
-          <div *ngSwitchCase="'chart'">
+          <div *ngSwitchCase="'chart'" class="executed-chart-analysis">
             <executed-chart-view
               *ngIf="analysis.chartType !== 'geo'"
               [analysis]="executedAnalysis"

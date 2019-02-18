@@ -102,7 +102,7 @@ export class AnalyzeListViewComponent implements OnInit {
       {
         caption: 'NAME',
         dataField: 'name',
-        width: '20%',
+        width: '36%',
         cellTemplate: 'linkCellTemplate',
         cssClass: 'branded-column-name'
       },
@@ -117,14 +117,12 @@ export class AnalyzeListViewComponent implements OnInit {
       {
         caption: 'SCHEDULED',
         calculateCellValue: rowData => {
-          const cron = isUndefined(this.cronJobs)
-            ? ''
-            : this.cronJobs[rowData.id];
+          const cron = isUndefined(this.cronJobs) ? '' : this.cronJobs[rowData.id];
           if (!cron) {
             return '';
           }
-          const { cronExpression, activeTab } = cron.jobDetails;
-          return generateSchedule(cronExpression, activeTab);
+          const {cronExpression, activeTab, timezone} = cron.jobDetails;
+          return generateSchedule(cronExpression, activeTab, timezone);
         },
         width: '12%'
       },
@@ -141,14 +139,6 @@ export class AnalyzeListViewComponent implements OnInit {
         width: '20%',
         calculateCellValue: rowData =>
           (rowData.userFullName || '').toUpperCase(),
-        cellTemplate: 'highlightCellTemplate'
-      },
-      {
-        caption: 'UPDATED BY',
-        dataField: 'updatedUserName',
-        width: '16%',
-        calculateCellValue: rowData =>
-          (rowData.updatedUserName || '').toUpperCase(),
         cellTemplate: 'highlightCellTemplate'
       },
       {

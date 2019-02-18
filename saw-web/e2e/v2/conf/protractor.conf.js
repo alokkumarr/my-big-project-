@@ -76,7 +76,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+        //'--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -219,7 +219,6 @@ exports.config = {
       // delete and create new always
       fs.unlinkSync('target/e2e/e2eId.json');
     }
-
     SuiteSetup.failedTestDataForRetry();
 
     let retryStatus = retry.afterLaunch(maxRetriesForFailedTests);

@@ -1,0 +1,5 @@
+- name: Copy XDF package
+  copy: src="{{ item }}" dest=/tmp/sip-xdf.rpm
+  with_fileglob: ["../rpms/xdf-*.rpm"]
+- name: Install XDF package
+  yum: name=/tmp/sip-xdf.rpm state=present

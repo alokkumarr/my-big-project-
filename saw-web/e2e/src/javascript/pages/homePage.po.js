@@ -2,7 +2,6 @@ const commonFunctions = require('../helpers/commonFunctions.js');
 const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../../protractor.conf');
 const analyzePage = require('./analyzePage.po');
-const utils = require('../helpers/utils');
 
 module.exports = {
   mainMenuExpandBtn: element(by.css('mat-icon[e2e="main-menu-expand-btn"]')),
@@ -17,8 +16,9 @@ module.exports = {
   cardViewButton: element(by.css('[e2e="analyze-card-view"]')),
   cardViewInput: element(by.css('[e2e="analyze-card-view"]')),
   listViewInput: element(by.css('[e2e="analyze-list-view"]')),
-  observeLink: element(by.xpath('//div[contains(text(),"OBSERVE")]')),
   progressbar: element(by.css('mat-progress-bar[mode="indeterminate"]')),
+  launcherButton: element(by.css('[class="header__module-launcher-button"]')),
+  observeLink: element(by.xpath('//a[contains(@class,"module-observe")]')),
 
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {
@@ -46,12 +46,6 @@ module.exports = {
       )
     );
   },
-  isCategoryExpanded: name =>
-    element(
-      by.xpath(
-        `//span[contains(text(),'${name}')]//parent::*//parent::*//parent::mat-expansion-panel-header`
-      )
-    ),
   category: catName => {
     return element(
       by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`)
@@ -90,25 +84,18 @@ const navigateToSubCategoryUpdated = (
   browser.sleep(1000);
   module.exports.mainMenuExpandBtn.click();
   browser.sleep(1000);
-  utils
-    .hasClass(module.exports.isCategoryExpanded(categoryName), 'mat-expanded')
-    .then(isPresent => {
-      if (!isPresent) {
-        commonFunctions.waitFor.elementToBePresent(
-          module.exports.category(categoryName)
-        );
-        commonFunctions.waitFor.elementToBeVisible(
-          module.exports.category(categoryName)
-        );
-        //Navigate to Category/Sub-category, expand category
-        commonFunctions.waitFor.elementToBeClickable(
-          module.exports.category(categoryName)
-        );
-        module.exports.category(categoryName).click();
-        browser.sleep(1000);
-      }
-    });
-
+  commonFunctions.waitFor.elementToBePresent(
+    module.exports.category(categoryName)
+  );
+  commonFunctions.waitFor.elementToBeVisible(
+    module.exports.category(categoryName)
+  );
+  //Navigate to Category/Sub-category, expand category
+  commonFunctions.waitFor.elementToBeClickable(
+    module.exports.category(categoryName)
+  );
+  module.exports.category(categoryName).click();
+  browser.sleep(1000);
   const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickable(subCategory);
   subCategory.click();

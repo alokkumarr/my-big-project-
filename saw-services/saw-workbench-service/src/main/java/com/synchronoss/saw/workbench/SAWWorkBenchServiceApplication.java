@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss")
+@ComponentScan("com.synchronoss.saw.workbench")
 public class SAWWorkBenchServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SAWWorkBenchServiceApplication.class);
   public static void main(String[] args) {
