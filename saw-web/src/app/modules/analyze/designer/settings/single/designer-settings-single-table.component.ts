@@ -38,6 +38,11 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
       this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+      if (this.unselectedArtifactColumns.length === this.artifactColumns.length) {
+        setTimeout(() => {
+          this.setGroupAdapters();
+        });
+      }
     }
   }
   @Input() analysisType: string;
@@ -71,7 +76,10 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   ngOnInit() {
-    /* prettier-ignore */
+    this.setGroupAdapters();
+  }
+
+  setGroupAdapters() {
     switch (this.analysisType) {
     case 'pivot':
       this.groupAdapters = this._designerService.getPivotGroupAdapters(

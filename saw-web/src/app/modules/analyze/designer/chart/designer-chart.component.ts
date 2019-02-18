@@ -24,6 +24,7 @@ import { ChartService } from '../../../../common/services/chart.service';
 export class DesignerChartComponent implements AfterViewInit, OnInit {
   _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
+  chartType: string;
   _auxSettings: any = {};
   CHART_TYPES_OBJ = CHART_TYPES_OBJ;
 
@@ -36,7 +37,12 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
     height: 500
   };
 
-  @Input() public chartType: string;
+  @Input('chartType') public set setChartType(chartType: string) {
+    this.chartType = chartType;
+    if (this._data && this._data.length) {
+      this.reloadChart(this._data, [...this.getLegendConfig()]);
+    }
+  }
 
   @Input() sorts: Array<Sort> = [];
 

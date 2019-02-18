@@ -445,6 +445,12 @@ export class DesignerService {
     adapter.onReorder(adapter.artifactColumns);
   }
 
+  removeAllArtifactColumnsFromGroup(adapter: IDEsignerSettingGroupAdapter) {
+    const cols = adapter.artifactColumns;
+    forEach(cols, col => adapter.reverseTransform(col));
+    adapter.artifactColumns = [];
+  }
+
   getPartialPivotSqlBuilder(
     artifactColumns: ArtifactColumns
   ): Partial<SqlBuilderPivot> {

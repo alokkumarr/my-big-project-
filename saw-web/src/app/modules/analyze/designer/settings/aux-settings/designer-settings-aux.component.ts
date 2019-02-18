@@ -1,11 +1,11 @@
-import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { DesignerChangeEvent } from '../../types';
 
 @Component({
   selector: 'designer-settings-aux',
   templateUrl: 'designer-settings-aux.component.html'
 })
-export class DesignerSettingsAuxComponent implements OnInit {
+export class DesignerSettingsAuxComponent {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() auxSettings: any;
@@ -13,7 +13,10 @@ export class DesignerSettingsAuxComponent implements OnInit {
 
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
-  constructor() {}
-
-  ngOnInit() {}
+  onChartTypeChange(chartType) {
+    this.change.emit({
+      subject: 'chartType',
+      data: chartType
+    });
+  }
 }

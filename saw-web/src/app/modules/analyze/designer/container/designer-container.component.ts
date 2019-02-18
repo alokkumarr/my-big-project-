@@ -21,6 +21,7 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisChart,
   AnalysisType,
   SqlBuilder,
   SqlBuilderReport,
@@ -775,7 +776,32 @@ export class DesignerContainerComponent implements OnInit {
       this.updateAnalysis();
       this.refreshDataObject();
       break;
+    case 'chartType':
+      this.changeChartType(event.data);
+      break;
     }
+  }
+
+  changeChartType(to: string) {
+    const analysis = <AnalysisChart>this.analysis;
+    analysis.chartType = to;
+    this.resetAnalysis();
+  }
+
+  resetAnalysis() {
+    this.cleanSorts();
+    this.sorts = [];
+    this.checkNodeForSorts();
+    this.designerState = DesignerStates.NO_SELECTION;
+    // this.analysis.sqlBuilder = null;
+    const artifactColumns = this.artifacts[0].columns;
+    forEach(artifactColumns, col => {
+      col.checked = false;
+      unset(col, 'area');
+    });
+    this.artifacts = [...this.artifacts];
+    // this.updateAnalysis();
+    // this.refreshDataObject();
   }
 
   /**

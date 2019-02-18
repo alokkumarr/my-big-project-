@@ -1,3 +1,11 @@
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModuleTs } from '../../../common';
+import { UChartModule } from '../../../common/components/charts';
+import { MaterialModule } from '../../../material.module';
+import { AceEditorModule } from 'ng2-ace-editor';
+import { AnalyzeFilterModule } from '../designer/filter';
+
 import { DesignerContainerComponent } from './container';
 import { DesignerHeaderComponent } from './header';
 import { DesignerToolbarComponent } from './toolbar';
@@ -32,10 +40,15 @@ import { DesignerPreviewDialogComponent } from './preview-dialog';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
 import { DesignerPageComponent } from './page/page.component';
+import { ChartTypeChooserComponent } from './chart-type-chooser';
 
 export {
-  AnalyzeReportQueryComponent,
   DesignerPageComponent,
+  DesignerService
+};
+
+const COMPONENTS = [
+  AnalyzeReportQueryComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
   DesignerToolbarComponent,
@@ -60,6 +73,26 @@ export {
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayoutComponent,
   MultiTableDesignerLayoutComponent,
-  DesignerService,
-  ArtifactColumns2PivotFieldsPipe
-};
+  ChartTypeChooserComponent
+];
+
+const SERVICES = [DesignerService];
+
+const PIPES = [ArtifactColumns2PivotFieldsPipe];
+@NgModule({
+  imports: [
+    CommonModuleTs,
+    MaterialModule,
+    AceEditorModule,
+    FormsModule,
+    ReactiveFormsModule,
+    UChartModule,
+    AnalyzeFilterModule
+  ],
+  declarations: [...COMPONENTS, ...PIPES],
+  entryComponents: COMPONENTS,
+  providers: SERVICES,
+  exports: COMPONENTS
+})
+export class AnalyzeDesignerModule {}
+

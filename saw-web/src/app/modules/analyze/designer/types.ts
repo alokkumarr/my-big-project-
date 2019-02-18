@@ -12,6 +12,7 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisChart,
   AnalysisReport,
   Sort,
   Filter,
@@ -35,6 +36,7 @@ export {
   ArtifactColumnChart,
   ArtifactColumnReport,
   Analysis,
+  AnalysisChart,
   AnalysisReport,
   DesignerMode,
   AnalysisStarter,
@@ -112,7 +114,8 @@ export interface DesignerChangeEvent {
     | 'chartTitle'
     | 'fetchLimit'
     | 'changeQuery'
-    | 'region';
+    | 'region'
+    | 'chartType';
   column?: ArtifactColumn;
   data?: any;
 }

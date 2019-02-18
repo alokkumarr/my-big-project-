@@ -1,0 +1,7 @@
+<mat-button-toggle-group #group="matButtonToggleGroup" (change)="change.emit($event.value)" [value]="chartType">
+  <mat-button-toggle *ngFor="let type of chartTypes" [value]="type.type">
+    <mat-icon [fontIcon]="type.icon.font"
+              [matTooltip]="type.label">
+    </mat-icon>
+  </mat-button-toggle>
+</mat-button-toggle-group>
