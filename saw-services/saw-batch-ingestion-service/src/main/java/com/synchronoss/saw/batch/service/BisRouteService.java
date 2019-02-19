@@ -118,18 +118,8 @@ public class BisRouteService {
     }
     logger.trace("Invoking URL:" + url);
     
-    try {
-      restTemplate.postForLocation(url, scheduleKeys);
-    } catch (ResourceAccessException exception) {
-      logger.error("Error in deactivating route for " 
-          + scheduleKeys.getJobName() + "with" + bisSchedulerUrl + pauseUrl
-          + " " + exception.getMessage());
-    } catch (Exception exception) {
-      logger.error("Error in deactivating route for " + scheduleKeys.getJobName() 
-           + "with" + bisSchedulerUrl + pauseUrl
-          + " " + exception.getMessage());
-      
-    }
+    //invoke scheduler
+    restTemplate.postForLocation(url, scheduleKeys);
   }
   
   /**
