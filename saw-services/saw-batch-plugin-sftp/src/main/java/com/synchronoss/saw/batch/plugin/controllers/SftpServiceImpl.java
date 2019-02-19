@@ -975,8 +975,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   } catch (Exception ex) {
 
                     logger.error("Exception occurred while transferring the file from channel", ex);
-                    if (fileTobeDeleted != null  
-                        && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
+                
                       prepareLogInfo(bisDataMetaInfo,
                           pattern, getFilePath(localDirectory, entry),
                           getActualRecDate(entry), entry.getAttrs().getSize(),
@@ -985,17 +984,19 @@ public class SftpServiceImpl extends SipPluginContract {
 
                       logger.trace(" files or directory to be deleted on exception "
                           + fileTobeDeleted);
-                      bisDataMetaInfo.setComponentState(BisComponentState.DATA_REMOVED.value());
+                      bisDataMetaInfo.setComponentState(BisComponentState.TRANSFER_FAILED.value());
                       bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                      //sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
                     }
+                  if (fileTobeDeleted != null  
+                      && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
                     this.processor.deleteFile(fileTobeDeleted.getPath(),
                         this.defaultDestinationLocation, this.mapRfsUser);
+                  }
                     if (template.getSession() != null) {
                       template.getSession().close();
                     }
-                  }
+                  
                 }
               }
             } // end of loop for the number of files to be download at each batch
