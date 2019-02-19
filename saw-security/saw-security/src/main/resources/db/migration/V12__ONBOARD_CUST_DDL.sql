@@ -8,7 +8,7 @@
  Stored Procedure Scripts Starts
 ********************************************************************************/
 
-DROP PROCEDURE onboard_customer ;
+DROP PROCEDURE IF EXISTS onboard_customer ;
 
 DELIMITER //
 CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product_name varchar(50), IN l_product_code varchar(50), IN l_email varchar(50), IN l_first_name varchar(50), IN l_middle_name varchar(50), IN l_last_name varchar(50))
