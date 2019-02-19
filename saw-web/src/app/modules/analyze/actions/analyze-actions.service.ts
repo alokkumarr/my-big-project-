@@ -10,6 +10,7 @@ import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish';
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
+import { DRAFT_CATEGORY_ID } from './../consts';
 
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
@@ -46,6 +47,19 @@ export class AnalyzeActionsService {
     return this.openPublishModal(clone(analysis), type);
   }
 
+  checkForChildAnalysis(cloneanalysis) {
+    this._analyzeService.getAnalysesFor(DRAFT_CATEGORY_ID.toString()).then(analyses => {
+      analyses.map(row => {
+        if (cloneanalysis.id === row.parentAnalysisId) {
+          delete row.parentAnalysisId;
+          delete row.parentCategoryId;
+          delete row.parentLastModified;
+          this._analyzeService.updateAnalysis(row);
+        }
+      });
+    });
+  }
+
   delete(analysis) {
     return this.openDeleteModal(analysis);
   }
@@ -58,6 +72,7 @@ export class AnalyzeActionsService {
         .subscribe({
           next: result => {
             if (result) {
+              this.checkForChildAnalysis(analysis);
               this.removeAnalysis(analysis).then(deletionSuccess => {
                 resolve(deletionSuccess);
               });
