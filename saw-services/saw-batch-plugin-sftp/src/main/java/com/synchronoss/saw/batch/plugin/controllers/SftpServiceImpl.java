@@ -987,6 +987,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       bisDataMetaInfo.setComponentState(BisComponentState.TRANSFER_FAILED.value());
                       bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                      //sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
                     }
                   if (fileTobeDeleted != null  
                       && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
