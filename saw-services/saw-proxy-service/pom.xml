@@ -74,10 +74,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-   <!-- <dependency>
+    <dependency>
 	    <groupId>io.micrometer</groupId>
 	    <artifactId>micrometer-registry-prometheus</artifactId>
-    </dependency>-->
+    </dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -195,11 +195,11 @@
 			<scope>provided</scope>
 		</dependency>
 
-    <!--<dependency>
+    <dependency>
       <groupId>com.synchronoss.bda.sip</groupId>
       <artifactId>sip-common-components</artifactId>
       <version>${revision}</version>
-    </dependency>-->
+    </dependency>
 	</dependencies>
 	<build>
 	<pluginManagement>
