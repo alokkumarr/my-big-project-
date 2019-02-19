@@ -298,205 +298,434 @@ describe('Privileges tests: privileges.test.js', () => {
   //   // }
   // };
 
-  beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+  beforeAll(function() {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL =
+      protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
-  beforeEach(function (done) {
-    setTimeout(function () {
+  beforeEach(function(done) {
+    setTimeout(function() {
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function (done) {
-    setTimeout(function () {
+  afterEach(function(done) {
+    setTimeout(function() {
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['PRIVILEGES']['privilegeDataProvider'], function (data, description) {
-    it('should check ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'PRIVILEGES', dp:'privilegeDataProvider'}), () => {
-       try {
-         loginPage.loginAs(data.user);
-         navigateToDefaultSubCategory();
+  using(
+    testDataReader.testData['PRIVILEGES']['privilegeDataProvider'],
+    function(data, description) {
+      it(
+        'should check ' +
+          description +
+          ' testDataMetaInfo: ' +
+          JSON.stringify({
+            test: description,
+            feature: 'PRIVILEGES',
+            dp: 'privilegeDataProvider'
+          }),
+        () => {
+          try {
+            loginPage.loginAs(data.user);
+            navigateToDefaultSubCategory();
 
-         // Validate presence of Create Button
-         element(analyzePage.analysisElems.addAnalysisBtn.isPresent().then(function (isVisible) {
-           expect(isVisible).toBe(data.create,
-             "Create button expected to be " + data.create + " on Analyze Page, but was " + !data.create);
-         }));
+            // Validate presence of Create Button
+            element(
+              analyzePage.analysisElems.addAnalysisBtn
+                .isPresent()
+                .then(function(isVisible) {
+                  expect(isVisible).toBe(
+                    data.create,
+                    'Create button expected to be ' +
+                      data.create +
+                      ' on Analyze Page, but was ' +
+                      !data.create
+                  );
+                })
+            );
 
-         // Go to Card View
-         commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
-         commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
-         analyzePage.analysisElems.cardView.click();
-         browser.sleep(1000);
+            // Go to Card View
+            commonFunctions.waitFor.elementToBeVisible(
+              analyzePage.analysisElems.cardView
+            );
+            commonFunctions.waitFor.elementToBeClickable(
+              analyzePage.analysisElems.cardView
+            );
+            analyzePage.analysisElems.cardView.click();
+            browser.sleep(1000);
 
-         element(analyzePage.analysisElems.cardMenuButton.isPresent().then(function (isVisible) {
-           expect(isVisible).toBe(data.cardOptions,
-             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
-         }));
-         // Validate presence on menu items in card menu
-         if (data.cardOptions) {
-           analyzePage.main.getAnalysisActionOptionsNew(analyzePage.main.firstCard).then(options => {
-             let analysisOptions = options;
-             expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
-             //should check privileges on card
-             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
-               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
-             expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isPresent()).toBe(data.fork,
-               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
-             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
-               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
-             //Currently element id is same for both publish and schedule //TODO: need to change this to  schedule
-             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.schedule,
-               "Schedule button expected to be " + data.schedule + " on Analyze Page, but was " + !data.schedule);
+            element(
+              analyzePage.analysisElems.cardMenuButton
+                .isPresent()
+                .then(function(isVisible) {
+                  expect(isVisible).toBe(
+                    data.cardOptions,
+                    'Options on card expected to be ' +
+                      data.cardOptions +
+                      ' on Analyze Page, but was ' +
+                      !data.cardOptions
+                  );
+                })
+            );
+            // Validate presence on menu items in card menu
+            if (data.cardOptions) {
+              analyzePage.main
+                .getAnalysisActionOptionsNew(analyzePage.main.firstCard)
+                .then(options => {
+                  let analysisOptions = options;
+                  expect(options.isPresent()).toBe(
+                    true,
+                    "Options on card expected to be present on Analyze Page, but weren't"
+                  );
+                  //should check privileges on card
+                  expect(isOptionPresent(analysisOptions, 'edit')).toBe(
+                    data.edit,
+                    'Edit button expected to be ' +
+                      data.edit +
+                      ' on Analyze Page, but was ' +
+                      !data.edit
+                  );
+                  expect(
+                    analyzePage.main
+                      .getForkBtn(analyzePage.main.firstCard)
+                      .isPresent()
+                  ).toBe(
+                    data.fork,
+                    'Fork button expected to be ' +
+                      data.fork +
+                      ' on Analyze Page, but was ' +
+                      !data.fork
+                  );
+                  expect(isOptionPresent(analysisOptions, 'publish')).toBe(
+                    data.publish,
+                    'Publish button expected to be ' +
+                      data.publish +
+                      ' on Analyze Page, but was ' +
+                      !data.publish
+                  );
+                  //Currently element id is same for both publish and schedule //TODO: need to change this to  schedule
+                  expect(isOptionPresent(analysisOptions, 'publish')).toBe(
+                    data.schedule,
+                    'Schedule button expected to be ' +
+                      data.schedule +
+                      ' on Analyze Page, but was ' +
+                      !data.schedule
+                  );
 
-             expect(isOptionPresent(analysisOptions, 'execute')).toBe(data.execute,
-               "Execute button expected to be " + data.execute + " on Analyze Page, but was " + !data.execute);
-             expect(isOptionPresent(analysisOptions, 'delete')).toBe(data.delete,
-               "Delete button expected to be " + data.delete + " on Analyze Page, but was " + !data.delete);
-           });
+                  expect(isOptionPresent(analysisOptions, 'execute')).toBe(
+                    data.execute,
+                    'Execute button expected to be ' +
+                      data.execute +
+                      ' on Analyze Page, but was ' +
+                      !data.execute
+                  );
+                  expect(isOptionPresent(analysisOptions, 'delete')).toBe(
+                    data.delete,
+                    'Delete button expected to be ' +
+                      data.delete +
+                      ' on Analyze Page, but was ' +
+                      !data.delete
+                  );
+                });
 
-           // Navigate back, close the opened actions menu
-           commonFunctions.waitFor.elementToBeVisible(element(by.css('[class="cdk-overlay-container"]')));
-           commonFunctions.waitFor.elementToBeClickable(element(by.css('[class="cdk-overlay-container"]')));
-           element(by.css('[class="cdk-overlay-container"]')).click();
-           commonFunctions.waitFor.elementToBeNotVisible(analyzePage.main.actionMenuOptions);
-           expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(false);
-         }
-         // Go to executed analysis page
-         commonFunctions.waitFor.elementToBeVisible(analyzePage.main.firstCardTitle);
-         commonFunctions.waitFor.elementToBeClickable(analyzePage.main.firstCardTitle);
-         analyzePage.main.firstCardTitle.click();
+              // Navigate back, close the opened actions menu
+              commonFunctions.waitFor.elementToBeVisible(
+                element(by.css('[class="cdk-overlay-container"]'))
+              );
+              commonFunctions.waitFor.elementToBeClickable(
+                element(by.css('[class="cdk-overlay-container"]'))
+              );
+              element(by.css('[class="cdk-overlay-container"]')).click();
+              commonFunctions.waitFor.elementToBeNotVisible(
+                analyzePage.main.actionMenuOptions
+              );
+              expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(
+                false
+              );
+            }
+            // Go to executed analysis page
+            commonFunctions.waitFor.elementToBeVisible(
+              analyzePage.main.firstCardTitle
+            );
+            commonFunctions.waitFor.elementToBeClickable(
+              analyzePage.main.firstCardTitle
+            );
+            analyzePage.main.firstCardTitle.click();
 
-         const condition = ec.urlContains('/executed');
-         browser
-           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
-           .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
+            const condition = ec.urlContains('/executed');
+            browser
+              .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
+              .then(() =>
+                expect(browser.getCurrentUrl()).toContain('/executed')
+              );
 
-         // Validate buttons in view mode of analysis
-         element(executedAnalysis.editBtn.isPresent().then(function(isPresent) {
-           if (isPresent) {
-             expect(executedAnalysis.editBtn.isDisplayed()).toBe(data.edit,
-               "Edit privilege expected to be " + data.edit + " in view mode, but was " + !data.edit);
-           } else {
-             expect(isPresent).toBe(data.edit,
-               "Edit privilege expected to be " + data.edit + " in view mode, but was " + !data.edit);
-           }
-         }));
+            // Validate buttons in view mode of analysis
+            element(
+              executedAnalysis.editBtn.isPresent().then(function(isPresent) {
+                if (isPresent) {
+                  expect(executedAnalysis.editBtn.isDisplayed()).toBe(
+                    data.edit,
+                    'Edit privilege expected to be ' +
+                      data.edit +
+                      ' in view mode, but was ' +
+                      !data.edit
+                  );
+                } else {
+                  expect(isPresent).toBe(
+                    data.edit,
+                    'Edit privilege expected to be ' +
+                      data.edit +
+                      ' in view mode, but was ' +
+                      !data.edit
+                  );
+                }
+              })
+            );
 
-         element(executedAnalysis.forkBtn.isPresent().then(function(isPresent) {
-           if(isPresent) {
-             expect(executedAnalysis.forkBtn.isDisplayed()).toBe(data.fork,
-               "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
-           } else {
-             expect(isPresent).toBe(data.fork,
-               "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
-           }
-         }));
-         // Validate menu in analysis
-         element(executedAnalysis.actionsMenuBtn.isPresent().then(function (isPresent) {
-           if(isPresent) {
-             expect(executedAnalysis.actionsMenuBtn.isDisplayed()).toBe(data.viewOptions,
-               "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
-           } else {
-             expect(isPresent).toBe(data.viewOptions,
-               "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
-           }
+            element(
+              executedAnalysis.forkBtn.isPresent().then(function(isPresent) {
+                if (isPresent) {
+                  expect(executedAnalysis.forkBtn.isDisplayed()).toBe(
+                    data.fork,
+                    'Fork button expected to be ' +
+                      data.fork +
+                      ' in view mode, but was ' +
+                      !data.fork
+                  );
+                } else {
+                  expect(isPresent).toBe(
+                    data.fork,
+                    'Fork button expected to be ' +
+                      data.fork +
+                      ' in view mode, but was ' +
+                      !data.fork
+                  );
+                }
+              })
+            );
+            // Validate menu in analysis
+            element(
+              executedAnalysis.actionsMenuBtn
+                .isPresent()
+                .then(function(isPresent) {
+                  if (isPresent) {
+                    expect(executedAnalysis.actionsMenuBtn.isDisplayed()).toBe(
+                      data.viewOptions,
+                      'Options menu button expected to be ' +
+                        data.viewOptions +
+                        ' in view mode, but was ' +
+                        !data.viewOptions
+                    );
+                  } else {
+                    expect(isPresent).toBe(
+                      data.viewOptions,
+                      'Options menu button expected to be ' +
+                        data.viewOptions +
+                        ' in view mode, but was ' +
+                        !data.viewOptions
+                    );
+                  }
+                })
+            );
 
-         }));
+            // Validate menu items under menu button
+            if (data.viewOptions === true) {
+              element(
+                executedAnalysis.actionsMenuBtn
+                  .isPresent()
+                  .then(function(isPresent) {
+                    if (isPresent) {
+                      expect(
+                        executedAnalysis.actionsMenuBtn.isDisplayed()
+                      ).toBe(
+                        data.viewOptions,
+                        'actionsMenuBtn button expected to be ' +
+                          data.viewOptions +
+                          ' in view mode, but was ' +
+                          !data.viewOptions
+                      );
+                      commonFunctions.waitFor.elementToBeClickable(
+                        executedAnalysis.actionsMenuBtn
+                      );
+                      executedAnalysis.actionsMenuBtn.click();
+                      browser.sleep(1000);
+                    } else {
+                      expect(isPresent).toBe(
+                        data.execute,
+                        'actionsMenuBtn button expected to be ' +
+                          data.execute +
+                          ' in view mode, but was ' +
+                          !data.execute
+                      );
+                    }
+                  })
+              );
 
-         // Validate menu items under menu button
-         if (data.viewOptions === true) {
+              element(
+                executedAnalysis.publishMenuOption
+                  .isPresent()
+                  .then(function(isPresent) {
+                    if (isPresent) {
+                      expect(
+                        executedAnalysis.publishMenuOption.isDisplayed()
+                      ).toBe(
+                        data.publish,
+                        'Publish button expected to be ' +
+                          data.publish +
+                          ' in view mode, but was ' +
+                          !data.publish
+                      );
+                    } else {
+                      expect(isPresent).toBe(
+                        data.publish,
+                        'Publish button expected to be ' +
+                          data.publish +
+                          ' in view mode, but was ' +
+                          !data.publish
+                      );
+                    }
+                  })
+              );
+              //Currently element id is same for both publish and schedule //TODO: need to change this to  schedule
+              element(
+                executedAnalysis.scheduleMenuOption
+                  .isPresent()
+                  .then(function(isPresent) {
+                    if (isPresent) {
+                      expect(
+                        executedAnalysis.scheduleMenuOption.isDisplayed()
+                      ).toBe(
+                        data.schedule,
+                        'Schedule button expected to be ' +
+                          data.schedule +
+                          ' in view mode, but was ' +
+                          !data.schedule
+                      );
+                    } else {
+                      expect(isPresent).toBe(
+                        data.schedule,
+                        'Schedule button expected to be ' +
+                          data.schedule +
+                          ' in view mode, but was ' +
+                          !data.schedule
+                      );
+                    }
+                  })
+              );
 
-           element(executedAnalysis.actionsMenuBtn.isPresent().then(function (isPresent) {
-             if(isPresent) {
-               expect(executedAnalysis.actionsMenuBtn.isDisplayed()).toBe(data.viewOptions,
-                 "actionsMenuBtn button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
-               commonFunctions.waitFor.elementToBeClickable(executedAnalysis.actionsMenuBtn);
-               executedAnalysis.actionsMenuBtn.click();
-               browser.sleep(1000);
-             } else {
-               expect(isPresent).toBe(data.execute,
-                 "actionsMenuBtn button expected to be " + data.execute + " in view mode, but was " + !data.execute);
-             }
-           }));
+              element(
+                executedAnalysis.executeMenuOption
+                  .isPresent()
+                  .then(function(isPresent) {
+                    if (isPresent) {
+                      expect(
+                        executedAnalysis.executeMenuOption.isDisplayed()
+                      ).toBe(
+                        data.execute,
+                        'Execute button expected to be ' +
+                          data.execute +
+                          ' in view mode, but was ' +
+                          !data.execute
+                      );
+                    } else {
+                      expect(isPresent).toBe(
+                        data.execute,
+                        'Execute button expected to be ' +
+                          data.execute +
+                          ' in view mode, but was ' +
+                          !data.execute
+                      );
+                    }
+                  })
+              );
 
-           element(executedAnalysis.publishMenuOption.isPresent().then(function (isPresent) {
-             if(isPresent) {
-               expect(executedAnalysis.publishMenuOption.isDisplayed()).toBe(data.publish,
-                 "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
-             } else {
-               expect(isPresent).toBe(data.publish,
-                 "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
-             }
-           }));
-           //Currently element id is same for both publish and schedule //TODO: need to change this to  schedule
-           element(executedAnalysis.scheduleMenuOption.isPresent().then(function (isPresent) {
-             if(isPresent) {
-               expect(executedAnalysis.scheduleMenuOption.isDisplayed()).toBe(data.schedule,
-                 "Schedule button expected to be " + data.schedule + " in view mode, but was " + !data.schedule);
-             } else {
-               expect(isPresent).toBe(data.schedule,
-                 "Schedule button expected to be " + data.schedule + " in view mode, but was " + !data.schedule);
-             }
-           }));
+              element(
+                executedAnalysis.exportMenuOption
+                  .isPresent()
+                  .then(function(isPresent) {
+                    if (isPresent) {
+                      expect(
+                        executedAnalysis.exportMenuOption.isDisplayed()
+                      ).toBe(
+                        data.export,
+                        'Export button expected to be ' +
+                          data.export +
+                          ' in view mode, but was ' +
+                          !data.export
+                      );
+                    } else {
+                      expect(isPresent).toBe(
+                        data.export,
+                        'Export button expected to be ' +
+                          data.export +
+                          ' in view mode, but was ' +
+                          !data.export
+                      );
+                    }
+                  })
+              );
 
-           element(executedAnalysis.executeMenuOption.isPresent().then(function (isPresent) {
-             if(isPresent) {
-               expect(executedAnalysis.executeMenuOption.isDisplayed()).toBe(data.execute,
-                 "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
-             } else {
-               expect(isPresent).toBe(data.execute,
-                 "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
-             }
-           }));
+              element(
+                executedAnalysis.deleteMenuOption
+                  .isPresent()
+                  .then(function(isPresent) {
+                    if (isPresent) {
+                      expect(
+                        executedAnalysis.deleteMenuOption.isDisplayed()
+                      ).toBe(
+                        data.delete,
+                        'Delete button expected to be ' +
+                          data.delete +
+                          ' in view mode, but was ' +
+                          !data.delete
+                      );
+                    } else {
+                      expect(isPresent).toBe(
+                        data.delete,
+                        'Delete button expected to be ' +
+                          data.delete +
+                          ' in view mode, but was ' +
+                          !data.delete
+                      );
+                    }
+                  })
+              );
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      );
 
-           element(executedAnalysis.exportMenuOption.isPresent().then(function (isPresent) {
-             if(isPresent) {
-               expect(executedAnalysis.exportMenuOption.isDisplayed()).toBe(data.export,
-                 "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
-             } else {
-               expect(isPresent).toBe(data.export,
-                 "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
-             }
-           }));
+      function isOptionPresent(options, optionName) {
+        const option = analyzePage.main.getAnalysisOption(options, optionName);
+        return option.isPresent();
+      }
 
-           element(executedAnalysis.deleteMenuOption.isPresent().then(function (isPresent) {
-             if(isPresent) {
-               expect(executedAnalysis.deleteMenuOption.isDisplayed()).toBe(data.delete,
-                 "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
-             } else {
-               expect(isPresent).toBe(data.delete,
-                 "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
-             }
-
-           }));
-         }
-       }catch (e) {
-         console.log(e);
-       }
-
-      });
-
-    function isOptionPresent(options, optionName) {
-      const option = analyzePage.main.getAnalysisOption(options, optionName);
-      return option.isPresent();
+      // Navigates to specific category where analysis view should happen
+      const navigateToDefaultSubCategory = () => {
+        homePage.mainMenuExpandBtn.click();
+        commonFunctions.waitFor.elementToBeVisible(
+          homePage.collapsedCategoryUpdated(categoryName)
+        );
+        commonFunctions.waitFor.elementToBeClickable(
+          homePage.collapsedCategoryUpdated(categoryName)
+        );
+        homePage.collapsedCategoryUpdated(categoryName).click();
+        browser.sleep(500);
+        commonFunctions.waitFor.elementToBeVisible(
+          homePage.subCategory(subCategories[data.subCategory].name)
+        );
+        commonFunctions.waitFor.elementToBeClickable(
+          homePage.subCategory(subCategories[data.subCategory].name)
+        );
+        homePage.subCategory(subCategories[data.subCategory].name).click();
+        browser.sleep(500);
+      };
     }
-
-    // Navigates to specific category where analysis view should happen
-    const navigateToDefaultSubCategory = () => {
-      homePage.mainMenuExpandBtn.click();
-      commonFunctions.waitFor.elementToBeVisible(homePage.collapsedCategoryUpdated(categoryName));
-      commonFunctions.waitFor.elementToBeClickable(homePage.collapsedCategoryUpdated(categoryName));
-      homePage.collapsedCategoryUpdated(categoryName).click();
-      browser.sleep(500);
-      commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(subCategories[data.subCategory].name));
-      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(subCategories[data.subCategory].name));
-      homePage.subCategory(subCategories[data.subCategory].name).click();
-      browser.sleep(500);
-    };
-  });
+  );
 });

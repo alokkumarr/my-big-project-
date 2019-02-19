@@ -13,6 +13,8 @@
 #sip_prometheus_yum_url = https://packagecloud.io/prometheus-rpm/release/el/7/$basearch
 # Alternative Grafana YUM URL
 #sip_grafana_yum_url = https://packages.grafana.com/oss/rpm
+# Openweathermap API Key for weather widget
+sip_openweathermap_api_token = 1d60893d260345b7c4a62ec0842ed731
 
 [sip-admin]
 #sip-host

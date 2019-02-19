@@ -236,7 +236,11 @@ public class TransformerComponent extends Component implements WithMovableResult
 
         List<Map<String, Object>> dss = new ArrayList<>();
         dss.add(outputs.get(RequiredNamedParameters.Output.toString()));
-        dss.add(outputs.get(RequiredNamedParameters.Rejected.toString()));
+
+        if (outputs.containsKey(RequiredNamedParameters.Rejected.toString())) {
+            dss.add(outputs.get(RequiredNamedParameters.Rejected.toString()));
+        }
+
         for ( Map<String, Object> ads : dss) {
             String name = (String) ads.get(DataSetProperties.Name.name());
             String src = tempLocation + Path.SEPARATOR + name;
@@ -277,18 +281,22 @@ public class TransformerComponent extends Component implements WithMovableResult
             }
         }
 
-        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'input' does not exist .");
+        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError,
+            "Incorrect configuration: dataset parameter with name 'input' does not exist .");
 
-        valid = false;
-        boolean rvalid = false;
+        valid = compConf.getOutputs().stream()
+            .filter(outK -> outK.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString()))
+            .count() == 0 ? false : true;
+
         for( Output outK: compConf.getOutputs()) {
             if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())) {
                 valid = true;
-            } else if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())) {
-                rvalid = true;
             }
+            /* else if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())) {
+                rvalid = true;
+            }*/
         }
-        if (!valid || !rvalid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejecteds' does not exist .");
+        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejected' does not exist .");
 
         return compConf;
     }

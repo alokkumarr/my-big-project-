@@ -31,7 +31,7 @@ public class HFileOperations {
             fc = FileContext.getFileContext(fs.getConf());
         } catch (IOException e) {
             logger.error(e.getMessage());
-            throw new Exception("Cannot initialize FileSystem");
+            throw new Exception("Cannot initialize FileSystem", e);
         }
         initialized = true;
     }
@@ -59,7 +59,9 @@ public class HFileOperations {
             return data;
         } catch (Exception e) {
             logger.error("XDF-Hadoop exception: ", e);
-            throw new FileNotFoundException("File not found on the provided location :" + e);
+            FileNotFoundException fe = new FileNotFoundException("File not found on the provided location");
+            fe.initCause(e);
+            throw fe;
         }
     }
 
@@ -82,7 +84,9 @@ public class HFileOperations {
 
         } catch (Exception e) {
             logger.error("XDF-Hadoop exception: ", e);
-            throw new FileNotFoundException("File not found on the provided location :" + e);
+            FileNotFoundException fe = new FileNotFoundException("File not found on the provided location");
+            fe.initCause(e);
+            throw fe;
         }
         return stream;
     }
@@ -102,7 +106,9 @@ public class HFileOperations {
             e.printStackTrace();
         } catch (Exception e) {
             logger.error("XDF-Hadoop exception: ", e);
-            throw new FileNotFoundException("File not found on the provided location :" + e);
+            FileNotFoundException fe = new FileNotFoundException("File not found on the provided location");
+            fe.initCause(e);
+            throw fe;
         }
         return fout_stream.getWrappedStream();
     }
@@ -127,7 +133,7 @@ public class HFileOperations {
             }
         } catch (IOException e) {
             logger.error("XDF-Hadoop exception: ", e);
-            throw new Exception("Cannot get file status on provided PhysicalLocation:" + e);
+            throw new Exception("Cannot get file status on provided PhysicalLocation", e);
         }
     }
 
@@ -140,7 +146,7 @@ public class HFileOperations {
             fs.delete(path, true);
         } catch (IOException e) {
             logger.error("XDF-Hadoop exception: ", e);
-            throw new Exception("Cannot get file status on provided PhysicalLocation:" + e);
+            throw new Exception("Cannot get file status on provided PhysicalLocation", e);
         }
     }
 
@@ -179,7 +185,7 @@ public class HFileOperations {
             fs.mkdirs(path);
         } catch (IOException e) {
             logger.error("IO Exception at attempt to create dir: ", e);
-            throw new Exception("Cannot create directory provided PhysicalLocation:" + e);
+            throw new Exception("Cannot create directory provided PhysicalLocation", e);
         }
     }
 
