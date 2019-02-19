@@ -987,6 +987,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     bisDataMetaInfo.setComponentState(BisComponentState.TRANSFER_FAILED.value());
                     bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                     sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                    sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
                   }
                   if (fileTobeDeleted != null  
                       && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
@@ -1112,73 +1113,80 @@ public class SftpServiceImpl extends SipPluginContract {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-        BisRouteEntity bisRouteEntity = bisRouteEntityPresent.get();
         JsonNode nodeEntity = null;
         ObjectNode rootNode = null;
         try {
-          nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
-          rootNode = (ObjectNode) nodeEntity;
-          if (rootNode.get("disableDuplicate") != null
-              && !rootNode.get("disableDuplicate").isNull()) {
-            String disableDupFlag = rootNode.get("disableDuplicate").asText();
-            Boolean isDisable = Boolean.valueOf(disableDupFlag);
-            if (isDisable) {
-              logger.trace("Inside isDisable starts here");
-              if (sipLogService.isRouteAndChannelExists(routeId, channelId)) {
-                updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
-                // To retry only specific file instead of downloading all files
-                // in the source folder
-                if (log.getFileName() != null) {
-                  logger.trace("Inside isDisable transferData starts here");
-                  // SIP-6094 : this flow is related when user is set disableDuplicate as true
-                  // and to update the process status as DATA_REMOVED when there is a file
-                  // associated with it.
+          BisRouteEntity bisRouteEntity;
+          if (bisRouteEntityPresent.isPresent()) {
+            bisRouteEntity = bisRouteEntityPresent.get();
+            nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+            rootNode = (ObjectNode) nodeEntity;
+            if (rootNode.get("disableDuplicate") != null
+                && !rootNode.get("disableDuplicate").isNull()) {
+              String disableDupFlag = rootNode.get("disableDuplicate").asText();
+              Boolean isDisable = Boolean.valueOf(disableDupFlag);
+              if (isDisable) {
+                logger.trace("Inside isDisable starts here");
+                if (sipLogService.isRouteAndChannelExists(routeId, channelId)) {
+                  updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
+                  // To retry only specific file instead of downloading all files
+                  // in the source folder
+                  if (log.getFileName() != null) {
+                    logger.trace("Inside isDisable transferData starts here");
+                    // SIP-6094 : this flow is related when user is set disableDuplicate as true
+                    // and to update the process status as DATA_REMOVED when there is a file
+                    // associated with it.
+                    updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
+                         BisComponentState.DATA_REMOVED.value());
+                    transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
+                          isDisable);
+                  } else {
+                    logger.trace("Inside isDisable transferData when starts here "
+                        + "log.getFileName() is null");
+                    // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
+                    // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
+                    // instead of inserting new one
+                    sipLogService.updateStatusFailed(BisProcessState.FAILED.value(),
+                        BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
+                    logger.trace("Inside the block of retry when process status is "
+                        + " inside disable block :"
+                        + BisComponentState.HOST_NOT_REACHABLE.value());
+                    transferData(channelId, routeId, null, isDisable);
+                  }
+                }
+                logger.trace("Inside isDisable ends here");
+              } else {
+                // To retry only specific file instead of downloading all files in
+                // the in source folder
+                logger.trace(
+                    "Inside the block of retry when disable is not "
+                    + "checked for route Id :" + routeId);
+                // SIP-6094 : duplicate check has been introduced; no need to retry if file
+                // has been identified has duplicate
+                // and to update the process status as DATA_REMOVED when there is a file
+                // associated with it.
+                if (log.getFileName() != null
+                    && (sipLogService.duplicateCheckFilename(isDisable,log.getFileName()))) {
                   updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
                       BisComponentState.DATA_REMOVED.value());
-                  transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
-                      isDisable);
+                  logger
+                    .trace("Inside the block of retry when file is not duplicate :" + log.getPid());
+                  transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()), true);
                 } else {
-                  logger.trace("Inside isDisable transferData when starts here "
-                      + "log.getFileName() is null");
                   // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
                   // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
                   // instead of inserting new one
                   sipLogService.updateStatusFailed(BisProcessState.FAILED.value(),
                       BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
-                  logger.trace("Inside the block of retry when process status is "
-                      + " inside disable block :"
+                  logger.trace("Inside the block of retry when process status is :"
                       + BisComponentState.HOST_NOT_REACHABLE.value());
-                  transferData(channelId, routeId, null, isDisable);
+                  transferRetry(channelId, routeId, log.getBisChannelType(),isDisable);
                 }
               }
-              logger.trace("Inside isDisable ends here");
-            } else {
-              // To retry only specific file instead of downloading all files in
-              // the in source folder
-              logger.trace(
-                  "Inside the block of retry when disable is not checked for route Id :" + routeId);
-              // SIP-6094 : duplicate check has been introduced; no need to retry if file
-              // has been identified has duplicate
-              // and to update the process status as DATA_REMOVED when there is a file
-              // associated with it.
-              if (log.getFileName() != null
-                  && (sipLogService.duplicateCheckFilename(isDisable,log.getFileName()))) {
-                updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
-                    BisComponentState.DATA_REMOVED.value());
-                logger
-                    .trace("Inside the block of retry when file is not duplicate :" + log.getPid());
-                transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()), true);
-              } else {
-                // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
-                // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
-                // instead of inserting new one
-                sipLogService.updateStatusFailed(BisProcessState.FAILED.value(),
-                    BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
-                logger.trace("Inside the block of retry when process status is :"
-                    + BisComponentState.HOST_NOT_REACHABLE.value());
-                transferRetry(channelId, routeId, log.getBisChannelType(),isDisable);
-              }
             }
+          } else {
+            logger.info("No route present with channelId: " 
+                + channelId + " routeID: " + routeId);
           }
         } catch (NotFoundException | IOException e) {
           logger.error("Exception occurred while reading duplicate attribute ", e);
