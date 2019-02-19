@@ -15,8 +15,7 @@ INSERT INTO schema_version VALUES ('8', '8', '<< Flyway Baseline >>', 'BASELINE'
 INSERT INTO schema_version VALUES ('9', '9', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('10', '10', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('11', '11', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
-INSERT INTO schema_version VALUES ('12', '12', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
-
+/** It is intentional not to include new entry for schema_version('12') to make sure V12__ONBOARD_CUST_DDL.sql is run for all migration **/
 
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
 INSERT INTO `PRODUCTS` (`PRODUCT_SYS_ID`,`PRODUCT_NAME`,`PRODUCT_CODE`,`PRODUCT_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (1,'MCT Insights','MCTI000001','MCT Insights',1,'2017-05-23 06:51:34','admin',NULL,NULL,NULL,NULL);

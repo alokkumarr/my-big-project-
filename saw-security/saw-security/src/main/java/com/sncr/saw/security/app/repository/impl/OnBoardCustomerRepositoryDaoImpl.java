@@ -23,6 +23,11 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
     @Autowired
     public OnBoardCustomerRepositoryDaoImpl(JdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
+    /**
+     * Check for validity for customerCode.
+     * @param custCode
+     * @return
+     */
     @Override
     public boolean isValidCustCode(String custCode) {
         try {
@@ -41,6 +46,10 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
         return false;
     }
 
+    /**
+     * Test sql connection
+     * @return
+     */
     @Override
     public int testSql() {
         String sql = "select 1";
@@ -53,6 +62,11 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
         return rowCount;
     }
 
+    /**
+     *
+     * @param cust
+     * @return
+     */
     @Override
     public long createNewCustomer(OnBoardCustomer cust) {
         String sql = "call onboard_customer(?,?,?,?,?,?,?) ";
@@ -70,6 +84,9 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
         return res;
     }
 
+    /**
+     *
+     */
     @Override
     public void displayCustomers() {
         String sql = "select CUSTOMER_SYS_ID, CUSTOMER_CODE, COMPANY_NAME, COMPANY_BUSINESS from CUSTOMERS";
