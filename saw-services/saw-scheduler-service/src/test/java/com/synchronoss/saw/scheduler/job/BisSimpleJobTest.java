@@ -17,7 +17,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
@@ -28,8 +27,6 @@ import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 public class BisSimpleJobTest {
 
 
-  @Mock
-  RetryTemplate retryTemplate;
 
   @Mock
   RestTemplate restTemplate;

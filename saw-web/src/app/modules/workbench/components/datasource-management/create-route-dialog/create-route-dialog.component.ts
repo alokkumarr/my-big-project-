@@ -15,6 +15,7 @@ import { isUnique } from '../../../../../common/validators';
 
 import { SourceFolderDialogComponent } from '../select-folder-dialog';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
+import * as moment from 'moment';
 
 @Component({
   selector: 'create-route-dialog',
@@ -27,6 +28,7 @@ export class CreateRouteDialogComponent {
   opType: 'create' | 'update' = 'create';
   channelName = '';
   isCronExpressionValid = false;
+  startDateCorrectFlag = true;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -132,6 +134,10 @@ export class CreateRouteDialogComponent {
   }
 
   createRoute(data) {
+    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment();
+    if (!this.startDateCorrectFlag) {
+      return false;
+    }
     const routeDetails = this.mapData(data);
     this.dialogRef.close({ routeDetails, opType: this.opType });
   }

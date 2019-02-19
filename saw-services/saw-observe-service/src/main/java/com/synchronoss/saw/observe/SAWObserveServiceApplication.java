@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss")
+@ComponentScan("com.synchronoss.saw.observe")
 @EnableAsync
 public class SAWObserveServiceApplication {
 

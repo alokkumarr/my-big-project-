@@ -99,13 +99,16 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     String jobKey = job.getJobName();
     String groupKey = job.getJobGroup();
-    String triggerKey = job.getJobName();
+
+    String timezone = job.getTimezone();
+    logger.trace("Timezone :" + timezone);
 
     JobDetail jobDetail = JobUtil.createBatchIngestionJob(jobClass, false, context, job, groupKey);
 
     logger.info("creating trigger for key :" + jobKey + " at date :" + job.getJobScheduleTime());
-    Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),
-        job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+    Trigger cronTriggerBean = JobUtil.createCronTrigger(jobKey, job.getJobScheduleTime(),
+        job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW,
+        timezone);
 
     try {
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -168,13 +171,16 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     String jobName = schedulerJobDetail.getJobName();
     Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
+    String timezone = schedulerJobDetail.getTimezone();
     JobKey jobKey = new JobKey(jobName, schedulerJobDetail.getJobGroup());
     logger.info("Parameters received for updating cron job : jobKey :" + jobKey + ", date: "
         + schedulerJobDetail.getJobScheduleTime());
     try {
       Trigger newTrigger = JobUtil.createCronTrigger(jobName,
           schedulerJobDetail.getJobScheduleTime(), schedulerJobDetail.getEndDate(),
-          schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+          schedulerJobDetail.getCronExpression(),
+          SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW, timezone);
       JobDetail jobDetail = scheduler.getJobDetail(jobKey);
       jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID, schedulerJobDetail);
       scheduler.addJob(jobDetail, true, true);
@@ -379,15 +385,14 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
                 || job.getCronExpression().trim().equals(""))) {
               // get job's trigger
               List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+              Map<String, Object> map = new HashMap<String, Object>();
+              map.put("jobDetails", job);
               Date scheduleTime = triggers.get(0).getStartTime();
               Date nextFireTime = triggers.get(0).getNextFireTime();
               Date lastFiredTime = triggers.get(0).getPreviousFireTime();
-
-              Map<String, Object> map = new HashMap<String, Object>();
-              map.put("jobDetails", job);
-              map.put("scheduleTime", scheduleTime);
-              map.put("lastFiredTime", lastFiredTime);
-              map.put("nextFireTime", nextFireTime);
+              map.put("scheduleTime", scheduleTime.getTime());
+              map.put("lastFiredTime", lastFiredTime != null ? lastFiredTime.getTime() : -1);
+              map.put("nextFireTime", nextFireTime.getTime());
               ScheduleKeys scheduleKeys = new ScheduleKeys();
               scheduleKeys.setJobName(jobName);
               scheduleKeys.setGroupName(groupName);
@@ -398,11 +403,11 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
                 String jobState = getJobState(scheduleKeys);
                 map.put("jobStatus", jobState);
               }
-
               list.add(map);
               logger.info("Job details:");
               logger.info("Job Name:" + jobName + ", Group Name:" + groupName + ", Schedule Time:"
-                  + scheduleTime);
+                  + scheduleTime + " nextFireTime :" + nextFireTime + ": lastFiredTime :"
+                  + lastFiredTime);
             }
           }
         }
@@ -434,14 +439,16 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
               // get job's trigger
               if (job.getChannelType().equalsIgnoreCase(scheduleKeys.getCategoryId())) {
                 List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+                logger.trace("Actual nextFireTime :" + triggers.get(0).getNextFireTime().getTime());
+                logger.trace(
+                    "Actual lastFiredTime :" + triggers.get(0).getPreviousFireTime().getTime());
+                map.put("jobDetails", job);
                 Date scheduleTime = triggers.get(0).getStartTime();
                 Date nextFireTime = triggers.get(0).getNextFireTime();
                 Date lastFiredTime = triggers.get(0).getPreviousFireTime();
-
-                map.put("jobDetails", job);
-                map.put("scheduleTime", scheduleTime);
-                map.put("lastFiredTime", lastFiredTime);
-                map.put("nextFireTime", nextFireTime);
+                map.put("scheduleTime", scheduleTime.getTime());
+                map.put("lastFiredTime", lastFiredTime != null ? lastFiredTime.getTime() : -1);
+                map.put("nextFireTime", nextFireTime.getTime());
 
                 if (isJobRunning(scheduleKeys)) {
                   map.put("jobStatus", "RUNNING");

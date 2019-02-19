@@ -17,6 +17,11 @@
 
     .mat-horizontal-stepper-content {
       height: 98%;
+
+      span.errorTextMsg {
+        color: $secondary-red;
+        margin-left: 3.5%;
+      }
     }
   }
 
@@ -63,3 +68,4 @@
     border: 3px $primary-blue-b1 solid;
   }
 }
+

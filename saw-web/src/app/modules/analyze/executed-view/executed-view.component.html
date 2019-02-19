@@ -52,7 +52,7 @@
       </mat-expansion-panel>
     </mat-card>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''">
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
         <div fxLayout="row">
@@ -166,6 +166,7 @@
                                 [analysis]="executedAnalysis"
                                 [data]="data"
                                 [updater]="chartUpdater$"
+                                class="executed-chart-analysis"
           >
           </executed-chart-view>
 
