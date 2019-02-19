@@ -976,27 +976,26 @@ public class SftpServiceImpl extends SipPluginContract {
 
                     logger.error("Exception occurred while transferring the file from channel", ex);
                 
-                      prepareLogInfo(bisDataMetaInfo,
+                    prepareLogInfo(bisDataMetaInfo,
                           pattern, getFilePath(localDirectory, entry),
                           getActualRecDate(entry), entry.getAttrs().getSize(),
                           sourcelocation + File.separator + entry.getFilename(), channelId, routeId,
                           localDirectory.getPath());
 
-                      logger.trace(" files or directory to be deleted on exception "
+                    logger.trace(" files or directory to be deleted on exception "
                           + fileTobeDeleted);
-                      bisDataMetaInfo.setComponentState(BisComponentState.TRANSFER_FAILED.value());
-                      bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
-                      sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                      //sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
-                    }
+                    bisDataMetaInfo.setComponentState(BisComponentState.TRANSFER_FAILED.value());
+                    bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
+                    sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                  }
                   if (fileTobeDeleted != null  
                       && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
                     this.processor.deleteFile(fileTobeDeleted.getPath(),
                         this.defaultDestinationLocation, this.mapRfsUser);
                   }
-                    if (template.getSession() != null) {
-                      template.getSession().close();
-                    }
+                  if (template.getSession() != null) {
+                    template.getSession().close();
+                  }
                   
                 }
               }
