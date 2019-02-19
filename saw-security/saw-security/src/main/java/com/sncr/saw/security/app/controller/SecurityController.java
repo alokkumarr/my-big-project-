@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
-import com.sncr.saw.security.app.repository.OnBoardCustomerRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
@@ -28,8 +27,6 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.TicketHelper;
-import com.sncr.saw.security.app.model.OnBoardCustomer;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -77,9 +74,6 @@ public class SecurityController {
 
 	@Autowired
     DataSecurityKeyRepository dataSecurityKeyRepository;
-
-	@Autowired
-    OnBoardCustomerRepository onBoardCustomerRepository;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -768,14 +762,6 @@ public class SecurityController {
 	    List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
 	    return groupNames;
     }
-
-    @RequestMapping(value = "/auth/admin/onboard",method = RequestMethod.POST)
-    public void callOnBoard(HttpServletRequest request,HttpServletResponse response,@RequestBody OnBoardCustomer on)    {
-        if (true) {
-            onBoardCustomerRepository.createNewCustomer(on);
-        }
-    }
-
 
     /**
      * Adding newly security Group Name to SEC_GROUP.
