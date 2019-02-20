@@ -1,0 +1,12 @@
+{
+  "CREATEDELETECHART": {
+    "charts": {
+      "CHART001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to create and delete combo charts"
+      }
+    }
+  }
+}
