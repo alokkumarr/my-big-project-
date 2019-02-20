@@ -10,3 +10,8 @@
   become: true
   roles:
     - saw-web
+- name: Install Product module metadata
+  hosts: saw-web
+  become: true
+  roles:
+    - product-module-metadata

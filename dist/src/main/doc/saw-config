@@ -205,3 +205,11 @@ sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
 [sip-rtps]
 sip-host1
 sip-host2
+
+[saw-product-module]
+sip-host1
+sip-host2
+
+[saw-product-module:vars]
+sip_product_module_id=prj::module1
+sip_product_module_config_path=
