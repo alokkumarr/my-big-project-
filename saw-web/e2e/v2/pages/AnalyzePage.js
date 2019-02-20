@@ -3,9 +3,12 @@ const commonFunctions = require('./utils/commonFunctions');
 const protractorConf = require('../conf/protractor.conf');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
+const CreateAnalysisModel = require('./components/CreateAnalysisModel');
+const Utils = require('./utils/Utils');
 
-class AnalyzePage {
+class AnalyzePage extends CreateAnalysisModel {
   constructor() {
+    super();
     this._addAnalysisButton = element(
       by.css(`[e2e="open-new-analysis-modal"]`)
     );
@@ -43,15 +46,48 @@ class AnalyzePage {
     this._actionDetailsButton = element(
       by.css(`[e2e="actions-menu-selector-details"]`)
     );
+    this._analysisTitleLink = name =>
+      element(by.xpath(`//a[text()="${name}"]`));
+
+    this._toastMessage = message =>
+      element(
+        by.xpath(
+          `//*[@class="toast-message" and contains(text(),"${message}")]`
+        )
+      );
+    this._labelNames = name => element(by.xpath(`//div[text()="${name}"]`));
+    this._analyzeTypeSelector = element(
+      by.xpath(`//*[contains(@class,"select-form-field")]`)
+    ); //[e2e="analyze-type-selector"]
+    this._analysisType = name =>
+      element(
+        by.xpath(
+          `//span[@class="mat-option-text" and contains(text(),"${name}")]`
+        )
+      );
   }
 
   goToView(viewName) {
     if (viewName === 'card') {
-      commonFunctions.waitFor.elementToBeClickable(this._cardView);
-      this._cardView.click();
+      commonFunctions.waitFor.elementToBeVisible(this._cardView);
+      element(
+        Utils.hasClass(this._cardView, 'mat-radio-checked').then(isPresent => {
+          if (!isPresent) {
+            commonFunctions.waitFor.elementToBeClickable(this._cardView);
+            this._cardView.click();
+          }
+        })
+      );
     } else {
-      commonFunctions.waitFor.elementToBeClickable(this._listView);
-      this._listView.click();
+      commonFunctions.waitFor.elementToBeVisible(this._listView);
+      element(
+        Utils.hasClass(this._listView, 'mat-radio-checked').then(isPresent => {
+          if (!isPresent) {
+            commonFunctions.waitFor.elementToBeClickable(this._listView);
+            this._listView.click();
+          }
+        })
+      );
     }
     browser.sleep(1000);
   }
@@ -74,11 +110,7 @@ class AnalyzePage {
   }
 
   verifyElementPresent(myElement, isExist, message) {
-    element(
-      myElement.isPresent().then(function(isVisible) {
-        expect(isVisible).toBe(isExist, message);
-      })
-    );
+    expect(myElement.isPresent()).toBe(isExist, message);
   }
 
   closeOpenedActionMenuFromCardView() {
@@ -104,6 +136,37 @@ class AnalyzePage {
     browser
       .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
       .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
+  }
+
+  clickOnAnalysisLink(name) {
+    commonFunctions.waitFor.elementToBeClickable(this._analysisTitleLink(name));
+    this._analysisTitleLink(name).click();
+    commonFunctions.waitFor.pageToBeReady(/executed/);
+  }
+
+  verifyToastMessagePresent(message) {
+    commonFunctions.waitFor.elementToBeVisible(this._toastMessage(message));
+  }
+
+  verifyAnalysisDeleted(name) {
+    commonFunctions.waitFor.pageToBeReady(/analyze/);
+    expect(this._analysisTitleLink(name).isPresent()).toBeFalsy();
+  }
+
+  verifyLabels(labels) {
+    labels.forEach(label => {
+      commonFunctions.waitFor.elementToBeVisible(this._labelNames(label));
+    });
+  }
+
+  clickOnAnalysisTypeSelector() {
+    commonFunctions.clickOnElement(this._analyzeTypeSelector);
+  }
+
+  verifyAnalysisTypeOptions(options) {
+    options.forEach(option => {
+      commonFunctions.waitFor.elementToBeVisible(this._analysisType(option));
+    });
   }
 }
 module.exports = AnalyzePage;
