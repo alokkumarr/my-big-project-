@@ -146,39 +146,39 @@ export const AGGREGATE_TYPES = [
     label: 'Total',
     value: 'sum',
     icon: 'icon-Sum',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Average',
     value: 'avg',
     icon: 'icon-ic-average',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Mininum',
     value: 'min',
     icon: 'icon-ic-min',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Maximum',
     value: 'max',
     icon: 'icon-ic-max',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Count',
     value: 'count',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Distinct Count',
     value: 'distinctCount',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Percentage',
