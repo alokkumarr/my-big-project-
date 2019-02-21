@@ -48,7 +48,7 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + "and Logs.channelSysId = :channelSysId "
       + "and ( (Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = 'DATA_INPROGRESS')"
       + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE')"
-      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'TRANSFER_FAILED') )")
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'FAILED') )")
   boolean isChannelAndRouteIdExists(@Param("routeId") Long routeId,
       @Param("channelSysId") Long channelSysId);
 
@@ -58,7 +58,7 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + "> :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
       + "and Logs.bisProcessState = 'DATA_INPROGRESS')  "
       + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE')"
-      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'TRANSFER_FAILED') )")
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'FAILED') )")
   Page<BisFileLog> retryIds(@Param("noOfMinutes") Integer noOfMinutes, Pageable pageable);
 
   @Modifying(clearAutomatically = true)
@@ -71,7 +71,7 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + " > :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
       + "and Logs.bisProcessState = 'DATA_INPROGRESS') "
       + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE') "
-      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'TRANSFER_FAILED') )")
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'FAILED') )")
   Integer countOfRetries(@Param("noOfMinutes") Integer noOfMinutes);
   
 

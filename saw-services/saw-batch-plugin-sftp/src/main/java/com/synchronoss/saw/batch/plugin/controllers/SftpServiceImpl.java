@@ -824,6 +824,7 @@ public class SftpServiceImpl extends SipPluginContract {
                        destination, batchId);
                   logger.trace("File location at destination:: " + path);
                   localDirectory = new File(path);
+                  String logId = "";
                   try {
                     if (entry.getAttrs().getSize() != 0 && sipLogService
                         .duplicateCheck(isDisableDuplicate,sourcelocation,entry)) {
@@ -849,6 +850,7 @@ public class SftpServiceImpl extends SipPluginContract {
                           localDirectory.getPath());
 
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                      logId = bisDataMetaInfo.getProcessId();
                       logger.trace("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
                       FSDataOutputStream fos = fs
@@ -867,6 +869,9 @@ public class SftpServiceImpl extends SipPluginContract {
                               logger.trace("File" + entry.getFilename() + " transfer strat time:: "
                                   + fileTransStartTime);
                               try {
+                                bisDataMetaInfo.setFileTransferStartTime(
+                                    Date.from(fileTransStartTime.toInstant()));
+                                
                                 if (stream != null) {
                                   if (processor.isDestinationMapR(defaultDestinationLocation)) {
                                       logger.info("COPY BYTES STARTS HERE 8");
@@ -898,8 +903,6 @@ public class SftpServiceImpl extends SipPluginContract {
                                           BisProcessState.SUCCESS.value());
                                     bisDataMetaInfo.setComponentState(
                                         BisComponentState.DATA_RECEIVED.value());
-                                    bisDataMetaInfo.setFileTransferStartTime(
-                                        Date.from(fileTransStartTime.toInstant()));
                                     bisDataMetaInfo.setFileTransferEndTime(
                                         Date.from(fileTransEndTime.toInstant()));
                                     bisDataMetaInfo.setFileTransferDuration(
@@ -984,10 +987,12 @@ public class SftpServiceImpl extends SipPluginContract {
 
                     logger.trace(" files or directory to be deleted on exception "
                           + fileTobeDeleted);
-                    bisDataMetaInfo.setComponentState(BisComponentState.TRANSFER_FAILED.value());
+
+                    logger.trace("UPDATING:::::");
+                    bisDataMetaInfo.setComponentState(BisComponentState.FAILED.value());
                     bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
-                    sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                    sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
+                    sipLogService.upsert(bisDataMetaInfo, logId);
+                    // sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
                     if (fileTobeDeleted != null  
                         && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
                       this.processor.deleteFile(fileTobeDeleted.getPath(),
