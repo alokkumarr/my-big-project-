@@ -390,13 +390,7 @@ class SuiteSetup {
       }
       if (suiteName !== undefined && suiteName === 'critical') {
         logger.warn('Executing with critical suite test data set.....');
-        let data = JSON.parse(
-          fs.readFileSync(
-            '../saw-web/e2e/v2/testdata/data.critical.json',
-            'utf8'
-          )
-        );
-        return data;
+        return SuiteSetup.readAllData(null, 'critical');
       } else {
         logger.warn('Executing with full suite test data set....');
         //let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.json', 'utf8'));

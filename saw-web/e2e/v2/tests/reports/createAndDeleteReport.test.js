@@ -54,7 +54,6 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
       it(`${id}:${data.description}`, () => {
         try {
           const reportName = `e2e dl report ${new Date().toString()}`;
-          console.log(reportName);
           const reportDescription = `e2e dl report description ${new Date().toString()}`;
           const analysisType = 'table:report';
           const tables = data.tables;
