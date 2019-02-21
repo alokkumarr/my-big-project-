@@ -1,4 +1,5 @@
 'use-strict';
+
 const logger = require('../conf/logger')(__filename);
 const commonFunctions = require('./utils/commonFunctions');
 const users = require('../helpers/data-generation/users');

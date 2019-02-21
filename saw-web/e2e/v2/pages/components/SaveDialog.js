@@ -1,7 +1,7 @@
 'use strict';
 
-const logger = require('../../conf/logger')(__filename);
 const commonFunctions = require('../utils/commonFunctions');
+
 class SaveDialog {
   constructor() {
     this._analysisNameInput = element(by.css(`[e2e="save-dialog-name"]`));
@@ -26,7 +26,7 @@ class SaveDialog {
   }
 
   clickOnSaveAndCloseDialogButton(landingPageAfterSave = null) {
-    commonFunctions.clickOnElement(this.__saveAndCloseButton);
+    commonFunctions.clickOnElement(this._saveAndCloseButton);
     if (landingPageAfterSave) {
       commonFunctions.waitFor.pageToBeReady(landingPageAfterSave);
     }

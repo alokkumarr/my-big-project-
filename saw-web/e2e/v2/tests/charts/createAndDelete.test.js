@@ -10,7 +10,7 @@ let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
 const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
-const DesignerPage = require('../../pages/DesignerPage');
+const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 
 describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
@@ -19,7 +19,6 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
   let token;
   const yAxisName = 'Double';
   const xAxisName = 'Date';
-  const yAxisName2 = 'Long';
   const groupName = 'String';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
@@ -58,6 +57,7 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
+        logger.info(`Executing test case with id: ${id}`);
         const chartName = `e2e chart ${new Date().toString()}`;
         const chartDescription = `e2e chart description ${new Date().toString()}`;
 
@@ -66,11 +66,53 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
 
         const analyzePage = new AnalyzePage();
         analyzePage.clickOnAddAnalysisButton();
-        analyzePage.clickOnAnalysisType('');
         analyzePage.clickOnChartType(data.chartType);
         analyzePage.clickOnNextButton();
         analyzePage.clickOnDataPods(metricName);
         analyzePage.clickOnCreateButton();
+
+        const chartDesignerPage = new ChartDesignerPage();
+        // Dimension section.
+        chartDesignerPage.clickOnAttribute(xAxisName);
+        // Group by section. i.e. Color by
+        chartDesignerPage.clickOnAttribute(groupName);
+        // Metric section.
+        chartDesignerPage.clickOnAttribute(yAxisName);
+        // Size section.
+        if (data.chartType === 'chart:bubble') {
+          chartDesignerPage.clickOnAttribute(sizeByName);
+        }
+        //Save
+        chartDesignerPage.clickOnSave();
+        chartDesignerPage.enterAnalysisName(chartName);
+        chartDesignerPage.enterAnalysisDescription(chartDescription);
+        chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+
+        // Verify analysis displayed in list and card view
+        analyzePage.goToView('list');
+        analyzePage.verifyElementPresent(
+          analyzePage._analysisTitleLink(chartName),
+          true,
+          'report should be present in list/card view'
+        );
+        analyzePage.goToView('card');
+        // Go to detail page and very details
+        analyzePage.clickOnAnalysisLink(chartName);
+
+        const executePage = new ExecutePage();
+        executePage.verifyTitle(chartName);
+        analysisId = executePage.getAnalysisId();
+
+        executePage.clickOnActionLink();
+        executePage.clickOnDetails();
+        executePage.verifyDescription(chartDescription);
+        executePage.closeActionMenu();
+        // Delete the report
+        executePage.clickOnActionLink();
+        executePage.clickOnDelete();
+        executePage.confirmDelete();
+        analyzePage.verifyToastMessagePresent('Analysis deleted.');
+        analyzePage.verifyAnalysisDeleted();
       }).result.testInfo = {
         testId: id,
         data: data,

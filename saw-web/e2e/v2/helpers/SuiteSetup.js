@@ -394,7 +394,7 @@ class SuiteSetup {
       } else {
         logger.warn('Executing with full suite test data set....');
         //let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.json', 'utf8'));
-        let data = SuiteSetup.readAllData();
+        let data = SuiteSetup.readAllData(null, null);
         return data;
       }
     }

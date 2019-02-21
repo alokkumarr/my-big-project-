@@ -29,11 +29,10 @@ class CreateAnalysisModel {
 
   clickOnCreateButton() {
     commonFunctions.clickOnElement(this._createButton);
-    commonFunctions.waitFor.elementToBeClickable(this._createButton);
   }
 
   clickOnChartType(type) {
-    commonFunctions.clickOnElement(his._chartType(type));
+    commonFunctions.clickOnElement(this._chartType(type));
   }
 }
 module.exports = CreateAnalysisModel;

@@ -1,33 +1,22 @@
-'use strict';
-const chai = require('chai');
-const assert = chai.assert;
+'use-strict';
+
+const Designer = require('./components/Designer');
 const commonFunctions = require('./utils/commonFunctions');
-const protractorConf = require('../conf/protractor.conf');
-const protractor = require('protractor');
-const ec = protractor.ExpectedConditions;
 
-const SaveDialog = require('./components/SaveDialog');
-
-class DesignerPage extends SaveDialog {
+class ReportDesignerPage extends Designer {
   constructor() {
     super();
-    this._designerButton = element(by.css(`[id="mat-button-toggle-1-button"]`));
+
     this._reportField = (tableName, fieldName) =>
       element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
+
     this._reportFieldCheckbox = (tableName, fieldName) =>
       this._reportField(tableName, fieldName).element(by.css('mat-checkbox'));
-    this._saveButton = element(by.css(`[e2e="designer-save-btn"]`));
+
     this._selectedField = name =>
       element(by.xpath(`//span[@class="column-name" and text()="${name}"]`));
+
     this._reportGrid = element(by.xpath(`//report-grid-upgraded`));
-  }
-
-  verifyOnDesignerPage() {
-    commonFunctions.waitFor.elementToBeVisible(this._designerButton);
-  }
-
-  clickOnDesignerButton() {
-    commonFunctions.clickOnElement(this._designerButton);
   }
 
   clickOnReportFields(tables) {
@@ -38,10 +27,6 @@ class DesignerPage extends SaveDialog {
         );
       });
     });
-  }
-
-  clickOnSave() {
-    commonFunctions.clickOnElement(this._saveButton);
   }
 
   verifyDisplayedColumns(tables) {
@@ -56,4 +41,4 @@ class DesignerPage extends SaveDialog {
     });
   }
 }
-module.exports = DesignerPage;
+module.exports = ReportDesignerPage;
