@@ -15,20 +15,17 @@ class LoginPage {
 
   fillUserNameField(userName) {
     logger.debug('Filling user name with :' + userName);
-    commonFunctions.waitFor.elementToBeVisible(this._userName);
-    this._userName.clear().sendKeys(userName);
+    commonFunctions.fillInput(this._userName, userName);
   }
 
   fillPasswordField(password) {
     logger.debug('Filling password with :' + password);
-    commonFunctions.waitFor.elementToBeVisible(this._password);
-    this._password.clear().sendKeys(password);
+    commonFunctions.fillInput(this._password, password);
   }
 
   clickOnLoginButton() {
     logger.debug('Click on login button');
-    commonFunctions.waitFor.elementToBeVisible(this._loginButton);
-    this._loginButton.click();
+    commonFunctions.clickOnElement(this._loginButton);
   }
 
   doLogin(userName, password) {

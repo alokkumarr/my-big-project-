@@ -33,10 +33,7 @@ class SideNav {
         .hasClass(this._categoryByName(name), 'mat-expanded')
         .then(isPresent => {
           if (!isPresent) {
-            commonFunctions.waitFor.elementToBeClickable(
-              self._categoryByName(name)
-            );
-            self._categoryByName(name).click();
+            commonFunctions.clickOnElement(self._categoryByName(name));
             browser.sleep(2000);
           }
         })
@@ -47,8 +44,7 @@ class SideNav {
    * @param {*} name
    */
   selectSubCategory(name) {
-    commonFunctions.waitFor.elementToBeClickable(this._subCategoryByName(name));
-    this._subCategoryByName(name).click();
+    commonFunctions.clickOnElement(self._subCategoryByName(name));
     browser.sleep(1000);
     commonFunctions.waitFor.elementToBeVisible(
       this._selectedCategoryTitle(name)

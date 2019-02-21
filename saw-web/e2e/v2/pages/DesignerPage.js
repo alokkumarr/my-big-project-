@@ -27,24 +27,21 @@ class DesignerPage extends SaveDialog {
   }
 
   clickOnDesignerButton() {
-    commonFunctions.waitFor.elementToBeClickable(this._designerButton);
-    this._designerButton.click();
+    commonFunctions.clickOnElement(this._designerButton);
   }
 
   clickOnReportFields(tables) {
     tables.forEach(table => {
       table.fields.forEach(field => {
-        commonFunctions.waitFor.elementToBeClickable(
+        commonFunctions.clickOnElement(
           this._reportFieldCheckbox(table.name, field)
         );
-        this._reportFieldCheckbox(table.name, field).click();
       });
     });
   }
 
   clickOnSave() {
-    commonFunctions.waitFor.elementToBeClickable(this._saveButton);
-    this._saveButton.click();
+    commonFunctions.clickOnElement(this._saveButton);
   }
 
   verifyDisplayedColumns(tables) {
