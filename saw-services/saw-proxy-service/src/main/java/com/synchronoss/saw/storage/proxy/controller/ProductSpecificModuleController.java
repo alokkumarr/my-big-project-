@@ -229,9 +229,9 @@ public class ProductSpecificModuleController {
         @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
     })
     //The request type is POST since we need request body to accept list of attribute-values to filter documents.
-    @RequestMapping(value = "/filter/docs", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/filter/docs", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ProductModuleDocs readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestParam MultiValueMap keyValues) {
+    public ProductModuleDocs readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestBody MultiValueMap keyValues) {
         logger.debug("Json returned : ",pms.getAllDocs(tableName,keyValues));
         return pms.getAllDocs(tableName,keyValues);
     }
