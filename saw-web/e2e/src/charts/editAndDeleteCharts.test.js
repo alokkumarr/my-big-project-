@@ -32,6 +32,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
   let analysisId;
+  let editedAnalysisId;
   let host;
   let token;
 
@@ -56,6 +57,14 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
           token,
           protractorConf.config.customerCode,
           analysisId
+        );
+      }
+      if (editedAnalysisId) {
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          editedAnalysisId
         );
       }
       commonFunctions.logOutByClearingLocalStorage();
@@ -134,10 +143,9 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
             );
             //Open the created analysis.
             const createdAnalysis = analyzePage.main.getCardTitle(name);
-
-            commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
             commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
             createdAnalysis.click();
+            commonFunctions.waitFor.pageToBeReady(/executed/);
             //get analysis id from current url
             browser.getCurrentUrl().then(url => {
               analysisId = commonFunctions.getAnalysisIdFromUrl(url);
@@ -215,20 +223,22 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
             commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
             save.nameInput.clear().sendKeys(updatedName);
             save.descriptionInput.clear().sendKeys(updatedDescription);
-            commonFunctions.waitFor.elementToBeClickable(
-              save.selectedCategoryUpdated
-            );
-            save.selectedCategoryUpdated.click();
-            commonFunctions.waitFor.elementToBeClickable(
-              save.selectCategoryToSave(subCategoryName)
-            );
-            save.selectCategoryToSave(subCategoryName).click();
             commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
             save.saveBtn.click();
 
-            commonFunctions.waitFor.elementToBeNotVisible(
-              analyzePage.designerDialog.chart.filterBtn
-            );
+            const updatedAnalysis = analyzePage.main.getCardTitle(updatedName);
+            commonFunctions.waitFor.elementToBeClickable(updatedAnalysis);
+            analyzePage.main.categoryName.getText().then(cat => {
+              expect(cat.trim()).toBe('DRAFTS');
+            });
+
+            updatedAnalysis.click();
+            commonFunctions.waitFor.pageToBeReady(/executed/);
+            //get analysis id from current url
+            browser.getCurrentUrl().then(url => {
+              editedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
+            });
+
             commonFunctions.waitFor.elementToBeClickable(
               savedAlaysisPage.editBtn
             );

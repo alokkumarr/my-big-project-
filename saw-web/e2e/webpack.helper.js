@@ -33,75 +33,99 @@ function generateFailedTests(dir) {
     fs.mkdirSync('target/e2e/testData/failed');
   }
 
-  const dirCont = fs.readdirSync(dir);
-  const files = dirCont.filter(elm => /.*\.(xml)/gi.test(elm));
-  let filesToProcess = [];
-  // create processed file json
-  if (fs.existsSync('target/e2e/testData/processed/processedFiles.json')) {
-    // Get all the files matching to json file
-    const processedDirCount = fs.readdirSync('target/e2e/testData/processed');
-    const oldProcessedFiles = processedDirCount.filter(elm =>
-      /.*\.(json)/gi.test(elm)
-    );
-    // Get new files to process
-    let oldProcessedXmlFiles = [];
-    oldProcessedFiles.forEach(function(oldProcessedFile) {
-      let filesInOld = JSON.parse(
-        fs.readFileSync(
-          'target/e2e/testData/processed/' + oldProcessedFile,
-          'utf8'
-        )
+  if (fs.existsSync(dir)) {
+    const dirCont = fs.readdirSync(dir);
+    const files = dirCont.filter(elm => /.*\.(xml)/gi.test(elm));
+    let filesToProcess = [];
+    // create processed file json
+    if (fs.existsSync('target/e2e/testData/processed/processedFiles.json')) {
+      // Get all the files matching to json file
+      const processedDirCount = fs.readdirSync('target/e2e/testData/processed');
+      const oldProcessedFiles = processedDirCount.filter(elm =>
+        /.*\.(json)/gi.test(elm)
       );
-      oldProcessedXmlFiles = [...oldProcessedXmlFiles, ...filesInOld];
-    });
+      // Get new files to process
+      let oldProcessedXmlFiles = [];
+      oldProcessedFiles.forEach(function(oldProcessedFile) {
+        let filesInOld = JSON.parse(
+          fs.readFileSync(
+            'target/e2e/testData/processed/' + oldProcessedFile,
+            'utf8'
+          )
+        );
+        oldProcessedXmlFiles = [...oldProcessedXmlFiles, ...filesInOld];
+      });
 
-    files.forEach(function(file) {
-      if (!oldProcessedXmlFiles.includes(file)) {
-        //console.log('new file adding into file to be processed...'+file)
-        filesToProcess.push(file);
-      }
-    });
+      files.forEach(function(file) {
+        if (!oldProcessedXmlFiles.includes(file)) {
+          //console.log('new file adding into file to be processed...'+file)
+          filesToProcess.push(file);
+        }
+      });
 
-    let oldProcessedFile =
-      'oldProcessedFiles_' + new Date().getTime() + '.json';
-    fs.writeFileSync(
-      'target/e2e/testData/processed/' + oldProcessedFile,
-      JSON.stringify(oldProcessedXmlFiles),
-      { encoding: 'utf8' }
+      let oldProcessedFile =
+        'oldProcessedFiles_' + new Date().getTime() + '.json';
+      fs.writeFileSync(
+        'target/e2e/testData/processed/' + oldProcessedFile,
+        JSON.stringify(oldProcessedXmlFiles),
+        { encoding: 'utf8' }
+      );
+
+      // delete old file
+      fs.unlinkSync('target/e2e/testData/processed/processedFiles.json');
+      // Create new file which is actual failed tests
+      fs.writeFileSync(
+        'target/e2e/testData/processed/processedFiles.json',
+        JSON.stringify(filesToProcess),
+        { encoding: 'utf8' }
+      );
+    } else {
+      filesToProcess = files;
+      // write processedFiles
+      fs.writeFileSync(
+        'target/e2e/testData/processed/processedFiles.json',
+        JSON.stringify(files),
+        { encoding: 'utf8' }
+      );
+    }
+
+    let mainTestData = JSON.parse(
+      fs.readFileSync('../saw-web/e2e/src/testdata/data.json', 'utf8')
     );
 
-    // delete old file
-    fs.unlinkSync('target/e2e/testData/processed/processedFiles.json');
-    // Create new file which is actual failed tests
-    fs.writeFileSync(
-      'target/e2e/testData/processed/processedFiles.json',
-      JSON.stringify(filesToProcess),
-      { encoding: 'utf8' }
-    );
-  } else {
-    filesToProcess = files;
-    // write processedFiles
-    fs.writeFileSync(
-      'target/e2e/testData/processed/processedFiles.json',
-      JSON.stringify(files),
-      { encoding: 'utf8' }
-    );
-  }
+    filesToProcess.forEach(function(file) {
+      let fileDataXml = fs.readFileSync(dir + '/' + file, 'utf8');
+      let fileDataJson = JSON.parse(
+        convert.xml2json(fileDataXml, { compact: true, spaces: 4 })
+      );
+      let testCases = fileDataJson['ns2:test-suite']['test-cases'];
 
-  let mainTestData = JSON.parse(
-    fs.readFileSync('../saw-web/e2e/src/testdata/data.json', 'utf8')
-  );
+      if (Array.isArray(testCases['test-case'])) {
+        //more than 1 tests failed
+        testCases['test-case'].forEach(function(testCase) {
+          if (testCase._attributes.status.toLocaleLowerCase() === 'failed') {
+            // add them to retry tests
+            let testMetaData = JSON.parse(
+              testCase.name._text.split('testDataMetaInfo: ')[1]
+            );
 
-  filesToProcess.forEach(function(file) {
-    let fileDataXml = fs.readFileSync(dir + '/' + file, 'utf8');
-    let fileDataJson = JSON.parse(
-      convert.xml2json(fileDataXml, { compact: true, spaces: 4 })
-    );
-    let testCases = fileDataJson['ns2:test-suite']['test-cases'];
-
-    if (Array.isArray(testCases['test-case'])) {
-      //more than 1 tests failed
-      testCases['test-case'].forEach(function(testCase) {
+            if (!subset[testMetaData['feature']]) {
+              subset[testMetaData['feature']] = {};
+            }
+            if (!subset[testMetaData['feature']][testMetaData['dp']]) {
+              subset[testMetaData['feature']][testMetaData['dp']] = {};
+            }
+            subset[testMetaData['feature']][testMetaData['dp']][
+              testMetaData['test']
+            ] =
+              mainTestData[testMetaData['feature']][testMetaData['dp']][
+                testMetaData['test']
+              ];
+          }
+        });
+      } else {
+        // only 1 test failed
+        let testCase = testCases['test-case'];
         if (testCase._attributes.status.toLocaleLowerCase() === 'failed') {
           // add them to retry tests
           let testMetaData = JSON.parse(
@@ -121,86 +145,67 @@ function generateFailedTests(dir) {
               testMetaData['test']
             ];
         }
-      });
-    } else {
-      // only 1 test failed
-      let testCase = testCases['test-case'];
-      if (testCase._attributes.status.toLocaleLowerCase() === 'failed') {
-        // add them to retry tests
-        let testMetaData = JSON.parse(
-          testCase.name._text.split('testDataMetaInfo: ')[1]
-        );
-
-        if (!subset[testMetaData['feature']]) {
-          subset[testMetaData['feature']] = {};
-        }
-        if (!subset[testMetaData['feature']][testMetaData['dp']]) {
-          subset[testMetaData['feature']][testMetaData['dp']] = {};
-        }
-        subset[testMetaData['feature']][testMetaData['dp']][
-          testMetaData['test']
-        ] =
-          mainTestData[testMetaData['feature']][testMetaData['dp']][
-            testMetaData['test']
-          ];
       }
-    }
-  });
-
-  if (fs.existsSync('target/e2e/testData/failed/failedTests.json')) {
-    // Get all the files matching to json file
-    const failedDirCount = fs.readdirSync('target/e2e/testData/failed');
-    const oldFailedTests = failedDirCount.filter(elm =>
-      /.*\.(json)/gi.test(elm)
-    );
-
-    let oldFailedJsonData = [];
-    oldFailedTests.forEach(function(oldFailedTest) {
-      oldFailedJsonData.push(
-        JSON.parse(
-          fs.readFileSync('target/e2e/testData/failed/' + oldFailedTest, 'utf8')
-        )
-      );
     });
 
-    let oldFailedFile = 'oldFailedTests_' + new Date().getTime() + '.json';
-    fs.writeFileSync(
-      'target/e2e/testData/failed/' + oldFailedFile,
-      JSON.stringify(oldFailedJsonData),
-      { encoding: 'utf8' }
-    );
+    if (fs.existsSync('target/e2e/testData/failed/failedTests.json')) {
+      // Get all the files matching to json file
+      const failedDirCount = fs.readdirSync('target/e2e/testData/failed');
+      const oldFailedTests = failedDirCount.filter(elm =>
+        /.*\.(json)/gi.test(elm)
+      );
 
-    // Create new file which is actual failed tests
-    fs.unlinkSync('target/e2e/testData/failed/failedTests.json');
-    fs.writeFileSync(
-      'target/e2e/testData/failed/failedTests.json',
-      JSON.stringify(subset),
-      { encoding: 'utf8' }
-    );
-  } else {
-    if (Object.keys(subset).length > 0) {
+      let oldFailedJsonData = [];
+      oldFailedTests.forEach(function(oldFailedTest) {
+        oldFailedJsonData.push(
+          JSON.parse(
+            fs.readFileSync(
+              'target/e2e/testData/failed/' + oldFailedTest,
+              'utf8'
+            )
+          )
+        );
+      });
+
+      let oldFailedFile = 'oldFailedTests_' + new Date().getTime() + '.json';
+      fs.writeFileSync(
+        'target/e2e/testData/failed/' + oldFailedFile,
+        JSON.stringify(oldFailedJsonData),
+        { encoding: 'utf8' }
+      );
+
+      // Create new file which is actual failed tests
+      fs.unlinkSync('target/e2e/testData/failed/failedTests.json');
       fs.writeFileSync(
         'target/e2e/testData/failed/failedTests.json',
         JSON.stringify(subset),
         { encoding: 'utf8' }
       );
+    } else {
+      if (Object.keys(subset).length > 0) {
+        fs.writeFileSync(
+          'target/e2e/testData/failed/failedTests.json',
+          JSON.stringify(subset),
+          { encoding: 'utf8' }
+        );
+      }
     }
-  }
 
-  if (Object.keys(subset).length > 0) {
-    // There are some failures hence deleting the old failed file & creating it again with new data set
-    if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
-      fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
-    }
-    fs.writeFileSync(
-      'target/e2e/testData/failed/finalFail.json',
-      JSON.stringify(subset),
-      { encoding: 'utf8' }
-    );
-  } else {
-    // There are no failures hence deleting the old failed file...
-    if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
-      fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
+    if (Object.keys(subset).length > 0) {
+      // There are some failures hence deleting the old failed file & creating it again with new data set
+      if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+        fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
+      }
+      fs.writeFileSync(
+        'target/e2e/testData/failed/finalFail.json',
+        JSON.stringify(subset),
+        { encoding: 'utf8' }
+      );
+    } else {
+      // There are no failures hence deleting the old failed file...
+      if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+        fs.unlinkSync('target/e2e/testData/failed/finalFail.json');
+      }
     }
   }
 }

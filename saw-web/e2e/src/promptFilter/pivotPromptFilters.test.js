@@ -112,16 +112,16 @@ describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
             );
             //From analysis detail/view page
             promptFilterFunctions.verifyPromptFromDetailPage(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data
             );
             //verifyPromptFromListView and by executing from action menu
             promptFilterFunctions.verifyPromptFromListView(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data,
@@ -129,8 +129,8 @@ describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
             );
             //verifyPromptFromListView and by clicking on analysis
             promptFilterFunctions.verifyPromptFromListView(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data,
@@ -138,8 +138,8 @@ describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
             );
             //verifyPromptFromCardView and by executing from action menu
             promptFilterFunctions.verifyPromptFromCardView(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data,
@@ -147,8 +147,8 @@ describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
             );
             //verifyPromptFromCardView and by clicking on analysis
             promptFilterFunctions.verifyPromptFromCardView(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data,
