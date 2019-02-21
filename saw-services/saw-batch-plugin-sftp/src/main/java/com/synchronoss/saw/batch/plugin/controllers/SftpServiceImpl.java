@@ -988,14 +988,14 @@ public class SftpServiceImpl extends SipPluginContract {
                     bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                     sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                     sipLogService.deleteLog(bisDataMetaInfo.getProcessId());
-                  }
-                  if (fileTobeDeleted != null  
-                      && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
-                    this.processor.deleteFile(fileTobeDeleted.getPath(),
-                        this.defaultDestinationLocation, this.mapRfsUser);
-                  }
-                  if (template.getSession() != null) {
-                    template.getSession().close();
+                    if (fileTobeDeleted != null  
+                        && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
+                      this.processor.deleteFile(fileTobeDeleted.getPath(),
+                          this.defaultDestinationLocation, this.mapRfsUser);
+                    }
+                    if (template.getSession() != null) {
+                      template.getSession().close();
+                    }
                   }
                   
                 }
