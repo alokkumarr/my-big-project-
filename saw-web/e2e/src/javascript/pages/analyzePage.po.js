@@ -431,6 +431,7 @@ module.exports = {
     getAnalysisChartType
   },
   main: {
+    categoryName: element(by.css(`[e2e="category-title"]`)),
     getAllAnalysis,
     actionMenuOptions: element(
       by.xpath('//div[contains(@class,"mat-menu-panel")]')
