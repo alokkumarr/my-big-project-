@@ -20,7 +20,7 @@ if [ -z "$2" ]; then
     suiteName="development"
 fi
 if [ -z "$3" ]; then
-    echo "${yellow}Third argument is not prvided hence running without retry + generating data only first time${reset}"
+    echo "${yellow}Third argument is not prvided hence running localRunTrue${reset}"
     localRun="--localRun"
 else 
     echo "Running tests with retry enabled..."
