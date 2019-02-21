@@ -10,12 +10,14 @@ $back-button-size: 32px;
   height: 100%;
 
   button {
-    line-height: 32px;
+    font-size: 11px;
+    line-height: 24px;
+    min-width: unset;
   }
 }
 
 .mat-icon {
-  height: 18px;
+  height: 11px;
 }
 
 .back-button-icon.mat-icon {
@@ -45,12 +47,12 @@ $back-button-size: 32px;
 }
 
 .header__description {
-  font-size: 14px;
+  font-size: 11px;
   padding-top: 5px;
   color: $primary-grey-g3;
 
   .mat-icon {
-    font-size: 14px;
+    font-size: 11px;
     height: 14px;
     width: 14px;
   }

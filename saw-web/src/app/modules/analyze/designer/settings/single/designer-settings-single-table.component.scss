@@ -9,7 +9,7 @@
   grid-template:
     "filters" 74px
     "unselected-fields" 1fr
-    "selected-fields" 1fr
+    // "selected-fields" 1fr
     / 100%;
 }
 
@@ -28,8 +28,22 @@
     border: 0;
   }
 
-  .settings__artifacts__filter__field {
-    width: 43%;
+  .settings__filters__keyword {
+    width: 100%;
+    font-size: 11px !important;
+  }
+
+  ::ng-deep .mat-button-toggle-label-content {
+    padding: 0;
+    line-height: 30px;
+
+    .mat-icon {
+      height: 11px;
+    }
+  }
+
+  .mat-button-toggle-checked{
+    background-color: $selection-highlight-col;
   }
 }
 
@@ -44,21 +58,19 @@
   }
 }
 
-.settings__selected-fields {
-  grid-area: selected-fields;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border-top: 1px solid $primary-grey-g1;
-  margin-top: 10px;
-}
+// .settings__selected-fields {
+//   grid-area: selected-fields;
+//   overflow-x: hidden;
+//   overflow-y: auto;
+//   border-top: 1px solid $primary-grey-g1;
+//   margin-top: 10px;
+// }
 
 .settings__list-item {
   cursor: move;
   margin-top: 3px;
   padding: 5px;
   min-width: max-content;
-  border: solid 1px $primary-grey-g1;
-  border-radius: 2px;
 
   button.mat-icon-button {
     line-height: 24px;
@@ -68,15 +80,35 @@
 
   .settings__list-item__name {
     max-width: 230px;
-    font-weight: 600;
     color: $primary-grey-g4;
+    font-size: 11px;
     white-space: normal;
     word-wrap: normal;
     word-break: break-word;
   }
 
   .settings__list-item__icon {
-    margin-left: 10px;
-    color: $primary-grey-g3;
+    color: $primary-blue-b2;
+    height: 11px;
   }
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.settings__list.cdk-drop-list-dragging .settings__list-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

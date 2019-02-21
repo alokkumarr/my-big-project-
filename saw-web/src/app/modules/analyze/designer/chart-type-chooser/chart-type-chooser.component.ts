@@ -4,7 +4,8 @@ import * as split from 'lodash/split';
 import { ANALYSIS_METHODS } from '../../consts';
 @Component({
   selector: 'chart-type-chooser',
-  templateUrl: 'chart-type-chooser.component.html'
+  templateUrl: 'chart-type-chooser.component.html',
+  styleUrls: ['chart-type-chooser.component.scss']
 })
 
 export class ChartTypeChooserComponent implements OnInit {

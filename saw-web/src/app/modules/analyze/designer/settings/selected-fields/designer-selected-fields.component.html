@@ -1,0 +1,27 @@
+<div *ngFor="let adapter of groupAdapters; let i = index"
+    fxLayout="row" fxLayoutAlign="start center"
+    class="selected-fields__container"
+>
+  <div fxFlex="10" class="selected-fields__label">
+    {{adapter.title}}:
+  </div>
+
+  <mat-chip-list cdkDropList
+                 cdkDropListOrientation="horizontal"
+                 [cdkDropListData]="adapter"
+                 [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
+                 (cdkDropListDropped)="drop($event)"
+                 fxFlex="90"
+                 class="selected-fields__list"
+                 [class.highlighted]=""
+  >
+    <mat-chip *ngFor="let col of adapter.artifactColumns"
+              class="selected-fields__item"
+              cdkDrag [cdkDragData]="col"
+              [removable]="true" (removed)="removeFromGroup(col, adapter)"
+    >
+      {{col.columnName}}
+      <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
+    </mat-chip>
+  </mat-chip-list>
+</div>

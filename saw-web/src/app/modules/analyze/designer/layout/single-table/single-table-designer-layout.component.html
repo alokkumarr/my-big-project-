@@ -10,14 +10,21 @@
 </designer-settings-single-table>
 
 <div class="designer__content">
-  <designer-settings-aux
+  <!-- <designer-settings-aux
     class="designer__aux-settings"
     [auxSettings]="auxSettings"
     [analysisType]="analysisType"
     [analysisSubtype]="analysisSubtype"
     [chartTitle]="chartTitle"
+    [artifacts]="artifacts"
     (change)="change.emit($event)"
-  ></designer-settings-aux>
+  ></designer-settings-aux> -->
+  <designer-selected-fields (change)="change.emit($event)"
+                            [analysisType]="analysisType"
+                            [analysisSubtype]="analysisSubtype"
+                            [artifacts]="artifacts"
+  >
+  </designer-selected-fields>
 
   <ng-container [ngSwitch]="">
 

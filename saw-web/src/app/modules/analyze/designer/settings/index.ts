@@ -2,6 +2,7 @@ import { DesignerSettingsSingleTableComponent } from './single';
 import { DesignerSettingsMultiTableComponent } from './multi';
 import { DesignerSettingsGroupComponent } from './group';
 import { DesignerSettingsQueryComponent } from './query';
+import { DesignerSelectedFieldsComponent } from './selected-fields';
 import {
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
@@ -16,6 +17,7 @@ export {
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
   DesignerSettingsQueryComponent,
+  DesignerSelectedFieldsComponent,
   DesignerSettingsGroupComponent,
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent,

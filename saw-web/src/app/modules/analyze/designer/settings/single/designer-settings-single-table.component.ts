@@ -7,6 +7,7 @@ import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
 
 import { DesignerService } from '../../designer.service';
+import { DndPubsubService } from '../../../../../common/services';
 import {
   IDEsignerSettingGroupAdapter,
   Artifact,
@@ -38,6 +39,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
       this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+      this.dropListContainer = {artifactColumns: this.unselectedArtifactColumns};
       if (this.unselectedArtifactColumns.length === this.artifactColumns.length) {
         setTimeout(() => {
           this.setGroupAdapters();
@@ -50,6 +52,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   @Input() fieldCount: number;
   @Input() public sqlBuilder;
 
+  public dropListContainer;
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
   public isEmpty: Function = isEmpty;
@@ -60,7 +63,10 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     keyword: '',
     types: ['number', 'date', 'string', 'geo']
   };
-  constructor(private _designerService: DesignerService) {
+  constructor(
+    private _designerService: DesignerService,
+    private _dndPubsub: DndPubsubService
+    ) {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
     // doesn't have to process everything with every quick change
@@ -206,5 +212,17 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       groupAdapter
     );
     this.onFieldsChange();
+  }
+
+  noReturnPredicate() {
+    return false;
+  }
+
+  dragStarted() {
+    this._dndPubsub.emit('dragStart');
+  }
+
+  dragReleased() {
+    this._dndPubsub.emit('dragEnd');
   }
 }

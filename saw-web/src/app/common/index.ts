@@ -6,6 +6,7 @@ import 'mottle';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {
   NgModule,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -23,6 +24,9 @@ import {
   DxDataGridComponent,
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
+import {
+  DxTextBoxModule
+} from 'devextreme-angular';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
@@ -87,7 +91,8 @@ import {
   WindowService,
   HeaderProgressService,
   DynamicModuleService,
-  CustomIconService
+  CustomIconService,
+  DndPubsubService
 } from './services';
 
 const MODULES = [
@@ -100,13 +105,15 @@ const MODULES = [
   MaterialModule,
   FlexLayoutModule,
   DndModule,
+  DragDropModule,
   DxPivotGridModule,
   DxDataGridModule,
   CommonPipesModule,
   HttpClientModule,
   OwlDateTimeModule,
   OwlNativeDateTimeModule,
-  UChartModule
+  UChartModule,
+  DxTextBoxModule
 ];
 
 const COMPONENTS = [
@@ -162,7 +169,8 @@ const SERVICES = [
   ToastService,
   UserService,
   WindowService,
-  CustomIconService
+  CustomIconService,
+  DndPubsubService
 ];
 
 const INTERCEPTORS = [

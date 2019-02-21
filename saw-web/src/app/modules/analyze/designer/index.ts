@@ -26,7 +26,8 @@ import {
   DesignerSettingsAuxMapChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
-  ExpandDetailChartComponent
+  ExpandDetailChartComponent,
+  DesignerSelectedFieldsComponent
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
@@ -73,7 +74,8 @@ const COMPONENTS = [
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayoutComponent,
   MultiTableDesignerLayoutComponent,
-  ChartTypeChooserComponent
+  ChartTypeChooserComponent,
+  DesignerSelectedFieldsComponent
 ];
 
 const SERVICES = [DesignerService];
