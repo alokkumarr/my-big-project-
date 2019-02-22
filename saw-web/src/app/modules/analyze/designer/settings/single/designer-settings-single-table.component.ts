@@ -5,6 +5,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
+import * as reject from 'lodash/reject';
 
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService } from '../../../../../common/services';
@@ -61,7 +62,8 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
-    types: ['number', 'date', 'string', 'geo']
+    types: []
+    // types: ['number', 'date', 'string', 'geo']
   };
   constructor(
     private _designerService: DesignerService,
@@ -161,6 +163,9 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   hasAllowedType(artifactColumn, filterTypes) {
     const generalType = this.getGeneralType(artifactColumn);
     /* prettier-ignore */
+    if (isEmpty(filterTypes)) {
+      return true;
+    }
     return filterTypes.includes(generalType);
   }
 
@@ -186,7 +191,12 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   onTypeFilterChange(value) {
-    this.filterObj.types = value;
+    // this.filterObj.types = value;
+    if (this.filterObj.types.includes(value)) {
+      this.filterObj.types = reject(this.filterObj.types, type => type === value);
+    } else {
+      this.filterObj.types.push(value);
+    }
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 

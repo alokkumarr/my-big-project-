@@ -1,18 +1,18 @@
 @import 'src/themes/base/colors';
 
 :host {
-  background-color: white;
+  background-color: $report-designer-settings-bg-color;
   height: 100%;
   max-width: 100vw;
   display: grid;
   grid-template:
-    'data-settings content' 100%
-    / 15% 85%;
+    'data-fields content options' 100%
+    / 15% 60% 25%;
 }
 
 .designer {
   &__data-settings {
-    grid-area: data-settings;
+    grid-area: data-fields;
     border-right: 1px solid $primary-grey-g1;
     margin: 10px 0;
   }
@@ -27,6 +27,10 @@
     //   'aux-settings'
     //   'filters'
     //   'data';
+  }
+
+  &__options {
+    grid-area: options;
   }
   &__filters {
     padding: 0 20px;

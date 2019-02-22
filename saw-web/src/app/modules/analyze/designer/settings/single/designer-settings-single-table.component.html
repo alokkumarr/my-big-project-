@@ -3,48 +3,27 @@
   <div class="settings__filters"
        fxLayout="column"
        fxLayoutAlign="center start">
-    <!-- <mat-form-field appearance="outline" class="form-select">
-      <mat-label>Types</mat-label>
-      <mat-select [value]="filterObj.types" (selectionChange)="onTypeFilterChange($event.value)" multiple>
-        <mat-option *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex" [value]="typeIcon.value">
-          <div fxLayout="row" fxLayoutAlign="space-between center">
-            {{ typeIcon.label}}
-            <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
-          </div>
-        </mat-option>
-      </mat-select>
-    </mat-form-field> -->
-    <mat-button-toggle-group multiple (change)="onTypeFilterChange($event.value)">
-      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
-                         [value]="typeIcon.value"
-                         [checked]="filterObj.types.includes(typeIcon.value)"
-                         class="settings__filters__type__toggle-btn"
-      >
-        <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
 
-    <dx-text-box [value]="filterObj.keyword"
-                (onValueChanged)="onTextFilterChange($event.target.value)"
-                placeholder="Search"
-                [showClearButton]="true"
-                class="settings__filters__keyword"
-    ></dx-text-box>
-
-    <!-- <mat-form-field class="settings__artifacts__filter__field">
+    <mat-form-field class="settings__filters__keyword" fxLayout="row">
       <input matInput type="text"
+              fxFlex="70"
               autocomplete="off"
               placeholder="Search"
               name="filter-settings"
               (input)="onTextFilterChange($event.target.value)"
               [value]="filterObj.keyword"/>
-      <button mat-button *ngIf="filterObj.keyword"
-              matSuffix mat-icon-button
-              aria-label="Clear"
-              (click)="onTextFilterChange('')">
-        <mat-icon fontIcon="icon-close"></mat-icon>
-      </button>
-    </mat-form-field> -->
+
+      <div fxFLex="30" fxLayout="row">
+        <mat-icon *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
+                  class="settings__filters_toggle"
+                  [class.selected]="filterObj.types.includes(typeIcon.value)"
+                  [fontIcon]="typeIcon.icon"
+                  (click)="onTypeFilterChange(typeIcon.value)"
+        >
+        </mat-icon>
+      </div>
+
+    </mat-form-field>
   </div>
 
   <div class="settings__unselected-fields">

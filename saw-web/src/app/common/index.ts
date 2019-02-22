@@ -25,7 +25,8 @@ import {
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
 import {
-  DxTextBoxModule
+  DxTextBoxModule,
+  DxButtonModule
 } from 'devextreme-angular';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
@@ -113,7 +114,8 @@ const MODULES = [
   OwlDateTimeModule,
   OwlNativeDateTimeModule,
   UChartModule,
-  DxTextBoxModule
+  DxTextBoxModule,
+  DxButtonModule
 ];
 
 const COMPONENTS = [

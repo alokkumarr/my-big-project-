@@ -5,10 +5,11 @@
 }
 
 ::ng-deep .mat-button-toggle-label-content {
-  padding: 0;
+  padding: 0 5px;
   line-height: 30px;
 
   .mat-icon {
-    height: 11px;
+    height: 14px;
+    font-size: 14px;
   }
 }

@@ -1,0 +1,11 @@
+:host {
+  ::ng-deep .mat-tab-label-content {
+    font-size: 11px;
+  }
+
+  ::ng-deep .mat-tab-label {
+    min-width: 80px;
+    height: 30px;
+    padding: 0 10px;
+  }
+}

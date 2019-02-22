@@ -2,12 +2,11 @@
 
 .settings__container {
   overflow: hidden;
-  background-color: white;
   display: grid;
   padding: 0 10px;
   height: 100%;
   grid-template:
-    "filters" 74px
+    "filters" 54px
     "unselected-fields" 1fr
     // "selected-fields" 1fr
     / 100%;
@@ -34,16 +33,37 @@
   }
 
   ::ng-deep .mat-button-toggle-label-content {
-    padding: 0;
+    padding: 0 5px;
     line-height: 30px;
 
     .mat-icon {
-      height: 11px;
+      height: 14px;
+      font-size: 14px;
     }
   }
 
   .mat-button-toggle-checked{
     background-color: $selection-highlight-col;
+  }
+
+  .settings__filters_toggle {
+    font-size: 8px;
+    width: 16px;
+    height: 16px;
+    padding-top: 4px;
+    padding-left: 4px;
+    width: 16px;
+    height: 12px;
+    cursor: pointer;
+    border: solid 1px transparent;
+
+    &.selected {
+      color: $primary-blue-b1;
+    }
+
+    &:hover {
+      border: solid 1px $primary-blue-b1;
+    }
   }
 }
 

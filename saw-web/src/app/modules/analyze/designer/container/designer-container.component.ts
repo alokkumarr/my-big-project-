@@ -716,6 +716,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'selectedFields':
       this.cleanSorts();
       this.addDefaultSorts();
+      this.artifacts = [...this.artifacts];
       this.checkNodeForSorts();
       this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
