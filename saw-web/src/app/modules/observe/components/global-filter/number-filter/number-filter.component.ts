@@ -1,5 +1,6 @@
 import {
   Component,
+  ChangeDetectionStrategy,
   OnInit,
   OnDestroy,
   Input,
@@ -14,7 +15,8 @@ import * as get from 'lodash/get';
 
 @Component({
   selector: 'g-number-filter',
-  templateUrl: 'number-filter.component.html'
+  templateUrl: 'number-filter.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
@@ -24,13 +26,14 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   public defaults: { min; max } = { min: 1, max: 100 };
   public filterCache: { operator?; start?; end? };
   public value: Array<number>;
-  public config = {
-    // tslint:disable-line
-    tooltips: true
-  };
   public clearFiltersListener: Subscription;
   public applyFiltersListener: Subscription;
   public closeFiltersListener: Subscription;
+  public sliderTooltip = {
+    enabled: true,
+    showMode: 'always',
+    position: 'top'
+  };
 
   constructor(
     public observe: ObserveService,
@@ -87,8 +90,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       this.defaults.max = parseFloat(get(data, `_max`, this.defaults.max));
 
       /* Give time for changes to min/max to propagate properly. The
-        nouislider library uses a settimeout to update changes in min/max.
-        https://github.com/tb/ng2-nouislider/blob/master/src/nouislider.ts#L154
+        range slider may use a settimeout to update changes in min/max.
       */
       setTimeout(() => {
         this.loadDefaults(useCache);
@@ -132,8 +134,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
         end: this.defaults.max
       };
 
-    this.value = [loadData.start, loadData.end];
-    this.onSliderChange(this.value);
+    this.onSliderChange([loadData.start, loadData.end]);
   }
 
   /**
@@ -149,8 +150,8 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       ...this._filter,
       ...{
         model: {
-          value: this.value[1],
-          otherValue: this.value[0],
+          value: data[1],
+          otherValue: data[0],
           operator: 'BTW'
         }
       }
