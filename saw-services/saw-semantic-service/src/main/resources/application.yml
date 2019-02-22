@@ -1,21 +1,23 @@
 info:
   component: Synchronoss Semantic Service
 spring:
-  application:
-    name: saw-semantic-service
-  http:
+  servlet:
     multipart:
       max-request-size: 25MB
       max-file-size: 25MB
+  application:
+    name: saw-semantic-service
 logging:
   level:
     com.synchronoss.saw.semantic: INFO
     org.springframework: INFO
     sncr.bda: INFO
 server:
+  servlet:
+    context-path: ''
   address: localhost
   port: 9901
-  context-path: ''
+  
   maxHttpHeaderSize: 65536
   compression:
     enabled: true
@@ -31,6 +33,6 @@ metastore:
 semantic:
     workbench-url:  http://localhost:9700
     transport-metadata-url:  http://localhost:9200
-    binary-migration-requires: true
+    binary-migration-requires: false
     migration-metadata-home: /var/sip/
     

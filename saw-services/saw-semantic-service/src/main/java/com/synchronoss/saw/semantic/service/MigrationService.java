@@ -1,5 +1,23 @@
 package com.synchronoss.saw.semantic.service;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,11 +38,6 @@ import com.synchronoss.saw.semantic.model.DataSemanticObjects;
 import com.synchronoss.saw.semantic.model.MetaDataObjects;
 import com.synchronoss.saw.semantic.model.request.BinarySemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
@@ -32,30 +45,30 @@ import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class is used to migrate the existing HBase Binary data to MapRDBStore.
  * It is independent migration class.
  * @author spau0004
  */
+@Component
 public class MigrationService {
 
   private static final Logger logger = LoggerFactory.getLogger(MigrationService.class);
   private String existingBinarySemanticPath = "/services/metadata/semantic_metadata";
   
+  
+  @Autowired
+  private ApplicationContext appContext;
+
    /**
    * This method will get the data from binary store & make it sure.
    * binary & maprDB store are in sync
    * @throws IOException 
    * @throws JsonProcessingException 
    */
-  public void convertHBaseBinaryToMaprDBStore (String transportURI, String basePath, String migrationMetadataHome) throws JsonProcessingException, IOException {
+  public Boolean convertHBaseBinaryToMaprDBStore (String transportURI, String basePath, String migrationMetadataHome) throws JsonProcessingException, Exception {
     logger.trace("migration process will begin here");
+     Boolean migrate = false;
      RestTemplate restTemplate = new RestTemplate();
      HttpHeaders  requestHeaders = new HttpHeaders();
      // Constructing the request structure to get the list of semantic from Binary Store
@@ -64,16 +77,30 @@ public class MigrationService {
      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
      HttpEntity<?> requestEntity = new HttpEntity<Object>(semanticNodeQuery("search"),requestHeaders);
-     logger.debug("transportMetadataURIL server URL {}", transportURI + "/md");
+     logger.trace("transportMetadataURIL server URL {}", transportURI + "/md");
      String url = transportURI + "/md";
      ResponseEntity<MetaDataObjects> binarySemanticStoreData = restTemplate.exchange(url, HttpMethod.POST,
          requestEntity, MetaDataObjects.class);
-   if ((binarySemanticStoreData.getBody()!=null && (binarySemanticStoreData.getBody().getContents()!=null) && (binarySemanticStoreData.getBody().getContents().size() >0))) {
-     logger.trace(objectMapper.writeValueAsString(binarySemanticStoreData));
+     
+     logger.trace("binarySemanticStoreData status Code :" + binarySemanticStoreData.getStatusCode().value());
+     logger.trace("binarySemanticStoreData hasBody :" + binarySemanticStoreData.hasBody());
+     logger.trace("binarySemanticStoreData body :" + (binarySemanticStoreData.hasBody() ? binarySemanticStoreData.getBody().toString() : "NA"));
+     logger.trace("binarySemanticStoreData getHeaders :" + binarySemanticStoreData.getHeaders());
+     logger.trace("binarySemanticStoreData getBody().getContents() :" + binarySemanticStoreData.getBody().getContents().size());
+     logger.trace("binarySemanticStoreData.getBody()!=null :" + (binarySemanticStoreData.getBody()!=null));
+     logger.trace("binarySemanticStoreData.getBody().getContents()!=null :" + (binarySemanticStoreData.getBody().getContents()!=null));
+     logger.trace("binarySemanticStoreData.getBody().getContents().size() > 0) :" + (binarySemanticStoreData.getBody().getContents().size() > 0));
+     logger.trace("binarySemanticStoreData if size > 0 :" + (binarySemanticStoreData.getBody().getContents().size() >0 ? objectMapper.writeValueAsString(binarySemanticStoreData) : "NA"));
+     logger.trace("if block :" + ((binarySemanticStoreData.getBody()!=null && (binarySemanticStoreData.getBody().getContents()!=null && binarySemanticStoreData.getBody().getContents().size() >0))));
+     
+     
+     if ((binarySemanticStoreData.getBody()!=null && (binarySemanticStoreData.getBody().getContents()!=null && binarySemanticStoreData.getBody().getContents().size() >0))) {
+     logger.trace("binarySemanticStoreData" + objectMapper.writeValueAsString(binarySemanticStoreData));
      List<BinarySemanticNode> binaryNodes = objectMapper.readValue(objectMapper.writeValueAsString(binarySemanticStoreData.getBody().getContents().get(0).getAnalyze()), 
          new TypeReference<List<BinarySemanticNode>>(){});
      SemanticNode  semanticNode = null;
        for (BinarySemanticNode binarySemanticNode : binaryNodes) {
+         logger.trace("binarySemanticNode" + objectMapper.writeValueAsString(binarySemanticNode));
          String id = binarySemanticNode.getId();
          semanticNode = new SemanticNode();
          semanticNode.set_id(id);
@@ -107,9 +134,9 @@ public class MigrationService {
            addSemantic(semanticNode, basePath);
          }
          catch (Exception ex) {
-           logger.trace("Throwing an exception while adding the semantic to the new store");
-           throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex);
-         }
+            logger.trace("Throwing an exception while adding the semantic to the new store :" + ex);
+            initiateShutdown(-1);
+          }
           try {
             logger.info("HFileOperations.exists(basePath + existingBinarySemanticPath)): "+ migrationMetadataHome + existingBinarySemanticPath);
             if (HFileOperations.exists(migrationMetadataHome + existingBinarySemanticPath)) {
@@ -118,17 +145,20 @@ public class MigrationService {
           } catch (Exception e) {
             logger.trace("Exception occurred while removing " + migrationMetadataHome
                 + existingBinarySemanticPath + " :", e);
+            initiateShutdown(-1);
           }
        } // end of Id check if it is there then ignore
         else {
            logger.info("This " + semanticNode.get_id() + " already exists on the store");
          }
+         migrate = true;
       }
      }
      else {
        logger.info("migration has been completed on previous installation");
      }
-     logger.trace("migration process will ends here");
+     logger.trace("migration process will ends here successfully :" + migrate);
+     return migrate;
     }
   
   /**
@@ -259,7 +289,12 @@ public class MigrationService {
       throw new DeleteEntitySAWException("Problem on the storage while updating an entity", ex);
     }
     
+  }  
+  
+  public void initiateShutdown(int returnCode) {
+    SpringApplication.exit(appContext, () -> returnCode);
   }
+
   
   public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
     String dataLocation  = "{\n" + 

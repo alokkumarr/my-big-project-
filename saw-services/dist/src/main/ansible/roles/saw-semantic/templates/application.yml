@@ -1,19 +1,20 @@
 info:
   component: Synchronoss Semantic Service
 spring:
-  application:
-    name: saw-semantic-service
-  http:
+  servlet:
     multipart:
       max-request-size: 25MB
       max-file-size: 25MB
+  application:
+    name: saw-semantic-service
 logging:
   level:
     com.synchronoss.saw.semantic: INFO
 server:
+  servlet:
+    context-path: ''
   address: localhost
   port: 9901
-  context-path: ''
   maxHttpHeaderSize: 65536
   compression:
     enabled: true

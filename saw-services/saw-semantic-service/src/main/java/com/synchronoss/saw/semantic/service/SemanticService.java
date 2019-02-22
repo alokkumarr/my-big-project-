@@ -3,7 +3,6 @@ package com.synchronoss.saw.semantic.service;
 
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
@@ -25,7 +24,7 @@ public interface SemanticService {
   public SemanticNode readSemantic(SemanticNode node)
       throws JSONValidationSAWException, ReadEntitySAWException;
 
-  public SemanticNode updateSemantic(SemanticNode node)
+  public SemanticNode updateSemantic(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, UpdateEntitySAWException;
 
   public SemanticNode deleteSemantic(SemanticNode node)
@@ -36,7 +35,7 @@ public interface SemanticService {
 
   public BackCompatibleStructure list(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, ReadEntitySAWException;
-
+  
   /**
    * This is the method which generates Id & will be used in CRUD operation.
    * @return String Id for the row

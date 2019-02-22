@@ -56,10 +56,11 @@ public class SAWSemanticController {
   @ResponseStatus(HttpStatus.CREATED)
   public SemanticNode addSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @RequestBody SemanticNode requestBody) throws JSONMissingSAWException {
+      @RequestBody SemanticNode requestBody, @RequestHeader Map<String, String> headers) throws JSONMissingSAWException {
     if (requestBody == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
+    SAWSemanticUtils.setAuditInformation(requestBody, headers);
     SAWSemanticUtils.checkMandatoryFields(requestBody);
     logger.trace("Request Body to create a semantic node:{}", requestBody);
     SemanticNode responseObjectFuture = null;
@@ -122,14 +123,15 @@ public class SAWSemanticController {
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "Id", required = true) String Id, @RequestBody SemanticNode requestBody) throws JSONMissingSAWException {
+      @PathVariable(name = "Id", required = true) String Id, @RequestBody SemanticNode requestBody,
+      @RequestHeader Map<String, String> headers) throws JSONMissingSAWException {
     logger.trace("Request Body to update a semantic node:{}", Id);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       requestBody.set_id(Id);
       logger.trace("Invoking service with entity id : {} ", requestBody.get_id());
-      responseObjectFuture = semanticService.updateSemantic(requestBody);
+      responseObjectFuture = semanticService.updateSemantic(requestBody, headers);
       logger.trace("Semantic updateded successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
     } catch (UpdateEntitySAWException | JsonProcessingException ex) {

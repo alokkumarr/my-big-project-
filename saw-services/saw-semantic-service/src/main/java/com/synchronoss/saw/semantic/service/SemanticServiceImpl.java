@@ -66,13 +66,17 @@ public class SemanticServiceImpl implements SemanticService {
   @Value("${semantic.migration-metadata-home}")
   @NotNull
   private String migrationMetadataHome;
-
+  
   @PostConstruct
   private void init() throws Exception {
     if (migrationRequires) {
-      new MigrationService().convertHBaseBinaryToMaprDBStore(transportURI, basePath, migrationMetadataHome);
+      logger.trace("Migration initiated.. " + migrationRequires);
+        new MigrationService().convertHBaseBinaryToMaprDBStore(transportURI, basePath,
+            migrationMetadataHome);
+      }
+      logger.trace("Migration ended..");
     }
-  }
+  
 
   @Override
   public SemanticNode addSemantic(SemanticNode node)
@@ -87,7 +91,9 @@ public class SemanticServiceImpl implements SemanticService {
           node.get_id(), Action.create, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}",
           mapper.writeValueAsString(structure));
-      node = setRepository(node);
+      if (node.getRepository() == null) {
+        node = setRepository(node);
+      }
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
@@ -180,14 +186,16 @@ public class SemanticServiceImpl implements SemanticService {
     return newSemanticNode;
   }
   @Override
-  public SemanticNode updateSemantic(SemanticNode node)
+  public SemanticNode updateSemantic(SemanticNode node, Map<String, String> headers)
       throws JSONValidationSAWException, UpdateEntitySAWException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("updating semantic from the store with an Id : {}", node.get_id());
-    Preconditions.checkArgument(node.getUpdatedBy() != null, "Updated by mandatory attribute.");
     SemanticNode responseNode = new SemanticNode();
     SemanticNode newSemanticNode = null;
-    node.setUpdatedBy(node.getUpdatedBy());
+    if (headers.get("x-userName")!=null) {
+      node.setUpdatedBy(headers.get("x-userName"));
+      logger.trace(headers.get("x-userName"));
+    }
     try {
       List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
           node.get_id(), Action.update, Category.Semantic);
@@ -311,7 +319,7 @@ public class SemanticServiceImpl implements SemanticService {
         }
         responseNode.setSemanticNodes(semanticNodes);
       } else {
-        throw new ReadEntitySAWException("There is no data avaiable for the given criteria");
+        responseNode.setSemanticNodes(semanticNodes);
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
@@ -410,7 +418,7 @@ public class SemanticServiceImpl implements SemanticService {
         contents.add(content);
         structure.setContents(contents);
       } else {
-        throw new ReadEntitySAWException("There is no data avaiable for the given criteria");
+        structure.setContents(contents);
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
@@ -418,8 +426,5 @@ public class SemanticServiceImpl implements SemanticService {
           "While retrieving it has been found that Entity does not exist");
     }
     return structure;
-  }
-  public static void main(String[] args) {
-
   }
 }

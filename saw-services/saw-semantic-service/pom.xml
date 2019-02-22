@@ -207,34 +207,10 @@
 			</plugin>
 		  -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>**/*RemoteIT.java</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues
-						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
-						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
-					<!-- The Spring Boot Maven plug-in includes also dependencies with "provided" scope by default.  Exclude
-						Spark and Scala to reduce artifact size. -->
-					<excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,org.ojai,org.scala-lang</excludeGroupIds>
-					<layout>ZIP</layout>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -279,10 +255,6 @@
 								<entry>
 									<name>/opt/bda/saw-semantic-service/saw-semantic.jar</name>
 									<file>target/saw-semantic-service-${revision}-exec.jar</file>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-semantic-service/saw-semantic-spark.jar</name>
-									<file>target/saw-semantic-service-${revision}-jar-with-dependencies.jar</file>
 								</entry>
 								<entry>
 									<name>/usr/lib/systemd/system/saw-semantic.service</name>

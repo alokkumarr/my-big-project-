@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -29,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
@@ -37,6 +42,7 @@ import sncr.bda.store.generic.schema.Query;
 
 @Component
 public class SAWSemanticUtils {
+  private static final Logger logger = LoggerFactory.getLogger(SAWSemanticUtils.class);
   public final static String COMMA = ",";
   public final static String PATH_SEARCH = "action.content.";
 
@@ -87,6 +93,21 @@ public class SAWSemanticUtils {
     Preconditions.checkArgument(node.getArtifacts()!=null, "artifacts code cannot be null");
     Preconditions.checkArgument(node.getMetricName()!=null, "metric name code cannot be null");
    Preconditions.checkArgument(node.getParentDataSetIds()!=null && node.getParentDataSetIds().size()!=0, "Parent DataSetsId cannot be null");
+  }
+  
+  public static SemanticNode setAuditInformation(SemanticNode node, Map<String, String> headers) {
+    logger.trace("Setting audit information starts here");
+    if (headers.get("x-customercode") != null) {
+      node.setCustomerCode(headers.get("x-customercode"));
+      logger.trace("x-customercode:" + headers.get("x-customercode"));
+    }
+    if (headers.get("x-userName") != null) {
+      node.setUsername(headers.get("x-userName"));
+      node.setCreatedBy(headers.get("x-userName"));
+      logger.trace("x-userName:" + headers.get("x-userName"));
+    }
+    logger.trace("Setting audit information ends here"); 
+   return node;
   }
   
   public static List<MetaDataStoreStructure> node2JSONObject(SemanticNode node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
@@ -231,6 +252,5 @@ public class SAWSemanticUtils {
     System.out.println(objectMapper.writeValueAsString(dataset));
     System.out.println(DataSetProperties.UserData.toString());
   }
-
   
 }

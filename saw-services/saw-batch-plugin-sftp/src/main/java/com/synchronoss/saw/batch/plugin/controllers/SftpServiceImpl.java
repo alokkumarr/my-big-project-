@@ -112,8 +112,8 @@ public class SftpServiceImpl extends SipPluginContract {
 
   private final Integer pageStart = 0;
 
-  private final String fileStatus = "FAILED";
-  private final String procesStatus = "DATA_REMOVED";
+
+
 
   @Value("${bis.destination-fs-user}")
   @NotNull
@@ -975,7 +975,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   } catch (Exception ex) {
 
                     logger.error("Exception occurred while transferring the file from channel", ex);
-                    if (fileTobeDeleted != null  
+                    if (fileTobeDeleted != null
                         && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
                       prepareLogInfo(bisDataMetaInfo,
                           pattern, getFilePath(localDirectory, entry),
@@ -1124,7 +1124,6 @@ public class SftpServiceImpl extends SipPluginContract {
             if (isDisable) {
               logger.trace("Inside isDisable starts here");
               if (sipLogService.isRouteAndChannelExists(routeId, channelId)) {
-                updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
                 // To retry only specific file instead of downloading all files
                 // in the source folder
                 if (log.getFileName() != null) {
@@ -1186,7 +1185,7 @@ public class SftpServiceImpl extends SipPluginContract {
     } // end of first for loop
     logger.debug("recoverFromInconsistentState execution ends here");
   }
-  
+
   private void transferRetry(Long channelId, Long routeId, String channelType, boolean isDisable)
       throws NotFoundException {
     logger.trace("inside transfer retry block for channel type " + channelType + "ends here");
