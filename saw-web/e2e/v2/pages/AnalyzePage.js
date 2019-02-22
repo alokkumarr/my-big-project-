@@ -91,8 +91,7 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   clickOnAddAnalysisButton() {
-    commonFunctions.waitFor.elementToBeClickable(this._addAnalysisButton);
-    this._addAnalysisButton.click();
+    commonFunctions.clickOnElement(this._addAnalysisButton);
   }
 
   clickOnActionMenu() {

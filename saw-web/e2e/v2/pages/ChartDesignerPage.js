@@ -12,7 +12,7 @@ class ChartsDesignerPage extends Designer {
   }
 
   searchAttribute(attribute) {
-    commonFunctions.fillInput(this._filterInput);
+    commonFunctions.fillInput(this._filterInput(attribute));
   }
 
   clickOnAttribute(attribute) {
