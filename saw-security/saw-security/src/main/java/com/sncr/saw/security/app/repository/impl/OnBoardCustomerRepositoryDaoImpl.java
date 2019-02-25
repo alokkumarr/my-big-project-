@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,5 +95,49 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
         for (Object x:rs) {
             System.out.println(x);
         }
+    }
+
+    @Override
+    public List<String> getCustomers() {
+        String fetchSql = "select CUSTOMER_CODE from CUSTOMERS";
+        List<String> customerCode = null;
+        try {
+            customerCode = jdbcTemplate.query(fetchSql,
+                preparedStatement -> {},
+                resultSet -> {
+                    List<String> nameList = new ArrayList<>();
+                    while (resultSet.next()) {
+                        nameList.add(resultSet.getString("CUSTOMER_CODE"));
+                    }
+                    return nameList;
+                });
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return customerCode;
+    }
+
+    @Override
+    public List<String> getProducts() {
+        String fetchSql = "select PRODUCT_CODE from PRODUCTS";
+        List<String> productCode = null;
+        try {
+            productCode = jdbcTemplate.query(fetchSql,
+                preparedStatement -> {},
+                resultSet -> {
+                    List<String> pcList = new ArrayList<>();
+                    while (resultSet.next()) {
+                        pcList.add(resultSet.getString("PRODUCT_CODE"));
+                    }
+                    return pcList;
+                });
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return productCode;
     }
 }

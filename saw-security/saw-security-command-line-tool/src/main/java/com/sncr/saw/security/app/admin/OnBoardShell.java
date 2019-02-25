@@ -10,6 +10,8 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
+import java.util.List;
+
 /*
 Created by pras0004
 */
@@ -30,6 +32,10 @@ public class OnBoardShell {
                                 @ShellOption(value = "--F",help = "User First Name") String firstName,
                                 @ShellOption(value = "--M",help = "User Middle Name") String middleName,
                                 @ShellOption(value = "--L",help = "User Last Name") String lastName ){
+        if (customerCode == null || productName == null || productCode == null || email== null
+            || firstName == null || middleName == null || lastName == null) {
+            throw new IllegalArgumentException("Missing argument!! Use 'help onboard-customer' command to print usage");
+        }
         OnBoardCustomerRepository onBoardCustomerRepositoryDao = onboard.getOnBoardCustomerRepositoryDao();
         OnBoardCustomer onBoardCustomer = new OnBoardCustomer();
         logger.debug("Read Required Params :");
@@ -48,6 +54,16 @@ public class OnBoardShell {
             // check if connection is working fine only then proceed
             if (onBoardCustomerRepositoryDao.testSql() == 1) {
                 logger.info("Connection successful !!");
+                List<String> custCodes = onBoardCustomerRepositoryDao.getCustomers();
+                for (String x:custCodes)   {
+                    if(x.equalsIgnoreCase(customerCode))
+                        return "Customer-code already exists!!";
+                }
+                List<String> prodCodes = onBoardCustomerRepositoryDao.getProducts();
+                for (String x:prodCodes)   {
+                    if(x.equalsIgnoreCase(productCode))
+                        return "Product-code already exists!!";
+                }
                 logger.debug("call stored Procedure to onBoard customer ");
                 onBoardCustomerRepositoryDao.createNewCustomer(onBoardCustomer);
                 return ("\n ====== ONBOARD CUSTOMER : Successful ====== ");
