@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 
 
-
 public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
 
   private static final Logger logger = LoggerFactory.getLogger(SimpleJob.class);
@@ -23,8 +22,9 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
 
   @Value("${bis-transfer-url}")
   private String bisTransferUrl;
-  
+
   RestTemplate restTemplate = new RestTemplate();
+  
   protected static final String JOB_DATA_MAP_ID = "JOB_DATA_MAP";
 
   @Override
@@ -37,10 +37,7 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
 
     BisSchedulerJobDetails jobDetails =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
-    
-   
     restTemplate.postForLocation(bisTransferUrl, jobDetails);
-
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

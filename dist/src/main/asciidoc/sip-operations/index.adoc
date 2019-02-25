@@ -336,6 +336,19 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTIS versions.
 
+=== System time zone
+
+Nodes can be configured to use any desired system time zone.  To set
+the system time zone, use the following command:
+
+    $ timedatectl set-timezone <timezone>
+
+NOTE: The available time zones can be listed using the `timedatectl
+list-timezones` command.
+
+The configured time zone will be reflected in system and application
+logs viewed using for example the `journalctl` command.
+
 == Installing SIP product modules
 
 Execute the following steps to install SIP product modules:
@@ -390,6 +403,58 @@ healthy state:
         {
             "status": "UP"
         }
+
+=== Monitoring interface
+
+The health status of SIP services can be accessed programmatically
+through a monitoring REST API.  The health status of each service
+instance is available as a separate monitoring metric.  It is also
+possible to query for an aggregation of health statuses, providing a
+single result indicating the combined health status of all SIP service
+instances.
+
+:prometheus: https://prometheus.io/
+:prometheus_query: https://prometheus.io/docs/prometheus/latest/querying/basics/
+
+The service instance health statuses are available in the metric
+`spring_boot_actuator_health_status`.  Its value is zero if the health
+check is successful and a non-zero value if the health check is
+failing.  This allows constructing a query that aggregates all health
+statuses by summing them together, knowing that a zero sum will
+indicate all services are healthy while a non-zero sum indicates at
+least one service in failing its health check.  The following shows an
+example of a query aggregating the health statuses of all service
+instances:
+
+        $ curl http://<sip-admin>/prometheus/api/v1/query?query=sum(spring_boot_actuator_health_status)
+        {
+          "status": "success",
+          "data": {
+            "resultType": "vector",
+            "result": [
+              {
+                "metric": {},
+                "value": [
+                  1549911414.824,
+                  "0"
+                ]
+              }
+            ]
+          }
+        }
+
+Note that the value is zero (value `0`), indicating that all SIP
+service instances are healthy.
+
+NOTE: For the monitoring REST API to be available in the SIP
+environment, there needs to be at least one node in the `sip-admin`
+role in the SIP environment configuration.
+
+The monitoring REST API is provided by {prometheus}[Prometheus].  It
+is available at the URL `http://<sip-admin>/prometheus/api/v1`, where
+`<sip-admin>` refers to a node configured in in the `sip-admin` role.
+The {prometheus_query}[Prometheus querying] documentation describes
+the full range of querying expressions available.
 
 == High availability
 
@@ -674,6 +739,25 @@ Service to use the required number of session, add the below to the
 
 After that run `systemctl reload sshd` to reload the SSH daemon
 configuration.
+
+== Batch Ingestion : High Availability
+
+The below parameters in Batch Ingestion Service gives the control the configurations
+related to resiliency & avoid inconsistency across bis instances. To control what
+should be the time difference to declare a data in the system is corrupted, & needs
+to be downloaded again (default is 5 mins). While configuring this parameter we need
+account for all customers using the BIS & routes is being configured.
+
+Specifically a use case which needs to be taken into account as follows:
+Let's say, we have a daily schedule at `5:00` PM for all `*.txt` files and as clean
+up job customers have a scheduled job on the customer data location to archive those
+files daily at `10:00 PM`. then if there is a failure or network glitches or may be
+due to some other reasons data source is not available until `10:00 PM` and we just
+marked status as failed there might be chances of data loss as `*.txt` file which
+has been archived before next schedule. The reason to mention this scenario so that we can
+configure the `sip_bis_retry_diffs_in_minutes` accordingly.
+
+    sip_bis_retry_diffs_in_minutes=5
 
 == Loading semantic metadata
 

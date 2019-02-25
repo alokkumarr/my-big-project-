@@ -24,8 +24,8 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
   beforeAll(function() {
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
-
+    jasmine.DEFAULT_TIMEOUT_INTERVAL =
+      protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(function(done) {
@@ -36,46 +36,130 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
 
   afterEach(function(done) {
     setTimeout(function() {
-      if(analysisId){
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+      if (analysisId) {
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['ESREPORTPROMPTFILTER']['esReportPromptFilterDataProvider'], function(data, description) {
-    it('should able to apply prompt filter for esReport: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'ESREPORTPROMPTFILTER', dp:'esReportPromptFilterDataProvider'}), () => {
-      try {
-        if(!token) {
-          logger.error('token cannot be null');
-          expect(token).toBeTruthy();
-          assert.isNotNull(token, 'token cannot be null');
+  using(
+    testDataReader.testData['ESREPORTPROMPTFILTER'][
+      'esReportPromptFilterDataProvider'
+    ],
+    function(data, description) {
+      it(
+        'should able to apply prompt filter for esReport: ' +
+          description +
+          ' testDataMetaInfo: ' +
+          JSON.stringify({
+            test: description,
+            feature: 'ESREPORTPROMPTFILTER',
+            dp: 'esReportPromptFilterDataProvider'
+          }),
+        () => {
+          try {
+            if (!token) {
+              logger.error('token cannot be null');
+              expect(token).toBeTruthy();
+              assert.isNotNull(token, 'token cannot be null');
+            }
+            let currentTime = new Date().getTime();
+            let user = data.user;
+            let name =
+              Constants.ES_REPORT +
+              ' ' +
+              globalVariables.e2eId +
+              '-' +
+              currentTime;
+            let description =
+              'Description:' +
+              Constants.ES_REPORT +
+              ' for e2e ' +
+              globalVariables.e2eId +
+              '-' +
+              currentTime;
+            let analysisType = Constants.ES_REPORT;
+            let analysis = new AnalysisHelper().createNewAnalysis(
+              host,
+              token,
+              name,
+              description,
+              analysisType,
+              null
+            );
+            expect(analysis).toBeTruthy();
+            assert.isNotNull(analysis, 'analysis cannot be null');
+            analysisId = analysis.contents.analyze[0].executionId.split(
+              '::'
+            )[0];
+            let promptFilterFunctions = new PromptFilterFunctions();
+            promptFilterFunctions.applyFilters(
+              categoryName,
+              subCategoryName,
+              defaultCategory,
+              user,
+              name,
+              description,
+              analysisType,
+              null,
+              data.fieldName
+            );
+            //From analysis detail/view page
+            promptFilterFunctions.verifyPromptFromDetailPage(
+              'My Analysis',
+              'DRAFTS',
+              defaultCategory,
+              name,
+              data
+            );
+            //verifyPromptFromListView and by executing from action menu
+            promptFilterFunctions.verifyPromptFromListView(
+              'My Analysis',
+              'DRAFTS',
+              defaultCategory,
+              name,
+              data,
+              true
+            );
+            //verifyPromptFromListView and by clicking on analysis
+            promptFilterFunctions.verifyPromptFromListView(
+              'My Analysis',
+              'DRAFTS',
+              defaultCategory,
+              name,
+              data,
+              false
+            );
+            //verifyPromptFromCardView and by executing from action menu
+            promptFilterFunctions.verifyPromptFromCardView(
+              'My Analysis',
+              'DRAFTS',
+              defaultCategory,
+              name,
+              data,
+              true
+            );
+            //verifyPromptFromCardView and by clicking on analysis
+            promptFilterFunctions.verifyPromptFromCardView(
+              'My Analysis',
+              'DRAFTS',
+              defaultCategory,
+              name,
+              data,
+              false
+            );
+          } catch (e) {
+            console.log(e);
+          }
         }
-        let currentTime = new Date().getTime();
-        let user = data.user;
-        let name = Constants.ES_REPORT + ' ' + globalVariables.e2eId + '-' + currentTime;
-        let description = 'Description:' + Constants.ES_REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
-        let analysisType = Constants.ES_REPORT;
-        let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, null);
-        expect(analysis).toBeTruthy();
-        assert.isNotNull(analysis, 'analysis cannot be null');
-        analysisId = analysis.contents.analyze[0].executionId.split('::')[0];
-        let promptFilterFunctions = new PromptFilterFunctions();
-        promptFilterFunctions.applyFilters(categoryName, subCategoryName, defaultCategory, user, name, description, analysisType, null, data.fieldName);
-        //From analysis detail/view page
-        promptFilterFunctions.verifyPromptFromDetailPage(categoryName, subCategoryName, defaultCategory, name, data);
-        //verifyPromptFromListView and by executing from action menu
-        promptFilterFunctions.verifyPromptFromListView(categoryName, subCategoryName, defaultCategory, name, data, true);
-        //verifyPromptFromListView and by clicking on analysis
-        promptFilterFunctions.verifyPromptFromListView(categoryName, subCategoryName, defaultCategory, name, data, false);
-        //verifyPromptFromCardView and by executing from action menu
-        promptFilterFunctions.verifyPromptFromCardView(categoryName, subCategoryName, defaultCategory, name, data, true);
-        //verifyPromptFromCardView and by clicking on analysis
-        promptFilterFunctions.verifyPromptFromCardView(categoryName, subCategoryName, defaultCategory, name, data, false);
-      } catch (e) {
-        console.log(e);
-      }
-    });
-  });
+      );
+    }
+  );
 });

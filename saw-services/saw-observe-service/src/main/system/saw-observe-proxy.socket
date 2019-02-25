@@ -2,7 +2,7 @@
 Description=SAW Observe Proxy Socket
 
 [Socket]
-ListenStream=127.0.0.1:9500
+ListenStream=9500
 
 [Install]
 WantedBy=sockets.target

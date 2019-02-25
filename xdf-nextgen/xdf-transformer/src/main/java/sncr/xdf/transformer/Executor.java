@@ -150,7 +150,10 @@ public abstract class Executor {
         logger.debug("Rejected DS: " + failedTransformationsCount.value());
 
         writeResults(outputResult, outDataSet, tempLoc);
-        writeResults(rejectedRecords, rejectedDataSet, tempLoc);
+
+        if (rejectedDataSet != null) {
+            writeResults(rejectedRecords, rejectedDataSet, tempLoc);
+        }
 
     }
 

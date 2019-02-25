@@ -34,9 +34,12 @@ import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
@@ -232,17 +235,19 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
             if (files != null && files.length != 0) {
                 //Create archive directory
-                Path archivePath = new Path(archiveDir);
-                ctx.fs.mkdirs(archivePath);
 
                 logger.debug("Total files = " + files.length);
 
                 int archiveCounter = 0;
 
-                for(FileStatus status: files) {
-                    logger.debug("Archiving " +  status.getPath() + " to " + archivePath);
+                for(FileStatus fiile: files) {
+                    String currentTimestamp = LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
 
-                    if (archiveSingleFile(status.getPath(), archivePath)) {
+                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
+                    ctx.fs.mkdirs(archivePath);
+
+                    if (archiveSingleFile(fiile.getPath(), archivePath)) {
                         archiveCounter++;
                     }
                 }
@@ -499,9 +504,11 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
                 }
 
-                logger.debug("Writing rejected data to temp directory " + rejectedDatasetLocation
-                    + "temp");
-                writeRdd(rejectedRecords, this.rejectedDatasetLocation + "temp");
+                String tempRejectedLocation = this.rejectedDatasetLocation + "_" + UUID.randomUUID()
+                    + "_" + System.currentTimeMillis();
+                logger.debug("Writing rejected data to temp directory " + tempRejectedLocation);
+
+                writeRdd(rejectedRecords, tempRejectedLocation);
 
 
                 if (HFileOperations.exists(this.rejectedDatasetLocation)) {
@@ -509,7 +516,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                     HFileOperations.deleteEnt(this.rejectedDatasetLocation);
                 }
 
-                this.ctx.fs.rename(new Path(this.rejectedDatasetLocation + "temp"),
+                this.ctx.fs.rename(new Path(tempRejectedLocation),
                     new Path(this.rejectedDatasetLocation));
             }
         } catch (Exception exception) {

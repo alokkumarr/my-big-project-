@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum BisComponentState {
-  DATA_RECEIVED("DATA_RECEIVED"), DATA_REMOVED("DATA_REMOVED"), 
+  DATA_RECEIVED("DATA_RECEIVED"), DATA_REMOVED("DATA_REMOVED"),
+  DATA_INPROGRESS("DATA_INPROGRESS"),
+  DUPLICATE("DUPLICATE"),
   HOST_NOT_REACHABLE("HOST_NOT_REACHABLE");
   private final String value;
   private static final Map<String, BisComponentState> CONSTANTS =

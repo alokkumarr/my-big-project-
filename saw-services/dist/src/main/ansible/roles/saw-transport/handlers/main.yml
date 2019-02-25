@@ -6,6 +6,7 @@
   # retry as a workaround for now.
   register: result
   until: result is success
+  delay: 30
 # Workaround: The Ansible systemd module fails with an "Could not find
 # the requested service saw-transport-executor@*" error when working
 # with wildcards, so work around this by enumerating instances for
@@ -20,6 +21,7 @@
   # workaround for now.
   register: result
   until: result is success
+  delay: 30
 - name: restart saw-transport-executor-fast
   systemd: name=saw-transport-executor@fast-{{ item }} state=stopped daemon_reload=true
   with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}
@@ -28,3 +30,4 @@
   # workaround for now.
   register: result
   until: result is success
+  delay: 30

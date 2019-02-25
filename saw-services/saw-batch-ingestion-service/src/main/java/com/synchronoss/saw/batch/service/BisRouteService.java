@@ -26,10 +26,6 @@ public class BisRouteService {
 
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
-
-  private String insertUrl = "/schedule";
-  private String updateUrl = "/update";
-  private String deleteUrl = "/delete";
   private String pauseUrl = "/pause";
   private String resumeUrl = "/resume";
   private static final Long STATUS_ACTIVE = 1L;

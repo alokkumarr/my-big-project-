@@ -146,7 +146,7 @@ public class SawBisSftpPluginController {
       value = "Payload structure which " + "to be used to " + "initiate the transfer",
       required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
     List<BisDataMetaInfo> response = null;
-    
+
     try {
       if (requestBody.getBatchSize() > 0) {
         sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
@@ -154,9 +154,27 @@ public class SawBisSftpPluginController {
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
         response = sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
-            Long.valueOf(requestBody.getRouteId()));
+            Long.valueOf(requestBody.getRouteId()), null, false);
       } else {
         response = sftpServiceImpl.immediateTransfer(requestBody);
+      }
+      for (BisDataMetaInfo info : response) {
+        if (info.getDestinationPath() != null) {
+          File folderWhereFilesDumped = new File(info.getDestinationPath());
+          if (folderWhereFilesDumped.exists() && folderWhereFilesDumped.isDirectory()) {
+            logger.trace("Thread with Name :" + Thread.currentThread().getName()
+                + "has completed & created folder to put the files in "
+                + info.getDestinationPath());
+            File[] listOfFiles = folderWhereFilesDumped.listFiles();
+            if (listOfFiles != null && listOfFiles.length == 0) {
+              folderWhereFilesDumped.delete();
+              logger.trace("Thread with Name :" + Thread.currentThread().getName()
+                  + "has completed & created folder to put the files in "
+                  + info.getDestinationPath()
+                  + " & it is empty so it has been deleted after completion of the thread.");
+            }
+          }
+        }
       }
     } catch (Exception e) {
       throw new SftpProcessorException("Exception occured while transferring the file", e);
@@ -196,7 +214,7 @@ public class SawBisSftpPluginController {
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
       CompletableFuture
           .supplyAsync(() -> sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
-              Long.valueOf(requestBody.getRouteId())), transactionPostExecutor)
+              Long.valueOf(requestBody.getRouteId()), null, false), transactionPostExecutor)
           .whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {

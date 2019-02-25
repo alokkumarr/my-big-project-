@@ -1,11 +1,10 @@
-'use-strict'
+'use-strict';
 const logger = require('../conf/logger')(__filename);
 const commonFunctions = require('./utils/commonFunctions');
 const users = require('../helpers/data-generation/users');
 let Header = require('./components/Header');
 
 class LoginPage {
-
   constructor() {
     // Initialize all elements
     this._userName = element(by.css(`[e2e='username-input']`));
@@ -54,33 +53,57 @@ class LoginPage {
     }
   }
   isUserLoggedIn() {
-    element(this._userName.isPresent().then(function (isPresent) {
-      if (isPresent) {
-        logger.debug('User is on login page, hence do the login, no need to logout');
-        return false;
-      }
-      logger.debug('User is already loggedIn');
-      return true;
-    }));
+    element(
+      this._userName.isPresent().then(function(isPresent) {
+        if (isPresent) {
+          logger.debug(
+            'User is on login page, hence do the login, no need to logout'
+          );
+          return false;
+        }
+        logger.debug('User is already loggedIn');
+        return true;
+      })
+    );
   }
 
   loginAs(userName, redirectedPage = null) {
     logger.silly('loginAs--->' + userName);
     switch (userName) {
       case 'admin':
-        this.logOutLogin(users.admin.loginId, users.anyUser.password, redirectedPage);
+        this.logOutLogin(
+          users.admin.loginId,
+          users.anyUser.password,
+          redirectedPage
+        );
         break;
       case 'userOne':
-        this.logOutLogin(users.userOne.loginId, users.anyUser.password, redirectedPage);
+        this.logOutLogin(
+          users.userOne.loginId,
+          users.anyUser.password,
+          redirectedPage
+        );
         break;
       case 'user':
-        this.logOutLogin('reportuser@synchronoss.com', 'Sawsyncnewuser1!', redirectedPage);
+        this.logOutLogin(
+          'reportuser@synchronoss.com',
+          'Sawsyncnewuser1!',
+          redirectedPage
+        );
         break;
       case 'analyst':
-        this.logOutLogin('analyst@synchronoss.com', 'Sawsyncnewuser1!', redirectedPage);
+        this.logOutLogin(
+          'analyst@synchronoss.com',
+          'Sawsyncnewuser1!',
+          redirectedPage
+        );
         break;
       case 'reviewer':
-        this.logOutLogin('reviewer@synchronoss.com', 'Sawsyncnewuser1!', redirectedPage);
+        this.logOutLogin(
+          'reviewer@synchronoss.com',
+          'Sawsyncnewuser1!',
+          redirectedPage
+        );
         break;
       default:
     }
@@ -92,4 +115,3 @@ class LoginPage {
   }
 }
 module.exports = LoginPage;
-
