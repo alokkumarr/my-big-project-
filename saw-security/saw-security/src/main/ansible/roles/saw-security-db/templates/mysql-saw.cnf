@@ -10,3 +10,4 @@ wsrep_cluster_address=gcomm://
 {%- for host in groups['saw-security'] + groups['saw-security-arbitrator'] -%}
   {{ host }}{% if not loop.last %},{% endif %}
 {%- endfor %}
+wsrep_retry_autocommit=5
