@@ -1,4 +1,4 @@
-package sncr.bda.metastore;
+package com.synchronoss.saw.storage.proxy.service.productSpecificModuleService;
 
 import com.mapr.db.MapRDB;
 import org.ojai.Document;
