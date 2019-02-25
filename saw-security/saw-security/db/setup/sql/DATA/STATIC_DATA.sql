@@ -15,7 +15,8 @@ INSERT INTO schema_version VALUES ('8', '8', '<< Flyway Baseline >>', 'BASELINE'
 INSERT INTO schema_version VALUES ('9', '9', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('10', '10', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('11', '11', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
-/** It is intentional not to include new entry for schema_version('12') to make sure V12__ONBOARD_CUST_DDL.sql is run for all migration **/
+INSERT INTO schema_version VALUES ('12', '12', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+/** It is intentional not to include new entry for schema_version('13') to make sure V13__ONBOARD_CUST_DDL.sql is run for all migration **/
 
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
 INSERT INTO `PRODUCTS` (`PRODUCT_SYS_ID`,`PRODUCT_NAME`,`PRODUCT_CODE`,`PRODUCT_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (1,'MCT Insights','MCTI000001','MCT Insights',1,'2017-05-23 06:51:34','admin',NULL,NULL,NULL,NULL);
@@ -161,7 +162,6 @@ INSERT INTO `PRIVILEGES` (`PRIVILEGE_SYS_ID`, `CUST_PROD_SYS_ID`, `CUST_PROD_MOD
 ('138', '1', '4', '38', '1', '0', '128', 'All', '1', NOW(), 'admin');
 
 INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ANALYZE' and PC.PRIVILEGE_CODES_NAME = 'ACCESS';
-INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ANALYZE' and PC.PRIVILEGE_CODES_NAME = 'CREATE';
 INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ANALYZE' and PC.PRIVILEGE_CODES_NAME = 'EXECUTE';
 INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ANALYZE' and PC.PRIVILEGE_CODES_NAME = 'PUBLISH';
 INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ANALYZE' and PC.PRIVILEGE_CODES_NAME = 'FORK';
