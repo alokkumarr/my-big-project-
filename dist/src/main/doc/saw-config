@@ -212,4 +212,3 @@ sip-host2
 
 [saw-product-module:vars]
 sip_product_module_id=prj::module1
-sip_product_module_config_path=
