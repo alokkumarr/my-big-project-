@@ -11,6 +11,7 @@ import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';
 
 import { Subscription } from 'rxjs';
+import * as round from 'lodash/round';
 import * as get from 'lodash/get';
 
 @Component({
@@ -31,6 +32,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   public closeFiltersListener: Subscription;
   public sliderTooltip = {
     enabled: true,
+    format: (value: number) => round(value, 2),
     showMode: 'always',
     position: 'top'
   };
