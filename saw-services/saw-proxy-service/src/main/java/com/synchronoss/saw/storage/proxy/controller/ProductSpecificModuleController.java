@@ -6,7 +6,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.synchronoss.saw.storage.proxy.model.response.ProductModuleDocs;
 import com.synchronoss.saw.storage.proxy.model.response.Valid;
-import com.synchronoss.saw.storage.proxy.service.ProductSpecificModuleService;
+import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductSpecificModuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;

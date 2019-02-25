@@ -1,4 +1,4 @@
-package com.synchronoss.saw.storage.proxy.service;
+package com.synchronoss.saw.storage.proxy.service.productSpecificModuleService;
 
 import com.google.gson.JsonElement;
 import com.synchronoss.saw.storage.proxy.model.response.ProductModuleDocs;

@@ -1,4 +1,4 @@
-package com.synchronoss.saw.storage.proxy.service;
+package com.synchronoss.saw.storage.proxy.service.productSpecificModuleService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -21,7 +21,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
 
     @Value("${metastore.base}")
     @NotNull
-    private String xdfRoot;
+    private String root;
 
     Gson gson = new Gson();
 
@@ -37,9 +37,8 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         logger.debug("Calling ProductModuleMetaStore obj to add a doc of id :",id);
         logger.debug("TableName :",tableName);
         Valid valid = new Valid();
-        // TODO: Set XDF ROOT dir value
         try {
-            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
+            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
             productModuleMetaStore.create(id,doc);
             valid.setValid(true);
             valid.setValidityMessage("Document added successfully!");
@@ -66,7 +65,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         logger.debug("TableName :",tableName);
         Valid valid = new Valid();
         try {
-            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
+            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
             productModuleMetaStore.update(id,doc);
             valid.setValid(true);
             valid.setValidityMessage("Document updated successfully!");
@@ -93,7 +92,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         logger.debug("TableName :",tableName);
         Valid valid = new Valid();
         try {
-            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
+            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
             productModuleMetaStore.delete(id);
             valid.setValid(true);
             valid.setValidityMessage("Document deleted successfully!");
@@ -121,7 +120,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         JsonElement doc = null;
         ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
-            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
+            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
             doc = productModuleMetaStore.read(id);
             if (doc == null)    {
                 productModuleDocs.setValid(false);
@@ -154,7 +153,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         Map<String, Document> docs = null;
         ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
-            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
+            ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
             docs = productModuleMetaStore.searchAll(keyValues);
             if (docs.isEmpty()) {
                 productModuleDocs.setValid(true);
@@ -187,7 +186,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         Map<String, Document> docs = null;
         ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
-            productModuleMetaStore = new ProductModuleMetaStore(tableName,xdfRoot);
+            productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
             docs = productModuleMetaStore.searchAll();
             if (docs.isEmpty()) {
                 productModuleDocs.setValid(true);
