@@ -25,16 +25,17 @@ public class OnBoardShell {
 
 
     @ShellMethod("Onboard the customer")
-    public String onboardCustomer(@ShellOption(value = "--C",help = "Customer-Code") String customerCode,
-                                @ShellOption(value = "--P",help = "Product-Name") String productName,
-                                @ShellOption(value = "--PC",help = "Product-Code") String productCode,
-                                @ShellOption(value = "--E",help = "User-Email") String email,
-                                @ShellOption(value = "--F",help = "User First Name") String firstName,
-                                @ShellOption(value = "--M",help = "User Middle Name") String middleName,
-                                @ShellOption(value = "--L",help = "User Last Name") String lastName ){
-        if (customerCode == null || productName == null || productCode == null || email== null
-            || firstName == null || middleName == null || lastName == null) {
-            throw new IllegalArgumentException("Missing argument!! Use 'help onboard-customer' command to print usage");
+    public String onboardCustomer(@ShellOption(value = "--C",help = "Customer-Code",defaultValue = "_NONE_") String customerCode,
+                                @ShellOption(value = "--P",help = "Product-Name",defaultValue = "_NONE_") String productName,
+                                @ShellOption(value = "--PC",help = "Product-Code",defaultValue = "_NONE_") String productCode,
+                                @ShellOption(value = "--E",help = "User-Email",defaultValue = "_NONE_") String email,
+                                @ShellOption(value = "--F",help = "User First Name",defaultValue = "_NONE_") String firstName,
+                                @ShellOption(value = "--M",help = "User Middle Name",defaultValue = "_NONE_") String middleName,
+                                @ShellOption(value = "--L",help = "User Last Name",defaultValue = "_NONE_") String lastName){
+        if (customerCode.equalsIgnoreCase("_NONE_") || productName.equalsIgnoreCase("_NONE_") || productCode.equalsIgnoreCase("_NONE_") || email.equalsIgnoreCase("_NONE_")
+            || firstName.equalsIgnoreCase("_NONE_") || middleName.equalsIgnoreCase("_NONE_") || lastName.equalsIgnoreCase("_NONE_")) {
+            logger.error("Missing argument, Following Options are mandatory to onBoardCustomer (--C,--P,--PC,--E,--F,--M,--L) \n  Use 'help onboard-customer' command to print usage!!");
+            throw new IllegalArgumentException("Missing argument!! Use 'help onboard-customer' command to print usage!!");
         }
         OnBoardCustomerRepository onBoardCustomerRepositoryDao = onboard.getOnBoardCustomerRepositoryDao();
         OnBoardCustomer onBoardCustomer = new OnBoardCustomer();
@@ -57,15 +58,18 @@ public class OnBoardShell {
                 List<String> custCodes = onBoardCustomerRepositoryDao.getCustomers();
                 for (String x:custCodes)   {
                     if(x.equalsIgnoreCase(customerCode))
-                        return "Customer-code already exists!!";
+                        logger.error("Customer-code already exists!!");
+                        return "Customer-code already exists!! ";
                 }
                 List<String> prodCodes = onBoardCustomerRepositoryDao.getProducts();
                 for (String x:prodCodes)   {
                     if(x.equalsIgnoreCase(productCode))
+                        logger.error("Product-code already exists!!");
                         return "Product-code already exists!!";
                 }
                 logger.debug("call stored Procedure to onBoard customer ");
                 onBoardCustomerRepositoryDao.createNewCustomer(onBoardCustomer);
+                logger.info("OnBoarding customer successful");
                 return ("\n ====== ONBOARD CUSTOMER : Successful ====== ");
             }
             else {
