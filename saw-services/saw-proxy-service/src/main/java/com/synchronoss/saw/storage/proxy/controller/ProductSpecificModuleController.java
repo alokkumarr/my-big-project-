@@ -70,12 +70,19 @@ public class ProductSpecificModuleController {
                              @RequestBody JsonNode jse) {
         logger.debug("Request Body String:{}", jse);
         Valid valid = new Valid();
+        if (!isRequestNotNull(jse)) {
+            valid.setValid(false);
+            valid.setError("Request Body can't be null!!");
+            logger.error("Request Body is null !!");
+            response.setStatus(400);
+            return valid;
+        }
 
         /* Extract input parameters */
         final String js = jse.path("source").toString();
         JsonElement jsonElement = toJsonElement(js);
 
-        if (jsonElement!= null) {
+        if (!jsonElement.isJsonNull()) {
             if (id == null){
                 valid.setValid(false);
                 valid.setError("ID can't be null or empty");
@@ -111,11 +118,18 @@ public class ProductSpecificModuleController {
                                 @PathVariable(name = "id", required = true) String id,
                                 @RequestBody JsonNode jse) {
         logger.debug("Request Body String:{}", jse);
+        Valid valid = new Valid();
+        if (!isRequestNotNull(jse)) {
+            valid.setValid(false);
+            valid.setError("Request Body can't be null!!");
+            logger.error("Request Body is null !!");
+            response.setStatus(400);
+            return valid;
+        }
 
         /* Extract input parameters */
         final String js = jse.path("source").toString();
         JsonElement jsonElement = toJsonElement(js);
-        Valid valid = new Valid();
         if(jsonElement != null) {
             if (id == null || id.isEmpty()){
                 valid.setValid(false);
@@ -193,8 +207,23 @@ public class ProductSpecificModuleController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ProductModuleDocs readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String,String> keyValues) {
+        if (keyValues == null) {
+            ProductModuleDocs productModuleDocs = new ProductModuleDocs();
+            productModuleDocs.setValid(false);
+            productModuleDocs.setMessage("Request Body can't be null!!");
+            logger.error("Request Body is null !!");
+            response.setStatus(400);
+            return productModuleDocs;
+        }
         logger.debug("Json returned : ",pms.getAllDocs(tableName,keyValues));
         return pms.getAllDocs(tableName,keyValues);
+    }
+
+    private boolean isRequestNotNull (JsonNode js) {
+        if(js.isNull()) {
+            return false;
+        }
+        return true;
     }
 
 }
