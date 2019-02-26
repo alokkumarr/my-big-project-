@@ -244,7 +244,7 @@ public class GenericJsonModel {
             case LONG:
                 return DataTypes.LongType;
             case DOUBLE:
-                return DataTypes.DateType;
+                return DataTypes.DoubleType;
             default:
                 return DataTypes.StringType;
         }

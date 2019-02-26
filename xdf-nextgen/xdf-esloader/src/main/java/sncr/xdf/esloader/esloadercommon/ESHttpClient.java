@@ -11,10 +11,12 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by skbm0001 on 30/1/2018.
@@ -22,14 +24,14 @@ import java.util.Map;
 public class ESHttpClient {
 
     private static final Logger logger = Logger.getLogger(ESHttpClient.class);
-    private String host;
+    private List<String> hosts;
     private ChallengeResponse authentication = null;
 
     public ESHttpClient(String host, String user, String password){
-
-        this.host = host;
         if(!host.toLowerCase().startsWith("http://") && !host.toLowerCase().startsWith("https://")){
-            this.host = "http://" + host;
+            this.hosts.add("http://" + host);
+        } else {
+            this.hosts.add(host);
         }
 
         ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
@@ -38,22 +40,23 @@ public class ESHttpClient {
     }
 
     public ESHttpClient(ESConfig config) throws Exception {
-        //TODO: Should be fixed as part of high-availability story
         List<String> esNodes = config.getEsHosts();
-        String esHost = esNodes.get(0);
-
-        this.host = esHost;
-
+        int port = config.getEsPort() == 0 ? 9200 : config.getEsPort();
         String user = config.getEsUser();
         String pwd = config.getEsPassword();
 
-        int port = config.getEsPort() == 0 ? 9200 : config.getEsPort();
+        this.hosts = esNodes.parallelStream().map(host -> {
+            String tempHost = null;
+            if(!host.toLowerCase().startsWith("http://") && !host.toLowerCase().startsWith("https://")){
+                tempHost = "http://" + host + ":" + port;
+            } else {
+                tempHost = host + ":" + port;
+            }
 
-        this.host = this.host + ":" + port;
+            return tempHost;
+        }).collect(Collectors.toList());
 
-        if(!host.toLowerCase().startsWith("http://") && !host.toLowerCase().startsWith("https://")){
-            this.host = "http://" + host;
-        }
+        logger.debug("Hosts = " + this.hosts);
 
         ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
         if(user != null && pwd != null)
@@ -61,99 +64,126 @@ public class ESHttpClient {
 
     }
 
-    private String get(String url) {
+    private String get(String url) throws Exception {
         String retval = null;
-        String fullUrl = host + url;
-        try {
-            ClientResource cr = new ClientResource(fullUrl);
-            if(authentication != null) cr.setChallengeResponse(authentication);
-            cr.get();
 
-            if(cr.getStatus().isSuccess()){
-                retval = cr.getResponseEntity().getText();
-            } else {
-                logger.error(cr.getStatus());
+        for(String host: this.hosts) {
+            logger.debug("Trying " + host);
+            String fullUrl = host + url;
+            try {
+                ClientResource cr = new ClientResource(fullUrl);
+                if(authentication != null) cr.setChallengeResponse(authentication);
+                cr.get();
+
+                if(cr.getStatus().isSuccess()){
+                    retval = cr.getResponseEntity().getText();
+                } else {
+                    logger.error(cr.getStatus());
+                }
+                return retval;
+            } catch(ResourceException exception) {
+                logger.warn("Unable to reach " + host);
+                logger.warn(exception);
             }
-        } catch (Exception e) {
-            logger.error(e);
         }
-        return retval;
+
+        return null;
     }
 
     private boolean head(String url) {
-        String fullUrl = host + url;
-        try {
-            ClientResource cr = new ClientResource(fullUrl);
-            if(authentication != null) cr.setChallengeResponse(authentication);
-            cr.head();
-            return cr.getStatus().isSuccess();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        for(String host: this.hosts) {
+            logger.debug("Trying " + host);
+            String fullUrl = host + url;
+            logger.debug("URL = " + fullUrl);
+
+            try {
+                ClientResource cr = new ClientResource(fullUrl);
+                if(authentication != null) cr.setChallengeResponse(authentication);
+                cr.head();
+                return cr.getStatus().isSuccess();
+            } catch(ResourceException exception) {
+                logger.warn("Unable to reach " + host);
+                logger.warn(exception);
+            }
         }
         return false;
     }
 
     private boolean delete(String url) {
-        String fullUrl = host + url;
-        try {
-            ClientResource cr = new ClientResource(fullUrl);
-            if(authentication != null) cr.setChallengeResponse(authentication);
-            cr.delete();
-            return cr.getStatus().isSuccess();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        for(String host: hosts) {
+            logger.debug("Trying " + host);
+            String fullUrl = host + url;
+            logger.debug("URL = " + fullUrl);
+
+            try {
+                ClientResource cr = new ClientResource(fullUrl);
+                if(authentication != null) cr.setChallengeResponse(authentication);
+                cr.delete();
+                return cr.getStatus().isSuccess();
+            } catch(ResourceException exception) {
+                logger.warn("Unable to reach " + host);
+                logger.warn(exception);
+            }
         }
+
         return false;
     }
 
     private boolean put(String url, String body) {
-        String retval = null;
-        String fullUrl = host + url;
-        try {
-            ClientResource cr = new ClientResource(fullUrl);
+        for(String host: hosts) {
+            String fullUrl = host + url;
+            logger.debug("URL = " + fullUrl);
 
-            if(authentication != null) cr.setChallengeResponse(authentication);
+            try {
+                ClientResource cr = new ClientResource(fullUrl);
 
-            // Specify Content-Type is application/json
-            StringRepresentation jsonData = new StringRepresentation(body);
-            jsonData.setMediaType(MediaType.APPLICATION_JSON);
+                if (authentication != null) cr.setChallengeResponse(authentication);
 
-            cr.put(jsonData);
-            if(!cr.getStatus().isSuccess()){
-                logger.error(cr.getStatus().getDescription());
-                return false;
-            } else {
-                return true;
+                // Specify Content-Type is application/json
+                StringRepresentation jsonData = new StringRepresentation(body);
+                jsonData.setMediaType(MediaType.APPLICATION_JSON);
+
+                cr.put(jsonData);
+                if (!cr.getStatus().isSuccess()) {
+                    logger.error(cr.getStatus().getDescription());
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch(ResourceException exception) {
+                logger.warn("Unable to reach " + host);
+                logger.warn(exception);
             }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.debug(ExceptionUtils.getStackTrace(e));
         }
+
         return false;
     }
 
     private boolean post(String url, String body) {
-        String retval = null;
-        String fullUrl = host + url;
-        try {
-            ClientResource cr = new ClientResource(fullUrl);
-            logger.debug("Full URL = " + fullUrl + ". Data = " + body);
+        for(String host: this.hosts) {
+            String fullUrl = host + url;
+            try {
+                ClientResource cr = new ClientResource(fullUrl);
+                logger.debug("Full URL = " + fullUrl + ". Data = " + body);
 
-            if(authentication != null) cr.setChallengeResponse(authentication);
+                if (authentication != null) cr.setChallengeResponse(authentication);
 
-            // Specify Content-Type is application/json
-            StringRepresentation jsonData = new StringRepresentation(body);
-            jsonData.setMediaType(MediaType.APPLICATION_JSON);
-            cr.post(jsonData);
-            return cr.getStatus().isSuccess();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.debug(ExceptionUtils.getStackTrace(e));
+                // Specify Content-Type is application/json
+                StringRepresentation jsonData = new StringRepresentation(body);
+                jsonData.setMediaType(MediaType.APPLICATION_JSON);
+                cr.post(jsonData);
+                return cr.getStatus().isSuccess();
+            } catch(ResourceException exception) {
+                logger.warn("Unable to reach " + host);
+                logger.warn(exception);
+            }
         }
+
         return false;
     }
 
     public String esClusterVersion() throws Exception {
+        logger.debug("Getting cluster version");
         String response = get("");
         if(response == null){
             throw new Exception("Cant obtain version.");
@@ -173,6 +203,7 @@ public class ESHttpClient {
     }
 
     public int esIndexStructure (String idx, String type, Map<String, String> mapping) throws Exception {
+        logger.debug("Getting ES index structure");
         String mappingString = get("/" + idx + "/_mapping/" + type);
         JsonObject mappingJson;
         try {
@@ -218,7 +249,8 @@ public class ESHttpClient {
      *
      * @return Total number of records in the index/alias
      */
-    public long getRecordCount (String index) {
+    public long getRecordCount (String index) throws Exception {
+        logger.debug("Getting record count");
         long count = 0;
 
         String countURL = "/" + index + "/_count";
@@ -293,6 +325,7 @@ public class ESHttpClient {
 
     // Returns number of aliases for given index
     public  int esIndexAliasParticipation(String idx) throws Exception{
+        logger.debug("Getting ES alias count");
         String aliases = get("/" + idx + "/_alias");
         if(aliases == null) {
             return -1;
@@ -343,14 +376,15 @@ public class ESHttpClient {
 
     // Return list of indexes with the given alias
     public List<String> esAliasListIndices(String alias) throws Exception {
+        logger.debug("Getting list of indexes for the alias " + alias);
         List<String> retval = new ArrayList<>();
         String aliasStr = get("/_alias/" + alias);
         if(aliasStr == null)  return null;
-        JsonObject inndexJson;
+        JsonObject indexJson;
         try {
             // Try to parse and access mapping section of ES JSON
-            inndexJson = new JsonParser().parse(aliasStr).getAsJsonObject();
-            for(Map.Entry<String, JsonElement> e : inndexJson.entrySet()) {
+            indexJson = new JsonParser().parse(aliasStr).getAsJsonObject();
+            for(Map.Entry<String, JsonElement> e : indexJson.entrySet()) {
                 String indexName = e.getKey();
                 retval.add(indexName);
             }
