@@ -109,6 +109,7 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{channelId}/routes", method = RequestMethod.POST,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
+  @Transactional
   public ResponseEntity<@Valid BisRouteDto> createRoute(
       @ApiParam(value = "Channel Id", required = true) @PathVariable Long channelId,
       @ApiParam(value = "Route related information to store",
@@ -165,22 +166,42 @@ public class SawBisRouteController {
         // irrespecitve of request set expression to empty
         // so that scheduler treats as immediate
         JsonNode activeTab = schedulerExpn.get("activeTab");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         if (activeTab != null && activeTab.asText().equals("immediate")) {
           schedulerRequest.setCronExpression("");
         } else {
           JsonNode cronExp = schedulerExpn.get("cronexp");
-          JsonNode startDate = schedulerExpn.get("startDate");
-          JsonNode endDate = schedulerExpn.get("endDate");
+          JsonNode startDateStr = schedulerExpn.get("startDate");
+          JsonNode endDateStr = schedulerExpn.get("endDate");
+          JsonNode timezone = schedulerExpn.get("timezone");
           if (cronExp != null) {
             schedulerRequest.setCronExpression(cronExp.asText());
           }
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+          // Date in sent in User's locale time along with the timezone.
+          // E.g.: 2019-02-07T00:00:26+05:30
+          // This will be converted to machine time
+          
+
           try {
-            if (startDate != null) {
-              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+            if (startDateStr != null) {
+              logger.debug("Start Date = " + startDateStr.asText());
+
+              Date startDate = dateFormat.parse(startDateStr.asText());
+              logger.debug("Start Date in system timezone = " + startDate);
+              schedulerRequest.setJobScheduleTime(startDate.getTime());
             }
-            if (endDate != null) {
-              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            if (endDateStr != null && !endDateStr.asText().equals("")) {
+              logger.debug("End Date = " + endDateStr.asText());
+
+              Date endDate = dateFormat.parse(endDateStr.asText());
+              logger.debug("End Date system timezone = " + endDate);
+              schedulerRequest.setEndDate(endDate.getTime());
+            } else {
+              schedulerRequest.setEndDate(Long.MAX_VALUE);
+            }
+            if (timezone != null) {
+              schedulerRequest.setTimezone(timezone.asText());
             }
           } catch (ParseException e) {
             logger.error(e.getMessage());
@@ -326,16 +347,22 @@ public class SawBisRouteController {
           JsonNode cronExp = schedulerData.get("cronexp");
           JsonNode startDate = schedulerData.get("startDate");
           JsonNode endDate = schedulerData.get("endDate");
+          JsonNode timezone = schedulerData.get("timezone");
           if (cronExp != null) {
             schedulerRequest.setCronExpression(cronExp.asText());
           }
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
           try {
             if (startDate != null) {
-              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()));
+              schedulerRequest.setJobScheduleTime(dateFormat.parse(startDate.asText()).getTime());
             }
-            if (endDate != null) {
-              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()));
+            if (endDate != null && !endDate.asText().equals("")) {
+              schedulerRequest.setEndDate(dateFormat.parse(endDate.asText()).getTime());
+            } else {
+              schedulerRequest.setEndDate(Long.MAX_VALUE);
+            }
+            if (timezone != null) {
+              schedulerRequest.setTimezone(timezone.asText());
             }
           } catch (ParseException e) {
             logger.error(e.getMessage());

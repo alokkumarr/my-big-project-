@@ -1056,7 +1056,7 @@ export class ChartService {
       </tr>`;
 
       const zString = fields.z
-        ? `<tr><th>${fields.z.alias ||
+        ? `<tr><th>${AGGREGATE_TYPES_OBJ[fields.z.aggregate].label} ${fields.z.alias ||
             fields.z.aliasName ||
             get(opts, 'labels.z', '') ||
             fields.z.displayName}:</th><td>${

@@ -3,6 +3,8 @@
 :host {
   display: block;
   color: $primary-grey-g4;
+  overflow-y: scroll;
+  height: 600px;
 }
 
 header {

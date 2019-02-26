@@ -50,12 +50,12 @@
       <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Last Fire Time : </span>
-          <span>{{lastFireTime | date: 'short'}}</span>
+          <span>{{lastFireTime > 0 ? (lastFireTime | date: 'short') : 'NA'}}</span>
         </div>
         <mat-divider [vertical]="true"></mat-divider>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Next Fire Time : </span>
-          <span>{{nextFireTime | date: 'short'}}</span>
+          <span>{{nextFireTime > 0 ? (nextFireTime  | date: 'short') : 'NA'}}</span>
         </div>
       </div>
     </div>

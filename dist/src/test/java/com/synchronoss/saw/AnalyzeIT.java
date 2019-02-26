@@ -455,7 +455,7 @@ public class AnalyzeIT extends BaseIT {
                         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
     JsonNode jsonNode= root.get("long");
-    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1546);
+    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1552);
     Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
   }
 
@@ -547,6 +547,7 @@ public class AnalyzeIT extends BaseIT {
         objectNode.put("categoryID","4");
         objectNode.put("jobGroup","SYNCHRONOSS");
         objectNode.put("endDate", "2099-03-01T16:24:28+05:30");
+        objectNode.put("timezone", "UTC");
      return objectNode;
     }
 

@@ -82,8 +82,8 @@ export class RoleEditDialogComponent extends BaseDialogComponent {
       roleName = '',
       roleDesc = '',
       activeStatusInd = 1,
-      roleType = '',
-      myAnalysis
+      roleType = ''
+      // myAnalysis
     } = formModel;
 
     this.formGroup = this._fb.group({
@@ -94,7 +94,7 @@ export class RoleEditDialogComponent extends BaseDialogComponent {
       roleDesc: roleDesc,
       activeStatusInd: [activeStatusInd, Validators.required],
       roleType: [roleType, Validators.required],
-      myAnalysis: myAnalysis
+      myAnalysis: true
     });
 
     this.formGroup.statusChanges.subscribe(change => {

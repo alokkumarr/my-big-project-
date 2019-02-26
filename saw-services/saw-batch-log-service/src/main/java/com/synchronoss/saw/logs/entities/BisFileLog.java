@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -69,12 +71,13 @@ public class BisFileLog implements Serializable {
   @Column(name = "BIS_PROCESS_STATE")
   String bisProcessState;
 
-  @ApiModelProperty(value = "Indicates the modified date", dataType = "Date",
-      allowEmptyValue = false)
+  @LastModifiedDate
+  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "MODIFIED_DATE")
   private Date modifiedDate;
-  @ApiModelProperty(value = "Indicates the created date", dataType = "Date",
-      allowEmptyValue = false)
+
+  @CreatedDate
+  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "CREATED_DATE")
   private Date createdDate;
 
