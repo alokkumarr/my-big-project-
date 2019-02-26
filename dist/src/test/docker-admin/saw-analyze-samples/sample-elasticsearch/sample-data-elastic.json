@@ -73,7 +73,7 @@
   ],
   "createdBy":"sipadmin@synchronoss.com",
   "customerCode":"SYNCHRONOSS",
-  "metricName":"sample-elastic",
+  "metricName":"sample-elasticsearch",
   "esRepository":{
     "indexName":"sampleAlias",
     "storageType":"ES",
