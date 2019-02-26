@@ -62,13 +62,6 @@ public class OnBoardShell {
                         return "Customer-code already exists!! ";
                     }
                 }
-                List<String> prodCodes = onBoardCustomerRepositoryDao.getProducts();
-                for (String x:prodCodes)   {
-                    if(x.equalsIgnoreCase(productCode)) {
-                        logger.error("Product-code already exists!!");
-                        return "Product-code already exists!!";
-                    }
-                }
                 logger.debug("call stored Procedure to onBoard customer ");
                 onBoardCustomerRepositoryDao.createNewCustomer(onBoardCustomer);
                 logger.info("OnBoarding customer successful");
