@@ -1,5 +1,8 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
+import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,8 +30,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
-import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
-import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
+
 
 
 
@@ -109,133 +111,135 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     try {
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
-      scheduler.getListenerManager().addSchedulerListener(new SchedulerListener() {
+      if (scheduler.getListenerManager() != null) {
 
-        @Override
-        public void jobScheduled(Trigger trigger) {
-          // TODO Auto-generated method stub
-          
-        }
+        scheduler.getListenerManager().addSchedulerListener(new SchedulerListener() {
 
-        @Override
-        public void jobUnscheduled(TriggerKey triggerKey) {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void jobScheduled(Trigger trigger) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void triggerFinalized(Trigger trigger) {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void triggerPaused(TriggerKey triggerKey) {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void jobUnscheduled(TriggerKey triggerKey) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void triggersPaused(String triggerGroup) {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void triggerResumed(TriggerKey triggerKey) {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void triggerFinalized(Trigger trigger) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void triggersResumed(String triggerGroup) {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void jobAdded(JobDetail jobDetail) {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void triggerPaused(TriggerKey triggerKey) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void jobDeleted(JobKey jobKey) {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void jobPaused(JobKey jobKey) {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void triggersPaused(String triggerGroup) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void jobsPaused(String jobGroup) {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void jobResumed(JobKey jobKey) {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void triggerResumed(TriggerKey triggerKey) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void jobsResumed(String jobGroup) {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void schedulerError(String msg, SchedulerException cause) {
-          logger.error("Error in trigger" + msg);
-          logger.error("#####  Cause of error in trigger ##### " + cause.getMessage());
-          logger.error("#####  Schedule retry starts here ##### " );
-          JobExecutionException e2 =
-              new JobExecutionException(cause);
-          e2.refireImmediately();
-        }
+          @Override
+          public void triggersResumed(String triggerGroup) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void schedulerInStandbyMode() {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void schedulerStarted() {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void jobAdded(JobDetail jobDetail) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void schedulerStarting() {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void schedulerShutdown() {
-          // TODO Auto-generated method stub
-          
-        }
+          @Override
+          public void jobDeleted(JobKey jobKey) {
+            // TODO Auto-generated method stub
 
-        @Override
-        public void schedulerShuttingdown() {
-          // TODO Auto-generated method stub
-          
-        }
+          }
 
-        @Override
-        public void schedulingDataCleared() {
-          // TODO Auto-generated method stub
-          
-        }
-        
-      });  
+          @Override
+          public void jobPaused(JobKey jobKey) {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void jobsPaused(String jobGroup) {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void jobResumed(JobKey jobKey) {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void jobsResumed(String jobGroup) {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void schedulerError(String msg, SchedulerException cause) {
+            logger.error("Error in trigger" + msg);
+            logger.error("#####  Cause of error in trigger ##### " + cause.getMessage());
+            logger.error("#####  Schedule retry starts here ##### ");
+            JobExecutionException e2 = new JobExecutionException(cause);
+            e2.refireImmediately();
+          }
+
+          @Override
+          public void schedulerInStandbyMode() {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void schedulerStarted() {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void schedulerStarting() {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void schedulerShutdown() {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void schedulerShuttingdown() {
+            // TODO Auto-generated method stub
+
+          }
+
+          @Override
+          public void schedulingDataCleared() {
+            // TODO Auto-generated method stub
+
+          }
+
+        });
+      }
       Date dt = scheduler.scheduleJob(jobDetail, cronTriggerBean);
       logger.info("Job with key jobKey :" + jobKey + " and group :" + groupKey
           + " scheduled successfully for date :" + dt);
