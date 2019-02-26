@@ -109,6 +109,7 @@ public class SawBisRouteController {
   @RequestMapping(value = "/channels/{channelId}/routes", method = RequestMethod.POST,
       produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
+  @Transactional
   public ResponseEntity<@Valid BisRouteDto> createRoute(
       @ApiParam(value = "Channel Id", required = true) @PathVariable Long channelId,
       @ApiParam(value = "Route related information to store",
@@ -165,6 +166,7 @@ public class SawBisRouteController {
         // irrespecitve of request set expression to empty
         // so that scheduler treats as immediate
         JsonNode activeTab = schedulerExpn.get("activeTab");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         if (activeTab != null && activeTab.asText().equals("immediate")) {
           schedulerRequest.setCronExpression("");
         } else {
@@ -179,7 +181,7 @@ public class SawBisRouteController {
           // Date in sent in User's locale time along with the timezone.
           // E.g.: 2019-02-07T00:00:26+05:30
           // This will be converted to machine time
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+          
 
           try {
             if (startDateStr != null) {
