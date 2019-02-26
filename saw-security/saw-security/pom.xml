@@ -81,6 +81,12 @@
         </dependency>
 
         <dependency>
+          <groupId>com.synchronoss.bda.sip</groupId>
+          <artifactId>sip-common-components</artifactId>
+          <version>${revision}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
