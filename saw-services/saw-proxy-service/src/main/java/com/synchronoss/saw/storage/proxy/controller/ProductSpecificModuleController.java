@@ -16,14 +16,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @RestController
 @Api(value="The controller provides operations pertaining to interacting with MapperDB meta-store used for Product-specific-modules")
+@ApiResponses(value = {
+    @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+    @ApiResponse(code = 400, message = "Bad Request"),
+    @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+    @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+    @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+    @ApiResponse(code = 500, message = "Something went down. Contact System administrator")
+})
 @RequestMapping(value = "/internal/proxy/storage/product-module")
 public class ProductSpecificModuleController {
 
@@ -52,14 +60,6 @@ public class ProductSpecificModuleController {
 
     @ApiOperation(value = "Provides ability to add document into ProductSpecificModules ", nickname = "insertDocToProductModule",
         notes = "", response = Valid.class)
-    @ApiResponses(value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
-    })
     @RequestMapping(value = "/{id}/configuration",
         method = RequestMethod.POST,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -103,14 +103,6 @@ public class ProductSpecificModuleController {
 
     @ApiOperation(value = "Provides ability to Update document in ProductSpecificModules ", nickname = "updateDocInProductModule",
         notes = "", response = Valid.class)
-    @ApiResponses(value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
-    })
     @RequestMapping(value = "/{id}/configuration",
         method = RequestMethod.PUT,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -145,14 +137,6 @@ public class ProductSpecificModuleController {
 
     @ApiOperation(value = "Provides ability to delete document from ProductSpecificModules ", nickname = "deleteSpecificDoc",
         notes = "", response = Valid.class)
-    @ApiResponses(value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
-    })
     @RequestMapping(value = "/{id}/configuration", method = RequestMethod.DELETE, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Valid deleteDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
@@ -178,15 +162,7 @@ public class ProductSpecificModuleController {
     }
 
     @ApiOperation(value = "Provides ability to read document from ProductSpecificModules ", nickname = "getSpecificProductModuleDoc",
-        notes = "", response = JsonElement.class)
-    @ApiResponses(value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
-    })
+        notes = "", response = ProductModuleDocs.class)
     @RequestMapping(value = "/{id}/configuration", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProductModuleDocs readDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "id", required = true) String id) {
@@ -202,15 +178,7 @@ public class ProductSpecificModuleController {
     }
 
     @ApiOperation(value = "Provides ability to fetch all documents from ProductSpecificModules ", nickname = "getAllProductModuleDocs",
-        notes = "", response = JsonElement.class)
-    @ApiResponses(value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
-    })
+        notes = "", response = ProductModuleDocs.class)
     @RequestMapping(value = "/docs", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProductModuleDocs readAllDocuments(HttpServletRequest request, HttpServletResponse response) {
@@ -219,19 +187,12 @@ public class ProductSpecificModuleController {
     }
 
     @ApiOperation(value = "Provides ability to fetch filtered document/'s from ProductSpecificModules ", nickname = "getAllProductModuleDocs",
-        notes = "", response = JsonElement.class)
-    @ApiResponses(value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
-    })
+        notes = "", response = ProductModuleDocs.class)
     //The request type is POST since we need request body to accept list of attribute-values to filter documents.
-    @RequestMapping(value = "/filter/docs", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/filter/docs", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
     @ResponseStatus(HttpStatus.OK)
-    public ProductModuleDocs readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestBody MultiValueMap keyValues) {
+    public ProductModuleDocs readDocumentsByCond(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String,String> keyValues) {
         logger.debug("Json returned : ",pms.getAllDocs(tableName,keyValues));
         return pms.getAllDocs(tableName,keyValues);
     }
