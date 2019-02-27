@@ -31,10 +31,11 @@ public class NSSOApplication extends SpringBootServletInitializer {
 	private static String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 	private static final String pidPath = "/var/bda/saw-security/run/saw-security.pid";
 	
-	@Bean
-	public TomcatServletWebServerFactory tomcatEmbeddedServletContainerFactory() {
-		return new TomcatServletWebServerFactory();
-	}
+    @Bean
+    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
+        return new TomcatServletWebServerFactory();
+    }
+
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {

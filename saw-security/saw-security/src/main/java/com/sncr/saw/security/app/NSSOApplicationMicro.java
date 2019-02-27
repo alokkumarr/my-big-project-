@@ -19,10 +19,10 @@ import com.sncr.saw.security.common.util.JwtFilter;
 //@EnableDiscoveryClient
 public class NSSOApplicationMicro extends SpringBootServletInitializer {
 
-	@Bean
-	public TomcatServletWebServerFactory tomcatEmbeddedServletContainerFactory() {
-		return new TomcatServletWebServerFactory();
-	}
+    @Bean
+    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
+        return new TomcatServletWebServerFactory();
+    }
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
