@@ -33,7 +33,6 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
   @Override
   protected void executeInternal(JobExecutionContext jobExecutionContext)
       throws JobExecutionException {
-    logger.info("Staring bis job");
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
     JobKey key = jobDetail.getKey();
     logger.info("Cron Job started with key :" + key.getName() + ", Group :" + key.getGroup()
@@ -47,13 +46,7 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
     JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
     String myValue = dataMap.getString("myKey");
     logger.info("Value:" + myValue);
-    try {
-      restTemplate.postForLocation(bisTransferUrl, jobRequest);
-    } catch (Exception exception) {
-      logger.error("exception during data transfer in BIS. "
-          + "Refer BIS Logs: " + exception.getMessage());
-    }
-    
+    restTemplate.postForLocation(bisTransferUrl, jobRequest);
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

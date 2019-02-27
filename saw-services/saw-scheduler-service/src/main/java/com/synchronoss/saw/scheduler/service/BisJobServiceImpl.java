@@ -8,29 +8,30 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerListener;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
+
 import org.quartz.impl.matchers.GroupMatcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+
 import org.springframework.context.annotation.Lazy;
+
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
-
-
 
 
 
@@ -111,135 +112,6 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     try {
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
-      if (scheduler.getListenerManager() != null) {
-
-        scheduler.getListenerManager().addSchedulerListener(new SchedulerListener() {
-
-          @Override
-          public void jobScheduled(Trigger trigger) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void jobUnscheduled(TriggerKey triggerKey) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void triggerFinalized(Trigger trigger) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void triggerPaused(TriggerKey triggerKey) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void triggersPaused(String triggerGroup) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void triggerResumed(TriggerKey triggerKey) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void triggersResumed(String triggerGroup) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void jobAdded(JobDetail jobDetail) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void jobDeleted(JobKey jobKey) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void jobPaused(JobKey jobKey) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void jobsPaused(String jobGroup) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void jobResumed(JobKey jobKey) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void jobsResumed(String jobGroup) {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void schedulerError(String msg, SchedulerException cause) {
-            logger.error("Error in trigger" + msg);
-            logger.error("#####  Cause of error in trigger ##### " + cause.getMessage());
-            logger.error("#####  Schedule retry starts here ##### ");
-            JobExecutionException e2 = new JobExecutionException(cause);
-            e2.refireImmediately();
-          }
-
-          @Override
-          public void schedulerInStandbyMode() {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void schedulerStarted() {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void schedulerStarting() {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void schedulerShutdown() {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void schedulerShuttingdown() {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void schedulingDataCleared() {
-            // TODO Auto-generated method stub
-
-          }
-
-        });
-      }
       Date dt = scheduler.scheduleJob(jobDetail, cronTriggerBean);
       logger.info("Job with key jobKey :" + jobKey + " and group :" + groupKey
           + " scheduled successfully for date :" + dt);
@@ -472,7 +344,6 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     logger.info("Parameters received for checking job is running now : jobKey :" + jobKey);
     try {
 
-      
       List<JobExecutionContext> currentJobs =
           schedulerFactoryBean.getScheduler().getCurrentlyExecutingJobs();
       if (currentJobs != null) {
