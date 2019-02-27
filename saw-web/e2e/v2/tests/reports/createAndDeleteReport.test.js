@@ -10,7 +10,7 @@ let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
 const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
-const DesignerPage = require('../../pages/DesignerPage');
+const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 
 describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.js', () => {
@@ -54,7 +54,6 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
       it(`${id}:${data.description}`, () => {
         try {
           const reportName = `e2e dl report ${new Date().toString()}`;
-          console.log(reportName);
           const reportDescription = `e2e dl report description ${new Date().toString()}`;
           const analysisType = 'table:report';
           const tables = data.tables;
@@ -69,13 +68,13 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
           analyzePage.clickOnDataPods(dataSets.report);
           analyzePage.clickOnCreateButton();
 
-          const designerPage = new DesignerPage();
-          designerPage.clickOnReportFields(tables);
-          designerPage.verifyDisplayedColumns(tables);
-          designerPage.clickOnSave();
-          designerPage.enterAnalysisName(reportName);
-          designerPage.enterAnalysisDescription(reportDescription);
-          designerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+          const reportDesignerPage = new ReportDesignerPage();
+          reportDesignerPage.clickOnReportFields(tables);
+          reportDesignerPage.verifyDisplayedColumns(tables);
+          reportDesignerPage.clickOnSave();
+          reportDesignerPage.enterAnalysisName(reportName);
+          reportDesignerPage.enterAnalysisDescription(reportDescription);
+          reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
           // Verify analysis displayed in list and card view
           analyzePage.goToView('list');
           analyzePage.verifyElementPresent(
@@ -135,14 +134,14 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
           analyzePage.clickOnDataPods(dataSets.pivotChart);
           analyzePage.clickOnCreateButton();
 
-          const designerPage = new DesignerPage();
-          designerPage.clickOnReportFields(tables);
+          const reportDesignerPage = new ReportDesignerPage();
+          reportDesignerPage.clickOnReportFields(tables);
           // Verify that all the columns are displayed
-          designerPage.verifyDisplayedColumns(tables);
-          designerPage.clickOnSave();
-          designerPage.enterAnalysisName(reportName);
-          designerPage.enterAnalysisDescription(reportDescription);
-          designerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+          reportDesignerPage.verifyDisplayedColumns(tables);
+          reportDesignerPage.clickOnSave();
+          reportDesignerPage.enterAnalysisName(reportName);
+          reportDesignerPage.enterAnalysisDescription(reportDescription);
+          reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
           // Verify analysis displayed in list and card view
           analyzePage.goToView('list');
           analyzePage.verifyElementPresent(
