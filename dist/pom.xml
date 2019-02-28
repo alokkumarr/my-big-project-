@@ -414,6 +414,9 @@
                 <network>
                   <name>saw</name>
                 </network>
+                <ports>
+                <port>+saw.docker.ip:8022:22</port>
+                </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <!-- Restart containers when Docker engine comes up
