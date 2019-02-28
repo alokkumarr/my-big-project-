@@ -2,15 +2,17 @@ package com.synchronoss.saw.storage.proxy.service.productSpecificModuleService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.synchronoss.saw.storage.proxy.model.response.ProductModuleDocs;
 import com.synchronoss.saw.storage.proxy.model.response.Valid;
-import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 @Component
 public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModuleService {
@@ -120,13 +122,17 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         try {
             ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
             doc = productModuleMetaStore.read(id);
+            System.out.println("Retrieved doc from MetaStore :"+doc);
+            System.out.println("doc as String : "+doc.toString());
             if (doc == null)    {
                 productModuleDocs.setValid(false);
                 productModuleDocs.setMessage("id given is not present");
                 logger.error(id," : not present in MaprDB");
                 return productModuleDocs;
             }
-            productModuleDocs.setDoc(gson.toJson(doc));
+            System.out.println("doc as gson.toJson : "+gson.toJson(doc));
+            productModuleDocs.setDoc((List<JsonObject>) doc);
+            System.out.println("doc strored in bean : "+productModuleDocs.getDoc());
             productModuleDocs.setValid(true);
             productModuleDocs.setMessage("Document Retrieved successfully");
             logger.debug("Retrieved Document = ",doc);
@@ -140,7 +146,7 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
         }
     }
 
-    /**
+    /**O
      * Fetch all documents based on queryCondition
      * @param tableName
      * @param keyValues : Attribute - values
@@ -148,18 +154,25 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
      */
     @Override
     public ProductModuleDocs getAllDocs(String tableName, Map<String, String> keyValues) {
-        Map<String, Document> docs = null;
+        List<JsonObject> docs = null;
         ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
             ProductModuleMetaStore productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
-            docs = productModuleMetaStore.searchAll(keyValues);
-            if (docs.isEmpty()) {
+            String res = gson.toJson(productModuleMetaStore.searchAll(keyValues));
+            JsonParser parser =  new JsonParser();
+            JsonObject o = parser.parse(res).getAsJsonObject();
+            docs.add(o);
+            System.out.println("Retrieved docs from MetaStore :"+docs);
+            System.out.println("docs as String : "+docs.toString());
+            if (res.isEmpty()) {
                 productModuleDocs.setValid(true);
                 productModuleDocs.setMessage("No documents present for given filters!!");
-                productModuleDocs.setDoc(gson.toJson((docs)));
+                productModuleDocs.setDoc(docs);
                 return productModuleDocs;
             }
-            productModuleDocs.setDoc(gson.toJson(docs));
+            System.out.println("doc as gson.toJson : "+gson.toJson(docs));
+            productModuleDocs.setDoc(docs);
+            System.out.println("doc strored in bean : "+productModuleDocs.getDoc());
             productModuleDocs.setValid(true);
             productModuleDocs.setMessage("Document Retrieved successfully!!");
             return productModuleDocs;
@@ -181,18 +194,21 @@ public class ProductSpecificModuleServiceRESTImpl implements ProductSpecificModu
     @Override
     public ProductModuleDocs getAllDocs(String tableName) {
         ProductModuleMetaStore productModuleMetaStore;
-        Map<String, Document> docs = null;
+        List<JsonObject> docs = null;
         ProductModuleDocs productModuleDocs = new ProductModuleDocs();
         try {
             productModuleMetaStore = new ProductModuleMetaStore(tableName,root);
-            docs = productModuleMetaStore.searchAll();
-            if (docs.isEmpty()) {
+            String res = gson.toJson(productModuleMetaStore.searchAll());
+            JsonParser parser =  new JsonParser();
+            JsonObject o = parser.parse(res).getAsJsonObject();
+            docs.add(o);
+            if (res.isEmpty()) {
                 productModuleDocs.setValid(true);
                 productModuleDocs.setMessage("No document present for given table!!");
-                productModuleDocs.setDoc(gson.toJson((docs)));
+                productModuleDocs.setDoc(docs);
                 return productModuleDocs;
             }
-            productModuleDocs.setDoc(gson.toJson(productModuleMetaStore.searchAll()));
+            productModuleDocs.setDoc(docs);
             productModuleDocs.setValid(true);
             productModuleDocs.setMessage("Document retrieved successfully!! ");
             return productModuleDocs;

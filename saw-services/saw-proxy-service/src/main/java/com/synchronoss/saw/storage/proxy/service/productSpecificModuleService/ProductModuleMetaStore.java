@@ -9,6 +9,7 @@ import sncr.bda.base.DocumentConverter;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.base.WithSearchInMetastore;
 
+import java.util.List;
 import java.util.Map;
 
 public class ProductModuleMetaStore extends MetadataStore implements WithSearchInMetastore, DocumentConverter {
@@ -28,12 +29,12 @@ public class ProductModuleMetaStore extends MetadataStore implements WithSearchI
         return searchAsMap(table, qc);
     }
 
-    public Map<String, Document> searchAll() throws Exception {
+    public List<Document> searchAll() throws Exception {
         QueryCondition cond = MapRDB.newCondition();
-        return searchAsMap(table, cond);
+        return searchAsList(table, cond);
     }
 
-    public Map<String, Document> searchAll( Map<String,String> keyValues ) throws Exception {
+    public List<Document> searchAll(Map<String,String> keyValues ) throws Exception {
         logger.trace("Search query on search " + keyValues);
         QueryCondition cond = MapRDB.newCondition();
         cond.and();
@@ -46,7 +47,7 @@ public class ProductModuleMetaStore extends MetadataStore implements WithSearchI
 
         cond.close();
         cond.build();
-        return searchAsMap(table, cond);
+        return searchAsList(table, cond);
 
     }
 }

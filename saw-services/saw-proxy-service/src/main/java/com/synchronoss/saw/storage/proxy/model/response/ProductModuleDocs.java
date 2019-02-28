@@ -1,18 +1,13 @@
 package com.synchronoss.saw.storage.proxy.model.response;
 
+import com.google.gson.JsonObject;
+
 import java.io.Serializable;
+import java.util.List;
 
 public class ProductModuleDocs implements Serializable {
 
     private static final long serialVersionUID = 7684700123455735559L;
-
-    public String getDoc() {
-        return doc;
-    }
-
-    public void setDoc(String doc) {
-        this.doc = doc;
-    }
 
     public boolean getValid() {
         return valid;
@@ -30,8 +25,19 @@ public class ProductModuleDocs implements Serializable {
         this.message = message;
     }
 
-    private String doc;
+    public List<JsonObject> getDoc() {
+        return doc;
+    }
+
+    public void setDoc(List<JsonObject> doc) {
+        this.doc = doc;
+    }
+
+    private List<JsonObject> doc;
     private boolean valid;
+
+
+
     private String message;
 
 }
