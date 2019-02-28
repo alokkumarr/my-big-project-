@@ -34,11 +34,11 @@ describe('Executing reset password tests from preResetPwd.test.js', () => {
       const forgotPasswordPage = new ForgotPasswordPage();
       forgotPasswordPage.doClickOnForgotPassword();
       const prpwd = new PreResetPwd();
-      prpwd.resetAs(data.user,data.expected.message);
+      prpwd.resetAs(data.user, data.expected.message);
       const preResetHdr = new PreResetHeader();
       preResetHdr.verifyLogo();
 
-    }).result.testInfo = { testId: id, data: data, feature: 'PRERESETPASSWORD', dataProvider: 'positiveTests' };
+    }).result.testInfo = {testId: id, data: data, feature: 'PRERESETPASSWORD', dataProvider: 'positiveTests'};
   });
 
   using(testDataReader.testData['PRERESETPASSWORD']['negativeTests'] ? testDataReader.testData['PRERESETPASSWORD']['negativeTests'] : {}, (data, id) => {
@@ -48,9 +48,9 @@ describe('Executing reset password tests from preResetPwd.test.js', () => {
       const forgotPasswordPage = new ForgotPasswordPage();
       forgotPasswordPage.doClickOnForgotPassword();
       const prpwd = new PreResetPwd();
-      prpwd.resetAs(data.user,data.expected.message);
+      prpwd.resetAs(data.user, data.expected.message);
 
-    }).result.testInfo = { testId: id, data: data, feature: 'PRERESETPASSWORD', dataProvider: 'negativeTests' };
+    }).result.testInfo = {testId: id, data: data, feature: 'PRERESETPASSWORD', dataProvider: 'negativeTests'};
   });
 
 });
