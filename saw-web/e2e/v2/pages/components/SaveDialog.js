@@ -1,7 +1,7 @@
 'use strict';
 
-const logger = require('../../conf/logger')(__filename);
 const commonFunctions = require('../utils/commonFunctions');
+
 class SaveDialog {
   constructor() {
     this._analysisNameInput = element(by.css(`[e2e="save-dialog-name"]`));
@@ -18,31 +18,26 @@ class SaveDialog {
   }
 
   enterAnalysisName(name) {
-    commonFunctions.waitFor.elementToBeVisible(this._analysisNameInput);
-    this._analysisNameInput.clear().sendKeys(name);
+    commonFunctions.fillInput(this._analysisNameInput, name);
   }
 
   enterAnalysisDescription(description) {
-    commonFunctions.waitFor.elementToBeVisible(this._analysisDescriptionInput);
-    this._analysisDescriptionInput.clear().sendKeys(description);
+    commonFunctions.fillInput(this._analysisDescriptionInput, description);
   }
 
   clickOnSaveAndCloseDialogButton(landingPageAfterSave = null) {
-    commonFunctions.waitFor.elementToBeClickable(this._saveAndCloseButton);
-    this._saveAndCloseButton.click();
+    commonFunctions.clickOnElement(this._saveAndCloseButton);
     if (landingPageAfterSave) {
       commonFunctions.waitFor.pageToBeReady(landingPageAfterSave);
     }
   }
 
   clickOnSaveDialogButton() {
-    commonFunctions.waitFor.elementToBeClickable(this._saveDialogButton);
-    this._saveDialogButton.click();
+    commonFunctions.clickOnElement(this._saveDialogButton);
   }
 
   clickOnCancelDialogButton() {
-    commonFunctions.waitFor.elementToBeClickable(this._cancelDialogButton);
-    this._cancelDialogButton.click();
+    commonFunctions.clickOnElement(this._cancelDialogButton);
   }
 }
 module.exports = SaveDialog;

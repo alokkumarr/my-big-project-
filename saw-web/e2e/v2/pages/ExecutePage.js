@@ -1,9 +1,6 @@
 'use strict';
-const commonFunctions = require('./utils/commonFunctions');
-const protractorConf = require('../conf/protractor.conf');
-const protractor = require('protractor');
-const ec = protractor.ExpectedConditions;
 
+const commonFunctions = require('./utils/commonFunctions');
 const ConfirmationModel = require('./components/ConfirmationModel');
 
 class ExecutePage extends ConfirmationModel {

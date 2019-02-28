@@ -1,7 +1,5 @@
 @import 'src/themes/base/colors';
 
-$range-handle-dimension: 20px;
-
 :host {
   background-color: whitesmoke;
   box-sizing: border-box;
@@ -60,37 +58,6 @@ mat-icon.remove-filter-chip {
 
 g-number-filter {
   padding: 30px 0 0;
-}
-
-nouislider {
-  width: calc(100% - #{$range-handle-dimension});
-}
-
-::ng-deep .noUi-target.noUi-horizontal {
-  border: none;
-  box-shadow: none;
-  background-color: $primary-grey-g1;
-  height: 5px;
-
-  ::ng-deep .noUi-connect {
-    background-color: $primary-blue-b2;
-  }
-
-  ::ng-deep .noUi-origin {
-    top: -2px;
-
-    ::ng-deep .noUi-handle {
-      outline: none;
-      width: $range-handle-dimension;
-      height: $range-handle-dimension;
-      border-radius: 50%;
-
-      &::before,
-      &::after {
-        display: none;
-      }
-    }
-  }
 }
 
 .mat-expansion-panel-header {

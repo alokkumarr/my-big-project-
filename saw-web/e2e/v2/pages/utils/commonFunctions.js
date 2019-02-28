@@ -144,5 +144,9 @@ module.exports = {
   clickOnElement(el) {
     this.waitFor.elementToBeClickable(el);
     el.click();
+  },
+  fillInput(el, value) {
+    this.waitFor.elementToBeVisible(el);
+    el.clear().sendKeys(value);
   }
 };
