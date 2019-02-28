@@ -98,5 +98,11 @@
   </div>
 </div>
 
-<designer-analysis-options class="designer__options">
+<designer-analysis-options class="designer__options"
+                           (change)="change.emit($event)"
+                           [analysisType]="analysisType"
+                           [analysisSubtype]="analysisSubtype"
+                           [sqlBuilder]="sqlBuilder"
+                           [artifacts]="artifacts"
+>
 </designer-analysis-options>

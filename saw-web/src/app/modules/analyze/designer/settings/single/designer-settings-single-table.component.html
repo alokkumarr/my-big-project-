@@ -49,7 +49,7 @@
             <mat-icon [fontIcon]="getArtifactColumnTypeIcon(artifactColumn)"
                       class="settings__list-item__icon">
             </mat-icon>
-            {{ artifactColumn.displayName }}
+            {{ artifactColumn.alias || artifactColumn.displayName }}
           </div>
           <!-- <button mat-icon-button
                   [attr.e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"

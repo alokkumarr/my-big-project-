@@ -20,7 +20,7 @@
               cdkDrag [cdkDragData]="col"
               [removable]="true" (removed)="removeFromGroup(col, adapter)"
     >
-      {{col.columnName}}
+      {{col.alias || col.displayName}}
       <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
     </mat-chip>
   </mat-chip-list>

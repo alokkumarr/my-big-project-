@@ -1,0 +1,73 @@
+<fieldset class="data-option__fieldset" fxLayout="column">
+  <legend class="data-option__display-name">{{artifactColumn.displayName}}</legend>
+
+  <div fxLayout="row" fxLayoutAlign="start center">
+    <label fxFlex="20" i18n>Alias:</label>
+    <mat-form-field fxFlex="80">
+        <input matInput type="text"
+              autocomplete="off"
+              (input)="onAliasChange($event.target.value)"
+              [value]="artifactColumn.alias || ''"/>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="artifactColumn.aggregate" fxLayout="row" fxLayoutAlign="start center">
+    <label fxFlex="20" i18n>Aggregate:</label>
+    <aggregate-chooser-u (change)="onAggregateChange($event)"
+                         [columnType]="artifactColumn.type"
+                         [analysisType]="analysisType"
+                         [aggregate]="artifactColumn.aggregate"
+                         [sqlBuilder]="sqlBuilder"
+                         [analysisSubtype]="analysisSubtype"
+                         [enablePercentByRow]="asChartColumn(artifactColumn).comboType === 'column'"
+                         fxFlex="80"
+    >
+    </aggregate-chooser-u>
+  </div>
+
+  <div *ngIf="analysisType === 'chart' && asChartColumn(artifactColumn).comboType" fxLayout="row" fxLayoutAlign="start center">
+    <label fxFlex="20" i18n>Combo type:</label>
+    <designer-combo-type-selector (change)="change.emit($event)"
+                                  [artifactColumn]="artifactColumn"
+                                  [comboTypes]="comboTypes"
+                                  fxFlex="80"
+    >
+    </designer-combo-type-selector>
+  </div>
+
+  <div *ngIf="analysisType !== 'pivot' && hasDateInterval" fxLayout="row" fxLayoutAlign="start center">
+    <label fxFlex="20" i18n>Date format:</label>
+    <designer-date-format-selector (change)="change.emit($event)"
+                                   [artifactColumn]="artifactColumn"
+                                   fxFlex="80"
+    >
+    </designer-date-format-selector>
+  </div>
+
+  <div *ngIf="analysisType === 'pivot' && hasDateInterval" fxLayout="row" fxLayoutAlign="start center">
+    <label fxFlex="20" i18n>Date interval:</label>
+    <designer-date-interval-selector (change)="change.emit($event)"
+                                     [artifactColumn]="artifactColumn"
+                                     fxFlex="80"
+    >
+    </designer-date-interval-selector>
+  </div>
+
+  <div *ngIf="analysisType === 'pivot' && isDataField" fxLayout="row" fxLayoutAlign="start center">
+    <label fxFlex="20" i18n>Data format:</label>
+    <designer-data-format-selector (change)="change.emit($event)"
+                                   [artifactColumn]="artifactColumn"
+                                   fxFlex="80"
+    >
+    </designer-data-format-selector>
+  </div>
+
+  <div *ngIf="analysisType === 'map' && analysisSubtype === 'chart__scale'" fxLayout="row" fxLayoutAlign="start center">
+    <label fxFlex="20" i18n>Region:</label>
+    <designer-region-selector (change)="change.emit($event)"
+                              [artifactColumn]="artifactColumn"
+                              fxFlex="80"
+    >
+    </designer-region-selector>
+  </div>
+</fieldset>

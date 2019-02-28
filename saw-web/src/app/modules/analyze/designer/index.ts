@@ -28,7 +28,13 @@ import {
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent,
   DesignerSelectedFieldsComponent,
-  DesignerAnalysisOptionsComponent
+  DesignerAnalysisOptionsComponent,
+  DesignerDataOptionFieldComponent,
+  DesignerDateFormatSelectorComponent,
+  DesignerDataFormatSelectorComponent,
+  DesignerRegionSelectorComponent,
+  DesignerComboTypeSelectorComponent,
+  DesignerDateIntervalSelectorComponent
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
@@ -77,7 +83,13 @@ const COMPONENTS = [
   MultiTableDesignerLayoutComponent,
   ChartTypeChooserComponent,
   DesignerSelectedFieldsComponent,
-  DesignerAnalysisOptionsComponent
+  DesignerAnalysisOptionsComponent,
+  DesignerDataOptionFieldComponent,
+  DesignerDateFormatSelectorComponent,
+  DesignerDataFormatSelectorComponent,
+  DesignerRegionSelectorComponent,
+  DesignerComboTypeSelectorComponent,
+  DesignerDateIntervalSelectorComponent
 ];
 
 const SERVICES = [DesignerService];

@@ -6,8 +6,6 @@ import {
   DesignerChangeEvent
 } from '../../types';
 import {
-  AGGREGATE_TYPES,
-  AGGREGATE_TYPES_OBJ,
   COMBO_TYPES,
   COMBO_TYPES_OBJ,
   TSCOMBO_TYPES,
@@ -32,8 +30,6 @@ export class ExpandableFieldComponent {
   @Input() analysisSubtype: string;
   public enablePercentByRow = true;
 
-  AGGREGATE_TYPES = AGGREGATE_TYPES;
-  AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public isExpanded = false;
   comboTypes = COMBO_TYPES;
   comboTypesObj = COMBO_TYPES_OBJ;

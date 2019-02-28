@@ -13,7 +13,15 @@ import {
   DesignerSettingsAuxChartComponent,
   DesignerSettingsAuxMapChartComponent
 } from './aux-settings';
-import { DesignerAnalysisOptionsComponent } from './options';
+import {
+  DesignerAnalysisOptionsComponent,
+  DesignerDataOptionFieldComponent,
+  DesignerDateFormatSelectorComponent,
+  DesignerDataFormatSelectorComponent,
+  DesignerRegionSelectorComponent,
+  DesignerComboTypeSelectorComponent,
+  DesignerDateIntervalSelectorComponent
+} from './options';
 export {
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
@@ -26,5 +34,11 @@ export {
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent,
-  DesignerAnalysisOptionsComponent
+  DesignerAnalysisOptionsComponent,
+  DesignerDataOptionFieldComponent,
+  DesignerDateFormatSelectorComponent,
+  DesignerDataFormatSelectorComponent,
+  DesignerRegionSelectorComponent,
+  DesignerComboTypeSelectorComponent,
+  DesignerDateIntervalSelectorComponent
 };

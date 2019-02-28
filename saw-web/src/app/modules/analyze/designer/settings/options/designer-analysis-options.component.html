@@ -1,6 +1,13 @@
 <mat-tab-group>
   <mat-tab label="Data Settings">
-    Data settings
+    <designer-data-option-field *ngFor="let col of selectedColumns"
+                                (change)="change.emit($event)"
+                                [artifactColumn]="col"
+                                [analysisType]="analysisType"
+                                [sqlBuilder]="sqlBuilder"
+                                [analysisSubtype]="analysisSubtype"
+    >
+    </designer-data-option-field>
   </mat-tab>
   <mat-tab label="Chart Settings">
     Chart Settings

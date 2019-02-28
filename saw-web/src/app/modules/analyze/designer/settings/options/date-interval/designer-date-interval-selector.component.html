@@ -1,0 +1,18 @@
+<div fxLayout="column">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Group interval</mat-label>
+    <mat-select (selectionChange)="onDateIntervalChange($event.value)"
+                [value]="artifactColumn.dateInterval">
+      <mat-option *ngFor="let dateInterval of DATE_INTERVALS"
+                  [value]="dateInterval.value">
+        {{ dateInterval.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <designer-date-format-selector *ngIf="artifactColumn.dateInterval === 'day'"
+                               (change)="change.emit($event)"
+                               [artifactColumn]="artifactColumn"
+  >
+  </designer-date-format-selector>
+</div>

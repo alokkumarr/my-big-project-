@@ -1,0 +1,12 @@
+@import "src/themes/base/colors";
+
+.data-option__fieldset {
+  border-style: solid;
+  border-radius: 3px;
+  border-width: 1px;
+  margin-top: 10px;
+}
+
+.data-option__display-name {
+  color: $primary-blue-b1;
+}
