@@ -11,18 +11,30 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import com.sncr.saw.security.common.util.JwtFilter;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 
 
 @SpringBootApplication
 //@EnableDiscoveryClient
 public class NSSOApplicationMicro extends SpringBootServletInitializer {
 
+    /**
+     * TomcatServletWebServerFactory has been overridden.
+     */
+
     @Bean
-    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
-        return new TomcatServletWebServerFactory();
+    public TomcatServletWebServerFactory tomcatEmbedded() {
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+        tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
+            if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
+                ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
+            }
+        });
+        return tomcat;
     }
+
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
