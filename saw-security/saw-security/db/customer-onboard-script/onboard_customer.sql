@@ -46,7 +46,7 @@ CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product
 SELECT max(PRODUCT_SYS_ID)+1 into l_incremental_product_sys_id from PRODUCTS;
 
 
-IF NOT exists(Select PRODUCT_NAME from Products where PRODUCT_NAME=l_product_name)
+IF NOT exists(Select PRODUCT_CODE from Products where PRODUCT_CODE=l_product_code)
 THEN
 INSERT INTO PRODUCTS (PRODUCT_SYS_ID,PRODUCT_NAME,PRODUCT_CODE,PRODUCT_DESC,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY)
 SELECT l_incremental_product_sys_id PRODUCT_SYS_ID,l_product_name PRODUCT_NAME,l_product_code PRODUCT_CODE,l_product_name PRODUCT_DESC,1 ACTIVE_STATUS_IND,Now() CREATED_DATE,'admin' CREATED_BY,NULL INACTIVATED_DATE,NULL INACTIVATED_BY,
@@ -57,7 +57,7 @@ SELECT max(PROD_MOD_SYS_ID)+1 into l_incremental_prod_mod_sys_id from PRODUCT_MO
 
 select PRODUCT_SYS_ID into l_product_sys_id
 from PRODUCTS
-where PRODUCT_NAME = l_product_name;
+where PRODUCT_CODE = l_product_code;
 
 select MODULE_SYS_ID into l_module_sys_id_analyze from MODULES where MODULE_NAME = 'ANALYZE' ;
 
@@ -322,7 +322,7 @@ INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID,
  l_cust_prod_mod_feature_sys_id+6 CUST_PROD_MOD_FEATURE_SYS_ID,
  l_role_sys_id ROLE_SYS_ID,
  '0' ANALYSIS_SYS_ID,
- '128' PRIVILEGE_CODE,
+ '0' PRIVILEGE_CODE,
  'All' PRIVILEGE_DESC,
  1 ACTIVE_STATUS_IND,
  now() CREATED_DATE,
@@ -335,7 +335,7 @@ INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID,
  l_cust_prod_mod_feature_sys_id+7 CUST_PROD_MOD_FEATURE_SYS_ID,
  l_role_sys_id ROLE_SYS_ID,
  '0' ANALYSIS_SYS_ID,
- '128' PRIVILEGE_CODE,
+ '0' PRIVILEGE_CODE,
  'All' PRIVILEGE_DESC,
  1 ACTIVE_STATUS_IND,
  now() CREATED_DATE,
