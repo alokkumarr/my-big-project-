@@ -1,13 +1,17 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.scheduler.entities.QrtzTriggers;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.saw.scheduler.repository.QuartzRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
@@ -17,21 +21,18 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
-
 import org.quartz.impl.matchers.GroupMatcher;
-
+import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-
 import org.springframework.context.annotation.Lazy;
-
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+
+
 
 
 
@@ -47,6 +48,10 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
   @Autowired
   private ApplicationContext context;
+  
+  
+  @Autowired
+  QuartzRepository quartzRepository;
 
   /**
    * Schedule a job by jobName at given date.
@@ -268,6 +273,18 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     try {
       schedulerFactoryBean.getScheduler().pauseJob(jkey);
+      
+      
+      /**
+      * Below lines are added to avoid quartz misfire during
+      * resume. Currently no way to avoid misfire
+      * through quartz api for one schedule. 
+      */
+      QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
+      cronTriggers.setNextFireTime(-1);
+      this.quartzRepository.save(cronTriggers);
+      
+      
       logger.info("Job with jobKey :" + jobKey + " paused succesfully.");
       return true;
     } catch (SchedulerException e) {
@@ -292,7 +309,25 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     JobKey key = new JobKey(jobKey, groupKey);
     logger.info("Parameters received for resuming job : jobKey :" + jobKey);
     try {
+      TriggerKey triggeKey = TriggerKey.triggerKey(jobKey);
+
+      logger.info("Trigger key:::" + triggeKey);
+      Scheduler scheduler = schedulerFactoryBean.getScheduler();
+      CronTriggerImpl trigger = (CronTriggerImpl) scheduler.getTrigger(triggeKey);
+     
+      
+      /**
+      * Below lines are added to avoid misfire during
+      * resume for a paused trigger. If any approach
+      * with api is found in future this can be replaced.
+      */
+      QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
+      cronTriggers.setNextFireTime(trigger.getFireTimeAfter(new Date()).getTime());
+      this.quartzRepository.save(cronTriggers);
+      
+      
       schedulerFactoryBean.getScheduler().resumeJob(key);
+      logger.info("Next fire time after now::: " + trigger.getFireTimeAfter(new Date()));
       logger.info("Job with jobKey :" + jobKey + " resumed succesfully.");
       return true;
     } catch (SchedulerException e) {
@@ -392,7 +427,8 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
               Date lastFiredTime = triggers.get(0).getPreviousFireTime();
               map.put("scheduleTime", scheduleTime.getTime());
               map.put("lastFiredTime", lastFiredTime != null ? lastFiredTime.getTime() : -1);
-              map.put("nextFireTime", nextFireTime.getTime());
+              long nextFt = (nextFireTime == null) ? -1 : nextFireTime.getTime();
+              map.put("nextFireTime", nextFt);
               ScheduleKeys scheduleKeys = new ScheduleKeys();
               scheduleKeys.setJobName(jobName);
               scheduleKeys.setGroupName(groupName);
