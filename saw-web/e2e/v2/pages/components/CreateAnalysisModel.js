@@ -15,29 +15,24 @@ class CreateAnalysisModel {
   }
 
   clickOnAnalysisType(type) {
-    commonFunctions.waitFor.elementToBeClickable(this._analysisType(type));
-    this._analysisType(type).click();
+    commonFunctions.clickOnElement(this._analysisType(type));
   }
 
   clickOnNextButton() {
-    commonFunctions.waitFor.elementToBeClickable(this._nextButton);
-    this._nextButton.click();
+    commonFunctions.clickOnElement(this._nextButton);
   }
 
   clickOnDataPods(name) {
     commonFunctions.waitFor.elementToBeClickable(this._backButton);
-    commonFunctions.waitFor.elementToBeClickable(this._dataPods(name));
-    this._dataPods(name).click();
+    commonFunctions.clickOnElement(this._dataPods(name));
   }
 
   clickOnCreateButton() {
-    commonFunctions.waitFor.elementToBeClickable(this._createButton);
-    this._createButton.click();
+    commonFunctions.clickOnElement(this._createButton);
   }
 
   clickOnChartType(type) {
-    commonFunctions.waitFor.elementToBeClickable(this._chartType(type));
-    this._chartType(type).click();
+    commonFunctions.clickOnElement(this._chartType(type));
   }
 }
 module.exports = CreateAnalysisModel;
