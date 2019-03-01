@@ -1,6 +1,6 @@
 package com.synchronoss.saw.storage.proxy.model.response;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -25,19 +25,15 @@ public class ProductModuleDocs implements Serializable {
         this.message = message;
     }
 
-    public List<JsonObject> getDoc() {
-        return doc;
-    }
-
-    public void setDoc(List<JsonObject> doc) {
-        this.doc = doc;
-    }
-
-    private List<JsonObject> doc;
     private boolean valid;
-
-
-
     private String message;
+    private List<ObjectNode> document;
 
+    public List<ObjectNode> getDocument() {
+        return document;
+    }
+
+    public void setDocument(List<ObjectNode> document) {
+        this.document = document;
+    }
 }

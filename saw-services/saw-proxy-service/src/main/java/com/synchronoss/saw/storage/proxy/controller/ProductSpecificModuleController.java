@@ -187,8 +187,13 @@ public class ProductSpecificModuleController {
             productModuleDocs.setMessage("Id can't be null!!");
             response.setStatus(400);
         }
-        logger.debug("Json returned : ",pms.getDocument(tableName,id));
-        return pms.getDocument(tableName,id);
+        ProductModuleDocs productModuleDocs = pms.getDocument(tableName,id);
+        if (productModuleDocs.getValid() == false) {
+            response.setStatus(400);
+            return productModuleDocs;
+        }
+        logger.debug("Json returned : ",productModuleDocs.getDocument());
+        return productModuleDocs;
     }
 
     @ApiOperation(value = "Provides ability to fetch all documents from ProductSpecificModules ", nickname = "getAllProductModuleDocs",

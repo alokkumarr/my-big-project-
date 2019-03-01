@@ -47,7 +47,7 @@ public class ProductModuleMetaStore extends MetadataStore implements WithSearchI
 
         cond.close();
         cond.build();
-        return searchAsList(table, cond);
+        return searchAsList(table,cond);
 
     }
 }
