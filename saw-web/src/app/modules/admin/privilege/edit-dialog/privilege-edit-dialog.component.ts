@@ -43,7 +43,6 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
     if (this.data.mode === 'edit') {
       this.formIsValid = true;
-      console.log(this.data);
       const { productId, moduleId, roleId, categoryCode } = this.data.model;
       this.modules$ = this.loadModules(productId);
       this.loadAllowedPrivilegesForModule(moduleId);

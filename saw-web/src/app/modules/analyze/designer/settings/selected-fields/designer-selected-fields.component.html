@@ -2,8 +2,8 @@
     fxLayout="row" fxLayoutAlign="start center"
     class="selected-fields__container"
 >
-  <div fxFlex="10" class="selected-fields__label">
-    {{adapter.title}}:
+  <div fxFlex="10" class="selected-fields__label" fxLayout="row" fxLayoutAlign="start center">
+      {{adapter.title}}:
   </div>
 
   <mat-chip-list cdkDropList
@@ -13,7 +13,7 @@
                  (cdkDropListDropped)="drop($event)"
                  fxFlex="90"
                  class="selected-fields__list"
-                 [class.highlighted]=""
+                 [class.highlighted]="isDragInProgress && openGroupArray[i]"
   >
     <mat-chip *ngFor="let col of adapter.artifactColumns"
               class="selected-fields__item"

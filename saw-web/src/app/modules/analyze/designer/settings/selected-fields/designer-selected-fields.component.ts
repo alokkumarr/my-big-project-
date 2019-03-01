@@ -1,8 +1,11 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
+import { Subject } from 'rxjs';
+import { bufferCount, take } from 'rxjs/operators';
 import * as isEmpty from 'lodash/isEmpty';
 import * as debounce from 'lodash/debounce';
 import * as every from 'lodash/every';
+import * as map from 'lodash/map';
 
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
@@ -41,6 +44,10 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       }
     }
   }
+  public isDragInProgress = false;
+  // array of booleans to show if the corresponding group addapterg can accept the field that is being dragged
+  public openGroupArray: boolean[];
+  private _acceptEventStream$: Subject<boolean> = new Subject<boolean>();
 
   constructor(
     private _designerService: DesignerService,
@@ -50,6 +57,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       this._changeSettingsDebounced,
       SETTINGS_CHANGE_DEBOUNCE_TIME
     );
+    this.changeOpenGroupArray = this.changeOpenGroupArray.bind(this);
   }
 
   ngOnInit() {
@@ -62,7 +70,19 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   onDndEvent(event: DndEvent) {
-    console.log(event);
+    switch (event) {
+    case 'dragStart':
+      this.isDragInProgress = true;
+      this._acceptEventStream$.pipe(bufferCount(3), take(1)).subscribe(this.changeOpenGroupArray);
+      break;
+    case 'dragEnd':
+      this.isDragInProgress = false;
+      break;
+    }
+  }
+
+  changeOpenGroupArray(array) {
+    this.openGroupArray = array;
   }
 
   setGroupAdapters() {
@@ -77,6 +97,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
         this.artifactColumns, this.analysisSubtype
       );
     }
+    this.openGroupArray = map(this.groupAdapters, () => false);
   }
 
   removeFromGroup(
@@ -99,7 +120,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragDrop<IDEsignerSettingGroupAdapter>) {
-    console.log('drop', event);
     const adapter = event.container.data;
     const previousAdapter = event.previousContainer.data;
     if (event.previousContainer === event.container) {
@@ -111,7 +131,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
                         event.currentIndex);
       const movedItem = adapter.artifactColumns[event.currentIndex];
       adapter.transform(movedItem);
-      console.log('movedItem: ', movedItem);
     }
     adapter.onReorder(adapter.artifactColumns);
     this.onFieldsChange();
@@ -121,7 +140,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     return (item: CdkDrag<ArtifactColumn>) => {
       const canAcceptFn = adapter.canAcceptArtifactColumn(adapter, this.groupAdapters);
       const artifactColumn = item.data;
-      return canAcceptFn(artifactColumn);
+      const canAccept = canAcceptFn(artifactColumn);
+      this._acceptEventStream$.next(canAccept);
+      return canAccept;
     };
   }
 }
