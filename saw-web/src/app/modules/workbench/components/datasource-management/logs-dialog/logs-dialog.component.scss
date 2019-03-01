@@ -1,9 +1,27 @@
 @import 'src/themes/base/colors';
 
 :host {
+  display: flex;
+  padding: 10px;
+  flex-direction: column;
+  height: 95%;
+
   .mat-card {
     margin: 0;
     padding: 20px;
+  }
+
+  .mat-dialog-content {
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .route-log {
+    &__data-grid {
+      flex-grow: 1;
+    }
   }
 
   .title {
