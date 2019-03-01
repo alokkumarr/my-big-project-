@@ -2,6 +2,7 @@
   "PRIVILEGES": {
     "positiveTests": {
       "PRIVIL001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "userOne",
         "subCategory": "all",
         "cardOptions": true,
@@ -17,6 +18,7 @@
         "description": "userOne should able to see all the permissions"
       },
       "PRIVIL002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "userOne",
         "subCategory": "create",
         "cardOptions": false,
@@ -32,6 +34,7 @@
         "description": "userOne should able to see create permissions"
       },
       "PRIVIL003": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "userOne",
         "subCategory": "edit",
         "cardOptions": true,
@@ -47,6 +50,7 @@
         "description": "userOne should able to see edit permissions"
       },
       "PRIVIL004": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "userOne",
         "subCategory": "fork",
         "cardOptions": false,
@@ -62,6 +66,7 @@
         "description": "userOne should able to see fork permissions"
       },
       "PRIVIL005": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "userOne",
         "subCategory": "publish",
         "cardOptions": true,
@@ -77,6 +82,7 @@
         "description": "userOne should able to see publish permissions"
       },
       "PRIVIL006": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "userOne",
         "subCategory": "execute",
         "cardOptions": true,
@@ -92,6 +98,7 @@
         "description": "userOne should able to see execute permissions"
       },
       "PRIVIL007": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "userOne",
         "subCategory": "export",
         "cardOptions": false,
@@ -107,6 +114,7 @@
         "description": "userOne should able to see export permissions"
       },
       "PRIVIL008": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "userOne",
         "subCategory": "delete",
         "cardOptions": true,
@@ -122,6 +130,7 @@
         "description": "userOne should able to see delete permissions"
       },
       "PRIVIL009": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "userOne",
         "subCategory": "view",
         "cardOptions": false,
@@ -137,6 +146,7 @@
         "description": "userOne should able to see view permissions"
       },
       "PRIVIL010": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "userOne",
         "subCategory": "multiple",
         "cardOptions": true,
@@ -152,6 +162,7 @@
         "description": "userOne should able to see multiple permissions"
       },
       "PRIVIL011": {
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "subCategory": "all",
         "cardOptions": true,
