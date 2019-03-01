@@ -2,6 +2,7 @@ const commonFunctions = require('../helpers/commonFunctions.js');
 const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../../protractor.conf');
 const analyzePage = require('./analyzePage.po');
+const utils = require('../helpers/utils');
 
 module.exports = {
   mainMenuExpandBtn: element(by.css('mat-icon[e2e="main-menu-expand-btn"]')),
@@ -51,6 +52,12 @@ module.exports = {
       by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`)
     );
   },
+  isCategoryExpanded: name =>
+    element(
+      by.xpath(
+        `//span[contains(text(),'${name}')]//parent::*//parent::*//parent::mat-expansion-panel-header`
+      )
+    ),
   subCategory: subCategoryName => {
     return element(by.xpath(`//a[contains(text(),"${subCategoryName}")]`));
   },
@@ -84,18 +91,24 @@ const navigateToSubCategoryUpdated = (
   browser.sleep(1000);
   module.exports.mainMenuExpandBtn.click();
   browser.sleep(1000);
-  commonFunctions.waitFor.elementToBePresent(
-    module.exports.category(categoryName)
-  );
-  commonFunctions.waitFor.elementToBeVisible(
-    module.exports.category(categoryName)
-  );
-  //Navigate to Category/Sub-category, expand category
-  commonFunctions.waitFor.elementToBeClickable(
-    module.exports.category(categoryName)
-  );
-  module.exports.category(categoryName).click();
-  browser.sleep(1000);
+  utils
+    .hasClass(module.exports.isCategoryExpanded(categoryName), 'mat-expanded')
+    .then(isPresent => {
+      if (!isPresent) {
+        commonFunctions.waitFor.elementToBePresent(
+          module.exports.category(categoryName)
+        );
+        commonFunctions.waitFor.elementToBeVisible(
+          module.exports.category(categoryName)
+        );
+        //Navigate to Category/Sub-category, expand category
+        commonFunctions.waitFor.elementToBeClickable(
+          module.exports.category(categoryName)
+        );
+        module.exports.category(categoryName).click();
+        browser.sleep(1000);
+      }
+    });
   const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickable(subCategory);
   subCategory.click();

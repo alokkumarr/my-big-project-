@@ -886,14 +886,15 @@ class DashboardFunctions {
           currentFilter.name.toLowerCase() === 'float' ||
           currentFilter.name.toLowerCase() === 'double'
         ) {
-          browser.sleep(2000);
+          browser.sleep(5000);
           commonFunctions.waitFor.elementToBeVisible(
             observePage.globalFilters.numberSlider
           );
           commonFunctions.slideHorizontally(
-            observePage.globalFilters.numberSlider,
+            observePage.globalFilters.numberSliderLow,
             currentFilter.value
           );
+          browser.sleep(2000);
         }
       });
 

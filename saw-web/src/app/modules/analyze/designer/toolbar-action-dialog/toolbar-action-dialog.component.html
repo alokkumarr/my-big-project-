@@ -19,6 +19,7 @@
   </designer-description>
   <designer-save *ngSwitchCase="'save'"
                  (nameChange)="onNameChange($event)"
+                 [designerMode]="data.designerMode"
                  (descriptionChange)="onSaveDescriptionChange($event)"
                  [analysis]="data.analysis">
   </designer-save>

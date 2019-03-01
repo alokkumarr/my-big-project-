@@ -6,6 +6,10 @@ import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
 import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
+import {
+  USER_ANALYSIS_CATEGORY_NAME,
+  USER_ANALYSIS_SUBCATEGORY_NAME
+} from '../consts';
 
 const PRIVILEGE_CODE_LENGTH = 16;
 
@@ -73,6 +77,32 @@ export class JwtService {
 
   validity() {
     return new Date(this.getTokenObj().ticket.validUpto);
+  }
+
+  /**
+   * Returns the id of user's private sub category.
+   *
+   * @readonly
+   * @type {(number | string)}
+   * @memberof JwtService
+   */
+  get userAnalysisCategoryId(): number | string {
+    const productModules =
+      get(this.getTokenObj(), 'ticket.products.0.productModules') || [];
+    const analyzeModule =
+      find(productModules, module => module.productModName === 'ANALYZE') || {};
+    const userCategory =
+      find(
+        analyzeModule.prodModFeature || [],
+        category => category.prodModFeatureName === USER_ANALYSIS_CATEGORY_NAME
+      ) || {};
+    const userSubcategory =
+      find(
+        userCategory.productModuleSubFeatures || [],
+        subCat => subCat.prodModFeatureName === USER_ANALYSIS_SUBCATEGORY_NAME
+      ) || {};
+
+    return userSubcategory.prodModFeatureID;
   }
 
   destroy() {

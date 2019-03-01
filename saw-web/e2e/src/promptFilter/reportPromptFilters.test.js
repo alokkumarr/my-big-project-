@@ -116,8 +116,8 @@ describe('Report Prompt filter tests: reportPromptFilters.test.js', () => {
             );
             //From analysis detail/view page
             promptFilterFunctions.verifyPromptFromDetailPage(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data,
@@ -125,8 +125,8 @@ describe('Report Prompt filter tests: reportPromptFilters.test.js', () => {
             );
             //verifyPromptFromListView and by executing from action menu
             promptFilterFunctions.verifyPromptFromListView(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data,
@@ -134,8 +134,8 @@ describe('Report Prompt filter tests: reportPromptFilters.test.js', () => {
             );
             //verifyPromptFromCardView and by executing from action menu
             promptFilterFunctions.verifyPromptFromCardView(
-              categoryName,
-              subCategoryName,
+              'My Analysis',
+              'DRAFTS',
               defaultCategory,
               name,
               data,
