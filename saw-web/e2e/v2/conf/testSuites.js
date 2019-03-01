@@ -44,7 +44,6 @@ const REGRESSION = [...CRITICAL];
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
-  TEST_BASE_DIR + 'charts/createAndDelete.test.js'
 ];
 
 module.exports = {
