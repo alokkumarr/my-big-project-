@@ -314,22 +314,25 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
       logger.info("Trigger key:::" + triggeKey);
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
       CronTriggerImpl trigger = (CronTriggerImpl) scheduler.getTrigger(triggeKey);
-     
+      if (trigger != null) {
+        
+        /* Below lines are added to avoid misfire during
+        * resume for a paused trigger. If any approach
+        * with api is found in future this can be replaced.
+        */
+        QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
+        cronTriggers.setNextFireTime(trigger.getFireTimeAfter(new Date()).getTime());
+        this.quartzRepository.save(cronTriggers);
+        
+        
+        schedulerFactoryBean.getScheduler().resumeJob(key);
+        logger.info("Next fire time after now::: " + trigger.getFireTimeAfter(new Date()));
+        logger.info("Job with jobKey :" + jobKey + " resumed succesfully.");
+        return true;
+      } else {
+        return false;
+      }
       
-      /**
-      * Below lines are added to avoid misfire during
-      * resume for a paused trigger. If any approach
-      * with api is found in future this can be replaced.
-      */
-      QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
-      cronTriggers.setNextFireTime(trigger.getFireTimeAfter(new Date()).getTime());
-      this.quartzRepository.save(cronTriggers);
-      
-      
-      schedulerFactoryBean.getScheduler().resumeJob(key);
-      logger.info("Next fire time after now::: " + trigger.getFireTimeAfter(new Date()));
-      logger.info("Job with jobKey :" + jobKey + " resumed succesfully.");
-      return true;
     } catch (SchedulerException e) {
       logger.error("SchedulerException while resuming job with key :" + jobKey + " message :"
           + e.getMessage());
