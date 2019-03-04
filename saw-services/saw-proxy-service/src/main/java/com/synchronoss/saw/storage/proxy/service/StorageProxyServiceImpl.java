@@ -363,6 +363,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     public List<Object> execute(SIPDSL sipdsl) throws Exception {
         ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
         String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl);
+        logger.info(query);
         List<Object> result = null;
         JsonNode response =
             storageConnectorService.ExecuteESQuery(query, sipdsl.getSipQuery().getStore());

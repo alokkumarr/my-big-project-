@@ -174,8 +174,8 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
           m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
           res.put("result", execution.getExecCode)
           res.put("reason", execution.getExecMessage)
-          res.put("start" , analysis.getStartTS )
-          res.put("finished" , analysis.getFinishedTS )
+         // res.put("start" , analysis.getStartTS )
+         // res.put("finished" , analysis.getFinishedTS )
         }
         case "exec-asynch" => {
           if (analysisId != null) {
@@ -202,8 +202,8 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             synchronized{ DLQueryHandler.storedResults += ( analysisId -> future ) }
             res.put("result", "STARTED")
             res.put("reason", analysis.getStatus)
-            res.put("start" , analysis.getStartTS )
-            res.put("finished" , analysis.getFinishedTS )
+           // res.put("start" , analysis.getStartTS )
+           // res.put("finished" , analysis.getFinishedTS )
           }
           //TODO:: Implement functionality for Semantic layer execution
           else if (semanticId != null) {

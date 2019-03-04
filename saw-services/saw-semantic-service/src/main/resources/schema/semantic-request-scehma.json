@@ -14,7 +14,6 @@
       "type": "string",
       "title": "The entityId Schema "
     },
-    
     "projectCode": {
       "id": "/properties/projectCode",
       "type": "string",
@@ -64,7 +63,12 @@
       "type": "string",
       "title": "The Module Schema ",
       "default": "ANALYZE",
-      "enum": ["ANALYZE", "OBSERVE", "ALERT", "WORKBENCH"]
+      "enum": [
+        "ANALYZE",
+        "OBSERVE",
+        "ALERT",
+        "WORKBENCH"
+      ]
     },
     "metricName": {
       "id": "/properties/metricName",

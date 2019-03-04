@@ -1,0 +1,11 @@
+[Unit]
+Description=SIP Metadata service
+
+[Service]
+Type=notify
+ExecStart=/bin/sh -c "exec java -Xmx1G -Dloader.path=BOOT-INF/lib,$(sip-mapr-classpath) -jar /opt/bda/sip-metadata-service/sip-metadata*.jar --spring.config.location=/opt/bda/sip-metadata-service/conf/application.yml"
+SyslogIdentifier=saw-observe
+User=mapr
+Restart=on-failure
+# Allow service to exit on SIGTERM, if socket-activated
+SuccessExitStatus=143
