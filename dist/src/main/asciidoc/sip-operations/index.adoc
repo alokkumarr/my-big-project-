@@ -854,7 +854,7 @@ Run the "onboard-customer" command with all required parameters stated above and
 The below is one such example to call onboard-customer with its required parameters.
 
 
-    shell:>onboard-customer --C SOFTBANK0001 --P SOFTBANK --PC workbench --E abc@xyz.com --F ABC --M XY --L Z
+    shell:>onboard-customer --C SNCR0001 --P SAWDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z
     1
     2019-02-19 08:04:41.326  INFO 17665 --- [           main] c.s.saw.security.app.admin.OnBoardShell  : Connection successful !!
     2019-02-19 08:04:41.357  INFO 17665 --- [           main] s.a.r.i.OnBoardCustomerRepositoryDaoImpl : res
@@ -862,7 +862,8 @@ The below is one such example to call onboard-customer with its required paramet
     ====== ONBOARD CUSTOMER : Successful ======
 
 Note : A parameter containing a space in between can be enclosed in either single quotes('') or double quotes("").
-Ex : onboard-customer --C SOFTBANK0001 --P SOFTBANK --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z
+
+        Ex : onboard-customer --C SNCR0001 --P SAWDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z
 
 ==  SAW SSO Authentication
 
