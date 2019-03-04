@@ -5,7 +5,8 @@ spring:
     name: saw-sechduler-service
   #mariaDB (metadata) DB details
   datasource:
-    url: jdbc:mariadb://{% for host in groups['saw-services'] %}{% if loop.last %}{{host}}:3306{% else %}{{host}}:3306,{% endif %}{% endfor %}/saw_scheduler
+    #The MariaDB instances are in the saw-security Ansible group.
+    url: jdbc:mariadb://{% for host in groups['saw-security'] %}{% if loop.last %}{{host}}:3306{% else %}{{host}}:3306,{% endif %}{% endfor %}/saw_scheduler
     username: saw_scheduler
     password: {{ saw_scheduler_db_password }}
     driver-class-name: org.mariadb.jdbc.Driver
