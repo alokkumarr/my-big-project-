@@ -121,7 +121,6 @@ public class BisRouteDto implements Serializable {
     this.status = status;
   }
 
-
   @Override
   public int hashCode() {
     int hash = 0;

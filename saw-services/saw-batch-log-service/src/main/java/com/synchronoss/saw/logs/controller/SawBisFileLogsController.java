@@ -14,8 +14,10 @@ import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import javax.management.OperationsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -47,7 +49,7 @@ public class SawBisFileLogsController {
   @ApiOperation(value = "Retrieve all logs of all routes", 
       nickname = "all routes history", notes = "",
       response = BisRouteHistory.class)
-  @RequestMapping(value = "", method = RequestMethod.GET)
+  @RequestMapping(value = "/internal/logs", method = RequestMethod.GET)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -165,4 +167,27 @@ public class SawBisFileLogsController {
     return bisRouteHistory;
 
   }
+
+  /**
+   * This method is used for integration test cases for tear down the entries.
+   * Note : should not be used from outside
+   * @return boolean true or false
+   * @throws OperationsException exception.
+   */
+  @RequestMapping(value = "/internal/logs", method = RequestMethod.DELETE,
+      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public Map<String, Boolean> removeAll() throws OperationsException {
+    Map<String, Boolean> responseMap = new HashMap<String, Boolean>();
+    Boolean result = false;
+    logger.trace("deleting all records");
+    try {
+      bisLogsRepository.deleteAll();
+      result = true;
+    } catch (Exception ex) {
+      throw new OperationsException("Exception occurred while performing delete operation");
+    }
+    responseMap.put("isDuplicate", result);
+    return responseMap;
+  }
+
 }

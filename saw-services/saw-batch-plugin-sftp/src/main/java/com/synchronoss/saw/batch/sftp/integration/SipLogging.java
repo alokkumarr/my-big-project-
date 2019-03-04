@@ -2,6 +2,8 @@ package com.synchronoss.saw.batch.sftp.integration;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.jcraft.jsch.ChannelSftp;
+import com.synchronoss.saw.batch.entities.BisRouteEntity;
+import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisComponentState;
@@ -9,14 +11,12 @@ import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
-
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +35,8 @@ public class SipLogging {
   @Autowired
   private BisFileLogsRepository bisFileLogsRepository;
 
+  @Autowired
+  private BisRouteDataRestRepository bisRouteDataRestRepository;
 
   /**
    * To make an entry to a log table.
@@ -108,11 +110,10 @@ public class SipLogging {
    * Adds entry to log table with given status.
    */
   @Transactional(TxType.REQUIRED)
-  public  void updateLogs(Long channelId, Long routeId, String reasonCode) {
+  public void updateLogs(Long channelId, Long routeId, String reasonCode) {
 
     BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
-    bisDataMetaInfo
-        .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
     bisDataMetaInfo.setDataSizeInBytes(0L);
     bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
     bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
@@ -125,8 +126,7 @@ public class SipLogging {
 
 
   /**
-   * verify duplicate check enabled and is duplicate
-   * or if duplicate check disabled.
+   * verify duplicate check enabled and is duplicate or if duplicate check disabled.
    *
    * @param isDisableDuplicate disabled duplicate check flag
    * @param sourcelocation source path
@@ -137,17 +137,18 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public boolean duplicateCheck(boolean isDisableDuplicate,
-      String sourcelocation, ChannelSftp.LsEntry entry) {
-    return (!isDisableDuplicate && !checkDuplicateFile(sourcelocation + File.separator
-        + entry.getFilename())) || isDisableDuplicate;
+  public boolean duplicateCheck(boolean isDisableDuplicate, String sourcelocation,
+      ChannelSftp.LsEntry entry) {
+    return (!isDisableDuplicate
+        && !checkDuplicateFile(sourcelocation + File.separator + entry.getFilename()))
+        || isDisableDuplicate;
 
   }
 
 
   /**
-   * verify the routeId & channelId exists with
-   * data received & success.
+   * verify the routeId & channelId exists with data received & success.
+   * 
    * @param routeId route id to be validated
    * @param channelId channel id to be validated
    * @return true or false
@@ -210,6 +211,7 @@ public class SipLogging {
 
   /**
    * This method is used to check the status by process.
+   * 
    * @param channelId unique Id for the channel.
    * @param routeId unique Id for the route
    * @param processStatus status for the component process.
@@ -236,10 +238,9 @@ public class SipLogging {
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
   }
-  
+
   /**
-   * verify duplicate check enabled and is duplicate
-   * or if duplicate check disabled.
+   * verify duplicate check enabled and is duplicate or if duplicate check disabled.
    *
    * @param isDisableDuplicate disabled duplicate check flag
    * @param location source path
@@ -249,11 +250,48 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public boolean duplicateCheckFilename(boolean isDisableDuplicate,
-      String location) {
+  public boolean duplicateCheckFilename(boolean isDisableDuplicate, String location) {
     return (!isDisableDuplicate && !checkDuplicateFile(location)) || isDisableDuplicate;
 
   }
 
-  
+  /**
+   * This method can be used to prepare the log meta data.
+   * @param bisDataMetaInfo object to set the values.
+   * @param pattern file pattern to declare.
+   * @param localFilePath destination path.
+   * @param recieveDate date of the file received.
+   * @param size file size in bytes.
+   * @param actualDataName actual data name received on the source.
+   * @param channelId channelId as the unique Id for the channel.
+   * @param routeId routeId as the unique Id for the route.
+   * @param destinationPath on the dfs.
+   * @return bisDataMetaInfo {@link BisDataMetaInfo}
+   */
+
+  public BisDataMetaInfo prepareLogInfo(BisDataMetaInfo bisDataMetaInfo, String pattern,
+      String localFilePath, Date recieveDate, Long size, String actualDataName, Long channelId,
+      Long routeId, String destinationPath) {
+    bisDataMetaInfo.setFilePattern(pattern);
+    bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setReceivedDataName(localFilePath);
+    bisDataMetaInfo.setDataSizeInBytes(size);
+    bisDataMetaInfo.setActualDataName(actualDataName);
+    bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+    bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
+    bisDataMetaInfo.setComponentState(BisComponentState.DATA_INPROGRESS.value());
+    bisDataMetaInfo.setActualReceiveDate(recieveDate);
+    bisDataMetaInfo.setChannelId(channelId);
+    bisDataMetaInfo.setRouteId(routeId);
+    // sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+    bisDataMetaInfo.setDestinationPath(destinationPath);
+    return bisDataMetaInfo;
+
+  }
+
+  @Transactional(TxType.REQUIRED)
+  public Optional<BisRouteEntity> findRouteById(Long routeId) {
+    return bisRouteDataRestRepository.findById(routeId);
+  }
+
 }
