@@ -15,6 +15,15 @@ class Header extends SideNav {
     );
     this._companyLogo = element(by.css('.company-logo'));
     this._categoryMenuIcon = element(by.css(`[e2e="main-menu-expand-btn"]`));
+    this._launcherButton = element(
+      by.css('[class="header__module-launcher-button"]')
+    );
+    this._observeLink = element(
+      by.xpath('//a[contains(@class,"module-observe")]')
+    );
+    this._workbenchLink = element(
+      by.xpath('//a[contains(@class,"module-workbench")]')
+    );
   }
 
   doLogout() {
@@ -34,6 +43,14 @@ class Header extends SideNav {
   }
   openCategoryMenu() {
     commonFunctions.clickOnElement(this._categoryMenuIcon);
+  }
+
+  clickOnLauncher() {
+    commonFunctions.clickOnElement(this._launcherButton);
+  }
+
+  clickOnWorkBench() {
+    commonFunctions.clickOnElement(this._workbenchLink);
   }
 }
 module.exports = Header;

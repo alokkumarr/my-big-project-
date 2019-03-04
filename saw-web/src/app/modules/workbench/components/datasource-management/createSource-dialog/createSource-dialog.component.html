@@ -7,7 +7,7 @@
     </button>
   </mat-card-header>
   <mat-divider></mat-divider>
-  <mat-card-content>
+  <mat-card-content e2e="data-source-panel">
     <mat-horizontal-stepper linear [selectedIndex]="selectedStepIndex">
       <ng-template matStepperIcon="edit">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
@@ -19,7 +19,7 @@
         <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="source-container">
           <div fxFlex fxLayout="row wrap" fxLayoutAlign="space-around space-around" class="source-list">
             <mat-card class="mat-elevation-z3" [class.selected]="selectedSource === source.uid" *ngFor="let source of sources"
-              fxFlex="31" fxLayout="row" fxLayoutAlign="start center" (click)="sourceSelected(source)" [class.no-click]="source.supported === false">
+              fxFlex="31" fxLayout="row" e2e="{{source.name}}" fxLayoutAlign="start center" (click)="sourceSelected(source)"  [class.no-click]="source.supported === false">
               <div>{{source.name}}</div>
               <div fxFlex></div>
               <img [src]="source.imgsrc" [attr.alt]="source.name" />
@@ -28,7 +28,7 @@
         </div>
         <mat-divider></mat-divider>
         <div fxFlex fxLayout="row" fxLayoutAlign="end center" style="height: 15%;">
-          <button mat-raised-button color="primary" matStepperNext [disabled]="selectedSource === ''" i18n>Next</button>
+          <button mat-raised-button color="primary" e2e="create-channel-next-button" matStepperNext [disabled]="selectedSource === ''" i18n>Next</button>
         </div>
       </mat-step>
       <mat-step label="Channel Details">
@@ -37,19 +37,19 @@
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
             <mat-form-field appearance="outline">
               <mat-label i18n>Name Your Channel</mat-label>
-              <input matInput name="name-of-channel" formControlName="channelName" maxlength="18" required autocomplete="off" />
+              <input matInput name="name-of-channel" e2e="name-of-channel" formControlName="channelName" maxlength="18" required autocomplete="off" />
               <mat-error *ngIf="detailsFormGroup.controls.channelName.hasError('required')" i18n>
                 Channel Name is
                 <strong>required</strong>
               </mat-error>
-              <mat-error *ngIf="detailsFormGroup.controls.channelName.hasError('isUnique')" i18n>
+              <mat-error e2e="channel-exist-error-msg" *ngIf="detailsFormGroup.controls.channelName.hasError('isUnique')" i18n>
                 Channel Name already
                 <strong>exists</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Hostname</mat-label>
-              <input matInput placeholder="Host Name" name="hostName" formControlName="hostName" required name="name-of-host"
+              <input matInput placeholder="Host Name" name="hostName" e2e="host-name" formControlName="hostName" required name="name-of-host"
                 autocomplete="new-password" />
               <mat-error *ngIf="detailsFormGroup.controls.hostName.hasError('required')" i18n>
                 Host Name is
@@ -58,12 +58,12 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Port Number</mat-label>
-              <input matInput placeholder="Port Number" name="portNo" formControlName="portNo" required />
+              <input matInput placeholder="Port Number" name="portNo" e2e="port-no" formControlName="portNo" required />
               <mat-error *ngIf="detailsFormGroup.controls.portNo.hasError('required')" i18n>
                 Port Number is
                 <strong>required</strong>
               </mat-error>
-              <mat-error *ngIf="detailsFormGroup.controls.portNo.hasError('pattern')" i18n>
+              <mat-error e2e="port-number-error-msg" *ngIf="detailsFormGroup.controls.portNo.hasError('pattern')" i18n>
                 Port Number can consist of only
                 <strong>Numbers</strong>
               </mat-error>
@@ -73,36 +73,36 @@
           <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
             <mat-form-field appearance="outline">
               <mat-label i18n>Access Type</mat-label>
-              <mat-select formControlName="accessType">
-                <mat-option value="R" i18n>Read</mat-option>
-                <mat-option value="RW" i18n>Read & Write</mat-option>
+              <mat-select formControlName="accessType" e2e="access-type">
+                <mat-option value="R" e2e="access-r" i18n>Read</mat-option>
+                <mat-option value="RW" e2e="access-rw" i18n>Read & Write</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Username</mat-label>
-              <input type="text" matInput placeholder="Username" name="name-of-user" autocomplete="new-password"
+              <input type="text" matInput placeholder="Username" name="name-of-user" e2e="name-of-user" autocomplete="new-password"
                 formControlName="userName" required />
               <button mat-button matSuffix mat-icon-button>
                 <mat-icon matTooltip="Username" fontIcon="icon-chat-bot"></mat-icon>
               </button>
-              <mat-error *ngIf="detailsFormGroup.controls.userName.hasError('required')" i18n>
+              <mat-error e2e="user-error-msg" *ngIf="detailsFormGroup.controls.userName.hasError('required')" i18n>
                 Username is
                 <strong>required</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Password</mat-label>
-              <input [type]="show ? 'text' : 'password'" matInput placeholder="Password" name="user-password"
+              <input [type]="show ? 'text' : 'password'" matInput placeholder="Password" name="user-password" e2e="user-password"
                 formControlName="password" required autocomplete="new-password" />
-              <button matTooltip="Show Password" *ngIf="!show" mat-button matSuffix mat-icon-button aria-label="show"
+              <button matTooltip="Show Password" e2e="show-password" *ngIf="!show" mat-button matSuffix mat-icon-button aria-label="show"
                 (click)="togglePWD()">
                 <mat-icon fontIcon="icon-show"></mat-icon>
               </button>
-              <button matTooltip="Hide Password" *ngIf="show" mat-button matSuffix mat-icon-button aria-label="show"
+              <button matTooltip="Hide Password" e2e="hide-password" *ngIf="show" mat-button matSuffix mat-icon-button aria-label="show"
                 (click)="togglePWD()">
                 <mat-icon fontIcon="icon-hide"></mat-icon>
               </button>
-              <mat-error *ngIf="detailsFormGroup.controls.password.hasError('required')" i18n>
+              <mat-error e2e="pwd-validation-msg" *ngIf="detailsFormGroup.controls.password.hasError('required')" i18n>
                 Password is
                 <strong>required</strong>
               </mat-error>
@@ -111,20 +111,20 @@
           <section fxFlex fxLayout="column" fxLayoutAlign="center center">
             <mat-form-field style="width: 90%;" appearance="outline">
               <mat-label i18n>Description about the source</mat-label>
-              <textarea matInput formControlName="description"></textarea>
+              <textarea matInput formControlName="description" e2e="channel-description" ></textarea>
             </mat-form-field>
           </section>
         </form>
         <mat-divider></mat-divider>
         <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" style="height: 20%;">
-          <button mat-raised-button color="primary" *ngIf="isTypeEditable" matStepperPrevious>Previous</button>
-          <button mat-stroked-button color="primary" *ngIf="!isTypeEditable" (click)="onCancelClick()" color="warn" matStepperPrevious>Cancel</button>
-          <button mat-stroked-button color="primary" (click)="testChannel(detailsFormGroup.value)" i18n [disabled]="!detailsFormGroup.valid">
+          <button mat-raised-button color="primary" *ngIf="isTypeEditable" matStepperPrevious e2e="channel-prev-btn">Previous</button>
+          <button mat-stroked-button color="primary" *ngIf="!isTypeEditable" (click)="onCancelClick()" color="warn" e2e="channel-cancel-btn" matStepperPrevious>Cancel</button>
+          <button e2e="channel-test-connect-btn" mat-stroked-button color="primary" (click)="testChannel(detailsFormGroup.value)" i18n [disabled]="!detailsFormGroup.valid">
             <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
           </button>
-          <button mat-raised-button *ngIf="opType === 'create'" color="primary" type="submit" [disabled]="!detailsFormGroup.valid"
+          <button e2e="channel-create-btn" mat-raised-button *ngIf="opType === 'create'" color="primary" type="submit" [disabled]="!detailsFormGroup.valid"
             (click)="createSource(detailsFormGroup.value)" i18n>Create</button>
-          <button mat-raised-button *ngIf="opType === 'update'" color="primary" type="submit" [disabled]="!detailsFormGroup.valid"
+          <button e2e="channel-update-btn" mat-raised-button *ngIf="opType === 'update'" color="primary" type="submit" [disabled]="!detailsFormGroup.valid"
             (click)="createSource(detailsFormGroup.value)" i18n>Update</button>
         </div>
       </mat-step>

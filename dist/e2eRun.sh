@@ -12,7 +12,7 @@ yellow=`tput setaf 3`
 suiteName=$2
 localRun=$3
 if [ -z "$1" ]; then
-    echo "${red}Pass first parameter as sip docker url e.g. http://3.92.141.140/saw/web/${reset}"
+    echo "${red}Pass first parameter as sip docker url(Only IP) e.g. http://3.92.141.140/saw/web/${reset}"
     exit 1
 fi
 if [ -z "$2" ]; then
