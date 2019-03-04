@@ -31,10 +31,10 @@
         <th>Instance</th>
         <th>Status</th>
       </tr>
-{{ range query "spring_boot_actuator_health_status{job='spring'}" | sortByLabel "instance" }}
+{{ range query "spring_boot_actuator_health_status" | sortByLabel "instance" }}
       <tr>
         <td>{{ .Labels.instance }}</td>
-        <td{{ if eq (. | value) 0.0 }} style="background-color: greenyellow">OK {{ else }} class="alert-danger">FAIL{{ end }} (status: {{ template "prom_query_drilldown" (args (printf "spring_boot_actuator_health_status{job='spring',instance='%s'}" .Labels.instance)) }})</td>
+        <td{{ if eq (. | value) 0.0 }} style="background-color: greenyellow">OK {{ else }} class="alert-danger">FAIL{{ end }} (status: {{ template "prom_query_drilldown" (args (printf "spring_boot_actuator_health_status{instance='%s'}" .Labels.instance)) }})</td>
       </tr>
 {{ end }}
     </table>
