@@ -1,15 +1,19 @@
-<mat-tab-group>
-  <mat-tab label="Data Settings">
-    <designer-data-option-field *ngFor="let col of selectedColumns"
-                                (change)="change.emit($event)"
-                                [artifactColumn]="col"
-                                [analysisType]="analysisType"
-                                [sqlBuilder]="sqlBuilder"
-                                [analysisSubtype]="analysisSubtype"
-    >
-    </designer-data-option-field>
+<mat-tab-group dynamicHeight>
+  <mat-tab label="DATA OPTIONS">
+    <div>
+      <designer-data-option-field *ngFor="let col of selectedColumns"
+                                  (change)="change.emit($event)"
+                                  [artifactColumn]="col"
+                                  [analysisType]="analysisType"
+                                  [sqlBuilder]="sqlBuilder"
+                                  [analysisSubtype]="analysisSubtype"
+                                  [fieldCount]="fieldCount"
+      >
+      </designer-data-option-field>
+    </div>
   </mat-tab>
-  <mat-tab label="Chart Settings">
-    Chart Settings
+  <mat-tab label="CHART OPTIONS">
+    <designer-chart-options *ngIf="analysisType === 'chart'">
+    </designer-chart-options>
   </mat-tab>
 </mat-tab-group>

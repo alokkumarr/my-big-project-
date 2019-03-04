@@ -16,6 +16,7 @@ export class DesignerAnalysisOptionsComponent implements OnInit {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() sqlBuilder: SqlBuilder;
+  @Input() fieldCount: number;
   @Input('artifacts') set setArtifacts(artifacts: Artifact[]) {
     const cols = get(artifacts, '0.columns');
     this.selectedColumns = filter(cols, 'checked');

@@ -20,7 +20,9 @@ import {
   DesignerDataFormatSelectorComponent,
   DesignerRegionSelectorComponent,
   DesignerComboTypeSelectorComponent,
-  DesignerDateIntervalSelectorComponent
+  DesignerDateIntervalSelectorComponent,
+  DesignerChartOptionsComponent,
+  DesignerDataLimitSelectorComponent
 } from './options';
 export {
   DesignerSettingsSingleTableComponent,
@@ -40,5 +42,7 @@ export {
   DesignerDataFormatSelectorComponent,
   DesignerRegionSelectorComponent,
   DesignerComboTypeSelectorComponent,
-  DesignerDateIntervalSelectorComponent
+  DesignerDateIntervalSelectorComponent,
+  DesignerChartOptionsComponent,
+  DesignerDataLimitSelectorComponent
 };

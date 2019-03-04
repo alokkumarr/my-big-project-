@@ -8,4 +8,12 @@
     height: 30px;
     padding: 0 10px;
   }
+
+  ::ng-deep .mat-tab-label-content {
+    font-weight: 600;
+  }
+
+  ::ng-deep .mat-tab-labels {
+    background-color: white;
+  }
 }

@@ -23,6 +23,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() sqlBuilder: SqlBuilder;
+  @Input() fieldCount: number;
 
   public comboTypes = COMBO_TYPES;
   public hasDateInterval = false;

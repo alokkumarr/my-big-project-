@@ -1,0 +1,14 @@
+@import "src/themes/base/colors";
+
+.limit-type .mat-button-toggle-checked {
+  background-color: $selection-highlight-col;
+}
+
+.mat-raised-button {
+  font-size: 11px;
+  font-size: 11px;
+  line-height: 26px;
+  padding: 0 10px;
+  min-width: unset;
+  float: right;
+}

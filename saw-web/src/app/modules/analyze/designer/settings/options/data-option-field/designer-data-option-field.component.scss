@@ -1,12 +1,22 @@
 @import "src/themes/base/colors";
 
+:host {
+  display: block;
+}
+
+.mat-expansion-panel-header {
+  height: 34px;
+}
+
+.mat-expansion-panel {
+  background-color: $report-designer-settings-bg-color;
+}
+
 .data-option__fieldset {
-  border-style: solid;
-  border-radius: 3px;
-  border-width: 1px;
-  margin-top: 10px;
+  font-size: 11px;
 }
 
 .data-option__display-name {
   color: $primary-blue-b1;
+  font-size: 11px;
 }

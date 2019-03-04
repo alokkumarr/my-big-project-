@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import * as get from 'lodash/get';
 
 import {
@@ -30,6 +31,25 @@ export class SingleTableDesignerLayoutComponent {
   @Input() fieldCount: number;
 
   public DesignerStates = DesignerStates;
+  public isOptionsPanelOpen = false;
+  public optionsPanelMode: 'side' | 'over' = 'side';
+  public breakpointObserver: BreakpointObserver;
+
+  constructor(breakpointObserver: BreakpointObserver) {
+    this.breakpointObserver = breakpointObserver;
+    breakpointObserver.observe([
+      Breakpoints.Medium,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.isOptionsPanelOpen = false;
+        this.optionsPanelMode = 'over';
+      } else {
+        this.isOptionsPanelOpen = true;
+        this.optionsPanelMode = 'side';
+      }
+    });
+  }
 
   onRemoveFilter(index) {
     this.filters.splice(index, 1);
