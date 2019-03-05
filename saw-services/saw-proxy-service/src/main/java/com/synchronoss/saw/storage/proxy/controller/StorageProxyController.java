@@ -172,8 +172,7 @@ public class StorageProxyController {
      logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(requestBody));
      responseObjectFuture= proxyService.execute(requestBody);
     } catch (IOException e){
-        e.printStackTrace();
-      logger.error("expected missing on the request body.", e);
+      logger.error("expected missing on the request body.", e.getMessage());
       throw new JSONProcessingSAWException("expected missing on the request body");
     } catch (ReadEntitySAWException ex){
       logger.error("Problem on the storage while reading data from storage.", ex);
