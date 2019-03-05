@@ -178,7 +178,7 @@
             <version>8.18</version>
           </dependency>
         </dependencies>
-       <!-- <executions>
+        <executions>
           <execution>
             <phase>test</phase>
             <configuration>
@@ -186,18 +186,14 @@
               </configLocation>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
               <violationSeverity>warning</violationSeverity>
-              &lt;!&ndash; Exclude files that were added before Checkstyle was enabled.  Gradually
-                make also these files conform to checkstyle rules and remove the exclusions &ndash;&gt;
-              <excludes>
-                **/model/**,**/controller/**,**/exceptions/**,****/saw/****,**/service/**,**/store/*,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAW*,**/*Utils*,
-                **/*Test*
-              </excludes>
+              <!-- Exclude files that were added before Checkstyle was enabled.  Gradually
+                make also these files conform to checkstyle rules and remove the exclusions -->
             </configuration>
             <goals>
               <goal>check</goal>
             </goals>
           </execution>
-        </executions>-->
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

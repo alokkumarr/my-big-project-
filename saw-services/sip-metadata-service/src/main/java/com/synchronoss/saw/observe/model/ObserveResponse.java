@@ -8,40 +8,42 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({"message", "id", "contents"})
 public class ObserveResponse {
 
-    @JsonProperty("message")
-    private String message;
-    @JsonProperty("id")
-    private String id;
-    @JsonProperty("contents")
-    private Content contents = null;
+  @JsonProperty("message")
+  private String message;
 
-    @JsonProperty("message")
-    public String getMessage() {
-        return message;
-    }
+  @JsonProperty("id")
+  private String id;
 
-    @JsonProperty("message")
-    public void setMessage(String message) {
-        this.message = message;
-    }
+  @JsonProperty("contents")
+  private Content contents = null;
 
-    @JsonProperty("contents")
-    public Content getContents() {
-        return contents;
-    }
+  @JsonProperty("message")
+  public String getMessage() {
+    return message;
+  }
 
-    @JsonProperty("contents")
-    public void setContents(Content contents) {
-        this.contents = contents;
-    }
+  @JsonProperty("message")
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
-    @JsonProperty("id")
-    public String getId() {
-        return id;
-    }
+  @JsonProperty("contents")
+  public Content getContents() {
+    return contents;
+  }
 
-    @JsonProperty("id")
-    public void setId(String id) {
-        this.id = id;
-    }
+  @JsonProperty("contents")
+  public void setContents(Content contents) {
+    this.contents = contents;
+  }
+
+  @JsonProperty("id")
+  public String getId() {
+    return id;
+  }
+
+  @JsonProperty("id")
+  public void setId(String id) {
+    this.id = id;
+  }
 }

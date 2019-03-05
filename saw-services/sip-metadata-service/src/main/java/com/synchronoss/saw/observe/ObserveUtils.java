@@ -30,134 +30,131 @@ import org.springframework.stereotype.Component;
 @Component
 public class ObserveUtils {
 
-    public final String SCHEMA_FILENAME = "payload-schema.json";
+  public final String SCHEMA_FILENAME = "payload-schema.json";
 
-    public static Observe getObserveNode(String json, String node)
-        throws JsonProcessingException, IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-        JsonNode objectNode = objectMapper.readTree(json);
-        JsonNode contentNode = objectNode.get(node);
-        JsonNode observeNode = contentNode.get("observe").get(0);
-        String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
-        JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
-        ObserveNode observeTreeNode = objectMapper
-            .treeToValue(observeNodeIndependent, ObserveNode.class);
-        Observe observeTree = observeTreeNode.getObserve();
-        return observeTree;
+  public static Observe getObserveNode(String json, String node)
+      throws JsonProcessingException, IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode objectNode = objectMapper.readTree(json);
+    JsonNode contentNode = objectNode.get(node);
+    JsonNode observeNode = contentNode.get("observe").get(0);
+    String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
+    JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
+    ObserveNode observeTreeNode =
+        objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
+    Observe observeTree = observeTreeNode.getObserve();
+    return observeTree;
+  }
+
+  public static String node2JsonString(
+      Observe node, String basePath, String Id, Action action, Category category)
+      throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+
+    if (node != null) {
+      metaDataStoreStructure.setSource(node);
     }
-
-    public static String node2JsonString(Observe node, String basePath, String Id, Action action,
-        Category category)
-        throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
-
-        if (node != null) {
-            metaDataStoreStructure.setSource(node);
-        }
-        if (Id != null) {
-            metaDataStoreStructure.setId(Id);
-        }
-        metaDataStoreStructure.setAction(action);
-        metaDataStoreStructure.setCategory(category);
-        metaDataStoreStructure.setXdfRoot(basePath);
-        List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
-        listOfMetadata.add(metaDataStoreStructure);
-
-        return objectMapper.writeValueAsString(listOfMetadata);
+    if (Id != null) {
+      metaDataStoreStructure.setId(Id);
     }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
 
-    public static String node2JsonString(Observe node, String basePath, String Id, Action action,
-        Category category,
-        Query query) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    return objectMapper.writeValueAsString(listOfMetadata);
+  }
 
-        if (node != null) {
-            metaDataStoreStructure.setSource(node);
-        }
-        if (Id != null) {
-            metaDataStoreStructure.setId(Id);
-        }
-        if (query != null) {
-            metaDataStoreStructure.setQuery(query);
-        }
-        metaDataStoreStructure.setAction(action);
-        metaDataStoreStructure.setCategory(category);
-        metaDataStoreStructure.setXdfRoot(basePath);
-        List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
-        listOfMetadata.add(metaDataStoreStructure);
-        return objectMapper.writeValueAsString(listOfMetadata);
+  public static String node2JsonString(
+      Observe node, String basePath, String Id, Action action, Category category, Query query)
+      throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+
+    if (node != null) {
+      metaDataStoreStructure.setSource(node);
     }
-
-    public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(Observe node,
-        String basePath, String output,
-        String Id, Action action, Category category) throws JsonProcessingException {
-        MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
-        if (node != null) {
-            metaDataStoreStructure.setSource(node);
-        }
-        if (Id != null) {
-            metaDataStoreStructure.setId(Id);
-        }
-        metaDataStoreStructure.setAction(action);
-        metaDataStoreStructure.setCategory(category);
-        metaDataStoreStructure.setXdfRoot(basePath);
-        List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
-        listOfMetadata.add(metaDataStoreStructure);
-        return listOfMetadata;
+    if (Id != null) {
+      metaDataStoreStructure.setId(Id);
     }
-
-    public static ObserveResponse prepareResponse(Observe node, String message) {
-        ObserveResponse createresponse = new ObserveResponse();
-        createresponse.setMessage(message);
-        createresponse.setId(node.get_id());
-        createresponse.setId(node.getEntityId());
-        Content content = new Content();
-        List<Observe> listOfObserve = new ArrayList<>();
-        listOfObserve.add(node);
-        content.setObserve(listOfObserve);
-        createresponse.setContents(content);
-        return createresponse;
+    if (query != null) {
+      metaDataStoreStructure.setQuery(query);
     }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return objectMapper.writeValueAsString(listOfMetadata);
+  }
 
-    public ObjectMapper getMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false);
-        return objectMapper;
+  public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(
+      Observe node, String basePath, String output, String Id, Action action, Category category)
+      throws JsonProcessingException {
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    if (node != null) {
+      metaDataStoreStructure.setSource(node);
     }
-
-    public <T> ResponseEntity<T> createOkResponse(T body) {
-        return createResponse(body, HttpStatus.OK);
+    if (Id != null) {
+      metaDataStoreStructure.setId(Id);
     }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return listOfMetadata;
+  }
 
-    /**
-     *
-     */
-    public <T> ResponseEntity<T> createResponse(ResponseEntity<T> result) {
+  public static ObserveResponse prepareResponse(Observe node, String message) {
+    ObserveResponse createresponse = new ObserveResponse();
+    createresponse.setMessage(message);
+    createresponse.setId(node.get_id());
+    createresponse.setId(node.getEntityId());
+    Content content = new Content();
+    List<Observe> listOfObserve = new ArrayList<>();
+    listOfObserve.add(node);
+    content.setObserve(listOfObserve);
+    createresponse.setContents(content);
+    return createresponse;
+  }
 
-        ResponseEntity<T> response = createResponse(result.getBody(), result.getStatusCode());
-        return response;
-    }
+  public ObjectMapper getMapper() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false);
+    return objectMapper;
+  }
 
-    public <T> ResponseEntity<T> createResponse(T body, HttpStatus httpStatus) {
-        return new ResponseEntity<>(body, httpStatus);
-    }
+  public <T> ResponseEntity<T> createOkResponse(T body) {
+    return createResponse(body, HttpStatus.OK);
+  }
 
-    public Resource getClassPathResources(String filename) {
-        return new ClassPathResource(filename);
-    }
+  /** */
+  public <T> ResponseEntity<T> createResponse(ResponseEntity<T> result) {
 
-    public Boolean jsonSchemaValidate(String jsonDataString, String filename)
-        throws IOException, ProcessingException {
-        final JsonNode data = JsonLoader.fromString(jsonDataString);
-        final JsonNode schema = JsonLoader.fromURL(this.getClassPathResources(filename).getURL());
-        final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
-        JsonValidator validator = factory.getValidator();
-        ProcessingReport report = validator.validate(schema, data);
-        return report.isSuccess();
-    }
+    ResponseEntity<T> response = createResponse(result.getBody(), result.getStatusCode());
+    return response;
+  }
 
+  public <T> ResponseEntity<T> createResponse(T body, HttpStatus httpStatus) {
+    return new ResponseEntity<>(body, httpStatus);
+  }
+
+  public Resource getClassPathResources(String filename) {
+    return new ClassPathResource(filename);
+  }
+
+  public Boolean jsonSchemaValidate(String jsonDataString, String filename)
+      throws IOException, ProcessingException {
+    final JsonNode data = JsonLoader.fromString(jsonDataString);
+    final JsonNode schema = JsonLoader.fromURL(this.getClassPathResources(filename).getURL());
+    final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+    JsonValidator validator = factory.getValidator();
+    ProcessingReport report = validator.validate(schema, data);
+    return report.isSuccess();
+  }
 }

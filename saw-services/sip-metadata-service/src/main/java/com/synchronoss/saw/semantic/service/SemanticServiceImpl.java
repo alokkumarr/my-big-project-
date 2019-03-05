@@ -9,12 +9,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
+import com.synchronoss.saw.exceptions.CreateEntitySAWException;
+import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
+import com.synchronoss.saw.exceptions.JSONValidationSAWException;
+import com.synchronoss.saw.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
 import com.synchronoss.saw.semantic.SAWSemanticUtils;
-import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.semantic.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
+
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.Content;

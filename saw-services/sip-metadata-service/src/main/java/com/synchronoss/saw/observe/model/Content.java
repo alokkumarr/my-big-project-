@@ -10,21 +10,19 @@ import java.util.List;
 @JsonPropertyOrder({"contents"})
 public class Content implements Serializable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    @JsonProperty("observe")
-    private List<Observe> observe = null;
+  /** */
+  private static final long serialVersionUID = 1L;
 
-    @JsonProperty("observe")
-    public List<Observe> getObserve() {
-        return observe;
-    }
+  @JsonProperty("observe")
+  private List<Observe> observe = null;
 
-    @JsonProperty("observe")
-    public void setObserve(List<Observe> observe) {
-        this.observe = observe;
-    }
+  @JsonProperty("observe")
+  public List<Observe> getObserve() {
+    return observe;
+  }
 
+  @JsonProperty("observe")
+  public void setObserve(List<Observe> observe) {
+    this.observe = observe;
+  }
 }

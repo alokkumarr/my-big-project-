@@ -1,4 +1,3 @@
-
 package com.synchronoss.saw.observe.model;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -14,38 +13,31 @@ import java.util.Map;
 @JsonPropertyOrder({"observe"})
 public class ObserveNode {
 
-    /**
-     * (Required)
-     */
-    @JsonProperty("observe")
-    private Observe observe;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  /** (Required) */
+  @JsonProperty("observe")
+  private Observe observe;
 
-    /**
-     * (Required)
-     */
-    @JsonProperty("observe")
-    public Observe getObserve() {
-        return observe;
-    }
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    /**
-     * (Required)
-     */
-    @JsonProperty("observe")
-    public void setObserve(Observe observe) {
-        this.observe = observe;
-    }
+  /** (Required) */
+  @JsonProperty("observe")
+  public Observe getObserve() {
+    return observe;
+  }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
+  /** (Required) */
+  @JsonProperty("observe")
+  public void setObserve(Observe observe) {
+    this.observe = observe;
+  }
 
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
+  @JsonAnyGetter
+  public Map<String, Object> getAdditionalProperties() {
+    return this.additionalProperties;
+  }
 
+  @JsonAnySetter
+  public void setAdditionalProperty(String name, Object value) {
+    this.additionalProperties.put(name, value);
+  }
 }

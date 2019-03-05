@@ -1,10 +1,11 @@
 package com.synchronoss.saw.semantic.service;
 
-import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.semantic.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
+
+import com.synchronoss.saw.exceptions.CreateEntitySAWException;
+import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
+import com.synchronoss.saw.exceptions.JSONValidationSAWException;
+import com.synchronoss.saw.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;

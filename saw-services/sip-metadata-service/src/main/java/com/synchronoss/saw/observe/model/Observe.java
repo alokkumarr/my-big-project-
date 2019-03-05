@@ -12,169 +12,189 @@ import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"_id", "entityId", "categoryId", "name", "description", "createdBy",
-    "updatedBy", "createdAt",
-    "updatedAt", "options", "tiles", "filters"})
+@JsonPropertyOrder({
+  "_id",
+  "entityId",
+  "categoryId",
+  "name",
+  "description",
+  "createdBy",
+  "updatedBy",
+  "createdAt",
+  "updatedAt",
+  "options",
+  "tiles",
+  "filters"
+})
 public class Observe implements Serializable {
 
-    private static final long serialVersionUID = 7077848381430952958L;
+  private static final long serialVersionUID = 7077848381430952958L;
 
-    @JsonProperty("_id")
-    private String _id;
-    @JsonProperty("entityId")
-    private String entityId;
-    @JsonProperty("categoryId")
-    private String categoryId;
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("createdBy")
-    private String createdBy;
-    @JsonProperty("updatedBy")
-    private String updatedBy;
-    @JsonProperty("createdAt")
-    private String createdAt;
-    @JsonProperty("updatedAt")
-    private String updatedAt;
-    @JsonProperty("description")
-    private String description;
-    @JsonProperty("options")
-    private List<Object> options = null;
-    @JsonProperty("tiles")
-    private List<Object> tiles = null;
-    @JsonProperty("filters")
-    private List<Object> filters = null;
+  @JsonProperty("_id")
+  private String _id;
 
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonProperty("entityId")
+  private String entityId;
 
-    @JsonProperty("_id")
-    public String get_id() {
-        return _id;
-    }
+  @JsonProperty("categoryId")
+  private String categoryId;
 
-    @JsonProperty("_id")
-    public void set_id(String _id) {
-        this._id = _id;
-    }
+  @JsonProperty("name")
+  private String name;
 
-    @JsonProperty("entityId")
-    public String getEntityId() {
-        return entityId;
-    }
+  @JsonProperty("createdBy")
+  private String createdBy;
 
-    @JsonProperty("entityId")
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
-    }
+  @JsonProperty("updatedBy")
+  private String updatedBy;
 
-    @JsonProperty("categoryId")
-    public String getCategoryId() {
-        return categoryId;
-    }
+  @JsonProperty("createdAt")
+  private String createdAt;
 
-    @JsonProperty("categoryId")
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
+  @JsonProperty("updatedAt")
+  private String updatedAt;
 
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
+  @JsonProperty("description")
+  private String description;
 
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
-    }
+  @JsonProperty("options")
+  private List<Object> options = null;
 
-    @JsonProperty("description")
-    public String getDescription() {
-        return description;
-    }
+  @JsonProperty("tiles")
+  private List<Object> tiles = null;
 
-    @JsonProperty("description")
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  @JsonProperty("filters")
+  private List<Object> filters = null;
 
-    @JsonProperty("createdBy")
-    public String getCreatedBy() {
-        return createdBy;
-    }
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("createdBy")
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
+  @JsonProperty("_id")
+  public String get_id() {
+    return _id;
+  }
 
-    @JsonProperty("updatedBy")
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
+  @JsonProperty("_id")
+  public void set_id(String _id) {
+    this._id = _id;
+  }
 
-    @JsonProperty("updatedBy")
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
+  @JsonProperty("entityId")
+  public String getEntityId() {
+    return entityId;
+  }
 
-    @JsonProperty("createdAt")
-    public String getCreatedAt() {
-        return createdAt;
-    }
+  @JsonProperty("entityId")
+  public void setEntityId(String entityId) {
+    this.entityId = entityId;
+  }
 
-    @JsonProperty("createdAt")
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
+  @JsonProperty("categoryId")
+  public String getCategoryId() {
+    return categoryId;
+  }
 
-    @JsonProperty("updatedAt")
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
+  @JsonProperty("categoryId")
+  public void setCategoryId(String categoryId) {
+    this.categoryId = categoryId;
+  }
 
-    @JsonProperty("updatedAt")
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
 
-    @JsonProperty("options")
-    public List<Object> getOptions() {
-        return options;
-    }
+  @JsonProperty("name")
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    @JsonProperty("options")
-    public void setOptions(List<Object> options) {
-        this.options = options;
-    }
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
 
-    @JsonProperty("tiles")
-    public List<Object> getTiles() {
-        return tiles;
-    }
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    @JsonProperty("tiles")
-    public void setTiles(List<Object> tiles) {
-        this.tiles = tiles;
-    }
+  @JsonProperty("createdBy")
+  public String getCreatedBy() {
+    return createdBy;
+  }
 
-    @JsonProperty("filters")
-    public List<Object> getFilters() {
-        return filters;
-    }
+  @JsonProperty("createdBy")
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
 
-    @JsonProperty("filters")
-    public void setFilters(List<Object> filters) {
-        this.filters = filters;
-    }
+  @JsonProperty("updatedBy")
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
+  @JsonProperty("updatedBy")
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
 
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
+  @JsonProperty("createdAt")
+  public String getCreatedAt() {
+    return createdAt;
+  }
 
+  @JsonProperty("createdAt")
+  public void setCreatedAt(String createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  @JsonProperty("updatedAt")
+  public String getUpdatedAt() {
+    return updatedAt;
+  }
+
+  @JsonProperty("updatedAt")
+  public void setUpdatedAt(String updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  @JsonProperty("options")
+  public List<Object> getOptions() {
+    return options;
+  }
+
+  @JsonProperty("options")
+  public void setOptions(List<Object> options) {
+    this.options = options;
+  }
+
+  @JsonProperty("tiles")
+  public List<Object> getTiles() {
+    return tiles;
+  }
+
+  @JsonProperty("tiles")
+  public void setTiles(List<Object> tiles) {
+    this.tiles = tiles;
+  }
+
+  @JsonProperty("filters")
+  public List<Object> getFilters() {
+    return filters;
+  }
+
+  @JsonProperty("filters")
+  public void setFilters(List<Object> filters) {
+    this.filters = filters;
+  }
+
+  @JsonAnyGetter
+  public Map<String, Object> getAdditionalProperties() {
+    return this.additionalProperties;
+  }
+
+  @JsonAnySetter
+  public void setAdditionalProperty(String name, Object value) {
+    this.additionalProperties.put(name, value);
+  }
 }
