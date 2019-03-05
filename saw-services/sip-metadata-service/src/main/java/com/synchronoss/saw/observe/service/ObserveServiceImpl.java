@@ -3,11 +3,11 @@ package com.synchronoss.saw.observe.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.synchronoss.saw.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
+import com.synchronoss.saw.exceptions.SipCreateEntityException;
+import com.synchronoss.saw.exceptions.SipDeleteEntityException;
+import com.synchronoss.saw.exceptions.SipJsonValidationException;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
+import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.observe.ObserveUtils;
 import com.synchronoss.saw.observe.model.Content;
 import com.synchronoss.saw.observe.model.Observe;
@@ -46,7 +46,7 @@ public class ObserveServiceImpl implements ObserveService {
 
   @Override
   public ObserveResponse addDashboard(Observe node)
-      throws JSONValidationSAWException, CreateEntitySAWException {
+      throws SipJsonValidationException, SipCreateEntityException {
     ObserveResponse response = new ObserveResponse();
     node.setCreatedAt(format.format(new Date()));
     try {
@@ -63,7 +63,7 @@ public class ObserveServiceImpl implements ObserveService {
       response = ObserveUtils.prepareResponse(node, "Entity is created successfully");
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity.");
+      throw new SipCreateEntityException("Problem on the storage while creating an entity.");
     }
     logger.debug("Response : " + response.toString());
     return response;
@@ -71,7 +71,7 @@ public class ObserveServiceImpl implements ObserveService {
 
   @Override
   public ObserveResponse getDashboardbyCriteria(Observe node)
-      throws JSONValidationSAWException, ReadEntitySAWException {
+      throws SipJsonValidationException, SipReadEntityException {
     ObserveResponse response = new ObserveResponse();
     try {
       response.setId(node.getEntityId());
@@ -88,7 +88,7 @@ public class ObserveServiceImpl implements ObserveService {
           ObserveUtils.prepareResponse(observeData, "Entity has been retrieved successfully");
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
-      throw new ReadEntitySAWException(
+      throw new SipReadEntityException(
           "While retrieving it has been found that Entity does not exist.");
     }
     logger.debug("Response : " + response.toString());
@@ -97,7 +97,7 @@ public class ObserveServiceImpl implements ObserveService {
 
   @Override
   public ObserveResponse updateDashboard(Observe node)
-      throws JSONValidationSAWException, UpdateEntitySAWException {
+      throws SipJsonValidationException, SipUpdateEntityException {
     ObserveResponse response = new ObserveResponse();
     node.setUpdatedAt(format.format(new Date()));
     try {
@@ -110,7 +110,7 @@ public class ObserveServiceImpl implements ObserveService {
       response = ObserveUtils.prepareResponse(node, "Entity is updated successfully");
     } catch (Exception ex) {
       logger.error("Entity does not exist to update.", ex);
-      throw new UpdateEntitySAWException("Entity does not exist to update.");
+      throw new SipUpdateEntityException("Entity does not exist to update.");
     }
     logger.debug("Response : " + response.toString());
     return response;
@@ -118,7 +118,7 @@ public class ObserveServiceImpl implements ObserveService {
 
   @Override
   public ObserveResponse deleteDashboard(Observe node)
-      throws JSONValidationSAWException, DeleteEntitySAWException {
+      throws SipJsonValidationException, SipDeleteEntityException {
     ObserveResponse response = new ObserveResponse();
     node.setUpdatedAt(format.format(new Date()));
     try {
@@ -131,7 +131,7 @@ public class ObserveServiceImpl implements ObserveService {
       response = ObserveUtils.prepareResponse(node, "Entity is deleted successfully.");
     } catch (Exception ex) {
       logger.error("Entity does not exist to delete.", ex.getCause());
-      throw new DeleteEntitySAWException("Entity does not exist to delete");
+      throw new SipDeleteEntityException("Entity does not exist to delete");
     }
     logger.debug("Response : " + response.toString());
     return response;
@@ -139,7 +139,7 @@ public class ObserveServiceImpl implements ObserveService {
 
   @Override
   public ObserveResponse getDashboardbyCategoryId(Observe node)
-      throws JSONValidationSAWException, ReadEntitySAWException {
+      throws SipJsonValidationException, SipReadEntityException {
     ObserveResponse response = new ObserveResponse();
     try {
       Query query = new Query();
@@ -208,7 +208,7 @@ public class ObserveServiceImpl implements ObserveService {
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
-      throw new ReadEntitySAWException(
+      throw new SipReadEntityException(
           "While retrieving it has been found that Entity does not exist.");
     }
     logger.debug("Response : " + response.toString());
@@ -216,7 +216,7 @@ public class ObserveServiceImpl implements ObserveService {
   }
 
   @Override
-  public String generateId() throws JSONValidationSAWException {
+  public String generateId() throws SipJsonValidationException {
     String id =
         UUID.randomUUID().toString()
             + delimiter

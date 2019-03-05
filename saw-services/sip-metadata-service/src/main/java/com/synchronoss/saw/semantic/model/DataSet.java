@@ -59,7 +59,7 @@ public class DataSet {
   // @JsonProperty("modifiedTime")
   // private long modifiedTime;
 
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<>();
 
   @JsonProperty("joinEligible")
   public boolean isJoinEligible() {

@@ -19,7 +19,7 @@ public class MetaDataObjects {
   @JsonProperty("contents")
   List<Content> contents = new ArrayList<>();
 
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<>();
 
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {

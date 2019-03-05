@@ -28,7 +28,7 @@ public class MetadataRuntimeException extends RuntimeException {
   /** Return the detail message, including the message from the nested exception if there is one. */
   @Override
   public String getMessage() {
-    return ExceptionSAWUtils.buildMessage(super.getMessage(), getCause());
+    return SipExceptionUtils.buildMessage(super.getMessage(), getCause());
   }
 
   /**

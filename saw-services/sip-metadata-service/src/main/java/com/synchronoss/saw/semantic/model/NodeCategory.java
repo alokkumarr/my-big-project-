@@ -28,7 +28,7 @@ public class NodeCategory {
   @JsonProperty("action")
   private Action action;
 
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<>();
 
   /**
    * The Node Category Schema

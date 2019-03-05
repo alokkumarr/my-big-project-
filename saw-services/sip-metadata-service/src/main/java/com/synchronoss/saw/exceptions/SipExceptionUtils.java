@@ -2,7 +2,7 @@ package com.synchronoss.saw.exceptions;
 
 import java.util.Arrays;
 
-public abstract class ExceptionSAWUtils {
+public abstract class SipExceptionUtils {
 
   /**
    * Build a message for the given base message and root cause.

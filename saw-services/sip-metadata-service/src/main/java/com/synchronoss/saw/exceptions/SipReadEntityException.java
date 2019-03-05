@@ -1,11 +1,11 @@
 package com.synchronoss.saw.exceptions;
 
-public class IOSAWException extends MetadataRuntimeException {
+public class SipReadEntityException extends MetadataRuntimeException {
 
   /** */
   private static final long serialVersionUID = 1L;
 
-  public IOSAWException(String msg) {
+  public SipReadEntityException(String msg) {
     super(msg);
   }
 
@@ -15,7 +15,7 @@ public class IOSAWException extends MetadataRuntimeException {
    * @param msg the detail message
    * @param cause the root cause
    */
-  public IOSAWException(String msg, Throwable cause) {
+  public SipReadEntityException(String msg, Throwable cause) {
     super(msg, cause);
   }
 
@@ -24,12 +24,12 @@ public class IOSAWException extends MetadataRuntimeException {
     if (this == other) {
       return true;
     }
-    if (!(other instanceof IOSAWException)) {
+    if (!(other instanceof SipReadEntityException)) {
       return false;
     }
-    IOSAWException otherBe = (IOSAWException) other;
+    SipReadEntityException otherBe = (SipReadEntityException) other;
     return (getMessage().equals(otherBe.getMessage())
-        && ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
+        && SipExceptionUtils.nullSafeEquals(getCause(), otherBe.getCause()));
   }
 
   @Override

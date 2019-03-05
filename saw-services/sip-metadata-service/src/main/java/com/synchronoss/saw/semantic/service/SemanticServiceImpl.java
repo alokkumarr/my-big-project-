@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
-import com.synchronoss.saw.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
+import com.synchronoss.saw.exceptions.SipCreateEntityException;
+import com.synchronoss.saw.exceptions.SipDeleteEntityException;
+import com.synchronoss.saw.exceptions.SipJsonValidationException;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
+import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.semantic.SAWSemanticUtils;
 
 import com.synchronoss.saw.semantic.model.DataSet;
@@ -80,7 +80,7 @@ public class SemanticServiceImpl implements SemanticService {
 
   @Override
   public SemanticNode addSemantic(SemanticNode node)
-      throws JSONValidationSAWException, CreateEntitySAWException {
+      throws SipJsonValidationException, SipCreateEntityException {
     logger.trace("Adding semantic with an Id : {}", node.get_id());
     SemanticNode responseNode = new SemanticNode();
     SemanticNode newSemanticNode = null;
@@ -103,7 +103,7 @@ public class SemanticServiceImpl implements SemanticService {
       org.springframework.beans.BeanUtils.copyProperties(responseNode, newSemanticNode, "_id");
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity.", ex);
+      throw new SipCreateEntityException("Problem on the storage while creating an entity.", ex);
     }
     logger.trace("Response : " + node.toString());
     return newSemanticNode;
@@ -162,7 +162,7 @@ public class SemanticServiceImpl implements SemanticService {
 
   @Override
   public SemanticNode readSemantic(SemanticNode node)
-      throws JSONValidationSAWException, ReadEntitySAWException {
+      throws SipJsonValidationException, SipReadEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("reading semantic from the store with an Id : {}", node.get_id());
     SemanticNode nodeRetrieved = null;
@@ -183,14 +183,14 @@ public class SemanticServiceImpl implements SemanticService {
       newSemanticNode = new SemanticNode();
       org.springframework.beans.BeanUtils.copyProperties(nodeRetrieved, newSemanticNode, "_id");
     } catch (Exception ex) {
-      throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
+      throw new SipReadEntityException("Problem on the storage while reading an entity", ex);
     }
     return newSemanticNode;
   }
 
   @Override
   public SemanticNode updateSemantic(SemanticNode node)
-      throws JSONValidationSAWException, UpdateEntitySAWException {
+      throws SipJsonValidationException, SipUpdateEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("updating semantic from the store with an Id : {}", node.get_id());
     Preconditions.checkArgument(node.getUpdatedBy() != null, "Updated by mandatory attribute.");
@@ -211,14 +211,14 @@ public class SemanticServiceImpl implements SemanticService {
       newSemanticNode = new SemanticNode();
       org.springframework.beans.BeanUtils.copyProperties(responseNode, newSemanticNode, "_id");
     } catch (Exception ex) {
-      throw new UpdateEntitySAWException("Problem on the storage while updating an entity", ex);
+      throw new SipUpdateEntityException("Problem on the storage while updating an entity", ex);
     }
     return newSemanticNode;
   }
 
   @Override
   public SemanticNode deleteSemantic(SemanticNode node)
-      throws JSONValidationSAWException, DeleteEntitySAWException {
+      throws SipJsonValidationException, SipDeleteEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("Deleting semantic from the store with an Id : {}", node.get_id());
     SemanticNode responseObject = new SemanticNode();
@@ -232,14 +232,14 @@ public class SemanticServiceImpl implements SemanticService {
       requestMetaDataStore.process();
       responseObject.setId(node.get_id());
     } catch (Exception ex) {
-      throw new UpdateEntitySAWException("Problem on the storage while updating an entity", ex);
+      throw new SipUpdateEntityException("Problem on the storage while updating an entity", ex);
     }
     return newSemanticNode;
   }
 
   @Override
   public SemanticNodes search(SemanticNode node, Map<String, String> headers)
-      throws JSONValidationSAWException, ReadEntitySAWException {
+      throws SipJsonValidationException, SipReadEntityException {
     logger.trace("search criteria :{}", node);
     SemanticNodes responseNode = new SemanticNodes();
     if (headers.get("x-customercode") != null) {
@@ -332,11 +332,11 @@ public class SemanticServiceImpl implements SemanticService {
         }
         responseNode.setSemanticNodes(semanticNodes);
       } else {
-        throw new ReadEntitySAWException("There is no data avaiable for the given criteria");
+        throw new SipReadEntityException("There is no data avaiable for the given criteria");
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
-      throw new ReadEntitySAWException(
+      throw new SipReadEntityException(
           "While retrieving it has been found that Entity does not exist.");
     }
     return responseNode;
@@ -344,7 +344,7 @@ public class SemanticServiceImpl implements SemanticService {
 
   @Override
   public BackCompatibleStructure list(SemanticNode node, Map<String, String> headers)
-      throws JSONValidationSAWException, ReadEntitySAWException {
+      throws SipJsonValidationException, SipReadEntityException {
     logger.trace("search criteria :{}", node);
     BackCompatibleStructure structure = new BackCompatibleStructure();
     Content content = new Content();
@@ -446,11 +446,11 @@ public class SemanticServiceImpl implements SemanticService {
         contents.add(content);
         structure.setContents(contents);
       } else {
-        throw new ReadEntitySAWException("There is no data avaiable for the given criteria");
+        throw new SipReadEntityException("There is no data avaiable for the given criteria");
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
-      throw new ReadEntitySAWException(
+      throw new SipReadEntityException(
           "While retrieving it has been found that Entity does not exist");
     }
     return structure;

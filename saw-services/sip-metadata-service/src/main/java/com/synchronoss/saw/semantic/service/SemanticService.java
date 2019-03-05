@@ -1,11 +1,11 @@
 package com.synchronoss.saw.semantic.service;
 
+import com.synchronoss.saw.exceptions.SipCreateEntityException;
+import com.synchronoss.saw.exceptions.SipDeleteEntityException;
+import com.synchronoss.saw.exceptions.SipJsonValidationException;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
+import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 
-import com.synchronoss.saw.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
@@ -19,30 +19,30 @@ public interface SemanticService {
   String nodeCategoryConvention = "SemanticNode";
 
   SemanticNode addSemantic(SemanticNode node)
-      throws JSONValidationSAWException, CreateEntitySAWException;
+      throws SipJsonValidationException, SipCreateEntityException;
 
   SemanticNode readSemantic(SemanticNode node)
-      throws JSONValidationSAWException, ReadEntitySAWException;
+      throws SipJsonValidationException, SipReadEntityException;
 
   SemanticNode updateSemantic(SemanticNode node)
-      throws JSONValidationSAWException, UpdateEntitySAWException;
+      throws SipJsonValidationException, SipUpdateEntityException;
 
   SemanticNode deleteSemantic(SemanticNode node)
-      throws JSONValidationSAWException, DeleteEntitySAWException;
+      throws SipJsonValidationException, SipDeleteEntityException;
 
   SemanticNodes search(SemanticNode node, Map<String, String> headers)
-      throws JSONValidationSAWException, ReadEntitySAWException;
+      throws SipJsonValidationException, SipReadEntityException;
 
   BackCompatibleStructure list(SemanticNode node, Map<String, String> headers)
-      throws JSONValidationSAWException, ReadEntitySAWException;
+      throws SipJsonValidationException, SipReadEntityException;
 
   /**
    * This is the method which generates Id & will be used in CRUD operation.
    *
    * @return String Id for the row
-   * @throws JSONValidationSAWException when JSON Parsing fails
+   * @throws SipJsonValidationException when JSON Parsing fails
    */
-  default String generateId(String project, String metricName) throws JSONValidationSAWException {
+  default String generateId(String project, String metricName) throws SipJsonValidationException {
     String id = project + delimiter + metricName;
     if (StringUtils.containsWhitespace(id)) {
       id = StringUtils.deleteWhitespace(id);

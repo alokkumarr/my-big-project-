@@ -9,10 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.synchronoss.saw.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.exceptions.SipCreateEntityException;
+import com.synchronoss.saw.exceptions.SipDeleteEntityException;
+import com.synchronoss.saw.exceptions.SipJsonValidationException;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.semantic.SAWSemanticUtils;
 import com.synchronoss.saw.semantic.model.DataSemanticObjects;
 import com.synchronoss.saw.semantic.model.MetaDataObjects;
@@ -54,6 +54,7 @@ public class MigrationService {
 
   /**
    * Run migration.
+   *
    * @param args arguments
    * @throws IOException exception
    */
@@ -217,7 +218,7 @@ public class MigrationService {
             addSemantic(semanticNode, basePath);
           } catch (Exception ex) {
             logger.trace("Throwing an exception while adding the semantic to the new store");
-            throw new CreateEntitySAWException(
+            throw new SipCreateEntityException(
                 "Exception generated during migration while creating an semantic entity ", ex);
           }
           try {
@@ -236,8 +237,8 @@ public class MigrationService {
                     + " :",
                 e);
           }
-        } // end of Id check if it is there then ignore
-        else {
+          // end of Id check if it is there then ignore
+        } else {
           logger.info("This " + semanticNode.get_id() + " already exists on the store");
         }
       }
@@ -330,7 +331,7 @@ public class MigrationService {
   }
 
   private void addSemantic(SemanticNode node, String basePath)
-      throws JSONValidationSAWException, CreateEntitySAWException {
+      throws SipJsonValidationException, SipCreateEntityException {
     logger.trace("Adding semantic with an Id : {}", node.get_id());
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
@@ -345,13 +346,13 @@ public class MigrationService {
       requestMetaDataStore.process();
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity.", ex);
+      throw new SipCreateEntityException("Problem on the storage while creating an entity.", ex);
     }
     logger.trace("Response : " + node.toString());
   }
 
   private boolean readSemantic(SemanticNode node, String basePath)
-      throws JSONValidationSAWException, ReadEntitySAWException {
+      throws SipJsonValidationException, SipReadEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("reading semantic from the store with an Id : {}", node.get_id());
     SemanticNode nodeRetrieved = null;
@@ -381,7 +382,7 @@ public class MigrationService {
   }
 
   public void deleteSemantic(SemanticNode node, String basePath)
-      throws JSONValidationSAWException, DeleteEntitySAWException {
+      throws SipJsonValidationException, SipDeleteEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("Deleting semantic from the store with an Id : {}", node.get_id());
     SemanticNode responseObject = new SemanticNode();
@@ -394,7 +395,7 @@ public class MigrationService {
       requestMetaDataStore.process();
       responseObject.setId(node.get_id());
     } catch (Exception ex) {
-      throw new DeleteEntitySAWException("Problem on the storage while updating an entity", ex);
+      throw new SipDeleteEntityException("Problem on the storage while updating an entity", ex);
     }
   }
 }

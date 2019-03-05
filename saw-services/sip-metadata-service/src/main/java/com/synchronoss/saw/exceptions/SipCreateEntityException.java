@@ -1,11 +1,11 @@
 package com.synchronoss.saw.exceptions;
 
-public class JSONProcessingSAWException extends MetadataRuntimeException {
+public class SipCreateEntityException extends MetadataRuntimeException {
 
   /** */
   private static final long serialVersionUID = 1L;
 
-  public JSONProcessingSAWException(String msg) {
+  public SipCreateEntityException(String msg) {
     super(msg);
   }
 
@@ -15,7 +15,7 @@ public class JSONProcessingSAWException extends MetadataRuntimeException {
    * @param msg the detail message
    * @param cause the root cause
    */
-  public JSONProcessingSAWException(String msg, Throwable cause) {
+  public SipCreateEntityException(String msg, Throwable cause) {
     super(msg, cause);
   }
 
@@ -24,12 +24,12 @@ public class JSONProcessingSAWException extends MetadataRuntimeException {
     if (this == other) {
       return true;
     }
-    if (!(other instanceof JSONProcessingSAWException)) {
+    if (!(other instanceof SipCreateEntityException)) {
       return false;
     }
-    JSONProcessingSAWException otherBe = (JSONProcessingSAWException) other;
+    SipCreateEntityException otherBe = (SipCreateEntityException) other;
     return (getMessage().equals(otherBe.getMessage())
-        && ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
+        && SipExceptionUtils.nullSafeEquals(getCause(), otherBe.getCause()));
   }
 
   @Override

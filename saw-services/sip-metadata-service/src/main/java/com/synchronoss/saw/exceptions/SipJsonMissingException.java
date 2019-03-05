@@ -1,11 +1,11 @@
 package com.synchronoss.saw.exceptions;
 
-public class JSONMissingSAWException extends MetadataRuntimeException {
+public class SipJsonMissingException extends MetadataRuntimeException {
 
   /** */
   private static final long serialVersionUID = 1L;
 
-  public JSONMissingSAWException(String msg) {
+  public SipJsonMissingException(String msg) {
     super(msg);
   }
 
@@ -15,7 +15,7 @@ public class JSONMissingSAWException extends MetadataRuntimeException {
    * @param msg the detail message
    * @param cause the root cause
    */
-  public JSONMissingSAWException(String msg, Throwable cause) {
+  public SipJsonMissingException(String msg, Throwable cause) {
     super(msg, cause);
   }
 
@@ -24,12 +24,12 @@ public class JSONMissingSAWException extends MetadataRuntimeException {
     if (this == other) {
       return true;
     }
-    if (!(other instanceof JSONMissingSAWException)) {
+    if (!(other instanceof SipJsonMissingException)) {
       return false;
     }
-    JSONMissingSAWException otherBe = (JSONMissingSAWException) other;
+    SipJsonMissingException otherBe = (SipJsonMissingException) other;
     return (getMessage().equals(otherBe.getMessage())
-        && ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
+        && SipExceptionUtils.nullSafeEquals(getCause(), otherBe.getCause()));
   }
 
   @Override

@@ -58,7 +58,7 @@ public class BinarySemanticNode {
    */
   @JsonProperty("projectCode")
   private String projectCode;
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("dataSetId")
   private List<Object> dataSetId = null;
 
@@ -99,10 +99,10 @@ public class BinarySemanticNode {
    */
   @JsonProperty("metricName")
   private String metricName;
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("supports")
   private List<Object> supports = null;
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("artifacts")
   private List<Object> artifacts = null;
   /**
@@ -120,7 +120,7 @@ public class BinarySemanticNode {
   @JsonProperty("repository")
   private Object repository;
 
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<>();
 
   @JsonProperty("groupByColumns")
   public List<Object> getGroupByColumns() {
@@ -222,13 +222,13 @@ public class BinarySemanticNode {
     this.projectCode = projectCode;
   }
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("dataSetId")
   public List<Object> getDataSetId() {
     return dataSetId;
   }
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("dataSetId")
   public void setDataSetId(List<Object> dataSetId) {
     this.dataSetId = dataSetId;
@@ -314,25 +314,25 @@ public class BinarySemanticNode {
     this.metricName = metricName;
   }
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("supports")
   public List<Object> getSupports() {
     return supports;
   }
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("supports")
   public void setSupports(List<Object> supports) {
     this.supports = supports;
   }
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("artifacts")
   public List<Object> getArtifacts() {
     return artifacts;
   }
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("artifacts")
   public void setArtifacts(List<Object> artifacts) {
     this.artifacts = artifacts;
@@ -467,8 +467,7 @@ public class BinarySemanticNode {
     OBSERVE("OBSERVE"),
     ALERT("ALERT"),
     WORKBENCH("WORKBENCH");
-    private static final Map<String, BinarySemanticNode.Module> CONSTANTS =
-        new HashMap<String, BinarySemanticNode.Module>();
+    private static final Map<String, BinarySemanticNode.Module> CONSTANTS = new HashMap<>();
 
     static {
       for (BinarySemanticNode.Module c : values()) {
@@ -482,6 +481,12 @@ public class BinarySemanticNode {
       this.value = value;
     }
 
+    /**
+     * fetch Value.
+     *
+     * @param value
+     * @return BinarySemanticNode.Module
+     */
     @JsonCreator
     public static BinarySemanticNode.Module fromValue(String value) {
       BinarySemanticNode.Module constant = CONSTANTS.get(value);

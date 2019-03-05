@@ -3,10 +3,10 @@ package com.synchronoss.saw.observe.controller;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.saw.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.exceptions.JSONMissingSAWException;
-import com.synchronoss.saw.exceptions.JSONProcessingSAWException;
-import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
+import com.synchronoss.saw.exceptions.SipCreateEntityException;
+import com.synchronoss.saw.exceptions.SipJsonMissingException;
+import com.synchronoss.saw.exceptions.SipJsonProcessingException;
+import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.observe.ObserveUtils;
 
 import com.synchronoss.saw.observe.model.Observe;
@@ -45,7 +45,7 @@ public class ObserveController {
   public ObserveResponse addDashboard(@RequestBody ObserveRequestBody requestBody) {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
-      throw new JSONMissingSAWException("json body is missing in request body");
+      throw new SipJsonMissingException("json body is missing in request body");
     }
     ObserveResponse responseObjectFuture = null;
     try {
@@ -59,9 +59,9 @@ public class ObserveController {
       logger.trace("Invoking service with entity id : {} ", observe.getEntityId());
       responseObjectFuture = observeService.addDashboard(observe);
     } catch (IOException e) {
-      throw new JSONProcessingSAWException("expected missing on the request body");
-    } catch (CreateEntitySAWException ex) {
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity");
+      throw new SipJsonProcessingException("expected missing on the request body");
+    } catch (SipCreateEntityException ex) {
+      throw new SipCreateEntityException("Problem on the storage while creating an entity");
     }
     return responseObjectFuture;
   }
@@ -138,7 +138,7 @@ public class ObserveController {
     logger.debug("dashboardId {}", entityId);
     logger.debug("Request Body", requestBody);
     if (requestBody == null) {
-      throw new JSONMissingSAWException("json body is missing in request body");
+      throw new SipJsonMissingException("json body is missing in request body");
     }
     ObserveResponse responseObjectFuture = null;
     try {
@@ -150,9 +150,9 @@ public class ObserveController {
       observe.setEntityId(entityId);
       responseObjectFuture = observeService.updateDashboard(observe);
     } catch (IOException e) {
-      throw new JSONProcessingSAWException("expected missing on the request body");
-    } catch (UpdateEntitySAWException ex) {
-      throw new UpdateEntitySAWException("Entity does not exist.");
+      throw new SipJsonProcessingException("expected missing on the request body");
+    } catch (SipUpdateEntityException ex) {
+      throw new SipUpdateEntityException("Entity does not exist.");
     }
     return responseObjectFuture;
   }

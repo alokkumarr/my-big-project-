@@ -1,11 +1,11 @@
 package com.synchronoss.saw.exceptions;
 
-public class UpdateEntitySAWException extends MetadataRuntimeException {
+public class SipUpdateEntityException extends MetadataRuntimeException {
 
   /** */
   private static final long serialVersionUID = 1L;
 
-  public UpdateEntitySAWException(String msg) {
+  public SipUpdateEntityException(String msg) {
     super(msg);
   }
 
@@ -15,7 +15,7 @@ public class UpdateEntitySAWException extends MetadataRuntimeException {
    * @param msg the detail message
    * @param cause the root cause
    */
-  public UpdateEntitySAWException(String msg, Throwable cause) {
+  public SipUpdateEntityException(String msg, Throwable cause) {
     super(msg, cause);
   }
 
@@ -24,12 +24,12 @@ public class UpdateEntitySAWException extends MetadataRuntimeException {
     if (this == other) {
       return true;
     }
-    if (!(other instanceof UpdateEntitySAWException)) {
+    if (!(other instanceof SipUpdateEntityException)) {
       return false;
     }
-    UpdateEntitySAWException otherBe = (UpdateEntitySAWException) other;
+    SipUpdateEntityException otherBe = (SipUpdateEntityException) other;
     return (getMessage().equals(otherBe.getMessage())
-        && ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
+        && SipExceptionUtils.nullSafeEquals(getCause(), otherBe.getCause()));
   }
 
   @Override

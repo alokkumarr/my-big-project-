@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss.saw.observe")
+@ComponentScan("com.synchronoss.saw")
 @EnableAsync
 public class SipMetadataServiceApplication {
 
@@ -59,7 +59,8 @@ public class SipMetadataServiceApplication {
     tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
       if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
         ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
-      } });
+      }
+    });
     return tomcat;
   }
 

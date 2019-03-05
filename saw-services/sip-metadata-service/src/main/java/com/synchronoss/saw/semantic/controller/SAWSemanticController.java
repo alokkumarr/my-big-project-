@@ -2,11 +2,11 @@ package com.synchronoss.saw.semantic.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.saw.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.exceptions.JSONMissingSAWException;
-import com.synchronoss.saw.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
+import com.synchronoss.saw.exceptions.SipCreateEntityException;
+import com.synchronoss.saw.exceptions.SipDeleteEntityException;
+import com.synchronoss.saw.exceptions.SipJsonMissingException;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
+import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.semantic.SAWSemanticUtils;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
@@ -49,9 +49,9 @@ public class SAWSemanticController {
   public SemanticNode addSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @RequestBody SemanticNode requestBody)
-      throws JSONMissingSAWException {
+      throws SipJsonMissingException {
     if (requestBody == null) {
-      throw new JSONMissingSAWException("json body is missing in request body");
+      throw new SipJsonMissingException("json body is missing in request body");
     }
     SAWSemanticUtils.checkMandatoryFields(requestBody);
     logger.trace("Request Body to create a semantic node:{}", requestBody);
@@ -64,8 +64,8 @@ public class SAWSemanticController {
       responseObjectFuture = semanticService.addSemantic(requestBody);
       logger.trace(
           "Semantic entity created : {}", objectMapper.writeValueAsString(responseObjectFuture));
-    } catch (CreateEntitySAWException | JsonProcessingException ex) {
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity");
+    } catch (SipCreateEntityException | JsonProcessingException ex) {
+      throw new SipCreateEntityException("Problem on the storage while creating an entity");
     }
     return responseObjectFuture;
   }
@@ -79,7 +79,7 @@ public class SAWSemanticController {
   public SemanticNode readSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @PathVariable(name = "Id", required = true) String Id)
-      throws JSONMissingSAWException {
+      throws SipJsonMissingException {
     logger.trace("Request Body to read a semantic node:{}", Id);
     SemanticNode responseObjectFuture = null;
     SemanticNode node = new SemanticNode();
@@ -91,8 +91,8 @@ public class SAWSemanticController {
       logger.trace(
           "Semantic retrieved successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
-    } catch (ReadEntitySAWException | JsonProcessingException ex) {
-      throw new ReadEntitySAWException("Problem on the storage while creating an entity", ex);
+    } catch (SipReadEntityException | JsonProcessingException ex) {
+      throw new SipReadEntityException("Problem on the storage while creating an entity", ex);
     }
     return responseObjectFuture;
   }
@@ -107,7 +107,7 @@ public class SAWSemanticController {
       @PathVariable(name = "projectId", required = true) String projectId,
       @PathVariable(name = "Id", required = true) String Id,
       @RequestBody SemanticNode requestBody)
-      throws JSONMissingSAWException {
+      throws SipJsonMissingException {
     logger.trace("Request Body to update a semantic node:{}", Id);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -118,8 +118,8 @@ public class SAWSemanticController {
       logger.trace(
           "Semantic updateded successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
-    } catch (UpdateEntitySAWException | JsonProcessingException ex) {
-      throw new UpdateEntitySAWException("Problem on the storage while creating an entity");
+    } catch (SipUpdateEntityException | JsonProcessingException ex) {
+      throw new SipUpdateEntityException("Problem on the storage while creating an entity");
     }
     return responseObjectFuture;
   }
@@ -133,7 +133,7 @@ public class SAWSemanticController {
   public SemanticNode deleteSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @PathVariable(name = "Id", required = true) String Id)
-      throws JSONMissingSAWException {
+      throws SipJsonMissingException {
     logger.trace("Request Body to delete a semantic node:{}", Id);
     SemanticNode responseObjectFuture = null;
     SemanticNode node = new SemanticNode();
@@ -145,8 +145,8 @@ public class SAWSemanticController {
       logger.trace(
           "Semantic deleted successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
-    } catch (DeleteEntitySAWException | JsonProcessingException ex) {
-      throw new DeleteEntitySAWException("Problem on the storage while creating an entity");
+    } catch (SipDeleteEntityException | JsonProcessingException ex) {
+      throw new SipDeleteEntityException("Problem on the storage while creating an entity");
     }
     return responseObjectFuture;
   }
@@ -161,7 +161,7 @@ public class SAWSemanticController {
       @PathVariable(name = "projectId", required = true) String projectId,
       @RequestParam Map<String, String> queryMap,
       @RequestHeader Map<String, String> headers)
-      throws JSONMissingSAWException {
+      throws SipJsonMissingException {
     SemanticNodes responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
@@ -171,10 +171,10 @@ public class SAWSemanticController {
       responseObjectFuture = semanticService.search(requestBody, headers);
       logger.trace(
           "Search Semantic Result : {}", objectMapper.writeValueAsString(responseObjectFuture));
-    } catch (ReadEntitySAWException | JsonProcessingException ex) {
-      throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
+    } catch (SipReadEntityException | JsonProcessingException ex) {
+      throw new SipReadEntityException("Problem on the storage while reading an entity", ex);
     } catch (IOException e) {
-      throw new ReadEntitySAWException("Problem on the storage while reading an entity", e);
+      throw new SipReadEntityException("Problem on the storage while reading an entity", e);
     }
     return responseObjectFuture;
   }
@@ -190,7 +190,7 @@ public class SAWSemanticController {
   @ResponseStatus(HttpStatus.OK)
   public BackCompatibleStructure searchSemanticWithOutArtifacts(
       @RequestParam Map<String, String> queryMap, @RequestHeader Map<String, String> headers)
-      throws JSONMissingSAWException {
+      throws SipJsonMissingException {
     BackCompatibleStructure responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
@@ -200,10 +200,10 @@ public class SAWSemanticController {
       responseObjectFuture = semanticService.list(requestBody, headers);
       logger.trace(
           "Search Semantic Result : {}", objectMapper.writeValueAsString(responseObjectFuture));
-    } catch (ReadEntitySAWException | JsonProcessingException ex) {
-      throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
+    } catch (SipReadEntityException | JsonProcessingException ex) {
+      throw new SipReadEntityException("Problem on the storage while reading an entity", ex);
     } catch (IOException e) {
-      throw new ReadEntitySAWException("Problem on the storage while reading an entity", e);
+      throw new SipReadEntityException("Problem on the storage while reading an entity", e);
     }
     return responseObjectFuture;
   }

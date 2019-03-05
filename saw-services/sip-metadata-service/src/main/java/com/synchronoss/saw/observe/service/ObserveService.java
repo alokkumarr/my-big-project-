@@ -1,10 +1,10 @@
 package com.synchronoss.saw.observe.service;
 
-import com.synchronoss.saw.exceptions.CreateEntitySAWException;
-import com.synchronoss.saw.exceptions.DeleteEntitySAWException;
-import com.synchronoss.saw.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.exceptions.UpdateEntitySAWException;
+import com.synchronoss.saw.exceptions.SipCreateEntityException;
+import com.synchronoss.saw.exceptions.SipDeleteEntityException;
+import com.synchronoss.saw.exceptions.SipJsonValidationException;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
+import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveResponse;
 
@@ -14,19 +14,19 @@ public interface ObserveService {
   String PortalDataSet = "PortalDataSet";
 
   ObserveResponse addDashboard(Observe node)
-      throws JSONValidationSAWException, CreateEntitySAWException;
+      throws SipJsonValidationException, SipCreateEntityException;
 
   ObserveResponse getDashboardbyCriteria(Observe node)
-      throws JSONValidationSAWException, ReadEntitySAWException;
+      throws SipJsonValidationException, SipReadEntityException;
 
   ObserveResponse updateDashboard(Observe node)
-      throws JSONValidationSAWException, UpdateEntitySAWException;
+      throws SipJsonValidationException, SipUpdateEntityException;
 
   ObserveResponse deleteDashboard(Observe node)
-      throws JSONValidationSAWException, DeleteEntitySAWException;
+      throws SipJsonValidationException, SipDeleteEntityException;
 
-  String generateId() throws JSONValidationSAWException;
+  String generateId() throws SipJsonValidationException;
 
   ObserveResponse getDashboardbyCategoryId(Observe node)
-      throws JSONValidationSAWException, ReadEntitySAWException;
+      throws SipJsonValidationException, SipReadEntityException;
 }
