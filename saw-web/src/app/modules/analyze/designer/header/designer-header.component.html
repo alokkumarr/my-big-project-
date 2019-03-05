@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <chart-type-chooser *ngIf="analysis.type === 'chart'"
+  <chart-type-chooser *ngIf="analysis?.type === 'chart'"
                       (change)="onChartTypeChange($event)"
                       [chartType]="analysis.chartType"
   >
@@ -30,11 +30,11 @@
 
   <div fxLayout="row"
        fxLayoutAlign="space-between center">
-    <mat-button-toggle-group *ngIf="analysis && analysis.type === 'report'"
+    <mat-button-toggle-group *ngIf="analysis?.type === 'report'"
                              (change)="requestAction.emit('modeToggle')"
                              [value]="isInQueryMode"
-                             [disabled]="analysis.edit">
-      <mat-button-toggle [value]="false" [disabled]="analysis.edit">
+                             [disabled]="analysis?.edit">
+      <mat-button-toggle [value]="false" [disabled]="analysis?.edit">
         <mat-icon fontIcon="icon-designer-mode"></mat-icon>
         <ng-container i18n>Designer</ng-container>
       </mat-button-toggle>
@@ -46,7 +46,7 @@
 
     <button mat-button
             e2e="refresh-data-btn"
-            *ngIf="analysis && (analysis.type === 'report' || analysis.type === 'esReport') && !isInQueryMode"
+            *ngIf="(analysis?.type === 'report' || analysis?.type === 'esReport') && !isInQueryMode"
             [disabled]="!areMinRequirmentsMet"
             [color]="designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA ? 'primary' : ''"
             (click)="requestAction.emit('refresh')">
