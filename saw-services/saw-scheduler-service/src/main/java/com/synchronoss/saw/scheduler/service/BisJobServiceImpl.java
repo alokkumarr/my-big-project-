@@ -314,13 +314,13 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
       logger.info("Trigger key:::" + triggeKey);
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
       CronTriggerImpl trigger = (CronTriggerImpl) scheduler.getTrigger(triggeKey);
-      if (trigger != null) {
-        
-        /* Below lines are added to avoid misfire during
-        * resume for a paused trigger. If any approach
-        * with api is found in future this can be replaced.
-        */
-        QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
+      
+      /* Below lines are added to avoid misfire during
+      * resume for a paused trigger. If any approach
+      * with api is found in future this can be replaced.
+      */
+      QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
+      if (cronTriggers != null) {
         cronTriggers.setNextFireTime(trigger.getFireTimeAfter(new Date()).getTime());
         this.quartzRepository.save(cronTriggers);
         
