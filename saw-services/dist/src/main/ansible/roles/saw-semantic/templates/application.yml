@@ -10,6 +10,7 @@ spring:
 logging:
   level:
     com.synchronoss.saw.semantic: INFO
+    sncr.bda.base: INFO
 server:
   servlet:
     context-path: ''

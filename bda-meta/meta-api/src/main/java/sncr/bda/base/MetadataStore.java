@@ -11,6 +11,7 @@ import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import com.mapr.db.exceptions.DBException;
 
 
 /**
@@ -37,17 +38,47 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
 
     protected Table table;
 
-    //TODO:: Replace altRoot with configuration reading
-    protected MetadataStore(String tableName, String altRoot) throws Exception {
-        super(altRoot);
-        metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
-        String fullTableName = metaRoot + Path.SEPARATOR + tableName;
-        logger.debug("Open table: " + fullTableName);
+    protected final int RETRIES = 3;
 
-        boolean exists = MapRDB.tableExists(fullTableName);
-        table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
-        table.setOption(Table.TableOption.BUFFERWRITE, false);
-    }
+    // TODO:: Replace altRoot with configuration reading
+     protected MetadataStore(String tableName, String altRoot) throws Exception {
+         super(altRoot);
+         metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
+         String fullTableName = metaRoot + Path.SEPARATOR + tableName;
+         logger.trace("Open table: " + fullTableName);
+         table = initTable(fullTableName, RETRIES);
+         table.setOption(Table.TableOption.BUFFERWRITE, false);
+     }
+
+
+     // This has been added to handle the use case
+     // while working on SIP-6061
+     private Table initTable(String tablePath, int RETRIES) {
+       Table tableDesc = null;
+       if (MapRDB.tableExists(tablePath)) {
+         tableDesc = MapRDB.getTable(tablePath);
+       } else {
+         try {
+           tableDesc = MapRDB.createTable(tablePath);
+         } catch (DBException ex) {
+           logger.trace("Table possibly already created by other instance :" + ex);
+           logger.trace("Table path :" + tablePath);
+           if (MapRDB.tableExists(tablePath)) {
+             tableDesc = MapRDB.getTable(tablePath);
+           } else {
+             logger.trace("Number of retries :" + RETRIES);
+             if (RETRIES > 0) {
+               initTable(tablePath, RETRIES - 1);
+             } else {
+               logger.trace("Number of retries has been exhausted:" + RETRIES);
+               throw new DBException(
+                   "Exception occured while creating table with the path :" + tablePath);
+             }
+           }
+         }
+       }
+       return tableDesc;
+     }
 
 
     protected void _save(String id, Document doc) throws Exception
