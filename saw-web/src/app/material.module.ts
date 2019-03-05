@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { NouisliderModule } from 'ng2-nouislider';
 import {
   MatButtonModule,
   MatRadioModule,
@@ -67,7 +66,6 @@ const MODULES = [
   MatToolbarModule,
   MatSlideToggleModule,
   MatDividerModule,
-  NouisliderModule,
   MatSnackBarModule,
   MatBadgeModule,
   MatTreeModule

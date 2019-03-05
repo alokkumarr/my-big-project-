@@ -1,8 +1,9 @@
-<nouislider [connect]="true"
+<dx-range-slider
   e2e="dashboard-global-filter-number-slider"
   [min]="defaults.min"
   [max]="defaults.max"
   [step]="step"
-  [(ngModel)]="value"
-  [config]="config"
-  (ngModelChange)="onSliderChange($event)"></nouislider>
+  [value]="value"
+  [tooltip]="sliderTooltip"
+  (valueChange)="onSliderChange($event)"
+></dx-range-slider>
