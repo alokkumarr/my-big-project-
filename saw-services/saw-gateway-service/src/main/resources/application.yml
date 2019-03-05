@@ -24,7 +24,6 @@ server:
     mime-types: text/html,text/css,application/javascript,application/json
 
 
-
 analysis:
     service:
         host: http://localhost:9300
@@ -141,5 +140,4 @@ api:
             method: DELETE
             path: '[/]ingestion/batch.*'
 
-            
             
