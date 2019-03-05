@@ -227,7 +227,7 @@
 					    The spring-boot-start-test dependency adds JUnit in the
 					    compile scope so exclude JUnit explicitly from packaging
 					-->
-					<excludeGroupIds>org.junit</excludeGroupIds>
+					<excludeGroupIds>junit</excludeGroupIds>
 				</configuration>
 			</plugin>
 			<plugin>
