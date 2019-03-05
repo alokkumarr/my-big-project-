@@ -191,6 +191,7 @@
 		<module>saw-batch-ingestion-service</module>
 		<module>saw-batch-plugin-interfaces</module>
 		<module>saw-batch-plugin-sftp</module>
+    <module>sip-common-components</module>
 		<module>dist</module>
 	</modules>
 </project>

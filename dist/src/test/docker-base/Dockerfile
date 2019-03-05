@@ -51,7 +51,7 @@ RUN sed -i -e 's/^#baseurl=/baseurl=/' /etc/yum.repos.d/epel.repo
 
 # Install system utilities
 RUN yum -y -q install man less file iproute lsof nc bind-utils \
-    smem sudo mlocate
+    smem sudo mlocate jq
 
 # Install log sender
 RUN yum -y -q install systemd-journal-gateway

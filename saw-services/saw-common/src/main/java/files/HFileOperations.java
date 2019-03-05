@@ -61,7 +61,9 @@ public class HFileOperations {
             }
 
         } catch (Exception e) {
-            throw new FileNotFoundException("File not found on the provided location :" + e);
+            FileNotFoundException fe = new FileNotFoundException("File not found on the provided location");
+            fe.initCause(e);
+            throw fe;
         }
         return stream;
     }
@@ -76,7 +78,9 @@ public class HFileOperations {
             FSDataOutputStream fout_stream = fs.create(path, true);
             return fout_stream.getWrappedStream();
         } catch (Exception e) {
-            throw new FileNotFoundException("File not found on the provided location :" + e);
+            FileNotFoundException fe = new FileNotFoundException("File not found on the provided location");
+            fe.initCause(e);
+            throw fe;
         }
     }
 
@@ -94,7 +98,9 @@ public class HFileOperations {
                 return fstat;
             }
         } catch (IOException e) {
-            throw new FileNotFoundException("Cannot get file status on provided locations:" + e);
+            FileNotFoundException fe = new FileNotFoundException("Cannot get file status on provided locations");
+            fe.initCause(e);
+            throw fe;
         }
     }
 
@@ -106,7 +112,9 @@ public class HFileOperations {
             fs = getFileSystem(path,conf);
             fs.delete(path, true);
         } catch (IOException e) {
-            throw new FileNotFoundException("Cannot get file status on provided locations:" + e);
+            FileNotFoundException fe = new FileNotFoundException("Cannot get file status on provided locations");
+            fe.initCause(e);
+            throw fe;
         }
     }
 

@@ -4,6 +4,7 @@ Description=SAW Workbench
 [Service]
 Type=notify
 ExecStart=/bin/sh -c "exec java -Xmx1G -Dloader.path=BOOT-INF/lib,$(sip-mapr-classpath) -jar /opt/bda/saw-workbench-service/saw-workbench.jar --spring.config.location=/opt/bda/saw-workbench-service/conf/application.yml"
+TimeoutStartSec=300
 SyslogIdentifier=saw-workbench
 User=mapr
 Restart=on-failure

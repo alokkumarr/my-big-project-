@@ -17,6 +17,12 @@ spring:
     testWhileIdle: true
     logValidationErrors: true
 flyway.baselineOnMigrate: true
+logging:
+  level:
+    com.synchronoss.saw.scheduler: INFO
+    org.springframework: INFO
+    org.hibernate.type : INFO
+
 server:
   address: localhost
   port: 9601
