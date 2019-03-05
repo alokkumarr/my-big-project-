@@ -15,53 +15,53 @@
       <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Channel Name : </span>
-          <span>{{routeData?.channelName}}</span>
+          <span e2e="channel-name-route-logs">{{routeData?.channelName}}</span>
         </div>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>File pattern : </span>
-          <span>{{routeData?.filePattern}}</span>
+          <span e2e="file-pattern-route-logs">{{routeData?.filePattern}}</span>
         </div>
       </div>
       <mat-divider></mat-divider>
       <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Modified by : </span>
-          <span>{{routeData?.modifiedBy || routeData?.mcreatedBy}}</span>
+          <span e2e="modifiedby-route-logs">{{routeData?.modifiedBy || routeData?.mcreatedBy}}</span>
         </div>
         <mat-divider [vertical]="true"></mat-divider>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Modified at : </span>
-          <span>{{routeData?.modifiedDate || routeData?.createdDate | date: 'short'}}</span>
+          <span e2e="modified-at-route-logs">{{routeData?.modifiedDate || routeData?.createdDate | date: 'short'}}</span>
         </div>
       </div>
       <mat-divider></mat-divider>
       <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Destination : </span>
-          <span>{{routeData?.destinationLocation}}</span>
+          <span e2e="destination-route-logs">{{routeData?.destinationLocation}}</span>
         </div>
         <mat-divider [vertical]="true"></mat-divider>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Source : </span>
-          <span>{{routeData?.sourceLocation}}</span>
+          <span e2e="source-loc-route-logs">{{routeData?.sourceLocation}}</span>
         </div>
       </div>
       <mat-divider></mat-divider>
       <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Last Fire Time : </span>
-          <span>{{lastFireTime > 0 ? (lastFireTime | date: 'short') : 'NA'}}</span>
+          <span e2e="last-fire-route-logs">{{lastFireTime > 0 ? (lastFireTime | date: 'short') : 'NA'}}</span>
         </div>
         <mat-divider [vertical]="true"></mat-divider>
         <div class="logs__route-details__cell" fxFlex="50" fxLayout="row">
           <span class="logs__route-details__cell__label" i18n>Next Fire Time : </span>
-          <span>{{nextFireTime > 0 ? (nextFireTime  | date: 'short') : 'NA'}}</span>
+          <span e2e="next-fire-route-logs">{{nextFireTime > 0 ? (nextFireTime  | date: 'short') : 'NA'}}</span>
         </div>
       </div>
     </div>
 
     <div>
-      <dx-data-grid #channelsGrid class="mat-elevation-z3"
+      <dx-data-grid e2e="route-logs-container"  #channelsGrid class="mat-elevation-z3"
                     height="300px" width="760px" [allowColumnResizing]="true" [columnMinWidth]="50"
                     [dataSource]="logs" [showBorders]="false" [columnAutoWidth]="true" [showColumnLines]="true"
                     [showColumnLines]="false" [showRowLines]="true" [rowAlternationEnabled]="false"
