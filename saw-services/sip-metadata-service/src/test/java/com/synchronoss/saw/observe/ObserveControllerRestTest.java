@@ -22,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,7 +31,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = ObserveController.class, secure = false)
-// @TestPropertySource(locations = "com/synchronoss/saw/observe/application-test.properties")
 public class ObserveControllerRestTest {
 
   private static final Logger logger = LoggerFactory.getLogger(ObserveControllerRestTest.class);

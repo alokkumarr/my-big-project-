@@ -32,7 +32,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = SipSemanticController.class, secure = false)
-@TestPropertySource(locations = "application-test.properties")
 public class SipSemanticControllerTest {
 
   private static final Logger logger = LoggerFactory.getLogger(SipSemanticControllerTest.class);
