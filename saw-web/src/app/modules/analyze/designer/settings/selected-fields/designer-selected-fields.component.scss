@@ -11,6 +11,19 @@
     width: 8px;
     height: 8px;
   }
+
+  &.string-type-chip-color {
+    background-color: $string-type-chip-color;
+  }
+  &.number-type-chip-color {
+    background-color: $number-type-chip-color;
+  }
+  &.geo-type-chip-color {
+    background-color: $geo-type-chip-color;
+  }
+  &.date-type-chip-color {
+    background-color: $date-type-chip-color;
+  }
 }
 
 .selected-fields__container {

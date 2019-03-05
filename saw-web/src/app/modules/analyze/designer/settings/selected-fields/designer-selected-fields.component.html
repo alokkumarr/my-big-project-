@@ -17,6 +17,7 @@
   >
     <mat-chip *ngFor="let col of adapter.artifactColumns"
               class="selected-fields__item"
+              [ngClass]="getFieldItemClass(col)"
               cdkDrag [cdkDragData]="col"
               [removable]="true" (removed)="removeFromGroup(col, adapter)"
     >

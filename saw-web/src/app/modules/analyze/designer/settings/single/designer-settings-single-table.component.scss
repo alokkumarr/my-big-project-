@@ -72,6 +72,19 @@
   overflow-x: hidden;
   overflow-y: auto;
 
+  .icon-string-type::before {
+    color: $string-type-color;
+  }
+  .icon-number-type::before {
+    color: $number-type-color;
+  }
+  .icon-geo-chart ::before{
+    color: $geo-type-color;
+  }
+  .icon-calendar::before {
+    color: $date-type-color;
+  }
+
   .settings__unselected-fields--empty {
     color: $primary-grey-g3;
     font-size: 26px;

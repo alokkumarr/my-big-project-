@@ -1,6 +1,6 @@
-<mat-drawer-container style="height: 100%;">
+<mat-drawer-container style="height: 100%;" [hasBackdrop]="false">
   <mat-drawer #drawer [mode]="optionsPanelMode"
-              hasBackdrop="false" position="end" [opened]="isOptionsPanelOpen"
+              position="end" [opened]="isOptionsPanelOpen"
               style="height: 100%;"
   >
     <designer-analysis-options class="designer__options"
@@ -35,12 +35,21 @@
         [artifacts]="artifacts"
         (change)="change.emit($event)"
       ></designer-settings-aux> -->
-      <designer-selected-fields (change)="change.emit($event)"
-                                [analysisType]="analysisType"
-                                [analysisSubtype]="analysisSubtype"
-                                [artifacts]="artifacts"
-      >
-      </designer-selected-fields>
+
+      <div>
+        <designer-selected-fields (change)="change.emit($event)"
+                                  [analysisType]="analysisType"
+                                  [analysisSubtype]="analysisSubtype"
+                                  [artifacts]="artifacts"
+                                  class="designer__selecte-fields__container"
+        >
+        </designer-selected-fields>
+        <div style="float: right;">
+          <button type="button" mat-icon-button (click)="drawer.toggle()">
+            <mat-icon fontIcon="icon-settings"></mat-icon>
+          </button>
+        </div>
+      </div>
 
       <filter-chips-u *ngIf="filters.length > 0"
                       class="designer__filters"
@@ -50,13 +59,7 @@
                       [artifacts]="artifacts">
       </filter-chips-u>
 
-      <div>
-        <button type="button" mat-button (click)="drawer.toggle()">
-          Toggle sidenav
-        </button>
-      </div>
-
-      <div [ngSwitch]="designerState" fxLayout="column">
+      <div [ngSwitch]="designerState" fxLayout="column" class="mat-elevation-z3">
 
         <div *ngSwitchCase="DesignerStates.NO_SELECTION"
               fxLayout="column"

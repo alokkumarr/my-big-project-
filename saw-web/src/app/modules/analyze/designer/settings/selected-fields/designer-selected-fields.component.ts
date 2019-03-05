@@ -9,6 +9,7 @@ import * as map from 'lodash/map';
 
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
+import { getArtifactColumnGeneralType } from '../../utils';
 import {
   IDEsignerSettingGroupAdapter,
   Artifact,
@@ -144,5 +145,19 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       this._acceptEventStream$.next(canAccept);
       return canAccept;
     };
+  }
+
+  getFieldItemClass(col) {
+    const type = getArtifactColumnGeneralType(col);
+    switch (type) {
+      case 'string':
+        return 'string-type-chip-color';
+      case 'number':
+        return 'number-type-chip-color';
+      case 'geo':
+        return 'geo-type-chip-color';
+      case 'date':
+        return 'calendar-type-chip-color';
+    }
   }
 }

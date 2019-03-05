@@ -20,6 +20,10 @@
 }
 
 .designer {
+  &__selecte-fields__container {
+    display: inline-block;
+    width: calc(100% - 40px);
+  }
   &__data-settings {
     grid-area: data-fields;
     border-right: 1px solid $primary-grey-g1;
