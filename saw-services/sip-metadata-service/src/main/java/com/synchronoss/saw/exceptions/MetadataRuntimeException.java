@@ -2,7 +2,6 @@ package com.synchronoss.saw.exceptions;
 
 public class MetadataRuntimeException extends RuntimeException {
 
-  /** */
   private static final long serialVersionUID = 1L;
 
   /**

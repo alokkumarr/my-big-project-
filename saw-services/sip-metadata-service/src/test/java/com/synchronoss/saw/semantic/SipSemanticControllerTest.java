@@ -3,7 +3,7 @@ package com.synchronoss.saw.semantic;
 import static org.junit.Assert.assertEquals;
 
 import com.synchronoss.saw.MetadataTestUtils;
-import com.synchronoss.saw.semantic.controller.SAWSemanticController;
+import com.synchronoss.saw.semantic.controller.SipSemanticController;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import com.synchronoss.saw.semantic.service.SemanticServiceImpl;
@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = SAWSemanticController.class, secure = false)
+@WebMvcTest(value = SipSemanticController.class, secure = false)
 @TestPropertySource(locations = "application-test.properties")
 public class SipSemanticControllerTest {
 
@@ -39,16 +39,16 @@ public class SipSemanticControllerTest {
   @Autowired private MockMvc mockMvc;
 
   @MockBean private SemanticServiceImpl semanticService;
-  private String requestCreatedSemanticJSON =
+  private String requestCreatedSemanticJson =
       MetadataTestUtils.getJsonString("com/synchronoss/saw/semantic/RequestSemantic.json");
 
-  private String responseCreatedSemanticJSON =
+  private String responseCreatedSemanticJson =
       MetadataTestUtils.getJsonString("com/synchronoss/saw/semantic/ResponseSemantic.json");
 
-  private SemanticNode responseCreatedObjectSemantic = getSemantic(responseCreatedSemanticJSON);
+  private SemanticNode responseCreatedObjectSemantic = getSemantic(responseCreatedSemanticJson);
 
-  private String responseReadSemanticJSON = requestCreatedSemanticJSON;
-  private SemanticNode responseReadObjectSemantic = getSemantic(responseReadSemanticJSON);
+  private String responseReadSemanticJson = requestCreatedSemanticJson;
+  private SemanticNode responseReadObjectSemantic = getSemantic(responseReadSemanticJson);
 
   @Test
   public void createSemanticTestCase() throws Exception {
@@ -57,7 +57,7 @@ public class SipSemanticControllerTest {
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.post("/internal/semantic/workbench/create")
             .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
-            .content(requestCreatedSemanticJSON)
+            .content(requestCreatedSemanticJson)
             .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .header(HttpHeaders.LOCATION, "http://localhost/internal/semantic/workbench/create");
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
@@ -71,7 +71,8 @@ public class SipSemanticControllerTest {
         .thenReturn(responseReadObjectSemantic);
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(
-                "/internal/semantic/workbench/372962f4-7236-4a94-9a77-282a119ee8b3::semanticDataSet::1526491639558")
+                "/internal/semantic/workbench/372962f4-7236-4a94-9a77-282a119ee8b3"
+                    + "::semanticDataSet::1526491639558")
             .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .header(HttpHeaders.LOCATION, "http://localhost/internal/semantic/workbench/create");
@@ -84,7 +85,8 @@ public class SipSemanticControllerTest {
   public void filterSemanticTestCase() throws Exception {
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(
-                "/internal/semantic/workbench/filter?username=sawadmin@synchronoss.com&module=ANALYZE")
+                "/internal/semantic/workbench/filter"
+                    + "?username=sawadmin@synchronoss.com&module=ANALYZE")
             .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .header(
@@ -95,17 +97,29 @@ public class SipSemanticControllerTest {
     assertEquals(HttpStatus.OK.value(), response.getStatus());
   }
 
-  public SemanticNode getSemantic(String semanticJSONString) {
+  /**
+   * Get Semantic Node Object.
+   *
+   * @param semanticJsonString SemanticNode string.
+   * @return SemanticNode
+   */
+  public SemanticNode getSemantic(String semanticJsonString) {
     SemanticNode mockObserve = null;
     try {
-      mockObserve = new ObjectMapper().readValue(semanticJSONString, SemanticNode.class);
+      mockObserve = new ObjectMapper().readValue(semanticJsonString, SemanticNode.class);
     } catch (IOException e) {
       logger.error(e.getCause().toString());
     }
     return mockObserve;
   }
 
-  public SemanticNodes getSemanticList(String semanticJSONString) {
+  /**
+   * getSemanticList.
+   *
+   * @param semanticJsonString SemanticNode string.
+   * @return
+   */
+  public SemanticNodes getSemanticList(String semanticJsonString) {
     SemanticNodes nodes = new SemanticNodes();
     ArrayList<SemanticNode> responseFilterObjectSemanticList =
         new ArrayList<SemanticNode>(Arrays.asList(responseReadObjectSemantic));

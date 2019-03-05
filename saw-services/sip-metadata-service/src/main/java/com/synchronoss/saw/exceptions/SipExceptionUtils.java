@@ -24,6 +24,13 @@ public abstract class SipExceptionUtils {
     }
   }
 
+  /**
+   * nullSafeEquals.
+   *
+   * @param o1 Object 1
+   * @param o2 Object 2
+   * @return boolean
+   */
   public static boolean nullSafeEquals(Object o1, Object o2) {
     if (o1 == o2) {
       return true;

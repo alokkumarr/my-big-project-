@@ -2,7 +2,6 @@ package com.synchronoss.saw.exceptions;
 
 public class SipReadEntityException extends MetadataRuntimeException {
 
-  /** */
   private static final long serialVersionUID = 1L;
 
   public SipReadEntityException(String msg) {

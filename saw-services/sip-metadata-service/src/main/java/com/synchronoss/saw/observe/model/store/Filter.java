@@ -135,6 +135,12 @@ public class Filter {
       this.value = value;
     }
 
+    /**
+     * Filter Condition.
+     *
+     * @param value fetch from Filter Condition
+     * @return Filter Condition
+     */
     @JsonCreator
     public static Filter.Condition fromValue(String value) {
       Filter.Condition constant = CONSTANTS.get(value);

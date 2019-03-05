@@ -23,36 +23,47 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
 
-    @Bean
-    public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
-        MappingJackson2HttpMessageConverter jackson = new MappingJackson2HttpMessageConverter();
-        ObjectMapper om = jackson.getObjectMapper();
-        JsonSerializer<?> streamSer = new StdSerializer<Stream<?>>(Stream.class, true) {
-            private static final long serialVersionUID = 1L;
+  /**
+   * jackson to Http Message Converter.
+   *
+   * @return MappingJackson2HttpMessageConverter Mapping Jackson to Http Message Converter
+   */
+  @Bean
+  public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
+    MappingJackson2HttpMessageConverter jackson = new MappingJackson2HttpMessageConverter();
+    ObjectMapper om = jackson.getObjectMapper();
+    JsonSerializer<?> streamSer =
+        new StdSerializer<Stream<?>>(Stream.class, true) {
+          private static final long serialVersionUID = 1L;
 
-            @Override
-            public void serialize(Stream<?> stream, JsonGenerator jgen, SerializerProvider provider)
-                throws IOException, JsonGenerationException {
-                provider.findValueSerializer(Iterator.class, null)
-                    .serialize(stream.iterator(), jgen, provider);
-            }
+          @Override
+          public void serialize(Stream<?> stream, JsonGenerator jgen, SerializerProvider provider)
+              throws IOException, JsonGenerationException {
+            provider
+                .findValueSerializer(Iterator.class, null)
+                .serialize(stream.iterator(), jgen, provider);
+          }
         };
-        om.registerModule(new SimpleModule("Streams API").addSerializer(streamSer));
-        jackson.setObjectMapper(om);
-        return jackson;
-    }
+    om.registerModule(new SimpleModule("Streams API").addSerializer(streamSer));
+    jackson.setObjectMapper(om);
+    return jackson;
+  }
 
-    @Override
-    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(jackson2HttpMessageConverter());
-        StringHttpMessageConverter converter = new StringHttpMessageConverter();
-        converter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
-        /*
-         * Workaround: Configure message converter for "text/plain" as required for
-         * Spring Boot Actuator Prometheus or "/actuator/prometheus" will respond with
-         * HTTP 406
-         */
-        converters.add(converter);
-    }
-
+  /**
+   * configure Message Converters.
+   *
+   * @param converters Http Message Converter
+   */
+  @Override
+  protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    converters.add(jackson2HttpMessageConverter());
+    StringHttpMessageConverter converter = new StringHttpMessageConverter();
+    converter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
+    /*
+     * Workaround: Configure message converter for "text/plain" as required for
+     * Spring Boot Actuator Prometheus or "/actuator/prometheus" will respond with
+     * HTTP 406
+     */
+    converters.add(converter);
+  }
 }

@@ -218,6 +218,12 @@ public class MetaDataStoreStructure {
       this.value = value;
     }
 
+    /**
+     * Fetch from value.
+     *
+     * @param value to fetch MetaDataStoreStructure action
+     * @return MetaDataStoreStructure.Action MetaDataStoreStructure action
+     */
     @JsonCreator
     public static MetaDataStoreStructure.Action fromValue(String value) {
       MetaDataStoreStructure.Action constant = CONSTANTS.get(value);
@@ -260,6 +266,12 @@ public class MetaDataStoreStructure {
       this.value = value;
     }
 
+    /**
+     * Fetch from Category value.
+     *
+     * @param value to fetch MetaDataStoreStructure Category
+     * @return MetaDataStoreStructure.Category MetaDataStoreStructure Category
+     */
     @JsonCreator
     public static MetaDataStoreStructure.Category fromValue(String value) {
       MetaDataStoreStructure.Category constant = CONSTANTS.get(value);

@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The Esrepository Schema
+ * The Esrepository Schema.
  *
- * <p>
+ * <p>EsRepository
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({})

@@ -39,14 +39,14 @@ public class SemanticNode {
   private List<String> parentDataSetIds;
 
   /**
-   * The Customercode Schema
+   * The Customercode Schema.
    *
    * <p>(Required)
    */
   @JsonProperty("customerCode")
   private String customerCode;
   /**
-   * The Projectcode Schema
+   * The Projectcode Schema.
    *
    * <p>(Required)
    */
@@ -66,28 +66,28 @@ public class SemanticNode {
   private Boolean saved = false;
 
   /**
-   * The Username Schema
+   * The Username Schema.
    *
    * <p>(Required)
    */
   @JsonProperty("username")
   private String username;
   /**
-   * The Datasecuritykey Schema
+   * The Datasecuritykey Schema.
    *
    * <p>
    */
   @JsonProperty("dataSecurityKey")
   private String dataSecurityKey;
   /**
-   * The Module Schema
+   * The Module Schema.
    *
    * <p>(Required)
    */
   @JsonProperty("module")
   private SemanticNode.Module module = null;
   /**
-   * The Metricname Schema
+   * The Metricname Schema.
    *
    * <p>(Required)
    */
@@ -100,14 +100,14 @@ public class SemanticNode {
   @JsonProperty("artifacts")
   private List<Object> artifacts = null;
   /**
-   * The Esrepository Schema
+   * The Esrepository Schema.
    *
    * <p>(Required)
    */
   @JsonProperty("esRepository")
   private Object esRepository;
   /**
-   * The Repository Schema
+   * The Repository Schema.
    *
    * <p>(Required)
    */
@@ -157,7 +157,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Customercode Schema
+   * The Customercode Schema.
    *
    * <p>(Required)
    */
@@ -167,7 +167,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Customercode Schema
+   * The Customercode Schema.
    *
    * <p>(Required)
    */
@@ -197,7 +197,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Projectcode Schema
+   * The Projectcode Schema.
    *
    * <p>(Required)
    */
@@ -207,7 +207,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Projectcode Schema
+   * The Projectcode Schema.
    *
    * <p>(Required)
    */
@@ -229,7 +229,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Username Schema
+   * The Username Schema.
    *
    * <p>(Required)
    */
@@ -239,7 +239,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Username Schema
+   * The Username Schema.
    *
    * <p>(Required)
    */
@@ -249,7 +249,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Datasecuritykey Schema
+   * The Datasecuritykey Schema.
    *
    * <p>
    */
@@ -259,7 +259,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Datasecuritykey Schema
+   * The Datasecuritykey Schema.
    *
    * <p>
    */
@@ -269,7 +269,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Module Schema
+   * The Module Schema.
    *
    * <p>(Required)
    */
@@ -279,7 +279,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Module Schema
+   * The Module Schema.
    *
    * <p>(Required)
    */
@@ -289,7 +289,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Metricname Schema
+   * The Metricname Schema.
    *
    * <p>(Required)
    */
@@ -299,7 +299,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Metricname Schema
+   * The Metricname Schema.
    *
    * <p>(Required)
    */
@@ -333,7 +333,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Esrepository Schema
+   * The Esrepository Schema.
    *
    * <p>(Required)
    */
@@ -343,7 +343,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Esrepository Schema
+   * The Esrepository Schema.
    *
    * <p>(Required)
    */
@@ -353,7 +353,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Repository Schema
+   * The Repository Schema.
    *
    * <p>(Required)
    */
@@ -363,7 +363,7 @@ public class SemanticNode {
   }
 
   /**
-   * The Repository Schema
+   * The Repository Schema.
    *
    * <p>(Required)
    */

@@ -36,11 +36,17 @@ import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 import sncr.bda.store.generic.schema.Query;
 
 @Component
-public class SAWSemanticUtils {
+public class SipSemanticUtils {
 
   public static final String COMMA = ",";
   public static final String PATH_SEARCH = "action.content.";
 
+  /**
+   * collectHeaders.
+   *
+   * @param flatJson Json Object.
+   * @return Set
+   */
   private static Set<String> collectHeaders(List<Map<String, Object>> flatJson) {
     Set<String> headers = new LinkedHashSet<String>();
     for (Map<String, Object> map : flatJson) {
@@ -49,6 +55,11 @@ public class SAWSemanticUtils {
     return headers;
   }
 
+  /**
+   * check SemanticNode MandatoryFields.
+   *
+   * @param node SemanticNode
+   */
   public static void checkMandatoryFields(SemanticNode node) {
     Preconditions.checkArgument(node != null, "Request body is empty");
     Preconditions.checkArgument(node.getUsername() != null, "username cannot be null");
@@ -61,15 +72,26 @@ public class SAWSemanticUtils {
         "Parent DataSetsId cannot be null");
   }
 
-  public static List<MetaDataStoreStructure> node2JSONObject(
-      SemanticNode node, String basePath, String Id, Action action, Category category)
+  /**
+   * node2Jsonobject.
+   *
+   * @param node SemanticNode
+   * @param basePath basePath
+   * @param id Object Id
+   * @param action SemanticNode action
+   * @param category category id
+   * @return List MetaDataStoreStructure
+   * @throws JsonProcessingException when Json parse error.
+   */
+  public static List<MetaDataStoreStructure> node2Jsonobject(
+      SemanticNode node, String basePath, String id, Action action, Category category)
       throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
     if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (node.get_id() != null || Id != null) {
-      metaDataStoreStructure.setId(Id);
+    if (node.get_id() != null || id != null) {
+      metaDataStoreStructure.setId(id);
     }
     metaDataStoreStructure.setAction(action);
     metaDataStoreStructure.setCategory(category);
@@ -79,17 +101,28 @@ public class SAWSemanticUtils {
     return listOfMetadata;
   }
 
+  /**
+   * SemanticNode to JsonString.
+   *
+   * @param node SemanticNode
+   * @param basePath basePath
+   * @param id Object Id
+   * @param action SemanticNode action
+   * @param category category id
+   * @param query SemanticNode query
+   * @return String SemanticNode as JsonString.
+   * @throws JsonProcessingException when json parse error
+   */
   public static String node2JsonString(
-      SemanticNode node, String basePath, String Id, Action action, Category category, Query query)
+      SemanticNode node, String basePath, String id, Action action, Category category, Query query)
       throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
 
     if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id != null) {
-      metaDataStoreStructure.setId(Id);
+    if (id != null) {
+      metaDataStoreStructure.setId(id);
     }
     if (query != null) {
       metaDataStoreStructure.setQuery(query);
@@ -99,10 +132,18 @@ public class SAWSemanticUtils {
     metaDataStoreStructure.setXdfRoot(basePath);
     List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
     listOfMetadata.add(metaDataStoreStructure);
-
+    ObjectMapper objectMapper = new ObjectMapper();
     return objectMapper.writeValueAsString(listOfMetadata);
   }
 
+  /**
+   * Get Separated Columns.
+   *
+   * @param headers headers
+   * @param map map
+   * @param separator separator
+   * @return String
+   */
   private static String getSeperatedColumns(
       Set<String> headers, Map<String, Object> map, String separator) {
     List<Object> items = new ArrayList<Object>();
@@ -114,6 +155,13 @@ public class SAWSemanticUtils {
     return StringUtils.join(items.toArray(), separator);
   }
 
+  /**
+   * Get TabularFormat.
+   *
+   * @param flatJson flatJson
+   * @param separator separator
+   * @return List CSV data
+   */
   public static List<Object> getTabularFormat(
       List<Map<String, Object>> flatJson, String separator) {
     List<Object> data = new ArrayList<>();
@@ -127,6 +175,12 @@ public class SAWSemanticUtils {
     return data;
   }
 
+  /**
+   * collect Ordered Headers.
+   *
+   * @param flatJson Json
+   * @return Set List of ordered header.
+   */
   public static Set<String> collectOrderedHeaders(List<Map<String, Object>> flatJson) {
     Set<String> headers = new TreeSet<String>();
     for (Map<String, Object> map : flatJson) {
@@ -135,6 +189,13 @@ public class SAWSemanticUtils {
     return headers;
   }
 
+  /**
+   * copy File Using File Channels.
+   *
+   * @param source source file
+   * @param dest destination file
+   * @throws IOException when file not found error
+   */
   public static void copyFileUsingFileChannels(File source, File dest) throws IOException {
     FileChannel inputChannel = null;
     FileChannel outputChannel = null;
@@ -154,14 +215,23 @@ public class SAWSemanticUtils {
     }
   }
 
-  public static Map<String, Object> removeJSONNode(Object jsonString, String attributedToBeRemoved)
+  /**
+   * removeJSONNode.
+   *
+   * @param jsonString json String
+   * @param attributedToBeRemoved attributed To Be Removed
+   * @return Map jsonNode
+   * @throws JsonProcessingException when Json processing exception.
+   * @throws IOException when Json failed to read.
+   */
+  public static Map<String, Object> removeJsonNode(Object jsonString, String attributedToBeRemoved)
       throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode node = objectMapper.readTree(objectMapper.writeValueAsString(jsonString));
     ObjectNode rootNode = (ObjectNode) node;
-    Map<String, Object> results = new HashMap<String, Object>();
+    Map<String, Object> results = new HashMap<>();
     Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
     while (fields.hasNext()) {
       Map.Entry<String, JsonNode> next = fields.next();
@@ -172,6 +242,13 @@ public class SAWSemanticUtils {
     return results;
   }
 
+  /**
+   * Run Semantic.
+   *
+   * @param args args
+   * @throws JsonProcessingException when json parse error.
+   * @throws IOException when Json Input error.
+   */
   public static void main(String[] args) throws JsonProcessingException, IOException {
     String json = "{\"name\":\"normal.csv\",\"size\":254743,\"d\":false,\"cat\":\"root\"}";
     ObjectMapper objectMapper = new ObjectMapper();
@@ -183,9 +260,25 @@ public class SAWSemanticUtils {
     System.out.println("data.csv".substring("data.csv".indexOf('.'), "data.csv".length()));
     System.out.println(FilenameUtils.getFullPathNoEndSeparator("/apps/sncr"));
     String row1 =
-        "{\"_id\":\"xda-ux-sr-comp-dev::TRTEST_JEXLREF_SS\",\"system\":{\"user\":\"A_user\",\"project\":\"xda-ux-sr-comp-dev\",\"type\":\"fs\",\"format\":\"parquet\",\"name\":\"TRTEST_JEXLREF_SS\",\"physicalLocation\":\"data\",\"catalog\":\"dout\",\"numberOfFiles\":\"1\"},\"userData\":{\"createdBy\":\"S.Ryabov\",\"category\":\"subcat1\",\"description\":\"Transformer component test case: transformed records\"},\"transformations\":[],\"asOutput\":\"xda-ux-sr-comp-dev::transformer::165407713\",\"asOfNow\":{\"status\":\"SUCCESS\",\"started\":\"20180209-195737\",\"finished\":\"20180209-195822\",\"aleId\":\"xda-ux-sr-comp-dev::1518206302595\",\"batchId\":\"BJEXLREFSS\"}}";
+        "{\"_id\":\"xda-ux-sr-comp-dev::TRTEST_JEXLREF_SS\",\"system\":{\"user\":\"A_user\","
+            + "\"project\":\"xda-ux-sr-comp-dev\",\"type\":\"fs\",\"format\":\"parquet\",\"name\":"
+            + "\"TRTEST_JEXLREF_SS\",\"physicalLocation\":\"data\",\"catalog\":\"dout\","
+            + "\"numberOfFiles\":\"1\"},\"userData\":{\"createdBy\":\"S.Ryabov\",\"category\":"
+            + "\"subcat1\",\"description\":\"Transformer component test case: transformed records\""
+            + "},\"transformations\":[],\"asOutput\":\"xda-ux-sr-comp-dev::transformer::165407713\""
+            + ",\"asOfNow\":{\"status\":\"SUCCESS\",\"started\":\"20180209-195737\",\"finished\":"
+            + "\"20180209-195822\",\"aleId\":\"xda-ux-sr-comp-dev::1518206302595\",\"batchId\":"
+            + "\"BJEXLREFSS\"}}";
     String row2 =
-        "{\"_id\":\"xda-ux-sr-comp-dev::tc220_1\",\"system\":{\"user\":\"A_user\",\"project\":\"xda-ux-sr-comp-dev\",\"type\":\"fs\",\"format\":\"parquet\",\"name\":\"tc220_1\",\"physicalLocation\":\"hdfs:///data/bda/xda-ux-sr-comp-dev/dl/fs/dout/tc220_1/data\",\"catalog\":\"dout\",\"numberOfFiles\":\"2\"},\"userData\":{\"createdBy\":\"S.Ryabov\",\"category\":\"subcat1\",\"description\":\"SQL component test case\"},\"transformations\":[{\"asOutput\":\"xda-ux-sr-comp-dev::sql::1192296717\"}],\"asOutput\":\"xda-ux-sr-comp-dev::sql::522761969\",\"asOfNow\":{\"status\":\"SUCCESS\",\"started\":\"20180223-220236\",\"finished\":\"20180223-220316\",\"aleId\":\"xda-ux-sr-comp-dev::1519423396639\",\"batchId\":\"BSQL10PM\"}}";
+        "{\"_id\":\"xda-ux-sr-comp-dev::tc220_1\",\"system\":{\"user\":\"A_user\",\"project\":"
+            + "\"xda-ux-sr-comp-dev\",\"type\":\"fs\",\"format\":\"parquet\",\"name\":\"tc220_1\","
+            + "\"physicalLocation\":\"hdfs:///data/bda/xda-ux-sr-comp-dev/dl/fs/dout/tc220_1/data"
+            + "\",\"catalog\":\"dout\",\"numberOfFiles\":\"2\"},\"userData\":{\"createdBy\":"
+            + "\"S.Ryabov\",\"category\":\"subcat1\",\"description\":\"SQL component test case\"},"
+            + "\"transformations\":[{\"asOutput\":\"xda-ux-sr-comp-dev::sql::1192296717\"}],"
+            + "\"asOutput\":\"xda-ux-sr-comp-dev::sql::522761969\",\"asOfNow\":{\"status\":"
+            + "\"SUCCESS\",\"started\":\"20180223-220236\",\"finished\":\"20180223-220316\","
+            + "\"aleId\":\"xda-ux-sr-comp-dev::1519423396639\",\"batchId\":\"BSQL10PM\"}}";
     List<DataSet> sets = new ArrayList<>();
     sets.add(objectMapper.readValue(row1, DataSet.class));
     sets.add(objectMapper.readValue(row2, DataSet.class));
@@ -206,12 +299,24 @@ public class SAWSemanticUtils {
     System.out.println(DataSetProperties.UserData.toString());
   }
 
+  /**
+   * getMapper.
+   *
+   * @return ObjectMapper
+   */
   public ObjectMapper getMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false);
     return objectMapper;
   }
 
+  /**
+   * createOkResponse.
+   *
+   * @param body body
+   * @param <T> type
+   * @return ResponseEntity ResponseEntity
+   */
   public <T> ResponseEntity<T> createOkResponse(T body) {
     return createResponse(body, HttpStatus.OK);
   }
@@ -226,10 +331,23 @@ public class SAWSemanticUtils {
     return response;
   }
 
+  /**
+   * createResponse.
+   * @param body body
+   * @param httpStatus HttpStatus
+   * @param <T> type
+   * @return ResponseEntity ResponseEntity
+   */
   public <T> ResponseEntity<T> createResponse(T body, HttpStatus httpStatus) {
     return new ResponseEntity<>(body, httpStatus);
   }
 
+  /**
+   * Get Class Path Resources.
+   *
+   * @param filename filename
+   * @return Resource file name.
+   */
   public Resource getClassPathResources(String filename) {
     return new ClassPathResource(filename);
   }

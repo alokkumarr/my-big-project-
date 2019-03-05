@@ -13,7 +13,7 @@ import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
-import com.synchronoss.saw.semantic.SAWSemanticUtils;
+import com.synchronoss.saw.semantic.SipSemanticUtils;
 import com.synchronoss.saw.semantic.model.DataSemanticObjects;
 import com.synchronoss.saw.semantic.model.MetaDataObjects;
 import com.synchronoss.saw.semantic.model.request.BinarySemanticNode;
@@ -249,7 +249,7 @@ public class MigrationService {
   }
 
   /**
-   * This will generate query for the dataObject to get the dlLocation
+   * This will generate query for the dataObject to get the dlLocation.
    *
    * @return String.
    */
@@ -320,7 +320,7 @@ public class MigrationService {
   }
 
   /**
-   * This will generate query for semanticNode
+   * This will generate query for semanticNode.
    *
    * @return String
    */
@@ -337,7 +337,7 @@ public class MigrationService {
     ObjectMapper mapper = new ObjectMapper();
     try {
       List<MetaDataStoreStructure> structure =
-          SAWSemanticUtils.node2JSONObject(
+          SipSemanticUtils.node2Jsonobject(
               node, basePath, node.get_id(), Action.create, Category.Semantic);
       logger.trace(
           "addSemantic : Before invoking request to MaprDB JSON store :{}",
@@ -361,7 +361,7 @@ public class MigrationService {
     ObjectMapper mapper = new ObjectMapper();
     try {
       List<MetaDataStoreStructure> structure =
-          SAWSemanticUtils.node2JSONObject(
+          SipSemanticUtils.node2Jsonobject(
               node, basePath, node.get_id(), Action.read, Category.Semantic);
       logger.trace(
           "readSemantic : Before invoking request to MaprDB JSON store :{}",
@@ -381,6 +381,14 @@ public class MigrationService {
     return exists;
   }
 
+  /**
+   * deleteSemantic.
+   *
+   * @param node node
+   * @param basePath basePath
+   * @throws SipJsonValidationException when SipJsonValidationException
+   * @throws SipDeleteEntityException when SipDeleteEntityException
+   */
   public void deleteSemantic(SemanticNode node, String basePath)
       throws SipJsonValidationException, SipDeleteEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
@@ -388,7 +396,7 @@ public class MigrationService {
     SemanticNode responseObject = new SemanticNode();
     try {
       List<MetaDataStoreStructure> structure =
-          SAWSemanticUtils.node2JSONObject(
+          SipSemanticUtils.node2Jsonobject(
               node, basePath, node.get_id(), Action.delete, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);

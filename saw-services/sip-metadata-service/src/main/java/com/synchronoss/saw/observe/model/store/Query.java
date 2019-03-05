@@ -89,6 +89,12 @@ public class Query {
       this.value = value;
     }
 
+    /**
+     * Query Conjunction.
+     *
+     * @param value fetch from Query Conjunction
+     * @return Query.Conjunction
+     */
     @JsonCreator
     public static Query.Conjunction fromValue(String value) {
       Query.Conjunction constant = CONSTANTS.get(value);

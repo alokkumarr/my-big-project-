@@ -13,19 +13,19 @@ import java.util.Map;
 @JsonPropertyOrder({"observe"})
 public class ObserveNode {
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("observe")
   private Observe observe;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("observe")
   public Observe getObserve() {
     return observe;
   }
 
-  /** (Required) */
+  /** (Required). */
   @JsonProperty("observe")
   public void setObserve(Observe observe) {
     this.observe = observe;

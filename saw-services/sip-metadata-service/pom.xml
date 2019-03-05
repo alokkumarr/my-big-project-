@@ -188,6 +188,8 @@
               <violationSeverity>warning</violationSeverity>
               <!-- Exclude files that were added before Checkstyle was enabled.  Gradually
                 make also these files conform to checkstyle rules and remove the exclusions -->
+              <excludes>**/observe/model/Observe.java,**/semantic/model/request/SemanticNode.java
+                ,**/semantic/model/request/BinarySemanticNode.java</excludes>
             </configuration>
             <goals>
               <goal>check</goal>

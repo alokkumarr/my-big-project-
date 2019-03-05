@@ -14,16 +14,12 @@ import java.util.Map;
 public class NodeCategory {
 
   /**
-   * The Node Category Schema
-   *
-   * <p>
+   * The Node Category Schema.
    */
   @JsonProperty("node-category")
   private String nodeCategory = "SemanticNode";
   /**
-   * The Projectcode Schema
-   *
-   * <p>
+   * The Projectcode Schema.
    */
   @JsonProperty("action")
   private Action action;
@@ -31,9 +27,7 @@ public class NodeCategory {
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<>();
 
   /**
-   * The Node Category Schema
-   *
-   * <p>
+   * The Node Category Schema.
    */
   @JsonProperty("node-category")
   public String getNodeCategory() {
@@ -41,9 +35,7 @@ public class NodeCategory {
   }
 
   /**
-   * The Node Category Schema
-   *
-   * <p>
+   * The Node Category Schema.
    */
   @JsonProperty("node-category")
   public void setNodeCategory(String nodeCategory) {
@@ -51,9 +43,7 @@ public class NodeCategory {
   }
 
   /**
-   * The Projectcode Schema
-   *
-   * <p>
+   * The Projectcode Schema.
    */
   @JsonProperty("action")
   public Action getAction() {

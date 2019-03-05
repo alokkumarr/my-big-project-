@@ -15,58 +15,34 @@ import java.util.Map;
 @JsonPropertyOrder({"verb", "content"})
 public class Action {
 
-  /**
-   * The Node Category Schema.
-   *
-   * <p>
-   */
+  /** The Node Category Schema. */
   @JsonProperty("verb")
   private Action.Verb verb = Action.Verb.fromValue("create");
-  /**
-   * The content
-   *
-   * <p>
-   */
+  /** The content. */
   @JsonProperty("content")
   private Object content;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-  /**
-   * The Node Category Schema.
-   *
-   * <p>
-   */
+  /** The Node Category Schema. */
   @JsonProperty("verb")
   public Action.Verb getVerb() {
     return verb;
   }
 
-  /**
-   * The Node Category Schema.
-   *
-   * <p>
-   */
+  /** The Node Category Schema. */
   @JsonProperty("verb")
   public void setVerb(Action.Verb verb) {
     this.verb = verb;
   }
 
-  /**
-   * The content.
-   *
-   * <p>
-   */
+  /** The content. */
   @JsonProperty("content")
   public Object getContent() {
     return content;
   }
 
-  /**
-   * The content.
-   *
-   * <p>
-   */
+  /** The content. */
   @JsonProperty("content")
   public void setContent(Object content) {
     this.content = content;
@@ -101,6 +77,12 @@ public class Action {
       this.value = value;
     }
 
+    /**
+     * Fetch from Action Verb.
+     *
+     * @param value Verb
+     * @return Action Verb
+     */
     @JsonCreator
     public static Action.Verb fromValue(String value) {
       Action.Verb constant = CONSTANTS.get(value);

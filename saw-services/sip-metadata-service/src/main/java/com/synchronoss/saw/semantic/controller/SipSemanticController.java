@@ -7,7 +7,7 @@ import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonMissingException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
-import com.synchronoss.saw.semantic.SAWSemanticUtils;
+import com.synchronoss.saw.semantic.SipSemanticUtils;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
@@ -29,18 +29,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author spau0004 This class is used to perform CRUD operation for the semantic metadata The
- *     requests are JSON documents in the following formats
+ * This class is used to perform CRUD operation for the semantic metadata requests are JSON
+ * documents in the following formats.
+ *
+ * @author spau0004
  */
 @RestController
 @RequestMapping("/internal/semantic/")
-public class SAWSemanticController {
+public class SipSemanticController {
 
-  private static final Logger logger = LoggerFactory.getLogger(SAWSemanticController.class);
+  private static final Logger logger = LoggerFactory.getLogger(SipSemanticController.class);
 
   @Autowired private SemanticService semanticService;
 
-  /** This method is used to create a semantic entity in mapr store with id */
+  /** This method is used to create a semantic entity in mapr store with id. */
   @RequestMapping(
       value = "/{projectId}/create",
       method = RequestMethod.POST,
@@ -53,7 +55,7 @@ public class SAWSemanticController {
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
-    SAWSemanticUtils.checkMandatoryFields(requestBody);
+    SipSemanticUtils.checkMandatoryFields(requestBody);
     logger.trace("Request Body to create a semantic node:{}", requestBody);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -70,22 +72,22 @@ public class SAWSemanticController {
     return responseObjectFuture;
   }
 
-  /** This method is used to read a semantic entity in mapr store with id */
+  /** This method is used to read a semantic entity in mapr store with id. */
   @RequestMapping(
-      value = "/{projectId}/{Id}",
+      value = "/{projectId}/{id}",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode readSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "Id", required = true) String Id)
+      @PathVariable(name = "id", required = true) String id)
       throws SipJsonMissingException {
-    logger.trace("Request Body to read a semantic node:{}", Id);
+    logger.trace("Request Body to read a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;
     SemanticNode node = new SemanticNode();
     ObjectMapper objectMapper = new ObjectMapper();
     try {
-      node.set_id(Id);
+      node.set_id(id);
       logger.trace("Invoking service with entity id : {} ", node.get_id());
       responseObjectFuture = semanticService.readSemantic(node);
       logger.trace(
@@ -97,22 +99,22 @@ public class SAWSemanticController {
     return responseObjectFuture;
   }
 
-  /** This method is used to update a semantic entity in mapr store with id */
+  /** This method is used to update a semantic entity in mapr store with id. */
   @RequestMapping(
-      value = "/{projectId}/{Id}",
+      value = "/{projectId}/{id}",
       method = RequestMethod.PUT,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "Id", required = true) String Id,
+      @PathVariable(name = "id", required = true) String id,
       @RequestBody SemanticNode requestBody)
       throws SipJsonMissingException {
-    logger.trace("Request Body to update a semantic node:{}", Id);
+    logger.trace("Request Body to update a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
-      requestBody.set_id(Id);
+      requestBody.set_id(id);
       logger.trace("Invoking service with entity id : {} ", requestBody.get_id());
       responseObjectFuture = semanticService.updateSemantic(requestBody);
       logger.trace(
@@ -124,22 +126,22 @@ public class SAWSemanticController {
     return responseObjectFuture;
   }
 
-  /** This method is used to delete a semantic entity in mapr store with id */
+  /** This method is used to delete a semantic entity in mapr store with id. */
   @RequestMapping(
-      value = "/{projectId}/{Id}",
+      value = "/{projectId}/{id}",
       method = RequestMethod.DELETE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode deleteSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "Id", required = true) String Id)
+      @PathVariable(name = "id", required = true) String id)
       throws SipJsonMissingException {
-    logger.trace("Request Body to delete a semantic node:{}", Id);
+    logger.trace("Request Body to delete a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;
     SemanticNode node = new SemanticNode();
     ObjectMapper objectMapper = new ObjectMapper();
     try {
-      node.set_id(Id);
+      node.set_id(id);
       logger.trace("Invoking service with entity id : {} ", node.get_id());
       responseObjectFuture = semanticService.deleteSemantic(node);
       logger.trace(
@@ -151,7 +153,7 @@ public class SAWSemanticController {
     return responseObjectFuture;
   }
 
-  /** This method is used to filter a semantic entity in mapr store with id */
+  /** This method is used to filter a semantic entity in mapr store with id. */
   @RequestMapping(
       value = "/{projectId}/filter",
       method = RequestMethod.GET,
@@ -181,7 +183,7 @@ public class SAWSemanticController {
 
   /**
    * This method is used to list the semantic entities. This will be deprecated after re-factoring
-   * of transport service
+   * of transport service.
    */
   @RequestMapping(
       value = "/md",

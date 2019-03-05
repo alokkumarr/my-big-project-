@@ -10,12 +10,13 @@ import org.springframework.core.io.Resource;
 public class MetadataTestUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(MetadataTestUtils.class);
+
   /**
    * Read Json data from classpath.
    *
-   * @param classpath
-   * @return
-   * @throws IOException
+   * @param classpath Classpath file.
+   * @return String
+   * @throws IOException when classpath file does not exists
    */
   public static String getJsonString(String classpath) {
     Resource resource = new ClassPathResource(classpath);
@@ -23,7 +24,7 @@ public class MetadataTestUtils {
     try {
       return objectMapper.readTree(resource.getFile()).toString();
     } catch (IOException e) {
-      logger.error("Exception occured while reading the file from class path." + e);
+      logger.error("Exception occurred while reading the file from class path." + e);
     }
     return null;
   }

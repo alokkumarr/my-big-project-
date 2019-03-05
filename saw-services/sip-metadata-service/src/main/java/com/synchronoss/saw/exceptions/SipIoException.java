@@ -1,11 +1,10 @@
 package com.synchronoss.saw.exceptions;
 
-public class SipIOException extends MetadataRuntimeException {
+public class SipIoException extends MetadataRuntimeException {
 
-  /** */
   private static final long serialVersionUID = 1L;
 
-  public SipIOException(String msg) {
+  public SipIoException(String msg) {
     super(msg);
   }
 
@@ -15,7 +14,7 @@ public class SipIOException extends MetadataRuntimeException {
    * @param msg the detail message
    * @param cause the root cause
    */
-  public SipIOException(String msg, Throwable cause) {
+  public SipIoException(String msg, Throwable cause) {
     super(msg, cause);
   }
 
@@ -24,10 +23,10 @@ public class SipIOException extends MetadataRuntimeException {
     if (this == other) {
       return true;
     }
-    if (!(other instanceof SipIOException)) {
+    if (!(other instanceof SipIoException)) {
       return false;
     }
-    SipIOException otherBe = (SipIOException) other;
+    SipIoException otherBe = (SipIoException) other;
     return (getMessage().equals(otherBe.getMessage())
         && SipExceptionUtils.nullSafeEquals(getCause(), otherBe.getCause()));
   }

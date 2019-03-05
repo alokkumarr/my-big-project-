@@ -94,6 +94,12 @@ public class ObserveControllerRestTest {
     assertEquals(HttpStatus.OK.value(), response.getStatus());
   }
 
+  /**
+   * getObserve.
+   *
+   * @param observeString string to get Observe Object.
+   * @return Observe
+   */
   public Observe getObserve(String observeString) {
     Observe mockObserve = null;
     try {
@@ -104,6 +110,12 @@ public class ObserveControllerRestTest {
     return mockObserve;
   }
 
+  /**
+   * getObserveResponseString.
+   *
+   * @param observeString to get ObserveResponseString
+   * @return String
+   */
   public String getObserveResponseString(ObserveResponse observeString) {
     String mockObserveResponse = null;
     try {

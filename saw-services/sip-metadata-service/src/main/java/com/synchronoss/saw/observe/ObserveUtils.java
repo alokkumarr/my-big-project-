@@ -30,8 +30,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ObserveUtils {
 
-  public final String SCHEMA_FILENAME = "payload-schema.json";
+  public final String schemaFileName = "payload-schema.json";
 
+  /**
+   * getObserveNode.
+   *
+   * @param json Json
+   * @param node node
+   * @return Observe
+   * @throws JsonProcessingException when json parsing error
+   * @throws IOException when failed to read json string
+   */
   public static Observe getObserveNode(String json, String node)
       throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -48,38 +57,59 @@ public class ObserveUtils {
     return observeTree;
   }
 
+  /**
+   * node2JsonString.
+   *
+   * @param node Observe Object
+   * @param basePath basePath
+   * @param id object Id
+   * @param action Node Action
+   * @param category category Id
+   * @return String JsonString
+   * @throws JsonProcessingException when failed to parse json.
+   */
   public static String node2JsonString(
-      Observe node, String basePath, String Id, Action action, Category category)
+      Observe node, String basePath, String id, Action action, Category category)
       throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
 
     if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id != null) {
-      metaDataStoreStructure.setId(Id);
+    if (id != null) {
+      metaDataStoreStructure.setId(id);
     }
     metaDataStoreStructure.setAction(action);
     metaDataStoreStructure.setCategory(category);
     metaDataStoreStructure.setXdfRoot(basePath);
     List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
     listOfMetadata.add(metaDataStoreStructure);
-
+    ObjectMapper objectMapper = new ObjectMapper();
     return objectMapper.writeValueAsString(listOfMetadata);
   }
 
+  /**
+   * node2JsonString.
+   *
+   * @param node Observe Object
+   * @param basePath basePath
+   * @param id object Id
+   * @param action Node action
+   * @param category category Id
+   * @param query Observe query
+   * @return String returns Json String
+   * @throws JsonProcessingException when failed to parse json
+   */
   public static String node2JsonString(
-      Observe node, String basePath, String Id, Action action, Category category, Query query)
+      Observe node, String basePath, String id, Action action, Category category, Query query)
       throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
 
     if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id != null) {
-      metaDataStoreStructure.setId(Id);
+    if (id != null) {
+      metaDataStoreStructure.setId(id);
     }
     if (query != null) {
       metaDataStoreStructure.setQuery(query);
@@ -89,18 +119,31 @@ public class ObserveUtils {
     metaDataStoreStructure.setXdfRoot(basePath);
     List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
     listOfMetadata.add(metaDataStoreStructure);
+    ObjectMapper objectMapper = new ObjectMapper();
     return objectMapper.writeValueAsString(listOfMetadata);
   }
 
+  /**
+   * nodeMetaDataStoreStructure.
+   *
+   * @param node Observe Object
+   * @param basePath basePath
+   * @param output output String
+   * @param id Object Id
+   * @param action Node action
+   * @param category category Id
+   * @return MetaDataStoreStructure List returns list of MetaDataStoreStructure
+   * @throws JsonProcessingException when failed to parse json.
+   */
   public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(
-      Observe node, String basePath, String output, String Id, Action action, Category category)
+      Observe node, String basePath, String output, String id, Action action, Category category)
       throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
     if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id != null) {
-      metaDataStoreStructure.setId(Id);
+    if (id != null) {
+      metaDataStoreStructure.setId(id);
     }
     metaDataStoreStructure.setAction(action);
     metaDataStoreStructure.setCategory(category);
@@ -110,6 +153,13 @@ public class ObserveUtils {
     return listOfMetadata;
   }
 
+  /**
+   * prepareResponse.
+   *
+   * @param node node
+   * @param message message
+   * @return ObserveResponse
+   */
   public static ObserveResponse prepareResponse(Observe node, String message) {
     ObserveResponse createresponse = new ObserveResponse();
     createresponse.setMessage(message);
@@ -123,31 +173,72 @@ public class ObserveUtils {
     return createresponse;
   }
 
+  /**
+   * getMapper.
+   *
+   * @return ObjectMapper
+   */
   public ObjectMapper getMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false);
     return objectMapper;
   }
 
+  /**
+   * createOkResponse.
+   *
+   * @param body body
+   * @param <T> Type
+   * @return ResponseEntity
+   */
   public <T> ResponseEntity<T> createOkResponse(T body) {
     return createResponse(body, HttpStatus.OK);
   }
 
-  /** */
+  /**
+   * createResponse.
+   *
+   * @param result result
+   * @param <T> type
+   * @return ResponseEntity
+   */
   public <T> ResponseEntity<T> createResponse(ResponseEntity<T> result) {
 
     ResponseEntity<T> response = createResponse(result.getBody(), result.getStatusCode());
     return response;
   }
 
+  /**
+   * createResponse.
+   *
+   * @param body body
+   * @param httpStatus httpStatus
+   * @param <T> type
+   * @return ResponseEntity
+   */
   public <T> ResponseEntity<T> createResponse(T body, HttpStatus httpStatus) {
     return new ResponseEntity<>(body, httpStatus);
   }
 
+  /**
+   * getClassPathResources.
+   *
+   * @param filename filename
+   * @return Resource
+   */
   public Resource getClassPathResources(String filename) {
     return new ClassPathResource(filename);
   }
 
+  /**
+   * jsonSchemaValidate.
+   *
+   * @param jsonDataString jsonDataString
+   * @param filename filename
+   * @return Boolean jsonSchema validation.
+   * @throws IOException when File not found.
+   * @throws ProcessingException when failed to parse json.
+   */
   public Boolean jsonSchemaValidate(String jsonDataString, String filename)
       throws IOException, ProcessingException {
     final JsonNode data = JsonLoader.fromString(jsonDataString);
