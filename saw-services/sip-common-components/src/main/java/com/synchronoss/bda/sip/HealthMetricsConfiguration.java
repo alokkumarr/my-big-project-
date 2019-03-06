@@ -9,7 +9,6 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Configure health status metric suitable for exposing through
@@ -19,7 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
  * on it, in addition to other metrics.
  */
 @Configuration
-@ConditionalOnMissingBean(MockMvc.class)
+@ConditionalOnMissingBean(
+    name = "org.springframework.test.web.servlet.MockMvc")
 class HealthMetricsConfiguration {
   private CompositeHealthIndicator healthIndicator;
 
