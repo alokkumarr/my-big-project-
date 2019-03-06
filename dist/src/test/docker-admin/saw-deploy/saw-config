@@ -169,3 +169,9 @@ sip-app2
 
 [sip-rtis:vars]
 sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
+
+[sip-product-module-metadata]
+sip-app1
+
+[sip-product-module-metadata:vars]
+sip_product_module_id=prj::module1

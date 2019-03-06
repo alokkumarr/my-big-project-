@@ -11,7 +11,7 @@
   roles:
     - saw-web
 - name: Install Product module metadata
-  hosts: saw-web
+  hosts: sip-product-module-metadata
   become: true
   roles:
-    - product-module-metadata
+    - sip-product-module-metadata

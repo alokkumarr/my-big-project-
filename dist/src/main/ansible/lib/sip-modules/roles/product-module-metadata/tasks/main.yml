@@ -1,8 +1,0 @@
-- name: Product module metadata
-  uri:
-      url: "http://localhost:9800/internal/proxy/storage/product-module/{{ sip_product_module_id }}"
-      method: POST
-
-      src: "{{ lookup('env','SIP_PRODUCT_MODULE') }}/configuration/product-module-config.json"
-      # body: "{{ lookup('file','issue.json') }}"
-      remote_src: false
