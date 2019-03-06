@@ -33,14 +33,14 @@ export class SingleTableDesignerLayoutComponent {
   public DesignerStates = DesignerStates;
   public isOptionsPanelOpen = false;
   public optionsPanelMode: 'side' | 'over' = 'side';
-  public breakpointObserver: BreakpointObserver;
+  private isInTabletMode = false;
 
   constructor(breakpointObserver: BreakpointObserver) {
-    this.breakpointObserver = breakpointObserver;
     breakpointObserver.observe([
       Breakpoints.Medium,
       Breakpoints.Small
     ]).subscribe(result => {
+      this.isInTabletMode = result.matches;
       if (result.matches) {
         this.isOptionsPanelOpen = false;
         this.optionsPanelMode = 'over';
@@ -49,6 +49,25 @@ export class SingleTableDesignerLayoutComponent {
         this.optionsPanelMode = 'side';
       }
     });
+  }
+
+  onClickedOutside(drawer) {
+    if (this.isInTabletMode && this.isOptionsPanelOpen) {
+      drawer.close();
+      this.isOptionsPanelOpen = false;
+    }
+  }
+
+  openDrawer(drawer) {
+    if (this.isInTabletMode) {
+      setTimeout(() => {
+        drawer.open();
+        this.isOptionsPanelOpen = true;
+      });
+    } else {
+      drawer.toggle();
+      this.isOptionsPanelOpen = !this.isOptionsPanelOpen;
+    }
   }
 
   onRemoveFilter(index) {

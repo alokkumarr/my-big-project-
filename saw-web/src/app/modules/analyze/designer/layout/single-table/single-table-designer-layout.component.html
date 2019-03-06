@@ -2,6 +2,7 @@
   <mat-drawer #drawer [mode]="optionsPanelMode"
               position="end" [opened]="isOptionsPanelOpen"
               style="height: 100%; width: 25%"
+              (clickOutside)="onClickedOutside(drawer)"
   >
     <designer-analysis-options class="designer__options"
                               (change)="change.emit($event)"
@@ -47,7 +48,7 @@
         >
         </designer-selected-fields>
         <div style="float: right;">
-          <button type="button" mat-icon-button (click)="drawer.toggle()">
+          <button type="button" mat-icon-button (click)="openDrawer(drawer)">
             <mat-icon fontIcon="icon-settings"></mat-icon>
           </button>
         </div>

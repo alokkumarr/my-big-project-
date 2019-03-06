@@ -29,8 +29,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public hasDateInterval = false;
   public isDataField = false;
 
-  constructor() { }
-
   ngOnInit() {
     const type = this.artifactColumn.type;
     this.hasDateInterval = DATE_TYPES.includes(type);

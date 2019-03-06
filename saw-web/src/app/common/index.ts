@@ -7,6 +7,7 @@ import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import { ClickOutsideModule } from 'ng-click-outside';
 import {
   NgModule,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -117,7 +118,8 @@ const MODULES = [
   OwlNativeDateTimeModule,
   UChartModule,
   DxTextBoxModule,
-  DxButtonModule
+  DxButtonModule,
+  ClickOutsideModule
 ];
 
 const COMPONENTS = [

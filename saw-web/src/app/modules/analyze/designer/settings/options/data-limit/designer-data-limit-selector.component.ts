@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import * as isUndefined from 'lodash/isUndefined';
 import {
   ArtifactColumnChart,
@@ -15,8 +16,16 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   @Input() artifactColumn: ArtifactColumnChart;
   public limitType;
   public limitValue;
+  public isInTabletMode = false;
 
-  constructor() { }
+  constructor(breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.Medium,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      this.isInTabletMode = result.matches;
+    });
+  }
 
   ngOnInit() {
     this.limitType =
