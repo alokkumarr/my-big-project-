@@ -16,7 +16,7 @@
     <div fxFlex="1 1 100px" fxLayout="row" fxLayoutAlign="space-around start">
       <div type="button" [attr.aria-label]="source.name" class="mat-elevation-z3 source-row" fxLayoutAlign="center center"
         [class.selected]="selectedSourceType === source.uid" *ngFor="let source of sourceTypes" (click)="sourceSelectedType(source.uid, source.count)"
-        [matBadge]="source.count" matBadgePosition="after" [matBadgeColor]="source.color" [attr.e2e]="source.name" [matTooltip]="source.name"
+        [matBadge]="source.count" matBadgePosition="after" [matBadgeColor]="source.color" [matTooltip]="source.name"
         [class.no-click]="source.count == 0">
         <img [src]="source.imgsrc" [attr.alt]="source.name" />
       </div>
@@ -37,7 +37,7 @@
               [allowFiltering]="false" [allowSorting]="false">
         </dxi-column>
         <div *dxTemplate="let data of 'actionsTemplate'" fxLayout="row" fxLayoutAlign="center center">
-          <button mat-icon-button i18n-matTooltip e2e="channel-active-inactive"
+          <button mat-icon-button i18n-matTooltip [attr.e2e]="data.data.status"
                   class="grid-icon-btn"
                   [color]="data.data.status ? 'error' : 'primary'"
                   [matTooltip]="data.data.status ? 'Deactivate' : 'Activate'"
