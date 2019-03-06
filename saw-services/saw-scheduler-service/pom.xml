@@ -262,10 +262,6 @@
 									<file>src/main/resources/logback.xml</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-scheduler-service/conf/application.yml</name>
-									<file>src/main/resources/application.yml</file>
-								</entry>
-								<entry>
 									<name>/opt/bda/saw-scheduler-service/db-setup/init</name>
 									<file>src/db-setup/init</file>
 									<mode>0755</mode>
