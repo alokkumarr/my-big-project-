@@ -36,7 +36,8 @@ import {
   DesignerComboTypeSelectorComponent,
   DesignerDateIntervalSelectorComponent,
   DesignerChartOptionsComponent,
-  DesignerDataLimitSelectorComponent
+  DesignerDataLimitSelectorComponent,
+  DesignerMapChartOptionsComponent
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
@@ -93,7 +94,8 @@ const COMPONENTS = [
   DesignerComboTypeSelectorComponent,
   DesignerDateIntervalSelectorComponent,
   DesignerChartOptionsComponent,
-  DesignerDataLimitSelectorComponent
+  DesignerDataLimitSelectorComponent,
+  DesignerMapChartOptionsComponent
 ];
 
 const SERVICES = [DesignerService];

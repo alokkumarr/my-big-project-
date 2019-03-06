@@ -17,6 +17,8 @@ export class DesignerAnalysisOptionsComponent implements OnInit {
   @Input() analysisSubtype: string;
   @Input() sqlBuilder: SqlBuilder;
   @Input() fieldCount: number;
+  @Input() auxSettings: any;
+  @Input() chartTitle: string;
   @Input('artifacts') set setArtifacts(artifacts: Artifact[]) {
     const cols = get(artifacts, '0.columns');
     this.selectedColumns = filter(cols, 'checked');

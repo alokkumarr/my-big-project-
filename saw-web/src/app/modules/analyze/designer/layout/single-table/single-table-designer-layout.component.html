@@ -1,7 +1,7 @@
 <mat-drawer-container style="height: 100%;" [hasBackdrop]="false">
   <mat-drawer #drawer [mode]="optionsPanelMode"
               position="end" [opened]="isOptionsPanelOpen"
-              style="height: 100%;"
+              style="height: 100%; width: 25%"
   >
     <designer-analysis-options class="designer__options"
                               (change)="change.emit($event)"
@@ -10,6 +10,8 @@
                               [sqlBuilder]="sqlBuilder"
                               [artifacts]="artifacts"
                               [fieldCount]="fieldCount"
+                              [auxSettings]="auxSettings"
+                              [chartTitle]="chartTitle"
     >
     </designer-analysis-options>
   </mat-drawer>

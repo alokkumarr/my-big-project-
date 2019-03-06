@@ -12,8 +12,22 @@
       </designer-data-option-field>
     </div>
   </mat-tab>
-  <mat-tab label="CHART OPTIONS">
-    <designer-chart-options *ngIf="analysisType === 'chart'">
+  <mat-tab *ngIf="analysisType === 'chart'" label="CHART OPTIONS">
+    <designer-chart-options [isInverted]="auxSettings.isInverted"
+                            [legend]="auxSettings.legend"
+                            [labelOptions]="auxSettings.labelOptions"
+                            [chartType]="analysisSubtype"
+                            [chartTitle]="chartTitle"
+                            (change)="change.emit($event)"
+    >
     </designer-chart-options>
+  </mat-tab>
+  <mat-tab *ngIf="analysisType === 'map'" label="MAP OPTIONS">
+    <designer-map-chart-options [legend]="auxSettings.legend"
+                                [chartType]="analysisSubtype"
+                                [chartTitle]="chartTitle"
+                                (change)="change.emit($event)"
+    >
+    </designer-map-chart-options>
   </mat-tab>
 </mat-tab-group>

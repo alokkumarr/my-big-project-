@@ -7,3 +7,4 @@ export { DesignerComboTypeSelectorComponent } from './combo-type';
 export { DesignerDateIntervalSelectorComponent } from './date-interval';
 export { DesignerChartOptionsComponent } from './chart-options';
 export { DesignerDataLimitSelectorComponent } from './data-limit';
+export { DesignerMapChartOptionsComponent } from './map-chart-options';
