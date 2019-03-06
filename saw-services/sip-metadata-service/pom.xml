@@ -19,7 +19,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <json.validate>2.2.6</json.validate>
-    <start-class>com.synchronoss.saw.observe.SAWObserveServiceApplication</start-class>
+    <start-class>com.synchronoss.saw.SipMetadataServiceApplication</start-class>
     <java.version>1.8</java.version>
     <jackson-coreutils>1.8</jackson-coreutils>
     <json-core>1.2.5</json-core>
