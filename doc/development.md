@@ -374,3 +374,26 @@ deploying the older release to the shared develoment environment.
    running `docker container rm {container-id}`. You may need to do this
    more than once. Keep deleting the container and restarting the mvn command
    to start docker until you can get a clean start.
+
+# SIP Product Modules
+
+The SIP Product Modules setup gives the flexibility to develop customized
+dashboards that meets the need of a business use case. Those modules
+can then be deployed on top of SIP code base. SIP WEB has the capability
+to render the external modules dynamically (via dynamic-module.service).
+
+### Pre Conditions
+
+Following are the conditions to be met in order to make module compatible with SIP
+
+- The module should be generated using Angular 6+ and output should be UMD format
+- Any NPM dependencies that are not a part of SIP WEB should be included in UMD
+- Information about the module should be provided to SIP WEB via SIP Security
+  modules database.
+
+> Product Modules code is maintained in separate [product modules repository].
+
+[product modules repository]: https://stash.synchronoss.net/projects/BDA/repos/sip-external-widgets
+
+Please refer to the **README** of [product modules repository]
+for further details.
