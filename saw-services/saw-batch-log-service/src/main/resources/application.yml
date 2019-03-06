@@ -4,8 +4,13 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost/sip_bis
     username: root
-    password: root
+    password: 
     driver-class-name:  org.mariadb.jdbc.Driver
+  datasource:
+  url: jdbc:mariadb://localhost/saw_scheduler
+  username: root
+  password: 
+  driver-class-name:  org.mariadb.jdbc.Driver
   jpa:
     show-sql: true
     hibernate:

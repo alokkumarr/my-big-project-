@@ -22,6 +22,7 @@ import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.entities.BisFileLog;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -43,7 +44,6 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javassist.NotFoundException;
-
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
@@ -618,6 +618,9 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.trace(
         "transferData file starts here with the channel id " + channelId + "& route Id " + routeId);
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
+    
+    this.executeSipJob(channelId, routeId, filePattern);
+    
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
     try (Session<?> session = sesionFactory.getSession()) {
@@ -1299,4 +1302,11 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("Corrupted file does not exist.");
     }
   }
+  
+  
+  void executeSipJob(Long channelId, Long routeId, String filePattern) {
+    sipLogService.createJobLog(channelId, routeId, filePattern);
+    
+  }
+  
 }

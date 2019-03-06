@@ -8,7 +8,9 @@ import com.synchronoss.saw.batch.model.BisComponentState;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.entities.BisFileLog;
+import com.synchronoss.saw.logs.entities.SipJobEntity;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
+import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
 import java.io.File;
 import java.util.Date;
@@ -34,6 +36,9 @@ public class SipLogging {
 
   @Autowired
   private BisFileLogsRepository bisFileLogsRepository;
+  
+  @Autowired
+  private SipJobDataRepository sipJobDataRepository;
 
 
   /**
@@ -255,5 +260,35 @@ public class SipLogging {
 
   }
 
+  /**
+   * Adds entry to job log.
+   * 
+   * @param channelId channel identifier.
+   * @param routeId route identifier
+   * @param filePattern pattern expression
+   * @return job log created or not
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean createJobLog(Long channelId, Long routeId, String filePattern) {
+    SipJobEntity sipJob = new SipJobEntity();
+    sipJob.setFilePattern(filePattern);
+    sipJob.setJobName(channelId + routeId.toString());
+    sipJob.setJobStatus("OPEN");
+    sipJob.setJobType("BIS");
+    sipJob.setStartTime(new Date());
+    sipJob.setTotalCount(0L);
+    sipJob.setSuccessCount(0L);
+    sipJob.setCreatedBy("system");
+    sipJob.setUpdatedBy("system");
+    sipJob.setCreatedDate(new Date());
+    sipJob.setUpdatedDate(new Date());
+    sipJobDataRepository.save(sipJob);
+    return sipJob.getJobId() == null;
+    
+  }
+  
   
 }
