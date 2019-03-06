@@ -2,7 +2,7 @@ info:
   component: SIP metadata Service
 spring:
   application:
-    name: saw-metadata-service
+    name: sip-metadata-service
   http:
     multipart:
       max-request-size: 25MB
@@ -14,7 +14,7 @@ logging:
     sncr.bda: INFO
 server:
   address: localhost
-  port: 9901
+  port: 9501
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
