@@ -40,7 +40,12 @@ public class XlsxExporter implements IFileExporter {
 
       Cell cell = row.createCell(col);
       DataFormat format = wb.createDataFormat();
-      if (specialType[col].toString().equalsIgnoreCase(DataField.Type.STRING.value())) {
+      if (specialType[col] == null) {
+          cellStyle.setAlignment(HorizontalAlignment.LEFT);
+          cellStyle.setDataFormat((format.getFormat("General")));
+          cell.setCellStyle(cellStyle);
+      }
+      else if (specialType[col].toString().equalsIgnoreCase(DataField.Type.STRING.value())) {
         cellStyle.setAlignment(HorizontalAlignment.LEFT);
         cellStyle.setDataFormat((format.getFormat("General")));
         cell.setCellStyle(cellStyle);
@@ -92,15 +97,15 @@ public class XlsxExporter implements IFileExporter {
       cellStyle.setDataFormat((format.getFormat("General")));
       cell.setCellStyle(cellStyle);
 
-    } else if (specialType.value().equalsIgnoreCase(DataField.Type.STRING.value())) {
+    } else if (specialType !=null && specialType.value().equalsIgnoreCase(DataField.Type.STRING.value())) {
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat("General")));
       cellStyle.setAlignment(HorizontalAlignment.LEFT);
       cell.setCellStyle(cellStyle);
       cell.setCellValue(value);
 
-    } else if (specialType.value().equalsIgnoreCase(DataField.Type.FLOAT.value())
-        || specialType.value().equalsIgnoreCase(DataField.Type.DOUBLE.value())) {
+    } else if (specialType !=null && (specialType.value().equalsIgnoreCase(DataField.Type.FLOAT.value())
+        || specialType.value().equalsIgnoreCase(DataField.Type.DOUBLE.value()))) {
       cellStyle.setAlignment(HorizontalAlignment.RIGHT);
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat(format.getFormat("0.00"));
@@ -108,8 +113,8 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellStyle(cellStyle);
       Double d = new Double(value);
       cell.setCellValue(d);
-    } else if (specialType.value().equalsIgnoreCase(DataField.Type.INT.value())
-        || specialType.value().equalsIgnoreCase(DataField.Type.LONG.value())) {
+    } else if (specialType !=null && (specialType.value().equalsIgnoreCase(DataField.Type.INT.value())
+        || specialType.value().equalsIgnoreCase(DataField.Type.LONG.value()))) {
       cellStyle.setAlignment(HorizontalAlignment.RIGHT);
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat(format.getFormat("0"));
@@ -118,8 +123,8 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellStyle(cellStyle);
       Double d = new Double(value);
       cell.setCellValue(d);
-    } else if (specialType.value().equalsIgnoreCase(DataField.Type.DATE.value())
-        || specialType.value().equalsIgnoreCase(DataField.Type.TIMESTAMP.value())) {
+    } else if (specialType !=null && (specialType.value().equalsIgnoreCase(DataField.Type.DATE.value())
+        || specialType.value().equalsIgnoreCase(DataField.Type.TIMESTAMP.value()))) {
       cellStyle.setAlignment(HorizontalAlignment.RIGHT);
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat("General")));

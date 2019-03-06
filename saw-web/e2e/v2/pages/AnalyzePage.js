@@ -55,6 +55,16 @@ class AnalyzePage extends CreateAnalysisModel {
           `//*[@class="toast-message" and contains(text(),"${message}")]`
         )
       );
+    this._labelNames = name => element(by.xpath(`//div[text()="${name}"]`));
+    this._analyzeTypeSelector = element(
+      by.xpath(`//*[contains(@class,"select-form-field")]`)
+    ); //[e2e="analyze-type-selector"]
+    this._analysisType = name =>
+      element(
+        by.xpath(
+          `//span[@class="mat-option-text" and contains(text(),"${name}")]`
+        )
+      );
   }
 
   goToView(viewName) {
@@ -63,8 +73,7 @@ class AnalyzePage extends CreateAnalysisModel {
       element(
         Utils.hasClass(this._cardView, 'mat-radio-checked').then(isPresent => {
           if (!isPresent) {
-            commonFunctions.waitFor.elementToBeClickable(this._cardView);
-            this._cardView.click();
+            commonFunctions.clickOnElement(this._cardView);
           }
         })
       );
@@ -73,8 +82,7 @@ class AnalyzePage extends CreateAnalysisModel {
       element(
         Utils.hasClass(this._listView, 'mat-radio-checked').then(isPresent => {
           if (!isPresent) {
-            commonFunctions.waitFor.elementToBeClickable(this._listView);
-            this._listView.click();
+            commonFunctions.clickOnElement(this._listView);
           }
         })
       );
@@ -83,8 +91,7 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   clickOnAddAnalysisButton() {
-    commonFunctions.waitFor.elementToBeClickable(this._addAnalysisButton);
-    this._addAnalysisButton.click();
+    commonFunctions.clickOnElement(this._addAnalysisButton);
   }
 
   clickOnActionMenu() {
@@ -92,8 +99,7 @@ class AnalyzePage extends CreateAnalysisModel {
     element(
       this._actionMenuButton.isPresent().then(function(isVisible) {
         if (isVisible) {
-          commonFunctions.waitFor.elementToBeClickable(self._actionMenuButton);
-          self._actionMenuButton.click();
+          commonFunctions.clickOnElement(self._actionMenuButton);
         }
       })
     );
@@ -101,11 +107,6 @@ class AnalyzePage extends CreateAnalysisModel {
 
   verifyElementPresent(myElement, isExist, message) {
     expect(myElement.isPresent()).toBe(isExist, message);
-    // element(
-    //   myElement.isPresent().then(function(isVisible) {
-    //     expect(isVisible).toBe(isExist, message);
-    //   })
-    // );
   }
 
   closeOpenedActionMenuFromCardView() {
@@ -113,8 +114,7 @@ class AnalyzePage extends CreateAnalysisModel {
     element(
       this._actionMenuOptions.isPresent().then(function(isVisible) {
         if (isVisible) {
-          commonFunctions.waitFor.elementToBeClickable(self._containerOverlay);
-          self._containerOverlay.click();
+          commonFunctions.clickOnElement(self._containerOverlay);
           commonFunctions.waitFor.elementToBeNotVisible(
             self._actionMenuOptions
           );
@@ -125,8 +125,7 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   gotoAnalysisExecutePageFromCardView() {
-    commonFunctions.waitFor.elementToBeClickable(this._firstCardTitle);
-    this._firstCardTitle.click();
+    commonFunctions.clickOnElement(this._firstCardTitle);
     const condition = ec.urlContains('/executed');
     browser
       .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
@@ -134,8 +133,7 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   clickOnAnalysisLink(name) {
-    commonFunctions.waitFor.elementToBeClickable(this._analysisTitleLink(name));
-    this._analysisTitleLink(name).click();
+    commonFunctions.clickOnElement(this._analysisTitleLink(name));
     commonFunctions.waitFor.pageToBeReady(/executed/);
   }
 
@@ -146,6 +144,22 @@ class AnalyzePage extends CreateAnalysisModel {
   verifyAnalysisDeleted(name) {
     commonFunctions.waitFor.pageToBeReady(/analyze/);
     expect(this._analysisTitleLink(name).isPresent()).toBeFalsy();
+  }
+
+  verifyLabels(labels) {
+    labels.forEach(label => {
+      commonFunctions.waitFor.elementToBeVisible(this._labelNames(label));
+    });
+  }
+
+  clickOnAnalysisTypeSelector() {
+    commonFunctions.clickOnElement(this._analyzeTypeSelector);
+  }
+
+  verifyAnalysisTypeOptions(options) {
+    options.forEach(option => {
+      commonFunctions.waitFor.elementToBeVisible(this._analysisType(option));
+    });
   }
 }
 module.exports = AnalyzePage;
