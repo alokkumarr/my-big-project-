@@ -37,7 +37,7 @@ internal-analysis:
         host: http://localhost:9200
 metadata:
     service:
-        host: http://localhost:9500
+        host: http://localhost:9200
 semantic:
     service:
         host: http://localhost:9200
@@ -47,6 +47,9 @@ security:
 export:
     service:
         host: http://localhost:9400
+observe:
+    service:
+        host: http://localhost:9500
 scheduler:
     service:
         host: http://localhost:9600
@@ -56,6 +59,9 @@ workbench:
 proxy:
     service:
         host: http://localhost:9800
+datapod:
+    service:
+        host: http://localhost:9900
 batch:
    service:
         host: http://localhost:9952
@@ -90,16 +96,16 @@ api:
         -   location: ${scheduler.service.host}
             method : DELETE
             path : '[/]scheduler.*'
-        -   location: ${metadata.service.host}
+        -   location: ${observe.service.host}
             method: POST
             path: '[/]observe.*'
-        -   location: ${metadata.service.host}
+        -   location: ${observe.service.host}
             method: GET
             path: '[/]observe.*'
-        -   location: ${metadata.service.host}
+        -   location: ${observe.service.host}
             method: PUT
             path: '[/]observe.*'
-        -   location: ${metadata.service.host}
+        -   location: ${observe.service.host}
             method: DELETE
             path: '[/]observe.*'
         -   location: ${internal-analysis.service.host}
@@ -120,6 +126,12 @@ api:
         -   location: ${proxy.service.host}
             method: POST
             path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: PUT
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: DELETE
+            path: '[/]internal/proxy.*'
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]internal/semantic.*'
@@ -129,6 +141,7 @@ api:
         -   location: ${metadata.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
+
         -   location: ${batch.service.host}
             method: PUT
             path: '[/]ingestion/batch.*'
