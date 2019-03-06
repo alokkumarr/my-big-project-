@@ -1751,15 +1751,13 @@
       }
     }
   },
-  "CREATE_DELETE_CHANNEL": {
-    "positiveTests": {
+  "BIS_CHANNEL": {
+    "createAndDelete": {
       "ByAdmin": {
+        "id": "CHANN001",
         "user": "admin",
-        "descripton": "Admin should be create and delete channel"
-      },
-      "ByUser": {
-        "user": "userOne",
-        "descripton": "User should be create and delete channel"
+        "sourceType": "SFTP",
+        "description": "Admin should be create and delete channel"
       }
     }
   }

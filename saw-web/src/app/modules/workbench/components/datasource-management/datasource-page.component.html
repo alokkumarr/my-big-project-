@@ -1,12 +1,22 @@
 <div class="datasource-view" fxLayout="column" fxFlex fxFill>
   <mat-toolbar class="toolbar-white">
     <mat-toolbar-row>
-      <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+      <div
+        fxFlex="47"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        fxLayoutGap="5px"
+      >
         <span i18n>Data Sources</span>
       </div>
       <span fxFlex></span>
       <div class="action-buttons" fxLayout="row" fxLayoutGap="10px">
-        <button mat-raised-button color="primary" e2e="add-new-channel-btn" (click)="createSource(undefined)">
+        <button
+          mat-raised-button
+          color="primary"
+          e2e="add-new-channel-btn"
+          (click)="createSource(undefined)"
+        >
           <span i18n>+ Channel</span>
         </button>
       </div>
@@ -14,64 +24,159 @@
   </mat-toolbar>
   <div class="body-container" fxLayout="column">
     <div fxFlex="1 1 100px" fxLayout="row" fxLayoutAlign="space-around start">
-      <div type="button" [attr.aria-label]="source.name" class="mat-elevation-z3 source-row" fxLayoutAlign="center center"
-        [class.selected]="selectedSourceType === source.uid" *ngFor="let source of sourceTypes" (click)="sourceSelectedType(source.uid, source.count)"
-        [matBadge]="source.count" matBadgePosition="after" [matBadgeColor]="source.color" [matTooltip]="source.name"
-        [class.no-click]="source.count == 0">
+      <div
+        type="button"
+        [attr.aria-label]="source.name"
+        class="mat-elevation-z3 source-row"
+        fxLayoutAlign="center center"
+        [class.selected]="selectedSourceType === source.uid"
+        *ngFor="let source of sourceTypes"
+        (click)="sourceSelectedType(source.uid, source.count)"
+        [matBadge]="source.count"
+        matBadgePosition="after"
+        [matBadgeColor]="source.color"
+        [matTooltip]="source.name"
+        [class.no-click]="source.count == 0"
+      >
         <img [src]="source.imgsrc" [attr.alt]="source.name" />
       </div>
     </div>
 
     <div fxFlex fxLayout="row" fxLayoutGap="5px">
-      <dx-data-grid #channelsGrid fxFlex="25" e2e= "channels-container" class="mat-elevation-z3 sources-grid" [dataSource]="sourceData"
-        [showBorders]="false" [columnAutoWidth]="false" [showColumnLines]="false" [showRowLines]="true"
-        (onToolbarPreparing)="onToolbarPreparing($event)" keyExpr="bisChannelSysId" [rowAlternationEnabled]="false"
-        (onSelectionChanged)="onSourceSelectionChanged($event)">
+      <dx-data-grid
+        #channelsGrid
+        fxFlex="25"
+        e2e="channels-container"
+        class="mat-elevation-z3 sources-grid"
+        [dataSource]="sourceData"
+        [showBorders]="false"
+        [columnAutoWidth]="false"
+        [showColumnLines]="false"
+        [showRowLines]="true"
+        (onToolbarPreparing)="onToolbarPreparing($event)"
+        keyExpr="bisChannelSysId"
+        [rowAlternationEnabled]="false"
+        (onSelectionChanged)="onSourceSelectionChanged($event)"
+      >
         <dxo-selection mode="single"></dxo-selection>
         <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
-        <dxo-search-panel [visible]="true" [width]="220" placeholder="Search..."></dxo-search-panel>
+        <dxo-search-panel
+          [visible]="true"
+          [width]="220"
+          placeholder="Search..."
+        ></dxo-search-panel>
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
-        <dxi-column caption="Channel Name" dataField="channelName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
-        <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
-          <dxi-column caption="Actions" dataField="bisRouteSysId"  alignment="center" cellTemplate="actionsTemplate"
-              [allowFiltering]="false" [allowSorting]="false">
+        <dxi-column
+          caption="Channel Name"
+          dataField="channelName"
+          alignment="left"
+          cellTemplate="nameTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Host Name"
+          dataField="hostName"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="Actions"
+          dataField="bisRouteSysId"
+          alignment="center"
+          cellTemplate="actionsTemplate"
+          [allowFiltering]="false"
+          [allowSorting]="false"
+        >
         </dxi-column>
-        <div *dxTemplate="let data of 'actionsTemplate'" fxLayout="row" fxLayoutAlign="center center">
-          <button mat-icon-button i18n-matTooltip [attr.e2e]="data.data.status"
-                  class="grid-icon-btn"
-                  [color]="data.data.status ? 'error' : 'primary'"
-                  [matTooltip]="data.data.status ? 'Deactivate' : 'Activate'"
-            (click)="toggleChannelActivation(data.data)">
+        <div
+          *dxTemplate="let data of 'actionsTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          <button
+            mat-icon-button
+            i18n-matTooltip
+            [attr.e2e]="data.data.status"
+            class="grid-icon-btn"
+            [color]="data.data.status ? 'error' : 'primary'"
+            [matTooltip]="data.data.status ? 'Deactivate' : 'Activate'"
+            (click)="toggleChannelActivation(data.data)"
+          >
             <mat-icon fontIcon="icon-logout"></mat-icon>
           </button>
         </div>
         <div *dxTemplate="let data of 'sourceTypeTemplate'">
-          <div fxHide.lt-lg="true" class="master-detail-caption" e2e="current-source-name">{{selectedSourceType | uppercase}}</div>
+          <div
+            fxHide.lt-lg="true"
+            class="master-detail-caption"
+            e2e="current-source-name"
+          >
+            {{ selectedSourceType | uppercase }}
+          </div>
         </div>
         <div *dxTemplate="let data of 'nameTemplate'">
-          <div class="s-name"  [attr.e2e]="data.value" [matTooltip]="data.value">{{data.value}}</div>
+          <div class="s-name" [attr.e2e]="data.value" [matTooltip]="data.value">
+            {{ data.value }}
+          </div>
         </div>
       </dx-data-grid>
 
       <mat-card fxFlex class="routes-card" fxLayout="column">
-        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="9px" fxLayoutAlign="space-around center">
+        <div
+          fxFlex="1 1 40px"
+          fxLayout="row"
+          fxLayoutGap="9px"
+          fxLayoutAlign="space-around center"
+        >
           <div class="mat-body-1">
-            <span class="details-title mat-subheading-2" e2e="channel-name-detail-panel">{{selectedSourceData?.channelName | uppercase}}</span>
+            <span
+              class="details-title mat-subheading-2"
+              e2e="channel-name-detail-panel"
+              >{{ selectedSourceData?.channelName | uppercase }}</span
+            >
           </div>
           <span fxFlex></span>
-          <button mat-mini-fab e2e="channel-test-connect-btn" class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="testChannel(selectedSourceData?.bisChannelSysId)"
-            i18n-matTooltip matTooltip="Test Channel Connectivity">
+          <button
+            mat-mini-fab
+            e2e="channel-test-connect-btn"
+            class="mat-elevation-z2"
+            color="primary"
+            [disabled]="!channelEditable"
+            (click)="testChannel(selectedSourceData?.bisChannelSysId)"
+            i18n-matTooltip
+            matTooltip="Test Channel Connectivity"
+          >
             <mat-icon fontIcon="icon-query-mode"></mat-icon>
           </button>
-          <button mat-mini-fab e2e="edit-channel"class="mat-elevation-z2" color="primary" [disabled]="!channelEditable" (click)="createSource(selectedSourceData)"
-            matTooltip="Edit Channel" i18n-matTooltip>
+          <button
+            mat-mini-fab
+            e2e="edit-channel"
+            class="mat-elevation-z2"
+            color="primary"
+            [disabled]="!channelEditable"
+            (click)="createSource(selectedSourceData)"
+            matTooltip="Edit Channel"
+            i18n-matTooltip
+          >
             <mat-icon fontIcon="icon-edit-solid"></mat-icon>
           </button>
-          <button mat-mini-fab e2e="delete-channel" class="mat-elevation-z3" color="warn" [disabled]="!channelEditable" (click)="deleteChannel(selectedSourceData?.bisChannelSysId)"
-            matTooltip="Delete Channel" i18n-matTooltip>
+          <button
+            mat-mini-fab
+            e2e="delete-channel"
+            class="mat-elevation-z3"
+            color="warn"
+            [disabled]="!channelEditable"
+            (click)="deleteChannel(selectedSourceData?.bisChannelSysId)"
+            matTooltip="Delete Channel"
+            i18n-matTooltip
+          >
             <mat-icon fontIcon="icon-delete-solid"></mat-icon>
           </button>
-          <button mat-raised-button e2e="add-route" color="primary" [disabled]="!channelEditable" (click)="createRoute(selectedSourceData?.bisChannelSysId)">
+          <button
+            mat-raised-button
+            e2e="add-route"
+            color="primary"
+            [disabled]="!channelEditable"
+            (click)="createRoute(selectedSourceData?.bisChannelSysId)"
+          >
             <span i18n>+ Route</span>
           </button>
         </div>
@@ -79,123 +184,288 @@
           <mat-divider></mat-divider>
         </div>
         <div class="routes-card-body">
-          <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div
+            fxLayout="row"
+            fxLayoutalign="start center"
+            fxLayout.lt-md="column"
+          >
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="host-name" i18n>Host Name : </span>
-              <span>{{selectedSourceData?.hostName}}</span>
+              <span>{{ selectedSourceData?.hostName }}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="port-number" i18n>Port No : </span>
-              <span>{{selectedSourceData?.portNo}}</span>
+              <span>{{ selectedSourceData?.portNo }}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
-          <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div
+            fxLayout="row"
+            fxLayoutalign="start center"
+            fxLayout.lt-md="column"
+          >
             <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="access-type" i18n>Access Type : </span>
-              <span>{{selectedSourceData?.accessType}}</span>
+              <span class="prop-name" e2e="access-type" i18n
+                >Access Type :
+              </span>
+              <span>{{ selectedSourceData?.accessType }}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="description" i18n>Description : </span>
-              <span>{{selectedSourceData?.description}}</span>
+              <span class="prop-name" e2e="description" i18n
+                >Description :
+              </span>
+              <span>{{ selectedSourceData?.description }}</span>
             </div>
           </div>
           <mat-divider></mat-divider>
-          <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div
+            fxLayout="row"
+            fxLayoutalign="start center"
+            fxLayout.lt-md="column"
+          >
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="created-by" i18n>Created By : </span>
-              <span>{{selectedSourceData?.modifiedBy || selectedSourceData?.createdBy}}</span>
+              <span>{{
+                selectedSourceData?.modifiedBy || selectedSourceData?.createdBy
+              }}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="last-modified-at" i18n>Last Modified: </span>
+              <span class="prop-name" e2e="last-modified-at" i18n
+                >Last Modified:
+              </span>
               <span *ngIf="selectedSourceData">
-                <span>{{selectedSourceData?.modifiedDate || selectedSourceData?.createdDate | date: 'short'}}</span>
+                <span>{{
+                  selectedSourceData?.modifiedDate ||
+                    selectedSourceData?.createdDate | date: 'short'
+                }}</span>
               </span>
             </div>
           </div>
           <mat-divider></mat-divider>
-          <div fxLayout="row" fxLayoutalign="start center" fxLayout.lt-md="column">
+          <div
+            fxLayout="row"
+            fxLayoutalign="start center"
+            fxLayout.lt-md="column"
+          >
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="user-name" i18n>User Name : </span>
-              <span>{{selectedSourceData?.userName}}</span>
+              <span>{{ selectedSourceData?.userName }}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
             <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="password-name" i18n>Password : </span>
+              <span class="prop-name" e2e="password-name" i18n
+                >Password :
+              </span>
               <div *ngIf="selectedSourceData">
-                  <span *ngIf="show; else hidePwd">{{selectedSourceData?.password}}</span>
-                  <ng-template #hidePwd>&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;</ng-template>
-                  <button *ngIf="!show" e2e="show-password" matTooltip="Show Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
-                    <mat-icon fontIcon="icon-show"></mat-icon>
-                  </button>
-                  <button *ngIf="show" e2e="hide-password" matTooltip="Hide Password" color="primary" mat-button matSuffix mat-icon-button aria-label="show" (click)="togglePWD()">
-                    <mat-icon fontIcon="icon-hide"></mat-icon>
-                  </button>
+                <span *ngIf="show; else hidePwd">{{
+                  selectedSourceData?.password
+                }}</span>
+                <ng-template #hidePwd
+                  >&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;
+                  &bull;</ng-template
+                >
+                <button
+                  *ngIf="!show"
+                  e2e="show-password-ds"
+                  matTooltip="Show Password"
+                  color="primary"
+                  mat-button
+                  matSuffix
+                  mat-icon-button
+                  aria-label="show"
+                  (click)="togglePWD()"
+                >
+                  <mat-icon fontIcon="icon-show"></mat-icon>
+                </button>
+                <button
+                  *ngIf="show"
+                  e2e="hide-password-ds"
+                  matTooltip="Hide Password"
+                  color="primary"
+                  mat-button
+                  matSuffix
+                  mat-icon-button
+                  aria-label="show"
+                  (click)="togglePWD()"
+                >
+                  <mat-icon fontIcon="icon-hide"></mat-icon>
+                </button>
               </div>
             </div>
           </div>
           <mat-divider></mat-divider>
-          <dx-data-grid class="routes-grid" [dataSource]="routesData" [showBorders]="false" [columnAutoWidth]="false"
-            [showColumnLines]="false" (onToolbarPreparing)="onRoutesToolbarPreparing($event)" [rowAlternationEnabled]="true"
-            keyExpr="bisRouteSysId" [width]="'100%'" [allowColumnResizing]="true" e2e="routes-container">
-            <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
-            <dxo-search-panel [visible]="true" [width]="240" placeholder="Search..."></dxo-search-panel>
-            <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
-            <dxi-column caption="Route Name" dataField="routeName" alignment="left"></dxi-column>
-            <dxi-column caption="Created By" dataField="createdBy"alignment="left"></dxi-column>
-            <dxi-column caption="Last Modified" dataField="createdDate" alignment="left" cellTemplate="dateTemplate"></dxi-column>
-            <dxi-column caption="File Pattern" dataField="filePattern" alignment="left"></dxi-column>
-            <dxi-column caption="Schedule" dataField="schedulerExpression" alignment="left" [calculateCellValue]="calculateScheduleCellValue"></dxi-column>
-            <dxi-column caption="Source Location" dataField="sourceLocation" alignment="left"></dxi-column>
-            <dxi-column caption="Destination Location" dataField="destinationLocation" alignment="left"></dxi-column>
-            <dxi-column caption="Description" dataField="description" alignment="left"></dxi-column>
-            <dxi-column caption="Actions" dataField="bisRouteSysId" alignment="center" cellTemplate="actionsTemplate"
-              [allowFiltering]="false" [allowSorting]="false"></dxi-column>
+          <dx-data-grid
+            class="routes-grid"
+            [dataSource]="routesData"
+            [showBorders]="false"
+            [columnAutoWidth]="false"
+            [showColumnLines]="false"
+            (onToolbarPreparing)="onRoutesToolbarPreparing($event)"
+            [rowAlternationEnabled]="true"
+            keyExpr="bisRouteSysId"
+            [width]="'100%'"
+            [allowColumnResizing]="true"
+            e2e="routes-container"
+          >
+            <dxo-filter-row
+              [visible]="true"
+              applyFilter="auto"
+            ></dxo-filter-row>
+            <dxo-search-panel
+              [visible]="true"
+              [width]="240"
+              placeholder="Search..."
+            ></dxo-search-panel>
+            <dxo-scrolling
+              mode="virtual"
+              showScrollbar="always"
+              [useNative]="false"
+            ></dxo-scrolling>
+            <dxi-column
+              caption="Route Name"
+              dataField="routeName"
+              alignment="left"
+            ></dxi-column>
+            <dxi-column
+              caption="Created By"
+              dataField="createdBy"
+              alignment="left"
+            ></dxi-column>
+            <dxi-column
+              caption="Last Modified"
+              dataField="createdDate"
+              alignment="left"
+              cellTemplate="dateTemplate"
+            ></dxi-column>
+            <dxi-column
+              caption="File Pattern"
+              dataField="filePattern"
+              alignment="left"
+            ></dxi-column>
+            <dxi-column
+              caption="Schedule"
+              dataField="schedulerExpression"
+              alignment="left"
+              [calculateCellValue]="calculateScheduleCellValue"
+            ></dxi-column>
+            <dxi-column
+              caption="Source Location"
+              dataField="sourceLocation"
+              alignment="left"
+            ></dxi-column>
+            <dxi-column
+              caption="Destination Location"
+              dataField="destinationLocation"
+              alignment="left"
+            ></dxi-column>
+            <dxi-column
+              caption="Description"
+              dataField="description"
+              alignment="left"
+            ></dxi-column>
+            <dxi-column
+              caption="Actions"
+              dataField="bisRouteSysId"
+              alignment="center"
+              cellTemplate="actionsTemplate"
+              [allowFiltering]="false"
+              [allowSorting]="false"
+            ></dxi-column>
 
             <div *dxTemplate="let data of 'nameTemplate'">
-              <div class="details-title mat-subheading-2" e2e="available-routes" i18n>Available Routes</div>
+              <div
+                class="details-title mat-subheading-2"
+                e2e="available-routes"
+                i18n
+              >
+                Available Routes
+              </div>
             </div>
 
             <div *dxTemplate="let data of 'dateTemplate'">
-              <span *ngIf="data.data.modifiedDate; else defDate">{{data.data.modifiedDate | date: 'short'}}</span>
-                <ng-template #defDate>{{data.data.createdDate | date: 'short'}}</ng-template>
+              <span *ngIf="data.data.modifiedDate; else defDate">{{
+                data.data.modifiedDate | date: 'short'
+              }}</span>
+              <ng-template #defDate>{{
+                data.data.createdDate | date: 'short'
+              }}</ng-template>
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
-
-              <button mat-icon-button class="triggerbtn" [attr.e2e]="data.data.routeName" [matMenuTriggerFor]="datapodmenu">
+              <button
+                mat-icon-button
+                class="triggerbtn"
+                [attr.e2e]="data.data.routeName"
+                [matMenuTriggerFor]="datapodmenu"
+              >
                 <mat-icon fontIcon="icon-action-solid"></mat-icon>
               </button>
               <mat-menu #datapodmenu="matMenu">
-                <button mat-menu-item e2e="route-active-inactive-btn"
-                        [disabled]="!selectedSourceData?.status"
-                        [attr.color]="data.data.status ? 'warn' : 'primary'"
-                        (click)="toggleRouteActivation(data.data)"
+                <button
+                  mat-menu-item
+                  e2e="route-active-inactive-btn"
+                  [disabled]="!selectedSourceData?.status"
+                  [attr.color]="data.data.status ? 'warn' : 'primary'"
+                  (click)="toggleRouteActivation(data.data)"
                 >
-                  <mat-icon class="menu-btn-icon"
-                            [color]="data.data.status ? 'warn' : 'primary'"
-                            [attr.color]="data.data.status ? 'warn' : 'primary'"
-                            fontIcon="icon-logout">
+                  <mat-icon
+                    class="menu-btn-icon"
+                    [color]="data.data.status ? 'warn' : 'primary'"
+                    [attr.color]="data.data.status ? 'warn' : 'primary'"
+                    fontIcon="icon-logout"
+                  >
                   </mat-icon>
-                  <span>{{data.data.status ? 'Deactivate' : 'Activate'}}</span>
+                  <span>{{
+                    data.data.status ? 'Deactivate' : 'Activate'
+                  }}</span>
                 </button>
-                <button mat-menu-item (click)="openLogsDialog(data.data)" e2e="view-route-logs-btn">
-                  <mat-icon class="menu-btn-icon" fontIcon="icon-clipboard"></mat-icon>
+                <button
+                  mat-menu-item
+                  (click)="openLogsDialog(data.data)"
+                  e2e="view-route-logs-btn"
+                >
+                  <mat-icon
+                    class="menu-btn-icon"
+                    fontIcon="icon-clipboard"
+                  ></mat-icon>
                   <span i18n>View Route Logs</span>
                 </button>
-                <button mat-menu-item (click)="testRoute(data.data)" e2e="test-connectivity-btn">
-                  <mat-icon class="menu-btn-icon" fontIcon="icon-query-mode"></mat-icon>
+                <button
+                  mat-menu-item
+                  (click)="testRoute(data.data)"
+                  e2e="test-connectivity-btn"
+                >
+                  <mat-icon
+                    class="menu-btn-icon"
+                    fontIcon="icon-query-mode"
+                  ></mat-icon>
                   <span i18n>Test Route Connectivity</span>
                 </button>
-                <button mat-menu-item (click)="createRoute(data.data)" e2e="edit-route-btn">
-                  <mat-icon class="menu-btn-icon" fontIcon="icon-edit"></mat-icon>
+                <button
+                  mat-menu-item
+                  (click)="createRoute(data.data)"
+                  e2e="edit-route-btn"
+                >
+                  <mat-icon
+                    class="menu-btn-icon"
+                    fontIcon="icon-edit"
+                  ></mat-icon>
                   <span i18n>Edit Route</span>
                 </button>
-                <button color="warn" mat-menu-item (click)="deleteRoute(data.data)" e2e="delete-route-btn">
-                  <mat-icon color="warn" class="menu-btn-icon" fontIcon="icon-delete"></mat-icon>
+                <button
+                  color="warn"
+                  mat-menu-item
+                  (click)="deleteRoute(data.data)"
+                  e2e="delete-route-btn"
+                >
+                  <mat-icon
+                    color="warn"
+                    class="menu-btn-icon"
+                    fontIcon="icon-delete"
+                  ></mat-icon>
                   <span i18n>Delete Route</span>
                 </button>
               </mat-menu>

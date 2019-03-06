@@ -1,9 +1,9 @@
 'use strict';
 
-const logger = require('../../conf/logger')(__filename);
-const commonFunctions = require('../utils/commonFunctions');
+const logger = require('../../../conf/logger')(__filename);
+const commonFunctions = require('../../utils/commonFunctions');
 
-class TestConnectivityWindow {
+class TestConnectivity {
   constructor() {
     this._testConnectivitySection = element(
       by.css(`[e2e="test-connectivity"]`)
@@ -27,4 +27,4 @@ class TestConnectivityWindow {
   }
 }
 
-module.exports = TestConnectivityWindow;
+module.exports = TestConnectivity;

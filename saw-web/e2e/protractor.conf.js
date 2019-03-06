@@ -78,7 +78,7 @@ const tempts = 10;
  * All tests are running for customer
  */
 const customerCode = 'SYNCHRONOSS';
-
+let run = SuiteSetup.islocalRun();
 let token;
 
 exports.timeouts = {
@@ -295,88 +295,93 @@ exports.config = {
     if (fs.existsSync('jasmine-results.json')) {
       fs.unlink('jasmine-results.json');
     }
-    // Generate test data
-    let appUrl = SuiteSetup.getSawWebUrl();
+    if (!run.localRun || (run.localRun && run.firstRun)) {
+      // Generate test data
+      let appUrl = SuiteSetup.getSawWebUrl();
 
-    if (!appUrl) {
-      logger.error(
-        'appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' +
-          appUrl +
-          ', hence exiting test suite and failing it...'
-      );
-      process.exit(1);
-    }
-
-    try {
-      logger.info('Generating test for this run...');
-
-      let APICommonHelpers = require('./v2/helpers/api/APICommonHelpers');
-
-      let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
-      let token = APICommonHelpers.generateToken(apiBaseUrl);
-
-      if (!token) {
+      if (!appUrl) {
         logger.error(
-          'cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.'
+          'appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' +
+            appUrl +
+            ', hence exiting test suite and failing it...'
         );
         process.exit(1);
       }
-      let TestDataGenerator = require('./v2/helpers/data-generation/TestDataGenerator');
-      new TestDataGenerator().generateUsersRolesPrivilegesCategories(
-        apiBaseUrl,
-        token
-      );
-    } catch (e) {
-      logger.error(
-        'There is some error during cleanup and setting up test data for e2e tests, ' +
-          'hence exiting test suite and failing it....' +
-          e
-      );
-      process.exit(1);
+
+      try {
+        logger.info('Generating test for this run...');
+
+        let APICommonHelpers = require('./v2/helpers/api/APICommonHelpers');
+
+        let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+        console.log('api data -----' + apiBaseUrl);
+        let token = APICommonHelpers.generateToken(apiBaseUrl);
+
+        if (!token) {
+          logger.error(
+            'cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.'
+          );
+          process.exit(1);
+        }
+        let TestDataGenerator = require('./v2/helpers/data-generation/TestDataGenerator');
+        new TestDataGenerator().generateUsersRolesPrivilegesCategories(
+          apiBaseUrl,
+          token
+        );
+      } catch (e) {
+        logger.error(
+          'There is some error during cleanup and setting up test data for e2e tests, ' +
+            'hence exiting test suite and failing it....' +
+            e
+        );
+        process.exit(1);
+      }
     }
   },
   afterLaunch: function() {
-    if (fs.existsSync('target/e2e/e2eId.json')) {
-      // delete and create new always
-      //console.log('deleting e2e id json file....')
-      fs.unlinkSync('target/e2e/e2eId.json');
-    }
-
-    let retryCounter = 1;
-    if (argv.retry) {
-      retryCounter = ++argv.retry;
-    }
-
-    webpackHelper.generateFailedTests('target/allure-results');
-
-    let retryStatus = retry.afterLaunch(maxRetryForFailedTests);
-    if (retryStatus === 1) {
-      // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
-      let failedTests;
-      if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
-        failedTests = JSON.parse(
-          fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8')
-        );
+    if (!run.localRun) {
+      if (fs.existsSync('target/e2e/e2eId.json')) {
+        // delete and create new always
+        //console.log('deleting e2e id json file....')
+        fs.unlinkSync('target/e2e/e2eId.json');
       }
-      logger.error(
-        'There are some failures hence marking test suite failed. Failed tests are: ' +
-          JSON.stringify(failedTests)
-      );
-      process.exit(1);
-    } else if (retryStatus === 0) {
-      // retryStatus 0 means there are no failures but to be double sure check the finalfail json file
-      if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
-        let failedTests = JSON.parse(
-          fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8')
-        );
+
+      let retryCounter = 1;
+      if (argv.retry) {
+        retryCounter = ++argv.retry;
+      }
+
+      webpackHelper.generateFailedTests('target/allure-results');
+
+      let retryStatus = retry.afterLaunch(maxRetryForFailedTests);
+      if (retryStatus === 1) {
+        // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
+        let failedTests;
+        if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+          failedTests = JSON.parse(
+            fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8')
+          );
+        }
         logger.error(
           'There are some failures hence marking test suite failed. Failed tests are: ' +
             JSON.stringify(failedTests)
         );
         process.exit(1);
+      } else if (retryStatus === 0) {
+        // retryStatus 0 means there are no failures but to be double sure check the finalfail json file
+        if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+          let failedTests = JSON.parse(
+            fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8')
+          );
+          logger.error(
+            'There are some failures hence marking test suite failed. Failed tests are: ' +
+              JSON.stringify(failedTests)
+          );
+          process.exit(1);
+        }
       }
-    }
 
-    return retryStatus;
+      return retryStatus;
+    }
   }
 };
