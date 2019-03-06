@@ -19,7 +19,7 @@
         <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="source-container">
           <div fxFlex fxLayout="row wrap" fxLayoutAlign="space-around space-around" class="source-list">
             <mat-card class="mat-elevation-z3" [class.selected]="selectedSource === source.uid" *ngFor="let source of sources"
-              fxFlex="31" fxLayout="row" e2e="{{source.name}}" fxLayoutAlign="start center" (click)="sourceSelected(source)"  [class.no-click]="source.supported === false">
+              fxFlex="31" fxLayout="row" [attr.e2e]="source.name" fxLayoutAlign="start center" (click)="sourceSelected(source)"  [class.no-click]="source.supported === false">
               <div>{{source.name}}</div>
               <div fxFlex></div>
               <img [src]="source.imgsrc" [attr.alt]="source.name" />
