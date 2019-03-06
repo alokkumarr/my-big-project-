@@ -9,14 +9,15 @@ const AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 const ObserveHelper = require('../../helpers/api/ObserveHelper');
 const chai = require('chai');
 const Constants = require('../../helpers/Constants');
-const DashboardFunctions = require('../../pages/components/DashboardFunctions')
-
 const assert = chai.assert;
 const categories = require('../../helpers/data-generation/categories');
-let subCategories = require('../../helpers/data-generation/subCategories');
-
+const subCategories = require('../../helpers/data-generation/subCategories');
 const LoginPage = require('../../pages/LoginPage');
 const ObservePage = require('../../pages/ObservePage');
+const HeaderPage = require('../../pages/components/Header');
+const CreateNewDashboard = require('../../pages/CreateNewDashboard');
+const SaveDashboardDialog = require('../../pages/components/SaveDashboardDialog');
+const ConfirmDeleteDialogModel = require('../../pages/components/ConfirmDeleteDialogModel');
 
 describe('Running create and delete dashboards with charts in dashboards/createAndDeleteDashboards.test.js', () => {
 
@@ -52,16 +53,14 @@ describe('Running create and delete dashboards with charts in dashboards/createA
       });
       //reset the array
       analysesDetails = [];
-
       //delete dashboard if ui failed.
       if(dashboardId) {
         new ObserveHelper().deleteDashboard(host, token, dashboardId);
       }
-      commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
-
 
   using(testDataReader.testData['CREATEDELETEDASHBOARDSWITHCHARTS']['dashboards']
   ? testDataReader.testData['CREATEDELETEDASHBOARDSWITHCHARTS']['dashboards']
@@ -73,31 +72,66 @@ describe('Running create and delete dashboards with charts in dashboards/createA
             logger.error('token cannot be null');
             assert.isNotNull(token, 'token cannot be null');
           }
-          let currentTime = new Date().getTime();
-          let type = Constants.CHART;
-          let subType = data.chartType.split(':')[1];
+          const currentTime = new Date().getTime();
+          const subType = data.chartType.split(':')[1];
+          const name = 'AT ' + data.chartType + ' ' + globalVariables.e2eId + '-' + currentTime;
+          const description = 'AT Description:' + data.chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
+          const dashboardName = 'AT Dashboard Name' + currentTime;
+          const dashboardDescription = 'AT Dashboard description ' + currentTime;
 
-          let name = 'AT ' + data.chartType + ' ' + globalVariables.e2eId + '-' + currentTime;
-          let description = 'AT Description:' + data.chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
-
-          let dashboardName = 'AT Dashboard Name' + currentTime;
-          let dashboardDescription = 'AT Dashboard description ' + currentTime;
-
-          let dashboardFunctions = new DashboardFunctions();
-          let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, subType);
+          const observePage = new ObservePage();
+          let analysis = observePage.addAnalysisByApi(host, token, name, description, Constants.CHART, subType);         
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');
           analysesDetails.push(analysis);
 
           new LoginPage().loginAs(data.user);
 
+          const headerPage = new HeaderPage();
+          headerPage.clickOnModuleLauncher();
+          headerPage.clickOnObserveLink();
           
-          dashboardFunctions.goToObserve();
-          dashboardId = dashboardFunctions.addNewDashBoardFromExistingAnalysis(dashboardName, dashboardDescription, analysisCategoryName, analysisSubCategoryName, subCategoryName, analysesDetails);
+          observePage.clickOnAddDashboardButton();
+
+          const createNewDashboard = new CreateNewDashboard();
+          createNewDashboard.clickOnAddWidgetButton();
+          createNewDashboard.clickOnExistingAnalysisLink();
+          createNewDashboard.clickOnCategory(analysisCategoryName);
+          createNewDashboard.clickOnSubCategory(analysisSubCategoryName);
+          createNewDashboard.addRemoveAnalysisById(analysesDetails);
+          createNewDashboard.clickonSaveButton();
+
+          const saveDashboardDialog= new SaveDashboardDialog();
+          saveDashboardDialog.setDashboardName(dashboardName);
+          saveDashboardDialog.setDashboardDescription(dashboardDescription)
+          saveDashboardDialog.clickOnCategorySelect();
+          saveDashboardDialog.clickOnSubCategorySelect(subCategoryName);
+          saveDashboardDialog.clickOnSaveDialogButton();
+
+          createNewDashboard.verifySaveButton();
+
+          observePage.verifyDashboardTitle(name);
+          //get dashboard id from current url
+          dashboardId = createNewDashboard.getDashboardId();
+          observePage.verifyDashboardTitle(dashboardName);
+          // Verify added analysis
+          expect(observePage.getAddedAnalysisName(name).isDisplayed).toBeTruthy();
+
+          observePage.displayDashboardAction('Refresh');
+          observePage.displayDashboardAction('Delete');
+          observePage.displayDashboardAction('Edit');
+          observePage.displayDashboardAction('Filter');
+
+          browser.sleep(4000); // Below condition was failing if browser was not put to sleep. 
+          observePage.verifyBrowserURLContainsText('?dashboard')
+          observePage.clickOnDeleteDashboardButton();
+
+          new ConfirmDeleteDialogModel().clickOnDashboardConfirmDeleteButton();
+
+          observePage.verifyDashboardTitleIsDeleted(dashboardName);       
         } catch(e) {
           logger.error(e);
-        }    
-
+        }
       }).result.testInfo = {
         testId: id,
         data: data,

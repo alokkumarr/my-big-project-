@@ -44,6 +44,7 @@ const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
    TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
+   // TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
   // TEST_BASE_DIR + 'charts/createAndDelete.test.js'
 ];
 

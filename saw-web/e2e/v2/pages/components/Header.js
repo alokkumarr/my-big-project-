@@ -19,6 +19,7 @@ class Header extends SideNav {
 
     this._launcherButton = element(by.css('[class="header__module-launcher-button"]'));
     this._observeLink= element(by.xpath('//a[contains(@class,"module-observe")]'));
+    this._analyzeLink= element(by.xpath('//a[contains(@class,"module-analyze")]'));
   }
 
   clickOnModuleLauncher(){
