@@ -1,5 +1,7 @@
 package com.synchronoss.saw.scheduler.job;
 
+import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
+
 import java.util.Date;
 
 import org.quartz.InterruptableJob;
@@ -15,8 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
 
-import com.synchronoss.saw.logs.entities.SipJob;
-import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 
 
 public class BisCronJob extends QuartzJobBean implements InterruptableJob {
