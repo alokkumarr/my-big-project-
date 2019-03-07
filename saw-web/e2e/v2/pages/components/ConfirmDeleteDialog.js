@@ -1,6 +1,5 @@
 'use strict';
 
-const logger = require('../../conf/logger')(__filename);
 const commonFunctions = require('../utils/commonFunctions');
 
 class ConfirmDeleteDialogModel {

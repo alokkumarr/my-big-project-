@@ -1,18 +1,14 @@
 'use strict';
 
-const commonFunctions = require('../pages/utils/commonFunctions');
-const ChooseWidgetPage = require('../pages/components/ChooseWidgetPage');
+const commonFunctions = require('./utils/commonFunctions');
+const ChooseWidget = require('./components/ChooseWidget');
 
-class CreateNewDashboard extends ChooseWidgetPage {
+class DashboardDesigner extends ChooseWidget{
     constructor() {
         super();
         this._addWidgetButton = element(by.css(`[e2e='dashboard-add-widget-button']`));
         this._saveButton = element(by.css('button[e2e="dashboard-designer-save-button"]'));
         this._filterButton = element(by.css('button[e2e="dashboard-designer-filters-button"]'));
-    }
-
-    getSaveButton() {
-        return this._saveButton;
     }
 
     verifySaveButton(){
@@ -32,4 +28,4 @@ class CreateNewDashboard extends ChooseWidgetPage {
     }
 }
 
-module.exports = CreateNewDashboard;
+module.exports = DashboardDesigner;

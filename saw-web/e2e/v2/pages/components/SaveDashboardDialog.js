@@ -1,14 +1,15 @@
 'use strict'
 
 const commonFunctions = require('../utils/commonFunctions');
-const logger = require('../../conf/logger')(__filename);
+const ConfirmDeleteDialog = require('../components/ConfirmDeleteDialog');
 
-class SaveDashboardDialog{
+class SaveDashboardDialog extends ConfirmDeleteDialog{
     constructor(){
+        super();
         this._dashboardName = element(by.css('input[e2e="dashboard-save-name-input"]'));
         this._dashboardDesc = element(by.css('textarea[e2e="dashboard-save-description-input"]'));
         this._categorySelect = element(by.css('[e2e="dashboard-save-category-select"]'));
-        this._subCategorySelect =  (name) => { return element(by.xpath(`//span[@class="mat-option-text"and contains(text(),"${name}")]`))};
+        this._subCategorySelect =  (name) =>  element(by.xpath(`//span[@class="mat-option-text"and contains(text(),"${name}")]`));
         this._saveDialogButton = element(by.css(`[e2e="dashboard-save-save-button"]`));
         this._cancelDialogButton = element(by.css(`[e2e="dashboard-save-cancel-button"]`));        
     }

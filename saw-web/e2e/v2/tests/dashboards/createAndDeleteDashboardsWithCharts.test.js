@@ -15,9 +15,7 @@ const subCategories = require('../../helpers/data-generation/subCategories');
 const LoginPage = require('../../pages/LoginPage');
 const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
-const CreateNewDashboard = require('../../pages/CreateNewDashboard');
-const SaveDashboardDialog = require('../../pages/components/SaveDashboardDialog');
-const ConfirmDeleteDialogModel = require('../../pages/components/ConfirmDeleteDialogModel');
+const DashboardDesigner = require('../../pages/DashboardDesigner');
 
 describe('Running create and delete dashboards with charts in dashboards/createAndDeleteDashboards.test.js', () => {
 
@@ -78,9 +76,8 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           const description = 'AT Description:' + data.chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
           const dashboardName = 'AT Dashboard Name' + currentTime;
           const dashboardDescription = 'AT Dashboard description ' + currentTime;
-
-          const observePage = new ObservePage();
-          let analysis = observePage.addAnalysisByApi(host, token, name, description, Constants.CHART, subType);         
+          
+          let analysis = new ObserveHelper().addAnalysisByApi(host, token, name, description, Constants.CHART, subType);         
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');
           analysesDetails.push(analysis);
@@ -91,42 +88,37 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           headerPage.clickOnModuleLauncher();
           headerPage.clickOnObserveLink();
           
+          const observePage = new ObservePage();
           observePage.clickOnAddDashboardButton();
 
-          const createNewDashboard = new CreateNewDashboard();
-          createNewDashboard.clickOnAddWidgetButton();
-          createNewDashboard.clickOnExistingAnalysisLink();
-          createNewDashboard.clickOnCategory(analysisCategoryName);
-          createNewDashboard.clickOnSubCategory(analysisSubCategoryName);
-          createNewDashboard.addRemoveAnalysisById(analysesDetails);
-          createNewDashboard.clickonSaveButton();
+          const dashboardDesigner = new DashboardDesigner();
+          dashboardDesigner.clickOnAddWidgetButton();
+          dashboardDesigner.clickOnExistingAnalysisLink();
+          dashboardDesigner.clickOnCategory(analysisCategoryName);
+          dashboardDesigner.clickOnSubCategory(analysisSubCategoryName);
+          dashboardDesigner.addRemoveAnalysisById(analysesDetails);
+          dashboardDesigner.clickonSaveButton();
+          dashboardDesigner.setDashboardName(dashboardName);
+          dashboardDesigner.setDashboardDescription(dashboardDescription)
+          dashboardDesigner.clickOnCategorySelect();
+          dashboardDesigner.clickOnSubCategorySelect(subCategoryName);
+          dashboardDesigner.clickOnSaveDialogButton();
+          dashboardDesigner.verifySaveButton();
+          
+          dashboardId = commonFunctions.getDashboardId(); //get dashboard id from current url
 
-          const saveDashboardDialog= new SaveDashboardDialog();
-          saveDashboardDialog.setDashboardName(dashboardName);
-          saveDashboardDialog.setDashboardDescription(dashboardDescription)
-          saveDashboardDialog.clickOnCategorySelect();
-          saveDashboardDialog.clickOnSubCategorySelect(subCategoryName);
-          saveDashboardDialog.clickOnSaveDialogButton();
-
-          createNewDashboard.verifySaveButton();
-
-          observePage.verifyDashboardTitle(name);
-          //get dashboard id from current url
-          dashboardId = createNewDashboard.getDashboardId();
+          observePage.verifyDashboardTitle(name);          
           observePage.verifyDashboardTitle(dashboardName);
-          // Verify added analysis
-          expect(observePage.getAddedAnalysisName(name).isDisplayed).toBeTruthy();
-
+          observePage.verifyAddedAnalysisName(name);
           observePage.displayDashboardAction('Refresh');
           observePage.displayDashboardAction('Delete');
           observePage.displayDashboardAction('Edit');
           observePage.displayDashboardAction('Filter');
-
           browser.sleep(4000); // Below condition was failing if browser was not put to sleep. 
           observePage.verifyBrowserURLContainsText('?dashboard')
           observePage.clickOnDeleteDashboardButton();
 
-          new ConfirmDeleteDialogModel().clickOnDashboardConfirmDeleteButton();
+          dashboardDesigner.clickOnDashboardConfirmDeleteButton();
 
           observePage.verifyDashboardTitleIsDeleted(dashboardName);       
         } catch(e) {
