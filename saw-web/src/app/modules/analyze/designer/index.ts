@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AngularSplitModule } from 'angular-split';
+
 import { CommonModuleTs } from '../../../common';
 import { UChartModule } from '../../../common/components/charts';
 import { MaterialModule } from '../../../material.module';
@@ -109,7 +111,8 @@ const PIPES = [ArtifactColumns2PivotFieldsPipe];
     FormsModule,
     ReactiveFormsModule,
     UChartModule,
-    AnalyzeFilterModule
+    AnalyzeFilterModule,
+    AngularSplitModule.forChild()
   ],
   declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,

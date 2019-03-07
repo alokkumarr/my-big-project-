@@ -1,8 +1,23 @@
 <mat-drawer-container style="height: 100%;" [hasBackdrop]="false">
+    <mat-drawer #fieldsdrawer mode="side"
+        position="start" [opened]="true"
+        style="height: 100%; width: 15%"
+    >
+    <designer-settings-single-table
+      class="designer__data-settings"
+      [analysisType]="analysisType"
+      [analysisSubtype]="analysisSubtype"
+      (change)="change.emit($event)"
+      [fieldCount]="fieldCount"
+      [sqlBuilder]="sqlBuilder"
+      [artifacts]="artifacts"
+    >
+    </designer-settings-single-table>
+    </mat-drawer>
   <mat-drawer #drawer [mode]="optionsPanelMode"
               position="end" [opened]="isOptionsPanelOpen"
               style="height: 100%; width: 25%"
-              (clickOutside)="onClickedOutside(drawer)"
+              (clickOutside)="onClickedOutsideOptionsPanel(drawer)"
   >
     <designer-analysis-options class="designer__options"
                               (change)="change.emit($event)"
@@ -17,113 +32,105 @@
     </designer-analysis-options>
   </mat-drawer>
   <div class="container">
-    <designer-settings-single-table
-      class="designer__data-settings"
-      [analysisType]="analysisType"
-      [analysisSubtype]="analysisSubtype"
-      (change)="change.emit($event)"
-      [fieldCount]="fieldCount"
-      [sqlBuilder]="sqlBuilder"
-      [artifacts]="artifacts"
-    >
-    </designer-settings-single-table>
 
     <div class="designer__content">
-      <!-- <designer-settings-aux
-        class="designer__aux-settings"
-        [auxSettings]="auxSettings"
-        [analysisType]="analysisType"
-        [analysisSubtype]="analysisSubtype"
-        [chartTitle]="chartTitle"
-        [artifacts]="artifacts"
-        (change)="change.emit($event)"
-      ></designer-settings-aux> -->
+        <!-- <designer-settings-aux
+          class="designer__aux-settings"
+          [auxSettings]="auxSettings"
+          [analysisType]="analysisType"
+          [analysisSubtype]="analysisSubtype"
+          [chartTitle]="chartTitle"
+          [artifacts]="artifacts"
+          (change)="change.emit($event)"
+        ></designer-settings-aux> -->
 
-      <div>
-        <designer-selected-fields (change)="change.emit($event)"
-                                  [analysisType]="analysisType"
-                                  [analysisSubtype]="analysisSubtype"
-                                  [artifacts]="artifacts"
-                                  class="designer__selecte-fields__container"
-        >
-        </designer-selected-fields>
-        <div style="float: right;">
-          <button type="button" mat-icon-button (click)="openDrawer(drawer)">
-            <mat-icon fontIcon="icon-settings"></mat-icon>
+        <div>
+          <designer-selected-fields (change)="change.emit($event)"
+                                    [analysisType]="analysisType"
+                                    [analysisSubtype]="analysisSubtype"
+                                    [artifacts]="artifacts"
+                                    class="designer__selecte-fields__container"
+          >
+          </designer-selected-fields>
+          <button mat-mini-fab class="fields-panel-toggle__btn">
+            <mat-icon fontIcon="icon-menu" (click)="toggleFieldsDrawer(fieldsdrawer)"></mat-icon>
+          </button>
+          <button mat-mini-fab class="options-panel-toggle__btn">
+            <mat-icon fontIcon="icon-settings" (click)="openDrawer(drawer)"></mat-icon>
           </button>
         </div>
-      </div>
 
-      <filter-chips-u *ngIf="filters.length > 0"
-                      class="designer__filters"
-                      (remove)="onRemoveFilter($event)"
-                      (removeAll)="onRemoveFilterAll()"
-                      [filters]="filters"
-                      [artifacts]="artifacts">
-      </filter-chips-u>
+        <filter-chips-u *ngIf="filters.length > 0"
+                        class="designer__filters"
+                        (remove)="onRemoveFilter($event)"
+                        (removeAll)="onRemoveFilterAll()"
+                        [filters]="filters"
+                        [artifacts]="artifacts">
+        </filter-chips-u>
 
-      <div [ngSwitch]="designerState" fxLayout="column" class="mat-elevation-z3">
+        <div [ngSwitch]="designerState" fxLayout="column" class="mat-elevation-z3">
 
-        <div *ngSwitchCase="DesignerStates.NO_SELECTION"
-              fxLayout="column"
-              fxLayoutAlign="space-between center"
-              class="non-ideal-state__container">
-          <span i18n class="non-ideal-state__message">
-            Add some fields to visualize, by dragging, or using the add button
-          </span>
-          <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
-        </div>
-
-        <div *ngSwitchCase="DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA"
-              fxLayout="column"
-              fxLayoutAlign="space-between center"
-              class="non-ideal-state__container">
-            <span class="non-ideal-state__message" i18n>
-              At least one data field needs to be selected
+          <div *ngSwitchCase="DesignerStates.NO_SELECTION"
+                fxLayout="column"
+                fxLayoutAlign="space-between center"
+                class="non-ideal-state__container">
+            <span i18n class="non-ideal-state__message">
+              Add some fields to visualize, by dragging, or using the add button
             </span>
             <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
-        </div>
+          </div>
 
-        <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA"
-              fxLayout="column"
-              fxLayoutAlign="space-between center"
-              class="non-ideal-state__container">
-          <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
-        </div>
+          <div *ngSwitchCase="DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA"
+                fxLayout="column"
+                fxLayoutAlign="space-between center"
+                class="non-ideal-state__container">
+              <span class="non-ideal-state__message" i18n>
+                At least one data field needs to be selected
+              </span>
+              <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
+          </div>
 
-        <div *ngSwitchCase="DesignerStates.SELECTION_WITH_NO_DATA"
-              fxLayout="column"
-              fxLayoutAlign="space-between center"
-              class="non-ideal-state__container">
-          <span class="non-ideal-state__message" i18n>
-            There is no data for the fields selected
-          </span>
-        </div>
+          <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA"
+                fxLayout="column"
+                fxLayoutAlign="space-between center"
+                class="non-ideal-state__container">
+            <mat-icon class="non-ideal-state__icon" [fontIcon]="getNonIdealStateIcon()"></mat-icon>
+          </div>
 
-        <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA">
-          <designer-pivot class="designer__data"
-                          *ngIf="analysisType === 'pivot'"
-                          [data]="data"
-                          [sorts]="sorts"
-                          [artifacts]="artifacts">
-          </designer-pivot>
-          <designer-map-chart class="designer__data"
-                          *ngIf="analysisType ==='chart' && analysisSubtype === 'geo'"
-                          [chartType]="analysisSubtype"
-                          [auxSettings]="auxSettings"
-                          [data]="data"
-                          [sqlBuilder]="sqlBuilder">
-          </designer-map-chart>
-          <designer-chart class="designer__data"
-                          *ngIf="analysisType ==='chart' && analysisSubtype !== 'geo'"
-                          [chartType]="analysisSubtype"
-                          [sorts]="sorts"
-                          [auxSettings]="auxSettings"
-                          [data]="data"
-                          [sqlBuilder]="sqlBuilder">
-          </designer-chart>
+          <div *ngSwitchCase="DesignerStates.SELECTION_WITH_NO_DATA"
+                fxLayout="column"
+                fxLayoutAlign="space-between center"
+                class="non-ideal-state__container">
+            <span class="non-ideal-state__message" i18n>
+              There is no data for the fields selected
+            </span>
+          </div>
+
+          <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA">
+            <designer-pivot class="designer__data"
+                            *ngIf="analysisType === 'pivot'"
+                            [data]="data"
+                            [sorts]="sorts"
+                            [artifacts]="artifacts">
+            </designer-pivot>
+            <designer-map-chart class="designer__data"
+                            *ngIf="analysisType ==='chart' && analysisSubtype === 'geo'"
+                            [chartType]="analysisSubtype"
+                            [auxSettings]="auxSettings"
+                            [data]="data"
+                            [sqlBuilder]="sqlBuilder">
+            </designer-map-chart>
+            <designer-chart class="designer__data"
+                            *ngIf="analysisType ==='chart' && analysisSubtype !== 'geo'"
+                            [chartType]="analysisSubtype"
+                            [sorts]="sorts"
+                            [auxSettings]="auxSettings"
+                            [data]="data"
+                            [sqlBuilder]="sqlBuilder">
+            </designer-chart>
+          </div>
         </div>
       </div>
-    </div>
+
   </div>
 </mat-drawer-container>

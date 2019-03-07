@@ -33,15 +33,16 @@ $secondary-red:    #D93E00;
 $secondary-berry:  #AC145A;
 $secondary-purple: #914191;
 
-$string-type-color: #FFBE00;
-$number-type-color: #D93E00;
-$geo-type-color: #FF9000;
-$date-type-color: #6FB320;
+$string-type-color: $secondary-purple;
+$number-type-color: $primary-red;
+$geo-type-color: $primary-orange;
+$date-type-color: $primary-green;
 
-$string-type-chip-color: rgba(#FFBE00, .3);
-$number-type-chip-color: rgba(#D93E00, .3);
-$geo-type-chip-color: rgba(#FF9000, .3);
-$date-type-chip-color: rgba(#6FB320, .3);
+$type-chip-opacity: .7;
+$string-type-chip-color: rgba($string-type-color, $type-chip-opacity);
+$number-type-chip-color: rgba($number-type-color, $type-chip-opacity);
+$geo-type-chip-color: rgba($geo-type-color, $type-chip-opacity);
+$date-type-chip-color: rgba($date-type-color, $type-chip-opacity);
 
 $report-designer-settings-bg-color: #F3F5F8;
 $background-color: #F5F9FC;

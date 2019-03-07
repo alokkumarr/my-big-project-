@@ -1,10 +1,15 @@
 @import "src/themes/base/colors";
+:host {
+  height: 100%;
+  width: 100%;
+}
 
 .settings__container {
   overflow: hidden;
   display: grid;
   padding: 0 10px;
   height: 100%;
+  width: 100%;
   grid-template:
     "filters" 54px
     "unselected-fields" 1fr

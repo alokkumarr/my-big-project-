@@ -1,6 +1,6 @@
 <mat-tab-group dynamicHeight>
   <mat-tab label="DATA OPTIONS">
-    <div>
+    <div style="padding: 5px;">
       <designer-data-option-field *ngFor="let col of selectedColumns"
                                   (change)="change.emit($event)"
                                   [artifactColumn]="col"

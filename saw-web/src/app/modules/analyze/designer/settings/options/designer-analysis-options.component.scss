@@ -7,7 +7,7 @@
 
   ::ng-deep .mat-tab-label {
     min-width: 80px;
-    height: 30px;
+    height: 36px;
     padding: 0 10px;
   }
 
@@ -18,9 +18,15 @@
 
   ::ng-deep .mat-tab-labels {
     background-color: white;
+    height: 36px;
   }
 
   ::ng-deep .mat-tab-label-active>.mat-tab-label-content {
     color: $primary-blue-b1;
+  }
+  ::ng-deep .mat-tab-label-active {
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    background-color: $report-designer-settings-bg-color;
   }
 }

@@ -51,11 +51,15 @@ export class SingleTableDesignerLayoutComponent {
     });
   }
 
-  onClickedOutside(drawer) {
+  onClickedOutsideOptionsPanel(drawer) {
     if (this.isInTabletMode && this.isOptionsPanelOpen) {
       drawer.close();
       this.isOptionsPanelOpen = false;
     }
+  }
+
+  toggleFieldsDrawer(drawer) {
+    drawer.toggle();
   }
 
   openDrawer(drawer) {

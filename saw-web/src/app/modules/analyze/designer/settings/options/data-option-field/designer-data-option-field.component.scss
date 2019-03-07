@@ -2,14 +2,7 @@
 
 :host {
   display: block;
-}
-
-.mat-expansion-panel-header {
-  height: 34px;
-}
-
-.mat-expansion-panel {
-  background-color: $report-designer-settings-bg-color;
+  margin-bottom: 5px;
 }
 
 .data-option__fieldset {
@@ -17,6 +10,5 @@
 }
 
 .data-option__display-name {
-  color: $primary-blue-b1;
   font-size: 11px;
 }
