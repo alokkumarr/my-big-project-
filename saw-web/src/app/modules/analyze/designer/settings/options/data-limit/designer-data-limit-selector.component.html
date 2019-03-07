@@ -1,8 +1,4 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <!-- <mat-radio-group [(ngModel)]="limitType" style="width:50%;">
-    <mat-radio-button value="top">Top</mat-radio-button>
-    <mat-radio-button style="margin-left: 4%;" value="bottom">Bottom</mat-radio-button>
-  </mat-radio-group> -->
   <mat-button-toggle-group [vertical]="isInTabletMode" [(ngModel)]="limitType" class="limit-type" appearance="legacy">
     <mat-button-toggle value="top">
       Top
