@@ -8,7 +8,7 @@
 - name: Install SIP Metadata Service configuration file
   template: src=application.yml dest=/opt/bda/sip-metadata-service/conf
   notify:
-    - restart saw-observe
+    - restart sip-metadata
 # Workaround: The service restart handler will run only after all
 # tasks have completed.  This causes the service to remain running
 # using the old port when the new socket activation proxy starts up,
