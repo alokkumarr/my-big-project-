@@ -22,7 +22,6 @@ public class MetricsIT extends BaseIT {
         .when().get("/prometheus/api/v1/query")
         .then().assertThat().statusCode(200)
         .body("status", equalTo("success"))
-        .log().all()
         .body("data.result.metric.job",
               hasItems(
                   "sip-batch-ingestion", "sip-export", "sip-observe",
