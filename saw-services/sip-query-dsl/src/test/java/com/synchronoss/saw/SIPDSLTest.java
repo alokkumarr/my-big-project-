@@ -31,7 +31,7 @@ public class SIPDSLTest {
         ObjectMapper objectMapper = new ObjectMapper();
         SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
         ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl);
+        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl,100);
         Assert.assertNotNull(query);
     }
 
