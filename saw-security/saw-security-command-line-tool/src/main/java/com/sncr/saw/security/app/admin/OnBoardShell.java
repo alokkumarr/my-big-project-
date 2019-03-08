@@ -32,13 +32,13 @@ public class OnBoardShell {
                                 @ShellOption(value = "--F",help = "User First Name",defaultValue = "_NONE_") String firstName,
                                 @ShellOption(value = "--M",help = "User Middle Name",defaultValue = "_NONE_") String middleName,
                                 @ShellOption(value = "--L",help = "User Last Name",defaultValue = "_NONE_") String lastName){
-        if (customerCode.isEmpty() || customerCode.equalsIgnoreCase("_NONE_")
-            || productName.isEmpty() || productName.equalsIgnoreCase("_NONE_")
-            || productCode.isEmpty() || productCode.equalsIgnoreCase("_NONE_")
-            || email.isEmpty() || email.equalsIgnoreCase("_NONE_")
-            || firstName.isEmpty() || firstName.equalsIgnoreCase("_NONE_")
+        if (customerCode.trim().isEmpty() || customerCode.equalsIgnoreCase("_NONE_")
+            || productName.trim().isEmpty() || productName.equalsIgnoreCase("_NONE_")
+            || productCode.trim().isEmpty() || productCode.equalsIgnoreCase("_NONE_")
+            || email.trim().isEmpty() || email.equalsIgnoreCase("_NONE_")
+            || firstName.trim().isEmpty() || firstName.equalsIgnoreCase("_NONE_")
             || middleName.equalsIgnoreCase("_NONE_")
-            || lastName.isEmpty() || lastName.equalsIgnoreCase("_NONE_")) {
+            || lastName.trim().isEmpty() || lastName.equalsIgnoreCase("_NONE_")) {
             logger.error("Missing argument, Following Options are mandatory to onBoardCustomer (--C,--P,--PC,--E,--F,--M,--L) \n  Use 'help onboard-customer' command to print usage!!");
             throw new IllegalArgumentException("Missing argument!! Use 'help onboard-customer' command to print usage!!");
         }
@@ -50,7 +50,7 @@ public class OnBoardShell {
 
         }
 
-        if (middleName.isEmpty() || middleName.equals("--L") ) {
+        if (middleName.trim().isEmpty() || middleName.equals("--L") ) {
             onBoardCustomer.setMiddleName(" ");
         }
         else {
