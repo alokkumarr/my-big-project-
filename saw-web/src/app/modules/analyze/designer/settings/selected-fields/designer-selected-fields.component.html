@@ -12,11 +12,13 @@
                  [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
                  (cdkDropListDropped)="drop($event)"
                  fxFlex="90"
+                 [attr.e2e]="'designer-selected-container' + adapter.title"
                  class="selected-fields__list"
                  [class.highlighted]="isDragInProgress && openGroupArray[i]"
   >
     <mat-chip *ngFor="let col of adapter.artifactColumns"
               class="selected-fields__item"
+              [attr.e2e]="'designer-selected-field-' + (col.aliasName || col.displayName)"
               [ngClass]="getFieldItemClass(col)"
               cdkDrag [cdkDragData]="col"
               [removable]="true" (removed)="removeFromGroup(col, adapter)"

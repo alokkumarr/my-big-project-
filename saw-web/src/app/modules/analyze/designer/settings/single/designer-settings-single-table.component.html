@@ -4,16 +4,28 @@
        fxLayout="column"
        fxLayoutAlign="center start">
 
-    <mat-form-field class="settings__filters__keyword" fxLayout="row">
+    <mat-button-toggle-group class="settings__type-filters">
+      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
+                         (change)="onTypeFilterChange($event.value)"
+                         [value]="typeIcon.value">
+        <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle *ngFor="let adapter of groupAdapters | slice:0:2" (change)="onFilterChange($event.value, adapter)"
+                         [value]="adapter.title">
+        {{adapter.title}}
+      </mat-button-toggle>
+
+    </mat-button-toggle-group>
+    <mat-form-field appearance="outline" class="settings__filters__keyword" fxLayout="row">
       <input matInput type="text"
-              fxFlex="70"
               autocomplete="off"
+              fxFlex="95"
               placeholder="Search"
               name="filter-settings"
               (input)="onTextFilterChange($event.target.value)"
               [value]="filterObj.keyword"/>
 
-      <div fxFLex="30" fxLayout="row">
+      <!-- <div fxFLex="30" fxLayout="row">
         <mat-icon *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
                   class="settings__filters_toggle"
                   [class.selected]="filterObj.types.includes(typeIcon.value)"
@@ -21,8 +33,13 @@
                   (click)="onTypeFilterChange(typeIcon.value)"
         >
         </mat-icon>
+      </div> -->
+      <div *ngIf="filterObj.keyword" fxFlex="5" fxLayout="row" style="height: 10px;">
+        <mat-icon fontIcon="icon-remove"
+                  (click)="onTextFilterChange('')"
+          >
+        </mat-icon>
       </div>
-
     </mat-form-field>
   </div>
 
@@ -39,6 +56,7 @@
            (cdkDragStarted)="dragStarted($event)"
            (cdkDragReleased)="dragReleased($event)"
            [cdkDragData]="artifactColumn"
+           [attr.e2e]="'designer-unselected-field-' + (artifactColumn.aliasName || artifactColumn.displayName)"
            class="settings__list-item"
       >
         <div fxLayout="row"

@@ -5,7 +5,6 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
-import * as reject from 'lodash/reject';
 
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService } from '../../../../../common/services';
@@ -145,14 +144,15 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     this.change.emit(event);
   }
 
-  getUnselectedArtifactColumns() {
+  getUnselectedArtifactColumns(filter?) {
     const { types, keyword } = this.filterObj;
+    const toggleFilter = filter || this.hasAllowedType(types);
     return fpPipe(
       fpFilter(artifactColumn => {
         const { checked, alias, displayName } = artifactColumn;
         return (
           !checked &&
-          this.hasAllowedType(artifactColumn, types) &&
+          toggleFilter(artifactColumn) &&
           this.hasKeyword(alias || displayName, keyword)
         );
       }),
@@ -160,13 +160,15 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     )(this.artifactColumns);
   }
 
-  hasAllowedType(artifactColumn, filterTypes) {
-    const generalType = this.getGeneralType(artifactColumn);
-    /* prettier-ignore */
-    if (isEmpty(filterTypes)) {
-      return true;
+  hasAllowedType(filterTypes) {
+    return (artifactColumn) => {
+      const generalType = this.getGeneralType(artifactColumn);
+      /* prettier-ignore */
+      if (isEmpty(filterTypes)) {
+        return true;
+      }
+      return filterTypes.includes(generalType);
     }
-    return filterTypes.includes(generalType);
   }
 
   getGeneralType(artifactColumn) {
@@ -191,13 +193,16 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   onTypeFilterChange(value) {
-    // this.filterObj.types = value;
-    if (this.filterObj.types.includes(value)) {
-      this.filterObj.types = reject(this.filterObj.types, type => type === value);
-    } else {
-      this.filterObj.types.push(value);
-    }
+    console.log('value', value);
+    this.filterObj.types = [value];
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  }
+
+  onFilterChange(value, adapter: IDEsignerSettingGroupAdapter) {
+    console.log('value', value);
+    console.log('adapter', adapter);
+    const filter = adapter.canAcceptArtifactColumn(adapter, this.groupAdapters);
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns(filter);
   }
 
   /**

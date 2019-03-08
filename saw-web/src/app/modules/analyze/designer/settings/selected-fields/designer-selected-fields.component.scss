@@ -3,8 +3,9 @@
 .selected-fields__item.mat-standard-chip {
   padding: 2px 10px;
   font-size: 10px;
-  min-height: 26px;
+  min-height: 20px;
   color: white;
+  margin: 3px 0 3px 3px;;
   background-color: $selection-highlight-col;
   cursor: move;
 
@@ -50,7 +51,7 @@
     border-bottom-right-radius: 3px;
     border: 1px solid $primary-grey-g1;
 
-    &>.mat-chip-list-wrapper {
+    ::ng-deep .mat-chip-list-wrapper {
       margin: 0;
     }
 

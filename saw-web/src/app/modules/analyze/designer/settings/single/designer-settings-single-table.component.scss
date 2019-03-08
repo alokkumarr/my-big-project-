@@ -7,13 +7,11 @@
 .settings__container {
   overflow: hidden;
   display: grid;
-  padding: 0 10px;
   height: 100%;
   width: 100%;
   grid-template:
-    "filters" 54px
+    "filters" 80px
     "unselected-fields" 1fr
-    // "selected-fields" 1fr
     / 100%;
 }
 
@@ -35,6 +33,10 @@
   .settings__filters__keyword {
     width: 100%;
     font-size: 11px !important;
+
+    ::ng-deep .mat-form-field-wrapper {
+      padding: 0;
+    }
   }
 
   ::ng-deep .mat-button-toggle-label-content {
@@ -42,8 +44,9 @@
     line-height: 30px;
 
     .mat-icon {
-      height: 14px;
-      font-size: 14px;
+      height: 9px;
+      font-size: 9px;
+      width: 12px;
     }
   }
 
@@ -76,6 +79,7 @@
   grid-area: unselected-fields;
   overflow-x: hidden;
   overflow-y: auto;
+  padding-bottom: 30px;
 
   .icon-string-type::before {
     color: $string-type-color;
@@ -103,6 +107,9 @@
 //   border-top: 1px solid $primary-grey-g1;
 //   margin-top: 10px;
 // }
+.settings__list {
+  padding-left: 5px;
+}
 
 .settings__list-item {
   cursor: move;

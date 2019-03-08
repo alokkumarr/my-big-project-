@@ -1,6 +1,6 @@
-<div fxLayout="column" class="chart-option__list">
+<div fxLayout="column" class="chart-option__list mat-elevation-z2">
   <div *ngIf="showLegendOpts">
-    <div class="chart-option__item mat-elevation-z2" fxLayout="row" fxLayoutAlign="start center">
+    <div class="chart-option__item" fxLayout="row" fxLayoutAlign="start center">
       <div fxFlex="25">
         Legend position:
       </div>
@@ -13,7 +13,7 @@
       </mat-form-field>
     </div>
 
-    <div class="chart-option__item mat-elevation-z2" fxLayout="row" fxLayoutAlign="start center">
+    <div class="chart-option__item" fxLayout="row" fxLayoutAlign="start center">
       <div fxFlex="25">
         Legend layout:
       </div>
@@ -28,7 +28,7 @@
   </div>
 
   <div *ngIf="showLabelOpts" fxLayout="column"
-       fxLayoutAlign="start center" class="aux__label__options chart-option__item mat-elevation-z2"
+       fxLayoutAlign="start center" class="aux__label__options chart-option__item"
   >
     <mat-checkbox [(ngModel)]="labelOptions.enabled" (change)="onLabelOptsChange($event)">Show Labels</mat-checkbox>
     <mat-radio-group *ngIf="labelOptions.enabled" [(ngModel)]="labelOptions.value" (change)="onLabelOptsChange($event)">
@@ -37,7 +37,7 @@
     </mat-radio-group>
   </div>
 
-  <div class="chart-option__item mat-elevation-z2" *ngIf="showInversion" fxLayout="row" fxLayoutAlign="start center">
+  <div class="chart-option__item" *ngIf="showInversion" fxLayout="row" fxLayoutAlign="start center">
     <div fxFlex="25">Inversion:</div>
     <div fxFlex="75">
       <button mat-icon-button [color]="isInverted === true ? 'primary': ''">
@@ -53,7 +53,7 @@
     </div>
   </div>
 
-  <div class="chart-option__item mat-elevation-z2" fxLayout="row" fxLayoutAlign="start center">
+  <div class="chart-option__item" fxLayout="row" fxLayoutAlign="start center">
     <div fxFlex="25">Chart title:</div>
     <div fxFlex="75">
       <mat-form-field>

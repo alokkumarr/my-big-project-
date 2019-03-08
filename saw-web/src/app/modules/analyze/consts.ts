@@ -244,7 +244,7 @@ export const ANALYSIS_METHODS = [
             label: 'Pie Chart',
             icon: {
               font: 'icon-pie-chart',
-              svg: 'bubble-chart-col'
+              svg: 'pie-chart-col'
             },
             type: 'chart:pie'
           },
