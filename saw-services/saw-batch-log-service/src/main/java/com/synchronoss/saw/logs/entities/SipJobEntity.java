@@ -11,7 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "SIP_JOB", catalog = "saw_scheduler", schema = "")
+@Table(name = "SIP_JOB", catalog = "sip_bis", schema = "")
 @Entity
 public class SipJobEntity implements Serializable {
   
