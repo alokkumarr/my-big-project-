@@ -8,7 +8,8 @@ import * as isEmpty from 'lodash/isEmpty';
 import { getPrivilegeDescription } from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
-import { first, tap, withLatestFrom, map as map$ } from 'rxjs/operators';
+import { from } from 'rxjs';
+import { first, tap, map as map$, flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'privilege-edit-dialog',
@@ -197,7 +198,11 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
     moduleIdControl.valueChanges
       .pipe(
-        withLatestFrom(this.modules$),
+        flatMap(mId =>
+          from(this.modules$ || Promise.resolve([])).pipe(
+            map$(modules => [mId, modules])
+          )
+        ),
         map$(([mId, modules]) => {
           const module = find(modules, mod => mod.moduleId === mId) || {};
           return { modId: mId, modName: module.moduleName };
