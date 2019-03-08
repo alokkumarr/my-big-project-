@@ -25,22 +25,6 @@
       </div>
     </nav>
 {{ template "prom_content_head" . }}
-    <h1>Health<h1>
-    <table class="table table-condensed table-striped table-bordered" style="width: 0%">
-      <tr>
-        <th>Instance</th>
-        <th>Status</th>
-      </tr>
-{{ range query "spring_boot_actuator_health_status{job='spring'}" | sortByLabel "instance" }}
-      <tr>
-        <td>{{ .Labels.instance }}</td>
-        <td{{ if eq (. | value) 0.0 }} style="background-color: greenyellow">OK {{ else }} class="alert-danger">FAIL{{ end }} (status: {{ template "prom_query_drilldown" (args (printf "spring_boot_actuator_health_status{job='spring',instance='%s'}" .Labels.instance)) }})</td>
-      </tr>
-{{ end }}
-    </table>
-{{ template "prom_content_tail" . }}
-
-{{ template "prom_content_head" . }}
     <h1>Load</h1>
     <div id="queryGraphLoad"></div>
     <script>
@@ -63,5 +47,22 @@
     </script>
 {{ template "prom_content_tail" . }}
 
+{{ template "prom_content_head" . }}
+    <h1>Health<h1>
+    <table class="table table-condensed table-striped table-bordered" style="width: 0%">
+      <tr>
+        <th>Instance</th>
+        <th>Job</th>
+        <th>Status</th>
+      </tr>
+{{ range query "spring_boot_actuator_health_status" | sortByLabel "job" }}
+      <tr>
+        <td>{{ .Labels.instance }}</td>
+        <td>{{ .Labels.job }}</td>
+        <td{{ if eq (. | value) 0.0 }} style="background-color: greenyellow">OK {{ else }} class="alert-danger">FAIL{{ end }} (status: {{ template "prom_query_drilldown" (args (printf "spring_boot_actuator_health_status{instance='%s'}" .Labels.instance)) }})</td>
+      </tr>
+{{ end }}
+    </table>
+{{ template "prom_content_tail" . }}
   </body>
 </html>
