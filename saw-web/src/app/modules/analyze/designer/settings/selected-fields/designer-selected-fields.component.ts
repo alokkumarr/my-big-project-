@@ -1,5 +1,17 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import {CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+  CdkDrag
+} from '@angular/cdk/drag-drop';
 import { Subject } from 'rxjs';
 import { bufferCount, take } from 'rxjs/operators';
 import * as isEmpty from 'lodash/isEmpty';
@@ -26,9 +38,7 @@ const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
   templateUrl: 'designer-selected-fields.component.html',
   styleUrls: ['designer-selected-fields.component.scss']
 })
-
 export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
-
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() analysisType: string;
@@ -53,7 +63,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   constructor(
     private _designerService: DesignerService,
     private _dndPubsub: DndPubsubService
-    ) {
+  ) {
     this._changeSettingsDebounced = debounce(
       this._changeSettingsDebounced,
       SETTINGS_CHANGE_DEBOUNCE_TIME
@@ -63,7 +73,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.setGroupAdapters();
-    this._dndSubscription = this._dndPubsub.subscribe(this.onDndEvent.bind(this));
+    this._dndSubscription = this._dndPubsub.subscribe(
+      this.onDndEvent.bind(this)
+    );
   }
 
   ngOnDestroy() {
@@ -72,13 +84,18 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   onDndEvent(event: DndEvent) {
     switch (event) {
-    case 'dragStart':
-      this.isDragInProgress = true;
-      this._acceptEventStream$.pipe(bufferCount(3), take(1)).subscribe(this.changeOpenGroupArray);
-      break;
-    case 'dragEnd':
-      this.isDragInProgress = false;
-      break;
+      case 'dragStart':
+        this.isDragInProgress = true;
+        this._acceptEventStream$
+          .pipe(
+            bufferCount(3),
+            take(1)
+          )
+          .subscribe(this.changeOpenGroupArray);
+        break;
+      case 'dragEnd':
+        this.isDragInProgress = false;
+        break;
     }
   }
 
@@ -88,15 +105,16 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   setGroupAdapters() {
     switch (this.analysisType) {
-    case 'pivot':
-      this.groupAdapters = this._designerService.getPivotGroupAdapters(
-        this.artifactColumns
-      );
-      break;
-    case 'chart':
-      this.groupAdapters = this._designerService.getChartGroupAdapters(
-        this.artifactColumns, this.analysisSubtype
-      );
+      case 'pivot':
+        this.groupAdapters = this._designerService.getPivotGroupAdapters(
+          this.artifactColumns
+        );
+        break;
+      case 'chart':
+        this.groupAdapters = this._designerService.getChartGroupAdapters(
+          this.artifactColumns,
+          this.analysisSubtype
+        );
     }
     this.openGroupArray = map(this.groupAdapters, () => false);
   }
@@ -124,12 +142,18 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     const adapter = event.container.data;
     const previousAdapter = event.previousContainer.data;
     if (event.previousContainer === event.container) {
-      moveItemInArray(<any>adapter.artifactColumns, event.previousIndex, event.currentIndex);
+      moveItemInArray(
+        <any>adapter.artifactColumns,
+        event.previousIndex,
+        event.currentIndex
+      );
     } else {
-      transferArrayItem(<any>previousAdapter.artifactColumns,
-                        <any>adapter.artifactColumns,
-                        event.previousIndex,
-                        event.currentIndex);
+      transferArrayItem(
+        <any>previousAdapter.artifactColumns,
+        <any>adapter.artifactColumns,
+        event.previousIndex,
+        event.currentIndex
+      );
       const movedItem = adapter.artifactColumns[event.currentIndex];
       adapter.transform(movedItem);
     }
@@ -139,7 +163,10 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   acceptPredicateFor(adapter: IDEsignerSettingGroupAdapter) {
     return (item: CdkDrag<ArtifactColumn>) => {
-      const canAcceptFn = adapter.canAcceptArtifactColumn(adapter, this.groupAdapters);
+      const canAcceptFn = adapter.canAcceptArtifactColumn(
+        adapter,
+        this.groupAdapters
+      );
       const artifactColumn = item.data;
       const canAccept = canAcceptFn(artifactColumn);
       this._acceptEventStream$.next(canAccept);
@@ -157,7 +184,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       case 'geo':
         return 'geo-type-chip-color';
       case 'date':
-        return 'calendar-type-chip-color';
+        return 'date-type-chip-color';
     }
   }
 }
