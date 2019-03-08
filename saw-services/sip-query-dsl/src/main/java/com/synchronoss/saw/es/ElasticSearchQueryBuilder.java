@@ -7,6 +7,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.saw.model.*;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
+import org.apache.commons.lang.time.DateUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -19,13 +20,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ElasticSearchQueryBuilder {
 
   public static final Logger logger = LoggerFactory.getLogger(ElasticSearchQueryBuilder.class);
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
+    private final static String EQ = "EQ";
+    private final static String GT = "GT";
+    private final static String LT = "LT";
+    private final static String GTE = "GTE";
+    private final static String LTE = "LTE";
+    private final static String NEQ = "NEQ";
+    private final static String BTW = "BTW";
     String dataSecurityString;
 
     public String buildDataQuery(SIPDSL sipdsl, Integer size) throws IOException, ProcessingException {
@@ -77,9 +88,49 @@ public class ElasticSearchQueryBuilder {
                             if(item.getType().value().equals(Filter.Type.DATE.value())) {
                                 rangeQueryBuilder.format(DATE_FORMAT);
                             }
+
                             rangeQueryBuilder.lte(dynamicConvertor.getLte());
                             rangeQueryBuilder.gte(dynamicConvertor.getGte());
                             builder.add(rangeQueryBuilder);
+                        }
+                        else if (item.getModel().getFormat().equalsIgnoreCase("epoch_millis")) {
+                            logger.info("Inside EPOCH method :\n");
+                                if (item.getModel().getOperator().equals(Model.Operator.EQ)) {
+                                    logger.info("Equal operator is passed:");
+                                    logger.info("recieved value :"+item.getModel().getValue().longValue());
+                                    Date date = new Date(item.getModel().getValue().longValue());
+                                    logger.info("Date object created :"+date);
+                                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    logger.info("dateFormat (SimpleDateFormat) :"+dateFormat);
+                                    RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        logger.info("rangeQueryBuilder.format(dateFormat.format(date)) : "+dateFormat.format(date));
+                                        rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
+                                    }
+                                    logger.info("is rangeQueryBuilder.equals(dateFormat.format(date)) ? :"+rangeQueryBuilder.equals(dateFormat.format(date)));
+                                    rangeQueryBuilder.lte(dateFormat.format(DateUtils.addMilliseconds(date,1)));
+                                    rangeQueryBuilder.gte(dateFormat.format(DateUtils.addMilliseconds(date,-1)));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : "+builder);
+                                }
+                                else if (item.getModel().getOperator().equals(Model.Operator.GTE)) {
+                                    logger.info("GTE operator is passed:");
+                                    logger.info("recieved value :"+item.getModel().getGte());
+
+                                    Date date = new Date(Long.valueOf(item.getModel().getGte()));
+                                    logger.info("Date object created :"+date);
+                                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    logger.info("dateFormat (SimpleDateFormat) :"+dateFormat);
+                                    RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        logger.info("rangeQueryBuilder.format(dateFormat.format(date)) : "+dateFormat.format(date));
+                                        rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
+                                    }
+                                    logger.info("is rangeQueryBuilder.equals(dateFormat.format(date)) ? :"+rangeQueryBuilder.gte(dateFormat.format(date)));
+                                    rangeQueryBuilder.gte(dateFormat.format(date));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : "+builder);
+                                }
                         }
                         else {
                             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
