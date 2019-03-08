@@ -107,8 +107,8 @@ export class AnalyzeService {
       executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
         : '';
-    const requestURL = isUndefined(executionId) ?
-      `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
+    const requestURL = isUndefined(executionId)
+      ? `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
       : `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`;
     return this.getRequest(requestURL);
   }
@@ -200,11 +200,11 @@ export class AnalyzeService {
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return <Promise<Analysis>>this.postRequest(
-      `analysis`,
-      payload,
-      customHeaders
-    ).then(fpGet(`contents.analyze.[0]`));
+    return <Promise<Analysis>>(
+      this.postRequest(`analysis`, payload, customHeaders).then(
+        fpGet(`contents.analyze.[0]`)
+      )
+    );
   }
 
   previewExecution(model, options = {}) {
@@ -331,14 +331,18 @@ export class AnalyzeService {
   updateAnalysis(model): Promise<Analysis> {
     delete model.isScheduled;
     delete model.executionType;
+    /* Add update info */
+    model.updatedTimestamp = Date.now();
+    model.updatedUserName = this._jwtService.getUserName();
+
     const payload = this.getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(
-      fpGet(`contents.analyze.[0]`)
+    return <Promise<Analysis>>(
+      this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`))
     );
   }
 
@@ -437,8 +441,8 @@ export class AnalyzeService {
       ],
       ['contents.keys.[0].analysisType', type]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, params).then(
-      fpGet('contents.analyze.[0]')
+    return <Promise<Analysis>>(
+      this.postRequest(`analysis`, params).then(fpGet('contents.analyze.[0]'))
     );
   }
 

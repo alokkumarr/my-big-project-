@@ -33,8 +33,7 @@ class Header extends SideNav {
     expect(this._companyLogo.isPresent()).toBeTruthy();
   }
   openCategoryMenu() {
-    commonFunctions.waitFor.elementToBeClickable(this._categoryMenuIcon);
-    this._categoryMenuIcon.click();
+    commonFunctions.clickOnElement(this._categoryMenuIcon);
   }
 }
 module.exports = Header;

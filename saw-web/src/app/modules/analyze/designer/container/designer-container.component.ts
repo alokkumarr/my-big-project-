@@ -43,6 +43,8 @@ import {
   DATE_TYPES,
   DEFAULT_MAP_SETTINGS
 } from '../consts';
+
+import { DRAFT_CATEGORY_ID } from './../../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
 
@@ -355,11 +357,15 @@ export class DesignerContainerComponent implements OnInit {
     });
     if (!isGroupByPresent) {
       forEach(analysis.sqlBuilder.dataFields, dataField => {
-        dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
+        dataField.aggregate =
+          dataField.aggregate === 'percentageByRow'
+            ? 'percentage'
+            : dataField.aggregate;
       });
 
       forEach(this.artifacts[0].columns, col => {
-        col.aggregate = col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+        col.aggregate =
+          col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
       });
     }
     return analysis;
@@ -394,7 +400,10 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
-    this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
+    this.analysis =
+      this.analysis.type === 'chart'
+        ? this.formulateChartRequest(this.analysis)
+        : this.analysis;
 
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
@@ -526,8 +535,12 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   openSaveDialog(): Promise<any> {
+    this.analysis.categoryId =
+      this.designerMode === 'new' || this.designerMode === 'fork'
+        ? DRAFT_CATEGORY_ID
+        : this.analysis.categoryId;
     return this._analyzeDialogService
-      .openSaveDialog(this.analysis)
+      .openSaveDialog(this.analysis, this.designerMode)
       .afterClosed()
       .toPromise();
   }
