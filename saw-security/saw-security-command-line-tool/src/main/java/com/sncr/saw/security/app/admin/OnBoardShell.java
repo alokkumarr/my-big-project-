@@ -32,8 +32,13 @@ public class OnBoardShell {
                                 @ShellOption(value = "--F",help = "User First Name",defaultValue = "_NONE_") String firstName,
                                 @ShellOption(value = "--M",help = "User Middle Name",defaultValue = "_NONE_") String middleName,
                                 @ShellOption(value = "--L",help = "User Last Name",defaultValue = "_NONE_") String lastName){
-        if (customerCode.equalsIgnoreCase("_NONE_") || productName.equalsIgnoreCase("_NONE_") || productCode.equalsIgnoreCase("_NONE_") || email.equalsIgnoreCase("_NONE_")
-            || firstName.equalsIgnoreCase("_NONE_") || middleName.equalsIgnoreCase("_NONE_") || lastName.equalsIgnoreCase("_NONE_")) {
+        if (customerCode.isEmpty() || customerCode.equalsIgnoreCase("_NONE_")
+            || productName.isEmpty() || productName.equalsIgnoreCase("_NONE_")
+            || productCode.isEmpty() || productCode.equalsIgnoreCase("_NONE_")
+            || email.isEmpty() || email.equalsIgnoreCase("_NONE_")
+            || firstName.isEmpty() || firstName.equalsIgnoreCase("_NONE_")
+            || middleName.equalsIgnoreCase("_NONE_")
+            || lastName.isEmpty() || lastName.equalsIgnoreCase("_NONE_")) {
             logger.error("Missing argument, Following Options are mandatory to onBoardCustomer (--C,--P,--PC,--E,--F,--M,--L) \n  Use 'help onboard-customer' command to print usage!!");
             throw new IllegalArgumentException("Missing argument!! Use 'help onboard-customer' command to print usage!!");
         }
@@ -44,12 +49,18 @@ public class OnBoardShell {
             return("Invalid Customer-Code !! Acceptable Format = [^A-Za-z0-9] ");
 
         }
+
+        if (middleName.isEmpty() || middleName.equals("--L") ) {
+            onBoardCustomer.setMiddleName(" ");
+        }
+        else {
+            onBoardCustomer.setMiddleName(middleName);
+        }
         onBoardCustomer.setCustomerCode(customerCode);
         onBoardCustomer.setProductName(productName);
         onBoardCustomer.setProductCode(productCode);
         onBoardCustomer.setEmail(email);
         onBoardCustomer.setFirstName(firstName);
-        onBoardCustomer.setMiddleName(middleName);
         onBoardCustomer.setLastName(lastName);
         try {
             // check if connection is working fine only then proceed
