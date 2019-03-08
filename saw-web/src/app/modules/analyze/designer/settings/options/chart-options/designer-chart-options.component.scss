@@ -5,16 +5,14 @@
 
 .chart-option {
   &__list {
-    padding: 5px;
+    padding: 9px;
+    margin: 3px;
   }
 
   &__item {
-    border-radius: 5px;
-    background: white;
-    margin-bottom: 5px;
-    padding: 5px;
+    font-size: 12px;
 
-    .select-form-field[appearance="outline"] {
+    .select-form-field[appearance='outline'] {
       margin: 5px 0;
     }
   }

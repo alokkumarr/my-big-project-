@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   ::ng-deep .mat-tab-label-content {
@@ -21,12 +21,14 @@
     height: 36px;
   }
 
-  ::ng-deep .mat-tab-label-active>.mat-tab-label-content {
+  ::ng-deep .mat-tab-label-active > .mat-tab-label-content {
     color: $primary-blue-b1;
+    opacity: 1;
   }
   ::ng-deep .mat-tab-label-active {
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
     background-color: $report-designer-settings-bg-color;
+    opacity: 1;
   }
 }

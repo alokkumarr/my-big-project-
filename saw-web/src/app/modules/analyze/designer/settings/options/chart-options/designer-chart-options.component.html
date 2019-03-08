@@ -1,25 +1,46 @@
-<div fxLayout="column" class="chart-option__list">
+<mat-card fxLayout="column" class="chart-option__list mat-elevation-z2">
   <div *ngIf="showLegendOpts">
-    <div class="chart-option__item mat-elevation-z2" fxLayout="row" fxLayoutAlign="start center">
+    <div class="chart-option__item" fxLayout="row" fxLayoutAlign="start center">
       <div fxFlex="25">
         Legend position:
       </div>
-      <mat-form-field class="select-form-field" appearance="outline" fxFlex="75">
-        <mat-select [(ngModel)]="legend.align" (selectionChange)="onLegendChange()">
-          <mat-option *ngFor="let pos of legend.options.align" [value]="pos.name">
+      <mat-form-field
+        class="select-form-field"
+        appearance="outline"
+        fxFlex="75"
+      >
+        <mat-select
+          [(ngModel)]="legend.align"
+          (selectionChange)="onLegendChange()"
+        >
+          <mat-option
+            *ngFor="let pos of legend.options.align"
+            [value]="pos.name"
+          >
             {{ pos.displayName }}
           </mat-option>
         </mat-select>
       </mat-form-field>
     </div>
 
-    <div class="chart-option__item mat-elevation-z2" fxLayout="row" fxLayoutAlign="start center">
+    <div class="chart-option__item" fxLayout="row" fxLayoutAlign="start center">
       <div fxFlex="25">
         Legend layout:
       </div>
-      <mat-form-field class="select-form-field" appearance="outline" fxFlex="75">
-        <mat-select placeholder="Legend Layout" [(ngModel)]="legend.layout" (selectionChange)="onLegendChange()">
-          <mat-option *ngFor="let layout of legend.options.layout" [value]="layout.name">
+      <mat-form-field
+        class="select-form-field"
+        appearance="outline"
+        fxFlex="75"
+      >
+        <mat-select
+          placeholder="Legend Layout"
+          [(ngModel)]="legend.layout"
+          (selectionChange)="onLegendChange()"
+        >
+          <mat-option
+            *ngFor="let layout of legend.options.layout"
+            [value]="layout.name"
+          >
             {{ layout.displayName }}
           </mat-option>
         </mat-select>
@@ -27,44 +48,61 @@
     </div>
   </div>
 
-  <div *ngIf="showLabelOpts" fxLayout="column"
-       fxLayoutAlign="start center" class="aux__label__options chart-option__item mat-elevation-z2"
+  <div
+    *ngIf="showLabelOpts"
+    fxLayout="column"
+    fxLayoutAlign="start center"
+    class="aux__label__options chart-option__item"
   >
-    <mat-checkbox [(ngModel)]="labelOptions.enabled" (change)="onLabelOptsChange($event)">Show Labels</mat-checkbox>
-    <mat-radio-group *ngIf="labelOptions.enabled" [(ngModel)]="labelOptions.value" (change)="onLabelOptsChange($event)">
+    <mat-checkbox
+      [(ngModel)]="labelOptions.enabled"
+      (change)="onLabelOptsChange($event)"
+      >Show Labels</mat-checkbox
+    >
+    <mat-radio-group
+      *ngIf="labelOptions.enabled"
+      [(ngModel)]="labelOptions.value"
+      (change)="onLabelOptsChange($event)"
+    >
       <mat-radio-button value="data">Show Data</mat-radio-button>
       <mat-radio-button value="percentage">Show Percentage</mat-radio-button>
     </mat-radio-group>
   </div>
 
-  <div class="chart-option__item mat-elevation-z2" *ngIf="showInversion" fxLayout="row" fxLayoutAlign="start center">
+  <div
+    class="chart-option__item"
+    *ngIf="showInversion"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+  >
     <div fxFlex="25">Inversion:</div>
     <div fxFlex="75">
-      <button mat-icon-button [color]="isInverted === true ? 'primary': ''">
-        <mat-icon fontIcon="icon-hor-bar-chart"
-                  (click)="setInversion(true)">
+      <button mat-icon-button [color]="isInverted === true ? 'primary' : ''">
+        <mat-icon fontIcon="icon-hor-bar-chart" (click)="setInversion(true)">
         </mat-icon>
       </button>
-      <button mat-icon-button [color]="isInverted === false ? 'primary': ''">
-        <mat-icon fontIcon="icon-vert-bar-chart"
-                  (click)="setInversion(false)">
+      <button mat-icon-button [color]="isInverted === false ? 'primary' : ''">
+        <mat-icon fontIcon="icon-vert-bar-chart" (click)="setInversion(false)">
         </mat-icon>
       </button>
     </div>
   </div>
 
-  <div class="chart-option__item mat-elevation-z2" fxLayout="row" fxLayoutAlign="start center">
+  <div class="chart-option__item" fxLayout="row" fxLayoutAlign="start center">
     <div fxFlex="25">Chart title:</div>
     <div fxFlex="75">
       <mat-form-field>
-        <input matInput
-               class="chart-title__input"
-               type="text"
-               (change)="onTitleChange()"
-               [(ngModel)]="chartTitle"
-               autocomplete="off"
-               maxlength="50" required/>
+        <input
+          matInput
+          class="chart-title__input"
+          type="text"
+          (change)="onTitleChange()"
+          [(ngModel)]="chartTitle"
+          autocomplete="off"
+          maxlength="50"
+          required
+        />
       </mat-form-field>
     </div>
   </div>
-</div>
+</mat-card>
