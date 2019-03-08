@@ -7,7 +7,7 @@ import org.springframework.boot.actuate.health.CompositeHealthIndicator;
 import org.springframework.boot.actuate.health.HealthAggregator;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -18,7 +18,8 @@ import org.springframework.context.annotation.Configuration;
  * on it, in addition to other metrics.
  */
 @Configuration
-@ConditionalOnMissingClass("org.junit.Test")
+@ConditionalOnProperty(
+    name = "sip.test", havingValue = "false", matchIfMissing = true)
 class HealthMetricsConfiguration {
   private CompositeHealthIndicator healthIndicator;
 
