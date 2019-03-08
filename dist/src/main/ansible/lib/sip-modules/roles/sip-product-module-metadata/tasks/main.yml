@@ -1,9 +1,11 @@
+- name: Copy product-module configurtion in hosts
+  template: src={{ lookup('env','SIP_PRODUCT_MODULE') }}/configuration/product-module-config.json dest=/tmp/product-module-config.json
+
 - name: Product module metadata
   uri:
-      # TODO: Host needs to change
-      url: "http://sip-app1:9800/internal/proxy/storage/product-module/{{ sip_product_module_id }}/configuration"
+      url: "http://localhost:9800/internal/proxy/storage/product-module/{{ sip_product_module_id }}/configuration"
       method: POST
       headers:
         Content-Type: "application/json"
-      src: "{{ lookup('env','SIP_PRODUCT_MODULE') }}/configuration/product-module-config.json"
-      remote_src: false
+      src: "/tmp/product-module-config.json"
+      remote_src: true
