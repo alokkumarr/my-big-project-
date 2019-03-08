@@ -70,8 +70,6 @@ public class BisCronJobTest {
       verify(jobDetail).getKey();
       verify(jobDetail).getJobDataMap();
       verify(jobDataMap).get("JOB_DATA_MAP");
-      //verify(context).getMergedJobDataMap();
-     // verify(jobDataMap).getString("myKey");
     } catch (JobExecutionException e) {
       logger.trace("Exception occured " + e);
     }
