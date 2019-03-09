@@ -15,7 +15,7 @@ scrape_configs:
 {% for host in groups['saw-services'] %}
           - '{{ host }}:9400'
 {% endfor %}
-  - job_name: 'sip-observe'
+  - job_name: 'sip-metadata'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
@@ -42,13 +42,6 @@ scrape_configs:
       - targets:
 {% for host in groups['saw-services'] %}
           - '{{ host }}:9800'
-{% endfor %}
-  - job_name: 'sip-semantic'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets:
-{% for host in groups['saw-services'] %}
-          - '{{ host }}:9900'
 {% endfor %}
   - job_name: 'sip-batch-ingestion'
     metrics_path: '/actuator/prometheus'
