@@ -6,11 +6,10 @@ const Constants = require('../Constants');
 const logger = require('../../conf/logger')(__filename);
 
 class APICommonHelpers {
-
   static getApiUrl(baseUrl) {
     const q = urlParser.parse(baseUrl, true);
     let url = 'http://' + q.host; // API base url
-    logger.debug('api base url: '+url)
+    logger.debug('api base url: ' + url);
     return url;
   }
 
@@ -21,10 +20,14 @@ class APICommonHelpers {
     };
     let apiUrl = `${this.getApiUrl(baseUrl)}${Constants.API_ROUTES.AUTH}`;
     let response = new RestClient().post(apiUrl, payload);
-    if(!response) {
+    if (!response) {
       return null;
     }
     return 'Bearer '.concat(response.aToken);
+  }
+  static getHost(baseUrl) {
+    const q = urlParser.parse(baseUrl, true);
+    return q.host;
   }
 }
 

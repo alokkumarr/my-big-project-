@@ -208,8 +208,11 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'workbench/channel/createAndDelete.test.js'
-      //testBaseDir + 'dummyDevelopmentTests2.js'
+      //testBaseDir + 'workbench/bis/createAndDelete.test.js'
+      //testBaseDir + 'workbench/bis/createAndDeleteChannel.test.js',
+      //testBaseDir + 'workbench/bis/updateAndDeleteChannel.test.js',
+      //testBaseDir + 'workbench/bis/activateDeActivateChannel.test.js',
+      testBaseDir + 'workbench/bis/createAndDeleteRoute.test.js'
     ]
   },
   onCleanUp: function(results) {

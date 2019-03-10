@@ -1753,14 +1753,93 @@
   },
   "BIS_CHANNEL": {
     "createAndDelete": {
-      "ByAdmin": {
+      "ByAdmin1": {
         "id": "CHANN001",
         "user": "admin",
         "sourceType": "SFTP",
+        "channelName": "e2e",
         "accessType": "rw",
         "status":1,
         "testConnectivityMessage":"Connection successful!!",
-        "description": "Admin should be create and delete channel"
+        "description": "Admin should be able to create and delete a channel"
+      },
+      "ByAdmin2": {
+        "id": "CHANN002",
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "eからe",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to create and delete a channel with multibytchars"
+      }
+    },
+    "updateAndDelete": {
+      "ByAdmin1": {
+        "id": "CHANN003",
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to update and delete a channel"
+      },
+      "ByAdmin2": {
+        "id": "CHANN004",
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to update and delete a channel with multibytchars"
+      }
+    },
+    "deActivateChannel": {
+      "ByAdmin1": {
+        "id": "CHANN005",
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to de-activate and delete a channel"
+      },
+      "ByAdmin2": {
+        "id": "CHANN006",
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to de-activate and delete a channel with multibytchars"
+      }
+    },
+    "createAndDeleteRoute": {
+      "ByAdmin1": {
+        "id": "CHANN007",
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "routeName": "e2eRoute",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to create and delete a route"
+      },
+      "ByAdmin2": {
+        "id": "CHANN008",
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "routeName": "e2eRoute",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to create and delete a route with multibytchars"
       }
     }
   }

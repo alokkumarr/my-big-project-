@@ -49,6 +49,15 @@ class Utils {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
+  static randomId() {
+    let text = '';
+    let possible =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+    for (let i = 0; i < 10; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+  }
 }
 
 module.exports = Utils;

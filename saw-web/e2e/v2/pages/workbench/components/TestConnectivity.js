@@ -2,6 +2,7 @@
 
 const logger = require('../../../conf/logger')(__filename);
 const commonFunctions = require('../../utils/commonFunctions');
+const expect = require('chai').expect;
 
 class TestConnectivity {
   constructor() {
@@ -14,16 +15,22 @@ class TestConnectivity {
     );
   }
 
-  verifyTestConnectivityLogs() {
+  verifyTestConnectivityLogs(msg = null) {
     commonFunctions.waitFor.elementToBeVisible(this._testConnectivitySection);
     commonFunctions.waitFor.elementToBeVisible(this._connectivtyOuptut);
 
     this._connectivtyOuptut.getText().then(content => {
       console.log('Content from logs---' + content);
+      if (msg) {
+        expect(content).to.contain(msg);
+      }
     });
   }
   closeTestConnectivity() {
     commonFunctions.clickOnElement(this._closeTestConnectivityLog);
+    commonFunctions.waitFor.elementToBeNotVisible(
+      this._testConnectivitySection
+    );
   }
 }
 

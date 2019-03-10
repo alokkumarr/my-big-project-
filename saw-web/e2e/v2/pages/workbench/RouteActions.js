@@ -2,10 +2,11 @@
 const commonFunctions = require('../utils/commonFunctions');
 const RouteModel = require('./components/RouteModel');
 
-class RouteManagement extends RouteModel {
+class RouteActions extends RouteModel {
   constructor() {
     super();
+    // all the page elements in the route list component
   }
 }
 
-module.exports = RouteManagement;
+module.exports = RouteActions;

@@ -15,23 +15,23 @@ class ChannelModel extends TestConnectivity {
       by.css(`[e2e="create-channel-next-button"]`)
     );
     this._channelNameInput = element(by.css(`[e2e="name-of-channel"]`));
-    this._accesTypeSelect = element(
-      by.xpath(`(//*[@e2e="access-type"])[position()=last()]`)
-    );
+    this._accesTypeSelect = element(by.css(`[e2e="access-type-select"]`));
     this._accessRead = element(by.css(`[e2e="access-r"]`));
     this._accessReadWrite = element(by.css(`[e2e="access-rw"]`));
-    this._channelHostNameInput = element(by.css(`[e2e="host-name"]`));
-    this._channelUserNameInput = element(by.css(`[e2e="name-of-user"]`));
-    this._channelPortNumberInput = element(by.css(`[e2e="port-no"]`));
+    this._channelHostNameInput = element(by.css(`[e2e="host-name-input"]`));
+    this._channelUserNameInput = element(by.css(`[e2e="name-of-user-input"]`));
+    this._channelPortNumberInput = element(by.css(`[e2e="port-no-input"]`));
     this._channelPasswordInput = element(by.css(`[e2e="user-password"]`));
-    this._showPasswordBtn = element(by.css(`[e2e="show-password"]`));
-    this._hidePasswordBtn = element(by.css(`[e2e="hide-password"]`));
-    this._channelDescTextArea = element(by.css(`[e2e="channel-description"]`));
+    this._showPasswordBtn = element(by.css(`[e2e="show-password-sc"]`));
+    this._hidePasswordBtn = element(by.css(`[e2e="hide-password-cs"]`));
+    this._channelDescTextArea = element(
+      by.css(`[e2e="channel-description-input"]`)
+    );
     this._channelPreviousBtn = element(by.css(`[e2e="channel-prev-btn"]`));
     this._channelCreateBtn = element(by.css(`[e2e="channel-create-btn"]`));
     this._channelUpdateBtn = element(by.css(`[e2e="channel-update-btn"]`));
     this._testConnectivity = element(
-      by.css(`[e2e="channel-test-connect-btn"]`)
+      by.css(`[e2e="channel-test-connect-btn-model"]`)
     );
   }
 
@@ -48,15 +48,13 @@ class ChannelModel extends TestConnectivity {
   }
 
   selectAccessType(type) {
-    browser.sleep(2000);
     commonFunctions.clickOnElement(this._accesTypeSelect);
-    browser.sleep(2000);
+    browser.sleep(500);
     if (type == 'r') {
       commonFunctions.clickOnElement(this._accessRead);
     } else {
       commonFunctions.clickOnElement(this._accessReadWrite);
     }
-    browser.sleep(2000);
   }
 
   enterHostName(hostName) {
@@ -72,7 +70,7 @@ class ChannelModel extends TestConnectivity {
   }
 
   fillPassword(password) {
-    commonFunctions.fillInput((this._channelPasswordInput, password));
+    this._channelPasswordInput.clear().sendKeys(password);
   }
 
   fillDescription(description) {
@@ -81,6 +79,7 @@ class ChannelModel extends TestConnectivity {
 
   clickOnTestConnectivity() {
     commonFunctions.clickOnElement(this._testConnectivity);
+    browser.sleep(5000);
   }
 
   clickOnPreviousButton() {
@@ -88,7 +87,10 @@ class ChannelModel extends TestConnectivity {
   }
 
   clickOnCreateButton() {
-    commonFunctions.clickOnElement(this._channelNextButton);
+    commonFunctions.clickOnElement(this._channelCreateBtn);
+  }
+  clickOnUpdateChannel() {
+    commonFunctions.clickOnElement(this._channelUpdateBtn);
   }
 }
 

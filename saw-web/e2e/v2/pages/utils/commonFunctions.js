@@ -148,5 +148,10 @@ module.exports = {
   fillInput(el, value) {
     this.waitFor.elementToBeVisible(el);
     el.clear().sendKeys(value);
+  },
+  validateText(el, msg) {
+    el.getText().then(text => {
+      expect(text.trim().toLowerCase()).toEqual(msg.trim().toLowerCase());
+    });
   }
 };
