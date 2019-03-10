@@ -1,9 +1,11 @@
-'use strict';
+//'use strict';
 const commonFunctions = require('../utils/commonFunctions');
 const ChannelModel = require('./components/ChannelModel');
 const RouteModel = require('./components/RouteModel');
+const TestConnectivity = require('./components/TestConnectivity');
+const mixin = require('mixin-es6');
 
-class WorkBenchPage extends ChannelModel {
+class WorkBenchPage extends mixin(ChannelModel, RouteModel, TestConnectivity) {
   constructor() {
     super();
     this._addChannelButton = element(by.css(`[e2e="add-new-channel-btn"]`));
@@ -19,7 +21,6 @@ class WorkBenchPage extends ChannelModel {
         )
       );
   }
-
   clickOnAddChannelButton() {
     commonFunctions.clickOnElement(this._addChannelButton);
   }
