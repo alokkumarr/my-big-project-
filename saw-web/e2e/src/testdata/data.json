@@ -1757,6 +1757,9 @@
         "id": "CHANN001",
         "user": "admin",
         "sourceType": "SFTP",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
         "description": "Admin should be create and delete channel"
       }
     }
