@@ -343,8 +343,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   calculateScheduleCellValue(rowData) {
-    const { cronexp, activeTab } = rowData.schedulerExpression;
-    return generateSchedule(cronexp, activeTab);
+    const { cronexp, activeTab, timezone } = rowData.schedulerExpression;
+    return generateSchedule(cronexp, activeTab, timezone);
   }
 
   togglePWD() {

@@ -249,7 +249,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
      * @return Record count
      */
     private long extractRecordCount (ESHttpClient esHttpClient,
-                                     String esIndex) {
+                                     String esIndex) throws Exception {
         long recordCount = 0;
 
         recordCount = esHttpClient.getRecordCount(esIndex);

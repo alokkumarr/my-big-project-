@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="140" height="140" viewBox="0 0 140 140">
+    <defs>
+        <circle id="a" cx="99.476" cy="98.375" r="70"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd" transform="translate(-29 -28)">
+        <circle cx="98.98" cy="98.98" r="70" fill="#0096D5" fill-rule="nonzero" transform="rotate(46 98.98 98.98)"/>
+        <mask id="b" fill="#fff">
+            <use xlink:href="#a"/>
+        </mask>
+        <use fill="#00C9E8" fill-rule="nonzero" transform="rotate(-1 99.476 98.375)" xlink:href="#a"/>
+        <path fill="#FFF" stroke="#FFF" stroke-width="4" d="M137.116 107.671h6v54h-6z" mask="url(#b)" opacity=".5" transform="rotate(-1 140.116 134.671)"/>
+        <path fill="#FFF" stroke="#FFF" stroke-width="4" d="M122.319 130.931h6v31h-6z" mask="url(#b)" opacity=".5" transform="rotate(-1 125.319 146.431)"/>
+        <path fill="#FFF" stroke="#FFF" stroke-width="4" d="M108.435 144.175h6v18h-6z" mask="url(#b)" opacity=".5" transform="rotate(-1 111.435 153.175)"/>
+        <path fill="#FFF" stroke="#FFF" stroke-width="4" d="M94.507 152.419h6v10h-6z" mask="url(#b)" opacity=".5" transform="rotate(-1 97.507 157.419)"/>
+        <path fill="#FFF" d="M61.573 101.437l20.177 14.43c.908.699.75 1.998 0 2.76l-2.276 2.307c-.75.763-1.728.572-2.72 0l-20.381-14.223" mask="url(#b)" transform="rotate(54 69.373 111.437)"/>
+        <path fill="#FFF" d="M75.337 109.35l-.006-.004-5.368 5.407-7.906 5.33 11.657 11.653 5.515-8.082 5.21-5.205-.003-.001 47.621-24.849-31.869-31.863z" mask="url(#b)" transform="rotate(46 97.057 96.736)"/>
+        <path stroke="#FFF" stroke-width="3.904" d="M152.95 111.684c.499-15.172-11.837-27.483-26.985-26.986" mask="url(#b)" transform="rotate(46 139.465 98.184)"/>
+        <path stroke="#FFF" stroke-width="3.904" d="M127.102 92.098a11.234 11.234 0 0 1 11.975 11.975" mask="url(#b)" transform="rotate(46 133.102 98.073)"/>
+    </g>
+</svg>

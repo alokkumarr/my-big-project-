@@ -50,3 +50,8 @@ wait_maprfs
 init_datalake
 load_data
 load_semantic
+
+# Workaround: Restart Semantic Service after loading sample semantic
+# data to ensure it is migrated from binary to JSON tables.  Remove
+# when sample data is loaded directly into JSON tables.
+sshpass -p root ssh sip-app1 systemctl restart sip-metadata

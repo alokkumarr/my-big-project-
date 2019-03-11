@@ -24,16 +24,19 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.impl.triggers.CronTriggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.synchronoss.saw.scheduler.entities.QrtzTriggers;
 import com.synchronoss.saw.scheduler.job.BisCronJob;
 import com.synchronoss.saw.scheduler.job.BisSimpleJob;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
+import com.synchronoss.saw.scheduler.repository.QuartzRepository;
 
 @RunWith(SpringRunner.class)
 public class BisServiceImplTest {
@@ -71,6 +74,7 @@ public class BisServiceImplTest {
 		schJobDetail.setJobScheduleTime(new Date());
 		schJobDetail.setUserFullName("DDDD");
 		schJobDetail.setChannelId("123");
+		schJobDetail.setTimezone("UTC");
 
 		
 		scheduleKeys = new ScheduleKeys();
@@ -82,6 +86,7 @@ public class BisServiceImplTest {
 		jobKey = new JobKey("test", "test");
 		
 		bisJobService = Mockito.spy(BisJobServiceImpl.class);
+    
 		
 	}
 	
@@ -103,6 +108,17 @@ public class BisServiceImplTest {
 		Mockito.when(scheduler.getJobDetail(jobKey)).thenReturn(jobDetail);
 		Mockito.when( jobDetail.getJobDataMap()).thenReturn(jobDataMap);
 		
+	}
+	
+	private void mockQuartzRepo() throws SchedulerException {
+	  QuartzRepository quartzRepository = Mockito.mock(QuartzRepository.class);
+    bisJobService.quartzRepository = quartzRepository;
+    Mockito.when(bisJobService.quartzRepository.
+        findByJobName("test")).thenReturn(new QrtzTriggers());
+   CronTriggerImpl cronImpl = Mockito.mock(CronTriggerImpl.class);
+   Mockito.when(scheduler.getTrigger(Mockito.any())).thenReturn((Trigger)cronImpl);
+   Mockito.when(cronImpl.getFireTimeAfter(Mockito.any())).thenReturn(new Date());
+    
 	}
 	
 	private void mockJobContext() throws SchedulerException  {
@@ -192,6 +208,7 @@ public class BisServiceImplTest {
 	public void testPauseJob() throws SchedulerException, ParseException{
 		mockScheduleJob();
 		mockJob();
+		mockQuartzRepo();
 		Boolean value = bisJobService.pauseJob(scheduleKeys);
 		Assert.assertTrue(value);
 
@@ -202,6 +219,7 @@ public class BisServiceImplTest {
 	public void testResumeJob() throws SchedulerException, ParseException{
 		mockScheduleJob();
 		mockJob();
+		mockQuartzRepo();
 		Boolean value = bisJobService.resumeJob(scheduleKeys);
 		Assert.assertTrue(value);
 
@@ -243,9 +261,9 @@ public class BisServiceImplTest {
 		Map<String, Object> resultMap = value.get(0);
 		Assert.assertEquals(resultMap.size(), 5);
 		Assert.assertEquals(resultMap.get("jobStatus"), "RUNNING");
-		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate());
+		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate().getTime());
 	}
 	
 	
@@ -263,9 +281,9 @@ public class BisServiceImplTest {
 		
 		Assert.assertEquals(resultMap.size(), 5);
 		Assert.assertEquals(resultMap.get("jobStatus"), "RUNNING");
-		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime());
-		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate());
+		Assert.assertEquals(resultMap.get("scheduleTime"), schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("lastFiredTime"),schJobDetail.getJobScheduleTime().getTime());
+		Assert.assertEquals(resultMap.get("nextFireTime"), schJobDetail.getEndDate().getTime());
 	}
 	
 	

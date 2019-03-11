@@ -53,6 +53,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+    <dependency>
+	    <groupId>io.micrometer</groupId>
+	    <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
@@ -117,6 +121,11 @@
 			<scope>test</scope>
 		</dependency>
 
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
 	</dependencies>
 
 	<build>
@@ -160,6 +169,11 @@
 						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254), 
 						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
+					<!--
+					    The spring-boot-start-test dependency adds JUnit in the
+					    compile scope so exclude JUnit explicitly from packaging
+					-->
+					<excludeGroupIds>junit</excludeGroupIds>
 				</configuration>
 			</plugin>
 			<plugin>

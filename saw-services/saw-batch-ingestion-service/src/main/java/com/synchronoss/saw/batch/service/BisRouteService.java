@@ -26,10 +26,7 @@ public class BisRouteService {
 
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
-
-  private String insertUrl = "/schedule";
-  private String updateUrl = "/update";
-  private String deleteUrl = "/delete";
+  private String scheduleUri = "/scheduler/bisscheduler";
   private String pauseUrl = "/pause";
   private String resumeUrl = "/resume";
   private static final Long STATUS_ACTIVE = 1L;
@@ -115,21 +112,22 @@ public class BisRouteService {
     logger.trace("Updating route scheduled jobs");
     
     if (isActivate) {
-      url = bisSchedulerUrl + resumeUrl;
+      url = bisSchedulerUrl + scheduleUri + resumeUrl;
       
     } else {
-      url = bisSchedulerUrl + pauseUrl;
+      url = bisSchedulerUrl + scheduleUri + pauseUrl;
     }
-    logger.trace("Invoking URL:" + url);
+    logger.info("Invoking URL:" + url);
     
     try {
       restTemplate.postForLocation(url, scheduleKeys);
     } catch (ResourceAccessException exception) {
-      logger.error("Error in deactivating route for " 
-          + scheduleKeys.getJobName() + "with" + bisSchedulerUrl + pauseUrl
+      logger.warn("ResourceAccessException Activate/Deactivate updated from next fire time only" 
+          + scheduleKeys.getJobName() + " with " + bisSchedulerUrl + pauseUrl
           + " " + exception.getMessage());
     } catch (Exception exception) {
-      logger.error("Error in deactivating route for " + scheduleKeys.getJobName() 
+      logger.warn("Activate/Deactivate updated from next fire time only" 
+          +  scheduleKeys.getJobName() 
            + "with" + bisSchedulerUrl + pauseUrl
           + " " + exception.getMessage());
       

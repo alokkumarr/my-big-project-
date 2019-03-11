@@ -30,6 +30,7 @@
 		<mariadb>2.3.0</mariadb>
 		<snotify>1.1</snotify>
 		<common.io>2.6</common.io>
+                <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -54,6 +55,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+    <dependency>
+	    <groupId>io.micrometer</groupId>
+	    <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -156,6 +161,17 @@
 			<artifactId>saw-batch-log-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
+                <dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>core</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+	  		<artifactId>hadoop-common</artifactId>
+	  		<version>${mapr.hadoop.client.version}</version>
+	  		<scope>provided</scope>
+		</dependency>
 
 		<!-- This is automated migration plugin -->
 		<dependency>
@@ -168,6 +184,19 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.retry</groupId>
+			<artifactId>spring-retry</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+		</dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -215,6 +244,11 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<classifier>exec</classifier>
+					<!--
+					    The spring-boot-start-test dependency adds JUnit in the
+					    compile scope so exclude JUnit explicitly from packaging
+					-->
+					<excludeGroupIds>junit</excludeGroupIds>
 				</configuration>
 			</plugin>
 			<plugin>

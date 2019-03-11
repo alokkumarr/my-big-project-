@@ -76,10 +76,13 @@ public class JobServiceImpl implements JobService<SchedulerJobDetail>{
 		String groupKey = job.getJobGroup();
 		String triggerKey = job.getJobName();
 
+		String timezone = job.getTimezone();
+
 		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, job, groupKey);
 
         logger.debug("creating trigger for key :"+jobKey + " at date :"+job.getJobScheduleTime());
-		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),
+            job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW, timezone);
 
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -102,6 +105,10 @@ public class JobServiceImpl implements JobService<SchedulerJobDetail>{
 	@Override
 	public boolean updateOneTimeJob(SchedulerJobDetail schedulerJobDetail) {
         logger.info("Request received for updating one time job.");
+        
+        logger.debug("Schedule time = " + schedulerJobDetail.getJobScheduleTime());
+        logger.debug("End date = " + schedulerJobDetail.getEndDate());
+
 
 		String jobName = schedulerJobDetail.getJobName();
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -135,12 +142,14 @@ public class JobServiceImpl implements JobService<SchedulerJobDetail>{
 
 		String jobName = schedulerJobDetail.getJobName();
 		Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
+		String timezone = schedulerJobDetail.getTimezone();
 		JobKey jobKey = new JobKey(jobName,schedulerJobDetail.getJobGroup());
         logger.debug("Parameters received for updating cron job : jobKey :"+jobKey + ", date: "+schedulerJobDetail.getJobScheduleTime());
 		try {
 			Trigger newTrigger = JobUtil.createCronTrigger(jobName, schedulerJobDetail.getJobScheduleTime(),
 					schedulerJobDetail.getEndDate(),
-					schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+					schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW, timezone);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID,schedulerJobDetail);
 			scheduler.addJob(jobDetail,true,true);

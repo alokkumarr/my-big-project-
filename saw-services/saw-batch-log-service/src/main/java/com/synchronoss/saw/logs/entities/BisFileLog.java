@@ -7,6 +7,10 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -49,22 +53,29 @@ public class BisFileLog implements Serializable {
 
   @Column(name = "BIS_PROCESS_STATE")
   String bisProcessState;
-  
+
+  @LastModifiedDate
+  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "MODIFIED_DATE")
   private Date modifiedDate;
 
+  @CreatedDate
+  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "CREATED_DATE")
   private Date createdDate;
-  
+
   @Column(name = "BIS_TRANSFER_START_TIME")
   private Date transferStartTime;
-  
+
   @Column(name = "BIS_TRANSFER_END_TIME")
   private Date transferEndTime;
-  
+
   @Column(name = "BIS_TRANSFER_DURATION")
   private Long transferDuration;
-  
+
+  @Column(name = "CHECKPOINT_TIMESTAMP")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date checkpointDate;
 
   public String getPid() {
     return pid;
@@ -163,7 +174,7 @@ public class BisFileLog implements Serializable {
   public Date getCreatedDate() {
     return createdDate;
   }
-  
+
   public void setModifiedDate(Date modifiedDate) {
     this.modifiedDate = modifiedDate;
   }
@@ -171,7 +182,7 @@ public class BisFileLog implements Serializable {
   public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
   }
-  
+
   public Date getTransferStartTime() {
     return transferStartTime;
   }
@@ -194,6 +205,16 @@ public class BisFileLog implements Serializable {
 
   public void setTransferDuration(Long transferDuration) {
     this.transferDuration = transferDuration;
+  }
+
+
+  @Temporal(TemporalType.TIMESTAMP)
+  public Date getCheckpointDate() {
+    return checkpointDate;
+  }
+
+  public void setCheckpointDate(Date checkpointDate) {
+    this.checkpointDate = checkpointDate;
   }
 
 }

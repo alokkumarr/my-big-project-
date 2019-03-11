@@ -38,6 +38,10 @@ export class AnalyzeViewComponent implements OnInit {
   public CARD_VIEW = 'card';
   public analysisId: string;
   public viewMode = this.LIST_VIEW;
+  public privileges = {
+    create: false
+  };
+  public subCategoryId: string;
   public analysisTypes = [
     ['all', 'All'],
     ['chart', 'Chart'],
