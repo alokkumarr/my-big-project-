@@ -1,5 +1,10 @@
 package com.synchronoss.saw.logs.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.synchronoss.saw.logs.entities.SipJobEntity;
+import com.synchronoss.saw.logs.models.SipJobDetails;
+import com.synchronoss.saw.logs.repository.SipJobDataRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.synchronoss.saw.logs.entities.SipJobEntity;
-import com.synchronoss.saw.logs.models.SipJobDetails;
-import com.synchronoss.saw.logs.repository.SipJobDataRepository;
+
 
 
 @RestController
