@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost/sip_bis
     username: root
-    password: 
+    password: root
     driver-class-name:  org.mariadb.jdbc.Driver
   jpa:
     show-sql: true
