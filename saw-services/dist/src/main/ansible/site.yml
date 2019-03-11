@@ -5,10 +5,9 @@
     - saw-transport
     - saw-workbench
     - saw-export
-    - saw-observe
+    - sip-metadata
     - saw-scheduler
     - saw-storage-proxy
-    - saw-semantic
     - saw-batch-ingestion
     # Keep Gateway Service last to avoid starting socket-activated
     # services from the health check until all Ansible handlers have

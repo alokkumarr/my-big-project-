@@ -26,7 +26,6 @@ public class BuilderUtil
 	
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 		JsonNode objectNode = objectMapper.readTree(jsonString);
 		JsonNode repository = objectNode.get(node);
         return repository;
@@ -37,7 +36,6 @@ public class BuilderUtil
 	{
 	  String jsonString = null;
 	  ObjectMapper objectMapper = new ObjectMapper();
-	  objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 	  jsonString = objectMapper.writeValueAsString(objects);
 	  return jsonString;
 	} 
