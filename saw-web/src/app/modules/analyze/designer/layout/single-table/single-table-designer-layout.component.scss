@@ -21,16 +21,28 @@
 
 .options-panel-toggle__btn {
   position: absolute;
-  top: calc(100% - 45px);
+  bottom: 5px;
   z-index: 99;
-  right: 5px;
+  right: 15px;
+
+  &.on-drawer {
+    bottom: 5px;
+    right: unset;
+    left: 5px;
+  }
 }
 
 .fields-panel-toggle__btn {
   position: absolute;
-  top: calc(100% - 45px);
+  bottom: 5px;
   z-index: 99;
-  left: 5px;
+  left: 10px;
+
+  &.on-drawer {
+    bottom: 5px;
+    left: unset;
+    right: 5px;
+  }
 
   .mat-icon {
     padding-top: 7px;
@@ -53,12 +65,13 @@
   }
 
   &__content {
-    padding: 10px;
+    height: 100%;
+    padding: 0 5px;
   }
 
   &__filters {
     padding: 0 20px;
-    grid-area: filters;
+    background-color: white;
   }
   &__data {
     grid-area: data;

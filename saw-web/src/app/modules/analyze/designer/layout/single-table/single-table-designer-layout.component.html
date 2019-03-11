@@ -1,19 +1,22 @@
-<mat-drawer-container style="height: 100%;" [hasBackdrop]="false">
-    <mat-drawer #fieldsdrawer mode="side"
-        position="start" [opened]="true"
-        [ngStyle]="{width: isInTabletMode ? '22%' : '15%'}"
+<mat-drawer-container [hasBackdrop]="false" style="height: calc(100% + 3px);">
+  <mat-drawer #fieldsdrawer mode="side"
+      position="start" [opened]="isFieldsPanelOpen"
+      [ngStyle]="{width: isInTabletMode ? '22%' : '15%'}"
+  >
+    <designer-settings-single-table
+      class="designer__data-settings"
+      [analysisType]="analysisType"
+      [analysisSubtype]="analysisSubtype"
+      (change)="change.emit($event)"
+      [fieldCount]="fieldCount"
+      [sqlBuilder]="sqlBuilder"
+      [artifacts]="artifacts"
     >
-      <designer-settings-single-table
-        class="designer__data-settings"
-        [analysisType]="analysisType"
-        [analysisSubtype]="analysisSubtype"
-        (change)="change.emit($event)"
-        [fieldCount]="fieldCount"
-        [sqlBuilder]="sqlBuilder"
-        [artifacts]="artifacts"
-      >
-      </designer-settings-single-table>
-    </mat-drawer>
+    </designer-settings-single-table>
+    <button *ngIf="isFieldsPanelOpen" mat-mini-fab color="secondary" class="fields-panel-toggle__btn on-drawer">
+      <mat-icon fontIcon="icon-menu" (click)="toggleFieldsDrawer(fieldsdrawer)"></mat-icon>
+    </button>
+  </mat-drawer>
   <mat-drawer #drawer [mode]="optionsPanelMode"
               position="end" [opened]="isOptionsPanelOpen"
               style="height: 100%; width: 25%"
@@ -30,6 +33,9 @@
                               [chartTitle]="chartTitle"
     >
     </designer-analysis-options>
+    <button *ngIf="isOptionsPanelOpen && !isInTabletMode" mat-mini-fab color="secondary" class="options-panel-toggle__btn on-drawer">
+      <mat-icon fontIcon="icon-settings" (click)="openDrawer(drawer)"></mat-icon>
+    </button>
   </mat-drawer>
   <div class="container">
 
@@ -42,23 +48,22 @@
                                     class="designer__selecte-fields__container"
           >
           </designer-selected-fields>
-          <button mat-mini-fab color="secondary" class="fields-panel-toggle__btn">
+          <button *ngIf="!isFieldsPanelOpen" mat-mini-fab color="secondary" class="fields-panel-toggle__btn">
             <mat-icon fontIcon="icon-menu" (click)="toggleFieldsDrawer(fieldsdrawer)"></mat-icon>
           </button>
-          <button mat-mini-fab color="secondary" class="options-panel-toggle__btn">
+          <button *ngIf="!isOptionsPanelOpen" mat-mini-fab color="secondary" class="options-panel-toggle__btn">
             <mat-icon fontIcon="icon-settings" (click)="openDrawer(drawer)"></mat-icon>
           </button>
         </div>
 
-        <filter-chips-u *ngIf="filters.length > 0"
-                        class="designer__filters"
-                        (remove)="onRemoveFilter($event)"
-                        (removeAll)="onRemoveFilterAll()"
-                        [filters]="filters"
-                        [artifacts]="artifacts">
-        </filter-chips-u>
-
         <div [ngSwitch]="designerState" fxLayout="column" class="mat-elevation-z3">
+          <filter-chips-u *ngIf="filters.length > 0"
+                          class="designer__filters"
+                          (remove)="onRemoveFilter($event)"
+                          (removeAll)="onRemoveFilterAll()"
+                          [filters]="filters"
+                          [artifacts]="artifacts">
+          </filter-chips-u>
 
           <div *ngSwitchCase="DesignerStates.NO_SELECTION"
                 fxLayout="column"

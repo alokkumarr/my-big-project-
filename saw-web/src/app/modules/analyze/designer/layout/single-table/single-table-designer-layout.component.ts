@@ -32,6 +32,7 @@ export class SingleTableDesignerLayoutComponent {
 
   public DesignerStates = DesignerStates;
   public isOptionsPanelOpen = false;
+  public isFieldsPanelOpen = true;
   public optionsPanelMode: 'side' | 'over' = 'side';
   private isInTabletMode = false;
 
@@ -60,6 +61,7 @@ export class SingleTableDesignerLayoutComponent {
 
   toggleFieldsDrawer(drawer) {
     drawer.toggle();
+    this.isFieldsPanelOpen = !this.isFieldsPanelOpen;
   }
 
   openDrawer(drawer) {
