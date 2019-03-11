@@ -26,6 +26,6 @@ public class MetricsIT extends BaseIT {
               hasItems(
                   "sip-batch-ingestion", "sip-export",
                   "sip-scheduler", "sip-security", "sip-metadata",
-                  "sip-workbench"));
+                  "sip-storage-proxy", "sip-workbench"));
   }
 }
