@@ -9,6 +9,6 @@ public interface StorageProxyService {
 
   public StorageProxy execute(StorageProxy proxy) throws Exception;
 
-  List<Object> execute(SIPDSL sipdsl) throws Exception;
+  List<Object> execute(SIPDSL sipdsl, Integer size) throws Exception;
 
 }

@@ -25,4 +25,5 @@ public class ServicesIT extends BaseIT {
         .when().get("/services/actuator/health")
         .then().statusCode(200).body("status", equalTo("UP"));
   }
+
 }

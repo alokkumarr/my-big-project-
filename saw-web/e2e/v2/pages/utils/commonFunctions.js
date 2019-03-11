@@ -148,5 +148,10 @@ module.exports = {
   fillInput(el, value) {
     this.waitFor.elementToBeVisible(el);
     el.clear().sendKeys(value);
+  },
+  getDashboardId(){
+    browser.getCurrentUrl().then(url => {
+        return url.split('=')[1];
+    });
   }
 };
