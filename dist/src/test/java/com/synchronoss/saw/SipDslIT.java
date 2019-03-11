@@ -10,6 +10,7 @@ import io.restassured.response.Response;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -29,6 +30,8 @@ public class SipDslIT extends BaseIT {
         .then().assertThat().statusCode(200)
         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
+    JsonNode node = root.get("integer");
+    Assert.assertEquals(node.get("integer"),643);
   }
 
 }
