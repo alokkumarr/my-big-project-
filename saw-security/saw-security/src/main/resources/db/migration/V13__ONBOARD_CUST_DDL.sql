@@ -1,4 +1,14 @@
-DROP PROCEDURE onboard_customer ;
+/*******************************************************************************
+ Filename:  V13__ONBOARD_CUST_DDL.sql
+ Purpose:   To on-board new customer.
+ Date:      13-02-2019
+********************************************************************************/
+
+/*******************************************************************************
+ Stored Procedure Scripts Starts
+********************************************************************************/
+
+DROP PROCEDURE IF EXISTS onboard_customer ;
 
 DELIMITER //
 CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product_name varchar(50), IN l_product_code varchar(50), IN l_email varchar(50), IN l_first_name varchar(50), IN l_middle_name varchar(50), IN l_last_name varchar(50))
@@ -81,6 +91,8 @@ select max(customer_sys_id)+1 into l_customer_sys_id  from customers;
 select l_customer_sys_id;
 
 
+
+
 INSERT INTO CUSTOMERS (CUSTOMER_SYS_ID,CUSTOMER_CODE,COMPANY_NAME,COMPANY_BUSINESS,LANDING_PROD_SYS_ID,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY,PASSWORD_EXPIRY_DAYS,DOMAIN_NAME)
 SELECT l_customer_sys_id CUSTOMER_SYS_ID,l_customer_code CUSTOMER_CODE,l_customer_code COMPANY_NAME,'Telecommunication' COMPANY_BUSINESS,
 l_product_sys_id LANDING_PROD_SYS_ID,1 ACTIVE_STATUS_IND,Now() CREATED_DATE,'onboard' CREATED_BY,NULL INACTIVATED_DATE,NULL INACTIVATED_BY,
@@ -95,7 +107,7 @@ Now() CREATED_DATE,'onboard' CREATED_BY,NULL INACTIVATED_DATE,NULL INACTIVATED_B
 
 
 
-select max(PROD_MOD_SYS_ID)    into l_prod_mod_sys_id_analyze  from PRODUCT_MODULES  where PRODUCT_SYS_ID = l_product_sys_id  and MODULE_SYS_ID = l_module_sys_id_analyze ;
+select max(PROD_MOD_SYS_ID)   into l_prod_mod_sys_id_analyze  from PRODUCT_MODULES  where PRODUCT_SYS_ID = l_product_sys_id  and MODULE_SYS_ID = l_module_sys_id_analyze ;
 
 
  select max(cust_prod_mod_sys_id)+1 into l_cust_prod_mod_sys_id from customer_product_modules ;
@@ -105,7 +117,7 @@ select max(PROD_MOD_SYS_ID)    into l_prod_mod_sys_id_analyze  from PRODUCT_MODU
  l_customer_sys_id CUSTOMER_SYS_ID, 1 ACTIVE_STATUS_IND, '/' MODULE_URL, 1  'DEFAULT', now() CREATED_DATE, 'onboard' CREATED_BY,
  NULL INACTIVATED_DATE, NULL INACTIVATED_BY, NULL MODIFIED_DATE, NULL MODIFIED_BY;
 
- select max(PROD_MOD_SYS_ID)    into l_prod_mod_sys_id_observe from PRODUCT_MODULES  where PRODUCT_SYS_ID = l_product_sys_id and MODULE_SYS_ID = l_module_sys_id_observe ;
+ select max(PROD_MOD_SYS_ID)  into l_prod_mod_sys_id_observe from PRODUCT_MODULES  where PRODUCT_SYS_ID = l_product_sys_id and MODULE_SYS_ID = l_module_sys_id_observe ;
 
 
  INSERT INTO CUSTOMER_PRODUCT_MODULES (CUST_PROD_MOD_SYS_ID,CUST_PROD_SYS_ID,PROD_MOD_SYS_ID,CUSTOMER_SYS_ID,ACTIVE_STATUS_IND,MODULE_URL,`DEFAULT`,CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY)
@@ -113,7 +125,7 @@ select max(PROD_MOD_SYS_ID)    into l_prod_mod_sys_id_analyze  from PRODUCT_MODU
  l_customer_sys_id CUSTOMER_SYS_ID, 1 ACTIVE_STATUS_IND, '/' MODULE_URL, 0  'DEFAULT', now() CREATED_DATE,
  'onboard' CREATED_BY, NULL INACTIVATED_DATE, NULL INACTIVATED_BY, NULL MODIFIED_DATE, NULL MODIFIED_BY;
 
- select max(PROD_MOD_SYS_ID)    into l_prod_mod_sys_id_workbench from PRODUCT_MODULES  where PRODUCT_SYS_ID = l_product_sys_id and MODULE_SYS_ID = l_module_sys_id_workbench ;
+ select max(PROD_MOD_SYS_ID)  into l_prod_mod_sys_id_workbench from PRODUCT_MODULES  where PRODUCT_SYS_ID = l_product_sys_id and MODULE_SYS_ID = l_module_sys_id_workbench ;
 
  INSERT INTO CUSTOMER_PRODUCT_MODULES (CUST_PROD_MOD_SYS_ID,CUST_PROD_SYS_ID,PROD_MOD_SYS_ID,CUSTOMER_SYS_ID,ACTIVE_STATUS_IND,MODULE_URL,`DEFAULT`,CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY)
  SELECT  l_cust_prod_mod_sys_id+2 CUST_PROD_MOD_SYS_ID, l_cust_prod_sys_id CUST_PROD_SYS_ID, l_prod_mod_sys_id_workbench PROD_MOD_SYS_ID,
@@ -162,7 +174,6 @@ INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_FEATURE_SYS_ID,CUST_
   select  l_cust_prod_mod_feature_sys_id+5 CUST_PROD_MOD_FEATURE_SYS_ID, l_cust_prod_mod_sys_id+1 CUST_PROD_MOD_SYS_ID,
  '/' DEFAULT_URL, 'Drafts' FEATURE_NAME, 'Drafts' FEATURE_DESC, concat(l_customer_code, 'DRAFTS2') FEATURE_CODE, concat('CHILD_',concat(l_customer_code, 'MYDASHBOARD1')) FEATURE_TYPE,
  0 'DEFAULT', 1 ACTIVE_STATUS_IND, now() CREATED_DATE, 'onboard' CREATED_BY, NULL INACTIVATED_DATE, NULL INACTIVATED_BY, NULL MODIFIED_DATE, NULL MODIFIED_BY;
-
 
 INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_FEATURE_SYS_ID,CUST_PROD_MOD_SYS_ID,DEFAULT_URL,FEATURE_NAME,FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,`DEFAULT`,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY)
   select  l_cust_prod_mod_feature_sys_id+6 CUST_PROD_MOD_FEATURE_SYS_ID,
@@ -345,3 +356,7 @@ INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID,
  END;
 //
 DELIMITER ;
+
+/*******************************************************************************
+ Stored Procedure Scripts Ends
+********************************************************************************/
