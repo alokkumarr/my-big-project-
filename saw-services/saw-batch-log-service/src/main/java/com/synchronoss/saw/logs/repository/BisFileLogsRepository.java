@@ -47,7 +47,8 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Query("SELECT COUNT(pid)>0 from BisFileLog Logs where Logs.routeSysId = :routeId "
       + "and Logs.channelSysId = :channelSysId "
       + "and ( (Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = 'DATA_INPROGRESS')"
-      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE') )")
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE')"
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'FAILED') )")
   boolean isChannelAndRouteIdExists(@Param("routeId") Long routeId,
       @Param("channelSysId") Long channelSysId);
 
@@ -56,7 +57,8 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Query("SELECT Logs from BisFileLog Logs where (TIMEDIFF(NOW(), Logs.checkpointDate))/60 "
       + "> :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
       + "and Logs.bisProcessState = 'DATA_INPROGRESS')  "
-      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE') )")
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE')"
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'FAILED') )")
   Page<BisFileLog> retryIds(@Param("noOfMinutes") Integer noOfMinutes, Pageable pageable);
 
   @Modifying(clearAutomatically = true)
@@ -68,7 +70,8 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Query("SELECT COUNT(pid) from BisFileLog Logs where (TIMEDIFF(NOW(),Logs.checkpointDate))/60 "
       + " > :noOfMinutes and ( (Logs.mflFileStatus = 'INPROGRESS'  "
       + "and Logs.bisProcessState = 'DATA_INPROGRESS') "
-      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE') )")
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'HOST_NOT_REACHABLE') "
+      + "or (Logs.mflFileStatus = 'FAILED' and  Logs.bisProcessState = 'FAILED') )")
   Integer countOfRetries(@Param("noOfMinutes") Integer noOfMinutes);
   
 
