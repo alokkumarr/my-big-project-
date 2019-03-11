@@ -1,5 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { SqlBuilder, Artifact, ArtifactColumn, DesignerChangeEvent } from '../../types';
+import {
+  SqlBuilder,
+  Artifact,
+  ArtifactColumn,
+  DesignerChangeEvent
+} from '../../types';
 
 import * as filter from 'lodash/filter';
 import * as get from 'lodash/get';
@@ -9,9 +14,7 @@ import * as get from 'lodash/get';
   templateUrl: 'designer-analysis-options.component.html',
   styleUrls: ['designer-analysis-options.component.scss']
 })
-
 export class DesignerAnalysisOptionsComponent implements OnInit {
-
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
@@ -25,7 +28,7 @@ export class DesignerAnalysisOptionsComponent implements OnInit {
   }
 
   public selectedColumns: ArtifactColumn[];
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 }

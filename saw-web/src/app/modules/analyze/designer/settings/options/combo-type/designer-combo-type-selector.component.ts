@@ -15,7 +15,6 @@ import {
   selector: 'designer-combo-type-selector',
   templateUrl: 'designer-combo-type-selector.component.html'
 })
-
 export class DesignerComboTypeSelectorComponent {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
@@ -24,7 +23,7 @@ export class DesignerComboTypeSelectorComponent {
 
   public enablePercentByRow = true;
 
-    /**
+  /**
    * asChartColumn - Typecasts artifact column to ArtifactColumnChart
    * For use in templates. Angular's AOT compiler is strict about types.
    *

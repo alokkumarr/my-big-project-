@@ -17,7 +17,10 @@ import {
   DesignerChangeEvent
 } from '../../types';
 import { TYPE_ICONS_OBJ, TYPE_ICONS } from '../../consts';
-import { getArtifactColumnTypeIcon, getArtifactColumnGeneralType } from '../../utils';
+import {
+  getArtifactColumnTypeIcon,
+  getArtifactColumnGeneralType
+} from '../../utils';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -39,7 +42,9 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
       this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      if (this.unselectedArtifactColumns.length === this.artifactColumns.length) {
+      if (
+        this.unselectedArtifactColumns.length === this.artifactColumns.length
+      ) {
         setTimeout(() => {
           this.setGroupAdapters();
         });
@@ -66,7 +71,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   constructor(
     private _designerService: DesignerService,
     private _dndPubsub: DndPubsubService
-    ) {
+  ) {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
     // doesn't have to process everything with every quick change
@@ -87,15 +92,16 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
 
   setGroupAdapters() {
     switch (this.analysisType) {
-    case 'pivot':
-      this.groupAdapters = this._designerService.getPivotGroupAdapters(
-        this.artifactColumns
-      );
-      break;
-    case 'chart':
-      this.groupAdapters = this._designerService.getChartGroupAdapters(
-        this.artifactColumns, this.analysisSubtype
-      );
+      case 'pivot':
+        this.groupAdapters = this._designerService.getPivotGroupAdapters(
+          this.artifactColumns
+        );
+        break;
+      case 'chart':
+        this.groupAdapters = this._designerService.getChartGroupAdapters(
+          this.artifactColumns,
+          this.analysisSubtype
+        );
     }
   }
 
@@ -157,12 +163,12 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       }),
       fpSort(artifactColumn => artifactColumn.displayName)
     )(this.artifactColumns);
-    this.dropListContainer = {artifactColumns: unselectedArtifactColumns};
+    this.dropListContainer = { artifactColumns: unselectedArtifactColumns };
     return unselectedArtifactColumns;
   }
 
   hasAllowedType(filterTypes) {
-    return (artifactColumn) => {
+    return artifactColumn => {
       const generalType = this.getGeneralType(artifactColumn);
       /* prettier-ignore */
       if (isEmpty(filterTypes)) {

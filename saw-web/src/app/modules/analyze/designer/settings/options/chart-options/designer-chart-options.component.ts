@@ -1,4 +1,11 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { ChartService } from '../../../../../../common/services/chart.service';
 import * as isEmpty from 'lodash/isEmpty';
 

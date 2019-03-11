@@ -1,29 +1,42 @@
-<div *ngFor="let adapter of groupAdapters; let i = index"
-    fxLayout="row" fxLayoutAlign="start center"
-    class="selected-fields__container"
+<div
+  *ngFor="let adapter of groupAdapters; let i = index"
+  fxLayout="row"
+  fxLayoutAlign="start center"
+  class="selected-fields__container"
 >
-  <div fxFlex="10" class="selected-fields__label" fxLayout="row" fxLayoutAlign="start center">
-      {{adapter.title}}:
+  <div
+    fxFlex="10"
+    class="selected-fields__label"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+  >
+    {{ adapter.title }}:
   </div>
 
-  <mat-chip-list cdkDropList
-                 cdkDropListOrientation="horizontal"
-                 [cdkDropListData]="adapter"
-                 [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
-                 (cdkDropListDropped)="drop($event)"
-                 fxFlex="90"
-                 [attr.e2e]="'designer-selected-container' + adapter.title"
-                 class="selected-fields__list"
-                 [class.highlighted]="isDragInProgress && openGroupArray[i]"
+  <mat-chip-list
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    [cdkDropListData]="adapter"
+    [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
+    (cdkDropListDropped)="drop($event)"
+    fxFlex="90"
+    [attr.e2e]="'designer-selected-container' + adapter.title"
+    class="selected-fields__list"
+    [class.highlighted]="isDragInProgress && openGroupArray[i]"
   >
-    <mat-chip *ngFor="let col of adapter.artifactColumns"
-              class="selected-fields__item"
-              [attr.e2e]="'designer-selected-field-' + (col.aliasName || col.displayName)"
-              [ngClass]="getFieldItemClass(col)"
-              cdkDrag [cdkDragData]="col"
-              [removable]="true" (removed)="removeFromGroup(col, adapter)"
+    <mat-chip
+      *ngFor="let col of adapter.artifactColumns"
+      class="selected-fields__item"
+      [attr.e2e]="
+        'designer-selected-field-' + (col.aliasName || col.displayName)
+      "
+      [ngClass]="getFieldItemClass(col)"
+      cdkDrag
+      [cdkDragData]="col"
+      [removable]="true"
+      (removed)="removeFromGroup(col, adapter)"
     >
-      {{col.alias || col.displayName}}
+      {{ col.alias || col.displayName }}
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
     </mat-chip>
   </mat-chip-list>

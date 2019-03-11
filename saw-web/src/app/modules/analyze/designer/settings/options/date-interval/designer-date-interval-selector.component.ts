@@ -1,25 +1,18 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import {
-  ArtifactColumnPivot,
-  DesignerChangeEvent
-} from '../../../types';
-import {
-  DATE_INTERVALS,
-  DEFAULT_DATE_FORMAT
-} from '../../../../consts';
+import { ArtifactColumnPivot, DesignerChangeEvent } from '../../../types';
+import { DATE_INTERVALS, DEFAULT_DATE_FORMAT } from '../../../../consts';
 
 @Component({
   selector: 'designer-date-interval-selector',
   templateUrl: 'designer-date-interval-selector.component.html'
 })
-
 export class DesignerDateIntervalSelectorComponent implements OnInit {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifactColumn: ArtifactColumnPivot;
   public DATE_INTERVALS = DATE_INTERVALS;
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   onDateIntervalChange(value) {
     this.artifactColumn.dateInterval = value;

@@ -1,9 +1,13 @@
-import { Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {
   formatNumber,
   isFormatted
 } from '../../../../../../common/utils/numberFormatter';
-import { ArtifactColumnChart, Format, DesignerChangeEvent } from '../../../types';
+import {
+  ArtifactColumnChart,
+  Format,
+  DesignerChangeEvent
+} from '../../../types';
 import { AnalyzeDialogService } from '../../../../services/analyze-dialog.service';
 
 const FLOAT_SAMPLE = 1000.33333;
@@ -14,14 +18,16 @@ const INT_SAMPLE = 1000;
   templateUrl: 'designer-data-format-selector.component.html'
 })
 export class DesignerDataFormatSelectorComponent implements OnInit {
-  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<
+    DesignerChangeEvent
+  > = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumnChart;
 
   public numberSample: string;
   public isFloat: boolean;
   constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   changeNumberSample() {
     const format = this.artifactColumn.format;

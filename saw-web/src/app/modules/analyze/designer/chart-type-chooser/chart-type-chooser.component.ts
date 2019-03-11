@@ -7,19 +7,21 @@ import { ANALYSIS_METHODS } from '../../consts';
   templateUrl: 'chart-type-chooser.component.html',
   styleUrls: ['chart-type-chooser.component.scss']
 })
-
 export class ChartTypeChooserComponent implements OnInit {
   @Output() change = new EventEmitter();
   @Input() chartType: string;
 
-  public chartTypes = map(ANALYSIS_METHODS[0].children[0].children, chartType => {
-    const [, type] = split(chartType.type, ':');
-    const ret = {
-      ...chartType,
-      type
-    };
-    return ret;
-  });
+  public chartTypes = map(
+    ANALYSIS_METHODS[0].children[0].children,
+    chartType => {
+      const [, type] = split(chartType.type, ':');
+      const ret = {
+        ...chartType,
+        type
+      };
+      return ret;
+    }
+  );
 
   ngOnInit() {}
 }

@@ -7,21 +7,21 @@ import {
   Format,
   DesignerChangeEvent
 } from '../../../types';
-import {
-  CHART_DATE_FORMATS
-} from '../../../../consts';
+import { CHART_DATE_FORMATS } from '../../../../consts';
 
 @Component({
   selector: 'designer-date-format-selector',
   templateUrl: 'designer-date-format-selector.component.html'
 })
 export class DesignerDateFormatSelectorComponent implements OnInit {
-  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<
+    DesignerChangeEvent
+  > = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumnChart;
 
   public dateSample: string;
 
-  constructor(private _analyzeDialogService: AnalyzeDialogService) { }
+  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
   ngOnInit() {
     this.changeDateSample();

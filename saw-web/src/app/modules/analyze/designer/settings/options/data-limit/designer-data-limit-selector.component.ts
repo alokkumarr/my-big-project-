@@ -1,11 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as isUndefined from 'lodash/isUndefined';
 import * as debounce from 'lodash/debounce';
-import {
-  ArtifactColumnChart,
-  DesignerChangeEvent
-} from '../../../types';
+import { ArtifactColumnChart, DesignerChangeEvent } from '../../../types';
 
 const LIMIT_DEBOUNCE_DELAY = 400;
 @Component({
@@ -13,7 +10,6 @@ const LIMIT_DEBOUNCE_DELAY = 400;
   templateUrl: 'designer-data-limit-selector.component.html',
   styleUrls: ['designer-data-limit-selector.component.scss']
 })
-
 export class DesignerDataLimitSelectorComponent implements OnInit {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifactColumn: ArtifactColumnChart;
@@ -22,14 +18,16 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   public isInTabletMode = false;
 
   constructor(breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.Medium,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      this.isInTabletMode = result.matches;
-    });
+    breakpointObserver
+      .observe([Breakpoints.Medium, Breakpoints.Small])
+      .subscribe(result => {
+        this.isInTabletMode = result.matches;
+      });
 
-    this.onLimitDataChange = debounce(this.onLimitDataChange, LIMIT_DEBOUNCE_DELAY);
+    this.onLimitDataChange = debounce(
+      this.onLimitDataChange,
+      LIMIT_DEBOUNCE_DELAY
+    );
   }
 
   ngOnInit() {

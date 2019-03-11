@@ -1,9 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
-import {
-  COMBO_TYPES,
-  DATE_TYPES
-} from '../../../../consts';
+import { COMBO_TYPES, DATE_TYPES } from '../../../../consts';
 import {
   ArtifactColumn,
   DesignerChangeEvent,
@@ -17,7 +14,6 @@ import {
   styleUrls: ['designer-data-option-field.component.scss']
 })
 export class DesignerDataOptionFieldComponent implements OnInit {
-
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifactColumn: ArtifactColumn;
   @Input() analysisType: string;
@@ -32,12 +28,14 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   ngOnInit() {
     const type = this.artifactColumn.type;
     this.hasDateInterval = DATE_TYPES.includes(type);
-    this.isDataField = ['y', 'z'].includes((<ArtifactColumnChart>this.artifactColumn).area);
+    this.isDataField = ['y', 'z'].includes(
+      (<ArtifactColumnChart>this.artifactColumn).area
+    );
   }
 
   onAliasChange(alias) {
     this.artifactColumn.alias = alias;
-    this.change.emit({subject: 'aliasName'});
+    this.change.emit({ subject: 'aliasName' });
   }
 
   onAggregateChange(value) {
@@ -53,7 +51,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
   }
 
-    /**
+  /**
    * asChartColumn - Typecasts artifact column to ArtifactColumnChart
    * For use in templates. Angular's AOT compiler is strict about types.
    *

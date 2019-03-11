@@ -1,38 +1,43 @@
 <mat-tab-group dynamicHeight>
-  <mat-tab label="DATA OPTIONS"
-           e2e="designer-options-tab-data"
-  >
+  <mat-tab label="DATA OPTIONS" e2e="designer-options-tab-data">
     <div style="padding: 5px;">
-      <designer-data-option-field *ngFor="let col of selectedColumns"
-                                  (change)="change.emit($event)"
-                                  [artifactColumn]="col"
-                                  [analysisType]="analysisType"
-                                  [sqlBuilder]="sqlBuilder"
-                                  [analysisSubtype]="analysisSubtype"
-                                  [fieldCount]="fieldCount"
+      <designer-data-option-field
+        *ngFor="let col of selectedColumns"
+        (change)="change.emit($event)"
+        [artifactColumn]="col"
+        [analysisType]="analysisType"
+        [sqlBuilder]="sqlBuilder"
+        [analysisSubtype]="analysisSubtype"
+        [fieldCount]="fieldCount"
       >
       </designer-data-option-field>
     </div>
   </mat-tab>
-  <mat-tab *ngIf="analysisType === 'chart'" label="CHART OPTIONS"
-           e2e="designer-options-tab-chart"
+  <mat-tab
+    *ngIf="analysisType === 'chart'"
+    label="CHART OPTIONS"
+    e2e="designer-options-tab-chart"
   >
-    <designer-chart-options [isInverted]="auxSettings.isInverted"
-                            [legend]="auxSettings.legend"
-                            [labelOptions]="auxSettings.labelOptions"
-                            [chartType]="analysisSubtype"
-                            [chartTitle]="chartTitle"
-                            (change)="change.emit($event)"
+    <designer-chart-options
+      [isInverted]="auxSettings.isInverted"
+      [legend]="auxSettings.legend"
+      [labelOptions]="auxSettings.labelOptions"
+      [chartType]="analysisSubtype"
+      [chartTitle]="chartTitle"
+      (change)="change.emit($event)"
     >
     </designer-chart-options>
   </mat-tab>
-  <mat-tab *ngIf="analysisType === 'map'" label="MAP OPTIONS"
-           e2e="designer-options-tab-map"
+  <mat-tab
+    *ngIf="analysisType === 'map'"
+    label="MAP OPTIONS"
+    e2e="designer-options-tab-map"
   >
-    <designer-map-chart-options [legend]="auxSettings.legend"
-                                [chartType]="analysisSubtype"
-                                [chartTitle]="chartTitle"
-                                (change)="change.emit($event)"
+    <designer-map-chart-options
+      [legend]="auxSettings.legend"
+      [chartType]="analysisSubtype"
+      [chartTitle]="chartTitle"
+      (change)="change.emit($event)"
     >
     </designer-map-chart-options>
   </mat-tab>

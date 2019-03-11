@@ -1,33 +1,43 @@
 <div class="settings__container">
-
-  <div class="settings__filters"
-       fxLayout="column"
-       fxLayoutAlign="center start">
-
+  <div class="settings__filters" fxLayout="column" fxLayoutAlign="center start">
     <mat-button-toggle-group class="settings__type-filters">
-      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
-                         (change)="onTypeFilterChange($event.value)"
-                         [value]="typeIcon.value">
+      <mat-button-toggle
+        *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
+        (change)="onTypeFilterChange($event.value)"
+        [value]="typeIcon.value"
+      >
         <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
       </mat-button-toggle>
-      <mat-button-toggle *ngFor="let adapter of groupAdapters | slice:0:2" (change)="onFilterChange($event.value, adapter)"
-                         [value]="adapter.title">
-        {{adapter.title}}
+      <mat-button-toggle
+        *ngFor="let adapter of (groupAdapters | slice: 0:2)"
+        (change)="onFilterChange($event.value, adapter)"
+        [value]="adapter.title"
+      >
+        {{ adapter.title }}
       </mat-button-toggle>
-
     </mat-button-toggle-group>
-    <mat-form-field appearance="outline" class="settings__filters__keyword" fxLayout="row">
-      <input matInput type="text"
-              autocomplete="off"
-              fxFlex="95"
-              placeholder="Search"
-              name="filter-settings"
-              (input)="onTextFilterChange($event.target.value)"
-              [value]="filterObj.keyword"/>
-      <div *ngIf="filterObj.keyword" fxFlex="5" fxLayout="row" style="height: 10px;">
-        <mat-icon fontIcon="icon-remove"
-                  (click)="onTextFilterChange('')"
-          >
+    <mat-form-field
+      appearance="outline"
+      class="settings__filters__keyword"
+      fxLayout="row"
+    >
+      <input
+        matInput
+        type="text"
+        autocomplete="off"
+        fxFlex="95"
+        placeholder="Search"
+        name="filter-settings"
+        (input)="onTextFilterChange($event.target.value)"
+        [value]="filterObj.keyword"
+      />
+      <div
+        *ngIf="filterObj.keyword"
+        fxFlex="5"
+        fxLayout="row"
+        style="height: 10px;"
+      >
+        <mat-icon fontIcon="icon-remove" (click)="onTextFilterChange('')">
         </mat-icon>
       </div>
     </mat-form-field>
@@ -35,42 +45,55 @@
 
   <div class="settings__unselected-fields">
     <div *ngIf="unselectedArtifactColumns">
-      <div *ngIf="!isEmpty(unselectedArtifactColumns)"
-           cdkDropList
-           [cdkDropListEnterPredicate]="noReturnPredicate"
-           [cdkDropListData]="dropListContainer"
-           class="settings__list"
+      <div
+        *ngIf="!isEmpty(unselectedArtifactColumns)"
+        cdkDropList
+        [cdkDropListEnterPredicate]="noReturnPredicate"
+        [cdkDropListData]="dropListContainer"
+        class="settings__list"
       >
-      <div *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
-           cdkDrag
-           (cdkDragStarted)="dragStarted($event)"
-           (cdkDragReleased)="dragReleased($event)"
-           [cdkDragData]="artifactColumn"
-           [attr.e2e]="'designer-unselected-field-' + (artifactColumn.aliasName || artifactColumn.displayName)"
-           class="settings__list-item"
-      >
-        <div fxLayout="row"
-             fxLayoutAlign="space-between center">
-          <div class="settings__list-item__name"
-               fxLayout="row"
-               fxLayoutAlign="space-between center">
-            <mat-icon [fontIcon]="getArtifactColumnTypeIcon(artifactColumn)"
-                      class="settings__list-item__icon">
-            </mat-icon>
-            {{ artifactColumn.alias || artifactColumn.displayName }}
-          </div>
-          <!-- <button mat-icon-button
+        <div
+          *ngFor="
+            let artifactColumn of unselectedArtifactColumns;
+            trackBy: trackByIndex
+          "
+          cdkDrag
+          (cdkDragStarted)="dragStarted($event)"
+          (cdkDragReleased)="dragReleased($event)"
+          [cdkDragData]="artifactColumn"
+          [attr.e2e]="
+            'designer-unselected-field-' +
+            (artifactColumn.aliasName || artifactColumn.displayName)
+          "
+          class="settings__list-item"
+        >
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <div
+              class="settings__list-item__name"
+              fxLayout="row"
+              fxLayoutAlign="space-between center"
+            >
+              <mat-icon
+                [fontIcon]="getArtifactColumnTypeIcon(artifactColumn)"
+                class="settings__list-item__icon"
+              >
+              </mat-icon>
+              {{ artifactColumn.alias || artifactColumn.displayName }}
+            </div>
+            <!-- <button mat-icon-button
                   [attr.e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"
                   (click)="addToGroupIfPossible(artifactColumn)">
             <mat-icon fontIcon="icon-plus"></mat-icon>
           </button> -->
+          </div>
         </div>
       </div>
-      </div>
-      <div *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
-           fxLayout="row" fxLayoutAlign="center center">
-        <div class="settings__unselected-fields--empty"
-             i18n>
+      <div
+        *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+      >
+        <div class="settings__unselected-fields--empty" i18n>
           There are no fields for this criteria
         </div>
       </div>

@@ -1,16 +1,16 @@
-<div fxLayout="row"
-      fxLayoutAlign="start center">
+<div fxLayout="row" fxLayoutAlign="start center">
   <mat-form-field (click)="openDateFormatDialog()">
-    <input matInput
-          type="text"
-          placeholder="Format"
-          disabled
-          autocomplete="off"
-          style="cursor: pointer;"
-          [value]="dateSample || ''"/>
+    <input
+      matInput
+      type="text"
+      placeholder="Format"
+      disabled
+      autocomplete="off"
+      style="cursor: pointer;"
+      [value]="dateSample || ''"
+    />
   </mat-form-field>
-  <button mat-icon-button
-          (click)="openDateFormatDialog()">
+  <button mat-icon-button (click)="openDateFormatDialog()">
     <mat-icon fontIcon="icon-filter"></mat-icon>
   </button>
 </div>
