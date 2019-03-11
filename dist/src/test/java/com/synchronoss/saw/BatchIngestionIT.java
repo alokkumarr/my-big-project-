@@ -14,6 +14,7 @@ import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
@@ -618,5 +620,66 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
     
     
+  }
+  
+  
+  @Test
+  public void testJobLog() throws JsonProcessingException {
+    
+    ObjectNode routeMetadata = mapper.createObjectNode();
+    routeMetadata.put("status", "active");
+    routeMetadata.put("routeName", "route123");
+    routeMetadata.put("sourceLocation", "/root/saw-batch-samples/small");
+    routeMetadata.put("destinationLocation", "/");
+    routeMetadata.put("filePattern", "*.csv");
+    routeMetadata.put("fileExclusions", "");
+    routeMetadata.put("disableDuplicate", "false");
+    ObjectNode schedulerNode = mapper.createObjectNode();
+    schedulerNode.put("cronexp", "0 0/2 * 1/1 * ? *");
+    schedulerNode.put("activeTab", "hourly");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    String startDate = sdf.format(new Date());
+    schedulerNode.put("startDate", startDate);
+    Date endDate = new Date();
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(endDate);
+    cal.add(Calendar.MINUTE, 3);
+    String endDateAsString = sdf.format(cal.getTime());
+    schedulerNode.put("endDate", endDateAsString);
+    schedulerNode.put("timezone", "America/New_York");
+    routeMetadata.set("schedulerExpression", schedulerNode);
+    routeMetadata.put("description", "file");
+    ObjectNode route = mapper.createObjectNode();
+    route.put("createdBy", "admin@synchronoss.com");
+    route.put("routeMetadata", new ObjectMapper()
+             .writeValueAsString(routeMetadata));
+    Long channelId = given(authSpec).body(this.prepareChannelDataSet()).when()
+        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200)
+        .extract().response().getBody().jsonPath().getLong("bisChannelSysId");
+ 
+    
+    String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
+    ValidatableResponse response = given(authSpec).body(route).when().post(routeUri)
+        .then().assertThat().statusCode(200);
+    log.debug("createRoute () " + response.log());
+   
+    Long routeId = given(authSpec).when().get(routeUri).then().assertThat()
+        .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    
+    ObjectNode transferNode = mapper.createObjectNode();
+    transferNode.put("channelId", channelId);
+    transferNode.put("routeId", routeId);
+    log.debug("job log here:::");
+    
+    Response resp = given(authSpec).when()
+        .get("/services/ingestion/batch/jobLogs/BIS")
+        .then().assertThat()
+        .statusCode(200).extract().response();
+    List<String> jsonResponse = resp.jsonPath().getList("$");
+    assertTrue(jsonResponse.size() > 0);
+    
+    this.tearDownRoute();
+    this.tearDownChannel();
+  
   }
 }
