@@ -39,7 +39,6 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
       this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      this.dropListContainer = {artifactColumns: this.unselectedArtifactColumns};
       if (this.unselectedArtifactColumns.length === this.artifactColumns.length) {
         setTimeout(() => {
           this.setGroupAdapters();
@@ -147,7 +146,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   getUnselectedArtifactColumns(filter?) {
     const { types, keyword } = this.filterObj;
     const toggleFilter = filter || this.hasAllowedType(types);
-    return fpPipe(
+    const unselectedArtifactColumns = fpPipe(
       fpFilter(artifactColumn => {
         const { checked, alias, displayName } = artifactColumn;
         return (
@@ -158,6 +157,8 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       }),
       fpSort(artifactColumn => artifactColumn.displayName)
     )(this.artifactColumns);
+    this.dropListContainer = {artifactColumns: unselectedArtifactColumns};
+    return unselectedArtifactColumns;
   }
 
   hasAllowedType(filterTypes) {
@@ -168,7 +169,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
         return true;
       }
       return filterTypes.includes(generalType);
-    }
+    };
   }
 
   getGeneralType(artifactColumn) {

@@ -24,16 +24,6 @@
               name="filter-settings"
               (input)="onTextFilterChange($event.target.value)"
               [value]="filterObj.keyword"/>
-
-      <!-- <div fxFLex="30" fxLayout="row">
-        <mat-icon *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
-                  class="settings__filters_toggle"
-                  [class.selected]="filterObj.types.includes(typeIcon.value)"
-                  [fontIcon]="typeIcon.icon"
-                  (click)="onTypeFilterChange(typeIcon.value)"
-        >
-        </mat-icon>
-      </div> -->
       <div *ngIf="filterObj.keyword" fxFlex="5" fxLayout="row" style="height: 10px;">
         <mat-icon fontIcon="icon-remove"
                   (click)="onTextFilterChange('')"

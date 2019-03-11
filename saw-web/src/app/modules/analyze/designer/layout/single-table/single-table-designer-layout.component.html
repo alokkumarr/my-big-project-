@@ -1,18 +1,18 @@
 <mat-drawer-container style="height: 100%;" [hasBackdrop]="false">
     <mat-drawer #fieldsdrawer mode="side"
         position="start" [opened]="true"
-        style="height: 100%; width: 15%"
+        [ngStyle]="{width: isInTabletMode ? '22%' : '15%'}"
     >
-    <designer-settings-single-table
-      class="designer__data-settings"
-      [analysisType]="analysisType"
-      [analysisSubtype]="analysisSubtype"
-      (change)="change.emit($event)"
-      [fieldCount]="fieldCount"
-      [sqlBuilder]="sqlBuilder"
-      [artifacts]="artifacts"
-    >
-    </designer-settings-single-table>
+      <designer-settings-single-table
+        class="designer__data-settings"
+        [analysisType]="analysisType"
+        [analysisSubtype]="analysisSubtype"
+        (change)="change.emit($event)"
+        [fieldCount]="fieldCount"
+        [sqlBuilder]="sqlBuilder"
+        [artifacts]="artifacts"
+      >
+      </designer-settings-single-table>
     </mat-drawer>
   <mat-drawer #drawer [mode]="optionsPanelMode"
               position="end" [opened]="isOptionsPanelOpen"
