@@ -8,7 +8,20 @@ import * as isEmpty from 'lodash/isEmpty';
   styleUrls: ['designer-chart-options.component.scss']
 })
 export class DesignerChartOptionsComponent implements OnInit, AfterViewInit {
-  @Input() chartType: string;
+  @Input('chartType') set setChartType(chartType: string) {
+    console.log('chartType: ', chartType);
+    this.chartType = chartType;
+    this.showLegendOpts = chartType !== 'pie';
+    this.showLabelOpts = chartType === 'pie';
+    this.showInversion = [
+      'column',
+      'bar',
+      'line',
+      'area',
+      'combo',
+      'stack'
+    ].includes(chartType);
+  }
   @Input() isInverted: boolean;
   @Input() chartTitle: string;
 
@@ -16,6 +29,7 @@ export class DesignerChartOptionsComponent implements OnInit, AfterViewInit {
   showLegendOpts: boolean;
   showLabelOpts = false;
   showInversion: boolean;
+  chartType: string;
 
   @Input() labelOptions: { enabled: boolean; value: string };
 
@@ -24,7 +38,6 @@ export class DesignerChartOptionsComponent implements OnInit, AfterViewInit {
     if (!data) {
       return;
     }
-
     this.legend = this.legend || {};
     this.legend.align = data.align;
     this.legend.layout = data.layout;
@@ -39,16 +52,6 @@ export class DesignerChartOptionsComponent implements OnInit, AfterViewInit {
       ...(this.legend ? { legend: this.legend } : {}),
       chartType: this.chartType
     });
-    this.showLegendOpts = this.chartType !== 'pie';
-    this.showLabelOpts = this.chartType === 'pie';
-    this.showInversion = [
-      'column',
-      'bar',
-      'line',
-      'area',
-      'combo',
-      'stack'
-    ].includes(this.chartType);
   }
 
   ngAfterViewInit() {

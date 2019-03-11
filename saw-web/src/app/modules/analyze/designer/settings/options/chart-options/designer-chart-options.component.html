@@ -61,6 +61,7 @@
     >
     <mat-radio-group
       *ngIf="labelOptions.enabled"
+      fxLayout="column"
       [(ngModel)]="labelOptions.value"
       (change)="onLabelOptsChange($event)"
     >
