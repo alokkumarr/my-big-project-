@@ -24,6 +24,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class ElasticSearchQueryBuilder {
@@ -31,6 +32,9 @@ public class ElasticSearchQueryBuilder {
   public static final Logger logger = LoggerFactory.getLogger(ElasticSearchQueryBuilder.class);
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
     private final static String EPOCH_TO_DATE_FORMAT="yyyy-MM-dd HH:mm:ss";
+    private final static String ONLY_YEAR_FORMAT="YYYY";
+    private final static String EPOCH_SECOND="epoch_second";
+    private final static String EPOCH_MILLIS="epoch_millis";
     String dataSecurityString;
 
     public String buildDataQuery(SIPDSL sipdsl, Integer size) throws IOException, ProcessingException {
@@ -87,8 +91,8 @@ public class ElasticSearchQueryBuilder {
                             rangeQueryBuilder.gte(dynamicConvertor.getGte());
                             builder.add(rangeQueryBuilder);
                         }
-                        else if ((item.getModel().getFormat().equalsIgnoreCase("epoch_millis")) || (item.getModel().getFormat().equalsIgnoreCase("epoch"))) {
-                            if (item.getModel().getFormat().equalsIgnoreCase("epoch")) {
+                        else if ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS)) || (item.getModel().getFormat().equalsIgnoreCase("epoch"))) {
+                            if (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)) {
                                 logger.info("Filter format : epoch");
                                 logger.info("TimeStamp in Epoch(in seconds),Value "+item.getModel().getValue());
                                 item.getModel().setValue(item.getModel().getValue()*1000);
@@ -175,11 +179,82 @@ public class ElasticSearchQueryBuilder {
                                     builder.add(rangeQueryBuilder);
                                     logger.debug("Builder Obj : " + builder);
                                     break;
-
-                                case NEQ:
-                                    break;
                             }
 
+                        }
+                        else if (item.getModel().getFormat().equalsIgnoreCase(ONLY_YEAR_FORMAT)) {
+                            DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
+                            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+                            GregorianCalendar startDate = new GregorianCalendar(item.getModel().getValue().intValue(),0,1,0,0,0);
+                            GregorianCalendar endDate;
+
+                            switch (item.getModel().getOperator()) {
+                                case EQ:
+                                    endDate = new GregorianCalendar(item.getModel().getValue().intValue() ,11,31,23,59,59);
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
+                                    }
+                                    logger.info("Start Date :"+ startDate.getTime());
+                                    logger.info("End Date :"+ endDate.getTime());
+                                    rangeQueryBuilder.gte(dateFormat.format(startDate.getTime()));
+                                    rangeQueryBuilder.lte(dateFormat.format(endDate.getTime()));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : " + builder);
+                                    break;
+
+                                case LT:
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
+                                    }
+                                    logger.debug("Retriving date < "+startDate.getTime());
+                                    rangeQueryBuilder.lt(dateFormat.format(startDate.getTime()));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : " + builder);
+                                    break;
+
+                                case GT:
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
+                                    }
+                                    logger.debug("Retriving date > "+startDate.getTime());
+                                    rangeQueryBuilder.gt(dateFormat.format(startDate.getTime()));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : " + builder);
+                                    break;
+
+                                case LTE:
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
+                                    }
+                                    logger.debug("Retriving date <= (less than or equal to) "+startDate.getTime());
+                                    rangeQueryBuilder.lte(dateFormat.format(startDate.getTime()));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : " + builder);
+                                    break;
+
+                                case GTE:
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
+                                    }
+                                    logger.debug("Retriving date >= "+startDate.getTime());
+                                    rangeQueryBuilder.gte(dateFormat.format(startDate.getTime()));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : " + builder);
+                                    break;
+
+                                case BTW:
+                                    endDate = new GregorianCalendar(item.getModel().getOtherValue().intValue() ,11,31,23,59,59);
+                                    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                                        rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
+                                    }
+                                    logger.info("Start Date :"+ startDate.getTime());
+                                    logger.info("End Date :"+ endDate.getTime());
+                                    rangeQueryBuilder.gte(dateFormat.format(startDate.getTime()));
+                                    rangeQueryBuilder.lte(dateFormat.format(endDate.getTime()));
+                                    builder.add(rangeQueryBuilder);
+                                    logger.info("Builder Obj : " + builder);
+                                    break;
+                            }
                         }
                         else {
                             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
