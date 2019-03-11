@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
 
@@ -41,13 +40,14 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
     BisSchedulerJobDetails jobRequest =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
-    /**
-     * For retrieving stored key-value pairs.
-     */
-    JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
-    String myValue = dataMap.getString("myKey");
-    logger.info("Value:" + myValue);
-    restTemplate.postForLocation(bisTransferUrl, jobRequest);
+    try {
+      restTemplate.postForLocation(bisTransferUrl, jobRequest);
+    } catch (Exception exception) {
+      logger.error("Error during file transfer for the schedule. "
+          + "Refer Batch Ingestion logs for more details", 
+          exception.getMessage());
+    }
+    
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

@@ -51,6 +51,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+    <dependency>
+	    <groupId>io.micrometer</groupId>
+	    <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -136,6 +140,11 @@
       <artifactId>meta-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
 	<build>
 		<plugins>
@@ -206,7 +215,11 @@
 						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
 						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
-					<excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,org.ojai,org.scala-lang</excludeGroupIds>
+					<!--
+					    The spring-boot-start-test dependency adds JUnit in the
+					    compile scope so exclude JUnit explicitly from packaging
+					-->
+					<excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,junit,org.ojai,org.scala-lang</excludeGroupIds>
 					<layout>ZIP</layout>
 				</configuration>
 			</plugin>
@@ -246,10 +259,6 @@
 								<entry>
 									<name>/opt/bda/saw-observe-service/conf/logback.xml</name>
 									<file>src/main/resources/logback.xml</file>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-observe-service/conf/application.yml</name>
-									<file>src/main/resources/application.yml</file>
 								</entry>
 							</entries>
 							<afterInstallation>

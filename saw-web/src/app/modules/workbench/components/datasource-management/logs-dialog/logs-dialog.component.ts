@@ -50,8 +50,8 @@ export class LogsDialogComponent implements OnInit {
   }
 
   getSchedule(schedulerExpression) {
-    const { cronexp, activeTab } = schedulerExpression;
-    return generateSchedule(cronexp, activeTab);
+    const { cronexp, activeTab, timezone } = schedulerExpression;
+    return generateSchedule(cronexp, activeTab, timezone);
   }
 
 }

@@ -26,16 +26,14 @@ public class ElasticSearchQueryBuilder {
 
   public static final Logger logger = LoggerFactory.getLogger(ElasticSearchQueryBuilder.class);
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
-    private final static String VALUE = "value";
-    private final static String SUM ="_sum";
     String dataSecurityString;
 
-    public String buildDataQuery(SIPDSL sipdsl) throws IOException, ProcessingException {
+    public String buildDataQuery(SIPDSL sipdsl, Integer size) throws IOException, ProcessingException {
         SipQuery sipQuery = sipdsl.getSipQuery();
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.from(0);
-        int size = 1000;
-
+        if (size==null || size.equals(0))
+            size=1000;
         searchSourceBuilder.size(size);
         if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
             throw new NullPointerException(

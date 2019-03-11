@@ -1,13 +1,17 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.scheduler.entities.QrtzTriggers;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.saw.scheduler.repository.QuartzRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
@@ -17,21 +21,18 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
-
 import org.quartz.impl.matchers.GroupMatcher;
-
+import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-
 import org.springframework.context.annotation.Lazy;
-
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+
+
 
 
 
@@ -47,6 +48,10 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
   @Autowired
   private ApplicationContext context;
+  
+  
+  @Autowired
+  QuartzRepository quartzRepository;
 
   /**
    * Schedule a job by jobName at given date.
@@ -99,13 +104,16 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     String jobKey = job.getJobName();
     String groupKey = job.getJobGroup();
-    String triggerKey = job.getJobName();
+
+    String timezone = job.getTimezone();
+    logger.trace("Timezone :" + timezone);
 
     JobDetail jobDetail = JobUtil.createBatchIngestionJob(jobClass, false, context, job, groupKey);
 
     logger.info("creating trigger for key :" + jobKey + " at date :" + job.getJobScheduleTime());
-    Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),
-        job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+    Trigger cronTriggerBean = JobUtil.createCronTrigger(jobKey, job.getJobScheduleTime(),
+        job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW,
+        timezone);
 
     try {
       Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -168,13 +176,16 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     String jobName = schedulerJobDetail.getJobName();
     Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
+    String timezone = schedulerJobDetail.getTimezone();
     JobKey jobKey = new JobKey(jobName, schedulerJobDetail.getJobGroup());
     logger.info("Parameters received for updating cron job : jobKey :" + jobKey + ", date: "
         + schedulerJobDetail.getJobScheduleTime());
     try {
       Trigger newTrigger = JobUtil.createCronTrigger(jobName,
           schedulerJobDetail.getJobScheduleTime(), schedulerJobDetail.getEndDate(),
-          schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+          schedulerJobDetail.getCronExpression(),
+          SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW, timezone);
       JobDetail jobDetail = scheduler.getJobDetail(jobKey);
       jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID, schedulerJobDetail);
       scheduler.addJob(jobDetail, true, true);
@@ -262,6 +273,18 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
 
     try {
       schedulerFactoryBean.getScheduler().pauseJob(jkey);
+      
+      
+      /**
+      * Below lines are added to avoid quartz misfire during
+      * resume. Currently no way to avoid misfire
+      * through quartz api for one schedule. 
+      */
+      QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
+      cronTriggers.setNextFireTime(-1);
+      this.quartzRepository.save(cronTriggers);
+      
+      
       logger.info("Job with jobKey :" + jobKey + " paused succesfully.");
       return true;
     } catch (SchedulerException e) {
@@ -286,9 +309,30 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
     JobKey key = new JobKey(jobKey, groupKey);
     logger.info("Parameters received for resuming job : jobKey :" + jobKey);
     try {
-      schedulerFactoryBean.getScheduler().resumeJob(key);
-      logger.info("Job with jobKey :" + jobKey + " resumed succesfully.");
-      return true;
+      TriggerKey triggeKey = TriggerKey.triggerKey(jobKey);
+
+      logger.info("Trigger key:::" + triggeKey);
+      Scheduler scheduler = schedulerFactoryBean.getScheduler();
+      CronTriggerImpl trigger = (CronTriggerImpl) scheduler.getTrigger(triggeKey);
+      
+      /* Below lines are added to avoid misfire during
+      * resume for a paused trigger. If any approach
+      * with api is found in future this can be replaced.
+      */
+      QrtzTriggers cronTriggers = this.quartzRepository.findByJobName(jobKey);
+      if (cronTriggers != null) {
+        cronTriggers.setNextFireTime(trigger.getFireTimeAfter(new Date()).getTime());
+        this.quartzRepository.save(cronTriggers);
+        
+        
+        schedulerFactoryBean.getScheduler().resumeJob(key);
+        logger.info("Next fire time after now::: " + trigger.getFireTimeAfter(new Date()));
+        logger.info("Job with jobKey :" + jobKey + " resumed succesfully.");
+        return true;
+      } else {
+        return false;
+      }
+      
     } catch (SchedulerException e) {
       logger.error("SchedulerException while resuming job with key :" + jobKey + " message :"
           + e.getMessage());
@@ -379,15 +423,15 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
                 || job.getCronExpression().trim().equals(""))) {
               // get job's trigger
               List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+              Map<String, Object> map = new HashMap<String, Object>();
+              map.put("jobDetails", job);
               Date scheduleTime = triggers.get(0).getStartTime();
               Date nextFireTime = triggers.get(0).getNextFireTime();
               Date lastFiredTime = triggers.get(0).getPreviousFireTime();
-
-              Map<String, Object> map = new HashMap<String, Object>();
-              map.put("jobDetails", job);
-              map.put("scheduleTime", scheduleTime);
-              map.put("lastFiredTime", lastFiredTime);
-              map.put("nextFireTime", nextFireTime);
+              map.put("scheduleTime", scheduleTime.getTime());
+              map.put("lastFiredTime", lastFiredTime != null ? lastFiredTime.getTime() : -1);
+              long nextFt = (nextFireTime == null) ? -1 : nextFireTime.getTime();
+              map.put("nextFireTime", nextFt);
               ScheduleKeys scheduleKeys = new ScheduleKeys();
               scheduleKeys.setJobName(jobName);
               scheduleKeys.setGroupName(groupName);
@@ -398,11 +442,11 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
                 String jobState = getJobState(scheduleKeys);
                 map.put("jobStatus", jobState);
               }
-
               list.add(map);
               logger.info("Job details:");
               logger.info("Job Name:" + jobName + ", Group Name:" + groupName + ", Schedule Time:"
-                  + scheduleTime);
+                  + scheduleTime + " nextFireTime :" + nextFireTime + ": lastFiredTime :"
+                  + lastFiredTime);
             }
           }
         }
@@ -434,14 +478,16 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
               // get job's trigger
               if (job.getChannelType().equalsIgnoreCase(scheduleKeys.getCategoryId())) {
                 List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+                logger.trace("Actual nextFireTime :" + triggers.get(0).getNextFireTime().getTime());
+                logger.trace(
+                    "Actual lastFiredTime :" + triggers.get(0).getPreviousFireTime().getTime());
+                map.put("jobDetails", job);
                 Date scheduleTime = triggers.get(0).getStartTime();
                 Date nextFireTime = triggers.get(0).getNextFireTime();
                 Date lastFiredTime = triggers.get(0).getPreviousFireTime();
-
-                map.put("jobDetails", job);
-                map.put("scheduleTime", scheduleTime);
-                map.put("lastFiredTime", lastFiredTime);
-                map.put("nextFireTime", nextFireTime);
+                map.put("scheduleTime", scheduleTime.getTime());
+                map.put("lastFiredTime", lastFiredTime != null ? lastFiredTime.getTime() : -1);
+                map.put("nextFireTime", nextFireTime.getTime());
 
                 if (isJobRunning(scheduleKeys)) {
                   map.put("jobStatus", "RUNNING");

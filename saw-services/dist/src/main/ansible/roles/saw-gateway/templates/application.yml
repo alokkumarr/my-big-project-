@@ -28,6 +28,10 @@ management:
   endpoint:
     health:
       show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: info, health, prometheus
 internal-analysis:
     service:
         host: http://localhost:9200
@@ -121,6 +125,12 @@ api:
             path: '[/]internal/proxy.*'
         -   location: ${proxy.service.host}
             method: POST
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: PUT
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: DELETE
             path: '[/]internal/proxy.*'
         -   location: ${datapod.service.host}
             method: POST

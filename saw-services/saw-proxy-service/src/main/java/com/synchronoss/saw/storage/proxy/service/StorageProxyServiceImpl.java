@@ -360,9 +360,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
     @Override
-    public List<Object> execute(SIPDSL sipdsl) throws Exception {
+    public List<Object> execute(SIPDSL sipdsl, Integer size ) throws Exception {
         ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl);
+        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl,size);
         List<Object> result = null;
         JsonNode response =
             storageConnectorService.ExecuteESQuery(query, sipdsl.getSipQuery().getStore());
