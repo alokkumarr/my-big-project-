@@ -61,7 +61,6 @@ public class ElasticSearchQueryBuilder {
 
         if (dataSecurityString !=null && !dataSecurityString.trim().equals("")){
             objectMapper= new ObjectMapper();
-            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
             JsonNode objectNode = objectMapper.readTree(dataSecurityString);
             dataSecurityKeyNode = objectMapper.treeToValue(objectNode, DataSecurityKey.class);
         }
