@@ -619,6 +619,7 @@ public class SftpServiceImpl extends SipPluginContract {
         "transferData file starts here with the channel id " + channelId + "& route Id " + routeId);
     logger.trace("Transfer starts here with an channel" + channelId + "and routeId " + routeId);
     
+    
     this.executeSipJob(channelId, routeId, filePattern);
     
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
@@ -1305,6 +1306,24 @@ public class SftpServiceImpl extends SipPluginContract {
   
   
   void executeSipJob(Long channelId, Long routeId, String filePattern) {
+    if (filePattern == null) {
+      Optional<BisRouteEntity> routeInfo = this.findRouteById(routeId);
+      if (routeInfo.isPresent()) {
+        BisRouteEntity route = routeInfo.get();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode;
+        try {
+          rootNode = objectMapper.readTree(
+                route.getRouteMetadata());
+          filePattern = rootNode.get("filePattern").asText();
+          logger.info("File pattern::" + filePattern);
+        } catch (IOException exception) {
+          logger.error("Exception during parsing" 
+                  + exception.getMessage());
+        }
+      }
+      
+    }
     sipLogService.createJobLog(channelId, routeId, filePattern);
     
   }
