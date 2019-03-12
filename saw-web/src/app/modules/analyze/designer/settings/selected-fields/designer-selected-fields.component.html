@@ -41,3 +41,36 @@
     </mat-chip>
   </mat-chip-list>
 </div>
+
+<div
+  *ngIf="filters.length > 0"
+  fxLayout="row"
+  fxLayoutAlign="start center"
+  class="selected-fields__container"
+>
+  <div
+    fxFlex="10"
+    class="selected-fields__label"
+    i18n
+    fxLayout="row"
+    fxLayoutAlign="start center"
+  >
+    Filters:
+  </div>
+
+  <mat-chip-list
+    fxFlex="90"
+    e2e="designer-applied-filters"
+    class="selected-fields__list"
+  >
+    <mat-chip
+      *ngFor="let filter of filters"
+      class="selected-fields__item"
+      [removable]="true"
+      (removed)="removeFilter.emit($event)"
+    >
+      {{ getDisplayName(filter) }}
+      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+    </mat-chip>
+  </mat-chip-list>
+</div>

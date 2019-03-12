@@ -62,12 +62,14 @@
   </mat-drawer>
   <div class="container">
     <div class="designer__content">
-      <div>
+      <div class="designer__content__fields">
         <designer-selected-fields
           (change)="change.emit($event)"
+          (removeFilter)="onRemoveFilter($event)"
           [analysisType]="analysisType"
           [analysisSubtype]="analysisSubtype"
           [artifacts]="artifacts"
+          [filters]="filters"
           class="designer__selecte-fields__container"
         >
         </designer-selected-fields>
@@ -97,19 +99,8 @@
 
       <div
         [ngSwitch]="designerState"
-        fxLayout="column"
-        class="mat-elevation-z3 designer__main"
+        class="mat-elevation-z3 designer__content__representation"
       >
-        <filter-chips-u
-          *ngIf="filters.length > 0"
-          class="designer__filters"
-          (remove)="onRemoveFilter($event)"
-          (removeAll)="onRemoveFilterAll()"
-          [filters]="filters"
-          [artifacts]="artifacts"
-        >
-        </filter-chips-u>
-
         <div
           *ngSwitchCase="DesignerStates.NO_SELECTION"
           fxLayout="column"
