@@ -95,6 +95,7 @@ class RouteModel extends TestConnectivity {
   setScheduleStartDate() {
     commonFunctions.clickOnElement(this._startDate);
     commonFunctions.clickOnElement(this._increaseMinute);
+    commonFunctions.clickOnElement(this._increaseMinute);
     commonFunctions.clickOnElement(this._set);
   }
 

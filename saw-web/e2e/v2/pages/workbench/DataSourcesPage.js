@@ -1,6 +1,7 @@
 'use strict';
 const commonFunctions = require('../utils/commonFunctions');
 const DeleteModel = require('../workbench/components/DeleteModel');
+const LogHistoryModel = require('../workbench/components/LogHistoryModel');
 
 class DataSourcesPage extends DeleteModel {
   constructor() {
@@ -31,6 +32,30 @@ class DataSourcesPage extends DeleteModel {
     this._routeItems = item => element(by.xpath(`//*[text()="${item}"]`));
     this._routeAction = name => element(by.css(`[e2e="${name}"]`));
     this._deleteRoute = element(by.css(`[e2e="delete-route-btn"]`));
+    this._routeStatusBtn = element(by.css(`[e2e="route-active-inactive-btn"]`));
+    this._routeStatus = status =>
+      element(
+        by.xpath(
+          `//button[@e2e="route-active-inactive-btn"]/descendant::span[contains(text(),"${status}")]`
+        )
+      );
+    this._back = element(
+      by.xpath(`//div[contains(@class,"cdk-overlay-backdrop")]`)
+    );
+    this._routeSearchInput = element(
+      by.xpath(`(//input[@aria-label="Search in data grid"])[2]`)
+    );
+    this._routeLogs = element(by.css(`[e2e="view-route-logs-btn"]`));
+    this._routeScheduleRowColumn = colNum =>
+      element(
+        by.xpath(
+          `((//*[@e2e="route-logs-container"]/descendant::tr)[position()=last()-1]/descendant::td)[position()=${colNum}]`
+        )
+      );
+
+    this._closeRouteLogsModel = element(
+      by.xpath(`//button[contains(@class,"close-button")]`)
+    );
   }
 
   clickOnAddChannelButton() {
@@ -118,14 +143,19 @@ class DataSourcesPage extends DeleteModel {
 
   clickOnRouteAction(name) {
     commonFunctions.clickOnElement(this._routeAction(name));
+    browser.sleep(2000); // some time takes time to load
   }
   clickOnDeleteRoute() {
     commonFunctions.clickOnElement(this._deleteRoute);
   }
 
   verifyRouteDeleted(routeName) {
+    browser.sleep(2000);
     commonFunctions.waitFor.elementToBeNotVisible(this._routeItems(routeName));
-    browser.sleep(200);
+  }
+
+  closeRouteLogModel() {
+    commonFunctions.clickOnElement(this._closeRouteLogsModel);
   }
   verifyRouteDetails(routeInfo) {
     commonFunctions.waitFor.elementToBeVisible(
@@ -143,6 +173,94 @@ class DataSourcesPage extends DeleteModel {
     commonFunctions.waitFor.elementToBeVisible(
       this._routeItems(routeInfo.desc)
     );
+  }
+
+  clickOnActivateDeActiveRoute() {
+    commonFunctions.clickOnElement(this._routeStatusBtn);
+  }
+  verifyRouteStatus(status) {
+    commonFunctions.waitFor.elementToBeVisible(this._routeStatus(status));
+  }
+  clickOnViewRouteLogs() {
+    commonFunctions.clickOnElement(this._routeLogs);
+  }
+
+  verifyRouteScheduleInformation(routeInfo) {
+    let _self = this;
+    let attempts = 15;
+    (function process(index) {
+      if (index >= attempts) {
+        return;
+      }
+
+      _self.clickOnRouteAction(routeInfo.routeName);
+      _self.clickOnViewRouteLogs();
+      browser.sleep(2000);
+      commonFunctions.waitFor.elementToBeVisible(
+        _self._routeScheduleRowColumn(2)
+      );
+      element(
+        _self
+          ._routeScheduleRowColumn(2)
+          .getText()
+          .then(text => {
+            if (text === `${routeInfo.source}/${routeInfo.fileName}`) {
+              expect(_self._routeScheduleRowColumn(2).getText()).toEqual(
+                `${routeInfo.source}/${routeInfo.fileName}`
+              );
+              _self.scheduleVerification(routeInfo);
+              _self.closeRouteLogModel();
+            } else {
+              _self.closeRouteLogModel();
+              console.log(`Attempt:${index} done`);
+              console.log(`waiting for 20 seconds and check again`);
+              browser.sleep(20000);
+              process(index + 1);
+            }
+          })
+      );
+    })(1);
+  }
+
+  scheduleVerification(routeInfo) {
+    expect(this._routeScheduleRowColumn(1).getText()).toEqual(
+      routeInfo.filePattern
+    );
+    expect(this._routeScheduleRowColumn(2).getText()).toContain(
+      `${routeInfo.source}/${routeInfo.fileName}`
+    );
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(3));
+    expect(this._routeScheduleRowColumn(3)).not.toBeNull();
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(4));
+    expect(this._routeScheduleRowColumn(4).getText()).toContain(
+      routeInfo.destination
+    );
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(5));
+    expect(this._routeScheduleRowColumn(5)).not.toBeNull();
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(6));
+    expect(this._routeScheduleRowColumn(6).getText()).toContain('SUCCESS');
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(7));
+    expect(this._routeScheduleRowColumn(7).getText()).toContain(
+      'DATA_RECEIVED'
+    );
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(8));
+    expect(this._routeScheduleRowColumn(8)).not.toBeNull();
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(9));
+    expect(this._routeScheduleRowColumn(9)).not.toBeNull();
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(10));
+    expect(this._routeScheduleRowColumn(10)).not.toBeNull();
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(11));
+    expect(this._routeScheduleRowColumn(11)).not.toBeNull();
+
+    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(12));
+    expect(this._routeScheduleRowColumn(12)).not.toBeNull();
   }
 }
 

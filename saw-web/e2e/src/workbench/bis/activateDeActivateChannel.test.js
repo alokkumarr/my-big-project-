@@ -1,21 +1,16 @@
-var testDataReader = require('../../testdata/testDataReader.js');
-var appRoot = require('app-root-path');
+const testDataReader = require('../../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../../protractor.conf');
 const users = require('../../../v2/helpers/data-generation/users');
 const Constants = require('../../../v2/helpers/Constants');
 const Utils = require('../../../v2/helpers/Utils');
-const APICommonHelpers = require('../../../v2/helpers/api/APICommonHelpers');
-const FtpHelper = require('../../../v2/helpers/ftp/FtpHelper');
 
 const commonFunctions = require('../../../v2/pages/utils/commonFunctions');
 const DataSourcesPage = require('../../../v2/pages/workbench/DataSourcesPage');
 const ChannelActions = require('../../../v2/pages/workbench/ChannelActions');
-const RouteActions = require('../../../v2/pages/workbench/RouteActions');
 const Header = require('../../../v2/pages/components/Header');
 const LoginPage = require('../../../v2/pages/LoginPage');
 const logger = require('../../../v2/conf/logger')(__filename);
-var fs = require('fs');
 
 describe('Workbench tests: createAndDelete.test.js', () => {
   beforeAll(function() {
@@ -37,14 +32,14 @@ describe('Workbench tests: createAndDelete.test.js', () => {
   });
 
   using(
-    testDataReader.testData['BIS_CHANNEL']['deActivateChannel'],
+    testDataReader.testData['BIS']['deActivateChannel'],
     (data, description) => {
       it(
         data.description +
           ' testDataMetaInfo: ' +
           JSON.stringify({
             test: description,
-            feature: 'BIS_CHANNEL',
+            feature: 'BIS',
             dp: 'deActivateChannel'
           }),
         () => {

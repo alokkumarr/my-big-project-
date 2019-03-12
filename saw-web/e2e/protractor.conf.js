@@ -109,7 +109,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        //'--headless', // start on background
+        '--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -202,17 +202,20 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
       testBaseDir + 'observe/dashboardGlobalFilter.test.js',
       testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js',
+      testBaseDir + 'workbench/bis/createAndDeleteChannel.test.js',
+      testBaseDir + 'workbench/bis/updateAndDeleteChannel.test.js',
+      testBaseDir + 'workbench/bis/activateDeActivateChannel.test.js',
+      testBaseDir + 'workbench/bis/createAndDeleteRoute.test.js',
+      testBaseDir + 'workbench/bis/activateAndDeActivateRoute.test.js',
+      testBaseDir + 'workbench/bis/scheduleRoute.test.js'
     ],
     /**
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      //testBaseDir + 'workbench/bis/createAndDelete.test.js'
-      //testBaseDir + 'workbench/bis/createAndDeleteChannel.test.js',
-      //testBaseDir + 'workbench/bis/updateAndDeleteChannel.test.js',
-      //testBaseDir + 'workbench/bis/activateDeActivateChannel.test.js',
-      testBaseDir + 'workbench/bis/createAndDeleteRoute.test.js'
+      testBaseDir + 'dummyDevelopmentTests1.js',
+      testBaseDir + 'dummyDevelopmentTests2.js'
     ]
   },
   onCleanUp: function(results) {

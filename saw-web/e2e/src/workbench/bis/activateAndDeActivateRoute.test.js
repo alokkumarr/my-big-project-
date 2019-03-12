@@ -15,7 +15,7 @@ const Header = require('../../../v2/pages/components/Header');
 const LoginPage = require('../../../v2/pages/LoginPage');
 const logger = require('../../../v2/conf/logger')(__filename);
 
-describe('Workbench tests: createAndDeleteRoute.test.js', () => {
+describe('Workbench tests: activateAndDeActivateRoute.test.js', () => {
   beforeAll(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL =
       protractorConf.timeouts.extendedDefaultTimeoutInterval;
@@ -35,7 +35,7 @@ describe('Workbench tests: createAndDeleteRoute.test.js', () => {
   });
 
   using(
-    testDataReader.testData['BIS']['createAndDeleteRoute'],
+    testDataReader.testData['BIS']['activateDeactivateRoute'],
     (data, description) => {
       it(
         data.description +
@@ -43,7 +43,7 @@ describe('Workbench tests: createAndDeleteRoute.test.js', () => {
           JSON.stringify({
             test: description,
             feature: 'BIS',
-            dp: 'createAndDeleteRoute'
+            dp: 'activateDeactivateRoute'
           }),
         () => {
           logger.warn(`Running testCase with id: ${data.id}`);
@@ -114,25 +114,27 @@ describe('Workbench tests: createAndDeleteRoute.test.js', () => {
           dataSourcesPage.clickOnAddRoute();
 
           const routeActions = new RouteActions();
-          routeActions.fillRouteName(routeInfo.routeName);
-          routeActions.fillRouteSource(routeInfo.source);
-          routeActions.fillRouteFilePattern(routeInfo.filePattern);
-          routeActions.fillRouteDestination(routeInfo.destination);
-          routeActions.fillRouteBatchSize(routeInfo.batchSize);
-          routeActions.fillRouteDescription(routeInfo.desc);
-          routeActions.clickOnRouteNextBtn();
-          routeActions.clickOnScheduleTab('Hourly');
-          routeActions.clickOnFrequency('Hour', 0);
-          routeActions.clickOnFrequency('Minute', 2);
-
-          routeActions.clickOnTestConnectivity();
-          routeActions.verifyTestConnectivityLogs(data.testConnectivityMessage);
-          routeActions.closeTestConnectivity();
-
-          routeActions.setScheduleStartDate();
-          routeActions.clickOnCreateRouteBtn();
+          routeActions.createRoute(routeInfo);
           dataSourcesPage.verifyRouteDetails(routeInfo);
+
+          if (data.type === 'Activate') {
+            dataSourcesPage.clickOnRouteAction(routeInfo.routeName);
+            dataSourcesPage.clickOnActivateDeActiveRoute();
+            browser.sleep(500); // Added as sometime data was not loaded quickly
+            dataSourcesPage.clickOnRouteAction(routeInfo.routeName);
+            dataSourcesPage.clickOnActivateDeActiveRoute();
+            browser.sleep(500); // Added as sometime data was not loaded quickly
+          } else if (data.type === 'Deactivate') {
+            dataSourcesPage.clickOnRouteAction(routeInfo.routeName);
+            dataSourcesPage.clickOnActivateDeActiveRoute();
+            browser.sleep(500); // Added as sometime data was not loaded quickly
+          }
           dataSourcesPage.clickOnRouteAction(routeInfo.routeName);
+          if (data.type === 'Activate') {
+            dataSourcesPage.verifyRouteStatus('Deactivate');
+          } else if (data.type === 'Deactivate') {
+            dataSourcesPage.verifyRouteStatus('Activate');
+          }
           dataSourcesPage.clickOnDeleteRoute();
           dataSourcesPage.clickOnConfirmYesButton();
           dataSourcesPage.verifyRouteDeleted(routeInfo.routeName);
