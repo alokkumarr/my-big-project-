@@ -39,12 +39,12 @@ import {
   DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES,
+  DATE_TYPES
 } from '../consts';
 
-import { DRAFT_CATEGORY_ID } from './../../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
+import { JwtService } from '../../../../common/services';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
@@ -81,7 +81,8 @@ export class DesignerContainerComponent implements OnInit {
   constructor(
     public _designerService: DesignerService,
     public _analyzeDialogService: AnalyzeDialogService,
-    public _chartService: ChartService
+    public _chartService: ChartService,
+    private _jwtService: JwtService
   ) {}
 
   ngOnInit() {
@@ -343,11 +344,15 @@ export class DesignerContainerComponent implements OnInit {
     });
     if (!isGroupByPresent) {
       forEach(analysis.sqlBuilder.dataFields, dataField => {
-        dataField.aggregate = dataField.aggregate === 'percentageByRow' ? 'percentage' : dataField.aggregate;
+        dataField.aggregate =
+          dataField.aggregate === 'percentageByRow'
+            ? 'percentage'
+            : dataField.aggregate;
       });
 
       forEach(this.artifacts[0].columns, col => {
-        col.aggregate = col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+        col.aggregate =
+          col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
       });
     }
     return analysis;
@@ -383,7 +388,10 @@ export class DesignerContainerComponent implements OnInit {
       }
     });
 
-    this.analysis = this.analysis.type === 'chart' ? this.formulateChartRequest(this.analysis) : this.analysis;
+    this.analysis =
+      this.analysis.type === 'chart'
+        ? this.formulateChartRequest(this.analysis)
+        : this.analysis;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -513,7 +521,10 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   openSaveDialog(): Promise<any> {
-    this.analysis.categoryId = (this.designerMode === 'new' || this.designerMode === 'fork') ? DRAFT_CATEGORY_ID : this.analysis.categoryId;
+    this.analysis.categoryId =
+      this.designerMode === 'new' || this.designerMode === 'fork'
+        ? this._jwtService.userAnalysisCategoryId
+        : this.analysis.categoryId;
     return this._analyzeDialogService
       .openSaveDialog(this.analysis, this.designerMode)
       .afterClosed()

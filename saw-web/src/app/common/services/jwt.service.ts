@@ -83,10 +83,10 @@ export class JwtService {
    * Returns the id of user's private sub category.
    *
    * @readonly
-   * @type {(number | string)}
+   * @type {number}
    * @memberof JwtService
    */
-  get userAnalysisCategoryId(): number | string {
+  get userAnalysisCategoryId(): number {
     const productModules =
       get(this.getTokenObj(), 'ticket.products.0.productModules') || [];
     const analyzeModule =
@@ -102,7 +102,11 @@ export class JwtService {
         subCat => subCat.prodModFeatureName === USER_ANALYSIS_SUBCATEGORY_NAME
       ) || {};
 
-    return userSubcategory.prodModFeatureID;
+    // If there's an issue with getting category's id, return 0. This is not ideal,
+    // but better than analysis getting assigned to something like NaN category.
+    // This OR condition is not expected to happen, ever. If it does, there's a bigger
+    // problem somewhere else.
+    return +userSubcategory.prodModFeatureID || 0;
   }
 
   destroy() {
