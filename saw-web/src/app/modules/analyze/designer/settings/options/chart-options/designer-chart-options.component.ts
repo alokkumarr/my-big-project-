@@ -32,9 +32,9 @@ export class DesignerChartOptionsComponent implements OnInit, AfterViewInit {
   @Input() chartTitle: string;
 
   @Output() change = new EventEmitter();
-  showLegendOpts: boolean;
+  showLegendOpts = false;
   showLabelOpts = false;
-  showInversion: boolean;
+  showInversion = false;
   chartType: string;
 
   @Input() labelOptions: { enabled: boolean; value: string };
