@@ -7,10 +7,15 @@ import { MapBoxComponent } from './map-box.component';
 const lng = -10.22;
 const lat = 24.343;
 const coordinateField = { columnName: 'COORDINATES' };
-const data = [{
-  'COORDINATES': `${lng},${lat}`,
-  'ORDER_COUNT': 12.32
-}];
+const dataFields = [
+  { columnName: 'ORDER_COUNT', alias: 'order count', displayName: 'OrderCount' }
+];
+const data = [
+  {
+    COORDINATES: `${lng},${lat}`,
+    ORDER_COUNT: 12.32
+  }
+];
 
 @Component({
   selector: 'map-box',
@@ -23,23 +28,25 @@ class MapBoxStubComponent {
 describe('Map Box Component', () => {
   let fixture: ComponentFixture<MapBoxComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [MapBoxComponent, MapBoxStubComponent],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      })
-        .compileComponents()
-        .then(() => {
-          fixture = TestBed.createComponent(MapBoxComponent);
-          fixture.detectChanges();
-        });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [MapBoxComponent, MapBoxStubComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
-  );
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(MapBoxComponent);
+        fixture.detectChanges();
+      });
+  }));
 
   it('should transform data into geojson', () => {
     const component = fixture.componentInstance;
-    const geoJsonFeatures = component.data2geoJsonFeatures(data, coordinateField);
+    const geoJsonFeatures = component.data2geoJsonFeatures(
+      data,
+      coordinateField,
+      dataFields
+    );
     const coordinatesPath = ['0', 'geometry', 'coordinates'];
     const coordinates = get(geoJsonFeatures, coordinatesPath);
     expect(coordinates[0]).toEqual(lng);
