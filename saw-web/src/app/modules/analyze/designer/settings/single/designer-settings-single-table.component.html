@@ -2,7 +2,7 @@
   <div class="settings__filters" fxLayout="column" fxLayoutAlign="center start">
     <mat-button-toggle-group class="settings__type-filters">
       <mat-button-toggle
-        *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
+        *ngFor="let typeIcon of typeIcons; trackBy: trackByIndex"
         (change)="onTypeFilterChange($event.value)"
         [value]="typeIcon.value"
       >

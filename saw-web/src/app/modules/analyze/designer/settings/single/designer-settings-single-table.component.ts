@@ -5,6 +5,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
+import * as filter from 'lodash/filter';
 
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService } from '../../../../../common/services';
@@ -16,7 +17,7 @@ import {
   ArtifactColumnFilter,
   DesignerChangeEvent
 } from '../../types';
-import { TYPE_ICONS_OBJ, TYPE_ICONS } from '../../consts';
+import { TYPE_ICONS } from '../../consts';
 import {
   getArtifactColumnTypeIcon,
   getArtifactColumnGeneralType
@@ -57,8 +58,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   @Input() public sqlBuilder;
 
   public dropListContainer;
-  public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
-  public TYPE_ICONS = TYPE_ICONS;
+  public typeIcons = TYPE_ICONS;
   public isEmpty: Function = isEmpty;
   public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
@@ -87,6 +87,12 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.typeIcons = filter(TYPE_ICONS, type => {
+      if (type.value === 'geo') {
+        return this.analysisType === 'chart' && this.analysisSubtype === 'geo';
+      }
+      return true;
+    });
     this.setGroupAdapters();
   }
 
@@ -149,9 +155,9 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     this.change.emit(event);
   }
 
-  getUnselectedArtifactColumns(filter?) {
+  getUnselectedArtifactColumns(filterFn?) {
     const { types, keyword } = this.filterObj;
-    const toggleFilter = filter || this.hasAllowedType(types);
+    const toggleFilter = filterFn || this.hasAllowedType(types);
     const unselectedArtifactColumns = fpPipe(
       fpFilter(artifactColumn => {
         const { checked, alias, displayName } = artifactColumn;
@@ -179,11 +185,11 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   getGeneralType(artifactColumn) {
-    return getArtifactColumnGeneralType(artifactColumn);
+    return getArtifactColumnGeneralType(artifactColumn, this.analysisSubtype);
   }
 
   getArtifactColumnTypeIcon(artifactColumn) {
-    return getArtifactColumnTypeIcon(artifactColumn);
+    return getArtifactColumnTypeIcon(artifactColumn, this.analysisSubtype);
   }
 
   hasKeyword(name, keyword) {
