@@ -73,7 +73,8 @@
             <div
               class="settings__list-item__name"
               fxLayout="row"
-              fxLayoutAlign="space-between center"
+              fxFlex
+              fxLayoutAlign="start center"
             >
               <mat-icon
                 [fontIcon]="getArtifactColumnTypeIcon(artifactColumn)"
@@ -82,11 +83,23 @@
               </mat-icon>
               {{ artifactColumn.alias || artifactColumn.displayName }}
             </div>
-            <!-- <button mat-icon-button
-                  [attr.e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"
-                  (click)="addToGroupIfPossible(artifactColumn)">
-            <mat-icon fontIcon="icon-plus"></mat-icon>
-          </button> -->
+
+            <button
+              class="settings__list-item__addbtn"
+              mat-icon-button
+              color="primary"
+              [matMenuTriggerFor]="addMetricMenu"
+            >
+              <mat-icon
+                class="settings__list-item__addbtn__icon"
+                fontIcon="icon-plus"
+              ></mat-icon>
+            </button>
+            <mat-menu #addMetricMenu="matMenu">
+              <button mat-menu-item>
+                <span>Add to Metrics</span>
+              </button>
+            </mat-menu>
           </div>
         </div>
       </div>
