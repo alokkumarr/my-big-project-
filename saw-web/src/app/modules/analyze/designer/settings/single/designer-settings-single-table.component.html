@@ -1,16 +1,18 @@
 <div class="settings__container">
   <div class="settings__filters" fxLayout="column" fxLayoutAlign="center start">
-    <mat-button-toggle-group class="settings__type-filters">
+    <mat-button-toggle-group multiple class="settings__type-filters">
       <mat-button-toggle
-        *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
+        *ngFor="let typeIcon of typeIcons; trackBy: trackByIndex"
         (change)="onTypeFilterChange($event.value)"
         [value]="typeIcon.value"
+        [checked]="filterObj.types[typeIcon.value]"
       >
         <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
       </mat-button-toggle>
       <mat-button-toggle
-        *ngFor="let adapter of (groupAdapters | slice: 0:2)"
-        (change)="onFilterChange($event.value, adapter)"
+        *ngFor="let adapter of (groupAdapters | slice: 0:2); let i = index"
+        (change)="onFilterChange(i)"
+        [checked]="filterObj.adapters[i]"
         [value]="adapter.title"
       >
         {{ adapter.title }}

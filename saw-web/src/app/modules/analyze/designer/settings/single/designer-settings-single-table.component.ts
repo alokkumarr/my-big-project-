@@ -6,6 +6,9 @@ import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+import * as filter from 'lodash/filter';
+import * as every from 'lodash/every';
+import * as map from 'lodash/map';
 
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService } from '../../../../../common/services';
@@ -17,7 +20,7 @@ import {
   ArtifactColumnFilter,
   DesignerChangeEvent
 } from '../../types';
-import { TYPE_ICONS_OBJ, TYPE_ICONS } from '../../consts';
+import { TYPE_ICONS } from '../../consts';
 import {
   getArtifactColumnTypeIcon,
   getArtifactColumnGeneralType
@@ -58,15 +61,23 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   @Input() public sqlBuilder;
 
   public dropListContainer;
-  public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
-  public TYPE_ICONS = TYPE_ICONS;
+  public typeIcons = TYPE_ICONS;
   public isEmpty: Function = isEmpty;
   public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
-    types: []
+    types: {
+      number: false,
+      date: false,
+      string: false,
+      geo: false
+    },
+    adapters: [
+      false, // first adapter
+      false // first adapter
+    ]
     // types: ['number', 'date', 'string', 'geo']
   };
 
@@ -91,6 +102,12 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.typeIcons = filter(TYPE_ICONS, type => {
+      if (type.value === 'geo') {
+        return this.analysisType === 'chart' && this.analysisSubtype === 'geo';
+      }
+      return true;
+    });
     this.setGroupAdapters();
   }
 
@@ -153,41 +170,58 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     this.change.emit(event);
   }
 
-  getUnselectedArtifactColumns(filter?) {
+  getUnselectedArtifactColumns() {
     const { types, keyword } = this.filterObj;
-    const toggleFilter = filter || this.hasAllowedType(types);
+    const toggleFilter = this.hasAllowedType(types);
     const unselectedArtifactColumns = fpPipe(
       fpFilter(artifactColumn => {
         const { checked, alias, displayName } = artifactColumn;
         return (
           !checked &&
           toggleFilter(artifactColumn) &&
-          this.hasKeyword(alias || displayName, keyword)
+          this.hasKeyword(alias || displayName, keyword) &&
+          this.filterByAdapters(artifactColumn)
         );
       }),
       fpSort(artifactColumn => artifactColumn.displayName)
     )(this.artifactColumns);
+
     this.dropListContainer = { artifactColumns: unselectedArtifactColumns };
     return unselectedArtifactColumns;
+  }
+
+  filterByAdapters(artifactColumn) {
+    if (!this.groupAdapters) {
+      return true;
+    }
+    const filterResults = map(this.filterObj.adapters, (toggled, index) => {
+      const adapter = this.groupAdapters[index];
+      const acceptFn = adapter.canAcceptArtifactColumn(
+        adapter,
+        this.groupAdapters
+      );
+      return toggled ? acceptFn(artifactColumn) : true;
+    });
+
+    return every(filterResults);
   }
 
   hasAllowedType(filterTypes) {
     return artifactColumn => {
       const generalType = this.getGeneralType(artifactColumn);
-      /* prettier-ignore */
-      if (isEmpty(filterTypes)) {
+      if (every(filterTypes, toggled => !toggled)) {
         return true;
       }
-      return filterTypes.includes(generalType);
+      return filterTypes[generalType];
     };
   }
 
   getGeneralType(artifactColumn) {
-    return getArtifactColumnGeneralType(artifactColumn);
+    return getArtifactColumnGeneralType(artifactColumn, this.analysisSubtype);
   }
 
   getArtifactColumnTypeIcon(artifactColumn) {
-    return getArtifactColumnTypeIcon(artifactColumn);
+    return getArtifactColumnTypeIcon(artifactColumn, this.analysisSubtype);
   }
 
   hasKeyword(name, keyword) {
@@ -204,16 +238,13 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   onTypeFilterChange(value) {
-    console.log('value', value);
-    this.filterObj.types = [value];
+    this.filterObj.types[value] = !this.filterObj.types[value];
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
-  onFilterChange(value, adapter: IDEsignerSettingGroupAdapter) {
-    console.log('value', value);
-    console.log('adapter', adapter);
-    const filter = adapter.canAcceptArtifactColumn(adapter, this.groupAdapters);
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns(filter);
+  onFilterChange(index) {
+    this.filterObj.adapters[index] = !this.filterObj.adapters[index];
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
   /**

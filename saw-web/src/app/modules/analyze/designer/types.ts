@@ -64,7 +64,8 @@ export {
 
 export interface ArtifactColumnFilter {
   keyword: string;
-  types: ('number' | 'date' | 'string' | 'geo')[];
+  types: { number: boolean; date: boolean; string: boolean; geo: boolean };
+  adapters: boolean[];
 }
 
 export type PivotArea = 'data' | 'row' | 'column';
