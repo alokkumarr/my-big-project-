@@ -28,13 +28,6 @@
   flex-direction: column;
 }
 
-.route-log {
-  &__data-grid {
-    flex-grow: 1;
-    max-height: calc(100% - 171px);
-  }
-}
-
 .title {
   text-align: left;
   color: $primary-blue-b1;
@@ -64,11 +57,4 @@
 
 .close-button {
   transform: translateY(-6px);
-}
-@media screen and (max-width: 959px) {
-  .route-log {
-    &__data-grid {
-      max-height: calc(100% - 339px) !important;
-    }
-  }
 }
