@@ -223,6 +223,11 @@
 						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254), 
 						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
+					<!--
+					    The spring-boot-start-test dependency adds JUnit in the
+					    compile scope so exclude JUnit explicitly from packaging
+					-->
+					<excludeGroupIds>junit</excludeGroupIds>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -261,10 +266,6 @@
 								<entry>
 									<name>/opt/bda/saw-export-service/conf/logback.xml</name>
 									<file>src/main/resources/logback.xml</file>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-export-service/conf/application.yml</name>
-									<file>src/main/resources/application.yml</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-export-service/conf/ftp-details.json</name>

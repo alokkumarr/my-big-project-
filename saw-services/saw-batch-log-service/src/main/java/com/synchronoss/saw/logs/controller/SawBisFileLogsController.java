@@ -57,7 +57,7 @@ public class SawBisFileLogsController {
           @ApiResponse(code = 415,
               message = "Unsupported Type. " + "Representation not supported for the resource")})
   public List<BisFileLog> retrieveAllLogs() {
-    return this.bisLogsRepository.findAll(bisLogsRepository.orderByCreatedDate());
+    return this.bisLogsRepository.findAll(bisLogsRepository.orderBy("createdDate"));
   }
 
   @ApiOperation(value = "Retrieve log record by log Id", nickname = "routeLogWithId", notes = "",
@@ -141,7 +141,7 @@ public class SawBisFileLogsController {
     } 
     
     List<BisFileLog> bisFileLogs =
-        this.bisLogsRepository.findByRouteSysId(routeId, bisLogsRepository.orderByCreatedDate());
+        this.bisLogsRepository.findByRouteSysId(routeId, bisLogsRepository.orderBy("createdDate"));
     List<BisFileLogDetails> bisFileLogDtos = new ArrayList<BisFileLogDetails>();
     for (BisFileLog bisFIleLog : bisFileLogs) {
       BisFileLogDetails logDto = new BisFileLogDetails();

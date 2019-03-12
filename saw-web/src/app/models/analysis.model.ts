@@ -17,6 +17,7 @@ export interface Analysis {
   categoryId: number;
   artifacts: Artifact[];
   createdTimestamp: number;
+  updatedTimestamp?: number;
   disabled: null | boolean | string;
   id: string;
   isScheduled: string;
@@ -45,6 +46,9 @@ export interface Analysis {
   crondetails?: any;
   chartTitle: string;
   mapSettings?: MapSettings;
+  parentAnalysisId?: string;
+  parentCategoryId?: string | number;
+  parentLastModified?: number;
   // groupByColumns should be deprecated
 }
 

@@ -327,6 +327,34 @@ example 1.0.1, 1.0.2 and so on).
 [project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
 [release notes]: https://confluence.synchronoss.net:8443/display/BDA/SAW+Releases+Documentation
 
+# Release branches
+
+Releases are by default made from the master branch, whenever
+possible.  In such cases release branches are not needed.  However, if
+a maintenance release is needed on top of a previous release, a
+release branch can be used to ensure only certain changes are included
+in that release.  Create a release branch by first identifying the
+release tag from which the branch will start, for example `v1.0.0`.
+Then create the corresponding release branch, in this case
+`release/v1.0`, using the following command:
+
+        $ git push origin v1.0.0:refs/heads/release/v1.0
+
+Note: The branch name should only contain the major and minor
+components of the version, excluding the patch component.  The branch
+name is derived from the common parts, the major and minor version,
+shared by each specific release `v1.0.1`, `v1.0.2` made from the
+branch.  The releases themselves are tags, not branches.
+
+Development on release branches should follow the upstream-first
+principle: Changes are first made on the master branch and only after
+that [cherry-picked] to the release branch.  This ensures fixes get
+included in the main development branch too (see [GitLab flow] for
+more details).
+
+[cherry-picked]: https://www.git-scm.com/docs/git-cherry-pick
+[GitLab flow]: https://docs.gitlab.com/ee/workflow/gitlab_flow.html#release-branches-with-gitlab-flow
+
 # Rebuilding an older release
 
 Use the same steps as for making a release generally, but use a Bamboo
@@ -346,3 +374,26 @@ deploying the older release to the shared develoment environment.
    running `docker container rm {container-id}`. You may need to do this
    more than once. Keep deleting the container and restarting the mvn command
    to start docker until you can get a clean start.
+
+# SIP Product Modules
+
+The SIP Product Modules setup gives the flexibility to develop customized
+dashboards that meets the need of a business use case. Those modules
+can then be deployed on top of SIP code base. SIP WEB has the capability
+to render the external modules dynamically (via dynamic-module.service).
+
+### Pre Conditions
+
+Following are the conditions to be met in order to make module compatible with SIP
+
+- The module should be generated using Angular 6+ and output should be UMD format
+- Any NPM dependencies that are not a part of SIP WEB should be included in UMD
+- Information about the module should be provided to SIP WEB via SIP Security
+  modules database.
+
+> Product Modules code is maintained in separate [product modules repository].
+
+[product modules repository]: https://stash.synchronoss.net/projects/BDA/repos/sip-external-widgets
+
+Please refer to the **README** of [product modules repository]
+for further details.

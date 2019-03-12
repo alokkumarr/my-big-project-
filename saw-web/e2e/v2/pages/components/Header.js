@@ -13,8 +13,21 @@ class Header extends SideNav {
     this._accountLogoutLink = element(
       by.css(`[e2e='account-settings-selector-logout']`)
     );
+
     this._companyLogo = element(by.css('.company-logo'));
     this._categoryMenuIcon = element(by.css(`[e2e="main-menu-expand-btn"]`));
+
+    this._launcherButton = element(by.css('[class="header__module-launcher-button"]'));
+    this._observeLink= element(by.xpath('//a[contains(@class,"module-observe")]'));
+    this._analyzeLink= element(by.xpath('//a[contains(@class,"module-analyze")]'));
+  }
+
+  clickOnModuleLauncher(){
+    commonFunctions.clickOnElement(this._launcherButton);    
+  }
+
+  clickOnObserveLink(){
+    commonFunctions.clickOnElement(this._observeLink);    
   }
 
   doLogout() {
@@ -33,8 +46,7 @@ class Header extends SideNav {
     expect(this._companyLogo.isPresent()).toBeTruthy();
   }
   openCategoryMenu() {
-    commonFunctions.waitFor.elementToBeClickable(this._categoryMenuIcon);
-    this._categoryMenuIcon.click();
+    commonFunctions.clickOnElement(this._categoryMenuIcon);
   }
 }
 module.exports = Header;

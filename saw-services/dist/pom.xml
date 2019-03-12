@@ -17,11 +17,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-analysis-service</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>saw-scheduler-service</artifactId>
       <version>${revision}</version>
     </dependency>
@@ -42,17 +37,12 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-observe-service</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>saw-storage-proxy-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-semantic-service</artifactId>
+      <artifactId>sip-metadata-service</artifactId>
       <version>${revision}</version>
     </dependency>
   </dependencies>

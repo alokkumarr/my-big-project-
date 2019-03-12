@@ -12,11 +12,11 @@ Web          +--------------------+--------------------+----------------------+
              +----------------------------------------------------------------+
 Security     |                        Security Service                        |
              +----------------------------------------------------------------+
-             | Analysis Service   |  Observe Service   |  Workbench Service   |
+             | Analysis Service   |    BIS Service     |  Workbench Service   |
 Services     |                    |                    |                      |
-             | Execution Service  |   BIS Service      |  Workbench Executor  |
+             | Execution Service  |                    |  Workbench Executor  |
              |                    |                    |                      |
-             | Export Service     |                    |  Semantic Service    |
+             | Export Service     |                    | SIP Metadata Service |
              |                    |                    |                      |
              | Scheduler Service  |                    | Storage Proxy Service|
              +--------------------+--------------------+----------------------+

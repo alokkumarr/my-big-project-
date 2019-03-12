@@ -10,7 +10,8 @@ const SMOKE = [
 const SANITY = [
   ...SMOKE,
   TEST_BASE_DIR + 'reports/createAndDeleteReport.test.js',
-  TEST_BASE_DIR + 'charts/createAndDeleteCharts.test.js'
+  TEST_BASE_DIR + 'charts/createAndDeleteCharts.test.js',
+  TEST_BASE_DIR + 'analyze/analyze.test.js'
 ];
 // ALL the test with minimal data set so that all the functionality is touched
 const CRITICAL = [
@@ -41,7 +42,10 @@ const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
-  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',
+  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
+   TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
+   // TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
+  // TEST_BASE_DIR + 'charts/createAndDelete.test.js'
 ];
 
 module.exports = {
