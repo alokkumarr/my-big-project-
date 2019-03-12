@@ -36,7 +36,18 @@
       [removable]="true"
       (removed)="removeFromGroup(col, adapter)"
     >
-      {{ col.alias || col.displayName }}
+      <ng-container *ngIf="col.aggregate; else defaultTemplate">
+        <span
+          [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate].label"
+          [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
+        >
+        </span>
+        <span> (&nbsp;{{ col.alias || col.displayName }}&nbsp;) </span>
+      </ng-container>
+      <ng-template #defaultTemplate>
+        {{ col.alias || col.displayName }}
+      </ng-template>
+
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
     </mat-chip>
   </mat-chip-list>

@@ -5,6 +5,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
 import * as every from 'lodash/every';
 import * as map from 'lodash/map';
@@ -79,6 +80,9 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     ]
     // types: ['number', 'date', 'string', 'geo']
   };
+
+  public config: PerfectScrollbarConfigInterface = {};
+
   constructor(
     private _designerService: DesignerService,
     private _dndPubsub: DndPubsubService

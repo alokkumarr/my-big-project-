@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as get from 'lodash/get';
 
 import {
@@ -35,6 +36,7 @@ export class SingleTableDesignerLayoutComponent {
   public isFieldsPanelOpen = true;
   public optionsPanelMode: 'side' | 'over' = 'side';
   private isInTabletMode = false;
+  public config: PerfectScrollbarConfigInterface = {};
 
   constructor(breakpointObserver: BreakpointObserver) {
     breakpointObserver

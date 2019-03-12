@@ -47,11 +47,12 @@ import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
 import { DesignerPageComponent } from './page/page.component';
 import { ChartTypeChooserComponent } from './chart-type-chooser';
-
-export {
-  DesignerPageComponent,
-  DesignerService
-};
+import {
+  PerfectScrollbarModule,
+  PerfectScrollbarConfigInterface,
+  PERFECT_SCROLLBAR_CONFIG
+} from 'ngx-perfect-scrollbar';
+export { DesignerPageComponent, DesignerService };
 
 const COMPONENTS = [
   AnalyzeReportQueryComponent,
@@ -86,6 +87,9 @@ const COMPONENTS = [
   DesignerMapChartOptionsComponent
 ];
 
+const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+  wheelPropagation: true
+};
 const SERVICES = [DesignerService];
 
 const PIPES = [ArtifactColumns2PivotFieldsPipe];
@@ -98,12 +102,18 @@ const PIPES = [ArtifactColumns2PivotFieldsPipe];
     ReactiveFormsModule,
     UChartModule,
     AnalyzeFilterModule,
-    AngularSplitModule.forChild()
+    AngularSplitModule.forChild(),
+    PerfectScrollbarModule
   ],
   declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,
-  providers: SERVICES,
+  providers: [
+    ...SERVICES,
+    {
+      provide: PERFECT_SCROLLBAR_CONFIG,
+      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
+    }
+  ],
   exports: COMPONENTS
 })
 export class AnalyzeDesignerModule {}
-

@@ -46,7 +46,7 @@
   </div>
 
   <div class="settings__unselected-fields">
-    <div *ngIf="unselectedArtifactColumns">
+    <perfect-scrollbar [config]="config" *ngIf="unselectedArtifactColumns">
       <div
         *ngIf="!isEmpty(unselectedArtifactColumns)"
         cdkDropList
@@ -99,6 +99,6 @@
           There are no fields for this criteria
         </div>
       </div>
-    </div>
+    </perfect-scrollbar>
   </div>
 </div>

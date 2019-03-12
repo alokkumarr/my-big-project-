@@ -20,6 +20,7 @@ import * as every from 'lodash/every';
 import * as map from 'lodash/map';
 import * as reduce from 'lodash/reduce';
 
+import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
 import { getArtifactColumnGeneralType } from '../../utils';
@@ -79,6 +80,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   // array of booleans to show if the corresponding group addapterg can accept the field that is being dragged
   public openGroupArray: boolean[];
   private _acceptEventStream$: Subject<boolean> = new Subject<boolean>();
+  public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
 
   constructor(
     private _designerService: DesignerService,
