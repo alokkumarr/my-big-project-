@@ -55,16 +55,19 @@ public class XlsxExporterTest {
         obj1.put("AccountNum",10206088);
         obj1.put("SWITCH_MOU",3.23);
         obj1.put("REGION","US");
+        obj1.put("COMPANY",null);
 
         LinkedHashMap obj2 = new LinkedHashMap();
         obj2.put("AccountNum",10206089);
         obj2.put("SWITCH_MOU",1.20);
         obj2.put("REGION","US");
+        obj2.put("COMPANY",null);
 
         LinkedHashMap obj3 = new LinkedHashMap();
         obj3.put("AccountNum",10206082);
         obj3.put("SWITCH_MOU",4.5);
         obj3.put("REGION","US");
+        obj3.put("COMPANY",null);
 
         ArrayList list = new ArrayList();
         list.add(obj1);

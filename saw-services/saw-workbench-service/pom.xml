@@ -63,6 +63,10 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
+	    <groupId>io.micrometer</groupId>
+	    <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jolokia</groupId>
       <artifactId>jolokia-core</artifactId>
     </dependency>
@@ -283,6 +287,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -359,7 +368,11 @@
           <classifier>exec</classifier>
           <!-- The Spring Boot Maven plug-in includes also dependencies with "provided" scope by default.  Exclude
                         Spark and Scala to reduce artifact size. -->
-          <excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,org.ojai,org.scala-lang</excludeGroupIds>
+          <!--
+              The spring-boot-start-test dependency adds JUnit in the
+              compile scope so exclude JUnit explicitly from packaging
+          -->
+          <excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,junit,org.ojai,org.scala-lang</excludeGroupIds>
           <layout>ZIP</layout>
         </configuration>
       </plugin>

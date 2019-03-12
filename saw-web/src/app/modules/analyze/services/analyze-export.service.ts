@@ -17,6 +17,7 @@ import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
+import { checkNullinReportData } from './../../../common/utils/dataFlattener';
 
 @Injectable()
 export class AnalyzeExportService {
@@ -31,7 +32,7 @@ export class AnalyzeExportService {
     this._analyzeActionsService
       .exportAnalysis(analysisId, executionId, analysisType, executionType)
       .then(data => {
-        const exportData = get(data, 'data');
+        let exportData = get(data, 'data');
         let fields = this.getCheckedFieldsForExport(analysis, exportData);
         fields = this.checkColumnName(fields);
         const columnNames = map(fields, 'columnName');
@@ -45,6 +46,9 @@ export class AnalyzeExportService {
           },
           columnNames
         };
+
+        exportData = ['report', 'esReport'].includes(analysisType) ? checkNullinReportData(exportData) : exportData;
+
         json2csv(
           exportData,
           (err, csv) => {
@@ -53,7 +57,7 @@ export class AnalyzeExportService {
                 'There was an error while exporting, please try again witha different dataset.'
               );
             }
-            const csvWithDisplayNames = this.replaceCSVHeader(csv, fields);
+            const csvWithDisplayNames = this.replaceCSVHeader(csv, fields, analysis);
             this.exportCSV(csvWithDisplayNames, analysis.name);
           },
           exportOptions
@@ -61,7 +65,7 @@ export class AnalyzeExportService {
       });
   }
 
-  replaceCSVHeader(csv, fields) {
+  replaceCSVHeader(csv, fields, analysis) {
     const firstNewLine = indexOf(csv, '\n');
     const firstRow = slice(csv, 0, firstNewLine).join('');
     const firstRowColumns = firstRow
@@ -77,6 +81,9 @@ export class AnalyzeExportService {
         if (!field) {
           return columnName;
         }
+        if (field.aggregate === 'distinctCount' && analysis.type === 'report') {
+          return `distinctCount(${field.aliasName || field.displayName})`;
+        }
         return field.aliasName || field.displayName;
       })
       .join(',');
@@ -87,7 +94,7 @@ export class AnalyzeExportService {
     /* If report was using designer mode, find checked columns */
     if (!analysis.edit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
-        fpPipe(fpMap(fpPick(['columnName', 'aliasName', 'displayName'])))(
+        fpPipe(fpMap(fpPick(['columnName', 'aliasName', 'displayName', 'aggregate'])))(
           artifact.columns
         )
       );

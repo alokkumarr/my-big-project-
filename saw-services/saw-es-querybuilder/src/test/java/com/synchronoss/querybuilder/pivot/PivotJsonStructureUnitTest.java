@@ -1,16 +1,18 @@
 package com.synchronoss.querybuilder.pivot;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class PivotJsonStructureUnitTest {
 
@@ -92,6 +94,7 @@ public class PivotJsonStructureUnitTest {
     || (sqlBuilderNodePivot.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("max"))
     || (sqlBuilderNodePivot.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("min")) 
     || (sqlBuilderNodePivot.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("count"))
+    || (sqlBuilderNodePivot.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("distinctCount"))
     || (sqlBuilderNodePivot.getSqlBuilder().getDataFields().get(0).getAggregate().value().equals("avg")));
   }
   

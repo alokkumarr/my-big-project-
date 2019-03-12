@@ -1,0 +1,40 @@
+{
+  "ANALYZE": {
+    "listView": {
+      "ANALY001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "description": "check if all analysis options are displayed in list view by user",
+        "verification": {
+          "createButton": true,
+          "labels": [
+            "NAME",
+            "METRICS",
+            "SCHEDULED",
+            "TYPE",
+            "CREATOR",
+            "CREATED"
+          ],
+          "options": ["All", "Chart", "Report", "Pivot", "Scheduled"]
+        }
+      },
+      "ANALY002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "description": "check if all analysis options are displayed in list view by amdin",
+        "verification": {
+          "createButton": true,
+          "labels": [
+            "NAME",
+            "METRICS",
+            "SCHEDULED",
+            "TYPE",
+            "CREATOR",
+            "CREATED"
+          ],
+          "options": ["All", "Chart", "Report", "Pivot", "Scheduled"]
+        }
+      }
+    }
+  }
+}

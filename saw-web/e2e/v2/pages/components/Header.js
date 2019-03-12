@@ -1,15 +1,37 @@
 'use strict';
 
 const logger = require('../../conf/logger')(__filename);
-const commonFunctions = require('../utils/commonFunctions')
+const commonFunctions = require('../utils/commonFunctions');
+const SideNav = require('./SideNav');
 
-class Header {
-
+class Header extends SideNav {
   constructor() {
-    this._accountSettingIcon = element(by.css(`[e2e='account-settings-menu-btn']`));
-    this._accountChangePasswordLink = element(by.css(`[e2e='account-settings-selector-change-password']`));
-    this._accountLogoutLink = element(by.css(`[e2e='account-settings-selector-logout']`));
+
+    super();
+    this._accountSettingIcon = element(
+      by.css(`[e2e='account-settings-menu-btn']`)
+    );
+    this._accountChangePasswordLink = element(
+      by.css(`[e2e='account-settings-selector-change-password']`)
+    );
+    this._accountLogoutLink = element(
+      by.css(`[e2e='account-settings-selector-logout']`)
+    );
+
     this._companyLogo = element(by.css('.company-logo'));
+    this._categoryMenuIcon = element(by.css(`[e2e="main-menu-expand-btn"]`));
+
+    this._launcherButton = element(by.css('[class="header__module-launcher-button"]'));
+    this._observeLink= element(by.xpath('//a[contains(@class,"module-observe")]'));
+    this._analyzeLink= element(by.xpath('//a[contains(@class,"module-analyze")]'));
+  }
+
+  clickOnModuleLauncher(){
+    commonFunctions.clickOnElement(this._launcherButton);    
+  }
+
+  clickOnObserveLink(){
+    commonFunctions.clickOnElement(this._observeLink);    
   }
 
 
@@ -45,6 +67,9 @@ class Header {
   verifyLogo() {
     commonFunctions.waitFor.elementToBeVisible(this._companyLogo);
     expect(this._companyLogo.isPresent()).toBeTruthy();
+  }
+  openCategoryMenu() {
+    commonFunctions.clickOnElement(this._categoryMenuIcon);
   }
 }
 module.exports = Header;

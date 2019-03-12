@@ -1,0 +1,138 @@
+{
+  "CREATEDELETECHART": {
+    "charts": {
+      "CHART001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to create and delete combo charts"
+      },
+      "CHART002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "description": "Admin should be able to create and delete combo charts"
+      },
+      "CHART003": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "description": "User should be able to create and delete column charts"
+      },
+      "CHART004": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to create and delete column charts"
+      },
+      "CHART005": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to create and delete bar charts"
+      },
+      "CHART006": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "description": "Admin should be able to create and delete bar charts"
+      },
+      "CHART007": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to create and delete stack charts"
+      },
+      "CHART008": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "description": "Admin should be able to create and delete stack charts"
+      },
+      "CHART009": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "description": "User should be able to create and delete line charts"
+      },
+      "CHART010": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to create and delete line charts"
+      },
+      "CHART011": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to create and delete area charts"
+      },
+      "CHART012": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "description": "Admin should be able to create and delete area charts"
+      },
+      "CHART013": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "description": "User should be able to create and delete scatter charts"
+      },
+      "CHART014": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to create and delete scatter charts"
+      },
+      "CHART015": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to create and delete bubble charts"
+      },
+      "CHART016": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "description": "Admin should be able to create and delete bubble charts"
+      },
+      "CHART017": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "description": "User should be able to create and delete pie charts"
+      },
+      "CHART018": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:pie",
+        "description": "Admin should be able to create and delete pie charts"
+      },
+      "CHART019": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to create and delete tsspline charts"
+      },
+      "CHART020": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "description": "Admin should be able to create and delete tsspline charts"
+      },
+      "CHART021": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "description": "User should be able to create and delete tsPane charts"
+      },
+      "CHART022": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to create and delete tsPane charts"
+      }
+    }
+  }
+}

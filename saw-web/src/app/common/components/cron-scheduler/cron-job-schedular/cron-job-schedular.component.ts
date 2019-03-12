@@ -7,10 +7,11 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as isFunction from 'lodash/isFunction';
 import * as range from 'lodash/range';
 
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
+import { timezones } from '../../../utils/timezones';
 
+window['moment'] = moment;
 import {
-  getLocalMinute,
   generateHourlyCron,
   generateDailyCron,
   generateWeeklyCron,
@@ -20,6 +21,7 @@ import {
   convertToLocal
 } from '../../../../common/utils/cronFormatter';
 
+const MOMENT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 import { SCHEDULE_TYPES } from '../../../../common/consts';
 
 @Component({
@@ -35,6 +37,9 @@ export class CronJobSchedularComponent implements OnInit {
   @Output()
   onCronChanged: EventEmitter<any> = new EventEmitter();
   public startAt = new Date();
+  public timezones = timezones;
+  public timezone = moment.tz.guess();
+
   NumberMapping: any = { '=1': '#st', '=2': '#nd', '=3': '#rd', other: '#th' };
   DayMapping: any = {
     '=TUE': 'TUESDAY',
@@ -77,6 +82,7 @@ export class CronJobSchedularComponent implements OnInit {
 
   ngOnInit() {
     this.today = new Date();
+    this.today.setMinutes(this.today.getMinutes() - 2);
     this.dailyTypeDay = {
       hour: '',
       minute: '',
@@ -306,17 +312,62 @@ export class CronJobSchedularComponent implements OnInit {
     }
   }
 
+  /**
+   * Parses a date object in specific timezone. For example, if selected time zone is
+   * America/Los_Angeles, then 5.30 local will become 5.30 American.
+   *
+   * @param {*} dateObject
+   * @returns
+   * @memberof CronJobSchedularComponent
+   */
+  toSelectedTimezone(timezone: string, dateObject: Date): string | Date {
+    if (!timezone || !dateObject) {
+      return dateObject;
+    }
+    return moment
+      .tz(
+        moment(dateObject).format(MOMENT_FORMAT),
+        MOMENT_FORMAT,
+        timezone || 'UTC'
+      )
+      .format();
+  }
+
+  /**
+   * Coverts a UTC date string to a timezone specific object.
+   * So 5.30 in supplied timezone will become 5.30 in local
+   *
+   * @param {string} timezone
+   * @param {string} datetime
+   * @memberof CronJobSchedularComponent
+   */
+  fromSelectedTimezone(timezone: string, datetime: string): Date {
+    if (!timezone) {
+      return new Date(
+        moment(datetime)
+          .local()
+          .seconds(0)
+          .format()
+      );
+    }
+
+    const datetimestring = moment.tz(datetime, timezone).format(MOMENT_FORMAT);
+    return new Date(moment(datetimestring, MOMENT_FORMAT).format());
+  }
+
   cronChange() {
     if (this.scheduleType !== 'immediate') {
       this.startDate = this.selectedMoments[0] || moment.utc().seconds(0);
       this.endDate = this.selectedMoments[1] || '';
     }
+
     this.crondetails = {
       cronexp: this.CronExpression,
       activeTab: this.scheduleType,
       activeRadio: this.activeRadio,
-      startDate: this.startDate,
-      endDate: this.endDate
+      startDate: this.toSelectedTimezone(this.timezone, this.startDate),
+      endDate: this.toSelectedTimezone(this.timezone, this.endDate),
+      timezone: this.timezone
     };
     this.onCronChanged.emit(this.crondetails);
   }
@@ -326,38 +377,28 @@ export class CronJobSchedularComponent implements OnInit {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     this.activeRadio = this.crondetails.activeRadio;
+    this.timezone = moment.tz.guess();
     this.selectedMoments = [];
     this.selectedMoments.push(
-      new Date(
-        moment(this.crondetails.startDate)
-          .local()
-          .seconds(0)
-          .format()
-      )
+      this.fromSelectedTimezone(this.timezone, this.crondetails.startDate)
     );
     if (
       !isUndefined(this.crondetails.endDate) &&
       this.crondetails.endDate !== null
     ) {
       this.selectedMoments.push(
-        new Date(
-          moment(this.crondetails.endDate)
-            .local()
-            .seconds(0)
-            .format()
-        )
+        this.fromSelectedTimezone(this.timezone, this.crondetails.endDate)
       );
     }
-
     if (isEmpty(this.crondetails.cronexp)) {
       return;
     }
     let parseCronValue;
     let modelDate;
     if (this.scheduleType === 'hourly') {
-      parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+      parseCronValue = this.crondetails.cronexp.split(' ');
     } else {
-      const localCronExpression = convertToLocal(this.crondetails.cronexp);
+      const localCronExpression = convertToLocal(this.crondetails.cronexp, this.crondetails.timezone);
       parseCronValue = cronstrue.toString(localCronExpression).split(' ');
       const fetchTime = parseCronValue[1].split(':');
       const meridium = parseCronValue[2].split(',');
@@ -370,22 +411,22 @@ export class CronJobSchedularComponent implements OnInit {
 
     switch (this.scheduleType) {
       case 'hourly':
-        let fetchLocalMinute;
         this.selectedTab = 1;
         if (this.crondetails.cronexp.match(/\d+ 0\/\d+ \* 1\/1 \* \? \*/)) {
           this.hourly.hours = 0;
-          fetchLocalMinute = parseCronValue[1].split('/');
-          this.hourly.minutes = isNaN(parseInt(fetchLocalMinute[0], 10))
-            ? 1
-            : parseInt(fetchLocalMinute[0], 10);
+          const extractHour = parseCronValue[1].split('/');
+          this.hourly.minutes = isNaN(parseInt(extractHour[1], 10))
+          ? 0
+          : parseInt(extractHour[1], 10);
         } else {
           // Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
-          this.hourly.hours = isNaN(parseInt(parseCronValue[7], 10))
+          const extractHour = parseCronValue[2].split('/');
+          this.hourly.hours = isNaN(parseInt(extractHour[1], 10))
             ? 1
-            : parseInt(parseCronValue[7], 10);
+            : parseInt(extractHour[1], 10);
           this.hourly.minutes = isNaN(parseInt(parseCronValue[1], 10))
             ? 0
-            : getLocalMinute(parseInt(parseCronValue[1], 10));
+            : parseInt(parseCronValue[1], 10);
         }
         break;
       case 'daily':

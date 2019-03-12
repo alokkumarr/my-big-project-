@@ -18,6 +18,7 @@
                   "min",
                   "max",
                   "count",
+                  "distinctCount",
                   "percentage",
                   "percentageByRow"
                 ],

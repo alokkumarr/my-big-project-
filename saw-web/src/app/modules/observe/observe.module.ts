@@ -12,6 +12,8 @@ import {
   DxDataGridComponent,
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
+import { DxRangeSliderModule } from 'devextreme-angular/ui/range-slider';
+import { DxNumberBoxModule } from 'devextreme-angular/ui/number-box';
 
 import { MaterialModule } from '../../material.module';
 import { JwtService, UserService } from '../../common/services';
@@ -84,6 +86,8 @@ const GUARDS = [FirstDashboardGuard];
     MaterialModule,
     GridsterModule,
     HttpClientModule,
+    DxRangeSliderModule,
+    DxNumberBoxModule,
     CommonModuleTs,
     AddWidgetModule,
     EditWidgetModule,
