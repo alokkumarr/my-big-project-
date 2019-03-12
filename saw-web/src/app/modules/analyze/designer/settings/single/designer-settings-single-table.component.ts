@@ -6,6 +6,8 @@ import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
+import * as every from 'lodash/every';
+import * as map from 'lodash/map';
 
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService } from '../../../../../common/services';
@@ -65,7 +67,16 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
-    types: []
+    types: {
+      number: false,
+      date: false,
+      string: false,
+      geo: false
+    },
+    adapters: [
+      false, // first adapter
+      false // first adapter
+    ]
     // types: ['number', 'date', 'string', 'geo']
   };
   constructor(
@@ -155,32 +166,49 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     this.change.emit(event);
   }
 
-  getUnselectedArtifactColumns(filterFn?) {
+  getUnselectedArtifactColumns() {
     const { types, keyword } = this.filterObj;
-    const toggleFilter = filterFn || this.hasAllowedType(types);
+    const toggleFilter = this.hasAllowedType(types);
     const unselectedArtifactColumns = fpPipe(
       fpFilter(artifactColumn => {
         const { checked, alias, displayName } = artifactColumn;
         return (
           !checked &&
           toggleFilter(artifactColumn) &&
-          this.hasKeyword(alias || displayName, keyword)
+          this.hasKeyword(alias || displayName, keyword) &&
+          this.filterByAdapters(artifactColumn)
         );
       }),
       fpSort(artifactColumn => artifactColumn.displayName)
     )(this.artifactColumns);
+
     this.dropListContainer = { artifactColumns: unselectedArtifactColumns };
     return unselectedArtifactColumns;
+  }
+
+  filterByAdapters(artifactColumn) {
+    if (!this.groupAdapters) {
+      return true;
+    }
+    const filterResults = map(this.filterObj.adapters, (toggled, index) => {
+      const adapter = this.groupAdapters[index];
+      const acceptFn = adapter.canAcceptArtifactColumn(
+        adapter,
+        this.groupAdapters
+      );
+      return toggled ? acceptFn(artifactColumn) : true;
+    });
+
+    return every(filterResults);
   }
 
   hasAllowedType(filterTypes) {
     return artifactColumn => {
       const generalType = this.getGeneralType(artifactColumn);
-      /* prettier-ignore */
-      if (isEmpty(filterTypes)) {
+      if (every(filterTypes, toggled => !toggled)) {
         return true;
       }
-      return filterTypes.includes(generalType);
+      return filterTypes[generalType];
     };
   }
 
@@ -206,16 +234,13 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   onTypeFilterChange(value) {
-    console.log('value', value);
-    this.filterObj.types = [value];
+    this.filterObj.types[value] = !this.filterObj.types[value];
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
-  onFilterChange(value, adapter: IDEsignerSettingGroupAdapter) {
-    console.log('value', value);
-    console.log('adapter', adapter);
-    const filter = adapter.canAcceptArtifactColumn(adapter, this.groupAdapters);
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns(filter);
+  onFilterChange(index) {
+    this.filterObj.adapters[index] = !this.filterObj.adapters[index];
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
   /**

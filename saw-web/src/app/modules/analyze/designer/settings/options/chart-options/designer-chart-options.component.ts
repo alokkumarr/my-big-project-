@@ -16,7 +16,6 @@ import * as isEmpty from 'lodash/isEmpty';
 })
 export class DesignerChartOptionsComponent implements OnInit, AfterViewInit {
   @Input('chartType') set setChartType(chartType: string) {
-    console.log('chartType: ', chartType);
     this.chartType = chartType;
     this.showLegendOpts = chartType !== 'pie';
     this.showLabelOpts = chartType === 'pie';

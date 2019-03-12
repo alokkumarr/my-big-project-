@@ -39,7 +39,6 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   }
 
   onLimitDataChange(value, type) {
-    console.log('limit changes', value);
     this.limitValue = value;
     this.limitType = type;
     if (!this.limitType) {
