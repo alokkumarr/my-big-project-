@@ -7,7 +7,6 @@ logging:
   level:
     com.synchronoss.saw.storage.proxy: INFO
 server:
-  address: localhost
   port: 9800
   context-path: ''
   maxHttpHeaderSize: 65536
