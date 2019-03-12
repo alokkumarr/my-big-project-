@@ -14,7 +14,7 @@ class Header {
 
 
   doChangePassword() {
-    logger.silly('Clicking on ChangePassword..');
+    logger.silly('Clicking on ChangePassword button..');
     commonFunctions.waitFor.elementToBeVisible(this._accountSettingIcon);
     if (!this._accountSettingIcon.isPresent()) {
       commonFunctions.goToHome();
@@ -23,6 +23,11 @@ class Header {
     commonFunctions.waitFor.elementToBeVisible(this._accountChangePasswordLink);
     this._accountChangePasswordLink.click();
     commonFunctions.waitFor.pageToBeReady(/changePwd/);
+  }
+
+  verifyChangePassword()
+  {
+    commonFunctions.waitFor.pageToBeReady(/login/);
   }
 
   doLogout() {

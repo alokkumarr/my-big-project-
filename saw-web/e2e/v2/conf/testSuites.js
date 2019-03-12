@@ -7,10 +7,6 @@ const SMOKE = [
   TEST_BASE_DIR + 'login-logout/logout.test.js',
 ];
 
-const TEST = [
-  TEST_BASE_DIR+ 'change-password/changepassword.test.js'
-];
-
 const SANITY = [...SMOKE,
 TEST_BASE_DIR + 'createReport.test.js',
 TEST_BASE_DIR + 'charts/createAndDeleteCharts.test.js',
@@ -43,6 +39,7 @@ const REGRESSION = [...CRITICAL];
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',
+  TEST_BASE_DIR+ 'change-password/changepassword.test.js'
 ];
 
 module.exports = {
@@ -50,6 +47,5 @@ module.exports = {
   SANITY,
   CRITICAL,
   REGRESSION,
-  DEVELOPMENT,
-  TEST
+  DEVELOPMENT
 }
