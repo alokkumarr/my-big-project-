@@ -4,9 +4,8 @@
   padding: 0 7px;
   font-size: 10px;
   min-height: 23px;
-  color: white;
+  color: black;
   margin: 3px 0 3px 3px;
-  background-color: $selection-highlight-col;
   cursor: move;
 
   mat-icon[matChipRemove] {
@@ -16,15 +15,19 @@
   }
 
   &.string-type-chip-color {
+    color: white;
     background-color: $string-type-chip-color;
   }
   &.number-type-chip-color {
+    color: white;
     background-color: $number-type-chip-color;
   }
   &.geo-type-chip-color {
+    color: white;
     background-color: $geo-type-chip-color;
   }
   &.date-type-chip-color {
+    color: white;
     background-color: $date-type-chip-color;
   }
 }

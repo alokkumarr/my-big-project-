@@ -18,6 +18,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as debounce from 'lodash/debounce';
 import * as every from 'lodash/every';
 import * as map from 'lodash/map';
+import * as reduce from 'lodash/reduce';
 
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
 import { DesignerService } from '../../designer.service';
@@ -28,7 +29,7 @@ import {
   Artifact,
   ArtifactColumn,
   ArtifactColumns,
-  // ArtifactColumnFilter,
+  Filter,
   DesignerChangeEvent
 } from '../../types';
 
@@ -42,8 +43,10 @@ const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() removeFilter = new EventEmitter();
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
+  @Input() filters: Filter[];
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public artifactColumns: ArtifactColumns;
   private _dndSubscription;
@@ -55,7 +58,24 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
         this.setGroupAdapters();
       }
     }
+    this.nameMap = reduce(
+      artifacts,
+      (acc, artifact: Artifact) => {
+        acc[artifact.artifactName] = reduce(
+          artifact.columns,
+          (accum, col: ArtifactColumn) => {
+            accum[col.columnName] = col.displayName;
+            return accum;
+          },
+          {}
+        );
+        return acc;
+      },
+      {}
+    );
   }
+
+  public nameMap;
   public isDragInProgress = false;
   // array of booleans to show if the corresponding group addapterg can accept the field that is being dragged
   public openGroupArray: boolean[];
@@ -82,6 +102,10 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._dndSubscription.unsubscribe();
+  }
+
+  getDisplayName(filter: Filter) {
+    return this.nameMap[filter.tableName][filter.columnName];
   }
 
   onDndEvent(event: DndEvent) {

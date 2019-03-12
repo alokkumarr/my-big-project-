@@ -82,11 +82,6 @@ export class SingleTableDesignerLayoutComponent {
     this.change.emit({ subject: 'filter' });
   }
 
-  onRemoveFilterAll() {
-    this.filters.splice(0, this.filters.length);
-    this.change.emit({ subject: 'filter' });
-  }
-
   getNonIdealStateIcon() {
     switch (this.analysisType) {
       case 'chart':

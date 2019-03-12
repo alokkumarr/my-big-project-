@@ -74,15 +74,20 @@
   &__content {
     height: 100%;
     padding: 0 5px;
+    display: grid;
+    grid-template-rows: [selected-fields] auto [analysis-representation] 1fr;
+
+    &__fields {
+      grid-row: selected-fields;
+    }
+
+    &__representation {
+      grid-row: analysis-representation;
+      overflow-y: auto;
+      background-color: white;
+    }
   }
 
-  &__main {
-    background-color: white;
-  }
-
-  &__filters {
-    padding: 0 20px;
-  }
   &__data {
     grid-area: data;
     overflow: auto;
