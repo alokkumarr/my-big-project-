@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as get from 'lodash/get';
 
 import {
@@ -7,7 +8,7 @@ import {
   DesignerChangeEvent,
   Sort,
   Filter,
-  SqlBuilder,
+  SqlBuilder
 } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 
@@ -35,21 +36,21 @@ export class SingleTableDesignerLayoutComponent {
   public isFieldsPanelOpen = true;
   public optionsPanelMode: 'side' | 'over' = 'side';
   private isInTabletMode = false;
+  public config: PerfectScrollbarConfigInterface = {};
 
   constructor(breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.Medium,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      this.isInTabletMode = result.matches;
-      if (result.matches) {
-        this.isOptionsPanelOpen = false;
-        this.optionsPanelMode = 'over';
-      } else {
-        this.isOptionsPanelOpen = true;
-        this.optionsPanelMode = 'side';
-      }
-    });
+    breakpointObserver
+      .observe([Breakpoints.Medium, Breakpoints.Small])
+      .subscribe(result => {
+        this.isInTabletMode = result.matches;
+        if (result.matches) {
+          this.isOptionsPanelOpen = false;
+          this.optionsPanelMode = 'over';
+        } else {
+          this.isOptionsPanelOpen = true;
+          this.optionsPanelMode = 'side';
+        }
+      });
   }
 
   onClickedOutsideOptionsPanel(drawer) {
@@ -88,11 +89,11 @@ export class SingleTableDesignerLayoutComponent {
 
   getNonIdealStateIcon() {
     switch (this.analysisType) {
-    case 'chart':
-      const chartTypeObj = CHART_TYPES_OBJ['chart:' + this.analysisSubtype];
-      return get(chartTypeObj, 'icon.font');
-    case 'pivot':
-      return 'icon-pivot';
+      case 'chart':
+        const chartTypeObj = CHART_TYPES_OBJ['chart:' + this.analysisSubtype];
+        return get(chartTypeObj, 'icon.font');
+      case 'pivot':
+        return 'icon-pivot';
     }
   }
 }

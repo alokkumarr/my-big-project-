@@ -1,5 +1,14 @@
-<mat-tab-group dynamicHeight>
-  <mat-tab label="DATA OPTIONS" e2e="designer-options-tab-data">
+<mat-tab-group dynamicHeight mat-align-tabs="center">
+  <mat-tab e2e="designer-options-tab-data">
+    <ng-template mat-tab-label>
+      <div
+        class="tab-header__data-options"
+        fxFill
+        fxLayoutAlign="center center"
+      >
+        DATA OPTIONS
+      </div>
+    </ng-template>
     <div style="padding: 5px;">
       <designer-data-option-field
         *ngFor="let col of selectedColumns"
@@ -13,11 +22,16 @@
       </designer-data-option-field>
     </div>
   </mat-tab>
-  <mat-tab
-    *ngIf="analysisType === 'chart'"
-    label="CHART OPTIONS"
-    e2e="designer-options-tab-chart"
-  >
+  <mat-tab *ngIf="analysisType === 'chart'" e2e="designer-options-tab-chart">
+    <ng-template mat-tab-label>
+      <div
+        class="tab-header__chart-options"
+        fxFill
+        fxLayoutAlign="center center"
+      >
+        CHART OPTIONS
+      </div>
+    </ng-template>
     <designer-chart-options
       [isInverted]="auxSettings.isInverted"
       [legend]="auxSettings.legend"
@@ -28,11 +42,12 @@
     >
     </designer-chart-options>
   </mat-tab>
-  <mat-tab
-    *ngIf="analysisType === 'map'"
-    label="MAP OPTIONS"
-    e2e="designer-options-tab-map"
-  >
+  <mat-tab *ngIf="analysisType === 'map'" e2e="designer-options-tab-map">
+    <ng-template mat-tab-label>
+      <div class="tab-header__map-options" fxFill fxLayoutAlign="center center">
+        MAP OPTIONS
+      </div>
+    </ng-template>
     <designer-map-chart-options
       [legend]="auxSettings.legend"
       [chartType]="analysisSubtype"
