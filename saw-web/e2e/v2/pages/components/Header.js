@@ -13,8 +13,10 @@ class Header extends SideNav {
     this._accountLogoutLink = element(
       by.css(`[e2e='account-settings-selector-logout']`)
     );
+
     this._companyLogo = element(by.css('.company-logo'));
     this._categoryMenuIcon = element(by.css(`[e2e="main-menu-expand-btn"]`));
+
     this._launcherButton = element(
       by.css('[class="header__module-launcher-button"]')
     );
@@ -24,6 +26,18 @@ class Header extends SideNav {
     this._workbenchLink = element(
       by.xpath('//a[contains(@class,"module-workbench")]')
     );
+
+    this._analyzeLink = element(
+      by.xpath('//a[contains(@class,"module-analyze")]')
+    );
+  }
+
+  clickOnModuleLauncher() {
+    commonFunctions.clickOnElement(this._launcherButton);
+  }
+
+  clickOnObserveLink() {
+    commonFunctions.clickOnElement(this._observeLink);
   }
 
   doLogout() {

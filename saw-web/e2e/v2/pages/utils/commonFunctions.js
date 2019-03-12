@@ -153,5 +153,10 @@ module.exports = {
     el.getText().then(text => {
       expect(text.trim().toLowerCase()).toEqual(msg.trim().toLowerCase());
     });
+  },
+  getDashboardId() {
+    browser.getCurrentUrl().then(url => {
+      return url.split('=')[1];
+    });
   }
 };

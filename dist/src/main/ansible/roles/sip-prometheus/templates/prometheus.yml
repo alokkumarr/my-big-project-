@@ -8,22 +8,54 @@ scrape_configs:
 {% for host in groups['all'] %}
           - '{{ host }}:8100'
 {% endfor %}
-  - job_name: 'spring'
+  - job_name: 'sip-export'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
 {% for host in groups['saw-services'] %}
           - '{{ host }}:9400'
-          - '{{ host }}:9500'
-          - '{{ host }}:9600'
-          - '{{ host }}:9700'
-          - '{{ host }}:9900'
 {% endfor %}
+  - job_name: 'sip-metadata'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+{% for host in groups['saw-services'] %}
+          - '{{ host }}:9500'
+{% endfor %}
+  - job_name: 'sip-scheduler'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+{% for host in groups['saw-services'] %}
+          - '{{ host }}:9600'
+{% endfor %}
+  - job_name: 'sip-workbench'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+{% for host in groups['saw-services'] %}
+          - '{{ host }}:9700'
+{% endfor %}
+  - job_name: 'sip-storage-proxy'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+{% for host in groups['saw-services'] %}
+          - '{{ host }}:9800'
+{% endfor %}
+  - job_name: 'sip-batch-ingestion'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+{% for host in groups['saw-services'] %}
+          - '{{ host }}:9952'
+{% endfor %}
+  - job_name: 'sip-security'
+    metrics_path: '/saw-security/actuator/prometheus'
+    static_configs:
+      - targets:
 {% for host in groups['saw-security'] %}
-          # Note: Enable the Security Service Prometheus endpoint
-          # after it has been upgraded to Spring Boot 2.x
-          # (https://jira.synchronoss.net:8443/jira/browse/SIP-3326)
-          #- '{{ host }}:9000'
+          - '{{ host }}:9000'
 {% endfor %}
   - job_name: 'haproxy'
     metrics_path: '/metrics'
