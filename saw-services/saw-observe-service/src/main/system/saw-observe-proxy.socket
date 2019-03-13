@@ -1,8 +1,0 @@
-[Unit]
-Description=SAW Observe Proxy Socket
-
-[Socket]
-ListenStream=9500
-
-[Install]
-WantedBy=sockets.target
