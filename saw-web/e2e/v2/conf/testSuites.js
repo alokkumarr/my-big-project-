@@ -39,17 +39,15 @@ const CRITICAL = [
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL,
-  TEST_BASE_DIR+ 'change-password/changepassword.test.js'];
+  TEST_BASE_DIR + 'change-password/changepassword.test.js'
+];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
-  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
-
-  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js',
-  TEST_BASE_DIR+ 'change-password/changepassword.test.js'
- //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
-  // TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
-   // TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
-  // TEST_BASE_DIR + 'charts/createAndDelete.test.js'
+//TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
+//TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
+  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
+//TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
+//TEST_BASE_DIR + 'charts/createAndDelete.test.js
 ];
 
 module.exports = {
