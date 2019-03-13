@@ -37,7 +37,15 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
 
     BisSchedulerJobDetails jobDetails =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
-    restTemplate.postForLocation(bisTransferUrl, jobDetails);
+    
+    try {
+      restTemplate.postForLocation(bisTransferUrl, jobDetails);
+    } catch (Exception exception) {
+      logger.error("Error during file transfer for the schedule. "
+          + "Refer Batch Ingestion logs for more details", 
+          exception.getMessage());
+    }
+    
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 
