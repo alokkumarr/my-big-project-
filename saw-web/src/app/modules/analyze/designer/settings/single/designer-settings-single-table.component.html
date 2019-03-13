@@ -112,11 +112,15 @@
       </div>
       <div
         *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
-        fxLayout="row"
+        fxLayout="column"
         fxLayoutAlign="center center"
       >
-        <div class="settings__unselected-fields--empty" i18n>
-          There are no fields for this criteria
+        <mat-icon
+          class="settings__unselected-fields__icon"
+          fontIcon="icon-chat-bot-solid"
+        ></mat-icon>
+        <div class="settings__unselected-fields__empty" i18n>
+          No matching fields found
         </div>
       </div>
     </perfect-scrollbar>

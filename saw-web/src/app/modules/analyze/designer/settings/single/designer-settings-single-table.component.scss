@@ -54,22 +54,33 @@
   overflow: hidden;
   padding-bottom: 30px;
 
-  .icon-string-type::before {
+  .icon-string-type {
     color: $string-type-color;
   }
-  .icon-number-type::before {
+  .icon-number-type {
     color: $number-type-color;
   }
-  .icon-geo-chart ::before {
+  .icon-geo-chart {
     color: $geo-type-color;
   }
-  .icon-calendar::before {
+  .icon-calendar {
     color: $date-type-color;
   }
 
-  .settings__unselected-fields--empty {
+  &__icon {
+    padding: 15px 0;
+    color: $primary-red;
+    font-size: 47px;
+    width: 47px;
+    height: 47px;
+  }
+
+  &__empty {
     color: $primary-grey-g3;
-    font-size: 26px;
+    font-size: 36px;
+    padding: 0 12px;
+    text-align: center;
+    word-break: break-word;
   }
 }
 
