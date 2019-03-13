@@ -1,0 +1,29 @@
+{
+    "contents": {
+    "observe": [
+    {
+    "entityId": "string",
+    "categoryId": "string",
+    "name": "string",
+    "description": "string",
+    "createdBy": "string",
+    "updatedBy": "string",
+    "createdAt": "string",
+    "updatedAt": "string",
+    "options": [],
+    "tiles": [
+    {
+    "type": "analysis",
+    "id": "analysisId - string",
+    "cols": 3,
+    "rows": 4,
+    "x": 5,
+    "y": 6,
+    "options": ""
+    }
+    ],
+    "filters": []
+    }
+    ]
+    }
+    }
