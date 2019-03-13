@@ -4,6 +4,7 @@ import * as isArray from 'lodash/isArray';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
+import * as lowerCase from 'lodash/lowerCase';
 import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
 import {
@@ -94,12 +95,16 @@ export class JwtService {
     const userCategory =
       find(
         analyzeModule.prodModFeature || [],
-        category => category.prodModFeatureName === USER_ANALYSIS_CATEGORY_NAME
+        category =>
+          lowerCase(category.prodModFeatureName) ===
+          lowerCase(USER_ANALYSIS_CATEGORY_NAME)
       ) || {};
     const userSubcategory =
       find(
         userCategory.productModuleSubFeatures || [],
-        subCat => subCat.prodModFeatureName === USER_ANALYSIS_SUBCATEGORY_NAME
+        subCat =>
+          lowerCase(subCat.prodModFeatureName) ===
+          lowerCase(USER_ANALYSIS_SUBCATEGORY_NAME)
       ) || {};
 
     // If there's an issue with getting category's id, return 0. This is not ideal,
