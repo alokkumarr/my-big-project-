@@ -1,7 +1,6 @@
 'use strict';
 const commonFunctions = require('../utils/commonFunctions');
 const DeleteModel = require('../workbench/components/DeleteModel');
-const LogHistoryModel = require('../workbench/components/LogHistoryModel');
 
 class DataSourcesPage extends DeleteModel {
   constructor() {
