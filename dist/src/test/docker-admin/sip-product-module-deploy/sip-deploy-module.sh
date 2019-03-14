@@ -28,7 +28,14 @@ fi
 
 config=$1
 module=$2
+
+# ID for product module metadata
+# Will be exported as an environment variable to be used in ansible script
+product_module_id=${3}
+export SIP_PRODUCT_MODULE_ID=${product_module_id}
+
 options="${3:-}"
+
 dir=$(dirname $0)
 
 # Extract the SIP product module to a temporary location
