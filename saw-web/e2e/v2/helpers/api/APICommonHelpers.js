@@ -27,7 +27,7 @@ class APICommonHelpers {
   }
   static getHost(baseUrl) {
     const q = urlParser.parse(baseUrl, true);
-    return q.host;
+    return q.hostname;
   }
 }
 

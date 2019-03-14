@@ -78,13 +78,13 @@ describe('Workbench tests: activateAndDeActivateRoute.test.js', () => {
           const source = `source${time}`;
           const destination = `/dest${time}`;
           const host = APICommonHelpers.getHost(browser.baseUrl);
-          let sshInfo;
-          new SshUtility(host, 8022, 'root', 'root')
-            .createDirectoryAndDummyFile(source, content, fileName)
-            .then(data => {
-              console.log(data);
-              sshInfo = data;
-            });
+
+          new SshUtility(
+            host,
+            8022,
+            'root',
+            'root'
+          ).createDirectoryAndDummyFile(source, content, fileName);
 
           let routeInfo = {
             routeName,

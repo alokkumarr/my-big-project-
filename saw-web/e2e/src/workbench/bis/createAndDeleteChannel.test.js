@@ -12,7 +12,7 @@ const LoginPage = require('../../../v2/pages/LoginPage');
 const logger = require('../../../v2/conf/logger')(__filename);
 const Header = require('../../../v2/pages/components/Header');
 
-describe('Workbench tests: createAndDelete.test.js', () => {
+describe('Workbench tests: createAndDeleteChannel.test.js', () => {
   beforeAll(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL =
       protractorConf.timeouts.extendedDefaultTimeoutInterval;
