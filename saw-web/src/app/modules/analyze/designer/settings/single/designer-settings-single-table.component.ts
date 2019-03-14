@@ -58,7 +58,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
 
   public dropListContainer;
   public typeIcons = TYPE_ICONS;
-  public isEmpty: Function = isEmpty;
+  public isEmpty: (any) => boolean = isEmpty;
   public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];

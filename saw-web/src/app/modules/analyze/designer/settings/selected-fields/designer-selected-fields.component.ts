@@ -13,7 +13,6 @@ import { Select, Store } from '@ngxs/store';
 
 import * as isEmpty from 'lodash/isEmpty';
 import * as debounce from 'lodash/debounce';
-import * as every from 'lodash/every';
 import * as map from 'lodash/map';
 import * as reduce from 'lodash/reduce';
 
@@ -58,16 +57,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   public set setArtifactColumns(artifacts: Artifact[]) {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
-      if (every(this.artifactColumns, col => !col.checked)) {
-        // TODO sed action form container when resetting chart type
-        /**
-         * this._store.dispatch(new DesignerInitGroupAdapters(
-           this.artifactColumns,
-           this.analysisType,
-           this.analysisSubtype
-         ));
-         */
-      }
     }
     this.nameMap = reduce(
       artifacts,
