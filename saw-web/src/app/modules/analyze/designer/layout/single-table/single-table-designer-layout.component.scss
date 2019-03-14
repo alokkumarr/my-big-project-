@@ -68,7 +68,7 @@
 }
 
 .designer {
-  &__selecte-fields__container {
+  &__selected-fields__container {
     display: inline-block;
     width: 100%;
   }
@@ -80,7 +80,7 @@
 
   &__content {
     height: 100%;
-    padding: 0 5px;
+    padding: 0 5px 0 5px;
     display: grid;
     grid-template-rows: [selected-fields] auto [analysis-representation] 1fr;
 
@@ -91,16 +91,22 @@
     &__representation {
       grid-row: analysis-representation;
       overflow-y: auto;
-      background-color: white;
+      margin-bottom: 7px;
     }
+  }
+
+  &__data__container {
+    padding: 0;
+    max-height: 100% !important;
+    height: 100% !important;
   }
 
   &__data {
     grid-area: data;
-    overflow: auto;
+    overflow: hidden;
     flex: 1;
-    height: 100%;
-    width: 100%;
+    max-height: 100%;
+    max-width: 100%;
   }
 }
 
