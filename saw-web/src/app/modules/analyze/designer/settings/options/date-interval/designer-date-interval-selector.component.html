@@ -1,6 +1,5 @@
 <div fxLayout="column">
-  <mat-form-field class="select-form-field" appearance="outline">
-    <mat-label>Group interval</mat-label>
+  <mat-form-field appearance="outline">
     <mat-select
       (selectionChange)="onDateIntervalChange($event.value)"
       [value]="artifactColumn.dateInterval"
