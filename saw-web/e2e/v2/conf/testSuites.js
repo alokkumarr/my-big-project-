@@ -32,7 +32,7 @@ const CRITICAL = [
   TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
   TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
   TEST_BASE_DIR +
-    'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+    'dashboards/createAndDeleteDashboardsWithActualVsTargetKPI.test.js',
   TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithPivot.test.js',
   TEST_BASE_DIR + 'observe/dashboardGlobalFilter.test.js',
   TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithPivot.test.js',

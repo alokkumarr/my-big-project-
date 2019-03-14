@@ -17,6 +17,10 @@ class SelectedItem extends SaveDashboardDialog{
         this._backgroundColorByName = name => element(by.xpath(`//*[@e2e="dashboard-add-kpi-color-${name}"]`));
         this._applyKPIButton = element(by.css('button[e2e="dashboard-add-kpi-apply-button"]')); 
         this._dateOrAggregationElement = name => element(by.xpath(`//span[contains(text(),"${name}") and @class="mat-option-text"]`));
+        this._measure1Input = element(by.css('input[e2e="dashboard-add-kpi-bullet-measure1-input"]'));
+        this._measure2Input = element(by.css('input[e2e="dashboard-add-kpi-bullet-measure2-input"]'));
+        this._metricTargetInput = element(by.css('input[e2e="dashboard-add-kpi-bullet-target-input"]'));
+        this._bandColor = name => element(by.css(`[e2e="dashboard-add-kpi-bullet-color-${name}"]`));
     }
 
     addRemoveAnalysisById(analysesDetails){
@@ -68,6 +72,22 @@ class SelectedItem extends SaveDashboardDialog{
 
     clickOnApplyKPIButton(){
         commonFunctions.clickOnElement(this._applyKPIButton);
+    }
+
+    fillMeasure1Input(text){
+        commonFunctions.fillInput(this._measure1Input, text)
+    }
+
+    fillMeasure2Input(text){
+        commonFunctions.fillInput(this._measure2Input, text)
+    }  
+
+    fillMetricTargetInput(text){
+        commonFunctions.fillInput(this._metricTargetInput, text)
+    }
+
+    clickOnBandColor(colorName){
+        commonFunctions.clickOnElement(this._bandColor(colorName));
     }
 
 }
