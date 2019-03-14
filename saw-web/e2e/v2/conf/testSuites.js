@@ -28,8 +28,8 @@ const CRITICAL = [
   TEST_BASE_DIR + 'promptFilter/reportPromptFilters.test.js',
   TEST_BASE_DIR + 'pivots/pivotFilters.test.js',
   TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithCharts.test.js',
-  TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithESReport.test.js',
-  TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
+  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
   TEST_BASE_DIR +
     'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
   TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithPivot.test.js',

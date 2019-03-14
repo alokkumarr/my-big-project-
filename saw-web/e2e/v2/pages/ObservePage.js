@@ -8,6 +8,16 @@ class ObservePage extends DashboardHeader{
         super();
         this._dashboardTitle = name => element(by.xpath(`//span[contains(text(),"${name}")]`));
         this._addedAnalysisByName = name => element(by.xpath(`//h1[text()="${name}"]`));
+        this._kpiByName = name => element(by.xpath(`//*[contains(text(),"${name}")]`));
+        this._filterByName = name => element(by.xpath(`//div[contains(text(),"${name}") and @class="filter-label"]`));
+    }
+
+    verifyKpiByName(name) {
+        expect(this._kpiByName(name).isDisplayed).toBeTruthy();
+    }
+
+    verifyFilterByName(name) {
+        expect(this._filterByName(name).isDisplayed).toBeTruthy();
     }
 
     verifyDashboardTitle(title) {
