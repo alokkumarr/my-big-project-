@@ -3,9 +3,9 @@
 
 - name: Product module metadata
   uri:
-      url: "http://localhost:9800/internal/proxy/storage/product-module/{{ sip_product_module_id }}/configuration"
+      url: "http://{{ groups['saw-services'][0] }}:9800/internal/proxy/storage/product-module/{{ lookup('env','SIP_PRODUCT_MODULE_ID') }}/configuration"
       method: POST
       headers:
         Content-Type: "application/json"
       src: "/tmp/product-module-config.json"
-      remote_src: true
+      remote_src: false
