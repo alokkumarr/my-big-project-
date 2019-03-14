@@ -176,7 +176,12 @@ public class ElasticSearchQueryBuilder {
                         else {
                             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
                             if(item.getType().value().equals(Filter.Type.DATE.value())) {
-                                rangeQueryBuilder.format(DATE_FORMAT);
+                                if (item.getModel().getFormat() == null) {
+                                    rangeQueryBuilder.format(DATE_FORMAT);
+                                }
+                                else {
+                                    rangeQueryBuilder.format(item.getModel().getFormat());
+                                }
                             }
                             rangeQueryBuilder.lte(item.getModel().getLte());
                             rangeQueryBuilder.gte(item.getModel().getGte());

@@ -16,6 +16,7 @@ import org.junit.Test;
 
 
 public class SipDslIT extends BaseIT {
+  @Ignore("Placeholder integration test, dependency on SIP-5433")
   @Test
   public void testSipDsl() throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
