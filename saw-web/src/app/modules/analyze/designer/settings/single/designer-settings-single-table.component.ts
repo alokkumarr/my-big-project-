@@ -6,6 +6,7 @@ import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
+import * as reject from 'lodash/reject';
 import * as every from 'lodash/every';
 import * as some from 'lodash/some';
 import * as map from 'lodash/map';
@@ -109,12 +110,14 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.typeIcons = filter(TYPE_ICONS, type => {
-      if (type.value === 'geo') {
-        return this.analysisType === 'chart' && this.analysisSubtype === 'geo';
-      }
-      return true;
-    });
+    const isPivotType = this.analysisType === 'pivot';
+    const isChartType =
+      this.analysisType === 'chart' && this.analysisSubtype !== 'geo';
+    const rejectExpression =
+      isPivotType || isChartType
+        ? type => type.value === 'geo'
+        : type => ['string', 'date'].includes(type.value);
+    this.typeIcons = reject(TYPE_ICONS, rejectExpression);
   }
 
   trackByIndex(index) {
