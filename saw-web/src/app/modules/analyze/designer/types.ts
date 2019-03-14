@@ -80,6 +80,7 @@ export interface IDEsignerSettingGroupAdapter {
     groupAdapters: Array<IDEsignerSettingGroupAdapter>
   ) => number;
   artifactColumns: ArtifactColumns;
+  canAcceptArtifactColumnOfType: (artifactColumn: ArtifactColumn) => boolean;
   canAcceptArtifactColumn: (
     groupAdapter: IDEsignerSettingGroupAdapter,
     groupAdapters: Array<IDEsignerSettingGroupAdapter>

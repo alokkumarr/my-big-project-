@@ -7,7 +7,9 @@ import * as isEmpty from 'lodash/isEmpty';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
 import * as every from 'lodash/every';
+import * as some from 'lodash/some';
 import * as map from 'lodash/map';
+import * as isBoolean from 'lodash/isBoolean';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
@@ -158,14 +160,15 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
     }
     const filterResults = map(this.filterObj.adapters, (toggled, index) => {
       const adapter = this.groupAdapters[index];
-      const acceptFn = adapter.canAcceptArtifactColumn(
-        adapter,
-        this.groupAdapters
-      );
-      return toggled ? acceptFn(artifactColumn) : true;
+      const acceptFn = adapter.canAcceptArtifactColumnOfType;
+      return toggled ? acceptFn(artifactColumn) : null;
     });
 
-    return every(filterResults);
+    const onlyFilterResults = filter(filterResults, isBoolean);
+    if (isEmpty(onlyFilterResults)) {
+      return true;
+    }
+    return some(onlyFilterResults);
   }
 
   hasAllowedType(filterTypes) {
