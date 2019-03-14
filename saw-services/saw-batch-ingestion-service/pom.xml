@@ -244,6 +244,11 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<classifier>exec</classifier>
+					<!--
+					    The spring-boot-start-test dependency adds JUnit in the
+					    compile scope so exclude JUnit explicitly from packaging
+					-->
+					<excludeGroupIds>junit</excludeGroupIds>
 				</configuration>
 			</plugin>
 			<plugin>

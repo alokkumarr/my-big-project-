@@ -8,7 +8,8 @@ import * as isEmpty from 'lodash/isEmpty';
 import { getPrivilegeDescription } from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
-import { first, tap } from 'rxjs/operators';
+import { from } from 'rxjs';
+import { first, tap, map as map$, flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'privilege-edit-dialog',
@@ -43,9 +44,15 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
     if (this.data.mode === 'edit') {
       this.formIsValid = true;
-      const { productId, moduleId, roleId, categoryCode } = this.data.model;
+      const {
+        productId,
+        moduleId,
+        moduleName,
+        roleId,
+        categoryCode
+      } = this.data.model;
       this.modules$ = this.loadModules(productId);
-      this.loadAllowedPrivilegesForModule(moduleId);
+      this.loadAllowedPrivilegesForModule(moduleName);
       this.loadCategories(moduleId);
       this.loadSubCategories(moduleId, roleId, productId, categoryCode);
     }
@@ -189,12 +196,24 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       this.loadSubCategories(f.moduleId, rId, f.productId, f.categoryCode);
     });
 
-    moduleIdControl.valueChanges.subscribe(mId => {
-      this.loadCategories(mId);
-      this.loadAllowedPrivilegesForModule(mId);
-      this.formGroup.controls.categoryCode.reset('');
-      this.subCategories = [];
-    });
+    moduleIdControl.valueChanges
+      .pipe(
+        flatMap(mId =>
+          from(this.modules$ || Promise.resolve([])).pipe(
+            map$(modules => [mId, modules])
+          )
+        ),
+        map$(([mId, modules]) => {
+          const module = find(modules, mod => mod.moduleId === mId) || {};
+          return { modId: mId, modName: module.moduleName };
+        })
+      )
+      .subscribe(({ modId, modName }) => {
+        this.loadCategories(modId);
+        this.loadAllowedPrivilegesForModule(modName);
+        this.formGroup.controls.categoryCode.reset('');
+        this.subCategories = [];
+      });
 
     categoryCodeControl.valueChanges.subscribe(cCode => {
       const f = this.formGroup.value;
@@ -218,12 +237,12 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   /**
    * Loads allowed provileges for selected module
    *
-   * @param {*} moduleId
+   * @param {*} moduleName
    * @memberof PrivilegeEditDialogComponent
    */
-  loadAllowedPrivilegesForModule(moduleId) {
+  loadAllowedPrivilegesForModule(moduleName: string) {
     this._privilegeService
-      .getPrivilegesForModule(moduleId)
+      .getPrivilegesForModule(moduleName)
       .pipe(
         first(),
         tap(privileges => {

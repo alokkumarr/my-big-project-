@@ -1,8 +1,0 @@
-spring:
-  main:
-    banner-mode: 'off'
-server:
-  port: 9300
-logging:
-  level:
-    org.springframework.web: WARN
