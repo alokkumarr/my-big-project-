@@ -1,5 +1,5 @@
 <div
-  *ngFor="let adapter of groupAdapters; let i = index"
+  *ngFor="let adapter of (groupAdapters$ | async); let adapterIndex = index"
   fxLayout="row"
   fxLayoutAlign="start center"
   class="selected-fields__container"
@@ -18,11 +18,11 @@
     cdkDropListOrientation="horizontal"
     [cdkDropListData]="adapter"
     [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
-    (cdkDropListDropped)="drop($event)"
+    (cdkDropListDropped)="drop($event, adapterIndex)"
     fxFlex="90"
     [attr.e2e]="'designer-selected-container' + adapter.title"
     class="selected-fields__list"
-    [class.highlighted]="isDragInProgress && openGroupArray[i]"
+    [class.highlighted]="isDragInProgress && openGroupArray[adapterIndex]"
   >
     <mat-chip
       *ngFor="let col of adapter.artifactColumns"

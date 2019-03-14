@@ -313,7 +313,9 @@ export class DesignerService {
       title: chartType === 'pie' ? 'Color By' : 'Dimension',
       canAcceptArtifactColumn: isStockChart
         ? canAcceptDateType
-        : chartType === 'geo' ? canAcceptGeoType : canAcceptAnyType,
+        : chartType === 'geo'
+        ? canAcceptGeoType
+        : canAcceptAnyType
     };
 
     const sizeAdapter: IDEsignerSettingGroupAdapter = {
@@ -365,8 +367,7 @@ export class DesignerService {
       /* prettier-ignore */
       chartType === 'bubble' ?
         sizeAdapter : null,
-      chartType === 'geo' ?
-        null : groupByAdapter
+      chartType === 'geo' ? null : groupByAdapter
     ]);
 
     this._distributeArtifactColumnsIntoGroups(
@@ -417,6 +418,15 @@ export class DesignerService {
       }
     });
     return addedSuccessfully;
+  }
+
+  getGroupsThatCanRecieve(
+    artifactColumn: ArtifactColumn,
+    groupAdapters: IDEsignerSettingGroupAdapter[]
+  ): IDEsignerSettingGroupAdapter[] {
+    return filter(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) =>
+      adapter.canAcceptArtifactColumn(adapter, groupAdapters)(artifactColumn)
+    );
   }
 
   addArtifactColumnIntoGroup(

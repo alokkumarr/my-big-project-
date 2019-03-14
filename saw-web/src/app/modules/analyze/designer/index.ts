@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
+import { NgxsModule } from '@ngxs/store';
 
 import { CommonModuleTs } from '../../../common';
 import { UChartModule } from '../../../common/components/charts';
 import { MaterialModule } from '../../../material.module';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AnalyzeFilterModule } from '../designer/filter';
+import { DesignerState } from '../designer/state/designer.state';
 
 import { DesignerContainerComponent } from './container';
 import { DesignerHeaderComponent } from './header';
@@ -103,7 +105,8 @@ const PIPES = [ArtifactColumns2PivotFieldsPipe];
     UChartModule,
     AnalyzeFilterModule,
     AngularSplitModule.forChild(),
-    PerfectScrollbarModule
+    PerfectScrollbarModule,
+    NgxsModule.forFeature([DesignerState])
   ],
   declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,

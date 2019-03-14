@@ -57,7 +57,8 @@
         <div
           *ngFor="
             let artifactColumn of unselectedArtifactColumns;
-            trackBy: trackByIndex
+            trackBy: trackByIndex;
+            let columnIndex = index
           "
           cdkDrag
           (cdkDragStarted)="dragStarted($event)"
@@ -88,16 +89,28 @@
               class="settings__list-item__addbtn"
               mat-icon-button
               color="primary"
-              [matMenuTriggerFor]="addMetricMenu"
+              [matMenuTriggerFor]="addToGroupsMenu"
+              (menuOpened)="onAddToGroupMenuOpened(artifactColumn)"
             >
               <mat-icon
                 class="settings__list-item__addbtn__icon"
                 fontIcon="icon-plus"
               ></mat-icon>
             </button>
-            <mat-menu #addMetricMenu="matMenu">
-              <button mat-menu-item>
-                <span>Add to Metrics</span>
+            <mat-menu #addToGroupsMenu="matMenu">
+              <button
+                *ngFor="
+                  let adapter of groupsThatCanRecieveColumn;
+                  let adapterIndex = index
+                "
+                [attr.e2e]="
+                  'designer-add-btn-' +
+                  (artifactColumn.aliasName || artifactColumn.displayName)
+                "
+                (click)="addToGroup(artifactColumn, columnIndex, adapter)"
+                mat-menu-item
+              >
+                <span>{{ adapter.title }}</span>
               </button>
             </mat-menu>
           </div>

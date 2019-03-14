@@ -6,14 +6,11 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import {
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem,
-  CdkDrag
-} from '@angular/cdk/drag-drop';
-import { Subject } from 'rxjs';
+import { CdkDragDrop, CdkDrag } from '@angular/cdk/drag-drop';
+import { Subject, Observable } from 'rxjs';
 import { bufferCount, take } from 'rxjs/operators';
+import { Select, Store } from '@ngxs/store';
+
 import * as isEmpty from 'lodash/isEmpty';
 import * as debounce from 'lodash/debounce';
 import * as every from 'lodash/every';
@@ -32,6 +29,13 @@ import {
   Filter,
   DesignerChangeEvent
 } from '../../types';
+import { DesignerState } from '../../state/designer.state';
+import {
+  DesignerInitGroupAdapters,
+  DesignerAddColumnToGroupAdapter,
+  DesignerMoveColumnInGroupAdapter,
+  DesignerRemoveColumnFromGroupAdapter
+} from '../../actions/designer.actions';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 // const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -55,7 +59,14 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
       if (every(this.artifactColumns, col => !col.checked)) {
-        this.setGroupAdapters();
+        // TODO sed action form container when resetting chart type
+        /**
+         * this._store.dispatch(new DesignerInitGroupAdapters(
+           this.artifactColumns,
+           this.analysisType,
+           this.analysisSubtype
+         ));
+         */
       }
     }
     this.nameMap = reduce(
@@ -75,6 +86,10 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     );
   }
 
+  @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
+    IDEsignerSettingGroupAdapter[]
+  >;
+
   public nameMap;
   public isDragInProgress = false;
   // array of booleans to show if the corresponding group addapterg can accept the field that is being dragged
@@ -84,7 +99,8 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   constructor(
     private _designerService: DesignerService,
-    private _dndPubsub: DndPubsubService
+    private _dndPubsub: DndPubsubService,
+    private _store: Store
   ) {
     this._changeSettingsDebounced = debounce(
       this._changeSettingsDebounced,
@@ -94,10 +110,20 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.setGroupAdapters();
+    this._store.dispatch(
+      new DesignerInitGroupAdapters(
+        this.artifactColumns,
+        this.analysisType,
+        this.analysisSubtype
+      )
+    );
     this._dndSubscription = this._dndPubsub.subscribe(
       this.onDndEvent.bind(this)
     );
+    this.groupAdapters$.subscribe(adapters => {
+      this.openGroupArray = map(adapters, () => false);
+      this.groupAdapters = adapters;
+    });
   }
 
   ngOnDestroy() {
@@ -129,22 +155,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     this.openGroupArray = array;
   }
 
-  setGroupAdapters() {
-    switch (this.analysisType) {
-      case 'pivot':
-        this.groupAdapters = this._designerService.getPivotGroupAdapters(
-          this.artifactColumns
-        );
-        break;
-      case 'chart':
-        this.groupAdapters = this._designerService.getChartGroupAdapters(
-          this.artifactColumns,
-          this.analysisSubtype
-        );
-    }
-    this.openGroupArray = map(this.groupAdapters, () => false);
-  }
-
   removeFromGroup(
     artifactColumn: ArtifactColumn,
     groupAdapter: IDEsignerSettingGroupAdapter
@@ -164,26 +174,41 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     this.change.emit(event);
   }
 
-  drop(event: CdkDragDrop<IDEsignerSettingGroupAdapter>) {
-    const adapter = event.container.data;
+  drop(event: CdkDragDrop<IDEsignerSettingGroupAdapter>, adapterIndex) {
     const previousAdapter = event.previousContainer.data;
-    if (event.previousContainer === event.container) {
-      moveItemInArray(
-        <any>adapter.artifactColumns,
-        event.previousIndex,
-        event.currentIndex
+    const isComingFromUnselectedFields = !previousAdapter.title;
+    const shouldMoveInSameGroupAdapter =
+      event.previousContainer === event.container;
+    if (shouldMoveInSameGroupAdapter) {
+      this._store.dispatch(
+        new DesignerMoveColumnInGroupAdapter(
+          event.previousIndex,
+          event.currentIndex,
+          adapterIndex
+        )
       );
     } else {
-      transferArrayItem(
-        <any>previousAdapter.artifactColumns,
-        <any>adapter.artifactColumns,
-        event.previousIndex,
-        event.currentIndex
+      const column = previousAdapter.artifactColumns[event.previousIndex];
+      if (isComingFromUnselectedFields) {
+        // remove from unselected fields
+        previousAdapter.artifactColumns.splice(event.previousIndex, 1);
+      } else {
+        // remove from previousAdapter
+        this._store.dispatch(
+          new DesignerRemoveColumnFromGroupAdapter(
+            event.previousIndex,
+            adapterIndex
+          )
+        );
+      }
+      this._store.dispatch(
+        new DesignerAddColumnToGroupAdapter(
+          column,
+          event.currentIndex,
+          adapterIndex
+        )
       );
-      const movedItem = adapter.artifactColumns[event.currentIndex];
-      adapter.transform(movedItem);
     }
-    adapter.onReorder(adapter.artifactColumns);
     this.onFieldsChange();
   }
 

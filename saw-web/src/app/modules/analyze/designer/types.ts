@@ -125,3 +125,7 @@ export interface DesignerSaveEvent {
   requestExecution: boolean;
   analysis: Analysis;
 }
+
+export interface DesignerStateModel {
+  groupAdapters: IDEsignerSettingGroupAdapter[];
+}
