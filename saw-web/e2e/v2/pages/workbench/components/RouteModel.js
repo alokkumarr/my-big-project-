@@ -81,20 +81,23 @@ class RouteModel extends TestConnectivity {
 
   clickOnScheduleTab(name) {
     commonFunctions.clickOnElement(this._schedule(name));
-    browser.sleep(500);
+    browser.sleep(2000);
   }
 
   clickOnFrequency(type, number) {
-    browser.sleep(500);
+    // Wait is required because app is getting slow and not responding as expected very fast
+    browser.sleep(1000);
     commonFunctions.clickOnElement(this._frequencyType(type));
-    browser.sleep(500);
+    browser.sleep(1000);
     commonFunctions.clickOnElement(this._frequencyValue(number));
-    browser.sleep(500);
+    browser.sleep(1000);
   }
 
   setScheduleStartDate() {
     commonFunctions.clickOnElement(this._startDate);
+    browser.sleep(1000);
     commonFunctions.clickOnElement(this._increaseMinute);
+    browser.sleep(1000);
     commonFunctions.clickOnElement(this._increaseMinute);
     commonFunctions.clickOnElement(this._set);
   }
