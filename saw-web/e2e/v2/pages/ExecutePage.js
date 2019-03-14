@@ -18,6 +18,7 @@ class ExecutePage extends ConfirmationModel {
     );
     this._delete = element(by.css(`[e2e='actions-menu-selector-delete']`));
     this._editLink = element(by.css(`[e2e="action-edit-btn"]`));
+    this._forlAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
   }
 
   verifyTitle(title) {
@@ -74,6 +75,10 @@ class ExecutePage extends ConfirmationModel {
   }
   clickOnEditLink() {
     commonFunctions.clickOnElement(this._editLink);
+  }
+
+  clickOnForkAndEditLink() {
+    commonFunctions.clickOnElement(this._forlAndEditLink);
   }
 }
 module.exports = ExecutePage;
