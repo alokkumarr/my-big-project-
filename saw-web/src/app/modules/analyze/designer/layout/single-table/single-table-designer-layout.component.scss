@@ -14,12 +14,19 @@
 .mat-drawer {
   background-color: $report-designer-settings-bg-color;
   height: 100%;
-  width: 25%;
   overflow: hidden;
 
   ::ng-deep .mat-drawer-inner-container {
     overflow: hidden;
   }
+}
+
+.fields-drawer {
+  max-width: 215px !important;
+}
+
+.settings-drawer {
+  width: 333px;
 }
 
 .analysis-content {

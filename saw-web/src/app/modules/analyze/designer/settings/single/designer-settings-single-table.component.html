@@ -1,23 +1,30 @@
 <div class="settings__container">
   <div class="settings__filters" fxLayout="column" fxLayoutAlign="center start">
-    <mat-button-toggle-group multiple class="settings__type-filters">
-      <mat-button-toggle
-        *ngFor="let typeIcon of typeIcons; trackBy: trackByIndex"
-        (change)="onTypeFilterChange($event.value)"
-        [value]="typeIcon.value"
-        [checked]="filterObj.types[typeIcon.value]"
-      >
-        <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
-      </mat-button-toggle>
-      <mat-button-toggle
-        *ngFor="let adapter of (groupAdapters | slice: 0:2); let i = index"
-        (change)="onFilterChange(i)"
-        [checked]="filterObj.adapters[i]"
-        [value]="adapter.title"
-      >
-        {{ adapter.title }}
-      </mat-button-toggle>
-    </mat-button-toggle-group>
+    <div
+      class="settings__filters__type"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+    >
+      <mat-button-toggle-group multiple>
+        <mat-button-toggle
+          *ngFor="let typeIcon of typeIcons; trackBy: trackByIndex"
+          (change)="onTypeFilterChange($event.value)"
+          [value]="typeIcon.value"
+          [checked]="filterObj.types[typeIcon.value]"
+        >
+          <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle
+          *ngFor="let adapter of (groupAdapters | slice: 0:2); let i = index"
+          (change)="onFilterChange(i)"
+          [checked]="filterObj.adapters[i]"
+          [value]="adapter.title"
+        >
+          {{ adapter.title }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
     <mat-form-field
       appearance="outline"
       class="settings__filters__keyword"
@@ -118,11 +125,15 @@
       </div>
       <div
         *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
-        fxLayout="row"
+        fxLayout="column"
         fxLayoutAlign="center center"
       >
-        <div class="settings__unselected-fields--empty" i18n>
-          There are no fields for this criteria
+        <mat-icon
+          class="settings__unselected-fields__icon"
+          fontIcon="icon-chat-bot-solid"
+        ></mat-icon>
+        <div class="settings__unselected-fields__empty" i18n>
+          No matching fields found
         </div>
       </div>
     </perfect-scrollbar>

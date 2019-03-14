@@ -19,42 +19,33 @@
   grid-area: filters;
   margin: 0 10px;
 
-  .mat-input-wrapper.mat-form-field-wrapper {
-    padding-bottom: 0;
-    margin-right: 10px;
+  &__type {
+    width: 100%;
 
-    .mat-input-underline.mat-form-field-underline {
-      top: 90%;
+    ::ng-deep .mat-button-toggle-label-content {
+      padding: 0 3px;
+      line-height: 30px;
+
+      .mat-icon {
+        height: 9px;
+        font-size: 9px;
+        width: 19px;
+      }
+    }
+
+    .mat-button-toggle-checked {
+      background-color: $primary-blue-b2;
+      color: white;
     }
   }
 
-  .mat-form-field-infix {
-    border: 0;
-  }
-
-  .settings__filters__keyword {
+  &__keyword {
     width: 100%;
     font-size: 11px !important;
 
     ::ng-deep .mat-form-field-wrapper {
       padding: 0;
     }
-  }
-
-  ::ng-deep .mat-button-toggle-label-content {
-    padding: 0 5px;
-    line-height: 30px;
-
-    .mat-icon {
-      height: 9px;
-      font-size: 9px;
-      width: 12px;
-    }
-  }
-
-  .mat-button-toggle-checked {
-    background-color: $primary-blue-b2;
-    color: white;
   }
 }
 
@@ -63,22 +54,33 @@
   overflow: hidden;
   padding-bottom: 30px;
 
-  .icon-string-type::before {
+  .icon-string-type {
     color: $string-type-color;
   }
-  .icon-number-type::before {
+  .icon-number-type {
     color: $number-type-color;
   }
-  .icon-geo-chart ::before {
+  .icon-geo-chart {
     color: $geo-type-color;
   }
-  .icon-calendar::before {
+  .icon-calendar {
     color: $date-type-color;
   }
 
-  .settings__unselected-fields--empty {
+  &__icon {
+    padding: 15px 0;
+    color: $primary-red;
+    font-size: 47px;
+    width: 47px;
+    height: 47px;
+  }
+
+  &__empty {
     color: $primary-grey-g3;
-    font-size: 26px;
+    font-size: 36px;
+    padding: 0 12px;
+    text-align: center;
+    word-break: break-word;
   }
 }
 

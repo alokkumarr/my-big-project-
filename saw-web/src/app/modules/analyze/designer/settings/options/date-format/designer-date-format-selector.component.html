@@ -1,5 +1,5 @@
 <div fxLayout="row" fxLayoutAlign="start center">
-  <mat-form-field (click)="openDateFormatDialog()">
+  <mat-form-field appearance="outline" fxFlex (click)="openDateFormatDialog()">
     <input
       matInput
       type="text"
@@ -10,7 +10,4 @@
       [value]="dateSample || ''"
     />
   </mat-form-field>
-  <button mat-icon-button (click)="openDateFormatDialog()">
-    <mat-icon fontIcon="icon-filter"></mat-icon>
-  </button>
 </div>
