@@ -1,6 +1,7 @@
-<div fxLayout="row" fxLayoutAlign="space-between center">
+<div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="5px">
   <mat-button-toggle-group
-    [vertical]="isInTabletMode"
+    fxFlex="30"
+    vertical="true"
     (change)="onLimitDataChange(limitValue, $event.value)"
     [value]="limitType"
     class="limit-type"
@@ -14,17 +15,12 @@
     </mat-button-toggle>
   </mat-button-toggle-group>
   <dx-slider
-    style="width: 150px;"
+    fxFlex
     (onValueChanged)="onLimitDataChange($event.value, limitType)"
     [min]="0"
     [max]="2000"
     [value]="limitValue"
-    [rtlEnabled]="false"
+    [tooltip]="tooltip"
   >
-    <dxo-tooltip
-      [enabled]="true"
-      showMode="always"
-      position="top"
-    ></dxo-tooltip>
   </dx-slider>
 </div>
