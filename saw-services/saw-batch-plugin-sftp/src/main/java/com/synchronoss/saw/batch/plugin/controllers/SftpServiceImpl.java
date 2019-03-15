@@ -1104,7 +1104,7 @@ public class SftpServiceImpl extends SipPluginContract {
    */
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   public void recoverFromInconsistentState() {
-    logger.info("recoverFromInconsistentState execution starts here");
+    logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
     int totalNoOfPages = IntegrationUtils.calculatePages(countOfRecords, retryPageSize);
@@ -1214,7 +1214,7 @@ public class SftpServiceImpl extends SipPluginContract {
         }
       } // end of second for loop
     } // end of first for loop
-    logger.info("recoverFromInconsistentState execution ends here");
+    logger.trace("recoverFromInconsistentState execution ends here");
   }
   
   private void transferRetry(Long channelId, Long routeId, String channelType, boolean isDisable,
