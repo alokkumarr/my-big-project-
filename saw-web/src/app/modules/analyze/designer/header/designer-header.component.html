@@ -1,7 +1,5 @@
 <div
   fxLayout="row"
-  fxLayout.lt-md="column"
-  fxLayoutGap.lt-md="10px"
   fxLayoutAlign="space-between center"
   class="header__container"
 >
@@ -11,19 +9,24 @@
     </button>
     <div
       fxLayout="row"
+      fxLayout.lt-md="column"
       fxLayoutAlign="start"
-      fxLayoutGap="10px"
+      fxLayoutGap.gt-md="10px"
       *ngIf="analysis"
     >
-      <div class="header__name">
+      <div
+        class="header__name header__name__small"
+        [ngClass.lt-md]="{ header__name__small: true, header__name: false }"
+        [ngClass.gt-md]="{ header__name__small: false, header__name: true }"
+      >
         <strong class="e2e-designer-title">
-          {{ analysis.name }}
+          {{ analysis.name | titlecase }}
         </strong>
         <label i18n *ngIf="isInDraftMode">Draft</label>
       </div>
       <div matTooltip="Metric Name" class="header__description">
         &#40;&nbsp;<mat-icon fontIcon="icon-report"></mat-icon>
-        <span i18n>{{ analysis.metricName }}</span
+        <span i18n>{{ analysis.metricName | titlecase }}</span
         >&nbsp;&#41;
       </div>
     </div>
@@ -36,7 +39,11 @@
   >
   </chart-type-chooser>
 
-  <div fxLayout="row" fxLayoutAlign="space-between center">
+  <div
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    fxLayoutGap.gt-md="5px"
+  >
     <mat-button-toggle-group
       *ngIf="analysis?.type === 'report'"
       (change)="requestAction.emit('modeToggle')"
@@ -79,43 +86,52 @@
     </button> -->
 
     <button
-      mat-button
+      matTooltip="Preview"
+      mat-icon-button
+      color="secondary"
       [disabled]="!areMinRequirmentsMet"
       e2e="open-preview-modal"
       (click)="requestAction.emit('preview')"
     >
-      <mat-icon fontIcon="icon-full-screen"></mat-icon>
-      <span fxHide.xs fxHide.sm fxHide.md i18n>Preview</span>
+      <mat-icon color="primary" fontIcon="icon-fullscreen"></mat-icon>
+      <span fxHide i18n>Preview</span>
     </button>
 
     <button
-      mat-button
+      matTooltip="Sort"
+      mat-icon-button
+      color="secondary"
       e2e="open-sort-modal"
       [disabled]="isInQueryMode"
       (click)="requestAction.emit('sort')"
     >
-      <mat-icon fontIcon="icon-sort"></mat-icon>
-      <span fxHide.xs fxHide.sm fxHide.md i18n>Sort</span>
+      <mat-icon color="primary" fontIcon="icon-sort"></mat-icon>
+      <span fxHide i18n>Sort</span>
     </button>
 
     <button
-      mat-button
+      matTooltip="Filter"
+      mat-icon-button
+      color="secondary"
       e2e="open-filter-modal"
       [disabled]="isInQueryMode"
       (click)="requestAction.emit('filter')"
     >
-      <mat-icon fontIcon="icon-filter"></mat-icon>
-      <span fxHide.xs fxHide.sm fxHide.md i18n>Filter</span>
+      <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
+      <span fxHide i18n>Filter</span>
     </button>
 
     <button
-      mat-raised-button
+      matTooltip="Save"
+      mat-icon-button
+      color="secondary"
       [disabled]="!areMinRequirmentsMet"
       e2e="designer-save-btn"
-      color="primary"
       (click)="requestAction.emit('save')"
     >
-      <span i18n>Save</span>
+      <mat-icon color="primary" fontIcon="icon-save"></mat-icon>
+
+      <span fxHide i18n>Save</span>
     </button>
   </div>
 </div>
