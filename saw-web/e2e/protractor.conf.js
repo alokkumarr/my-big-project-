@@ -97,7 +97,7 @@ exports.config = {
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
   testData: webpackHelper.getTestData(),
-  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
+  directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
   baseUrl: 'http://localhost:3000',
   capabilities: {
