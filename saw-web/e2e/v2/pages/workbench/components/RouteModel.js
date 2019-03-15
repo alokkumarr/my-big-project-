@@ -29,6 +29,7 @@ class RouteModel extends TestConnectivity {
 
     this._routeDescInput = element(by.css(`[e2e="route-description-input"]`));
     this._routeCancelBtn = element(by.css(`[e2e="route-cancel-btn"]`));
+    this._routePreviousBtn = element(by.css(`[e2e="route-schd-previous-btn"]`));
     this._routeNextBtn = element(by.css(`[e2e="route-next-btn"]`));
     this._schedule = name =>
       element(by.xpath(`//div[contains(text(),"${name}")]`));
@@ -80,13 +81,13 @@ class RouteModel extends TestConnectivity {
   }
 
   clickOnScheduleTab(name) {
+    commonFunctions.waitFor.elementToBeVisible(this._routePreviousBtn);
     commonFunctions.clickOnElement(this._schedule(name));
     browser.sleep(2000);
   }
 
   clickOnFrequency(type, number) {
     // Wait is required because app is getting slow and not responding as expected very fast
-    browser.sleep(1000);
     commonFunctions.clickOnElement(this._frequencyType(type));
     browser.sleep(1000);
     commonFunctions.clickOnElement(this._frequencyValue(number));
