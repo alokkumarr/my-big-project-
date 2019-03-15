@@ -39,6 +39,36 @@ import {
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
+const onReorder = (columns: ArtifactColumns) => {
+  forEach(columns, (column, index) => {
+    column.areaIndex = index;
+  });
+};
+
+const canAcceptGeoType = (
+  groupAdapter: IDEsignerSettingGroupAdapter,
+  groupAdapters: Array<IDEsignerSettingGroupAdapter>
+) => ({ geoType }: ArtifactColumnChart) => {
+  const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+  if (groupAdapter.artifactColumns.length >= maxAllowed) {
+    return false;
+  }
+
+  return GEO_TYPES.includes(geoType);
+};
+
+const canAcceptLngLat = (
+  groupAdapter: IDEsignerSettingGroupAdapter,
+  groupAdapters: Array<IDEsignerSettingGroupAdapter>
+) => ({ geoType }: ArtifactColumnChart) => {
+  const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+  if (groupAdapter.artifactColumns.length >= maxAllowed) {
+    return false;
+  }
+
+  return geoType === 'lngLat';
+};
+
 @Injectable()
 export class DesignerService {
   constructor(private _analyzeService: AnalyzeService) {}
@@ -103,23 +133,9 @@ export class DesignerService {
       artifactColumn.checked = false;
     };
 
-    const onReorder = (columns: ArtifactColumns) => {
-      forEach(columns, (column, index) => {
-        column.areaIndex = index;
-      });
-    };
-
     const areLessThenMaxFields = (columns: ArtifactColumns): boolean => {
       return columns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
     };
-
-    // const canAcceptNumberType = (
-    //   groupAdapter: IDEsignerSettingGroupAdapter,
-    //   _
-    // ) => ({ type }: ArtifactColumnPivot) =>
-    //   areLessThenMaxFields(groupAdapter.artifactColumns) &&
-    //   NUMBER_TYPES.includes(type);
-
     const canAcceptAnyType = (
       groupAdapter: IDEsignerSettingGroupAdapter,
       _
@@ -191,6 +207,82 @@ export class DesignerService {
     return pivotGroupAdapters;
   }
 
+  getMapGroupAdapters(artifactColumns, subType): IDEsignerSettingGroupAdapter[] {
+    const mapReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
+      artifactColumn.area = null;
+      artifactColumn.areaIndex = null;
+      artifactColumn.checked = false;
+    };
+
+    const canAcceptData = (groupAdapter: IDEsignerSettingGroupAdapter, _) => ({
+      type
+    }: ArtifactColumnPivot) => NUMBER_TYPES.includes(type);
+
+    const applyDataFieldDefaults = artifactColumn => {
+      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    };
+
+    const applyNonDatafieldDefaults = artifactColumn => {
+      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+    };
+
+    const defaultMetricAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Data',
+      type: 'map',
+      marker: 'y',
+      artifactColumns: [],
+      canAcceptArtifactColumn: canAcceptData,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'y';
+        artifactColumn.checked = true;
+        applyDataFieldDefaults(artifactColumn);
+      },
+      reverseTransform: mapReverseTransform,
+      onReorder
+    };
+
+    const defaultDimensionAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Coordinates',
+      type: 'map',
+      marker: 'x',
+      maxAllowed: () => 1,
+      artifactColumns: [],
+      canAcceptArtifactColumn: null,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'x';
+        artifactColumn.checked = true;
+        applyNonDatafieldDefaults(artifactColumn);
+      },
+      reverseTransform: mapReverseTransform,
+      onReorder
+    };
+
+    const metricAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultMetricAdapter,
+      title: subType === 'map' ? 'Data' : 'Metric'
+    };
+
+    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultDimensionAdapter,
+      title: subType === 'map' ? 'Coordinates' : 'Dimension',
+      canAcceptArtifactColumn: subType === 'map' ?
+        canAcceptLngLat : canAcceptGeoType
+    };
+
+    const mapGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
+      metricAdapter,
+      dimensionAdapter
+    ]);
+
+    this._distributeArtifactColumnsIntoGroups(
+      artifactColumns,
+      mapGroupAdapters,
+      'map'
+    );
+
+    return mapGroupAdapters;
+  }
+
   getChartGroupAdapters(
     artifactColumns,
     chartType
@@ -199,12 +291,6 @@ export class DesignerService {
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn.area = null;
       artifactColumn.checked = false;
-    };
-
-    const onReorder = (columns: ArtifactColumns) => {
-      forEach(columns, (column, index) => {
-        column.areaIndex = index;
-      });
     };
 
     const canAcceptNumberType = (
@@ -227,18 +313,6 @@ export class DesignerService {
         return false;
       }
       return DATE_TYPES.includes(type);
-    };
-
-    const canAcceptGeoType = (
-      groupAdapter: IDEsignerSettingGroupAdapter,
-      groupAdapters: Array<IDEsignerSettingGroupAdapter>
-    ) => ({ geoType }: ArtifactColumnChart) => {
-      const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
-      if (groupAdapter.artifactColumns.length >= maxAllowed) {
-        return false;
-      }
-
-      return GEO_TYPES.includes(geoType);
     };
 
     const canAcceptAnyType = (
@@ -381,11 +455,12 @@ export class DesignerService {
   public _distributeArtifactColumnsIntoGroups(
     artifactColumns: ArtifactColumns,
     groupAdapters: IDEsignerSettingGroupAdapter[],
-    analysisType: 'chart' | 'pivot'
+    analysisType: 'chart' | 'pivot' | 'map'
   ) {
     const groupByProps = {
       chart: 'area',
-      pivot: 'area'
+      pivot: 'area',
+      map: 'area'
     };
     fpPipe(
       fpFilter('checked'),

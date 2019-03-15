@@ -16,13 +16,17 @@ export const DATE_TYPES = ['timestamp', 'date'];
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
   country: ['name', 'fips'],
+  lngLat: [''],
   zip: []
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) =>
-    map(identifiers, identifier => `${geoType}:${identifier}`)
-  )
+  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
+    if (!identifier) {
+      return geoType;
+    }
+    return `${geoType}:${identifier}`;
+  }))
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
@@ -145,39 +149,39 @@ export const AGGREGATE_TYPES = [
     label: 'Total',
     value: 'sum',
     icon: 'icon-Sum',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Average',
     value: 'avg',
     icon: 'icon-ic-average',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Mininum',
     value: 'min',
     icon: 'icon-ic-min',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Maximum',
     value: 'max',
     icon: 'icon-ic-max',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Count',
     value: 'count',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Distinct Count',
     value: 'distinctCount',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Percentage',
