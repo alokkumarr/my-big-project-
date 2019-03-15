@@ -1,4 +1,21 @@
 #!/bin/bash
+
+PRODUCT_MODULE="sip-product-module"
+
+echo ${PRODUCT_MODULE}
+
+echo "Creating the tarball"
+
+CWD=$(PWD)
+
+TAR_CONTENT="${PRODUCT_MODULE}"
+
+tar -czvf "${PRODUCT_MODULE}.tar.gz" ${TAR_CONTENT}
+
+echo "Deploying the product module"
+
+
+#!/bin/bash
 #
 # Deploy SIP product module
 #
@@ -17,7 +34,7 @@ module=$2
 product_module_id=${3}
 export SIP_PRODUCT_MODULE_ID=${product_module_id}
 
-options="${4:-}"
+options="${3:-}"
 
 dir=$(dirname $0)
 
