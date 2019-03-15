@@ -33,20 +33,22 @@ import {
   IToolbarActionResult,
   DesignerChangeEvent,
   DesignerSaveEvent,
-  AnalysisReport
+  AnalysisReport,
+  MapSettings
 } from '../types';
 import {
   DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES
+  DATE_TYPES,
+  DEFAULT_MAP_SETTINGS
 } from '../consts';
 
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
 import { JwtService } from '../../../../common/services';
 
-const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
+const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
 @Component({
   selector: 'designer-container',
@@ -135,6 +137,7 @@ export class DesignerContainerComponent implements OnInit {
       return 'multi';
     case 'pivot':
     case 'chart':
+    case 'map':
     default:
       return 'single';
     }
@@ -183,14 +186,24 @@ export class DesignerContainerComponent implements OnInit {
       }
       this.chartTitle = this.analysis.chartTitle || this.analysis.name;
 
+      const chartOnlySettings = {
+        legend: (<any>this.analysis).legend,
+        labelOptions: (<any>this.analysis).labelOptions || {},
+        isInverted: (<any>this.analysis).isInverted
+      };
+
       this.auxSettings = {
         ...this.auxSettings,
-        ...(this.analysis.type === 'chart' ? {
-          legend: (<any>this.analysis).legend,
-          labelOptions: (<any>this.analysis).labelOptions || {},
-          isInverted: (<any>this.analysis).isInverted
-        } : {})
+        ...chartOnlySettings
       };
+      break;
+    case 'map':
+      const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
+      this.auxSettings = {
+        ...this.auxSettings,
+        ...mapOnlySettings
+      };
+      this.analysis.mapSettings = this.auxSettings;
       break;
     }
   }
@@ -327,6 +340,7 @@ export class DesignerContainerComponent implements OnInit {
     switch (this.analysis.type) {
       case 'pivot':
       case 'chart':
+      case 'map':
         return [];
 
       case 'report':
@@ -387,11 +401,11 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
-
     this.analysis =
       this.analysis.type === 'chart'
         ? this.formulateChartRequest(this.analysis)
         : this.analysis;
+
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -432,6 +446,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'esReport':
       return data;
     case 'chart':
+    case 'map':
       return flattenChartData(
         data,
         analysis.sqlBuilder
@@ -545,6 +560,7 @@ export class DesignerContainerComponent implements OnInit {
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'chart':
+    case 'map':
       partialSqlBuilder = this._designerService.getPartialChartSqlBuilder(this.artifacts[0].columns);
       sortProp = 'sorts';
       break;
@@ -600,6 +616,7 @@ export class DesignerContainerComponent implements OnInit {
       }
       return isDataEmpty;
     case 'chart':
+    case 'map':
       const parsedData = flattenChartData(data, sqlBuilder);
       return isEmpty(parsedData);
     // TODO verify if the object returned is empty
@@ -626,6 +643,7 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'pivot':
     case 'chart':
+    case 'map':
       this.handleOtherChangeEvents(event);
       break;
     }
@@ -781,6 +799,10 @@ export class DesignerContainerComponent implements OnInit {
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
+    case 'mapSettings':
+      this.auxSettings = event.data.mapSettings;
+      this.analysis.mapSettings = this.auxSettings;
+      break;
     case 'fetchLimit':
       this.analysis.sqlBuilder = this.getSqlBuilder();
       this.requestDataIfPossible();
@@ -810,6 +832,13 @@ export class DesignerContainerComponent implements OnInit {
     case 'pivot':
       const length = get(this.analysis, 'sqlBuilder.dataFields.length');
       return isNumber(length) ? length > 0 : false;
+    case 'map':
+      const sqlB = get(this.analysis, 'sqlBuilder') || {};
+      const requestConditions = [
+        find(sqlB.nodeFields || [], field => field.checked === 'x'),
+        find(sqlB.dataFields || [], field => field.checked === 'y')
+      ];
+      return every(requestConditions, Boolean);
     case 'chart':
       /* At least one y and x field needs to be present. If this is a bubble chart,
        * at least one z axis field is also needed */

@@ -54,6 +54,7 @@ export const AnalyseTypes = {
   Report: 'report',
   ESReport: 'esReport',
   Chart: 'chart',
+  Map: 'map',
   Pivot: 'pivot'
 };
 
@@ -257,8 +258,14 @@ export const ANALYSIS_METHODS = [
           {
             label: 'Geolocation',
             icon: { font: 'icon-geo-chart' },
-            type: 'chart:geo',
-            typeOnBackEnd: 'chart:geo'
+            type: 'map:chart_scale',
+            typeOnBackEnd: 'map:chart_scale'
+          },
+          {
+            label: 'Map',
+            icon: { font: 'icon-geo-chart' },
+            type: 'map:map',
+            typeOnBackEnd: 'map-map'
           }
         ]
       }

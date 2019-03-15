@@ -59,10 +59,17 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   ngOnDestroy() {}
 
   getSources() {
-    this.datasourceService.getSourceList()
+    this.datasourceService
+      .getSourceList()
       .pipe(
-        rxMap(channels => map(channels, channel => ({...channel, ...JSON.parse(channel.channelMetadata)})))
-      ).subscribe(channels => {
+        rxMap(channels =>
+          map(channels, channel => ({
+            ...channel,
+            ...JSON.parse(channel.channelMetadata)
+          }))
+        )
+      )
+      .subscribe(channels => {
         this.unFilteredSourceData = channels;
         this.countSourceByType(this.unFilteredSourceData);
       });
@@ -85,7 +92,10 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       const firstChannelId = this.sourceData[0].bisChannelSysId;
       if (this.selectedSourceData) {
         const selectedId = this.selectedSourceData.bisChannelSysId;
-        const alreadySelected = find(this.sourceData, ({bisChannelSysId}) => bisChannelSysId === selectedId);
+        const alreadySelected = find(
+          this.sourceData,
+          ({ bisChannelSysId }) => bisChannelSysId === selectedId
+        );
         if (alreadySelected) {
           this.selectSingleChannel(selectedId);
         } else {
@@ -242,9 +252,15 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   getRoutesForChannel(channelID) {
-    this.datasourceService.getRoutesList(channelID)
+    this.datasourceService
+      .getRoutesList(channelID)
       .pipe(
-        rxMap(routes => map(routes, route => ({...route, ...JSON.parse(route.routeMetadata)})))
+        rxMap(routes =>
+          map(routes, route => ({
+            ...route,
+            ...JSON.parse(route.routeMetadata)
+          }))
+        )
       )
       .subscribe(routes => {
         this.routesData = routes;
@@ -275,7 +291,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
     dateDialogRef.afterClosed().subscribe(data => {
       if (!isUndefined(data)) {
-        const payload: {status?: number, createdBy: string, routeMetadata: Object} = {
+        const payload: {
+          status?: number;
+          createdBy: string;
+          routeMetadata: Object;
+        } = {
           createdBy: '',
           // Route metadata JSON object have to be stringified  to store in MariaDB due to BE limitation.
           routeMetadata: JSON.stringify(data.routeDetails)
@@ -317,7 +337,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     const selectedChannelId = this.selectedSourceData.bisChannelSysId;
     const isChannelNotActive = this.selectedSourceData.status === 0;
     if (isChannelNotActive && channelId === selectedChannelId) {
-      return this.datasourceService.toggleRoute(channelId, routeId, false).toPromise();
+      return this.datasourceService
+        .toggleRoute(channelId, routeId, false)
+        .toPromise();
     }
   }
 
@@ -357,8 +379,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       autoFocus: false,
       closeOnNavigation: true,
       disableClose: true,
-      height: '590px',
-      width: '800px',
+      height: '80vh',
+      width: '80vw',
       panelClass: 'sourceDialogClass',
       data: {
         ...routeData,
@@ -369,24 +391,28 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   toggleRouteActivation(route) {
     const { bisChannelSysId, bisRouteSysId, status } = route;
-    this.datasourceService.toggleRoute(bisChannelSysId, bisRouteSysId, !status).subscribe(() => {
-      route.status = this.reverseStatus(status);
-    });
+    this.datasourceService
+      .toggleRoute(bisChannelSysId, bisRouteSysId, !status)
+      .subscribe(() => {
+        route.status = this.reverseStatus(status);
+      });
   }
 
   toggleChannelActivation(channel) {
     const { status } = channel;
     this.channelToggleRequestPending = true;
-    this.datasourceService.toggleChannel(channel.bisChannelSysId, !status)
-    .pipe(
-      finalize(() => {
+    this.datasourceService
+      .toggleChannel(channel.bisChannelSysId, !status)
+      .pipe(
+        finalize(() => {
+          this.channelToggleRequestPending = false;
+        })
+      )
+      .subscribe(() => {
         this.channelToggleRequestPending = false;
-      })
-    ).subscribe(() => {
-      this.channelToggleRequestPending = false;
-      channel.status = this.reverseStatus(status);
-      this.getRoutesForChannel(channel.bisChannelSysId);
-    });
+        channel.status = this.reverseStatus(status);
+        this.getRoutesForChannel(channel.bisChannelSysId);
+      });
   }
 
   toggleAllRoutesOnFrontEnd(status) {
