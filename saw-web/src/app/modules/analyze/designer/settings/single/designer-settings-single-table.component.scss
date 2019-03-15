@@ -104,6 +104,7 @@
     max-width: 230px;
     color: $primary-grey-g4;
     font-size: 11px;
+    font-weight: 600;
     white-space: normal;
     word-wrap: normal;
     word-break: break-word;
@@ -111,7 +112,9 @@
 
   &__icon {
     color: $primary-blue-b2;
-    height: 11px;
+    height: 12px;
+    width: 24px;
+    font-weight: bolder;
   }
 
   &__addbtn {
