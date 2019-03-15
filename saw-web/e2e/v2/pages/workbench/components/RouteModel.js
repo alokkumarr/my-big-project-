@@ -82,6 +82,7 @@ class RouteModel extends TestConnectivity {
 
   clickOnScheduleTab(name) {
     commonFunctions.waitFor.elementToBeVisible(this._routePreviousBtn);
+    browser.sleep(2000);
     commonFunctions.clickOnElement(this._schedule(name));
     browser.sleep(2000);
   }

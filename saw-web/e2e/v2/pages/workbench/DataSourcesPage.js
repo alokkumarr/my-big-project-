@@ -141,6 +141,7 @@ class DataSourcesPage extends DeleteModel {
   }
 
   clickOnRouteAction(name) {
+    browser.sleep(2000);
     commonFunctions.clickOnElement(this._routeAction(name));
     browser.sleep(2000); // some time takes time to load
   }
