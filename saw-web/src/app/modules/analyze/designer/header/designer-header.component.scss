@@ -17,6 +17,20 @@ $back-button-size: 32px;
       font-size: 22px;
     }
   }
+
+  ::ng-deep .mat-button-toggle-checked {
+    background-color: $primary-blue-b2;
+    color: white;
+  }
+
+  ::ng-deep .mat-button-toggle-label-content {
+    line-height: 32px !important;
+    font-size: 13px;
+  }
+
+  ::ng-deep .mat-button-toggle-label-content > * {
+    vertical-align: inherit;
+  }
 }
 
 .back-button-icon.mat-icon {
@@ -77,21 +91,4 @@ $back-button-size: 32px;
 
 .mat-progress-bar {
   height: 2px !important;
-}
-
-.mat-button-toggle-checked {
-  background-color: $primary-blue-b2;
-  color: white;
-}
-
-.mat-button-toggle-label-content {
-  line-height: 32px !important;
-
-  .mat-icon {
-    width: auto;
-  }
-}
-
-.mat-button-toggle-label-content > * {
-  vertical-align: bottom;
 }
