@@ -5,7 +5,8 @@ import {
   ArtifactColumn,
   DesignerChangeEvent,
   SqlBuilder,
-  ArtifactColumnChart
+  ArtifactColumnChart,
+  ArtifactColumnPivot
 } from '../../../types';
 
 @Component({
@@ -59,6 +60,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
    * @returns {ArtifactColumnChart}
    */
   asChartColumn(column): ArtifactColumnChart {
+    return column;
+  }
+
+  asPivotColumn(column): ArtifactColumnPivot {
     return column;
   }
 }

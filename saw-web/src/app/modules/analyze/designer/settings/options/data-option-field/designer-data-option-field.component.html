@@ -80,20 +80,6 @@
     </div>
 
     <div
-      *ngIf="analysisType !== 'pivot' && hasDateInterval"
-      fxLayout="row"
-      fxLayoutAlign="start center"
-    >
-      <label fxFlex i18n>Format :</label>
-      <designer-date-format-selector
-        (change)="change.emit($event)"
-        [artifactColumn]="artifactColumn"
-        fxFlex="75"
-      >
-      </designer-date-format-selector>
-    </div>
-
-    <div
       *ngIf="analysisType === 'pivot' && hasDateInterval"
       fxLayout="row"
       fxLayoutAlign="space-around center"
@@ -105,6 +91,26 @@
         fxFlex="75"
       >
       </designer-date-interval-selector>
+    </div>
+
+    <div
+      *ngIf="
+        (analysisType !== 'pivot' && hasDateInterval) ||
+        (analysisType === 'pivot' &&
+          hasDateInterval &&
+          asPivotColumn(artifactColumn).dateInterval === 'day')
+      "
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label fxFlex i18n>Format :</label>
+      <designer-date-format-selector
+        (change)="change.emit($event)"
+        [artifactColumn]="artifactColumn"
+        [analysisType]="analysisType"
+        fxFlex="75"
+      >
+      </designer-date-format-selector>
     </div>
 
     <div

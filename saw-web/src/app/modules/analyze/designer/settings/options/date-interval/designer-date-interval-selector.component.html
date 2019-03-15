@@ -12,11 +12,4 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-
-  <designer-date-format-selector
-    *ngIf="artifactColumn.dateInterval === 'day'"
-    (change)="change.emit($event)"
-    [artifactColumn]="artifactColumn"
-  >
-  </designer-date-format-selector>
 </div>
