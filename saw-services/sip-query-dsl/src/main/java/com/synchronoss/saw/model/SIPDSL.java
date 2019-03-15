@@ -1,212 +1,263 @@
-
 package com.synchronoss.saw.model;
 
-import java.util.HashMap;
-import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "type", "semanticId", "name", "id", "customerCode", "projectCode", "module", "createdTime",
-		"createdBy", "modifiedTime", "modifiedBy", "sipQuery" })
+@JsonPropertyOrder({
+  "type",
+  "semanticId",
+  "name",
+  "id",
+  "customerCode",
+  "projectCode",
+  "module",
+  "createdTime",
+  "createdBy",
+  "modifiedTime",
+  "modifiedBy",
+  "sipQuery"
+})
 public class SIPDSL {
 
-	@JsonProperty("type")
-	private String type;
-	@JsonProperty("semanticId")
-	private String semanticId;
-	@JsonProperty("name")
-	private String name;
-	@JsonProperty("id")
-	private String id;
-	@JsonProperty("customerCode")
-	private String customerCode;
-	@JsonProperty("projectCode")
-	private String projectCode;
-	@JsonProperty("module")
-	private String module;
-	@JsonProperty("createdTime")
-	private Integer createdTime;
-	@JsonProperty("createdBy")
-	private String createdBy;
-	@JsonProperty("modifiedTime")
-	private Integer modifiedTime;
-	@JsonProperty("modifiedBy")
-	private String modifiedBy;
-	@JsonProperty("sipQuery")
-	private SipQuery sipQuery;
+  @JsonProperty("type")
+  private String type;
 
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonProperty("semanticId")
+  private String semanticId;
 
-	@JsonProperty("type")
-	public String getType() {
-		return type;
-	}
+  @JsonProperty("name")
+  private String name;
 
-	@JsonProperty("type")
-	public void setType(String type) {
-		this.type = type;
-	}
+  @JsonProperty("id")
+  private String id;
 
-	@JsonProperty("semanticId")
-	public String getSemanticId() {
-		return semanticId;
-	}
+  @JsonProperty("customerCode")
+  private String customerCode;
 
-	@JsonProperty("semanticId")
-	public void setSemanticId(String semanticId) {
-		this.semanticId = semanticId;
-	}
+  @JsonProperty("projectCode")
+  private String projectCode;
 
-	@JsonProperty("name")
-	public String getName() {
-		return name;
-	}
+  @JsonProperty("module")
+  private String module;
 
-	@JsonProperty("name")
-	public void setName(String name) {
-		this.name = name;
-	}
+  @JsonProperty("createdTime")
+  private Integer createdTime;
 
-	@JsonProperty("id")
-	public String getId() {
-		return id;
-	}
+  @JsonProperty("createdBy")
+  private String createdBy;
 
-	@JsonProperty("id")
-	public void setId(String id) {
-		this.id = id;
-	}
+  @JsonProperty("modifiedTime")
+  private Integer modifiedTime;
 
-	@JsonProperty("customerCode")
-	public String getCustomerCode() {
-		return customerCode;
-	}
+  @JsonProperty("modifiedBy")
+  private String modifiedBy;
 
-	@JsonProperty("customerCode")
-	public void setCustomerCode(String customerCode) {
-		this.customerCode = customerCode;
-	}
+  @JsonProperty("sipQuery")
+  private SipQuery sipQuery;
 
-	@JsonProperty("projectCode")
-	public String getProjectCode() {
-		return projectCode;
-	}
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-	@JsonProperty("projectCode")
-	public void setProjectCode(String projectCode) {
-		this.projectCode = projectCode;
-	}
+  @JsonProperty("type")
+  public String getType() {
+    return type;
+  }
 
-	@JsonProperty("module")
-	public String getModule() {
-		return module;
-	}
+  @JsonProperty("type")
+  public void setType(String type) {
+    this.type = type;
+  }
 
-	@JsonProperty("module")
-	public void setModule(String module) {
-		this.module = module;
-	}
+  @JsonProperty("semanticId")
+  public String getSemanticId() {
+    return semanticId;
+  }
 
-	@JsonProperty("createdTime")
-	public Integer getCreatedTime() {
-		return createdTime;
-	}
+  @JsonProperty("semanticId")
+  public void setSemanticId(String semanticId) {
+    this.semanticId = semanticId;
+  }
 
-	@JsonProperty("createdTime")
-	public void setCreatedTime(Integer createdTime) {
-		this.createdTime = createdTime;
-	}
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
 
-	@JsonProperty("createdBy")
-	public String getCreatedBy() {
-		return createdBy;
-	}
+  @JsonProperty("name")
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	@JsonProperty("createdBy")
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
+  @JsonProperty("id")
+  public String getId() {
+    return id;
+  }
 
-	@JsonProperty("modifiedTime")
-	public Integer getModifiedTime() {
-		return modifiedTime;
-	}
+  @JsonProperty("id")
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	@JsonProperty("modifiedTime")
-	public void setModifiedTime(Integer modifiedTime) {
-		this.modifiedTime = modifiedTime;
-	}
+  @JsonProperty("customerCode")
+  public String getCustomerCode() {
+    return customerCode;
+  }
 
-	@JsonProperty("modifiedBy")
-	public String getModifiedBy() {
-		return modifiedBy;
-	}
+  @JsonProperty("customerCode")
+  public void setCustomerCode(String customerCode) {
+    this.customerCode = customerCode;
+  }
 
-	@JsonProperty("modifiedBy")
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
+  @JsonProperty("projectCode")
+  public String getProjectCode() {
+    return projectCode;
+  }
 
-	@JsonProperty("sipQuery")
-	public SipQuery getSipQuery() {
-		return sipQuery;
-	}
+  @JsonProperty("projectCode")
+  public void setProjectCode(String projectCode) {
+    this.projectCode = projectCode;
+  }
 
-	@JsonProperty("sipQuery")
-	public void setSipQuery(SipQuery sipQuery) {
-		this.sipQuery = sipQuery;
-	}
+  @JsonProperty("module")
+  public String getModule() {
+    return module;
+  }
 
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
+  @JsonProperty("module")
+  public void setModule(String module) {
+    this.module = module;
+  }
 
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-		this.additionalProperties.put(name, value);
-	}
+  @JsonProperty("createdTime")
+  public Integer getCreatedTime() {
+    return createdTime;
+  }
 
-	@Override
-	public String toString() {
-		return new ToStringBuilder(this).append("type", type).append("semanticId", semanticId).append("name", name)
-				.append("id", id).append("customerCode", customerCode).append("projectCode", projectCode)
-				.append("module", module).append("createdTime", createdTime).append("createdBy", createdBy)
-				.append("modifiedTime", modifiedTime).append("modifiedBy", modifiedBy).append("sipQuery", sipQuery)
-				.append("additionalProperties", additionalProperties).toString();
-	}
+  @JsonProperty("createdTime")
+  public void setCreatedTime(Integer createdTime) {
+    this.createdTime = createdTime;
+  }
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(module).append(projectCode).append(createdTime).append(modifiedBy)
-				.append(modifiedTime).append(type).append(sipQuery).append(id).append(createdBy)
-				.append(additionalProperties).append(semanticId).append(customerCode).append(name).toHashCode();
-	}
+  @JsonProperty("createdBy")
+  public String getCreatedBy() {
+    return createdBy;
+  }
 
-	@Override
-	public boolean equals(Object other) {
-		if (other == this) {
-			return true;
-		}
-		if ((other instanceof SIPDSL) == false) {
-			return false;
-		}
-		SIPDSL rhs = ((SIPDSL) other);
-		return new EqualsBuilder().append(module, rhs.module).append(projectCode, rhs.projectCode)
-				.append(createdTime, rhs.createdTime).append(modifiedBy, rhs.modifiedBy)
-				.append(modifiedTime, rhs.modifiedTime).append(type, rhs.type).append(sipQuery, rhs.sipQuery)
-				.append(id, rhs.id).append(createdBy, rhs.createdBy)
-				.append(additionalProperties, rhs.additionalProperties).append(semanticId, rhs.semanticId)
-				.append(customerCode, rhs.customerCode).append(name, rhs.name).isEquals();
-	}
+  @JsonProperty("createdBy")
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
 
+  @JsonProperty("modifiedTime")
+  public Integer getModifiedTime() {
+    return modifiedTime;
+  }
+
+  @JsonProperty("modifiedTime")
+  public void setModifiedTime(Integer modifiedTime) {
+    this.modifiedTime = modifiedTime;
+  }
+
+  @JsonProperty("modifiedBy")
+  public String getModifiedBy() {
+    return modifiedBy;
+  }
+
+  @JsonProperty("modifiedBy")
+  public void setModifiedBy(String modifiedBy) {
+    this.modifiedBy = modifiedBy;
+  }
+
+  @JsonProperty("sipQuery")
+  public SipQuery getSipQuery() {
+    return sipQuery;
+  }
+
+  @JsonProperty("sipQuery")
+  public void setSipQuery(SipQuery sipQuery) {
+    this.sipQuery = sipQuery;
+  }
+
+  @JsonAnyGetter
+  public Map<String, Object> getAdditionalProperties() {
+    return this.additionalProperties;
+  }
+
+  @JsonAnySetter
+  public void setAdditionalProperty(String name, Object value) {
+    this.additionalProperties.put(name, value);
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("type", type)
+        .append("semanticId", semanticId)
+        .append("name", name)
+        .append("id", id)
+        .append("customerCode", customerCode)
+        .append("projectCode", projectCode)
+        .append("module", module)
+        .append("createdTime", createdTime)
+        .append("createdBy", createdBy)
+        .append("modifiedTime", modifiedTime)
+        .append("modifiedBy", modifiedBy)
+        .append("sipQuery", sipQuery)
+        .append("additionalProperties", additionalProperties)
+        .toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder()
+        .append(module)
+        .append(projectCode)
+        .append(createdTime)
+        .append(modifiedBy)
+        .append(modifiedTime)
+        .append(type)
+        .append(sipQuery)
+        .append(id)
+        .append(createdBy)
+        .append(additionalProperties)
+        .append(semanticId)
+        .append(customerCode)
+        .append(name)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    }
+    if ((other instanceof SIPDSL) == false) {
+      return false;
+    }
+    SIPDSL rhs = ((SIPDSL) other);
+    return new EqualsBuilder()
+        .append(module, rhs.module)
+        .append(projectCode, rhs.projectCode)
+        .append(createdTime, rhs.createdTime)
+        .append(modifiedBy, rhs.modifiedBy)
+        .append(modifiedTime, rhs.modifiedTime)
+        .append(type, rhs.type)
+        .append(sipQuery, rhs.sipQuery)
+        .append(id, rhs.id)
+        .append(createdBy, rhs.createdBy)
+        .append(additionalProperties, rhs.additionalProperties)
+        .append(semanticId, rhs.semanticId)
+        .append(customerCode, rhs.customerCode)
+        .append(name, rhs.name)
+        .isEquals();
+  }
 }

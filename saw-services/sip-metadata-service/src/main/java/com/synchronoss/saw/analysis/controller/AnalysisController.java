@@ -42,6 +42,7 @@ public class AnalysisController {
 
   /**
    * create Analysis API.
+   *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @param analysis analysis definition
@@ -73,6 +74,7 @@ public class AnalysisController {
     }
     analysis.setId(id);
     analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, ticket));
+    analysisResponse.setAnalysisId(id);
     return analysisResponse;
   }
 
@@ -110,6 +112,7 @@ public class AnalysisController {
     }
     analysis.setId(id);
     analysisResponse.setAnalysis(analysisService.updateAnalysis(analysis, ticket));
+    analysisResponse.setAnalysisId(id);
     return analysisResponse;
   }
 
@@ -165,7 +168,7 @@ public class AnalysisController {
       @PathVariable(name = "id") String id) {
     Ticket ticket = new Ticket();
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    analysisService.getAnalysis(id, ticket);
+    analysisResponse.setAnalysis(analysisService.getAnalysis(id, ticket));
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
