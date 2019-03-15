@@ -1104,21 +1104,21 @@ public class SftpServiceImpl extends SipPluginContract {
    */
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   public void recoverFromInconsistentState() {
-    logger.trace("recoverFromInconsistentState execution starts here");
+    logger.info("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
     int totalNoOfPages = IntegrationUtils.calculatePages(countOfRecords, retryPageSize);
-    logger.debug("totalNoOfPages :" + totalNoOfPages);
+    logger.trace("totalNoOfPages :" + totalNoOfPages);
     for (int i = pageStart; i < totalNoOfPages; i++) {
       List<BisFileLog> logs =
           sipLogService.listOfRetryIds(retryDiff, i, retryPageSize, "checkpointDate");
       logger.trace("Data listOfRetryIds :" + logs);
       for (BisFileLog log : logs) {
-        logger.trace("ids which is in inconsistent state :" + log.getPid());
+        logger.info("Id which is in inconsistent state: " + log.getPid());
         long routeId = log.getRouteSysId();
-        logger.trace("Route Id :" + routeId);
+        logger.info("Route Id which is in inconsistent state: " + routeId);
         long channelId = log.getBisChannelSysId();
-        logger.trace("Channel Id :" + channelId);
+        logger.info("Channel Id which is in inconsistent state: " + channelId);
         Optional<BisRouteEntity> bisRouteEntityPresent =
             this.findRouteById(routeId);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -1162,6 +1162,9 @@ public class SftpServiceImpl extends SipPluginContract {
                     logger.trace("Inside the block of retry when process status is "
                         + " inside disable block :"
                         + BisComponentState.HOST_NOT_REACHABLE.value());
+                    logger.info("Channel Id with :" + BisComponentState.HOST_NOT_REACHABLE.value()
+                        + " will be triggered by retry in case of isDisable duplicate " + isDisable
+                        + " : " + channelId);
                     transferRetry(channelId, routeId, log.getBisChannelType(), isDisable,
                         log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value());
                   }
@@ -1194,6 +1197,9 @@ public class SftpServiceImpl extends SipPluginContract {
                   logger.trace("Inside the block of retry when process status is :"
                       + BisComponentState.HOST_NOT_REACHABLE.value());
                   // log.pid() has been added as part of SIP-6292
+                  logger.info("Channel Id with :" + BisComponentState.HOST_NOT_REACHABLE.value()
+                      + " will be triggered by retry in case of isDisable duplicate " + isDisable
+                      + " : " + channelId);
                   transferRetry(channelId, routeId, log.getBisChannelType(), isDisable,
                       log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value());
                 }
@@ -1208,13 +1214,14 @@ public class SftpServiceImpl extends SipPluginContract {
         }
       } // end of second for loop
     } // end of first for loop
-    logger.debug("recoverFromInconsistentState execution ends here");
+    logger.info("recoverFromInconsistentState execution ends here");
   }
   
   private void transferRetry(Long channelId, Long routeId, String channelType, boolean isDisable,
       String pid, String status)
       throws NotFoundException {
-    logger.trace("inside transfer retry block for channel type " + channelType + "ends here");
+    logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
+        + channelId + " starts here");
     final List<BisDataMetaInfo>  filesInfo = new ArrayList<>();
     // This block needs to improved in future with appropriate design pattern like
     // Abstract factory or switch block when more channel type will be added
@@ -1258,11 +1265,13 @@ public class SftpServiceImpl extends SipPluginContract {
           }
           // This has been added as a part of SIP-6292 change
           // when HOST_NOT_REACHABLE host is successfully connected
-          if (filesInfo.size() > 0) {
-            sipLogService.deleteLog(pid);
-            logger.info("deleted the pid which had " + BisComponentState.HOST_NOT_REACHABLE
-                + "with pid " + pid);
-          }
+          // this will rectify irrespective of route active or not
+          // and date are available on the source or not
+          // all it make sure it host got back online
+          // and removes the entry from the store
+          sipLogService.deleteLog(pid);
+          logger.info("deleted the pid which had " + BisComponentState.HOST_NOT_REACHABLE
+                + " with pid " + pid);
         } catch (Exception ex) {
           logger.error(
               "Exception occurred while connecting to channel with the channel Id:" + channelId,
@@ -1276,7 +1285,8 @@ public class SftpServiceImpl extends SipPluginContract {
       default:
         throw new NotFoundException("channelType does not support");
     }
-    logger.trace("inside transfer retry block for channel type " + channelType + "ends here");
+    logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
+        + channelId + " ends here");
   }
 
   /**
@@ -1289,11 +1299,14 @@ public class SftpServiceImpl extends SipPluginContract {
   private void updateAndDeleteCorruptFiles(BisFileLog log, String fileStatus, String procesStatus) {
     int rowId = 0;
     rowId = sipLogService.updateStatusFailed(fileStatus, procesStatus, log.getPid());
-    logger.trace("rowId updated :" + rowId);
+    logger.info("rowId updateAndDeleteCorruptFiles: " + log.getPid());
     if (rowId <= 0) {
       throw new PersistenceException(
           "Exception occured while updating the bis log table to handle inconsistency");
     }
+    // The below code fix which will be part of 
+    // TODO : SIP-6148
+    // This is known issue with this feature branch
     String fileName = null;
     if (log.getRecdFileName() != null) {
       fileName = log.getRecdFileName();
