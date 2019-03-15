@@ -1,9 +1,13 @@
 package com.synchronoss.saw.logs.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.synchronoss.saw.logs.entities.SipJobEntity;
 import com.synchronoss.saw.logs.models.SipJobDetails;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 
+@Api(value = "This Controller provides job level"
+    + "operations for sip ingestion in synchronoss analytics platform ")
 @RestController
 @RequestMapping(value = "/ingestion/batch")
 public class SipJobsLogController {
@@ -36,7 +42,17 @@ public class SipJobsLogController {
    * @param jobType type of job
    * @return logs
    */
+  @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "",
+      response = SipJobDetails.class, responseContainer = "List")
   @RequestMapping(value = "jobLogs/{jobType}", method = RequestMethod.GET)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 201, message = "Created"),
+          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
+              message = "Unsupported Type. " + "Representation not supported for the resource")})
   public List<SipJobDetails> logsByJobType(@PathVariable("jobType") String jobType) {
     logger.info("fetching job logs");
     List<SipJobEntity> jobLogs = this.jobRepository.findByjobType(jobType);

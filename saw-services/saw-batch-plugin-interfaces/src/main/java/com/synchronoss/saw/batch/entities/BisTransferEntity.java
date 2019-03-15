@@ -1,7 +1,8 @@
 package com.synchronoss.saw.batch.entities;
 
-import java.util.Date;
+import io.swagger.annotations.ApiModel;
 
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@ApiModel(value = "SIP_BIS_TRANSFER", 
+    description = "Model for storing sip transfer details")
 @Entity(name = "sip transfer")
 @Table(name = "SIP_BIS_TRANSFER", catalog = "sip_bis", schema = "")
 public class BisTransferEntity {

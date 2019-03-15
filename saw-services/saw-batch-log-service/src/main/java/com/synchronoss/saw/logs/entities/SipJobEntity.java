@@ -11,6 +11,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import io.swagger.annotations.ApiModel;
+
+@ApiModel(value="SIP_JOB", 
+description="Model for storing sip job entity")
 @Table(name = "SIP_JOB", catalog = "sip_bis", schema = "")
 @Entity
 public class SipJobEntity implements Serializable {
