@@ -207,6 +207,14 @@ public class SipLogging {
     return bisFileLogsRepository.isStatusExistsForProcess(processStatus, channelId, routeId,
         BisChannelType.SFTP.value(), PageRequest.of(0, 1, Direction.DESC, "modifiedDate"));
   }
+  
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public Integer updateLongRunningTransfers(Integer minutesToCheck) {
+    return bisFileLogsRepository.updateLongRunningTranfers(minutesToCheck);
+  }
 
   /**
    * This method is used to check the status by process.
