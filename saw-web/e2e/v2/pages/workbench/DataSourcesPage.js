@@ -22,7 +22,7 @@ class DataSourcesPage extends DeleteModel {
     this._showPwd = element(by.css(`[e2e="show-password-ds"]`));
     this._hidePwd = element(by.css(`[e2e="hide-password-ds"]`));
 
-    this._items = name =>
+    this._channelAttributes = name =>
       element(by.xpath(`//*[@e2e="${name}"]/following::span[1]`));
 
     this._channelDeleteBtn = element(by.css(`[e2e="delete-channel"]`));
@@ -89,32 +89,35 @@ class DataSourcesPage extends DeleteModel {
       channelInfo.channelName
     );
     commonFunctions.validateText(
-      this._items('host-name'),
+      this._channelAttributes('host-name'),
       channelInfo.sftpHost
     );
     commonFunctions.validateText(
-      this._items('access-type'),
+      this._channelAttributes('access-type'),
       channelInfo.access
     );
     commonFunctions.validateText(
-      this._items('port-number'),
+      this._channelAttributes('port-number'),
       channelInfo.sftpPort
     );
     commonFunctions.validateText(
-      this._items('created-by'),
+      this._channelAttributes('created-by'),
       channelInfo.created
     );
     commonFunctions.validateText(
-      this._items('user-name'),
+      this._channelAttributes('user-name'),
       channelInfo.sftpUser
     );
     commonFunctions.clickOnElement(this._showPwd);
     commonFunctions.waitFor.elementToBeVisible(this._hidePwd);
     commonFunctions.validateText(
-      this._items('password-name'),
+      this._channelAttributes('password-name'),
       channelInfo.sftpPwd
     );
-    commonFunctions.validateText(this._items('description'), channelInfo.desc);
+    commonFunctions.validateText(
+      this._channelAttributes('description'),
+      channelInfo.desc
+    );
   }
 
   clickOnDeleteChannel() {
