@@ -46,6 +46,13 @@
     right: unset;
     left: 5px;
   }
+
+  .mat-icon {
+    color: $primary-grey-g3;
+    width: 7px;
+    font-weight: bolder;
+    font-size: 22px;
+  }
 }
 
 .fields-panel-toggle__btn {
@@ -61,11 +68,10 @@
   }
 
   .mat-icon {
-    padding-top: 7px;
-
-    &:before {
-      clip-path: inset(0 0 5px 0);
-    }
+    color: $primary-grey-g3;
+    width: 7px;
+    font-weight: bolder;
+    font-size: 22px;
   }
 }
 

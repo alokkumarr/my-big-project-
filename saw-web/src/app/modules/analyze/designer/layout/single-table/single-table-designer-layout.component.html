@@ -19,14 +19,14 @@
     </designer-settings-single-table>
     <button
       *ngIf="isFieldsPanelOpen"
-      mat-mini-fab
+      mat-icon-button
       color="secondary"
       class="fields-panel-toggle__btn on-drawer"
+      (click)="toggleFieldsDrawer(fieldsdrawer)"
+      matTooltip="Collapse Fields Panel"
     >
-      <mat-icon
-        fontIcon="icon-menu"
-        (click)="toggleFieldsDrawer(fieldsdrawer)"
-      ></mat-icon>
+      <mat-icon fontIcon="icon-chevron-left"></mat-icon>
+      <mat-icon fontIcon="icon-chevron-left"></mat-icon>
     </button>
   </mat-drawer>
   <mat-drawer
@@ -51,14 +51,14 @@
     </designer-analysis-options>
     <button
       *ngIf="isOptionsPanelOpen && !isInTabletMode"
-      mat-mini-fab
+      mat-icon-button
       color="secondary"
       class="options-panel-toggle__btn on-drawer"
+      (click)="openDrawer(drawer)"
+      matTooltip="Collapse Settings"
     >
-      <mat-icon
-        fontIcon="icon-settings"
-        (click)="openDrawer(drawer)"
-      ></mat-icon>
+      <mat-icon fontIcon="icon-chevron-right"></mat-icon>
+      <mat-icon fontIcon="icon-chevron-right"></mat-icon>
     </button>
   </mat-drawer>
   <mat-drawer-content class="container">
@@ -76,25 +76,24 @@
         </designer-selected-fields>
         <button
           *ngIf="!isFieldsPanelOpen"
-          mat-mini-fab
-          color="secondary"
+          mat-icon-button
           class="fields-panel-toggle__btn"
+          (click)="toggleFieldsDrawer(fieldsdrawer)"
+          matTooltip="Open Fields Panel"
         >
-          <mat-icon
-            fontIcon="icon-menu"
-            (click)="toggleFieldsDrawer(fieldsdrawer)"
-          ></mat-icon>
+          <mat-icon fontIcon="icon-chevron-right"></mat-icon>
+          <mat-icon fontIcon="icon-chevron-right"></mat-icon>
         </button>
         <button
           *ngIf="!isOptionsPanelOpen"
-          mat-mini-fab
+          mat-icon-button
           color="secondary"
           class="options-panel-toggle__btn"
+          (click)="openDrawer(drawer)"
+          matTooltip="Open Settings"
         >
-          <mat-icon
-            fontIcon="icon-settings"
-            (click)="openDrawer(drawer)"
-          ></mat-icon>
+          <mat-icon fontIcon="icon-chevron-left"></mat-icon>
+          <mat-icon fontIcon="icon-chevron-left"></mat-icon>
         </button>
       </div>
 
