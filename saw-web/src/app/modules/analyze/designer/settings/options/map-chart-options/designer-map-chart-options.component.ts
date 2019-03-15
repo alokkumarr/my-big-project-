@@ -14,6 +14,8 @@ export class DesignerMapChartOptionsComponent {
   @Output() change = new EventEmitter();
 
   public options;
+  public legend: any = {};
+  public editMode: false;
 
   @Input('legend')
   set analysisLegend(data: any) {
@@ -23,9 +25,6 @@ export class DesignerMapChartOptionsComponent {
     this.legend.align = data.align;
     this.legend.layout = data.layout;
   }
-
-  legend: any = {};
-  public editMode: false;
 
   constructor(private _chartService: ChartService) {
     this.legend = {

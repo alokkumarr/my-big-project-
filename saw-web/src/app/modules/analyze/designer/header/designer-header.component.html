@@ -33,7 +33,7 @@
   </div>
 
   <chart-type-chooser
-    *ngIf="analysis?.type === 'chart' && analysis.chartType !== 'geo'"
+    *ngIf="analysis?.type === 'chart'"
     (change)="onChartTypeChange($event)"
     [chartType]="analysis.chartType"
   >

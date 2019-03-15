@@ -127,7 +127,7 @@
     </div>
 
     <div
-      *ngIf="analysisType === 'chart' && analysisSubtype === 'geo'"
+      *ngIf="(analysisType | isAnalysisType: 'mapChart':analysisSubtype)"
       fxLayout="row"
       fxLayoutAlign="start center"
     >

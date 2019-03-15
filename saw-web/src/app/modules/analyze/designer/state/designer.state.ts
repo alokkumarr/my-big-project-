@@ -52,6 +52,11 @@ export class DesignerState {
           analysisSubType
         );
         break;
+      case 'map':
+        groupAdapters = this._designerService.getMapGroupAdapters(
+          artifactColumns, analysisSubType
+        );
+        break;
       default:
         groupAdapters = [];
         break;

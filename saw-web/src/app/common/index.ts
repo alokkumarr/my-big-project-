@@ -78,6 +78,7 @@ import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-p
 import { ChartGridComponent } from './components/chart-grid';
 
 import { UChartModule } from './components/charts';
+import { MapBoxModule } from './map-box/map-box.module';
 
 import {
   RemoteFolderSelectorComponent,
@@ -104,28 +105,29 @@ import {
 
 const MODULES = [
   CommonModuleAngular4,
+  DxDataGridModule,
+  DxPivotGridModule,
+  DxDataGridModule,
+  DxTextBoxModule,
+  DxButtonModule,
+  DxSliderModule,
+  DxTooltipModule,
   RouterModule,
   FormsModule,
   ReactiveFormsModule,
-  DxDataGridModule,
   DxTemplateModule,
   MaterialModule,
   NgxPopperModule,
   FlexLayoutModule,
   DndModule,
   DragDropModule,
-  DxPivotGridModule,
-  DxDataGridModule,
   CommonPipesModule,
   HttpClientModule,
   OwlDateTimeModule,
   OwlNativeDateTimeModule,
   UChartModule,
-  DxTextBoxModule,
-  DxButtonModule,
-  DxSliderModule,
   ClickOutsideModule,
-  DxTooltipModule
+  MapBoxModule
 ];
 
 const COMPONENTS = [

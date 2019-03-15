@@ -6,7 +6,6 @@ import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
-import * as reject from 'lodash/reject';
 import * as every from 'lodash/every';
 import * as some from 'lodash/some';
 import * as map from 'lodash/map';
@@ -26,10 +25,11 @@ import {
   ArtifactColumnFilter,
   DesignerChangeEvent
 } from '../../types';
-import { TYPE_ICONS } from '../../consts';
+
 import {
   getArtifactColumnTypeIcon,
-  getArtifactColumnGeneralType
+  getArtifactColumnGeneralType,
+  getFilterTypes
 } from '../../utils';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
@@ -60,7 +60,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   @Input() public sqlBuilder;
 
   public dropListContainer;
-  public typeIcons = TYPE_ICONS;
+  public typeIcons = [];
   public isEmpty: (any) => boolean = isEmpty;
   public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
@@ -110,14 +110,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   ngOnInit() {
-    const isPivotType = this.analysisType === 'pivot';
-    const isChartType =
-      this.analysisType === 'chart' && this.analysisSubtype !== 'geo';
-    const rejectExpression =
-      isPivotType || isChartType
-        ? type => type.value === 'geo'
-        : type => ['string', 'date'].includes(type.value);
-    this.typeIcons = reject(TYPE_ICONS, rejectExpression);
+    this.typeIcons = getFilterTypes(this.analysisType, this.analysisSubtype);
   }
 
   trackByIndex(index) {
@@ -185,11 +178,11 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   getGeneralType(artifactColumn) {
-    return getArtifactColumnGeneralType(artifactColumn, this.analysisSubtype);
+    return getArtifactColumnGeneralType(artifactColumn, this.analysisType);
   }
 
   getArtifactColumnTypeIcon(artifactColumn) {
-    return getArtifactColumnTypeIcon(artifactColumn, this.analysisSubtype);
+    return getArtifactColumnTypeIcon(artifactColumn, this.analysisType);
   }
 
   hasKeyword(name, keyword) {

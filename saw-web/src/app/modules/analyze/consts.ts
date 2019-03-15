@@ -54,6 +54,7 @@ export const AnalyseTypes = {
   Report: 'report',
   ESReport: 'esReport',
   Chart: 'chart',
+  Map: 'map',
   Pivot: 'pivot'
 };
 
@@ -69,7 +70,7 @@ export const TYPE_MAP = reduce(
   [
     ...map(NUMBER_TYPES, type => ({ type, generalType: 'number' })),
     ...map(DATE_TYPES, type => ({ type, generalType: 'date' })),
-    { type: 'string', generalType: 'string' },
+    { type: 'string', generalType: 'string' }
   ],
   (typeMap, { type, generalType }) => {
     typeMap[type] = generalType;
@@ -78,23 +79,33 @@ export const TYPE_MAP = reduce(
   {}
 );
 
-export const TYPE_ICONS = [{
-  icon: 'icon-number-type',
-  label: 'Number',
-  value: 'number'
-}, {
-  icon: 'icon-string-type',
-  label: 'String',
-  value: 'string'
-}, {
-  icon: 'icon-geo-chart',
-  label: 'Geo',
-  value: 'geo'
-}, {
-  icon: 'icon-calendar',
-  label: 'Date',
-  value: 'date'
-}];
+export const TYPE_ICONS = [
+  {
+    icon: 'icon-number-type',
+    label: 'Number',
+    value: 'number'
+  },
+  {
+    icon: 'icon-string-type',
+    label: 'String',
+    value: 'string'
+  },
+  {
+    icon: 'icon-geo-chart',
+    label: 'Geo',
+    value: 'geo'
+  },
+  {
+    icon: 'icon-geo-chart',
+    label: 'Coordinate',
+    value: 'coordinate'
+  },
+  {
+    icon: 'icon-calendar',
+    label: 'Date',
+    value: 'date'
+  }
+];
 
 export const TYPE_ICONS_OBJ = fpPipe(
   fpGroupBy('value'),
@@ -283,12 +294,20 @@ export const ANALYSIS_METHODS = [
         label: 'Geolocation',
         icon: { font: 'icon-geo-chart' },
         type: '',
-        children: [{
-          label: 'Geolocation',
-          icon: { font: 'icon-geo-chart' },
-          type: 'chart:geo',
-          typeOnBackEnd: 'chart:geo'
-        }]
+        children: [
+          {
+            label: 'Geolocation',
+            icon: { font: 'icon-geo-chart' },
+            type: 'map:chart_scale',
+            typeOnBackEnd: 'map:chart_scale'
+          },
+          {
+            label: 'Map',
+            icon: { font: 'icon-geo-chart' },
+            type: 'map:map',
+            typeOnBackEnd: 'map-map'
+          }
+        ]
       }
     ]
   }

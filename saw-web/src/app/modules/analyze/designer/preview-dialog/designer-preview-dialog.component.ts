@@ -71,6 +71,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
     switch (analysis.type) {
     case 'pivot':
     case 'chart':
+    case 'map':
       this._designerService.getDataForAnalysisPreview(analysis, {})
         .then(data => {
           this.previewData = this.flattenData(data.data, analysis);
@@ -88,6 +89,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
     case 'esReport':
       return data;
     case 'chart':
+    case 'map':
       let chartData = flattenChartData(
         data,
         analysis.sqlBuilder

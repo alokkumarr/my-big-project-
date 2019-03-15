@@ -12,27 +12,36 @@ const numberColumns = map(NUMBER_TYPES, type => ({ type } as ArtifactColumn));
 const dateColumns = map(DATE_TYPES, type => ({ type } as ArtifactColumn));
 const stringColumn = { type: 'string' } as ArtifactColumn;
 const geoColumn = { type: 'string', geoType: 'state' } as ArtifactColumn;
+const lngLatColumn = { type: 'string', geoType: 'lngLat' } as ArtifactColumn;
 
 describe('Analyze utils', () => {
   it('should return the general type of an artifactColumn', () => {
     forEach(numberColumns, col =>
-      expect(getArtifactColumnGeneralType(col)).toBe('number')
+      expect(getArtifactColumnGeneralType(col, 'pivot')).toBe('number')
     );
     forEach(dateColumns, col =>
-      expect(getArtifactColumnGeneralType(col)).toBe('date')
+      expect(getArtifactColumnGeneralType(col, 'pivot')).toBe('date')
     );
-    expect(getArtifactColumnGeneralType(stringColumn)).toBe('string');
-    expect(getArtifactColumnGeneralType(geoColumn, 'geo')).toBe('geo');
+    expect(getArtifactColumnGeneralType(stringColumn, 'pivot')).toBe('string');
+    expect(getArtifactColumnGeneralType(geoColumn, 'map')).toBe('geo');
+    expect(getArtifactColumnGeneralType(lngLatColumn, 'map')).toBe(
+      'coordinate'
+    );
   });
 
   it('should return the icon of an artifactColumn', () => {
     forEach(numberColumns, col =>
-      expect(getArtifactColumnTypeIcon(col)).toBe('icon-number-type')
+      expect(getArtifactColumnTypeIcon(col, 'pivot')).toBe('icon-number-type')
     );
     forEach(dateColumns, col =>
-      expect(getArtifactColumnTypeIcon(col)).toBe('icon-calendar')
+      expect(getArtifactColumnTypeIcon(col, 'pivot')).toBe('icon-calendar')
     );
-    expect(getArtifactColumnTypeIcon(stringColumn)).toBe('icon-string-type');
-    expect(getArtifactColumnTypeIcon(geoColumn, 'geo')).toBe('icon-geo-chart');
+    expect(getArtifactColumnTypeIcon(stringColumn, 'pivot')).toBe(
+      'icon-string-type'
+    );
+    expect(getArtifactColumnTypeIcon(geoColumn, 'map')).toBe('icon-geo-chart');
+    expect(getArtifactColumnTypeIcon(lngLatColumn, 'nap')).toBe(
+      'icon-geo-chart'
+    );
   });
 });

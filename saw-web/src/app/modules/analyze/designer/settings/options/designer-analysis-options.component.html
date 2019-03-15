@@ -48,12 +48,21 @@
         MAP OPTIONS
       </div>
     </ng-template>
+
     <designer-map-chart-options
+      *ngIf="analysisSubtype !== 'map'"
       [legend]="auxSettings.legend"
       [chartType]="analysisSubtype"
       [chartTitle]="chartTitle"
       (change)="change.emit($event)"
     >
     </designer-map-chart-options>
+
+    <designer-map-options
+      *ngIf="analysisSubtype === 'map'"
+      (change)="change.emit($event)"
+      [mapSettings]="auxSettings"
+    >
+    </designer-map-options>
   </mat-tab>
 </mat-tab-group>

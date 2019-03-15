@@ -1,26 +1,63 @@
 import * as get from 'lodash/get';
-import * as has from 'lodash/has';
+import * as reject from 'lodash/reject';
+
 import { TYPE_ICONS_OBJ, TYPE_MAP } from './consts';
 import { ArtifactColumn } from '../types';
+import { TYPE_ICONS } from '../consts';
 
 export function getArtifactColumnGeneralType(
   artifactColumn: ArtifactColumn,
-  chartType?: string
+  analysisType: string
 ) {
   const { type } = artifactColumn;
-  const hasGeoType = has(artifactColumn, 'geoType');
-  const isGeoType = chartType === 'geo';
+  const geoType = get(artifactColumn, 'geoType');
+  const hasGeoType = Boolean(geoType);
+  const isLngLat = geoType === 'lngLat';
 
-  if (hasGeoType && isGeoType && type === 'string') {
-    return 'geo';
+  switch (analysisType) {
+    case 'pivot':
+    case 'chart':
+      return get(TYPE_MAP, type);
+    case 'map':
+      if (hasGeoType) {
+        if (isLngLat) {
+          return 'coordinate';
+        } else {
+          return 'geo';
+        }
+      } else {
+        return get(TYPE_MAP, type);
+      }
   }
-  return get(TYPE_MAP, type);
 }
 
 export function getArtifactColumnTypeIcon(
   artifactColumn: ArtifactColumn,
-  chartType?: string
+  analysisType?: string
 ) {
-  const generalType = getArtifactColumnGeneralType(artifactColumn, chartType);
+  const generalType = getArtifactColumnGeneralType(
+    artifactColumn,
+    analysisType
+  );
   return get(TYPE_ICONS_OBJ, `${generalType}.icon`);
+}
+
+export function getFilterTypes(analysisType: string, analysisSubtype: string) {
+  let rejectExpression;
+  switch (analysisType) {
+    case 'pivot':
+    case 'chart':
+      rejectExpression = type => ['geo', 'coordinate'].includes(type.value);
+      break;
+    case 'map':
+      if (analysisSubtype === 'map') {
+        rejectExpression = type =>
+          ['string', 'date', 'geo'].includes(type.value);
+      } else {
+        rejectExpression = type =>
+          ['string', 'date', 'coordinate'].includes(type.value);
+      }
+      break;
+  }
+  return reject(TYPE_ICONS, rejectExpression);
 }

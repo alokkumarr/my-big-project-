@@ -10,3 +10,8 @@
   become: true
   roles:
     - saw-web
+- name: Install Product module metadata
+  hosts: sip-admin
+  become: true
+  roles:
+    - sip-product-module-metadata

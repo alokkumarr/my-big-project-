@@ -168,9 +168,17 @@
             [artifacts]="artifacts"
           >
           </designer-pivot>
+          <designer-map
+            class="designer__data"
+            *ngIf="(analysisType | isAnalysisType: 'map':analysisSubtype)"
+            [auxSettings]="auxSettings"
+            [data]="data"
+            [sqlBuilder]="sqlBuilder"
+          >
+          </designer-map>
           <designer-map-chart
             class="designer__data"
-            *ngIf="analysisType === 'chart' && analysisSubtype === 'geo'"
+            *ngIf="(analysisType | isAnalysisType: 'mapChart':analysisSubtype)"
             [chartType]="analysisSubtype"
             [auxSettings]="auxSettings"
             [data]="data"
@@ -179,7 +187,7 @@
           </designer-map-chart>
           <designer-chart
             class="designer__data"
-            *ngIf="analysisType === 'chart' && analysisSubtype !== 'geo'"
+            *ngIf="analysisType === 'chart'"
             [chartType]="analysisSubtype"
             [sorts]="sorts"
             [auxSettings]="auxSettings"

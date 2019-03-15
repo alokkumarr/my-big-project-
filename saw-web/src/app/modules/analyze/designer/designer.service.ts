@@ -51,6 +51,8 @@ const canAcceptDateType = ({ type }: ArtifactColumnChart) =>
   DATE_TYPES.includes(type);
 const canAcceptGeoType = ({ geoType }: ArtifactColumnChart) =>
   GEO_TYPES.includes(geoType);
+const canAcceptLngLat = ({ geoType }: ArtifactColumnChart) =>
+  geoType === 'lngLat';
 const canAcceptAnyType = () => true;
 
 @Injectable()
@@ -204,6 +206,99 @@ export class DesignerService {
     return pivotGroupAdapters;
   }
 
+  getMapGroupAdapters(
+    artifactColumns,
+    subType
+  ): IDEsignerSettingGroupAdapter[] {
+    const mapReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
+      artifactColumn.area = null;
+      artifactColumn.areaIndex = null;
+      artifactColumn.checked = false;
+    };
+
+    const maxAllowedDecorator = (
+      typeFn: (column: ArtifactColumnChart) => boolean
+    ) => {
+      return (
+        groupAdapter: IDEsignerSettingGroupAdapter,
+        groupAdapters: Array<IDEsignerSettingGroupAdapter>
+      ) => (column: ArtifactColumnChart) => {
+        const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+        if (groupAdapter.artifactColumns.length >= maxAllowed) {
+          return false;
+        }
+        return typeFn(column);
+      };
+    };
+
+    const applyDataFieldDefaults = artifactColumn => {
+      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    };
+
+    const canAcceptMetricType = canAcceptNumberType;
+    const canAcceptInMetric = maxAllowedDecorator(canAcceptMetricType);
+
+    const defaultMetricAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Data',
+      type: 'map',
+      marker: 'y',
+      maxAllowed: () => Infinity,
+      artifactColumns: [],
+      canAcceptArtifactColumnOfType: canAcceptMetricType,
+      canAcceptArtifactColumn: canAcceptInMetric,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'y';
+        artifactColumn.checked = true;
+        applyDataFieldDefaults(artifactColumn);
+      },
+      reverseTransform: mapReverseTransform,
+      onReorder
+    };
+
+    const canAcceptDimensionType =
+      subType === 'map' ? canAcceptLngLat : canAcceptGeoType;
+    const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
+
+    const defaultDimensionAdapter: IDEsignerSettingGroupAdapter = {
+      title: 'Coordinates',
+      type: 'map',
+      marker: 'x',
+      maxAllowed: () => 1,
+      artifactColumns: [],
+      canAcceptArtifactColumnOfType: canAcceptDimensionType,
+      canAcceptArtifactColumn: canAcceptInDimension,
+      transform(artifactColumn: ArtifactColumnChart) {
+        artifactColumn.area = 'x';
+        artifactColumn.checked = true;
+      },
+      reverseTransform: mapReverseTransform,
+      onReorder
+    };
+
+    const metricAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultMetricAdapter,
+      title: subType === 'map' ? 'Data' : 'Metric'
+    };
+
+    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
+      ...defaultDimensionAdapter,
+      title: subType === 'map' ? 'Coordinates' : 'Dimension'
+    };
+
+    const mapGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
+      metricAdapter,
+      dimensionAdapter
+    ]);
+
+    this._distributeArtifactColumnsIntoGroups(
+      artifactColumns,
+      mapGroupAdapters,
+      'map'
+    );
+
+    return mapGroupAdapters;
+  }
+
   getChartGroupAdapters(
     artifactColumns,
     chartType
@@ -270,7 +365,7 @@ export class DesignerService {
       ...defaultMetricAdapter,
       title: chartType === 'pie' ? 'Angle' : 'Metrics',
       maxAllowed: () =>
-        ['pie', 'bubble', 'stack', 'geo'].includes(chartType) ? 1 : Infinity
+        ['pie', 'bubble', 'stack'].includes(chartType) ? 1 : Infinity
     };
 
     const canAcceptSizeType = canAcceptNumberType;
@@ -326,8 +421,6 @@ export class DesignerService {
 
     const canAcceptDimensionType = isStockChart
       ? canAcceptDateType
-      : chartType === 'geo'
-      ? canAcceptGeoType
       : canAcceptAnyType;
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
@@ -359,7 +452,7 @@ export class DesignerService {
       /* prettier-ignore */
       chartType === 'bubble' ?
         sizeAdapter : null,
-      chartType === 'geo' ? null : groupByAdapter
+      groupByAdapter
     ]);
 
     this._distributeArtifactColumnsIntoGroups(
@@ -374,11 +467,12 @@ export class DesignerService {
   public _distributeArtifactColumnsIntoGroups(
     artifactColumns: ArtifactColumns,
     groupAdapters: IDEsignerSettingGroupAdapter[],
-    analysisType: 'chart' | 'pivot'
+    analysisType: 'chart' | 'pivot' | 'map'
   ) {
     const groupByProps = {
       chart: 'area',
-      pivot: 'area'
+      pivot: 'area',
+      map: 'area'
     };
     fpPipe(
       fpFilter('checked'),

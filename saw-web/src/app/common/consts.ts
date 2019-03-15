@@ -16,13 +16,17 @@ export const DATE_TYPES = ['timestamp', 'date'];
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
   country: ['name', 'fips'],
+  lngLat: [''],
   zip: []
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) =>
-    map(identifiers, identifier => `${geoType}:${identifier}`)
-  )
+  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
+    if (!identifier) {
+      return geoType;
+    }
+    return `${geoType}:${identifier}`;
+  }))
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
@@ -146,28 +150,28 @@ export const AGGREGATE_TYPES = [
     designerLabel: 'SUM',
     value: 'sum',
     icon: 'icon-Sum',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Average',
     designerLabel: 'AVG',
     value: 'avg',
     icon: 'icon-ic-average',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Mininum',
     designerLabel: 'MIN',
     value: 'min',
     icon: 'icon-ic-min',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Maximum',
     designerLabel: 'MAX',
     value: 'max',
     icon: 'icon-ic-max',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Count',
@@ -175,7 +179,7 @@ export const AGGREGATE_TYPES = [
     value: 'count',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Distinct Count',
@@ -183,7 +187,7 @@ export const AGGREGATE_TYPES = [
     value: 'distinctCount',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Percentage',

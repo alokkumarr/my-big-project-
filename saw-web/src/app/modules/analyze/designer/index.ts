@@ -18,6 +18,7 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
 import { DesignerChartComponent } from './chart';
+import { DesignerMapComponent } from './map';
 import { DesignerMapChartComponent } from './map-chart';
 import { DesignerReportComponent } from './report';
 import {
@@ -34,7 +35,8 @@ import {
   DesignerDateIntervalSelectorComponent,
   DesignerChartOptionsComponent,
   DesignerDataLimitSelectorComponent,
-  DesignerMapChartOptionsComponent
+  DesignerMapChartOptionsComponent,
+  DesignerMapOptionsComponent
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
@@ -63,6 +65,7 @@ const COMPONENTS = [
   DesignerToolbarComponent,
   DesignerPivotComponent,
   DesignerChartComponent,
+  DesignerMapComponent,
   DesignerMapChartComponent,
   DesignerReportComponent,
   DesignerSettingsSingleTableComponent,
@@ -86,7 +89,8 @@ const COMPONENTS = [
   DesignerDateIntervalSelectorComponent,
   DesignerChartOptionsComponent,
   DesignerDataLimitSelectorComponent,
-  DesignerMapChartOptionsComponent
+  DesignerMapChartOptionsComponent,
+  DesignerMapOptionsComponent
 ];
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {

@@ -12,7 +12,8 @@ import {
   DesignerDateIntervalSelectorComponent,
   DesignerChartOptionsComponent,
   DesignerDataLimitSelectorComponent,
-  DesignerMapChartOptionsComponent
+  DesignerMapChartOptionsComponent,
+  DesignerMapOptionsComponent
 } from './options';
 export {
   DesignerSettingsSingleTableComponent,
@@ -28,5 +29,6 @@ export {
   DesignerDateIntervalSelectorComponent,
   DesignerChartOptionsComponent,
   DesignerDataLimitSelectorComponent,
-  DesignerMapChartOptionsComponent
+  DesignerMapChartOptionsComponent,
+  DesignerMapOptionsComponent
 };

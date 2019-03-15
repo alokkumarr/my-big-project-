@@ -21,8 +21,10 @@ import * as CoreJs from 'core-js';
 import * as DevextremeAngular from 'devextreme-angular';
 import * as Lodash from 'lodash';
 import * as LodashFp from 'lodash/fp';
-import * as Rxjs from 'rxjs';
 import * as RxjsOperators from 'rxjs/operators';
+import * as Rxjs from 'rxjs';
+import * as mapboxgl from 'mapbox-gl';
+import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import * as get from 'lodash/get';
 import APP_CONFIG from '../../../../appConfig';
 
@@ -49,7 +51,9 @@ const dependencies = {
   'rxjs': Rxjs,
   'rxjs/operators': RxjsOperators,
   'lodash': Lodash,
-  'lodash/fp': LodashFp
+  'lodash/fp': LodashFp,
+  'mapbox-gl': mapboxgl,
+  '@mapbox/mapbox-gl-geocoder': MapboxGeocoder
 };
 
 interface ModuleInfo {

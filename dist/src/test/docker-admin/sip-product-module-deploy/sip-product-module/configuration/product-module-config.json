@@ -1,0 +1,48 @@
+{
+  "source": {
+    "module_type": "ratings",
+    "customer_code": "customer1",
+    "product_code": "ratings and reviews",
+    "fields": [
+      {
+        "name": "ID",
+        "type": "string",
+        "filterEligible": false
+      }, {
+        "name": "RATING",
+        "type": "integer",
+        "filterEligible": true
+      }, {
+        "name": "REVIEW_DATE",
+        "type": "timestamp",
+        "format": "yyyy-MM-dd HH:mm:ss",
+        "filterEligible": true
+      },
+      {
+        "name": "REVIEW",
+        "type": "string"
+      }, {
+        "name": "COMMENT",
+        "type": "string"
+      },
+      {
+        "name": "APP_VERSION",
+        "type": "string",
+        "displayName": "Version",
+        "filterEligible": true
+      },
+      {
+        "name": "OS",
+        "type": "string",
+        "displayName": "Operating System",
+        "filterEligible": true
+      }, {
+        "name": "OS_VERSION",
+        "type": "string",
+        "displayName": "OS Version"
+      }, {
+        "name": "MAKE",
+        "type": "string"
+      }]
+  }
+}
