@@ -40,6 +40,9 @@ public class Field {
     private GroupInterval groupInterval;
     @JsonProperty("dateFormat")
     private String dateFormat;
+
+    @JsonProperty("limitType")
+    private LimitType limitType;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -271,6 +274,45 @@ public class Field {
         @JsonCreator
         public static Field.Type fromValue(String value) {
             Field.Type constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
+    }
+
+    public enum LimitType {
+
+        TOP("top"),
+        BOTTOM("bottom");
+        private final String value;
+        private final static Map<String, Field.LimitType> CONSTANTS = new HashMap<>();
+
+        static {
+            for (Field.LimitType c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private LimitType(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static Field.LimitType fromValue(String value) {
+            Field.LimitType constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {
