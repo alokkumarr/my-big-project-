@@ -55,6 +55,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,9 +125,9 @@ public class SftpServiceImpl extends SipPluginContract {
   FileSystem fs;
   Configuration conf;
   
-  @Value("${sip.service.max.inprogress.mins:45}")
+  //@Value("${sip.service.max.inprogress.mins:45}")
   @NotNull
-  private Integer maxInprogressMins;
+  private Integer maxInprogressMins = 45;
 
   @PostConstruct
   private void init() throws Exception {
@@ -1109,8 +1110,11 @@ public class SftpServiceImpl extends SipPluginContract {
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   public void recoverFromInconsistentState() {
     
+    Log.info("checking for long running in progress process");
     //Mark long running 'InProgress to 'Failed'
     sipLogService.updateLongRunningTransfers(maxInprogressMins);
+    
+    Log.info("Long running in progress process update completed");
     
     logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
