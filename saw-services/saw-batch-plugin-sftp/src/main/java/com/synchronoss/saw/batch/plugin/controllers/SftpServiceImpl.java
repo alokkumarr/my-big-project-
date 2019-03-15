@@ -124,7 +124,7 @@ public class SftpServiceImpl extends SipPluginContract {
   FileSystem fs;
   Configuration conf;
   
-  @Value("${sip.service.max.inprogress.mins}")
+  @Value("${sip.service.max.inprogress.mins:45}")
   @NotNull
   private Integer maxInprogressMins;
 
@@ -142,6 +142,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
       logger.info("Default drop location folders created? :: "
           + processor.isDestinationExists(defaultDestinationLocation));
+      logger.info("Max in progress minutes:: " + this.maxInprogressMins);
     }
 
     String location = defaultDestinationLocation
