@@ -1,4 +1,4 @@
-package com.synchronoss.saw.model;
+package com.synchronoss.saw.analysis.modal;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -6,29 +6,32 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.synchronoss.saw.model.SipQuery;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-  "type",
-  "semanticId",
-  "name",
-  "id",
-  "customerCode",
-  "projectCode",
-  "module",
-  "createdTime",
-  "createdBy",
-  "modifiedTime",
-  "modifiedBy",
-  "sipQuery"
-})
-public class SIPDSL {
+public class Analysis {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonPropertyOrder({
+      "type",
+      "semanticId",
+      "name",
+      "description",
+      "id",
+      "category",
+      "customerCode",
+      "projectCode",
+      "module",
+      "createdTime",
+      "createdBy",
+      "modifiedTime",
+      "modifiedBy",
+      "sipQuery"
+  })
   @JsonProperty("type")
   private String type;
 
@@ -41,6 +44,9 @@ public class SIPDSL {
   @JsonProperty("id")
   private String id;
 
+  @JsonProperty("category")
+  private String category;
+
   @JsonProperty("customerCode")
   private String customerCode;
 
@@ -51,13 +57,13 @@ public class SIPDSL {
   private String module;
 
   @JsonProperty("createdTime")
-  private Integer createdTime;
+  private Long createdTime;
 
   @JsonProperty("createdBy")
   private String createdBy;
 
   @JsonProperty("modifiedTime")
-  private Integer modifiedTime;
+  private Long modifiedTime;
 
   @JsonProperty("modifiedBy")
   private String modifiedBy;
@@ -107,6 +113,14 @@ public class SIPDSL {
     this.id = id;
   }
 
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
   @JsonProperty("customerCode")
   public String getCustomerCode() {
     return customerCode;
@@ -138,12 +152,12 @@ public class SIPDSL {
   }
 
   @JsonProperty("createdTime")
-  public Integer getCreatedTime() {
+  public Long getCreatedTime() {
     return createdTime;
   }
 
   @JsonProperty("createdTime")
-  public void setCreatedTime(Integer createdTime) {
+  public void setCreatedTime(Long createdTime) {
     this.createdTime = createdTime;
   }
 
@@ -158,12 +172,12 @@ public class SIPDSL {
   }
 
   @JsonProperty("modifiedTime")
-  public Integer getModifiedTime() {
+  public Long getModifiedTime() {
     return modifiedTime;
   }
 
   @JsonProperty("modifiedTime")
-  public void setModifiedTime(Integer modifiedTime) {
+  public void setModifiedTime(Long modifiedTime) {
     this.modifiedTime = modifiedTime;
   }
 
@@ -240,10 +254,10 @@ public class SIPDSL {
     if (other == this) {
       return true;
     }
-    if ((other instanceof SIPDSL) == false) {
+    if ((other instanceof Analysis) == false) {
       return false;
     }
-    SIPDSL rhs = ((SIPDSL) other);
+    Analysis rhs = ((Analysis) other);
     return new EqualsBuilder()
         .append(module, rhs.module)
         .append(projectCode, rhs.projectCode)
