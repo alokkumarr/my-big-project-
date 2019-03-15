@@ -1,7 +1,8 @@
 @import 'src/themes/base/colors';
 
 .limit-type .mat-button-toggle-checked {
-  background-color: $selection-highlight-col;
+  background-color: $primary-blue-b2;
+  color: white;
 }
 
 .mat-raised-button {

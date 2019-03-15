@@ -61,7 +61,7 @@
       ></mat-icon>
     </button>
   </mat-drawer>
-  <div class="container">
+  <mat-drawer-content class="container">
     <div class="designer__content">
       <div class="designer__content__fields">
         <designer-selected-fields
@@ -71,7 +71,7 @@
           [analysisSubtype]="analysisSubtype"
           [artifacts]="artifacts"
           [filters]="filters"
-          class="designer__selecte-fields__container"
+          class="designer__selected-fields__container"
         >
         </designer-selected-fields>
         <button
@@ -155,7 +155,11 @@
           </span>
         </div>
 
-        <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA">
+        <mat-card
+          fxFlex
+          class="designer__data__container"
+          *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA"
+        >
           <designer-pivot
             class="designer__data"
             *ngIf="analysisType === 'pivot'"
@@ -183,8 +187,8 @@
             [sqlBuilder]="sqlBuilder"
           >
           </designer-chart>
-        </div>
+        </mat-card>
       </div>
     </div>
-  </div>
+  </mat-drawer-content>
 </mat-drawer-container>

@@ -16,7 +16,11 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   public limitType;
   public limitValue;
   public isInTabletMode = false;
-
+  tooltip = {
+    enabled: true,
+    showMode: 'always',
+    position: 'bottom'
+  };
   constructor(breakpointObserver: BreakpointObserver) {
     breakpointObserver
       .observe([Breakpoints.Medium, Breakpoints.Small])

@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 $back-button-size: 32px;
 
@@ -10,14 +10,13 @@ $back-button-size: 32px;
   height: 100%;
 
   button {
-    font-size: 11px;
     line-height: 24px;
     min-width: unset;
-  }
-}
 
-.mat-icon {
-  height: 11px;
+    mat-icon {
+      font-size: 22px;
+    }
+  }
 }
 
 .back-button-icon.mat-icon {
@@ -39,6 +38,24 @@ $back-button-size: 32px;
   label {
     padding: 0 2px;
     font-size: 11px;
+    text-transform: uppercase;
+    background-color: $secondary-orange;
+    color: $primary-white;
+    vertical-align: top;
+  }
+}
+
+.header__name__small {
+  strong {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: $primary-blue-b2;
+    letter-spacing: 0.005em;
+  }
+
+  label {
+    padding: 0 2px;
+    font-size: 8px;
     text-transform: uppercase;
     background-color: $secondary-orange;
     color: $primary-white;
