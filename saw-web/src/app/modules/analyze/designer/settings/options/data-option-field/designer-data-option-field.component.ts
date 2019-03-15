@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as debounce from 'lodash/debounce';
 import { COMBO_TYPES, DATE_TYPES } from '../../../../consts';
 import {
   ArtifactColumn,
@@ -8,6 +9,8 @@ import {
   ArtifactColumnChart,
   ArtifactColumnPivot
 } from '../../../types';
+
+const ALIAS_CHANGE_DELAY = 500;
 
 @Component({
   selector: 'designer-data-option-field',
@@ -25,6 +28,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public comboTypes = COMBO_TYPES;
   public hasDateInterval = false;
   public isDataField = false;
+
+  constructor() {
+    this.onAliasChange = debounce(this.onAliasChange, ALIAS_CHANGE_DELAY);
+  }
 
   ngOnInit() {
     const type = this.artifactColumn.type;
