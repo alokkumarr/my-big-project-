@@ -1110,12 +1110,9 @@ public class SftpServiceImpl extends SipPluginContract {
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   public void recoverFromInconsistentState() {
     
-    Log.info("checking for long running in progress process");
     //Mark long running 'InProgress to 'Failed'
     sipLogService.updateLongRunningTransfers(maxInprogressMins);
-    
-    Log.info("Long running in progress process update completed");
-    
+
     logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
