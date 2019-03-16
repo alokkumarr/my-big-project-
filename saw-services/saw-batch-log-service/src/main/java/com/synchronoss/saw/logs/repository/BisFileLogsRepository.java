@@ -73,6 +73,11 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + "Logs.bisProcessState = 'FAILED') )")
   Integer countOfRetries(@Param("noOfMinutes") Integer noOfMinutes);
   
+  @Query("SELECT COUNT(pid) from BisFileLog Logs  where (Logs.mflFileStatus = 'INPROGRESS' " 
+      + "and Logs.bisProcessState = 'DATA_INPROGRESS') and "
+      + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
+  Integer countOfLongRunningTransfers(@Param("minutesForLongProc") Integer minutesForLongProc);
+  
   @Modifying
   @Query("UPDATE  BisFileLog Logs set Logs.mflFileStatus = 'FAILED', "
       + "Logs.bisProcessState = 'FAILED' where (Logs.mflFileStatus = 'INPROGRESS' " 

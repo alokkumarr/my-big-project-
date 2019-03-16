@@ -208,12 +208,29 @@ public class SipLogging {
         BisChannelType.SFTP.value(), PageRequest.of(0, 1, Direction.DESC, "modifiedDate"));
   }
   
+  /**
+   * check if any long running process exists
+   * and update if any.
+   * 
+   * @param minutesToCheck maxInProgress minutes
+   * @return number of updated records
+   */
   @Transactional(TxType.REQUIRED)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public Integer updateLongRunningTransfers(Integer minutesToCheck) {
-    return bisFileLogsRepository.updateLongRunningTranfers(minutesToCheck);
+    int updatedRecords = 0; 
+    int longCount = bisFileLogsRepository
+        .countOfLongRunningTransfers(minutesToCheck);
+    logger.trace("Long running process count: " +    longCount);
+    if (longCount > 0) {
+      logger.trace("Updating long running transfers to failed");
+      updatedRecords = bisFileLogsRepository
+          .updateLongRunningTranfers(minutesToCheck);
+      logger.trace("long running transfer update completed");
+    }
+    return updatedRecords;
   }
 
   /**

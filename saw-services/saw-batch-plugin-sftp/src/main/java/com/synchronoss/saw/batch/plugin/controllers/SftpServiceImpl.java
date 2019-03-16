@@ -1208,7 +1208,7 @@ public class SftpServiceImpl extends SipPluginContract {
               }
             }
           } else {
-            logger.info("No route present with channelId: " 
+            logger.trace("No route present with channelId: " 
                 + channelId + " routeID: " + routeId);
           }
         } catch (NotFoundException | IOException e) {
