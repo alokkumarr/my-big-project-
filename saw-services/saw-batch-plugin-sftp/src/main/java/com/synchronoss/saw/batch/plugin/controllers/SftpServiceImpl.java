@@ -125,7 +125,7 @@ public class SftpServiceImpl extends SipPluginContract {
   FileSystem fs;
   Configuration conf;
   
-  //@Value("${sip.service.max.inprogress.mins:45}")
+  @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
 
