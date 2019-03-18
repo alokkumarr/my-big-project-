@@ -13,6 +13,7 @@ import * as fpMapValues from 'lodash/fp/mapValues';
 import * as isEmpty from 'lodash/isEmpty';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as compact from 'lodash/compact';
+import * as isFunction from 'lodash/isFunction';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -237,9 +238,10 @@ export class DesignerService {
 
     const canAcceptMetricType = canAcceptNumberType;
     const canAcceptInMetric = maxAllowedDecorator(canAcceptMetricType);
+    const metricTitle = subType === 'map' ? 'Data' : 'Metric';
 
-    const defaultMetricAdapter: IDEsignerSettingGroupAdapter = {
-      title: 'Data',
+    const metricAdapter: IDEsignerSettingGroupAdapter = {
+      title: metricTitle,
       type: 'map',
       marker: 'y',
       maxAllowed: () => Infinity,
@@ -258,9 +260,10 @@ export class DesignerService {
     const canAcceptDimensionType =
       subType === 'map' ? canAcceptLngLat : canAcceptGeoType;
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
+    const dimensionTitle = subType === 'map' ? 'Coordinates' : 'Dimension';
 
-    const defaultDimensionAdapter: IDEsignerSettingGroupAdapter = {
-      title: 'Coordinates',
+    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
+      title: dimensionTitle,
       type: 'map',
       marker: 'x',
       maxAllowed: () => 1,
@@ -273,16 +276,6 @@ export class DesignerService {
       },
       reverseTransform: mapReverseTransform,
       onReorder
-    };
-
-    const metricAdapter: IDEsignerSettingGroupAdapter = {
-      ...defaultMetricAdapter,
-      title: subType === 'map' ? 'Data' : 'Metric'
-    };
-
-    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
-      ...defaultDimensionAdapter,
-      title: subType === 'map' ? 'Coordinates' : 'Dimension'
     };
 
     const mapGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
@@ -309,8 +302,16 @@ export class DesignerService {
       artifactColumn.checked = false;
     };
 
+    const metricTitle = chartType === 'pie' ? 'Angle' : 'Metrics';
+    const groupByTitle = chartType === 'bubble' ? 'Color By' : 'Group By';
+    const dimensionTitle = chartType === 'pie' ? 'Color By' : 'Dimension';
+
     const maxAllowedDecorator = (
-      typeFn: (column: ArtifactColumnChart) => boolean
+      typeFn: (column: ArtifactColumnChart) => boolean,
+      rejectFn?: (
+        groupAdapter: IDEsignerSettingGroupAdapter,
+        groupAdapters: Array<IDEsignerSettingGroupAdapter>
+      ) => boolean
     ) => {
       return (
         groupAdapter: IDEsignerSettingGroupAdapter,
@@ -320,9 +321,57 @@ export class DesignerService {
         if (groupAdapter.artifactColumns.length >= maxAllowed) {
           return false;
         }
+        if (isFunction(rejectFn) && rejectFn(groupAdapter, groupAdapters)) {
+          return false;
+        }
+        if (groupAdapter.title === groupByTitle) {
+        }
+        if (groupAdapter.title === metricTitle) {
+        }
         return typeFn(column);
       };
     };
+
+    const groupByRejectFn = (
+      _,
+      groupAdapters: Array<IDEsignerSettingGroupAdapter>
+    ) => {
+      const metricGroupAdapter = find(
+        groupAdapters,
+        adapter => adapter.title === metricTitle
+      );
+      return metricGroupAdapter.artifactColumns.length > 1;
+    };
+    const metricRejectFn = (
+      _,
+      groupAdapters: Array<IDEsignerSettingGroupAdapter>
+    ) => {
+      const groupByGroupAdapter = find(
+        groupAdapters,
+        adapter => adapter.title === groupByTitle
+      );
+      return groupByGroupAdapter.artifactColumns.length > 0;
+    };
+
+    const canAcceptMetricType = canAcceptNumberType;
+    const canAcceptInMetric = maxAllowedDecorator(
+      canAcceptMetricType,
+      metricRejectFn
+    );
+
+    const canAcceptSizeType = canAcceptNumberType;
+    const canAcceptInSize = maxAllowedDecorator(canAcceptSizeType);
+
+    const canAcceptGroupByType = canAcceptAnyType;
+    const canAcceptInGroupBy = maxAllowedDecorator(
+      canAcceptGroupByType,
+      groupByRejectFn
+    );
+
+    const canAcceptDimensionType = isStockChart
+      ? canAcceptDateType
+      : canAcceptAnyType;
+    const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
     const applyDataFieldDefaults = artifactColumn => {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
@@ -341,14 +390,12 @@ export class DesignerService {
       }
     };
 
-    const canAcceptMetricType = canAcceptNumberType;
-    const canAcceptInMetric = maxAllowedDecorator(canAcceptMetricType);
-
-    const defaultMetricAdapter: IDEsignerSettingGroupAdapter = {
-      title: 'Metrics',
+    const metricAdapter: IDEsignerSettingGroupAdapter = {
+      title: metricTitle,
       type: 'chart',
       marker: 'y',
-      maxAllowed: () => Infinity,
+      maxAllowed: () =>
+        ['pie', 'bubble', 'stack'].includes(chartType) ? 1 : Infinity,
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,
@@ -360,16 +407,6 @@ export class DesignerService {
       reverseTransform: chartReverseTransform,
       onReorder
     };
-
-    const metricAdapter: IDEsignerSettingGroupAdapter = {
-      ...defaultMetricAdapter,
-      title: chartType === 'pie' ? 'Angle' : 'Metrics',
-      maxAllowed: () =>
-        ['pie', 'bubble', 'stack'].includes(chartType) ? 1 : Infinity
-    };
-
-    const canAcceptSizeType = canAcceptNumberType;
-    const canAcceptInSize = maxAllowedDecorator(canAcceptSizeType);
 
     const sizeAdapter: IDEsignerSettingGroupAdapter = {
       title: 'Size',
@@ -388,11 +425,8 @@ export class DesignerService {
       onReorder
     };
 
-    const canAcceptGroupByType = canAcceptAnyType;
-    const canAcceptInGroupBy = maxAllowedDecorator(canAcceptGroupByType);
-
-    const defaultGroupByAdapter: IDEsignerSettingGroupAdapter = {
-      title: 'Group By',
+    const groupByAdapter: IDEsignerSettingGroupAdapter = {
+      title: groupByTitle,
       type: 'chart',
       marker: 'g',
       maxAllowed: (_, groupAdapters) => {
@@ -414,18 +448,8 @@ export class DesignerService {
       onReorder
     };
 
-    const groupByAdapter: IDEsignerSettingGroupAdapter = {
-      ...defaultGroupByAdapter,
-      title: chartType === 'bubble' ? 'Color By' : 'Group By'
-    };
-
-    const canAcceptDimensionType = isStockChart
-      ? canAcceptDateType
-      : canAcceptAnyType;
-    const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
-
-    const defaultDimensionAdapter: IDEsignerSettingGroupAdapter = {
-      title: 'Dimension',
+    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
+      title: dimensionTitle,
       type: 'chart',
       marker: 'x',
       maxAllowed: () => 1,
@@ -439,11 +463,6 @@ export class DesignerService {
       },
       reverseTransform: chartReverseTransform,
       onReorder
-    };
-
-    const dimensionAdapter: IDEsignerSettingGroupAdapter = {
-      ...defaultDimensionAdapter,
-      title: chartType === 'pie' ? 'Color By' : 'Dimension'
     };
 
     const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([

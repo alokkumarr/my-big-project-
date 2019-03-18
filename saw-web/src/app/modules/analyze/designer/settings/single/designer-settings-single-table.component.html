@@ -99,6 +99,10 @@
               mat-icon-button
               color="primary"
               [matMenuTriggerFor]="addToGroupsMenu"
+              [attr.e2e]="
+                'designer-add-menu-btn-' +
+                (artifactColumn.aliasName || artifactColumn.displayName)
+              "
               (menuOpened)="onAddToGroupMenuOpened(artifactColumn)"
             >
               <mat-icon
@@ -113,8 +117,10 @@
                   let adapterIndex = index
                 "
                 [attr.e2e]="
-                  'designer-add-btn-' +
-                  (artifactColumn.aliasName || artifactColumn.displayName)
+                  'designer-add-option-btn-' +
+                  (artifactColumn.aliasName || artifactColumn.displayName) +
+                  '-' +
+                  adapter.title
                 "
                 (click)="addToGroup(artifactColumn, columnIndex, adapter)"
                 mat-menu-item
