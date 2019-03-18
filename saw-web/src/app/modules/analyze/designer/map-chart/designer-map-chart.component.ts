@@ -15,6 +15,7 @@ import { Subject, Observable, isObservable } from 'rxjs';
 import { SqlBuilderChart } from '../types';
 import { ChartService } from '../../../../common/services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
+import { ArtifactColumn } from '../../types';
 
 export enum MapChartStates {
   NO_MAP_SELECTED,
@@ -33,6 +34,7 @@ export class DesignerMapChartComponent implements OnInit {
   _rawSeries: any;
   public MapChartStates = MapChartStates;
   public currentState: MapChartStates = MapChartStates.NO_MAP_SELECTED;
+  public fieldWithNoRegion: ArtifactColumn;
   public chartOptions = {};
   public chartUpdater = new Subject();
 
@@ -55,6 +57,8 @@ export class DesignerMapChartComponent implements OnInit {
         this._mapData = this._mapDataService.getMapData(xField.region);
         this.setSeries();
       }
+    } else {
+      this.fieldWithNoRegion = xField;
     }
   }
 
@@ -90,7 +94,9 @@ export class DesignerMapChartComponent implements OnInit {
   }
 
   ngOnInit() {
-    const legend = this._chartService.analysisLegend2ChartLegend(this._auxSettings.legend);
+    const legend = this._chartService.analysisLegend2ChartLegend(
+      this._auxSettings.legend
+    );
     this.setChartConfig(legend);
   }
 
@@ -126,13 +132,16 @@ export class DesignerMapChartComponent implements OnInit {
       maxColor: '#1A89D4'
     };
 
-    this.chartOptions = omitBy({
-      mapNavigation: {
-        enabled: true
+    this.chartOptions = omitBy(
+      {
+        mapNavigation: {
+          enabled: true
+        },
+        colorAxis,
+        legend
       },
-      colorAxis,
-      legend
-    }, isNil);
+      isNil
+    );
   }
 
   updateSettings(auxSettings) {
@@ -140,7 +149,9 @@ export class DesignerMapChartComponent implements OnInit {
       return;
     }
 
-    const legend = this._chartService.analysisLegend2ChartLegend(auxSettings.legend);
+    const legend = this._chartService.analysisLegend2ChartLegend(
+      auxSettings.legend
+    );
 
     if (!legend) {
       return;
