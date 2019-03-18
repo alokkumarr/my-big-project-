@@ -22,7 +22,7 @@
     fxFlex="90"
     [attr.e2e]="'designer-selected-container' + adapter.title"
     class="selected-fields__list"
-    [class.highlighted]="isDragInProgress && openGroupArray[adapterIndex]"
+    [class.highlighted]="isDragInProgress && canAcceptMap[adapter.title]"
   >
     <mat-chip
       *ngFor="let col of adapter.artifactColumns"
@@ -32,6 +32,8 @@
       "
       [ngClass]="getFieldItemClass(col)"
       cdkDrag
+      (cdkDragStarted)="dragStarted($event)"
+      (cdkDragReleased)="dragReleased($event)"
       [cdkDragData]="col"
       [removable]="true"
       (removed)="removeFromGroup(col, adapter)"

@@ -8,12 +8,12 @@ import {
 } from '@angular/core';
 import { CdkDragDrop, CdkDrag } from '@angular/cdk/drag-drop';
 import { Subject, Observable } from 'rxjs';
-import { bufferCount, take } from 'rxjs/operators';
+import { takeWhile, last } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 
 import * as isEmpty from 'lodash/isEmpty';
 import * as debounce from 'lodash/debounce';
-import * as map from 'lodash/map';
+import * as has from 'lodash/has';
 import * as reduce from 'lodash/reduce';
 
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
@@ -37,7 +37,7 @@ import {
 } from '../../actions/designer.actions';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
-// const FILTER_CHANGE_DEBOUNCE_TIME = 300;
+
 @Component({
   selector: 'designer-selected-fields',
   templateUrl: 'designer-selected-fields.component.html',
@@ -81,9 +81,12 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   public nameMap;
   public isDragInProgress = false;
-  // array of booleans to show if the corresponding group addapterg can accept the field that is being dragged
-  public openGroupArray: boolean[];
-  private _acceptEventStream$: Subject<boolean> = new Subject<boolean>();
+  // map of booleans to show wichi adapter can accept a field, { [adapter.title]: adapter.canAcceptArtifact }
+  public canAcceptMap: Object;
+  private _acceptEventStream$ = new Subject<{
+    adapterTitle: string;
+    canAccept: boolean;
+  }>();
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
 
   constructor(
@@ -95,7 +98,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       this._changeSettingsDebounced,
       SETTINGS_CHANGE_DEBOUNCE_TIME
     );
-    this.changeOpenGroupArray = this.changeOpenGroupArray.bind(this);
   }
 
   ngOnInit() {
@@ -110,7 +112,14 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       this.onDndEvent.bind(this)
     );
     this.groupAdapters$.subscribe(adapters => {
-      this.openGroupArray = map(adapters, () => false);
+      this.canAcceptMap = reduce(
+        adapters,
+        (acc, adapter) => {
+          acc[adapter.title] = false;
+          return acc;
+        },
+        {}
+      );
       this.groupAdapters = adapters;
     });
   }
@@ -126,22 +135,25 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   onDndEvent(event: DndEvent) {
     switch (event) {
       case 'dragStart':
+        const canAcceptMap = {};
         this.isDragInProgress = true;
         this._acceptEventStream$
           .pipe(
-            bufferCount(3),
-            take(1)
+            takeWhile(({ adapterTitle, canAccept }) => {
+              const isInAcceptMap = !has(canAcceptMap, adapterTitle);
+              canAcceptMap[adapterTitle] = canAccept;
+              return isInAcceptMap;
+            }),
+            last()
           )
-          .subscribe(this.changeOpenGroupArray);
+          .subscribe(() => {
+            this.canAcceptMap = canAcceptMap;
+          });
         break;
       case 'dragEnd':
         this.isDragInProgress = false;
         break;
     }
-  }
-
-  changeOpenGroupArray(array) {
-    this.openGroupArray = array;
   }
 
   removeFromGroup(
@@ -183,10 +195,13 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
         previousAdapter.artifactColumns.splice(event.previousIndex, 1);
       } else {
         // remove from previousAdapter
+        const previousAdapterIndex = this.groupAdapters.indexOf(
+          previousAdapter
+        );
         this._store.dispatch(
           new DesignerRemoveColumnFromGroupAdapter(
             event.previousIndex,
-            adapterIndex
+            previousAdapterIndex
           )
         );
       }
@@ -209,7 +224,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       );
       const artifactColumn = item.data;
       const canAccept = canAcceptFn(artifactColumn);
-      this._acceptEventStream$.next(canAccept);
+      this._acceptEventStream$.next({ adapterTitle: adapter.title, canAccept });
       return canAccept;
     };
   }
@@ -226,5 +241,13 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       case 'date':
         return 'date-type-chip-color';
     }
+  }
+
+  dragStarted() {
+    this._dndPubsub.emit('dragStart');
+  }
+
+  dragReleased() {
+    this._dndPubsub.emit('dragEnd');
   }
 }
