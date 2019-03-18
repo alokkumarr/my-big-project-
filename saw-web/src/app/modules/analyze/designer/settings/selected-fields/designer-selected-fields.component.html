@@ -44,10 +44,10 @@
           [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
         >
         </span>
-        <span> (&nbsp;{{ col.alias || col.displayName }}&nbsp;) </span>
+        <span> (&nbsp;{{ col.aliasName || col.displayName }}&nbsp;) </span>
       </ng-container>
       <ng-template #defaultTemplate>
-        {{ col.alias || col.displayName }}
+        {{ col.aliasName || col.displayName }}
       </ng-template>
 
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
