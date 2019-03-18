@@ -1,50 +1,54 @@
 var testDataReader = require('../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const login = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
-const homePage = require('../javascript/pages/homePage.po');
-const savedAlaysisPage = require('../javascript/pages/savedAlaysisPage.po');
 const protractorConf = require('../../protractor.conf');
-const categories = require('../javascript/data/categories');
-const subCategories = require('../javascript/data/subCategories');
 const dataSets = require('../javascript/data/datasets');
-const designModePage = require('../javascript/pages/designModePage.po.js');
-const utils = require('../javascript/helpers/utils');
-const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
+const ChartDesignerPage = require('../../v2/pages/ChartDesignerPage');
+const ExecutePage = require('../../v2/pages/ExecutePage');
+const LoginPage = require('../../v2/pages/LoginPage');
+const AnalyzePage = require('../../v2/pages/AnalyzePage');
+let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
+let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
-  const defaultCategory = categories.privileges.name;
-  const categoryName = categories.analyses.name;
-  const subCategoryName = subCategories.createAnalysis.name;
-  const chartDesigner = analyzePage.designerDialog.chart;
-  // const chartName = `e2e chart ${(new Date()).toString()}`;
-  // const chartDescription = 'descr';
+  let analysisId;
+  let host;
+  let token;
   const yAxisName = 'Double';
   const xAxisName = 'Date';
-  const yAxisName2 = 'Long';
   const groupName = 'String';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
+  const yAxisName2 = 'Long';
 
-  beforeAll(function() {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL =
-      protractorConf.timeouts.extendedDefaultTimeoutInterval;
+  beforeAll(() => {
+    logger.info('Starting charts/createAndDelete.test.js.....');
+    host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(host);
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
-  beforeEach(function(done) {
-    setTimeout(function() {
+  beforeEach(done => {
+    setTimeout(() => {
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function(done) {
-    setTimeout(function() {
-      commonFunctions.logOutByClearingLocalStorage();
+  afterEach(done => {
+    setTimeout(() => {
+      if (analysisId) {
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
+      }
+      // Logout by clearing the storage
+      commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
-
   using(
     testDataReader.testData['CREATEDELETECHART'][
       'createDeleteChartDataProvider'
@@ -61,131 +65,64 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
           }),
         () => {
           try {
-            login.loginAs(data.user);
+            const chartName = `e2e chart ${new Date().toString()}`;
+            const chartDescription = `e2e chart description ${new Date().toString()}`;
 
-            homePage.navigateToSubCategoryUpdated(
-              categoryName,
-              subCategoryName,
-              defaultCategory
-            );
+            const loginPage = new LoginPage();
+            loginPage.loginAs(data.user, /analyze/);
 
-            let chartName = `e2e ${description} ${new Date().toString()}-${utils.getRandomInt(
-              5,
-              7
-            )}`;
-            let chartDescription = `e2e ${description} : description ${new Date().toString()}`;
+            const analyzePage = new AnalyzePage();
+            analyzePage.clickOnAddAnalysisButton();
+            analyzePage.clickOnChartType(data.chartType);
+            analyzePage.clickOnNextButton();
+            analyzePage.clickOnDataPods(metricName);
+            analyzePage.clickOnCreateButton();
 
-            let analyzePageV2 = new AnalyzePage();
-            analyzePageV2.clickOnAddAnalysisButton();
-            analyzePageV2.clickOnAnalysisType('');
-            analyzePageV2.clickOnChartType(data.chartType);
-            analyzePageV2.clickOnNextButton();
-            analyzePageV2.clickOnDataPods(metricName);
-            analyzePageV2.clickOnCreateButton();
-            //Select fields
-            commonFunctions.waitFor.elementToBeVisible(
-              analyzePage.designerDialog.chart.fieldSearchInput
-            );
-            // Dimension section.
-            commonFunctions.waitFor.elementToBeClickable(
-              designModePage.chart.addFieldButton(xAxisName)
-            );
-            designModePage.chart.addFieldButton(xAxisName).click();
-
-            // Group by section. i.e. Color by
-            commonFunctions.waitFor.elementToBeClickable(
-              designModePage.chart.addFieldButton(groupName)
-            );
-            designModePage.chart.addFieldButton(groupName).click();
-
-            // Metric section.
-            commonFunctions.waitFor.elementToBeClickable(
-              designModePage.chart.addFieldButton(yAxisName)
-            );
-            designModePage.chart.addFieldButton(yAxisName).click();
+            const chartDesignerPage = new ChartDesignerPage();
+            chartDesignerPage.searchInputPresent();
+            chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
+            chartDesignerPage.clickOnAttribute(groupName, 'Group By');
+            chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
 
             // Size section.
             if (data.chartType === 'chart:bubble') {
-              commonFunctions.waitFor.elementToBeClickable(
-                designModePage.chart.addFieldButton(sizeByName)
-              );
-              designModePage.chart.addFieldButton(sizeByName).click();
+              chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
             }
             //If Combo then add one more field
             if (data.chartType === 'chart:combo') {
-              commonFunctions.waitFor.elementToBeClickable(
-                designModePage.chart.addFieldButton(yAxisName2)
-              );
-              designModePage.chart.addFieldButton(yAxisName2).click();
+              chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
             }
             //Save
-            const save = analyzePage.saveDialog;
-            const designer = analyzePage.designerDialog;
-            commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-            designer.saveBtn.click();
+            chartDesignerPage.clickOnSave();
+            chartDesignerPage.enterAnalysisName(chartName);
+            chartDesignerPage.enterAnalysisDescription(chartDescription);
+            chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
 
-            commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
-            save.nameInput.clear().sendKeys(chartName);
-            save.descriptionInput.clear().sendKeys(chartDescription);
-            commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
-            save.saveBtn.click();
-            browser.sleep(1000);
-            const createdAnalysis = analyzePage.main.getCardTitle(chartName);
-
-            //Change to Card View
-            element(
-              utils
-                .hasClass(homePage.cardViewInput, 'mat-radio-checked')
-                .then(function(isPresent) {
-                  if (isPresent) {
-                    console.log('Already in card view..');
-                  } else {
-                    console.log('Not in card view..');
-                    commonFunctions.waitFor.elementToBeVisible(
-                      analyzePage.analysisElems.cardView
-                    );
-                    commonFunctions.waitFor.elementToBeClickable(
-                      analyzePage.analysisElems.cardView
-                    );
-                    analyzePage.analysisElems.cardView.click();
-                  }
-                })
+            // Verify analysis displayed in list and card view
+            analyzePage.goToView('list');
+            analyzePage.verifyElementPresent(
+              analyzePage._analysisTitleLink(chartName),
+              true,
+              'report should be present in list/card view'
             );
+            analyzePage.goToView('card');
+            // Go to detail page and very details
+            analyzePage.clickOnAnalysisLink(chartName);
 
-            //Verify if created appeared in list
-            commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
-            commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
-            createdAnalysis.click();
-            browser.sleep(1000);
-            commonFunctions.waitFor.elementToBeClickable(
-              savedAlaysisPage.backButton
-            );
-            savedAlaysisPage.backButton.click();
-            commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
-            /*commonFunctions.waitFor.elementToBePresent(createdAnalysis)
-         .then(() => expect(createdAnalysis.isPresent()).toBe(true));*/
-            //Verify chart type on home page
-            commonFunctions.waitFor.elementToBeVisible(
-              analyzePage.analysisElems.analysisWithType(
-                chartName,
-                data.chartType
-              ),
-              10000
-            );
-            //Delete created chart
-            const main = analyzePage.main;
-            const cards = main.getAnalysisCards(chartName);
-            cards.count().then(count => {
-              main.doAnalysisAction(chartName, 'delete');
-              commonFunctions.waitFor.elementToBeClickable(
-                main.confirmDeleteBtn
-              );
-              main.confirmDeleteBtn.click();
-              commonFunctions.waitFor.cardsCountToUpdate(cards, count);
+            const executePage = new ExecutePage();
+            executePage.verifyTitle(chartName);
+            analysisId = executePage.getAnalysisId();
 
-              //Expect to be deleted
-              expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
-            });
+            executePage.clickOnActionLink();
+            executePage.clickOnDetails();
+            executePage.verifyDescription(chartDescription);
+            executePage.closeActionMenu();
+            // Delete the report
+            executePage.clickOnActionLink();
+            executePage.clickOnDelete();
+            executePage.confirmDelete();
+            analyzePage.verifyToastMessagePresent('Analysis deleted.');
+            analyzePage.verifyAnalysisDeleted();
           } catch (e) {
             console.log(e);
           }

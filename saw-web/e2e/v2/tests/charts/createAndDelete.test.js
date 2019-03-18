@@ -72,15 +72,17 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
         analyzePage.clickOnCreateButton();
 
         const chartDesignerPage = new ChartDesignerPage();
-        // Dimension section.
-        chartDesignerPage.clickOnAttribute(xAxisName);
-        // Group by section. i.e. Color by
-        chartDesignerPage.clickOnAttribute(groupName);
-        // Metric section.
-        chartDesignerPage.clickOnAttribute(yAxisName);
+        chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
+        chartDesignerPage.clickOnAttribute(groupName, 'Group By');
+        chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
+
         // Size section.
         if (data.chartType === 'chart:bubble') {
-          chartDesignerPage.clickOnAttribute(sizeByName);
+          chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+        }
+        //If Combo then add one more field
+        if (data.chartType === 'chart:combo') {
+          chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
         }
         //Save
         chartDesignerPage.clickOnSave();
