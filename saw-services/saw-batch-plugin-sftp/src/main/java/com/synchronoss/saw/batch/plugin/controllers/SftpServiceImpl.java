@@ -123,6 +123,10 @@ public class SftpServiceImpl extends SipPluginContract {
   private  FileProcessor processor;
   FileSystem fs;
   Configuration conf;
+  
+  @Value("${sip.service.max.inprogress.mins}")
+  @NotNull
+  private Integer maxInprogressMins = 45;
 
   @PostConstruct
   private void init() throws Exception {
@@ -138,6 +142,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
       logger.info("Default drop location folders created? :: "
           + processor.isDestinationExists(defaultDestinationLocation));
+      logger.info("Max in progress minutes:: " + this.maxInprogressMins);
     }
 
     String location = defaultDestinationLocation
@@ -1102,9 +1107,18 @@ public class SftpServiceImpl extends SipPluginContract {
   // in future as part of refactoring with SIP-6058
   /**
    * This is method to handle inconsistency during failure.
+   * Step1: Check if any long running process with 'InProgress'
+   * and mark them as failed.
+   * Step2: Retrive all 'Failed' or 'HOST_NOT_REACHABLE' entries
+   * and cleans up destination and update logs with 'Data_removed'
+   * Step3: Triggers transfer call as part of retry
    */
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   public void recoverFromInconsistentState() {
+    
+    //Mark long running 'InProgress to 'Failed'
+    sipLogService.updateLongRunningTransfers(maxInprogressMins);
+
     logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
@@ -1207,7 +1221,7 @@ public class SftpServiceImpl extends SipPluginContract {
               }
             }
           } else {
-            logger.info("No route present with channelId: " 
+            logger.trace("No route present with channelId: " 
                 + channelId + " routeID: " + routeId);
           }
         } catch (NotFoundException | IOException e) {
@@ -1293,6 +1307,8 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
         + channelId + " ends here");
   }
+  
+  
 
   /**
    * This is a common method to update the status.
@@ -1336,4 +1352,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("Corrupted file does not exist.");
     }
   }
+  
+  
+ 
 }

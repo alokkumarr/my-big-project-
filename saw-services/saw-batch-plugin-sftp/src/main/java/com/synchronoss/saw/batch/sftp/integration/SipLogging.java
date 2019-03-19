@@ -207,7 +207,7 @@ public class SipLogging {
     return bisFileLogsRepository.isStatusExistsForProcess(processStatus, channelId, routeId,
         BisChannelType.SFTP.value(), PageRequest.of(0, 1, Direction.DESC, "modifiedDate"));
   }
-  
+
   /**
    * verify pid exists before deleting it.
    */
@@ -230,6 +230,29 @@ public class SipLogging {
     return result;
   }
 
+  /**
+  * check if any long running process exists.
+  * and update if any.
+  * @param minutesToCheck maxInProgress minutes
+  * @return number of updated records
+  */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public Integer updateLongRunningTransfers(Integer minutesToCheck) {
+    int updatedRecords = 0;
+    int longCount = bisFileLogsRepository
+        .countOfLongRunningTransfers(minutesToCheck);
+    logger.trace("Long running process count: " +    longCount);
+    if (longCount > 0) {
+      logger.trace("Updating long running transfers to failed");
+      updatedRecords = bisFileLogsRepository
+          .updateLongRunningTranfers(minutesToCheck);
+      logger.trace("long running transfer update completed");
+    }
+    return updatedRecords;
+  }
 
   /**
    * This method is used to check the status by process.
@@ -261,9 +284,9 @@ public class SipLogging {
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
     logger.trace(
-        "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "ends here"); 
+        "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "ends here");
   }
-  
+
   /**
    * verify duplicate check enabled and is duplicate
    * or if duplicate check disabled.
@@ -282,5 +305,5 @@ public class SipLogging {
 
   }
 
-  
+
 }
