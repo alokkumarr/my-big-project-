@@ -5,6 +5,19 @@
     font-size: 11px;
   }
 
+  .mat-tab-group {
+    height: 100% !important;
+    overflow-y: auto !important;
+  }
+
+  ::ng-deep .mat-tab-body {
+    overflow-y: auto !important;
+  }
+
+  ::ng-deep .mat-tab-body-content {
+    overflow-y: auto !important;
+  }
+
   ::ng-deep .mat-tab-label {
     height: 43px;
     padding: 0;
