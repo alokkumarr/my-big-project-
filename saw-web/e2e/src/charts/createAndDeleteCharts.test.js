@@ -67,7 +67,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
           }),
         () => {
           try {
-            logger.error(`running test:${description}`);
             const chartName = `e2e chart ${new Date().toString()}`;
             const chartDescription = `e2e chart description ${new Date().toString()}`;
 

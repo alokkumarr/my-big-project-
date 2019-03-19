@@ -9,11 +9,14 @@ class ChartsDesignerPage extends Designer {
     this._filterInput = element(by.css(`[name="filter-settings"]`));
     this._attribute = attribute =>
       element(by.css(`[e2e="designer-add-menu-btn-${attribute}"]`));
-    this._attributesCloseIcons = element.all(by.css('[fonticon="icon-remove"]'));
+    this._attributesCloseIcons = element.all(
+      by.css('[fonticon="icon-remove"]')
+    );
     this._fieldType = (attribute, name) =>
       element(by.css(`[e2e="designer-add-option-btn-${attribute}-${name}"]`));
     this._unselectedField = name =>
       element(by.css(`[e2e="designer-unselected-field-${name}"]`));
+    this._previewBtn = element(by.css('button[e2e="open-preview-modal"]'));
   }
 
   searchAttribute(attribute) {
@@ -50,6 +53,10 @@ class ChartsDesignerPage extends Designer {
 
   searchInputPresent() {
     commonFunctions.waitFor.elementToBeVisible(this._filterInput);
+  }
+
+  clickOnPreviewButton() {
+    commonFunctions.clickOnElement(this._previewBtn);
   }
 }
 module.exports = ChartsDesignerPage;
