@@ -50,7 +50,7 @@ import { DesignerPreviewDialogComponent } from './preview-dialog';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
 import { DesignerPageComponent } from './page/page.component';
-import { ChartTypeChooserComponent } from './chart-type-chooser';
+import { AnalysisSubTypeChooserComponent } from './analysis-sub-type-chooser';
 import {
   PerfectScrollbarModule,
   PerfectScrollbarConfigInterface,
@@ -78,7 +78,7 @@ const COMPONENTS = [
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayoutComponent,
   MultiTableDesignerLayoutComponent,
-  ChartTypeChooserComponent,
+  AnalysisSubTypeChooserComponent,
   DesignerSelectedFieldsComponent,
   DesignerAnalysisOptionsComponent,
   DesignerDataOptionFieldComponent,
