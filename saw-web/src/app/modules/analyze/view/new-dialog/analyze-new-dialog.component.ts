@@ -73,8 +73,18 @@ export class AnalyzeNewDialogComponent {
 
     this.supportedMetricCategories = fpPipe(
       fpFilter(metric => {
+        if (method.type === 'map:map') {
+          const doesSupportsMap = some(
+            metric.supports,
+            ({ category }) => category === 'map'
+          );
+          return doesSupportsMap;
+        }
         if (startsWith(method.type, 'map:chart')) {
-          const doesSupportsMapChart = some(metric.supports, ({category}) => category === 'mapChart');
+          const doesSupportsMapChart = some(
+            metric.supports,
+            ({ category }) => category === 'mapChart'
+          );
           return doesSupportsMapChart;
         }
         const isEsMetric = get(metric, 'esRepository.storageType') === 'ES';
