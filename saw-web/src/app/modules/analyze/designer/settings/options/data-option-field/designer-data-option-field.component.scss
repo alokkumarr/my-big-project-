@@ -22,20 +22,20 @@
       height: 47px;
     }
   }
-}
 
-mat-expansion-panel-header {
-  height: 43px !important;
-}
+  mat-expansion-panel-header {
+    height: 43px !important;
+  }
 
-::ng-deep .mat-expansion-panel-content {
-  background-color: $background-color;
-}
+  ::ng-deep .mat-expansion-panel-content {
+    background-color: $background-color;
+  }
 
-::ng-deep .mat-expansion-panel-body {
-  padding: 24px;
-}
+  ::ng-deep .mat-expansion-panel-body {
+    padding: 24px;
+  }
 
-::ng-deep .mat-form-field-outline {
-  background-color: white;
+  ::ng-deep .mat-form-field-outline {
+    background-color: white;
+  }
 }

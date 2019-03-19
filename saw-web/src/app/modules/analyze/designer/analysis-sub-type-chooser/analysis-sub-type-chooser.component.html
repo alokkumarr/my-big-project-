@@ -1,8 +1,10 @@
 <mat-button-toggle-group
+  id="analysis-subtype"
   #group="matButtonToggleGroup"
   appearance="legacy"
   (change)="change.emit($event.value)"
   [value]="subType"
+  e2e="analysis-subtype"
 >
   <mat-button-toggle
     class="chart-option"

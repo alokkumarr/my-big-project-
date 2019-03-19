@@ -1,15 +1,21 @@
 @import 'src/themes/base/colors';
 
-.limit-type .mat-button-toggle-checked {
-  background-color: $primary-blue-b2;
-  color: white;
-}
+.designer-data-limit {
+  &__type .mat-button-toggle-checked {
+    background-color: $primary-blue-b2;
+    color: white;
+  }
 
-.mat-raised-button {
-  font-size: 11px;
-  font-size: 11px;
-  line-height: 26px;
-  padding: 0 10px;
-  min-width: unset;
-  float: right;
+  .mat-raised-button {
+    font-size: 11px;
+    font-size: 11px;
+    line-height: 26px;
+    padding: 0 10px;
+    min-width: unset;
+    float: right;
+  }
+
+  &__value {
+    max-height: 46px;
+  }
 }

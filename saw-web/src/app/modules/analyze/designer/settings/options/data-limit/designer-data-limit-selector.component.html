@@ -1,26 +1,41 @@
-<div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="5px">
-  <mat-button-toggle-group
-    fxFlex="30"
-    vertical="true"
-    (change)="onLimitDataChange(limitValue, $event.value)"
-    [value]="limitType"
-    class="limit-type"
-    appearance="legacy"
+<div
+  fxLayout="row"
+  class="designer-data-limit"
+  fxLayoutAlign="space-around center"
+  fxLayoutGap="5px"
+>
+  <div fxFlex>
+    <mat-button-toggle-group
+      e2e="designer-data-limit-type"
+      vertical="false"
+      (change)="onLimitDataChange(limitValue, $event.value)"
+      [value]="limitType"
+      class="designer-data-limit__type"
+      appearance="legacy"
+    >
+      <mat-button-toggle value="top">
+        Top
+      </mat-button-toggle>
+      <mat-button-toggle value="bottom">
+        Bottom
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <mat-form-field
+    e2e="designer-data-limit-value"
+    class="designer-data-limit__value"
+    appearance="outline"
+    fxFlex="40"
   >
-    <mat-button-toggle value="top">
-      Top
-    </mat-button-toggle>
-    <mat-button-toggle value="bottom">
-      Bottom
-    </mat-button-toggle>
-  </mat-button-toggle-group>
-  <dx-slider
-    fxFlex
-    (onValueChanged)="onLimitDataChange($event.value, limitType)"
-    [min]="0"
-    [max]="2000"
-    [value]="limitValue"
-    [tooltip]="tooltip"
-  >
-  </dx-slider>
+    <mat-label>Value</mat-label>
+    <input
+      matInput
+      type="number"
+      min="0"
+      max="50"
+      autocomplete="off"
+      (input)="onLimitDataChange($event.target.value, limitType)"
+      [value]="limitValue"
+    />
+  </mat-form-field>
 </div>
