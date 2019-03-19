@@ -7,15 +7,10 @@
 
   .mat-tab-group {
     height: 100% !important;
-    overflow-y: auto !important;
   }
 
   ::ng-deep .mat-tab-body {
-    overflow-y: auto !important;
-  }
-
-  ::ng-deep .mat-tab-body-content {
-    overflow-y: auto !important;
+    padding: 3px;
   }
 
   ::ng-deep .mat-tab-label {

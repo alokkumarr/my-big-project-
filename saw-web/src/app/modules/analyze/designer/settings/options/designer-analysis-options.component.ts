@@ -5,7 +5,7 @@ import {
   ArtifactColumn,
   DesignerChangeEvent
 } from '../../types';
-
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
 import * as get from 'lodash/get';
 
@@ -28,6 +28,8 @@ export class DesignerAnalysisOptionsComponent implements OnInit {
   }
 
   public selectedColumns: ArtifactColumn[];
+  public config: PerfectScrollbarConfigInterface = {};
+
   constructor() {}
 
   ngOnInit() {}
