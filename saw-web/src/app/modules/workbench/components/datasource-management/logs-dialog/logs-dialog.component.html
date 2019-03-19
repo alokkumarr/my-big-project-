@@ -157,30 +157,39 @@
       e2e="route-log-row"
       *dxTemplate="let logRow of 'logTableRowTemplate'"
     >
-      <tr class="tr-row">
-        <td>{{ logRow.data.filePattern }}</td>
-        <td [matTooltip]="logRow.data.fileName">{{ logRow.data.fileName }}</td>
-        <td>
+      <tr class="tr-row" e2e="route-log-row-tr">
+        <td e2e="route-log-filePattern">{{ logRow.data.filePattern }}</td>
+        <td e2e="route-log-fileName" [matTooltip]="logRow.data.fileName">
+          {{ logRow.data.fileName }}
+        </td>
+        <td e2e="route-log-actualFileRecDate">
           {{ logRow.data.actualFileRecDate | date: 'short' }}
         </td>
-        <td [matTooltip]="logRow.data.recdFileName">
+        <td
+          e2e="route-log-recdFileName"
+          [matTooltip]="logRow.data.recdFileName"
+        >
           {{ logRow.data.recdFileName }}
         </td>
-        <td>{{ logRow.data.recdFileSize }}</td>
-        <td>{{ logRow.data.mflFileStatus }}</td>
-        <td>{{ logRow.data.bisProcessState }}</td>
-        <td>
+        <td e2e="route-log-recdFileSize">{{ logRow.data.recdFileSize }}</td>
+        <td e2e="route-log-mflFileStatus">{{ logRow.data.mflFileStatus }}</td>
+        <td e2e="route-log-bisProcessState">
+          {{ logRow.data.bisProcessState }}
+        </td>
+        <td e2e="route-log-transferStartTime">
           {{ logRow.data.transferStartTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
         </td>
-        <td>
+        <td e2e="route-log-transferEndTime">
           {{ logRow.data.transferEndTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
         </td>
 
-        <td>{{ logRow.data.transferDuration }}</td>
-        <td>
+        <td e2e="route-log-transferDuration">
+          {{ logRow.data.transferDuration }}
+        </td>
+        <td e2e="route-log-modifiedDate">
           {{ logRow.data.modifiedDate | date: 'short' }}
         </td>
-        <td>
+        <td e2e="route-log-createdDate">
           {{ logRow.data.createdDate | date: 'short' }}
         </td>
       </tr>
