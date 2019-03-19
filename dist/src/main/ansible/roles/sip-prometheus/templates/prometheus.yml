@@ -69,5 +69,5 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['sip-elastic'] %}
-          - '{{ host }}:8200'
+          - '{{ host }}:{{ sip_elastic_port | default('8200') }}'
 {% endfor %}

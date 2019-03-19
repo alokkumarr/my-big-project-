@@ -205,3 +205,10 @@ sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
 [sip-rtps]
 sip-host1
 sip-host2
+
+[sip-elastic]
+sip-host1
+sip-host2
+
+[sip-elastic:vars]
+#sip_elastic_port=8200
