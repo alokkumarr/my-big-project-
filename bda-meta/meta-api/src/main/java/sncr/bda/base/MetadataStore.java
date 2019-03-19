@@ -38,7 +38,7 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
 
     protected Table table;
 
-    protected final int RETRIES = 3;
+    protected final int retries = 3;
 
     // TODO:: Replace altRoot with configuration reading
      protected MetadataStore(String tableName, String altRoot) throws Exception {
@@ -46,14 +46,14 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
          metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
          String fullTableName = metaRoot + Path.SEPARATOR + tableName;
          logger.trace("Open table: " + fullTableName);
-         table = initTable(fullTableName, RETRIES);
+         table = initTable(fullTableName, retries);
          table.setOption(Table.TableOption.BUFFERWRITE, false);
      }
 
 
      // This has been added to handle the use case
      // while working on SIP-6061
-     private Table initTable(String tablePath, int RETRIES) {
+     private Table initTable(String tablePath, int retries) {
        Table tableDesc = null;
        if (MapRDB.tableExists(tablePath)) {
          tableDesc = MapRDB.getTable(tablePath);
@@ -66,11 +66,11 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
            if (MapRDB.tableExists(tablePath)) {
              tableDesc = MapRDB.getTable(tablePath);
            } else {
-             logger.trace("Number of retries :" + RETRIES);
-             if (RETRIES > 0) {
-               initTable(tablePath, RETRIES - 1);
+             logger.trace("Number of retries :" + retries);
+             if (retries > 0) {
+               initTable(tablePath, retries - 1);
              } else {
-               logger.trace("Number of retries has been exhausted:" + RETRIES);
+               logger.trace("Number of retries has been exhausted:" + retries);
                throw new DBException(
                    "Exception occured while creating table with the path :" + tablePath);
              }
