@@ -127,7 +127,10 @@
     </div>
 
     <div
-      *ngIf="(analysisType | isAnalysisType: 'mapChart':analysisSubtype)"
+      *ngIf="
+        (analysisType | isAnalysisType: 'mapChart':analysisSubtype) &&
+        artifactColumn.geoType
+      "
       fxLayout="row"
       fxLayoutAlign="start center"
     >
