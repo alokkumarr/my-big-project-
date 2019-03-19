@@ -1,14 +1,15 @@
-var testDataReader = require('../testdata/testDataReader.js');
+const testDataReader = require('../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const commonFunctions = require('../../v2/pages/utils/commonFunctions');
 const protractorConf = require('../../protractor.conf');
 const dataSets = require('../javascript/data/datasets');
 const ChartDesignerPage = require('../../v2/pages/ChartDesignerPage');
 const ExecutePage = require('../../v2/pages/ExecutePage');
 const LoginPage = require('../../v2/pages/LoginPage');
 const AnalyzePage = require('../../v2/pages/AnalyzePage');
-let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
-let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
+const AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
+const APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
+const logger = require('../../v2/conf/logger')(__filename);
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   let analysisId;
@@ -25,7 +26,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     logger.info('Starting charts/createAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL =
+      protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(done => {
@@ -53,7 +55,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     testDataReader.testData['CREATEDELETECHART'][
       'createDeleteChartDataProvider'
     ],
-    function(data, description) {
+    (data, description) => {
       it(
         'should create and delete ' +
           description +
@@ -65,6 +67,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
           }),
         () => {
           try {
+            logger.error(`running test:${description}`);
             const chartName = `e2e chart ${new Date().toString()}`;
             const chartDescription = `e2e chart description ${new Date().toString()}`;
 
@@ -81,18 +84,19 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
             const chartDesignerPage = new ChartDesignerPage();
             chartDesignerPage.searchInputPresent();
             chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
-            chartDesignerPage.clickOnAttribute(groupName, 'Group By');
             chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
 
-            // Size section.
             if (data.chartType === 'chart:bubble') {
               chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+              chartDesignerPage.clickOnAttribute(groupName, 'Color By');
             }
-            //If Combo then add one more field
+            // If Combo then add one more metric field
             if (data.chartType === 'chart:combo') {
               chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
+            } else if (data.chartType !== 'chart:bubble') {
+              chartDesignerPage.clickOnAttribute(groupName, 'Group By');
             }
-            //Save
+            // Save
             chartDesignerPage.clickOnSave();
             chartDesignerPage.enterAnalysisName(chartName);
             chartDesignerPage.enterAnalysisDescription(chartDescription);

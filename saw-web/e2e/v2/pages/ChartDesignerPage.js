@@ -9,7 +9,7 @@ class ChartsDesignerPage extends Designer {
     this._filterInput = element(by.css(`[name="filter-settings"]`));
     this._attribute = attribute =>
       element(by.css(`[e2e="designer-add-menu-btn-${attribute}"]`));
-    this._attributesCloseIcons = element.all(by.css('[fonticon="icon-close"]'));
+    this._attributesCloseIcons = element.all(by.css('[fonticon="icon-remove"]'));
     this._fieldType = (attribute, name) =>
       element(by.css(`[e2e="designer-add-option-btn-${attribute}-${name}"]`));
     this._unselectedField = name =>
