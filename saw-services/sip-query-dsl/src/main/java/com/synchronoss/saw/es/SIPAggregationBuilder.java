@@ -41,9 +41,12 @@ public class SIPAggregationBuilder {
                     if (dataField.getType().name().equals(Field.Type.DATE.name())
                         || dataField.getType().name().equals(Field.Type.TIMESTAMP.name()))
                     {
+                        if(dataField.getDateFormat()==null|| dataField.getDateFormat().isEmpty())
+                            dataField.setDateFormat(DATE_FORMAT);
                         if (dataField.getGroupInterval()!=null){
                             aggregationBuilder = AggregationBuilders.
-                                dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount).field(dataField.getColumnName()).format(DATE_FORMAT).
+                                dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount).field(dataField.getColumnName()).format(
+                                    dataField.getDateFormat()).
                                 dateHistogramInterval(groupInterval(dataField.getGroupInterval().value())).order(BucketOrder.key(false));
                         }
                         else {
@@ -68,9 +71,11 @@ public class SIPAggregationBuilder {
                     if (dataField.getType().name().equals(Field.Type.DATE.name())
                         || dataField.getType().name().equals(Field.Type.TIMESTAMP.name()))
                     {
+                        if(dataField.getDateFormat()==null|| dataField.getDateFormat().isEmpty())
+                            dataField.setDateFormat(DATE_FORMAT);
                         if (dataField.getGroupInterval()!=null){
                             aggregationBuilderMain = AggregationBuilders.
-                                dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount).field(dataField.getColumnName()).format(DATE_FORMAT).
+                                dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount).field(dataField.getColumnName()).format(dataField.getDateFormat()).
                                 dateHistogramInterval(groupInterval(dataField.getGroupInterval().value())).order(BucketOrder.key(false))
                                 .subAggregation(aggregationBuilder);
                         }

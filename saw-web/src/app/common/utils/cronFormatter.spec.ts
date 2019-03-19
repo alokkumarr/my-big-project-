@@ -1,7 +1,6 @@
 import { isValid,
          convertToUtc,
          convertToLocal,
-         getLocalMinute,
          hourToCron,
          generateHourlyCron,
          generateDailyCron,
@@ -26,10 +25,6 @@ describe('Cron Formatter', () => {
 
   it('should exist', () => {
     expect(convertToLocal).not.toBeNull();
-  });
-
-  it('should exist', () => {
-    expect(getLocalMinute).not.toBeNull();
   });
 
   it('should exist', () => {

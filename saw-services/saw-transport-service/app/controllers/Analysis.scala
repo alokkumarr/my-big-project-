@@ -696,7 +696,10 @@ class Analysis extends BaseController {
 
       return (getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray),analysisResultNodeID)
     }
-    if (typeInfo.equals("chart")) {
+    // The type 'map' has been added to support analysis type map which is equivalent to chart
+    // It has not been bifurcated to separate type because once we start supporting geo-json
+    // sip-dsl has to be improved to support geo spatial queries
+    if (typeInfo.equals("chart") || typeInfo.equals("map")) {
       var data: String = null
       if (dataSecurityKeyStr != null) {
         m_log.trace("dataSecurityKeyStr dataset inside chart block: {}", dataSecurityKeyStr);
@@ -925,9 +928,19 @@ class Analysis extends BaseController {
             case obj: java.math.BigInteger => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj: scala.math.BigInt => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj =>
-              throw new RuntimeException(
-                "Unsupported data type in result: " + dataType
-                  + ", object class: " + obj.getClass.getName)
+              /* Return NULL back to UI, if exists.
+                 if value is null in row for a column then report formatter unable to find the corresponding datatype,
+                 since null having ambiguity with object type and throws exception Unsupported data type in result.
+                 Use case handled with null check.
+               */
+              if (obj == null) {
+                JNull
+              }
+              else {
+                throw new RuntimeException(
+                  "Unsupported data type in result: " + dataType
+                    + ", object class: " + obj.getClass.getName)
+              }
           }
         })
       ).toList

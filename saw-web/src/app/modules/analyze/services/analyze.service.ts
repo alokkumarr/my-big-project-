@@ -10,6 +10,7 @@ import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isUndefined from 'lodash/isUndefined';
+import * as clone from 'lodash/clone';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Analysis } from '../../../models';
@@ -106,8 +107,8 @@ export class AnalyzeService {
       executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
         : '';
-    const requestURL = isUndefined(executionId) ?
-      `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
+    const requestURL = isUndefined(executionId)
+      ? `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
       : `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`;
     return this.getRequest(requestURL);
   }
@@ -199,11 +200,11 @@ export class AnalyzeService {
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return <Promise<Analysis>>this.postRequest(
-      `analysis`,
-      payload,
-      customHeaders
-    ).then(fpGet(`contents.analyze.[0]`));
+    return <Promise<Analysis>>(
+      this.postRequest(`analysis`, payload, customHeaders).then(
+        fpGet(`contents.analyze.[0]`)
+      )
+    );
   }
 
   previewExecution(model, options = {}) {
@@ -330,14 +331,18 @@ export class AnalyzeService {
   updateAnalysis(model): Promise<Analysis> {
     delete model.isScheduled;
     delete model.executionType;
+    /* Add update info */
+    model.updatedTimestamp = Date.now();
+    model.updatedUserName = this._jwtService.getUserName();
+
     const payload = this.getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(
-      fpGet(`contents.analyze.[0]`)
+    return <Promise<Analysis>>(
+      this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`))
     );
   }
 
@@ -354,14 +359,20 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
 
+    // TODO remove clone stuff before merging
+    const cloned = clone(model);
+    if (cloned.type === 'map') {
+      cloned.type = 'chart';
+    }
+
     const payload = this.getRequestParams([
       ['contents.action', 'execute'],
       ['contents.executedBy', this._jwtService.getLoginId()],
       ['contents.page', page],
       ['contents.pageSize', options.take],
-      ['contents.keys.[0].id', model.id],
-      ['contents.keys.[0].type', model.type],
-      ['contents.analyze', [model]]
+      ['contents.keys.[0].id', cloned.id],
+      ['contents.keys.[0].type', cloned.type],
+      ['contents.analyze', [cloned]]
     ]);
     return this.postRequest(`analysis`, payload).then(resp => {
       return {
@@ -430,8 +441,8 @@ export class AnalyzeService {
       ],
       ['contents.keys.[0].analysisType', type]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, params).then(
-      fpGet('contents.analyze.[0]')
+    return <Promise<Analysis>>(
+      this.postRequest(`analysis`, params).then(fpGet('contents.analyze.[0]'))
     );
   }
 

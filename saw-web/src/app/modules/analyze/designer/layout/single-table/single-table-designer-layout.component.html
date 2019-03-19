@@ -9,7 +9,7 @@
 >
 </designer-settings-single-table>
 
-<div class="designer__content">
+<div class="designer__content" class="analysis-content">
   <designer-settings-aux
     class="designer__aux-settings"
     [auxSettings]="auxSettings"
@@ -67,19 +67,25 @@
         </span>
       </div>
 
-      <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA">
+      <div *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA" class="designer__main-container">
         <designer-pivot class="designer__data"
                         *ngIf="analysisType === 'pivot'"
                         [data]="data"
                         [sorts]="sorts"
                         [artifacts]="artifacts">
         </designer-pivot>
+        <designer-map class="designer__data"
+                      *ngIf="analysisType | isAnalysisType:'map':analysisSubtype"
+                      [auxSettings]="auxSettings"
+                      [data]="data"
+                      [sqlBuilder]="sqlBuilder">
+        </designer-map>
         <designer-map-chart class="designer__data"
-                        *ngIf="analysisType ==='chart' && analysisSubtype === 'geo'"
-                        [chartType]="analysisSubtype"
-                        [auxSettings]="auxSettings"
-                        [data]="data"
-                        [sqlBuilder]="sqlBuilder">
+                            *ngIf="analysisType | isAnalysisType:'mapChart':analysisSubtype"
+                            [chartType]="analysisSubtype"
+                            [auxSettings]="auxSettings"
+                            [data]="data"
+                            [sqlBuilder]="sqlBuilder">
         </designer-map-chart>
         <designer-chart class="designer__data"
                         *ngIf="analysisType ==='chart' && analysisSubtype !== 'geo'"

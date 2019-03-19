@@ -73,6 +73,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   emailValidateFlag = false;
   isReport: boolean;
   fileType: string;
+  startDateCorrectFlag = true;
 
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
@@ -94,9 +95,11 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     });
 
     this.isReport = ['report', 'esReport'].includes(
-      get(this.data.analysis, 'type'));
+      get(this.data.analysis, 'type')
+    );
 
-    this.fileType = get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
+    this.fileType =
+      get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
   }
 
   trackByIndex(index) {
@@ -145,6 +148,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               activeRadio,
               jobScheduleTime,
               endDate,
+              timezone,
               analysisID,
               emailList,
               fileType,
@@ -155,7 +159,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               startDate: jobScheduleTime,
               activeTab,
               activeRadio,
-              endDate
+              endDate,
+              timezone
             };
             if (analysisID) {
               this.scheduleState = 'exist';
@@ -217,7 +222,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         this.scheduleState = 'new';
         cronJobName = cronJobName + '-' + this.alphanumericUnique();
         crondetails.cronexp = '';
-        crondetails.startDate = moment.utc().format();
+        crondetails.startDate = moment().local().format();
       }
 
       analysis.schedule = {
@@ -237,6 +242,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         type: analysis.type,
         userFullName: analysis.userFullName,
         jobScheduleTime: crondetails.startDate,
+        timezone: crondetails.timezone,
         categoryID: analysis.categoryId,
         jobGroup: this.token.ticket.custCode
       };
@@ -254,10 +260,12 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.cronValidateField = false;
     let validationCheck = true;
 
+    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
     const validateFields = {
       emails: this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
-      publish: this.validatePublishSelection()
+      publish: this.validatePublishSelection(),
+      startDate: moment(this.crondetails.startDate) > moment().subtract(2, 'minutes')
     };
     fpPipe(
       fpMap(check => {
@@ -289,6 +297,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       this.cronValidateField = true;
       return false;
     }
+    return true;
   }
 
   validateEmails(emails) {

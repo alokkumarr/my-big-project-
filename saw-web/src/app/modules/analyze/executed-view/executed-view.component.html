@@ -52,7 +52,7 @@
       </mat-expansion-panel>
     </mat-card>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''">
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
         <div fxLayout="row">
@@ -103,6 +103,7 @@
             (detailsRequested)="detailsSidenav.toggle()"
             [actionsToDisable]="isExecuting ? 'execute' : ''"
             (afterDelete)="afterDelete(analysis)"
+            (afterPublish)="afterPublish($event)"
             (afterExport)="exportData()"
           ></analyze-actions-menu-u>
         </div>
@@ -162,20 +163,25 @@
             [updater]="pivotUpdater$"
           >
           </executed-pivot-view>
-          <div *ngSwitchCase="'chart'">
-            <executed-chart-view
-              *ngIf="analysis.chartType !== 'geo'"
-              [analysis]="executedAnalysis"
-              [data]="data"
-              [updater]="chartUpdater$"
-            >
-            </executed-chart-view>
-            <executed-map-chart-view
-              *ngIf="analysis.chartType === 'geo'"
-              [analysis]="executedAnalysis"
-              [data]="data"
-              [updater]="chartUpdater$"
-              [actionBus]="chartActionBus$"
+          <executed-chart-view *ngSwitchCase="'chart'"
+                                [analysis]="executedAnalysis"
+                                [data]="data"
+                                [updater]="chartUpdater$"
+                                class="executed-chart-analysis"
+          >
+          </executed-chart-view>
+
+          <div *ngSwitchCase="'map'">
+            <executed-map-view *ngIf="analysis.type | isAnalysisType:'map':analysis?.chartType"
+                              [analysis]="executedAnalysis"
+                              [data]="data"
+                              >
+            </executed-map-view>
+            <executed-map-chart-view *ngIf="analysis.type | isAnalysisType:'mapChart':analysis?.chartType"
+                                  [analysis]="executedAnalysis"
+                                  [data]="data"
+                                  [updater]="chartUpdater$"
+                                  [actionBus]="chartActionBus$"
             >
             </executed-map-chart-view>
           </div>

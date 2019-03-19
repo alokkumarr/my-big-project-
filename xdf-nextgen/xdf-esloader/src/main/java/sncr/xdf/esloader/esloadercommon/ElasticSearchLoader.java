@@ -2,6 +2,7 @@ package sncr.xdf.esloader.esloadercommon;
 
 import com.synchronoss.bda.xdf.datasetutils.filterutils.FilterUtils;
 import com.synchronoss.bda.xdf.datasetutils.filterutils.RowFilter;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
@@ -41,6 +42,7 @@ public class ElasticSearchLoader {
     public final static String ES_PARAM_PASSWORD = ES_PARAM_PREFIX + "net.http.auth.pass";
     public final static String ES_MAPPING_ID = ES_PARAM_PREFIX + "mapping.id";
     public final static String ES_PARAM_PORT = ES_PARAM_PREFIX + "port";
+    public final static String ES_NODE_DISCOVERY = ES_PARAM_PREFIX + "nodes.discovery";
 
     private ESLoader esLoader;
 
@@ -87,9 +89,10 @@ public class ElasticSearchLoader {
 
         //TODO: Should be fixed as part of high-availability story
         List<String> esNodes = config.getEsHosts();
-        String esHost = esNodes.get(0);
+        String esHosts = StringUtils.join(esNodes, ",");
 
-        configMap.put(ES_PARAM_NODES, esHost);
+        configMap.put(ES_NODE_DISCOVERY, String.valueOf(false));
+        configMap.put(ES_PARAM_NODES, esHosts);
         configMap.put(ES_PARAM_ADMIN_PORT, String.valueOf(config.getEsPort()));
 
         if(config.getEsUser() != null && config.getEsPassword() != null) {

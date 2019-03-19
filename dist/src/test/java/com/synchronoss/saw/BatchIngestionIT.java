@@ -107,6 +107,7 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode childNode = mapper.createObjectNode();
     childNode.put("cronexp", "0 0 12 1 * ?");
     childNode.put("activeTab", "monthly");
+    childNode.put("timezone", "UTC");
     return childNode;
   }
   

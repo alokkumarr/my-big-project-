@@ -54,8 +54,11 @@ export const AnalyseTypes = {
   Report: 'report',
   ESReport: 'esReport',
   Chart: 'chart',
+  Map: 'map',
   Pivot: 'pivot'
 };
+
+export const DRAFT_CATEGORY_ID = 5;
 
 export const ENTRY_MODES = {
   EDIT: 'edit',
@@ -251,8 +254,13 @@ export const ANALYSIS_METHODS = [
         children: [{
           label: 'Geolocation',
           icon: { font: 'icon-geo-chart' },
-          type: 'chart:geo',
-          typeOnBackEnd: 'chart:geo'
+          type: 'map:chart_scale',
+          typeOnBackEnd: 'map:chart_scale'
+        }, {
+          label: 'Map',
+          icon: { font: 'icon-geo-chart' },
+          type: 'map:map',
+          typeOnBackEnd: 'map-map'
         }]
       }
     ]

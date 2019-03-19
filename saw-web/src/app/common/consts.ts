@@ -5,6 +5,9 @@ import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as map from 'lodash/map';
 
+export const USER_ANALYSIS_CATEGORY_NAME = 'My Analysis';
+export const USER_ANALYSIS_SUBCATEGORY_NAME = 'DRAFTS';
+
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;
@@ -13,13 +16,17 @@ export const DATE_TYPES = ['timestamp', 'date'];
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
   country: ['name', 'fips'],
+  lngLat: [''],
   zip: []
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) =>
-    map(identifiers, identifier => `${geoType}:${identifier}`)
-  )
+  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
+    if (!identifier) {
+      return geoType;
+    }
+    return `${geoType}:${identifier}`;
+  }))
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
@@ -142,32 +149,39 @@ export const AGGREGATE_TYPES = [
     label: 'Total',
     value: 'sum',
     icon: 'icon-Sum',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Average',
     value: 'avg',
     icon: 'icon-ic-average',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Mininum',
     value: 'min',
     icon: 'icon-ic-min',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Maximum',
     value: 'max',
     icon: 'icon-ic-max',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Count',
     value: 'count',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+  },
+  {
+    label: 'Distinct Count',
+    value: 'distinctCount',
+    icon: 'icon-Count',
+    type: 'long',
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Percentage',
@@ -196,6 +210,11 @@ export const AGGREGATE_STRING_TYPES = [
   {
     label: 'Count',
     value: 'count',
+    icon: 'icon-Count'
+  },
+  {
+    label: 'Distinct Count',
+    value: 'distinctCount',
     icon: 'icon-Count'
   }
 ];

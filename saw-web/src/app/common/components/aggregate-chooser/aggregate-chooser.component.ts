@@ -34,7 +34,7 @@ export class AggregateChooserComponent implements OnInit {
       this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, type => {
-        return type.value === 'count';
+        return type.value === 'count' || type.value === 'distinctCount';
       });
     }
   }

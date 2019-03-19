@@ -20,7 +20,6 @@ public class DataSecurityKeyDef {
 * 
 */
 @JsonProperty("name")
-@JsonPropertyDescription("An explanation about the purpose of this instance.")
 private String name;
 @JsonProperty("values")
 private List<String> values = null;

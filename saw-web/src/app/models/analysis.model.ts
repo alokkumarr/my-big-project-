@@ -8,6 +8,7 @@ import { LabelOptions } from './label-options.model';
 import { Legend } from './legend.model';
 import { Axis } from './axis.model';
 import { AnalysisType } from './analysis-type.model';
+import { MapSettings } from './map-settings.model';
 
 export interface Analysis {
   description: string;
@@ -16,6 +17,7 @@ export interface Analysis {
   categoryId: number;
   artifacts: Artifact[];
   createdTimestamp: number;
+  updatedTimestamp?: number;
   disabled: null | boolean | string;
   id: string;
   isScheduled: string;
@@ -43,6 +45,10 @@ export interface Analysis {
   groupByColumns?: any[];
   crondetails?: any;
   chartTitle: string;
+  mapSettings?: MapSettings;
+  parentAnalysisId?: string;
+  parentCategoryId?: string | number;
+  parentLastModified?: number;
   // groupByColumns should be deprecated
 }
 
