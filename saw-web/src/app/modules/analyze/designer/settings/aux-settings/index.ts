@@ -4,3 +4,4 @@ export {
 export { DesignerSettingsAuxMapChartComponent } from './map-chart';
 
 export { DesignerSettingsAuxChartComponent } from './chart';
+export { DesignerSettingsAuxMapComponent } from './map';
