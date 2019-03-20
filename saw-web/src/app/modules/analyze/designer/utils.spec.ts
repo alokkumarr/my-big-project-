@@ -40,7 +40,7 @@ describe('Analyze utils', () => {
       'icon-string-type'
     );
     expect(getArtifactColumnTypeIcon(geoColumn, 'map')).toBe('icon-geo-chart');
-    expect(getArtifactColumnTypeIcon(lngLatColumn, 'nap')).toBe(
+    expect(getArtifactColumnTypeIcon(lngLatColumn, 'map')).toBe(
       'icon-geo-chart'
     );
   });

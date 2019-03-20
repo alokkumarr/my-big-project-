@@ -54,12 +54,8 @@
     border-bottom-right-radius: 3px;
     border: 1px solid $primary-grey-g1;
 
-    & > .mat-chip-list-wrapper {
-      margin: 0;
-    }
-
     &.highlighted {
-      border: 1px solid green;
+      border: 1px solid $primary-blue-b2;
     }
   }
 }
