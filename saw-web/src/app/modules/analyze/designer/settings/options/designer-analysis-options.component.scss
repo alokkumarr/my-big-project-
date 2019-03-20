@@ -5,6 +5,14 @@
     font-size: 11px;
   }
 
+  .mat-tab-group {
+    height: 100% !important;
+  }
+
+  ::ng-deep .mat-tab-body {
+    padding: 3px;
+  }
+
   ::ng-deep .mat-tab-label {
     height: 43px;
     padding: 0;

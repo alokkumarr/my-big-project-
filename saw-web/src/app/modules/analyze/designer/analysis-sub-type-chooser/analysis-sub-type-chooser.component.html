@@ -1,12 +1,14 @@
 <mat-button-toggle-group
+  id="analysis-subtype"
   #group="matButtonToggleGroup"
   appearance="legacy"
   (change)="change.emit($event.value)"
-  [value]="chartType"
+  [value]="subType"
+  e2e="analysis-subtype"
 >
   <mat-button-toggle
     class="chart-option"
-    *ngFor="let type of chartTypes"
+    *ngFor="let type of subTypes"
     [value]="type.type"
   >
     <mat-icon [svgIcon]="type.icon.svg" [matTooltip]="type.label"> </mat-icon>

@@ -343,14 +343,17 @@ export class DesignerService {
       return metricGroupAdapter.artifactColumns.length > 1;
     };
     const metricRejectFn = (
-      _,
+      groupAdapter: IDEsignerSettingGroupAdapter,
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => {
       const groupByGroupAdapter = find(
         groupAdapters,
         adapter => adapter.title === groupByTitle
       );
-      return groupByGroupAdapter.artifactColumns.length > 0;
+      return (
+        groupByGroupAdapter.artifactColumns.length > 0 &&
+        groupAdapter.artifactColumns.length === 1
+      );
     };
 
     const canAcceptMetricType = canAcceptNumberType;

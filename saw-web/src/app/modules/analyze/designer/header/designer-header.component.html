@@ -32,12 +32,13 @@
     </div>
   </div>
 
-  <chart-type-chooser
+  <analysis-sub-type-chooser
     *ngIf="analysis?.type === 'chart'"
     (change)="onChartTypeChange($event)"
-    [chartType]="analysis.chartType"
+    [category]="analysis.type"
+    [subType]="analysis.chartType"
   >
-  </chart-type-chooser>
+  </analysis-sub-type-chooser>
 
   <div
     fxLayout="row"

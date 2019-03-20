@@ -297,13 +297,13 @@ export const ANALYSIS_METHODS = [
         children: [
           {
             label: 'Geolocation',
-            icon: { font: 'icon-geo-chart' },
+            icon: { font: 'icon-geo-chart', svg: 'geo-location-col' },
             type: 'map:chart_scale',
             typeOnBackEnd: 'map:chart_scale'
           },
           {
             label: 'Map',
-            icon: { font: 'icon-geo-chart' },
+            icon: { font: 'icon-geo-chart', svg: 'geo-location-col' },
             type: 'map:map',
             typeOnBackEnd: 'map-map'
           }

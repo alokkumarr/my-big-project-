@@ -12,46 +12,48 @@
   >
     {{ adapter.title }}:
   </div>
-
   <mat-chip-list
+    class="selected-fields__list"
+    fxLayout="row"
+    fxFlex="90"
     cdkDropList
     cdkDropListOrientation="horizontal"
     [cdkDropListData]="adapter"
     [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
     (cdkDropListDropped)="drop($event, adapterIndex)"
-    fxFlex="90"
     [attr.e2e]="'designer-selected-container' + adapter.title"
-    class="selected-fields__list"
     [class.highlighted]="isDragInProgress && canAcceptMap[adapter.title]"
   >
-    <mat-chip
-      *ngFor="let col of adapter.artifactColumns"
-      class="selected-fields__item"
-      [attr.e2e]="
-        'designer-selected-field-' + (col.aliasName || col.displayName)
-      "
-      [ngClass]="getFieldItemClass(col)"
-      cdkDrag
-      (cdkDragStarted)="dragStarted($event)"
-      (cdkDragReleased)="dragReleased($event)"
-      [cdkDragData]="col"
-      [removable]="true"
-      (removed)="removeFromGroup(col, adapter)"
-    >
-      <ng-container *ngIf="col.aggregate; else defaultTemplate">
-        <span
-          [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate].label"
-          [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
-        >
-        </span>
-        <span> (&nbsp;{{ col.aliasName || col.displayName }}&nbsp;) </span>
-      </ng-container>
-      <ng-template #defaultTemplate>
-        {{ col.aliasName || col.displayName }}
-      </ng-template>
+    <perfect-scrollbar [config]="config">
+      <mat-chip
+        *ngFor="let col of adapter.artifactColumns"
+        class="selected-fields__item"
+        [attr.e2e]="
+          'designer-selected-field-' + (col.aliasName || col.displayName)
+        "
+        [ngClass]="getFieldItemClass(col)"
+        cdkDrag
+        (cdkDragStarted)="dragStarted($event)"
+        (cdkDragReleased)="dragReleased($event)"
+        [cdkDragData]="col"
+        [removable]="true"
+        (removed)="removeFromGroup(col, adapter)"
+      >
+        <ng-container *ngIf="col.aggregate; else defaultTemplate">
+          <span
+            [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate].label"
+            [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
+          >
+          </span>
+          <span> (&nbsp;{{ col.aliasName || col.displayName }}&nbsp;) </span>
+        </ng-container>
+        <ng-template #defaultTemplate>
+          {{ col.aliasName || col.displayName }}
+        </ng-template>
 
-      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
-    </mat-chip>
+        <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+      </mat-chip>
+    </perfect-scrollbar>
   </mat-chip-list>
 </div>
 

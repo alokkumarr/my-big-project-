@@ -125,19 +125,11 @@ export class DesignerMapChartComponent implements OnInit {
   }
 
   setChartConfig(legend) {
-    const colorAxis = {
-      min: 1,
-      type: 'logarithmic',
-      minColor: '#FFFFFF',
-      maxColor: '#1A89D4'
-    };
-
     this.chartOptions = omitBy(
       {
         mapNavigation: {
           enabled: true
         },
-        colorAxis,
         legend
       },
       isNil
