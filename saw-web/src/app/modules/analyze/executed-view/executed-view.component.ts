@@ -97,25 +97,32 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   onParamsChange(params, queryParams) {
     const { analysisId } = params;
-    const { awaitingExecution, loadLastExecution, executionId } = queryParams;
+    const {
+      awaitingExecution,
+      loadLastExecution,
+      executionId,
+      isDSL
+    } = queryParams;
 
     this.executionId = executionId;
 
-    this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
-      this.analysis = analysis;
-      this.setPrivileges(analysis);
+    this.loadAnalysisById(analysisId, isDSL === 'true').then(
+      (analysis: Analysis) => {
+        this.analysis = analysis;
+        this.setPrivileges(analysis);
 
-      /* If an execution is not already going on, create a new execution
-       * as applicable. */
-      this.executeIfNotWaiting(
-        analysis,
-        /* awaitingExecution and loadLastExecution paramaters are supposed to be boolean,
-         * but all query params come as strings. So typecast them properly */
-        awaitingExecution === 'true',
-        loadLastExecution === 'true',
-        executionId
-      );
-    });
+        /* If an execution is not already going on, create a new execution
+         * as applicable. */
+        this.executeIfNotWaiting(
+          analysis,
+          /* awaitingExecution and loadLastExecution paramaters are supposed to be boolean,
+           * but all query params come as strings. So typecast them properly */
+          awaitingExecution === 'true',
+          loadLastExecution === 'true',
+          executionId
+        );
+      }
+    );
 
     this.executionsSub = this._executeService.subscribe(
       analysisId,
@@ -338,8 +345,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       );
   }
 
-  loadAnalysisById(analysisId) {
-    return this._analyzeService.readAnalysis(analysisId).then(
+  loadAnalysisById(analysisId, isDSLAnalysis: boolean) {
+    return this._analyzeService.readAnalysis(analysisId, isDSLAnalysis).then(
       (analysis: Analysis) => {
         this.analysis = analysis;
         // this._analyzeService

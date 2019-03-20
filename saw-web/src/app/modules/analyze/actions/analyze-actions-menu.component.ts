@@ -6,6 +6,7 @@ import * as isString from 'lodash/isString';
 import * as upperCase from 'lodash/upperCase';
 import { JwtService } from '../../../common/services';
 import { Analysis } from '../types';
+import { AnalysisDSL } from '../../../models';
 import { AnalyzeActionsService } from './analyze-actions.service';
 import { DesignerSaveEvent } from '../designer/types';
 import * as clone from 'lodash/clone';
@@ -22,7 +23,7 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   @Output() afterPublish: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterSchedule: EventEmitter<Analysis> = new EventEmitter();
   @Output() detailsRequested: EventEmitter<boolean> = new EventEmitter();
-  @Input() analysis: Analysis;
+  @Input() analysis: Analysis | AnalysisDSL;
   @Input() exclude: string;
   @Input('actionsToDisable')
   set disabledActions(actionsToDisable: string) {
@@ -100,7 +101,9 @@ export class AnalyzeActionsMenuComponent implements OnInit {
       const privilegeName = upperCase(privilegeMap[value] || value);
       const hasPriviledge = this._jwt.hasPrivilege(privilegeName, {
         subCategoryId: this.analysis.categoryId,
-        creatorId: this.analysis.userId
+        creatorId:
+          (<Analysis>this.analysis).userId ||
+          (<AnalysisDSL>this.analysis).createdBy
       });
 
       return notExcluded && hasPriviledge;
@@ -126,7 +129,7 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   delete() {
     this._analyzeActionsService.delete(this.analysis).then(wasSuccessful => {
       if (wasSuccessful) {
-        this.afterDelete.emit(this.analysis);
+        this.afterDelete.emit(<Analysis>this.analysis);
       }
     });
   }

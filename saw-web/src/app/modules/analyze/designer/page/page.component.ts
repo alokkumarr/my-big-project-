@@ -33,6 +33,7 @@ interface NewDesignerQueryParams {
 interface ExistingDesignerQueryParams {
   mode: DesignerMode;
   analysisId: string;
+  isDSLAnalysis: string;
 }
 
 type DesignerQueryParams = NewDesignerQueryParams | ExistingDesignerQueryParams;
@@ -85,7 +86,10 @@ export class DesignerPageComponent implements OnInit {
   }
 
   onSave({ analysis, requestExecution }: DesignerSaveEvent) {
-    const navigateBackTo = this.designerMode === 'fork' || this.designerMode === 'new'  ? 'home' : 'back';
+    const navigateBackTo =
+      this.designerMode === 'fork' || this.designerMode === 'new'
+        ? 'home'
+        : 'back';
     if (requestExecution) {
       this._executeService.executeAnalysis(
         analysis,
@@ -128,7 +132,10 @@ export class DesignerPageComponent implements OnInit {
     } else {
       const existingAnalysisParams = <ExistingDesignerQueryParams>params;
       this.analyzeService
-        .readAnalysis(existingAnalysisParams.analysisId)
+        .readAnalysis(
+          existingAnalysisParams.analysisId,
+          existingAnalysisParams.isDSLAnalysis === 'true'
+        )
         .then(analysis => {
           this.analysis = this.forkIfNecessary({
             ...analysis,

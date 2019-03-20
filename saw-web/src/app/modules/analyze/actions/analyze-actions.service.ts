@@ -135,39 +135,46 @@ export class AnalyzeActionsService {
     }
 
     return this._analyzeService
-      .readAnalysis(analysis.parentAnalysisId, { [CUSTOM_HEADERS.SKIP_TOAST]: '1' })
-      .then(parentAnalysis => {
-        /* The destination category is different from parent analysis's category. Publish it normally */
-        if (
-          parentAnalysis.categoryId.toString() !==
-          analysis.categoryId.toString()
-        ) {
+      .readAnalysis(analysis.parentAnalysisId, !!(analysis as any).sipQuery, {
+        [CUSTOM_HEADERS.SKIP_TOAST]: '1'
+      })
+      .then(
+        parentAnalysis => {
+          /* The destination category is different from parent analysis's category. Publish it normally */
+          if (
+            parentAnalysis.categoryId.toString() !==
+            analysis.categoryId.toString()
+          ) {
+            return publish();
+          }
+
+          /* If the parent has been modified since fork/editing, allow user to choose whether
+           they want to overwrite the parent analysis */
+          if (
+            analysis.parentLastModified !==
+            (<Analysis>parentAnalysis).updatedTimestamp
+          ) {
+            return this.showPublishOverwriteConfirmation()
+              .afterClosed()
+              .toPromise()
+              .then(shouldPublish => {
+                if (shouldPublish) {
+                  return overwriteParent(parentAnalysis, analysis);
+                } else {
+                  return null;
+                }
+              });
+          }
+          return overwriteParent(parentAnalysis, analysis);
+        },
+        err => {
+          delete analysis.parentAnalysisId;
+          delete analysis.parentCategoryId;
+          delete analysis.parentLastModified;
+
           return publish();
         }
-
-        /* If the parent has been modified since fork/editing, allow user to choose whether
-           they want to overwrite the parent analysis */
-        if (analysis.parentLastModified !== parentAnalysis.updatedTimestamp) {
-          return this.showPublishOverwriteConfirmation()
-            .afterClosed()
-            .toPromise()
-            .then(shouldPublish => {
-              if (shouldPublish) {
-                return overwriteParent(parentAnalysis, analysis);
-              } else {
-                return null;
-              }
-            });
-        }
-        return overwriteParent(parentAnalysis, analysis);
-      },
-      err => {
-        delete analysis.parentAnalysisId;
-        delete analysis.parentCategoryId;
-        delete analysis.parentLastModified;
-
-        return publish();
-      });
+      );
   }
 
   openPublishModal(analysis, type) {
@@ -194,7 +201,7 @@ export class AnalyzeActionsService {
                         ? 'Analysis has been updated.'
                         : 'Analysis schedule changes have been updated.'
                     );
-                    resolve(publishedAnalysis);
+                    resolve(publishedAnalysis as Analysis);
                   },
                   () => {
                     reject();
@@ -228,7 +235,7 @@ export class AnalyzeActionsService {
                           ? 'Analysis has been updated.'
                           : 'Analysis schedule changes have been updated.'
                       );
-                      resolve(updatedAnalysis);
+                      resolve(updatedAnalysis as Analysis);
                     },
                     () => {
                       reject();

@@ -1,4 +1,6 @@
 export {
+  AnalysisDSL,
+  AnalysisChartDSL,
   Analysis,
   AnalysisChart,
   AnalysisReport,

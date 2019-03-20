@@ -17,6 +17,8 @@ import * as compact from 'lodash/compact';
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
 import { AnalysisType, Analysis } from '../types';
+import { AnalysisDSL } from '../../../models';
+
 import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
@@ -73,7 +75,10 @@ const canAcceptLngLat = (
 export class DesignerService {
   constructor(private _analyzeService: AnalyzeService) {}
 
-  createAnalysis(semanticId: string, type: AnalysisType): Promise<Analysis> {
+  createAnalysis(
+    semanticId: string,
+    type: AnalysisType
+  ): Promise<Analysis | AnalysisDSL> {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 
@@ -207,7 +212,10 @@ export class DesignerService {
     return pivotGroupAdapters;
   }
 
-  getMapGroupAdapters(artifactColumns, subType): IDEsignerSettingGroupAdapter[] {
+  getMapGroupAdapters(
+    artifactColumns,
+    subType
+  ): IDEsignerSettingGroupAdapter[] {
     const mapReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
@@ -265,8 +273,8 @@ export class DesignerService {
     const dimensionAdapter: IDEsignerSettingGroupAdapter = {
       ...defaultDimensionAdapter,
       title: subType === 'map' ? 'Coordinates' : 'Dimension',
-      canAcceptArtifactColumn: subType === 'map' ?
-        canAcceptLngLat : canAcceptGeoType
+      canAcceptArtifactColumn:
+        subType === 'map' ? canAcceptLngLat : canAcceptGeoType
     };
 
     const mapGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
@@ -387,7 +395,9 @@ export class DesignerService {
       title: chartType === 'pie' ? 'Color By' : 'Dimension',
       canAcceptArtifactColumn: isStockChart
         ? canAcceptDateType
-        : chartType === 'geo' ? canAcceptGeoType : canAcceptAnyType,
+        : chartType === 'geo'
+        ? canAcceptGeoType
+        : canAcceptAnyType
     };
 
     const sizeAdapter: IDEsignerSettingGroupAdapter = {
@@ -439,8 +449,7 @@ export class DesignerService {
       /* prettier-ignore */
       chartType === 'bubble' ?
         sizeAdapter : null,
-      chartType === 'geo' ?
-        null : groupByAdapter
+      chartType === 'geo' ? null : groupByAdapter
     ]);
 
     this._distributeArtifactColumnsIntoGroups(

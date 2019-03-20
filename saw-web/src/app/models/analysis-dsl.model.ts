@@ -60,7 +60,9 @@ export interface QueryDSL {
 
 // All fields marked todo have not yet been implemented in
 // backend in new API.
-export interface AnalysisDSL {
+
+// Don't use this base interface directly
+export interface AnalysisBaseDSL {
   categoryId: number; // todo
   createdBy?: string; // email
   createdTime?: number;
@@ -77,6 +79,7 @@ export interface AnalysisDSL {
   parentCategoryId?: string | number; // todo
   parentLastModified?: number; // todo
   projectCode: string;
+  saved: boolean; // todo
   schedule?: Schedule; // todo
   scheduled: null; // todo
   scheduleHuman?: string; // todo
@@ -86,7 +89,7 @@ export interface AnalysisDSL {
   sipQuery: QueryDSL;
 }
 
-export interface AnalysisChartDSL {
+export interface AnalysisChartDSL extends AnalysisBaseDSL {
   chartTitle: string; // todo
   chartType: string; // todo
   isInverted: boolean; // todo
@@ -95,3 +98,5 @@ export interface AnalysisChartDSL {
   xAxis?: Axis; // todo
   yAxis?: Axis; // todo
 }
+
+export type AnalysisDSL = AnalysisChartDSL;

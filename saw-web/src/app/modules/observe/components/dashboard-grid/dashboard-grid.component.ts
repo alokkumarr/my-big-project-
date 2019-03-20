@@ -41,7 +41,7 @@ import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component'
+import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -89,7 +89,7 @@ export class DashboardGridComponent
     private dashboardService: DashboardService,
     private windowService: WindowService,
     private sidenav: SideNavService,
-    private _dialog: MatDialog,
+    private _dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -361,7 +361,9 @@ export class DashboardGridComponent
       }
 
       this.analyze
-        .readAnalysis(tile.id, { [CUSTOM_HEADERS.SKIP_TOAST]: '1' })
+        .readAnalysis(tile.id, tile.dslAnalysis, {
+          [CUSTOM_HEADERS.SKIP_TOAST]: '1'
+        })
         .then(
           data => {
             tile.analysis = data;
@@ -371,7 +373,7 @@ export class DashboardGridComponent
             this.getDashboard.emit({ changed: true, dashboard: this.model });
             this.refreshTile(tile);
           },
-          err => {
+          () => {
             tile.success = false;
             this.dashboard.push(tile);
             tileLoaded();
@@ -541,6 +543,7 @@ export class DashboardGridComponent
       updatedAt: get(model, 'updatedAt', ''),
       tiles: map(this.dashboard, tile => ({
         type: this.tileType(tile),
+        dslAnalysis: !!get(tile, 'analysis.sipQuery', null),
         id: get(tile, 'analysis.id', ''),
         x: tile.x,
         y: tile.y,

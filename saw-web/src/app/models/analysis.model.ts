@@ -49,6 +49,7 @@ export interface Analysis {
   sqlBuilder: SqlBuilder;
   type: AnalysisType;
   updatedTimestamp?: number;
+  updatedUserName?: string;
   userFullName: string;
   userId: number;
   // groupByColumns should be deprecated

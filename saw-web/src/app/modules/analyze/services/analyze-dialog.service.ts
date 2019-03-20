@@ -47,7 +47,12 @@ export class AnalyzeDialogService {
   openAnalysisDialog(data: AnalysisDialogData) {
     const mode = data.designerMode || 'new';
     const analysisStarter = data.analysisStarter || {};
-    const analysis = data.analysis ? { analysisId: data.analysis.id } : {};
+    const analysis = data.analysis
+      ? {
+          analysisId: data.analysis.id,
+          isDSLAnalysis: !!(data.analysis as any).sipQuery
+        }
+      : {};
 
     return this.router.navigate(['analyze/designer'], {
       queryParams: { ...analysisStarter, ...analysis, mode }
