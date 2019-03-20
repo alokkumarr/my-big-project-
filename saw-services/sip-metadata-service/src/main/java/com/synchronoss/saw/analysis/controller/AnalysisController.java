@@ -7,6 +7,7 @@ import com.synchronoss.saw.analysis.service.AnalysisService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -46,7 +47,6 @@ public class AnalysisController {
    * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @param analysis analysis definition
-   * @param id analysis ID
    * @return Analysis
    */
   @ApiOperation(
@@ -55,15 +55,14 @@ public class AnalysisController {
       notes = "",
       response = AnalysisResponse.class)
   @RequestMapping(
-      value = "/{id}",
+      value = "/",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public AnalysisResponse createAnalysis(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestBody Analysis analysis,
-      @PathVariable(name = "id") String id) {
+      @RequestBody Analysis analysis) {
 
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket ticket = new Ticket();
@@ -72,6 +71,8 @@ public class AnalysisController {
       response.setStatus(400);
       return analysisResponse;
     }
+
+    String id = UUID.randomUUID().toString();
     analysis.setId(id);
     analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, ticket));
     analysisResponse.setAnalysisId(id);
