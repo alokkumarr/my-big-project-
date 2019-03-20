@@ -17,6 +17,19 @@ class ChartsDesignerPage extends Designer {
     this._unselectedField = name =>
       element(by.css(`[e2e="designer-unselected-field-${name}"]`));
     this._previewBtn = element(by.css('button[e2e="open-preview-modal"]'));
+    this._filterBtn = element(by.css(`[e2e="open-filter-modal"]`));
+    this._dataOptions = name =>
+      element(by.css(`[e2e="designer-data-option-${name}"]`));
+    this._groupBySelector = element(by.css(`designer-date-interval-selector`));
+    this._groupByOption = name =>
+      element(
+        by.xpath(
+          `//span[@class="mat-option-text" and contains(text(),"${name}")]`
+        )
+      );
+    this._aggregateOption = name => element(by.css(`[e2e="${name}"]`));
+    this._selectedField=name=>element(by.css(`[e2e="designer-selected-field-${name}"]`));
+    this._appliedFilters=element(by.css(`[e2e="designer-applied-filters"]`));
   }
 
   searchAttribute(attribute) {
@@ -57,6 +70,32 @@ class ChartsDesignerPage extends Designer {
 
   clickOnPreviewButton() {
     commonFunctions.clickOnElement(this._previewBtn);
+  }
+
+  clickOnFilterButton() {
+    commonFunctions.clickOnElement(this._filterBtn);
+  }
+
+  clickOnDataOptions(type) {
+    commonFunctions.clickOnElement(this._dataOptions(type));
+  }
+
+  clickOnGroupBySelector() {
+    commonFunctions.clickOnElement(this._groupBySelector);
+  }
+
+  clickOnGroupByOption(name) {
+    commonFunctions.clickOnElement(this._groupByOption(name));
+  }
+  clickOnAggregateOption(name) {
+    commonFunctions.clickOnElement(this._aggregateOption(name));
+  }
+  verifySelectedFiledIsPresent(name){
+      commonFunctions.waitFor.elementToBeVisible(this._selectedField(name))
+  }
+
+  verifyFilterApplied(filter){
+      commonFunctions.waitFor.elementToBeVisible(this._appliedFilters);
   }
 }
 module.exports = ChartsDesignerPage;

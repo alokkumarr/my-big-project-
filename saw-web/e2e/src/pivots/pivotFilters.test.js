@@ -55,7 +55,7 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
             const analyzePage = new AnalyzePage();
             analyzePage.clickOnAddAnalysisButton();
-            analyzePage.clickOnAnalysisType(analysisType)
+            analyzePage.clickOnAnalysisType(analysisType);
             analyzePage.clickOnNextButton();
             analyzePage.clickOnDataPods(metricName);
             analyzePage.clickOnCreateButton();
@@ -86,56 +86,26 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
             // Scenario for group intervals
             if (data.groupIntervalSpecified) {
-                commonFunctions.clickOnElement(designModePage.pivot.expandSelectedFieldPropertiesButton(
-                  dateFieldName
-                ))
+              chartDesignerPage.clickOnDataOptions(dateFieldName);
               browser.sleep(2000);
-              designModePage.pivot.groupIntervalDropDown
-                .getAttribute('id')
-                .then(function(id) {
-                  commonFunctions.waitFor.elementToBeVisible(
-                    designModePage.pivot.groupIntervalDrop(id)
-                  );
-                  designModePage.pivot.groupIntervalDrop(id).click();
 
-                  commonFunctions.waitFor.elementToBeClickable(
-                    designModePage.pivot.groupIntervalDropDownElement(
-                      data.groupInterval
-                    )
-                  );
-                  designModePage.pivot
-                    .groupIntervalDropDownElement(data.groupInterval)
-                    .click();
-                });
+              // select the group by interval value e.g. year/month day etc
+              chartDesignerPage.clickOnGroupBySelector();
+              chartDesignerPage.clickOnGroupByOption(data.groupInterval);
             }
 
             // Scenario for aggregate functions
             if (data.aggregateFunction) {
-              commonFunctions.waitFor.elementToBeClickable(
-                designModePage.aggregateFunctionButton('sum')
-              );
-              designModePage.aggregateFunctionButton('sum').click();
-              // Have to add sleep for elements to be rendered. They appear in DOM faster than they can be actually clicked
-              commonFunctions.waitFor.elementToBeVisible(
-                designModePage.aggregateFunctionMenuItem(data.aggregateFunction)
-              );
-              commonFunctions.waitFor.elementToBeClickable(
-                designModePage.aggregateFunctionMenuItem(data.aggregateFunction)
-              );
-              designModePage
-                .aggregateFunctionMenuItem(data.aggregateFunction)
-                .click();
+              chartDesignerPage.clickOnDataOptions(numberFieldName);
+              browser.sleep(2000); // Needed to avoid element not loaded/active
+              chartDesignerPage.clickOnAggregateOption('sum');
+              browser.sleep(1000);
+              chartDesignerPage.clickOnAggregateOption(data.aggregateFunction);
             }
 
             // Add filter
             const filterWindow = designModePage.filterWindow;
-            commonFunctions.waitFor.elementToBeVisible(
-              designModePage.filterBtn
-            );
-            commonFunctions.waitFor.elementToBeClickable(
-              designModePage.filterBtn
-            );
-            designModePage.filterBtn.click();
+            chartDesignerPage.clickOnFilterButton();
             commonFunctions.waitFor.elementToBeClickable(
               designModePage.filterWindow.addFilter('sample')
             );
@@ -188,7 +158,7 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
                 filterWindow.string.operatorDropDownItem(data.operator)
               );
               filterWindow.string.operatorDropDownItem(data.operator).click();
-              // Select diffrent input for Is in and Is not in operator TODO: we should be consistent
+              // Select different input for Is in and Is not in operator TODO: we should be consistent
               if (data.operator === 'Is in' || data.operator === 'Is not in') {
                 commonFunctions.waitFor.elementToBeVisible(
                   filterWindow.string.isInIsNotInInput
