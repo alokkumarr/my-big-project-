@@ -41,11 +41,11 @@ class GlobalFilters{
         try{
             dashboardGlobalFilters.forEach(currentFilter => {
                 if (currentFilter.name.toLowerCase() === 'string') {
-                    // browser.sleep(2000);
+                    browser.sleep(2000);
                     commonFunctions.fillInput(this._stringFilter, currentFilter.value);
                     commonFunctions.clickOnElement(this._stringFilterValue(currentFilter.value));
                 } else if (currentFilter.name.toLowerCase() === 'date') {
-                   // browser.sleep(2000);
+                    browser.sleep(2000);
                     commonFunctions.clickOnElement(this._dateFilterPreset); 
                     commonFunctions.clickOnElement(this._dateFilterPresetValue(currentFilter.preset));
                 } else if (currentFilter.name.toLowerCase() === 'long' || currentFilter.name.toLowerCase() === 'integer' || currentFilter.name.toLowerCase() === 'float' || currentFilter.name.toLowerCase() === 'double') {
