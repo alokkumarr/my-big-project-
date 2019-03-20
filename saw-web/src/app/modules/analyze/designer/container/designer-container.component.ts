@@ -44,9 +44,9 @@ import {
   DEFAULT_MAP_SETTINGS
 } from '../consts';
 
-import { DRAFT_CATEGORY_ID } from './../../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
+import { JwtService } from '../../../../common/services';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -83,7 +83,8 @@ export class DesignerContainerComponent implements OnInit {
   constructor(
     public _designerService: DesignerService,
     public _analyzeDialogService: AnalyzeDialogService,
-    public _chartService: ChartService
+    public _chartService: ChartService,
+    private _jwtService: JwtService
   ) {}
 
   ngOnInit() {
@@ -537,7 +538,7 @@ export class DesignerContainerComponent implements OnInit {
   openSaveDialog(): Promise<any> {
     this.analysis.categoryId =
       this.designerMode === 'new' || this.designerMode === 'fork'
-        ? DRAFT_CATEGORY_ID
+        ? this._jwtService.userAnalysisCategoryId
         : this.analysis.categoryId;
     return this._analyzeDialogService
       .openSaveDialog(this.analysis, this.designerMode)

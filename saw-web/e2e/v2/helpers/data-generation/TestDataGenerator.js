@@ -89,6 +89,35 @@ class TestDataGenerator {
       'generate user for userOne'
     );
 
+    // Generate user for reset password
+    utils.validApiCall(
+      adminHelper.generateUser(
+        apiUrl,
+        users.adminReset,
+        roles.admin.roleId,
+        token,
+        activeStatusInd,
+        customerId,
+        users.anyUser.email,
+        users.anyUser.password
+      ),
+      'generate user for admin'
+    );
+
+    utils.validApiCall(
+      adminHelper.generateUser(
+        apiUrl,
+        users.userOneReset,
+        roles.userOne.roleId,
+        token,
+        activeStatusInd,
+        customerId,
+        users.anyUser.email,
+        users.anyUser.password
+      ),
+      'generate user for userOne'
+    );
+
     // Generate categories
     utils.validApiCall(
       adminHelper.generateCategory(
@@ -322,55 +351,6 @@ class TestDataGenerator {
       ),
       'generatePrivilege for user with ' +
         createSubCategories.observeSubCategory
-    );
-
-    // Workbench section
-    // Add all privilege to Data Ingestion Service category with sub cat  Channel Management to workbench moduleId =4
-    // Generate categories for workbench module
-    let workbenchCategoriesList = utils.validApiCall(
-      adminHelper.generateCategory(
-        apiUrl,
-        categories.workbench,
-        token,
-        activeStatusInd,
-        productId,
-        customerId,
-        users.anyUser.email,
-        4
-      ),
-      'generateCategory for ' + categories.workbench
-    );
-
-    utils.validApiCall(
-      adminHelper.generateSubCategory(
-        apiUrl,
-        categories.workbench,
-        createSubCategories.workbenchSubCategory,
-        workbenchCategoriesList,
-        token,
-        activeStatusInd,
-        productId,
-        customerId,
-        users.anyUser.email,
-        4
-      ),
-      'generateSubCategory for ' + createSubCategories.workbenchSubCategory
-    );
-
-    utils.validApiCall(
-      adminHelper.generatePrivilege(
-        apiUrl,
-        privileges.all,
-        roles.admin,
-        categories.workbench,
-        createSubCategories.workbenchSubCategory,
-        token,
-        productId,
-        users.anyUser.email,
-        4
-      ),
-      'generatePrivilege for admin with ' +
-        createSubCategories.workbenchSubCategory
     );
   }
 }
