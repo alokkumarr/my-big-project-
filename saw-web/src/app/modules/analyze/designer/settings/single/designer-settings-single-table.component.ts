@@ -85,6 +85,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   public config: PerfectScrollbarConfigInterface = {};
 
   public groupsThatCanRecieveColumn: IDEsignerSettingGroupAdapter[];
+  menuVisibleFor: string;
 
   constructor(
     private _designerService: DesignerService,
@@ -247,9 +248,14 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   onAddToGroupMenuOpened(artifactColumn) {
+    this.menuVisibleFor = artifactColumn.displayName;
     this.groupsThatCanRecieveColumn = this._designerService.getGroupsThatCanRecieve(
       artifactColumn,
       this.groupAdapters
     );
+  }
+
+  onMenuClosed() {
+    this.menuVisibleFor = '';
   }
 }

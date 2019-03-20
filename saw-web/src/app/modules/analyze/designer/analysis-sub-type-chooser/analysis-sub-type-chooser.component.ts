@@ -29,7 +29,6 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
     const methods = cloneDeep(methodsMap[this.category]) || [];
     this.subTypes = map(methods, chartType => {
       const [, type] = split(chartType.type, ':');
-      console.log('type', type);
 
       const ret = {
         ...chartType,
