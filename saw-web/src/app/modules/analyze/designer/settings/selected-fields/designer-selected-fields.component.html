@@ -84,7 +84,7 @@
       [removable]="true"
       (removed)="removeFilter.emit($event)"
     >
-      {{ getDisplayName(filter) }}
+      {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
     </mat-chip>
   </mat-chip-list>

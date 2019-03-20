@@ -35,7 +35,7 @@ import {
   DesignerMoveColumnInGroupAdapter,
   DesignerRemoveColumnFromGroupAdapter
 } from '../../actions/designer.actions';
-
+import { getFilterValue } from '../../filter/chips-u';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
 @Component({
@@ -250,5 +250,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   dragReleased() {
     this._dndPubsub.emit('dragEnd');
+  }
+
+  getFilterValue(filter) {
+    return getFilterValue(filter);
   }
 }

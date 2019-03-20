@@ -9,6 +9,7 @@
   <mat-button-toggle
     class="chart-option"
     *ngFor="let type of subTypes"
+    [disabled]="type.disabled"
     [value]="type.type"
   >
     <mat-icon [svgIcon]="type.icon.svg" [matTooltip]="type.label"> </mat-icon>
