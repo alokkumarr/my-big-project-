@@ -80,6 +80,7 @@ export class AnalyzeActionsService {
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
+    case AnalyseTypes.Map:
       return this._analyzeDialogService
         .openEditAnalysisDialog(analysis, mode);
     default:

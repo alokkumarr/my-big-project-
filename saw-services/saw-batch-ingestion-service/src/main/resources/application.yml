@@ -53,6 +53,7 @@ sip:
     retry.delay: 5000
     retry.diff.mins: 1
     retry.page.size: 20
+    max.inprogress.mins: 45
 bis:
   transfer-batch-size: 10
   modified-retries: 3
