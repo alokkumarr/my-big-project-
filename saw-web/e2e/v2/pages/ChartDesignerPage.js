@@ -8,25 +8,55 @@ class ChartsDesignerPage extends Designer {
     super();
     this._filterInput = element(by.css(`[name="filter-settings"]`));
     this._attribute = attribute =>
-      element(by.css(`[e2e="designer-add-btn-${attribute}"]`));
-    this.attributesCloseIcons = element.all(by.css('[fonticon="icon-close"]'));
+      element(by.css(`[e2e="designer-add-menu-btn-${attribute}"]`));
+    this._attributesCloseIcons = element.all(
+      by.css('[fonticon="icon-remove"]')
+    );
+    this._fieldType = (attribute, name) =>
+      element(by.css(`[e2e="designer-add-option-btn-${attribute}-${name}"]`));
+    this._unselectedField = name =>
+      element(by.css(`[e2e="designer-unselected-field-${name}"]`));
+    this._previewBtn = element(by.css('button[e2e="open-preview-modal"]'));
   }
 
   searchAttribute(attribute) {
     commonFunctions.fillInput(this._filterInput(attribute));
   }
 
-  clickOnAttribute(attribute) {
+  clickOnAttribute(attribute, type) {
+    browser
+      .actions()
+      .mouseMove(this._unselectedField(attribute))
+      .click()
+      .perform();
+
+    commonFunctions.waitFor.elementToBeVisible(this._attribute(attribute));
     commonFunctions.clickOnElement(this._attribute(attribute));
+    browser.sleep(1000);
+
+    commonFunctions.waitFor.elementToBeVisible(
+      this._fieldType(attribute, type)
+    );
+    commonFunctions.clickOnElement(this._fieldType(attribute, type));
+    browser.sleep(1000);
   }
+
   clearAttributeSelection() {
     //Clear all fields.
-    this.attributesCloseIcons.then(function(deleteElements) {
+    this._attributesCloseIcons.then(function(deleteElements) {
       for (let i = 0; i < deleteElements.length; ++i) {
         commonFunctions.clickOnElement(deleteElements[i]);
         browser.sleep(2000); // sleep for some time to avoid failures
       }
     });
+  }
+
+  searchInputPresent() {
+    commonFunctions.waitFor.elementToBeVisible(this._filterInput);
+  }
+
+  clickOnPreviewButton() {
+    commonFunctions.clickOnElement(this._previewBtn);
   }
 }
 module.exports = ChartsDesignerPage;
