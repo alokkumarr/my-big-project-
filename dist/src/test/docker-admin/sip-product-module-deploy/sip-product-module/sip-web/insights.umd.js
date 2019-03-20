@@ -1,0 +1,1 @@
+/* Sample UMD file used for testing purpose */

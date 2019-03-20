@@ -6,6 +6,7 @@ import { ExecutedListComponent } from './list';
 import { ExecutedReportViewComponent } from './report';
 import { ExecutedPivotViewComponent } from './pivot';
 import { ExecutedChartViewComponent } from './chart';
+import { ExecutedMapViewComponent } from './map';
 import { ExecutedMapChartViewComponent } from './map-chart';
 import { ChartService, ToastService } from '../../../common/services';
 import { ExecuteService } from '../services/execute.service';
@@ -19,6 +20,7 @@ const COMPONENTS = [
   ExecutedReportViewComponent,
   ExecutedPivotViewComponent,
   ExecutedChartViewComponent,
+  ExecutedMapViewComponent,
   ExecutedMapChartViewComponent
 ];
 

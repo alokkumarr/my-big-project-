@@ -20,22 +20,24 @@ const CRITICAL = [
   TEST_BASE_DIR + 'analyze.test.js',
   TEST_BASE_DIR + 'charts/applyFiltersToCharts.js',
   TEST_BASE_DIR + 'charts/previewForCharts.test.js',
-  TEST_BASE_DIR + 'charts/editAndDeleteCharts.test.js',
-  TEST_BASE_DIR + 'charts/forkAndEditAndDeleteCharts.test.js',
+  TEST_BASE_DIR + 'charts/createAndDelete.test.js',
+  TEST_BASE_DIR + 'charts/editAndDelete.test.js',
+  TEST_BASE_DIR + 'charts/forkEditAndDelete.test.js',
   TEST_BASE_DIR + 'promptFilter/chartPromptFilters.test.js',
   TEST_BASE_DIR + 'promptFilter/esReportPromptFilters.test.js',
   TEST_BASE_DIR + 'promptFilter/pivotPromptFilters.test.js',
   TEST_BASE_DIR + 'promptFilter/reportPromptFilters.test.js',
   TEST_BASE_DIR + 'pivots/pivotFilters.test.js',
   TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithCharts.test.js',
-  TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithESReport.test.js',
-  TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
+  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
   TEST_BASE_DIR +
-    'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
-  TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithPivot.test.js',
+    'dashboards/createAndDeleteDashboardsWithActualVsTargetKPI.test.js',
+  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithPivot.test.js',
   TEST_BASE_DIR + 'observe/dashboardGlobalFilter.test.js',
   TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithPivot.test.js',
-  TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithESReport.test.js'
+  TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithESReport.test.js',
+  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithESReport.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL,
@@ -43,11 +45,8 @@ const REGRESSION = [...CRITICAL,
 ];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
-//TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
-//TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
-  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
-//TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
-//TEST_BASE_DIR + 'charts/createAndDelete.test.js
+  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
+  //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
 ];
 
 module.exports = {
