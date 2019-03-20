@@ -9,6 +9,8 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 
 import { ANALYSIS_METHODS, DATAPOD_CATEGORIES_OBJ } from '../../consts';
 import { IAnalysisMethod } from '../../types';
@@ -70,20 +72,44 @@ export class AnalyzeNewDialogComponent {
 
   setSupportedMetrics(method) {
     this._sortOrder = 'asc';
+    console.log(
+      'this.data.metrics',
+      map(this.data.metrics, metric => metric.supports)
+    );
 
     this.supportedMetricCategories = fpPipe(
       fpFilter(metric => {
+        // console.log('metric.supports', metric.supports);
+
         if (method.type === 'map:map') {
-          const doesSupportsMap = some(
+          const mapSupport = find(
             metric.supports,
             ({ category }) => category === 'map'
+          );
+
+          if (!mapSupport) {
+            return false;
+          }
+
+          const doesSupportsMap = some(
+            mapSupport.children,
+            ({ type }) => type === 'map:map'
           );
           return doesSupportsMap;
         }
         if (startsWith(method.type, 'map:chart')) {
-          const doesSupportsMapChart = some(
+          const mapChartSupport = find(
             metric.supports,
-            ({ category }) => category === 'mapChart'
+            ({ category }) => category === 'map'
+          );
+
+          if (!mapChartSupport) {
+            return false;
+          }
+
+          const doesSupportsMapChart = some(
+            mapChartSupport.children,
+            ({ type }) => type === 'map:chart'
           );
           return doesSupportsMapChart;
         }
@@ -157,18 +183,20 @@ export class AnalyzeNewDialogComponent {
   }
 
   createAnalysis() {
-    const semanticId = this.selectedMetric.id;
-    const metricName = this.selectedMetric.metricName;
+    const { id: semanticId, metricName, supports } = this.selectedMetric;
     const { type, chartType } = this.getAnalysisType(
       this.selectedMethod,
       this.selectedMetric
     );
+    console.log('supports', map(supports, 'category'));
+
     const model = {
       type,
       chartType,
       categoryId: this.data.id,
       semanticId,
-      metricName
+      metricName,
+      supports
     };
     this._dialogRef.afterClosed().subscribe(() => {
       this._analyzeDialogService.openNewAnalysisDialog(model);
