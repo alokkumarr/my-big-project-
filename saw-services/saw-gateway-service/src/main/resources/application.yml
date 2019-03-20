@@ -68,12 +68,18 @@ api:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]analysis.*'
+        -   location: ${metadata.service.host}
             method: GET
             path: '[/]analysis.*'
-        -   location: ${internal-analysis.service.host}
-            method: POST
-            path: '[/]analysis*'
+        -   location: ${metadata.service.host}
+            method: PUT
+            path: '[/]analysis.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]analysis.*'
         -   location: ${semantic.service.host}
             method: POST
             path: '[/]semantic*'
@@ -141,5 +147,4 @@ api:
             method: DELETE
             path: '[/]ingestion/batch.*'
 
-            
             
