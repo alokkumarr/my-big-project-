@@ -55,7 +55,7 @@ public class AnalysisController {
       notes = "",
       response = AnalysisResponse.class)
   @RequestMapping(
-      value = "/",
+      value = "",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
