@@ -20,6 +20,7 @@ class Header extends SideNav {
     this._launcherButton = element(by.css('[class="header__module-launcher-button"]'));
     this._observeLink= element(by.xpath('//a[contains(@class,"module-observe")]'));
     this._analyzeLink= element(by.xpath('//a[contains(@class,"module-analyze")]'));
+    this._progressBar = element(by.css('mat-progress-bar[mode="indeterminate"]'));
   }
 
   clickOnModuleLauncher(){
@@ -47,6 +48,10 @@ class Header extends SideNav {
   }
   openCategoryMenu() {
     commonFunctions.clickOnElement(this._categoryMenuIcon);
+  }
+
+  hideProgressBar(){
+    commonFunctions.waitFor.elementToBeNotVisible(this._progressBar);
   }
 }
 module.exports = Header;

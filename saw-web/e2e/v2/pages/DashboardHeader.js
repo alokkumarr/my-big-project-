@@ -1,9 +1,11 @@
 'use strict'
 
 const commonFunctions = require('../pages/utils/commonFunctions');
+const GlobalFilters = require('../pages/components/GlobalFilters');
 
-class DashboardHeader {
+class DashboardHeader extends GlobalFilters{
     constructor() {
+        super();
         this._addDashboardButton = element(by.css(`[e2e='dashboard-new-dashboard-button']`));
         this._manualRefreshButton = element(by.css(`[e2e='dashboard-manual-refresh-button']`));
         this._deleteDashboardButton = element(by.css(`[e2e='dashboard-delete-dashboard-button']`));
