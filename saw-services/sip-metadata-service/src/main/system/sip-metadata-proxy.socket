@@ -1,0 +1,8 @@
+[Unit]
+Description=SIP Metadata Proxy Socket
+
+[Socket]
+ListenStream=9500
+
+[Install]
+WantedBy=sockets.target

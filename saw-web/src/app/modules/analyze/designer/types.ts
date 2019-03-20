@@ -5,7 +5,8 @@ import {
   SqlBuilderReport,
   SqlBuilderEsReport,
   Join,
-  AnalysisType
+  AnalysisType,
+  MapSettings
 } from '../models';
 import { JsPlumbCanvasChangeEvent } from '../../../common/components/js-plumb/types';
 import {
@@ -57,7 +58,8 @@ export {
   Join,
   JsPlumbCanvasChangeEvent,
   AnalysisDialogData,
-  Region
+  Region,
+  MapSettings
 };
 
 export interface ArtifactColumnFilter {
@@ -112,7 +114,8 @@ export interface DesignerChangeEvent {
     | 'chartTitle'
     | 'fetchLimit'
     | 'changeQuery'
-    | 'region';
+    | 'region'
+    | 'mapSettings';
   column?: ArtifactColumn;
   data?: any;
 }
