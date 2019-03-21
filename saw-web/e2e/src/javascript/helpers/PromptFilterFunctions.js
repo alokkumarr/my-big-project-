@@ -385,8 +385,28 @@ class PromptFilterFunctions {
       commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
       filters.applyBtn.click();
       browser.sleep(1000);
-      const chartDesignerPage = new ChartDesignerPage();
-      chartDesignerPage.verifyAppliedFilters([fieldName]);
+      if (
+        analysisType === Constants.CHART ||
+        analysisType === Constants.PIVOT
+      ) {
+        const chartDesignerPage = new ChartDesignerPage();
+        chartDesignerPage.verifyAppliedFilters([fieldName]);
+      } else if (
+        analysisType === Constants.REPORT ||
+        analysisType === Constants.ES_REPORT
+      ) {
+        commonFunctions.waitFor.elementToBeVisible(
+          analyzePage.appliedFiltersDetails.filterText
+        );
+        commonFunctions.waitFor.elementToBeVisible(
+          analyzePage.appliedFiltersDetails.filterClear
+        );
+        commonFunctions.waitFor.elementToBeVisible(
+          analyzePage.appliedFiltersDetails.selectedFiltersText
+        );
+        _self.validateSelectedFilters([fieldName]);
+      }
+
       //Save
       const save = analyzePage.saveDialog;
       const designer = analyzePage.designerDialog;
