@@ -30,7 +30,7 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
 
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
   chartOptions: any;
-  updateChart = new BehaviorSubject([]);
+  @Input() updater;
 
   @ViewChild('chartContainer') chartContainer: ElementRef;
   chartHgt = {
@@ -96,6 +96,10 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
         chartType: this.chartType
       })
     });
+
+    if (!this.updater) {
+      this.updater = new BehaviorSubject([]);
+    }
   }
 
   ngAfterViewInit() {
@@ -165,6 +169,6 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
       path: 'chart.inverted',
       data: Boolean(this._auxSettings.isInverted)
     });
-    this.updateChart.next(changes);
+    this.updater.next(changes);
   }
 }

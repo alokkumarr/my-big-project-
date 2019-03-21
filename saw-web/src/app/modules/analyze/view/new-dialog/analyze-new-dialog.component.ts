@@ -9,7 +9,6 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
-import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 
 import { ANALYSIS_METHODS, DATAPOD_CATEGORIES_OBJ } from '../../consts';
@@ -72,15 +71,9 @@ export class AnalyzeNewDialogComponent {
 
   setSupportedMetrics(method) {
     this._sortOrder = 'asc';
-    console.log(
-      'this.data.metrics',
-      map(this.data.metrics, metric => metric.supports)
-    );
 
     this.supportedMetricCategories = fpPipe(
       fpFilter(metric => {
-        // console.log('metric.supports', metric.supports);
-
         if (method.type === 'map:map') {
           const mapSupport = find(
             metric.supports,
@@ -188,7 +181,6 @@ export class AnalyzeNewDialogComponent {
       this.selectedMethod,
       this.selectedMetric
     );
-    console.log('supports', map(supports, 'category'));
 
     const model = {
       type,

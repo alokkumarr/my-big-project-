@@ -76,6 +76,9 @@
             (artifactColumn.aliasName || artifactColumn.displayName)
           "
           class="settings__list-item"
+          [ngClass]="{
+            elevationClass: menuVisibleFor === artifactColumn.displayName
+          }"
         >
           <div fxLayout="row" fxLayoutAlign="space-between center">
             <div
@@ -104,6 +107,7 @@
                 (artifactColumn.aliasName || artifactColumn.displayName)
               "
               (menuOpened)="onAddToGroupMenuOpened(artifactColumn)"
+              (menuClosed)="onMenuClosed()"
             >
               <mat-icon
                 class="settings__list-item__addbtn__icon"
@@ -127,6 +131,16 @@
               >
                 <span>{{ adapter.title }}</span>
               </button>
+              <div
+                fxLayout="column"
+                fxFlex
+                fxLayoutAlign="center center"
+                class="settings__list-item__add-limit"
+                *ngIf="groupsThatCanRecieveColumn?.length < 1"
+              >
+                <mat-icon fontIcon="icon-warning2" color="warn"></mat-icon>
+                <strong>Accepted Category Metric Limit Reached</strong>
+              </div>
             </mat-menu>
           </div>
         </div>

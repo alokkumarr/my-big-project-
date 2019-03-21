@@ -188,6 +188,7 @@
             class="designer__data"
             *ngIf="analysisType === 'chart'"
             [chartType]="analysisSubtype"
+            [updater]="chartUpdater"
             [sorts]="sorts"
             [auxSettings]="auxSettings"
             [data]="data"
