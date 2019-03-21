@@ -68,16 +68,22 @@ api:
             path: '[/]md*'
         -   location: ${metadata.service.host}
             method: POST
-            path: '[/]analysis.*'
+            path: '[/]dslanalysis.*'
         -   location: ${metadata.service.host}
             method: GET
-            path: '[/]analysis.*'
+            path: '[/]dslanalysis.*'
         -   location: ${metadata.service.host}
             method: PUT
-            path: '[/]analysis.*'
+            path: '[/]dslanalysis.*'
         -   location: ${metadata.service.host}
             method: DELETE
+            path: '[/]dslanalysis.*'
+        -   location: ${internal-analysis.service.host}
+            method: GET
             path: '[/]analysis.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]analysis*'
         -   location: ${semantic.service.host}
             method: POST
             path: '[/]semantic*'
