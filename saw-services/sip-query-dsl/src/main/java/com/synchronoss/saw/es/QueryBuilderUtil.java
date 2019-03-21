@@ -1,25 +1,18 @@
 package com.synchronoss.saw.es;
 
-import java.util.*;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.model.*;
 import com.synchronoss.saw.util.BuilderUtil;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.PrefixQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.index.query.WildcardQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import java.util.*;
 
 public class QueryBuilderUtil {
 	
@@ -108,6 +101,7 @@ public class QueryBuilderUtil {
 			case MIN: aggregationBuilder = AggregationBuilders.min(field.getDisplayName()).field(field.getColumnName()); break;
 			case MAX: aggregationBuilder = AggregationBuilders.max(field.getDisplayName()).field(field.getColumnName()); break;
 			case COUNT: aggregationBuilder = AggregationBuilders.count(field.getDisplayName()).field(field.getColumnName()); break;
+            case DISTINCT_COUNT: aggregationBuilder = AggregationBuilders.cardinality(field.getDisplayName()).field(field.getColumnName()); break;
 			case PERCENTAGE:
 				Script script = new Script("_value*100/"+field.getAdditionalProperties().get(field.getColumnName()
 						+"_sum"));
@@ -316,9 +310,11 @@ public class QueryBuilderUtil {
                     for (Object dataField : dataFields) {
                         if (dataField instanceof com.synchronoss.saw.model.Field) {
                             Field field = (Field) dataField;
-                            if (field.getAggregate().value().equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value())) {
-                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
-                                    field.getDisplayName()).field(field.getColumnName()));
+                            if (field.getAggregate() != null) {
+                                if (field.getAggregate().value().equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value())) {
+                                    preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
+                                        field.getDisplayName()).field(field.getColumnName()));
+                                }
                             }
                         }
                     }
