@@ -12,18 +12,18 @@ import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
@@ -112,27 +112,28 @@ public class AnalysisServiceImpl implements AnalysisService {
     return analysis;
   }
 
-    @Override
-    public List<ObjectNode> getAnalysisByCategory(String categoryID, Ticket ticket) throws SipReadEntityException {
-        List<Document> doc = null;
-        Analysis analysis;
-        List<ObjectNode> objDocs = new ArrayList<>();
-        Map<String,String> category = new HashMap<>();
-        category.put("category",categoryID);
-        try {
-            analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-            doc = analysisMetadataStore.searchAll(category);
-            if (doc == null) {
-                return null;
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            for (Document d : doc) {
-                objDocs.add((ObjectNode) mapper.readTree(gson.toJson(d)));
-            }
-        } catch (Exception e) {
-            logger.error("Exception occurred while fetching analysis", e);
-            throw new SipReadEntityException("Exception occurred while fetching analysis", e);
-        }
-        return objDocs;
+  @Override
+  public List<ObjectNode> getAnalysisByCategory(String categoryID, Ticket ticket)
+      throws SipReadEntityException {
+    List<Document> doc = null;
+    Analysis analysis;
+    List<ObjectNode> objDocs = new ArrayList<>();
+    Map<String, String> category = new HashMap<>();
+    category.put("category", categoryID);
+    try {
+      analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+      doc = analysisMetadataStore.searchAll(category);
+      if (doc == null) {
+        return null;
+      }
+      ObjectMapper mapper = new ObjectMapper();
+      for (Document d : doc) {
+        objDocs.add((ObjectNode) mapper.readTree(gson.toJson(d)));
+      }
+    } catch (Exception e) {
+      logger.error("Exception occurred while fetching analysis", e);
+      throw new SipReadEntityException("Exception occurred while fetching analysis", e);
     }
+    return objDocs;
+  }
 }
