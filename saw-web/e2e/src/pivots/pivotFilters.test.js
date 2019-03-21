@@ -64,7 +64,7 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
             chartDesignerPage.searchInputPresent();
             chartDesignerPage.clickOnAttribute(dateFieldName, 'Row');
             chartDesignerPage.clickOnAttribute(numberFieldName, 'Data');
-            chartDesignerPage.clickOnAttribute(stringFieldName, 'Column');
+            chartDesignerPage.clickOnAttribute(stringFieldName, 'Row');
 
             // Create filter object. Specify type and preset/operator
             const filter = new Filter({
