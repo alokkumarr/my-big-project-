@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import { AdminService } from '../main-view/admin.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { map, tap } from 'rxjs/operators';
+import { map, tap ,  map as map$ } from 'rxjs/operators';
 import { IAdminDataService } from '../admin-data-service.interface';
 import { getPrivilegeDescription } from './privilege-code-transformer';
 import { Observable, of } from 'rxjs';
-import { map as map$ } from 'rxjs/operators';
 
 interface PrivilegeResponse {
   privileges: any[];

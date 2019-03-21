@@ -5,11 +5,13 @@
                  [designerState]="designerState"
                  [isInQueryMode]="isInQueryMode"
                  (onBack)="onBack.emit(isInDraftMode)"
+                 (change)="onSettingsChange($event)"
                  (requestAction)="onToolbarAction($event)">
 </designer-header>
 
 <div *ngIf="analysis" [ngSwitch]="layoutConfiguration" class="designer__main">
   <single-table-designer-layout *ngSwitchCase="'single'"
+                                cdkDropListGroup
                                 (change)="onSettingsChange($event)"
                                 [artifacts]="artifacts"
                                 [auxSettings]="auxSettings"

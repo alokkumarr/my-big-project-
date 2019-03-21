@@ -24,19 +24,25 @@ import { ChartService } from '../../../../common/services/chart.service';
 export class DesignerChartComponent implements AfterViewInit, OnInit {
   _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
+  chartType: string;
   _auxSettings: any = {};
   CHART_TYPES_OBJ = CHART_TYPES_OBJ;
 
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
   chartOptions: any;
-  updateChart = new BehaviorSubject([]);
+  @Input() updater;
 
   @ViewChild('chartContainer') chartContainer: ElementRef;
   chartHgt = {
     height: 500
   };
 
-  @Input() public chartType: string;
+  @Input('chartType') public set setChartType(chartType: string) {
+    this.chartType = chartType;
+    if (this._data && this._data.length) {
+      this.reloadChart(this._data, [...this.getLegendConfig()]);
+    }
+  }
 
   @Input() sorts: Array<Sort> = [];
 
@@ -90,6 +96,10 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
         chartType: this.chartType
       })
     });
+
+    if (!this.updater) {
+      this.updater = new BehaviorSubject([]);
+    }
   }
 
   ngAfterViewInit() {
@@ -159,6 +169,6 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
       path: 'chart.inverted',
       data: Boolean(this._auxSettings.isInverted)
     });
-    this.updateChart.next(changes);
+    this.updater.next(changes);
   }
 }

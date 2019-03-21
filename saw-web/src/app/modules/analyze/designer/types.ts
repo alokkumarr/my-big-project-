@@ -13,6 +13,7 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisChart,
   AnalysisReport,
   Sort,
   Filter,
@@ -36,6 +37,7 @@ export {
   ArtifactColumnChart,
   ArtifactColumnReport,
   Analysis,
+  AnalysisChart,
   AnalysisReport,
   DesignerMode,
   AnalysisStarter,
@@ -64,7 +66,8 @@ export {
 
 export interface ArtifactColumnFilter {
   keyword: string;
-  types: ('number' | 'date' | 'string' | 'geo')[];
+  types: { number: boolean; date: boolean; string: boolean; geo: boolean };
+  adapters: boolean[];
 }
 
 export type PivotArea = 'data' | 'row' | 'column';
@@ -79,6 +82,7 @@ export interface IDEsignerSettingGroupAdapter {
     groupAdapters: Array<IDEsignerSettingGroupAdapter>
   ) => number;
   artifactColumns: ArtifactColumns;
+  canAcceptArtifactColumnOfType: (artifactColumn: ArtifactColumn) => boolean;
   canAcceptArtifactColumn: (
     groupAdapter: IDEsignerSettingGroupAdapter,
     groupAdapters: Array<IDEsignerSettingGroupAdapter>
@@ -115,6 +119,7 @@ export interface DesignerChangeEvent {
     | 'fetchLimit'
     | 'changeQuery'
     | 'region'
+    | 'chartType'
     | 'mapSettings';
   column?: ArtifactColumn;
   data?: any;
@@ -123,4 +128,8 @@ export interface DesignerChangeEvent {
 export interface DesignerSaveEvent {
   requestExecution: boolean;
   analysis: Analysis;
+}
+
+export interface DesignerStateModel {
+  groupAdapters: IDEsignerSettingGroupAdapter[];
 }

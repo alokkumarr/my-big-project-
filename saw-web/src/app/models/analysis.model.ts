@@ -47,6 +47,7 @@ export interface Analysis {
   scheduleHuman?: string;
   semanticId: string;
   sqlBuilder: SqlBuilder;
+  supports?: string[];
   type: AnalysisType;
   updatedTimestamp?: number;
   updatedUserName?: string;

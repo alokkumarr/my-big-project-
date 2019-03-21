@@ -10,14 +10,12 @@ import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { MarkerDataPoint } from './types';
 
-
 @Component({
   selector: 'map-box',
   templateUrl: './map-box.component.html',
   styleUrls: ['./map-box.component.scss']
 })
 export class MapBoxComponent implements OnChanges {
-
   public selectedPoint: GeoJSON.Feature<GeoJSON.Point>;
   dataFields: any[];
   coordinateField: any;
@@ -45,7 +43,11 @@ export class MapBoxComponent implements OnChanges {
   }
 
   setGeoJson(data, coordinateField, dataFields) {
-    const features = this.data2geoJsonFeatures(data, coordinateField, dataFields);
+    const features = this.data2geoJsonFeatures(
+      data,
+      coordinateField,
+      dataFields
+    );
 
     this.geoJson = {
       type: 'FeatureCollection',
@@ -65,12 +67,20 @@ export class MapBoxComponent implements OnChanges {
     this.selectedPoint = { ...point };
   }
 
-  data2geoJsonFeatures(data, coordinateField, dataFields): Array<GeoJSON.Feature> {
+  data2geoJsonFeatures(
+    data,
+    coordinateField,
+    dataFields
+  ): Array<GeoJSON.Feature> {
     const allFields = [coordinateField, ...dataFields];
-    const fieldsMap = reduce(allFields, (acc, field) => {
-      acc[field.columnName] = field;
-      return acc;
-    }, {});
+    const fieldsMap = reduce(
+      allFields,
+      (acc, field) => {
+        acc[field.columnName] = field;
+        return acc;
+      },
+      {}
+    );
     return map(data, datum => {
       const coordinatesKey = coordinateField.columnName;
       const [lng, lat] = split(datum[coordinatesKey], ',');
@@ -79,7 +89,7 @@ export class MapBoxComponent implements OnChanges {
         fpToPairs,
         fpFilter(([key]) => key !== coordinatesKey),
         fpMap(([key, value]) => {
-          const alias = get(fieldsMap, `${key}.alias`);
+          const alias = get(fieldsMap, `${key}.aliasName`);
           const displayName = get(fieldsMap, `${key}.displayName`);
           const aggregate: MarkerDataPoint = {
             key,

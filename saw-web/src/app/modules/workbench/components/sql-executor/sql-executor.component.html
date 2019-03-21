@@ -41,14 +41,14 @@
     </div>
   </div>
   <div class="exec-body">
-    <split direction="vertical">
-      <split-area class="script-pane" [size]="scriptHeight">
-        <split direction="horizontal">
-          <split-area size="75">
+    <as-split direction="vertical">
+      <as-split-area class="script-pane" [size]="scriptHeight">
+        <as-split direction="horizontal">
+          <as-split-area size="75">
             <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)" (onCreate)="getQuery($event)">
             </sql-script>
-          </split-area>
-          <split-area size="25" class="fields-pane">
+          </as-split-area>
+          <as-split-area size="25" class="fields-pane">
             <mat-card class="details-grid" fxFlex>
               <div fxFill>
                 <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'99%'"
@@ -76,12 +76,12 @@
                 <mat-divider></mat-divider>
               </mat-list-item>
             </mat-list> -->
-          </split-area>
-        </split>
-      </split-area>
-      <split-area class="preview-pane" [size]="previewHeight">
+          </as-split-area>
+        </as-split>
+      </as-split-area>
+      <as-split-area class="preview-pane" [size]="previewHeight">
         <!-- <sqlpreview-grid-page [updater]="gridData" (onToggleScreenMode)="toggleViewMode($event)"></sqlpreview-grid-page> -->
-      </split-area>
-    </split>
+      </as-split-area>
+    </as-split>
   </div>
 </div>

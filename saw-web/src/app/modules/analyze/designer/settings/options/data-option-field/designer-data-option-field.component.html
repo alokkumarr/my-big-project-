@@ -1,0 +1,146 @@
+<mat-expansion-panel
+  class="data-option"
+  [attr.e2e]="'designer-data-option-' + artifactColumn.displayName"
+>
+  <mat-expansion-panel-header class="data-option__header">
+    <mat-panel-title class="data-option__display-name">
+      {{ artifactColumn.displayName }}
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <div class="data-option__fieldset" fxLayout="column">
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <label fxFlex i18n>Alias:</label>
+      <mat-form-field appearance="outline" fxFlex="75">
+        <input
+          matInput
+          type="text"
+          autocomplete="off"
+          (input)="onAliasChange($event.target.value)"
+          [value]="artifactColumn.aliasName || ''"
+        />
+      </mat-form-field>
+    </div>
+
+    <div
+      *ngIf="artifactColumn.aggregate"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label fxFlex i18n>Aggregate:</label>
+      <aggregate-chooser-u
+        (change)="onAggregateChange($event)"
+        [columnType]="artifactColumn.type"
+        [analysisType]="analysisType"
+        [aggregate]="artifactColumn.aggregate"
+        [sqlBuilder]="sqlBuilder"
+        [analysisSubtype]="analysisSubtype"
+        [enablePercentByRow]="
+          asChartColumn(artifactColumn).comboType === 'column'
+        "
+        fxFlex="75"
+      >
+      </aggregate-chooser-u>
+    </div>
+
+    <div
+      *ngIf="
+        analysisType === 'chart' && asChartColumn(artifactColumn).comboType
+      "
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label fxFlex i18n>Chart type :</label>
+      <designer-combo-type-selector
+        (change)="change.emit($event)"
+        [artifactColumn]="artifactColumn"
+        [comboTypes]="comboTypes"
+        fxFlex="75"
+      >
+      </designer-combo-type-selector>
+    </div>
+
+    <div
+      *ngIf="
+        analysisType === 'chart' &&
+        asChartColumn(artifactColumn).area === 'y' &&
+        fieldCount < 2
+      "
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label fxFlex i18n>Limit :</label>
+      <designer-data-limit-selector
+        (change)="change.emit($event)"
+        [artifactColumn]="artifactColumn"
+        fxFlex="75"
+      >
+      </designer-data-limit-selector>
+    </div>
+
+    <div
+      *ngIf="analysisType === 'pivot' && hasDateInterval"
+      fxLayout="row"
+      fxLayoutAlign="space-around center"
+    >
+      <label fxFlex i18n>Group By :</label>
+      <designer-date-interval-selector
+        (change)="change.emit($event)"
+        [artifactColumn]="artifactColumn"
+        fxFlex="75"
+      >
+      </designer-date-interval-selector>
+    </div>
+
+    <div
+      *ngIf="
+        (analysisType !== 'pivot' && hasDateInterval) ||
+        (analysisType === 'pivot' &&
+          hasDateInterval &&
+          asPivotColumn(artifactColumn).dateInterval === 'day')
+      "
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label fxFlex i18n>Format :</label>
+      <designer-date-format-selector
+        (change)="change.emit($event)"
+        [artifactColumn]="artifactColumn"
+        [analysisType]="analysisType"
+        fxFlex="75"
+      >
+      </designer-date-format-selector>
+    </div>
+
+    <div
+      *ngIf="analysisType === 'pivot' && isDataField"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label fxFlex i18n>Format :</label>
+      <designer-data-format-selector
+        (change)="change.emit($event)"
+        [artifactColumn]="artifactColumn"
+        fxFlex="75"
+      >
+      </designer-data-format-selector>
+    </div>
+
+    <div
+      *ngIf="
+        (analysisType | isAnalysisType: 'mapChart':analysisSubtype) &&
+        artifactColumn.geoType
+      "
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label fxFlex i18n>Region :</label>
+      <designer-region-selector
+        (change)="change.emit($event)"
+        [artifactColumn]="artifactColumn"
+        fxFlex="75"
+      >
+      </designer-region-selector>
+    </div>
+  </div>
+</mat-expansion-panel>

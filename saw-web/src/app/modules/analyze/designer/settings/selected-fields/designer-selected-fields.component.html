@@ -1,0 +1,91 @@
+<div
+  *ngFor="let adapter of (groupAdapters$ | async); let adapterIndex = index"
+  fxLayout="row"
+  fxLayoutAlign="start center"
+  class="selected-fields__container"
+>
+  <div
+    fxFlex="10"
+    class="selected-fields__label"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+  >
+    {{ adapter.title }}:
+  </div>
+  <mat-chip-list
+    class="selected-fields__list"
+    fxLayout="row"
+    fxFlex="90"
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    [cdkDropListData]="adapter"
+    [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
+    (cdkDropListDropped)="drop($event, adapterIndex)"
+    [attr.e2e]="'designer-selected-container' + adapter.title"
+    [class.highlighted]="isDragInProgress && canAcceptMap[adapter.title]"
+  >
+    <perfect-scrollbar [config]="config">
+      <mat-chip
+        *ngFor="let col of adapter.artifactColumns"
+        class="selected-fields__item"
+        [attr.e2e]="
+          'designer-selected-field-' + (col.aliasName || col.displayName)
+        "
+        [ngClass]="getFieldItemClass(col)"
+        cdkDrag
+        (cdkDragStarted)="dragStarted($event)"
+        (cdkDragReleased)="dragReleased($event)"
+        [cdkDragData]="col"
+        [removable]="true"
+        (removed)="removeFromGroup(col, adapter)"
+      >
+        <ng-container *ngIf="col.aggregate; else defaultTemplate">
+          <span
+            [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate].label"
+            [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
+          >
+          </span>
+          <span> (&nbsp;{{ col.aliasName || col.displayName }}&nbsp;) </span>
+        </ng-container>
+        <ng-template #defaultTemplate>
+          {{ col.aliasName || col.displayName }}
+        </ng-template>
+
+        <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+      </mat-chip>
+    </perfect-scrollbar>
+  </mat-chip-list>
+</div>
+
+<div
+  *ngIf="filters.length > 0"
+  fxLayout="row"
+  fxLayoutAlign="start center"
+  class="selected-fields__container"
+>
+  <div
+    fxFlex="10"
+    class="selected-fields__label"
+    i18n
+    fxLayout="row"
+    fxLayoutAlign="start center"
+  >
+    Filters:
+  </div>
+
+  <mat-chip-list
+    fxFlex="90"
+    e2e="designer-applied-filters"
+    class="selected-fields__list"
+  >
+    <mat-chip
+      *ngFor="let filter of filters"
+      class="selected-fields__item"
+      [removable]="true"
+      (removed)="removeFilter.emit($event)"
+    >
+      {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
+      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+    </mat-chip>
+  </mat-chip-list>
+</div>
