@@ -262,7 +262,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
     this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
     const validateFields = {
-      emails: this.validateEmails(this.emails),
+      emails: this.data.analysis.type === 'chart' ? true : this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
       publish: this.validatePublishSelection(),
       startDate: moment(this.crondetails.startDate) > moment().subtract(2, 'minutes')
@@ -303,7 +303,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   validateEmails(emails) {
     const emailsList = emails;
     let emailsAreValid = true;
-    if (isEmpty(emailsList) && this.data.analysis.type === 'chart') {
+    if (isEmpty(emailsList)) {
       emailsAreValid = false;
       this.emailValidateFlag = true;
     }
