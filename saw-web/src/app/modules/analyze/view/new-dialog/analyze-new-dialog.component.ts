@@ -9,7 +9,6 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
-import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 
 import { ANALYSIS_METHODS, DATAPOD_CATEGORIES_OBJ } from '../../consts';
