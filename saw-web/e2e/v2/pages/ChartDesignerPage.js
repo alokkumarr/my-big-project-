@@ -28,8 +28,14 @@ class ChartsDesignerPage extends Designer {
         )
       );
     this._aggregateOption = name => element(by.css(`[e2e="${name}"]`));
-    this._selectedField=name=>element(by.css(`[e2e="designer-selected-field-${name}"]`));
-    this._appliedFilters=element(by.css(`[e2e="designer-applied-filters"]`));
+    this._selectedField = name =>
+      element(by.css(`[e2e="designer-selected-field-${name}"]`));
+    this._appliedFilter = filter =>
+      element(
+        by.xpath(
+          `//*[@e2e="designer-applied-filters"]/descendant::*[contains(text(),"${filter}")]`
+        )
+      );
   }
 
   searchAttribute(attribute) {
@@ -90,12 +96,14 @@ class ChartsDesignerPage extends Designer {
   clickOnAggregateOption(name) {
     commonFunctions.clickOnElement(this._aggregateOption(name));
   }
-  verifySelectedFiledIsPresent(name){
-      commonFunctions.waitFor.elementToBeVisible(this._selectedField(name))
+  verifySelectedFiledIsPresent(name) {
+    commonFunctions.waitFor.elementToBeVisible(this._selectedField(name));
   }
 
-  verifyFilterApplied(filter){
-      commonFunctions.waitFor.elementToBeVisible(this._appliedFilters);
+  verifyAppliedFilters(filters) {
+    filters.forEach(filter => {
+      commonFunctions.waitFor.elementToBeVisible(this._appliedFilter(filter));
+    });
   }
 }
 module.exports = ChartsDesignerPage;
