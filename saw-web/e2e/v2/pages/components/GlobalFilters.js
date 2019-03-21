@@ -9,8 +9,12 @@ class GlobalFilters{
         this._stringFilterValue = value => element(by.xpath(`//mat-option[contains(text(),"${value}")]`));
         this._dateFilterPreset = element(by.css('[e2e="filter-date-preset"]'));
         this._dateFilterPresetValue = value => element(by.xpath(`//mat-option[contains(text(),"${value}")]`));
-        this._applyFilter = element(by.css(`button[e2e="dashboard-global-filters-apply-button"]`)); 
-        this._numberSliderLow = element(by.xpath(`//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"noUi-handle-lower")]`));
+        this._applyFilter = element(by.css(`button[e2e="dashboard-global-filters-apply-button"]`));
+        this._numberSliderLow = element(
+          by.xpath(
+            `//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"noUi-handle-lower")]`
+          )
+        );
         this._selectedPresetValue = value =>element(by.xpath(`//*[contains(text(),"${value}")]`));
         this._cancelFilter = element(by.css('[e2e="dashboard-global-filters-cancel-button"]'));
         this._numberSlider = element(by.css('[e2e="dashboard-global-filter-number-slider"]'));
@@ -46,7 +50,7 @@ class GlobalFilters{
                     commonFunctions.clickOnElement(this._stringFilterValue(currentFilter.value));
                 } else if (currentFilter.name.toLowerCase() === 'date') {
                     browser.sleep(2000);
-                    commonFunctions.clickOnElement(this._dateFilterPreset); 
+                    commonFunctions.clickOnElement(this._dateFilterPreset);
                     commonFunctions.clickOnElement(this._dateFilterPresetValue(currentFilter.preset));
                 } else if (currentFilter.name.toLowerCase() === 'long' || currentFilter.name.toLowerCase() === 'integer' || currentFilter.name.toLowerCase() === 'float' || currentFilter.name.toLowerCase() === 'double') {
                     browser.sleep(2000);
