@@ -1,15 +1,7 @@
 package com.sncr.saw.security.app.service;
 
-import com.sncr.saw.security.app.repository.impl.CustomerProductModuleFeatureRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.CustomerProductModuleRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.CustomerProductRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.CustomerRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.ModuleRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.PrivilegeRepositoryDao;
-import com.sncr.saw.security.app.repository.impl.ProductModuleRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.ProductRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.RoleRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
+import com.sncr.saw.security.app.repository.OnBoardCustomerRepository;
+import com.sncr.saw.security.app.repository.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +41,15 @@ public class OnBoardService {
   @Autowired
   private PrivilegeRepositoryDao privRepoDao;
 
+  @Autowired
+  private OnBoardCustomerRepository onBoardCustomerRepositoryDao;
+
   // assuming that privileges and roles will already be there as basic requirement.
+
+
+  public OnBoardCustomerRepository getOnBoardCustomerRepositoryDao() {
+      return onBoardCustomerRepositoryDao;
+  }
 
   public CustomerRepositoryDaoImpl getCustomerDao() {
     return customerDao;
