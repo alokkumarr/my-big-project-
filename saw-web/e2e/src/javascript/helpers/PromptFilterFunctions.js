@@ -7,6 +7,7 @@ const designModePage = require('../pages/designModePage.po.js');
 const Constants = require('../api/Constants');
 const utils = require('./utils');
 const commonElementsPage = require('../pages/commonElementsPage.po');
+const ChartDesignerPage = require('../../../v2/pages/ChartDesignerPage');
 let analysisId;
 
 class PromptFilterFunctions {
@@ -384,19 +385,8 @@ class PromptFilterFunctions {
       commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
       filters.applyBtn.click();
       browser.sleep(1000);
-      //TODO: Need to check that filters applied or not.
-      // Need to fix below issue and add filter validation
-      //https://jira.synchronoss.net:8443/jira/browse/SIP-6392
-      // commonFunctions.waitFor.elementToBeVisible(
-      //   analyzePage.appliedFiltersDetails.filterText
-      // );
-      // commonFunctions.waitFor.elementToBeVisible(
-      //   analyzePage.appliedFiltersDetails.filterClear
-      // );
-      // commonFunctions.waitFor.elementToBeVisible(
-      //   analyzePage.appliedFiltersDetails.selectedFiltersText
-      // );
-      // _self.validateSelectedFilters([fieldName]);
+      const chartDesignerPage = new ChartDesignerPage();
+      chartDesignerPage.verifyAppliedFilters([fieldName]);
       //Save
       const save = analyzePage.saveDialog;
       const designer = analyzePage.designerDialog;
