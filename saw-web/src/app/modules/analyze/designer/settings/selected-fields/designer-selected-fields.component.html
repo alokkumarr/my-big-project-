@@ -27,7 +27,7 @@
       *ngFor="let col of adapter.artifactColumns"
       class="selected-fields__item"
       [attr.e2e]="
-        'designer-selected-field-' + (col.aliasName || col.displayName)
+        'designer-selected-field-' + (col.displayName || col.aliasName)
       "
       [ngClass]="getFieldItemClass(col)"
       cdkDrag
@@ -43,10 +43,10 @@
           [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
         >
         </span>
-        <span> (&nbsp;{{ col.aliasName || col.displayName }}&nbsp;) </span>
+        <span> (&nbsp;{{ col.displayName || col.aliasName }}&nbsp;) </span>
       </ng-container>
       <ng-template #defaultTemplate>
-        {{ col.aliasName || col.displayName }}
+        {{ col.displayName || col.aliasName }}
       </ng-template>
 
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
