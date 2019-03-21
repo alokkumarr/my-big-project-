@@ -301,7 +301,19 @@ export class AnalyzeService {
     return this.postRequest(`exports/listFTP`, custCode);
   }
 
-  deleteAnalysis(model) {
+  deleteAnalysis(model: Analysis | AnalysisDSL): Promise<any> {
+    return !!(<AnalysisDSL>model).sipQuery
+      ? this.deleteAnalysisDSL(model as AnalysisDSL).toPromise()
+      : this.deleteAnalysisNonDSL(model as Analysis);
+  }
+
+  deleteAnalysisDSL(model: AnalysisDSL): Observable<any> {
+    return <Observable<AnalysisDSL>>(
+      this._http.delete(`${apiUrl}/analysis/${model.id}`).pipe(first())
+    );
+  }
+
+  deleteAnalysisNonDSL(model: Analysis): Promise<Analysis> {
     if (
       !this._jwtService.hasPrivilege('DELETE', {
         subCategoryId: model.categoryId,
@@ -314,7 +326,7 @@ export class AnalyzeService {
       ['contents.action', 'delete'],
       ['contents.keys.[0].id', model.id]
     ]);
-    return this.postRequest(`analysis`, payload);
+    return <Promise<Analysis>>this.postRequest(`analysis`, payload);
   }
 
   getCategories(privilege) {
