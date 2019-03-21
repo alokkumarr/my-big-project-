@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+import { BehaviorSubject } from 'rxjs';
+
 import * as get from 'lodash/get';
 
 import {
@@ -11,6 +13,9 @@ import {
   SqlBuilder
 } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
+
+// the delay needed to animate opening and closing the sidemenus
+const SIDEMENU_ANIMATION_TIME = 250;
 
 @Component({
   selector: 'single-table-designer-layout',
@@ -36,6 +41,7 @@ export class SingleTableDesignerLayoutComponent {
   public isFieldsPanelOpen = true;
   public optionsPanelMode: 'side' | 'over' = 'side';
   private isInTabletMode = false;
+  public chartUpdater: BehaviorSubject<[] | {}> = new BehaviorSubject([]);
   public config: PerfectScrollbarConfigInterface = {};
 
   constructor(breakpointObserver: BreakpointObserver) {
@@ -63,6 +69,9 @@ export class SingleTableDesignerLayoutComponent {
   toggleFieldsDrawer(drawer) {
     drawer.toggle();
     this.isFieldsPanelOpen = !this.isFieldsPanelOpen;
+    setTimeout(() => {
+      this.chartUpdater.next({ reflow: true });
+    }, SIDEMENU_ANIMATION_TIME);
   }
 
   openDrawer(drawer) {
@@ -75,6 +84,9 @@ export class SingleTableDesignerLayoutComponent {
       drawer.toggle();
       this.isOptionsPanelOpen = !this.isOptionsPanelOpen;
     }
+    setTimeout(() => {
+      this.chartUpdater.next({ reflow: true });
+    }, SIDEMENU_ANIMATION_TIME);
   }
 
   onRemoveFilter(index) {

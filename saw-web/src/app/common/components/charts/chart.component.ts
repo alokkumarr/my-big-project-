@@ -87,7 +87,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.enableExporting(this.config);
     }
     setTimeout(() => {
-      this.chart.reflow();
+      this.reflow();
     });
   }
 
@@ -188,10 +188,19 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
+  reflow() {
+    if (this.chart) {
+      this.chart.reflow();
+    }
+  }
+
   onOptionsChartUpdate(updates) {
     if (!isArray(updates)) {
       if (updates.export) {
         this.onExport();
+      }
+      if (updates.reflow) {
+        this.reflow();
       }
       return;
     }
