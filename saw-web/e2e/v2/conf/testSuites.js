@@ -29,15 +29,14 @@ const CRITICAL = [
   TEST_BASE_DIR + 'promptFilter/reportPromptFilters.test.js',
   TEST_BASE_DIR + 'pivots/pivotFilters.test.js',
   TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithCharts.test.js',
-  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithCharts.test.js',
-  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js',
-  TEST_BASE_DIR +
-    'dashboards/createAndDeleteDashboardsWithActualVsTargetKPI.test.js',
-  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithPivot.test.js',
-  TEST_BASE_DIR + 'observe/dashboardGlobalFilter.test.js',
-  TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithPivot.test.js',
-  TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithESReport.test.js',
-  TEST_BASE_DIR + 'dashboards/createAndDeleteDashboardsWithESReport.test.js'
+  TEST_BASE_DIR + 'create-delete-dashboards/charts.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/snapshotKPI.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/actualVsTargetKPI.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/pivot.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/chartsGlobalFilter.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/pivotWithGlobalFilter.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/esReportGlobalFilter.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/esReport.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];

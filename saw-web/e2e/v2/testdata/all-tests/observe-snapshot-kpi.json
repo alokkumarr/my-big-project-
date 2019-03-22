@@ -1,0 +1,82 @@
+{
+  "SNAPSHOT_KPI": {
+    "dashboard": {
+      "SNAPK001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "This Week",
+          "primaryAggregation": "Sum",
+          "secondaryAggregations": [
+            "Sum",
+            "Average",
+            "Minimum",
+            "Maximum",
+            "Count"
+          ],
+          "backgroundColor": "green"
+        },
+        "description": "Admin should create snapshot kpi dashboard with columns."
+      },
+      "SNAPK002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Yesterday",
+          "primaryAggregation": "Average",
+          "secondaryAggregations": [
+            "Sum",
+            "Average",
+            "Minimum",
+            "Maximum",
+            "Count"
+          ],
+          "backgroundColor": "green"
+        },
+        "description": "User should create snapshot kpi dashboard with float values."
+      },
+      "SNAPK003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "kpiInfo": {
+          "column": "Integer",
+          "date": "Date",
+          "filter": "MTD (Month to Date)",
+          "primaryAggregation": "Minimum",
+          "secondaryAggregations": [
+            "Sum",
+            "Average",
+            "Minimum",
+            "Maximum",
+            "Count"
+          ],
+          "backgroundColor": "black"
+        },
+        "description": "Admin should create snapshot kpi dashboard with integer values."
+      },
+      "SNAPK004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Double",
+          "date": "Date",
+          "filter": "Last Week",
+          "primaryAggregation": "Maximum",
+          "secondaryAggregations": [
+            "Sum",
+            "Average",
+            "Minimum",
+            "Maximum",
+            "Count"
+          ],
+          "backgroundColor": "blue"
+        },
+        "description": "User should create snapshot kpi dashboard with double values."
+      }
+    }
+  }
+}
