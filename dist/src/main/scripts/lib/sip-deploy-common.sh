@@ -50,3 +50,4 @@ ensure_role sip-rtis
 ensure_role sip-xdf
 ensure_role sip-a2
 ensure_role saw-security-arbitrator
+ensure_role sip-elastic
