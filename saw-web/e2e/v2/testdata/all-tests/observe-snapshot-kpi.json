@@ -1,6 +1,6 @@
 {
-  "OBSERVESNAPSHOTKPI": {
-    "dashboards": {
+  "SNAPSHOT_KPI": {
+    "dashboard": {
       "SNAPK001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",

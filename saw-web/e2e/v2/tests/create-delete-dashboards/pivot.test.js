@@ -67,8 +67,8 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
   });
 
   using(
-    testDataReader.testData['OBSERVEPIVOT']['dashboards']
-      ? testDataReader.testData['OBSERVEPIVOT']['dashboards']
+    testDataReader.testData['PIVOT_DASHBOARD']['dashboard']
+      ? testDataReader.testData['PIVOT_DASHBOARD']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -157,8 +157,8 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'OBSERVEPIVOT',
-        dataProvider: 'dashboards'
+        feature: 'PIVOT_DASHBOARD',
+        dataProvider: 'dashboard'
       };
     }
   );

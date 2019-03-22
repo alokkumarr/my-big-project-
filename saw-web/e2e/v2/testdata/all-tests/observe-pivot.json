@@ -1,6 +1,6 @@
 {
-  "OBSERVEPIVOT": {
-    "dashboards": {
+  "PIVOTS": {
+    "dashboard": {
       "PIVOT001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",

@@ -15,7 +15,7 @@ const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 
-describe('Running create and delete dashboards with Snapshot KPIS in create-delete-dashboards/actualVSTargetKPI.test', () => {
+describe('Running create and delete dashboards with ActualVSTarget KPIS in create-delete-dashboards/actualVSTargetKPI.test', () => {
   const subCategoryName =
     subCategories.createSubCategories.observeSubCategory.name;
   let host;
@@ -50,8 +50,8 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
   });
 
   using(
-    testDataReader.testData['OBSERVEACTUALVSTARGETKPI']['dashboards']
-      ? testDataReader.testData['OBSERVEACTUALVSTARGETKPI']['dashboards']
+    testDataReader.testData['ACTUAL_VS_TARGET']['dashboard']
+      ? testDataReader.testData['ACTUAL_VS_TARGET']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -130,8 +130,8 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'OBSERVEACTUALVSTARGETKPI',
-        dataProvider: 'dashboards'
+        feature: 'ACTUAL_VS_TARGET',
+        dataProvider: 'dashboard'
       };
     }
   );

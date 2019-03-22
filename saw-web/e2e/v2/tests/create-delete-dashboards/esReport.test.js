@@ -67,8 +67,8 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
   });
 
   using(
-    testDataReader.testData['OBSERVEESREPORT']['dashboards']
-      ? testDataReader.testData['OBSERVEESREPORT']['dashboards']
+    testDataReader.testData['ES_REPORT']['dashboard']
+      ? testDataReader.testData['ES_REPORT']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -156,8 +156,8 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'OBSERVEESREPORT',
-        dataProvider: 'dashboards'
+        feature: 'ES_REPORT',
+        dataProvider: 'dashboard'
       };
     }
   );

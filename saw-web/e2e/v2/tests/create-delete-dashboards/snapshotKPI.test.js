@@ -48,8 +48,8 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
   });
 
   using(
-    testDataReader.testData['OBSERVESNAPSHOTKPI']['dashboards']
-      ? testDataReader.testData['OBSERVESNAPSHOTKPI']['dashboards']
+    testDataReader.testData['SNAPSHOT_KPI']['dashboard']
+      ? testDataReader.testData['SNAPSHOT_KPI']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -128,8 +128,8 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'OBSERVESNAPSHOTKPI',
-        dataProvider: 'dashboards'
+        feature: 'SNAPSHOT_KPI',
+        dataProvider: 'dashboard'
       };
     }
   );

@@ -1,6 +1,6 @@
 {
-  "OBSERVECHARTS": {
-    "dashboards": {
+  "CHART_DASHBOARD": {
+    "dashboard": {
       "DASHB001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",

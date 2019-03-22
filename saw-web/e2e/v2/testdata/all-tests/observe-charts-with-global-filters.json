@@ -1,6 +1,6 @@
 {
-  "OBSERVECHARTSWITHGLOBALFILTERS": {
-    "globalfilters": {
+  "CHART_GLOBAL_FILTER": {
+    "dashboard": {
       "GLBFI001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",

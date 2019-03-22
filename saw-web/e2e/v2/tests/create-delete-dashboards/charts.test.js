@@ -67,8 +67,8 @@ describe('Running create and delete dashboards with charts in create-delete-dash
   });
 
   using(
-    testDataReader.testData['OBSERVECHARTS']['dashboards']
-      ? testDataReader.testData['OBSERVECHARTS']['dashboards']
+    testDataReader.testData['CHART_DASHBOARD']['dashboard']
+      ? testDataReader.testData['CHART_DASHBOARD']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -157,8 +157,8 @@ describe('Running create and delete dashboards with charts in create-delete-dash
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'OBSERVECHARTS',
-        dataProvider: 'dashboards'
+        feature: 'CHART_DASHBOARD',
+        dataProvider: 'dashboard'
       };
     }
   );

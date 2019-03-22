@@ -70,10 +70,8 @@ describe('Running create and delete dashboards with charts in create-delete-dash
   });
 
   using(
-    testDataReader.testData['OBSERVECHARTSWITHGLOBALFILTERS']['globalfilters']
-      ? testDataReader.testData['OBSERVECHARTSWITHGLOBALFILTERS'][
-          'globalfilters'
-        ]
+    testDataReader.testData['CHART_GLOBAL_FILTER']['dashboard']
+      ? testDataReader.testData['CHART_GLOBAL_FILTER']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -180,8 +178,8 @@ describe('Running create and delete dashboards with charts in create-delete-dash
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'OBSERVECHARTSWITHGLOBALFILTERS',
-        dataProvider: 'globalfilters'
+        feature: 'CHART_GLOBAL_FILTER',
+        dataProvider: 'dashboard'
       };
     }
   );

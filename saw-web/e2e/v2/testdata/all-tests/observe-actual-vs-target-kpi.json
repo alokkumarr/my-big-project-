@@ -1,6 +1,6 @@
 {
-  "OBSERVEACTUALVSTARGETKPI": {
-    "dashboards": {
+  "ACTUAL_VS_TARGET": {
+    "dashboard": {
       "ACVTA001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",

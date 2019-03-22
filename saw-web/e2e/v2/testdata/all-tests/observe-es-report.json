@@ -1,6 +1,6 @@
 {
-  "OBSERVEESREPORT": {
-    "dashboards": {
+  "ES_REPORT": {
+    "dashboard": {
       "ESREP001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",
