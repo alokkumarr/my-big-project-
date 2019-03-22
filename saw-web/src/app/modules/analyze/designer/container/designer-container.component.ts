@@ -819,13 +819,16 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'chartType':
       this.changeChartType(event.data);
-      this._store.dispatch(
-        new DesignerInitGroupAdapters(
-          <ArtifactColumnChart[]>this.artifacts[0].columns,
-          this.analysis.type,
-          (<AnalysisChart>this.analysis).chartType
-        )
-      );
+      setTimeout(() => {
+        this.resetAnalysis();
+        this._store.dispatch(
+          new DesignerInitGroupAdapters(
+            <ArtifactColumnChart[]>this.artifacts[0].columns,
+            this.analysis.type,
+            (<AnalysisChart>this.analysis).chartType
+          )
+        );
+      });
       break;
     }
   }
@@ -833,7 +836,6 @@ export class DesignerContainerComponent implements OnInit {
   changeChartType(to: string) {
     const analysis = <AnalysisChart>this.analysis;
     analysis.chartType = to;
-    this.resetAnalysis();
   }
 
   resetAnalysis() {

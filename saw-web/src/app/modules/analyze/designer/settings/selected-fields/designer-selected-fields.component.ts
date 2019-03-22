@@ -231,7 +231,11 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   getFieldItemClass(col) {
-    const type = getArtifactColumnGeneralType(col, this.analysisType);
+    const type = getArtifactColumnGeneralType(
+      col,
+      this.analysisType,
+      this.analysisSubtype
+    );
     switch (type) {
       case 'string':
         return 'string-type-chip-color';

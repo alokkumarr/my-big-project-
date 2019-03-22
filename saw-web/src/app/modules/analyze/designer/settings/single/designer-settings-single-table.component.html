@@ -89,7 +89,11 @@
             >
               <mat-icon
                 [fontIcon]="
-                  getArtifactColumnTypeIcon(artifactColumn, analysisType)
+                  getArtifactColumnTypeIcon(
+                    artifactColumn,
+                    analysisType,
+                    analysisSubtype
+                  )
                 "
                 class="settings__list-item__icon"
               >

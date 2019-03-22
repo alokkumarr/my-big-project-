@@ -1,5 +1,6 @@
 import * as get from 'lodash/get';
 import * as reject from 'lodash/reject';
+import * as startsWith from 'lodash/startsWith';
 
 import { TYPE_ICONS_OBJ, TYPE_MAP } from './consts';
 import { ArtifactColumn } from '../types';
@@ -7,7 +8,8 @@ import { TYPE_ICONS } from '../consts';
 
 export function getArtifactColumnGeneralType(
   artifactColumn: ArtifactColumn,
-  analysisType: string
+  analysisType: string,
+  analysisSubType?: string
 ) {
   const { type } = artifactColumn;
   const geoType = get(artifactColumn, 'geoType');
@@ -20,24 +22,32 @@ export function getArtifactColumnGeneralType(
       return get(TYPE_MAP, type);
     case 'map':
       if (hasGeoType) {
-        if (isLngLat) {
-          return 'coordinate';
-        } else {
+        if (startsWith(analysisSubType, 'chart')) {
+          if (isLngLat) {
+            return get(TYPE_MAP, type);
+          }
           return 'geo';
         }
-      } else {
-        return get(TYPE_MAP, type);
+
+        if (analysisSubType === 'map') {
+          if (isLngLat) {
+            return 'coordinate';
+          }
+        }
       }
+      return get(TYPE_MAP, type);
   }
 }
 
 export function getArtifactColumnTypeIcon(
   artifactColumn: ArtifactColumn,
-  analysisType?: string
+  analysisType: string,
+  analysisSubType?: string
 ) {
   const generalType = getArtifactColumnGeneralType(
     artifactColumn,
-    analysisType
+    analysisType,
+    analysisSubType
   );
   return get(TYPE_ICONS_OBJ, `${generalType}.icon`);
 }

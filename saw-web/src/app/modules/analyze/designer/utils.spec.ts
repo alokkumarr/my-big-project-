@@ -23,8 +23,8 @@ describe('Analyze utils', () => {
       expect(getArtifactColumnGeneralType(col, 'pivot')).toBe('date')
     );
     expect(getArtifactColumnGeneralType(stringColumn, 'pivot')).toBe('string');
-    expect(getArtifactColumnGeneralType(geoColumn, 'map')).toBe('geo');
-    expect(getArtifactColumnGeneralType(lngLatColumn, 'map')).toBe(
+    expect(getArtifactColumnGeneralType(geoColumn, 'map', 'chart')).toBe('geo');
+    expect(getArtifactColumnGeneralType(lngLatColumn, 'map', 'map')).toBe(
       'coordinate'
     );
   });
@@ -39,8 +39,10 @@ describe('Analyze utils', () => {
     expect(getArtifactColumnTypeIcon(stringColumn, 'pivot')).toBe(
       'icon-string-type'
     );
-    expect(getArtifactColumnTypeIcon(geoColumn, 'map')).toBe('icon-geo-chart');
-    expect(getArtifactColumnTypeIcon(lngLatColumn, 'map')).toBe(
+    expect(getArtifactColumnTypeIcon(geoColumn, 'map', 'chart')).toBe(
+      'icon-geo-chart'
+    );
+    expect(getArtifactColumnTypeIcon(lngLatColumn, 'map', 'map')).toBe(
       'icon-geo-chart'
     );
   });
