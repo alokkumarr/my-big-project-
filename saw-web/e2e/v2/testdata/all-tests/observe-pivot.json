@@ -1,5 +1,5 @@
 {
-  "PIVOTS": {
+  "PIVOT_DASHBOARD": {
     "dashboard": {
       "PIVOT001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
