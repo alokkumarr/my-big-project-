@@ -13,6 +13,7 @@ import {
   SqlBuilder
 } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
+import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
 
 // the delay needed to animate opening and closing the sidemenus
 const SIDEMENU_ANIMATION_TIME = 250;
@@ -42,6 +43,9 @@ export class SingleTableDesignerLayoutComponent {
   public optionsPanelMode: 'side' | 'over' = 'side';
   private isInTabletMode = false;
   public chartUpdater: BehaviorSubject<[] | {}> = new BehaviorSubject([]);
+  public pivotUpdater: BehaviorSubject<IPivotGridUpdate> = new BehaviorSubject(
+    {}
+  );
   public config: PerfectScrollbarConfigInterface = {};
 
   constructor(breakpointObserver: BreakpointObserver) {
@@ -70,7 +74,7 @@ export class SingleTableDesignerLayoutComponent {
     drawer.toggle();
     this.isFieldsPanelOpen = !this.isFieldsPanelOpen;
     setTimeout(() => {
-      this.chartUpdater.next({ reflow: true });
+      this.rePaintAnalysis(this.analysisType);
     }, SIDEMENU_ANIMATION_TIME);
   }
 
@@ -85,8 +89,16 @@ export class SingleTableDesignerLayoutComponent {
       this.isOptionsPanelOpen = !this.isOptionsPanelOpen;
     }
     setTimeout(() => {
-      this.chartUpdater.next({ reflow: true });
+      this.rePaintAnalysis(this.analysisType);
     }, SIDEMENU_ANIMATION_TIME);
+  }
+
+  rePaintAnalysis(type) {
+    if (type === 'pivot') {
+      this.pivotUpdater.next({ rePaint: true });
+    } else {
+      this.chartUpdater.next({ reflow: true });
+    }
   }
 
   onRemoveFilter(index) {
