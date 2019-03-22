@@ -17,18 +17,26 @@ class Header extends SideNav {
     this._companyLogo = element(by.css('.company-logo'));
     this._categoryMenuIcon = element(by.css(`[e2e="main-menu-expand-btn"]`));
 
-    this._launcherButton = element(by.css('[class="header__module-launcher-button"]'));
-    this._observeLink= element(by.xpath('//a[contains(@class,"module-observe")]'));
-    this._analyzeLink= element(by.xpath('//a[contains(@class,"module-analyze")]'));
-    this._progressBar = element(by.css('mat-progress-bar[mode="indeterminate"]'));
+    this._launcherButton = element(
+      by.css('[class="header__module-launcher-button"]')
+    );
+    this._observeLink = element(
+      by.xpath('//a[contains(@class,"module-observe")]')
+    );
+    this._analyzeLink = element(
+      by.xpath('//a[contains(@class,"module-analyze")]')
+    );
+    this._progressBar = element(
+      by.css('mat-progress-bar[mode="indeterminate"]')
+    );
   }
 
-  clickOnModuleLauncher(){
-    commonFunctions.clickOnElement(this._launcherButton);    
+  clickOnModuleLauncher() {
+    commonFunctions.clickOnElement(this._launcherButton);
   }
 
-  clickOnObserveLink(){
-    commonFunctions.clickOnElement(this._observeLink);    
+  clickOnObserveLink() {
+    commonFunctions.clickOnElement(this._observeLink);
   }
 
   doLogout() {
@@ -50,7 +58,7 @@ class Header extends SideNav {
     commonFunctions.clickOnElement(this._categoryMenuIcon);
   }
 
-  hideProgressBar(){
+  hideProgressBar() {
     commonFunctions.waitFor.elementToBeNotVisible(this._progressBar);
   }
 }

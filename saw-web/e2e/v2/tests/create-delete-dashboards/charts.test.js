@@ -5,26 +5,32 @@ const logger = require('../../conf/logger')(__filename);
 const commonFunctions = require('../../pages/utils/commonFunctions');
 const globalVariables = require('../../helpers/data-generation/globalVariables');
 const APICommonHelpers = require('../../helpers/api/APICommonHelpers');
+const AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 const ObserveHelper = require('../../helpers/api/ObserveHelper');
 const chai = require('chai');
-const dataSets = require('../../helpers/data-generation/datasets');
+const Constants = require('../../helpers/Constants');
 const assert = chai.assert;
+const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
 const LoginPage = require('../../pages/LoginPage');
 const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 
-describe('Running create and delete dashboards with Snapshot KPIS in dashboards/createAndDeleteDashboardsWithSnapshotKPI.test', () => {
+describe('Running create and delete dashboards with charts in create-delete-dashboards/charts.test.js', () => {
+  const subCategoryName =
+    subCategories.createSubCategories.observeSubCategory.name;
+  const analysisCategoryName = categories.analyses.name;
+  const analysisSubCategoryName =
+    subCategories.createSubCategories.createAnalysis.name;
 
-  const subCategoryName = subCategories.createSubCategories.observeSubCategory.name;
   let host;
   let token;
+  let analysesDetails = [];
   let dashboardId;
-  const metricName = dataSets.pivotChart;
 
   beforeAll(() => {
-    logger.info('Starting dashboards/createAndDeleteDashboardsWithSnapshotKPI.test.js.....');
+    logger.info('Starting create-delete-dashboards/charts.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -38,8 +44,21 @@ describe('Running create and delete dashboards with Snapshot KPIS in dashboards/
 
   afterEach(function(done) {
     setTimeout(function() {
+      //Delete analysis
+      analysesDetails.forEach(function(currentAnalysis) {
+        if (currentAnalysis.analysisId) {
+          new AnalysisHelper().deleteAnalysis(
+            host,
+            token,
+            protractorConf.config.customerCode,
+            currentAnalysis.analysisId
+          );
+        }
+      });
+      //reset the array
+      analysesDetails = [];
       //delete dashboard if ui failed.
-      if(dashboardId) {
+      if (dashboardId) {
         new ObserveHelper().deleteDashboard(host, token, dashboardId);
       }
       commonFunctions.clearLocalStorage();
@@ -47,23 +66,51 @@ describe('Running create and delete dashboards with Snapshot KPIS in dashboards/
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-
-  using(testDataReader.testData['CREATEDELETEDASHBOARDSWITHSNAPSHOTKPI']['dashboards']
-  ? testDataReader.testData['CREATEDELETEDASHBOARDSWITHSNAPSHOTKPI']['dashboards']
-  : {}, (data, id) => {
-      it(`${id}:${data.description}`, ()=> {
+  using(
+    testDataReader.testData['OBSERVECHARTS']['dashboards']
+      ? testDataReader.testData['OBSERVECHARTS']['dashboards']
+      : {},
+    (data, id) => {
+      it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        try{
-          if(!token) {
+        try {
+          if (!token) {
             logger.error('token cannot be null');
             assert.isNotNull(token, 'token cannot be null');
           }
-          new LoginPage().loginAs(data.user);   
-          
           const currentTime = new Date().getTime();
+          const subType = data.chartType.split(':')[1];
+          const name =
+            'AT ' +
+            data.chartType +
+            ' ' +
+            globalVariables.e2eId +
+            '-' +
+            currentTime;
+          const description =
+            'AT Description:' +
+            data.chartType +
+            ' for e2e ' +
+            globalVariables.e2eId +
+            '-' +
+            currentTime;
           const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription = 'AT Dashboard description ' + currentTime;
-          const kpiName = 'AT kpi'+data.kpiInfo.column+ globalVariables.e2eId;
+          const dashboardDescription =
+            'AT Dashboard description ' + currentTime;
+
+          let analysis = new ObserveHelper().addAnalysisByApi(
+            host,
+            token,
+            name,
+            description,
+            Constants.CHART,
+            subType
+          );
+          expect(analysis).toBeTruthy();
+          assert.isNotNull(analysis, 'analysis cannot be null');
+          analysesDetails.push(analysis);
+
+          new LoginPage().loginAs(data.user);
 
           const headerPage = new HeaderPage();
           headerPage.clickOnModuleLauncher();
@@ -74,22 +121,15 @@ describe('Running create and delete dashboards with Snapshot KPIS in dashboards/
 
           const dashboardDesigner = new DashboardDesigner();
           dashboardDesigner.clickOnAddWidgetButton();
-          dashboardDesigner.clickOnSnapshotKPILink();
-          dashboardDesigner.clickOnCategoryOrMetricName(metricName);
-          dashboardDesigner.clickOnKpiColumnByName(data.kpiInfo.column.toLowerCase());
-          dashboardDesigner.fillKPINameDetails(kpiName);
-          dashboardDesigner.clickOnDateFieldSelect();
-          dashboardDesigner.clickOnDateOrAggregationElement(data.kpiInfo.date);
-          dashboardDesigner.clickOnDatePreSelect();
-          dashboardDesigner.clickOnDateOrAggregationElement(data.kpiInfo.filter);
-          dashboardDesigner.clickOnAggregationSelect();
-          dashboardDesigner.clickOnDateOrAggregationElement(data.kpiInfo.primaryAggregation);
-          dashboardDesigner.addSecondryAggregations(data.kpiInfo);
-          dashboardDesigner.clickOnBackgroundColorByName(data.kpiInfo.backgroundColor);
-          dashboardDesigner.clickOnApplyKPIButton();
+          dashboardDesigner.clickOnExistingAnalysisLink();
+          dashboardDesigner.clickOnCategoryOrMetricName(analysisCategoryName);
+          dashboardDesigner.clickOnCategoryOrMetricName(
+            analysisSubCategoryName
+          );
+          dashboardDesigner.addRemoveAnalysisById(analysesDetails);
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);
-          dashboardDesigner.setDashboardDescription(dashboardDescription)
+          dashboardDesigner.setDashboardDescription(dashboardDescription);
           dashboardDesigner.clickOnCategorySelect();
           dashboardDesigner.clickOnSubCategorySelect(subCategoryName);
           dashboardDesigner.clickOnSaveDialogButton();
@@ -97,29 +137,29 @@ describe('Running create and delete dashboards with Snapshot KPIS in dashboards/
 
           dashboardId = commonFunctions.getDashboardId(); //get dashboard id from current url
 
+          observePage.verifyDashboardTitle(name);
           observePage.verifyDashboardTitle(dashboardName);
-          observePage.verifyKpiByName(kpiName);
-          observePage.verifyFilterByName(data.kpiInfo.filter);
+          observePage.verifyAddedAnalysisName(name);
           observePage.displayDashboardAction('Refresh');
-          observePage.displayDashboardAction('Edit');
           observePage.displayDashboardAction('Delete');
+          observePage.displayDashboardAction('Edit');
           observePage.displayDashboardAction('Filter');
-          browser.sleep(4000);
+          browser.sleep(4000); // Below condition was failing if browser was not put to sleep.
           observePage.verifyBrowserURLContainsText('?dashboard');
           observePage.clickOnDeleteDashboardButton();
 
           dashboardDesigner.clickOnDashboardConfirmDeleteButton();
 
-          observePage.verifyDashboardTitleIsDeleted(dashboardName); 
-        } catch(e) {
+          observePage.verifyDashboardTitleIsDeleted(dashboardName);
+        } catch (e) {
           logger.error(e);
-        }    
-
+        }
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'CREATEDELETEDASHBOARDSWITHSNAPSHOTKPI',
+        feature: 'OBSERVECHARTS',
         dataProvider: 'dashboards'
-      }
-  });
+      };
+    }
+  );
 });

@@ -4,6 +4,8 @@ const ES_REPORT = 'esReport'; // ES
 const PIVOT = 'pivot';
 const REPORT = 'report'; // DL
 const CHART = 'chart';
+const NUMBER_TYPES = ['long', 'integer', 'double', 'float'];
+
 const API_ROUTES = {
   AUTH: '/saw/security/doAuthenticate',
   ANALYSIS: '/saw/services/analysis',
@@ -34,5 +36,6 @@ module.exports = {
   CHART,
   API_ROUTES,
   LOG_LEVELS,
-  E2E_OUTPUT_BASE_DIR
+  E2E_OUTPUT_BASE_DIR,
+  NUMBER_TYPES
 };
