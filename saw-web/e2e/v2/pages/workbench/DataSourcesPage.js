@@ -45,11 +45,9 @@ class DataSourcesPage extends DeleteModel {
       by.xpath(`(//input[@aria-label="Search in data grid"])[2]`)
     );
     this._routeLogs = element(by.css(`[e2e="view-route-logs-btn"]`));
-    this._routeScheduleRowColumn = colNum =>
+    this._getRouteScheduleRowValueOf = ColumnName =>
       element(
-        by.xpath(
-          `((//*[@e2e="route-logs-container"]/descendant::tr)[position()=last()-1]/descendant::td)[position()=${colNum}]`
-        )
+        by.xpath(`(//*[@e2e="route-log-${ColumnName}"])[position()=last()]`)
       );
 
     this._closeRouteLogsModel = element(
@@ -199,23 +197,36 @@ class DataSourcesPage extends DeleteModel {
       _self.clickOnRouteAction(routeInfo.routeName);
       _self.clickOnViewRouteLogs();
       browser.sleep(2000);
-      commonFunctions.waitFor.elementToBeVisible(
-        _self._routeScheduleRowColumn(2)
-      );
+
       element(
         _self
-          ._routeScheduleRowColumn(2)
-          .getText()
-          .then(text => {
-            if (text === `${routeInfo.source}/${routeInfo.fileName}`) {
-              expect(_self._routeScheduleRowColumn(2).getText()).toEqual(
-                `${routeInfo.source}/${routeInfo.fileName}`
-              );
-              _self.scheduleVerification(routeInfo);
-              _self.closeRouteLogModel();
+          ._getRouteScheduleRowValueOf('fileName')
+          .isPresent()
+          .then(present => {
+            if (present) {
+              _self
+                ._getRouteScheduleRowValueOf('fileName')
+                .getText()
+                .then(text => {
+                  if (text === `${routeInfo.source}/${routeInfo.fileName}`) {
+                    expect(
+                      _self._getRouteScheduleRowValueOf('fileName').getText()
+                    ).toEqual(`${routeInfo.source}/${routeInfo.fileName}`);
+                    _self.scheduleVerification(routeInfo);
+                    _self.closeRouteLogModel();
+                  } else {
+                    _self.closeRouteLogModel();
+                    console.log(
+                      `Element present, Attempt:${index} done but content is the one which wee need`
+                    );
+                    console.log(`waiting for 20 seconds and check again`);
+                    browser.sleep(20000);
+                    process(index + 1);
+                  }
+                });
             } else {
               _self.closeRouteLogModel();
-              console.log(`Attempt:${index} done`);
+              console.log(`Element not present Attempt:${index} done`);
               console.log(`waiting for 20 seconds and check again`);
               browser.sleep(20000);
               process(index + 1);
@@ -226,44 +237,70 @@ class DataSourcesPage extends DeleteModel {
   }
 
   scheduleVerification(routeInfo) {
-    expect(this._routeScheduleRowColumn(1).getText()).toEqual(
+    expect(this._getRouteScheduleRowValueOf('filePattern').getText()).toEqual(
       routeInfo.filePattern
     );
-    expect(this._routeScheduleRowColumn(2).getText()).toContain(
+    expect(this._getRouteScheduleRowValueOf('fileName').getText()).toContain(
       `${routeInfo.source}/${routeInfo.fileName}`
     );
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(3));
-    expect(this._routeScheduleRowColumn(3)).not.toBeNull();
-
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(4));
-    expect(this._routeScheduleRowColumn(4).getText()).toContain(
-      routeInfo.destination
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('actualFileRecDate')
     );
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(5));
-    expect(this._routeScheduleRowColumn(5)).not.toBeNull();
+    expect(
+      this._getRouteScheduleRowValueOf('actualFileRecDate')
+    ).not.toBeNull();
 
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(6));
-    expect(this._routeScheduleRowColumn(6).getText()).toContain('SUCCESS');
-
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(7));
-    expect(this._routeScheduleRowColumn(7).getText()).toContain(
-      'DATA_RECEIVED'
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('recdFileName')
     );
+    expect(
+      this._getRouteScheduleRowValueOf('recdFileName').getText()
+    ).toContain(routeInfo.destination);
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('recdFileSize')
+    );
+    expect(this._getRouteScheduleRowValueOf('recdFileSize')).not.toBeNull();
 
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(8));
-    expect(this._routeScheduleRowColumn(8)).not.toBeNull();
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('mflFileStatus')
+    );
+    expect(
+      this._getRouteScheduleRowValueOf('mflFileStatus').getText()
+    ).toContain('SUCCESS');
 
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(9));
-    expect(this._routeScheduleRowColumn(9)).not.toBeNull();
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('bisProcessState')
+    );
+    expect(
+      this._getRouteScheduleRowValueOf('bisProcessState').getText()
+    ).toContain('DATA_RECEIVED');
 
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(10));
-    expect(this._routeScheduleRowColumn(10)).not.toBeNull();
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('transferStartTime')
+    );
+    expect(
+      this._getRouteScheduleRowValueOf('transferStartTime')
+    ).not.toBeNull();
 
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(11));
-    expect(this._routeScheduleRowColumn(11)).not.toBeNull();
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('transferEndTime')
+    );
+    expect(this._getRouteScheduleRowValueOf('transferEndTime')).not.toBeNull();
 
-    commonFunctions.scrollIntoView(this._routeScheduleRowColumn(12));
-    expect(this._routeScheduleRowColumn(12)).not.toBeNull();
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('transferDuration')
+    );
+    expect(this._getRouteScheduleRowValueOf('transferDuration')).not.toBeNull();
+
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('modifiedDate')
+    );
+    expect(this._getRouteScheduleRowValueOf('modifiedDate')).not.toBeNull();
+
+    commonFunctions.scrollIntoView(
+      this._getRouteScheduleRowValueOf('createdDate')
+    );
+    expect(this._getRouteScheduleRowValueOf('createdDate')).not.toBeNull();
   }
 }
 
