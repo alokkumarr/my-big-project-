@@ -51,7 +51,7 @@ const canAcceptNumberType = ({ type }: ArtifactColumnChart) =>
 const canAcceptDateType = ({ type }: ArtifactColumnChart) =>
   DATE_TYPES.includes(type);
 const canAcceptGeoType = ({ geoType }: ArtifactColumnChart) =>
-  GEO_TYPES.includes(geoType);
+  geoType !== 'lngLat' && GEO_TYPES.includes(geoType);
 const canAcceptLngLat = ({ geoType }: ArtifactColumnChart) =>
   geoType === 'lngLat';
 const canAcceptAnyType = () => true;
