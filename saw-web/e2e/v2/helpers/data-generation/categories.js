@@ -4,7 +4,6 @@ const description = 'Category created for e2e testing'; // same for all categori
 const nullValue = 'NULL';
 
 const categories = {
-
   privileges: {
     name: 'AT Privileges Category ' + globalVariables.e2eId,
     description: description,
@@ -21,6 +20,13 @@ const categories = {
   },
   observe: {
     name: 'AT observe Category ' + globalVariables.e2eId,
+    description: description,
+    id: nullValue,
+    type: nullValue,
+    code: nullValue
+  },
+  workbench: {
+    name: 'AT work Category ' + globalVariables.e2eId,
     description: description,
     id: nullValue,
     type: nullValue,

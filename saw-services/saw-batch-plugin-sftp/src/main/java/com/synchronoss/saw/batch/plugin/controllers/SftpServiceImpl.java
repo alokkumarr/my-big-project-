@@ -862,6 +862,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       logId = bisDataMetaInfo.getProcessId();
                       logger.info("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
+                      logger.info("Thread starts downloading file with Id  : " + logId);  
                       FSDataOutputStream fos = fs
                           .create(new Path(localFile.getPath()));
                       template.get(sourcelocation + File.separator + entry.getFilename(),
@@ -1011,7 +1012,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       template.getSession().close();
                     }
                   }
-                  
+                  logger.info("Thread ends downloading file with Id  : " + logId);  
                 }
               }
             } // end of loop for the number of files to be download at each batch
@@ -1128,7 +1129,7 @@ public class SftpServiceImpl extends SipPluginContract {
           sipLogService.listOfRetryIds(retryDiff, i, retryPageSize, "checkpointDate");
       logger.trace("Data listOfRetryIds :" + logs);
       for (BisFileLog log : logs) {
-        logger.info("Id which is in inconsistent state: " + log.getPid());
+        logger.info("Process Id which is in inconsistent state: " + log.getPid());
         long routeId = log.getRouteSysId();
         logger.info("Route Id which is in inconsistent state: " + routeId);
         long channelId = log.getBisChannelSysId();
@@ -1236,6 +1237,7 @@ public class SftpServiceImpl extends SipPluginContract {
       throws NotFoundException {
     logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
         + channelId + " starts here");
+    logger.info("transferRetry with the process Id :" + pid);
     final List<BisDataMetaInfo>  filesInfo = new ArrayList<>();
     // This block needs to improved in future with appropriate design pattern like
     // Abstract factory or switch block when more channel type will be added
@@ -1282,13 +1284,16 @@ public class SftpServiceImpl extends SipPluginContract {
           // this will rectify irrespective of route active or not
           // and date are available on the source or not
           // all it make sure it host got back online
-          // and removes the entry from the store
-          sipLogService.deleteLog(pid);
-          logger.info("deleted the pid which had " + BisComponentState.HOST_NOT_REACHABLE
-                + " with pid " + pid);
+          // and after checking for existence then
+          // removes the entry from the store
+          if (sipLogService.checkAndDeleteLog(pid)) {
+            logger.info("deleted successfully the pid which had "
+                + BisComponentState.HOST_NOT_REACHABLE + " with pid " + pid);
+          }
         } catch (Exception ex) {
           logger.error(
-              "Exception occurred while connecting to channel with the channel Id:" + channelId,
+              "Exception occurred while connecting to channel with the channel Id:" + channelId
+              + " and with process id " + pid,
               ex);
           sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
               BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value());
