@@ -44,7 +44,8 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional()
   public void upsert(BisDataMetaInfo entity, String pid) throws SipNestedRuntimeException {
     logger.trace("Integrate with logging API to update with a status start here : "
         + entity.getProcessState());
@@ -90,7 +91,8 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public boolean checkDuplicateFile(String fileName) throws SipNestedRuntimeException {
     logger.trace("Integrate with logging API & checking for the duplicate files : " + fileName);
     return bisFileLogsRepository.isFileNameExists(fileName);
@@ -99,7 +101,8 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional()
   public void deleteLog(String pid) throws SipNestedRuntimeException {
     logger.trace("Delete an entry with logging API :" + pid);
     bisFileLogsRepository.deleteById(pid);
@@ -133,7 +136,8 @@ public class SipLogging {
    * @param entry file entry
    * @return true or false
    */
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -153,7 +157,8 @@ public class SipLogging {
    * @param channelId channel id to be validated
    * @return true or false
    */
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -171,7 +176,8 @@ public class SipLogging {
    * @param column column to operate
    * @return BisFileLog
    */
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -182,7 +188,8 @@ public class SipLogging {
     return logs.getContent();
   }
 
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -191,7 +198,8 @@ public class SipLogging {
     return countOfRows;
   }
 
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional()
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -203,6 +211,7 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public Page<BisFileLog> statusExistsForProcess(Long channelId, Long routeId,
       String processStatus) {
     return bisFileLogsRepository.isStatusExistsForProcess(processStatus, channelId, routeId,
@@ -212,7 +221,8 @@ public class SipLogging {
   /**
    * verify pid exists before deleting it.
    */
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional()
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -237,7 +247,7 @@ public class SipLogging {
   * @param minutesToCheck maxInProgress minutes
   * @return number of updated records
   */
-  @Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional()
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -262,7 +272,8 @@ public class SipLogging {
    * @param routeId unique Id for the route
    * @param processStatus status for the component process.
    */
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional()
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
       String fileStatus) {
     logger.trace(
@@ -296,7 +307,8 @@ public class SipLogging {
    * @param location source path
    * @return true or false
    */
-  @Transactional(TxType.REQUIRED)
+  //@Transactional(TxType.REQUIRED)
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
