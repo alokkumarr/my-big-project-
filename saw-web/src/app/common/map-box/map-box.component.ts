@@ -9,6 +9,7 @@ import fpMap from 'lodash/fp/map';
 import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { MarkerDataPoint } from './types';
+import { AGGREGATE_TYPES_OBJ } from '../../common/consts';
 
 @Component({
   selector: 'map-box',
@@ -89,14 +90,13 @@ export class MapBoxComponent implements OnChanges {
         fpToPairs,
         fpFilter(([key]) => key !== coordinatesKey),
         fpMap(([key, value]) => {
-          const alias = get(fieldsMap, `${key}.aliasName`);
-          const displayName = get(fieldsMap, `${key}.displayName`);
-          const aggregate: MarkerDataPoint = {
+          const { aliasName, displayName, aggregate } = get(fieldsMap, key);
+          const aggregateFun = AGGREGATE_TYPES_OBJ[aggregate].designerLabel;
+          return {
             key,
             value,
-            label: alias || displayName
+            label: `${aggregateFun}(${aliasName || displayName})`
           };
-          return aggregate;
         })
       )(datum);
 
