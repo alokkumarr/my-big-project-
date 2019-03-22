@@ -77,8 +77,8 @@ export class SingleTableDesignerLayoutComponent {
   openDrawer(drawer) {
     if (this.isInTabletMode) {
       setTimeout(() => {
-        drawer.open();
-        this.isOptionsPanelOpen = true;
+        drawer.toggle();
+        this.isOptionsPanelOpen = !this.isOptionsPanelOpen;
       });
     } else {
       drawer.toggle();
