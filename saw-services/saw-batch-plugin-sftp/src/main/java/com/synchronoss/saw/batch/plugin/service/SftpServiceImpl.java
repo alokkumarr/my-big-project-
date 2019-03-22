@@ -1032,7 +1032,8 @@ public class SftpServiceImpl extends SipPluginContract {
       long durationInMillis = Duration.between(startTime, endTime).toMillis();
       logger.trace("End of data tranfer.....Total time in milliseconds::: " + durationInMillis);
     } catch (Exception ex) {
-      logger.error("Exception occurred while transferring the file from channel", ex);
+      logger.error("Exception occurred while transferring the file " 
+          + sourcelocation + File.separator + pattern, ex.getMessage());
     }
     logger.trace("TransferDataFromChannelDirectory ends here with the channelId " + channelId
         + " and routeId " + routeId);
