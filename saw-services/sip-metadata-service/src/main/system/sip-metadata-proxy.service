@@ -1,0 +1,10 @@
+[Unit]
+Description=SIP Metadata Proxy
+Requires=sip-metadata.service
+After=sip-metadata.service
+Requires=sip-metadata-proxy.socket
+After=sip-metadata-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9501
+PrivateTmp=yes

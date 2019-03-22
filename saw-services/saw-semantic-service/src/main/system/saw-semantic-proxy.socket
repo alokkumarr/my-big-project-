@@ -1,8 +1,0 @@
-[Unit]
-Description=SAW Semantic Proxy Socket
-
-[Socket]
-ListenStream=9900
-
-[Install]
-WantedBy=sockets.target
