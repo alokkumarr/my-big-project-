@@ -298,28 +298,27 @@ public class QueryBuilderUtil {
        }
     }
 
-    /**
-     *  To get the aggregation builder for data fields.
-     * @param dataFields
-     * @param preSearchSourceBuilder
-     * @return
-     */
-	public static void getAggregationBuilder(List<?> dataFields, SearchSourceBuilder preSearchSourceBuilder)
-    {
+  /**
+   * To get the aggregation builder for data fields.
+   *
+   * @param dataFields
+   * @param preSearchSourceBuilder
+   * @return
+   */
+  public static void getAggregationBuilder(
+      List<?> dataFields, SearchSourceBuilder preSearchSourceBuilder) {
 
-                    for (Object dataField : dataFields) {
-                        if (dataField instanceof com.synchronoss.saw.model.Field) {
-                            Field field = (Field) dataField;
-                            if (field.getAggregate() != null) {
-                                if (field.getAggregate().value().equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value())) {
-                                    preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
-                                        field.getDisplayName()).field(field.getColumnName()));
-                                }
-                            }
-                        }
-                    }
-              //  return aggregationBuilder;
+    for (Object dataField : dataFields) {
+      if (dataField instanceof com.synchronoss.saw.model.Field) {
+        Field field = (Field) dataField;
+        if (Field.Aggregate.PERCENTAGE.value().equalsIgnoreCase(field.getAggregate().value())) {
+          preSearchSourceBuilder.aggregation(
+              AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName()));
+        }
+      }
     }
+    //  return aggregationBuilder;
+  }
 
    /**
      * query builder for DSK node.
