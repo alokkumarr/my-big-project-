@@ -10,6 +10,7 @@ class ChartsDesignerPage extends Designer {
     this._attribute = attribute =>
       element(by.css(`[e2e="designer-add-btn-${attribute}"]`));
     this.attributesCloseIcons = element.all(by.css('[fonticon="icon-close"]'));
+
   }
 
   searchAttribute(attribute) {
@@ -28,5 +29,6 @@ class ChartsDesignerPage extends Designer {
       }
     });
   }
+
 }
 module.exports = ChartsDesignerPage;
