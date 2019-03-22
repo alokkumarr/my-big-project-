@@ -19,7 +19,7 @@ import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
 import { Observable } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { first, map } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 
 const apiUrl = AppConfig.api.url;
@@ -123,7 +123,7 @@ export class AnalyzeService {
       ['contents.action', 'search'],
       ['contents.keys.[0].categoryId', subCategoryId]
     ]);
-    return <Promise<Analysis[]>>this.postRequest(`analysis/`, payload)
+    return <Promise<Analysis[]>>this.postRequest(`analysis`, payload)
       .then(fpGet('contents.analyze'))
       .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
   }
@@ -224,7 +224,7 @@ export class AnalyzeService {
 
   readAnalysisDSL(analysisId): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.get(`${apiUrl}/analysis/${analysisId}`).pipe(first())
+      this._http.get(`${apiUrl}/dslanalysis/${analysisId}`).pipe(first())
     );
   }
 
@@ -309,7 +309,7 @@ export class AnalyzeService {
 
   deleteAnalysisDSL(model: AnalysisDSL): Observable<any> {
     return <Observable<AnalysisDSL>>(
-      this._http.delete(`${apiUrl}/analysis/${model.id}`).pipe(first())
+      this._http.delete(`${apiUrl}/dslanalysis/${model.id}`).pipe(first())
     );
   }
 
@@ -387,11 +387,48 @@ export class AnalyzeService {
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.put(`${apiUrl}/analysis/${model.id}`, model).pipe(first())
+      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(first())
     );
   }
 
   applyAnalysis(
+    model,
+    mode = EXECUTION_MODES.LIVE,
+    options: ExecutionRequestOptions = {}
+  ) {
+    console.log(model);
+    return !!model.sipQuery
+      ? this.applyAnalysisDSL(model, mode, options)
+      : this.applyAnalysisNonDSL(model, mode, options);
+  }
+
+  applyAnalysisDSL(
+    model,
+    mode = EXECUTION_MODES.LIVE,
+    options: ExecutionRequestOptions = {}
+  ) {
+    return this._http
+      .post(`${apiUrl}/internal/proxy/storage/fetch`, {
+        sipQuery: model.sipQuery
+      })
+      .pipe(
+        map((resp: any) => {
+          return {
+            data: resp.data,
+            executionId: resp.executionId,
+            executionType: mode,
+            executedBy: this._jwtService.getLoginId(),
+            executedAt: Date.now(),
+            designerQuery: fpGet(`query`, resp),
+            queryBuilder: { ...model.sqlQuery },
+            count: fpGet(`totalRows`, resp)
+          };
+        })
+      )
+      .toPromise();
+  }
+
+  applyAnalysisNonDSL(
     model,
     mode = EXECUTION_MODES.LIVE,
     options: ExecutionRequestOptions = {}
@@ -477,6 +514,12 @@ export class AnalyzeService {
     ).then(fpGet(`contents.[0].${MODULE_NAME}`));
   }
 
+  getArtifactsForDataSet(semanticId: string) {
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`).then(
+      (data: any) => data.artifacts
+    );
+  }
+
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {
     return DSL_ANALYSIS_TYPES.includes(type)
       ? this.createAnalysisDSL(
@@ -501,7 +544,7 @@ export class AnalyzeService {
 
   createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.post(`${apiUrl}/analysis/`, model).pipe(first())
+      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(first())
     );
   }
 
@@ -520,7 +563,7 @@ export class AnalyzeService {
       sipQuery: {
         artifacts: [
           {
-            artifactsName: 'sample',
+            artifactsName: 'sample', // make this dynamic
             fields: []
           }
         ],
@@ -528,7 +571,7 @@ export class AnalyzeService {
         filters: [],
         sorts: [],
         store: {
-          dataStore: 'sampleAlias/sample',
+          dataStore: 'sampleAlias/sample', // make this dynamic
           storageType: 'ES'
         }
       }

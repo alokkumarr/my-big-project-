@@ -59,8 +59,8 @@ export class DesignerPageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.convertParamsToData(this.route.snapshot
-      .queryParams as DesignerQueryParams);
+    const params = this.route.snapshot.queryParams as DesignerQueryParams;
+    this.convertParamsToData(params);
   }
 
   warnUser() {

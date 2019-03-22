@@ -50,6 +50,7 @@ import {
 import { DRAFT_CATEGORY_ID } from './../../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
+import { AnalyzeService } from '../../services/analyze.service';
 
 import { DesignerInitGroupAdapters } from '../actions/designer.actions';
 
@@ -89,6 +90,7 @@ export class DesignerContainerComponent implements OnInit {
     public _designerService: DesignerService,
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
+    public _analyzeService: AnalyzeService,
     private _store: Store
   ) {}
 
@@ -150,20 +152,28 @@ export class DesignerContainerComponent implements OnInit {
 
   initNewAnalysis() {
     const { type, semanticId } = this.analysisStarter;
-    return this._designerService
-      .createAnalysis(semanticId, type)
-      .then((newAnalysis: Analysis) => {
-        this.analysis = { ...this.analysisStarter, ...newAnalysis };
-        if (!this.analysis.sqlBuilder) {
-          this.analysis.sqlBuilder = {
-            joins: []
-          };
-        }
-        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-        this.initAuxSettings();
-        this.analysis.edit = this.analysis.edit || false;
-        unset(this.analysis, 'supports');
-        unset(this.analysis, 'categoryId');
+    return this._analyzeService
+      .getArtifactsForDataSet(semanticId)
+      .then(artifacts => {
+        return this._designerService
+          .createAnalysis(semanticId, type)
+          .then((newAnalysis: Analysis) => {
+            this.analysis = {
+              ...this.analysisStarter,
+              ...(newAnalysis['analysis'] || newAnalysis),
+              artifacts
+            };
+            if (!this.analysis.sqlBuilder) {
+              this.analysis.sqlBuilder = {
+                joins: []
+              };
+            }
+            this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+            this.initAuxSettings();
+            this.analysis.edit = this.analysis.edit || false;
+            unset(this.analysis, 'supports');
+            unset(this.analysis, 'categoryId');
+          });
       });
   }
 
