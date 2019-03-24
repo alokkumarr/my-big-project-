@@ -718,6 +718,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'format':
     case 'aliasName':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
