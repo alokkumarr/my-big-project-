@@ -64,3 +64,10 @@ scrape_configs:
 {% for host in groups['saw-proxy'] %}
           - '{{ host }}:3100'
 {% endfor %}
+  - job_name: 'elasticsearch'
+    metrics_path: '/_prometheus/metrics'
+    static_configs:
+      - targets:
+{% for host in groups['sip-elastic'] %}
+          - '{{ host }}:{{ sip_elastic_port | default('8200') }}'
+{% endfor %}

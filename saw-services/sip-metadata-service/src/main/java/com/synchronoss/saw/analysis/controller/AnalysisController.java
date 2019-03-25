@@ -1,5 +1,6 @@
 package com.synchronoss.saw.analysis.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.modal.Ticket;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
@@ -7,6 +8,7 @@ import com.synchronoss.saw.analysis.service.AnalysisService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,12 +20,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+
 /** Analysis entity controller. */
 @RestController
-@RequestMapping("/analysis")
+@RequestMapping("/dslanalysis")
 @ApiResponses(
     value = {
       @ApiResponse(code = 202, message = "Request has been accepted without any error"),
@@ -60,9 +64,7 @@ public class AnalysisController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public AnalysisResponse createAnalysis(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      @RequestBody Analysis analysis) {
+      HttpServletRequest request, HttpServletResponse response, @RequestBody Analysis analysis) {
 
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket ticket = new Ticket();
@@ -173,5 +175,30 @@ public class AnalysisController {
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
+  }
+
+  /**
+   * Fetch Analysis definition by Category Id.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @param id Category id
+   * @return List of Analysis
+   */
+  @ApiOperation(
+      value = "Fetch Analysis definition API",
+      nickname = "FetchAnalysis",
+      notes = "",
+      response = AnalysisResponse.class)
+  @RequestMapping(
+      value = "",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public List<ObjectNode> getAnalysisByCategory(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestParam(name = "category") String id) {
+    Ticket ticket = new Ticket();
+    return analysisService.getAnalysisByCategory(id, ticket);
   }
 }
