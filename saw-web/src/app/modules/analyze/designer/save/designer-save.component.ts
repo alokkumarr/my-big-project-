@@ -1,10 +1,10 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Analysis } from '../types';
-import { DRAFT_CATEGORY_ID } from './../../consts';
 import {
   USER_ANALYSIS_CATEGORY_NAME,
   USER_ANALYSIS_SUBCATEGORY_NAME
 } from '../../../../common/consts';
+import { JwtService } from '../../../../common/services';
 
 @Component({
   selector: 'designer-save',
@@ -21,12 +21,12 @@ export class DesignerSaveComponent implements OnInit {
 
   public categories;
 
-  constructor() {}
+  constructor(private jwtService: JwtService) {}
 
   ngOnInit() {
     this.analysis.categoryId =
       this.designerMode === 'new'
-        ? DRAFT_CATEGORY_ID
+        ? this.jwtService.userAnalysisCategoryId
         : this.analysis.categoryId;
   }
 

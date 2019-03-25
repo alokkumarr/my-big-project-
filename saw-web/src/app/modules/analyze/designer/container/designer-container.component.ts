@@ -47,9 +47,9 @@ import {
   DEFAULT_MAP_SETTINGS
 } from '../consts';
 
-import { DRAFT_CATEGORY_ID } from './../../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
+import { JwtService } from '../../../../common/services';
 
 import { DesignerInitGroupAdapters } from '../actions/designer.actions';
 
@@ -89,7 +89,8 @@ export class DesignerContainerComponent implements OnInit {
     public _designerService: DesignerService,
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
-    private _store: Store
+    private _store: Store,
+    private _jwtService: JwtService
   ) {}
 
   ngOnInit() {
@@ -543,7 +544,7 @@ export class DesignerContainerComponent implements OnInit {
   openSaveDialog(): Promise<any> {
     this.analysis.categoryId =
       this.designerMode === 'new' || this.designerMode === 'fork'
-        ? DRAFT_CATEGORY_ID
+        ? this._jwtService.userAnalysisCategoryId
         : this.analysis.categoryId;
     return this._analyzeDialogService
       .openSaveDialog(this.analysis, this.designerMode)

@@ -91,16 +91,21 @@ const subCategories = {
   }
 };
 
-const createSubCategories  = {
+const createSubCategories = {
   createAnalysis: {
     name: 'Create new Analysis ' + globalVariables.e2eId,
-      description: description,
-      id: nullValue
+    description: description,
+    id: nullValue
   },
   observeSubCategory: {
     name: 'AT Observe SubCat' + globalVariables.e2eId,
-      description: description,
-      id: nullValue
+    description: description,
+    id: nullValue
+  },
+  workbenchSubCategory: {
+    name: 'AT workbench SubCat' + globalVariables.e2eId,
+    description: description,
+    id: nullValue
   }
 };
 

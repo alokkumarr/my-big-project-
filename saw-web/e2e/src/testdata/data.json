@@ -1766,5 +1766,185 @@
         ]
       }
     }
+  },
+  "BIS": {
+    "createAndDeleteChannel": {
+      "CHANN001": {
+        "id": "CHANN001",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to create and delete a channel"
+      },
+      "CHANN002": {
+        "id": "CHANN002",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "eからe",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to create and delete a channel with multibytchars"
+      }
+    },
+    "updateAndDeleteChannel": {
+      "CHANN003": {
+        "id": "CHANN003",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to update and delete a channel"
+      },
+      "CHANN004": {
+        "id": "CHANN004",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to update and delete a channel with multibytchars"
+      }
+    },
+    "deActivateChannel": {
+      "CHANN005": {
+        "id": "CHANN005",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to de-activate and delete a channel"
+      },
+      "CHANN006": {
+        "id": "CHANN006",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be able to de-activate and delete a channel with multibytchars"
+      }
+    },
+    "createAndDeleteRoute": {
+      "CHANN007": {
+        "id": "CHANN007",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "routeName": "e2eRoute",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to create and delete a route"
+      },
+      "CHANN008": {
+        "id": "CHANN008",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "routeName": "e2eRoutee到e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to create and delete a route with multibytchars"
+      }
+    },
+    "activateDeactivateRoute": {
+      "CHANN009": {
+        "id": "CHANN009",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "routeName": "e2eRoute",
+        "accessType": "rw",
+        "status":1,
+        "type": "Activate",
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to activate a route"
+      },
+      "CHANN010": {
+        "id": "CHANN010",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "routeName": "e2eRoutee到e",
+        "accessType": "rw",
+        "status":1,
+        "type": "Activate",
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to activate a route with multibytchars"
+      },
+      "CHANN011": {
+        "id": "CHANN011",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "routeName": "e2eRoutee到e",
+        "accessType": "rw",
+        "status":1,
+        "type": "Deactivate",
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to de-Activate a route with multibytchars"
+      },
+      "CHANN012": {
+        "id": "CHANN012",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "routeName": "e2eRoute",
+        "accessType": "rw",
+        "status":1,
+        "type": "Deactivate",
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to de-Activate a route"
+      }
+    },
+    "routeSchedule": {
+      "CHANN013": {
+        "id": "CHANN013",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e2e",
+        "routeName": "e2eRoute",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to schedule a route and it should run as per define schedule"
+      },
+      "CHANN014": {
+        "id": "CHANN014",
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "sourceType": "SFTP",
+        "channelName": "e到e",
+        "routeName": "e2eRoutee到e",
+        "accessType": "rw",
+        "status":1,
+        "testConnectivityMessage":"Connection successful!!",
+        "description": "Admin should be to schedule a route with multibytchars and it should run as per define schedule"
+      }
+    }
   }
 }

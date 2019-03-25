@@ -58,8 +58,6 @@ export const AnalyseTypes = {
   Pivot: 'pivot'
 };
 
-export const DRAFT_CATEGORY_ID = 5;
-
 export const ENTRY_MODES = {
   EDIT: 'edit',
   FORK: 'fork',
