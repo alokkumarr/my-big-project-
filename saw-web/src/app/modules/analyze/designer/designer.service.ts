@@ -596,7 +596,7 @@ export class DesignerService {
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:
-                artifactColumn.dateFormat || artifactColumn.format || DEFAULT_DATE_FORMAT.value
+                artifactColumn.dateFormat || DEFAULT_DATE_FORMAT.value
             } : {format: artifactColumn.format})
           };
         })

@@ -16,7 +16,7 @@ import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
 
 // the delay needed to animate opening and closing the sidemenus
-const SIDEMENU_ANIMATION_TIME = 250;
+const SIDEMENU_ANIMATION_TIME = 300;
 
 @Component({
   selector: 'single-table-designer-layout',

@@ -18,7 +18,6 @@ export class DesignerDateIntervalSelectorComponent implements OnInit {
     this.artifactColumn.dateInterval = value;
     if (this.artifactColumn.dateInterval !== 'day') {
       this.artifactColumn.format = DEFAULT_DATE_FORMAT.value;
-      this.artifactColumn.dateFormat = DEFAULT_DATE_FORMAT.value;
     }
     this.change.emit({ subject: 'dateInterval' });
   }
