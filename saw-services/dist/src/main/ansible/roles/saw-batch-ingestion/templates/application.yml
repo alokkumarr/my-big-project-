@@ -68,3 +68,4 @@ bis:
   scheduler-url: http://localhost:9600
   recheck-file-modified: {{ sip_bis_recheck_file_modified  | default('false') }}
   destination-fs-user: mapr
+  duplicate-entry: {{ sip_bis_duplicate_entry  | default('true') }}
