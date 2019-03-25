@@ -2,9 +2,25 @@ package com.synchronoss.saw.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.synchronoss.saw.model.*;
+import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Filter;
+import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.util.BuilderUtil;
-import org.elasticsearch.index.query.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.PrefixQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -12,7 +28,7 @@ import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import java.util.*;
+
 
 public class QueryBuilderUtil {
 	
