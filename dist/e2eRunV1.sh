@@ -20,7 +20,7 @@ if [ -z "$2" ]; then
     suiteName="development"
 fi
 if [ -z "$3" ]; then
-    echo "${yellow}Third argument is not provided hence running without retry and generating data only first time..${reset}"
+    echo "${yellow}Third argument is not provided hence running without retry and generating datat only first time..${reset}"
     localRun="--localRun"
 else 
     echo "Running tests with retry enabled..."
@@ -33,4 +33,4 @@ echo ""
 echo -e "${red}Tests are running on server $1 from your local system, if you are running first time with this server please delete target directory and run again.${reset}"
 echo ""
 read -rsp $'Press any key to continue...\n' -n1 key
-protractor ../saw-web/e2e/v2/conf/protractor.conf.js --baseUrl=$1 --suite=$suiteName $localRun
+protractor ../saw-web/e2e/protractor.conf.js --baseUrl=$1 --suite=$suiteName $localRun --disableChecks
