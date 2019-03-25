@@ -94,8 +94,8 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           const dashboardDesigner = new DashboardDesigner();
           dashboardDesigner.clickOnAddWidgetButton();
           dashboardDesigner.clickOnExistingAnalysisLink();
-          dashboardDesigner.clickOnCategory(analysisCategoryName);
-          dashboardDesigner.clickOnSubCategory(analysisSubCategoryName);
+          dashboardDesigner.clickOnCategoryOrMetricName(analysisCategoryName);
+          dashboardDesigner.clickOnCategoryOrMetricName(analysisSubCategoryName);
           dashboardDesigner.addRemoveAnalysisById(analysesDetails);
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);
