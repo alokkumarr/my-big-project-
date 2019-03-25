@@ -1,19 +1,10 @@
 package com.synchronoss.saw.es;
 
+import java.util.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
-import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Filter;
-import com.synchronoss.saw.model.Model;
+import com.synchronoss.saw.model.*;
 import com.synchronoss.saw.util.BuilderUtil;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -26,9 +17,8 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-
-
 
 public class QueryBuilderUtil {
 	
@@ -314,27 +304,26 @@ public class QueryBuilderUtil {
        }
     }
 
-  /**
-   * To get the aggregation builder for data fields.
-   *
-   * @param dataFields
-   * @param preSearchSourceBuilder
-   * @return
-   */
-  public static void getAggregationBuilder(
-      List<?> dataFields, SearchSourceBuilder preSearchSourceBuilder) {
+    /**
+     *  To get the aggregation builder for data fields.
+     * @param dataFields
+     * @param preSearchSourceBuilder
+     * @return
+     */
+	public static void getAggregationBuilder(List<?> dataFields, SearchSourceBuilder preSearchSourceBuilder)
+    {
 
-    for (Object dataField : dataFields) {
-      if (dataField instanceof com.synchronoss.saw.model.Field) {
-        Field field = (Field) dataField;
-        if (Field.Aggregate.PERCENTAGE.value().equalsIgnoreCase(field.getAggregate().value())) {
-          preSearchSourceBuilder.aggregation(
-              AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName()));
-        }
-      }
+                    for (Object dataField : dataFields) {
+                        if (dataField instanceof com.synchronoss.saw.model.Field) {
+                            Field field = (Field) dataField;
+                            if (field.getAggregate().value().equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value())) {
+                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
+                                    field.getDisplayName()).field(field.getColumnName()));
+                            }
+                        }
+                    }
+              //  return aggregationBuilder;
     }
-    //  return aggregationBuilder;
-  }
 
    /**
      * query builder for DSK node.
@@ -364,22 +353,14 @@ public class QueryBuilderUtil {
      * @param jsonNode
      * @return
      */
-    public static List<Object> buildReportData(JsonNode jsonNode, List<Field> dataFields)
+    public static List<Object> buildReportData(JsonNode jsonNode)
     {
         Iterator<JsonNode> recordIterator = jsonNode.get(HITS).get(HITS).iterator();
         List<Object> data = new ArrayList<>();
         while(recordIterator.hasNext())
         {
             JsonNode source = recordIterator.next();
-            ObjectNode row = source.get(_SOURCE).deepCopy();
-            // Add the missing columns in response for reports.
-            dataFields.forEach( field -> {
-                // Remove the .keyword if its string fields.
-                String fieldName= field.getColumnName().replace(".keyword","");
-                if (!row.has(fieldName))
-                    row.put(fieldName, "");
-            });
-            data.add(row);
+            data.add(source.get(_SOURCE));
         }
         return data;
     }
