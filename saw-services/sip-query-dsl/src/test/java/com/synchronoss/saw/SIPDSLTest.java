@@ -17,7 +17,7 @@ import java.util.List;
 
 
 /**
- * Unit test for simple App.
+ * Unit test .
  */
 public class SIPDSLTest {
 
