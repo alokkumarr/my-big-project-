@@ -19,17 +19,11 @@
       {{ lookup('password', inventory_dir
         + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
 
-- name: SAW Batch Ingestion Service database root password file exists
-  stat:
-    path: "/etc/bda/mariadb-root-password"
-  register: file_details_root
-
 - name: lookup & setting database root password
   set_fact:
     root_password: >-
         {{ lookup('password', inventory_dir
         + '/mariadb-root-password chars=ascii_letters,digits') }}
-  when: file_details_root.stat.exists
 
 - name: Install SAW Batch Ingestion Service configuration file
   template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
