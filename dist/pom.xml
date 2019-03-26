@@ -426,6 +426,12 @@
                 <network>
                   <name>saw</name>
                 </network>
+                <ports>
+                <!--- addd this to expose docker as sftp server over the network
+                  user can acess sip-admin container from local system(synchronoss network)
+                  to test bis -->
+                <port>+saw.docker.ip:8022:22</port>
+                </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <!-- Restart containers when Docker engine comes up

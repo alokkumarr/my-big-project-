@@ -148,7 +148,7 @@ public class SipLogging {
 
   /**
    * verify the routeId & channelId exists with data received & success.
-   * 
+   *
    * @param routeId route id to be validated
    * @param channelId channel id to be validated
    * @return true or false
@@ -208,20 +208,41 @@ public class SipLogging {
     return bisFileLogsRepository.isStatusExistsForProcess(processStatus, channelId, routeId,
         BisChannelType.SFTP.value(), PageRequest.of(0, 1, Direction.DESC, "modifiedDate"));
   }
-  
+
   /**
-   * check if any long running process exists
-   * and update if any.
-   * 
-   * @param minutesToCheck maxInProgress minutes
-   * @return number of updated records
+   * verify pid exists before deleting it.
    */
   @Transactional(TxType.REQUIRED)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean checkAndDeleteLog(String pid) throws Exception {
+    logger.trace("Delete and check process id :" + pid + "starts here");
+    boolean result = false;
+    if (bisFileLogsRepository.existsById(pid)) {
+      try {
+        deleteLog(pid);
+        result = true;
+      } catch (Exception ex) {
+        throw new Exception("Exception occurred while deleting pid :" + pid);
+      }
+    }
+    logger.trace("Delete and check process id :" + pid + "ends here");
+    return result;
+  }
+
+  /**
+  * check if any long running process exists.
+  * and update if any.
+  * @param minutesToCheck maxInProgress minutes
+  * @return number of updated records
+  */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public Integer updateLongRunningTransfers(Integer minutesToCheck) {
-    int updatedRecords = 0; 
+    int updatedRecords = 0;
     int longCount = bisFileLogsRepository
         .countOfLongRunningTransfers(minutesToCheck);
     logger.trace("Long running process count: " +    longCount);
@@ -236,7 +257,7 @@ public class SipLogging {
 
   /**
    * This method is used to check the status by process.
-   * 
+   *
    * @param channelId unique Id for the channel.
    * @param routeId unique Id for the route
    * @param processStatus status for the component process.
@@ -244,6 +265,8 @@ public class SipLogging {
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
       String fileStatus) {
+    logger.trace(
+        "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
     BisFileLog fileLog = null;
     if (statuslog != null
@@ -262,6 +285,8 @@ public class SipLogging {
       bisDataMetaInfo.setProcessState(fileStatus);
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
+    logger.trace(
+        "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "ends here");
   }
 
   /**
@@ -280,43 +305,5 @@ public class SipLogging {
 
   }
 
-  /**
-   * This method can be used to prepare the log meta data.
-   * @param bisDataMetaInfo object to set the values.
-   * @param pattern file pattern to declare.
-   * @param localFilePath destination path.
-   * @param recieveDate date of the file received.
-   * @param size file size in bytes.
-   * @param actualDataName actual data name received on the source.
-   * @param channelId channelId as the unique Id for the channel.
-   * @param routeId routeId as the unique Id for the route.
-   * @param destinationPath on the dfs.
-   * @return bisDataMetaInfo {@link BisDataMetaInfo}
-   */
-
-  public BisDataMetaInfo prepareLogInfo(BisDataMetaInfo bisDataMetaInfo, String pattern,
-      String localFilePath, Date recieveDate, Long size, String actualDataName, Long channelId,
-      Long routeId, String destinationPath) {
-    bisDataMetaInfo.setFilePattern(pattern);
-    bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-    bisDataMetaInfo.setReceivedDataName(localFilePath);
-    bisDataMetaInfo.setDataSizeInBytes(size);
-    bisDataMetaInfo.setActualDataName(actualDataName);
-    bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-    bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
-    bisDataMetaInfo.setComponentState(BisComponentState.DATA_INPROGRESS.value());
-    bisDataMetaInfo.setActualReceiveDate(recieveDate);
-    bisDataMetaInfo.setChannelId(channelId);
-    bisDataMetaInfo.setRouteId(routeId);
-    // sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-    bisDataMetaInfo.setDestinationPath(destinationPath);
-    return bisDataMetaInfo;
-
-  }
-
-  @Transactional(TxType.REQUIRED)
-  public Optional<BisRouteEntity> findRouteById(Long routeId) {
-    return bisRouteDataRestRepository.findById(routeId);
-  }
 
 }
