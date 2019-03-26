@@ -1,19 +1,11 @@
 package com.synchronoss.saw.es;
 
+import java.util.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
-import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Filter;
-import com.synchronoss.saw.model.Model;
+import com.synchronoss.saw.model.*;
 import com.synchronoss.saw.util.BuilderUtil;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -26,127 +18,113 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class QueryBuilderUtil {
+	
+	public final static String DATE_FORMAT = "yyyy-MM-dd";
+	public final static String SPACE_REGX = "\\s+";
+	public final static String EMPTY_STRING = "";
+    private static String HITS= "hits";
+    private static String _SOURCE ="_source";
+	public static Map<String,String> dateFormats = new HashMap<String, String>();
+	static {
 
-  public static final String DATE_FORMAT = "yyyy-MM-dd";
-  public static final String SPACE_REGX = "\\s+";
-  public static final String EMPTY_STRING = "";
-  public static Map<String, String> dateFormats = new HashMap<String, String>();
-  private static String HITS = "hits";
-  private static String _SOURCE = "_source";
-
-  static {
-    Map<String, String> formats = new HashMap<String, String>();
-    formats.put("YYYY", "year");
-    formats.put("MMMYYYY", "month");
-    formats.put("MMYYYY", "month");
-    formats.put("MMMdYYYY", "day");
-    formats.put("MMMMdYYYY,h:mm:ssa", "hour");
-    dateFormats = Collections.unmodifiableMap(formats);
+      Map<String, String> formats = new HashMap<String, String>();
+      formats.put("YYYY", "year");
+      formats.put("MMMYYYY", "month");
+      formats.put("MMYYYY", "month");
+      formats.put("MMMdYYYY", "day");
+      formats.put("MMMMdYYYY,h:mm:ssa", "hour");
+      dateFormats = Collections.unmodifiableMap(formats);
   }
 
-  /**
-   * @param field
-   * @param aggregationName
-   * @return
-   */
-  public static AggregationBuilder aggregationBuilder(Field field, String aggregationName) {
+    /**
+     *
+     * @param field
+     * @param aggregationName
+     * @return
+     */
+	public static AggregationBuilder aggregationBuilder (Field field,
+	     String aggregationName)
 
-    AggregationBuilder aggregationBuilder = null;
+	{
+		AggregationBuilder aggregationBuilder = null;
+		
+		if (field.getType().name().equals(Field.Type.DATE.name())
+		    || field.getType().name().equals(Field.Type.TIMESTAMP.name()))
+		{
+		  if (field.getGroupInterval()!=null){
+			aggregationBuilder = AggregationBuilders.
+					dateHistogram(aggregationName).field(field.getColumnName()).format(DATE_FORMAT).
+					dateHistogramInterval(groupInterval(field.getGroupInterval().value())).order(BucketOrder.key(false));
+			}
+		  else {
+		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(field.getColumnName())
+		        .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+		  }
+		}
+		else {
+          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(field.getColumnName()).size(BuilderUtil.SIZE);
+		}
 
-    if (field.getType().name().equals(Field.Type.DATE.name())
-        || field.getType().name().equals(Field.Type.TIMESTAMP.name())) {
-      if (field.getGroupInterval() != null) {
-        aggregationBuilder =
-            AggregationBuilders.dateHistogram(aggregationName)
-                .field(field.getColumnName())
-                .format(DATE_FORMAT)
-                .dateHistogramInterval(groupInterval(field.getGroupInterval().value()))
-                .order(BucketOrder.key(false));
-      } else {
-        aggregationBuilder =
-            AggregationBuilders.terms(aggregationName)
-                .field(field.getColumnName())
-                .format(DATE_FORMAT)
-                .order(BucketOrder.key(false))
-                .size(BuilderUtil.SIZE);
-      }
-    } else {
-      aggregationBuilder =
-          AggregationBuilders.terms(aggregationName)
-              .field(field.getColumnName())
-              .size(BuilderUtil.SIZE);
-    }
+		return aggregationBuilder;
+	}
 
-    return aggregationBuilder;
-  }
+    /**
+     * Group interval for the DateHistogram.
+     * @param groupInterval
+     * @return
+     */
+     public static DateHistogramInterval groupInterval(String groupInterval)
+     {
+    	 DateHistogramInterval histogramInterval = null; 
+    	    switch (groupInterval)
+    	    {
+    	    case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
+    	    case "day" : histogramInterval =  DateHistogramInterval.DAY; break;
+    	    case "year" : histogramInterval =  DateHistogramInterval.YEAR; break;
+    	    case "quarter" : histogramInterval =  DateHistogramInterval.QUARTER; break;
+    	    case "hour" : histogramInterval =  DateHistogramInterval.HOUR;break;
+    	    case "week" : histogramInterval =  DateHistogramInterval.WEEK;break;
+    	    }
+    	    return histogramInterval;
+     }
 
-  /**
-   * Group interval for the DateHistogram.
-   *
-   * @param groupInterval
-   * @return
-   */
-  public static DateHistogramInterval groupInterval(String groupInterval) {
-    DateHistogramInterval histogramInterval = null;
-    switch (groupInterval) {
-      case "month":
-        histogramInterval = DateHistogramInterval.MONTH;
-        break;
-      case "day":
-        histogramInterval = DateHistogramInterval.DAY;
-        break;
-      case "year":
-        histogramInterval = DateHistogramInterval.YEAR;
-        break;
-      case "quarter":
-        histogramInterval = DateHistogramInterval.QUARTER;
-        break;
-      case "hour":
-        histogramInterval = DateHistogramInterval.HOUR;
-        break;
-      case "week":
-        histogramInterval = DateHistogramInterval.WEEK;
-        break;
-    }
-    return histogramInterval;
-  }
-
-  /**
-   * Aggregation builder for data fields.
-   *
-   * @param field
-   * @return
-   */
-  public static AggregationBuilder aggregationBuilderDataField(Field field) {
-    AggregationBuilder aggregationBuilder = null;
+    /**
+     * Aggregation builder for data fields.
+     * @param field
+     * @return
+     */
+	public static AggregationBuilder aggregationBuilderDataField(Field field)
+	{
+		AggregationBuilder aggregationBuilder = null;
 
     switch (field.getAggregate()) {
       case SUM:
         aggregationBuilder =
-            AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName());
+            AggregationBuilders.sum(field.getDataField()).field(field.getColumnName());
         break;
       case AVG:
         aggregationBuilder =
-            AggregationBuilders.avg(field.getDisplayName()).field(field.getColumnName());
+            AggregationBuilders.avg(field.getDataField()).field(field.getColumnName());
         break;
       case MIN:
         aggregationBuilder =
-            AggregationBuilders.min(field.getDisplayName()).field(field.getColumnName());
+            AggregationBuilders.min(field.getDataField()).field(field.getColumnName());
         break;
       case MAX:
         aggregationBuilder =
-            AggregationBuilders.max(field.getDisplayName()).field(field.getColumnName());
+            AggregationBuilders.max(field.getDataField()).field(field.getColumnName());
         break;
       case COUNT:
         aggregationBuilder =
-            AggregationBuilders.count(field.getDisplayName()).field(field.getColumnName());
+            AggregationBuilders.count(field.getDataField()).field(field.getColumnName());
         break;
       case DISTINCT_COUNT:
         aggregationBuilder =
-            AggregationBuilders.cardinality(field.getDisplayName()).field(field.getColumnName());
+            AggregationBuilders.cardinality(field.getDataField()).field(field.getColumnName());
         break;
       case PERCENTAGE:
         Script script =
@@ -154,7 +132,7 @@ public class QueryBuilderUtil {
                 "_value*100/"
                     + field.getAdditionalProperties().get(field.getColumnName() + "_sum"));
         aggregationBuilder =
-            AggregationBuilders.sum(field.getDisplayName())
+            AggregationBuilders.sum(field.getDataField())
                 .field(field.getColumnName())
                 .script(script);
         break;
