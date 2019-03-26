@@ -1,29 +1,18 @@
 package com.synchronoss.saw.storage.proxy.service;
 
 
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.SIPDSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
@@ -35,11 +24,29 @@ import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StorageProxyServiceImpl implements StorageProxyService {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyServiceImpl.class);
+    private final static String VALUE = "value";
+    private final static String SUM ="_sum";
+    String dataSecurityString = null;
   
   @Value("${schema.file}")
   private String schemaFile;
@@ -362,12 +369,20 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     @Override
     public List<Object> execute(SIPDSL sipdsl, Integer size ) throws Exception {
         ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl,size);
+        List<Field> dataFields =
+            sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+        boolean isPercentage = dataFields.stream().anyMatch(dataField ->
+            dataField.getAggregate()!=null && dataField.getAggregate().value().equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value()));
+        String query;
+        if (!isPercentage) {
+            query = elasticSearchQueryBuilder.buildDataQuery(sipdsl,size);
+        }
+        else {
+            query = priorExecute(sipdsl,size);
+        }
         List<Object> result = null;
         JsonNode response =
             storageConnectorService.ExecuteESQuery(query, sipdsl.getSipQuery().getStore());
-        List<Field> dataFields =
-            sipdsl.getSipQuery().getArtifacts().get(0).getFields();
         List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
         ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
         if (response.get("aggregations")!=null)
@@ -376,6 +391,76 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             result = QueryBuilderUtil.buildReportData(response, dataFields);
         return result;
     }
+
+  public String priorExecute(SIPDSL sipdsl, Integer size) throws Exception {
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    SipQuery sipQuery = sipdsl.getSipQuery();
+    List<Object> result = null;
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.from(0);
+    if (size == null || size.equals(0)) size = 1000;
+    searchSourceBuilder.size(size);
+    if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
+      throw new NullPointerException(
+          "Please add sort[] & filter[] block.It can be empty but these blocks are important.");
+    }
+    searchSourceBuilder = elasticSearchQueryBuilder.buildSortQuery(sipQuery, searchSourceBuilder);
+
+    if (dataSecurityString != null && !dataSecurityString.trim().equals("")) {
+      DataSecurityKey dataSecurityKeyNode = elasticSearchQueryBuilder.buildDsk(dataSecurityString);
+    }
+
+    BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    if (sipQuery.getBooleanCriteria() != null) {
+      List<Filter> filters = sipQuery.getFilters();
+      List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+      builder = elasticSearchQueryBuilder.buildFilters(filters, builder);
+      //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder);  TODO: Future Implementation
+      boolQueryBuilder = elasticSearchQueryBuilder.buildBooleanQuery(sipQuery, builder);
+      searchSourceBuilder.query(boolQueryBuilder);
+    }
+
+    List<Field> dataFields = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+    List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
+
+    boolean isPercentage =
+        dataFields.stream()
+            .anyMatch(
+                dataField ->
+                    dataField.getAggregate() != null
+                        && dataField
+                            .getAggregate()
+                            .value()
+                            .equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value()));
+
+    if (isPercentage) {
+      SearchSourceBuilder preSearchSourceBuilder = new SearchSourceBuilder();
+      preSearchSourceBuilder.size(0);
+      preSearchSourceBuilder.query(boolQueryBuilder);
+      QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
+      JsonNode perResponse =
+          storageConnectorService.ExecuteESQuery(
+              preSearchSourceBuilder.toString(), sipdsl.getSipQuery().getStore());
+      dataFields.forEach(
+          dataField -> {
+            String columnName = dataField.getColumnName();
+            if (dataField.getAggregate() != null
+                && dataField.getAggregate().equals(Field.Aggregate.PERCENTAGE))
+              dataField
+                  .getAdditionalProperties()
+                  .put(
+                      columnName + SUM,
+                      String.valueOf(perResponse.get("aggregations").get(columnName).get(VALUE)));
+          });
+    }
+
+    searchSourceBuilder =
+        elasticSearchQueryBuilder.buildAggregations(
+            dataFields, aggregationFields, searchSourceBuilder, size);
+    logger.info("Final Query", searchSourceBuilder.toString());
+
+    return searchSourceBuilder.toString();
+  }
 
     public int getSize() {
     return size;
