@@ -1,10 +1,15 @@
 <div
+  e2e="snapshot-kpi"
   class="observe-kpi"
   [ngClass]="{ 'has-secondary-measure': secondaryResult.length > 0 }"
   [style.background-color]="bgColor"
 >
   <div class="header-row">
-    <div class="kpi-title" [textContent]="_kpi.name"></div>
+    <div
+      class="kpi-title"
+      e2e="snapshot-kpi-title"
+      [textContent]="_kpi.name"
+    ></div>
     <div class="val-change">
       <mat-icon
         *ngIf="primaryChange < 0"
@@ -15,6 +20,7 @@
         fontIcon="icon-arrow-up-circle"
       ></mat-icon>
       <div
+        e2e="snapshot-kpi-change"
         counto
         [step]="5"
         [duration]="2"
@@ -27,11 +33,14 @@
     </div>
   </div>
 
-  <div class="filter-label">{{ filterLabel }}</div>
+  <div class="filter-label" e2e="snapshot-kpi-filter-label">
+    {{ filterLabel }}
+  </div>
 
   <div class="kpi-primary-measure-container">
     <div class="kpi-measure">
       <span
+        e2e="snapshot-kpi-current"
         class="kpi-main-measure"
         counto
         [step]="100"
@@ -47,8 +56,12 @@
 
   <div class="kpi-secondary-measure-container">
     <span *ngFor="let measure of secondaryResult">
-      <span class="mName">{{ measure.name }}</span>
-      <span class="mValue">{{ measure.value }}</span>
+      <span [attr.e2e]="'snapshot-kpi-' + measure.name" class="mName"
+        >{{ measure.name }}:&nbsp;
+      </span>
+      <span [attr.e2e]="'snapshot-kpi-value-' + measure.name" class="mValue">{{
+        measure.value
+      }}</span>
     </span>
   </div>
 </div>
