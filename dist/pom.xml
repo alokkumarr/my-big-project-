@@ -108,7 +108,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf</artifactId>
       <version>${project.version}</version>
@@ -151,7 +151,7 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency> --> 
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
@@ -420,6 +420,12 @@
                 <network>
                   <name>saw</name>
                 </network>
+                <ports>
+                <!--- addd this to expose docker as sftp server over the network
+                  user can acess sip-admin container from local system(synchronoss network)
+                  to test bis -->
+                <port>+saw.docker.ip:8022:22</port>
+                </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <!-- Restart containers when Docker engine comes up

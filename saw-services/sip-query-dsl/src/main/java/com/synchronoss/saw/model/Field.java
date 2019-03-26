@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -14,7 +15,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({
   "dataField",
   "area",
@@ -56,6 +57,9 @@ public class Field {
 
   @JsonProperty("limitType")
   private LimitType limitType;
+
+  @JsonProperty("limitValue")
+  private Integer limitValue;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -153,6 +157,20 @@ public class Field {
     this.dateFormat = dateFormat;
   }
 
+  /**
+   * Gets limitType
+   *
+   * @return value of limitType
+   */
+  public LimitType getLimitType() {
+    return limitType;
+  }
+
+  /** Sets limitType */
+  public void setLimitType(LimitType limitType) {
+    this.limitType = limitType;
+  }
+
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
     return this.additionalProperties;
@@ -215,6 +233,14 @@ public class Field {
         .isEquals();
   }
 
+  public Integer getLimitValue() {
+    return limitValue;
+  }
+
+  public void setLimitValue(Integer limitValue) {
+    this.limitValue = limitValue;
+  }
+
   public enum GroupInterval {
     YEAR("year"),
     MONTH("month"),
@@ -222,11 +248,11 @@ public class Field {
     QUARTER("quarter"),
     HOUR("hour"),
     WEEK("week");
-    private static final Map<String, Field.GroupInterval> CONSTANTS =
-        new HashMap<String, Field.GroupInterval>();
+    private static final Map<String, GroupInterval> CONSTANTS =
+        new HashMap<String, GroupInterval>();
 
     static {
-      for (Field.GroupInterval c : values()) {
+      for (GroupInterval c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -238,8 +264,8 @@ public class Field {
     }
 
     @JsonCreator
-    public static Field.GroupInterval fromValue(String value) {
-      Field.GroupInterval constant = CONSTANTS.get(value);
+    public static GroupInterval fromValue(String value) {
+      GroupInterval constant = CONSTANTS.get(value);
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -264,11 +290,12 @@ public class Field {
     MIN("min"),
     MAX("max"),
     COUNT("count"),
-    PERCENTAGE("percentage");
-    private static final Map<String, Field.Aggregate> CONSTANTS = new HashMap<>();
+    PERCENTAGE("percentage"),
+    DISTINCT_COUNT("distinctCount");
+    private static final Map<String, Aggregate> CONSTANTS = new HashMap<>();
 
     static {
-      for (Field.Aggregate c : values()) {
+      for (Aggregate c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -280,8 +307,8 @@ public class Field {
     }
 
     @JsonCreator
-    public static Field.Aggregate fromValue(String value) {
-      Field.Aggregate constant = CONSTANTS.get(value);
+    public static Aggregate fromValue(String value) {
+      Aggregate constant = CONSTANTS.get(value);
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -308,10 +335,10 @@ public class Field {
     FLOAT("float"),
     INTEGER("integer"),
     STRING("string");
-    private static final Map<String, Field.Type> CONSTANTS = new HashMap<>();
+    private static final Map<String, Type> CONSTANTS = new HashMap<>();
 
     static {
-      for (Field.Type c : values()) {
+      for (Type c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -323,8 +350,8 @@ public class Field {
     }
 
     @JsonCreator
-    public static Field.Type fromValue(String value) {
-      Field.Type constant = CONSTANTS.get(value);
+    public static Type fromValue(String value) {
+      Type constant = CONSTANTS.get(value);
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -346,10 +373,10 @@ public class Field {
   public enum LimitType {
     TOP("top"),
     BOTTOM("bottom");
-    private static final Map<String, Field.LimitType> CONSTANTS = new HashMap<>();
+    private static final Map<String, LimitType> CONSTANTS = new HashMap<>();
 
     static {
-      for (Field.LimitType c : values()) {
+      for (LimitType c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -361,8 +388,8 @@ public class Field {
     }
 
     @JsonCreator
-    public static Field.LimitType fromValue(String value) {
-      Field.LimitType constant = CONSTANTS.get(value);
+    public static LimitType fromValue(String value) {
+      LimitType constant = CONSTANTS.get(value);
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

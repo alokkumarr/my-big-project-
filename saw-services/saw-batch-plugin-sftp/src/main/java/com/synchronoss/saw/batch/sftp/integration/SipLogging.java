@@ -207,20 +207,41 @@ public class SipLogging {
     return bisFileLogsRepository.isStatusExistsForProcess(processStatus, channelId, routeId,
         BisChannelType.SFTP.value(), PageRequest.of(0, 1, Direction.DESC, "modifiedDate"));
   }
-  
+
   /**
-   * check if any long running process exists
-   * and update if any.
-   * 
-   * @param minutesToCheck maxInProgress minutes
-   * @return number of updated records
+   * verify pid exists before deleting it.
    */
   @Transactional(TxType.REQUIRED)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean checkAndDeleteLog(String pid) throws Exception {
+    logger.trace("Delete and check process id :" + pid + "starts here");
+    boolean result = false;
+    if (bisFileLogsRepository.existsById(pid)) {
+      try {
+        deleteLog(pid);
+        result = true;
+      } catch (Exception ex) {
+        throw new Exception("Exception occurred while deleting pid :" + pid);
+      }
+    }
+    logger.trace("Delete and check process id :" + pid + "ends here");
+    return result;
+  }
+
+  /**
+  * check if any long running process exists.
+  * and update if any.
+  * @param minutesToCheck maxInProgress minutes
+  * @return number of updated records
+  */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public Integer updateLongRunningTransfers(Integer minutesToCheck) {
-    int updatedRecords = 0; 
+    int updatedRecords = 0;
     int longCount = bisFileLogsRepository
         .countOfLongRunningTransfers(minutesToCheck);
     logger.trace("Long running process count: " +    longCount);
@@ -242,6 +263,8 @@ public class SipLogging {
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
       String fileStatus) {
+    logger.trace(
+        "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
     BisFileLog fileLog = null;
     if (statuslog != null
@@ -260,8 +283,10 @@ public class SipLogging {
       bisDataMetaInfo.setProcessState(fileStatus);
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
+    logger.trace(
+        "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "ends here");
   }
-  
+
   /**
    * verify duplicate check enabled and is duplicate
    * or if duplicate check disabled.
@@ -280,5 +305,5 @@ public class SipLogging {
 
   }
 
-  
+
 }
