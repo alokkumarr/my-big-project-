@@ -66,7 +66,13 @@ export {
 
 export interface ArtifactColumnFilter {
   keyword: string;
-  types: { number: boolean; date: boolean; string: boolean; geo: boolean };
+  types: {
+    number: boolean;
+    date: boolean;
+    string: boolean;
+    geo: boolean;
+    coordinate: boolean;
+  };
   adapters: boolean[];
 }
 

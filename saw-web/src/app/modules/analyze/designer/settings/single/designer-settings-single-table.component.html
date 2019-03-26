@@ -89,12 +89,16 @@
             >
               <mat-icon
                 [fontIcon]="
-                  getArtifactColumnTypeIcon(artifactColumn, analysisType)
+                  getArtifactColumnTypeIcon(
+                    artifactColumn,
+                    analysisType,
+                    analysisSubtype
+                  )
                 "
                 class="settings__list-item__icon"
               >
               </mat-icon>
-              {{ artifactColumn.aliasName || artifactColumn.displayName }}
+              {{ artifactColumn.displayName || artifactColumn.aliasName }}
             </div>
 
             <button

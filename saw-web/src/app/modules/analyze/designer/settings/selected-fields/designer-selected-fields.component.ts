@@ -15,7 +15,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as debounce from 'lodash/debounce';
 import * as has from 'lodash/has';
 import * as reduce from 'lodash/reduce';
-import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
@@ -53,7 +52,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public artifactColumns: ArtifactColumns;
   private _dndSubscription;
-  public config: PerfectScrollbarConfigInterface = {};
   @Input('artifacts')
   public set setArtifactColumns(artifacts: Artifact[]) {
     if (!isEmpty(artifacts)) {
@@ -231,7 +229,11 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   getFieldItemClass(col) {
-    const type = getArtifactColumnGeneralType(col, this.analysisType);
+    const type = getArtifactColumnGeneralType(
+      col,
+      this.analysisType,
+      this.analysisSubtype
+    );
     switch (type) {
       case 'string':
         return 'string-type-chip-color';

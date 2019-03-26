@@ -104,6 +104,8 @@ export class DashboardGridComponent
       margin: MARGIN_BETWEEN_TILES,
       minRows: 4,
       maxRows: 10000,
+      minItemRows: 6,
+      minItemCols: 10,
       maxItemCols: 100,
       maxItemRows: 10000,
       maxItemArea: 1000000,

@@ -9,6 +9,23 @@ import fpMap from 'lodash/fp/map';
 import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { MarkerDataPoint } from './types';
+import { AGGREGATE_TYPES_OBJ } from '../../common/consts';
+
+interface GeoFeature {
+  index: number;
+  type: 'Feature';
+  properties: {
+    aggregates: any[];
+  };
+  geometry: {
+    type: 'Point';
+    coordinates: number[];
+  };
+}
+interface GeoJson {
+  type: 'FeatureCollection';
+  features: GeoFeature[];
+}
 
 @Component({
   selector: 'map-box',
@@ -16,12 +33,12 @@ import { MarkerDataPoint } from './types';
   styleUrls: ['./map-box.component.scss']
 })
 export class MapBoxComponent implements OnChanges {
-  public selectedPoint: GeoJSON.Feature<GeoJSON.Point>;
+  public selectedPoint: GeoFeature;
   dataFields: any[];
   coordinateField: any;
   center: number[];
   mapStyle: string;
-  geoJson: GeoJSON.GeoJSON;
+  geoJson: GeoJson;
 
   @Input('mapSettings') set setMapSettings(settings) {
     this.mapStyle = settings.mapStyle;
@@ -34,10 +51,15 @@ export class MapBoxComponent implements OnChanges {
 
   @Input() data: any[];
 
-  ngOnChanges(changes) {
+  ngOnChanges() {
     if (this.data && this.coordinateField && this.dataFields) {
       setTimeout(() => {
         this.setGeoJson(this.data, this.coordinateField, this.dataFields);
+        if (this.selectedPoint) {
+          this.selectedPoint = {
+            ...this.geoJson.features[this.selectedPoint.index]
+          };
+        }
       }, 10);
     }
   }
@@ -67,11 +89,7 @@ export class MapBoxComponent implements OnChanges {
     this.selectedPoint = { ...point };
   }
 
-  data2geoJsonFeatures(
-    data,
-    coordinateField,
-    dataFields
-  ): Array<GeoJSON.Feature> {
+  data2geoJsonFeatures(data, coordinateField, dataFields): Array<GeoFeature> {
     const allFields = [coordinateField, ...dataFields];
     const fieldsMap = reduce(
       allFields,
@@ -81,7 +99,7 @@ export class MapBoxComponent implements OnChanges {
       },
       {}
     );
-    return map(data, datum => {
+    return map(data, (datum, index) => {
       const coordinatesKey = coordinateField.columnName;
       const [lng, lat] = split(datum[coordinatesKey], ',');
       const lnglat = [parseFloat(lng), parseFloat(lat)];
@@ -89,18 +107,21 @@ export class MapBoxComponent implements OnChanges {
         fpToPairs,
         fpFilter(([key]) => key !== coordinatesKey),
         fpMap(([key, value]) => {
-          const alias = get(fieldsMap, `${key}.aliasName`);
-          const displayName = get(fieldsMap, `${key}.displayName`);
-          const aggregate: MarkerDataPoint = {
+          const { alias, aliasName, displayName, aggregate } = get(
+            fieldsMap,
+            key
+          );
+          const aggregateFun = AGGREGATE_TYPES_OBJ[aggregate].designerLabel;
+          return {
             key,
             value,
-            label: alias || displayName
+            label: `${aggregateFun}(${alias || aliasName || displayName})`
           };
-          return aggregate;
         })
       )(datum);
 
       return {
+        index,
         type: 'Feature',
         properties: {
           aggregates

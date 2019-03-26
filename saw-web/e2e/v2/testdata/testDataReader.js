@@ -2,5 +2,5 @@
 
 const SuiteSetup = require('../helpers/SuiteSetup');
 module.exports = {
-  testData: SuiteSetup.getTestData(),
-}
+  testData: SuiteSetup.getTestData()
+};

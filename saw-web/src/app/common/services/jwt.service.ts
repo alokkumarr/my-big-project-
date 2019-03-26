@@ -4,6 +4,7 @@ import * as isArray from 'lodash/isArray';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
+import * as lowerCase from 'lodash/lowerCase';
 import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
 import {
@@ -83,10 +84,10 @@ export class JwtService {
    * Returns the id of user's private sub category.
    *
    * @readonly
-   * @type {(number | string)}
+   * @type {number}
    * @memberof JwtService
    */
-  get userAnalysisCategoryId(): number | string {
+  get userAnalysisCategoryId(): number {
     const productModules =
       get(this.getTokenObj(), 'ticket.products.0.productModules') || [];
     const analyzeModule =
@@ -94,15 +95,23 @@ export class JwtService {
     const userCategory =
       find(
         analyzeModule.prodModFeature || [],
-        category => category.prodModFeatureName === USER_ANALYSIS_CATEGORY_NAME
+        category =>
+          lowerCase(category.prodModFeatureName) ===
+          lowerCase(USER_ANALYSIS_CATEGORY_NAME)
       ) || {};
     const userSubcategory =
       find(
         userCategory.productModuleSubFeatures || [],
-        subCat => subCat.prodModFeatureName === USER_ANALYSIS_SUBCATEGORY_NAME
+        subCat =>
+          lowerCase(subCat.prodModFeatureName) ===
+          lowerCase(USER_ANALYSIS_SUBCATEGORY_NAME)
       ) || {};
 
-    return userSubcategory.prodModFeatureID;
+    // If there's an issue with getting category's id, return 0. This is not ideal,
+    // but better than analysis getting assigned to something like NaN category.
+    // This OR condition is not expected to happen, ever. If it does, there's a bigger
+    // problem somewhere else.
+    return +userSubcategory.prodModFeatureID || 0;
   }
 
   destroy() {

@@ -27,6 +27,12 @@ const LOG_LEVELS = {
 
 const E2E_OUTPUT_BASE_DIR = 'target/e2e';
 
+const SFTP_DETAILS = {
+  sftpHost: 'sip-admin',
+  sftpPort: '22',
+  sftpUser: 'root',
+  sftpPassword: 'root'
+};
 module.exports = {
   ES_REPORT,
   PIVOT,
@@ -34,5 +40,6 @@ module.exports = {
   CHART,
   API_ROUTES,
   LOG_LEVELS,
-  E2E_OUTPUT_BASE_DIR
+  E2E_OUTPUT_BASE_DIR,
+  SFTP_DETAILS
 };

@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  OnInit
+} from '@angular/core';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -9,6 +16,7 @@ import * as filter from 'lodash/filter';
 import * as every from 'lodash/every';
 import * as some from 'lodash/some';
 import * as map from 'lodash/map';
+import * as mapValues from 'lodash/mapValues';
 import * as isBoolean from 'lodash/isBoolean';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -44,7 +52,7 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
   templateUrl: './designer-settings-single-table.component.html',
   styleUrls: ['./designer-settings-single-table.component.scss']
 })
-export class DesignerSettingsSingleTableComponent implements OnInit {
+export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input('artifacts')
@@ -74,7 +82,8 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       number: false,
       date: false,
       string: false,
-      geo: false
+      geo: false,
+      coordinate: false
     },
     adapters: [
       false, // first adapter
@@ -112,6 +121,18 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
 
   ngOnInit() {
     this.typeIcons = getFilterTypes(this.analysisType, this.analysisSubtype);
+  }
+
+  ngOnChanges(changes) {
+    const subType = changes.analysisSubtype;
+    if (
+      subType &&
+      !subType.firstChange &&
+      subType.currentValue !== subType.previousValue
+    ) {
+      this.filterObj.types = mapValues(this.filterObj.types, () => false);
+      this.typeIcons = getFilterTypes(this.analysisType, this.analysisSubtype);
+    }
   }
 
   trackByIndex(index) {
@@ -171,6 +192,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   hasAllowedType(filterTypes) {
     return artifactColumn => {
       const generalType = this.getGeneralType(artifactColumn);
+
       if (every(filterTypes, toggled => !toggled)) {
         return true;
       }
@@ -179,11 +201,19 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   getGeneralType(artifactColumn) {
-    return getArtifactColumnGeneralType(artifactColumn, this.analysisType);
+    return getArtifactColumnGeneralType(
+      artifactColumn,
+      this.analysisType,
+      this.analysisSubtype
+    );
   }
 
   getArtifactColumnTypeIcon(artifactColumn) {
-    return getArtifactColumnTypeIcon(artifactColumn, this.analysisType);
+    return getArtifactColumnTypeIcon(
+      artifactColumn,
+      this.analysisType,
+      this.analysisSubtype
+    );
   }
 
   hasKeyword(name, keyword) {

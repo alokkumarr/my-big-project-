@@ -126,26 +126,15 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
             commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
             filters.applyBtn.click();
 
-            // TODO: Need to check that filters applied or not. for bug fix.
-            // https://jira.synchronoss.net:8443/jira/browse/SIP-6392
-
+            const filterDisplayed =
+              fieldName + ': ' + operator + ' ' + filterValue;
+            const appliedFilters = [filterDisplayed];
+            chartDesignerPage.verifyAppliedFilters(appliedFilters);
           } catch (e) {
             console.log(e);
           }
         }
       );
-
-      const validateSelectedFilters = filters => {
-        analyzePagePO.appliedFiltersDetails.selectedFilters
-          .map(function(elm) {
-            return elm.getText();
-          })
-          .then(function(displayedFilters) {
-            expect(
-              utils.arrayContainsArray(displayedFilters, filters)
-            ).toBeTruthy();
-          });
-      };
     }
   );
 });

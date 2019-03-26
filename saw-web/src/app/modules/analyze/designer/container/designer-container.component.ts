@@ -47,10 +47,10 @@ import {
   DEFAULT_MAP_SETTINGS
 } from '../consts';
 
-import { DRAFT_CATEGORY_ID } from './../../consts';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
 import { AnalyzeService } from '../../services/analyze.service';
+import { JwtService } from '../../../../common/services';
 
 import { DesignerInitGroupAdapters } from '../actions/designer.actions';
 
@@ -91,7 +91,8 @@ export class DesignerContainerComponent implements OnInit {
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
     public _analyzeService: AnalyzeService,
-    private _store: Store
+    private _store: Store,
+    private _jwtService: JwtService
   ) {}
 
   ngOnInit() {
@@ -553,7 +554,7 @@ export class DesignerContainerComponent implements OnInit {
   openSaveDialog(): Promise<any> {
     this.analysis.categoryId =
       this.designerMode === 'new' || this.designerMode === 'fork'
-        ? DRAFT_CATEGORY_ID
+        ? this._jwtService.userAnalysisCategoryId
         : this.analysis.categoryId;
     return this._analyzeDialogService
       .openSaveDialog(this.analysis, this.designerMode)
@@ -728,6 +729,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'format':
     case 'aliasName':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
@@ -829,13 +831,16 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'chartType':
       this.changeChartType(event.data);
-      this._store.dispatch(
-        new DesignerInitGroupAdapters(
-          <ArtifactColumnChart[]>this.artifacts[0].columns,
-          this.analysis.type,
-          (<AnalysisChart>this.analysis).chartType
-        )
-      );
+      setTimeout(() => {
+        this.resetAnalysis();
+        this._store.dispatch(
+          new DesignerInitGroupAdapters(
+            <ArtifactColumnChart[]>this.artifacts[0].columns,
+            this.analysis.type,
+            (<AnalysisChart>this.analysis).chartType
+          )
+        );
+      });
       break;
     }
   }
@@ -843,7 +848,6 @@ export class DesignerContainerComponent implements OnInit {
   changeChartType(to: string) {
     const analysis = <AnalysisChart>this.analysis;
     analysis.chartType = to;
-    this.resetAnalysis();
   }
 
   resetAnalysis() {
