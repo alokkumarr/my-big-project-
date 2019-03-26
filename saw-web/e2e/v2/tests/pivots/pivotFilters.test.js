@@ -1,0 +1,129 @@
+const using = require('jasmine-data-provider');
+const testDataReader = require('../../testdata/testDataReader.js');
+const protractorConf = require('../../conf/protractor.conf');
+const logger = require('../../conf/logger')(__filename);
+const dataSets = require('../../helpers/data-generation/datasets');
+const commonFunctions = require('../../pages/utils/commonFunctions');
+const Filter = require('../../helpers/Filter');
+
+const LoginPage = require('../../pages/LoginPage');
+const AnalyzePage = require('../../pages/AnalyzePage');
+const ChartDesignerPage = require('../../pages/ChartDesignerPage');
+const PreviewPage = require('../../pages/PreviewPage');
+
+describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', () => {
+  const metricName = dataSets.pivotChart;
+  const analysisType = 'table:pivot';
+  const dateFieldName = 'Date';
+  const numberFieldName = 'Integer';
+  const stringFieldName = 'String';
+  beforeAll(() => {
+    logger.info('Starting pivots/pivotFilters.test.js.....');
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
+  });
+
+  beforeEach(done => {
+    setTimeout(() => {
+      done();
+    }, protractorConf.timeouts.pageResolveTimeout);
+  });
+
+  afterEach(done => {
+    setTimeout(() => {
+      // Logout by clearing the storage
+      commonFunctions.clearLocalStorage();
+      done();
+    }, protractorConf.timeouts.pageResolveTimeout);
+  });
+
+  using(
+    testDataReader.testData['PIVOT']['pivotFilters']
+      ? testDataReader.testData['PIVOT']['pivotFilters']
+      : {},
+    (data, id) => {
+      it(`${id}:${data.description}`, () => {
+        logger.info(`Executing test case with id: ${id}`);
+        const loginPage = new LoginPage();
+        loginPage.loginAs(data.user, /analyze/);
+
+        const analyzePage = new AnalyzePage();
+        analyzePage.clickOnAddAnalysisButton();
+        analyzePage.clickOnAnalysisType(analysisType);
+        analyzePage.clickOnNextButton();
+        analyzePage.clickOnDataPods(metricName);
+        analyzePage.clickOnCreateButton();
+
+        const chartDesignerPage = new ChartDesignerPage();
+        // Dimension section.
+        chartDesignerPage.clickOnAttribute(dateFieldName);
+        // Group by section. i.e. Color by
+        chartDesignerPage.clickOnAttribute(numberFieldName);
+        // Metric section.
+        chartDesignerPage.clickOnAttribute(stringFieldName);
+
+        // Create filter object. Specify type and preset/operator
+        const filter = new Filter({
+          preset: data.preset,
+          operator: data.operator,
+          from: data.from,
+          to: data.to,
+          moreThen: data.moreThen,
+          lessThen: data.lessThen
+        });
+
+        if (data.fieldType === 'date') {
+          filter.columnName = dateFieldName;
+        } else if (data.fieldType === 'number') {
+          filter.columnName = numberFieldName;
+        } else if (data.fieldType === 'string') {
+          filter.columnName = stringFieldName;
+        }
+
+        // Scenario for group intervals
+        if (data.groupIntervalSpecified) {
+          chartDesignerPage.clickOnExpandField(dateFieldName);
+          browser.sleep(2000);
+          chartDesignerPage.selectGroupInterval(data.groupInterval);
+        }
+
+        // Scenario for aggregate functions
+        if (data.aggregateFunction) {
+          chartDesignerPage.clickOnAggregateButton('sum');
+          chartDesignerPage.clickOnAggregateFunctionIcon(
+            data.aggregateFunction
+          );
+        }
+
+        chartDesignerPage.clickOnFilterButton();
+        chartDesignerPage.clickOnAddFilterButtonByTableName('sample');
+        chartDesignerPage.clickOnColumnInput();
+        chartDesignerPage.clickOnColumnDropDown(filter.columnName);
+
+        // Scenario for dates
+        if (data.fieldType === 'date') {
+          chartDesignerPage.selectPreset(data.preset);
+        }
+        // Scenario for numbers
+        if (data.fieldType === 'number') {
+          chartDesignerPage.selectNumberOperatorAndValue(
+            data.operator,
+            data.value
+          );
+        }
+
+        // Scenario for strings
+        if (data.fieldType === 'string') {
+          chartDesignerPage.selectStringOperatorAndValue(
+            data.operator,
+            data.value
+          );
+        }
+      }).result.testInfo = {
+        testId: id,
+        data: data,
+        feature: 'PIVOT',
+        dataProvider: 'pivotFilters'
+      };
+    }
+  );
+});
