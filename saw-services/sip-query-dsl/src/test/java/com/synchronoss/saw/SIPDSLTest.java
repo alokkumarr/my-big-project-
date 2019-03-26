@@ -8,13 +8,17 @@ import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SIPDSL;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-/** Unit test for simple App. */
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+
+/**
+ * Unit test .
+ */
 public class SIPDSLTest {
 
   /** Query Builder Tests with aggregation. */

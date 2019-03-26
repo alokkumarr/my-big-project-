@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.synchronoss.saw.model.ChartProperties;
 import com.synchronoss.saw.model.SipQuery;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,6 +75,9 @@ public class Analysis {
 
   @JsonProperty("sipQuery")
   private SipQuery sipQuery;
+
+  @JsonProperty("chartProperties")
+  private ChartProperties chartProperties;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -205,6 +209,16 @@ public class Analysis {
     this.modifiedBy = modifiedBy;
   }
 
+  @JsonProperty("chartProperties")
+  public ChartProperties getChartProperties() {
+      return this.chartProperties;
+  }
+
+  @JsonProperty("chartProperties")
+  public void setChartProperties(ChartProperties chartProperties) {
+      this.chartProperties = chartProperties;
+  }
+
   @JsonProperty("sipQuery")
   public SipQuery getSipQuery() {
     return sipQuery;
@@ -239,6 +253,7 @@ public class Analysis {
         .append("createdBy", createdBy)
         .append("modifiedTime", modifiedTime)
         .append("modifiedBy", modifiedBy)
+        .append("chartProperties", chartProperties)
         .append("sipQuery", sipQuery)
         .append("additionalProperties", additionalProperties)
         .toString();
