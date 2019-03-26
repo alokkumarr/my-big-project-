@@ -61,6 +61,9 @@ public class Field {
   @JsonProperty("limitValue")
   private Integer limitValue;
 
+  @JsonProperty("displayType")
+  private String displayType;
+
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("dataField")
@@ -171,7 +174,15 @@ public class Field {
     this.limitType = limitType;
   }
 
-  @JsonAnyGetter
+  public String getDisplayType() {
+    return displayType;
+  }
+
+  public void setDisplayType(String displayType) {
+    this.displayType = displayType;
+  }
+
+    @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
     return this.additionalProperties;
   }
