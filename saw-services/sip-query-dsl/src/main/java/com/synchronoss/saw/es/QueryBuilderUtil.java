@@ -144,6 +144,10 @@ public class QueryBuilderUtil {
         aggregationBuilder =
             AggregationBuilders.count(field.getDisplayName()).field(field.getColumnName());
         break;
+      case DISTINCT_COUNT:
+        aggregationBuilder =
+            AggregationBuilders.cardinality(field.getDisplayName()).field(field.getColumnName());
+        break;
       case PERCENTAGE:
         Script script =
             new Script(
