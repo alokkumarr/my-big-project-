@@ -150,20 +150,18 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
   }
 
   reloadChart(data, changes = []) {
-    changes = [
-      ...changes,
-      ...this._chartService.dataToChangeConfig(
-        this.chartType,
-        this.settings,
-        this._sqlBuilder,
-        map(data || [], clone),
-        {
-          labels: {},
-          labelOptions: get(this._auxSettings, 'labelOptions', {}),
-          sorts: this.sorts
-        }
-      )
-    ];
+    const changeConfig = this._chartService.dataToChangeConfig(
+      this.chartType,
+      this.settings,
+      this._sqlBuilder,
+      map(data || [], clone),
+      {
+        labels: {},
+        labelOptions: get(this._auxSettings, 'labelOptions', {}),
+        sorts: this.sorts
+      }
+    );
+    changes = [...changes, ...changeConfig];
 
     changes.push({
       path: 'chart.inverted',

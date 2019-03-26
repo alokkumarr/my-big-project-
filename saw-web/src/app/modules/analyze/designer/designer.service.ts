@@ -14,6 +14,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as compact from 'lodash/compact';
 import * as isFunction from 'lodash/isFunction';
+import * as unset from 'lodash/unset';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -300,6 +301,7 @@ export class DesignerService {
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn.area = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'comboType');
     };
 
     const metricTitle = chartType === 'pie' ? 'Angle' : 'Metrics';

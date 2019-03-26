@@ -1,5 +1,6 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import * as cloneDeep from 'lodash/clone';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as forEach from 'lodash/forEach';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -8,7 +9,8 @@ import {
   DesignerInitGroupAdapters,
   DesignerAddColumnToGroupAdapter,
   DesignerMoveColumnInGroupAdapter,
-  DesignerRemoveColumnFromGroupAdapter
+  DesignerRemoveColumnFromGroupAdapter,
+  DesignerClearGroupAdapters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 
@@ -54,7 +56,8 @@ export class DesignerState {
         break;
       case 'map':
         groupAdapters = this._designerService.getMapGroupAdapters(
-          artifactColumns, analysisSubType
+          artifactColumns,
+          analysisSubType
         );
         break;
       default:
@@ -91,6 +94,23 @@ export class DesignerState {
     const adapter = groupAdapters[adapterIndex];
     adapter.transform(artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
+    return patchState({ groupAdapters: [...groupAdapters] });
+  }
+
+  @Action(DesignerClearGroupAdapters)
+  clearGroupAdapters(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    {  }: DesignerClearGroupAdapters
+  ) {
+    const groupAdapters = getState().groupAdapters;
+
+    forEach(groupAdapters, adapter => {
+      forEach(adapter.artifactColumns, column => {
+        adapter.reverseTransform(column);
+      });
+
+      adapter.artifactColumns = [];
+    });
     return patchState({ groupAdapters: [...groupAdapters] });
   }
 

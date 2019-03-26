@@ -36,8 +36,8 @@ import {
   DesignerChangeEvent,
   DesignerSaveEvent,
   AnalysisReport,
-  ArtifactColumnChart,
-  MapSettings
+  MapSettings,
+  ArtifactColumnChart
 } from '../types';
 import {
   DesignerStates,
@@ -51,7 +51,10 @@ import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
 import { JwtService } from '../../../../common/services';
 
-import { DesignerInitGroupAdapters } from '../actions/designer.actions';
+import {
+  DesignerClearGroupAdapters,
+  DesignerInitGroupAdapters
+} from '../actions/designer.actions';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -821,15 +824,16 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'chartType':
       this.changeChartType(event.data);
+      this._store.dispatch(new DesignerClearGroupAdapters());
+      this._store.dispatch(
+        new DesignerInitGroupAdapters(
+          <ArtifactColumnChart[]>this.artifacts[0].columns,
+          this.analysis.type,
+          (<AnalysisChart>this.analysis).chartType
+        )
+      );
       setTimeout(() => {
         this.resetAnalysis();
-        this._store.dispatch(
-          new DesignerInitGroupAdapters(
-            <ArtifactColumnChart[]>this.artifacts[0].columns,
-            this.analysis.type,
-            (<AnalysisChart>this.analysis).chartType
-          )
-        );
       });
       break;
     }
