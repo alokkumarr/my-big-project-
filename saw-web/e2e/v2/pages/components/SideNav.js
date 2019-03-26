@@ -43,7 +43,7 @@ class SideNav {
    * @param {*} name
    */
   selectSubCategory(name) {
-    commonFunctions.clickOnElement(self._subCategoryByName(name));
+    commonFunctions.clickOnElement(this._subCategoryByName(name));
     browser.sleep(1000);
     commonFunctions.waitFor.elementToBeVisible(
       this._selectedCategoryTitle(name)

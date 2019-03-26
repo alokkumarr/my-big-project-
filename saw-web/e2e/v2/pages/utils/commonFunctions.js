@@ -149,9 +149,14 @@ module.exports = {
     this.waitFor.elementToBeVisible(el);
     el.clear().sendKeys(value);
   },
-  getDashboardId(){
+  validateText(el, msg) {
+    el.getText().then(text => {
+      expect(text.trim().toLowerCase()).toEqual(msg.trim().toLowerCase());
+    });
+  },
+  getDashboardId() {
     browser.getCurrentUrl().then(url => {
-        return url.split('=')[1];
+      return url.split('=')[1];
     });
   }
 };
