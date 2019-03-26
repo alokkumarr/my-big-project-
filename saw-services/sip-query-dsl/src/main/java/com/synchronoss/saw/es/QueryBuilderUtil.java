@@ -317,11 +317,9 @@ public class QueryBuilderUtil {
                     for (Object dataField : dataFields) {
                         if (dataField instanceof com.synchronoss.saw.model.Field) {
                             Field field = (Field) dataField;
-                            if (field.getAggregate() != null) {
-                                if (Field.Aggregate.PERCENTAGE.value().equalsIgnoreCase(field.getAggregate().value())) {
-                                    preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
-                                        field.getDataField()).field(field.getColumnName()));
-                                }
+                            if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
+                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
+                                    field.getDataField()).field(field.getColumnName()));
                             }
                         }
                     }
