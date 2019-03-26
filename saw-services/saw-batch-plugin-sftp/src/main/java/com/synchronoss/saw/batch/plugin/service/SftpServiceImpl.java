@@ -691,7 +691,8 @@ public class SftpServiceImpl extends SipPluginContract {
             logger.info(
                 "Transfer data ended with routeId: " + routeId + " ended time: " + new Date());
             logger.info("Thread Id ended with: " + thread);
-            logger.info("Total time taken in seconds to complete the process with route Id: "
+            logger.info("Total time taken in seconds to complete the process with channel Id: "
+                + channelId + " routeId: " + routeId + ": "
                 + TimeUnit.MILLISECONDS.toSeconds(durationInMillis));
             logger.trace("invocation of method transferData when "
                 + "directory is availble in destination with location ends here " + sourceLocation
