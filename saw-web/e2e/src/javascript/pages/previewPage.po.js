@@ -8,7 +8,8 @@ module.exports = {
   axisTitleUpdated: (chartType, axisLabel, axis) =>
     element(
       by.xpath(
-        `(//chart/descendant::*[name()="svg"])[position()=last()]/descendant::*[name()="g" and contains(@class,"highcharts-${axis}")]/descendant::*[contains(text(),"${axisLabel}")]`
+        `(//chart/descendant::*[name()="svg"])[position()=last()]/descendant::*[name()="g" 
+        and contains(@class,"highcharts-${axis}")]/descendant::*[contains(text(),"${axisLabel}")]`
       )
     ),
   closeButton: () => element(by.xpath(`//button[contains(@class,'close')]`))
