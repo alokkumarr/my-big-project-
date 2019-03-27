@@ -1,28 +1,34 @@
 import { DesignerSettingsSingleTableComponent } from './single';
 import { DesignerSettingsMultiTableComponent } from './multi';
-import { DesignerSettingsGroupComponent } from './group';
 import { DesignerSettingsQueryComponent } from './query';
+import { DesignerSelectedFieldsComponent } from './selected-fields';
 import {
-  ExpandableFieldComponent,
-  ExpandDetailPivotComponent,
-  ExpandDetailChartComponent
-} from './expandable-field';
-import {
-  DesignerSettingsAuxComponent,
-  DesignerSettingsAuxMapComponent,
-  DesignerSettingsAuxChartComponent,
-  DesignerSettingsAuxMapChartComponent,
-} from './aux-settings';
+  DesignerAnalysisOptionsComponent,
+  DesignerDataOptionFieldComponent,
+  DesignerDateFormatSelectorComponent,
+  DesignerDataFormatSelectorComponent,
+  DesignerRegionSelectorComponent,
+  DesignerComboTypeSelectorComponent,
+  DesignerDateIntervalSelectorComponent,
+  DesignerChartOptionsComponent,
+  DesignerDataLimitSelectorComponent,
+  DesignerMapChartOptionsComponent,
+  DesignerMapOptionsComponent
+} from './options';
 export {
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
   DesignerSettingsQueryComponent,
-  DesignerSettingsGroupComponent,
-  DesignerSettingsAuxComponent,
-  DesignerSettingsAuxChartComponent,
-  DesignerSettingsAuxMapComponent,
-  DesignerSettingsAuxMapChartComponent,
-  ExpandableFieldComponent,
-  ExpandDetailPivotComponent,
-  ExpandDetailChartComponent
+  DesignerSelectedFieldsComponent,
+  DesignerAnalysisOptionsComponent,
+  DesignerDataOptionFieldComponent,
+  DesignerDateFormatSelectorComponent,
+  DesignerDataFormatSelectorComponent,
+  DesignerRegionSelectorComponent,
+  DesignerComboTypeSelectorComponent,
+  DesignerDateIntervalSelectorComponent,
+  DesignerChartOptionsComponent,
+  DesignerDataLimitSelectorComponent,
+  DesignerMapChartOptionsComponent,
+  DesignerMapOptionsComponent
 };

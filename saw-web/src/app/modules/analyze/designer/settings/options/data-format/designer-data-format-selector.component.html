@@ -1,0 +1,16 @@
+<div fxLayout="row" fxLayoutAlign="start center">
+  <mat-form-field (click)="openDataFormatDialog()">
+    <input
+      matInput
+      type="text"
+      placeholder="Format"
+      autocomplete="off"
+      disabled
+      style="cursor: pointer;"
+      [value]="numberSample || ''"
+    />
+  </mat-form-field>
+  <button mat-icon-button (click)="openDataFormatDialog()">
+    <mat-icon fontIcon="icon-filter"></mat-icon>
+  </button>
+</div>
