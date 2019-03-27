@@ -29,7 +29,8 @@ import {
   Artifact,
   Format,
   AnalysisDialogData,
-  Region
+  Region,
+  isDSLAnalysis
 } from '../types';
 
 export {
@@ -61,7 +62,8 @@ export {
   JsPlumbCanvasChangeEvent,
   AnalysisDialogData,
   Region,
-  MapSettings
+  MapSettings,
+  isDSLAnalysis
 };
 
 export interface ArtifactColumnFilter {

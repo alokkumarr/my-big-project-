@@ -10,6 +10,7 @@ import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as flatMap from 'lodash/flatMap';
 import { Store } from '@ngxs/store';
 
 import {
@@ -37,8 +38,10 @@ import {
   DesignerSaveEvent,
   AnalysisReport,
   ArtifactColumnChart,
-  MapSettings
+  MapSettings,
+  isDSLAnalysis
 } from '../types';
+import { AnalysisDSL } from '../../../../models';
 import {
   DesignerStates,
   FLOAT_TYPES,
@@ -63,7 +66,7 @@ const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 })
 export class DesignerContainerComponent implements OnInit {
   @Input() public analysisStarter?: AnalysisStarter;
-  @Input() public analysis?: Analysis;
+  @Input() public analysis?: Analysis | AnalysisDSL;
   @Input() public designerMode: DesignerMode;
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
@@ -137,7 +140,7 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
-  getLayoutConfiguration(analysis: Analysis | AnalysisStarter) {
+  getLayoutConfiguration(analysis: Analysis | AnalysisStarter | AnalysisDSL) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'report':
@@ -153,37 +156,39 @@ export class DesignerContainerComponent implements OnInit {
 
   initNewAnalysis() {
     const { type, semanticId } = this.analysisStarter;
-    return this._analyzeService
-      .getArtifactsForDataSet(semanticId)
-      .then(artifacts => {
-        return this._designerService
-          .createAnalysis(semanticId, type)
-          .then((newAnalysis: Analysis) => {
-            this.analysis = {
-              ...this.analysisStarter,
-              ...(newAnalysis['analysis'] || newAnalysis),
-              artifacts
-            };
-            if (!this.analysis.sqlBuilder) {
-              this.analysis.sqlBuilder = {
-                joins: []
-              };
-            }
-            this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-            this.initAuxSettings();
-            this.analysis.edit = this.analysis.edit || false;
-            unset(this.analysis, 'supports');
-            unset(this.analysis, 'categoryId');
-          });
-      });
+    const artifacts$ = this._analyzeService.getArtifactsForDataSet(semanticId);
+    const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
+
+    return Promise.all([artifacts$, newAnalysis$]).then(
+      ([artifacts, newAnalysis]) => {
+        this.analysis = {
+          ...this.analysisStarter,
+          ...(newAnalysis['analysis'] || newAnalysis),
+          artifacts
+        };
+        if (!isDSLAnalysis(this.analysis)) {
+          this.analysis.edit = this.analysis.edit || false;
+          !this.analysis.sqlBuilder &&
+            (this.analysis.sqlBuilder = {
+              joins: []
+            });
+        }
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+        this.initAuxSettings();
+        unset(this.analysis, 'supports');
+        unset(this.analysis, 'categoryId');
+      }
+    );
   }
 
   initExistingAnalysis() {
-    const sqlBuilder = this.analysis.sqlBuilder;
+    const queryBuilder = isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery
+      : this.analysis.sqlBuilder;
     this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-    this.filters = sqlBuilder.filters;
-    this.sorts = sqlBuilder.sorts || sqlBuilder.orderByColumns;
-    this.booleanCriteria = sqlBuilder.booleanCriteria;
+    this.filters = queryBuilder.filters;
+    this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
+    this.booleanCriteria = queryBuilder.booleanCriteria;
     this.isInQueryMode = this.analysis.edit;
 
     this.initAuxSettings();
@@ -246,7 +251,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'report':
       forEach(artifacts, table => {
         table.columns = map(table.columns, column => {
-          forEach(this.analysis.sqlBuilder.dataFields, fields => {
+          forEach((<Analysis>this.analysis).sqlBuilder.dataFields, fields => {
             forEach(fields.columns, field => {
               if (field.columnName === column.columnName) {
                 column.checked = true;
@@ -401,18 +406,25 @@ export class DesignerContainerComponent implements OnInit {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
 
-    forEach(this.analysis.sqlBuilder.dataFields, field => {
-      if (field.checked === 'y') {
+    const dataFields = isDSLAnalysis(this.analysis)
+      ? flatMap(this.analysis.sipQuery.artifacts, table => table.fields)
+      : this.analysis.sqlBuilder.dataFields;
+    const filters = isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery.filters
+      : this.analysis.sqlBuilder.filters;
+
+    forEach(dataFields, field => {
+      if (field.checked === 'y' || field.area === 'y') {
         this.fieldCount++;
       }
 
-      if (this.analysis.sqlBuilder.dataFields.length > 1 && field.limitType) {
+      if (dataFields.length > 1 && field.limitType) {
         delete field.limitType;
         delete field.limitValue;
       }
     });
 
-    forEach(this.analysis.sqlBuilder.filters, filt => {
+    forEach(filters, filt => {
       if (filt.isRuntimeFilter) {
         delete filt.model;
       }
@@ -428,7 +440,8 @@ export class DesignerContainerComponent implements OnInit {
           this.isDataEmpty(
             response.data,
             this.analysis.type,
-            this.analysis.sqlBuilder
+            (<Analysis>this.analysis).sqlBuilder ||
+              (<AnalysisDSL>this.analysis).sipQuery
           )
         ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
@@ -453,11 +466,11 @@ export class DesignerContainerComponent implements OnInit {
     );
   }
 
-  flattenData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis | AnalysisDSL) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, (<Analysis>analysis).sqlBuilder || (<AnalysisDSL>analysis).sipQuery);
     case 'report':
     case 'esReport':
       return data;
@@ -465,7 +478,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'map':
       return flattenChartData(
         data,
-        analysis.sqlBuilder
+        (<Analysis>analysis).sqlBuilder || (<AnalysisDSL>analysis).sipQuery
       );
     }
   }
@@ -495,7 +508,7 @@ export class DesignerContainerComponent implements OnInit {
         });
       break;
     case 'preview':
-      this._analyzeDialogService.openPreviewDialog(this.analysis);
+      this._analyzeDialogService.openPreviewDialog(<Analysis>this.analysis);
       break;
     case 'description':
       this._analyzeDialogService
@@ -557,7 +570,7 @@ export class DesignerContainerComponent implements OnInit {
         ? this._jwtService.userAnalysisCategoryId
         : this.analysis.categoryId;
     return this._analyzeDialogService
-      .openSaveDialog(this.analysis, this.designerMode)
+      .openSaveDialog(<Analysis>this.analysis, this.designerMode)
       .afterClosed()
       .toPromise();
   }
@@ -593,7 +606,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'report':
       partialSqlBuilder = {
         dataFields: this._designerService.generateReportDataField(this.artifacts),
-        joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
+        joins: ((<Analysis>this.analysis).sqlBuilder as SqlBuilderReport).joins
       };
       sortProp = 'orderByColumns';
       break;
@@ -643,7 +656,10 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   checkifSortsApplied(event) {
-    forEach(this.analysis.sqlBuilder.orderByColumns, field => {
+    const query = isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery
+      : this.analysis.sqlBuilder;
+    forEach(query.orderByColumns, field => {
       if (event.column.columnName === field.columnName) {
         field.aggregate = event.column.aggregate;
       }
@@ -729,7 +745,11 @@ export class DesignerContainerComponent implements OnInit {
     case 'format':
     case 'aliasName':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
-      this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
+      if (isDSLAnalysis(this.analysis)) {
+        this.analysis.sipQuery = {...this.analysis.sipQuery};
+      } else {
+        this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
+      }
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
@@ -822,7 +842,7 @@ export class DesignerContainerComponent implements OnInit {
       this.analysis.mapSettings = this.auxSettings;
       break;
     case 'fetchLimit':
-      this.analysis.sqlBuilder = this.getSqlBuilder();
+      (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
       this.requestDataIfPossible();
       break;
     case 'region':
@@ -938,7 +958,7 @@ export class DesignerContainerComponent implements OnInit {
         forEach(artifact.column, col => (col.checked = false));
       });
     }
-    this.analysis.sqlBuilder = this.getSqlBuilder();
+    (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
   }
 
   /**

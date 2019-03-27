@@ -3,30 +3,8 @@ import { Legend } from './legend.model';
 import { LabelOptions } from './label-options.model';
 import { Axis } from './axis.model';
 import { Schedule } from './schedule.model';
-
-export interface FilterModelDSL {
-  operator: string;
-  otherValue: any;
-  value: any;
-}
-
-export interface FilterDSL {
-  artifactsName: string;
-  columnName: string;
-  isGlobalFilter: string;
-  isOptional: boolean;
-  isRuntimeFilter: string;
-  model: FilterModelDSL;
-  type: string;
-}
-
-export interface SortDSL {
-  aggregate: string;
-  artifacts: string;
-  columnName: string;
-  order: 'asc' | 'desc';
-  type: string;
-}
+import { Filter } from './filter.model';
+import { Sort } from './sort.model';
 
 export interface FieldDSL {
   aggregate: string;
@@ -36,6 +14,8 @@ export interface FieldDSL {
   dataField: string;
   displayName: string;
   groupInterval: string;
+  limitType: string; // todo
+  limitValue: any; // todo
   name: string;
   type: string;
 }
@@ -53,8 +33,9 @@ export interface StorageDSL {
 export interface QueryDSL {
   artifacts: ArtifactDSL[];
   booleanCriteria: string;
-  filters: FilterDSL[];
-  sorts: SortDSL[];
+  filters: Filter[];
+  sorts: Sort[];
+  orderByColumns?: Sort[]; // this is legacy field. Should be removed after migration
   store: StorageDSL;
 }
 
@@ -63,6 +44,7 @@ export interface QueryDSL {
 
 // Don't use this base interface directly
 export interface AnalysisBaseDSL {
+  artifacts?: any[]; // this field needs to be removed from analysis structure before saving
   categoryId: number; // todo
   createdBy?: string; // email
   createdTime?: number;
@@ -70,7 +52,9 @@ export interface AnalysisBaseDSL {
   customerCode: string;
   dataSecurityKey?: string; // todo
   description: string; // todo
+  edit: boolean; // todo - this field needs to be removed and worked around
   id: string;
+  mapSettings: any; // todo - fix 'any'
   modifiedBy: string; // email
   modifiedTime: string;
   module: string;
@@ -79,6 +63,8 @@ export interface AnalysisBaseDSL {
   parentCategoryId?: string | number; // todo
   parentLastModified?: number; // todo
   projectCode: string;
+  query?: string;
+  queryManual?: string;
   saved: boolean; // todo
   schedule?: Schedule; // todo
   scheduled: null; // todo
