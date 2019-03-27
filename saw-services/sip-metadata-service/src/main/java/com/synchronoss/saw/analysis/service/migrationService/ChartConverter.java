@@ -24,7 +24,7 @@ public class ChartConverter implements AnalysisSipDslConverter {
     Analysis analysis = new Analysis();
 
     analysis.setId(oldAnalysisDefinition.get("id").getAsString());
-    analysis.setSemanticId(oldAnalysisDefinition.get("sementicId").getAsString());
+    analysis.setSemanticId(oldAnalysisDefinition.get("semanticId").getAsString());
     analysis.setName(oldAnalysisDefinition.get("name").getAsString());
 
     analysis.setType(oldAnalysisDefinition.get("type").getAsString());
@@ -133,17 +133,7 @@ public class ChartConverter implements AnalysisSipDslConverter {
     ChartProperties chartProperties = new ChartProperties();
 
     chartProperties.setInverted(isInverted);
-
-    ObjectMapper mapper = new ObjectMapper();
-
-    try {
-      if (legend != null) {
-        JsonNode legendNode = mapper.readTree(legend.toString());
-        chartProperties.setLegend(legendNode);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    chartProperties.setLegend(legend);
     return chartProperties;
   }
 

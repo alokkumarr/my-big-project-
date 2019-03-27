@@ -9,9 +9,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.analysis.service.migrationService.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationService.AnalysisSipDslConverter;
+import com.synchronoss.saw.analysis.service.migrationService.ChartConverter;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -90,7 +94,7 @@ public class MigrateAnalysis {
         converter = new ChartConverter();
         break;
       case "pivot":
-          logger.warn("Not implemented yet");
+        logger.warn("Not implemented yet");
         break;
       case "report":
         logger.warn("Not implemented yet");
@@ -122,9 +126,18 @@ public class MigrateAnalysis {
         + "}";
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     System.out.println("Convert analysis");
 
+    Gson gson = new Gson();
+    File jsonFile = Paths.get("C:\\Workspace\\Project\\sip\\saw-services\\"
+        + "sip-metadata-service\\src\\main\\resources\\sample-analysis.json").toFile();
+    JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
+    MigrateAnalysis ma = new MigrateAnalysis();
+
+    Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(jsonObject);
+
+    System.out.println(gson.toJsonTree(analysis, Analysis.class));
   }
 }
