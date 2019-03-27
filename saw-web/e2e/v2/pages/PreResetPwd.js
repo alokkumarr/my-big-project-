@@ -32,9 +32,7 @@ class PreResetPwd {
     logger.debug('Doing Reset..');
     //message = message + ' ' + userName;
     this.fillUserNameField(userName);
-    browser.sleep(5000);
     this.clickOnResetButton();
-    browser.sleep(5000);
     commonFunctions.waitFor.elementToBeVisible(this._errorMessage);
     console.log(this._errorMessage.getText());
     console.log(message);
