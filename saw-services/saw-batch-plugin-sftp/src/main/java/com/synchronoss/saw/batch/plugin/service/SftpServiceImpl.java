@@ -1,4 +1,4 @@
-package com.synchronoss.saw.batch.plugin.controllers;
+package com.synchronoss.saw.batch.plugin.service;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -51,6 +51,7 @@ import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -1102,9 +1103,25 @@ public class SftpServiceImpl extends SipPluginContract {
 
   }
 
-
-  // TODO : This below retry related code will be moved separate service
-  // in future as part of refactoring with SIP-6058
+  @Override
+  public boolean isDataExists(String filePath) throws Exception {
+    logger.info("Checking data exists for :" + filePath);
+    boolean exists = false;
+    String fileName = null;
+    logger.trace("Filename :" + fileName);
+    logger.trace("isAlphanumeric :" + StringUtils.isAlphanumeric(fileName));
+    fileName = FilenameUtils.getBaseName(filePath);
+    if (processor.isDestinationMapR(defaultDestinationLocation)) {
+      filePath = FileProcessor.maprFsPrefix + filePath;
+    }
+    if (StringUtils.isAlphanumeric(fileName)) {
+      exists = processor.isDestinationExists(filePath);
+    } else {
+      exists = processor.getDataFileBasedOnPattern(filePath) > 0 ? true : false;
+    }
+    return exists;
+  }
+  
   /**
    * This is method to handle inconsistency during failure.
    * Step1: Check if any long running process with 'InProgress'
