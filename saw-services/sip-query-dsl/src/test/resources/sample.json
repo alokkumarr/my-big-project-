@@ -84,7 +84,6 @@
     "sorts": [
       {
         "artifacts": "sample",
-        "aggregate": "sum",
         "columnName": "long",
         "type": "long",
         "order": "asc"
