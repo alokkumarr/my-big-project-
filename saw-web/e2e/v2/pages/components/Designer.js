@@ -30,20 +30,23 @@ class Designer extends SaveDialog {
     this._numberOperator = element(
       by.css('mat-select[e2e="filter-number-operator-select"]')
     );
-    (this._numberOperatorDropDownItem = operator =>
+    this._numberOperatorDropDownItem = operator =>
       element(
         by.css(`mat-option[e2e="filter-number-operator-option-${operator}"]`)
-      )),
-      (this._numberInput = element(by.xpath('//input[@type="number"]')));
-    (this._stringOperator = element(by.css('[e2e="filter-string-select"]'))),
-      (this._stringOperatorDropDownItem = operator =>
-        element(by.css(`mat-option[e2e="filter-string-option-${operator}"]`))),
-      (this._stringInput = element(
-        by.xpath(`(//input[contains(@id,"mat-input-")])[position()=last()]`)
-      )),
-      (this._stringIsInIsNotInInput = element(
-        by.xpath(`//input[@e2e="designer-filter-string-input"]`)
-      ));
+      );
+    this._numberInput = element(by.xpath('//input[@type="number"]'));
+    this._stringOperator = element(by.css('[e2e="filter-string-select"]'));
+    this._stringOperatorDropDownItem = operator =>
+      element(by.css(`mat-option[e2e="filter-string-option-${operator}"]`));
+    this._stringInput = element(
+      by.xpath(`(//input[contains(@id,"mat-input-")])[position()=last()]`)
+    );
+    this._stringIsInIsNotInInput = element(
+      by.xpath(`//input[@e2e="designer-filter-string-input"]`)
+    );
+    this._applyFiltersBtn = element(
+      by.xpath('//span[contains(text(),"Apply Filters")]')
+    );
   }
 
   clickOnDesignerButton() {
@@ -63,10 +66,12 @@ class Designer extends SaveDialog {
 
   clickOnAddFilterButtonByTableName(tableName) {
     commonFunctions.clickOnElement(this._addFilter(tableName));
+
   }
 
   clickOnColumnInput() {
-    commonFunctions.clickOnElement(this._columnDropDown);
+      commonFunctions.waitFor.elementToBeVisible(this._columnDropDown);
+      this._columnDropDown.click();
   }
 
   clickOnColumnDropDown(name) {
@@ -91,6 +96,10 @@ class Designer extends SaveDialog {
     } else {
       commonFunctions.fillInput(this._stringInput, value);
     }
+  }
+
+  clickOnApplyFilterButton() {
+    commonFunctions.clickOnElement(this._applyFiltersBtn);
   }
 }
 module.exports = Designer;

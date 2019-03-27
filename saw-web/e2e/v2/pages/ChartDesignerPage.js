@@ -54,13 +54,14 @@ class ChartsDesignerPage extends Designer {
   }
 
   selectGroupInterval(name) {
+      const _self = this;
        commonFunctions.waitFor.elementToBeVisible(this._groupIntervalDropDown);
        browser.sleep(2000);
         this._groupIntervalDropDown.getAttribute('id').then(function(id) {
-        commonFunctions.waitFor.elementToBeVisible(this._groupIntervalDrop(id));
-        commonFunctions.scrollIntoView(this._groupIntervalDrop(id));
-        this._groupIntervalDrop(id).click();
-      commonFunctions.clickOnElement(this._groupIntervalDropDownElement(name));
+        commonFunctions.waitFor.elementToBeVisible(_self._groupIntervalDrop(id));
+        commonFunctions.scrollIntoView(_self._groupIntervalDrop(id));
+        _self._groupIntervalDrop(id).click();
+      commonFunctions.clickOnElement(_self._groupIntervalDropDownElement(name));
     });
   }
 
