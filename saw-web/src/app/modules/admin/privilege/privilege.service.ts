@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import { AdminService } from '../main-view/admin.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { map, tap ,  map as map$ } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { IAdminDataService } from '../admin-data-service.interface';
 import { getPrivilegeDescription } from './privilege-code-transformer';
 import { Observable, of } from 'rxjs';
@@ -104,7 +104,7 @@ export class PrivilegeService implements IAdminDataService {
       return of(this.privilegeMap);
     }
     return (<any>this.getModulePrivilegeMap('')).pipe(
-      map$((resp: any[]) => {
+      map((resp: any[]) => {
         this.privilegeMap = (resp || []).reduce(
           (accum, { moduleName, privilegeCodeName }) => {
             accum[moduleName] = accum[moduleName] || [];
@@ -130,7 +130,7 @@ export class PrivilegeService implements IAdminDataService {
       return of(this.privilegeMap[moduleName]);
     }
     return this.getAllPrivilegeMap().pipe(
-      map$((privilegeMap: PrivilegeMap) => privilegeMap[moduleName])
+      map((privilegeMap: PrivilegeMap) => privilegeMap[moduleName])
     );
   }
 
