@@ -2,18 +2,23 @@ package com.synchronoss.saw.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChartProperties {
+public class ChartOptions {
   @JsonProperty("isInverted")
   Boolean isInverted;
 
   @JsonProperty("legend")
-  JsonNode legend;
+  Object legend;
+
+  @JsonProperty("chartTitle")
+  String chartTitle;
+
+  @JsonProperty("chartType")
+  String chartType;
 
   @JsonProperty("isInverted")
   public Boolean isInverted() {
@@ -26,14 +31,35 @@ public class ChartProperties {
   }
 
   @JsonProperty("legend")
-  public JsonNode getLegend() {
+  public Object getLegend() {
     return legend;
   }
 
   @JsonProperty("legend")
-  public void setLegend(JsonNode legend) {
+  public void setLegend(Object legend) {
     this.legend = legend;
   }
+
+  @JsonProperty("chartTitle")
+  public String getChartTitle() {
+    return this.chartTitle;
+  }
+
+  @JsonProperty("chartTitle")
+  public void setChartTitle(String chartTitle) {
+    this.chartTitle = chartTitle;
+  }
+
+  @JsonProperty("chartType")
+  public String getChartType() {
+    return this.chartType;
+  }
+
+  @JsonProperty("chartType")
+  public void setChartType(String chartType) {
+    this.chartType = chartType;
+  }
+
 
   @Override
   public String toString() {
@@ -56,11 +82,11 @@ public class ChartProperties {
     if (other == this) {
       return true;
     }
-    if ((other instanceof ChartProperties) == false) {
+    if ((other instanceof ChartOptions) == false) {
       return false;
     }
 
-    ChartProperties rhs = (ChartProperties)other;
+    ChartOptions rhs = (ChartOptions)other;
     return new EqualsBuilder()
         .append(isInverted, rhs.isInverted)
         .append(legend, rhs.legend)

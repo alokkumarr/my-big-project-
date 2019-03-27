@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.synchronoss.saw.model.ChartProperties;
+import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.SipQuery;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,9 +20,11 @@ public class Analysis {
   @JsonPropertyOrder({
       "type",
       "semanticId",
+      "metricName",
       "name",
       "description",
       "id",
+      "parentAnalysisId",
       "category",
       "customerCode",
       "projectCode",
@@ -31,6 +33,7 @@ public class Analysis {
       "createdBy",
       "modifiedTime",
       "modifiedBy",
+      "designerEdit",
       "sipQuery"
   })
   @JsonProperty("type")
@@ -39,11 +42,17 @@ public class Analysis {
   @JsonProperty("semanticId")
   private String semanticId;
 
+  @JsonProperty("metricName")
+  private String metricName;
+
   @JsonProperty("name")
   private String name;
 
   @JsonProperty("id")
   private String id;
+
+  @JsonProperty("parentAnalysisId")
+  private String parentAnalysisId;
 
   @JsonProperty("category")
   private String category;
@@ -72,8 +81,11 @@ public class Analysis {
   @JsonProperty("sipQuery")
   private SipQuery sipQuery;
 
-  @JsonProperty("chartProperties")
-  private ChartProperties chartProperties;
+  @JsonProperty("chartOptions")
+  private ChartOptions chartOptions;
+
+  @JsonProperty("designerEdit")
+  private Boolean designerEdit;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -97,6 +109,16 @@ public class Analysis {
     this.semanticId = semanticId;
   }
 
+  @JsonProperty("metricName")
+  public String getMetricName() {
+    return metricName;
+  }
+
+  @JsonProperty("metricName")
+  public void setMetricName(String metricName) {
+    this.metricName = metricName;
+  }
+
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -115,6 +137,16 @@ public class Analysis {
   @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
+  }
+
+  @JsonProperty("parentAnalysisId")
+  public String getParentAnalysisId() {
+    return parentAnalysisId;
+  }
+
+  @JsonProperty("parentAnalysisId")
+  public void setParentAnalysisId(String parentAnalysisId) {
+    this.parentAnalysisId = parentAnalysisId;
   }
 
   public String getCategory() {
@@ -195,14 +227,24 @@ public class Analysis {
     this.modifiedBy = modifiedBy;
   }
 
-  @JsonProperty("chartProperties")
-  public ChartProperties getChartProperties() {
-    return this.chartProperties;
+  @JsonProperty("chartOptions")
+  public ChartOptions getChartOptions() {
+    return this.chartOptions;
   }
 
-  @JsonProperty("chartProperties")
-  public void setChartProperties(ChartProperties chartProperties) {
-    this.chartProperties = chartProperties;
+  @JsonProperty("chartOptions")
+  public void setChartOptions(ChartOptions chartOptions) {
+    this.chartOptions = chartOptions;
+  }
+
+  @JsonProperty("designerEdit")
+  public Boolean getDesignerEdit() {
+    return this.designerEdit;
+  }
+
+  @JsonProperty("designerEdit")
+  public void setDesignerEdit(Boolean designerEdit) {
+    this.designerEdit = designerEdit;
   }
 
   @JsonProperty("sipQuery")
@@ -239,7 +281,8 @@ public class Analysis {
         .append("createdBy", createdBy)
         .append("modifiedTime", modifiedTime)
         .append("modifiedBy", modifiedBy)
-        .append("chartProperties", chartProperties)
+        .append("chartOptions", chartOptions)
+        .append("designerEdit", designerEdit)
         .append("sipQuery", sipQuery)
         .append("additionalProperties", additionalProperties)
         .toString();
@@ -254,6 +297,7 @@ public class Analysis {
         .append(modifiedBy)
         .append(modifiedTime)
         .append(type)
+        .append(designerEdit)
         .append(sipQuery)
         .append(id)
         .append(createdBy)
@@ -280,6 +324,7 @@ public class Analysis {
         .append(modifiedBy, rhs.modifiedBy)
         .append(modifiedTime, rhs.modifiedTime)
         .append(type, rhs.type)
+        .append(designerEdit, rhs.designerEdit)
         .append(sipQuery, rhs.sipQuery)
         .append(id, rhs.id)
         .append(createdBy, rhs.createdBy)
