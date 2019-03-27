@@ -35,119 +35,125 @@ import org.slf4j.LoggerFactory;
 public class ElasticSearchQueryBuilder {
 
   public static final Logger logger = LoggerFactory.getLogger(ElasticSearchQueryBuilder.class);
-    private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
-    private final static String EPOCH_TO_DATE_FORMAT="yyyy-MM-dd HH:mm:ss";
-    private final static String ONLY_YEAR_FORMAT="YYYY";
-    private final static String EPOCH_SECOND="epoch_second";
-    private final static String EPOCH_MILLIS="epoch_millis";
-    String dataSecurityString;
+  private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
+  private static final String EPOCH_TO_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+  private static final String ONLY_YEAR_FORMAT = "YYYY";
+  private static final String EPOCH_SECOND = "epoch_second";
+  private static final String EPOCH_MILLIS = "epoch_millis";
+  private static final String VALUE = "value";
+  private static final String SUM = "_sum";
+  String dataSecurityString;
 
-    public String buildDataQuery(SIPDSL sipdsl, Integer size) throws IOException, ProcessingException {
-        SipQuery sipQuery = sipdsl.getSipQuery();
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.from(0);
-        if (size==null || size.equals(0))
-            size=1000;
-        searchSourceBuilder.size(size);
-        if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
-            throw new NullPointerException(
-                "Please add sort[] & filter[] block.It can be empty but these blocks are important.");
-        }
-        // The below call is to build sort
-        searchSourceBuilder = buildSortQuery(sipQuery,searchSourceBuilder);
+  public String buildDataQuery(SIPDSL sipdsl, Integer size)
+      throws IOException, ProcessingException {
+    SipQuery sipQuery = sipdsl.getSipQuery();
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.from(0);
+    if (size == null || size.equals(0)) size = 1000;
+    searchSourceBuilder.size(size);
+    if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
+      throw new NullPointerException(
+          "Please add sort[] & filter[] block.It can be empty but these blocks are important.");
+    }
+    // The below call is to build sort
+    searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
 
-        if (dataSecurityString !=null && !dataSecurityString.trim().equals("")){
-            DataSecurityKey dataSecurityKeyNode = buildDsk(dataSecurityString);
-        }
-
-        // The below code to build filters
-        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-        if (sipQuery.getBooleanCriteria() !=null ){
-            List<Filter> filters = sipQuery.getFilters();
-            List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-
-            builder = buildFilters(filters,builder);
-
-            //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder); TODO: Future Implementation
-
-            boolQueryBuilder = buildBooleanQuery(sipQuery,builder);
-            searchSourceBuilder.query(boolQueryBuilder);
-        }
-
-        List<Field> dataFields =
-            sipQuery.getArtifacts().get(0).getFields();
-        List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
-
-        // Generated Query
-        searchSourceBuilder = buildAggregations(dataFields,aggregationFields,searchSourceBuilder,size);
-        return searchSourceBuilder.toString();
+    if (dataSecurityString != null && !dataSecurityString.trim().equals("")) {
+      DataSecurityKey dataSecurityKeyNode = buildDsk(dataSecurityString);
     }
 
-    /**
-     * This method will return all the list of columns which required for ES report.
-     * @param dataFields
-     */
-    public String [] getFieldsInclude(List<Field> dataFields)
-    {
-        String [] fieldsIncludes = new String[dataFields.size()];
-        int count =0;
-        /** Iterate the Data fields to include */
-        for (Field dataField : dataFields)
-        {
-            String columnName = dataField.getColumnName();
-            /** .keyword may present in the es-mapping fields
-             take out form the columnName to get actual column name
-             if present */
-            String [] split = columnName.split("\\.");
-            if (split.length>=2)
-                fieldsIncludes[count++]= split[0];
-            else
-                fieldsIncludes[count++]= columnName;
-        }
-        return fieldsIncludes;
+    // The below code to build filters
+    BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    if (sipQuery.getBooleanCriteria() != null) {
+      List<Filter> filters = sipQuery.getFilters();
+      List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+
+      builder = buildFilters(filters, builder);
+
+      //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder); TODO: Future
+      // Implementation
+
+      boolQueryBuilder = buildBooleanQuery(sipQuery, builder);
+      searchSourceBuilder.query(boolQueryBuilder);
     }
 
-    /**
-     *
-     * @param item
-     * @param date
-     * @return
-     */
-    public RangeQueryBuilder filterByOperator (Filter item,Date date) {
+    List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
+    List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
 
-        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-        DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
+    // Generated Query
+    searchSourceBuilder =
+        buildAggregations(dataFields, aggregationFields, searchSourceBuilder, size);
+    return searchSourceBuilder.toString();
+  }
 
-        if (item.getType().value().equals(Filter.Type.DATE.value())) {
-            logger.info("rangeQueryBuilder.format(dateFormat.format(date)) : " + dateFormat.format(date));
-            rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
-        }
-
-        switch (item.getModel().getOperator()) {
-
-            case GT:
-                logger.info("Filter for values - Operator: 'GT', Timestamp(asLong) : " + item.getModel().getValue().longValue());
-                rangeQueryBuilder.gt(dateFormat.format(date));
-                break;
-
-            case LT:
-                logger.info("Filter for values - Operator: 'LT', Timestamp(asLong) : " + item.getModel().getValue().longValue());
-                rangeQueryBuilder.lt(dateFormat.format(date));
-                break;
-
-            case GTE:
-                logger.info("Filter for values - Operator: 'GTE', Timestamp(asLong) : " + item.getModel().getValue().longValue());
-                rangeQueryBuilder.gte(dateFormat.format(date));
-                break;
-
-            case LTE:
-                logger.info("Filter for values - Operator: 'LTE', Timestamp(asLong) : " + item.getModel().getValue().longValue());
-                rangeQueryBuilder.lte(dateFormat.format(date));
-                break;
-        }
-        return rangeQueryBuilder;
-
+  /**
+   * This method will return all the list of columns which required for ES report.
+   *
+   * @param dataFields
+   */
+  public String[] getFieldsInclude(List<Field> dataFields) {
+    String[] fieldsIncludes = new String[dataFields.size()];
+    int count = 0;
+    /** Iterate the Data fields to include */
+    for (Field dataField : dataFields) {
+      String columnName = dataField.getColumnName();
+      /**
+       * .keyword may present in the es-mapping fields take out form the columnName to get actual
+       * column name if present
+       */
+      String[] split = columnName.split("\\.");
+      if (split.length >= 2) fieldsIncludes[count++] = split[0];
+      else fieldsIncludes[count++] = columnName;
     }
+    return fieldsIncludes;
+  }
+
+  /**
+   * @param item
+   * @param date
+   * @return
+   */
+  public RangeQueryBuilder filterByOperator(Filter item, Date date) {
+
+    RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+    DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
+
+    if (item.getType().value().equals(Filter.Type.DATE.value())) {
+      logger.info("rangeQueryBuilder.format(dateFormat.format(date)) : " + dateFormat.format(date));
+      rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
+    }
+
+    switch (item.getModel().getOperator()) {
+      case GT:
+        logger.info(
+            "Filter for values - Operator: 'GT', Timestamp(asLong) : "
+                + item.getModel().getValue().longValue());
+        rangeQueryBuilder.gt(dateFormat.format(date));
+        break;
+
+      case LT:
+        logger.info(
+            "Filter for values - Operator: 'LT', Timestamp(asLong) : "
+                + item.getModel().getValue().longValue());
+        rangeQueryBuilder.lt(dateFormat.format(date));
+        break;
+
+      case GTE:
+        logger.info(
+            "Filter for values - Operator: 'GTE', Timestamp(asLong) : "
+                + item.getModel().getValue().longValue());
+        rangeQueryBuilder.gte(dateFormat.format(date));
+        break;
+
+      case LTE:
+        logger.info(
+            "Filter for values - Operator: 'LTE', Timestamp(asLong) : "
+                + item.getModel().getValue().longValue());
+        rangeQueryBuilder.lte(dateFormat.format(date));
+        break;
+    }
+    return rangeQueryBuilder;
+  }
 
   /**
    * @param sipQuery
@@ -429,5 +435,48 @@ public class ElasticSearchQueryBuilder {
       }
     }
     return builder;
+  }
+
+  /**
+   * Prepare sum calculated fields required for percentage aggregation.
+   *
+   * @param sipQuery SIP Query.
+   * @return Elasticsearch SearchSourceBuilder
+   */
+  public SearchSourceBuilder percentagePriorQuery(SipQuery sipQuery) {
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.size(0);
+    if (sipQuery.getBooleanCriteria() != null) {
+      List<Filter> filters = sipQuery.getFilters();
+      List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+      builder = buildFilters(filters, builder);
+      // TODO: Future Implementation
+      //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder);
+      BoolQueryBuilder boolQueryBuilder = buildBooleanQuery(sipQuery, builder);
+      searchSourceBuilder.query(boolQueryBuilder);
+    }
+    QueryBuilderUtil.getAggregationBuilder(
+        sipQuery.getArtifacts().get(0).getFields(), searchSourceBuilder);
+    return searchSourceBuilder;
+  }
+
+  /**
+   * Set the pre percentage sum calculated data to dataFields.
+   *
+   * @param fields List of the fields.
+   * @param jsonNode Sum calculated json response.
+   */
+  public void setPriorPercentages(List<Field> fields, JsonNode jsonNode) {
+    fields.forEach(
+        dataField -> {
+          String columnName = dataField.getColumnName();
+          if (dataField.getAggregate() != null
+              && dataField.getAggregate().equals(Field.Aggregate.PERCENTAGE))
+            dataField
+                .getAdditionalProperties()
+                .put(
+                    columnName + SUM,
+                    String.valueOf(jsonNode.get("aggregations").get(columnName).get(VALUE)));
+        });
   }
 }
