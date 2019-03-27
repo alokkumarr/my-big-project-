@@ -182,7 +182,7 @@ public class Field {
     this.displayType = displayType;
   }
 
-    @JsonAnyGetter
+  @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
     return this.additionalProperties;
   }

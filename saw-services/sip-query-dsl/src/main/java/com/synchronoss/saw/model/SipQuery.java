@@ -1,9 +1,6 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -36,8 +33,6 @@ public class SipQuery {
 
   @JsonProperty("store")
   private Store store;
-
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("artifacts")
   public List<Artifact> getArtifacts() {
@@ -99,16 +94,6 @@ public class SipQuery {
     this.store = store;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -118,7 +103,6 @@ public class SipQuery {
         .append("sorts", sorts)
         .append("joins", joins)
         .append("store", store)
-        .append("additionalProperties", additionalProperties)
         .toString();
   }
 
@@ -126,7 +110,6 @@ public class SipQuery {
   public int hashCode() {
     return new HashCodeBuilder()
         .append(store)
-        .append(additionalProperties)
         .append(booleanCriteria)
         .append(sorts)
         .append(filters)
@@ -146,7 +129,6 @@ public class SipQuery {
     SipQuery rhs = ((SipQuery) other);
     return new EqualsBuilder()
         .append(store, rhs.store)
-        .append(additionalProperties, rhs.additionalProperties)
         .append(booleanCriteria, rhs.booleanCriteria)
         .append(sorts, rhs.sorts)
         .append(joins, rhs.joins)

@@ -1,7 +1,5 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,8 +27,6 @@ public class Sort {
 
   @JsonProperty("order")
   private Order order;
-
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("artifacts")
   public String getArtifacts() {
@@ -72,16 +68,6 @@ public class Sort {
     this.order = order;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -89,7 +75,6 @@ public class Sort {
         .append("columnName", columnName)
         .append("type", type)
         .append("order", order)
-        .append("additionalProperties", additionalProperties)
         .toString();
   }
 
@@ -97,7 +82,6 @@ public class Sort {
   public int hashCode() {
     return new HashCodeBuilder()
         .append(order)
-        .append(additionalProperties)
         .append(columnName)
         .append(type)
         .append(artifacts)
@@ -115,7 +99,6 @@ public class Sort {
     Sort rhs = ((Sort) other);
     return new EqualsBuilder()
         .append(order, rhs.order)
-        .append(additionalProperties, rhs.additionalProperties)
         .append(columnName, rhs.columnName)
         .append(type, rhs.type)
         .append(artifacts, rhs.artifacts)

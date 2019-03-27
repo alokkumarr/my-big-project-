@@ -1,13 +1,8 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -64,8 +59,6 @@ public class SIPDSL {
 
   @JsonProperty("sipQuery")
   private SipQuery sipQuery;
-
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("type")
   public String getType() {
@@ -187,16 +180,6 @@ public class SIPDSL {
     this.sipQuery = sipQuery;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -212,7 +195,6 @@ public class SIPDSL {
         .append("modifiedTime", modifiedTime)
         .append("modifiedBy", modifiedBy)
         .append("sipQuery", sipQuery)
-        .append("additionalProperties", additionalProperties)
         .toString();
   }
 
@@ -228,7 +210,6 @@ public class SIPDSL {
         .append(sipQuery)
         .append(id)
         .append(createdBy)
-        .append(additionalProperties)
         .append(semanticId)
         .append(customerCode)
         .append(name)
@@ -254,7 +235,6 @@ public class SIPDSL {
         .append(sipQuery, rhs.sipQuery)
         .append(id, rhs.id)
         .append(createdBy, rhs.createdBy)
-        .append(additionalProperties, rhs.additionalProperties)
         .append(semanticId, rhs.semanticId)
         .append(customerCode, rhs.customerCode)
         .append(name, rhs.name)

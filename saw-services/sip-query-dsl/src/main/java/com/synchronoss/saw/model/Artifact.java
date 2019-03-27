@@ -23,8 +23,6 @@ public class Artifact {
   @JsonProperty("fields")
   private List<Field> fields = null;
 
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
   @JsonProperty("artifactsName")
   public String getArtifactsName() {
     return artifactsName;
@@ -45,29 +43,17 @@ public class Artifact {
     this.fields = fields;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
         .append("artifactsName", artifactsName)
         .append("fields", fields)
-        .append("additionalProperties", additionalProperties)
         .toString();
   }
 
   @Override
   public int hashCode() {
     return new HashCodeBuilder()
-        .append(additionalProperties)
         .append(artifactsName)
         .append(fields)
         .toHashCode();
@@ -83,7 +69,6 @@ public class Artifact {
     }
     Artifact rhs = ((Artifact) other);
     return new EqualsBuilder()
-        .append(additionalProperties, rhs.additionalProperties)
         .append(artifactsName, rhs.artifactsName)
         .append(fields, rhs.fields)
         .isEquals();

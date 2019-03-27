@@ -1,13 +1,8 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,8 +16,6 @@ public class Store {
 
   @JsonProperty("storageType")
   private String storageType;
-
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("dataStore")
   public String getDataStore() {
@@ -44,22 +37,11 @@ public class Store {
     this.storageType = storageType;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
         .append("dataStore", dataStore)
         .append("storageType", storageType)
-        .append("additionalProperties", additionalProperties)
         .toString();
   }
 
@@ -67,7 +49,6 @@ public class Store {
   public int hashCode() {
     return new HashCodeBuilder()
         .append(dataStore)
-        .append(additionalProperties)
         .append(storageType)
         .toHashCode();
   }
@@ -83,7 +64,6 @@ public class Store {
     Store rhs = ((Store) other);
     return new EqualsBuilder()
         .append(dataStore, rhs.dataStore)
-        .append(additionalProperties, rhs.additionalProperties)
         .append(storageType, rhs.storageType)
         .isEquals();
   }
