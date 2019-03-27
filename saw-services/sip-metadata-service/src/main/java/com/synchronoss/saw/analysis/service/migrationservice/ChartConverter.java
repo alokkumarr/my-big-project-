@@ -1,20 +1,17 @@
-package com.synchronoss.saw.analysis.service.migrationService;
+package com.synchronoss.saw.analysis.service.migrationservice;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.ChartProperties;
+import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.Store;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,11 +21,17 @@ public class ChartConverter implements AnalysisSipDslConverter {
     Analysis analysis = new Analysis();
 
     analysis.setId(oldAnalysisDefinition.get("id").getAsString());
+
+    if (oldAnalysisDefinition.has("parentAnalysisId")) {
+      String parentAnalysisId = oldAnalysisDefinition.get("parentAnalysisId").getAsString();
+
+      analysis.setParentAnalysisId(parentAnalysisId);
+    }
+
     analysis.setSemanticId(oldAnalysisDefinition.get("semanticId").getAsString());
     analysis.setName(oldAnalysisDefinition.get("name").getAsString());
 
     analysis.setType(oldAnalysisDefinition.get("type").getAsString());
-    analysis.setChartType(oldAnalysisDefinition.get("chartType").getAsString());
 
     //TODO: Should be category id or category name?
     //analysis.setCategory();
@@ -56,19 +59,35 @@ public class ChartConverter implements AnalysisSipDslConverter {
     artifactName = artifact.get("artifactName").getAsString();
 
     // Set chartProperties
-    if (oldAnalysisDefinition.has("isInverted") || oldAnalysisDefinition.has("legend")) {
-      Boolean isInverted = null;
-      if (oldAnalysisDefinition.has("isInverted")) {
-        isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
-      }
+    Boolean isInverted = null;
+    JsonObject legendObject = null;
+    String chartType = null;
+    String chartTitle = null;
 
-      JsonObject legendObject = null;
-      if (oldAnalysisDefinition.has("legend")) {
-        legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
-      }
-
-      analysis.setChartProperties(createChartProperties(isInverted, legendObject));
+    if (oldAnalysisDefinition.has("isInverted")) {
+      isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
     }
+
+    if (oldAnalysisDefinition.has("legend")) {
+      legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
+    }
+
+
+    if (oldAnalysisDefinition.has("chartType")) {
+      chartType = oldAnalysisDefinition.get("chartType").getAsString();
+    }
+
+    if (oldAnalysisDefinition.has("chartTitle")) {
+      chartTitle = oldAnalysisDefinition.get("chartTitle").getAsString();
+    }
+    analysis.setChartOptions(createChartOptions(isInverted, legendObject, chartTitle, chartType));
+
+    if (oldAnalysisDefinition.has("edit")) {
+      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
+
+      analysis.setDesignerEdit(designerEdit);
+    }
+
     JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
     Store store = null;
     if (esRepository != null) {
@@ -129,12 +148,15 @@ public class ChartConverter implements AnalysisSipDslConverter {
     return filters;
   }
 
-  private ChartProperties createChartProperties(boolean isInverted, JsonObject legend) {
-    ChartProperties chartProperties = new ChartProperties();
+  private ChartOptions createChartOptions(boolean isInverted, JsonObject legend, String chartTitle,
+                                          String chartType) {
+    ChartOptions chartOptions = new ChartOptions();
 
-    chartProperties.setInverted(isInverted);
-    chartProperties.setLegend(legend);
-    return chartProperties;
+    chartOptions.setInverted(isInverted);
+    chartOptions.setLegend(legend);
+    chartOptions.setChartTitle(chartTitle);
+    chartOptions.setChartType(chartType);
+    return chartOptions;
   }
 
   private Filter generateFilter(JsonObject filterObject) {

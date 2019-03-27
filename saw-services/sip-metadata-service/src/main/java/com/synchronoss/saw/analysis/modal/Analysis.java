@@ -19,7 +19,6 @@ public class Analysis {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonPropertyOrder({
       "type",
-      "chartType",
       "semanticId",
       "metricName",
       "name",
@@ -39,9 +38,6 @@ public class Analysis {
   })
   @JsonProperty("type")
   private String type;
-
-  @JsonProperty("chartType")
-  private String chartType;
 
   @JsonProperty("semanticId")
   private String semanticId;
@@ -101,16 +97,6 @@ public class Analysis {
   @JsonProperty("type")
   public void setType(String type) {
     this.type = type;
-  }
-
-  @JsonProperty("chartType")
-  public String getChartType() {
-      return this.chartType;
-  }
-
-  @JsonProperty("chartType")
-  public void setChartType(String chartType) {
-      this.chartType = chartType;
   }
 
   @JsonProperty("semanticId")

@@ -1,4 +1,4 @@
-package com.synchronoss.saw.analysis.service.migrationService;
+package com.synchronoss.saw.analysis.service.migrationservice;
 
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;

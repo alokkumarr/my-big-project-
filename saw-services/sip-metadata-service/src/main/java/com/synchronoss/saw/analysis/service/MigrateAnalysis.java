@@ -9,8 +9,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.analysis.service.migrationService.AnalysisSipDslConverter;
-import com.synchronoss.saw.analysis.service.migrationService.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 
 import java.io.File;
 import java.io.FileReader;
@@ -126,6 +126,12 @@ public class MigrateAnalysis {
         + "}";
   }
 
+  /**
+   * Main function.
+   *
+   * @param args - command line args
+   * @throws IOException - In case of file errors
+   */
   public static void main(String[] args) throws IOException {
     System.out.println("Convert analysis");
 
