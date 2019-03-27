@@ -1,99 +1,47 @@
-package com.synchronoss.saw.analysis.service;
+package com.synchronoss.saw.analysis.service.migrationService;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.ChartProperties;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.Store;
+
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
-
-public class MigrationService {
-  private static final Logger logger = LoggerFactory.getLogger(MigrationService.class);
-  private String existingBinaryAnalysisPath = "/services/metadata/analysis_metadata";
-
-
-  public void convertBinaryToJson(String analysisStoreBasePath,
-                                  String listAnalysisUri, String migrationMetadataHome) {
-    logger.trace("migration process will begin here");
-    HttpHeaders requestHeaders = new HttpHeaders();
-
-    requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    HttpEntity<?> requestEntity =
-        new HttpEntity<Object>(semanticNodeQuery(), requestHeaders);
-    logger.debug("Analysis server URL {}", listAnalysisUri + "/analysis");
-
-
-    String url = listAnalysisUri + "/analysis";
-    RestTemplate restTemplate = new RestTemplate();
-    ResponseEntity analysisBinaryData =
-        restTemplate.exchange(url, HttpMethod.GET, requestEntity, Analysis.class);
-
-    if (analysisBinaryData.getBody() != null) {
-      Gson gson = new GsonBuilder().create();
-      logger.debug("Analysis data = " + analysisBinaryData.getBody());
-
-      //TODO: Check if this works
-      JsonObject analysisBinaryObject = gson.toJsonTree(analysisBinaryData.getBody())
-                             .getAsJsonObject();
-
-      JsonArray analysisList = analysisBinaryObject.get("contents")
-                              .getAsJsonObject().getAsJsonArray("analyze");
-
-
-      for (JsonElement analysisElement: analysisList) {
-        JsonObject analysisObject = analysisElement.getAsJsonObject();
-        Analysis analysis = createDslAnalysis(analysisObject);
-
-        // TODO: Call add analysis API
-      }
-    }
-  }
-
-  private Analysis createDslAnalysis(JsonObject analysisObject) {
+public class ChartConverter implements AnalysisSipDslConverter {
+  @Override
+  public Analysis convert(JsonObject oldAnalysisDefinition) {
     Analysis analysis = new Analysis();
 
-    analysis.setId(analysisObject.get("id").getAsString());
-    analysis.setSemanticId(analysisObject.get("sementicId").getAsString());
-    analysis.setName(analysisObject.get("name").getAsString());
+    analysis.setId(oldAnalysisDefinition.get("id").getAsString());
+    analysis.setSemanticId(oldAnalysisDefinition.get("sementicId").getAsString());
+    analysis.setName(oldAnalysisDefinition.get("name").getAsString());
 
-    analysis.setType(analysisObject.get("type").getAsString());
-    analysis.setChartType(analysisObject.get("chartType").getAsString());
+    analysis.setType(oldAnalysisDefinition.get("type").getAsString());
+    analysis.setChartType(oldAnalysisDefinition.get("chartType").getAsString());
 
     //TODO: Should be category id or category name?
     //analysis.setCategory();
 
-    analysis.setCustomerCode(analysisObject.get("customerCode").getAsString());
-    analysis.setProjectCode(analysisObject.get("projectCode").getAsString());
-    analysis.setModule(analysisObject.get("module").getAsString());
+    analysis.setCustomerCode(oldAnalysisDefinition.get("customerCode").getAsString());
+    analysis.setProjectCode(oldAnalysisDefinition.get("projectCode").getAsString());
+    analysis.setModule(oldAnalysisDefinition.get("module").getAsString());
 
-    analysis.setCreatedTime(analysisObject.get("createdTimestamp").getAsLong());
-    analysis.setCreatedBy(analysisObject.get("username").getAsString());
+    analysis.setCreatedTime(oldAnalysisDefinition.get("createdTimestamp").getAsLong());
+    analysis.setCreatedBy(oldAnalysisDefinition.get("username").getAsString());
 
-    analysis.setModifiedTime(analysisObject.get("updatedTimestamp").getAsLong());
-    analysis.setModifiedBy(analysisObject.get("updatedUserName").getAsString());
+    analysis.setModifiedTime(oldAnalysisDefinition.get("updatedTimestamp").getAsLong());
+    analysis.setModifiedBy(oldAnalysisDefinition.get("updatedUserName").getAsString());
 
 
     // Extract artifact name from "artifacts"
@@ -101,18 +49,32 @@ public class MigrationService {
     // there will be 2 objects
     String artifactName = null;
 
-    JsonArray artifacts = analysisObject.getAsJsonArray("artifacts");
+    JsonArray artifacts = oldAnalysisDefinition.getAsJsonArray("artifacts");
 
     // Handling artifact name for charts and pivots
     JsonObject artifact = artifacts.get(0).getAsJsonObject();
     artifactName = artifact.get("artifactName").getAsString();
 
-    JsonObject esRepository = analysisObject.getAsJsonObject("esRepository");
+    // Set chartProperties
+    if (oldAnalysisDefinition.has("isInverted") || oldAnalysisDefinition.has("legend")) {
+      Boolean isInverted = null;
+      if (oldAnalysisDefinition.has("isInverted")) {
+        isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
+      }
+
+      JsonObject legendObject = null;
+      if (oldAnalysisDefinition.has("legend")) {
+        legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
+      }
+
+      analysis.setChartProperties(createChartProperties(isInverted, legendObject));
+    }
+    JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
     Store store = null;
     if (esRepository != null) {
       store = extractStoreInfo(esRepository);
     }
-    JsonElement sqlQueryBuilderElement = analysisObject.get("sqlBuilder");
+    JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
       analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, store));
@@ -125,31 +87,15 @@ public class MigrationService {
     return analysis;
   }
 
-  private Store extractStoreInfo(JsonObject esRepository) {
-    Store store = new Store();
-
-    if (esRepository.has("storageType")) {
-      store.setStorageType(esRepository.get("storageType").getAsString());
-    }
-
-    if (esRepository.has("indexName") && esRepository.has("type")) {
-      String index = esRepository.get("indexName").getAsString();
-      String type = esRepository.get("type").getAsString();
-      store.setDataStore(index + "/" + type);
-    }
-
-    return store;
-  }
-
   private SipQuery generateSipQuery(String artifactName, JsonObject sqlQueryBuilder,
-                                    Store store) {
+                                      Store store) {
     SipQuery sipQuery = new SipQuery();
 
     sipQuery.setArtifacts(generateArtifactsList(artifactName, sqlQueryBuilder));
 
     String booleanCriteriaValue = sqlQueryBuilder.get("booleanCriteria").getAsString();
     SipQuery.BooleanCriteria booleanCriteria
-        = SipQuery.BooleanCriteria.fromValue(booleanCriteriaValue);
+            = SipQuery.BooleanCriteria.fromValue(booleanCriteriaValue);
     sipQuery.setBooleanCriteria(booleanCriteria);
 
     sipQuery.setFilters(generateFilters(sqlQueryBuilder));
@@ -175,12 +121,30 @@ public class MigrationService {
     if (sqlBuilder.has("filters")) {
       JsonArray filtersArray = sqlBuilder.getAsJsonArray("filters");
 
-      for(JsonElement filterElement: filtersArray) {
+      for (JsonElement filterElement: filtersArray) {
         filters.add(generateFilter(filterElement.getAsJsonObject()));
       }
     }
 
     return filters;
+  }
+
+  private ChartProperties createChartProperties(boolean isInverted, JsonObject legend) {
+    ChartProperties chartProperties = new ChartProperties();
+
+    chartProperties.setInverted(isInverted);
+
+    ObjectMapper mapper = new ObjectMapper();
+
+    try {
+      if (legend != null) {
+        JsonNode legendNode = mapper.readTree(legend.toString());
+        chartProperties.setLegend(legendNode);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return chartProperties;
   }
 
   private Filter generateFilter(JsonObject filterObject) {
@@ -221,37 +185,37 @@ public class MigrationService {
     if (sqlBuilder.has("sorts")) {
       JsonArray sortsArray = sqlBuilder.getAsJsonArray("sorts");
 
-      for(JsonElement sortsElement: sortsArray) {
-          sorts.add(generateSortObject(artifactName, sortsElement.getAsJsonObject()));
+      for (JsonElement sortsElement: sortsArray) {
+        sorts.add(generateSortObject(artifactName, sortsElement.getAsJsonObject()));
       }
     }
     return sorts;
   }
 
   private Sort generateSortObject(String artifactName, JsonObject sortObject) {
-      Sort sort = new Sort();
+    Sort sort = new Sort();
 
-      sort.setArtifacts(artifactName);
+    sort.setArtifacts(artifactName);
 
-      if (sortObject.has("order")) {
-        String orderVal = sortObject.get("order").getAsString();
+    if (sortObject.has("order")) {
+      String orderVal = sortObject.get("order").getAsString();
 
-        sort.setOrder(Sort.Order.fromValue(orderVal));
-      }
+      sort.setOrder(Sort.Order.fromValue(orderVal));
+    }
 
-      if (sortObject.has("columnName")) {
-        String columnName = sortObject.get("columnName").getAsString();
+    if (sortObject.has("columnName")) {
+      String columnName = sortObject.get("columnName").getAsString();
 
-        sort.setColumnName(columnName);
-      }
+      sort.setColumnName(columnName);
+    }
 
-      if (sortObject.has("type")) {
-        String typeVal = sortObject.get("type").getAsString();
+    if (sortObject.has("type")) {
+      String typeVal = sortObject.get("type").getAsString();
 
-        sort.setType(Sort.Type.fromValue(typeVal));
-      }
+      sort.setType(Sort.Type.fromValue(typeVal));
+    }
 
-      return sort;
+    return sort;
   }
 
   // For charts, there will be dataFields and nodefields
@@ -342,24 +306,22 @@ public class MigrationService {
       }
     }
 
-
-      //TODO: check regarding "checked" fields - Maps to area
-
-
-      return field;
+    return field;
   }
 
+  private Store extractStoreInfo(JsonObject esRepository) {
+    Store store = new Store();
 
-  private String semanticNodeQuery() {
-    return "{\n" +
-      "   \"contents\":{\n" +
-      "      \"keys\":[\n" +
-      "         {\n" +
-      "            \"module\":\"ANALYZE\"\n" +
-      "         }\n" +
-      "      ],\n" +
-      "      \"action\":\"export\"\n" +
-      "   }\n" +
-      "}";
+    if (esRepository.has("storageType")) {
+      store.setStorageType(esRepository.get("storageType").getAsString());
+    }
+
+    if (esRepository.has("indexName") && esRepository.has("type")) {
+      String index = esRepository.get("indexName").getAsString();
+      String type = esRepository.get("type").getAsString();
+      store.setDataStore(index + "/" + type);
+    }
+
+    return store;
   }
 }
