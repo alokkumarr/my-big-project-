@@ -302,6 +302,8 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.checked = false;
       unset(artifactColumn, 'comboType');
+      unset(artifactColumn, 'limitType');
+      unset(artifactColumn, 'limitValue');
     };
 
     const metricTitle = chartType === 'pie' ? 'Angle' : 'Metrics';

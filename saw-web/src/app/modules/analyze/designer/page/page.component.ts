@@ -128,7 +128,6 @@ export class DesignerPageComponent implements OnInit {
         scheduled: null,
         supports: JSON.parse(newAnalysisParams.supports || '')
       };
-      console.log('this.analysisStarter', this.analysisStarter);
 
       /* Else, load existing analysis */
     } else {
