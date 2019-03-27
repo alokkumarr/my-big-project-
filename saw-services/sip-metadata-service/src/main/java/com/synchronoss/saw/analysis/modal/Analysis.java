@@ -211,12 +211,12 @@ public class Analysis {
 
   @JsonProperty("chartProperties")
   public ChartProperties getChartProperties() {
-      return this.chartProperties;
+    return this.chartProperties;
   }
 
   @JsonProperty("chartProperties")
   public void setChartProperties(ChartProperties chartProperties) {
-      this.chartProperties = chartProperties;
+    this.chartProperties = chartProperties;
   }
 
   @JsonProperty("sipQuery")
