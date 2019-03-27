@@ -1,9 +1,6 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -46,8 +43,6 @@ public class Filter {
 
   @JsonProperty("model")
   private Model model;
-
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("type")
   public Type getType() {
@@ -119,16 +114,6 @@ public class Filter {
     this.model = model;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -139,7 +124,6 @@ public class Filter {
         .append("isRuntimeFilter", isRuntimeFilter)
         .append("isGlobalFilter", isGlobalFilter)
         .append("model", model)
-        .append("additionalProperties", additionalProperties)
         .toString();
   }
 
@@ -147,7 +131,6 @@ public class Filter {
   public int hashCode() {
     return new HashCodeBuilder()
         .append(model)
-        .append(additionalProperties)
         .append(isRuntimeFilter)
         .append(artifactsName)
         .append(columnName)
@@ -168,7 +151,6 @@ public class Filter {
     Filter rhs = ((Filter) other);
     return new EqualsBuilder()
         .append(model, rhs.model)
-        .append(additionalProperties, rhs.additionalProperties)
         .append(isRuntimeFilter, rhs.isRuntimeFilter)
         .append(artifactsName, rhs.artifactsName)
         .append(columnName, rhs.columnName)

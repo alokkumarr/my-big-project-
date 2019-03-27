@@ -87,8 +87,6 @@ public class Analysis {
   @JsonProperty("designerEdit")
   private Boolean designerEdit;
 
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
   @JsonProperty("type")
   public String getType() {
     return type;
@@ -257,16 +255,6 @@ public class Analysis {
     this.sipQuery = sipQuery;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -284,7 +272,6 @@ public class Analysis {
         .append("chartOptions", chartOptions)
         .append("designerEdit", designerEdit)
         .append("sipQuery", sipQuery)
-        .append("additionalProperties", additionalProperties)
         .toString();
   }
 
@@ -301,7 +288,6 @@ public class Analysis {
         .append(sipQuery)
         .append(id)
         .append(createdBy)
-        .append(additionalProperties)
         .append(semanticId)
         .append(customerCode)
         .append(name)
@@ -328,7 +314,6 @@ public class Analysis {
         .append(sipQuery, rhs.sipQuery)
         .append(id, rhs.id)
         .append(createdBy, rhs.createdBy)
-        .append(additionalProperties, rhs.additionalProperties)
         .append(semanticId, rhs.semanticId)
         .append(customerCode, rhs.customerCode)
         .append(name, rhs.name)

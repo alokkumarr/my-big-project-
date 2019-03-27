@@ -1,9 +1,6 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -21,8 +18,6 @@ public class Join {
 
   @JsonProperty("criteria")
   private List<Criteria> criteria = null;
-
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("join")
   public JoinType getJoinType() {
@@ -42,16 +37,6 @@ public class Join {
   @JsonProperty("criteria")
   public void setCriteria(List<Criteria> criteria) {
     this.criteria = criteria;
-  }
-
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
   }
 
   public enum JoinType {
