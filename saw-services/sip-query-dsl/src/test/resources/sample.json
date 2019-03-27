@@ -93,9 +93,5 @@
       "dataStore": "sampleAlias/sample",
       "storageType": "ES"
     }
-  },
-  "legend": {
-    "align": "right",
-    "layout": "vertical"
   }
 }
