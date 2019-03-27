@@ -166,7 +166,9 @@ export class DesignerContainerComponent implements OnInit {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.initAuxSettings();
         this.analysis.edit = this.analysis.edit || false;
-        unset(this.analysis, 'supports');
+        this.analysis.supports = this.analysisStarter.supports;
+        console.log('this.analysis.supports', this.analysis.supports);
+        console.log('this.analysisStarter', this.analysisStarter);
         unset(this.analysis, 'categoryId');
       });
   }

@@ -1,5 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import * as map from 'lodash/map';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
+import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as split from 'lodash/split';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as startsWith from 'lodash/startsWith';
@@ -21,8 +24,16 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
   @Output() change = new EventEmitter();
   @Input() category: 'map' | 'chart';
   @Input() subType: string;
-  @Input() supports: string[];
+  @Input('supports') set setSupports(supports: string[]) {
+    this.supports = fpPipe(
+      fpFlatMap(support => support.children),
+      fpMap('type'),
+      fpMap(type => split(type, ':')),
+      fpMap(([_, subType]) => subType)
+    )(supports);
+  }
 
+  public supports;
   public subTypes;
 
   ngOnInit() {
@@ -33,15 +44,15 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
       const ret = {
         ...chartType,
         type,
-        disabled: this.shouldSubTypeBeDisabled(type, this.category)
+        disabled: !this.doesSupportType(type, this.category)
       };
       return ret;
     });
   }
 
-  shouldSubTypeBeDisabled(type, category) {
+  doesSupportType(type, category) {
     if (category === 'chart') {
-      return false;
+      return true;
     }
     if (category === 'map') {
       const isMapChart = startsWith(type, 'chart');
