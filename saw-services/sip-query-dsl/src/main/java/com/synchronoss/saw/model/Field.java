@@ -147,7 +147,7 @@ public class Field {
   }
 
   /**
-   * Gets dateFormat
+   * Gets dateFormat.
    *
    * @return value of dateFormat
    */
@@ -190,6 +190,13 @@ public class Field {
   @JsonAnySetter
   public void setAdditionalProperty(String name, Object value) {
     this.additionalProperties.put(name, value);
+  }
+
+  /**
+   * Used to nullify additionalProperties field, so that it won't appear in the output json
+   */
+  public void nullifyAdditionalProperties() {
+    this.additionalProperties = null;
   }
 
   @Override

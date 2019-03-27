@@ -318,6 +318,8 @@ public class ChartConverter implements AnalysisSipDslConverter {
       }
     }
 
+    field.nullifyAdditionalProperties();
+
     return field;
   }
 
