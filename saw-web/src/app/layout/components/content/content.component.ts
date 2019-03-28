@@ -37,7 +37,7 @@ const TIMEOUT_TRIGGER = 60;
 // nr of seconds before the user is timed out
 const TIMEOUT = 20 * 60;
 
-const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH', 'ADMIN'];
+const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH', 'ADMIN', 'ALERTS'];
 
 @Component({
   selector: 'layout-content',
