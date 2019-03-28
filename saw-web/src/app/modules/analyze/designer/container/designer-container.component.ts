@@ -832,6 +832,9 @@ export class DesignerContainerComponent implements OnInit {
           (<AnalysisChart>this.analysis).chartType
         )
       );
+
+      unset(this.analysis, 'chartTitle');
+      this.chartTitle = '';
       const {align, layout} = this._chartService.initLegend({chartType: (<any>this.analysis).chartType});
       (<any>this.analysis).legend = {align, layout};
 
