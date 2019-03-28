@@ -28,6 +28,11 @@ public class ChartConverter implements AnalysisSipDslConverter {
       analysis.setParentAnalysisId(parentAnalysisId);
     }
 
+    //TODO: Add description information
+    if (oldAnalysisDefinition.has("description")) {
+//      analysis.;
+    }
+
     analysis.setSemanticId(oldAnalysisDefinition.get("semanticId").getAsString());
     analysis.setName(oldAnalysisDefinition.get("name").getAsString());
 
