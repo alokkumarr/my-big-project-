@@ -1,89 +1,167 @@
 <div class="settings__container">
-
-  <div class="settings__filters"
-       fxLayout="row"
-       fxLayoutAlign="space-between center">
-    <mat-form-field class="settings__artifacts__filter__field">
-      <input matInput type="text"
-              autocomplete="off"
-              placeholder="Filter"
-              name="filter-settings"
-              (input)="onTextFilterChange($event.target.value)"
-              [value]="filterObj.keyword"/>
-      <button mat-button *ngIf="filterObj.keyword"
-              matSuffix mat-icon-button
-              aria-label="Clear"
-              (click)="onTextFilterChange('')">
-        <mat-icon fontIcon="icon-close"></mat-icon>
-      </button>
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="form-select">
-      <mat-label>Types</mat-label>
-      <mat-select [value]="filterObj.types" (selectionChange)="onTypeFilterChange($event.value)" multiple>
-        <mat-option *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex" [value]="typeIcon.value">
-          <div fxLayout="row" fxLayoutAlign="space-between center">
-            {{ typeIcon.label}}
-            <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
-          </div>
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <!-- <mat-button-toggle-group multiple>
-      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
-                         (change)="onTypeFilterChange($event)"
-                         [value]="typeIcon.value"
-                         [checked]="filterObj.types.includes(typeIcon.value)">
-        <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
-      </mat-button-toggle>
-    </mat-button-toggle-group> -->
-  </div>
-
-  <div class="settings__unselected-fields"
-       dndSortableContainer
-       dndZone="designer-setting-zone">
-    <div *ngIf="unselectedArtifactColumns">
-      <div *ngIf="!isEmpty(unselectedArtifactColumns)">
-        <div *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
-             [dndSortable]="artifactColumn"
-             class="settings__list-item"
-             fxLayout="row"
-             fxLayoutAlign="space-between center">
-          <div class="settings__list-item__name"
-               fxLayout="row"
-               fxLayoutAlign="space-between center">
-            {{ artifactColumn.displayName }}
-            <mat-icon [fontIcon]="getArtifactColumnTypeIcon(artifactColumn)"
-                      class="settings__list-item__icon">
-            </mat-icon>
-          </div>
-          <button mat-icon-button
-                  [attr.e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"
-                  (click)="addToGroupIfPossible(artifactColumn)">
-            <mat-icon fontIcon="icon-plus"></mat-icon>
-          </button>
-        </div>
-      </div>
-      <div *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
-           fxLayout="row" fxLayoutAlign="center center">
-        <div class="settings__unselected-fields--empty"
-             i18n>
-          There are no fields for this criteria
-        </div>
-      </div>
+  <div class="settings__filters" fxLayout="column" fxLayoutAlign="center start">
+    <div
+      class="settings__filters__type"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+    >
+      <mat-button-toggle-group multiple>
+        <mat-button-toggle
+          *ngFor="let typeIcon of typeIcons; trackBy: trackByIndex"
+          (change)="onTypeFilterChange($event.value)"
+          [value]="typeIcon.value"
+          [checked]="filterObj.types[typeIcon.value]"
+        >
+          <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle
+          *ngFor="let adapter of (groupAdapters | slice: 0:2); let i = index"
+          (change)="onFilterChange(i)"
+          [checked]="filterObj.adapters[i]"
+          [value]="adapter.title"
+        >
+          {{ adapter.title }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
+
+    <mat-form-field
+      appearance="outline"
+      class="settings__filters__keyword"
+      fxLayout="row"
+    >
+      <input
+        matInput
+        type="text"
+        autocomplete="off"
+        fxFlex="95"
+        placeholder="Search"
+        name="filter-settings"
+        (input)="onTextFilterChange($event.target.value)"
+        [value]="filterObj.keyword"
+      />
+      <div
+        *ngIf="filterObj.keyword"
+        fxFlex="5"
+        fxLayout="row"
+        style="height: 10px;"
+      >
+        <mat-icon fontIcon="icon-remove" (click)="onTextFilterChange('')">
+        </mat-icon>
+      </div>
+    </mat-form-field>
   </div>
 
-  <div class="settings__selected-fields">
-    <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: trackByIndex"
-                             (fieldsChange)="onFieldsChange()"
-                             (fieldPropChange)="onFieldPropChange($event)"
-                             (removeField)="removeFromGroup($event, groupAdapter)"
-                             [groupAdapter]="groupAdapter"
-                             [groupAdapters]="groupAdapters"
-                             [fieldCount]="fieldCount"
-                             [sqlBuilder]="sqlBuilder"
-                             [analysisSubtype]="analysisSubtype"
-                             [artifactColumns]="groupAdapter.artifactColumns">
-    </designer-settings-group>
+  <div class="settings__unselected-fields">
+    <perfect-scrollbar [config]="config" *ngIf="unselectedArtifactColumns">
+      <div
+        *ngIf="!isEmpty(unselectedArtifactColumns)"
+        cdkDropList
+        [cdkDropListEnterPredicate]="noReturnPredicate"
+        [cdkDropListData]="dropListContainer"
+        class="settings__list"
+      >
+        <div
+          *ngFor="
+            let artifactColumn of unselectedArtifactColumns;
+            trackBy: trackByIndex;
+            let columnIndex = index
+          "
+          cdkDrag
+          (cdkDragStarted)="dragStarted($event)"
+          (cdkDragReleased)="dragReleased($event)"
+          [cdkDragData]="artifactColumn"
+          [attr.e2e]="
+            'designer-unselected-field-' +
+            (artifactColumn.aliasName || artifactColumn.displayName)
+          "
+          class="settings__list-item"
+          [ngClass]="{
+            elevationClass: menuVisibleFor === artifactColumn.displayName
+          }"
+        >
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <div
+              class="settings__list-item__name"
+              fxLayout="row"
+              fxFlex
+              fxLayoutAlign="start center"
+            >
+              <mat-icon
+                [fontIcon]="
+                  getArtifactColumnTypeIcon(
+                    artifactColumn,
+                    analysisType,
+                    analysisSubtype
+                  )
+                "
+                class="settings__list-item__icon"
+              >
+              </mat-icon>
+              {{ artifactColumn.displayName || artifactColumn.aliasName }}
+            </div>
+
+            <button
+              class="settings__list-item__addbtn"
+              mat-icon-button
+              color="primary"
+              [matMenuTriggerFor]="addToGroupsMenu"
+              [attr.e2e]="
+                'designer-add-menu-btn-' +
+                (artifactColumn.aliasName || artifactColumn.displayName)
+              "
+              (menuOpened)="onAddToGroupMenuOpened(artifactColumn)"
+              (menuClosed)="onMenuClosed()"
+            >
+              <mat-icon
+                class="settings__list-item__addbtn__icon"
+                fontIcon="icon-plus"
+              ></mat-icon>
+            </button>
+            <mat-menu #addToGroupsMenu="matMenu">
+              <button
+                *ngFor="
+                  let adapter of groupsThatCanRecieveColumn;
+                  let adapterIndex = index
+                "
+                [attr.e2e]="
+                  'designer-add-option-btn-' +
+                  (artifactColumn.aliasName || artifactColumn.displayName) +
+                  '-' +
+                  adapter.title
+                "
+                (click)="addToGroup(artifactColumn, columnIndex, adapter)"
+                mat-menu-item
+              >
+                <span>{{ adapter.title }}</span>
+              </button>
+              <div
+                fxLayout="column"
+                fxFlex
+                fxLayoutAlign="center center"
+                class="settings__list-item__add-limit"
+                *ngIf="groupsThatCanRecieveColumn?.length < 1"
+              >
+                <mat-icon fontIcon="icon-warning2" color="warn"></mat-icon>
+                <strong>Accepted Category Metric Limit Reached</strong>
+              </div>
+            </mat-menu>
+          </div>
+        </div>
+      </div>
+      <div
+        *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
+        fxLayout="column"
+        fxLayoutAlign="center center"
+      >
+        <mat-icon
+          class="settings__unselected-fields__icon"
+          fontIcon="icon-chat-bot-solid"
+        ></mat-icon>
+        <div class="settings__unselected-fields__empty" i18n>
+          No matching fields found
+        </div>
+      </div>
+    </perfect-scrollbar>
   </div>
 </div>

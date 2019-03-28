@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import javax.validation.Valid;
@@ -284,5 +286,29 @@ public class SawBisSftpPluginController {
 
     return deferredResult;
   }
+  
+  /**
+   * This end-point will be used to get the status of the destination.
+   * @param requestBody object to send the payload.
+   * @return Object {@link Map}
+   */
+  @RequestMapping(value = "/data/status", method = RequestMethod.POST,
+      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public Map<String, Boolean> isDestinationExist(@ApiParam(
+      value = "Payload structure which to be used to initiate the transfer",
+      required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
+    logger.trace("Checking for data path: " + requestBody.getDestinationLocation());
+    boolean result = false;
+    try {
+      result = sftpServiceImpl.isDataExists(requestBody.getDestinationLocation());
+    } catch (Exception e) {
+      logger.trace("Exception occurred while checking the data location" + e);
+      throw new SftpProcessorException("Exception occurred while checking the data location", e);
+    }
+    Map<String, Boolean> responseMap = new HashMap<String, Boolean>();
+    responseMap.put("status", result);
+    return responseMap;
+  }
+
 }
 

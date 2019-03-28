@@ -16,7 +16,7 @@ import { ExportPageState } from './state/export-page.state';
 import { ExportService } from './export.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
