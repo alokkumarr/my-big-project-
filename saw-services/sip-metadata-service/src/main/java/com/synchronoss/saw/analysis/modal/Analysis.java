@@ -127,12 +127,12 @@ public class Analysis {
 
   @JsonProperty("description")
   public String getDescription() {
-      return description;
+    return description;
   }
 
   @JsonProperty("description")
   public void setDescription(String description) {
-      this.description = description;
+    this.description = description;
   }
 
   @JsonProperty("id")

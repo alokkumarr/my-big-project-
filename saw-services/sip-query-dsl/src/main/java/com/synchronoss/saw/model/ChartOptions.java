@@ -20,6 +20,15 @@ public class ChartOptions {
   @JsonProperty("chartType")
   String chartType;
 
+  @JsonProperty("labelOptions")
+  Object labelOptions;
+
+  @JsonProperty("xAxis")
+  Object xAxis;
+
+  @JsonProperty("yAxis")
+  Object yAxis;
+
   @JsonProperty("isInverted")
   public Boolean isInverted() {
     return isInverted;
@@ -60,12 +69,46 @@ public class ChartOptions {
     this.chartType = chartType;
   }
 
+  @JsonProperty("labelOptions")
+  public Object getLabelOptions() {
+    return this.labelOptions;
+  }
+
+  @JsonProperty("labelOptions")
+  public void setLabelOptions(Object labelOptions) {
+    this.labelOptions = labelOptions;
+  }
+
+  @JsonProperty("xAxis")
+  public Object getxAxis() {
+    return this.xAxis;
+  }
+
+  @JsonProperty("xAxis")
+  public void setxAxis(Object xAxis) {
+    this.xAxis = xAxis;
+  }
+
+  @JsonProperty("yAxis")
+  public Object getyAxis() {
+    return this.yAxis;
+  }
+
+  @JsonProperty("yAxis")
+  public void setyAxis(Object yAxis) {
+    this.yAxis = yAxis;
+  }
 
   @Override
   public String toString() {
     return new ToStringBuilder(this)
       .append("isInverted", isInverted)
       .append("legend", legend)
+      .append("chartTitle", chartTitle)
+      .append("chartType", chartType)
+      .append("labelOptions", labelOptions)
+      .append("xAxis", xAxis)
+      .append("yAxis", yAxis)
       .toString();
   }
 
@@ -74,6 +117,11 @@ public class ChartOptions {
     return new HashCodeBuilder()
         .append(isInverted)
         .append(legend)
+        .append(chartTitle)
+        .append(chartType)
+        .append(labelOptions)
+        .append(xAxis)
+        .append(yAxis)
         .toHashCode();
   }
 
@@ -90,6 +138,11 @@ public class ChartOptions {
     return new EqualsBuilder()
         .append(isInverted, rhs.isInverted)
         .append(legend, rhs.legend)
+        .append(chartTitle, rhs.chartTitle)
+        .append(chartType, rhs.chartType)
+        .append(labelOptions, rhs.labelOptions)
+        .append(xAxis, rhs.xAxis)
+        .append(yAxis, rhs.yAxis)
         .isEquals();
   }
 }
