@@ -10,6 +10,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const PreviewPage = require('../../pages/PreviewPage');
+const Header = require('../../pages/components/Header');
 
 describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', () => {
   const metricName = dataSets.pivotChart;
@@ -54,12 +55,10 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
         analyzePage.clickOnCreateButton();
 
         const chartDesignerPage = new ChartDesignerPage();
-        // Dimension section.
-        chartDesignerPage.clickOnAttribute(dateFieldName);
-        // Group by section. i.e. Color by
-        chartDesignerPage.clickOnAttribute(numberFieldName);
-        // Metric section.
-        chartDesignerPage.clickOnAttribute(stringFieldName);
+        chartDesignerPage.searchInputPresent();
+        chartDesignerPage.clickOnAttribute(dateFieldName, 'Row');
+        chartDesignerPage.clickOnAttribute(numberFieldName, 'Data');
+        chartDesignerPage.clickOnAttribute(stringFieldName, 'Row');
 
         // Create filter object. Specify type and preset/operator
         const filter = new Filter({
@@ -81,17 +80,21 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
 
         // Scenario for group intervals
         if (data.groupIntervalSpecified) {
-          chartDesignerPage.clickOnExpandField(dateFieldName);
+          chartDesignerPage.clickOnDataOptions(dateFieldName);
           browser.sleep(2000);
-          chartDesignerPage.selectGroupInterval(data.groupInterval);
+
+          // select the group by interval value e.g. year/month day etc
+          chartDesignerPage.clickOnGroupBySelector();
+          chartDesignerPage.clickOnGroupByOption(data.groupInterval);
         }
 
         // Scenario for aggregate functions
         if (data.aggregateFunction) {
-          chartDesignerPage.clickOnAggregateButton('sum');
-          chartDesignerPage.clickOnAggregateFunctionIcon(
-            data.aggregateFunction
-          );
+          chartDesignerPage.clickOnDataOptions(numberFieldName);
+          browser.sleep(2000); // Needed to avoid element not loaded/active
+          chartDesignerPage.clickOnAggregateOption('sum');
+          browser.sleep(1000);
+          chartDesignerPage.clickOnAggregateOption(data.aggregateFunction);
         }
 
         chartDesignerPage.clickOnFilterButton();
@@ -118,6 +121,7 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
             data.value
           );
         }
+        chartDesignerPage.clickOnApplyFilterButton();
       }).result.testInfo = {
         testId: id,
         data: data,
