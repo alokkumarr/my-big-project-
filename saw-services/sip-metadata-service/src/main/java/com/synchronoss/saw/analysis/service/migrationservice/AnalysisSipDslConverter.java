@@ -7,6 +7,10 @@ public interface AnalysisSipDslConverter {
   public Analysis convert(JsonObject oldAnalysisDefinition);
 
   default Analysis setCommonParams(Analysis analysis) {
+    if (analysis == null) {
+        return null;
+    }
+
     return analysis;
   }
 }

@@ -28,9 +28,8 @@ public class ChartConverter implements AnalysisSipDslConverter {
       analysis.setParentAnalysisId(parentAnalysisId);
     }
 
-    //TODO: Add description information
     if (oldAnalysisDefinition.has("description")) {
-//      analysis.;
+      analysis.setDescription(oldAnalysisDefinition.get("description").getAsString());
     }
 
     analysis.setSemanticId(oldAnalysisDefinition.get("semanticId").getAsString());
@@ -38,8 +37,7 @@ public class ChartConverter implements AnalysisSipDslConverter {
 
     analysis.setType(oldAnalysisDefinition.get("type").getAsString());
 
-    //TODO: Should be category id or category name?
-    //analysis.setCategory();
+    analysis.setCategory(oldAnalysisDefinition.get("categoryId").getAsString());
 
     analysis.setCustomerCode(oldAnalysisDefinition.get("customerCode").getAsString());
     analysis.setProjectCode(oldAnalysisDefinition.get("projectCode").getAsString());
