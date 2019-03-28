@@ -1,0 +1,41 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.data-option {
+  &__header {
+    &__display-name {
+      font-size: 11px;
+    }
+  }
+
+  &__fieldset {
+    label {
+      font-size: 13px;
+    }
+    font-size: 11px;
+
+    mat-form-field {
+      height: 47px;
+    }
+  }
+
+  mat-expansion-panel-header {
+    height: 43px !important;
+  }
+
+  ::ng-deep .mat-expansion-panel-content {
+    background-color: $background-color;
+  }
+
+  ::ng-deep .mat-expansion-panel-body {
+    padding: 24px;
+  }
+
+  ::ng-deep .mat-form-field-outline {
+    background-color: white;
+  }
+}

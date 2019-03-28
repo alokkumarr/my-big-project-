@@ -55,6 +55,18 @@
   }
 }
 
+::ng-deep #routeLogsGrid .dx-row > tr > td {
+  padding: 3px 7px;
+}
+
+::ng-deep #routeLogsGrid .dx-freespace-row {
+  visibility: hidden;
+}
+
+::ng-deep #routeLogsGrid tbody:nth-child(even) {
+  background-color: $background-color;
+}
+
 .close-button {
   transform: translateY(-6px);
 }

@@ -7,7 +7,7 @@ import * as map from 'lodash/map';
 import * as fpGet from 'lodash/fp/get';
 
 import { map as mapObservable, first } from 'rxjs/operators';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { AdminService } from '../main-view/admin.service';
 import { JwtService } from '../../../common/services';

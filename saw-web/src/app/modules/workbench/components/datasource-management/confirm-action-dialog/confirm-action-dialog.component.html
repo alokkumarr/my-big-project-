@@ -3,21 +3,21 @@
 <div mat-dialog-content>
   <div fxLayout="column">
     <div class="details-content" fxFlex="50" fxLayout="row">
-      <span class="prop-name" i18n>{{ data?.typeTitle }} : </span>
+      <span class="prop-name" e2e="delete-title" i18n>{{ data?.typeTitle }} : </span>
       <span>{{ data?.typeName }}</span>
     </div>
-    <p *ngIf="!data.routesNr" class="mat-caption" i18n>
+    <p *ngIf="!data.routesNr" class="mat-caption" e2e="delete-route-warn-msg" i18n>
       This action deletes the above permanently and cannot be un-done.
     </p>
-    <p *ngIf="data.routesNr > 0" class="mat-caption" i18n>
+    <p *ngIf="data.routesNr > 0" class="mat-caption" e2e="delete-channel-warn-msg" i18n>
       This channel has {{data.routesNr}} routes and cannot be deleted. Delete the routes first!
     </p>
   </div>
 </div>
 <div mat-dialog-actions>
-  <button mat-raised-button color="primary" (click)="onNoClick()">No</button>
+  <button mat-raised-button color="primary" e2e="delete-no" (click)="onNoClick()">No</button>
   <div fxFlex></div>
-  <button [disabled]="data.routesNr > 0" mat-raised-button color="warn" (click)="onYesClick()" cdkFocusInitial>
+  <button e2e="delete-yes" [disabled]="data.routesNr > 0" mat-raised-button color="warn" (click)="onYesClick()" cdkFocusInitial>
     Yes
   </button>
 </div>

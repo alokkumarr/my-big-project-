@@ -7,8 +7,8 @@ import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
-import { AngularSplitModule } from 'angular-split';
 import { RouterModule } from '@angular/router';
+import { AngularSplitModule } from 'angular-split';
 import { routes } from './routes';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
@@ -99,8 +99,8 @@ const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
     FlexLayoutModule,
     TreeModule,
     AceEditorModule,
-    AngularSplitModule,
-    CommonModuleTs
+    CommonModuleTs,
+    AngularSplitModule.forChild()
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,

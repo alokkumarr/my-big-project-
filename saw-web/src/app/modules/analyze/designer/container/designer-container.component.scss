@@ -3,6 +3,7 @@
 $designer-header-height: 57px;
 
 :host {
+  font-size: 11px;
   background-color: white;
   height: 100%;
   max-width: 100%;
@@ -16,10 +17,11 @@ $designer-header-height: 57px;
 
 .designer__header {
   grid-area: header;
-  margin: 0 10px 3px;
   padding: 0 7px;
 }
 
 .designer__main {
   grid-area: content;
+  padding-top: 3px;
+  background-color: $background-color;
 }

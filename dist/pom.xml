@@ -163,6 +163,12 @@
       <version>3.0.7</version>
       <scope>test</scope>
     </dependency>
+	<dependency>
+		<groupId>commons-io</groupId>
+		<artifactId>commons-io</artifactId>
+		<version>2.6</version>
+		<scope>test</scope>
+	</dependency>
     <dependency>
       <groupId>org.springframework.restdocs</groupId>
       <artifactId>spring-restdocs-restassured</artifactId>
@@ -420,6 +426,12 @@
                 <network>
                   <name>saw</name>
                 </network>
+                <ports>
+                <!--- addd this to expose docker as sftp server over the network
+                  user can acess sip-admin container from local system(synchronoss network)
+                  to test bis -->
+                <port>+saw.docker.ip:8022:22</port>
+                </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <!-- Restart containers when Docker engine comes up
@@ -772,6 +784,20 @@
               <outputDir>target/generated-snippets/apidoc-workbench</outputDir>
               <config>
                 <swagger2markup.anchorPrefix>apidoc_workbench_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
+          <execution>
+            <id>apidoc-batch</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-batch.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-batch</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_batch_</swagger2markup.anchorPrefix>
               </config>
             </configuration>
           </execution>

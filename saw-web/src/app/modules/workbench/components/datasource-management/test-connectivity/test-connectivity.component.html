@@ -1,8 +1,8 @@
 <div fxFlex fxLayout="column" class="container test-connectivity">
     <div class="console-header" fxFlex fxLayout="row" fxLayoutAlign="center center">
-        <div>Connection Logs</div>
+        <div e2e="test-connectivity">Connection Logs</div>
         <span fxFlex></span>
-        <mat-icon fontIcon="icon-remove" color="warn" style="height: 15px;" (click)="close()"></mat-icon>
+        <mat-icon e2e="close-test-connectivity" fontIcon="icon-remove" color="warn" style="height: 15px;" (click)="close()"></mat-icon>
     </div>
     <div class="console-body">
         <div id="screen" #screen><b id="prompt" class="idle"> &#9595; </b></div>
