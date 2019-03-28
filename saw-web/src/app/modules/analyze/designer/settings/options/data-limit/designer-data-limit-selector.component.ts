@@ -4,6 +4,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as debounce from 'lodash/debounce';
 import { ArtifactColumnChart, DesignerChangeEvent } from '../../../types';
 
+const MAX_LIMIT = 99;
 const LIMIT_DEBOUNCE_DELAY = 400;
 @Component({
   selector: 'designer-data-limit-selector',
@@ -59,8 +60,8 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     const int = parseInt(value, 10);
     if (int < 0) {
       this.limitValue = 0;
-    } else if (int > Number.MAX_SAFE_INTEGER) {
-      this.limitValue = Number.MAX_SAFE_INTEGER;
+    } else if (int > MAX_LIMIT) {
+      this.limitValue = MAX_LIMIT;
     }
   }
 }
