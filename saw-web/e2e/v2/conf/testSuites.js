@@ -19,7 +19,7 @@ const CRITICAL = [
   TEST_BASE_DIR + 'privilege/privilege.test.js',
   TEST_BASE_DIR + 'analyze.test.js',
   TEST_BASE_DIR + 'charts/applyFiltersToCharts.js',
-  TEST_BASE_DIR + 'charts/previewForCharts.test.js',
+  TEST_BASE_DIR + 'charts/preview.test.js',
   TEST_BASE_DIR + 'charts/createAndDelete.test.js',
   TEST_BASE_DIR + 'charts/editAndDelete.test.js',
   TEST_BASE_DIR + 'charts/forkEditAndDelete.test.js',

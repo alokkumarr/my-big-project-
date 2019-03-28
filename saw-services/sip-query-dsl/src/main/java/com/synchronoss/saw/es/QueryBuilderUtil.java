@@ -108,6 +108,7 @@ public class QueryBuilderUtil {
 			case MIN: aggregationBuilder = AggregationBuilders.min(field.getDisplayName()).field(field.getColumnName()); break;
 			case MAX: aggregationBuilder = AggregationBuilders.max(field.getDisplayName()).field(field.getColumnName()); break;
 			case COUNT: aggregationBuilder = AggregationBuilders.count(field.getDisplayName()).field(field.getColumnName()); break;
+            case DISTINCT_COUNT: aggregationBuilder = AggregationBuilders.cardinality(field.getDisplayName()).field(field.getColumnName()); break;
 			case PERCENTAGE:
 				Script script = new Script("_value*100/"+field.getAdditionalProperties().get(field.getColumnName()
 						+"_sum"));

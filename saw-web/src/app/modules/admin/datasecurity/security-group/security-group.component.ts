@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
 import { JwtService } from '../../../../common/services/jwt.service';
 import { MatDialog, MatDialogConfig } from '@angular/material';

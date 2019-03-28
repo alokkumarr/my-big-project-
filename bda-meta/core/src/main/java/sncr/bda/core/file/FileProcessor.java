@@ -23,4 +23,5 @@ public interface FileProcessor {
   String getFilePath(String defaultDataDropLocation, String destination, String batchId);
   
   public boolean deleteFile(String filePath, String defaultLoc, String user) throws IOException;
+  public int getDataFileBasedOnPattern(String filePath) throws Exception;
 }

@@ -12,6 +12,7 @@ import javax.persistence.TemporalType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -20,37 +21,53 @@ public class BisFileLog implements Serializable {
 
   private static final long serialVersionUID = 26663931172032006L;
 
+  @ApiModelProperty(value = "Unique identifier for log resource", dataType = "String")
   @Id
   @Column(name = "BIS_PID")
   String pid;
-
+  @ApiModelProperty(value = "Unique identifier for route resource", dataType = "Long")
   @Column(name = "BIS_ROUTE_SYS_ID")
   long routeSysId;
-
+  @ApiModelProperty(value = "Unique identifier for channel resource", dataType = "Long")
   @Column(name = "BIS_CHANNEL_SYS_ID")
   long channelSysId;
-
+  @ApiModelProperty(value = "Indicates the channel type", dataType = "String",
+      allowEmptyValue = false, allowableValues = "SFTP")
   @Column(name = "BIS_CHANNEL_TYPE")
   String channelType;
 
+  @ApiModelProperty(value = "Indicates the file pattern being accepted by the route",
+      dataType = "String", allowEmptyValue = false)
   @Column(name = "BIS_FILE_PATTERN")
   String filePattern;
 
+  @ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
+      allowEmptyValue = false)
   @Column(name = "BIS_FILE_NAME")
   String fileName;
 
+  @ApiModelProperty(value = "Indicates the date received at the source location",
+      dataType = "Date", allowEmptyValue = false)
   @Column(name = "BIS_ACTUAL_FILE_RCV_DATE")
   Date actualFileRecDate;
 
+  @ApiModelProperty(value = "Indicates the file name at the destination location",
+      dataType = "String", allowEmptyValue = false)
   @Column(name = "BIS_RECD_FILE_NAME")
   String recdFileName;
 
+  @ApiModelProperty(value = "Indicates the file size at the destination location",
+      dataType = "Long", allowEmptyValue = false)
   @Column(name = "BIS_RECD_FILE_SIZE_BYTES")
   Long recdFileSize;
 
+  @ApiModelProperty(value = "Indicates the file status while downloading the file",
+      dataType = "String", allowEmptyValue = false, allowableValues = "SUCCESS, FAILED, INPROGRESS")
   @Column(name = "BIS_FILE_VALID_STATUS")
   String mflFileStatus;
 
+  @ApiModelProperty(value = "Indicates the status of the component process", dataType = "String",
+      allowEmptyValue = false, allowableValues = "DATA_RECEIVED, DATA_REMOVED, HOST_NOT_REACHABLE")
   @Column(name = "BIS_PROCESS_STATE")
   String bisProcessState;
 
