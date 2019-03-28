@@ -1,0 +1,76 @@
+<mat-card fxLayout="column" class="map-chart-option__list mat-elevation-z2">
+  <div>
+    <div
+      class="map-chart-option__item"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <div fxFlex="25">
+        Legend position:
+      </div>
+      <mat-form-field
+        class="select-form-field"
+        appearance="outline"
+        fxFlex="75"
+      >
+        <mat-select
+          [(ngModel)]="legend.align"
+          (selectionChange)="onLegendChange()"
+        >
+          <mat-option *ngFor="let pos of options.align" [value]="pos.name">
+            {{ pos.displayName }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div
+      class="map-chart-option__item"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <div fxFlex="25">
+        Legend layout:
+      </div>
+      <mat-form-field
+        class="select-form-field"
+        appearance="outline"
+        fxFlex="75"
+      >
+        <mat-select
+          placeholder="Legend Layout"
+          [(ngModel)]="legend.layout"
+          (selectionChange)="onLegendChange()"
+        >
+          <mat-option
+            *ngFor="let layout of options.layout"
+            [value]="layout.name"
+          >
+            {{ layout.displayName }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div
+    class="map-chart-option__item"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+  >
+    <div fxFlex="25">Title:</div>
+    <div fxFlex="75">
+      <mat-form-field>
+        <input
+          matInput
+          class="chart-title__input"
+          type="text"
+          (change)="onTitleChange()"
+          [(ngModel)]="chartTitle"
+          autocomplete="off"
+          maxlength="50"
+          required
+        />
+      </mat-form-field>
+    </div>
+  </div>
+</mat-card>

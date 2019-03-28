@@ -7,20 +7,20 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./alias-rename-dialog.component.scss']
 })
 export class AliasRenameDialogComponent {
-  public alias: string;
+  public aliasName: string;
 
   constructor(
     public _dialogRef: MatDialogRef<AliasRenameDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
-      alias: string;
+      aliasName: string;
     }
   ) {
-    this.alias = this.data.alias;
+    this.aliasName = this.data.aliasName;
   }
 
-  onAliasChange(alias) {
-    this.alias = alias;
+  onAliasChange(aliasName) {
+    this.aliasName = aliasName;
   }
 
   close() {
@@ -28,6 +28,6 @@ export class AliasRenameDialogComponent {
   }
 
   rename() {
-    this._dialogRef.close(this.alias);
+    this._dialogRef.close(this.aliasName);
   }
 }

@@ -36,7 +36,10 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    NgxsModule.forRoot([], { developmentMode: !environment.production }),
+    // disabled development mode until all the designer is refactored to use ngxs
+    // because when only partially implemented, freeing objects introduces some conflicts
+    // NgxsModule.forRoot([], { developmentMode: !environment.production }),
+    NgxsModule.forRoot([], { developmentMode: false }),
     NgxsLoggerPluginModule.forRoot({ disabled: environment.production }),
     AppRoutingModule,
     NgIdleModule.forRoot(),

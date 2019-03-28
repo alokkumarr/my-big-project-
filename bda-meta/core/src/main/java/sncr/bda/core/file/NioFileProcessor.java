@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 public class NioFileProcessor implements FileProcessor{
 
-  private static final Logger logger = Logger.getLogger(HFileOperations.class);
+  private static final Logger logger = Logger.getLogger(NioFileProcessor.class);
   
   @Override
   public boolean isDestinationExists(String destination) throws Exception {
@@ -29,11 +29,9 @@ public class NioFileProcessor implements FileProcessor{
   public void transferFile(InputStream stream, File localFile, String defaultLoc, String user) throws Exception {
     java.nio.file.Files.copy(stream, localFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
    // this.closeStream(stream);
-    
   }
 
  
-
   @Override
   public boolean isFileExistsWithPermissions(String location) throws Exception {
     File destinationPath = new File(location);
@@ -46,10 +44,9 @@ public class NioFileProcessor implements FileProcessor{
     if (stream != null) {
       try {
         stream.close();
-      } catch (final IOException ignored) { 
+      } catch (final IOException ignored) {
       }
-  }
-    
+    }
   }
 
   @Override
@@ -61,7 +58,18 @@ public class NioFileProcessor implements FileProcessor{
   @Override
   public boolean deleteFile(String filePath, String defaultLoc, String user) throws IOException {
    return new File(filePath).delete();
-    
+  }
+
+  @Override
+  public int getDataFileBasedOnPattern(String filePath) throws Exception {
+    logger.trace("Getting the status for the file pattern starts here :" + filePath);
+    String extension = FilenameUtils.getExtension(filePath);
+    File parentFileName = new File(filePath);
+    int size =
+        parentFileName.list((directory, localfileName) -> localfileName.endsWith(extension)).length;
+    logger
+        .trace("Getting the status for the file pattern ends here :" + filePath + " size :" + size);
+    return size;
   }
 
  

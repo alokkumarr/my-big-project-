@@ -23,11 +23,17 @@ class Header extends SideNav {
     this._observeLink = element(
       by.xpath('//a[contains(@class,"module-observe")]')
     );
+
     this._analyzeLink = element(
       by.xpath('//a[contains(@class,"module-analyze")]')
     );
+
     this._progressBar = element(
       by.css('mat-progress-bar[mode="indeterminate"]')
+    );
+
+    this._workbenchLink = element(
+      by.xpath('//a[contains(@class,"module-workbench")]')
     );
   }
 
@@ -60,6 +66,14 @@ class Header extends SideNav {
 
   hideProgressBar() {
     commonFunctions.waitFor.elementToBeNotVisible(this._progressBar);
+  }
+
+  clickOnLauncher() {
+    commonFunctions.clickOnElement(this._launcherButton);
+  }
+
+  clickOnWorkBench() {
+    commonFunctions.clickOnElement(this._workbenchLink);
   }
 }
 module.exports = Header;
