@@ -26,7 +26,7 @@
             <mat-radio-button class="format-xlsx" value="xlsx">XLSX</mat-radio-button>
           </mat-radio-group>
         </div>
-        <div *ngIf="data.analysis.type !== 'chart'" class="form-container" fxLayout="column">
+        <div *ngIf="data.analysis.type !== 'chart' && data.analysis.type !== 'map'" class="form-container" fxLayout="column">
           <label i18n>Publish to Email</label>
           <mat-form-field flex="20" *ngIf="data.analysis.type !== 'chart'">
             <mat-chip-list #chipList>
