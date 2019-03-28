@@ -1,15 +1,10 @@
 package com.synchronoss.saw.analysis.modal;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.SipQuery;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -47,6 +42,9 @@ public class Analysis {
 
   @JsonProperty("name")
   private String name;
+
+  @JsonProperty("description")
+  private String description;
 
   @JsonProperty("id")
   private String id;
@@ -125,6 +123,16 @@ public class Analysis {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty("description")
+  public String getDescription() {
+      return description;
+  }
+
+  @JsonProperty("description")
+  public void setDescription(String description) {
+      this.description = description;
   }
 
   @JsonProperty("id")
@@ -261,6 +269,7 @@ public class Analysis {
         .append("type", type)
         .append("semanticId", semanticId)
         .append("name", name)
+        .append("description", description)
         .append("id", id)
         .append("customerCode", customerCode)
         .append("projectCode", projectCode)
@@ -284,6 +293,7 @@ public class Analysis {
         .append(modifiedBy)
         .append(modifiedTime)
         .append(type)
+        .append(description)
         .append(designerEdit)
         .append(sipQuery)
         .append(id)
@@ -310,6 +320,7 @@ public class Analysis {
         .append(modifiedBy, rhs.modifiedBy)
         .append(modifiedTime, rhs.modifiedTime)
         .append(type, rhs.type)
+        .append(description, rhs.description)
         .append(designerEdit, rhs.designerEdit)
         .append(sipQuery, rhs.sipQuery)
         .append(id, rhs.id)
