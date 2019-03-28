@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as map from 'lodash/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
@@ -9,6 +10,8 @@ import * as startsWith from 'lodash/startsWith';
 import * as includes from 'lodash/includes';
 import * as some from 'lodash/some';
 // import * as startsWith from 'lodash/startsWith';
+import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
+
 import { ANALYSIS_METHODS } from '../../consts';
 const methodsMap = {
   chart: ANALYSIS_METHODS[0].children[0].children,
@@ -35,6 +38,8 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
 
   public supports;
   public subTypes;
+
+  constructor(private _dialog: MatDialog) {}
 
   ngOnInit() {
     const methods = cloneDeep(methodsMap[this.category]) || [];
@@ -67,5 +72,36 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
         return supportsMapChart;
       }
     }
+  }
+
+  onChange(event) {
+    const newValue = event.value;
+    const oldValue = this.subType;
+    this.subType = null;
+
+    setTimeout(() => {
+      this.subType = oldValue;
+    });
+    this.openConfirmationDialog()
+      .afterClosed()
+      .subscribe(isConfirmed => {
+        if (isConfirmed) {
+          this.change.emit(newValue);
+        }
+      });
+  }
+
+  openConfirmationDialog() {
+    const resetConfirmation = {
+      title: 'Your settings will be lost.',
+      content: 'Are you sure you want to proceed?',
+      positiveActionLabel: 'Proceed',
+      negativeActionLabel: 'Cancel'
+    };
+    return this._dialog.open(ConfirmDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data: resetConfirmation
+    } as MatDialogConfig);
   }
 }
