@@ -1,95 +1,50 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"artifactsName", "columnName", "side"})
-public class Criteria {
+@JsonPropertyOrder({"joinCondition"})
+public class Criteria implements Serializable {
 
-  @JsonProperty("artifactsName")
-  private String artifactsName;
+  private static final long serialVersionUID = -6202723440049243096L;
+  @JsonProperty("joinCondition")
+  private JoinCondition joinCondition;
 
-  @JsonProperty("columnName")
-  private String columnName;
-
-  @JsonProperty("side")
-  private Side side;
-
-  @JsonProperty("artifactsName")
-  public String getArtifactsName() {
-    return artifactsName;
+  @JsonProperty("joinCondition")
+  public JoinCondition getJoinCondition() {
+    return joinCondition;
   }
 
-  @JsonProperty("artifactsName")
-  public void setArtifactsName(String artifactsName) {
-    this.artifactsName = artifactsName;
+  @JsonProperty("joinCondition")
+  public void setJoinCondition(JoinCondition joinCondition) {
+    this.joinCondition = joinCondition;
   }
 
-  @JsonProperty("columnName")
-  public String getColumnName() {
-    return columnName;
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this).append("joinCondition", joinCondition).toString();
   }
 
-  @JsonProperty("columnName")
-  public void setColumnName(String columnName) {
-    this.columnName = columnName;
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder().append(joinCondition).toHashCode();
   }
 
-  @JsonProperty("side")
-  public Side getSide() {
-    return side;
-  }
-
-  @JsonProperty("side")
-  public void setSide(Side side) {
-    this.side = side;
-  }
-
-  public enum Side {
-    LEFT("left"),
-    RIGHT("right");
-
-    private static final Map<String, Criteria.Side> CONSTANTS = new HashMap<>();
-
-    static {
-      for (Criteria.Side c : values()) {
-        CONSTANTS.put(c.value, c);
-      }
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
     }
-
-    private final String value;
-
-    private Side(String value) {
-      this.value = value;
+    if ((other instanceof Criteria) == false) {
+      return false;
     }
-
-    @JsonCreator
-    public static Side fromValue(String value) {
-      Side constant = CONSTANTS.get(value);
-      if (constant == null) {
-        throw new IllegalArgumentException("Join type not implemented: " + value);
-      } else {
-        return constant;
-      }
-    }
-
-    @Override
-    public String toString() {
-      return this.value;
-    }
-
-    @JsonValue
-    public String value() {
-      return this.value;
-    }
+      Criteria rhs = ((Criteria) other);
+    return new EqualsBuilder().append(joinCondition, rhs.joinCondition).isEquals();
   }
 }
