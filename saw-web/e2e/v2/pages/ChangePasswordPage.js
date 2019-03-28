@@ -16,33 +16,23 @@ class ChangePasswordPage {
     }
 
     fillOldPassword(oldpassword) {
-      logger.debug('Filling OldPwd with :' + oldpassword);
-      commonFunctions.waitFor.elementToBeVisible(this._oldPassword);
-      this._oldPassword.clear().sendKeys(oldpassword);
+      commonFunctions.fillInput(this._oldPassword, oldpassword);
     }
 
     fillNewPassword(newpassword) {
-      logger.debug('Filling new password with :' + newpassword);
-      commonFunctions.waitFor.elementToBeVisible(this._newPassword);
-      this._newPassword.clear().sendKeys(newpassword);
+      commonFunctions.fillInput(this._newPassword, newpassword);
     }
 
     fillConfirmPassword(confirmpassword) {
-      logger.debug('Filling confirm password with :' + confirmpassword);
-      commonFunctions.waitFor.elementToBeVisible(this._confirmPassword);
-      this._confirmPassword.clear().sendKeys(confirmpassword);
+      commonFunctions.fillInput(this._confirmPassword,confirmpassword);
     }
 
     clickOnChangeButton() {
-      logger.debug('Click on Change button');
-      commonFunctions.waitFor.elementToBeVisible(this._changeButton);
-      this._changeButton.click();
+      commonFunctions.clickOnElement(this._changeButton);
     }
 
     clickOnCancelButton() {
-      logger.debug('Click on Cancel button');
-      commonFunctions.waitFor.elementToBeVisible(this._cancelButton);
-      this._cancelButton.click();
+      commonFunctions.clickOnElement(this._cancelButton);
     }
 
     doChangePwd(oldpwd,newpwd,confpwd)
