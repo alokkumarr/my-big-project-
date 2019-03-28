@@ -117,6 +117,9 @@ export class DesignerPageComponent implements OnInit {
     /* If new analysis, setup a basic analysis starter */
     if (params.mode === 'new') {
       const newAnalysisParams = <NewDesignerQueryParams>params;
+      const supports = newAnalysisParams.supports
+        ? JSON.parse(newAnalysisParams.supports)
+        : [];
       this.analysisStarter = {
         categoryId: newAnalysisParams.categoryId,
         metricName: newAnalysisParams.metricName,
@@ -126,7 +129,7 @@ export class DesignerPageComponent implements OnInit {
         name: 'Untitled Analysis',
         description: '',
         scheduled: null,
-        supports: JSON.parse(newAnalysisParams.supports || '')
+        supports
       };
 
       /* Else, load existing analysis */
