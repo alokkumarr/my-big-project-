@@ -41,6 +41,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   onLimitDataChange(value, type) {
     this.limitValue = value;
     this.limitType = type;
+    this.resetInvalidValueIfNeeded(this.limitValue);
     if (!this.limitType) {
       return;
     }
@@ -52,5 +53,14 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     this.artifactColumn.limitValue = this.limitValue;
     this.artifactColumn.limitType = this.limitType;
     this.change.emit({ subject: 'fetchLimit' });
+  }
+
+  resetInvalidValueIfNeeded(value) {
+    const int = parseInt(value, 10);
+    if (int < 0) {
+      this.limitValue = 0;
+    } else if (int > Number.MAX_SAFE_INTEGER) {
+      this.limitValue = Number.MAX_SAFE_INTEGER;
+    }
   }
 }
