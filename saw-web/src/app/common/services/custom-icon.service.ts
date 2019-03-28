@@ -2,7 +2,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { Injectable } from '@angular/core';
 
-const basePath = 'assets/img/category-icons/';
+const basePath = 'assets/img/';
 
 @Injectable()
 export class CustomIconService {
@@ -12,12 +12,12 @@ export class CustomIconService {
   ) {}
 
   public init() {
-    this._registerCustomSVGIconSet();
+    this._registerCustomSVGIconSet('category-icons/category-icon-set.svg');
+    this._registerCustomSVGIconSet('colored-chart-icons/colored-chart-icon-set.svg');
   }
 
-  private _registerCustomSVGIconSet() {
-    const path = `${basePath}category-icon-set.svg`;
-    const safePath = this._domSanitizer.bypassSecurityTrustResourceUrl(path);
+  private _registerCustomSVGIconSet(path) {
+    const safePath = this._domSanitizer.bypassSecurityTrustResourceUrl(`${basePath}${path}`);
     this._matIconRegistry.addSvgIconSet(safePath);
   }
 }

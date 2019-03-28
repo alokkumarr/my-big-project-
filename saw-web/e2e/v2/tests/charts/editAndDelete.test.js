@@ -76,7 +76,7 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
         logger.info(`Executing test case with id: ${id}`);
         const chartName = `e2e chart ${new Date().toString()}`;
         const chartDescription = `e2e chart description ${new Date().toString()}`;
-        let type = data.chartType.split(':')[1];
+        const type = data.chartType.split(':')[1];
         if (!token) {
           logger.error('token cannot be null');
           expect(token).toBeTruthy();
@@ -113,22 +113,22 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
         const chartDesignerPage = new ChartDesignerPage();
         chartDesignerPage.clearAttributeSelection();
 
-        // Dimension section.
-        chartDesignerPage.clickOnAttribute(dimension);
-        // Group by section. i.e. Color by
-        chartDesignerPage.clickOnAttribute(groupName);
-        // Metric section.
-        chartDesignerPage.clickOnAttribute(metrics);
-        // Size section.
+        chartDesignerPage.searchInputPresent();
+        chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
+        chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
+
         if (data.chartType === 'chart:bubble') {
-          chartDesignerPage.clickOnAttribute(sizeByName);
+          chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+          chartDesignerPage.clickOnAttribute(groupName, 'Color By');
         }
-        //If Combo then add one more field
+        // If Combo then add one more metric field
         if (data.chartType === 'chart:combo') {
-          chartDesignerPage.clickOnAttribute(yAxisName2);
+          chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
+        } else if (data.chartType !== 'chart:bubble') {
+          chartDesignerPage.clickOnAttribute(groupName, 'Group By');
         }
-        let updatedName = chartName + ' updated';
-        let updatedDescription = chartDescription + 'updated';
+        const updatedName = chartName + ' updated';
+        const updatedDescription = chartDescription + 'updated';
         //Save
         chartDesignerPage.clickOnSave();
         chartDesignerPage.enterAnalysisName(updatedName);
