@@ -1,11 +1,10 @@
-'use-strict'
+'use-strict';
 const logger = require('../conf/logger')(__filename);
 const commonFunctions = require('./utils/commonFunctions');
 const users = require('../helpers/data-generation/users');
 let PreResetHeader = require('./components/PreResetHeader');
 
 class PreResetPwd {
-
   constructor() {
     // Initialize all elements
     this._userName = element(by.css(`[e2e="Username"]`));
@@ -13,7 +12,6 @@ class PreResetPwd {
     this._loginButton = element(by.css(`[e2e="Login"]`));
     this._errorMessage = element(by.css(`[e2e="error-msg"]`));
     this._pageName = element(by.css(`[e2e="Reset-Password"]`));
-
   }
 
   fillUserNameField(userName) {
@@ -34,8 +32,8 @@ class PreResetPwd {
     this.fillUserNameField(userName);
     this.clickOnResetButton();
     commonFunctions.waitFor.elementToBeVisible(this._errorMessage);
-    console.log(this._errorMessage.getText());
-    console.log(message);
+    logger.debug(this._errorMessage.getText());
+    logger.debug(message);
     expect(this._errorMessage.getText()).toEqual(message);
   }
 
@@ -68,4 +66,3 @@ class PreResetPwd {
 }
 
 module.exports = PreResetPwd;
-

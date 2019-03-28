@@ -1,28 +1,31 @@
 {
   "PRERESETPASSWORD": {
     "positiveTests": {
-      "PRERESETPASSWORD001": {
+      "PRERESET001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "userOne",
-        "description": "Mail should be sent to userOne for resetting password ",
-        "expected":{
-          "message":"Mail sent successfully to e2e@email.com"
-        }
+        "expected": {
+          "message": "Mail sent successfully to e2e@email.com"
+        },
+        "description": "Mail should be sent to userOne for resetting password "
       },
-      "PRERESETPASSWORD002": {
+      "PRERESET002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",
-        "description": "Mail should be sent to admin for resetting password",
-        "expected":{
-          "message":"Mail sent successfully to e2e@email.com"
-        }
+        "expected": {
+          "message": "Mail sent successfully to e2e@email.com"
+        },
+        "description": "Mail should be sent to admin for resetting password"
       }
     },
     "negativeTests": {
-      "PRERESETPASSWORD003": {
+      "PRERESET003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin1",
-        "description": "Error message saying Invalid user ID should come",
-        "expected":{
-          "message":"Invalid user Id"
-        }
+        "expected": {
+          "message": "Invalid user Id"
+        },
+        "description": "Error message saying Invalid user ID should come"
       }
     }
   }
