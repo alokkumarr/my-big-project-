@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../../material.module';
@@ -7,8 +7,15 @@ import { RouterModule } from '@angular/router';
 import { routes } from './routes';
 import { AlertsPageComponent } from './components/alerts-page/alerts-page.component';
 import { AlertsViewComponent } from './components/alerts-view/alerts-view.component';
+import { AlertsConfigurationComponent } from './components/configure/index';
 
-const components = [AlertsPageComponent, AlertsViewComponent];
+import { IsAdminGuard } from '../admin/guards';
+
+const components = [
+  AlertsPageComponent,
+  AlertsViewComponent,
+  AlertsConfigurationComponent
+];
 
 @NgModule({
   declarations: components,
@@ -21,6 +28,7 @@ const components = [AlertsPageComponent, AlertsViewComponent];
     FlexLayoutModule
   ],
   entryComponents: components,
-  providers: []
+  providers: [IsAdminGuard],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AlertsModule {}
