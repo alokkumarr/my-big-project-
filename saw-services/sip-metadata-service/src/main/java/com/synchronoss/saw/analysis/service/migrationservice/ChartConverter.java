@@ -66,6 +66,9 @@ public class ChartConverter implements AnalysisSipDslConverter {
     JsonObject legendObject = null;
     String chartType = null;
     String chartTitle = null;
+    JsonObject labelOptions = null;
+    JsonElement xAxis = null;
+    JsonElement yAxis = null;
 
     if (oldAnalysisDefinition.has("isInverted")) {
       isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
@@ -83,7 +86,21 @@ public class ChartConverter implements AnalysisSipDslConverter {
     if (oldAnalysisDefinition.has("chartTitle")) {
       chartTitle = oldAnalysisDefinition.get("chartTitle").getAsString();
     }
-    analysis.setChartOptions(createChartOptions(isInverted, legendObject, chartTitle, chartType));
+
+    if (oldAnalysisDefinition.has("labelOptions")) {
+      labelOptions = oldAnalysisDefinition.get("labelOptions").getAsJsonObject();
+    }
+
+    if (oldAnalysisDefinition.has("xAxis")) {
+      xAxis = oldAnalysisDefinition.get("xAxis");
+    }
+
+    if (oldAnalysisDefinition.has("yAxis")) {
+        yAxis = oldAnalysisDefinition.get("yAxis");
+    }
+
+    analysis.setChartOptions(createChartOptions(isInverted, legendObject, chartTitle, chartType,
+      labelOptions, xAxis, yAxis));
 
     if (oldAnalysisDefinition.has("edit")) {
       Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
@@ -152,13 +169,17 @@ public class ChartConverter implements AnalysisSipDslConverter {
   }
 
   private ChartOptions createChartOptions(boolean isInverted, JsonObject legend, String chartTitle,
-                                          String chartType) {
+                                          String chartType, JsonObject labelOptions,
+                                          JsonElement xAxis, JsonElement yAxis) {
     ChartOptions chartOptions = new ChartOptions();
 
     chartOptions.setInverted(isInverted);
     chartOptions.setLegend(legend);
     chartOptions.setChartTitle(chartTitle);
     chartOptions.setChartType(chartType);
+    chartOptions.setLabelOptions(labelOptions);
+    chartOptions.setxAxis(xAxis);
+    chartOptions.setyAxis(yAxis);
     return chartOptions;
   }
 
