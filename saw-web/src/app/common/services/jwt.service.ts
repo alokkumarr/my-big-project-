@@ -211,7 +211,7 @@ export class JwtService {
       'prodCode': 'SAWD0000012131',
       'productModName': 'RATINGS',
       'productModDesc': 'Ratings Module',
-      'productModCode': 'INSIGH00001',
+      'productModCode': 'RATINGS00001',
       'productModID': '1324244',
       'moduleURL': 'ratings',
       'defaultMod': '1',
