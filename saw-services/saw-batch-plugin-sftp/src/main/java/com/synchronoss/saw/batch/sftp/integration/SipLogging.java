@@ -12,6 +12,8 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import java.io.File;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -138,11 +140,29 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public boolean duplicateCheck(boolean isDisableDuplicate, String sourcelocation,
-      ChannelSftp.LsEntry entry) {
-    return (!isDisableDuplicate
-        && !checkDuplicateFile(sourcelocation + File.separator + entry.getFilename()))
-        || isDisableDuplicate;
+  public boolean duplicateCheck(boolean isDisableDuplicate,
+      String sourcelocation, ChannelSftp.LsEntry entry) {
+
+    ZonedDateTime duplicateCheckStartTime = ZonedDateTime.now();
+    logger.trace("Duplicate check starting now :: ");
+
+    boolean isDuplicate =  (!isDisableDuplicate
+        &&  !checkDuplicateFile(sourcelocation + File.separator
+        + entry.getFilename())) || isDisableDuplicate;
+
+    ZonedDateTime duplicateCheckEndTime = ZonedDateTime.now();
+
+    if (isDisableDuplicate) {
+      logger.trace("Duplicate check disabled. Duration to check flag in milliseconds :: " + Duration
+                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+    } else {
+      logger.trace("Total time for duplicate check in milliseconds :: " + Duration
+                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+    }
+
+
+
+    return isDuplicate;
 
   }
 
