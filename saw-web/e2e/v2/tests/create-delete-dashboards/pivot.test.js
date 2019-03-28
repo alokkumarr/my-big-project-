@@ -17,11 +17,12 @@ const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 
-describe('Running create and delete dashboards with charts in dashboards/createAndDeleteDashboards.test.js', () => {
-
-  const subCategoryName = subCategories.createSubCategories.observeSubCategory.name;
+describe('Running create and delete dashboards with Pivot in create-delete-dashboards/pivot.test.js', () => {
+  const subCategoryName =
+    subCategories.createSubCategories.observeSubCategory.name;
   const analysisCategoryName = categories.analyses.name;
-  const analysisSubCategoryName = subCategories.createSubCategories.createAnalysis.name;
+  const analysisSubCategoryName =
+    subCategories.createSubCategories.createAnalysis.name;
 
   let host;
   let token;
@@ -29,7 +30,7 @@ describe('Running create and delete dashboards with charts in dashboards/createA
   let dashboardId;
 
   beforeAll(() => {
-    logger.info('Starting dashboards/createAndDeleteDashboards.test.js.....');
+    logger.info('Starting create-delete-dashboards/pivot.test.js');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -41,18 +42,23 @@ describe('Running create and delete dashboards with charts in dashboards/createA
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function(done) {
-    setTimeout(function() {
+  afterEach(done => {
+    setTimeout(() => {
       //Delete analysis
-      analysesDetails.forEach(function(currentAnalysis) {
-        if(currentAnalysis.analysisId){
-          new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
+      analysesDetails.forEach(currentAnalysis => {
+        if (currentAnalysis.analysisId) {
+          new AnalysisHelper().deleteAnalysis(
+            host,
+            token,
+            protractorConf.config.customerCode,
+            currentAnalysis.analysisId
+          );
         }
       });
       //reset the array
       analysesDetails = [];
       //delete dashboard if ui failed.
-      if(dashboardId) {
+      if (dashboardId) {
         new ObserveHelper().deleteDashboard(host, token, dashboardId);
       }
       commonFunctions.clearLocalStorage();
@@ -60,24 +66,47 @@ describe('Running create and delete dashboards with charts in dashboards/createA
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['CREATEDELETEDASHBOARDSWITHCHARTS']['dashboards']
-  ? testDataReader.testData['CREATEDELETEDASHBOARDSWITHCHARTS']['dashboards']
-  : {}, (data, id) => {
-      it(`${id}:${data.description}`, ()=> {
+  using(
+    testDataReader.testData['PIVOT_DASHBOARD']['dashboard']
+      ? testDataReader.testData['PIVOT_DASHBOARD']['dashboard']
+      : {},
+    (data, id) => {
+      it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        try{
-          if(!token) {
+        try {
+          if (!token) {
             logger.error('token cannot be null');
             assert.isNotNull(token, 'token cannot be null');
           }
+
           const currentTime = new Date().getTime();
-          const subType = data.chartType.split(':')[1];
-          const name = 'AT ' + data.chartType + ' ' + globalVariables.e2eId + '-' + currentTime;
-          const description = 'AT Description:' + data.chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
+
+          const name =
+            'AT ' +
+            Constants.PIVOT +
+            ' ' +
+            globalVariables.e2eId +
+            '-' +
+            currentTime;
+          const description =
+            'AT Description:' +
+            Constants.PIVOT +
+            ' for e2e ' +
+            globalVariables.e2eId +
+            '-' +
+            currentTime;
           const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription = 'AT Dashboard description ' + currentTime;
-          
-          let analysis = new ObserveHelper().addAnalysisByApi(host, token, name, description, Constants.CHART, subType);         
+          const dashboardDescription =
+            'AT Dashboard description ' + currentTime;
+
+          let analysis = new ObserveHelper().addAnalysisByApi(
+            host,
+            token,
+            name,
+            description,
+            Constants.PIVOT,
+            null
+          );
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');
           analysesDetails.push(analysis);
@@ -87,7 +116,7 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           const headerPage = new HeaderPage();
           headerPage.clickOnModuleLauncher();
           headerPage.clickOnObserveLink();
-          
+
           const observePage = new ObservePage();
           observePage.clickOnAddDashboardButton();
 
@@ -95,40 +124,42 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           dashboardDesigner.clickOnAddWidgetButton();
           dashboardDesigner.clickOnExistingAnalysisLink();
           dashboardDesigner.clickOnCategoryOrMetricName(analysisCategoryName);
-          dashboardDesigner.clickOnCategoryOrMetricName(analysisSubCategoryName);
+          dashboardDesigner.clickOnCategoryOrMetricName(
+            analysisSubCategoryName
+          );
           dashboardDesigner.addRemoveAnalysisById(analysesDetails);
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);
-          dashboardDesigner.setDashboardDescription(dashboardDescription)
+          dashboardDesigner.setDashboardDescription(dashboardDescription);
           dashboardDesigner.clickOnCategorySelect();
           dashboardDesigner.clickOnSubCategorySelect(subCategoryName);
           dashboardDesigner.clickOnSaveDialogButton();
           dashboardDesigner.verifySaveButton();
-          
+
           dashboardId = commonFunctions.getDashboardId(); //get dashboard id from current url
 
-          observePage.verifyDashboardTitle(name);          
+          observePage.verifyDashboardTitle(name);
           observePage.verifyDashboardTitle(dashboardName);
           observePage.verifyAddedAnalysisName(name);
           observePage.displayDashboardAction('Refresh');
           observePage.displayDashboardAction('Delete');
           observePage.displayDashboardAction('Edit');
           observePage.displayDashboardAction('Filter');
-          browser.sleep(4000); // Below condition was failing if browser was not put to sleep. 
-          observePage.verifyBrowserURLContainsText('?dashboard')
+          browser.sleep(4000); // Below condition was failing if browser was not put to sleep.
+          observePage.verifyBrowserURLContainsText('?dashboard');
           observePage.clickOnDeleteDashboardButton();
 
           dashboardDesigner.clickOnDashboardConfirmDeleteButton();
-
-          observePage.verifyDashboardTitleIsDeleted(dashboardName);       
-        } catch(e) {
+          observePage.verifyDashboardTitleIsDeleted(dashboardName);
+        } catch (e) {
           logger.error(e);
         }
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'CREATEDELETEDASHBOARDSWITHCHARTS',
-        dataProvider: 'dashboards'
-      }
-  });
+        feature: 'PIVOT_DASHBOARD',
+        dataProvider: 'dashboard'
+      };
+    }
+  );
 });
