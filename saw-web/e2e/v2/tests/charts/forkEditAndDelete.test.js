@@ -76,7 +76,7 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         logger.info(`Executing test case with id: ${id}`);
         const chartName = `e2e chart ${new Date().toString()}`;
         const chartDescription = `e2e chart description ${new Date().toString()}`;
-        let type = data.chartType.split(':')[1];
+        const type = data.chartType.split(':')[1];
         if (!token) {
           logger.error('token cannot be null');
           expect(token).toBeTruthy();
@@ -84,7 +84,7 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         }
 
         //Create new analysis.
-        let analysis = new AnalysisHelper().createNewAnalysis(
+        const analysis = new AnalysisHelper().createNewAnalysis(
           host,
           token,
           chartName,
@@ -111,24 +111,24 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         executePage.clickOnForkAndEditLink();
 
         const chartDesignerPage = new ChartDesignerPage();
+        chartDesignerPage.searchInputPresent();
         chartDesignerPage.clearAttributeSelection();
 
-        // Dimension section.
-        chartDesignerPage.clickOnAttribute(dimension);
-        // Group by section. i.e. Color by
-        chartDesignerPage.clickOnAttribute(groupName);
-        // Metric section.
-        chartDesignerPage.clickOnAttribute(metrics);
-        // Size section.
+        chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+        chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+
         if (data.chartType === 'chart:bubble') {
-          chartDesignerPage.clickOnAttribute(sizeByName);
+          chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+          chartDesignerPage.clickOnAttribute(groupName, 'Color By');
         }
-        //If Combo then add one more field
+        // If Combo then add one more metric field
         if (data.chartType === 'chart:combo') {
-          chartDesignerPage.clickOnAttribute(yAxisName2);
+          chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
+        } else if (data.chartType !== 'chart:bubble') {
+          chartDesignerPage.clickOnAttribute(groupName, 'Group By');
         }
-        let forkedName = chartName + ' forked';
-        let forkedDescription = chartDescription + 'forked';
+        const forkedName = chartName + ' forked';
+        const forkedDescription = chartDescription + 'forked';
         //Save
         chartDesignerPage.clickOnSave();
         chartDesignerPage.enterAnalysisName(forkedName);

@@ -453,7 +453,6 @@ public class SawBisRouteController {
 
   /**
    * checks is there a route with given route name.
-   * 
    * @param channelId channe identifier
    * @param routeId id of the route
    * @return true or false
@@ -477,7 +476,6 @@ public class SawBisRouteController {
   
   /**
    * checks is there a route with given route name.
-   * 
    * @param channelId channe identifier
    * @param routeId id of the route
    * @return true or false
@@ -502,7 +500,6 @@ public class SawBisRouteController {
   
   /**
    * checks is there a route with given route name.
-   * 
    * @param channelId channe identifier
    * @param routeName name of the route
    * @return true or false
@@ -521,7 +518,5 @@ public class SawBisRouteController {
     responseMap.put("isDuplicate", result);
     return responseMap;
   }
-
-
 
 }
