@@ -393,7 +393,7 @@ export class DesignerService {
 
     const applyNonDatafieldDefaults = artifactColumn => {
       if (DATE_TYPES.includes(artifactColumn.type)) {
-        artifactColumn.dateFormat = CHART_DEFAULT_DATE_FORMAT.value;
+        artifactColumn.format = CHART_DEFAULT_DATE_FORMAT.value;
       }
     };
 
@@ -600,7 +600,7 @@ export class DesignerService {
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:
-                artifactColumn.dateFormat || DEFAULT_DATE_FORMAT.value
+                artifactColumn.format || DEFAULT_DATE_FORMAT.value
             } : {format: artifactColumn.format})
           };
         })
@@ -647,7 +647,7 @@ export class DesignerService {
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:
-                artifactColumn.dateFormat || CHART_DEFAULT_DATE_FORMAT.value
+                artifactColumn.format || CHART_DEFAULT_DATE_FORMAT.value
             } : {})
           };
         })

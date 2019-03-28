@@ -429,7 +429,7 @@ export class ChartService {
     }
 
     if (DATE_TYPES.includes(field.type)) {
-      const momentDateFormat = this.getMomentDateFormat(field.dateFormat);
+      const momentDateFormat = this.getMomentDateFormat(field.format);
       return moment(value, momentDateFormat);
     }
 
