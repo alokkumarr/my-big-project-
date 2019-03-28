@@ -121,6 +121,5 @@ public abstract class SipPluginContract {
     this.batchSize = batchSize;
   }
 
-
-
+  public abstract boolean isDataExists(String data) throws Exception;
 }

@@ -48,7 +48,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['saw-services'] %}
-          - '{{ host }}:9952'
+          - '{{ host }}:9903'
 {% endfor %}
   - job_name: 'sip-security'
     metrics_path: '/saw-security/actuator/prometheus'
