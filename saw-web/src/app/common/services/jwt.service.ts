@@ -213,14 +213,13 @@ export class JwtService {
       'productModDesc': 'Ratings Module',
       'productModCode': 'INSIGH00001',
       'productModID': '1324244',
-      'moduleURL': 'http://localhost:4200/assets/umd/ratings.umd.js',
+      'moduleURL': 'ratings',
       'defaultMod': '1',
       'privilegeCode': 128,
       'prodModFeature': []
     };
     // // tslint:enable
     parsedJwt.ticket.products[0].productModules.push(ratingsModule);
-    return parsedJwt;
     return parsedJwt;
   }
 
