@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as isUndefined from 'lodash/isUndefined';
 import * as debounce from 'lodash/debounce';
+import * as isEmpty from 'lodash/isEmpty';
 import { ArtifactColumnChart, DesignerChangeEvent } from '../../../types';
 
 const MAX_LIMIT = 99;
@@ -43,12 +44,12 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     this.limitValue = value;
     this.limitType = type;
     this.resetInvalidValueIfNeeded(this.limitValue);
-    if (!this.limitType) {
-      return;
-    }
-    if (this.limitValue === null || isUndefined(this.limitValue)) {
-      delete this.artifactColumn.limitValue;
-      delete this.artifactColumn.limitType;
+    if (
+      !this.limitType ||
+      (this.limitValue === null ||
+        isUndefined(this.limitValue) ||
+        isEmpty(this.limitValue))
+    ) {
       return;
     }
     this.artifactColumn.limitValue = this.limitValue;
