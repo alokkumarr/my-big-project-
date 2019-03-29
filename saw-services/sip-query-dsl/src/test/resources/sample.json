@@ -82,7 +82,7 @@
       },
       {
         "type": "date",
-        "tableName": "sample",
+        "artifactsName": "sample",
         "isOptional": false,
         "columnName": "date",
         "isRuntimeFilter": false,
@@ -96,7 +96,7 @@
       },
       {
         "type": "date",
-        "tableName": "sample",
+        "artifactsName": "sample",
         "isOptional": false,
         "columnName": "date",
         "isRuntimeFilter": false,
@@ -110,7 +110,7 @@
       },
       {
         "type": "date",
-        "tableName": "sample",
+        "artifactsName": "sample",
         "isOptional": false,
         "columnName": "date",
         "isRuntimeFilter": false,
