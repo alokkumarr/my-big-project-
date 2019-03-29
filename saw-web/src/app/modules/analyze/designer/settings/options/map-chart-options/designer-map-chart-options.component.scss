@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.map-chart-option {
+  &__list {
+    padding: 9px;
+    margin: 3px;
+  }
+
+  &__item {
+    font-size: 12px;
+
+    .select-form-field[appearance='outline'] {
+      margin: 5px 0;
+    }
+  }
+}
+
+.aux__label__options {
+  width: 100%;
+
+  mat-checkbox {
+    margin-right: 40px;
+  }
+}
+
+.chart-title__input {
+  padding-left: 10px;
+}
+
+button.chart-title-button {
+  font-size: 14px;
+  min-width: 9%;
+}
