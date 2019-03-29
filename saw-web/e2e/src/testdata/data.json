@@ -31,12 +31,28 @@
   },
   "APPLYFILTERSCHARTS": {
     "applyFiltersChartsDataProvider": {
-      "ByAdmin": {
-        "user": "admin"
+      "ComboChartByAdmin": { "user": "admin", "chartType": "chart:combo" },
+      "ComboChartByUser": { "user": "userOne", "chartType": "chart:combo" },
+      "ColumnChartByAdmin": { "user": "admin", "chartType": "chart:column" },
+      "ColumnChartByUser": { "user": "userOne", "chartType": "chart:column" },
+      "BarChartByAdmin": { "user": "admin", "chartType": "chart:bar" },
+      "BarChartByUser": { "user": "userOne", "chartType": "chart:bar" },
+      "StackedChartByAdmin": { "user": "admin", "chartType": "chart:stack" },
+      "StackedChartByUser": { "user": "userOne", "chartType": "chart:stack" },
+      "LineChartByAdmin": { "user": "admin", "chartType": "chart:line" },
+      "LineChartByUser": { "user": "userOne", "chartType": "chart:line" },
+      "AreaChartByAdmin": { "user": "admin", "chartType": "chart:area" },
+      "AreaChartByUser": { "user": "userOne", "chartType": "chart:area" },
+      "ScatterPlotChartByAdmin": {
+        "user": "admin",
+        "chartType": "chart:scatter"
       },
-      "ByUser": {
-        "user": "userOne"
-      }
+      "ScatterPlotChartByUser": {
+        "user": "userOne",
+        "chartType": "chart:scatter"
+      },
+      "BubbleChartByAdmin": { "user": "admin", "chartType": "chart:bubble" },
+      "BubbleChartByUser": { "user": "userOne", "chartType": "chart:bubble" }
     }
   },
   "ANALYZE": {
