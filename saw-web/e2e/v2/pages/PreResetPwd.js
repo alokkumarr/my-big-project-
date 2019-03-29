@@ -15,15 +15,11 @@ class PreResetPwd {
   }
 
   fillUserNameField(userName) {
-    logger.debug('Filling user name with :' + userName);
-    commonFunctions.waitFor.elementToBeVisible(this._userName);
-    this._userName.clear().sendKeys(userName);
+    commonFunctions.fillInput(this._userName, userName);
   }
 
   clickOnResetButton() {
-    logger.debug('Click on reset button');
-    commonFunctions.waitFor.elementToBeVisible(this._resetButton);
-    this._resetButton.click();
+    commonFunctions.clickOnElement(this._resetButton);
   }
 
   doReset(userName, message) {
@@ -32,8 +28,8 @@ class PreResetPwd {
     this.fillUserNameField(userName);
     this.clickOnResetButton();
     commonFunctions.waitFor.elementToBeVisible(this._errorMessage);
-    logger.debug(this._errorMessage.getText());
-    logger.debug(message);
+    logger.info(this._errorMessage.getText());
+    logger.info(message);
     expect(this._errorMessage.getText()).toEqual(message);
   }
 

@@ -5,22 +5,21 @@ const logger = require('../../conf/logger')(__filename);
 const PreResetPwd = require('../../pages/PreResetPwd');
 const ForgotPasswordPage = require('../../pages/ForgotPasswordPage');
 const PreResetHeader = require('../../pages/components/PreResetHeader');
-const commonFunctions = require('../../pages/utils/commonFunctions')
+const commonFunctions = require('../../pages/utils/commonFunctions');
 
 describe('Executing reset password tests from preResetPwd.test.js', () => {
-
   beforeAll(() => {
     logger.info('Starting forgot password tests...');
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     setTimeout(() => {
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     setTimeout(() => {
       // Logout by clearing the storage
       commonFunctions.clearLocalStorage();
@@ -28,29 +27,40 @@ describe('Executing reset password tests from preResetPwd.test.js', () => {
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['PRERESETPASSWORD']['positiveTests'] ? testDataReader.testData['PRERESETPASSWORD']['positiveTests'] : {}, (data, id) => {
-    it(`${id}:${data.description}`, () => {
-      commonFunctions.goToHome();
-      const forgotPasswordPage = new ForgotPasswordPage();
-      forgotPasswordPage.doClickOnForgotPassword();
-      const prpwd = new PreResetPwd();
-      prpwd.resetAs(data.user, data.expected.message);
-      const preResetHdr = new PreResetHeader();
-      preResetHdr.verifyLogo();
+  using(
+    testDataReader.testData['PRERESETPASSWORD']['positiveTests']
+      ? testDataReader.testData['PRERESETPASSWORD']['positiveTests']
+      : {},
+    (data, id) => {
+      it(`${id}:${data.description}`, () => {
+        commonFunctions.goToHome();
+        new ForgotPasswordPage().doClickOnForgotPassword();
+        new PreResetPwd().resetAs(data.user, data.expected.message);
+        new PreResetHeader().verifyLogo();
+      }).result.testInfo = {
+        testId: id,
+        data: data,
+        feature: 'PRERESETPASSWORD',
+        dataProvider: 'positiveTests'
+      };
+    }
+  );
 
-    }).result.testInfo = {testId: id, data: data, feature: 'PRERESETPASSWORD', dataProvider: 'positiveTests'};
-  });
-
-  using(testDataReader.testData['PRERESETPASSWORD']['negativeTests'] ? testDataReader.testData['PRERESETPASSWORD']['negativeTests'] : {}, (data, id) => {
-    it(`${id}:${data.description}`, () => {
-
-      commonFunctions.goToHome();
-      const forgotPasswordPage = new ForgotPasswordPage();
-      forgotPasswordPage.doClickOnForgotPassword();
-      const prpwd = new PreResetPwd();
-      prpwd.resetAs(data.user, data.expected.message);
-
-    }).result.testInfo = {testId: id, data: data, feature: 'PRERESETPASSWORD', dataProvider: 'negativeTests'};
-  });
-
+  using(
+    testDataReader.testData['PRERESETPASSWORD']['negativeTests']
+      ? testDataReader.testData['PRERESETPASSWORD']['negativeTests']
+      : {},
+    (data, id) => {
+      it(`${id}:${data.description}`, () => {
+        commonFunctions.goToHome();
+        new ForgotPasswordPage().doClickOnForgotPassword();
+        new PreResetPwd().resetAs(data.user, data.expected.message);
+      }).result.testInfo = {
+        testId: id,
+        data: data,
+        feature: 'PRERESETPASSWORD',
+        dataProvider: 'negativeTests'
+      };
+    }
+  );
 });
