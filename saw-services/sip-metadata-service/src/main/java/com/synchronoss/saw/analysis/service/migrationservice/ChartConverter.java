@@ -319,20 +319,4 @@ public class ChartConverter implements AnalysisSipDslConverter {
 
     return field;
   }
-
-  private Store extractStoreInfo(JsonObject esRepository) {
-    Store store = new Store();
-
-    if (esRepository.has("storageType")) {
-      store.setStorageType(esRepository.get("storageType").getAsString());
-    }
-
-    if (esRepository.has("indexName") && esRepository.has("type")) {
-      String index = esRepository.get("indexName").getAsString();
-      String type = esRepository.get("type").getAsString();
-      store.setDataStore(index + "/" + type);
-    }
-
-    return store;
-  }
 }

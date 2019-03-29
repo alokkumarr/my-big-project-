@@ -2,6 +2,7 @@ package com.synchronoss.saw.analysis.service.migrationservice;
 
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.model.Store;
 
 public interface AnalysisSipDslConverter {
   public Analysis convert(JsonObject oldAnalysisDefinition);
@@ -48,5 +49,21 @@ public interface AnalysisSipDslConverter {
     analysis.setModifiedBy(oldAnalysisDefinition.get("updatedUserName").getAsString());
 
     return analysis;
+  }
+
+  default Store extractStoreInfo(JsonObject esRepository) {
+    Store store = new Store();
+
+    if (esRepository.has("storageType")) {
+      store.setStorageType(esRepository.get("storageType").getAsString());
+    }
+
+    if (esRepository.has("indexName") && esRepository.has("type")) {
+      String index = esRepository.get("indexName").getAsString();
+      String type = esRepository.get("type").getAsString();
+      store.setDataStore(index + "/" + type);
+    }
+
+    return store;
   }
 }
