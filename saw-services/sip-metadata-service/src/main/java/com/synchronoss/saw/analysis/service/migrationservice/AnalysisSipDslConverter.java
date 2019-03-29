@@ -8,7 +8,7 @@ public interface AnalysisSipDslConverter {
 
   default Analysis setCommonParams(Analysis analysis) {
     if (analysis == null) {
-        return null;
+      return null;
     }
 
     return analysis;
