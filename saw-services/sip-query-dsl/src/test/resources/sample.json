@@ -84,7 +84,6 @@
     "sorts": [
       {
         "artifacts": "sample",
-        "aggregate": "sum",
         "columnName": "long",
         "type": "long",
         "order": "asc"
@@ -94,9 +93,5 @@
       "dataStore": "sampleAlias/sample",
       "storageType": "ES"
     }
-  },
-  "legend": {
-    "align": "right",
-    "layout": "vertical"
   }
 }

@@ -14,7 +14,7 @@ logging:
     sncr.bda: INFO
 server:
   address: localhost
-  port: 9501
+  port: 9502
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
@@ -27,9 +27,17 @@ application:
     queue-capacity: 10000
 
 metastore:
-  base:  hdfs:///main/
+  base:  hdfs:///user/pman0003/
+  analysis: analysisMetadata
 semantic:
   workbench-url:  http://localhost:9700
   transport-metadata-url:  http://localhost:9200
   binary-migration-requires: false
+  migration-metadata-home: /var/sip/
+
+analysis:
+  store-base:  hdfs:///var/sip/
+  analysis-table: analysis
+  get-analysis-url:  http://localhost:9200
+  binary-migration-requires: true
   migration-metadata-home: /var/sip/

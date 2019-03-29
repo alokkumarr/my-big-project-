@@ -1,40 +1,59 @@
-package com.synchronoss.saw.model;
+package com.synchronoss.saw.analysis.modal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import com.synchronoss.saw.model.ChartOptions;
+import com.synchronoss.saw.model.SipQuery;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-  "type",
-  "semanticId",
-  "name",
-  "id",
-  "customerCode",
-  "projectCode",
-  "module",
-  "createdTime",
-  "createdBy",
-  "modifiedTime",
-  "modifiedBy",
-  "sipQuery"
-})
-public class SIPDSL {
+public class Analysis {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonPropertyOrder({
+      "type",
+      "semanticId",
+      "metricName",
+      "name",
+      "description",
+      "id",
+      "parentAnalysisId",
+      "category",
+      "customerCode",
+      "projectCode",
+      "module",
+      "createdTime",
+      "createdBy",
+      "modifiedTime",
+      "modifiedBy",
+      "designerEdit",
+      "sipQuery"
+  })
   @JsonProperty("type")
   private String type;
 
   @JsonProperty("semanticId")
   private String semanticId;
 
+  @JsonProperty("metricName")
+  private String metricName;
+
   @JsonProperty("name")
   private String name;
 
+  @JsonProperty("description")
+  private String description;
+
   @JsonProperty("id")
   private String id;
+
+  @JsonProperty("parentAnalysisId")
+  private String parentAnalysisId;
+
+  @JsonProperty("category")
+  private String category;
 
   @JsonProperty("customerCode")
   private String customerCode;
@@ -46,19 +65,25 @@ public class SIPDSL {
   private String module;
 
   @JsonProperty("createdTime")
-  private Integer createdTime;
+  private Long createdTime;
 
   @JsonProperty("createdBy")
   private String createdBy;
 
   @JsonProperty("modifiedTime")
-  private Integer modifiedTime;
+  private Long modifiedTime;
 
   @JsonProperty("modifiedBy")
   private String modifiedBy;
 
   @JsonProperty("sipQuery")
   private SipQuery sipQuery;
+
+  @JsonProperty("chartOptions")
+  private ChartOptions chartOptions;
+
+  @JsonProperty("designerEdit")
+  private Boolean designerEdit;
 
   @JsonProperty("type")
   public String getType() {
@@ -80,6 +105,16 @@ public class SIPDSL {
     this.semanticId = semanticId;
   }
 
+  @JsonProperty("metricName")
+  public String getMetricName() {
+    return metricName;
+  }
+
+  @JsonProperty("metricName")
+  public void setMetricName(String metricName) {
+    this.metricName = metricName;
+  }
+
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -90,6 +125,16 @@ public class SIPDSL {
     this.name = name;
   }
 
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   @JsonProperty("id")
   public String getId() {
     return id;
@@ -98,6 +143,24 @@ public class SIPDSL {
   @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
+  }
+
+  @JsonProperty("parentAnalysisId")
+  public String getParentAnalysisId() {
+    return parentAnalysisId;
+  }
+
+  @JsonProperty("parentAnalysisId")
+  public void setParentAnalysisId(String parentAnalysisId) {
+    this.parentAnalysisId = parentAnalysisId;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   @JsonProperty("customerCode")
@@ -131,12 +194,12 @@ public class SIPDSL {
   }
 
   @JsonProperty("createdTime")
-  public Integer getCreatedTime() {
+  public Long getCreatedTime() {
     return createdTime;
   }
 
   @JsonProperty("createdTime")
-  public void setCreatedTime(Integer createdTime) {
+  public void setCreatedTime(Long createdTime) {
     this.createdTime = createdTime;
   }
 
@@ -151,12 +214,12 @@ public class SIPDSL {
   }
 
   @JsonProperty("modifiedTime")
-  public Integer getModifiedTime() {
+  public Long getModifiedTime() {
     return modifiedTime;
   }
 
   @JsonProperty("modifiedTime")
-  public void setModifiedTime(Integer modifiedTime) {
+  public void setModifiedTime(Long modifiedTime) {
     this.modifiedTime = modifiedTime;
   }
 
@@ -168,6 +231,26 @@ public class SIPDSL {
   @JsonProperty("modifiedBy")
   public void setModifiedBy(String modifiedBy) {
     this.modifiedBy = modifiedBy;
+  }
+
+  @JsonProperty("chartOptions")
+  public ChartOptions getChartOptions() {
+    return this.chartOptions;
+  }
+
+  @JsonProperty("chartOptions")
+  public void setChartOptions(ChartOptions chartOptions) {
+    this.chartOptions = chartOptions;
+  }
+
+  @JsonProperty("designerEdit")
+  public Boolean getDesignerEdit() {
+    return this.designerEdit;
+  }
+
+  @JsonProperty("designerEdit")
+  public void setDesignerEdit(Boolean designerEdit) {
+    this.designerEdit = designerEdit;
   }
 
   @JsonProperty("sipQuery")
@@ -186,6 +269,7 @@ public class SIPDSL {
         .append("type", type)
         .append("semanticId", semanticId)
         .append("name", name)
+        .append("description", description)
         .append("id", id)
         .append("customerCode", customerCode)
         .append("projectCode", projectCode)
@@ -194,6 +278,8 @@ public class SIPDSL {
         .append("createdBy", createdBy)
         .append("modifiedTime", modifiedTime)
         .append("modifiedBy", modifiedBy)
+        .append("chartOptions", chartOptions)
+        .append("designerEdit", designerEdit)
         .append("sipQuery", sipQuery)
         .toString();
   }
@@ -207,6 +293,8 @@ public class SIPDSL {
         .append(modifiedBy)
         .append(modifiedTime)
         .append(type)
+        .append(description)
+        .append(designerEdit)
         .append(sipQuery)
         .append(id)
         .append(createdBy)
@@ -221,10 +309,10 @@ public class SIPDSL {
     if (other == this) {
       return true;
     }
-    if ((other instanceof SIPDSL) == false) {
+    if ((other instanceof Analysis) == false) {
       return false;
     }
-    SIPDSL rhs = ((SIPDSL) other);
+    Analysis rhs = ((Analysis) other);
     return new EqualsBuilder()
         .append(module, rhs.module)
         .append(projectCode, rhs.projectCode)
@@ -232,6 +320,8 @@ public class SIPDSL {
         .append(modifiedBy, rhs.modifiedBy)
         .append(modifiedTime, rhs.modifiedTime)
         .append(type, rhs.type)
+        .append(description, rhs.description)
+        .append(designerEdit, rhs.designerEdit)
         .append(sipQuery, rhs.sipQuery)
         .append(id, rhs.id)
         .append(createdBy, rhs.createdBy)

@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ElasticSearchQueryBuilder {
 
-  public static final Logger logger = LoggerFactory.getLogger(ElasticSearchQueryBuilder.class);
+    public static final Logger logger = LoggerFactory.getLogger(ElasticSearchQueryBuilder.class);
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
     private final static String EPOCH_TO_DATE_FORMAT="yyyy-MM-dd HH:mm:ss";
     private final static String ONLY_YEAR_FORMAT="YYYY";
@@ -70,7 +70,7 @@ public class ElasticSearchQueryBuilder {
         if (sipQuery.getBooleanCriteria() !=null ){
             List<Filter> filters = sipQuery.getFilters();
             List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-          //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder);
+            //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder);
             for (Filter item : filters)
             {
                 if (!item.getIsRuntimeFilter() && item.getIsGlobalFilter()!=null

@@ -7,11 +7,11 @@ import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonMissingException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
-import com.synchronoss.saw.semantic.SipSemanticUtils;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import com.synchronoss.saw.semantic.service.SemanticService;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.IOException;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class SipSemanticController {
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
-    SipSemanticUtils.checkMandatoryFields(requestBody);
+    SipMetadataUtils.checkSemanticMandatoryFields(requestBody);
     logger.trace("Request Body to create a semantic node:{}", requestBody);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();

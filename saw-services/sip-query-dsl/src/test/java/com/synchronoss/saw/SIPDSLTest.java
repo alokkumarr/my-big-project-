@@ -17,39 +17,35 @@ import java.util.List;
 
 
 /**
- * Unit test for simple App.
+ * Unit test .
  */
 public class SIPDSLTest {
 
-    /**
-     * Query Builder Tests with aggregation.
-     */
-    @Test
-    public void testQueryWithAggregationBuilder() throws IOException, ProcessingException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("sample.json").getPath());
-        ObjectMapper objectMapper = new ObjectMapper();
-        SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
-        ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl,100);
-        Assert.assertNotNull(query);
-    }
+  /** Query Builder Tests with aggregation. */
+  @Test
+  public void testQueryWithAggregationBuilder() throws IOException, ProcessingException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    File file = new File(classLoader.getResource("sample.json").getPath());
+    ObjectMapper objectMapper = new ObjectMapper();
+    SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl, 100);
+    Assert.assertNotNull(query);
+  }
 
-    /**
-     * Query Builder Tests for parsing the data :
-     */
-    @Test
-    public void testResultParser() throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("sample.json").getPath());
-        ObjectMapper objectMapper = new ObjectMapper();
-        SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
-        List<Field> dataFields =
-            sipdsl.getSipQuery().getArtifacts().get(0).getFields();
-        List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
-        JsonNode jsonNode = objectMapper.readTree(new File(classLoader.getResource("response_sample.json").getPath()));
-        ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
-        List<Object> result = esResponseParser.parseData(jsonNode);
-        Assert.assertTrue(result.size()>0);
-    }
+  /** Query Builder Tests for parsing the data : */
+  @Test
+  public void testResultParser() throws IOException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    File file = new File(classLoader.getResource("sample.json").getPath());
+    ObjectMapper objectMapper = new ObjectMapper();
+    SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
+    List<Field> dataFields = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+    List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
+    JsonNode jsonNode =
+        objectMapper.readTree(new File(classLoader.getResource("response_sample.json").getPath()));
+    ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
+    List<Object> result = esResponseParser.parseData(jsonNode);
+    Assert.assertTrue(result.size() > 0);
+  }
 }
