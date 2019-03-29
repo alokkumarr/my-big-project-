@@ -24,6 +24,7 @@ class CreateAnalysisModel {
 
   clickOnDataPods(name) {
     commonFunctions.waitFor.elementToBeClickable(this._backButton);
+    
     commonFunctions.clickOnElement(this._dataPods(name));
   }
 

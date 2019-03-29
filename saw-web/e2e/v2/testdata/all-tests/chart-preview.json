@@ -1,0 +1,126 @@
+{
+  "PREVIEW": {
+    "charts": {
+      "PREVIEW001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to see preview for combo charts"
+      },
+      "PREVIEW002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "description": "Admin should be able to see preview for combo charts"
+      },
+      "PREVIEW003": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "description": "User should be able to see preview for column charts"
+      },
+      "PREVIEW004": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to see preview for column charts"
+      },
+      "PREVIEW005": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to see preview for bar charts"
+      },
+      "PREVIEW006": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "description": "Admin should be able to see preview for bar charts"
+      },
+      "PREVIEW007": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to see preview for stack charts"
+      },
+      "PREVIEW008": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "description": "Admin should be able to see preview for stack charts"
+      },
+      "PREVIEW009": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "description": "User should be able to see preview for line charts"
+      },
+      "PREVIEW010": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to see preview for line charts"
+      },
+      "PREVIEW011": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to see preview for area charts"
+      },
+      "PREVIEW012": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "description": "Admin should be able to see preview for area charts"
+      },
+      "PREVIEW013": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "description": "User should be able to see preview for scatter charts"
+      },
+      "PREVIEW014": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to see preview for scatter charts"
+      },
+      "PREVIEW015": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to see preview for bubble charts"
+      },
+      "PREVIEW016": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "description": "Admin should be able to see preview for bubble charts"
+      },
+      "PREVIEW019": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to see preview for tsspline charts"
+      },
+      "PREVIEW020": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "description": "Admin should be able to see preview for tsspline charts"
+      },
+      "PREVIEW021": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "description": "User should be able to see preview for tsPane charts"
+      },
+      "PREVIEW022": {
+        "suites": ["smoke", "sanity", "regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to see preview for tsPane charts"
+      }
+    }
+  }
+}

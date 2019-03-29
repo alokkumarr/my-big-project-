@@ -13,8 +13,36 @@ class Header extends SideNav {
     this._accountLogoutLink = element(
       by.css(`[e2e='account-settings-selector-logout']`)
     );
+
     this._companyLogo = element(by.css('.company-logo'));
     this._categoryMenuIcon = element(by.css(`[e2e="main-menu-expand-btn"]`));
+
+    this._launcherButton = element(
+      by.css('[class="header__module-launcher-button"]')
+    );
+    this._observeLink = element(
+      by.xpath('//a[contains(@class,"module-observe")]')
+    );
+
+    this._progressBar = element(
+      by.css('mat-progress-bar[mode="indeterminate"]')
+    );
+
+    this._workbenchLink = element(
+      by.xpath('//a[contains(@class,"module-workbench")]')
+    );
+
+    this._analyzeLink = element(
+      by.xpath('//a[contains(@class,"module-analyze")]')
+    );
+  }
+
+  clickOnModuleLauncher() {
+    commonFunctions.clickOnElement(this._launcherButton);
+  }
+
+  clickOnObserveLink() {
+    commonFunctions.clickOnElement(this._observeLink);
   }
 
   doLogout() {
@@ -34,6 +62,18 @@ class Header extends SideNav {
   }
   openCategoryMenu() {
     commonFunctions.clickOnElement(this._categoryMenuIcon);
+  }
+
+  hideProgressBar() {
+    commonFunctions.waitFor.elementToBeNotVisible(this._progressBar);
+  }
+
+  clickOnLauncher() {
+    commonFunctions.clickOnElement(this._launcherButton);
+  }
+
+  clickOnWorkBench() {
+    commonFunctions.clickOnElement(this._workbenchLink);
   }
 }
 module.exports = Header;

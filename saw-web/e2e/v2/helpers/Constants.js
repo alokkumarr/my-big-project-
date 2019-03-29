@@ -4,6 +4,8 @@ const ES_REPORT = 'esReport'; // ES
 const PIVOT = 'pivot';
 const REPORT = 'report'; // DL
 const CHART = 'chart';
+const NUMBER_TYPES = ['long', 'integer', 'double', 'float'];
+
 const API_ROUTES = {
   AUTH: '/saw/security/doAuthenticate',
   ANALYSIS: '/saw/services/analysis',
@@ -27,6 +29,12 @@ const LOG_LEVELS = {
 
 const E2E_OUTPUT_BASE_DIR = 'target/e2e';
 
+const SFTP_DETAILS = {
+  sftpHost: 'sip-admin',
+  sftpPort: '22',
+  sftpUser: 'root',
+  sftpPassword: 'root'
+};
 module.exports = {
   ES_REPORT,
   PIVOT,
@@ -34,5 +42,7 @@ module.exports = {
   CHART,
   API_ROUTES,
   LOG_LEVELS,
-  E2E_OUTPUT_BASE_DIR
+  E2E_OUTPUT_BASE_DIR,
+  NUMBER_TYPES,
+  SFTP_DETAILS
 };

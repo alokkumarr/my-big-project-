@@ -10,6 +10,7 @@ import io.restassured.response.Response;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,6 +21,7 @@ public class SipDslIT extends BaseIT {
   public void testSipDsl() throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
     File file = new File(classLoader.getResource("sample-DSL.json").getPath());
+    int testData = 643; //To assert Filter on es-data.ndjson
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(file);
     Response response = given(spec)
@@ -29,6 +31,8 @@ public class SipDslIT extends BaseIT {
         .then().assertThat().statusCode(200)
         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
+    JsonNode node = root.get("integer");
+    Assert.assertEquals(node.get("integer"),testData);
   }
 
 }

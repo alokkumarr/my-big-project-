@@ -1,0 +1,43 @@
+#Cleanup the existing saw-observe service as observe service
+#got combined with sip-metadata service. These steps can be
+# removed once all the SIP enviroment migrated to latest.
+- name: Stop saw-observe-proxy.socket
+  systemd: name=saw-observe-proxy.socket state=stopped
+  ignore_errors: yes
+- name: Stop Observe Service
+  systemd: name=saw-observe state=stopped
+  ignore_errors: yes
+- name: Uninstall and Remove Observe Service
+  yum: name=saw-observe state=absent
+#Cleanup the existing saw-semantic service as semantic service
+#got combined with sip-metadata service. These steps can be
+# removed once all the SIP enviroment migrated to latest.
+- name: Stop saw-semantic-proxy.socket
+  systemd: name=saw-semantic-proxy.socket state=stopped
+  ignore_errors: yes
+- name: Stop Semantic Service
+  systemd: name=saw-semantic state=stopped
+  ignore_errors: yes
+- name: Uninstall and Remove Semantic Service
+  yum: name=saw-semantic state=absent
+- name: Copy SIP Metadata Service package
+  copy: src="{{ item }}" dest=/tmp/sip-metadata.rpm
+  with_fileglob: ["../rpms/sip-metadata-*.rpm"]
+- name: Install SIP Metadata Service package
+  yum: name=/tmp/sip-metadata.rpm state=present
+  notify:
+    - restart sip-metadata
+- name: Install SIP Metadata Service configuration file
+  template: src=application.yml dest=/opt/bda/sip-metadata-service/conf
+  notify:
+    - restart sip-metadata
+# Workaround: The service restart handler will run only after all
+# tasks have completed.  This causes the service to remain running
+# using the old port when the new socket activation proxy starts up,
+# resulting in a port already in use error.  So trigger the restart
+# handler already here, to force the service to pick up the new port
+# setting before starting the socket activation proxy.  Can be removed
+# as no longer needed after the next SAW release.
+- meta: flush_handlers
+- name: Enable SIP Metadata Service
+  systemd: name=sip-metadata-proxy.socket enabled=true state=started

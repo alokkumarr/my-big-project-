@@ -31,7 +31,7 @@ logging:
 
 server:
   address: localhost
-  port: 9651
+  port: 9904
   servlet:
     context-path: ''
   maxHttpHeaderSize: 65536
@@ -59,6 +59,7 @@ sip:
     retry.delay: 5000
     retry.diff.mins: {{ sip_bis_retry_diffs_in_minutes  | default(5) }}
     retry.page.size: 20
+    max.inprogress.mins: 45
 bis:
   transfer-batch-size: 10
   modified-retries: 3
