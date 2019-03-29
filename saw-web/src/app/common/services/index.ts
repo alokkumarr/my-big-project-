@@ -13,3 +13,4 @@ export { UserService } from './user.service';
 export { WindowService } from './window.service';
 export { ChartService } from './chart.service';
 export { CustomIconService } from './custom-icon.service';
+export { DndPubsubService, DndEvent } from './dnd-pubsub.service';

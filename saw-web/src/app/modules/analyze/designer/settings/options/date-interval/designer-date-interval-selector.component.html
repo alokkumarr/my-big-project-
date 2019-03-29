@@ -1,0 +1,15 @@
+<div fxLayout="column">
+  <mat-form-field appearance="outline">
+    <mat-select
+      (selectionChange)="onDateIntervalChange($event.value)"
+      [value]="artifactColumn.dateInterval"
+    >
+      <mat-option
+        *ngFor="let dateInterval of DATE_INTERVALS"
+        [value]="dateInterval.value"
+      >
+        {{ dateInterval.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>

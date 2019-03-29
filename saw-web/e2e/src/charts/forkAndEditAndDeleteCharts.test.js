@@ -1,54 +1,51 @@
-var testDataReader = require('../testdata/testDataReader.js');
+const testDataReader = require('../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const login = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
-const homePage = require('../javascript/pages/homePage.po');
-const savedAlaysisPage = require('../javascript/pages/savedAlaysisPage.po');
+const commonFunctions = require('../../v2/pages/utils/commonFunctions');
 const protractorConf = require('../../protractor.conf');
-const categories = require('../javascript/data/categories');
-const subCategories = require('../javascript/data/subCategories');
-const dataSets = require('../javascript/data/datasets');
-const designModePage = require('../javascript/pages/designModePage.po.js');
-const globalVariables = require('../javascript/helpers/globalVariables');
-const Constants = require('../javascript/api/Constants');
-const utils = require('../javascript/helpers/utils');
-const chai = require('chai');
-const assert = chai.assert;
-let AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
-let APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
+const categories = require('../../v2/helpers/data-generation/categories');
+const subCategories = require('../../v2/helpers/data-generation/subCategories');
+
+const ChartDesignerPage = require('../../v2/pages/ChartDesignerPage');
+const ExecutePage = require('../../v2/pages/ExecutePage');
+const LoginPage = require('../../v2/pages/LoginPage');
+const AnalyzePage = require('../../v2/pages/AnalyzePage');
+const Header = require('../../v2/pages/components/Header');
+
+const AnalysisHelper = require('../../v2/helpers/api/AnalysisHelper');
+const APICommonHelpers = require('../../v2/helpers/api/APICommonHelpers');
 const logger = require('../../v2/conf/logger')(__filename);
 
+const Constants = require('../../v2/helpers/Constants');
+const assert = require('chai').assert;
+
 describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', () => {
-  const defaultCategory = categories.privileges.name;
   const categoryName = categories.analyses.name;
-  const subCategoryName = subCategories.createAnalysis.name;
-  const chartDesigner = analyzePage.designerDialog.chart;
+  const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
+
   //updated fields
   const metrics = 'Integer';
   const dimension = 'String';
   const yAxisName2 = 'Long';
   const groupName = 'Date';
-  const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
   let analysisId;
   let forkedAnalysisId;
   let host;
   let token;
-  beforeAll(function() {
+  beforeAll(() => {
+    logger.info('Starting charts/forkAndEditAndDeleteCharts.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
-    jasmine.DEFAULT_TIMEOUT_INTERVAL =
-      protractorConf.timeouts.extendedDefaultTimeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
-  beforeEach(function(done) {
-    setTimeout(function() {
+  beforeEach(done => {
+    setTimeout(() => {
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function(done) {
+  afterEach(done => {
     setTimeout(function() {
       if (analysisId) {
         new AnalysisHelper().deleteAnalysis(
@@ -66,14 +63,14 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
           forkedAnalysisId
         );
       }
-      commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   using(
     testDataReader.testData['FORKDELETECHARTS']['forkDeleteChartsDataProvider'],
-    function(data, description) {
+    (data, description) => {
       it(
         'should fork, edit and delete ' +
           description +
@@ -85,227 +82,91 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
           }),
         () => {
           try {
+            const chartName = `e2e chart ${new Date().toString()}`;
+            const chartDescription = `e2e chart description ${new Date().toString()}`;
+            const type = data.chartType.split(':')[1];
             if (!token) {
               logger.error('token cannot be null');
               expect(token).toBeTruthy();
               assert.isNotNull(token, 'token cannot be null');
             }
-            let currentTime = new Date().getTime();
-            let type = data.chartType.split(':')[1];
-            let name =
-              data.chartType +
-              ' ' +
-              globalVariables.e2eId +
-              '-' +
-              currentTime +
-              '-' +
-              utils.getRandomInt(5, 7);
-            let description =
-              'Description:' +
-              data.chartType +
-              ' for e2e ' +
-              globalVariables.e2eId +
-              '-' +
-              currentTime;
 
             //Create new analysis.
-            let analysis = new AnalysisHelper().createNewAnalysis(
+            const analysis = new AnalysisHelper().createNewAnalysis(
               host,
               token,
-              name,
-              description,
+              chartName,
+              chartDescription,
               Constants.CHART,
               type
             );
             expect(analysis).toBeTruthy();
             assert.isNotNull(analysis, 'analysis should not be null');
-            login.loginAs(data.user);
-            browser.sleep(500);
-            homePage.navigateToSubCategoryUpdated(
-              categoryName,
-              subCategoryName,
-              defaultCategory
-            );
 
-            //Change to Card View.
-            element(
-              utils
-                .hasClass(homePage.cardViewInput, 'mat-radio-checked')
-                .then(function(isPresent) {
-                  if (isPresent) {
-                    console.log('Already in card view..');
-                  } else {
-                    console.log('Not in card view..');
-                    commonFunctions.waitFor.elementToBeVisible(
-                      analyzePage.analysisElems.cardView
-                    );
-                    commonFunctions.waitFor.elementToBeClickable(
-                      analyzePage.analysisElems.cardView
-                    );
-                    analyzePage.analysisElems.cardView.click();
-                  }
-                })
-            );
-            //Open the created analysis.
-            const createdAnalysis = analyzePage.main.getCardTitle(name);
+            const loginPage = new LoginPage();
+            loginPage.loginAs(data.user, /analyze/);
 
-            commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
-            commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
-            createdAnalysis.click();
-            //get analysis id from current url
-            browser.getCurrentUrl().then(url => {
-              analysisId = commonFunctions.getAnalysisIdFromUrl(url);
-            });
-            commonFunctions.waitFor.elementToBeVisible(
-              savedAlaysisPage.forkBtn
-            );
-            commonFunctions.waitFor.elementToBeClickable(
-              savedAlaysisPage.forkBtn
-            );
-            savedAlaysisPage.forkBtn.click();
-            browser.waitForAngular();
-            browser.sleep(2000);
-            const designer = analyzePage.designerDialog;
-            //Clear all fields.
-            designModePage.filterWindow.deleteFields.then(function(
-              deleteElements
-            ) {
-              for (var i = 0; i < deleteElements.length; ++i) {
-                commonFunctions.waitFor.elementToBeVisible(deleteElements[i]);
-                commonFunctions.waitFor.elementToBeClickable(deleteElements[i]);
-                deleteElements[i].click();
-              }
-            });
-            //Add new feilds.
-            //Dimension section.
-            commonFunctions.waitFor.elementToBeClickable(
-              designModePage.chart.addFieldButton(dimension)
-            );
-            designModePage.chart.addFieldButton(dimension).click();
+            const header = new Header();
+            header.openCategoryMenu();
+            header.selectCategory(categoryName);
+            header.selectSubCategory(subCategoryName);
 
-            // Group by section. i.e. Color by
-            commonFunctions.waitFor.elementToBeClickable(
-              designModePage.chart.addFieldButton(groupName)
-            );
-            designModePage.chart.addFieldButton(groupName).click();
+            const analyzePage = new AnalyzePage();
+            analyzePage.goToView('card');
+            analyzePage.clickOnAnalysisLink(chartName);
 
-            // Metric section.
-            commonFunctions.waitFor.elementToBeClickable(
-              designModePage.chart.addFieldButton(metrics)
-            );
-            designModePage.chart.addFieldButton(metrics).click();
+            const executePage = new ExecutePage();
+            executePage.clickOnForkAndEditLink();
 
-            // Size section.
+            const chartDesignerPage = new ChartDesignerPage();
+            chartDesignerPage.searchInputPresent();
+            chartDesignerPage.clearAttributeSelection();
+
+            chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+            chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+
             if (data.chartType === 'chart:bubble') {
-              commonFunctions.waitFor.elementToBeClickable(
-                designModePage.chart.addFieldButton(sizeByName)
-              );
-              designModePage.chart.addFieldButton(sizeByName).click();
+              chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+              chartDesignerPage.clickOnAttribute(groupName, 'Color By');
             }
-            //If Combo then add one more field
+            // If Combo then add one more metric field
             if (data.chartType === 'chart:combo') {
-              commonFunctions.waitFor.elementToBeClickable(
-                designModePage.chart.addFieldButton(yAxisName2)
-              );
-              designModePage.chart.addFieldButton(yAxisName2).click();
+              chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
+            } else if (data.chartType !== 'chart:bubble') {
+              chartDesignerPage.clickOnAttribute(groupName, 'Group By');
             }
-            //Verify chart axis and group by
-            commonFunctions.waitFor.elementToBePresent(
-              designModePage.chart.getAxisLabel(metrics, 'yaxis')
-            );
-            commonFunctions.waitFor.elementToBePresent(
-              designModePage.chart.getAxisLabel(dimension, 'xaxis')
-            );
-            commonFunctions.waitFor.elementToBePresent(
-              designModePage.chart.groupBy
-            );
-
+            const forkedName = chartName + ' forked';
+            const forkedDescription = chartDescription + 'forked';
             //Save
-            const save = analyzePage.saveDialog;
-            commonFunctions.waitFor.elementToBeVisible(designer.saveBtn);
-            commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-            designer.saveBtn.click();
-            let forkedName = name + ' forked';
-            let forkedDescription = description + 'forked';
-            commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
-            save.nameInput.clear().sendKeys(forkedName);
-            save.descriptionInput.clear().sendKeys(forkedDescription);
+            chartDesignerPage.clickOnSave();
+            chartDesignerPage.enterAnalysisName(forkedName);
+            chartDesignerPage.enterAnalysisDescription(forkedDescription);
+            chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
 
-            // commonFunctions.waitFor.elementToBeVisible(save.saveBtn);
-            commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
-            save.saveBtn.click();
-            commonFunctions.waitFor.elementToBeNotVisible(
-              analyzePage.designerDialog.chart.filterBtn
+            // Verify analysis displayed in list and card view
+            analyzePage.goToView('list');
+            analyzePage.verifyElementPresent(
+              analyzePage._analysisTitleLink(forkedName),
+              true,
+              'report should be present in list/card view'
             );
-            element(
-              utils
-                .hasClass(homePage.cardViewInput, 'mat-radio-checked')
-                .then(function(isPresent) {
-                  if (isPresent) {
-                    //console.log('Already in card view..')
-                  } else {
-                    //console.log('Not in card view..')
-                    commonFunctions.waitFor.elementToBeVisible(
-                      analyzePage.analysisElems.cardView
-                    );
-                    commonFunctions.waitFor.elementToBeClickable(
-                      analyzePage.analysisElems.cardView
-                    );
-                    analyzePage.analysisElems.cardView.click();
-                  }
-                })
-            );
+            analyzePage.goToView('card');
+            // Go to detail page and very details
+            analyzePage.clickOnAnalysisLink(forkedName);
 
-            //Verify analysis with chart type on home page
-            commonFunctions.waitFor.elementToBeVisible(
-              analyzePage.analysisElems.analysisWithType(
-                forkedName,
-                data.chartType
-              ),
-              10000
-            );
+            executePage.verifyTitle(forkedName);
+            forkedAnalysisId = executePage.getAnalysisId();
 
-            const forkedAnalysis = analyzePage.main.getCardTitle(forkedName);
-            //Change to Card View
-            commonFunctions.waitFor.elementToBeVisible(
-              analyzePage.analysisElems.cardView
-            );
-            commonFunctions.waitFor.elementToBeClickable(
-              analyzePage.analysisElems.cardView
-            );
-            analyzePage.analysisElems.cardView.click();
-            //Verify if created appeared in list
-            commonFunctions.waitFor.elementToBeVisible(forkedAnalysis);
-            commonFunctions.waitFor.elementToBeClickable(forkedAnalysis);
-            forkedAnalysis.click();
-            //get analysis id from current url
-            browser.getCurrentUrl().then(url => {
-              forkedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
-            });
-            //Verify updated details.
-            expect(
-              savedAlaysisPage.analysisViewPageElements
-                .text(forkedName)
-                .getText()
-            ).toBe(forkedName);
-
-            commonFunctions.waitFor.elementToBeClickable(
-              savedAlaysisPage.actionsMenuBtn
-            );
-            savedAlaysisPage.actionsMenuBtn.click();
-            commonFunctions.waitFor.elementToBeClickable(
-              savedAlaysisPage.detailsOption
-            );
-            savedAlaysisPage.detailsOption.click();
-
-            commonFunctions.waitFor.elementToBeVisible(
-              savedAlaysisPage.detailsNav.analysisDetailLabel
-            );
-            expect(
-              savedAlaysisPage.analysisViewPageElements
-                .text(forkedDescription)
-                .getText()
-            ).toBe(forkedDescription);
+            executePage.clickOnActionLink();
+            executePage.clickOnDetails();
+            executePage.verifyDescription(forkedDescription);
+            executePage.closeActionMenu();
+            // Delete the report
+            executePage.clickOnActionLink();
+            executePage.clickOnDelete();
+            executePage.confirmDelete();
+            analyzePage.verifyToastMessagePresent('Analysis deleted.');
+            analyzePage.verifyAnalysisDeleted();
           } catch (e) {
             logger.error(e);
           }

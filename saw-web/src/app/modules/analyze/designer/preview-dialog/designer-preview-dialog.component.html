@@ -38,23 +38,32 @@
     [isEditable]="false"
   >
   </report-grid-upgraded>
-  <designer-map-chart *ngIf="analysis.type | isAnalysisType:'mapChart':analysis?.chartType"
-                  [chartType]="chartType"
-                  [data]="previewData"
-                  [auxSettings]="{legend: analysis.legend}"
-                  [sqlBuilder]="analysis.sqlBuilder">
+  <designer-map-chart
+    *ngIf="(analysis.type | isAnalysisType: 'mapChart':analysis?.chartType)"
+    [chartType]="chartType"
+    [data]="previewData"
+    [auxSettings]="{ legend: analysis.legend }"
+    [sqlBuilder]="analysis.sqlBuilder"
+  >
   </designer-map-chart>
-  <designer-chart *ngIf="analysis.type === 'chart' && chartType !== 'geo'"
-                  [chartType]="chartType"
-                  [sorts]="analysis.sqlBuilder.sorts"
-                  [auxSettings]="{isInverted: analysis.isInverted, legend: analysis.legend}"
-                  [data]="previewData"
-                  [sqlBuilder]="analysis.sqlBuilder">
+  <designer-chart
+    *ngIf="analysis.type === 'chart'"
+    [chartType]="chartType"
+    [sorts]="analysis.sqlBuilder.sorts"
+    [auxSettings]="{ isInverted: analysis.isInverted, legend: analysis.legend }"
+    [data]="previewData"
+    [sqlBuilder]="analysis.sqlBuilder"
+  >
   </designer-chart>
-  <div *ngIf="analysis.type === 'map'" class="map-container">
-    <designer-map [auxSettings]="analysis.mapSettings"
-                  [data]="previewData"
-                  [sqlBuilder]="analysis.sqlBuilder">
+  <div
+    *ngIf="(analysis.type | isAnalysisType: 'map':analysis?.chartType)"
+    class="map-container"
+  >
+    <designer-map
+      [auxSettings]="analysis.mapSettings"
+      [data]="previewData"
+      [sqlBuilder]="analysis.sqlBuilder"
+    >
     </designer-map>
   </div>
 </div>

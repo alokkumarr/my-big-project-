@@ -154,12 +154,8 @@ export class ChartService {
   }
 
   analysisLegend2ChartLegend(legend) {
-    const align = LEGEND_POSITIONING[
-      get(legend, 'align')
-    ];
-    const layout = LAYOUT_POSITIONS[
-      get(legend, 'layout')
-    ];
+    const align = LEGEND_POSITIONING[get(legend, 'align')];
+    const layout = LAYOUT_POSITIONS[get(legend, 'layout')];
 
     if (!align || !layout) {
       return null;
@@ -176,8 +172,8 @@ export class ChartService {
       analysis.chartType === 'combo'
         ? 'top'
         : analysis.chartType.substring(0, 2) === 'ts'
-          ? 'bottom'
-          : 'right';
+        ? 'bottom'
+        : 'right';
     const initialLegendLayout =
       analysis.chartType === 'combo' ||
       analysis.chartType.substring(0, 2) === 'ts'
@@ -322,11 +318,14 @@ export class ChartService {
 
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
     const yField = isArray(fields.y) ? fields.y[0] : fields.y;
-    return [{
-      ...this.getSerie(yField, 0, fields.y, chartType),
-      data: map(parsedData, dataPoint =>
-        mapValues(axesFieldNameMap, val => dataPoint[val]))
-    }];
+    return [
+      {
+        ...this.getSerie(yField, 0, fields.y, chartType),
+        data: map(parsedData, dataPoint =>
+          mapValues(axesFieldNameMap, val => dataPoint[val])
+        )
+      }
+    ];
   }
 
   splitToSeriesAndCategories(parsedData, fields, { sorts }, chartType) {
@@ -533,7 +532,10 @@ export class ChartService {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
     let comboType = fields.y[0].comboType;
     let aggrsymbol = '';
-    if (fields.y[0].aggregate === 'percentage' || fields.y[0].aggregate === 'percentageByRow') {
+    if (
+      fields.y[0].aggregate === 'percentage' ||
+      fields.y[0].aggregate === 'percentageByRow'
+    ) {
       aggrsymbol = '%';
     }
     if (!isUndefined(comboType)) {
@@ -760,6 +762,7 @@ export class ChartService {
         };
         /* eslint-enable */
       });
+
       changes.push({
         path: 'series',
         data: chartSeries
@@ -943,33 +946,33 @@ export class ChartService {
 
     /* prettier-ignore */
     switch (type) {
-    case 'pie':
-      changes = this.getPieChangeConfig(
-        type,
-        settings,
-        fields,
-        gridData,
-        opts
-      );
-      break;
-    case 'column':
-    case 'bar':
-    case 'line':
-    case 'spline':
-    case 'stack':
-    case 'scatter':
-    case 'bubble':
-    case 'tsspline':
-    case 'tsPane':
-    default:
-      changes = this.getBarChangeConfig(
-        type,
-        settings,
-        fields,
-        gridData,
-        opts
-      );
-      break;
+      case 'pie':
+        changes = this.getPieChangeConfig(
+          type,
+          settings,
+          fields,
+          gridData,
+          opts
+        );
+        break;
+      case 'column':
+      case 'bar':
+      case 'line':
+      case 'spline':
+      case 'stack':
+      case 'scatter':
+      case 'bubble':
+      case 'tsspline':
+      case 'tsPane':
+      default:
+        changes = this.getBarChangeConfig(
+          type,
+          settings,
+          fields,
+          gridData,
+          opts
+        );
+        break;
     }
 
     return concat(changes, this.addTooltipsAndLegend(fields, type, opts));
@@ -1020,13 +1023,13 @@ export class ChartService {
         ? xIsString
           ? point.key
           : xIsNumber
-            ? round(point.x, 2)
-            : point.x
+          ? round(point.x, 2)
+          : point.x
         : xIsString
-          ? 'point.key'
-          : xIsNumber
-            ? 'point.x:,.2f'
-            : 'point.x';
+        ? 'point.key'
+        : xIsNumber
+        ? 'point.x:,.2f'
+        : 'point.x';
 
       const xString = `<tr>
         <th>${fields.x.alias ||
@@ -1044,7 +1047,9 @@ export class ChartService {
         <td>${
           point
             ? round(
-                options.aggregate === 'percentageByRow' ? round(point.percentage, 2) : point.y,
+                options.aggregate === 'percentageByRow'
+                  ? round(point.percentage, 2)
+                  : point.y,
                 getPrecision(options.aggregate, options.dataType)
               ).toLocaleString()
             : '{point.y:,.2f}'
@@ -1056,7 +1061,8 @@ export class ChartService {
       </tr>`;
 
       const zString = fields.z
-        ? `<tr><th>${AGGREGATE_TYPES_OBJ[fields.z.aggregate].label} ${fields.z.alias ||
+        ? `<tr><th>${AGGREGATE_TYPES_OBJ[fields.z.aggregate].label} ${fields.z
+            .alias ||
             fields.z.aliasName ||
             get(opts, 'labels.z', '') ||
             fields.z.displayName}:</th><td>${
