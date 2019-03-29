@@ -20,34 +20,7 @@ public class ChartConverter implements AnalysisSipDslConverter {
   public Analysis convert(JsonObject oldAnalysisDefinition) {
     Analysis analysis = new Analysis();
 
-    analysis.setId(oldAnalysisDefinition.get("id").getAsString());
-
-    if (oldAnalysisDefinition.has("parentAnalysisId")) {
-      String parentAnalysisId = oldAnalysisDefinition.get("parentAnalysisId").getAsString();
-
-      analysis.setParentAnalysisId(parentAnalysisId);
-    }
-
-    if (oldAnalysisDefinition.has("description")) {
-      analysis.setDescription(oldAnalysisDefinition.get("description").getAsString());
-    }
-
-    analysis.setSemanticId(oldAnalysisDefinition.get("semanticId").getAsString());
-    analysis.setName(oldAnalysisDefinition.get("name").getAsString());
-
-    analysis.setType(oldAnalysisDefinition.get("type").getAsString());
-
-    analysis.setCategory(oldAnalysisDefinition.get("categoryId").getAsString());
-
-    analysis.setCustomerCode(oldAnalysisDefinition.get("customerCode").getAsString());
-    analysis.setProjectCode(oldAnalysisDefinition.get("projectCode").getAsString());
-    analysis.setModule(oldAnalysisDefinition.get("module").getAsString());
-
-    analysis.setCreatedTime(oldAnalysisDefinition.get("createdTimestamp").getAsLong());
-    analysis.setCreatedBy(oldAnalysisDefinition.get("username").getAsString());
-
-    analysis.setModifiedTime(oldAnalysisDefinition.get("updatedTimestamp").getAsLong());
-    analysis.setModifiedBy(oldAnalysisDefinition.get("updatedUserName").getAsString());
+    analysis = setCommonParams(analysis, oldAnalysisDefinition);
 
 
     // Extract artifact name from "artifacts"
@@ -91,8 +64,8 @@ public class ChartConverter implements AnalysisSipDslConverter {
       labelOptions = oldAnalysisDefinition.get("labelOptions").getAsJsonObject();
     }
 
-    if (oldAnalysisDefinition.has("xaxis")) {
-      xaxis = oldAnalysisDefinition.get("xaxis");
+    if (oldAnalysisDefinition.has("xAxis")) {
+      xaxis = oldAnalysisDefinition.get("xAxis");
     }
 
     if (oldAnalysisDefinition.has("yAxis")) {

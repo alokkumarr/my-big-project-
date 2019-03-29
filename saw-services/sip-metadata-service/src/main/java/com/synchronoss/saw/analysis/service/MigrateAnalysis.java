@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.ReportConverter;
 
 import java.io.File;
 import java.io.FileReader;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -97,7 +99,7 @@ public class MigrateAnalysis {
         logger.warn("Not implemented yet");
         break;
       case "report":
-        logger.warn("Not implemented yet");
+        converter = new ReportConverter();
         break;
       default:
         logger.error("Unknown chart type");
@@ -125,8 +127,8 @@ public class MigrateAnalysis {
         + "   }\n"
         + "}";
   }
-
   /**
+
    * Main function.
    *
    * @param args - command line args
@@ -137,7 +139,7 @@ public class MigrateAnalysis {
 
     Gson gson = new Gson();
     File jsonFile = Paths.get("C:\\Workspace\\Project\\sip\\saw-services\\"
-        + "sip-metadata-service\\src\\main\\resources\\sample-analysis.json").toFile();
+        + "sip-metadata-service\\src\\main\\resources\\sample-chart.json").toFile();
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
     MigrateAnalysis ma = new MigrateAnalysis();
