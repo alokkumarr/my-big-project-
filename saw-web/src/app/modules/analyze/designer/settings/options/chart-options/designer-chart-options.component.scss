@@ -1,0 +1,27 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.chart-option {
+  &__list {
+    padding: 9px;
+    margin: 3px;
+  }
+
+  &__item {
+    font-size: 12px;
+
+    .select-form-field[appearance='outline'] {
+      margin: 5px 0;
+    }
+  }
+}
+
+.aux__label__options {
+  width: 100%;
+
+  mat-checkbox {
+    margin-right: 40px;
+  }
+}

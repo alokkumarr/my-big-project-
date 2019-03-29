@@ -10,6 +10,7 @@ import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
+import { Store } from '@ngxs/store';
 
 import {
   flattenPivotData,
@@ -21,6 +22,7 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisChart,
   AnalysisType,
   SqlBuilder,
   SqlBuilderReport,
@@ -34,7 +36,8 @@ import {
   DesignerChangeEvent,
   DesignerSaveEvent,
   AnalysisReport,
-  MapSettings
+  MapSettings,
+  ArtifactColumnChart
 } from '../types';
 import {
   DesignerStates,
@@ -47,6 +50,11 @@ import {
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
 import { JwtService } from '../../../../common/services';
+
+import {
+  DesignerClearGroupAdapters,
+  DesignerInitGroupAdapters
+} from '../actions/designer.actions';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -84,6 +92,7 @@ export class DesignerContainerComponent implements OnInit {
     public _designerService: DesignerService,
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
+    private _store: Store,
     private _jwtService: JwtService
   ) {}
 
@@ -713,6 +722,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'format':
     case 'aliasName':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
@@ -747,6 +757,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'selectedFields':
       this.cleanSorts();
       this.addDefaultSorts();
+      this.artifacts = [...this.artifacts];
       this.checkNodeForSorts();
       this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
@@ -811,7 +822,39 @@ export class DesignerContainerComponent implements OnInit {
       this.updateAnalysis();
       this.refreshDataObject();
       break;
+    case 'chartType':
+      this.changeChartType(event.data);
+      this._store.dispatch(new DesignerClearGroupAdapters());
+      this._store.dispatch(
+        new DesignerInitGroupAdapters(
+          <ArtifactColumnChart[]>this.artifacts[0].columns,
+          this.analysis.type,
+          (<AnalysisChart>this.analysis).chartType
+        )
+      );
+      setTimeout(() => {
+        this.resetAnalysis();
+      });
+      break;
     }
+  }
+
+  changeChartType(to: string) {
+    const analysis = <AnalysisChart>this.analysis;
+    analysis.chartType = to;
+  }
+
+  resetAnalysis() {
+    this.cleanSorts();
+    this.sorts = [];
+    this.checkNodeForSorts();
+    this.designerState = DesignerStates.NO_SELECTION;
+    const artifactColumns = this.artifacts[0].columns;
+    forEach(artifactColumns, col => {
+      col.checked = false;
+      unset(col, 'area');
+    });
+    this.artifacts = [...this.artifacts];
   }
 
   /**

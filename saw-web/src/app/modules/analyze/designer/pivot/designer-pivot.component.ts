@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { Artifact, ArtifactColumnPivot } from '../types';
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
@@ -19,8 +19,7 @@ export class DesignerPivotComponent {
   }
   @Input() data;
   @Input() sorts: any[];
+  @Input() updater: BehaviorSubject<IPivotGridUpdate>;
 
   public artifactColumns: ArtifactColumnPivot[];
-
-  public updater: Subject<IPivotGridUpdate> = new Subject();
 }

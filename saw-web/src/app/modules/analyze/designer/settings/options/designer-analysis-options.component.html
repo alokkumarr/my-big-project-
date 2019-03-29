@@ -1,0 +1,68 @@
+<mat-tab-group dynamicHeight mat-align-tabs="center">
+  <mat-tab e2e="designer-options-tab-data">
+    <ng-template mat-tab-label>
+      <div
+        class="tab-header__data-options"
+        fxFill
+        fxLayoutAlign="center center"
+      >
+        DATA OPTIONS
+      </div>
+    </ng-template>
+    <perfect-scrollbar [config]="config">
+      <designer-data-option-field
+        *ngFor="let col of selectedColumns"
+        (change)="change.emit($event)"
+        [artifactColumn]="col"
+        [analysisType]="analysisType"
+        [sqlBuilder]="sqlBuilder"
+        [analysisSubtype]="analysisSubtype"
+        [fieldCount]="fieldCount"
+      >
+      </designer-data-option-field>
+    </perfect-scrollbar>
+  </mat-tab>
+  <mat-tab *ngIf="analysisType === 'chart'" e2e="designer-options-tab-chart">
+    <ng-template mat-tab-label>
+      <div
+        class="tab-header__chart-options"
+        fxFill
+        fxLayoutAlign="center center"
+      >
+        CHART OPTIONS
+      </div>
+    </ng-template>
+    <designer-chart-options
+      [isInverted]="auxSettings.isInverted"
+      [legend]="auxSettings.legend"
+      [labelOptions]="auxSettings.labelOptions"
+      [chartType]="analysisSubtype"
+      [chartTitle]="chartTitle"
+      (change)="change.emit($event)"
+    >
+    </designer-chart-options>
+  </mat-tab>
+  <mat-tab *ngIf="analysisType === 'map'" e2e="designer-options-tab-map">
+    <ng-template mat-tab-label>
+      <div class="tab-header__map-options" fxFill fxLayoutAlign="center center">
+        MAP OPTIONS
+      </div>
+    </ng-template>
+
+    <designer-map-chart-options
+      *ngIf="analysisSubtype !== 'map'"
+      [legend]="auxSettings.legend"
+      [chartType]="analysisSubtype"
+      [chartTitle]="chartTitle"
+      (change)="change.emit($event)"
+    >
+    </designer-map-chart-options>
+
+    <designer-map-options
+      *ngIf="analysisSubtype === 'map'"
+      (change)="change.emit($event)"
+      [mapSettings]="auxSettings"
+    >
+    </designer-map-options>
+  </mat-tab>
+</mat-tab-group>

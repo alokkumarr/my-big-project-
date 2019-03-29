@@ -342,17 +342,16 @@ public class QueryBuilderUtil {
   public static void getAggregationBuilder(
       List<?> dataFields, SearchSourceBuilder preSearchSourceBuilder) {
 
-    for (Object dataField : dataFields) {
-      if (dataField instanceof com.synchronoss.saw.model.Field) {
-        Field field = (Field) dataField;
-        if (field.getAggregate().value().equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value())) {
-          preSearchSourceBuilder.aggregation(
-              AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName()));
-        }
-      }
+                    for (Object dataField : dataFields) {
+                        if (dataField instanceof com.synchronoss.saw.model.Field) {
+                            Field field = (Field) dataField;
+                            if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
+                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
+                                    field.getDataField()).field(field.getColumnName()));
+                            }
+                        }
+                    }
     }
-    //  return aggregationBuilder;
-  }
 
   /**
    * query builder for DSK node. TODO: Original DSK was supporting only string format, So query

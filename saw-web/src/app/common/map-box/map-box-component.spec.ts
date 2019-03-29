@@ -8,7 +8,12 @@ const lng = -10.22;
 const lat = 24.343;
 const coordinateField = { columnName: 'COORDINATES' };
 const dataFields = [
-  { columnName: 'ORDER_COUNT', alias: 'order count', displayName: 'OrderCount' }
+  {
+    columnName: 'ORDER_COUNT',
+    alias: 'order count',
+    displayName: 'OrderCount',
+    aggregate: 'sum'
+  }
 ];
 const data = [
   {

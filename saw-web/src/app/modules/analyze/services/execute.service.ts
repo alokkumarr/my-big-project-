@@ -91,7 +91,7 @@ export class ExecuteService {
     return this.execs$
       .pipe(
         filter(({ subject }) => !subject.isStopped),
-        mergeMap<IExecuteEventEmitter, IExecuteAggregateEvent>(
+        mergeMap<IExecuteEventEmitter, any>(
           ({ id, subject }) => subject.pipe(map(({ state }) => ({ id, state })))
         ),
         scan<IExecuteAggregateEvent, Object>((acc, e) => {
