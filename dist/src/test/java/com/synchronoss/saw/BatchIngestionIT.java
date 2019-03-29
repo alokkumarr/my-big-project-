@@ -681,6 +681,7 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("Json Path for transfer data :" + path.prettyPrint());
     String result = path.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result);
+    assertEquals("SUCCESS", result);
     String fileName = path.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName);
     assertNotNull(fileName);
