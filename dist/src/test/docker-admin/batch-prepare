@@ -9,19 +9,19 @@ leaf=$2
 copy=$3
 DATE=$(date)
 
-for i in {001..0010};
+for i in {001..010};
  do dDir=$(date +%Y%m%d -d "$DATE - $i day");
-  for j in {001..0010};
+  for j in {001..010};
     do
       nDir=sipadmintdnode$j;
-      for k in {001..0020};
+      for k in {001..020};
       do
        pDir=$mainDataDir$dDir/$nDir/var/log/$name$k/$dDir/$leaf
        mkdir -p $pDir
         if [ "$copy" = true ] ; then
-          for l in {001..0010};
+          for l in {001..010};
            do
-             cp /root/saw-batch-samples/small/sample1.csv $pDir/cdr-data$l.csv
+             cp /root/saw-batch-samples/log/small/sample1.csv $pDir/cdr-data$l.csv
            done
         fi
      done
@@ -31,8 +31,6 @@ for i in {001..0010};
 
 mkdir -p $mainDataDir
 createNamedDir sip logstash false
-#createNamedDir sncr mct false
-#createNamedDir sncr snt true
 createNamedDir sip cloud true
 
 echo "Number of directory: $(find $mainDataDir -type d | wc -l)"
