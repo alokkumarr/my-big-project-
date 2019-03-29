@@ -140,15 +140,15 @@ export class JwtService {
     // TODO remove hardcoded insightsModule when the ticket is successfully tested
     // tslint:disable
     // const insightsModule = {
-    //   "prodCode":"SAWD0000012131",
-    //   "productModName":"INSIGHTS",
-    //   "productModDesc":"Insights Module",
-    //   "productModCode":"INSIGH00001",
-    //   "productModID":"1324244",
-    //   "moduleURL":"http://localhost:4200/assets/insights.umd.js",
-    //   "defaultMod":"1",
-    //   "privilegeCode":128,
-    //   "prodModFeature": [{
+    //   'prodCode':'SAWD0000012131',
+    //   'productModName':'INSIGHTS',
+    //   'productModDesc':'Insights Module',
+    //   'productModCode':'INSIGH00001',
+    //   'productModID':'1324244',
+    //   'moduleURL':'http://localhost:4200/assets/insights.umd.js',
+    //   'defaultMod':'1',
+    //   'privilegeCode':128,
+    //   'prodModFeature': [{
     //     prodModFeatureName: 'SubModules',
     //     prodModCode: 'INSIGH00001',
     //     productModuleSubFeatures: [{
@@ -204,8 +204,22 @@ export class JwtService {
     //     }]
     //   }]
     // }
-    // // tslint:enable
+    // tslint:enable
     // parsedJwt.ticket.products[0].productModules.push(insightsModule);
+
+    const ratingsModule = {
+      'prodCode': 'SAWD0000012131',
+      'productModName': 'RATINGS',
+      'productModDesc': 'Ratings Module',
+      'productModCode': 'RATINGS00001',
+      'productModID': '1324244',
+      'moduleURL': 'ratings',
+      'defaultMod': '1',
+      'privilegeCode': 128,
+      'prodModFeature': []
+    };
+    // // tslint:enable
+    parsedJwt.ticket.products[0].productModules.push(ratingsModule);
     return parsedJwt;
   }
 
