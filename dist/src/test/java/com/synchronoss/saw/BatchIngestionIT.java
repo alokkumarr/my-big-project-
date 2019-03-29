@@ -275,8 +275,8 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("routeName", "route-scheduled-transfer-" + testId());
     childNode.put("sourceLocation", "/root/saw-batch-samples/log/small");
     childNode.put("destinationLocation", "log/scheduled");
-    childNode.put("filePattern", "*.csv");
-    childNode.put("fileExclusions", "log");
+    childNode.put("filePattern", "*.log");
+    childNode.put("fileExclusions", "csv");
     childNode.put("disableDuplicate", "false");
     childNode.put("batchSize", "10");
     childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
@@ -941,9 +941,9 @@ public class BatchIngestionIT extends BaseIT {
           given(authSpec).when().body(testPayload).when().post(PLUGNIN_PATH + "/data/status").then()
               .assertThat().statusCode(200).extract().response().jsonPath();
       log.debug("Json Path for wait for file to be available :" + jsonPath.prettify());
-      assertNotNull(jsonPath.getBoolean("status"));
+      assertEquals(true, jsonPath.getBoolean("status"));
     }
-    assertNotNull(fileName);
+    assertEquals("SUCCESS", result);
   }
 
   private void waitForFileTobeAvailable(int retries, Long channelId, Long routeId) {
