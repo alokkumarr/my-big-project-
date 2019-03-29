@@ -301,6 +301,8 @@ export class DesignerService {
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn.area = null;
       artifactColumn.checked = false;
+      artifactColumn.alias = artifactColumn.displayName || '';
+      artifactColumn.aliasName = artifactColumn.alias;
       unset(artifactColumn, 'comboType');
       unset(artifactColumn, 'limitType');
       unset(artifactColumn, 'limitValue');
