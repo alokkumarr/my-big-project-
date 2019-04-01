@@ -1,6 +1,6 @@
 {
-  "PROMPT_FILTER": {
-    "chart": {
+  "CHAT_PROMPT_FILTER": {
+    "positiveTests": {
       "CPROM001": {
         "suites": ["smoke", "sanity", "critical", "regression"],
         "user": "admin",
