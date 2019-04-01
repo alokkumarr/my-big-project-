@@ -103,16 +103,16 @@ public class QueryBuilderUtil {
 
 		switch (field.getAggregate())
 		{
-			case SUM: aggregationBuilder = AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName()); break;
-			case AVG: aggregationBuilder = AggregationBuilders.avg(field.getDisplayName()).field(field.getColumnName()); break;
-			case MIN: aggregationBuilder = AggregationBuilders.min(field.getDisplayName()).field(field.getColumnName()); break;
-			case MAX: aggregationBuilder = AggregationBuilders.max(field.getDisplayName()).field(field.getColumnName()); break;
-			case COUNT: aggregationBuilder = AggregationBuilders.count(field.getDisplayName()).field(field.getColumnName()); break;
-            case DISTINCT_COUNT: aggregationBuilder = AggregationBuilders.cardinality(field.getDisplayName()).field(field.getColumnName()); break;
+			case SUM: aggregationBuilder = AggregationBuilders.sum(field.getDataField()).field(field.getColumnName()); break;
+			case AVG: aggregationBuilder = AggregationBuilders.avg(field.getDataField()).field(field.getColumnName()); break;
+			case MIN: aggregationBuilder = AggregationBuilders.min(field.getDataField()).field(field.getColumnName()); break;
+			case MAX: aggregationBuilder = AggregationBuilders.max(field.getDataField()).field(field.getColumnName()); break;
+			case COUNT: aggregationBuilder = AggregationBuilders.count(field.getDataField()).field(field.getColumnName()); break;
+            case DISTINCT_COUNT: aggregationBuilder = AggregationBuilders.cardinality(field.getDataField()).field(field.getColumnName()); break;
 			case PERCENTAGE:
 				Script script = new Script("_value*100/"+field.getAdditionalProperties().get(field.getColumnName()
 						+"_sum"));
-				aggregationBuilder = AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName()).script(script); break;
+				aggregationBuilder = AggregationBuilders.sum(field.getDataField()).field(field.getColumnName()).script(script); break;
 		}
 		return aggregationBuilder;
 	}
