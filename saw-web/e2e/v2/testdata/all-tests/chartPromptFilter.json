@@ -1,0 +1,58 @@
+{
+  "PROMPT_FILTER": {
+    "chart": {
+      "CPROM001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date",
+        "description": "Admin should be able to add Date prompt filter and execute"
+      },
+      "CPROM002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date",
+        "description": "User should be able to add Date prompt filter and execute"
+      },
+      "CPROM003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double",
+        "description": "Admin should be able to add Number prompt filter and execute"
+      },
+      "CPROM004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double",
+        "description": "User should be able to add Number prompt filter and execute"
+      },
+      "CPROM005": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String",
+        "description": "Admin should be able to add String prompt filter and execute"
+      },
+      "CPROM006": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String",
+        "description": "User should be able to add String prompt filter and execute"
+      }
+    }
+  }
+}
