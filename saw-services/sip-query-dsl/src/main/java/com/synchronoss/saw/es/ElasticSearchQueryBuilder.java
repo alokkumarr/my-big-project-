@@ -369,8 +369,18 @@ public class ElasticSearchQueryBuilder {
                 rangeQueryBuilder.format(item.getModel().getFormat());
               }
             }
-            rangeQueryBuilder.lte(item.getModel().getLte());
-            rangeQueryBuilder.gte(item.getModel().getGte());
+            if (item.getModel().getLt() != null) {
+              rangeQueryBuilder.lt(item.getModel().getLt());
+            }
+            if (item.getModel().getGt() != null) {
+              rangeQueryBuilder.gt(item.getModel().getGt());
+            }
+            if (item.getModel().getLte() != null) {
+              rangeQueryBuilder.lte(item.getModel().getLte());
+            }
+            if (item.getModel().getGte() != null) {
+              rangeQueryBuilder.gte(item.getModel().getGte());
+            }
             builder.add(rangeQueryBuilder);
           }
         }
