@@ -11,15 +11,12 @@ import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
-import com.synchronoss.saw.analysis.service.migrationservice.ReportConverter;
-
+import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -29,11 +26,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-
 public class MigrateAnalysis {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
   private String existingBinaryAnalysisPath = "/services/metadata/analysis_metadata";
-
 
   /**
    * Converts analysis definition in binary table to new SIP DSL format.
@@ -42,8 +37,8 @@ public class MigrateAnalysis {
    * @param listAnalysisUri - API to get list of existing analysis
    * @param migrationMetadataHome - Binary table path
    */
-  public void convertBinaryToJson(String analysisStoreBasePath,
-                                  String listAnalysisUri, String migrationMetadataHome) {
+  public void convertBinaryToJson(
+      String analysisStoreBasePath, String listAnalysisUri, String migrationMetadataHome) {
     logger.trace("migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
 
@@ -51,10 +46,8 @@ public class MigrateAnalysis {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    HttpEntity<?> requestEntity =
-        new HttpEntity<Object>(semanticNodeQuery(), requestHeaders);
+    HttpEntity<?> requestEntity = new HttpEntity<Object>(semanticNodeQuery(), requestHeaders);
     logger.debug("Analysis server URL {}", listAnalysisUri + "/analysis");
-
 
     String url = listAnalysisUri + "/analysis";
     RestTemplate restTemplate = new RestTemplate();
@@ -65,16 +58,15 @@ public class MigrateAnalysis {
       Gson gson = new GsonBuilder().create();
       logger.debug("Analysis data = " + analysisBinaryData.getBody());
 
-      //TODO: Check if this works
-      JsonObject analysisBinaryObject = gson.toJsonTree(analysisBinaryData.getBody())
-                             .getAsJsonObject();
+      // TODO: Check if this works
+      JsonObject analysisBinaryObject =
+          gson.toJsonTree(analysisBinaryData.getBody()).getAsJsonObject();
 
-      JsonArray analysisList = analysisBinaryObject.get("contents")
-                              .getAsJsonObject().getAsJsonArray("analyze");
-
+      JsonArray analysisList =
+          analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
 
       List<Analysis> dslAnalysis = new ArrayList<>();
-      for (JsonElement analysisElement: analysisList) {
+      for (JsonElement analysisElement : analysisList) {
         Analysis analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
 
         dslAnalysis.add(analysis);
@@ -98,8 +90,8 @@ public class MigrateAnalysis {
       case "pivot":
         logger.warn("Not implemented yet");
         break;
-      case "report":
-        converter = new ReportConverter();
+      case "esReport":
+        converter = new EsReportConverter();
         break;
       default:
         logger.error("Unknown chart type");
@@ -127,8 +119,8 @@ public class MigrateAnalysis {
         + "   }\n"
         + "}";
   }
-  /**
 
+  /**
    * Main function.
    *
    * @param args - command line args
@@ -138,8 +130,8 @@ public class MigrateAnalysis {
     System.out.println("Convert analysis");
 
     Gson gson = new Gson();
-    File jsonFile = Paths.get("C:\\Workspace\\Project\\sip\\saw-services\\"
-        + "sip-metadata-service\\src\\main\\resources\\sample-chart.json").toFile();
+    ClassLoader classLoader = MigrateAnalysis.class.getClassLoader();
+    File jsonFile = new File(classLoader.getResource("sample-esreport.json").getPath());
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
     MigrateAnalysis ma = new MigrateAnalysis();

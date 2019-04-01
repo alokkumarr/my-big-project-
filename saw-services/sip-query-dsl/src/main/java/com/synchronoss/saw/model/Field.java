@@ -55,6 +55,17 @@ public class Field {
   @JsonProperty("dateFormat")
   private String dateFormat;
 
+  public Format getFormat() {
+    return this.format;
+  }
+
+  public void setFormat(Format format) {
+    this.format = format;
+  }
+
+  @JsonProperty("format")
+  private Format format;
+
   @JsonProperty("limitType")
   private LimitType limitType;
 
@@ -192,9 +203,7 @@ public class Field {
     this.additionalProperties.put(name, value);
   }
 
-  /**
-   * Used to nullify additionalProperties field, so that it won't appear in the output json
-   */
+  /** Used to nullify additionalProperties field, so that it won't appear in the output json */
   public void nullifyAdditionalProperties() {
     this.additionalProperties = null;
   }
