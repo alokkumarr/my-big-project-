@@ -58,7 +58,7 @@ proxy:
         host: http://localhost:9800
 batch:
    service:
-        host: http://localhost:9952
+        host: http://localhost:9903
 
 api:
   gateway:
@@ -66,6 +66,18 @@ api:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: GET
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: PUT
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]dslanalysis.*'
         -   location: ${internal-analysis.service.host}
             method: GET
             path: '[/]analysis.*'

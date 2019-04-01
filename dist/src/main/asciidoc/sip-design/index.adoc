@@ -241,8 +241,11 @@ Below are the salient feature which are as follows:
 * Scheduling the data retrieval from the source.
 * Supports various protocol to pull data.
 
+High level Entity Relationship diagram
+
 .Figure: SAW Batch Ingestion ER Diagram
 plantuml::sip-design/figure-batch-er-diagram.pum[format=svg]
+
 
 The above entities are used to hold the base of Batch Ingestion module.
 Entity BIS_ROUTE is used to hold the details of route i.e it holds the details of destination, frequency etc etc.

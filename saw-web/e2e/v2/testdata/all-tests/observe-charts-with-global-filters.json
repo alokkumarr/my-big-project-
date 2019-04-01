@@ -1,0 +1,249 @@
+{
+  "CHART_GLOBAL_FILTER": {
+    "dashboard": {
+      "GLBFI001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should create scatter chart with float global filter."
+      },
+      "GLBFI002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should create bubble chart with float global filter."
+      },
+      "GLBFI003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should create pie chart with float global filter."
+      },
+      "GLBFI004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should create tsspline chart with float global filter."
+      },
+      "GLBFI005": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should create tspane chart with float global filter."
+      },
+      "GLBFI006": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "dashboardGlobalFilters": [
+          {
+            "name": "string",
+            "value": "string 499"
+          }
+        ],
+        "filters": [
+          {
+            "type": "string",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "string.keyword",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should create combo chart with string global filter."
+      },
+      "GLBFI007": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "dashboardGlobalFilters": [
+          {
+            "name": "date",
+            "value": null,
+            "preset": "Last Quarter"
+          }
+        ],
+        "filters": [
+          {
+            "type": "date",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "date",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should create column chart with date global filter."
+      },
+      "GLBFI008": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "dashboardGlobalFilters": [
+          {
+            "name": "long",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "long",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "long",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should create bar chart with long global filter."
+      },
+      "GLBFI009": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "dashboardGlobalFilters": [
+          {
+            "name": "integer",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "integer",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "integer",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should create stack chart with integer global filter."
+      },
+      "GLBFI010": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "dashboardGlobalFilters": [
+          {
+            "name": "double",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "double",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should create area chart with double global filter."
+      },
+      "GLBFI011": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should create line chart with float global filter."
+      }
+    }
+  }
+}

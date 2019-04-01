@@ -78,6 +78,7 @@ export class DynamicModuleService {
     // Also it is expected that plugin code should be placed in saw/web folder in server
 
     const moduleServerURL = `${this.api}/${moduleInfo.moduleURL}.umd.js`;
+    // const moduleServerURL = moduleInfo.moduleURL;
     forEach(dependencies, (dep, key) =>
       SystemJS.set(key, SystemJS.newModule(dep))
     );

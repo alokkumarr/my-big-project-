@@ -7,7 +7,8 @@ class PreviewPage {
     this._axisTitleUpdated = (chartType, axisLabel, axis) =>
       element(
         by.xpath(
-          `(//chart/descendant::*[name()="svg"])[position()=last()]/descendant::*[name()="g" and contains(@class,"highcharts-${axis}")]/descendant::*[contains(text(),"${axisLabel}")]`
+          `(//chart/descendant::*[name()="svg"])[position()=last()]/descendant::*[name()="g" 
+          and contains(@class,"highcharts-${axis}")]/descendant::*[contains(text(),"${axisLabel}")]`
         )
       );
   }

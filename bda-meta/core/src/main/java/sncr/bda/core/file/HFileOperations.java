@@ -137,6 +137,21 @@ public class HFileOperations {
         }
     }
 
+      public static FileStatus[] getlistOfFileStatus(String fileName) throws Exception {
+        FileSystem fs;
+        FileStatus[] files = null;
+        try {
+          Path path = new Path(fileName);
+          Configuration conf = new Configuration();
+          fs = FileSystem.get(path.toUri(), conf);
+          files = fs.globStatus(path);
+        } catch (IOException e) {
+          logger.error("Exception occurred while getting the file status from hdfs using file pattern: " + fileName, e);
+          throw new Exception("Exception occurred while getting the file status from hdfs using file pattern :" + e);
+        }
+        return files;
+      }
+   
     public static void deleteEnt(String file) throws Exception {
         FileSystem fs;
         try {
@@ -202,7 +217,6 @@ public class HFileOperations {
         return false;
 
     }
-
 
     public static FileSystem getFileSystem() {
         try {

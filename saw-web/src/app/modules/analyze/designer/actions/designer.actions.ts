@@ -9,6 +9,11 @@ export class DesignerInitGroupAdapters {
   ) {}
 }
 
+export class DesignerClearGroupAdapters {
+  static readonly type = '[Designer] Clear group adapters';
+  constructor() {}
+}
+
 export class DesignerAddColumnToGroupAdapter {
   static readonly type = '[Designer] Add column to group adapter';
   constructor(

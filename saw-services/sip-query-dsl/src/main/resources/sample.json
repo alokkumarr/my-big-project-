@@ -20,7 +20,6 @@
             "area": "x-axis",
             "alias": "String",
             "columnName": "string.keyword",
-            "name": "string",
             "displayName": "String",
             "type": "string"
           },
@@ -28,7 +27,6 @@
             "dataField": "integer",
             "area": "y-axis",
             "columnName": "integer",
-            "name": "integer",
             "displayName": "Integer",
             "type": "integer",
             "aggregate": "avg"
@@ -37,7 +35,6 @@
             "dataField": "long",
             "area": "z-axis",
             "columnName": "long",
-            "name": "long",
             "displayName": "Long",
             "type": "long",
             "aggregate": "avg"
@@ -46,7 +43,6 @@
             "dataField": "date",
             "area": "g-axis",
             "columnName": "date",
-            "name": "date",
             "displayName": "Date",
             "type": "date",
             "groupInterval": "year"
@@ -55,7 +51,6 @@
             "dataField": "double",
             "area": "m-axis",
             "columnName": "double",
-            "name": "double",
             "displayName": "Double",
             "type": "double",
             "aggregate": "avg"
@@ -64,7 +59,6 @@
             "dataField": "float",
             "area": "m-axis",
             "columnName": "float",
-            "name": "float",
             "displayName": "Float",
             "type": "double",
             "aggregate": "avg"
@@ -90,7 +84,6 @@
     "sorts": [
       {
         "artifacts": "sample",
-        "aggregate": "sum",
         "columnName": "long",
         "type": "long",
         "order": "asc"

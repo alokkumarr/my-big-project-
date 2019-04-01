@@ -60,7 +60,7 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
   openDateFormatDialog() {
     const dateFormats = get(dateFormatsMap, `${this.analysisType}.array`);
     this._analyzeDialogService
-      .openDateFormatDialog(<string>this.artifactColumn.dateFormat, dateFormats)
+      .openDateFormatDialog(<string>this.artifactColumn.format, dateFormats)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }

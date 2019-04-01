@@ -10,8 +10,6 @@ public class FileProcessorFactory {
     } else {
       processor = new NioFileProcessor();
     }
-
     return processor;
-
   }
 }

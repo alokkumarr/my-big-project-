@@ -1,0 +1,175 @@
+{
+  "metricName": "sample-elasticsearch",
+  "semanticId": "03fa2843-d5f8-4583-bd11-8c76bfb58ea8",
+  "type": "chart",
+  "chartType": "line",
+  "name": "New Line Chart",
+  "description": "",
+  "scheduled": null,
+  "statusMessage": "Entity has retrieved successfully",
+  "id": "b4a65e75-1415-441d-aac5-ac4ec7a54474",
+  "createdBy": "sawadmin@synchronoss.com",
+  "customerCode": "SYNCHRONOSS",
+  "projectCode": "workbench",
+  "saved": true,
+  "username": "sawadmin@synchronoss.com",
+  "module": "ANALYZE",
+  "artifacts": [
+    {
+      "artifactName": "sample",
+      "columns": [
+        {
+          "aliasName": "",
+          "columnName": "string.keyword",
+          "displayName": "String",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "string",
+          "table": "sample",
+          "type": "string"
+        },
+        {
+          "aliasName": "",
+          "columnName": "long",
+          "displayName": "Long",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "long",
+          "table": "sample",
+          "type": "long"
+        },
+        {
+          "aliasName": "",
+          "columnName": "float",
+          "displayName": "Float",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "float",
+          "table": "sample",
+          "type": "float",
+          "area": "y",
+          "checked": true,
+          "aggregate": "sum",
+          "comboType": "line",
+          "areaIndex": 0
+        },
+        {
+          "aliasName": "",
+          "columnName": "date",
+          "displayName": "Date",
+          "filterEligible": true,
+          "format": "yyyy-MM-dd HH:mm:ss",
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "date",
+          "table": "sample",
+          "type": "date",
+          "area": "x",
+          "checked": true,
+          "dateFormat": "MMM d YYYY",
+          "areaIndex": 0
+        },
+        {
+          "aliasName": "",
+          "columnName": "integer",
+          "displayName": "Integer",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "integer",
+          "table": "sample",
+          "type": "integer"
+        },
+        {
+          "aliasName": "",
+          "columnName": "double",
+          "displayName": "Double",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "double",
+          "table": "sales",
+          "type": "double",
+          "area": "g",
+          "checked": true,
+          "areaIndex": 0
+        }
+      ]
+    }
+  ],
+  "esRepository": {
+    "indexName": "sampleAlias",
+    "storageType": "ES",
+    "type": "sample"
+  },
+  "modifiedTime": 1553497579,
+  "createdTime": 1553497579,
+  "createdTimestamp": 1553500911413,
+  "userId": 1,
+  "userFullName": "system sncr admin",
+  "sqlBuilder": {
+    "booleanCriteria": "AND",
+    "filters": [],
+    "sorts": [
+      {
+        "order": "asc",
+        "columnName": "date",
+        "type": "date"
+      },
+      {
+        "order": "asc",
+        "columnName": "double",
+        "type": "double"
+      }
+    ],
+    "dataFields": [
+      {
+        "aggregate": "sum",
+        "alias": "",
+        "checked": "y",
+        "columnName": "float",
+        "name": "float",
+        "comboType": "line",
+        "displayName": "Float",
+        "table": "sample",
+        "tableName": "sample",
+        "type": "float"
+      }
+    ],
+    "nodeFields": [
+      {
+        "alias": "",
+        "checked": "x",
+        "columnName": "date",
+        "name": "date",
+        "displayName": "Date",
+        "table": "sample",
+        "tableName": "sample",
+        "type": "date",
+        "dateFormat": "MMM d YYYY"
+      },
+      {
+        "alias": "",
+        "checked": "g",
+        "columnName": "double",
+        "name": "double",
+        "displayName": "Double",
+        "table": "sales",
+        "tableName": "sales",
+        "type": "double"
+      }
+    ]
+  },
+  "isInverted": false,
+  "edit": false,
+  "legend": {
+    "align": "right",
+    "layout": "vertical"
+  },
+  "categoryId": 5,
+  "updatedTimestamp": 1553500949045,
+  "updatedUserName": "system sncr admin",
+  "isScheduled": "false"
+}

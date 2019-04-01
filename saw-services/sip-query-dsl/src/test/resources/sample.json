@@ -79,12 +79,52 @@
           "operator": "EQ",
           "value": 1000
         }
+      },
+      {
+        "type": "date",
+        "artifactsName": "sample",
+        "isOptional": false,
+        "columnName": "date",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "format": "epoch_second",
+          "operator": "EQ",
+          "value": 1546021800,
+          "otherValue": 1546021800
+        }
+      },
+      {
+        "type": "date",
+        "artifactsName": "sample",
+        "isOptional": false,
+        "columnName": "date",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "format": "epoch_millis",
+          "operator": "BTW",
+          "value": 1546021800000,
+          "otherValue": 1546021800000
+        }
+      },
+      {
+        "type": "date",
+        "artifactsName": "sample",
+        "isOptional": false,
+        "columnName": "date",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "format": "YYYY",
+          "operator":"GT",
+          "value": 2018
+        }
       }
     ],
     "sorts": [
       {
         "artifacts": "sample",
-        "aggregate": "sum",
         "columnName": "long",
         "type": "long",
         "order": "asc"
@@ -94,9 +134,5 @@
       "dataStore": "sampleAlias/sample",
       "storageType": "ES"
     }
-  },
-  "legend": {
-    "align": "right",
-    "layout": "vertical"
   }
 }
