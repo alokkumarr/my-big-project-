@@ -8,7 +8,7 @@ const APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 const ObserveHelper = require('../../helpers/api/ObserveHelper');
 const chai = require('chai');
-const Constants = require('../../helpers/Constants');
+const PIVOT = require('../../helpers/Constants').PIVOT;
 const assert = chai.assert;
 const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
@@ -83,15 +83,10 @@ describe('Running create and delete dashboards with charts in dashboards/createA
 
           const currentTime = new Date().getTime();
           const name =
-            'AT ' +
-            Constants.PIVOT +
-            ' ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+            'AT ' + PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
           const description =
             'AT Description:' +
-            Constants.PIVOT +
+            PIVOT +
             ' for e2e ' +
             globalVariables.e2eId +
             '-' +
@@ -104,8 +99,8 @@ describe('Running create and delete dashboards with charts in dashboards/createA
             token,
             name,
             description,
-            Constants.PIVOT,
-            null,
+            PIVOT,
+            null, // No subtype of Pivot.
             data.filters
           );
           expect(analysis).toBeTruthy();
