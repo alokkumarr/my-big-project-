@@ -2,7 +2,7 @@
 
 const commonFunctions = require('../../pages/utils/commonFunctions');
 const logger = require('../../conf/logger')(__filename);
-const Constants = require('../../helpers/Constants');
+const NUMBER_TYPES = require('../../helpers/Constants').NUMBER_TYPES;
 
 class GlobalFilters {
   constructor() {
@@ -45,9 +45,7 @@ class GlobalFilters {
           expect(
             this._selectedPresetValue(currentFilter.preset).getText()
           ).toContain(currentFilter.preset);
-        } else if (
-          Constants.NUMBER_TYPES.includes(currentFilter.name.toLowerCase())
-        ) {
+        } else if (NUMBER_TYPES.includes(currentFilter.name.toLowerCase())) {
           browser.sleep(2000);
           expect(
             this._numberSliderLow.getAttribute('aria-valuenow')
@@ -75,9 +73,7 @@ class GlobalFilters {
           commonFunctions.clickOnElement(
             this._dateFilterPresetValue(currentFilter.preset)
           );
-        } else if (
-          Constants.NUMBER_TYPES.includes(currentFilter.name.toLowerCase())
-        ) {
+        } else if (NUMBER_TYPES.includes(currentFilter.name.toLowerCase())) {
           browser.sleep(2000);
           commonFunctions.waitFor.elementToBeVisible(this._numberSlider);
           commonFunctions.slideHorizontally(
