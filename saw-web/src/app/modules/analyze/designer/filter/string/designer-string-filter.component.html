@@ -15,6 +15,7 @@
                   *ngIf="filterModel.operator === 'EQ' || filterModel.operator === 'NEQ' || filterModel.operator === 'CONTAINS' || filterModel.operator === 'SW' || filterModel.operator === 'EW'" >
     <input matInput (input)="onValueChange($event.target.value)"
             autocomplete="off"
+            e2e="e2e-filter-string-input-other"
             [value]="tempValue"/>
   </mat-form-field>
   <mat-form-field *ngIf="filterModel.operator === 'ISIN' || filterModel.operator === 'ISNOTIN'" style="margin-left: 10px;">

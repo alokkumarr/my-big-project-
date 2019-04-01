@@ -39,7 +39,7 @@ class Designer extends SaveDialog {
     this._stringOperatorDropDownItem = operator =>
       element(by.css(`mat-option[e2e="filter-string-option-${operator}"]`));
     this._filterStringInput = element(
-      by.xpath(`(//input[contains(@id,"mat-input-")])[position()=last()]`)
+      by.css(`[e2e="e2e-filter-string-input-other"]`)
     );
     this._filterStringIsInIsNotInInput = element(
       by.xpath(`//input[@e2e="designer-filter-string-input"]`)
