@@ -23,15 +23,12 @@ class Header extends SideNav {
     this._observeLink = element(
       by.xpath('//a[contains(@class,"module-observe")]')
     );
-
     this._analyzeLink = element(
       by.xpath('//a[contains(@class,"module-analyze")]')
     );
-
     this._progressBar = element(
       by.css('mat-progress-bar[mode="indeterminate"]')
     );
-
     this._workbenchLink = element(
       by.xpath('//a[contains(@class,"module-workbench")]')
     );
