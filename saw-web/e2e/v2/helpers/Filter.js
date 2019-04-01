@@ -1,4 +1,4 @@
-class Filter {
+class FilterOptions {
   constructor(options) {
     const defaults = {
       columnName: 'NULL',
@@ -21,4 +21,4 @@ class Filter {
   }
 }
 
-module.exports = Filter;
+module.exports = FilterOptions;

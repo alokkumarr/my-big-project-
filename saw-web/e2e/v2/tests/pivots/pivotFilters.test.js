@@ -4,7 +4,7 @@ const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const dataSets = require('../../helpers/data-generation/datasets');
 const commonFunctions = require('../../pages/utils/commonFunctions');
-const Filter = require('../../helpers/Filter');
+const FilterOptions = require('../../helpers/FilterOptions');
 
 const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
@@ -61,7 +61,7 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
         chartDesignerPage.clickOnAttribute(stringFieldName, 'Row');
 
         // Create filter object. Specify type and preset/operator
-        const filter = new Filter({
+        const filter = new FilterOptions({
           preset: data.preset,
           operator: data.operator,
           from: data.from,
