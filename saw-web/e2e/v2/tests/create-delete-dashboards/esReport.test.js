@@ -99,7 +99,7 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
             name,
             description,
             ES_REPORT,
-            null
+            null // No subtype of Es Report.
           );
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');
