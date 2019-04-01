@@ -618,7 +618,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Override
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
-      boolean isDisable) throws SipNestedRuntimeException {
+      boolean isDisable, String source) throws SipNestedRuntimeException {
     Preconditions.checkNotNull(channelId != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(routeId != null, "payload.getRouteId() cannot be null");
     logger.info(
@@ -635,6 +635,9 @@ public class SftpServiceImpl extends SipPluginContract {
           objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
           objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
           BisRouteEntity bisRouteEntity = routeEntity.get();
+          
+          
+          
           if (bisRouteEntity.getStatus() > 0) {
             JsonNode nodeEntity = null;
             ObjectNode rootNode = null;
@@ -667,18 +670,38 @@ public class SftpServiceImpl extends SipPluginContract {
               isDisable = Boolean.valueOf(disableDupFlag);
               logger.trace("Duplicate has been disabled :" + isDisable);
             }
-            SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
-            logger.trace("invocation of method transferData when "
-                + "directory is availble in destination with location starts here " + sourceLocation
-                + " & file pattern " + filePattern);
-            listOfFiles = transferDataFromChannel(template, sourceLocation, filePattern,
-                destinationLocation, channelId, routeId, fileExclusions, isDisable);
-            logger.trace("invocation of method transferData when "
-                + "directory is availble in destination with location ends here " + sourceLocation
-                + " & file pattern " + filePattern);
-            // if (session.isOpen()) {
-            //  session.close();
-            // }
+            
+            JsonNode isConcurrencyNode = rootNode.get("disableConcurrency");
+            Boolean isConcurDisable = null;
+            if (isConcurrencyNode != null) {
+              String isConcurrency = isConcurrencyNode.asText();
+              isConcurDisable = Boolean.valueOf(isConcurrency);
+              logger.trace("Concurrency has been disabled :" + isConcurDisable);
+            }
+            
+            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId)) {
+            
+              logger.info("Already process running for the route" + routeId 
+                    + "and concurrency disabled hence skipping transfer");
+            
+            } else {
+              SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
+              logger.trace("invocation of method transferData when "
+                    + "directory is availble in destination with location "
+                    + "starts here " + sourceLocation
+                    + " & file pattern " + filePattern);
+              listOfFiles = transferDataFromChannel(template, sourceLocation, filePattern,
+                    destinationLocation, channelId, routeId, fileExclusions, isDisable, source);
+              logger.trace("invocation of method transferData when "
+                    + "directory is availble in destination with location "
+                    + "ends here " + sourceLocation
+                    + " & file pattern " + filePattern);
+              // if (session.isOpen()) {
+              //  session.close();
+              // }
+            }
+            
+            
           } else {
             logger.trace(bisRouteEntity.getBisRouteSysId() + " has been deactivated");
           }
@@ -700,19 +723,22 @@ public class SftpServiceImpl extends SipPluginContract {
     return listOfFiles;
   }
 
+  
+
   /**
    * Transfer files from given directory, recursing into each subdirectory.
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, boolean isDisableDuplicate)
+      Long routeId, String exclusions, boolean isDisableDuplicate, String source)
       throws IOException, ParseException {
     logger.info("TransferDataFromChannel starts here with the channelId " + channelId
         + " and routeId " + routeId);
     List<BisDataMetaInfo> list = new ArrayList<>();
     /* First transfer the files from the directory */
     list.addAll(transferDataFromChannelDirectory(template, sourcelocation, pattern,
-        destinationLocation, channelId, routeId, exclusions, getBatchId(), isDisableDuplicate));
+        destinationLocation, channelId, routeId, 
+        exclusions, getBatchId(), isDisableDuplicate, source));
     /* Then iterate through directory looking for subdirectories */
     LsEntry[] entries = template.list(sourcelocation);
     for (LsEntry entry : entries) {
@@ -729,7 +755,7 @@ public class SftpServiceImpl extends SipPluginContract {
       /* Transfer files from subdirectory */
       String sourcelocationDirectory = sourcelocation + File.separator + entry.getFilename();
       list.addAll(transferDataFromChannel(template, sourcelocationDirectory, pattern,
-          destinationLocation, channelId, routeId, exclusions, isDisableDuplicate));
+          destinationLocation, channelId, routeId, exclusions, isDisableDuplicate, source));
     }
     logger.info("TransferDataFromChannel ends here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -738,7 +764,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, String batchId, boolean isDisableDuplicate)
+      Long routeId, String exclusions, String batchId, boolean isDisableDuplicate, String source)
       throws IOException, ParseException {
     ZonedDateTime startTime = ZonedDateTime.now();
     logger.info("TransferDataFromChannelDirectory starts here with the channelId " + channelId
@@ -790,6 +816,7 @@ public class SftpServiceImpl extends SipPluginContract {
               .info("file from the source is downnloaded in the location :" + destinationLocation);
           File localDirectory = null;
           final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+          bisDataMetaInfo.setSource(source);
           long lastModifiedDate = 0L;
 
           for (List<LsEntry> entries : result) {
@@ -820,7 +847,8 @@ public class SftpServiceImpl extends SipPluginContract {
                       + channelId + " & route Id" + routeId);
                   transferDataFromChannel(template,
                       sourcelocation + File.separator + entry.getFilename(), pattern,
-                      destinationLocation, channelId, routeId, exclusions, isDisableDuplicate);
+                      destinationLocation, channelId, routeId, 
+                      exclusions, isDisableDuplicate,source);
                   logger.trace("invocation of method transferDataFromChannel"
                       + " when directory is availble in destination with location ends here "
                       + sourcelocation + " & file pattern " + pattern + " with channel Id "
@@ -1182,7 +1210,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
                          BisComponentState.DATA_REMOVED.value());
                     transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
-                          isDisable);
+                          isDisable, "RETRY");
                   } else {
                     logger.trace("Inside isDisable transferData when starts here "
                         + "log.getFileName() is null");
@@ -1219,7 +1247,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   logger
                     .trace("Inside the block of retry when file is not duplicate :" + log.getPid());
                   transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
-                      isDisable);
+                      isDisable, null);
                 } else {
                   // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
                   // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
@@ -1287,7 +1315,8 @@ public class SftpServiceImpl extends SipPluginContract {
                 String destinationLocation = rootNode.get("destinationLocation").asText();
                 filesInfo.addAll(
                     transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
-                        destinationLocation, channelId, routeId, fileExclusions, isDisable));
+                        destinationLocation, channelId, routeId, 
+                        fileExclusions, isDisable, "Retry"));
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);
                 logger.info(

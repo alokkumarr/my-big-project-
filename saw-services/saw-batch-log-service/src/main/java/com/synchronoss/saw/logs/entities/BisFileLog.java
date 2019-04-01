@@ -40,8 +40,16 @@ public class BisFileLog implements Serializable {
       dataType = "String", allowEmptyValue = false)
   @Column(name = "BIS_FILE_PATTERN")
   String filePattern;
+  
 
-  @ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
+  @ApiModelProperty(value = "Indicates the file pattern being accepted by the route",
+      dataType = "String", allowEmptyValue = false)
+  @Column(name = "SOURCE")
+  String source;
+
+ 
+
+@ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
       allowEmptyValue = false)
   @Column(name = "BIS_FILE_NAME")
   String fileName;
@@ -93,6 +101,8 @@ public class BisFileLog implements Serializable {
   @Column(name = "CHECKPOINT_TIMESTAMP")
   @Temporal(TemporalType.TIMESTAMP)
   private Date checkpointDate;
+  
+  
 
   public String getPid() {
     return pid;
@@ -232,6 +242,14 @@ public class BisFileLog implements Serializable {
 
   public void setCheckpointDate(Date checkpointDate) {
     this.checkpointDate = checkpointDate;
+  }
+  
+  public String getSource() {
+		return source;
+  }
+
+  public void setSource(String source) {
+	  this.source = source;
   }
 
 }

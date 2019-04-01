@@ -85,5 +85,12 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
   Integer updateLongRunningTranfers(@Param("minutesForLongProc") Integer minutesForLongProc);
   
+  @Query("SELECT COUNT(pid) from BisFileLog Logs where ( Logs.source = 'REGULAR' "
+        + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "
+        + "'DATA_INPROGRESS' and Logs.routeSysId :routeId")
+        Integer countOfInProgress(@Param("routeId") Long routeId);
+  
+  
+  
 
 }

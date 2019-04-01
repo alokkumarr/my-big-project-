@@ -61,6 +61,7 @@ public class SipLogging {
       bisLog.setTransferDuration(entity.getFileTransferDuration());
       bisLog.setTransferEndTime(entity.getFileTransferEndTime());
       bisLog.setTransferStartTime(entity.getFileTransferStartTime());
+      bisLog.setSource(entity.getSource());
       bisFileLogsRepository.save(bisLog);
     } else {
       logger.trace("inserting logs when process Id is not found :" + pid);
@@ -81,6 +82,7 @@ public class SipLogging {
       bisLog.setTransferDuration(entity.getFileTransferDuration());
       bisLog.setCheckpointDate(new Date());
       bisLog.setCreatedDate(new Date());
+      bisLog.setSource(entity.getSource());
       bisFileLogsRepository.save(bisLog);
     }
     logger.trace("Integrate with logging API to update with a status ends here : "
@@ -303,6 +305,22 @@ public class SipLogging {
   public boolean duplicateCheckFilename(boolean isDisableDuplicate, String location) {
     return (!isDisableDuplicate && !checkDuplicateFile(location)) || isDisableDuplicate;
 
+  }
+  
+  /**
+   * check if any regular file running for the route.
+   *
+   * @param routeId Route identifier
+   * @return true or false
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean checkIfAlreadyRunning(Long routeId) {
+    boolean isInProgress =   bisFileLogsRepository.countOfInProgress(routeId) > 0;
+    logger.info("Any Inprogress regular jobs for  " + routeId + "? :: " + isInProgress);
+    return isInProgress;
   }
 
 
