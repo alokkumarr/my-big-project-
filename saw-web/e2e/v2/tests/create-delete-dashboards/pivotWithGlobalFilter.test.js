@@ -8,7 +8,7 @@ const APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 const ObserveHelper = require('../../helpers/api/ObserveHelper');
 const chai = require('chai');
-const ES_REPORT = require('../../helpers/Constants').ES_REPORT;
+const PIVOT = require('../../helpers/Constants').PIVOT;
 const assert = chai.assert;
 const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
@@ -16,8 +16,9 @@ const LoginPage = require('../../pages/LoginPage');
 const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
+const DashboardHeader = require('../../pages/DashboardHeader');
 
-describe('Running create and delete dashboards with ES Report in create-delete-dashboards/esReport.test.js', () => {
+describe('Running create and delete dashboards with charts in dashboards/createAndDeleteDashboardsWithPivotWithGlobalFilter.test.js', () => {
   const subCategoryName =
     subCategories.createSubCategories.observeSubCategory.name;
   const analysisCategoryName = categories.analyses.name;
@@ -30,7 +31,9 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
   let dashboardId;
 
   beforeAll(() => {
-    logger.info('Starting create-delete-dashboards/esReport.test.js');
+    logger.info(
+      'Starting dashboards/createAndDeleteDashboardsWithPivotWitGlobalFilter.test.js.....'
+    );
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -67,39 +70,38 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
   });
 
   using(
-    testDataReader.testData['ES_REPORT']['dashboard']
-      ? testDataReader.testData['ES_REPORT']['dashboard']
+    testDataReader.testData['PIVOT_GLOBAL_FILTER']['dashboard']
+      ? testDataReader.testData['PIVOT_GLOBAL_FILTER']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
-        logger.info(`Executing test case with id: ${id}`);
         try {
           if (!token) {
-            logger.error('token cannot be null');
-            assert.isNotNull(token, 'token cannot be null');
+            logger.error('token can not be null');
+            assert.isNotNull(token, 'token can not be null');
           }
-          const currentTime = new Date().getTime();
 
+          const currentTime = new Date().getTime();
           const name =
-            'AT ' + ES_REPORT + ' ' + globalVariables.e2eId + '-' + currentTime;
+            'AT ' + PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
           const description =
             'AT Description:' +
-            ES_REPORT +
+            PIVOT +
             ' for e2e ' +
             globalVariables.e2eId +
             '-' +
             currentTime;
-          const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription =
-            'AT Dashboard description ' + currentTime;
+          let dashboardName = 'AT Dashboard Name' + currentTime;
+          let dashboardDescription = 'AT Dashboard description ' + currentTime;
 
           let analysis = new ObserveHelper().addAnalysisByApi(
             host,
             token,
             name,
             description,
-            ES_REPORT,
-            null // No subtype of Es Report.
+            PIVOT,
+            null, // No subtype of Pivot.
+            data.filters
           );
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');
@@ -141,6 +143,23 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
           observePage.displayDashboardAction('Filter');
           browser.sleep(4000); // Below condition was failing if browser was not put to sleep.
           observePage.verifyBrowserURLContainsText('?dashboard');
+
+          browser.sleep(2000); // Some time browser is not able to load the global filter button
+          const dashboardHeader = new DashboardHeader();
+          dashboardHeader.clickOnOpenGlobalFilterButton();
+
+          headerPage.hideProgressBar();
+          dashboardHeader.applyAndVerifyGlobalFilters(
+            data.dashboardGlobalFilters
+          );
+
+          browser.sleep(2000); // Some time browser is not able to load the global filter button
+          dashboardHeader.clickOnOpenGlobalFilterButton();
+          dashboardHeader.verifyAppliedGlobalFilters(
+            data.dashboardGlobalFilters
+          );
+          browser.refresh();
+
           observePage.clickOnDeleteDashboardButton();
 
           dashboardDesigner.clickOnDashboardConfirmDeleteButton();
@@ -151,7 +170,7 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'ES_REPORT',
+        feature: 'PIVOT_GLOBAL_FILTER',
         dataProvider: 'dashboard'
       };
     }

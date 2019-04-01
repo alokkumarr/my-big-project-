@@ -34,7 +34,7 @@ const CRITICAL = [
   TEST_BASE_DIR + 'create-delete-dashboards/actualVsTargetKPI.test.js',
   TEST_BASE_DIR + 'create-delete-dashboards/pivot.test.js',
   TEST_BASE_DIR + 'create-delete-dashboards/chartsGlobalFilter.test.js',
-  TEST_BASE_DIR + 'observe/dashboardGlobalFilterWithPivot.test.js',
+  TEST_BASE_DIR + 'create-delete-dashboards/pivotWithGlobalFilter.test.js',
   TEST_BASE_DIR + 'create-delete-dashboards/esReportGlobalFilter.test.js',
   TEST_BASE_DIR + 'create-delete-dashboards/esReport.test.js'
 ];
