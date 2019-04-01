@@ -77,17 +77,9 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
       result => {
         this.showProgress = false;
 
-        // Excluding mapbox analysis from being able to add in dashboard
-        // until mapbox chart download issue is fixed.
-        // https://jira.synchronoss.net:8443/jira/browse/SIP-6083
-        const EXCLUDE_CHARTTYPE = ['map'];
-
         this.analyses = filter(
           result,
-          analysis =>
-            analysis &&
-            ALLOWED_ANALYSIS_TYPES.includes(analysis.type) &&
-            !EXCLUDE_CHARTTYPE.includes(analysis.chartType)
+          analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
         );
       },
       () => {

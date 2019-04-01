@@ -1,42 +1,30 @@
-<mgl-map *ngIf="geoJson"
-    [trackResize]="true"
-    [style]="mapStyle"
-    [zoom]="[6]"
-    [center]="center"
+<mgl-map
+  *ngIf="geoJson"
+  [trackResize]="true"
+  [style]="mapStyle"
+  [zoom]="[6]"
+  [center]="center"
 >
-  <mgl-control mglNavigation>
-  </mgl-control>
-  <mgl-control mglGeocoder
-               position="top-left">
-  </mgl-control>
+  <mgl-control mglNavigation> </mgl-control>
+  <mgl-control mglGeocoder position="top-left"> </mgl-control>
 
-  <mgl-marker-cluster *ngIf="geoJson"
-                      [data]="geoJson"
-                      [maxZoom]="14"
-                      [radius]="50"
+  <mgl-marker-cluster
+    *ngIf="geoJson"
+    [data]="geoJson"
+    [maxZoom]="14"
+    [radius]="50"
   >
     <ng-template mglPoint let-feature>
-      <div
-        class="marker"
-        (click)="selectPoint($event, feature)"
-      >
-      </div>
+      <div class="marker" (click)="selectPoint($event, feature)"></div>
     </ng-template>
     <ng-template mglClusterPoint let-feature>
-      <div
-        class="marker-cluster"
-      >
+      <div class="marker-cluster">
         {{ feature.properties?.point_count }}
       </div>
     </ng-template>
   </mgl-marker-cluster>
 
-  <mgl-popup
-    *ngIf="selectedPoint"
-    [feature]="selectedPoint"
-  >
-    <marker-popup
-      [selectedPoint]="selectedPoint"
-    ></marker-popup>
+  <mgl-popup *ngIf="selectedPoint" [feature]="selectedPoint">
+    <marker-popup [selectedPoint]="selectedPoint"></marker-popup>
   </mgl-popup>
 </mgl-map>
