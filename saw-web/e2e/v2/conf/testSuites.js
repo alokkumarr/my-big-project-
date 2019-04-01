@@ -39,7 +39,9 @@ const CRITICAL = [
   TEST_BASE_DIR + 'create-delete-dashboards/esReport.test.js'
 ];
 // All tests which were executed in critical with larger data set
-const REGRESSION = [...CRITICAL];
+const REGRESSION = [...CRITICAL,
+  TEST_BASE_DIR + 'change-password/changepassword.test.js'
+];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
