@@ -87,7 +87,7 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   
   @Query("SELECT COUNT(pid) from BisFileLog Logs where ( Logs.source = 'REGULAR' "
         + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "
-        + "'DATA_INPROGRESS' and Logs.routeSysId :routeId")
+        + "'DATA_INPROGRESS' and Logs.routeSysId = :routeId")
         Integer countOfInProgress(@Param("routeId") Long routeId);
   
   
