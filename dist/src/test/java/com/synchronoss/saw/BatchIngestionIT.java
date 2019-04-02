@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
  */
-@Ignore
+//@Ignore
 public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_CHANNEL = "channels";
   private static final String BATCH_ROUTE = "routes";
@@ -116,6 +116,7 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "log");
     routeMetadata.put("disableDuplicate", "false");
+    routeMetadata.put("disableConcurrency", "false");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -142,6 +143,7 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "log");
     routeMetadata.put("disableDuplicate", "false");
+    routeMetadata.put("disableConcurrency", "false");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -169,6 +171,7 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "log");
     routeMetadata.put("disableDuplicate", "true");
+    routeMetadata.put("disableConcurrency", "false");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -254,6 +257,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("destinationLocation", "/log/updated");
     childNode.put("filePattern", "*.csv");
     childNode.put("disableDuplicate", "false");
+    routeMetadata.put("disableConcurrency", "false");
     childNode.put("batchSize", "10");
     childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "route has been updated");
@@ -280,6 +284,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("filePattern", "*.log");
     childNode.put("fileExclusions", "csv");
     childNode.put("disableDuplicate", "false");
+    childNode.put("disableConcurrency", "false");
     childNode.put("batchSize", "10");
     childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
     childNode.put("description", "route has been created for scheduled test case");
