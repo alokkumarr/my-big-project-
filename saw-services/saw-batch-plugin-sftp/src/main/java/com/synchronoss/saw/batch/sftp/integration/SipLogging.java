@@ -12,11 +12,14 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import java.io.File;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +115,7 @@ public class SipLogging {
    * Adds entry to log table with given status.
    */
   @Transactional(TxType.REQUIRED)
-  public void updateLogs(Long channelId, Long routeId, String reasonCode) {
+  public  void updateLogs(Long channelId, Long routeId, String reasonCode) {
 
     BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
     bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
@@ -139,11 +142,29 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public boolean duplicateCheck(boolean isDisableDuplicate, String sourcelocation,
-      ChannelSftp.LsEntry entry) {
-    return (!isDisableDuplicate
-        && !checkDuplicateFile(sourcelocation + File.separator + entry.getFilename()))
-        || isDisableDuplicate;
+  public boolean duplicateCheck(boolean isDisableDuplicate,
+      String sourcelocation, ChannelSftp.LsEntry entry) {
+
+    ZonedDateTime duplicateCheckStartTime = ZonedDateTime.now();
+    logger.trace("Duplicate check starting now :: ");
+
+    boolean isDuplicate =  (!isDisableDuplicate
+        &&  !checkDuplicateFile(sourcelocation + File.separator
+        + entry.getFilename())) || isDisableDuplicate;
+
+    ZonedDateTime duplicateCheckEndTime = ZonedDateTime.now();
+
+    if (isDisableDuplicate) {
+      logger.trace("Duplicate check disabled. Duration to check flag in milliseconds :: " + Duration
+                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+    } else {
+      logger.trace("Total time for duplicate check in milliseconds :: " + Duration
+                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+    }
+
+
+
+    return isDuplicate;
 
   }
 

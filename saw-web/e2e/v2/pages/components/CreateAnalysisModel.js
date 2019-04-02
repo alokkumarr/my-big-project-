@@ -16,6 +16,7 @@ class CreateAnalysisModel {
 
   clickOnAnalysisType(type) {
     commonFunctions.clickOnElement(this._analysisType(type));
+    browser.sleep(2000); // Required somehow in headless mode without sleep its not working. Need to find
   }
 
   clickOnNextButton() {
@@ -23,8 +24,8 @@ class CreateAnalysisModel {
   }
 
   clickOnDataPods(name) {
+    browser.sleep(2000); // Required somehow in headless mode without sleep its not working. Need to find
     commonFunctions.waitFor.elementToBeClickable(this._backButton);
-    
     commonFunctions.clickOnElement(this._dataPods(name));
   }
 
