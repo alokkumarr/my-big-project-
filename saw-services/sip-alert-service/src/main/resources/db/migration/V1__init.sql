@@ -6,9 +6,9 @@ CREATE TABLE `ALERT_CUSTOMER_DETAILS` (
     `PRODUCT_CODE` VARCHAR(45) NOT NULL COMMENT 'Product Code ',
     `ACTIVE_IND` TINYINT(4) NOT NULL COMMENT 'Customer active indicator',
     `CREATED_BY` VARCHAR(45) DEFAULT NULL COMMENT 'Customer details created by user',
-    `CREATED_TIME` VARCHAR(45) DEFAULT NULL COMMENT 'Customer details created time',
+    `CREATED_TIME` DATETIME DEFAULT NULL COMMENT 'Customer details created time',
     `MODIFIED_BY` VARCHAR(45) DEFAULT NULL COMMENT 'Customer details modified by user',
-    `MODIFIED_TIME` VARCHAR(45) DEFAULT NULL COMMENT 'Customer details modified time',
+    `MODIFIED_TIME` DATETIME DEFAULT NULL COMMENT 'Customer details modified time',
     PRIMARY KEY (`ALERT_CUSTOMER_SYS_ID`)
 )  ENGINE=INNODB;
 
@@ -37,8 +37,8 @@ CREATE TABLE `ALERT_RULES_DETAILS` (
     `THRESHHOLD_VALUE` DECIMAL(5 , 0 ) NOT NULL COMMENT 'Threshold Values',
     `ACTIVE_IND` TINYINT(4) NOT NULL COMMENT 'Rule Active Indicator',
     `CREATED_BY` VARCHAR(45) NOT NULL COMMENT 'Alert rule created by user',
-    `CREATED_TIME` VARCHAR(45) NOT NULL COMMENT 'Alert rule created Time',
-    `MODIFIED_TIME` VARCHAR(45) DEFAULT NULL COMMENT 'Alert rule Modified time',
+    `CREATED_TIME` DATETIME(45) NOT NULL COMMENT 'Alert rule created Time',
+    `MODIFIED_TIME` DATETIME(45) DEFAULT NULL COMMENT 'Alert rule Modified time',
     `MODIFIED_BY` VARCHAR(45) DEFAULT NULL COMMENT 'Alert rule modified by user',
     PRIMARY KEY (`ALERT_RULES_SYS_ID`),
     KEY `DatapodID_fk_idx` (`DATAPOD_ID`),
