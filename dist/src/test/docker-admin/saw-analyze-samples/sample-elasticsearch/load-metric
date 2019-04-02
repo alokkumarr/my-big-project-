@@ -9,15 +9,6 @@ dir=$(dirname $0)
 # Load common metrics functions
 . $dir/../lib/common.sh
 
-load_semantic() {
-    echo "Loading sample Elasticsearch semantic metadata"
-    local datalake=$datalake_home/sample-elasticsearch
-    local semantic=semantic.json
-    $sudo_mapr hadoop fs -mkdir -p $datalake
-    $sudo_mapr hadoop fs -put -f $dir/$semantic $datalake
-    $mdcli -i $datalake/$semantic -o $datalake/$semantic-output
-}
-
 curl_json() {
     curl -sS -X $1 -H "Content-Type: application/json" $2 --data-binary @$3
 }
@@ -35,4 +26,5 @@ load_data() {
 
 wait_maprfs
 load_data
-load_semantic
+wait_semantic_service
+insert_json_store_sample $sample_location/sample-elasticsearch/sample-data-elastic.json
