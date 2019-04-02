@@ -43,6 +43,7 @@ public class ElasticSearchQueryBuilder {
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
   String dataSecurityString;
+  private static String appenderForGTLTE = "||/M";
 
   public String buildDataQuery(SIPDSL sipdsl, Integer size)
       throws IOException, ProcessingException {
@@ -373,10 +374,29 @@ public class ElasticSearchQueryBuilder {
               rangeQueryBuilder.lt(item.getModel().getLt());
             }
             if (item.getModel().getGt() != null) {
-              rangeQueryBuilder.gt(item.getModel().getGt());
+              /*In yyyy-MM format GT is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
+               * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
+               * */
+              if (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM")) {
+                String date = item.getModel().getGt();
+                date = date + appenderForGTLTE;
+                rangeQueryBuilder.gt(date);
+
+              } else {
+                rangeQueryBuilder.gt(item.getModel().getGt());
+              }
             }
             if (item.getModel().getLte() != null) {
-              rangeQueryBuilder.lte(item.getModel().getLte());
+              /*In yyyy-MM format LTE is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
+               * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
+               * */
+              if (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM")) {
+                String date = item.getModel().getLte();
+                date = date + appenderForGTLTE;
+                rangeQueryBuilder.lte(date);
+              } else {
+                rangeQueryBuilder.lte(item.getModel().getLte());
+              }
             }
             if (item.getModel().getGte() != null) {
               rangeQueryBuilder.gte(item.getModel().getGte());
