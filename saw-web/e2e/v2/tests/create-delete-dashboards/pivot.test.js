@@ -100,7 +100,7 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
             name,
             description,
             PIVOT,
-            null // No Subtype for Pivots.
+            null // No Subtype of Pivots.
           );
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');

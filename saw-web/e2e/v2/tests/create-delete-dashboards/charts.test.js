@@ -8,7 +8,7 @@ const APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 const ObserveHelper = require('../../helpers/api/ObserveHelper');
 const chai = require('chai');
-const Constants = require('../../helpers/Constants');
+const CHART = require('../../helpers/Constants').CHART;
 const assert = chai.assert;
 const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
@@ -103,7 +103,7 @@ describe('Running create and delete dashboards with charts in create-delete-dash
             token,
             name,
             description,
-            Constants.CHART,
+            CHART,
             subType
           );
           expect(analysis).toBeTruthy();

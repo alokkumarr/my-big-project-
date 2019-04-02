@@ -102,7 +102,7 @@ describe('Running create and delete dashboards with charts in create-delete-dash
             name,
             description,
             ES_REPORT,
-            null, // No subtype of ES Report.
+            null, // No Subtype of ES Report.
             data.filters
           );
           expect(analysis).toBeTruthy();
