@@ -12,16 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Test sending events to the Real Time Ingestion and Processing
- * Service.
+ * Test managing alerts, collecting metrics for alerts during data
+ * ingestion and and evaluating alerts after data has been ingested.
  */
-public class RealTimeIT extends BaseIT {
+public class AlertsIT extends BaseIT {
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
   @Test
-  public void testSendEvent() throws JsonProcessingException {
+  public void testTriggerAlert() throws JsonProcessingException {
+    String testId = testId();
     ObjectNode root = mapper.createObjectNode();
-    root.put("metric", 0);
+    root.put("metric", 100);
     given(authSpec)
         .queryParam("APP_KEY", "stream_1")
         .queryParam("APP_VERSION", "1")

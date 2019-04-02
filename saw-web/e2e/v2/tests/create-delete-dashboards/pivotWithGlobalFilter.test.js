@@ -8,7 +8,7 @@ const APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 const ObserveHelper = require('../../helpers/api/ObserveHelper');
 const chai = require('chai');
-const CHART = require('../../helpers/Constants').CHART;
+const PIVOT = require('../../helpers/Constants').PIVOT;
 const assert = chai.assert;
 const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
@@ -18,7 +18,7 @@ const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 const DashboardHeader = require('../../pages/DashboardHeader');
 
-describe('Running create and delete dashboards with charts in create-delete-dashboards/chartsGlobalFilter.test.js', () => {
+describe('Running create and delete dashboards with charts in dashboards/createAndDeleteDashboardsWithPivotWithGlobalFilter.test.js', () => {
   const subCategoryName =
     subCategories.createSubCategories.observeSubCategory.name;
   const analysisCategoryName = categories.analyses.name;
@@ -32,7 +32,7 @@ describe('Running create and delete dashboards with charts in create-delete-dash
 
   beforeAll(() => {
     logger.info(
-      'Starting create-delete-dashboards/chartsGlobalFilter.test.js.'
+      'Starting dashboards/createAndDeleteDashboardsWithPivotWitGlobalFilter.test.js.....'
     );
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
@@ -70,45 +70,37 @@ describe('Running create and delete dashboards with charts in create-delete-dash
   });
 
   using(
-    testDataReader.testData['CHART_GLOBAL_FILTER']['dashboard']
-      ? testDataReader.testData['CHART_GLOBAL_FILTER']['dashboard']
+    testDataReader.testData['PIVOT_GLOBAL_FILTER']['dashboard']
+      ? testDataReader.testData['PIVOT_GLOBAL_FILTER']['dashboard']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
-        logger.info(`Executing test case with id: ${id}`);
         try {
           if (!token) {
-            logger.error('token cannot be null');
-            assert.isNotNull(token, 'token cannot be null');
+            logger.error('token can not be null');
+            assert.isNotNull(token, 'token can not be null');
           }
 
           const currentTime = new Date().getTime();
-          const subType = data.chartType.split(':')[1];
           const name =
-            'AT ' +
-            data.chartType +
-            ' ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+            'AT ' + PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
           const description =
             'AT Description:' +
-            data.chartType +
+            PIVOT +
             ' for e2e ' +
             globalVariables.e2eId +
             '-' +
             currentTime;
-          const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription =
-            'AT Dashboard description ' + currentTime;
+          let dashboardName = 'AT Dashboard Name' + currentTime;
+          let dashboardDescription = 'AT Dashboard description ' + currentTime;
 
           let analysis = new ObserveHelper().addAnalysisByApi(
             host,
             token,
             name,
             description,
-            CHART,
-            subType,
+            PIVOT,
+            null, // No subtype of Pivot.
             data.filters
           );
           expect(analysis).toBeTruthy();
@@ -172,13 +164,13 @@ describe('Running create and delete dashboards with charts in create-delete-dash
 
           dashboardDesigner.clickOnDashboardConfirmDeleteButton();
           observePage.verifyDashboardTitleIsDeleted(dashboardName);
-        } catch (err) {
-          logger.error(err);
+        } catch (e) {
+          logger.error(e);
         }
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'CHART_GLOBAL_FILTER',
+        feature: 'PIVOT_GLOBAL_FILTER',
         dataProvider: 'dashboard'
       };
     }
