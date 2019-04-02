@@ -197,6 +197,8 @@
 		<module>saw-batch-plugin-interfaces</module>
 		<module>saw-batch-plugin-sftp</module>
     <module>sip-common-components</module>
+    <module>sip-alert-service</module>
 		<module>dist</module>
-	</modules>
+
+  </modules>
 </project>
