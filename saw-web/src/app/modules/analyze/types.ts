@@ -21,6 +21,7 @@ export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
   ArtifactColumnReport,
+  AnalysisDSL,
   Sort,
   Format,
   Filter,
@@ -44,7 +45,6 @@ export type ChartType =
   | 'bubble';
 
 export type Analysis = AnalysisChart | AnalysisReport;
-
 export const isDSLAnalysis = (
   analysis: Analysis | AnalysisDSL
 ): analysis is AnalysisDSL => {

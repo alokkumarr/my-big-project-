@@ -13,6 +13,7 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisDSL,
   AnalysisChart,
   AnalysisReport,
   Sort,
@@ -38,6 +39,7 @@ export {
   ArtifactColumnChart,
   ArtifactColumnReport,
   Analysis,
+  AnalysisDSL,
   AnalysisChart,
   AnalysisReport,
   DesignerMode,
@@ -140,4 +142,5 @@ export interface DesignerSaveEvent {
 
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
+  analysis: AnalysisDSL;
 }

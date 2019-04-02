@@ -57,8 +57,12 @@ import { JwtService } from '../../../../common/services';
 
 import {
   DesignerClearGroupAdapters,
-  DesignerInitGroupAdapters
+  DesignerInitGroupAdapters,
+  DesignerInitNewAnalysis,
+  DesignerInitEditAnalysis,
+  DesignerInitForkAnalysis
 } from '../actions/designer.actions';
+// import { DesignerState } from '../state/designer.state';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -99,7 +103,9 @@ export class DesignerContainerComponent implements OnInit {
     public _analyzeService: AnalyzeService,
     private _store: Store,
     private _jwtService: JwtService
-  ) {}
+  ) {
+    window['designer'] = this;
+  }
 
   ngOnInit() {
     const isReport = ['report', 'esReport'].includes(
@@ -111,6 +117,8 @@ export class DesignerContainerComponent implements OnInit {
     case 'new':
       this.initNewAnalysis().then(() => {
         this.designerState = DesignerStates.NO_SELECTION;
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
       });
       this.layoutConfiguration = this.getLayoutConfiguration(
         this.analysisStarter
@@ -125,6 +133,8 @@ export class DesignerContainerComponent implements OnInit {
       if (!isReport) {
         this.requestDataIfPossible();
       }
+      isDSLAnalysis(this.analysis) &&
+        this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
       break;
     case 'fork':
       this.forkAnalysis().then(() => {
@@ -136,6 +146,8 @@ export class DesignerContainerComponent implements OnInit {
         if (!isReport) {
           this.requestDataIfPossible();
         }
+      isDSLAnalysis(this.analysis) &&
+        this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
       });
       break;
     default:
@@ -443,14 +455,16 @@ export class DesignerContainerComponent implements OnInit {
           this.isDataEmpty(
             response.data,
             this.analysis.type,
-            (<Analysis>this.analysis).sqlBuilder ||
-              (<AnalysisDSL>this.analysis).sipQuery
+            (<AnalysisDSL>this.analysis).sipQuery ||
+              (<Analysis>this.analysis).sqlBuilder
           )
         ) {
+          console.log('empty');
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
           this.dataCount = 0;
           this.data = this.setEmptyData();
         } else {
+          console.log('non empty');
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
@@ -481,7 +495,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'map':
       return flattenChartData(
         data,
-        (<Analysis>analysis).sqlBuilder || (<AnalysisDSL>analysis).sipQuery
+        (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder
       );
     }
   }

@@ -1,6 +1,7 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as forEach from 'lodash/forEach';
+import * as get from 'lodash/get';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -10,14 +11,18 @@ import {
   DesignerAddColumnToGroupAdapter,
   DesignerMoveColumnInGroupAdapter,
   DesignerRemoveColumnFromGroupAdapter,
-  DesignerClearGroupAdapters
+  DesignerClearGroupAdapters,
+  DesignerInitEditAnalysis,
+  DesignerInitForkAnalysis,
+  DesignerInitNewAnalysis
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 
 // setAutoFreeze(false);
 
 const defaultDesignerState: DesignerStateModel = {
-  groupAdapters: []
+  groupAdapters: [],
+  analysis: null
 };
 
 @State<DesignerStateModel>({
@@ -30,6 +35,26 @@ export class DesignerState {
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
     return state.groupAdapters;
+  }
+
+  @Selector()
+  static filters(state: DesignerStateModel) {
+    return get(state, 'analysis.sipQuery.filters');
+  }
+
+  @Action(DesignerInitEditAnalysis)
+  @Action(DesignerInitForkAnalysis)
+  @Action(DesignerInitNewAnalysis)
+  initAnalysis(
+    { patchState }: StateContext<DesignerStateModel>,
+    {
+      analysis
+    }:
+      | DesignerInitNewAnalysis
+      | DesignerInitEditAnalysis
+      | DesignerInitForkAnalysis
+  ) {
+    return patchState({ analysis });
   }
 
   @Action(DesignerInitGroupAdapters)

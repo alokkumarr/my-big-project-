@@ -414,7 +414,7 @@ export class AnalyzeService {
       .pipe(
         map((resp: any) => {
           return {
-            data: resp.data,
+            data: resp,
             executionId: resp.executionId,
             executionType: mode,
             executedBy: this._jwtService.getLoginId(),
@@ -521,6 +521,7 @@ export class AnalyzeService {
   }
 
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {
+    // return this.createAnalysisNonDSL(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
       ? this.createAnalysisDSL(
           this.newAnalysisModel(metricId, type)
