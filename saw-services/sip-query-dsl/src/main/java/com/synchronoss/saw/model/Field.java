@@ -55,14 +55,6 @@ public class Field {
   @JsonProperty("dateFormat")
   private String dateFormat;
 
-  public Format getFormat() {
-    return this.format;
-  }
-
-  public void setFormat(Format format) {
-    this.format = format;
-  }
-
   @JsonProperty("format")
   private Format format;
 
@@ -157,6 +149,16 @@ public class Field {
     this.groupInterval = groupInterval;
   }
 
+  @JsonProperty("format")
+  public Format getFormat() {
+    return this.format;
+  }
+
+  @JsonProperty("format")
+  public void setFormat(Format format) {
+    this.format = format;
+  }
+
   /**
    * Gets dateFormat.
    *
@@ -220,6 +222,7 @@ public class Field {
         .append("aggregate", aggregate)
         .append("groupInterval", groupInterval)
         .append("additionalProperties", additionalProperties)
+        .append("format", format)
         .toString();
   }
 
@@ -235,6 +238,7 @@ public class Field {
         .append(type)
         .append(displayName)
         .append(groupInterval)
+        .append(format)
         .toHashCode();
   }
 
@@ -247,6 +251,7 @@ public class Field {
       return false;
     }
     Field rhs = ((Field) other);
+
     return new EqualsBuilder()
         .append(aggregate, rhs.aggregate)
         .append(area, rhs.area)
@@ -257,6 +262,7 @@ public class Field {
         .append(type, rhs.type)
         .append(displayName, rhs.displayName)
         .append(groupInterval, rhs.groupInterval)
+        .append(format, rhs.format)
         .isEquals();
   }
 
