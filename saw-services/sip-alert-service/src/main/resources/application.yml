@@ -3,7 +3,7 @@ info:
 spring:
   application:
     name: sip-alert-service
-  #mariaDB (metadata) DB details
+  #mariaDB (Alert) DB details
   datasource:
     url: jdbc:mariadb://localhost:3306/sip_alert
     username: root

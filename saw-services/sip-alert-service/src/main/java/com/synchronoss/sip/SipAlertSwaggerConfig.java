@@ -26,7 +26,7 @@ public class SipAlertSwaggerConfig extends WebMvcConfigurationSupport {
     return new Docket(DocumentationType.SWAGGER_2)
         .apiInfo(getApiInfo())
         .select()
-        .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw"))
+        .apis(RequestHandlerSelectors.basePackage("com.synchronoss.sip"))
         // .paths(PathSelectors.regex("/internal/proxy.*"))
         .build();
   }
@@ -38,10 +38,10 @@ public class SipAlertSwaggerConfig extends WebMvcConfigurationSupport {
    */
   private ApiInfo getApiInfo() {
     return new ApiInfoBuilder()
-        .title("Synchronoss Insights metadata Service")
+        .title("Synchronoss Insights Alert Service")
         .description(
-            "This REST API has been developed for metadata Service to be accessible. "
-                + "Currently its manages Analyse, Observe and Semantic metadata. You can find more "
+            "This REST API has been developed for Alert Service to be accessible. "
+                + "Currently its manages Alert. You can find more "
                 + "about Synchronoss Insight Platform at [http://www.synchronoss.com]")
         .version("3.X.X")
         .contact(
