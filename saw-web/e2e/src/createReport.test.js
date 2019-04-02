@@ -10,7 +10,7 @@ const dataSets = require('./javascript/data/datasets');
 const designModePage = require('./javascript/pages/designModePage.po.js');
 const AnalyzePage = require('./javascript/v2/pages/AnalyzePage');
 
-describe('Create report type analysis: createAndDeleteReport.test.js', () => {
+describe('Create report type analysis: createReport.test.js', () => {
   const reportDesigner = analyzePage.designerDialog.report;
   const reportName = `e2e report ${new Date().toString()}`;
   const reportDescription = 'e2e report description';
