@@ -24,14 +24,14 @@ $font-source-sans-pro: 'Source Sans Pro';
 
 body {
   font-family: $font-source-sans-pro;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   color: $app-font-color;
 }
 
 a {
   font-family: $font-source-sans-pro;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: $link-color;
   text-decoration: none;
@@ -40,7 +40,7 @@ a {
 
 .link {
   font-family: $font-source-sans-pro;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   display: none;
   color: $app-font-color;

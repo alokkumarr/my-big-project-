@@ -5,7 +5,10 @@ import { IsAdminGuard } from '../admin/guards';
 
 import { AlertsPageComponent } from './components/alerts-page/alerts-page.component';
 import { AlertsViewComponent } from './components/alerts-view/alerts-view.component';
-import { AlertsConfigurationComponent } from './components/configure/alerts-configuration/alerts-configuration.component';
+import {
+  AlertsConfigurationComponent,
+  AddAlertComponent
+} from './components/configure/index';
 
 export const routes: Routes = [
   {
@@ -16,18 +19,23 @@ export const routes: Routes = [
     runGuardsAndResolvers: 'paramsOrQueryParamsChange',
     children: [
       {
-        path: 'alerts/view',
+        path: 'view',
         component: AlertsViewComponent
       },
       {
-        path: 'alerts/configure',
+        path: 'configure',
         component: AlertsConfigurationComponent,
+        canActivate: [IsAdminGuard]
+      },
+      {
+        path: 'add',
+        component: AddAlertComponent,
         canActivate: [IsAdminGuard]
       },
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'alerts/configure'
+        redirectTo: 'configure'
       }
     ]
   }

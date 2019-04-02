@@ -7,14 +7,18 @@ import { RouterModule } from '@angular/router';
 import { routes } from './routes';
 import { AlertsPageComponent } from './components/alerts-page/alerts-page.component';
 import { AlertsViewComponent } from './components/alerts-view/alerts-view.component';
-import { AlertsConfigurationComponent } from './components/configure/index';
+import {
+  AlertsConfigurationComponent,
+  AddAlertComponent
+} from './components/configure/index';
 
 import { IsAdminGuard } from '../admin/guards';
 
 const components = [
   AlertsPageComponent,
   AlertsViewComponent,
-  AlertsConfigurationComponent
+  AlertsConfigurationComponent,
+  AddAlertComponent
 ];
 
 @NgModule({

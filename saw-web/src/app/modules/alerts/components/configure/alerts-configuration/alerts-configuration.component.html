@@ -1,3 +1,56 @@
-<p>
-  alerts-configuration works!
-</p>
+<mat-sidenav-container fxFlex fxFill hasBackdrop="false" class="conf-container">
+  <mat-sidenav
+    #sidenav
+    position="end"
+    [mode]="addAlertPanelMode"
+    autoFocus="false"
+  >
+    <div fxFlex fxLayout="column" class="conf-container__add">
+      <div
+        fxFlex="45px"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        class="conf-container__add__header"
+      >
+        <span fxFlex class="conf-container__add__header__title" i18n
+          >Add Alert
+        </span>
+        <button
+          mat-icon-button
+          color="warn"
+          e2e="cancel-add-alert"
+          (click)="sidenav.close()"
+        >
+          <mat-icon fontIcon="icon-close"></mat-icon>
+        </button>
+      </div>
+      <add-alert></add-alert>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content fxFlex fxLayout="column" class="conf-container-content">
+    <div
+      fxFlex="45px"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      class="conf-container-content__header"
+    >
+      <span fxFlex class="conf-container-content__header__title" i18n
+        >Configure Alerts
+      </span>
+      <button
+        *ngIf="!sidenav.opened"
+        i18n
+        class="conf-container-content__header__addBtn"
+        color="primary"
+        mat-raised-button
+        e2e="add-alert"
+        (click)="sidenav.toggle()"
+      >
+        + Alert
+      </button>
+    </div>
+    <div fxFlex class="conf-container-content__body mat-elevation-z3">
+      Content
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

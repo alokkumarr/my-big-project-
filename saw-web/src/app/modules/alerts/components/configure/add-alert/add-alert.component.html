@@ -1,0 +1,205 @@
+<mat-card
+  fxFlex
+  FxFill
+  fxLayout="column"
+  class="add-container mat-elevation-z3"
+>
+  <div fxFlex class="add-container__body">
+    <form [formGroup]="addAlertFormGroup" novalidate (ngSubmit)="createAlert()">
+      <mat-vertical-stepper
+        linear
+        #addAlertStepper
+        formArrayName="alertFormArray"
+        class="add-container__body__stepper"
+      >
+        <ng-template matStepperIcon="done">
+          <mat-icon fontIcon="icon-checkmark"></mat-icon>
+        </ng-template>
+        <ng-template matStepperIcon="edit">
+          <mat-icon fontIcon="icon-checkmark"></mat-icon>
+        </ng-template>
+
+        <mat-step formGroupName="0" [stepControl]="alertFormArray?.get([0])">
+          <ng-template matStepLabel>Name Your Alert</ng-template>
+          <mat-form-field appearance="outline">
+            <mat-label>Alert Name</mat-label>
+            <input
+              matInput
+              placeholder="Alert Name"
+              formControlName="alertName"
+              required
+            />
+            <mat-error>This field is required</mat-error>
+          </mat-form-field>
+          <div fxFlex fxLayoutAlign="space-around center">
+            <button
+              class="add-container__body__stepper__btn"
+              color="primary"
+              mat-icon-button
+              matStepperNext
+            >
+              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <mat-step formGroupName="1" [stepControl]="alertFormArray?.get([1])">
+          <ng-template matStepLabel>Select a Datapod</ng-template>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Datapod</mat-label>
+            <mat-select placeholder="Datapod" formControlName="datapodName">
+              <mat-option value="orders">Orders</mat-option>
+              <mat-option value="sales">Sales</mat-option>
+              <mat-option value="accounts">Accounts</mat-option>
+            </mat-select>
+            <mat-error>This field is required</mat-error>
+          </mat-form-field>
+
+          <div fxFlex fxLayoutAlign="space-around center">
+            <button
+              class="add-container__body__stepper__btn"
+              mat-icon-button
+              matStepperPrevious
+            >
+              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
+            </button>
+            <button
+              class="add-container__body__stepper__btn"
+              color="primary"
+              mat-icon-button
+              matStepperNext
+            >
+              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <mat-step formGroupName="2" [stepControl]="alertFormArray?.get([2])">
+          <ng-template matStepLabel>Select a Metric</ng-template>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Metric Name</mat-label>
+            <mat-select placeholder="Metric Name" formControlName="metricName">
+              <mat-option value="primary">Primary</mat-option>
+              <mat-option value="accent">Accent</mat-option>
+              <mat-option value="warn">Warn</mat-option>
+            </mat-select>
+            <mat-error>This field is required</mat-error>
+          </mat-form-field>
+
+          <div fxFlex fxLayoutAlign="space-around center">
+            <button
+              class="add-container__body__stepper__btn"
+              mat-icon-button
+              matStepperPrevious
+            >
+              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
+            </button>
+            <button
+              class="add-container__body__stepper__btn"
+              color="primary"
+              mat-icon-button
+              matStepperNext
+            >
+              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <mat-step formGroupName="3" [stepControl]="alertFormArray?.get([3])">
+          <ng-template matStepLabel>Select a Operator</ng-template>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Operator Name</mat-label>
+            <mat-select
+              placeholder="Operator Name"
+              formControlName="operatorName"
+            >
+              <mat-option value="gt">Greater Than</mat-option>
+              <mat-option value="lt">Less Than</mat-option>
+              <mat-option value="eq">Equal To</mat-option>
+            </mat-select>
+            <mat-error>This field is required</mat-error>
+          </mat-form-field>
+
+          <div fxFlex fxLayoutAlign="space-around center">
+            <button
+              class="add-container__body__stepper__btn"
+              mat-icon-button
+              matStepperPrevious
+            >
+              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
+            </button>
+            <button
+              class="add-container__body__stepper__btn"
+              color="primary"
+              mat-icon-button
+              matStepperNext
+            >
+              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <mat-step formGroupName="4" [stepControl]="alertFormArray?.get([4])">
+          <ng-template matStepLabel>Enter Threshold Value</ng-template>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Threshold Value</mat-label>
+            <input
+              matInput
+              placeholder="Threshold Value"
+              formControlName="thresholdValue"
+              required
+            />
+            <mat-error>This field is required</mat-error>
+          </mat-form-field>
+
+          <div fxFlex fxLayoutAlign="space-around center">
+            <button
+              class="add-container__body__stepper__btn"
+              mat-icon-button
+              matStepperPrevious
+            >
+              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
+            </button>
+            <button
+              class="add-container__body__stepper__btn"
+              color="primary"
+              mat-icon-button
+              matStepperNext
+            >
+              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Validate and Create</ng-template>
+          <pre class="add-container__body__stepper__validate">{{
+            addAlertFormGroup.value.alertFormArray | json
+          }}</pre>
+          <div fxFlex fxLayoutAlign="space-around center">
+            <button
+              class="add-container__body__stepper__btn"
+              mat-icon-button
+              matStepperPrevious
+            >
+              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
+            </button>
+            <button
+              matTooltip="Save"
+              class="add-container__body__stepper__btn"
+              color="primary"
+              mat-icon-button
+              matStepperNext
+            >
+              <mat-icon fontIcon="icon-save"></mat-icon>
+            </button>
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+    </form>
+  </div>
+</mat-card>
