@@ -257,7 +257,7 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("destinationLocation", "/log/updated");
     childNode.put("filePattern", "*.csv");
     childNode.put("disableDuplicate", "false");
-    routeMetadata.put("disableConcurrency", "false");
+    childNode.put("disableConcurrency", "false");
     childNode.put("batchSize", "10");
     childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "route has been updated");
