@@ -42,10 +42,6 @@
                       "id": "/properties/sipQuery/properties/fields/items/properties/columnName",
                       "type": "string"
                     },
-                    "name": {
-                      "id": "/properties/sipQuery/properties/fields/items/properties/name",
-                      "type": "string"
-                    },
                     "type": {
                       "enum": [
                         "date",

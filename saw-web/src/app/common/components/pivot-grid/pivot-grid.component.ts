@@ -23,7 +23,6 @@ import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
 import { Subject } from 'rxjs';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
-// import {PivotGridDataSourceField} from 'devextreme/ui/pivot_grid';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import { ArtifactColumnPivot, Sort } from '../../../models';
 import {
@@ -48,6 +47,7 @@ export interface IPivotGridUpdate {
   data?: any;
   sorts?: any;
   export?: boolean;
+  rePaint?: boolean;
 }
 
 @Component({
@@ -159,6 +159,7 @@ export class PivotGridComponent implements OnDestroy {
     update.dataSource && this.updateDataSource(update.dataSource);
     update.sorts && this.updateSorts(update.sorts, null);
     update.export && this.exportToExcel();
+    update.rePaint && this.rePaintGrid();
     /* eslint-disable no-unused-expressions */
   }
 
@@ -174,6 +175,10 @@ export class PivotGridComponent implements OnDestroy {
     this.delayIfNeeded(() => {
       this._gridInstance.option('dataSource', dataSource);
     });
+  }
+
+  rePaintGrid() {
+    this._gridInstance.repaint();
   }
 
   updateSorts(sorts: Sort[], source) {

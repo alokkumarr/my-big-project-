@@ -9,6 +9,10 @@
   template: src=appl.conf dest=/opt/bda/sip-rtps/conf
   notify:
     - restart sip-rtps
+- name: Install RTPS stream schema file
+  template: src=stream_1-schema.json dest=/opt/bda/sip-rtps/conf
+  notify:
+    - restart sip-rtps
 - name: Create symbolink link to current Spark version
   file:
     src: /opt/mapr/spark/spark-2.2.1

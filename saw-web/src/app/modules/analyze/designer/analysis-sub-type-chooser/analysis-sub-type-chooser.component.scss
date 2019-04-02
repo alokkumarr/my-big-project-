@@ -1,0 +1,10 @@
+@import 'src/themes/base/colors';
+
+.chart-option.mat-button-toggle-checked {
+  background-color: $selection-highlight-col;
+}
+
+::ng-deep #analysis-subtype .mat-button-toggle-label-content {
+  padding: 0 5px;
+  line-height: 30px;
+}

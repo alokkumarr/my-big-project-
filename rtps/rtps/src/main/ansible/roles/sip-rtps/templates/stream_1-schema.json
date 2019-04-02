@@ -1,0 +1,11 @@
+{
+  "objects": [
+    {
+      "name" : "1",
+      "fields" : [
+        { "name" : "metric", "type" : "LONG", "source" : "metric" },
+        { "name":"RECEIVED_TS","type":"STRING", "source" : "received_ts" }
+      ]
+    }
+  ]
+}

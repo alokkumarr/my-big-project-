@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 $back-button-size: 32px;
 
@@ -10,12 +10,23 @@ $back-button-size: 32px;
   height: 100%;
 
   button {
-    line-height: 32px;
-  }
-}
+    line-height: 24px;
+    min-width: unset;
 
-.mat-icon {
-  height: 18px;
+    mat-icon {
+      font-size: 22px;
+    }
+  }
+
+  ::ng-deep .mat-button-toggle-checked {
+    background-color: $primary-blue-b2;
+    color: white;
+  }
+
+  ::ng-deep .mat-button-toggle-label-content {
+    line-height: 32px !important;
+    font-size: 13px;
+  }
 }
 
 .back-button-icon.mat-icon {
@@ -44,13 +55,31 @@ $back-button-size: 32px;
   }
 }
 
+.header__name__small {
+  strong {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: $primary-blue-b2;
+    letter-spacing: 0.005em;
+  }
+
+  label {
+    padding: 0 2px;
+    font-size: 8px;
+    text-transform: uppercase;
+    background-color: $secondary-orange;
+    color: $primary-white;
+    vertical-align: top;
+  }
+}
+
 .header__description {
-  font-size: 14px;
+  font-size: 11px;
   padding-top: 5px;
   color: $primary-grey-g3;
 
   .mat-icon {
-    font-size: 14px;
+    font-size: 11px;
     height: 14px;
     width: 14px;
   }
@@ -58,21 +87,4 @@ $back-button-size: 32px;
 
 .mat-progress-bar {
   height: 2px !important;
-}
-
-.mat-button-toggle-checked {
-  background-color: $primary-blue-b2;
-  color: white;
-}
-
-.mat-button-toggle-label-content {
-  line-height: 32px !important;
-
-  .mat-icon {
-    width: auto;
-  }
-}
-
-.mat-button-toggle-label-content > * {
-  vertical-align: bottom;
 }

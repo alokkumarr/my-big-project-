@@ -92,7 +92,7 @@ public class ESResponseParser {
         {
             Map<String,String> flatValues = new LinkedHashMap<>();
             for (Field dataField : aggregationFields){
-                String columnName = dataField.getColumnName();
+                String columnName = dataField.getDataField();
                 flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
             }
             flatStructure.add(flatValues);
@@ -102,8 +102,8 @@ public class ESResponseParser {
             Map<String,String> flatValues = new LinkedHashMap<>();
             flatValues.putAll(dataObj);
             for (Field dataField : aggregationFields){
-                String columnName = dataField.getColumnName();
-                flatValues.put(columnName, String.valueOf(childNode.get(dataField.getDisplayName()).get(VALUE)));
+                String columnName = dataField.getDataField();
+                flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
             }
             flatStructure.add(flatValues);
         }
