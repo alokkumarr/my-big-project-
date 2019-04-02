@@ -7,6 +7,8 @@ import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
+import com.synchronoss.saw.logs.constants.SourceType;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -156,7 +158,7 @@ public class SawBisSftpPluginController {
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
         response = sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
-            Long.valueOf(requestBody.getRouteId()), null, false, "REGULAR");
+            Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
       } else {
         response = sftpServiceImpl.immediateTransfer(requestBody);
       }
@@ -217,7 +219,7 @@ public class SawBisSftpPluginController {
       CompletableFuture
           .supplyAsync(() -> sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
               Long.valueOf(requestBody.getRouteId()), null, false,
-              "REGULAR"), transactionPostExecutor)
+              SourceType.REGULAR.name()), transactionPostExecutor)
           .whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {

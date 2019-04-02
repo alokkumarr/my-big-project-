@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
  */
-//@Ignore
 public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_CHANNEL = "channels";
   private static final String BATCH_ROUTE = "routes";

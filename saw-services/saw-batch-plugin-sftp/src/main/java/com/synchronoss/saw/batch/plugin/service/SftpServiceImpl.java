@@ -21,6 +21,7 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
+import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import java.io.File;
 import java.io.FileFilter;
@@ -684,7 +685,7 @@ public class SftpServiceImpl extends SipPluginContract {
             }
             
             if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId) 
-                     && source.equals("REGULAR")) {
+                     && source.equals(SourceType.REGULAR)) {
             
               logger.info("Already process running for the route" + routeId 
                     + "and concurrency disabled hence skipping transfer");
@@ -1227,7 +1228,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
                          BisComponentState.DATA_REMOVED.value());
                     transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
-                          isDisable, "RETRY");
+                          isDisable, SourceType.RETRY.name());
                   } else {
                     logger.trace("Inside isDisable transferData when starts here "
                         + "log.getFileName() is null");
@@ -1264,7 +1265,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   logger
                     .trace("Inside the block of retry when file is not duplicate :" + log.getPid());
                   transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
-                      isDisable, null);
+                      isDisable, SourceType.RETRY.name());
                 } else {
                   // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
                   // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
@@ -1333,7 +1334,7 @@ public class SftpServiceImpl extends SipPluginContract {
                 filesInfo.addAll(
                     transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
                         destinationLocation, channelId, routeId, 
-                        fileExclusions, isDisable, "Retry"));
+                        fileExclusions, isDisable, SourceType.RETRY.name()));
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);
                 logger.info(
