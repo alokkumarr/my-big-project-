@@ -293,6 +293,32 @@ public class BatchIngestionIT extends BaseIT {
     root.put("status", 1);
     return root;
   }
+  
+  /**
+   * This method is used to prepare a route to use it while scheduling transfer. data on hourly
+   * basis
+   * 
+   * @return object {@link ObjectNode}
+   * @throws JsonProcessingException exception.
+   */
+  private ObjectNode prepareRouteDataSetForDisableConcurrency() throws JsonProcessingException {
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("routeName", "route-scheduled-transfer-" + testId());
+    childNode.put("sourceLocation", "/root/saw-batch-samples/log/small");
+    childNode.put("destinationLocation", "log/scheduled");
+    childNode.put("filePattern", "*.log");
+    childNode.put("fileExclusions", "csv");
+    childNode.put("disableDuplicate", "false");
+    childNode.put("disableConcurrency", "true");
+    childNode.put("batchSize", "10");
+    childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
+    childNode.put("description", "route has been created for scheduled test case");
+    ObjectNode root = mapper.createObjectNode();
+    root.put("createdBy", "sysadmin@synchronoss.com");
+    root.put("routeMetadata", new ObjectMapper().writeValueAsString(childNode));
+    root.put("status", 1);
+    return root;
+  }
 
   /**
    * This test-case is check the scenario to create a channel.
@@ -950,7 +976,11 @@ public class BatchIngestionIT extends BaseIT {
       assertEquals(true, jsonPath.getBoolean("status"));
     }
     assertEquals("SUCCESS", result);
+    this.tearDownRoute();
+    this.tearDownChannel();
+    this.tearDownLogs();
   }
+  
 
   private void waitForFileTobeAvailable(int retries, Long channelId, Long routeId) {
     JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
