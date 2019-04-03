@@ -206,7 +206,6 @@ export class JwtService {
     // }
     // tslint:enable
     // parsedJwt.ticket.products[0].productModules.push(insightsModule);
-    console.log(parsedJwt);
     return parsedJwt;
   }
 
