@@ -134,9 +134,12 @@ public class MigrateAnalysis {
     File jsonFile = new File(analysisFile);
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
+    JsonObject analyzeObject = jsonObject.getAsJsonObject("contents")
+        .getAsJsonArray("analyze").get(0).getAsJsonObject();
+
     MigrateAnalysis ma = new MigrateAnalysis();
 
-    Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(jsonObject);
+    Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(analyzeObject);
 
     System.out.println(gson.toJson(analysis, Analysis.class));
   }
