@@ -682,10 +682,14 @@ public class SftpServiceImpl extends SipPluginContract {
               String isConcurrency = isConcurrencyNode.asText();
               isConcurDisable = Boolean.valueOf(isConcurrency);
               logger.trace("Concurrency has been disabled :" + isConcurDisable);
+              logger.trace("Another process running :" + sipLogService.
+            		  checkIfAlreadyRunning(routeId));
+              logger.trace("Source regular" + source.equals(SourceType.REGULAR.name()));
             }
             
+            
             if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId) 
-                     && source.equals(SourceType.REGULAR)) {
+                     && source.equals(SourceType.REGULAR.name())) {
             
               logger.info("Already process running for the route" + routeId 
                     + "and concurrency disabled hence skipping transfer");
