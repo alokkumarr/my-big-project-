@@ -10,7 +10,6 @@ import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as flatMap from 'lodash/flatMap';
 import { Store } from '@ngxs/store';
 
 import {
@@ -62,7 +61,7 @@ import {
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis
 } from '../actions/designer.actions';
-// import { DesignerState } from '../state/designer.state';
+import { DesignerState } from '../state/designer.state';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -105,6 +104,7 @@ export class DesignerContainerComponent implements OnInit {
     private _jwtService: JwtService
   ) {
     window['designer'] = this;
+    window['DesignerState'] = DesignerState;
   }
 
   ngOnInit() {
@@ -417,16 +417,9 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
-  requestData() {
-    this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
-    this.fieldCount = 0;
-
-    const dataFields = isDSLAnalysis(this.analysis)
-      ? flatMap(this.analysis.sipQuery.artifacts, table => table.fields)
-      : this.analysis.sqlBuilder.dataFields;
-    const filters = isDSLAnalysis(this.analysis)
-      ? this.analysis.sipQuery.filters
-      : this.analysis.sqlBuilder.filters;
+  nonDSLAnalysisForRequest(analysis: Analysis): Analysis {
+    const dataFields = analysis.sqlBuilder.dataFields;
+    const filters = analysis.sqlBuilder.filters;
 
     forEach(dataFields, field => {
       if (field.checked === 'y' || field.area === 'y') {
@@ -444,12 +437,27 @@ export class DesignerContainerComponent implements OnInit {
         delete filt.model;
       }
     });
+
     this.analysis =
       this.analysis.type === 'chart'
-        ? this.formulateChartRequest(this.analysis)
-        : this.analysis;
+        ? this.formulateChartRequest(analysis)
+        : analysis;
+    return <Analysis>this.analysis;
+  }
 
-    this._designerService.getDataForAnalysis(this.analysis).then(
+  dslAnalysisForRequest(): AnalysisDSL {
+    return this._store.selectSnapshot(DesignerState.dslAnalysis);
+  }
+
+  requestData() {
+    this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
+    this.fieldCount = 0;
+
+    const requestAnalysis = isDSLAnalysis(this.analysis)
+      ? this.dslAnalysisForRequest()
+      : this.nonDSLAnalysisForRequest(this.analysis);
+
+    this._designerService.getDataForAnalysis(requestAnalysis).then(
       response => {
         if (
           this.isDataEmpty(
@@ -459,12 +467,10 @@ export class DesignerContainerComponent implements OnInit {
               (<Analysis>this.analysis).sqlBuilder
           )
         ) {
-          console.log('empty');
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
           this.dataCount = 0;
           this.data = this.setEmptyData();
         } else {
-          console.log('non empty');
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);

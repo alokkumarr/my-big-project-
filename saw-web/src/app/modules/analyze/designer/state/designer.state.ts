@@ -1,11 +1,12 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as forEach from 'lodash/forEach';
-import * as get from 'lodash/get';
+import * as flatMap from 'lodash/flatMap';
+import * as values from 'lodash/values';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
-import { DesignerStateModel } from '../types';
+import { DesignerStateModel, AnalysisDSL } from '../types';
 import {
   DesignerInitGroupAdapters,
   DesignerAddColumnToGroupAdapter,
@@ -38,8 +39,37 @@ export class DesignerState {
   }
 
   @Selector()
-  static filters(state: DesignerStateModel) {
-    return get(state, 'analysis.sipQuery.filters');
+  static dslAnalysis(state: DesignerStateModel): AnalysisDSL {
+    const fields: Array<any> = flatMap(
+      state.groupAdapters,
+      adapter => adapter.artifactColumns
+    );
+    const artifacts = {};
+    fields.forEach(field => {
+      artifacts[field.table] = artifacts[field.table] || {
+        artifactsName: field.table,
+        fields: []
+      };
+      artifacts[field.table].fields.push({
+        aggregate: field.aggregate,
+        alias: field.alias || field.aliasName,
+        area: field.area,
+        columnName: field.columnName,
+        dataField: field.name || field.columnName,
+        displayName: field.displayName,
+        dateFormat: field.dateFormat,
+        groupInterval: field.groupInterval,
+        name: field.name,
+        type: field.type,
+        table: field.table || field.tableName
+      });
+    });
+
+    const sipQuery = {
+      ...state.analysis.sipQuery,
+      artifacts: values(artifacts)
+    };
+    return { ...state.analysis, sipQuery };
   }
 
   @Action(DesignerInitEditAnalysis)

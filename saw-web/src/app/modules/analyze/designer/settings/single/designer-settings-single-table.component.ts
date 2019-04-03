@@ -14,6 +14,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
 import * as every from 'lodash/every';
+import * as findIndex from 'lodash/findIndex';
 import * as some from 'lodash/some';
 import * as map from 'lodash/map';
 import * as mapValues from 'lodash/mapValues';
@@ -22,7 +23,10 @@ import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { DesignerState } from '../../state/designer.state';
-import { DesignerAddColumnToGroupAdapter } from '../../actions/designer.actions';
+import {
+  DesignerAddColumnToGroupAdapter,
+  DesignerRemoveColumnFromGroupAdapter
+} from '../../actions/designer.actions';
 import { DesignerService } from '../../designer.service';
 import { DndPubsubService } from '../../../../../common/services';
 import {
@@ -258,10 +262,18 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
     artifactColumn: ArtifactColumn,
     groupAdapter: IDEsignerSettingGroupAdapter
   ) {
-    this._designerService.removeArtifactColumnFromGroup(
-      artifactColumn,
-      groupAdapter
+    const columnIndex = findIndex(
+      groupAdapter.artifactColumns,
+      ({ columnName }) => artifactColumn.columnName === columnName
     );
+    const adapterIndex = this.groupAdapters.indexOf(groupAdapter);
+    this._store.dispatch(
+      new DesignerRemoveColumnFromGroupAdapter(columnIndex, adapterIndex)
+    );
+    // this._designerService.removeArtifactColumnFromGroup(
+    //   artifactColumn,
+    //   groupAdapter
+    // );
     this.onFieldsChange();
   }
 
