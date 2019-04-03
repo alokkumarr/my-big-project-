@@ -5,9 +5,9 @@ spring:
     name: sip-alert-service
   #mariaDB (Alert) DB details
   datasource:
-    url: jdbc:mariadb://localhost:3306/sip_alert
+    url: jdbc:mariadb://localhost:3306/sip_alert1
     username: root
-    password: root
+    password:
     driver-class-name: org.mariadb.jdbc.Driver
     max-active: 25
     testOnBorrow: true
@@ -16,7 +16,9 @@ spring:
     validationQuery: SELECT 1
     testWhileIdle: true
     logValidationErrors: true
-flyway.baselineOnMigrate: true
+
+  flyway:
+    baselineOnMigrate:: true
 logging:
   level:
     com.synchronoss.sip: INFO
@@ -25,7 +27,7 @@ logging:
 
 server:
   address: localhost
-  port: 9620
+  port: 9621
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
