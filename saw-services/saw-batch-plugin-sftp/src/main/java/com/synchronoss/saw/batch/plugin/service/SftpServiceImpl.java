@@ -675,16 +675,12 @@ public class SftpServiceImpl extends SipPluginContract {
               String disableDupFlag = rootNode.get("disableDuplicate").asText();
               isDisable = Boolean.valueOf(disableDupFlag);
               logger.trace("Duplicate has been disabled :" + isDisable);
-            }
+            }  
             JsonNode isConcurrencyNode = rootNode.get("disableConcurrency");
             Boolean isConcurDisable = null;
             if (isConcurrencyNode != null) {
               String isConcurrency = isConcurrencyNode.asText();
               isConcurDisable = Boolean.valueOf(isConcurrency);
-              logger.trace("Concurrency has been disabled :" + isConcurDisable);
-              logger.trace("Another process running :" + sipLogService.
-            		  checkIfAlreadyRunning(routeId));
-              logger.trace("Source regular" + source.equals(SourceType.REGULAR.name()));
             }
             
             
