@@ -127,17 +127,17 @@ public class MigrateAnalysis {
    * @throws IOException - In case of file errors
    */
   public static void main(String[] args) throws IOException {
-    System.out.println("Convert analysis");
+    String analysisFile = args[0];
+    System.out.println("Convert analysis from file = " + analysisFile);
 
-    Gson gson = new Gson();
-    ClassLoader classLoader = MigrateAnalysis.class.getClassLoader();
-    File jsonFile = new File(classLoader.getResource("sample-esreport.json").getPath());
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    File jsonFile = new File(analysisFile);
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
     MigrateAnalysis ma = new MigrateAnalysis();
 
     Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(jsonObject);
 
-    System.out.println(gson.toJsonTree(analysis, Analysis.class));
+    System.out.println(gson.toJson(analysis, Analysis.class));
   }
 }
