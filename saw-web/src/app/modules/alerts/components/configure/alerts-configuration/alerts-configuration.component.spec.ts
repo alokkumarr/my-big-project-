@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { AlertsConfigurationComponent } from './alerts-configuration.component';
 
@@ -8,9 +9,9 @@ describe('AlertsConfigurationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AlertsConfigurationComponent ]
-    })
-    .compileComponents();
+      declarations: [AlertsConfigurationComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
