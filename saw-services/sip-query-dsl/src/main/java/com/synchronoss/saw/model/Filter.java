@@ -230,7 +230,7 @@ public class Filter {
   public enum Type {
     LONG("long"),
     STRING("string"),
-    INT("integer"),
+    INTEGER("integer"),
     DOUBLE("double"),
     DATE("date"),
     TIMESTAMP("timestamp"),
