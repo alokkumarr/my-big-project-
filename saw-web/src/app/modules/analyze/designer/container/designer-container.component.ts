@@ -588,10 +588,13 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   openSaveDialog(): Promise<any> {
-    this.analysis.categoryId =
+    const categoryIdField = isDSLAnalysis(this.analysis)
+      ? 'category'
+      : 'categoryId';
+    this.analysis[categoryIdField] =
       this.designerMode === 'new' || this.designerMode === 'fork'
         ? this._jwtService.userAnalysisCategoryId
-        : this.analysis.categoryId;
+        : this.analysis[categoryIdField];
     return this._analyzeDialogService
       .openSaveDialog(<Analysis>this.analysis, this.designerMode)
       .afterClosed()
