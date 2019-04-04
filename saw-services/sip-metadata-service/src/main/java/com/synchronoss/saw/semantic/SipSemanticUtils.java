@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -41,6 +43,8 @@ public class SipSemanticUtils {
   public static final String COMMA = ",";
   public static final String PATH_SEARCH = "action.content.";
 
+  private static Logger logger = LoggerFactory.getLogger(SipSemanticUtils.class);
+
   /**
    * collectHeaders.
    *
@@ -53,6 +57,27 @@ public class SipSemanticUtils {
       headers.addAll(map.keySet());
     }
     return headers;
+  }
+
+  /**
+   * This is used to set the audit information.
+   * @param node {@link SemanticNode}
+   * @param headers {@link Map}
+   * @return {@link SemanticNode}
+   */
+  public static SemanticNode setAuditInformation(SemanticNode node, Map<String, String> headers) {
+    logger.trace("Setting audit information starts here");
+    if (headers.get("x-customercode") != null) {
+      node.setCustomerCode(headers.get("x-customercode"));
+      logger.trace("x-customercode:" + headers.get("x-customercode"));
+    }
+    if (headers.get("x-userName") != null) {
+      node.setUsername(headers.get("x-userName"));
+      node.setCreatedBy(headers.get("x-userName"));
+      logger.trace("x-userName:" + headers.get("x-userName"));
+    }
+    logger.trace("Setting audit information ends here");
+    return node;
   }
 
   /**
@@ -73,19 +98,19 @@ public class SipSemanticUtils {
   }
 
   /**
-   * node2Jsonobject.
-   *
-   * @param node SemanticNode
-   * @param basePath basePath
-   * @param id Object Id
-   * @param action SemanticNode action
-   * @param category category id
-   * @return List MetaDataStoreStructure
-   * @throws JsonProcessingException when Json parse error.
+   * This method is used to convert node to json format.
+   * 
+   * @param node {@link SemanticNode}.
+   * @param basePath base path.
+   * @param id unique id.
+   * @param action crud operation.
+   * @param category
+   *        {@link com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category}}
+   * @return {@link MetaDataStoreStructure}
+   * @throws JsonProcessingException exception
    */
-  public static List<MetaDataStoreStructure> node2Jsonobject(
-      SemanticNode node, String basePath, String id, Action action, Category category)
-      throws JsonProcessingException {
+  public static List<MetaDataStoreStructure> node2JsonObject(SemanticNode node, String basePath,
+      String id, Action action, Category category) throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
     if (node != null) {
       metaDataStoreStructure.setSource(node);
@@ -113,9 +138,8 @@ public class SipSemanticUtils {
    * @return String SemanticNode as JsonString.
    * @throws JsonProcessingException when json parse error
    */
-  public static String node2JsonString(
-      SemanticNode node, String basePath, String id, Action action, Category category, Query query)
-      throws JsonProcessingException {
+  public static String node2JsonString(SemanticNode node, String basePath, String id, Action action,
+      Category category, Query query) throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
 
     if (node != null) {
@@ -144,8 +168,8 @@ public class SipSemanticUtils {
    * @param separator separator
    * @return String
    */
-  private static String getSeperatedColumns(
-      Set<String> headers, Map<String, Object> map, String separator) {
+  private static String getSeperatedColumns(Set<String> headers, Map<String, Object> map,
+      String separator) {
     List<Object> items = new ArrayList<Object>();
     for (String header : headers) {
       Object value = map.get(header) == null ? "" : map.get(header);
@@ -162,8 +186,8 @@ public class SipSemanticUtils {
    * @param separator separator
    * @return List CSV data
    */
-  public static List<Object> getTabularFormat(
-      List<Map<String, Object>> flatJson, String separator) {
+  public static List<Object> getTabularFormat(List<Map<String, Object>> flatJson,
+      String separator) {
     List<Object> data = new ArrayList<>();
     Set<String> headers = collectHeaders(flatJson);
     String csvString = StringUtils.join(headers.toArray(), separator);
@@ -333,6 +357,7 @@ public class SipSemanticUtils {
 
   /**
    * createResponse.
+   * 
    * @param body body
    * @param httpStatus HttpStatus
    * @param <T> type

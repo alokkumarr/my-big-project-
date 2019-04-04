@@ -1,0 +1,191 @@
+{
+  "ACTUAL_VS_TARGET": {
+    "dashboard": {
+      "ACVTA001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "This Week",
+          "primaryAggregation": "Sum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        },
+        "description": "Admin should create & delete dashboards using actual vs target kpi with long column values."
+      },
+      "ACVTA002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Yesterday",
+          "primaryAggregation": "Average",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        },
+        "description": "User should create & delete dashboards using actual vs target kpi with float values."
+      },
+      "ACVTA003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "kpiInfo": {
+          "column": "Integer",
+          "date": "Date",
+          "filter": "MTD (Month to Date)",
+          "primaryAggregation": "Minimum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "blues"
+        },
+        "description": "Admin should create & delete dashboards using actual vs target kpi with integer values."
+      },
+      "ACVTA004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Double",
+          "date": "Date",
+          "filter": "Last Week",
+          "primaryAggregation": "Maximum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        },
+        "description": "User should create & delete dashboards using actual vs target kpi with double values."
+      },
+      "ACVTA005": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "YTD (Year to Date)",
+          "primaryAggregation": "Count",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        },
+        "description": "Admin should create & delete dashboards using actual vs target kpi with long values."
+      },
+      "ACVTA006": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last Week",
+          "primaryAggregation": "Average",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        },
+        "description": "User should create & delete dashboards using actual vs target kpi with float and last week values."
+      },
+      "ACVTA007": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "Last 6 Weeks",
+          "primaryAggregation": "Minimum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        },
+        "description": "Admin should create & delete dashboards using actual vs target kpi with long and last 6 weeks values."
+      },
+      "ACVTA008": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last 2 Weeks",
+          "primaryAggregation": "Maximum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        },
+        "description": "User should create & delete dashboards using actual vs target kpi with float and last 2 weeks values."
+      },
+      "ACVTA009": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "Last Month",
+          "primaryAggregation": "Count",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        },
+        "description": "Admin should create & delete dashboards using actual vs target kpi with long and last month values."
+      },
+      "ACVTA010": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last Quarter",
+          "primaryAggregation": "Average",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        },
+        "description": "User should create & delete dashboards using actual vs target kpi with float and last quarter values."
+      },
+      "ACVTA011": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "Last 3 Months",
+          "primaryAggregation": "Sum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        },
+        "description": "Admin should create & delete dashboards using actual vs target kpi with long and last 3 months values."
+      },
+      "ACVTA012": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last 6 Months",
+          "primaryAggregation": "Minimum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        },
+        "description": "User should create & delete dashboards using actual vs target kpi with float and last 6 months values."
+      }
+    }
+  }
+}
