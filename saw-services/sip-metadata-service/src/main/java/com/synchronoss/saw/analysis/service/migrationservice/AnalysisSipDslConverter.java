@@ -359,8 +359,11 @@ public interface AnalysisSipDslConverter {
     }
 
     if (fieldObject.has("aggregate")) {
-      String aggVal = fieldObject.get("aggregate").getAsString();
-      field.setAggregate(Field.Aggregate.fromValue(aggVal));
+      JsonElement aggValElement = fieldObject.get("aggregate");
+
+      if (aggValElement != null) {
+        field.setAggregate(Field.Aggregate.fromValue(aggValElement.getAsString()));
+      }
     }
 
     if (fieldObject.has("groupInterval")) {
