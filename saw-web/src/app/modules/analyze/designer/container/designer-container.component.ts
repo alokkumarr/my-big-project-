@@ -337,6 +337,7 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   forkAnalysis() {
+    console.log(this.analysis);
     const { type, semanticId } = this.analysis;
     const analysis = this.analysis;
     this.analysis = null;

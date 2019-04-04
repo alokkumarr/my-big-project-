@@ -284,7 +284,10 @@ export class AnalyzeService {
 
   readAnalysisDSL(analysisId): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.get(`${apiUrl}/dslanalysis/${analysisId}`).pipe(first())
+      this._http.get(`${apiUrl}/dslanalysis/${analysisId}`).pipe(
+        first(),
+        map((resp: { analysis: AnalysisDSL }) => resp.analysis)
+      )
     );
   }
 
@@ -584,6 +587,7 @@ export class AnalyzeService {
 
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {
     // return this.createAnalysisNonDSL(metricId, type);
+    console.log(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
       ? this.createAnalysisDSL(
           this.newAnalysisModel(metricId, type)

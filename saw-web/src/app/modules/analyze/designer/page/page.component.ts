@@ -6,11 +6,12 @@ import {
   EXECUTION_MODES
 } from '../../services/analyze.service';
 import { JwtService } from '../../../../common/services/jwt.service';
-import { DesignerSaveEvent, DesignerMode } from '../types';
+import { DesignerSaveEvent, DesignerMode, isDSLAnalysis } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ExecuteService } from '../../services/execute.service';
+import { Analysis, AnalysisDSL } from '../types';
 import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
 
@@ -137,13 +138,18 @@ export class DesignerPageComponent implements OnInit {
           existingAnalysisParams.isDSLAnalysis === 'true'
         )
         .then(analysis => {
-          this.analysis = this.forkIfNecessary({
-            ...analysis,
-            name:
-              this.designerMode === 'fork'
-                ? `${analysis.name} Copy`
-                : analysis.name
-          });
+          this.analyzeService
+            .getArtifactsForDataSet(analysis.semanticId)
+            .then(artifacts => {
+              this.analysis = this.forkIfNecessary({
+                ...analysis,
+                artifacts,
+                name:
+                  this.designerMode === 'fork'
+                    ? `${analysis.name} Copy`
+                    : analysis.name
+              });
+            });
         });
     }
   }
@@ -160,10 +166,13 @@ export class DesignerPageComponent implements OnInit {
    * @returns
    * @memberof DesignerPageComponent
    */
-  forkIfNecessary(analysis) {
+  forkIfNecessary(analysis: Analysis | AnalysisDSL) {
     const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId;
+    const analysisCategoryId = isDSLAnalysis(analysis)
+      ? analysis.category
+      : analysis.categoryId;
     if (
-      userAnalysisCategoryId === analysis.categoryId ||
+      userAnalysisCategoryId === analysisCategoryId ||
       this.designerMode !== 'edit'
     ) {
       /* Analysis is from user's private folder or action is not edit.
@@ -176,8 +185,7 @@ export class DesignerPageComponent implements OnInit {
         ...analysis,
         categoryId: userAnalysisCategoryId,
         parentAnalysisId: analysis.id,
-        parentCategoryId: analysis.categoryId,
-        parentLastModified: analysis.updatedTimestamp || 0
+        parentCategoryId: analysisCategoryId
       };
     }
   }
