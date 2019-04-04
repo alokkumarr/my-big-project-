@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
+/** This ENUM classs defines the severity of Alerts. */
 public enum AlertSeverity {
   CRITICAL("CRITICAL"),
   MEDIUM("MEDIUM"),
@@ -19,10 +20,21 @@ public enum AlertSeverity {
 
   private final String value;
 
+  /**
+   * AlertSeverity Value.
+   *
+   * @param value AlertSeverity
+   */
   private AlertSeverity(String value) {
     this.value = value;
   }
 
+  /**
+   * Fetch value.
+   *
+   * @param value AlertSeverity
+   * @return AlertSeverity
+   */
   @JsonCreator
   public static AlertSeverity fromValue(String value) {
     AlertSeverity constant = CONSTANTS.get(value);

@@ -15,7 +15,7 @@ public class DatapodDetails {
 
   @Id
   @Column(name = "DATAPOD_ID")
-  String datapodID;
+  String datapodId;
 
   @Column(name = "DATAPOD_NAME")
   String datapodName;

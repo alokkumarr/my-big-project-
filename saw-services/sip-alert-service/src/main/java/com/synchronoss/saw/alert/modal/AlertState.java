@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
+/** This ENUM defines Alert state changes. */
 public enum AlertState {
   CRITICAL("ALARM"),
   MEDIUM("OK");
@@ -18,10 +19,21 @@ public enum AlertState {
 
   private final String value;
 
+  /**
+   * AlertState value.
+   *
+   * @param value AlertState
+   */
   private AlertState(String value) {
     this.value = value;
   }
 
+  /**
+   * Fetch from value.
+   *
+   * @param value String
+   * @return AlertState
+   */
   @JsonCreator
   public static AlertState fromValue(String value) {
     AlertState constant = CONSTANTS.get(value);

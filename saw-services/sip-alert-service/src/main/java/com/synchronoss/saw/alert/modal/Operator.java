@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This Enum class defines the Operator like GT > , LT < , GTE >= , LTE <= , EQ =, NEQ != , bTW -
+ * between , SW - start with , EW- End With Contains, Is IN and Is not In.
+ */
 public enum Operator {
   GT("GT"),
   LT("LT"),
@@ -28,10 +32,21 @@ public enum Operator {
 
   private final String value;
 
+  /**
+   * Operator value.
+   *
+   * @param value Operator
+   */
   private Operator(String value) {
     this.value = value;
   }
 
+  /**
+   * fetch from value.
+   *
+   * @param value Operator
+   * @return Operator
+   */
   @JsonCreator
   public static Operator fromValue(String value) {
     Operator constant = CONSTANTS.get(value);
