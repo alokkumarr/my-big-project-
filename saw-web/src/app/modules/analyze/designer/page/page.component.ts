@@ -14,6 +14,7 @@ import { ExecuteService } from '../../services/execute.service';
 import { Analysis, AnalysisDSL } from '../types';
 import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
+import * as find from 'lodash/find';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -143,7 +144,7 @@ export class DesignerPageComponent implements OnInit {
             .then(artifacts => {
               this.analysis = this.forkIfNecessary({
                 ...analysis,
-                artifacts,
+                artifacts: this.fixArtifactsForSIPQuery(analysis, artifacts),
                 name:
                   this.designerMode === 'fork'
                     ? `${analysis.name} Copy`
@@ -152,6 +153,28 @@ export class DesignerPageComponent implements OnInit {
             });
         });
     }
+  }
+
+  fixArtifactsForSIPQuery(analysis, artifacts) {
+    if (!isDSLAnalysis(analysis)) {
+      return artifacts;
+    }
+
+    analysis.sipQuery.artifacts[0].fields.forEach(field => {
+      const artifactColumn = find(
+        artifacts[0].columns,
+        col => col.columnName === field.columnName
+      );
+
+      if (!artifactColumn) {
+        return;
+      }
+
+      artifactColumn.checked = true;
+      artifactColumn.area = field.area;
+    });
+
+    return artifacts;
   }
 
   /**
@@ -167,12 +190,12 @@ export class DesignerPageComponent implements OnInit {
    * @memberof DesignerPageComponent
    */
   forkIfNecessary(analysis: Analysis | AnalysisDSL) {
-    const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId;
+    const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId.toString();
     const analysisCategoryId = isDSLAnalysis(analysis)
       ? analysis.category
       : analysis.categoryId;
     if (
-      userAnalysisCategoryId === analysisCategoryId ||
+      userAnalysisCategoryId === analysisCategoryId.toString() ||
       this.designerMode !== 'edit'
     ) {
       /* Analysis is from user's private folder or action is not edit.

@@ -57,6 +57,7 @@ export class DesignerState {
         alias: field.alias || field.aliasName,
         area: field.area,
         columnName: field.columnName,
+        comboType: field.comboType || 'column',
         dataField: field.name || field.columnName,
         displayName: field.displayName,
         dateFormat: field.dateFormat,

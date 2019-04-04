@@ -10,7 +10,8 @@ import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
-import { Store } from '@ngxs/store';
+import { Store, Select } from '@ngxs/store';
+import { Observable } from 'rxjs';
 
 import {
   flattenPivotData,
@@ -79,6 +80,8 @@ export class DesignerContainerComponent implements OnInit {
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
+  @Select(DesignerState.dslAnalysis) dslAnalysis$: Observable<AnalysisDSL>;
+
   public isInDraftMode = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;

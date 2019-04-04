@@ -25,7 +25,9 @@
     [filters]="filters"
     [chartTitle]="chartTitle"
     [fieldCount]="fieldCount"
-    [sqlBuilder]="analysis.sqlBuilder"
+    [sqlBuilder]="
+      analysis.sipQuery ? (dslAnalysis$ | async).sipQuery : analysis.sqlBuilder
+    "
     [designerState]="designerState"
   >
   </single-table-designer-layout>
