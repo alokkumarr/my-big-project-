@@ -12,6 +12,8 @@ import * as moment from 'moment';
 import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as toNumber from 'lodash/toNumber';
+import * as round from 'lodash/round';
+
 import * as defaults from 'lodash/defaults';
 
 import { DATE_PRESETS_OBJ, BULLET_CHART_OPTIONS } from '../../consts';
@@ -151,7 +153,7 @@ export class ObserveKPIBulletComponent
         this.item.bullet.bulletPalette,
         this.item.bullet.measure1,
         this.item.bullet.measure2,
-        toNumber(count),
+        round(toNumber(count), 2),
         this.item.bullet.target
       );
       changes.push(
