@@ -8,7 +8,7 @@ const APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 const ObserveHelper = require('../../helpers/api/ObserveHelper');
 const chai = require('chai');
-const Constants = require('../../helpers/Constants');
+const ES_REPORT = require('../../helpers/Constants').ES_REPORT;
 const assert = chai.assert;
 const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
@@ -81,15 +81,10 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
           const currentTime = new Date().getTime();
 
           const name =
-            'AT ' +
-            Constants.ES_REPORT +
-            ' ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+            'AT ' + ES_REPORT + ' ' + globalVariables.e2eId + '-' + currentTime;
           const description =
             'AT Description:' +
-            Constants.ES_REPORT +
+            ES_REPORT +
             ' for e2e ' +
             globalVariables.e2eId +
             '-' +
@@ -103,8 +98,8 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
             token,
             name,
             description,
-            Constants.ES_REPORT,
-            null
+            ES_REPORT,
+            null // No subtype of Es Report.
           );
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');

@@ -6,9 +6,13 @@ const SideNav = require('./SideNav');
 
 class Header extends SideNav {
   constructor() {
+
     super();
     this._accountSettingIcon = element(
       by.css(`[e2e='account-settings-menu-btn']`)
+    );
+    this._accountChangePasswordLink = element(
+      by.css(`[e2e='account-settings-selector-change-password']`)
     );
     this._accountLogoutLink = element(
       by.css(`[e2e='account-settings-selector-logout']`)
@@ -23,17 +27,14 @@ class Header extends SideNav {
     this._observeLink = element(
       by.xpath('//a[contains(@class,"module-observe")]')
     );
-
+    this._analyzeLink = element(
+      by.xpath('//a[contains(@class,"module-analyze")]')
+    );
     this._progressBar = element(
       by.css('mat-progress-bar[mode="indeterminate"]')
     );
-
     this._workbenchLink = element(
       by.xpath('//a[contains(@class,"module-workbench")]')
-    );
-
-    this._analyzeLink = element(
-      by.xpath('//a[contains(@class,"module-analyze")]')
     );
   }
 
@@ -43,6 +44,24 @@ class Header extends SideNav {
 
   clickOnObserveLink() {
     commonFunctions.clickOnElement(this._observeLink);
+  }
+
+
+  doChangePassword() {
+    logger.silly('Clicking on ChangePassword button..');
+    commonFunctions.waitFor.elementToBeVisible(this._accountSettingIcon);
+    if (!this._accountSettingIcon.isPresent()) {
+      commonFunctions.goToHome();
+    }
+    this._accountSettingIcon.click();
+    commonFunctions.waitFor.elementToBeVisible(this._accountChangePasswordLink);
+    this._accountChangePasswordLink.click();
+    commonFunctions.waitFor.pageToBeReady(/changePwd/);
+  }
+
+  verifyChangePassword()
+  {
+    commonFunctions.waitFor.pageToBeReady(/login/);
   }
 
   doLogout() {
@@ -58,6 +77,7 @@ class Header extends SideNav {
   }
 
   verifyLogo() {
+    commonFunctions.waitFor.elementToBeVisible(this._companyLogo);
     expect(this._companyLogo.isPresent()).toBeTruthy();
   }
   openCategoryMenu() {

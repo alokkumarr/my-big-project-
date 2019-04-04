@@ -50,11 +50,13 @@ public class SipSemanticController {
   @ResponseStatus(HttpStatus.CREATED)
   public SemanticNode addSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @RequestBody SemanticNode requestBody)
+      @RequestBody SemanticNode requestBody,
+      @RequestHeader Map<String, String> headers)
       throws SipJsonMissingException {
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
+    SipMetadataUtils.setAuditInformation(requestBody, headers);
     SipMetadataUtils.checkSemanticMandatoryFields(requestBody);
     logger.trace("Request Body to create a semantic node:{}", requestBody);
     SemanticNode responseObjectFuture = null;
@@ -107,18 +109,16 @@ public class SipSemanticController {
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "id", required = true) String id,
-      @RequestBody SemanticNode requestBody)
-      throws SipJsonMissingException {
+      @PathVariable(name = "Id", required = true) String id, @RequestBody SemanticNode requestBody,
+      @RequestHeader Map<String, String> headers) throws SipJsonMissingException {
     logger.trace("Request Body to update a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       requestBody.set_id(id);
       logger.trace("Invoking service with entity id : {} ", requestBody.get_id());
-      responseObjectFuture = semanticService.updateSemantic(requestBody);
-      logger.trace(
-          "Semantic updateded successfully : {}",
+      responseObjectFuture = semanticService.updateSemantic(requestBody, headers);
+      logger.trace("Semantic updateded successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
     } catch (SipUpdateEntityException | JsonProcessingException ex) {
       throw new SipUpdateEntityException("Problem on the storage while creating an entity");

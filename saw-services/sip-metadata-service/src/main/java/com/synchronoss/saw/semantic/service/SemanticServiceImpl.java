@@ -68,15 +68,16 @@ public class SemanticServiceImpl implements SemanticService {
   @NotNull
   private String migrationMetadataHome;
 
-  public static void main(String[] args) {}
-
   @PostConstruct
   private void init() throws Exception {
     if (migrationRequires) {
-      new MigrationService()
-          .convertHBaseBinaryToMaprdbStore(transportUri, basePath, migrationMetadataHome);
+      logger.trace("Migration initiated.. " + migrationRequires);
+      new MigrationService().convertHBaseBinaryToMaprdbStore(transportUri, basePath,
+          migrationMetadataHome);
     }
+    logger.trace("Migration ended..");
   }
+
 
   @Override
   public SemanticNode addSemantic(SemanticNode node)
@@ -87,12 +88,13 @@ public class SemanticServiceImpl implements SemanticService {
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
     try {
-      List<MetaDataStoreStructure> structure =
-          SipMetadataUtils.node2Jsonobject(
-              node, basePath, node.get_id(), Action.create, Category.Semantic);
-      logger.trace(
-          "Before invoking request to MaprDB JSON store :{}", mapper.writeValueAsString(structure));
-      node = setRepository(node);
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
+          node.get_id(), Action.create, Category.Semantic);
+      logger.trace("Before invoking request to MaprDB JSON store :{}",
+          mapper.writeValueAsString(structure));
+      if (node.getRepository() == null) {
+        node = setRepository(node);
+      }
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
@@ -116,11 +118,8 @@ public class SemanticServiceImpl implements SemanticService {
   private SemanticNode setRepository(SemanticNode semanticNode)
       throws JsonProcessingException, IOException {
     logger.trace("Setting repository starts here..");
-    String requestUrl =
-        workbenchURl
-            + "/internal/workbench/projects/"
-            + semanticNode.getProjectCode()
-            + "/datasets/";
+    String requestUrl = workbenchURl + "/internal/workbench/projects/"
+        + semanticNode.getProjectCode() + "/datasets/";
     List<Object> dataSetDetailsObject = new ArrayList<>();
     DataSet dataSet = null;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -147,16 +146,15 @@ public class SemanticServiceImpl implements SemanticService {
       repoNode = objectMapper.createObjectNode();
       repoNode.put(DataSetProperties.Name.toString(), dataSetName);
       repoNode.put(DataSetProperties.Format.toString(), dataSetFormat);
-      repoNode.put(
-          DataSetProperties.PhysicalLocation.toString(), physicalLocation + Path.SEPARATOR);
+      repoNode.put(DataSetProperties.PhysicalLocation.toString(),
+          physicalLocation + Path.SEPARATOR);
       dataSetDetailsObject.add(repoNode);
       respository.add(repoNode);
     }
     semanticNode.setRepository(dataSetDetailsObject);
     logger.trace("Setting repository ends here.");
-    logger.trace(
-        "Semantic node after adding repository for DL type: "
-            + objectMapper.writeValueAsString(semanticNode));
+    logger.trace("Semantic node after adding repository for DL type: "
+        + objectMapper.writeValueAsString(semanticNode));
     return semanticNode;
   }
 
@@ -168,9 +166,8 @@ public class SemanticServiceImpl implements SemanticService {
     SemanticNode nodeRetrieved = null;
     SemanticNode newSemanticNode = null;
     try {
-      List<MetaDataStoreStructure> structure =
-          SipMetadataUtils.node2Jsonobject(
-              node, basePath, node.get_id(), Action.read, Category.Semantic);
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
+          node.get_id(), Action.read, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -189,18 +186,19 @@ public class SemanticServiceImpl implements SemanticService {
   }
 
   @Override
-  public SemanticNode updateSemantic(SemanticNode node)
+  public SemanticNode updateSemantic(SemanticNode node, Map<String, String> headers)
       throws SipJsonValidationException, SipUpdateEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("updating semantic from the store with an Id : {}", node.get_id());
-    Preconditions.checkArgument(node.getUpdatedBy() != null, "Updated by mandatory attribute.");
     SemanticNode responseNode = new SemanticNode();
     SemanticNode newSemanticNode = null;
-    node.setUpdatedBy(node.getUpdatedBy());
+    if (headers.get("x-userName") != null) {
+      node.setUpdatedBy(headers.get("x-userName"));
+      logger.trace(headers.get("x-userName"));
+    }
     try {
-      List<MetaDataStoreStructure> structure =
-          SipMetadataUtils.node2Jsonobject(
-              node, basePath, node.get_id(), Action.update, Category.Semantic);
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
+          node.get_id(), Action.update, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -224,9 +222,8 @@ public class SemanticServiceImpl implements SemanticService {
     SemanticNode responseObject = new SemanticNode();
     SemanticNode newSemanticNode = new SemanticNode();
     try {
-      List<MetaDataStoreStructure> structure =
-          SipMetadataUtils.node2Jsonobject(
-              node, basePath, node.get_id(), Action.delete, Category.Semantic);
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
+          node.get_id(), Action.delete, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -254,8 +251,8 @@ public class SemanticServiceImpl implements SemanticService {
       if (node.getCreatedBy() != null || node.getUsername() != null) {
         filterCreated.setFieldPath("username");
         filterCreated.setCondition(Condition.EQ);
-        filterCreated.setValue(
-            node.getCreatedBy() != null ? node.getCreatedBy() : node.getUsername());
+        filterCreated
+            .setValue(node.getCreatedBy() != null ? node.getCreatedBy() : node.getUsername());
         filters.add(filterCreated);
       }
       Filter filterCustomerCode = new Filter();
@@ -287,9 +284,8 @@ public class SemanticServiceImpl implements SemanticService {
         filters.add(filterMetricName);
       }
       query.setFilter(filters);
-      String searchQuery =
-          SipMetadataUtils.node2JsonString(
-              node, basePath, node.get_id(), Action.search, Category.Semantic, query);
+      String searchQuery = SipMetadataUtils.node2JsonString(node, basePath, node.get_id(),
+          Action.search, Category.Semantic, query);
       logger.debug("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);
       requestMetaDataStore.process();
@@ -305,34 +301,24 @@ public class SemanticServiceImpl implements SemanticService {
             logger.debug("Inside resultArray.isJsonArray() ");
             logger.debug(
                 " element.isJsonArray() :" + resultArray.getAsJsonArray().get(i).isJsonArray());
-            logger.debug(
-                " element.isJsonObject() :"
-                    + resultArray
-                        .getAsJsonArray()
-                        .get(i)
-                        .getAsJsonObject()
-                        .getAsJsonObject(String.valueOf(j)));
-            String jsonString =
-                resultArray
-                    .getAsJsonArray()
-                    .get(i)
-                    .getAsJsonObject()
-                    .getAsJsonObject(String.valueOf(j))
-                    .toString();
+            logger.debug(" element.isJsonObject() :" + resultArray.getAsJsonArray().get(i)
+                .getAsJsonObject().getAsJsonObject(String.valueOf(j)));
+            String jsonString = resultArray.getAsJsonArray().get(i).getAsJsonObject()
+                .getAsJsonObject(String.valueOf(j)).toString();
             SemanticNode semanticNode = mapper.readValue(jsonString, SemanticNode.class);
             logger.trace("Id: {}", semanticNode.get_id());
             // This is extra field copy of _id field to support both backend & frontend
             semanticNode.setId(semanticNode.get_id());
             semanticNode.setStatusMessage("Entity has retrieved successfully");
             SemanticNode newSemanticNode = new SemanticNode();
-            org.springframework.beans.BeanUtils.copyProperties(
-                semanticNode, newSemanticNode, "_id");
+            org.springframework.beans.BeanUtils.copyProperties(semanticNode, newSemanticNode,
+                "_id");
             semanticNodes.add(newSemanticNode);
           }
         }
         responseNode.setSemanticNodes(semanticNodes);
       } else {
-        throw new SipReadEntityException("There is no data avaiable for the given criteria");
+        responseNode.setSemanticNodes(semanticNodes);
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
@@ -361,8 +347,8 @@ public class SemanticServiceImpl implements SemanticService {
       if (node.getCreatedBy() != null || node.getUsername() != null) {
         filterCreated.setFieldPath("username");
         filterCreated.setCondition(Condition.EQ);
-        filterCreated.setValue(
-            node.getCreatedBy() != null ? node.getCreatedBy() : node.getUsername());
+        filterCreated
+            .setValue(node.getCreatedBy() != null ? node.getCreatedBy() : node.getUsername());
         filters.add(filterCreated);
       }
       Filter filterCustomerCode = new Filter();
@@ -394,9 +380,8 @@ public class SemanticServiceImpl implements SemanticService {
         filters.add(filterMetricName);
       }
       query.setFilter(filters);
-      String searchQuery =
-          SipMetadataUtils.node2JsonString(
-              node, basePath, node.get_id(), Action.search, Category.Semantic, query);
+      String searchQuery = SipMetadataUtils.node2JsonString(node, basePath, node.get_id(),
+          Action.search, Category.Semantic, query);
       logger.trace("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);
       requestMetaDataStore.process();
@@ -411,20 +396,10 @@ public class SemanticServiceImpl implements SemanticService {
             logger.trace("Inside resultArray.isJsonArray() ");
             logger.trace(
                 " element.isJsonArray() :" + resultArray.getAsJsonArray().get(i).isJsonArray());
-            logger.trace(
-                " element.isJsonObject() :"
-                    + resultArray
-                        .getAsJsonArray()
-                        .get(i)
-                        .getAsJsonObject()
-                        .getAsJsonObject(String.valueOf(j)));
-            String jsonString =
-                resultArray
-                    .getAsJsonArray()
-                    .get(i)
-                    .getAsJsonObject()
-                    .getAsJsonObject(String.valueOf(j))
-                    .toString();
+            logger.trace(" element.isJsonObject() :" + resultArray.getAsJsonArray().get(i)
+                .getAsJsonObject().getAsJsonObject(String.valueOf(j)));
+            String jsonString = resultArray.getAsJsonArray().get(i).getAsJsonObject()
+                .getAsJsonObject(String.valueOf(j)).toString();
 
             SemanticNode semanticNodeTemp = mapper.readValue(jsonString, SemanticNode.class);
             logger.trace("Id: {}", semanticNodeTemp.get_id());
@@ -432,13 +407,8 @@ public class SemanticServiceImpl implements SemanticService {
             semanticNodeTemp.setId(semanticNodeTemp.get_id());
             semanticNodeTemp.setStatusMessage("Entity has been retrieved successfully");
             SemanticNode newSemanticNode = new SemanticNode();
-            org.springframework.beans.BeanUtils.copyProperties(
-                semanticNodeTemp,
-                newSemanticNode,
-                "dataSetId",
-                "dataSecurityKey",
-                "artifacts",
-                "_id");
+            org.springframework.beans.BeanUtils.copyProperties(semanticNodeTemp, newSemanticNode,
+                "dataSetId", "dataSecurityKey", "artifacts", "_id");
             semanticNodes.add(newSemanticNode);
           }
         }
@@ -446,7 +416,7 @@ public class SemanticServiceImpl implements SemanticService {
         contents.add(content);
         structure.setContents(contents);
       } else {
-        throw new SipReadEntityException("There is no data avaiable for the given criteria");
+        structure.setContents(contents);
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);

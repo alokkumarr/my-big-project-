@@ -275,8 +275,8 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("routeName", "route-scheduled-transfer-" + testId());
     childNode.put("sourceLocation", "/root/saw-batch-samples/log/small");
     childNode.put("destinationLocation", "log/scheduled");
-    childNode.put("filePattern", "*.csv");
-    childNode.put("fileExclusions", "log");
+    childNode.put("filePattern", "*.log");
+    childNode.put("fileExclusions", "csv");
     childNode.put("disableDuplicate", "false");
     childNode.put("batchSize", "10");
     childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
@@ -681,9 +681,10 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("Json Path for transfer data :" + path.prettyPrint());
     String result = path.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result);
+    assertEquals("SUCCESS", result);
     String fileName = path.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName);
-    assertEquals("SUCCESS", result);
+    assertNotNull(fileName);
     this.tearDownRoute();
     this.tearDownChannel();
     this.tearDownLogs();
@@ -929,9 +930,10 @@ public class BatchIngestionIT extends BaseIT {
     JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     String result = path.getString("logs[0].mflFileStatus");
+    String fileName = null;
     if (result != null) {
       log.debug("Status of the file :" + result);
-      String fileName = path.getString("logs[0].recdFileName");
+      fileName = path.getString("logs[0].recdFileName");
       log.debug("Name of the downloaded file : " + fileName);
       ObjectNode testPayload = mapper.createObjectNode();
       testPayload.put("destinationLocation", fileName);
