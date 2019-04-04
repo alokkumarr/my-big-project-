@@ -1,4 +1,4 @@
-package com.synchronoss.sip.alert.controller;
+package com.synchronoss.saw.alert.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,4 @@ import org.springframework.web.bind.annotation.RestController;
 public class SipAlertController {
 
   private static final Logger logger = LoggerFactory.getLogger(SipAlertController.class);
-
-
-
 }

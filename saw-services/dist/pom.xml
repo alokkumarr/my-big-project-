@@ -45,6 +45,11 @@
       <artifactId>sip-metadata-service</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sip-alert-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

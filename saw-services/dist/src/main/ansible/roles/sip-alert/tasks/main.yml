@@ -3,11 +3,15 @@
     root_password: >-
       {{ lookup('password', inventory_dir
       + '/mariadb-root-password chars=ascii_letters,digits') }}
-- name: Look up Batch Ingestion Service database password
+- name: Look up Alert Service database password
   set_fact:
     sip_alert_db_password: >-
       {{ lookup('password', inventory_dir
-        + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
+        + '/sip-alert-db-password chars=ascii_letters,digits') }}
+- name: Set the SIP Alert Service database password
+  copy:
+    content: "{{ sip_alert_db_password }}"
+    dest: /etc/bda/sip_alert_db_password
 - name: Ensure a list of packages installed
   yum:
     name: "{{ packages }}"
@@ -27,7 +31,7 @@
   when: "groups['saw-services'].index(inventory_hostname) == 0"
   tags: mariadb
 
-- name: Create the sip_bis users
+- name: Create the sip_alert users
   mysql_user:
     name: "sip_alert"
     password: "{{ sip_alert_db_password }}"
@@ -42,7 +46,7 @@
 - name: Copy SIP Alert Service package
   copy: src="{{ item }}" dest=/tmp/sip-alert.rpm
   with_fileglob: ["../rpms/sip-alert-*.rpm"]
-- name: Install SIP Metadata Service package
+- name: Install SIP Alert Service package
   yum: name=/tmp/sip-alert.rpm state=present
   notify:
     - restart sip-alert

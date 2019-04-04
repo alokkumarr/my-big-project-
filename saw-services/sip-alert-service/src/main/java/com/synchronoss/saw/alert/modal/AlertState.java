@@ -1,4 +1,4 @@
-package com.synchronoss.sip.alert.modal;
+package com.synchronoss.saw.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

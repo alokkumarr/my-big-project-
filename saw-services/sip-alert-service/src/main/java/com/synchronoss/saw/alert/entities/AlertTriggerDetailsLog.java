@@ -1,6 +1,6 @@
-package com.synchronoss.sip.alert.entities;
+package com.synchronoss.saw.alert.entities;
 
-import com.synchronoss.sip.alert.modal.AlertState;
+import com.synchronoss.saw.alert.modal.AlertState;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,17 +14,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "ALERT_TRIGGER_DETAILS_LOG")
 public class AlertTriggerDetailsLog {
 
-    @Id
-    @Column(name = "ALERT_TRIGGER_SYS_ID")
-    Long alertTriggerSysId;
+  @Id
+  @Column(name = "ALERT_TRIGGER_SYS_ID")
+  Long alertTriggerSysId;
 
-    @Column (name ="ALERT_RULES_SYS_ID")
-    Long alertRulesSysId;
+  @Column(name = "ALERT_RULES_SYS_ID")
+  Long alertRulesSysId;
 
-    @Column (name ="ALERT_STATE")
-    AlertState alertState;
+  @Column(name = "ALERT_STATE")
+  AlertState alertState;
 
-    @Column (name ="START_TIME")
-    Date StartTime;
-
+  @Column(name = "START_TIME")
+  Date startTime;
 }

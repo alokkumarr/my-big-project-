@@ -1,4 +1,4 @@
-package com.synchronoss.sip;
+package com.synchronoss.saw;
 
 import info.faljse.SDNotify.SDNotify;
 import org.apache.coyote.http11.AbstractHttp11Protocol;

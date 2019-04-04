@@ -1,4 +1,4 @@
-package com.synchronoss.sip.alert.entities;
+package com.synchronoss.saw.alert.entities;
 
 import java.util.Date;
 import javax.persistence.Column;
@@ -13,21 +13,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "DATAPOD_DETAILS")
 public class DatapodDetails {
 
-    @Id
-    @Column(name="DATAPOD_ID")
-    String datapodID;
+  @Id
+  @Column(name = "DATAPOD_ID")
+  String datapodID;
 
-    @Column(name="DATAPOD_NAME")
-    String datapodName;
+  @Column(name = "DATAPOD_NAME")
+  String datapodName;
 
-    @Column(name="ALERT_CUSTOMER_SYS_ID")
-    Long alertCustomerSysId;
+  @Column(name = "ALERT_CUSTOMER_SYS_ID")
+  Long alertCustomerSysId;
 
-    @Column(name="CREATED_TIME")
-    Date createdTime;
+  @Column(name = "CREATED_TIME")
+  Date createdTime;
 
-    @Column(name="CREATED_BY")
-    String createdBy;
-
-
+  @Column(name = "CREATED_BY")
+  String createdBy;
 }

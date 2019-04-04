@@ -1,4 +1,4 @@
-package com.synchronoss.sip.alert.entities;
+package com.synchronoss.saw.alert.entities;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -38,5 +38,4 @@ public class AlertCustomerDetails implements Serializable {
 
   @Column(name = "MODIFIED_BY")
   String modifiedBy;
-
 }

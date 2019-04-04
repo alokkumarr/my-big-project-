@@ -6,8 +6,8 @@ spring:
   #mariaDB (Alert) DB details
   datasource:
     url: jdbc:mariadb://localhost:3306/sip_alert
-    username: root
-    password:
+    username: sip_alert
+    password: {{ sip_alert_db_password }}
     driver-class-name: org.mariadb.jdbc.Driver
     max-active: 25
     testOnBorrow: true

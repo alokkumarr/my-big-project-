@@ -1,31 +1,40 @@
-package com.synchronoss.sip.alert.modal;
+package com.synchronoss.saw.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum AlertSeverity {
-  CRITICAL("CRITICAL"),
-  MEDIUM("MEDIUM"),
-  LOW("LOW");
-  private static final Map<String, AlertSeverity> CONSTANTS = new HashMap<>();
+public enum Operator {
+  GT("GT"),
+  LT("LT"),
+  GTE("GTE"),
+  LTE("LTE"),
+  EQ("EQ"),
+  NEQ("NEQ"),
+  BTW("BTW"),
+  SW("SW"),
+  EW("EW"),
+  CONTAINS("CONTAINS"),
+  ISIN("ISIN"),
+  ISNOTIN("ISNOTIN");
+  private static final Map<String, Operator> CONSTANTS = new HashMap<>();
 
   static {
-    for (AlertSeverity c : values()) {
+    for (Operator c : values()) {
       CONSTANTS.put(c.value, c);
     }
   }
 
   private final String value;
 
-  private AlertSeverity(String value) {
+  private Operator(String value) {
     this.value = value;
   }
 
   @JsonCreator
-  public static AlertSeverity fromValue(String value) {
-    AlertSeverity constant = CONSTANTS.get(value);
+  public static Operator fromValue(String value) {
+    Operator constant = CONSTANTS.get(value);
     if (constant == null) {
       throw new IllegalArgumentException(value);
     } else {
