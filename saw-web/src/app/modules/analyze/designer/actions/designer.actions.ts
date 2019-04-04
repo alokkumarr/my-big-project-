@@ -53,3 +53,15 @@ export class DesignerInitForkAnalysis {
   static readonly type = '[Designer] Initialise analysis object for fork';
   constructor(public analysis: AnalysisDSL) {}
 }
+
+export class DesignerUpdateAnalysisCategory {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update category for analysis';
+  constructor(public category: string | number) {}
+}
+
+export class DesignerUpdateAnalysisChartType {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update chartType for analysis';
+  constructor(public chartType: string) {}
+}

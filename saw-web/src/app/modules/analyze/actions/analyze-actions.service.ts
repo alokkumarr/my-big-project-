@@ -19,6 +19,7 @@ import {
   EXECUTION_MODES,
   EXECUTION_DATA_MODES
 } from '../services/analyze.service';
+import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
 export class AnalyzeActionsService {
@@ -141,9 +142,15 @@ export class AnalyzeActionsService {
       .then(
         parentAnalysis => {
           /* The destination category is different from parent analysis's category. Publish it normally */
+          const parentAnalysisCategoryId = isDSLAnalysis(parentAnalysis)
+            ? parentAnalysis.category
+            : parentAnalysis.categoryId;
+          const childAnalysisCategoryId = isDSLAnalysis(analysis)
+            ? analysis.category
+            : analysis.categoryId;
           if (
-            parentAnalysis.categoryId.toString() !==
-            analysis.categoryId.toString()
+            parentAnalysisCategoryId.toString() !==
+            childAnalysisCategoryId.toString()
           ) {
             return publish();
           }

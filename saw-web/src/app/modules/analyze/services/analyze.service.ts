@@ -620,16 +620,14 @@ export class AnalyzeService {
       semanticId,
       name: 'Untitled Analysis',
       description: '',
+      chartOptions: {
+        chartType: null
+      },
       customerCode: 'SYNCHRONOSS',
       projectCode: 'workbench',
       module: 'ANALYZE',
       sipQuery: {
-        artifacts: [
-          {
-            artifactsName: 'sample', // make this dynamic
-            fields: []
-          }
-        ],
+        artifacts: [],
         booleanCriteria: 'AND',
         filters: [],
         sorts: [],

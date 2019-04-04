@@ -6,6 +6,7 @@ import {
   AnalysisDialogData,
   AnalysisStarter,
   Analysis,
+  AnalysisDSL,
   DesignerMode,
   Sort,
   Filter,
@@ -152,7 +153,7 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openSaveDialog(analysis: Analysis, designerMode) {
+  openSaveDialog(analysis: Analysis | AnalysisDSL, designerMode) {
     const data = {
       action: 'save',
       analysis,

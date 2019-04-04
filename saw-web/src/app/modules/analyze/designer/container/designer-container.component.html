@@ -19,7 +19,7 @@
     [artifacts]="artifacts"
     [auxSettings]="auxSettings"
     [analysisType]="analysis.type"
-    [analysisSubtype]="analysis.chartType"
+    [analysisSubtype]="analysis.chartOptions?.chartType || analysis.chartType"
     [data]="data"
     [sorts]="sorts"
     [filters]="filters"

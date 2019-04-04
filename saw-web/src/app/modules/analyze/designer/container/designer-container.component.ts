@@ -59,7 +59,9 @@ import {
   DesignerInitGroupAdapters,
   DesignerInitNewAnalysis,
   DesignerInitEditAnalysis,
-  DesignerInitForkAnalysis
+  DesignerInitForkAnalysis,
+  DesignerUpdateAnalysisCategory,
+  DesignerUpdateAnalysisChartType
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 
@@ -95,6 +97,13 @@ export class DesignerContainerComponent implements OnInit {
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
+  get chartType(): string {
+    return isDSLAnalysis(this.analysis)
+      ? this._store.selectSnapshot(DesignerState).analysis.chartOptions
+          .chartType
+      : (<AnalysisChart>this.analysis).chartType;
+  }
+
   constructor(
     public _designerService: DesignerService,
     public _analyzeDialogService: AnalyzeDialogService,
@@ -117,14 +126,15 @@ export class DesignerContainerComponent implements OnInit {
     case 'new':
       this.initNewAnalysis().then(() => {
         this.designerState = DesignerStates.NO_SELECTION;
-        isDSLAnalysis(this.analysis) &&
-          this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
       });
       this.layoutConfiguration = this.getLayoutConfiguration(
         this.analysisStarter
       );
       break;
     case 'edit':
+      isDSLAnalysis(this.analysis) &&
+        this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
+
       this.initExistingAnalysis();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.layoutConfiguration = this.getLayoutConfiguration(
@@ -133,11 +143,11 @@ export class DesignerContainerComponent implements OnInit {
       if (!isReport) {
         this.requestDataIfPossible();
       }
-      isDSLAnalysis(this.analysis) &&
-        this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
       break;
     case 'fork':
       this.forkAnalysis().then(() => {
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
         this.initExistingAnalysis();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.layoutConfiguration = this.getLayoutConfiguration(
@@ -146,8 +156,6 @@ export class DesignerContainerComponent implements OnInit {
         if (!isReport) {
           this.requestDataIfPossible();
         }
-      isDSLAnalysis(this.analysis) &&
-        this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
       });
       break;
     default:
@@ -181,12 +189,20 @@ export class DesignerContainerComponent implements OnInit {
           ...(newAnalysis['analysis'] || newAnalysis),
           artifacts
         };
+
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
+
         if (!isDSLAnalysis(this.analysis)) {
           this.analysis.edit = this.analysis.edit || false;
           !this.analysis.sqlBuilder &&
             (this.analysis.sqlBuilder = {
               joins: []
             });
+        } else if (this.analysis.type === 'chart') {
+          this._store.dispatch(
+            new DesignerUpdateAnalysisChartType(this.analysisStarter.chartType)
+          );
         }
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.initAuxSettings();
@@ -218,7 +234,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'chart':
       this._chartService.updateAnalysisModel(this.analysis);
       if (this.designerMode === 'new') {
-        (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
+        (<any>this.analysis).isInverted = this.chartType === 'bar';
       }
       this.chartTitle = this.analysis.chartTitle || this.analysis.name;
 
@@ -588,15 +604,27 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   openSaveDialog(): Promise<any> {
-    const categoryIdField = isDSLAnalysis(this.analysis)
-      ? 'category'
-      : 'categoryId';
-    this.analysis[categoryIdField] =
-      this.designerMode === 'new' || this.designerMode === 'fork'
-        ? this._jwtService.userAnalysisCategoryId
-        : this.analysis[categoryIdField];
+    if (isDSLAnalysis(this.analysis) && this.designerMode === 'new') {
+      this._store.dispatch(
+        new DesignerUpdateAnalysisCategory(
+          this._jwtService.userAnalysisCategoryId
+        )
+      );
+    } else if (this.designerMode === 'new') {
+      (<Analysis>(
+        this.analysis
+      )).categoryId = this._jwtService.userAnalysisCategoryId;
+    }
+
+    const analysisForSave = isDSLAnalysis(this.analysis)
+      ? this._store.selectSnapshot(DesignerState.dslAnalysis)
+      : this.analysis;
+
     return this._analyzeDialogService
-      .openSaveDialog(<Analysis>this.analysis, this.designerMode)
+      .openSaveDialog(
+        <Analysis | AnalysisDSL>analysisForSave,
+        this.designerMode
+      )
       .afterClosed()
       .toPromise();
   }
@@ -882,7 +910,7 @@ export class DesignerContainerComponent implements OnInit {
         new DesignerInitGroupAdapters(
           <ArtifactColumnChart[]>this.artifacts[0].columns,
           this.analysis.type,
-          (<AnalysisChart>this.analysis).chartType
+          this.chartType
         )
       );
       setTimeout(() => {
@@ -893,8 +921,11 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   changeChartType(to: string) {
-    const analysis = <AnalysisChart>this.analysis;
-    analysis.chartType = to;
+    if (isDSLAnalysis(this.analysis)) {
+      this._store.dispatch(new DesignerUpdateAnalysisChartType(to));
+    } else {
+      (<AnalysisChart>this.analysis).chartType = to;
+    }
   }
 
   resetAnalysis() {
@@ -943,7 +974,7 @@ export class DesignerContainerComponent implements OnInit {
         find(sqlBuilder.dataFields || [], field => field.checked === 'y'),
         find(sqlBuilder.nodeFields || [], field => field.checked === 'x'),
         /* prettier-ignore */
-        ...((<any>this.analysis).chartType === 'bubble' ?
+        ...(this.chartType === 'bubble' ?
         [
           find(sqlBuilder.dataFields || [], field => field.checked === 'z')
         ] : [])

@@ -45,7 +45,7 @@ export interface QueryDSL {
 // Don't use this base interface directly
 export interface AnalysisBaseDSL {
   artifacts?: any[]; // this field needs to be removed from analysis structure before saving
-  categoryId: number; // todo
+  category: number | string;
   createdBy?: string; // email
   createdTime?: number;
   crondetails?: any; // todo
@@ -76,8 +76,10 @@ export interface AnalysisBaseDSL {
 }
 
 export interface AnalysisChartDSL extends AnalysisBaseDSL {
+  chartOptions: {
+    chartType: string;
+  };
   chartTitle: string; // todo
-  chartType: string; // todo
   isInverted: boolean; // todo
   labelOptions?: LabelOptions; // todo
   legend?: Legend; // todo

@@ -15,7 +15,9 @@ import {
   DesignerClearGroupAdapters,
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
-  DesignerInitNewAnalysis
+  DesignerInitNewAnalysis,
+  DesignerUpdateAnalysisCategory,
+  DesignerUpdateAnalysisChartType
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 
@@ -70,6 +72,29 @@ export class DesignerState {
       artifacts: values(artifacts)
     };
     return { ...state.analysis, sipQuery };
+  }
+
+  @Action(DesignerUpdateAnalysisCategory)
+  updateCategoryId(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { category }: DesignerUpdateAnalysisCategory
+  ) {
+    const analysis = getState().analysis;
+    return patchState({
+      analysis: { ...analysis, category }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartType)
+  updateChartType(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { chartType }: DesignerUpdateAnalysisChartType
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || {};
+    return patchState({
+      analysis: { ...analysis, chartOptions: { ...chartOptions, chartType } }
+    });
   }
 
   @Action(DesignerInitEditAnalysis)
