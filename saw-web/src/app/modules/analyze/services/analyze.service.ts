@@ -21,6 +21,7 @@ import AppConfig from '../../../../../appConfig';
 import { zip, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
+import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
 
@@ -131,17 +132,14 @@ export class AnalyzeService {
       ['contents.action', 'search'],
       ['contents.keys.[0].categoryId', subCategoryId]
     ]);
-    return <Observable<Analysis[]>>this.postRequest(`analysis`, payload).pipe(
-      map(fpGet('contents.analyze')),
-      map(fpSortBy([(analysis: Analysis) => -(analysis.createdTimestamp || 0)]))
+    return <Observable<Analysis[]>>(
+      this.postRequest(`analysis`, payload).pipe(map(fpGet('contents.analyze')))
     );
   }
 
   getAnalysesDSL(subCategoryId: string | number): Observable<AnalysisDSL[]> {
     return <Observable<AnalysisDSL[]>>(
-      this.getRequest(`dslanalysis?category=${subCategoryId}`).pipe(
-        map(fpSortBy([(analysis: AnalysisDSL) => -(analysis.createdTime || 0)]))
-      )
+      this.getRequest(`dslanalysis?category=${subCategoryId}`)
     );
   }
 
@@ -156,14 +154,29 @@ export class AnalyzeService {
   getAnalysesFor(
     subCategoryId: string | number /* , opts = {} */
   ): Promise<Array<Analysis | AnalysisDSL>> {
+    // Create fp sort's type to nail everything down with types
+    type FPSort<T> = (input: Array<T>) => Array<T>;
+
     return zip(
       this.getAnalysesForNonDSL(subCategoryId),
       this.getAnalysesDSL(subCategoryId)
     )
       .pipe(
+        // Merge list of analyses from both observables into one
         map(([nonDSLAnalyses, dslAnalyses]) => {
           return [].concat(nonDSLAnalyses).concat(dslAnalyses);
-        })
+        }),
+
+        // Sort all the analyses based on their create time in descending order (newest first).
+        // Uses correct time field based on if analysis is new dsl type or not
+        map(<FPSort<Analysis | AnalysisDSL>>(
+          fpSortBy([
+            analysis =>
+              isDSLAnalysis(analysis)
+                ? -(analysis.createdTime || 0)
+                : -(analysis.createdTimestamp || 0)
+          ])
+        ))
       )
       .toPromise();
   }
