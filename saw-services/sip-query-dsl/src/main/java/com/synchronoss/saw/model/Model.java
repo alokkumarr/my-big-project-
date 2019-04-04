@@ -160,7 +160,7 @@ public class Model {
 
     @JsonCreator
     public static Model.BooleanCriteria fromValue(String value) {
-      Model.BooleanCriteria constant = CONSTANTS.get(value);
+      Model.BooleanCriteria constant = CONSTANTS.get(value.toUpperCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -209,7 +209,7 @@ public class Model {
 
     @JsonCreator
     public static Model.Operator fromValue(String value) {
-      Model.Operator constant = CONSTANTS.get(value);
+      Model.Operator constant = CONSTANTS.get(value.toUpperCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -259,7 +259,7 @@ public class Model {
 
     @JsonCreator
     public static Model.Preset fromValue(String value) {
-      Model.Preset constant = CONSTANTS.get(value);
+      Model.Preset constant = CONSTANTS.get(value.toUpperCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

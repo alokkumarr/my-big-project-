@@ -44,9 +44,8 @@ public class ElasticSearchQueryBuilder {
   private static final String SUM = "_sum";
   String dataSecurityString;
 
-  public String buildDataQuery(SIPDSL sipdsl, Integer size)
+  public String buildDataQuery(SipQuery sipQuery, Integer size)
       throws IOException, ProcessingException {
-    SipQuery sipQuery = sipdsl.getSipQuery();
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
     if (size == null || size.equals(0)) size = 1000;
