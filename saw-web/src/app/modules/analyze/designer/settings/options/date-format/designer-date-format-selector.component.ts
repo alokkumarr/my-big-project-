@@ -45,7 +45,6 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
 
   onFormatChange(format: Format | string) {
     if (format) {
-      console.log('format', format);
       this.artifactColumn.format = format;
       this.changeDateSample();
       this.change.emit({ subject: 'format' });
@@ -54,7 +53,6 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
 
   getDateLabel(artifactColumn) {
     const dateFormatsObj = get(dateFormatsMap, `${this.analysisType}.obj`);
-    // const format = this.analysisType === 'pivot' ? 'format' : 'dateFormat';
     return get(dateFormatsObj, `[${artifactColumn.format}].label`, '');
   }
 
