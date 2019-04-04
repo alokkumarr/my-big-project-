@@ -11,15 +11,15 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-  "booleanCriteria",
-  "operator",
-  "preset",
-  "value",
-  "otherValue",
-  "gte",
-  "lte",
-  "format",
-  "modelValues"
+    "booleanCriteria",
+    "operator",
+    "preset",
+    "value",
+    "otherValue",
+    "gte",
+    "lte",
+    "format",
+    "modelValues"
 })
 public class Model {
 
@@ -37,6 +37,12 @@ public class Model {
 
   @JsonProperty("otherValue")
   private Double otherValue;
+
+  @JsonProperty("gt")
+  private String gt;
+
+  @JsonProperty("lt")
+  private String lt;
 
   @JsonProperty("gte")
   private String gte;
@@ -100,6 +106,26 @@ public class Model {
     this.otherValue = otherValue;
   }
 
+  @JsonProperty("gt")
+  public String getGt() {
+    return gt;
+  }
+
+  @JsonProperty("gt")
+  public void setGt(String gt) {
+    this.gt = gt;
+  }
+
+  @JsonProperty("lt")
+  public String getLt() {
+    return lt;
+  }
+
+  @JsonProperty("lt")
+  public void setLt(String lt) {
+    this.lt = lt;
+  }
+
   @JsonProperty("gte")
   public String getGte() {
     return gte;
@@ -143,8 +169,9 @@ public class Model {
   public enum BooleanCriteria {
     AND("AND"),
     OR("OR");
+    private final String value;
     private static final Map<String, Model.BooleanCriteria> CONSTANTS =
-        new HashMap<String, Model.BooleanCriteria>();
+        new HashMap<>();
 
     static {
       for (Model.BooleanCriteria c : values()) {
@@ -152,20 +179,8 @@ public class Model {
       }
     }
 
-    private final String value;
-
     private BooleanCriteria(String value) {
       this.value = value;
-    }
-
-    @JsonCreator
-    public static Model.BooleanCriteria fromValue(String value) {
-      Model.BooleanCriteria constant = CONSTANTS.get(value.toUpperCase());
-      if (constant == null) {
-        throw new IllegalArgumentException(value);
-      } else {
-        return constant;
-      }
     }
 
     @Override
@@ -176,6 +191,22 @@ public class Model {
     @JsonValue
     public String value() {
       return this.value;
+    }
+
+    /**
+     * Creates BooleanCrieteria Object from a string value.
+     *
+     * @param value Enum value in String
+     * @return
+     */
+    @JsonCreator
+    public static Model.BooleanCriteria fromValue(String value) {
+      Model.BooleanCriteria constant = CONSTANTS.get(value.toUpperCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
     }
   }
 
@@ -192,8 +223,9 @@ public class Model {
     CONTAINS("CONTAINS"),
     ISIN("ISIN"),
     ISNOTIN("ISNOTIN");
+    private final String value;
     private static final Map<String, Model.Operator> CONSTANTS =
-        new HashMap<String, Model.Operator>();
+        new HashMap<>();
 
     static {
       for (Model.Operator c : values()) {
@@ -201,20 +233,8 @@ public class Model {
       }
     }
 
-    private final String value;
-
     private Operator(String value) {
       this.value = value;
-    }
-
-    @JsonCreator
-    public static Model.Operator fromValue(String value) {
-      Model.Operator constant = CONSTANTS.get(value.toUpperCase());
-      if (constant == null) {
-        throw new IllegalArgumentException(value);
-      } else {
-        return constant;
-      }
     }
 
     @Override
@@ -225,6 +245,22 @@ public class Model {
     @JsonValue
     public String value() {
       return this.value;
+    }
+
+    /**
+     * Creates Operator Object from a string value.
+     *
+     * @param value Enum value in String
+     * @return
+     */
+    @JsonCreator
+    public static Model.Operator fromValue(String value) {
+      Model.Operator constant = CONSTANTS.get(value.toUpperCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
     }
   }
 
@@ -243,7 +279,8 @@ public class Model {
     LSW("LSW"),
     LTW("LTW"),
     NA("NA");
-    private static final Map<String, Model.Preset> CONSTANTS = new HashMap<String, Model.Preset>();
+    private final String value;
+    private static final Map<String, Model.Preset> CONSTANTS = new HashMap<>();
 
     static {
       for (Model.Preset c : values()) {
@@ -251,20 +288,8 @@ public class Model {
       }
     }
 
-    private final String value;
-
     private Preset(String value) {
       this.value = value;
-    }
-
-    @JsonCreator
-    public static Model.Preset fromValue(String value) {
-      Model.Preset constant = CONSTANTS.get(value.toUpperCase());
-      if (constant == null) {
-        throw new IllegalArgumentException(value);
-      } else {
-        return constant;
-      }
     }
 
     @Override
@@ -275,6 +300,22 @@ public class Model {
     @JsonValue
     public String value() {
       return this.value;
+    }
+
+    /**
+     * Creates Preset Object from a string value.
+     *
+     * @param value Enum value in String
+     * @return
+     */
+    @JsonCreator
+    public static Model.Preset fromValue(String value) {
+      Model.Preset constant = CONSTANTS.get(value.toUpperCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
     }
   }
 }
