@@ -10,7 +10,7 @@ This project is governed by the [SIP Team](https://confluence.synchronoss.net:84
 # Features
 
   - It provides all necessary data wrangling transformation method as a part of configuration.
-  - It provides a framework for efficiently and reliabily building statistical models.
+  - It provides a framework for efficiently and reliably building statistical models.
   - It provides a unified API which works both on RDataFrame & SparkDataFrame
   - It provides an integration module to integrate & execute on sip execution environment.
 
@@ -35,8 +35,10 @@ A2 module uses [JIRA to track issue](https://jira.synchronoss.net:8443/jira/secu
 ### Tech
 A2 uses a number of open source projects to work properly:
 
-* [R](https://www.r-project.org/) - R is a free software environment for statistical computing and graphics
-* [Apache Spark](https://spark.apache.org/) - is a unified analytics engine for large-scale data processing
+* [R](https://www.r-project.org/) - R is a free software environment for statistical computing and graphics.
+  __R__ software language version >= 3.5.0
+* [Apache Spark](https://spark.apache.org/) - is a unified analytics engine for large-scale data processing.
+  __Spark__ software version >= 2.3.0
 * [sparklyr](https://spark.rstudio.com/) - R interface for Apache Spark
 * [Spark MLlib](http://spark.apache.org/docs/latest/mllib-guide.html) : Use Spark’s distributed machine learning library from R
 * [Docker](https://www.docker.com/) : a tool designed to make it easier to create, deploy, and run applications by using containers
@@ -52,7 +54,6 @@ A2 uses a number of open source projects to work properly:
 * [A2SipR](https://stash.synchronoss.net/projects/BDA/repos/sip/browse/a2sipr): contains the integration service layer to interact with [SIP](https://stash.synchronoss.net/projects/BDA/repos/sip/browse) execution environment.
 
 
-
 # Installation and Getting Started
 ### Installation
 
@@ -60,16 +61,15 @@ A2Module requires [R](https://www.r-project.org/) R version >= 3.5.0 required to
 Install the dependencies and devDependencies and start the server.
 ##### CentOS
 
-```sh
-sudo yum install R
+```
+$ sudo yum install R
 ```
 
 ##### MacOS
 
-```sh
-sudo brew install R
 ```
-
+$ sudo brew install R
+```
 
 ##### RStudio
 
@@ -80,31 +80,27 @@ To execute R from the terminal:
 ```
 $ R
 ```
-
 ##### Importing project into RStudio
 
 > Note :If you haven't done so already, the first step is create a checkout the SIP repository. See this [guide](https://support.rstudio.com/hc/en-us/articles/200532077-Version-Control-with-Git-and-SVN) for details.
 
-Once a SIP project connected to the Stash repository is made, open the project. You should have a fresh RStudio enviornment with the working directory set to your local repository.
+Once a SIP project connected to the Stash repository is made, open the project. You should have a fresh RStudio environment with the working directory set to your local repository.
 
 > In RStudio, go to ```File Menu``` and Open SIP Projects, RStudio may ask you to install all dependent packages or select ```Tools Menu``` then select ```Install Packages```
 
 The R package devtools is required to install A2 modules. If its not already install on your local environment, run the following command RStudion Terminal
 
-``` sh
-
+```
 $ install.packages("devtools")
-
 ```
 
-Finally install the all packages and its dependencies by typing the following into your RStudio Terminal
+Finally, install all packages and its dependencies by typing the following into your RStudio Terminal
 
 ```
 # this may take a min while dependencies are installed
 $ install.packages(“sparklyr”)
 $ devtools::install("./a2munge")
 $ devtools::install("./a2modeler")
-
 ```
 
 ##### Running Test Suits from RStudio
@@ -120,19 +116,36 @@ $ devtools::test("./a2modeler")
 #### Building for A2 Module source
 
 ##### Maven
-> TODO
+> Note: Command to test & build only a2 module once you check out into your local
+```sh
+$ mvn -pl "a2" clean package -Dsip.modules=all
+```
 ##### build
-> TODO
-##### Docker
-> TODO
-##### rbuild
-> TODO
-##### rpreinstall
-> TODO
+> In the a2 directory, you will observe ```build.sh``` it copies the a2 modules
+> it invokes the script to build docker image which holds the requisite packages
+> system libraries required by a2 modules
 
+##### Docker
+> To understand how a2 modules has been included refer to [docker](https://stash.synchronoss.net/projects/BDA/repos/sip/browse/dist/src/main)
+if any changes require in DockerFile for a2 module, we can do it [here](https://stash.synchronoss.net/projects/BDA/repos/sip/browse/a2/Dockerfile)
+
+##### rpreinstall
+> In a2 directory, you will observe ```rpreinstall.sh``` this script sets up the
+> entire R environment
+
+#### Some Important links
+ * [S3 Objects](http://adv-r.had.co.nz/S3.html)
+ * [SparklyR](https://cfss.uchicago.edu/notes/sparklyr/)
+ * [spark_apply](https://www.rdocumentation.org/packages/sparklyr/versions/0.9.2/topics/spark_apply)
+ * [Pipes](https://r4ds.had.co.nz/pipes.html)
+ * [R for Data Science](https://r4ds.had.co.nz/)
 
 # Build from Source
 See the [Build from Source](https://stash.synchronoss.net/projects/BDA/repos/sip/browse/doc) Wiki page
+
+# Other Projects
+* [Dispute Forecasting](https://stash.synchronoss.net/projects/AAR/repos/dispute_forecasting/browse)
+* [Dispute Forecasting Demonstration](https://synchronoss1-my.sharepoint.com/:f:/g/personal/knat0001_synchronoss_com/EqUraVmsiTxLgMzOn_q3plEBQEuPS7VHO-7jdX-aRjbUFA?e=NdLgcX)
 
 # Stay in Touch
 SIP team members on [#sip-team-b](https://synchronoss.slack.com/messages/G8QTCE6UD) and releases are announced via our [news feed](https://confluence.synchronoss.net:8443/display/BDA/SIP+Releases)
