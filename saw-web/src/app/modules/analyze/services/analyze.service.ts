@@ -18,7 +18,7 @@ import { Analysis, AnalysisDSL, AnalysisType } from '../../../models';
 import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
-import { Observable } from 'rxjs';
+import { zip, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 
@@ -115,21 +115,62 @@ export class AnalyzeService {
     const requestURL = isUndefined(executionId)
       ? `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
       : `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`;
-    return this.getRequest(requestURL);
+    return this.getRequest(requestURL).toPromise();
   }
 
-  getAnalysesFor(subCategoryId /* , opts = {} */) {
+  /**
+   * Gets list of analyses from legacy endpoint (non-dsl).
+   * This endpoint is for backward-compatibility. Remove when not needed.
+   *
+   * @param {*} subCategoryId
+   * @returns {Observable<Analysis[]>}
+   * @memberof AnalyzeService
+   */
+  getAnalysesForNonDSL(subCategoryId): Observable<Analysis[]> {
     const payload = this.getRequestParams([
       ['contents.action', 'search'],
       ['contents.keys.[0].categoryId', subCategoryId]
     ]);
-    return <Promise<Analysis[]>>this.postRequest(`analysis`, payload)
-      .then(fpGet('contents.analyze'))
-      .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
+    return <Observable<Analysis[]>>this.postRequest(`analysis`, payload).pipe(
+      map(fpGet('contents.analyze')),
+      map(fpSortBy([(analysis: Analysis) => -(analysis.createdTimestamp || 0)]))
+    );
+  }
+
+  getAnalysesDSL(subCategoryId: string | number): Observable<AnalysisDSL[]> {
+    return <Observable<AnalysisDSL[]>>(
+      this.getRequest(`dslanalysis?category=${subCategoryId}`).pipe(
+        map(fpSortBy([(analysis: AnalysisDSL) => -(analysis.createdTime || 0)]))
+      )
+    );
+  }
+
+  /**
+   * Stitches non-dsl and dsl endpoints for listing analyses and provides
+   * results as a single array.
+   *
+   * @param {*} subCategoryId
+   * @returns {Promise<Analysis[]>}
+   * @memberof AnalyzeService
+   */
+  getAnalysesFor(
+    subCategoryId: string | number /* , opts = {} */
+  ): Promise<Array<Analysis | AnalysisDSL>> {
+    return zip(
+      this.getAnalysesForNonDSL(subCategoryId),
+      this.getAnalysesDSL(subCategoryId)
+    )
+      .pipe(
+        map(([nonDSLAnalyses, dslAnalyses]) => {
+          return [].concat(nonDSLAnalyses).concat(dslAnalyses);
+        })
+      )
+      .toPromise();
   }
 
   getPublishedAnalysesByAnalysisId(id) {
     return <Promise<Analysis[]>>this.getRequest(`analysis/${id}/executions`)
+      .toPromise()
       .then(fpGet(`executions`))
       .then(fpSortBy([obj => -obj.finished]));
   }
@@ -151,20 +192,22 @@ export class AnalyzeService {
       options.analysisType
     }`;
 
-    return this.getRequest(`${path}?${queryParams}`).then(resp => {
-      const data = fpGet(`data`, resp);
-      const queryBuilder = fpGet(`queryBuilder`, resp);
-      const executedBy = fpGet(`executedBy`, resp);
-      const count = fpGet(`totalRows`, resp) || data.length;
-      return {
-        data: options.forcePaginate
-          ? this.forcePagination(data, options)
-          : data,
-        queryBuilder,
-        executedBy,
-        count
-      };
-    });
+    return this.getRequest(`${path}?${queryParams}`)
+      .toPromise()
+      .then(resp => {
+        const data = fpGet(`data`, resp);
+        const queryBuilder = fpGet(`queryBuilder`, resp);
+        const executedBy = fpGet(`executedBy`, resp);
+        const count = fpGet(`totalRows`, resp) || data.length;
+        return {
+          data: options.forcePaginate
+            ? this.forcePagination(data, options)
+            : data,
+          queryBuilder,
+          executedBy,
+          count
+        };
+      });
   }
 
   getExecutionData(
@@ -184,20 +227,22 @@ export class AnalyzeService {
       options.analysisType
     }${onetimeExecution}`;
     const url = `${path}${queryParams}`;
-    return this.getRequest(url).then(resp => {
-      const data = fpGet(`data`, resp);
-      const queryBuilder = fpGet(`queryBuilder`, resp);
-      const executedBy = fpGet(`executedBy`, resp);
-      const count = fpGet(`totalRows`, resp) || data.length;
-      return {
-        data: options.forcePaginate
-          ? this.forcePagination(data, options)
-          : data,
-        queryBuilder,
-        executedBy,
-        count
-      };
-    });
+    return this.getRequest(url)
+      .toPromise()
+      .then(resp => {
+        const data = fpGet(`data`, resp);
+        const queryBuilder = fpGet(`queryBuilder`, resp);
+        const executedBy = fpGet(`executedBy`, resp);
+        const count = fpGet(`totalRows`, resp) || data.length;
+        return {
+          data: options.forcePaginate
+            ? this.forcePagination(data, options)
+            : data,
+          queryBuilder,
+          executedBy,
+          count
+        };
+      });
   }
 
   readAnalysis(
@@ -215,11 +260,13 @@ export class AnalyzeService {
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return <Promise<Analysis>>(
-      this.postRequest(`analysis`, payload, customHeaders).then(
-        fpGet(`contents.analyze.[0]`)
-      )
-    );
+    return <Promise<Analysis>>this.postRequest(
+      `analysis`,
+      payload,
+      customHeaders
+    )
+      .toPromise()
+      .then(fpGet(`contents.analyze.[0]`));
   }
 
   readAnalysisDSL(analysisId): Observable<AnalysisDSL> {
@@ -280,25 +327,25 @@ export class AnalyzeService {
     const scheduleState = schedule.scheduleState;
     switch (scheduleState) {
       case 'new':
-        return this.postRequest(`scheduler/schedule`, schedule);
+        return this.postRequest(`scheduler/schedule`, schedule).toPromise();
       case 'exist':
-        return this.postRequest(`scheduler/update`, schedule);
+        return this.postRequest(`scheduler/update`, schedule).toPromise();
       case 'delete':
-        return this.postRequest(`scheduler/delete`, schedule);
+        return this.postRequest(`scheduler/delete`, schedule).toPromise();
       default:
     }
   }
 
   getCronDetails(requestBody) {
-    return this.postRequest(`scheduler/fetchJob`, requestBody);
+    return this.postRequest(`scheduler/fetchJob`, requestBody).toPromise();
   }
 
   getAllCronJobs(model) {
-    return this.postRequest(`scheduler/jobs`, model);
+    return this.postRequest(`scheduler/jobs`, model).toPromise();
   }
 
   getlistFTP(custCode) {
-    return this.postRequest(`exports/listFTP`, custCode);
+    return this.postRequest(`exports/listFTP`, custCode).toPromise();
   }
 
   deleteAnalysis(model: Analysis | AnalysisDSL): Promise<any> {
@@ -326,7 +373,7 @@ export class AnalyzeService {
       ['contents.action', 'delete'],
       ['contents.keys.[0].id', model.id]
     ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload);
+    return <Promise<Analysis>>this.postRequest(`analysis`, payload).toPromise();
   }
 
   getCategories(privilege) {
@@ -358,7 +405,7 @@ export class AnalyzeService {
   }
 
   getMethods() {
-    return this.getRequest('/api/analyze/methods');
+    return this.getRequest('/api/analyze/methods').toPromise();
   }
 
   updateAnalysis(model): Promise<Analysis | AnalysisDSL> {
@@ -380,9 +427,9 @@ export class AnalyzeService {
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return <Promise<Analysis>>(
-      this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`))
-    );
+    return <Promise<Analysis>>this.postRequest(`analysis`, payload)
+      .toPromise()
+      .then(fpGet(`contents.analyze.[0]`));
   }
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
@@ -456,18 +503,20 @@ export class AnalyzeService {
       ['contents.keys.[0].type', cloned.type],
       ['contents.analyze', [cloned]]
     ]);
-    return this.postRequest(`analysis`, payload).then(resp => {
-      return {
-        data: fpGet(`contents.analyze.[0].data`, resp),
-        executionId: fpGet(`contents.analyze.[0].executionId`, resp),
-        executionType: mode,
-        executedBy: this._jwtService.getLoginId(),
-        executedAt: Date.now(),
-        designerQuery: fpGet(`query`, resp),
-        queryBuilder: { ...model.sqlBuilder },
-        count: fpGet(`contents.analyze.[0].totalRows`, resp)
-      };
-    });
+    return this.postRequest(`analysis`, payload)
+      .toPromise()
+      .then(resp => {
+        return {
+          data: fpGet(`contents.analyze.[0].data`, resp),
+          executionId: fpGet(`contents.analyze.[0].executionId`, resp),
+          executionType: mode,
+          executedBy: this._jwtService.getLoginId(),
+          executedAt: Date.now(),
+          designerQuery: fpGet(`query`, resp),
+          queryBuilder: { ...model.sqlBuilder },
+          count: fpGet(`contents.analyze.[0].totalRows`, resp)
+        };
+      });
   }
 
   getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW, options = {}) {
@@ -498,7 +547,7 @@ export class AnalyzeService {
   }
 
   generateQuery(payload) {
-    return this.postRequest('/api/analyze/generateQuery', payload);
+    return this.postRequest('/api/analyze/generateQuery', payload).toPromise();
   }
 
   saveReport(model) {
@@ -509,15 +558,15 @@ export class AnalyzeService {
 
   getSemanticLayerData() {
     const userProject = 'workbench';
-    return this.getRequest(
-      `internal/semantic/md?projectId=${userProject}`
-    ).then(fpGet(`contents.[0].${MODULE_NAME}`));
+    return this.getRequest(`internal/semantic/md?projectId=${userProject}`)
+      .toPromise()
+      .then(fpGet(`contents.[0].${MODULE_NAME}`));
   }
 
   getArtifactsForDataSet(semanticId: string) {
-    return this.getRequest(`internal/semantic/workbench/${semanticId}`).then(
-      (data: any) => data.artifacts
-    );
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`)
+      .toPromise()
+      .then((data: any) => data.artifacts);
   }
 
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {
@@ -538,9 +587,9 @@ export class AnalyzeService {
       ],
       ['contents.keys.[0].analysisType', type]
     ]);
-    return <Promise<Analysis>>(
-      this.postRequest(`analysis`, params).then(fpGet('contents.analyze.[0]'))
-    );
+    return <Promise<Analysis>>this.postRequest(`analysis`, params)
+      .toPromise()
+      .then(fpGet('contents.analyze.[0]'));
   }
 
   createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
@@ -579,19 +628,21 @@ export class AnalyzeService {
     };
   }
 
-  getRequest(path) {
-    return this._http.get(`${apiUrl}/${path}`).toPromise();
+  getRequest(path): Observable<any> {
+    return this._http.get(`${apiUrl}/${path}`);
   }
 
-  postRequest(path: string, params: Object, customHeaders = {}) {
+  postRequest(
+    path: string,
+    params: Object,
+    customHeaders = {}
+  ): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         ...customHeaders
       })
     };
-    return this._http
-      .post(`${apiUrl}/${path}`, params, httpOptions)
-      .toPromise();
+    return this._http.post(`${apiUrl}/${path}`, params, httpOptions);
   }
 }
