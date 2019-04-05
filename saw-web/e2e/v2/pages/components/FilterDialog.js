@@ -108,5 +108,21 @@ class FilterDialog {
   verifySelectFieldValue(value) {
     expect(this._selectedFilterField.getAttribute('value')).toEqual(value);
   }
+
+  fillFilterOptions(fieldType, operator, value) {
+    // Scenario for dates
+    if (fieldType === 'date') {
+      this.selectPreset(value);
+    }
+    // Scenario for numbers
+    if (fieldType === 'number') {
+      this.selectNumberOperatorAndValue(operator, value);
+    }
+
+    // Scenario for strings
+    if (fieldType === 'string') {
+      this.selectStringOperatorAndValue(operator, value);
+    }
+  }
 }
 module.exports = FilterDialog;
