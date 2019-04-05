@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
 
@@ -94,22 +93,26 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
   }
 
+  // TODO : Response to be changed back to Analysis type
   @Override
-  public Analysis getAnalysis(String analysisID, Ticket ticket) throws SipReadEntityException {
+  public ObjectNode getAnalysis(String analysisID, Ticket ticket) throws SipReadEntityException {
     JsonElement doc;
     Analysis analysis;
+    ObjectNode analysisNode;
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       doc = analysisMetadataStore.read(analysisID);
       if (doc == null) {
         return null;
       }
-      analysis = gson.fromJson(doc, Analysis.class);
+      //      analysis = gson.fromJson(doc, Analysis.class);
+      ObjectMapper mapper = new ObjectMapper();
+      analysisNode = (ObjectNode) mapper.readTree(gson.toJson(doc));
     } catch (Exception e) {
       logger.error("Exception occurred while fetching analysis", e);
       throw new SipReadEntityException("Exception occurred while fetching analysis", e);
     }
-    return analysis;
+    return analysisNode;
   }
 
   @Override

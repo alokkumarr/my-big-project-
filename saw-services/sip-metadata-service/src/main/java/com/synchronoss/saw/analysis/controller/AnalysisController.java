@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.modal.Ticket;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
+import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /** Analysis entity controller. */
 @RestController
@@ -160,17 +160,17 @@ public class AnalysisController {
       value = "Fetch Analysis definition API",
       nickname = "FetchAnalysis",
       notes = "",
-      response = AnalysisResponse.class)
+      response = TempAnalysisResponse.class)
   @RequestMapping(
       value = "/{id}",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public AnalysisResponse getAnalysis(
+  public TempAnalysisResponse getAnalysis(
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id) {
     Ticket ticket = new Ticket();
-    AnalysisResponse analysisResponse = new AnalysisResponse();
+    TempAnalysisResponse analysisResponse = new TempAnalysisResponse();
     analysisResponse.setAnalysis(analysisService.getAnalysis(id, ticket));
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);
