@@ -637,6 +637,25 @@ export class AnalyzeService {
           dataStore: 'sampleAlias/sample', // make this dynamic
           storageType: 'ES'
         }
+      },
+      chartOptions: {
+        chartTitle: 'Untitled Analysis',
+        chartType: 'column',
+        isInverted: false,
+        labelOptions: {
+          enabled: false,
+          value: ''
+        },
+        legend: {
+          align: '',
+          layout: ''
+        },
+        xAxis: {
+          title: null
+        },
+        yAxis: {
+          title: null
+        }
       }
     };
   }

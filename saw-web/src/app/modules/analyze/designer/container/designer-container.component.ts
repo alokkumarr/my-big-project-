@@ -22,7 +22,7 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
-  AnalysisChart,
+  // AnalysisChart,
   AnalysisType,
   SqlBuilder,
   SqlBuilderReport,
@@ -213,35 +213,53 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   initAuxSettings() {
-    /* prettier-ignore */
     switch (this.analysis.type) {
-    case 'chart':
-      this._chartService.updateAnalysisModel(this.analysis);
-      if (this.designerMode === 'new') {
-        (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
-      }
-      this.chartTitle = this.analysis.chartTitle || this.analysis.name;
-
-      const chartOnlySettings = {
-        legend: (<any>this.analysis).legend,
-        labelOptions: (<any>this.analysis).labelOptions || {},
-        isInverted: (<any>this.analysis).isInverted
-      };
-
-      this.auxSettings = {
-        ...this.auxSettings,
-        ...chartOnlySettings
-      };
-      break;
-    case 'map':
-      const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
-      this.auxSettings = {
-        ...this.auxSettings,
-        ...mapOnlySettings
-      };
-      this.analysis.mapSettings = this.auxSettings;
-      break;
+      case 'chart':
+        this._chartService.updateAnalysisModel(this.analysis);
+        const chartOnlySettings = isDSLAnalysis(this.analysis)
+          ? this.chartDslAuxSetting()
+          : this.chartNonDslAuxSetting();
+        this.auxSettings = {
+          ...this.auxSettings,
+          ...chartOnlySettings
+        };
+        break;
+      case 'map':
+        const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
+        this.auxSettings = {
+          ...this.auxSettings,
+          ...mapOnlySettings
+        };
+        this.analysis.mapSettings = this.auxSettings;
+        break;
     }
+  }
+
+  chartDslAuxSetting() {
+    if (this.designerMode === 'new') {
+      (<any>this.analysis).chartOptions.isInverted =
+        (<any>this.analysis).chartOptions.chartType === 'bar';
+    }
+    this.chartTitle =
+      (<any>this.analysis).chartOptions.chartTitle || this.analysis.name;
+    return {
+      legend: (<any>this.analysis).charOptions.legend,
+      labelOptions: (<any>this.analysis).charOptions.labelOptions || {},
+      isInverted: (<any>this.analysis).charOptions.isInverted
+    };
+  }
+
+  chartNonDslAuxSetting() {
+    if (this.designerMode === 'new') {
+      (<any>this.analysis).isInverted =
+        (<any>this.analysis).chartType === 'bar';
+    }
+    this.chartTitle = (<any>this.analysis).chartTitle || this.analysis.name;
+    return {
+      legend: (<any>this.analysis).legend,
+      labelOptions: (<any>this.analysis).labelOptions || {},
+      isInverted: (<any>this.analysis).isInverted
+    };
   }
 
   fixLegacyArtifacts(artifacts): Array<Artifact> {
@@ -847,19 +865,25 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'legend':
       if (!event.data || !event.data.legend) { return; }
-      (<any>this.analysis).legend = event.data.legend;
+      isDSLAnalysis(this.analysis)
+        ? (<any>this.analysis.chartOptions.legend) = event.data.legend
+        : (<any>this.analysis).legend = event.data.legend;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
     case 'inversion':
       if (!event.data) { return; }
-      (<any>this.analysis).isInverted = event.data.isInverted;
+      isDSLAnalysis(this.analysis)
+       ? (<any>this.analysis).chartOptions.isInverted = event.data.isInverted
+       : (<any>this.analysis).isInverted = event.data.isInverted;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
     case 'chartTitle':
       if (!event.data) { return; }
-      this.analysis.chartTitle = event.data.title;
+      isDSLAnalysis(this.analysis)
+       ? (<any>this.analysis).chartOptions.chartTitle = event.data.title
+       : (<any>this.analysis).chartTitle = event.data.title;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
@@ -882,8 +906,8 @@ export class DesignerContainerComponent implements OnInit {
         new DesignerInitGroupAdapters(
           <ArtifactColumnChart[]>this.artifacts[0].columns,
           this.analysis.type,
-          (<AnalysisChart>this.analysis).chartType
-        )
+          isDSLAnalysis(this.analysis) ? (<any>this.analysis).chartOptions.chartType  : (<any>this.analysis).chartType
+          )
       );
       setTimeout(() => {
         this.resetAnalysis();
@@ -893,8 +917,10 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   changeChartType(to: string) {
-    const analysis = <AnalysisChart>this.analysis;
-    analysis.chartType = to;
+    const analysis = <any>this.analysis;
+    isDSLAnalysis(analysis)
+      ? (analysis.chartOptions.chartType = to)
+      : (analysis.chartType = to);
   }
 
   resetAnalysis() {
