@@ -11,7 +11,17 @@ import { DesignerPageComponent } from './page.component';
 
 class LocationStub {}
 class AnalysisStubService {
-  readAnalysis() {}
+  getArtifactsForDataSet() {
+    return Promise.resolve([]);
+  }
+  readAnalysis() {
+    return Promise.resolve({
+      id: '124',
+      category: '6',
+      categoryId: '6',
+      sipQuery: {}
+    });
+  }
 }
 class ActivatedRouteStub {
   snapshot = { queryParams: {} };
@@ -23,7 +33,11 @@ class ExecuteServiceStub {
   executeAnalysis() {}
 }
 
-class JwtServiceStub {}
+class JwtServiceStub {
+  get userAnalysisCategoryId() {
+    return 1;
+  }
+}
 
 class MatDialogStub {}
 

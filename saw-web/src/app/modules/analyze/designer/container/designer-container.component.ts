@@ -1,4 +1,11 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
@@ -11,7 +18,8 @@ import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { Store, Select } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { takeWhile, finalize } from 'rxjs/operators';
 
 import {
   flattenPivotData,
@@ -61,7 +69,7 @@ import {
   DesignerInitNewAnalysis,
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
-  DesignerUpdateAnalysisCategory,
+  DesignerUpdateAnalysisMetadata,
   DesignerUpdateAnalysisChartType
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
@@ -73,7 +81,7 @@ const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
   templateUrl: './designer-container.component.html',
   styleUrls: ['./designer-container.component.scss']
 })
-export class DesignerContainerComponent implements OnInit {
+export class DesignerContainerComponent implements OnInit, OnDestroy {
   @Input() public analysisStarter?: AnalysisStarter;
   @Input() public analysis?: Analysis | AnalysisDSL;
   @Input() public designerMode: DesignerMode;
@@ -97,6 +105,7 @@ export class DesignerContainerComponent implements OnInit {
   public isInQueryMode = false;
   public chartTitle = '';
   public fieldCount: number;
+  private subscriptions: Subscription[] = [];
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -117,6 +126,10 @@ export class DesignerContainerComponent implements OnInit {
   ) {
     window['designer'] = this;
     window['DesignerState'] = DesignerState;
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   ngOnInit() {
@@ -149,8 +162,6 @@ export class DesignerContainerComponent implements OnInit {
       break;
     case 'fork':
       this.forkAnalysis().then(() => {
-        isDSLAnalysis(this.analysis) &&
-          this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
         this.initExistingAnalysis();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.layoutConfiguration = this.getLayoutConfiguration(
@@ -340,24 +351,34 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   forkAnalysis() {
-    console.log(this.analysis);
     const { type, semanticId } = this.analysis;
     const analysis = this.analysis;
     this.analysis = null;
     return this._designerService
       .createAnalysis(semanticId, type)
-      .then((newAnalysis: Analysis) => {
+      .then((newAnalysis: Analysis | AnalysisDSL) => {
         this.analysis = {
           ...analysis,
           ...{
-            id: newAnalysis.id,
-            metric: newAnalysis.metric,
-            createdTimestamp: newAnalysis.createdTimestamp,
-            userId: newAnalysis.userId,
-            userFullName: newAnalysis.userFullName,
-            metricName: newAnalysis.metricName
-          }
+            id: newAnalysis.id
+          },
+          ...(isDSLAnalysis(newAnalysis)
+            ? {
+                id: newAnalysis.id,
+                semanticId: newAnalysis.semanticId,
+                createdTime: newAnalysis.createdTime,
+                createdBy: newAnalysis.createdBy
+              }
+            : {
+                metric: newAnalysis.metric,
+                createdTimestamp: newAnalysis.createdTimestamp,
+                userId: newAnalysis.userId,
+                userFullName: newAnalysis.userFullName,
+                metricName: newAnalysis.metricName
+              })
         };
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
       });
   }
 
@@ -431,7 +452,24 @@ export class DesignerContainerComponent implements OnInit {
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
-      this.requestData();
+      /* If it's a DSL analysis, since we're depending on group adapters
+         to generate sipQuery, wait until group adapters are loaded before
+         requesting data.
+         */
+      if (isDSLAnalysis(this.analysis)) {
+        const subscription = this._store
+          .select(DesignerState.groupAdapters)
+          .pipe(
+            takeWhile(adapters => isEmpty(adapters)),
+            finalize(() => {
+              this.requestData();
+            })
+          )
+          .subscribe();
+        this.subscriptions.push(subscription);
+      } else {
+        this.requestData();
+      }
     } else {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
     }
@@ -610,9 +648,9 @@ export class DesignerContainerComponent implements OnInit {
   openSaveDialog(): Promise<any> {
     if (isDSLAnalysis(this.analysis) && this.designerMode === 'new') {
       this._store.dispatch(
-        new DesignerUpdateAnalysisCategory(
-          this._jwtService.userAnalysisCategoryId
-        )
+        new DesignerUpdateAnalysisMetadata({
+          category: this._jwtService.userAnalysisCategoryId
+        })
       );
     } else if (this.designerMode === 'new') {
       (<Analysis>(

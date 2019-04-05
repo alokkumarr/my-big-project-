@@ -260,10 +260,10 @@ export class AnalyzeService {
 
   readAnalysis(
     analysisId,
-    isDSLAnalysis: boolean,
+    hasDSL: boolean,
     customHeaders = {}
   ): Promise<Analysis | AnalysisDSL> {
-    return isDSLAnalysis
+    return hasDSL
       ? this.readAnalysisDSL(analysisId).toPromise()
       : this.readAnalysisNonDSL(analysisId, customHeaders);
   }
@@ -459,7 +459,6 @@ export class AnalyzeService {
     mode = EXECUTION_MODES.LIVE,
     options: ExecutionRequestOptions = {}
   ) {
-    console.log(model);
     return !!model.sipQuery
       ? this.applyAnalysisDSL(model, mode, options)
       : this.applyAnalysisNonDSL(model, mode, options);
@@ -587,7 +586,6 @@ export class AnalyzeService {
 
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {
     // return this.createAnalysisNonDSL(metricId, type);
-    console.log(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
       ? this.createAnalysisDSL(
           this.newAnalysisModel(metricId, type)
@@ -611,7 +609,10 @@ export class AnalyzeService {
 
   createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(first())
+      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
+        first(),
+        map((resp: { analysis: AnalysisDSL }) => resp.analysis)
+      )
     );
   }
 

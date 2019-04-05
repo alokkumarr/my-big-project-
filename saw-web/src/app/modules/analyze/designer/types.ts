@@ -137,7 +137,7 @@ export interface DesignerChangeEvent {
 
 export interface DesignerSaveEvent {
   requestExecution: boolean;
-  analysis: Analysis;
+  analysis: Analysis | AnalysisDSL;
 }
 
 export interface DesignerStateModel {
