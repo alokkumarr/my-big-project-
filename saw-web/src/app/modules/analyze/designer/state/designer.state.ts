@@ -16,7 +16,7 @@ import {
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
   DesignerInitNewAnalysis,
-  DesignerUpdateAnalysisCategory,
+  DesignerUpdateAnalysisMetadata,
   DesignerUpdateAnalysisChartType
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
@@ -75,14 +75,14 @@ export class DesignerState {
     return { ...state.analysis, sipQuery };
   }
 
-  @Action(DesignerUpdateAnalysisCategory)
+  @Action(DesignerUpdateAnalysisMetadata)
   updateCategoryId(
     { patchState, getState }: StateContext<DesignerStateModel>,
-    { category }: DesignerUpdateAnalysisCategory
+    { metadata }: DesignerUpdateAnalysisMetadata
   ) {
     const analysis = getState().analysis;
     return patchState({
-      analysis: { ...analysis, category }
+      analysis: { ...analysis, ...metadata }
     });
   }
 

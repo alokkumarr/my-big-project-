@@ -54,10 +54,12 @@ export class DesignerInitForkAnalysis {
   constructor(public analysis: AnalysisDSL) {}
 }
 
-export class DesignerUpdateAnalysisCategory {
-  /* Use for only new DSL analyses */
-  static readonly type = '[Designer] Update category for analysis';
-  constructor(public category: string | number) {}
+export class DesignerUpdateAnalysisMetadata {
+  /* Use for only new DSL analyses. This should only be used for top level analysis fields
+  like createdTime, id, semanticId etc. For nested fields like chartOptions, sipQuery etc.,
+  use different action and handler. */
+  static readonly type = '[Designer] Update top level metadata for analysis';
+  constructor(public metadata: Partial<AnalysisDSL>) {}
 }
 
 export class DesignerUpdateAnalysisChartType {

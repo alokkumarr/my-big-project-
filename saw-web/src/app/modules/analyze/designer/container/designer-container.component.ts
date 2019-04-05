@@ -69,7 +69,7 @@ import {
   DesignerInitNewAnalysis,
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
-  DesignerUpdateAnalysisCategory,
+  DesignerUpdateAnalysisMetadata,
   DesignerUpdateAnalysisChartType
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
@@ -162,8 +162,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     case 'fork':
       this.forkAnalysis().then(() => {
-        isDSLAnalysis(this.analysis) &&
-          this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
         this.initExistingAnalysis();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.layoutConfiguration = this.getLayoutConfiguration(
@@ -358,18 +356,29 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.analysis = null;
     return this._designerService
       .createAnalysis(semanticId, type)
-      .then((newAnalysis: Analysis) => {
+      .then((newAnalysis: Analysis | AnalysisDSL) => {
         this.analysis = {
           ...analysis,
           ...{
-            id: newAnalysis.id,
-            metric: newAnalysis.metric,
-            createdTimestamp: newAnalysis.createdTimestamp,
-            userId: newAnalysis.userId,
-            userFullName: newAnalysis.userFullName,
-            metricName: newAnalysis.metricName
-          }
+            id: newAnalysis.id
+          },
+          ...(isDSLAnalysis(newAnalysis)
+            ? {
+                id: newAnalysis.id,
+                semanticId: newAnalysis.semanticId,
+                createdTime: newAnalysis.createdTime,
+                createdBy: newAnalysis.createdBy
+              }
+            : {
+                metric: newAnalysis.metric,
+                createdTimestamp: newAnalysis.createdTimestamp,
+                userId: newAnalysis.userId,
+                userFullName: newAnalysis.userFullName,
+                metricName: newAnalysis.metricName
+              })
         };
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
       });
   }
 
@@ -639,9 +648,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   openSaveDialog(): Promise<any> {
     if (isDSLAnalysis(this.analysis) && this.designerMode === 'new') {
       this._store.dispatch(
-        new DesignerUpdateAnalysisCategory(
-          this._jwtService.userAnalysisCategoryId
-        )
+        new DesignerUpdateAnalysisMetadata({
+          category: this._jwtService.userAnalysisCategoryId
+        })
       );
     } else if (this.designerMode === 'new') {
       (<Analysis>(

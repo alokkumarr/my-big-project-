@@ -105,7 +105,10 @@ export class DesignerPageComponent implements OnInit {
       ).length;
       if (navigateToList) {
         if (navigateBackTo === 'home') {
-          this.router.navigate(['analyze', analysis.categoryId]);
+          this.router.navigate([
+            'analyze',
+            isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+          ]);
         } else {
           this.locationService.back();
         }
