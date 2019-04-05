@@ -3,8 +3,6 @@ import { Title } from '@angular/platform-browser';
 import {
   Router,
   Event,
-  RouteConfigLoadStart,
-  RouteConfigLoadEnd,
   NavigationEnd,
   NavigationStart
 } from '@angular/router';
@@ -26,7 +24,6 @@ import {
   UserService,
   MenuService,
   JwtService,
-  HeaderProgressService,
   DynamicModuleService
 } from '../../../common/services';
 import { SidenavMenuService } from '../../../common/components/sidenav';
@@ -49,7 +46,6 @@ export class LayoutContentComponent implements OnInit {
   public modules: any[];
   constructor(
     public _user: UserService,
-    public _headerProgress: HeaderProgressService,
     public _router: Router,
     public _title: Title,
     public _sidenav: SidenavMenuService,
@@ -81,11 +77,6 @@ export class LayoutContentComponent implements OnInit {
         } else {
           loadExternalModulesOnce = once(() => this.loadExternalModules());
         }
-      } else if (event instanceof RouteConfigLoadStart) {
-        this._headerProgress.show();
-      } else if (event instanceof RouteConfigLoadEnd) {
-        this._headerProgress.hide();
-      }
     });
   }
 
