@@ -59,7 +59,7 @@ public class EsReportConverter implements AnalysisSipDslConverter {
   @Override
   public Field buildArtifactField(JsonObject fieldObject) {
     Field field = new Field();
-    field = buildCommonsInArtifactField(field, fieldObject);
+    field = setCommonFieldProperties(field, fieldObject);
     return field;
   }
 }

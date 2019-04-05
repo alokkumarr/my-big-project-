@@ -61,6 +61,12 @@ public interface AnalysisSipDslConverter {
 
     analysis.setMetricName(oldAnalysisDefinition.get("metricName").getAsString());
 
+    if (oldAnalysisDefinition.has("edit")) {
+      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
+
+      analysis.setDesignerEdit(designerEdit);
+    }
+
     return analysis;
   }
 
@@ -337,7 +343,7 @@ public interface AnalysisSipDslConverter {
    * @param fieldObject Old Analysis field definition
    * @return Field Object
    */
-  default Field buildCommonsInArtifactField(Field field, JsonObject fieldObject) {
+  default Field setCommonFieldProperties(Field field, JsonObject fieldObject) {
 
     if (fieldObject.has("columnName")) {
       field.setColumnName(fieldObject.get("columnName").getAsString());
@@ -350,11 +356,21 @@ public interface AnalysisSipDslConverter {
       field.setDisplayName(fieldObject.get("displayName").getAsString());
     }
 
+    // alias and aliasName are used alternatively in different types of analysis.
+    // Both should be handled
     if (fieldObject.has("aliasName")) {
       String alias = fieldObject.get("aliasName").getAsString();
 
       if (alias.length() != 0) {
         field.setAlias(fieldObject.get("aliasName").getAsString());
+      }
+    }
+
+    if (fieldObject.has("alias")) {
+      String alias = fieldObject.get("alias").getAsString();
+
+      if (alias.length() != 0) {
+        field.setAlias(fieldObject.get("alias").getAsString());
       }
     }
 

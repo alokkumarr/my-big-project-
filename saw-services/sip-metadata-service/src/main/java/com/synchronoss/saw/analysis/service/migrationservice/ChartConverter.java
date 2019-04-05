@@ -30,51 +30,8 @@ public class ChartConverter implements AnalysisSipDslConverter {
     artifactName = artifact.get("artifactName").getAsString();
 
     // Set chartProperties
-    Boolean isInverted = null;
-    JsonObject legendObject = null;
-    String chartType = null;
-    String chartTitle = null;
-    JsonObject labelOptions = null;
-    JsonElement xaxis = null;
-    JsonElement yaxis = null;
-
-    if (oldAnalysisDefinition.has("isInverted")) {
-      isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
-    }
-
-    if (oldAnalysisDefinition.has("legend")) {
-      legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
-    }
-
-    if (oldAnalysisDefinition.has("chartType")) {
-      chartType = oldAnalysisDefinition.get("chartType").getAsString();
-    }
-
-    if (oldAnalysisDefinition.has("chartTitle")) {
-      chartTitle = oldAnalysisDefinition.get("chartTitle").getAsString();
-    }
-
-    if (oldAnalysisDefinition.has("labelOptions")) {
-      labelOptions = oldAnalysisDefinition.get("labelOptions").getAsJsonObject();
-    }
-
-    if (oldAnalysisDefinition.has("xAxis")) {
-      xaxis = oldAnalysisDefinition.get("xAxis");
-    }
-
-    if (oldAnalysisDefinition.has("yAxis")) {
-      yaxis = oldAnalysisDefinition.get("yAxis");
-    }
-
     analysis.setChartOptions(
-        createChartOptions(
-            isInverted, legendObject, chartTitle, chartType, labelOptions, xaxis, yaxis));
-
-    if (oldAnalysisDefinition.has("edit")) {
-      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
-
-      analysis.setDesignerEdit(designerEdit);
-    }
+        createChartOptions(oldAnalysisDefinition));
 
     JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
     Store store = null;
@@ -115,7 +72,7 @@ public class ChartConverter implements AnalysisSipDslConverter {
   @Override
   public Field buildArtifactField(JsonObject fieldObject) {
     Field field = new Field();
-    field = buildCommonsInArtifactField(field, fieldObject);
+    field = setCommonFieldProperties(field, fieldObject);
 
     if (fieldObject.has("comboType")) {
       field.setDisplayType(fieldObject.get("comboType").getAsString());
@@ -141,18 +98,46 @@ public class ChartConverter implements AnalysisSipDslConverter {
     return field;
   }
 
-  private ChartOptions createChartOptions(
-      boolean isInverted,
-      JsonObject legend,
-      String chartTitle,
-      String chartType,
-      JsonObject labelOptions,
-      JsonElement xaxis,
-      JsonElement yaxis) {
+  private ChartOptions createChartOptions(JsonObject oldAnalysisDefinition) {
+    Boolean isInverted = null;
+    JsonObject legendObject = null;
+    String chartType = null;
+    String chartTitle = null;
+    JsonObject labelOptions = null;
+    JsonElement xaxis = null;
+    JsonElement yaxis = null;
+
+    if (oldAnalysisDefinition.has("isInverted")) {
+      isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
+    }
+
+    if (oldAnalysisDefinition.has("legend")) {
+      legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
+    }
+
+    if (oldAnalysisDefinition.has("chartType")) {
+      chartType = oldAnalysisDefinition.get("chartType").getAsString();
+    }
+
+    if (oldAnalysisDefinition.has("chartTitle")) {
+      chartTitle = oldAnalysisDefinition.get("chartTitle").getAsString();
+    }
+
+    if (oldAnalysisDefinition.has("labelOptions")) {
+      labelOptions = oldAnalysisDefinition.get("labelOptions").getAsJsonObject();
+    }
+
+    if (oldAnalysisDefinition.has("xAxis")) {
+      xaxis = oldAnalysisDefinition.get("xAxis");
+    }
+
+    if (oldAnalysisDefinition.has("yAxis")) {
+      yaxis = oldAnalysisDefinition.get("yAxis");
+    }
     ChartOptions chartOptions = new ChartOptions();
 
     chartOptions.setInverted(isInverted);
-    chartOptions.setLegend(legend);
+    chartOptions.setLegend(legendObject);
     chartOptions.setChartTitle(chartTitle);
     chartOptions.setChartType(chartType);
     chartOptions.setLabelOptions(labelOptions);
