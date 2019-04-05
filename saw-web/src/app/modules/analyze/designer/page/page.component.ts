@@ -172,6 +172,9 @@ export class DesignerPageComponent implements OnInit {
 
       artifactColumn.checked = true;
       artifactColumn.area = field.area;
+      if (field.aggregate) {
+        artifactColumn.aggregate = field.aggregate;
+      }
     });
 
     return artifacts;
