@@ -9,6 +9,7 @@ import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SIPDSL;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
@@ -411,9 +412,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SIPDSL sipdsl, Integer size) throws Exception {
+  public List<Object> execute(SipQuery sipQuery, Integer size) throws Exception {
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-    List<Field> dataFields = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+    List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
     boolean isPercentage =
         dataFields.stream()
             .anyMatch(
@@ -424,19 +425,19 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             .value()
                             .equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value()));
     SearchSourceBuilder searchSourceBuilder =
-        elasticSearchQueryBuilder.percentagePriorQuery(sipdsl.getSipQuery());
+        elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
     if (isPercentage) {
       JsonNode percentageData =
           storageConnectorService.ExecuteESQuery(
-              searchSourceBuilder.toString(), sipdsl.getSipQuery().getStore());
+              searchSourceBuilder.toString(), sipQuery.getStore());
       elasticSearchQueryBuilder.setPriorPercentages(
-          sipdsl.getSipQuery().getArtifacts().get(0).getFields(), percentageData);
+          sipQuery.getArtifacts().get(0).getFields(), percentageData);
     }
     String query;
-    query = elasticSearchQueryBuilder.buildDataQuery(sipdsl, size);
+    query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size);
     List<Object> result = null;
     JsonNode response =
-        storageConnectorService.ExecuteESQuery(query, sipdsl.getSipQuery().getStore());
+        storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
     if (response.get("aggregations") != null)
