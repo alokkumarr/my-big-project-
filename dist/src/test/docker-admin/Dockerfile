@@ -80,5 +80,10 @@ RUN systemctl enable systemd-journal-gatewayd.socket
 RUN systemctl mask systemd-machine-id-commit.service
 RUN systemctl mask systemd-remount-fs.service
 
+# Add script to generate large directory tree structure
+# to test saw ingestion module
+COPY batch-prepare /root/batch-prepare
+RUN /root/batch-prepare
+
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/

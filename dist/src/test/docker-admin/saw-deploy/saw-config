@@ -109,6 +109,12 @@ saw_storage_proxy_uri=http://localhost:9800/
 # Default is 5 minutes
 sip_bis_retry_diffs_in_minutes=5
 
+# This parameter has been added to control the logging of duplicate
+# entries on store. This has been added as a part of SIP-6386
+# For expected performance with the large file trees structure
+# it needs to be instructed to turn it off
+sip_bis_duplicate_entry=true
+
 
 #Default configuration is set preview limit is 100, if it not set in config file.
 saw_preview_rows_limit=10000
