@@ -197,9 +197,8 @@ export class DesignerPageComponent implements OnInit {
    */
   forkIfNecessary(analysis: Analysis | AnalysisDSL) {
     const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId.toString();
-    const analysisCategoryId = isDSLAnalysis(analysis)
-      ? analysis.category
-      : analysis.categoryId;
+    const analysisCategoryId =
+      (isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId) || '';
     if (
       userAnalysisCategoryId === analysisCategoryId.toString() ||
       this.designerMode !== 'edit'
