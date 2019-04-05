@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import {
-  Router,
-  Event,
-  NavigationEnd,
-  NavigationStart
-} from '@angular/router';
+import { Router, Event, NavigationEnd, NavigationStart } from '@angular/router';
 import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import {
   map,
@@ -77,6 +72,7 @@ export class LayoutContentComponent implements OnInit {
         } else {
           loadExternalModulesOnce = once(() => this.loadExternalModules());
         }
+      }
     });
   }
 
