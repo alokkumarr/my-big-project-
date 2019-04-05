@@ -32,7 +32,7 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
 
   @Override
-  @Transactional
+  // @Transactional
   protected void executeInternal(JobExecutionContext jobExecutionContext)
       throws JobExecutionException {
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
