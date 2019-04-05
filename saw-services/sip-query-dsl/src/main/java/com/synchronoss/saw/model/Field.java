@@ -298,7 +298,7 @@ public class Field {
 
     @JsonCreator
     public static GroupInterval fromValue(String value) {
-      GroupInterval constant = CONSTANTS.get(value);
+      GroupInterval constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -341,7 +341,7 @@ public class Field {
 
     @JsonCreator
     public static Aggregate fromValue(String value) {
-      Aggregate constant = CONSTANTS.get(value);
+      Aggregate constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -384,7 +384,7 @@ public class Field {
 
     @JsonCreator
     public static Type fromValue(String value) {
-      Type constant = CONSTANTS.get(value);
+      Type constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -422,7 +422,7 @@ public class Field {
 
     @JsonCreator
     public static LimitType fromValue(String value) {
-      LimitType constant = CONSTANTS.get(value);
+      LimitType constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

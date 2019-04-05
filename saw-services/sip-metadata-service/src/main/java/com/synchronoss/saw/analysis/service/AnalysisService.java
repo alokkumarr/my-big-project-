@@ -22,7 +22,7 @@ public interface AnalysisService {
       @NotNull(message = "AnalysisID cannot be null") @NotNull String analysisID,
       @Valid Ticket ticket);
 
-  Analysis getAnalysis(
+  ObjectNode getAnalysis(
       @NotNull(message = "AnalysisID cannot be null") @NotNull String analysisID,
       @Valid Ticket ticket);
 

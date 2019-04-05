@@ -251,6 +251,10 @@ public interface AnalysisSipDslConverter {
       model.setValue(modelObject.get("value").getAsDouble());
     }
 
+    if (modelObject.has("otherValue")) {
+      model.setOtherValue(modelObject.get("otherValue").getAsDouble());
+    }
+
     if (modelObject.has("gte")) {
       model.setGte(modelObject.get("gte").getAsString());
     }
