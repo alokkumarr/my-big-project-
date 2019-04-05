@@ -118,7 +118,6 @@ public interface AnalysisSipDslConverter {
    * @param sqlBuilder sqlBuilder Object
    * @return {@link List} of {@link Artifact}
    */
-
   default List<Artifact> generateArtifactsList(String artifactName, JsonObject sqlBuilder) {
     List<Artifact> artifacts = new LinkedList<>();
 
@@ -219,6 +218,10 @@ public interface AnalysisSipDslConverter {
 
     if (modelObject.has("value")) {
       model.setValue(modelObject.get("value").getAsDouble());
+    }
+
+    if (modelObject.has("otherValue")) {
+      model.setOtherValue(modelObject.get("otherValue").getAsDouble());
     }
 
     if (modelObject.has("gte")) {
@@ -389,6 +392,7 @@ public interface AnalysisSipDslConverter {
           JsonObject formatObject = fieldObject.getAsJsonObject("format");
 
           Format format = createFormatObject(formatObject);
+          field.setFormat(format);
         }
       }
     }

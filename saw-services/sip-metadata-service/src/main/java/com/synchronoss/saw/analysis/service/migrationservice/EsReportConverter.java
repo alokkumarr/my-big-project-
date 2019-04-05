@@ -23,6 +23,12 @@ public class EsReportConverter implements AnalysisSipDslConverter {
     JsonObject artifact = artifacts.get(0).getAsJsonObject();
     artifactName = artifact.get("artifactName").getAsString();
 
+    if (oldAnalysisDefinition.has("edit")) {
+      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
+
+      analysis.setDesignerEdit(designerEdit);
+    }
+
     JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
     Store store = null;
     if (esRepository != null) {
