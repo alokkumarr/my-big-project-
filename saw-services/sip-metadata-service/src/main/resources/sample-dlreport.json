@@ -1,237 +1,410 @@
 {
-  "metricName": "sample-spark",
-  "semanticId": "a3a63557-f3da-407c-ae12-8ae4f0d74a2d",
-  "type": "report",
-  "name": "6534DLTest",
-  "description": "",
-  "scheduled": null,
-  "statusMessage": "Entity has retrieved successfully",
-  "id": "50a8e699-173a-45bf-8dc5-676f52de1147",
-  "createdBy": "sawadmin@synchronoss.com",
-  "customerCode": "SYNCHRONOSS",
-  "projectCode": "workbench",
-  "saved": true,
-  "username": "sawadmin@synchronoss.com",
-  "module": "ANALYZE",
-  "artifacts": [],
-  "repository": [
-    {
-      "format": "ndjson",
-      "name": "SALES",
-      "physicalLocation": "/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson"
-    },
-    {
-      "format": "ndjson",
-      "name": "PRODUCT",
-      "physicalLocation": "/var/sip/services/saw-analyze-samples/sample-spark/data-product.ndjson"
-    }
-  ],
-  "parentDataSetIds": [
-    "SALES::json::1545924551866",
-    "PRODUCT::json::1545924560816"
-  ],
-  "modifiedTime": 1545928076,
-  "createdTime": 1545928076,
-  "parentDataSetNames": [
-    "SALES",
-    "PRODUCT"
-  ],
-  "createdTimestamp": 1554188420705,
-  "userId": 1,
-  "userFullName": "system sncr admin",
-  "sqlBuilder": {
-    "booleanCriteria": "AND",
-    "filters": [
+  "contents": {
+    "keys": [
       {
-        "type": "date",
-        "tableName": "SALES",
-        "isOptional": false,
-        "columnName": "date",
-        "isRuntimeFilter": false,
-        "isGlobalFilter": false,
-        "model": {
-          "preset": "NA",
-          "lte": "2019-04-02",
-          "gte": "2018-01-01"
-        }
-      },
+        "customerCode": "SYNCHRONOSS",
+        "module": "ANALYZE",
+        "id": "50a8e699-173a-45bf-8dc5-676f52de1147",
+        "type": "report"
+      }
+    ],
+    "action": "update",
+    "analyze": [
       {
-        "type": "string",
-        "tableName": "SALES",
-        "isOptional": false,
-        "columnName": "string",
-        "isRuntimeFilter": false,
-        "isGlobalFilter": false,
-        "model": {
-          "modelValues": [
-            "str"
+        "metricName": "sample-spark",
+        "semanticId": "a3a63557-f3da-407c-ae12-8ae4f0d74a2d",
+        "type": "report",
+        "name": "6534DLTest",
+        "description": "",
+        "scheduled": null,
+        "statusMessage": "Entity has retrieved successfully",
+        "id": "50a8e699-173a-45bf-8dc5-676f52de1147",
+        "createdBy": "sawadmin@synchronoss.com",
+        "customerCode": "SYNCHRONOSS",
+        "projectCode": "workbench",
+        "saved": true,
+        "username": "sawadmin@synchronoss.com",
+        "module": "ANALYZE",
+        "artifacts": [
+          {
+            "artifactName": "SALES",
+            "columns": [
+              {
+                "aliasName": "",
+                "columnName": "string",
+                "displayName": "String",
+                "filterEligible": true,
+                "joinEligible": true,
+                "name": "string",
+                "table": "sales",
+                "type": "string",
+                "visibleIndex": 2
+              },
+              {
+                "aliasName": "",
+                "columnName": "long",
+                "displayName": "Long",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "long",
+                "table": "sample",
+                "type": "long",
+                "visibleIndex": 3
+              },
+              {
+                "aliasName": "",
+                "columnName": "float",
+                "displayName": "Float",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "float",
+                "table": "sales",
+                "type": "float"
+              },
+              {
+                "aliasName": "",
+                "columnName": "date",
+                "displayName": "Date",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "date",
+                "table": "sales",
+                "type": "date",
+                "format": "yyyy-MM-dd",
+                "visibleIndex": 0
+              },
+              {
+                "aliasName": "",
+                "columnName": "integer",
+                "displayName": "Integer",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "integer",
+                "table": "sample",
+                "type": "integer"
+              },
+              {
+                "aliasName": "",
+                "columnName": "double",
+                "displayName": "Double",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "double",
+                "table": "sales",
+                "type": "double",
+                "format": {
+                  "precision": 2
+                },
+                "visibleIndex": 1
+              }
+            ],
+            "artifactPosition": [
+              20,
+              1
+            ]
+          },
+          {
+            "artifactName": "PRODUCT",
+            "columns": [
+              {
+                "aliasName": "",
+                "columnName": "string_2",
+                "displayName": "String_2",
+                "filterEligible": true,
+                "joinEligible": true,
+                "name": "string_2",
+                "table": "product",
+                "type": "string",
+                "visibleIndex": 5
+              },
+              {
+                "aliasName": "",
+                "columnName": "long_2",
+                "displayName": "Long_2",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "long_2",
+                "table": "sample",
+                "type": "long"
+              },
+              {
+                "aliasName": "",
+                "columnName": "float_2",
+                "displayName": "Float_2",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "float_2",
+                "table": "product",
+                "type": "float",
+                "format": {
+                  "precision": 2
+                },
+                "visibleIndex": 6
+              },
+              {
+                "aliasName": "",
+                "columnName": "date_2",
+                "displayName": "Date_2",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "date_2",
+                "table": "product",
+                "type": "date",
+                "format": "yyyy-MM-dd",
+                "visibleIndex": 4
+              },
+              {
+                "aliasName": "",
+                "columnName": "integer_2",
+                "displayName": "Integer_2",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "integer_2",
+                "table": "sample",
+                "type": "integer"
+              },
+              {
+                "aliasName": "",
+                "columnName": "double_2",
+                "displayName": "Double_2",
+                "filterEligible": true,
+                "joinEligible": false,
+                "name": "double_2",
+                "table": "sales",
+                "type": "double",
+                "format": {
+                  "precision": 2
+                },
+                "visibleIndex": 7
+              }
+            ],
+            "artifactPosition": [
+              420,
+              0
+            ]
+          }
+        ],
+        "repository": [
+          {
+            "format": "ndjson",
+            "name": "SALES",
+            "physicalLocation": "/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson"
+          },
+          {
+            "format": "ndjson",
+            "name": "PRODUCT",
+            "physicalLocation": "/var/sip/services/saw-analyze-samples/sample-spark/data-product.ndjson"
+          }
+        ],
+        "parentDataSetIds": [
+          "SALES::json::1545924551866",
+          "PRODUCT::json::1545924560816"
+        ],
+        "modifiedTime": 1545928076,
+        "createdTime": 1545928076,
+        "parentDataSetNames": [
+          "SALES",
+          "PRODUCT"
+        ],
+        "createdTimestamp": 1554188420705,
+        "userId": 1,
+        "userFullName": "system sncr admin",
+        "sqlBuilder": {
+          "booleanCriteria": "AND",
+          "filters": [
+            {
+              "type": "date",
+              "tableName": "SALES",
+              "isOptional": false,
+              "columnName": "date",
+              "isRuntimeFilter": false,
+              "isGlobalFilter": false,
+              "model": {
+                "preset": "NA",
+                "lte": "2019-04-02",
+                "gte": "2018-01-01"
+              }
+            },
+            {
+              "type": "string",
+              "tableName": "SALES",
+              "isOptional": false,
+              "columnName": "string",
+              "isRuntimeFilter": false,
+              "isGlobalFilter": false,
+              "model": {
+                "modelValues": [
+                  "str"
+                ],
+                "operator": "CONTAINS"
+              }
+            },
+            {
+              "type": "double",
+              "tableName": "PRODUCT",
+              "isOptional": false,
+              "columnName": "double_2",
+              "isRuntimeFilter": false,
+              "isGlobalFilter": false,
+              "model": {
+                "operator": "GTE",
+                "value": 1
+              }
+            }
           ],
-          "operator": "CONTAINS"
+          "orderByColumns": [
+            {
+              "tableName": "SALES",
+              "columnName": "date",
+              "type": "date",
+              "order": "desc"
+            },
+            {
+              "tableName": "SALES",
+              "columnName": "string",
+              "type": "string",
+              "order": "asc"
+            }
+          ],
+          "dataFields": [
+            {
+              "tableName": "SALES",
+              "columns": [
+                {
+                  "aliasName": "",
+                  "columnName": "string",
+                  "displayName": "String",
+                  "filterEligible": true,
+                  "joinEligible": true,
+                  "name": "string",
+                  "table": "sales",
+                  "type": "string",
+                  "visibleIndex": 2
+                },
+                {
+                  "aliasName": "",
+                  "columnName": "long",
+                  "displayName": "Long",
+                  "filterEligible": true,
+                  "joinEligible": false,
+                  "name": "long",
+                  "table": "sample",
+                  "type": "long",
+                  "visibleIndex": 3
+                },
+                {
+                  "aliasName": "",
+                  "columnName": "date",
+                  "displayName": "Date",
+                  "filterEligible": true,
+                  "joinEligible": false,
+                  "name": "date",
+                  "table": "sales",
+                  "type": "date",
+                  "format": "yyyy-MM-dd",
+                  "visibleIndex": 0
+                },
+                {
+                  "aliasName": "",
+                  "columnName": "double",
+                  "displayName": "Double",
+                  "filterEligible": true,
+                  "joinEligible": false,
+                  "name": "double",
+                  "table": "sales",
+                  "type": "double",
+                  "format": {
+                    "precision": 2
+                  },
+                  "visibleIndex": 1
+                }
+              ]
+            },
+            {
+              "tableName": "PRODUCT",
+              "columns": [
+                {
+                  "aliasName": "",
+                  "columnName": "string_2",
+                  "displayName": "String_2",
+                  "filterEligible": true,
+                  "joinEligible": true,
+                  "name": "string_2",
+                  "table": "product",
+                  "type": "string",
+                  "visibleIndex": 5
+                },
+                {
+                  "aliasName": "",
+                  "columnName": "float_2",
+                  "displayName": "Float_2",
+                  "filterEligible": true,
+                  "joinEligible": false,
+                  "name": "float_2",
+                  "table": "product",
+                  "type": "float",
+                  "format": {
+                    "precision": 2
+                  },
+                  "visibleIndex": 6
+                },
+                {
+                  "aliasName": "",
+                  "columnName": "date_2",
+                  "displayName": "Date_2",
+                  "filterEligible": true,
+                  "joinEligible": false,
+                  "name": "date_2",
+                  "table": "product",
+                  "type": "date",
+                  "format": "yyyy-MM-dd",
+                  "visibleIndex": 4
+                },
+                {
+                  "aliasName": "",
+                  "columnName": "double_2",
+                  "displayName": "Double_2",
+                  "filterEligible": true,
+                  "joinEligible": false,
+                  "name": "double_2",
+                  "table": "sales",
+                  "type": "double",
+                  "format": {
+                    "precision": 2
+                  },
+                  "visibleIndex": 7
+                }
+              ]
+            }
+          ],
+          "joins": [
+            {
+              "type": "left",
+              "criteria": [
+                {
+                  "tableName": "SALES",
+                  "columnName": "string",
+                  "side": "right"
+                },
+                {
+                  "tableName": "PRODUCT",
+                  "columnName": "string_2",
+                  "side": "left"
+                }
+              ]
+            }
+          ]
+        },
+        "edit": false,
+        "query": "SELECT SALES.string, SALES.long, SALES.date, SALES.double, PRODUCT.string_2, PRODUCT.float_2, PRODUCT.date_2, PRODUCT.double_2 FROM SALES LEFT JOIN PRODUCT ON (SALES.string = PRODUCT.string_2) WHERE SALES.date >= TO_DATE('2018-01-01') AND SALES.date <= TO_DATE(date_add('2019-04-02', 1)) AND upper(SALES.string) like '%STR%' AND PRODUCT.double_2 >= 1 ORDER BY SALES.date desc, SALES.string asc",
+        "categoryId": 5,
+        "updatedTimestamp": 1554188935357,
+        "updatedUserName": "system sncr admin",
+        "outputFile": {
+          "outputFormat": "json",
+          "outputFileName": "test.json"
         }
-      },
-      {
-        "type": "double",
-        "tableName": "PRODUCT",
-        "isOptional": false,
-        "columnName": "double_2",
-        "isRuntimeFilter": false,
-        "isGlobalFilter": false,
-        "model": {
-          "operator": "GTE",
-          "value": 1
-        }
-      }
-    ],
-    "orderByColumns": [
-      {
-        "tableName": "SALES",
-        "columnName": "date",
-        "type": "date",
-        "order": "desc"
-      },
-      {
-        "tableName": "SALES",
-        "columnName": "string",
-        "type": "string",
-        "order": "asc"
-      }
-    ],
-    "dataFields": [
-      {
-        "tableName": "SALES",
-        "columns": [
-          {
-            "aliasName": "",
-            "columnName": "string",
-            "displayName": "String",
-            "filterEligible": true,
-            "joinEligible": true,
-            "name": "string",
-            "table": "sales",
-            "type": "string",
-            "visibleIndex": 2
-          },
-          {
-            "aliasName": "",
-            "columnName": "long",
-            "displayName": "Long",
-            "filterEligible": true,
-            "joinEligible": false,
-            "name": "long",
-            "table": "sample",
-            "type": "long",
-            "visibleIndex": 3
-          },
-          {
-            "aliasName": "",
-            "columnName": "date",
-            "displayName": "Date",
-            "filterEligible": true,
-            "joinEligible": false,
-            "name": "date",
-            "table": "sales",
-            "type": "date",
-            "format": "yyyy-MM-dd",
-            "visibleIndex": 0
-          },
-          {
-            "aliasName": "",
-            "columnName": "double",
-            "displayName": "Double",
-            "filterEligible": true,
-            "joinEligible": false,
-            "name": "double",
-            "table": "sales",
-            "type": "double",
-            "format": {
-              "precision": 2
-            },
-            "visibleIndex": 1
-          }
-        ]
-      },
-      {
-        "tableName": "PRODUCT",
-        "columns": [
-          {
-            "aliasName": "",
-            "columnName": "string_2",
-            "displayName": "String_2",
-            "filterEligible": true,
-            "joinEligible": true,
-            "name": "string_2",
-            "table": "product",
-            "type": "string",
-            "visibleIndex": 5
-          },
-          {
-            "aliasName": "",
-            "columnName": "float_2",
-            "displayName": "Float_2",
-            "filterEligible": true,
-            "joinEligible": false,
-            "name": "float_2",
-            "table": "product",
-            "type": "float",
-            "format": {
-              "precision": 2
-            },
-            "visibleIndex": 6
-          },
-          {
-            "aliasName": "",
-            "columnName": "date_2",
-            "displayName": "Date_2",
-            "filterEligible": true,
-            "joinEligible": false,
-            "name": "date_2",
-            "table": "product",
-            "type": "date",
-            "format": "yyyy-MM-dd",
-            "visibleIndex": 4
-          },
-          {
-            "aliasName": "",
-            "columnName": "double_2",
-            "displayName": "Double_2",
-            "filterEligible": true,
-            "joinEligible": false,
-            "name": "double_2",
-            "table": "sales",
-            "type": "double",
-            "format": {
-              "precision": 2
-            },
-            "visibleIndex": 7
-          }
-        ]
-      }
-    ],
-    "joins": [
-      {
-        "type": "left",
-        "criteria": [
-          {
-            "tableName": "SALES",
-            "columnName": "string",
-            "side": "right"
-          },
-          {
-            "tableName": "PRODUCT",
-            "columnName": "string_2",
-            "side": "left"
-          }
-        ]
       }
     ]
-  },
-  "edit": false,
-  "query": "SELECT SALES.string, SALES.long, SALES.date, SALES.double, PRODUCT.string_2, PRODUCT.float_2, PRODUCT.date_2, PRODUCT.double_2 FROM SALES LEFT JOIN PRODUCT ON (SALES.string = PRODUCT.string_2) WHERE SALES.date >= TO_DATE('2018-01-01') AND SALES.date <= TO_DATE(date_add('2019-04-02', 1)) AND upper(SALES.string) like '%STR%' AND PRODUCT.double_2 >= 1 ORDER BY SALES.date desc, SALES.string asc",
-  "categoryId": 5,
-  "updatedTimestamp": 1554188935357,
-  "updatedUserName": "system sncr admin",
-  "outputFile": {
-    "outputFormat": "json",
-    "outputFileName": "test.json"
   }
 }
