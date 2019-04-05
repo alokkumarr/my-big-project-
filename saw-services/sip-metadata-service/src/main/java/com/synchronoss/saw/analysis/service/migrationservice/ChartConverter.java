@@ -4,14 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Filter;
-import com.synchronoss.saw.model.SipQuery;
-import com.synchronoss.saw.model.Sort;
+import com.synchronoss.saw.model.Field.LimitType;
 import com.synchronoss.saw.model.Store;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +17,6 @@ public class ChartConverter implements AnalysisSipDslConverter {
     Analysis analysis = new Analysis();
 
     analysis = setCommonParams(analysis, oldAnalysisDefinition);
-
 
     // Extract artifact name from "artifacts"
     // NOTE: For charts and pivots, there will be only one object in artifacts. For reports,
@@ -51,7 +46,6 @@ public class ChartConverter implements AnalysisSipDslConverter {
       legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
     }
 
-
     if (oldAnalysisDefinition.has("chartType")) {
       chartType = oldAnalysisDefinition.get("chartType").getAsString();
     }
@@ -72,8 +66,9 @@ public class ChartConverter implements AnalysisSipDslConverter {
       yaxis = oldAnalysisDefinition.get("yAxis");
     }
 
-    analysis.setChartOptions(createChartOptions(isInverted, legendObject, chartTitle, chartType,
-        labelOptions, xaxis, yaxis));
+    analysis.setChartOptions(
+        createChartOptions(
+            isInverted, legendObject, chartTitle, chartType, labelOptions, xaxis, yaxis));
 
     if (oldAnalysisDefinition.has("edit")) {
       Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
@@ -91,59 +86,69 @@ public class ChartConverter implements AnalysisSipDslConverter {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
       analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, store));
     }
-
-    //TODO: Understand the dynamic parameters
-
-    //TODO: Any additional parameters required???
-
     return analysis;
   }
 
-  private SipQuery generateSipQuery(String artifactName, JsonObject sqlQueryBuilder,
-                                      Store store) {
-    SipQuery sipQuery = new SipQuery();
+  @Override
+  public List<Field> generateArtifactFields(JsonObject sqlBuilder) {
+    List<Field> fields = new LinkedList<>();
 
-    sipQuery.setArtifacts(generateArtifactsList(artifactName, sqlQueryBuilder));
+    if (sqlBuilder.has("dataFields")) {
+      JsonArray dataFields = sqlBuilder.getAsJsonArray("dataFields");
 
-    String booleanCriteriaValue = sqlQueryBuilder.get("booleanCriteria").getAsString();
-    SipQuery.BooleanCriteria booleanCriteria
-            = SipQuery.BooleanCriteria.fromValue(booleanCriteriaValue);
-    sipQuery.setBooleanCriteria(booleanCriteria);
-
-    sipQuery.setFilters(generateFilters(sqlQueryBuilder));
-    sipQuery.setSorts(generateSorts(artifactName, sqlQueryBuilder));
-    sipQuery.setStore(store);
-
-    return sipQuery;
-  }
-
-  private List<Artifact> generateArtifactsList(String artifactName, JsonObject sqlBuilder) {
-    List<Artifact> artifacts = new LinkedList<>();
-
-    Artifact artifact = generateArtifact(artifactName, sqlBuilder);
-
-    artifacts.add(artifact);
-
-    return artifacts;
-  }
-
-  private List<Filter> generateFilters(JsonObject sqlBuilder) {
-    List<Filter> filters = new LinkedList<>();
-
-    if (sqlBuilder.has("filters")) {
-      JsonArray filtersArray = sqlBuilder.getAsJsonArray("filters");
-
-      for (JsonElement filterElement: filtersArray) {
-        filters.add(generateFilter(filterElement.getAsJsonObject()));
+      for (JsonElement dataField : dataFields) {
+        fields.add(buildArtifactField(dataField.getAsJsonObject()));
       }
     }
 
-    return filters;
+    if (sqlBuilder.has("nodeFields")) {
+      JsonArray nodeFields = sqlBuilder.getAsJsonArray("nodeFields");
+
+      for (JsonElement dataField : nodeFields) {
+        fields.add(buildArtifactField(dataField.getAsJsonObject()));
+      }
+    }
+
+    return fields;
   }
 
-  private ChartOptions createChartOptions(boolean isInverted, JsonObject legend, String chartTitle,
-                                          String chartType, JsonObject labelOptions,
-                                          JsonElement xaxis, JsonElement yaxis) {
+  @Override
+  public Field buildArtifactField(JsonObject fieldObject) {
+    Field field = new Field();
+    field = buildCommonsInArtifactField(field, fieldObject);
+
+    if (fieldObject.has("comboType")) {
+      field.setDisplayType(fieldObject.get("comboType").getAsString());
+    }
+
+    if (fieldObject.has("checked")) {
+      String checkedVal = fieldObject.get("checked").getAsString();
+
+      field.setArea(checkedVal + "-axis");
+    }
+
+    // Set limit fields
+    if (fieldObject.has("limitType")) {
+      LimitType limitType = LimitType.fromValue(fieldObject.get("limitType").getAsString());
+      field.setLimitType(limitType);
+    }
+
+    if (fieldObject.has("limitValue")) {
+      int limitValue = fieldObject.get("limitValue").getAsInt();
+      field.setLimitValue(limitValue);
+    }
+
+    return field;
+  }
+
+  private ChartOptions createChartOptions(
+      boolean isInverted,
+      JsonObject legend,
+      String chartTitle,
+      String chartType,
+      JsonObject labelOptions,
+      JsonElement xaxis,
+      JsonElement yaxis) {
     ChartOptions chartOptions = new ChartOptions();
 
     chartOptions.setInverted(isInverted);
@@ -154,185 +159,5 @@ public class ChartConverter implements AnalysisSipDslConverter {
     chartOptions.setxAxis(xaxis);
     chartOptions.setyAxis(yaxis);
     return chartOptions;
-  }
-
-  private Filter generateFilter(JsonObject filterObject) {
-    Filter filter = new Filter();
-
-    if (filterObject.has("type")) {
-      String typeVal = filterObject.get("type").getAsString();
-
-      filter.setType(Filter.Type.fromValue(typeVal));
-    }
-
-    if (filterObject.has("tableName")) {
-      filter.setArtifactsName(filterObject.get("tableName").getAsString());
-    }
-
-    if (filterObject.has("isOptional")) {
-      filter.setIsOptional(filterObject.get("isOptional").getAsBoolean());
-    }
-
-    if (filterObject.has("columnName")) {
-      filter.setColumnName(filterObject.get("columnName").getAsString());
-    }
-
-    if (filterObject.has("isRuntimeFilter")) {
-      filter.setIsRuntimeFilter(filterObject.get("isRuntimeFilter").getAsBoolean());
-    }
-
-    if (filterObject.has("isGlobalFilter")) {
-      filter.setIsGlobalFilter(filterObject.get("isGlobalFilter").getAsBoolean());
-    }
-
-    return filter;
-  }
-
-  private List<Sort> generateSorts(String artifactName, JsonObject sqlBuilder) {
-    List<Sort> sorts = new LinkedList<>();
-
-    if (sqlBuilder.has("sorts")) {
-      JsonArray sortsArray = sqlBuilder.getAsJsonArray("sorts");
-
-      for (JsonElement sortsElement: sortsArray) {
-        sorts.add(generateSortObject(artifactName, sortsElement.getAsJsonObject()));
-      }
-    }
-    return sorts;
-  }
-
-  private Sort generateSortObject(String artifactName, JsonObject sortObject) {
-    Sort sort = new Sort();
-
-    sort.setArtifacts(artifactName);
-
-    if (sortObject.has("order")) {
-      String orderVal = sortObject.get("order").getAsString();
-
-      sort.setOrder(Sort.Order.fromValue(orderVal));
-    }
-
-    if (sortObject.has("columnName")) {
-      String columnName = sortObject.get("columnName").getAsString();
-
-      sort.setColumnName(columnName);
-    }
-
-    if (sortObject.has("type")) {
-      String typeVal = sortObject.get("type").getAsString();
-
-      sort.setType(Sort.Type.fromValue(typeVal));
-    }
-
-    return sort;
-  }
-
-  // For charts, there will be dataFields and nodefields
-  // For pivots, there will be rowfields, columnFIelds and dataFields
-  private Artifact generateArtifact(String artifactName, JsonObject sqlBuilder) {
-    Artifact artifact = new Artifact();
-
-    artifact.setArtifactsName(artifactName);
-    artifact.setFields(generateArtifactFields(sqlBuilder));
-
-    return artifact;
-  }
-
-  private List<Field> generateArtifactFields(JsonObject sqlBuilder) {
-    List<Field> fields = new LinkedList<>();
-
-    if (sqlBuilder.has("dataFields")) {
-      JsonArray dataFields = sqlBuilder.getAsJsonArray("dataFields");
-
-      for (JsonElement dataField: dataFields) {
-        fields.add(generateArtifactField(dataField.getAsJsonObject()));
-      }
-    }
-
-    if (sqlBuilder.has("nodeFields")) {
-      JsonArray nodeFields = sqlBuilder.getAsJsonArray("nodeFields");
-
-      for (JsonElement dataField: nodeFields) {
-        fields.add(generateArtifactField(dataField.getAsJsonObject()));
-      }
-    }
-
-    return fields;
-  }
-
-  private Field generateArtifactField(JsonObject fieldObject) {
-    Field field = new Field();
-
-    if (fieldObject.has("columnName")) {
-      field.setColumnName(fieldObject.get("columnName").getAsString());
-
-      // For analysis migration, we will use column name as dataField
-      field.setDataField(field.getColumnName());
-    }
-    if (fieldObject.has("displayName")) {
-      field.setDisplayName(fieldObject.get("displayName").getAsString());
-    }
-    if (fieldObject.has("aliasName")) {
-      String alias = fieldObject.get("aliasName").getAsString();
-
-      if (alias.length() != 0) {
-        field.setAlias(fieldObject.get("aliasName").getAsString());
-      }
-    }
-
-    if (fieldObject.has("comboType")) {
-      field.setDisplayType(fieldObject.get("comboType").getAsString());
-    }
-
-    if (fieldObject.has("aggregate")) {
-      String aggVal = fieldObject.get("aggregate").getAsString();
-      field.setAggregate(Field.Aggregate.fromValue(aggVal));
-    }
-
-    if (fieldObject.has("groupInterval")) {
-      String groupIntVal = fieldObject.get("groupInterval").getAsString();
-
-      field.setGroupInterval(Field.GroupInterval.fromValue(groupIntVal));
-    }
-
-    if (fieldObject.has("checked")) {
-      String checkedVal = fieldObject.get("checked").getAsString();
-
-      field.setArea(checkedVal + "-axis");
-    }
-
-    if (fieldObject.has("type")) {
-      String typeVal = fieldObject.get("type").getAsString();
-
-      field.setType(Field.Type.fromValue(typeVal));
-
-      if (field.getType() == Field.Type.DATE) {
-        if (fieldObject.has("dateFormat")) {
-          String dateFormat = fieldObject.get("dateFormat").getAsString();
-
-          field.setDateFormat(dateFormat);
-        }
-      }
-    }
-
-    field.nullifyAdditionalProperties();
-
-    return field;
-  }
-
-  private Store extractStoreInfo(JsonObject esRepository) {
-    Store store = new Store();
-
-    if (esRepository.has("storageType")) {
-      store.setStorageType(esRepository.get("storageType").getAsString());
-    }
-
-    if (esRepository.has("indexName") && esRepository.has("type")) {
-      String index = esRepository.get("indexName").getAsString();
-      String type = esRepository.get("type").getAsString();
-      store.setDataStore(index + "/" + type);
-    }
-
-    return store;
   }
 }
