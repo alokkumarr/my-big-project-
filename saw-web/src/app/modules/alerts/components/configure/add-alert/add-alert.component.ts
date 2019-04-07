@@ -20,7 +20,7 @@ export class AddAlertComponent implements OnInit {
     this.addAlertFormGroup = this._formBuilder.group({
       alertFormArray: this._formBuilder.array([
         this._formBuilder.group({
-          alertName: ['', Validators.required]
+          alertName: ['', [Validators.required, Validators.maxLength(18)]]
         }),
         this._formBuilder.group({
           datapodName: ['', Validators.required]
@@ -32,7 +32,10 @@ export class AddAlertComponent implements OnInit {
           operatorName: ['', Validators.required]
         }),
         this._formBuilder.group({
-          thresholdValue: ['', Validators.required]
+          thresholdValue: [
+            '',
+            [Validators.required, Validators.pattern('^[0-9]*$')]
+          ]
         })
       ])
     });

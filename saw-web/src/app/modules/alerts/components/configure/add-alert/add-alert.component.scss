@@ -12,21 +12,14 @@
 
 .add-container {
   max-width: 99%;
+  max-height: 99%;
+  overflow: auto;
 
   &__body {
     background-color: white;
 
     &__stepper {
-      height: 100%;
-
-      &__btn {
-        mat-icon {
-          font-size: 28px;
-        }
-      }
-
-      &__validate {
-      }
+      height: 99%;
     }
   }
 }

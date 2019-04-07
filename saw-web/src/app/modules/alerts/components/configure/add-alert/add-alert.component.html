@@ -21,181 +21,181 @@
 
         <mat-step formGroupName="0" [stepControl]="alertFormArray?.get([0])">
           <ng-template matStepLabel>Name Your Alert</ng-template>
-          <mat-form-field appearance="outline">
-            <mat-label>Alert Name</mat-label>
-            <input
-              matInput
-              placeholder="Alert Name"
-              formControlName="alertName"
-              required
-            />
-            <mat-error>This field is required</mat-error>
-          </mat-form-field>
-          <div fxFlex fxLayoutAlign="space-around center">
-            <button
-              class="add-container__body__stepper__btn"
-              color="primary"
-              mat-icon-button
-              matStepperNext
+          <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__item__elm"
             >
-              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
-            </button>
+              <mat-label>Alert Name</mat-label>
+              <input
+                matInput
+                placeholder="Alert Name"
+                formControlName="alertName"
+                required
+                maxlength="18"
+              />
+              <mat-error
+                *ngIf="
+                  alertFormArray
+                    .get([0])
+                    .controls.alertName.hasError('required')
+                "
+                >This field is required</mat-error
+              >
+              <mat-error
+                *ngIf="
+                  alertFormArray
+                    .get([0])
+                    .controls.alertName.hasError('maxlength')
+                "
+                >Alert Name cannot exceed 18 characters</mat-error
+              >
+            </mat-form-field>
+
+            <div class="add-container__body__stepper__item__elm">
+              <button color="primary" mat-button matStepperNext>
+                Next
+              </button>
+            </div>
           </div>
         </mat-step>
 
         <mat-step formGroupName="1" [stepControl]="alertFormArray?.get([1])">
           <ng-template matStepLabel>Select a Datapod</ng-template>
+          <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
+            <mat-form-field appearance="outline">
+              <mat-label>Datapod</mat-label>
+              <mat-select placeholder="Datapod" formControlName="datapodName">
+                <mat-option value="orders">Orders</mat-option>
+                <mat-option value="sales">Sales</mat-option>
+                <mat-option value="accounts">Accounts</mat-option>
+              </mat-select>
+              <mat-error>This field is required</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Datapod</mat-label>
-            <mat-select placeholder="Datapod" formControlName="datapodName">
-              <mat-option value="orders">Orders</mat-option>
-              <mat-option value="sales">Sales</mat-option>
-              <mat-option value="accounts">Accounts</mat-option>
-            </mat-select>
-            <mat-error>This field is required</mat-error>
-          </mat-form-field>
-
-          <div fxFlex fxLayoutAlign="space-around center">
-            <button
-              class="add-container__body__stepper__btn"
-              mat-icon-button
-              matStepperPrevious
-            >
-              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
-            </button>
-            <button
-              class="add-container__body__stepper__btn"
-              color="primary"
-              mat-icon-button
-              matStepperNext
-            >
-              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
-            </button>
+            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+              <button color="secondary" mat-button matStepperPrevious>
+                Back
+              </button>
+              <button color="primary" mat-button matStepperNext>
+                Next
+              </button>
+            </div>
           </div>
         </mat-step>
 
         <mat-step formGroupName="2" [stepControl]="alertFormArray?.get([2])">
           <ng-template matStepLabel>Select a Metric</ng-template>
+          <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
+            <mat-form-field appearance="outline">
+              <mat-label>Metric Name</mat-label>
+              <mat-select
+                placeholder="Metric Name"
+                formControlName="metricName"
+              >
+                <mat-option value="primary">Primary</mat-option>
+                <mat-option value="accent">Accent</mat-option>
+                <mat-option value="warn">Warn</mat-option>
+              </mat-select>
+              <mat-error>This field is required</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Metric Name</mat-label>
-            <mat-select placeholder="Metric Name" formControlName="metricName">
-              <mat-option value="primary">Primary</mat-option>
-              <mat-option value="accent">Accent</mat-option>
-              <mat-option value="warn">Warn</mat-option>
-            </mat-select>
-            <mat-error>This field is required</mat-error>
-          </mat-form-field>
-
-          <div fxFlex fxLayoutAlign="space-around center">
-            <button
-              class="add-container__body__stepper__btn"
-              mat-icon-button
-              matStepperPrevious
-            >
-              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
-            </button>
-            <button
-              class="add-container__body__stepper__btn"
-              color="primary"
-              mat-icon-button
-              matStepperNext
-            >
-              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
-            </button>
+            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+              <button color="secondary" mat-button matStepperPrevious>
+                Back
+              </button>
+              <div fxFlex></div>
+              <button color="primary" mat-button matStepperNext>
+                Next
+              </button>
+            </div>
           </div>
         </mat-step>
 
         <mat-step formGroupName="3" [stepControl]="alertFormArray?.get([3])">
           <ng-template matStepLabel>Select a Operator</ng-template>
+          <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
+            <mat-form-field appearance="outline">
+              <mat-label>Operator Name</mat-label>
+              <mat-select
+                placeholder="Operator Name"
+                formControlName="operatorName"
+              >
+                <mat-option value="gt">Greater Than</mat-option>
+                <mat-option value="lt">Less Than</mat-option>
+                <mat-option value="eq">Equal To</mat-option>
+              </mat-select>
+              <mat-error>This field is required</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Operator Name</mat-label>
-            <mat-select
-              placeholder="Operator Name"
-              formControlName="operatorName"
-            >
-              <mat-option value="gt">Greater Than</mat-option>
-              <mat-option value="lt">Less Than</mat-option>
-              <mat-option value="eq">Equal To</mat-option>
-            </mat-select>
-            <mat-error>This field is required</mat-error>
-          </mat-form-field>
-
-          <div fxFlex fxLayoutAlign="space-around center">
-            <button
-              class="add-container__body__stepper__btn"
-              mat-icon-button
-              matStepperPrevious
-            >
-              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
-            </button>
-            <button
-              class="add-container__body__stepper__btn"
-              color="primary"
-              mat-icon-button
-              matStepperNext
-            >
-              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
-            </button>
+            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+              <button color="secondary" mat-button matStepperPrevious>
+                Back
+              </button>
+              <div fxFlex></div>
+              <button color="primary" mat-button matStepperNext>
+                Next
+              </button>
+            </div>
           </div>
         </mat-step>
 
         <mat-step formGroupName="4" [stepControl]="alertFormArray?.get([4])">
           <ng-template matStepLabel>Enter Threshold Value</ng-template>
+          <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
+            <mat-form-field appearance="outline">
+              <mat-label>Threshold Value</mat-label>
+              <input
+                matInput
+                placeholder="Threshold Value"
+                formControlName="thresholdValue"
+                required
+              />
+              <mat-error
+                *ngIf="
+                  alertFormArray
+                    .get([4])
+                    .controls.thresholdValue.hasError('required')
+                "
+                >This field is required</mat-error
+              >
+              <mat-error
+                *ngIf="
+                  alertFormArray
+                    .get([4])
+                    .controls.thresholdValue.hasError('pattern')
+                "
+                >Only numbers are allowed for Threshold Value.</mat-error
+              >
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Threshold Value</mat-label>
-            <input
-              matInput
-              placeholder="Threshold Value"
-              formControlName="thresholdValue"
-              required
-            />
-            <mat-error>This field is required</mat-error>
-          </mat-form-field>
-
-          <div fxFlex fxLayoutAlign="space-around center">
-            <button
-              class="add-container__body__stepper__btn"
-              mat-icon-button
-              matStepperPrevious
-            >
-              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
-            </button>
-            <button
-              class="add-container__body__stepper__btn"
-              color="primary"
-              mat-icon-button
-              matStepperNext
-            >
-              <mat-icon fontIcon="icon-arrow-down-circle-filled"></mat-icon>
-            </button>
+            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+              <button color="secondary" mat-button matStepperPrevious>
+                Back
+              </button>
+              <div fxFlex></div>
+              <button color="primary" mat-button matStepperNext>
+                Next
+              </button>
+            </div>
           </div>
         </mat-step>
 
-        <mat-step>
+        <mat-step style="max-height: 100px;">
           <ng-template matStepLabel>Validate and Create</ng-template>
-          <pre class="add-container__body__stepper__validate">{{
-            addAlertFormGroup.value.alertFormArray | json
-          }}</pre>
-          <div fxFlex fxLayoutAlign="space-around center">
-            <button
-              class="add-container__body__stepper__btn"
-              mat-icon-button
-              matStepperPrevious
-            >
-              <mat-icon fontIcon="icon-arrow-up-circle-filled"></mat-icon>
+          <code>
+            <pre class="add-container__body__stepper__validate">{{
+              addAlertFormGroup.value.alertFormArray | json
+            }}</pre>
+          </code>
+
+          <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+            <button color="primary" mat-stroked-button matStepperPrevious>
+              Back
             </button>
-            <button
-              matTooltip="Save"
-              class="add-container__body__stepper__btn"
-              color="primary"
-              mat-icon-button
-              matStepperNext
-            >
-              <mat-icon fontIcon="icon-save"></mat-icon>
+            <div fxFlex></div>
+            <button color="primary" mat-raised-button matStepperNext>
+              Add
             </button>
           </div>
         </mat-step>
