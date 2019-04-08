@@ -30,14 +30,10 @@ public class ChartConverter implements AnalysisSipDslConverter {
     artifactName = artifact.get("artifactName").getAsString();
 
     // Set chartProperties
-    analysis.setChartOptions(
-        createChartOptions(oldAnalysisDefinition));
+    analysis.setChartOptions(createChartOptions(oldAnalysisDefinition));
 
-    JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
-    Store store = null;
-    if (esRepository != null) {
-      store = extractStoreInfo(esRepository);
-    }
+    Store store = buildStoreObject(oldAnalysisDefinition);
+
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();

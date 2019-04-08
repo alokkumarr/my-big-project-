@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.GroupInterval;
+import com.synchronoss.saw.model.Store;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,24 @@ public class PivotConverter implements AnalysisSipDslConverter {
   @Override
   public Analysis convert(JsonObject oldAnalysisDefinition) {
     Analysis analysis = new Analysis();
+
+    analysis = setCommonParams(analysis, oldAnalysisDefinition);
+
+    String artifactName = null;
+
+    JsonArray artifacts = oldAnalysisDefinition.getAsJsonArray("artifacts");
+
+    // Handling artifact name for charts and pivots
+    JsonObject artifact = artifacts.get(0).getAsJsonObject();
+    artifactName = artifact.get("artifactName").getAsString();
+
+    Store store = buildStoreObject(oldAnalysisDefinition);
+
+    JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
+    if (sqlQueryBuilderElement != null) {
+      JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
+      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, store));
+    }
 
     return analysis;
   }
@@ -60,9 +79,11 @@ public class PivotConverter implements AnalysisSipDslConverter {
 
     // Set groupInterval/dateInterval
     if (fieldObject.has("dateInterval")) {
-      String dateInterval = fieldObject.get("dateInterval").getAsString();
+      JsonElement dateInterval = fieldObject.get("dateInterval");
 
-      field.setGroupInterval(GroupInterval.fromValue(dateInterval));
+      if (!dateInterval.isJsonNull() && dateInterval != null) {
+        field.setGroupInterval(GroupInterval.fromValue(dateInterval.getAsString()));
+      }
     }
 
     return field;

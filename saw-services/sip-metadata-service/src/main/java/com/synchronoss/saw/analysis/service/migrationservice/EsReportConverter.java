@@ -29,11 +29,8 @@ public class EsReportConverter implements AnalysisSipDslConverter {
       analysis.setDesignerEdit(designerEdit);
     }
 
-    JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
-    Store store = null;
-    if (esRepository != null) {
-      store = extractStoreInfo(esRepository);
-    }
+    Store store = buildStoreObject(oldAnalysisDefinition);
+
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();

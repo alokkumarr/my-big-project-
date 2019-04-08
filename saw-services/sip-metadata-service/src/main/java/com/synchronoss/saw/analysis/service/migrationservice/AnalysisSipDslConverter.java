@@ -47,7 +47,10 @@ public interface AnalysisSipDslConverter {
     analysis.setName(oldAnalysisDefinition.get("name").getAsString());
 
     analysis.setType(oldAnalysisDefinition.get("type").getAsString());
-    analysis.setCategory(oldAnalysisDefinition.get("categoryId").getAsString());
+
+    if (oldAnalysisDefinition.has("categoryId")) {
+      analysis.setCategory(oldAnalysisDefinition.get("categoryId").getAsString());
+    }
 
     analysis.setCustomerCode(oldAnalysisDefinition.get("customerCode").getAsString());
     analysis.setProjectCode(oldAnalysisDefinition.get("projectCode").getAsString());
@@ -56,8 +59,13 @@ public interface AnalysisSipDslConverter {
     analysis.setCreatedTime(oldAnalysisDefinition.get("createdTimestamp").getAsLong());
     analysis.setCreatedBy(oldAnalysisDefinition.get("username").getAsString());
 
-    analysis.setModifiedTime(oldAnalysisDefinition.get("updatedTimestamp").getAsLong());
-    analysis.setModifiedBy(oldAnalysisDefinition.get("updatedUserName").getAsString());
+    if (oldAnalysisDefinition.has("updatedTimestamp")) {
+      analysis.setModifiedTime(oldAnalysisDefinition.get("updatedTimestamp").getAsLong());
+    }
+
+    if (oldAnalysisDefinition.has("updatedUserName")) {
+      analysis.setModifiedBy(oldAnalysisDefinition.get("updatedUserName").getAsString());
+    }
 
     analysis.setMetricName(oldAnalysisDefinition.get("metricName").getAsString());
 
@@ -71,9 +79,25 @@ public interface AnalysisSipDslConverter {
   }
 
   /**
+   * Builds a store object from the old analysis definition.
+   *
+   * @param oldAnalysisDefinition Old analysis deginition
+   * @return Store Object
+   */
+  default Store buildStoreObject(JsonObject oldAnalysisDefinition) {
+    JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
+    Store store = null;
+    if (esRepository != null) {
+      store = extractStoreInfo(esRepository);
+    }
+
+    return store;
+  }
+
+  /**
    * Migrate EsRepository{} to Store{}.
    *
-   * @param esRepository Old Analysis definition contains Store information.
+   * @param esRepository esRepository object extracted from oldDefinition
    * @return Store Object
    */
   default Store extractStoreInfo(JsonObject esRepository) {
@@ -380,7 +404,7 @@ public interface AnalysisSipDslConverter {
     if (fieldObject.has("aggregate")) {
       JsonElement aggValElement = fieldObject.get("aggregate");
 
-      if (aggValElement != null) {
+      if (!aggValElement.isJsonNull() && aggValElement != null) {
         field.setAggregate(Field.Aggregate.fromValue(aggValElement.getAsString()));
       }
     }

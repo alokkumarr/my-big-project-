@@ -12,6 +12,7 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class MigrateAnalysis {
         converter = new ChartConverter();
         break;
       case "pivot":
-        logger.warn("Not implemented yet");
+        converter = new PivotConverter();
         break;
       case "esReport":
         converter = new EsReportConverter();

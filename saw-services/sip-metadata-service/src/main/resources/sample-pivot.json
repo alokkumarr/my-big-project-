@@ -4,7 +4,7 @@
          {
             "customerCode":"SYNCHRONOSS",
             "module":"ANALYZE",
-            "id":"0820d52f-25d0-4e5f-bc3d-a8bbd04b8193",
+            "id":"eae07b3c-33e5-421e-99af-045b68a3b298",
             "type":"pivot"
          }
       ],
@@ -20,8 +20,87 @@
             "name":"Untitled Analysis",
             "description":"",
             "scheduled":null,
+            "supports":[
+               {
+                  "category":"table",
+                  "children":[
+                     {
+                        "icon":"icon-pivot",
+                        "label":"Pivot",
+                        "type":"table:pivot"
+                     },
+                     {
+                        "icon":"icon-report",
+                        "label":"Report",
+                        "type":"table:esReport"
+                     }
+                  ],
+                  "label":"TABLES"
+               },
+               {
+                  "category":"charts",
+                  "children":[
+                     {
+                        "icon":"icon-vert-bar-chart",
+                        "label":"Column Chart",
+                        "type":"chart:column"
+                     },
+                     {
+                        "icon":"icon-vert-bar-chart",
+                        "label":"Stacked Chart",
+                        "type":"chart:stack"
+                     },
+                     {
+                        "icon":"icon-vert-bar-chart",
+                        "label":"Line Chart",
+                        "type":"chart:line"
+                     },
+                     {
+                        "icon":"icon-vert-bar-chart",
+                        "label":"Bar Chart",
+                        "type":"chart:bar"
+                     },
+                     {
+                        "icon":"icon-vert-bar-chart",
+                        "label":"Scatter Plot",
+                        "type":"chart:scatter"
+                     },
+                     {
+                        "icon":"icon-vert-bar-chart",
+                        "label":"Bubble Chart",
+                        "type":"chart:bubble"
+                     },
+                     {
+                        "icon":"icon-timeseries-chart",
+                        "label":"Time Series Chart",
+                        "type":"chart:tsline"
+                     },
+                     {
+                        "icon":"icon-Candlestick-icon",
+                        "label":"Time series multi pane",
+                        "type":"chart:tsareaspline"
+                     },
+                     {
+                        "icon":"icon-area-chart",
+                        "label":"Area Chart",
+                        "type":"chart:area"
+                     },
+                     {
+                        "icon":"icon-combo-chart",
+                        "label":"Combo Chart",
+                        "type":"chart:combo"
+                     },
+                     {
+                        "icon":"icon-pie-chart",
+                        "label":"Pie Chart",
+                        "type":"chart:pie"
+                     }
+                  ],
+                  "label":"CHARTS"
+               }
+            ],
             "statusMessage":"Entity has retrieved successfully",
-            "id":"0820d52f-25d0-4e5f-bc3d-a8bbd04b8193",
+            "id":"eae07b3c-33e5-421e-99af-045b68a3b298",
             "createdBy":"sawadmin@synchronoss.com",
             "customerCode":"SYNCHRONOSS",
             "projectCode":"workbench",
@@ -77,7 +156,8 @@
                         "area":"row",
                         "checked":true,
                         "dateInterval":"day",
-                        "areaIndex":0
+                        "areaIndex":0,
+                        "format":"MM/dd/yyyy HH:mm:ss"
                      },
                      {
                         "aliasName":"",
@@ -88,7 +168,11 @@
                         "kpiEligible":true,
                         "name":"integer",
                         "table":"sample",
-                        "type":"integer"
+                        "type":"integer",
+                        "area":"column",
+                        "checked":true,
+                        "dateInterval":"day",
+                        "areaIndex":0
                      },
                      {
                         "aliasName":"",
@@ -103,7 +187,12 @@
                         "area":"data",
                         "checked":true,
                         "aggregate":"sum",
-                        "areaIndex":0
+                        "areaIndex":0,
+                        "format":{
+                           "precision":2,
+                           "currency":"USD",
+                           "currencySymbol":"$"
+                        }
                      }
                   ]
                }
@@ -115,7 +204,7 @@
             },
             "modifiedTime":1545924107,
             "createdTime":1545924107,
-            "createdTimestamp":1554286516799,
+            "createdTimestamp":1554707976876,
             "userId":1,
             "userFullName":"system sncr admin",
             "sqlBuilder":{
@@ -135,11 +224,19 @@
                      "aggregate":null,
                      "name":null,
                      "dateInterval":"day",
-                     "dateFormat":"yyyy-MM-dd"
+                     "dateFormat":"MM/dd/yyyy HH:mm:ss"
                   }
                ],
                "columnFields":[
-
+                  {
+                     "type":"integer",
+                     "columnName":"integer",
+                     "area":"column",
+                     "areaIndex":0,
+                     "aggregate":null,
+                     "name":null,
+                     "dateInterval":null
+                  }
                ],
                "dataFields":[
                   {
@@ -149,7 +246,12 @@
                      "areaIndex":0,
                      "aggregate":"sum",
                      "name":"double",
-                     "dateInterval":null
+                     "dateInterval":null,
+                     "format":{
+                        "precision":2,
+                        "currency":"USD",
+                        "currencySymbol":"$"
+                     }
                   }
                ]
             },
