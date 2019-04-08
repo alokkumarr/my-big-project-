@@ -111,7 +111,7 @@ export function flattenChartData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
   const sorts = sqlBuilder.sorts;
 
-  const result = fpPipe(
+  return fpPipe(
     nestedData => parseNodeChart(data, {}, nodeFieldMap, 1),
     flattenedData => {
       /* Order chart data manually. Backend doesn't sort chart data. */
@@ -125,8 +125,6 @@ export function flattenChartData(data, sqlBuilder) {
       return flattenedData;
     }
   )(data);
-  console.log(result);
-  return result;
 }
 
 export function checkNullinReportData(data) {

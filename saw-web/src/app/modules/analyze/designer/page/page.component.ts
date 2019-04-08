@@ -105,7 +105,10 @@ export class DesignerPageComponent implements OnInit {
       ).length;
       if (navigateToList) {
         if (navigateBackTo === 'home') {
-          this.router.navigate(['analyze', analysis.categoryId]);
+          this.router.navigate([
+            'analyze',
+            isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+          ]);
         } else {
           this.locationService.back();
         }
@@ -172,6 +175,9 @@ export class DesignerPageComponent implements OnInit {
 
       artifactColumn.checked = true;
       artifactColumn.area = field.area;
+      if (field.aggregate) {
+        artifactColumn.aggregate = field.aggregate;
+      }
     });
 
     return artifacts;
@@ -191,9 +197,8 @@ export class DesignerPageComponent implements OnInit {
    */
   forkIfNecessary(analysis: Analysis | AnalysisDSL) {
     const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId.toString();
-    const analysisCategoryId = isDSLAnalysis(analysis)
-      ? analysis.category
-      : analysis.categoryId;
+    const analysisCategoryId =
+      (isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId) || '';
     if (
       userAnalysisCategoryId === analysisCategoryId.toString() ||
       this.designerMode !== 'edit'

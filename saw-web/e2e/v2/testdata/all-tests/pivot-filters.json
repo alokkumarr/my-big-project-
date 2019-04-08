@@ -1,0 +1,318 @@
+{
+  "PIVOT": {
+    "pivotFilters": {
+      "PIVOT001": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "This Week",
+        "description": "Admin should be able to add filter with Date_This_Week_Group_Interval_not_specified"
+      },
+      "PIVOT002": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Year",
+        "preset": "MTD (Month to Date)",
+        "description": "Admin should be able to add filter with Date_MTD_Month_to_Date_Group_Interval_Year"
+      },
+      "PIVOT003": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Quarter",
+        "preset": "YTD (Year to Date)",
+        "description": "Admin should be able to add filter with Date_YTD_Year_to_Date_Group_Interval_Quarter"
+      },
+      "PIVOT004": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Month",
+        "preset": "Last Week",
+        "description": "Admin should be able to add filter with Date_Last_Week_Group_Interval_Month"
+      },
+      "PIVOT005": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Date",
+        "preset": "Last 2 Weeks",
+        "description": "Admin should be able to add filter Date_Last_2_Weeks_Group_Interval_Date"
+      },
+      "PIVOT006": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Month",
+        "description": "Admin should be able to add filter Date_Last_Month_Group_Interval_not_specified"
+      },
+      "PIVOT007": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Quarter",
+        "description": "Admin should be able to add filter Date_Las_Quarter_Group_Interval_not_specified"
+      },
+      "PIVOT008": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 3 Months",
+        "description": "Admin should be able to add filter Date_Last_3_Months_Group_Interval_not_specified"
+      },
+      "PIVOT009": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 6 Months",
+        "description": "Admin should be able to add filter Date_Last_6_Months_Group_Interval_not_specified"
+      },
+      "PIVOT010": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "This Week",
+        "description": "User should be able to add filter Date_This_Week_Group_Interval_not_specified"
+      },
+      "PIVOT011": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Year",
+        "preset": "MTD (Month to Date)",
+        "description": "User should be able to add filter Date_MTD_Month_to_Date_Group_Interval_Year"
+      },
+      "PIVOT012": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Quarter",
+        "preset": "YTD (Year to Date)",
+        "description": "User should be able to add filter Date_YTD_Year_to_Date_Group_Interval_Quarter"
+      },
+      "PIVOT013": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Month",
+        "preset": "Last Week",
+        "description": "User should be able to add filter Date_Last_Week_Group_Interval_Month"
+      },
+      "PIVOT014": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Date",
+        "preset": "Last 2 Weeks",
+        "description": "User should be able to add filter Date_Last_2_Weeks_Group_Interval_Date"
+      },
+      "PIVOT015": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Month",
+        "description": "User should be able to add filter Date_Last_Month_Group_Interval_not_specified"
+      },
+      "PIVOT016": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Quarter",
+        "description": "User should be able to add filter Date_Last_Quarter_Group_Interval_not_specified"
+      },
+      "PIVOT017": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 3 Months",
+        "description": "User should be able to add filter Date_Last_3_Months_Group_Interval_not_specified"
+      },
+      "PIVOT018": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 6 Months",
+        "description": "User should be able to add filter Date_Last_6_Months_Group_Interval_not_specified"
+      },
+      "PIVOT019": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": 10,
+        "description": "Admin should be able to add filter String_Equals"
+      },
+      "PIVOT020": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Not equal",
+        "value": 10,
+        "description": "Admin should be able to add filter String_Not_equal"
+      },
+      "PIVOT021": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Is in",
+        "value": 10,
+        "description": "Admin should be able to add filter String_Is_in"
+      },
+      "PIVOT022": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Is not in",
+        "value": 10,
+        "description": "Admin should be able to add filter String_Is_not_in"
+      },
+      "PIVOT023": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Contains",
+        "value": 10,
+        "description": "Admin should be able to add filter String_Contains"
+      },
+      "PIVOT024": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Starts with",
+        "value": 10,
+        "description": "Admin should be able to add filter String_Starts_with"
+      },
+      "PIVOT025": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Ends with",
+        "value": 10,
+        "description": "Admin should be able to add filter String_Ends_with"
+      },
+      "PIVOT026": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": 10,
+        "description": "User should be able to add filter String_Equals"
+      },
+      "PIVOT027": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Not equal",
+        "value": 10,
+        "description": "User should be able to add filter String_Not_equal"
+      },
+      "PIVOT028": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Is in",
+        "value": 10,
+        "description": "User should be able to add filter String_Is_in"
+      },
+      "PIVOT029": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Is not in",
+        "value": 10,
+        "description": "User should be able to add filter String_Is_not_in"
+      },
+      "PIVOT030": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Contains",
+        "value": 10,
+        "description": "User should be able to add filter String_Contains"
+      },
+      "PIVOT031": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Starts with",
+        "value": 10,
+        "description": "User should be able to add filter String_Starts_with"
+      },
+      "PIVOT032": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Ends with",
+        "value": 10,
+        "description": "User should be able to add filter String_Ends_with"
+      },
+      "PIVOT033": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "avg",
+        "operator": "Greater than",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Greater_than_Aggregate_function_Average"
+      },
+      "PIVOT034": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "min",
+        "operator": "Less than",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Less_than_Aggregate_function_Minimum"
+      },
+      "PIVOT035": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "max",
+        "operator": "Greater than or equal to",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Greater_than_or_equal_to_Aggregate_function_Maximum"
+      },
+      "PIVOT036": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "count",
+        "operator": "Less than or equal to",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Less_than_or_equal_to_Aggregate_function_Count"
+      },
+      "PIVOT037": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Greater than",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Greater_than_Aggregate_function_default"
+      },
+      "PIVOT038": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Less than",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Less_than_Aggregate_function_default"
+      },
+      "PIVOT039": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Greater than or equal to",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Greater_than_or_equal_to_Aggregate_function_default"
+      },
+      "PIVOT040": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Less than or equal to",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Less_than_or_equal_to_Aggregate_function_default"
+      },
+      "PIVOT041": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Equal to",
+        "value": 10,
+        "description": "Admin should be able to add filter Number_Equal_to_Aggregate_function_default"
+      },
+      "PIVOT042": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Not equal to",
+        "value": 10,
+        "description": "Number_Not_equal_to_Aggregate_function_default"
+      }
+    }
+  }
+}

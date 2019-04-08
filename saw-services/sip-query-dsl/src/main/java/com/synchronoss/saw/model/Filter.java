@@ -230,7 +230,7 @@ public class Filter {
   public enum Type {
     LONG("long"),
     STRING("string"),
-    INT("integer"),
+    INTEGER("integer"),
     DOUBLE("double"),
     DATE("date"),
     TIMESTAMP("timestamp"),
@@ -251,7 +251,7 @@ public class Filter {
 
     @JsonCreator
     public static Filter.Type fromValue(String value) {
-      Filter.Type constant = CONSTANTS.get(value);
+      Filter.Type constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

@@ -55,6 +55,9 @@ public class Field {
   @JsonProperty("dateFormat")
   private String dateFormat;
 
+  @JsonProperty("format")
+  private Format format;
+
   @JsonProperty("limitType")
   private LimitType limitType;
 
@@ -146,6 +149,16 @@ public class Field {
     this.groupInterval = groupInterval;
   }
 
+  @JsonProperty("format")
+  public Format getFormat() {
+    return this.format;
+  }
+
+  @JsonProperty("format")
+  public void setFormat(Format format) {
+    this.format = format;
+  }
+
   /**
    * Gets dateFormat.
    *
@@ -192,9 +205,7 @@ public class Field {
     this.additionalProperties.put(name, value);
   }
 
-  /**
-   * Used to nullify additionalProperties field, so that it won't appear in the output json
-   */
+  /** Used to nullify additionalProperties field, so that it won't appear in the output json */
   public void nullifyAdditionalProperties() {
     this.additionalProperties = null;
   }
@@ -211,6 +222,7 @@ public class Field {
         .append("aggregate", aggregate)
         .append("groupInterval", groupInterval)
         .append("additionalProperties", additionalProperties)
+        .append("format", format)
         .toString();
   }
 
@@ -226,6 +238,7 @@ public class Field {
         .append(type)
         .append(displayName)
         .append(groupInterval)
+        .append(format)
         .toHashCode();
   }
 
@@ -238,6 +251,7 @@ public class Field {
       return false;
     }
     Field rhs = ((Field) other);
+
     return new EqualsBuilder()
         .append(aggregate, rhs.aggregate)
         .append(area, rhs.area)
@@ -248,6 +262,7 @@ public class Field {
         .append(type, rhs.type)
         .append(displayName, rhs.displayName)
         .append(groupInterval, rhs.groupInterval)
+        .append(format, rhs.format)
         .isEquals();
   }
 
@@ -283,7 +298,7 @@ public class Field {
 
     @JsonCreator
     public static GroupInterval fromValue(String value) {
-      GroupInterval constant = CONSTANTS.get(value);
+      GroupInterval constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -326,7 +341,7 @@ public class Field {
 
     @JsonCreator
     public static Aggregate fromValue(String value) {
-      Aggregate constant = CONSTANTS.get(value);
+      Aggregate constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -369,7 +384,7 @@ public class Field {
 
     @JsonCreator
     public static Type fromValue(String value) {
-      Type constant = CONSTANTS.get(value);
+      Type constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -407,7 +422,7 @@ public class Field {
 
     @JsonCreator
     public static LimitType fromValue(String value) {
-      LimitType constant = CONSTANTS.get(value);
+      LimitType constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

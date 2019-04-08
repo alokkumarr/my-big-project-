@@ -260,10 +260,10 @@ export class AnalyzeService {
 
   readAnalysis(
     analysisId,
-    isDSLAnalysis: boolean,
+    hasDSL: boolean,
     customHeaders = {}
   ): Promise<Analysis | AnalysisDSL> {
-    return isDSLAnalysis
+    return hasDSL
       ? this.readAnalysisDSL(analysisId).toPromise()
       : this.readAnalysisNonDSL(analysisId, customHeaders);
   }
@@ -609,7 +609,10 @@ export class AnalyzeService {
 
   createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(first())
+      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
+        first(),
+        map((resp: { analysis: AnalysisDSL }) => resp.analysis)
+      )
     );
   }
 
