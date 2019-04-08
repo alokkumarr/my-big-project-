@@ -39,27 +39,13 @@ export interface QueryDSL {
   store: StorageDSL;
 }
 
-// New Chart DSL query has separate chartOptions which is not part of sipQuery Object.
-// Due to which new corresponding interface has been created.
-// ref : ../sip/saw-services/sip-query-dsl/src/main/resources/sample.json
-
-export interface ChartOptions {
-  chartTitle: string;
-  chartType: string;
-  isInverted: boolean;
-  labelOptions?: LabelOptions;
-  legend?: Legend;
-  xAxis?: Axis;
-  yAxis?: Axis;
-}
-
 // All fields marked todo have not yet been implemented in
 // backend in new API.
 
 // Don't use this base interface directly
 export interface AnalysisBaseDSL {
   artifacts?: any[]; // this field needs to be removed from analysis structure before saving
-  categoryId: number; // todo
+  category: number | string;
   createdBy?: string; // email
   createdTime?: number;
   crondetails?: any; // todo
@@ -90,7 +76,15 @@ export interface AnalysisBaseDSL {
 }
 
 export interface AnalysisChartDSL extends AnalysisBaseDSL {
-  chartOptions: ChartOptions;
+  chartOptions: {
+    chartType: string;
+    chartTitle: string;
+    isInverted: boolean;
+    legend?: Legend;
+    labelOptions?: LabelOptions;
+    xAxis?: Axis;
+    yAxis?: Axis;
+  };
 }
 
 export type AnalysisDSL = AnalysisChartDSL;

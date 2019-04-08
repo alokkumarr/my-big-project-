@@ -34,6 +34,9 @@ public class SipQuery {
   @JsonProperty("store")
   private Store store;
 
+  @JsonProperty("query")
+  private String query;
+
   @JsonProperty("artifacts")
   public List<Artifact> getArtifacts() {
     return artifacts;
@@ -92,6 +95,16 @@ public class SipQuery {
   @JsonProperty("store")
   public void setStore(Store store) {
     this.store = store;
+  }
+
+  @JsonProperty("query")
+  public String getQuery() {
+    return query;
+  }
+
+  @JsonProperty("query")
+  public void setQuery(String query) {
+    this.query = query;
   }
 
   @Override

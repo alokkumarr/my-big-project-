@@ -6,7 +6,10 @@ import {
   SqlBuilderEsReport,
   Join,
   AnalysisType,
-  MapSettings
+  MapSettings,
+  LabelOptions,
+  Legend,
+  Axis
 } from '../models';
 import { JsPlumbCanvasChangeEvent } from '../../../common/components/js-plumb/types';
 import {
@@ -143,4 +146,14 @@ export interface DesignerSaveEvent {
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
   analysis: AnalysisDSL;
+}
+
+export interface DSLChartOptionsModel {
+  chartType: string;
+  chartTitle: string;
+  isInverted: boolean;
+  legend?: Legend;
+  labelOptions?: LabelOptions;
+  xAxis: Axis;
+  yAxis: Axis;
 }

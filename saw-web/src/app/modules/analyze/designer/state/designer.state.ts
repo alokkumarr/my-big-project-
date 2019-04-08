@@ -6,7 +6,11 @@ import * as values from 'lodash/values';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
-import { DesignerStateModel, AnalysisDSL } from '../types';
+import {
+  DesignerStateModel,
+  AnalysisDSL,
+  DSLChartOptionsModel
+} from '../types';
 import {
   DesignerInitGroupAdapters,
   DesignerAddColumnToGroupAdapter,
@@ -15,7 +19,15 @@ import {
   DesignerClearGroupAdapters,
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
-  DesignerInitNewAnalysis
+  DesignerInitNewAnalysis,
+  DesignerUpdateAnalysisCategory,
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateAnalysisChartTitle,
+  DesignerUpdateAnalysisChartInversion,
+  DesignerUpdateAnalysisChartLegend,
+  DesignerUpdateAnalysisChartLabelOptions,
+  DesignerUpdateAnalysisChartXAxis,
+  DesignerUpdateAnalysisChartYAxis
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 
@@ -24,6 +36,26 @@ import { DesignerService } from '../designer.service';
 const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
   analysis: null
+};
+
+const defaultDSLChartOptions: DSLChartOptionsModel = {
+  chartTitle: null,
+  chartType: null,
+  isInverted: false,
+  legend: {
+    align: '',
+    layout: ''
+  },
+  labelOptions: {
+    enabled: false,
+    value: ''
+  },
+  xAxis: {
+    title: null
+  },
+  yAxis: {
+    title: null
+  }
 };
 
 @State<DesignerStateModel>({
@@ -55,6 +87,7 @@ export class DesignerState {
         alias: field.alias || field.aliasName,
         area: field.area,
         columnName: field.columnName,
+        comboType: field.comboType || 'column',
         dataField: field.name || field.columnName,
         displayName: field.displayName,
         dateFormat: field.dateFormat,
@@ -70,6 +103,122 @@ export class DesignerState {
       artifacts: values(artifacts)
     };
     return { ...state.analysis, sipQuery };
+  }
+
+  @Action(DesignerUpdateAnalysisCategory)
+  updateCategoryId(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { category }: DesignerUpdateAnalysisCategory
+  ) {
+    const analysis = getState().analysis;
+    return patchState({
+      analysis: { ...analysis, category }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartType)
+  updateChartType(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { chartType }: DesignerUpdateAnalysisChartType
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, chartType }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartInversion)
+  updateChartInversion(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { isInverted }: DesignerUpdateAnalysisChartInversion
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, isInverted }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartTitle)
+  updateChartTitle(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { chartTitle }: DesignerUpdateAnalysisChartTitle
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, chartTitle }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartLegend)
+  updateChartLegend(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { legend }: DesignerUpdateAnalysisChartLegend
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, legend }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartLabelOptions)
+  updateChartLabelOptions(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { labelOptions }: DesignerUpdateAnalysisChartLabelOptions
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, labelOptions }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartXAxis)
+  updateChartXAxis(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { xAxis }: DesignerUpdateAnalysisChartXAxis
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, xAxis }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartYAxis)
+  updateChartYAxis(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { yAxis }: DesignerUpdateAnalysisChartYAxis
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, yAxis }
+      }
+    });
   }
 
   @Action(DesignerInitEditAnalysis)

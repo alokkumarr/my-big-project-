@@ -191,9 +191,9 @@ exports.config = {
 
         let APICommonHelpers = require('../helpers/api/APICommonHelpers');
 
+
         let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
         let token = APICommonHelpers.generateToken(apiBaseUrl);
-
         if (!token) {
           logger.error(
             'cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.'

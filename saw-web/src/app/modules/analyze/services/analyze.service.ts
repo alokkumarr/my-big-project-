@@ -284,7 +284,10 @@ export class AnalyzeService {
 
   readAnalysisDSL(analysisId): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.get(`${apiUrl}/dslanalysis/${analysisId}`).pipe(first())
+      this._http.get(`${apiUrl}/dslanalysis/${analysisId}`).pipe(
+        first(),
+        map((resp: { analysis: AnalysisDSL }) => resp.analysis)
+      )
     );
   }
 
@@ -456,7 +459,6 @@ export class AnalyzeService {
     mode = EXECUTION_MODES.LIVE,
     options: ExecutionRequestOptions = {}
   ) {
-    console.log(model);
     return !!model.sipQuery
       ? this.applyAnalysisDSL(model, mode, options)
       : this.applyAnalysisNonDSL(model, mode, options);
@@ -624,12 +626,7 @@ export class AnalyzeService {
       projectCode: 'workbench',
       module: 'ANALYZE',
       sipQuery: {
-        artifacts: [
-          {
-            artifactsName: 'sample', // make this dynamic
-            fields: []
-          }
-        ],
+        artifacts: [],
         booleanCriteria: 'AND',
         filters: [],
         sorts: [],
@@ -639,16 +636,16 @@ export class AnalyzeService {
         }
       },
       chartOptions: {
-        chartTitle: 'Untitled Analysis',
         chartType: 'column',
+        chartTitle: 'Untitled Analysis',
         isInverted: false,
+        legend: {
+          align: 'right',
+          layout: 'vertical'
+        },
         labelOptions: {
           enabled: false,
           value: ''
-        },
-        legend: {
-          align: '',
-          layout: ''
         },
         xAxis: {
           title: null
