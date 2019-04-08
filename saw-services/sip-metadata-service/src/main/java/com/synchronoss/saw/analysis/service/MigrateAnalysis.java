@@ -1,6 +1,7 @@
 package com.synchronoss.saw.analysis.service;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -8,11 +9,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,19 +32,20 @@ import org.springframework.web.client.RestTemplate;
 
 public class MigrateAnalysis {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
-  private String existingBinaryAnalysisPath = "/services/metadata/analysis_metadata";
 
   /**
    * Converts analysis definition in binary table to new SIP DSL format.
    *
-   * @param analysisStoreBasePath - Binary store path
+   * @param tableName - Analysis metastore table name
+   * @param basePath - Table path
    * @param listAnalysisUri - API to get list of existing analysis
-   * @param migrationMetadataHome - Binary table path
    */
   public void convertBinaryToJson(
-      String analysisStoreBasePath, String listAnalysisUri, String migrationMetadataHome) {
-    logger.trace("migration process will begin here");
+      String tableName, String basePath, String listAnalysisUri) throws Exception {
+    logger.trace("Migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
+
+    AnalysisMetadata analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
 
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -66,14 +70,27 @@ public class MigrateAnalysis {
       JsonArray analysisList =
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
 
-      List<Analysis> dslAnalysis = new ArrayList<>();
-      for (JsonElement analysisElement : analysisList) {
-        Analysis analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+      (analysisList)
+          .forEach(
+              analysisElement -> {
+                  Analysis analysis =
+                      convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+                  try {
 
-        dslAnalysis.add(analysis);
-      }
-
-      // TODO: Bulk add analysis to mapr db store
+                    logger.info("Inserting analysis " + analysis.getId() + " into json store");
+                    JsonElement parsedAnalysis =
+                        SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
+                    analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+                  } catch (JsonProcessingException exception) {
+                    logger.error("Unable to convert analysis to json");
+                  } catch (Exception ex) {
+                    if (analysis != null) {
+                      logger.error("Unable to process analysis " + analysis.getId());
+                    } else {
+                      logger.error("Unable to process analysis");
+                    }
+                  }
+              });
     }
   }
 
