@@ -56,13 +56,13 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
   }*/
 
-  private void init() throws Exception {
-    if (migrationRequired) {
-      logger.trace("Migration initiated.. " + migrationRequired);
-      new MigrateAnalysis().convertBinaryToJson(tableName, basePath, listAnalysisUri);
-    }
-    logger.trace("Migration ended..");
-  }
+//  private void init() throws Exception {
+//    if (migrationRequired) {
+//      logger.trace("Migration initiated.. " + migrationRequired);
+//      new MigrateAnalysis().convertBinaryToJson(tableName, basePath, listAnalysisUri);
+//    }
+//    logger.trace("Migration ended..");
+//  }
 
   @Override
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {
