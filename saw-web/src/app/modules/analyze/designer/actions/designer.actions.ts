@@ -1,4 +1,4 @@
-import { ArtifactColumnChart, AnalysisDSL } from '../types';
+import { ArtifactColumnChart, AnalysisDSL, Sort } from '../types';
 
 export class DesignerInitGroupAdapters {
   static readonly type = '[Designer] Init group adapters';
@@ -66,4 +66,10 @@ export class DesignerUpdateAnalysisChartType {
   /* Use for only new DSL analyses */
   static readonly type = '[Designer] Update chartType for analysis';
   constructor(public chartType: string) {}
+}
+
+export class DesignerUpdateSorts {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update sorts for analysis';
+  constructor(public sorts: Sort[]) {}
 }

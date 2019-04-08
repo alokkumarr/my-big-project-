@@ -70,7 +70,8 @@ import {
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateSorts
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 
@@ -89,6 +90,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   @Select(DesignerState.dslAnalysis) dslAnalysis$: Observable<AnalysisDSL>;
+  @Select(state => state.designerState.analysis.sipQuery.sorts)
+  dslSorts$: Observable<Sort[]>;
 
   public isInDraftMode = false;
   public designerState: DesignerStates;
@@ -330,6 +333,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
       });
     });
+    isDSLAnalysis(this.analysis) &&
+      this._store.dispatch(new DesignerUpdateSorts(this.sorts));
   }
 
   addDefaultSorts() {
@@ -348,6 +353,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       });
     }
+    isDSLAnalysis && this._store.dispatch(new DesignerUpdateSorts(this.sorts));
   }
 
   forkAnalysis() {
@@ -572,6 +578,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this._analyzeDialogService.openSortDialog(this.sorts, this.artifacts)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
+            this._store.dispatch(new DesignerUpdateSorts(result.sorts));
             this.sorts = result.sorts;
             this.onSettingsChange({ subject: 'sort' });
           }

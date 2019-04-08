@@ -17,7 +17,8 @@ import {
   DesignerInitForkAnalysis,
   DesignerInitNewAnalysis,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateSorts
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 
@@ -95,6 +96,18 @@ export class DesignerState {
     const chartOptions = analysis.chartOptions || {};
     return patchState({
       analysis: { ...analysis, chartOptions: { ...chartOptions, chartType } }
+    });
+  }
+
+  @Action(DesignerUpdateSorts)
+  updateSorts(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { sorts }: DesignerUpdateSorts
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, sorts } }
     });
   }
 
