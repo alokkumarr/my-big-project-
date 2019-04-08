@@ -55,4 +55,186 @@ public class AlertRulesDetails {
 
   @Column(name = "MODIFIED_BY")
   String modifiedBy;
+
+  /**
+   * Gets alertRulesSysId.
+   *
+   * @return value of alertRulesSysId
+   */
+  public Long getAlertRulesSysId() {
+    return alertRulesSysId;
+  }
+
+  /** Sets alertRulesSysId. */
+  public void setAlertRulesSysId(Long alertRulesSysId) {
+    this.alertRulesSysId = alertRulesSysId;
+  }
+
+  /**
+   * Gets datapodId.
+   *
+   * @return value of datapodId
+   */
+  public String getDatapodId() {
+    return datapodId;
+  }
+
+  /** Sets datapodId. */
+  public void setDatapodId(String datapodId) {
+    this.datapodId = datapodId;
+  }
+
+  /**
+   * Gets ruleName.
+   *
+   * @return value of ruleName
+   */
+  public String getRuleName() {
+    return ruleName;
+  }
+
+  /** Sets ruleName. */
+  public void setRuleName(String ruleName) {
+    this.ruleName = ruleName;
+  }
+
+  /**
+   * Gets ruleDescriptions.
+   *
+   * @return value of ruleDescriptions
+   */
+  public String getRuleDescriptions() {
+    return ruleDescriptions;
+  }
+
+  /** Sets ruleDescriptions. */
+  public void setRuleDescriptions(String ruleDescriptions) {
+    this.ruleDescriptions = ruleDescriptions;
+  }
+
+  /**
+   * Gets alertSeverity.
+   *
+   * @return value of alertSeverity
+   */
+  public AlertSeverity getAlertSeverity() {
+    return alertSeverity;
+  }
+
+  /** Sets alertSeverity. */
+  public void setAlertSeverity(AlertSeverity alertSeverity) {
+    this.alertSeverity = alertSeverity;
+  }
+
+  /**
+   * Gets monitoringEntity.
+   *
+   * @return value of monitoringEntity
+   */
+  public String getMonitoringEntity() {
+    return monitoringEntity;
+  }
+
+  /** Sets monitoringEntity. */
+  public void setMonitoringEntity(String monitoringEntity) {
+    this.monitoringEntity = monitoringEntity;
+  }
+
+  /**
+   * Gets aggregation.
+   *
+   * @return value of aggregation
+   */
+  public Aggregation getAggregation() {
+    return aggregation;
+  }
+
+  /** Sets aggregation. */
+  public void setAggregation(Aggregation aggregation) {
+    this.aggregation = aggregation;
+  }
+
+  /**
+   * Gets operator.
+   *
+   * @return value of operator
+   */
+  public Operator getOperator() {
+    return operator;
+  }
+
+  /** Sets operator. */
+  public void setOperator(Operator operator) {
+    this.operator = operator;
+  }
+
+  /**
+   * Gets activeInd.
+   *
+   * @return value of activeInd
+   */
+  public Boolean getActiveInd() {
+    return activeInd;
+  }
+
+  /** Sets activeInd. */
+  public void setActiveInd(Boolean activeInd) {
+    this.activeInd = activeInd;
+  }
+
+  /**
+   * Gets createdBy.
+   *
+   * @return value of createdBy
+   */
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  /** Sets createdBy. */
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  /**
+   * Gets createdTime.
+   *
+   * @return value of createdTime
+   */
+  public Date getCreatedTime() {
+    return createdTime;
+  }
+
+  /** Sets createdTime. */
+  public void setCreatedTime(Date createdTime) {
+    this.createdTime = createdTime;
+  }
+
+  /**
+   * Gets modifiedTime.
+   *
+   * @return value of modifiedTime
+   */
+  public Date getModifiedTime() {
+    return modifiedTime;
+  }
+
+  /** Sets modifiedTime. */
+  public void setModifiedTime(Date modifiedTime) {
+    this.modifiedTime = modifiedTime;
+  }
+
+  /**
+   * Gets modifiedBy.
+   *
+   * @return value of modifiedBy
+   */
+  public String getModifiedBy() {
+    return modifiedBy;
+  }
+
+  /** Sets modifiedBy. */
+  public void setModifiedBy(String modifiedBy) {
+    this.modifiedBy = modifiedBy;
+  }
 }

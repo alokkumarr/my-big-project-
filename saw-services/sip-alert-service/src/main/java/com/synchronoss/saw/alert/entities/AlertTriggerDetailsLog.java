@@ -26,4 +26,60 @@ public class AlertTriggerDetailsLog {
 
   @Column(name = "START_TIME")
   Date startTime;
+
+  /**
+   * Gets alertTriggerSysId.
+   *
+   * @return value of alertTriggerSysId
+   */
+  public Long getAlertTriggerSysId() {
+    return alertTriggerSysId;
+  }
+
+  /** Sets alertTriggerSysId. */
+  public void setAlertTriggerSysId(Long alertTriggerSysId) {
+    this.alertTriggerSysId = alertTriggerSysId;
+  }
+
+  /**
+   * Gets alertRulesSysId.
+   *
+   * @return value of alertRulesSysId
+   */
+  public Long getAlertRulesSysId() {
+    return alertRulesSysId;
+  }
+
+  /** Sets alertRulesSysId. */
+  public void setAlertRulesSysId(Long alertRulesSysId) {
+    this.alertRulesSysId = alertRulesSysId;
+  }
+
+  /**
+   * Gets alertState.
+   *
+   * @return value of alertState
+   */
+  public AlertState getAlertState() {
+    return alertState;
+  }
+
+  /** Sets alertState. */
+  public void setAlertState(AlertState alertState) {
+    this.alertState = alertState;
+  }
+
+  /**
+   * Gets startTime.
+   *
+   * @return value of startTime
+   */
+  public Date getStartTime() {
+    return startTime;
+  }
+
+  /** Sets startTime. */
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
 }

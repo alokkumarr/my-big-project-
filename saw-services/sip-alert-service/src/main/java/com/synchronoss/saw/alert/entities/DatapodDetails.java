@@ -28,4 +28,74 @@ public class DatapodDetails {
 
   @Column(name = "CREATED_BY")
   String createdBy;
+
+  /**
+   * Gets datapodId.
+   *
+   * @return value of datapodId
+   */
+  public String getDatapodId() {
+    return datapodId;
+  }
+
+  /** Sets datapodId. */
+  public void setDatapodId(String datapodId) {
+    this.datapodId = datapodId;
+  }
+
+  /**
+   * Gets datapodName.
+   *
+   * @return value of datapodName
+   */
+  public String getDatapodName() {
+    return datapodName;
+  }
+
+  /** Sets datapodName. */
+  public void setDatapodName(String datapodName) {
+    this.datapodName = datapodName;
+  }
+
+  /**
+   * Gets alertCustomerSysId.
+   *
+   * @return value of alertCustomerSysId
+   */
+  public Long getAlertCustomerSysId() {
+    return alertCustomerSysId;
+  }
+
+  /** Sets alertCustomerSysId. */
+  public void setAlertCustomerSysId(Long alertCustomerSysId) {
+    this.alertCustomerSysId = alertCustomerSysId;
+  }
+
+  /**
+   * Gets createdTime.
+   *
+   * @return value of createdTime
+   */
+  public Date getCreatedTime() {
+    return createdTime;
+  }
+
+  /** Sets createdTime. */
+  public void setCreatedTime(Date createdTime) {
+    this.createdTime = createdTime;
+  }
+
+  /**
+   * Gets createdBy.
+   *
+   * @return value of createdBy
+   */
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  /** Sets createdBy. */
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
 }
