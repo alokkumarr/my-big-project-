@@ -6,10 +6,12 @@ import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
-import com.synchronoss.saw.model.Criteria.Side;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Join;
 import com.synchronoss.saw.model.Join.JoinType;
+import com.synchronoss.saw.model.JoinCondition;
+import com.synchronoss.saw.model.Left;
+import com.synchronoss.saw.model.Right;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import java.util.ArrayList;
@@ -65,8 +67,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
   }
 
   /**
-   * @param sqlQueryBuilder
-   * @return
+   * Generates new DSL SipQuery.
+   *
+   * @param sqlQueryBuilder oldAnalysis sqlBuilder
+   * @return SipQuery Object
    */
   public SipQuery buildSipQuery(JsonObject sqlQueryBuilder) {
     SipQuery sipQuery = new SipQuery();
@@ -85,8 +89,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
   }
 
   /**
-   * @param sqlBuilder
-   * @return
+   * Generates List of Dsl Artifact.
+   *
+   * @param sqlBuilder oldAnalysis sqlBuilder
+   * @return {@link List} of {@link Artifact}
    */
   public List<Artifact> buildArtifactsList(JsonObject sqlBuilder) {
     List<Artifact> artifacts = new LinkedList<>();
@@ -104,8 +110,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
   }
 
   /**
-   * @param sqlBuilder
-   * @return
+   * Generates DSL Artifact Object.
+   *
+   * @param sqlBuilder oldAnalysis sqlBuilder
+   * @return Artifact Object
    */
   public Artifact buildArtifact(JsonObject sqlBuilder) {
     Artifact artifact = new Artifact();
@@ -118,8 +126,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
   }
 
   /**
-   * @param sqlBuilder
-   * @return
+   * Generates List of DSL Joins.
+   *
+   * @param sqlBuilder oldAnalysis sqlBuilder
+   * @return {@link List} of {@link Join}
    */
   public List<Join> buildJoins(JsonObject sqlBuilder) {
     List<Join> joinsList = new ArrayList<>();
@@ -133,9 +143,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
   }
 
   /**
-   * 
-   * @param joinObj
-   * @return
+   * Generates new DSL Join Object.
+   *
+   * @param joinObj oldAnalysis Join object
+   * @return Join Object
    */
   public Join buildJoin(JsonObject joinObj) {
     Join join = new Join();
@@ -146,22 +157,69 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     }
     if (joinObj.has("criteria")) {
       JsonArray criteriaList = joinObj.getAsJsonArray("criteria");
+      JoinCondition joinCondition = new JoinCondition();
+      Criteria criteria = new Criteria();
+      joinCondition.setOperator("EQ");
       for (JsonElement criteriaElement : criteriaList) {
         JsonObject criteiaObj = criteriaElement.getAsJsonObject();
-        Criteria criteria = new Criteria();
-        criteria.setSide(Side.fromValue(criteiaObj.get("side").getAsString()));
-        criteria.setArtifactsName(criteiaObj.get("tableName").getAsString());
-        criteria.setColumnName(criteiaObj.get("columnName").getAsString());
-        criList.add(criteria);
+
+        if (criteiaObj.get("side").getAsString().equalsIgnoreCase("left")) {
+          joinCondition.setLeft(buildLeft(criteiaObj));
+        }
+        if (criteiaObj.get("side").getAsString().equalsIgnoreCase("right")) {
+          joinCondition.setRight(buildRight(criteiaObj));
+        }
       }
+      criteria.setJoinCondition(joinCondition);
+      criList.add(criteria);
       join.setCriteria(criList);
     }
     return join;
   }
 
   /**
-   * @param orderByObj
-   * @return
+   * Generates Join Criteria.
+   *
+   * @param criteriaObj oldAnalysis Criteria Object.
+   * @return Left Object
+   */
+  public Left buildLeft(JsonObject criteriaObj) {
+    Left left = new Left();
+    if (criteriaObj.has("tableName")) {
+      left.setArtifactsName(criteriaObj.get("tableName").getAsString());
+    }
+
+    if (criteriaObj.has("columnName")) {
+      left.setColumnName(criteriaObj.get("columnName").getAsString());
+    }
+
+    return left;
+  }
+
+  /**
+   * Generates Join Criteria.
+   *
+   * @param criteriaObj oldAnalysis Criteria Object.
+   * @return Right Object
+   */
+  public Right buildRight(JsonObject criteriaObj) {
+    Right right = new Right();
+    if (criteriaObj.has("tableName")) {
+      right.setArtifactsName(criteriaObj.get("tableName").getAsString());
+    }
+
+    if (criteriaObj.has("columnName")) {
+      right.setColumnName(criteriaObj.get("columnName").getAsString());
+    }
+
+    return right;
+  }
+
+  /**
+   * Generates Order By columns.
+   *
+   * @param orderByObj oldAnalysis orderBy Object
+   * @return {@link List} of {@link Sort}
    */
   public List<Sort> buildOrderbyCols(JsonObject orderByObj) {
     List<Sort> sorts = new LinkedList<>();
