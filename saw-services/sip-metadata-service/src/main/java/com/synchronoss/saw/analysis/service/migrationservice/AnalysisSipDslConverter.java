@@ -117,21 +117,6 @@ public interface AnalysisSipDslConverter {
     return sipQuery;
   }
 
-    default SipQuery generateSipQuery(JsonObject sqlQueryBuilder) {
-        SipQuery sipQuery = new SipQuery();
-
-        sipQuery.setArtifacts(generateArtifactsList(sqlQueryBuilder));
-
-        String booleanCriteriaValue = sqlQueryBuilder.get("booleanCriteria").getAsString();
-        SipQuery.BooleanCriteria booleanCriteria =
-            SipQuery.BooleanCriteria.fromValue(booleanCriteriaValue);
-        sipQuery.setBooleanCriteria(booleanCriteria);
-
-        sipQuery.setFilters(generateFilters(sqlQueryBuilder));
-//        sipQuery.setSorts(generateSorts(artifactName, sqlQueryBuilder));
-
-        return sipQuery;
-    }
   /**
    * Prepare list of Artifacts as new DSL structure.
    *
@@ -149,17 +134,7 @@ public interface AnalysisSipDslConverter {
     return artifacts;
   }
 
-    default List<Artifact> generateArtifactsList(JsonObject sqlBuilder) {
-        List<Artifact> artifacts = new LinkedList<>();
-
-        Artifact artifact = generateArtifact(sqlBuilder);
-
-        artifacts.add(artifact);
-
-        return artifacts;
-    }
-
-    /**
+  /**
    * Prepare Filters as new DSL structure.
    *
    * @param sqlBuilder sqlBuilder Object
@@ -348,12 +323,6 @@ public interface AnalysisSipDslConverter {
     return artifact;
   }
 
-    default Artifact generateArtifact(JsonObject sqlBuilder) {
-        Artifact artifact = new Artifact();
-        artifact.setFields(generateArtifactFields(sqlBuilder));
-
-        return artifact;
-    }
   /**
    * Generates a List of fields.
    *

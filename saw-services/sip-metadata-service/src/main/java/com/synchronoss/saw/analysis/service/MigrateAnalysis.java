@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.DlReportConvertor;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import java.io.File;
 import java.io.FileReader;
@@ -93,6 +94,9 @@ public class MigrateAnalysis {
       case "esReport":
         converter = new EsReportConverter();
         break;
+      case "report":
+        converter = new DlReportConvertor();
+        break;
       default:
         logger.error("Unknown chart type");
         break;
@@ -134,8 +138,8 @@ public class MigrateAnalysis {
     File jsonFile = new File(analysisFile);
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
-    JsonObject analyzeObject = jsonObject.getAsJsonObject("contents")
-        .getAsJsonArray("analyze").get(0).getAsJsonObject();
+    JsonObject analyzeObject =
+        jsonObject.getAsJsonObject("contents").getAsJsonArray("analyze").get(0).getAsJsonObject();
 
     MigrateAnalysis ma = new MigrateAnalysis();
 

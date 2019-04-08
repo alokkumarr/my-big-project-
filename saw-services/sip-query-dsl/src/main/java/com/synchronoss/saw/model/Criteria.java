@@ -1,9 +1,6 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -74,7 +71,7 @@ public class Criteria {
 
     @JsonCreator
     public static Side fromValue(String value) {
-      Side constant = CONSTANTS.get(value);
+      Side constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException("Join type not implemented: " + value);
       } else {
