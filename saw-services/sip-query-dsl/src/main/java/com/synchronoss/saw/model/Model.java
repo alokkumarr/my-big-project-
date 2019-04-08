@@ -1,18 +1,13 @@
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -60,8 +55,6 @@ public class Model {
 
   @JsonProperty("modelValues")
   private List<Object> modelValues = null;
-
-  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("booleanCriteria")
   public Model.BooleanCriteria getBooleanCriteria() {
@@ -173,22 +166,12 @@ public class Model {
     this.modelValues = modelValues;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
-
   public enum BooleanCriteria {
     AND("AND"),
     OR("OR");
     private final String value;
     private static final Map<String, Model.BooleanCriteria> CONSTANTS =
-        new HashMap<String, Model.BooleanCriteria>();
+        new HashMap<>();
 
     static {
       for (Model.BooleanCriteria c : values()) {
@@ -218,7 +201,7 @@ public class Model {
      */
     @JsonCreator
     public static Model.BooleanCriteria fromValue(String value) {
-      Model.BooleanCriteria constant = CONSTANTS.get(value);
+      Model.BooleanCriteria constant = CONSTANTS.get(value.toUpperCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -242,7 +225,7 @@ public class Model {
     ISNOTIN("ISNOTIN");
     private final String value;
     private static final Map<String, Model.Operator> CONSTANTS =
-        new HashMap<String, Model.Operator>();
+        new HashMap<>();
 
     static {
       for (Model.Operator c : values()) {
@@ -263,16 +246,16 @@ public class Model {
     public String value() {
       return this.value;
     }
+
     /**
      * Creates Operator Object from a string value.
      *
      * @param value Enum value in String
      * @return
      */
-
     @JsonCreator
     public static Model.Operator fromValue(String value) {
-      Model.Operator constant = CONSTANTS.get(value);
+      Model.Operator constant = CONSTANTS.get(value.toUpperCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -297,7 +280,7 @@ public class Model {
     LTW("LTW"),
     NA("NA");
     private final String value;
-    private static final Map<String, Model.Preset> CONSTANTS = new HashMap<String, Model.Preset>();
+    private static final Map<String, Model.Preset> CONSTANTS = new HashMap<>();
 
     static {
       for (Model.Preset c : values()) {
@@ -318,15 +301,16 @@ public class Model {
     public String value() {
       return this.value;
     }
+
     /**
      * Creates Preset Object from a string value.
+     *
      * @param value Enum value in String
      * @return
      */
-
     @JsonCreator
     public static Model.Preset fromValue(String value) {
-      Model.Preset constant = CONSTANTS.get(value);
+      Model.Preset constant = CONSTANTS.get(value.toUpperCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

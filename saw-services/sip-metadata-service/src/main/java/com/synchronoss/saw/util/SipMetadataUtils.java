@@ -1,4 +1,4 @@
-package com.synchronoss.saw.semantic;
+package com.synchronoss.saw.util;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import java.io.File;
@@ -38,12 +41,12 @@ import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 import sncr.bda.store.generic.schema.Query;
 
 @Component
-public class SipSemanticUtils {
+public class SipMetadataUtils {
 
   public static final String COMMA = ",";
   public static final String PATH_SEARCH = "action.content.";
 
-  private static Logger logger = LoggerFactory.getLogger(SipSemanticUtils.class);
+  private static final Logger logger = LoggerFactory.getLogger(SipMetadataUtils.class);
 
   /**
    * collectHeaders.
@@ -85,7 +88,7 @@ public class SipSemanticUtils {
    *
    * @param node SemanticNode
    */
-  public static void checkMandatoryFields(SemanticNode node) {
+  public static void checkSemanticMandatoryFields(SemanticNode node) {
     Preconditions.checkArgument(node != null, "Request body is empty");
     Preconditions.checkArgument(node.getUsername() != null, "username cannot be null");
     Preconditions.checkArgument(node.getCustomerCode() != null, "customer code cannot be null");
@@ -98,8 +101,15 @@ public class SipSemanticUtils {
   }
 
   /**
+   * check Analysis MandatoryFields.
+   *
+   * @param analysis Analysis
+   */
+  public static void checkAnalysisMandatoryFields(Analysis analysis) {}
+
+  /**
    * This method is used to convert node to json format.
-   * 
+   *
    * @param node {@link SemanticNode}.
    * @param basePath base path.
    * @param id unique id.
@@ -240,6 +250,28 @@ public class SipSemanticUtils {
   }
 
   /**
+   * Convert to JsonElement.
+   *
+   * @param jsonString Json String
+   * @return JsonElement
+   */
+  public static JsonElement toJsonElement(String jsonString) {
+    logger.trace("toJsonElement Called: String = ", jsonString);
+    com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
+    JsonElement jsonElement;
+    try {
+      jsonElement = jsonParser.parse(jsonString);
+      logger.info("json element parsed successfully");
+      logger.trace("Parsed String = ", jsonElement);
+      return jsonElement;
+    } catch (JsonParseException jse) {
+      logger.error("Can't parse String to Json, JsonParseException occurred!\n");
+      logger.error(jse.getStackTrace().toString());
+      return null;
+    }
+  }
+
+  /**
    * removeJSONNode.
    *
    * @param jsonString json String
@@ -357,7 +389,7 @@ public class SipSemanticUtils {
 
   /**
    * createResponse.
-   * 
+   *
    * @param body body
    * @param httpStatus HttpStatus
    * @param <T> type

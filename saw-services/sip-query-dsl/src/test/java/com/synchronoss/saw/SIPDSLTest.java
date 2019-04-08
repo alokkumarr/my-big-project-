@@ -25,19 +25,17 @@ import org.junit.Test;
  */
 public class SIPDSLTest {
 
-    /**
-     * Query Builder Tests with aggregation.
-     */
-    @Test
-    public void testQueryWithAggregationBuilder() throws IOException, ProcessingException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("sample.json").getPath());
-        ObjectMapper objectMapper = new ObjectMapper();
-        SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
-        ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-        String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl,100);
-        Assert.assertNotNull(query);
-    }
+  /** Query Builder Tests with aggregation. */
+  @Test
+  public void testQueryWithAggregationBuilder() throws IOException, ProcessingException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    File file = new File(classLoader.getResource("sample.json").getPath());
+    ObjectMapper objectMapper = new ObjectMapper();
+    SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    String query = elasticSearchQueryBuilder.buildDataQuery(sipdsl.getSipQuery(), 100);
+    Assert.assertNotNull(query);
+  }
 
     /**
      * Query Builder Tests for parsing the data :

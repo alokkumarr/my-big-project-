@@ -14,12 +14,13 @@ import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
-import com.synchronoss.saw.semantic.SipSemanticUtils;
+
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.Content;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +88,7 @@ public class SemanticServiceImpl implements SemanticService {
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
     try {
-      List<MetaDataStoreStructure> structure = SipSemanticUtils.node2JsonObject(node, basePath,
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
           node.get_id(), Action.create, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}",
           mapper.writeValueAsString(structure));
@@ -165,7 +166,7 @@ public class SemanticServiceImpl implements SemanticService {
     SemanticNode nodeRetrieved = null;
     SemanticNode newSemanticNode = null;
     try {
-      List<MetaDataStoreStructure> structure = SipSemanticUtils.node2JsonObject(node, basePath,
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
           node.get_id(), Action.read, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
@@ -196,7 +197,7 @@ public class SemanticServiceImpl implements SemanticService {
       logger.trace(headers.get("x-userName"));
     }
     try {
-      List<MetaDataStoreStructure> structure = SipSemanticUtils.node2JsonObject(node, basePath,
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
           node.get_id(), Action.update, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
@@ -221,7 +222,7 @@ public class SemanticServiceImpl implements SemanticService {
     SemanticNode responseObject = new SemanticNode();
     SemanticNode newSemanticNode = new SemanticNode();
     try {
-      List<MetaDataStoreStructure> structure = SipSemanticUtils.node2JsonObject(node, basePath,
+      List<MetaDataStoreStructure> structure = SipMetadataUtils.node2JsonObject(node, basePath,
           node.get_id(), Action.delete, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
@@ -283,7 +284,7 @@ public class SemanticServiceImpl implements SemanticService {
         filters.add(filterMetricName);
       }
       query.setFilter(filters);
-      String searchQuery = SipSemanticUtils.node2JsonString(node, basePath, node.get_id(),
+      String searchQuery = SipMetadataUtils.node2JsonString(node, basePath, node.get_id(),
           Action.search, Category.Semantic, query);
       logger.debug("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);
@@ -379,7 +380,7 @@ public class SemanticServiceImpl implements SemanticService {
         filters.add(filterMetricName);
       }
       query.setFilter(filters);
-      String searchQuery = SipSemanticUtils.node2JsonString(node, basePath, node.get_id(),
+      String searchQuery = SipMetadataUtils.node2JsonString(node, basePath, node.get_id(),
           Action.search, Category.Semantic, query);
       logger.trace("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);

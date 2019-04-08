@@ -45,9 +45,8 @@ public class ElasticSearchQueryBuilder {
   String dataSecurityString;
   private static String appenderForGTLTE = "||/M";
 
-  public String buildDataQuery(SIPDSL sipdsl, Integer size)
+  public String buildDataQuery(SipQuery sipQuery, Integer size)
       throws IOException, ProcessingException {
-    SipQuery sipQuery = sipdsl.getSipQuery();
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
     if (size == null || size.equals(0)) size = 1000;
@@ -413,7 +412,7 @@ public class ElasticSearchQueryBuilder {
                 || item.getType()
                     .value()
                     .toLowerCase()
-                    .equals(Filter.Type.INT.value().toLowerCase()))
+                    .equals(Type.INTEGER.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
             || item.getType()
                 .value()
@@ -454,7 +453,7 @@ public class ElasticSearchQueryBuilder {
                 || item.getType()
                     .value()
                     .toLowerCase()
-                    .equals(Filter.Type.INT.value().toLowerCase()))
+                    .equals(Type.INTEGER.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
             || item.getType()
                 .value()

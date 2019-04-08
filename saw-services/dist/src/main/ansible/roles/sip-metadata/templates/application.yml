@@ -33,6 +33,7 @@ application:
     queue-capacity: 10000
 metastore:
   base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
+  analysis: analysisMetadata
 semantic:
   workbench-url:  http://localhost:9700
   transport-metadata-url:  http://localhost:9200
