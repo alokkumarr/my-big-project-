@@ -145,7 +145,7 @@ export class JwtService {
       productModDesc: 'Alerts Module',
       productModCode: 'ALERT00001',
       productModID: '333333',
-      moduleURL: 'http://localhost:4200/assets/insights.umd.js',
+      moduleURL: 'alerts',
       defaultMod: '1',
       privilegeCode: 128,
       prodModFeature: [

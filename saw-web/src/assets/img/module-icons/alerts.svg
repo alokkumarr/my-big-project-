@@ -3,7 +3,7 @@
         <circle id="a" cx="99.476" cy="98.375" r="70"/>
     </defs>
     <g fill="none" fill-rule="evenodd" transform="translate(-29 -28)">
-        <circle cx="98.98" cy="98.98" r="70" fill="#26D990" fill-rule="nonzero" transform="rotate(46 98.98 98.98)"/>
+        <circle cx="98.98" cy="98.98" r="70" fill="#7B96CE" fill-rule="nonzero" transform="rotate(46 98.98 98.98)"/>
         <mask id="b" fill="#fff">
             <use xlink:href="#a"/>
         </mask>

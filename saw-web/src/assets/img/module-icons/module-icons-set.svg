@@ -16,7 +16,7 @@
         <circle id="a" cx="99.476" cy="98.375" r="70"/>
     </defs>
     <g fill="none" fill-rule="evenodd" transform="translate(-29 -28)">
-        <circle cx="98.98" cy="98.98" r="70" fill="#26D990" fill-rule="nonzero" transform="rotate(46 98.98 98.98)"/>
+        <circle cx="98.98" cy="98.98" r="70" fill="#7B96CE" fill-rule="nonzero" transform="rotate(46 98.98 98.98)"/>
         <mask id="b" fill="#fff">
             <use xlink:href="#a"/>
         </mask>
@@ -25,6 +25,7 @@
         <path stroke="#FFF" stroke-width="3" d="M124.938 93.132c2.269 3.466 9.532 6 18.045 6 8.513 0 15.686-2.534 17.955-6" mask="url(#b)" opacity=".5" transform="rotate(-93 142.938 96.132)"/>
     </g>
 </svg>
+
 
     <svg id="module-analyze" xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140">
     <g fill="none" fill-rule="evenodd">
