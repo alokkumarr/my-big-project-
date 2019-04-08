@@ -70,7 +70,9 @@ import {
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateFilters,
+  DesignerUpdatebooleanCriteria
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 
@@ -582,7 +584,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, supportsGlobalFilters)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
+            this._store.dispatch(new DesignerUpdateFilters(result.filters));
             this.filters = result.filters;
+            this._store.dispatch(new DesignerUpdatebooleanCriteria(result.booleanCriteria));
             this.booleanCriteria = result.booleanCriteria;
             this.onSettingsChange({ subject: 'filter' });
           }
