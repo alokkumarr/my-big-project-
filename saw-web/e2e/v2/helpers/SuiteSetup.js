@@ -15,6 +15,9 @@ class SuiteSetup {
    * server
    * */
   static distRun() {
+    if (!process.env.PWD) {
+      process.env.PWD = process.cwd();
+    }
     return process.env.PWD.endsWith('/dist');
   }
 

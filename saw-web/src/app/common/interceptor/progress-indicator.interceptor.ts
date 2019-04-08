@@ -22,38 +22,18 @@ export class ProgressIndicatorInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    let cancelled = true;
     return next.handle(req).pipe(
-      tap(
-        event => {
-          switch (event.type) {
-            case HttpEventType.Sent:
-              this.zone.run(() => {
-                this._headerProgress.show();
-              });
-              break;
-            case HttpEventType.Response:
-              cancelled = false;
-              this.zone.run(() => {
-                this._headerProgress.hide();
-              });
-              break;
-          }
-        },
-        err => {
-          cancelled = false;
+      tap(event => {
+        if (event.type === HttpEventType.Sent) {
           this.zone.run(() => {
-            this._headerProgress.hide();
+            this._headerProgress.show();
           });
-          return err;
         }
-      ),
+      }),
       finalize(() => {
-        if (cancelled) {
-          this.zone.run(() => {
-            this._headerProgress.hide();
-          });
-        }
+        this.zone.run(() => {
+          this._headerProgress.hide();
+        });
       })
     );
   }

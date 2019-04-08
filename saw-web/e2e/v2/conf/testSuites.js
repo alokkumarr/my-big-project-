@@ -7,10 +7,11 @@ const SMOKE = [
   TEST_BASE_DIR + 'login-logout/logout.test.js'
 ];
 
-const SANITY = [
-  ...SMOKE,
-  TEST_BASE_DIR + 'reports/createAndDeleteReport.test.js',
+const SANITY = [...SMOKE,
+  TEST_BASE_DIR + 'createReport.test.js',
   TEST_BASE_DIR + 'charts/createAndDeleteCharts.test.js',
+  TEST_BASE_DIR + 'ForgotPassword/preResetPwd.test.js',
+  TEST_BASE_DIR + 'reports/createAndDeleteReport.test.js',
   TEST_BASE_DIR + 'analyze/analyze.test.js'
 ];
 // ALL the test with minimal data set so that all the functionality is touched
