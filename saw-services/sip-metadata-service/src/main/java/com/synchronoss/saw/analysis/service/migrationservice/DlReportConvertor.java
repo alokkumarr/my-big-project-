@@ -24,19 +24,20 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
 
     analysis = setCommonParams(analysis, oldAnalysisDefinition);
 
-    if (oldAnalysisDefinition.has("query")) {
-      String parentAnalysisId = oldAnalysisDefinition.get("query").getAsString();
-
-      // TODO : Query match to sipQuery
-      //            analysis.setSipQuery(parentAnalysisId);
+    if (oldAnalysisDefinition.has("parentAnalysisId")) {
+      String parentAnalysisId = oldAnalysisDefinition.get("parentAnalysisId").getAsString();
+      analysis.setParentAnalysisId(parentAnalysisId);
     }
-
-    // TODO : Old Analysis 'artifacts' contains 2 artifactName.
 
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      analysis.setSipQuery(buildSipQuery(sqlQueryBuilderObject));
+      SipQuery sipQuery = buildSipQuery(sqlQueryBuilderObject);
+      if (oldAnalysisDefinition.has("query")) {
+        String query = oldAnalysisDefinition.get("query").getAsString();
+        sipQuery.setQuery(query);
+      }
+      analysis.setSipQuery(sipQuery);
     }
     return analysis;
   }
@@ -63,6 +64,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     return field;
   }
 
+  /**
+   * @param sqlQueryBuilder
+   * @return
+   */
   public SipQuery buildSipQuery(JsonObject sqlQueryBuilder) {
     SipQuery sipQuery = new SipQuery();
 
@@ -79,6 +84,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     return sipQuery;
   }
 
+  /**
+   * @param sqlBuilder
+   * @return
+   */
   public List<Artifact> buildArtifactsList(JsonObject sqlBuilder) {
     List<Artifact> artifacts = new LinkedList<>();
     Artifact artifact;
@@ -94,6 +103,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     return artifacts;
   }
 
+  /**
+   * @param sqlBuilder
+   * @return
+   */
   public Artifact buildArtifact(JsonObject sqlBuilder) {
     Artifact artifact = new Artifact();
     if (sqlBuilder.has("tableName")) {
@@ -104,6 +117,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     return artifact;
   }
 
+  /**
+   * @param sqlBuilder
+   * @return
+   */
   public List<Join> buildJoins(JsonObject sqlBuilder) {
     List<Join> joinsList = new ArrayList<>();
     if (sqlBuilder.has("joins")) {
@@ -115,6 +132,11 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     return joinsList;
   }
 
+  /**
+   * 
+   * @param joinObj
+   * @return
+   */
   public Join buildJoin(JsonObject joinObj) {
     Join join = new Join();
     List<Criteria> criList = new ArrayList<>();
@@ -137,6 +159,10 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     return join;
   }
 
+  /**
+   * @param orderByObj
+   * @return
+   */
   public List<Sort> buildOrderbyCols(JsonObject orderByObj) {
     List<Sort> sorts = new LinkedList<>();
 
@@ -150,6 +176,12 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
     return sorts;
   }
 
+  /**
+   * Prepare Sort Object as DSL structure.
+   *
+   * @param sortObject Old analysis Order-by Object
+   * @return Sort Object
+   */
   public Sort buildSortObject(JsonObject sortObject) {
     Sort sort = new Sort();
 
