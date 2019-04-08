@@ -73,6 +73,8 @@ public class SawBisChannelController {
   private BisChannelService bisChannelService;
 
   private static final Long STATUS_ACTIVE = 1L;
+  
+  private static final Long STATUS_DEACTIVE = 0L;
 
 
   /**
@@ -300,6 +302,9 @@ public class SawBisChannelController {
       requestBody.setBisChannelSysId(channelId);
       BeanUtils.copyProperties(requestBody, channel, "modifiedDate", "createdDate");
       channel.setModifiedDate(new Date());
+      if (channel.getStatus() == STATUS_DEACTIVE) {
+        throw new BisException("Update not allowed on a deactivated channel");
+      }
       if (channel.getStatus() == null) {
         channel.setStatus(STATUS_ACTIVE);
       }

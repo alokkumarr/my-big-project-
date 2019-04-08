@@ -375,7 +375,10 @@ public class SawBisRouteController {
         routeEntity.setBisChannelSysId(channelId);
         routeEntity.setBisRouteSysId(routeId);
         routeEntity.setModifiedDate(new Date());
-        if (routeEntity.getStatus() == null || routeEntity.getStatus() == STATUS_DEACTIVE) {
+        if (routeEntity.getStatus() == STATUS_DEACTIVE) {
+          throw new BisException("Update not allowed on a a deactivated route");
+        }
+        if (routeEntity.getStatus() == null) {
           routeEntity.setStatus(STATUS_ACTIVE);
         }
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
