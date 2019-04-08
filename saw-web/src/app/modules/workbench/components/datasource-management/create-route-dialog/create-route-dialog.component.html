@@ -118,6 +118,16 @@
                 >
               </mat-error>
             </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label i18n>Last modified time (Hrs)</mat-label>
+              <input
+                matInput
+                type="text"
+                name="lastModifiedLimitHours"
+                e2e="last-modified-limit-input"
+                formControlName="lastModifiedLimitHours"
+              />
+             </mat-form-field>
             <mat-checkbox
               style="margin: 20px 0 65px 0;"
               e2e="route-disable-duplicate-ch"

@@ -70,7 +70,8 @@ export class CreateRouteDialogComponent {
       description: [''],
       disableDuplicate: [false],
       batchSize: ['', [Validators.required]],
-      fileExclusions: ['', this.validatefileExclusion]
+      fileExclusions: ['', this.validatefileExclusion],
+      lastModifiedLimitHours:['']
 
     });
   }
@@ -152,7 +153,8 @@ export class CreateRouteDialogComponent {
       description: data.description,
       disableDuplicate: data.disableDuplicate,
       batchSize: data.batchSize,
-      fileExclusions: data.fileExclusions
+      fileExclusions: data.fileExclusions,
+      lastModifiedLimitHours:data.lastModifiedLimitHours
     };
     return routeDetails;
   }

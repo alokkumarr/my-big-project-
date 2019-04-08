@@ -33,6 +33,8 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.InvalidPathException;
 import java.text.ParseException;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -133,6 +135,8 @@ public class SftpServiceImpl extends SipPluginContract {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
+  
+  private static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
 
   @PostConstruct
   private void init() throws Exception {
@@ -672,6 +676,13 @@ public class SftpServiceImpl extends SipPluginContract {
               isDisable = Boolean.valueOf(disableDupFlag);
               logger.trace("Duplicate has been disabled :" + isDisable);
             }
+            int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
+            if (rootNode.get("lastModifiedLimitHours") != null) {
+              String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
+              lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
+              logger.trace("Last modified hours limit configured:" 
+                  + lastModifiedHoursLmt);
+            }
             logger.trace("invocation of method transferData when "
                 + "directory is availble in destination with location starts here " + sourceLocation
                 + " & file pattern " + filePattern);
@@ -684,7 +695,8 @@ public class SftpServiceImpl extends SipPluginContract {
             // Adding to a list has been removed as a part of optimization
             // SIP-6386
             transferDataFromChannel(template, sourceLocation, filePattern,
-                destinationLocation, channelId, routeId, fileExclusions, isDisable);
+                destinationLocation, channelId, routeId, fileExclusions,
+                isDisable, lastModifiedHoursLmt);
             ZonedDateTime fileTransEndTime = ZonedDateTime.now();
             long durationInMillis =
                 Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
@@ -723,7 +735,7 @@ public class SftpServiceImpl extends SipPluginContract {
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, boolean isDisableDuplicate)
+      Long routeId, String exclusions, boolean isDisableDuplicate, int filesModifiedInLast)
       throws IOException, ParseException {
     logger.trace("TransferDataFromChannel starts here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -753,12 +765,34 @@ public class SftpServiceImpl extends SipPluginContract {
       if (entry.getFilename().startsWith(".")) {
         continue;
       }
+      
+      if (filesModifiedInLast > LAST_MODIFIED_DEFAUTL_VAL) {
+        Instant instant = Instant.ofEpochSecond(entry.getAttrs().getMTime());
+        ZonedDateTime lastModifiedTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+        ZonedDateTime currentTime = ZonedDateTime.now();
+        long durationInHours = Duration.between(lastModifiedTime, currentTime).toHours();
+        
+        logger.trace("current time::::" + currentTime);
+        logger.trace("Last modified time::::" + lastModifiedTime);
+        logger.trace("Duration::::" + durationInHours);
+          
+        if (durationInHours > filesModifiedInLast) {
+          logger.trace("Skipping File/Folder with name " + entry.getFilename() 
+                   + " older then configured time limit. Last modified time:: " 
+                   + entry.getAttrs().getMTime());
+          continue;
+        }
+      }
+      
+     
+      //if(entry.getAttrs().getMTime())
       /* Transfer files from subdirectory */
       String sourcelocationDirectory = sourcelocation + File.separator + entry.getFilename();
       // Adding to a list has been removed as a part of optimization
       // SIP-6386
       transferDataFromChannel(template, sourcelocationDirectory, pattern,
-          destinationLocation, channelId, routeId, exclusions, isDisableDuplicate);
+          destinationLocation, channelId, routeId, exclusions, 
+          isDisableDuplicate, filesModifiedInLast);
     }
     logger.trace("TransferDataFromChannel ends here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -1290,17 +1324,27 @@ public class SftpServiceImpl extends SipPluginContract {
                 nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
                 rootNode = (ObjectNode) nodeEntity;
                 // The below change has been made for the task SIP-6292
-                SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
-                String sourceLocation = rootNode.get("sourceLocation").asText();
+                
+                
                 String fileExclusions = null;
                 if (rootNode.get("fileExclusions") != null) {
                   fileExclusions = rootNode.get("fileExclusions").asText();
                 }
                 metaInfo.setFilePattern(rootNode.get("filePattern").asText());
                 String destinationLocation = rootNode.get("destinationLocation").asText();
+                int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
+                String sourceLocation = rootNode.get("sourceLocation").asText();
+                SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
+                if (rootNode.get("lastModifiedLimitHours") != null) {
+                  String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
+                  lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
+                  logger.trace("Last modified hours limit configured:" 
+                        + lastModifiedHoursLmt);
+                }
                 filesInfo.addAll(
                     transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
-                        destinationLocation, channelId, routeId, fileExclusions, isDisable));
+                        destinationLocation, channelId, routeId, fileExclusions,
+                        isDisable, lastModifiedHoursLmt));
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);
                 logger.info(
