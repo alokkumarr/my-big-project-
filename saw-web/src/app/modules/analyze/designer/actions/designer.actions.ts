@@ -86,6 +86,7 @@ export class DesignerUpdatebooleanCriteria {
    /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
    static readonly type = '[Designer] Update booleanCriteria for analysis';
    constructor(public booleanCriteria: string) {}
+}
 
 export class DesignerUpdateAnalysisChartTitle {
   /* Use for only new DSL analyses */
