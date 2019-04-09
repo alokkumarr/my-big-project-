@@ -18,7 +18,7 @@ public class ChartController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ChartController.class);
 
   @RequestMapping(
-      value = "/internal/proxy/chartResultAnalysis/",
+      value = "/internal/proxy/chartResultAnalysis",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
