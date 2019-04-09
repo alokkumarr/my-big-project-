@@ -1,0 +1,58 @@
+- name: lookup & setting database root password
+  set_fact:
+    root_password: >-
+      {{ lookup('password', inventory_dir
+      + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Look up Alert Service database password
+  set_fact:
+    sip_alert_db_password: >-
+      {{ lookup('password', inventory_dir
+        + '/sip-alert-db-password chars=ascii_letters,digits') }}
+- name: Set the SIP Alert Service database password
+  copy:
+    content: "{{ sip_alert_db_password }}"
+    dest: /etc/bda/sip_alert_db_password
+- name: Ensure a list of packages installed
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - python
+      - python-setuptools
+      - python2-pip
+      - python2-PyMySQL
+- name: Create user defined sip_alert databases
+  mysql_db:
+    name: "sip_alert"
+    login_user: root
+    login_password: "{{ root_password }}"
+    state: present
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+  tags: mariadb
+
+- name: Create the sip_alert users
+  mysql_user:
+    name: "sip_alert"
+    password: "{{ sip_alert_db_password }}"
+    host: "localhost"
+    priv: "sip_alert.*:ALL,GRANT"
+    append_privs: "true"
+    login_user: root
+    login_password: "{{ root_password }}"
+    state: present
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+  tags: mariadb
+- name: Copy SIP Alert Service package
+  copy: src="{{ item }}" dest=/tmp/sip-alert.rpm
+  with_fileglob: ["../rpms/sip-alert-*.rpm"]
+- name: Install SIP Alert Service package
+  yum: name=/tmp/sip-alert.rpm state=present
+  notify:
+    - restart sip-alert
+- name: Install SIP alert Service configuration file
+  template: src=application.yml dest=/opt/bda/sip-alert-service/conf
+  notify:
+    - restart sip-alert
+- name: Enable SIP Alert Service
+  systemd: name=sip-alert-proxy.socket enabled=true state=started

@@ -59,6 +59,13 @@
               </configLocation>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
               <violationSeverity>warning</violationSeverity>
+              <!-- Exclude files that were added before Checkstyle was enabled.
+               These classes exported from saw-security and to maintain the backward compatibility
+               variables names etc, has not been corrected as per checkstyle standards for now.
+                Gradually will make these files also conform to checkstyle rules in future and
+                remove the exclusions-->
+              <excludes>**/jwt/token/Products.java,**/jwt/token/ProductModuleFeature.java
+                ,**/jwt/token/ProductModules.java,**/jwt/token/Ticket.java,**/jwt/token/TicketDSKDetails.java</excludes>
             </configuration>
             <goals>
               <goal>check</goal>
@@ -69,3 +76,4 @@
     </plugins>
   </build>
 </project>
+

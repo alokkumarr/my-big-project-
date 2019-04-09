@@ -10,21 +10,21 @@
         "group_by_field_1":{
           "doc_count_error_upper_bound":0,
           "sum_other_doc_count":0,
-          "buckets":[
+          "buckets": [
             {
-              "key":"string 1",
-              "doc_count":1,
-              "Integer":{
-                "value":100
+              "key": "string 1",
+              "doc_count": 1,
+              "double": {
+                "value": 99995.01
               },
-              "Float":{
-                "value":1000.010009765625
+              "integer": {
+                "value": 100
               },
-              "Long":{
-                "value":1000
+              "float": {
+                "value": 1000.010009765625
               },
-              "Double":{
-                "value":99995.01
+              "long": {
+                "value": 1000
               }
             }
           ]

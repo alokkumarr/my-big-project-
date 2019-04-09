@@ -2,8 +2,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as isUndefined from 'lodash/isUndefined';
 import * as debounce from 'lodash/debounce';
+import * as isEmpty from 'lodash/isEmpty';
 import { ArtifactColumnChart, DesignerChangeEvent } from '../../../types';
 
+const MAX_LIMIT = 99;
 const LIMIT_DEBOUNCE_DELAY = 400;
 @Component({
   selector: 'designer-data-limit-selector',
@@ -41,16 +43,26 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   onLimitDataChange(value, type) {
     this.limitValue = value;
     this.limitType = type;
-    if (!this.limitType) {
-      return;
-    }
-    if (this.limitValue === null || isUndefined(this.limitValue)) {
-      delete this.artifactColumn.limitValue;
-      delete this.artifactColumn.limitType;
+    this.resetInvalidValueIfNeeded(this.limitValue);
+    if (
+      !this.limitType ||
+      (this.limitValue === null ||
+        isUndefined(this.limitValue) ||
+        isEmpty(this.limitValue))
+    ) {
       return;
     }
     this.artifactColumn.limitValue = this.limitValue;
     this.artifactColumn.limitType = this.limitType;
     this.change.emit({ subject: 'fetchLimit' });
+  }
+
+  resetInvalidValueIfNeeded(value) {
+    const int = parseInt(value, 10);
+    if (int < 0) {
+      this.limitValue = 0;
+    } else if (int > MAX_LIMIT) {
+      this.limitValue = MAX_LIMIT;
+    }
   }
 }

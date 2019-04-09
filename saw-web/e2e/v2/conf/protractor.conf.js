@@ -67,6 +67,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
+  directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
@@ -191,9 +192,9 @@ exports.config = {
 
         let APICommonHelpers = require('../helpers/api/APICommonHelpers');
 
+
         let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
         let token = APICommonHelpers.generateToken(apiBaseUrl);
-
         if (!token) {
           logger.error(
             'cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.'

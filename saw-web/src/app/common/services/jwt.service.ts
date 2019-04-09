@@ -137,9 +137,9 @@ export class JwtService {
     }
     const parsedJwt = this.parseJWT(this.get());
 
-    // TODO remove hardcoded insightsModule when the ticket is successfully tested
+    // TODO remove alertsModule when it's added into saw_security DB
     // tslint:disable
-    const insightsModule = {
+    const alertsModule = {
       prodCode: 'SAWD0000012131',
       productModName: 'ALERTS',
       productModDesc: 'Alerts Module',
@@ -174,7 +174,46 @@ export class JwtService {
       ]
     };
     // tslint:enable
-    parsedJwt.ticket.products[0].productModules.push(insightsModule);
+    parsedJwt.ticket.products[0].productModules.push(alertsModule);
+
+    // const insightsModule = {
+    //   prodCode: 'SAWD0000012131',
+    //   productModName: 'INSIGHTS',
+    //   productModDesc: 'Insights Module',
+    //   productModCode: 'INSIGH00001',
+    //   productModID: '1324244',
+    //   moduleURL: 'http://localhost:4200/assets/insights.umd.js',
+    //   defaultMod: '1',
+    //   privilegeCode: 128,
+    //   prodModFeature: [
+    //     {
+    //       prodModFeatureName: 'SubModules',
+    //       prodModCode: 'INSIGH00001',
+    //       productModuleSubFeatures: [
+    //         {
+    //           prodModFeatureName: 'IOT',
+    //           prodModFeatureDesc: 'Iot',
+    //           defaultURL: 'iot',
+    //           prodModFeatureID: 'iot',
+    //           prodModFeatrCode: 'iot',
+    //           prodModCode: 'INSIGH00001',
+    //           roleId: 1
+    //         },
+    //         {
+    //           prodModFeatureName: 'REVIEW',
+    //           prodModFeatureDesc: 'Review',
+    //           defaultURL: 'review',
+    //           prodModFeatureID: 'review',
+    //           prodModFeatrCode: 'review',
+    //           roleId: 1
+    //         }
+    //       ]
+    //     }
+    //   ]
+    // };
+    // // tslint:enable
+    // parsedJwt.ticket.products[0].productModules.push(insightsModule);
+
     return parsedJwt;
   }
 
