@@ -361,6 +361,15 @@ public interface AnalysisSipDslConverter {
       }
     }
 
+    // Since we had schema free structure, Some of our older Analysis definition have alias.
+    if (fieldObject.has("alias")) {
+      String alias = fieldObject.get("alias").getAsString();
+
+      if (alias.length() != 0) {
+        field.setAlias(fieldObject.get("alias").getAsString());
+      }
+    }
+
     if (fieldObject.has("aggregate")) {
       String aggVal = fieldObject.get("aggregate").getAsString();
       field.setAggregate(Field.Aggregate.fromValue(aggVal));
