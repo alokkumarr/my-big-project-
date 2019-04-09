@@ -25,15 +25,12 @@ import {
   DesignerUpdateSorts,
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
-  DesignerUpdateAnalysisChartType,
   DesignerUpdateAnalysisChartTitle,
   DesignerUpdateAnalysisChartInversion,
   DesignerUpdateAnalysisChartLegend,
   DesignerUpdateAnalysisChartLabelOptions,
   DesignerUpdateAnalysisChartXAxis,
-  DesignerUpdateAnalysisChartYAxis,
-  DesignerUpdateAnalysisMetadata
-
+  DesignerUpdateAnalysisChartYAxis
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../../analyze/consts';
