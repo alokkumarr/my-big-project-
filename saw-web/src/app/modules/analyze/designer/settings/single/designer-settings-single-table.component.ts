@@ -154,15 +154,13 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
 
   getUnselectedArtifactColumns() {
     const { types, keyword } = this.filterObj;
-    const toggleFilter = this.hasAllowedType(types);
     const unselectedArtifactColumns = fpPipe(
       fpFilter(artifactColumn => {
         const { checked, alias, displayName } = artifactColumn;
         return (
           !checked &&
-          toggleFilter(artifactColumn) &&
           this.hasKeyword(alias || displayName, keyword) &&
-          this.filterByAdapters(artifactColumn)
+          this.passesTypeFilter(types, artifactColumn)
         );
       }),
       fpSort(artifactColumn => artifactColumn.displayName)
@@ -172,32 +170,27 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
     return unselectedArtifactColumns;
   }
 
-  filterByAdapters(artifactColumn) {
+  passesTypeFilter(types, artifactColumn) {
     if (isEmpty(this.groupAdapters)) {
       return true;
     }
-    const filterResults = map(this.filterObj.adapters, (toggled, index) => {
-      const adapter = this.groupAdapters[index];
-      const acceptFn = adapter.canAcceptArtifactColumnOfType;
-      return toggled ? acceptFn(artifactColumn) : null;
-    });
+    const adapterFilterResults = map(
+      this.filterObj.adapters,
+      (toggled, index) => {
+        const adapter = this.groupAdapters[index];
+        const acceptFn = adapter.canAcceptArtifactColumnOfType;
+        return toggled ? acceptFn(artifactColumn) : null;
+      }
+    );
 
-    const onlyFilterResults = filter(filterResults, isBoolean);
-    if (isEmpty(onlyFilterResults)) {
+    const generalType = this.getGeneralType(artifactColumn);
+    const onlyFilterResults = filter(adapterFilterResults, isBoolean);
+
+    if (every(types, toggled => !toggled) && isEmpty(onlyFilterResults)) {
       return true;
     }
-    return some(onlyFilterResults);
-  }
 
-  hasAllowedType(filterTypes) {
-    return artifactColumn => {
-      const generalType = this.getGeneralType(artifactColumn);
-
-      if (every(filterTypes, toggled => !toggled)) {
-        return true;
-      }
-      return filterTypes[generalType];
-    };
+    return some(onlyFilterResults) || types[generalType];
   }
 
   getGeneralType(artifactColumn) {
