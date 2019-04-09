@@ -4,7 +4,6 @@ import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 
 import java.util.Date;
 
-import org.quartz.DisallowConcurrentExecution;
 import org.quartz.InterruptableJob;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -18,7 +17,6 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
 
 
-@DisallowConcurrentExecution
 public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
   private static final Logger logger = LoggerFactory.getLogger(CronJob.class);
