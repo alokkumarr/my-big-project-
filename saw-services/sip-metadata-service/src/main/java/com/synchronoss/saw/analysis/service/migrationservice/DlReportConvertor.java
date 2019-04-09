@@ -62,7 +62,7 @@ public class DlReportConvertor implements AnalysisSipDslConverter {
   public Field buildArtifactField(JsonObject fieldObject) {
 
     Field field = new Field();
-    field = buildCommonsInArtifactField(field, fieldObject);
+    field = setCommonFieldProperties(field, fieldObject);
     return field;
   }
 

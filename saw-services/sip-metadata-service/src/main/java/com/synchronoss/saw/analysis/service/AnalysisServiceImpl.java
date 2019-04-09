@@ -37,6 +37,13 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${metastore.analysis}")
   private String tableName;
 
+  @Value("${analysis.binary-migration-required}")
+  @NotNull
+  private boolean migrationRequired;
+
+  @Value("${analysis.fetch-analysis-url}")
+  private String listAnalysisUri;
+
   private ObjectMapper objectMapper = new ObjectMapper();
   private AnalysisMetadata analysisMetadataStore;
 
@@ -47,6 +54,14 @@ public class AnalysisServiceImpl implements AnalysisService {
       throw new SipIoException("Exception occurred while initializing the analysis metadata table");
     }
   }*/
+
+  //  private void init() throws Exception {
+  //    if (migrationRequired) {
+  //      logger.trace("Migration initiated.. " + migrationRequired);
+  //      new MigrateAnalysis().convertBinaryToJson(tableName, basePath, listAnalysisUri);
+  //    }
+  //    logger.trace("Migration ended..");
+  //  }
 
   @Override
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {
@@ -83,10 +98,10 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public void deleteAnalysis(String analysisID, Ticket ticket) throws SipDeleteEntityException {
+  public void deleteAnalysis(String analysisId, Ticket ticket) throws SipDeleteEntityException {
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      analysisMetadataStore.delete(analysisID);
+      analysisMetadataStore.delete(analysisId);
     } catch (Exception e) {
       logger.error("Exception occurred while deleting analysis", e);
       throw new SipDeleteEntityException("Exception occurred while deleting analysis", e);
@@ -116,13 +131,13 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public List<ObjectNode> getAnalysisByCategory(String categoryID, Ticket ticket)
+  public List<ObjectNode> getAnalysisByCategory(String categoryId, Ticket ticket)
       throws SipReadEntityException {
     List<Document> doc = null;
     Analysis analysis;
     List<ObjectNode> objDocs = new ArrayList<>();
     Map<String, String> category = new HashMap<>();
-    category.put("category", categoryID);
+    category.put("category", categoryId);
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       doc = analysisMetadataStore.searchAll(category);
