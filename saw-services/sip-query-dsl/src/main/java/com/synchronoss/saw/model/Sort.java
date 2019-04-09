@@ -124,7 +124,7 @@ public class Sort {
 
     @JsonCreator
     public static Sort.Order fromValue(String value) {
-      Sort.Order constant = CONSTANTS.get(value);
+      Sort.Order constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
@@ -167,7 +167,7 @@ public class Sort {
 
     @JsonCreator
     public static Sort.Type fromValue(String value) {
-      Sort.Type constant = CONSTANTS.get(value);
+      Sort.Type constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

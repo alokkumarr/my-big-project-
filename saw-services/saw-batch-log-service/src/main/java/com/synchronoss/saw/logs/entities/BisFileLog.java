@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -16,7 +17,8 @@ import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "BIS_FILE_LOGS", catalog = "sip_bis", schema = "")
+@Table(name = "BIS_FILE_LOGS", catalog = "sip_bis", schema = "",
+    indexes = {@Index(columnList = "BIS_FILE_NAME", name = "bis_file_name_index")})
 public class BisFileLog implements Serializable {
 
   private static final long serialVersionUID = 26663931172032006L;
