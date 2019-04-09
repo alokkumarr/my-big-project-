@@ -57,6 +57,7 @@ import {
   DATE_TYPES,
   DEFAULT_MAP_SETTINGS
 } from '../consts';
+import moment from 'moment';
 
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
@@ -75,6 +76,7 @@ import {
   DesignerUpdatebooleanCriteria
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
+import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -152,7 +154,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'edit':
       isDSLAnalysis(this.analysis) &&
         this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
-
       this.initExistingAnalysis();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.layoutConfiguration = this.getLayoutConfiguration(
@@ -228,12 +229,25 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     );
   }
 
+  generateDSLDateFilters(filters) {
+    forEach(filters, filtr => {
+      if (filtr.type === 'date' && filtr.model.operator === 'BTW') {
+        filtr.model.gte =  moment(filtr.model.value).format('YYYY-MM-DD');
+        filtr.model.lte =  moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
+      }
+    });
+    return filters;
+  }
+
   initExistingAnalysis() {
     const queryBuilder = isDSLAnalysis(this.analysis)
       ? this.analysis.sipQuery
       : this.analysis.sqlBuilder;
     this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-    this.filters = queryBuilder.filters;
+    this.filters = isDSLAnalysis(this.analysis)
+    ? this.generateDSLDateFilters(queryBuilder.filters)
+    : queryBuilder.filters;
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
     this.booleanCriteria = queryBuilder.booleanCriteria;
     this.isInQueryMode = this.analysis.edit;
