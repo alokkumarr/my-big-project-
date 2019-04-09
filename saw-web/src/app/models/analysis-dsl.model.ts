@@ -78,13 +78,13 @@ export interface AnalysisBaseDSL {
 export interface AnalysisChartDSL extends AnalysisBaseDSL {
   chartOptions: {
     chartType: string;
+    chartTitle: string;
+    isInverted: boolean;
+    legend?: Legend;
+    labelOptions?: LabelOptions;
+    xAxis?: Axis;
+    yAxis?: Axis;
   };
-  chartTitle: string; // todo
-  isInverted: boolean; // todo
-  labelOptions?: LabelOptions; // todo
-  legend?: Legend; // todo
-  xAxis?: Axis; // todo
-  yAxis?: Axis; // todo
 }
 
 export type AnalysisDSL = AnalysisChartDSL;

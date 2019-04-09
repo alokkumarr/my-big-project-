@@ -1,4 +1,6 @@
 import { ArtifactColumnChart, AnalysisDSL, Sort } from '../types';
+import { Legend, Axis } from '../../models';
+import { LabelOptions } from '../../models';
 
 export class DesignerInitGroupAdapters {
   static readonly type = '[Designer] Init group adapters';
@@ -84,4 +86,39 @@ export class DesignerUpdatebooleanCriteria {
    /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
    static readonly type = '[Designer] Update booleanCriteria for analysis';
    constructor(public booleanCriteria: string) {}
+
+export class DesignerUpdateAnalysisChartTitle {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update chart title for analysis';
+  constructor(public chartTitle: string) {}
+}
+
+export class DesignerUpdateAnalysisChartInversion {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update chart inversion for analysis';
+  constructor(public isInverted: boolean) {}
+}
+
+export class DesignerUpdateAnalysisChartLegend {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update chart legend for analysis';
+  constructor(public legend: Legend) {}
+}
+
+export class DesignerUpdateAnalysisChartLabelOptions {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update chart label options for analysis';
+  constructor(public labelOptions: LabelOptions) {}
+}
+
+export class DesignerUpdateAnalysisChartXAxis {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update chart x axis for analysis';
+  constructor(public xAxis: Axis) {}
+}
+
+export class DesignerUpdateAnalysisChartYAxis {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update chart y axis for analysis';
+  constructor(public yAxis: Axis) {}
 }

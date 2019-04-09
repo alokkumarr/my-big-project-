@@ -625,9 +625,6 @@ export class AnalyzeService {
       semanticId,
       name: 'Untitled Analysis',
       description: '',
-      chartOptions: {
-        chartType: null
-      },
       customerCode: 'SYNCHRONOSS',
       projectCode: 'workbench',
       module: 'ANALYZE',
@@ -639,6 +636,25 @@ export class AnalyzeService {
         store: {
           dataStore: 'sampleAlias/sample', // make this dynamic
           storageType: 'ES'
+        }
+      },
+      chartOptions: {
+        chartType: 'column',
+        chartTitle: 'Untitled Analysis',
+        isInverted: false,
+        legend: {
+          align: 'right',
+          layout: 'vertical'
+        },
+        labelOptions: {
+          enabled: false,
+          value: ''
+        },
+        xAxis: {
+          title: null
+        },
+        yAxis: {
+          title: null
         }
       }
     };

@@ -6,7 +6,11 @@ import * as values from 'lodash/values';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
-import { DesignerStateModel, AnalysisDSL } from '../types';
+import {
+  DesignerStateModel,
+  AnalysisDSL,
+  DSLChartOptionsModel
+} from '../types';
 import {
   DesignerInitGroupAdapters,
   DesignerAddColumnToGroupAdapter,
@@ -20,7 +24,16 @@ import {
   DesignerUpdateAnalysisChartType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria
+  DesignerUpdatebooleanCriteria,
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateAnalysisChartTitle,
+  DesignerUpdateAnalysisChartInversion,
+  DesignerUpdateAnalysisChartLegend,
+  DesignerUpdateAnalysisChartLabelOptions,
+  DesignerUpdateAnalysisChartXAxis,
+  DesignerUpdateAnalysisChartYAxis,
+  DesignerUpdateAnalysisMetadata
+
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../../analyze/consts';
@@ -32,6 +45,26 @@ import moment from 'moment';
 const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
   analysis: null
+};
+
+const defaultDSLChartOptions: DSLChartOptionsModel = {
+  chartTitle: null,
+  chartType: null,
+  isInverted: false,
+  legend: {
+    align: '',
+    layout: ''
+  },
+  labelOptions: {
+    enabled: false,
+    value: ''
+  },
+  xAxis: {
+    title: null
+  },
+  yAxis: {
+    title: null
+  }
 };
 
 @State<DesignerStateModel>({
@@ -98,9 +131,102 @@ export class DesignerState {
     { chartType }: DesignerUpdateAnalysisChartType
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || {};
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
     return patchState({
-      analysis: { ...analysis, chartOptions: { ...chartOptions, chartType } }
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, chartType }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartInversion)
+  updateChartInversion(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { isInverted }: DesignerUpdateAnalysisChartInversion
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, isInverted }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartTitle)
+  updateChartTitle(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { chartTitle }: DesignerUpdateAnalysisChartTitle
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, chartTitle }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartLegend)
+  updateChartLegend(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { legend }: DesignerUpdateAnalysisChartLegend
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, legend }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartLabelOptions)
+  updateChartLabelOptions(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { labelOptions }: DesignerUpdateAnalysisChartLabelOptions
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, labelOptions }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartXAxis)
+  updateChartXAxis(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { xAxis }: DesignerUpdateAnalysisChartXAxis
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, xAxis }
+      }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartYAxis)
+  updateChartYAxis(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { yAxis }: DesignerUpdateAnalysisChartYAxis
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, yAxis }
+      }
     });
   }
 

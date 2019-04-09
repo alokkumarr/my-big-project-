@@ -70,6 +70,10 @@ import {
   DesignerInitNewAnalysis,
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
+  DesignerUpdateAnalysisChartTitle,
+  DesignerUpdateAnalysisChartInversion,
+  DesignerUpdateAnalysisChartLegend,
+  DesignerUpdateAnalysisChartLabelOptions,
   DesignerUpdateAnalysisMetadata,
   DesignerUpdateAnalysisChartType,
   DesignerUpdateSorts,
@@ -264,32 +268,40 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   initAuxSettings() {
     /* prettier-ignore */
     switch (this.analysis.type) {
-    case 'chart':
-      this._chartService.updateAnalysisModel(this.analysis);
-      if (this.designerMode === 'new') {
-        (<any>this.analysis).isInverted = this.chartType === 'bar';
-      }
-      this.chartTitle = this.analysis.chartTitle || this.analysis.name;
+      case 'chart':
+        this._chartService.updateAnalysisModel(this.analysis);
+        if (this.designerMode === 'new') {
+          (<any>this.analysis).isInverted = this.chartType === 'bar';
+        }
+        this.chartTitle = isDSLAnalysis(this.analysis)
+          ? this.analysis.chartOptions.chartTitle || this.analysis.name
+          : (this.chartTitle = this.analysis.chartTitle || this.analysis.name);
 
-      const chartOnlySettings = {
-        legend: (<any>this.analysis).legend,
-        labelOptions: (<any>this.analysis).labelOptions || {},
-        isInverted: (<any>this.analysis).isInverted
-      };
+          const chartOnlySettings = {
+          legend: isDSLAnalysis(<any>this.analysis)
+            ? (<any>this.analysis).chartOptions.legend
+            : (<any>this.analysis).legend,
+          labelOptions: isDSLAnalysis(<any>this.analysis)
+            ? (<any>this.analysis).chartOptions.labelOptions
+            : (<any>this.analysis).labelOptions || {},
+          isInverted: isDSLAnalysis(<any>this.analysis)
+            ? (<any>this.analysis).chartOptions.isInverted
+            : (<any>this.analysis).isInverted
+        };
 
-      this.auxSettings = {
-        ...this.auxSettings,
-        ...chartOnlySettings
-      };
-      break;
-    case 'map':
-      const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
-      this.auxSettings = {
-        ...this.auxSettings,
-        ...mapOnlySettings
-      };
-      this.analysis.mapSettings = this.auxSettings;
-      break;
+        this.auxSettings = {
+          ...this.auxSettings,
+          ...chartOnlySettings
+        };
+        break;
+      case 'map':
+        const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
+        this.auxSettings = {
+          ...this.auxSettings,
+          ...mapOnlySettings
+        };
+        this.analysis.mapSettings = this.auxSettings;
+        break;
     }
   }
 
@@ -819,7 +831,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
-      // this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
@@ -902,88 +914,111 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   handleOtherChangeEvents(event: DesignerChangeEvent) {
     /* prettier-ignore */
     switch (event.subject) {
-    case 'selectedFields':
-      this.cleanSorts();
-      this.addDefaultSorts();
-      this.artifacts = [...this.artifacts];
-      this.checkNodeForSorts();
-      this.areMinRequirmentsMet = this.canRequestData();
-      this.requestDataIfPossible();
-      break;
-    case 'dateInterval':
-    case 'aggregate':
-    case 'filter':
-    case 'format':
-      this.requestDataIfPossible();
-      break;
-    case 'aliasName':
-      // reload frontEnd
-      this.updateAnalysis();
-      this.artifacts = [...this.artifacts];
-      if (this.analysis.type === 'chart') {
+      case 'selectedFields':
+        this.cleanSorts();
+        this.addDefaultSorts();
+        this.artifacts = [...this.artifacts];
+        this.checkNodeForSorts();
+        this.areMinRequirmentsMet = this.canRequestData();
+        this.requestDataIfPossible();
+        break;
+      case 'dateInterval':
+      case 'aggregate':
+      case 'filter':
+      case 'format':
+        this.requestDataIfPossible();
+        break;
+      case 'aliasName':
+        // reload frontEnd
+        console.log('Alias Name : ', this.artifacts);
+        this.updateAnalysis();
+        this.artifacts = [...this.artifacts];
+        if (this.analysis.type === 'chart') {
+          this.refreshDataObject();
+        }
+        break;
+      case 'sort':
+        this.cleanSorts();
+        this.addDefaultSorts();
+        this.requestDataIfPossible();
+        this.updateAnalysis();
         this.refreshDataObject();
-      }
-      break;
-    case 'sort':
-      this.cleanSorts();
-      this.addDefaultSorts();
-      this.requestDataIfPossible();
-      this.updateAnalysis();
-      this.refreshDataObject();
-      break;
-    case 'comboType':
-      this.updateAnalysis();
-      this.refreshDataObject();
-      break;
-    case 'labelOptions':
-      (<any>this.analysis).labelOptions = event.data.labelOptions;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.refreshDataObject();
-      break;
-    case 'legend':
-      if (!event.data || !event.data.legend) { return; }
-      (<any>this.analysis).legend = event.data.legend;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.artifacts = [...this.artifacts];
-      break;
-    case 'inversion':
-      if (!event.data) { return; }
-      (<any>this.analysis).isInverted = event.data.isInverted;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.artifacts = [...this.artifacts];
-      break;
-    case 'chartTitle':
-      if (!event.data) { return; }
-      this.analysis.chartTitle = event.data.title;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.artifacts = [...this.artifacts];
-      break;
-    case 'mapSettings':
-      this.auxSettings = event.data.mapSettings;
-      this.analysis.mapSettings = this.auxSettings;
-      break;
-    case 'fetchLimit':
-      (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
-      this.requestDataIfPossible();
-      break;
-    case 'region':
-      this.updateAnalysis();
-      this.refreshDataObject();
-      break;
-    case 'chartType':
-      this.changeChartType(event.data);
-      this._store.dispatch(new DesignerClearGroupAdapters());
-      this._store.dispatch(
-        new DesignerInitGroupAdapters(
-          <ArtifactColumnChart[]>this.artifacts[0].columns,
-          this.analysis.type,
-          this.chartType
+        break;
+      case 'comboType':
+        this.updateAnalysis();
+        this.refreshDataObject();
+        break;
+      case 'labelOptions':
+      isDSLAnalysis(this.analysis)
+      ? this._store.dispatch(
+          new DesignerUpdateAnalysisChartLabelOptions(event.data.labelOptions)
         )
-      );
-      setTimeout(() => {
-        this.resetAnalysis();
-      });
-      break;
+      : (<any>this.analysis).labelOptions = event.data.labelOptions;
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.refreshDataObject();
+        break;
+      case 'legend':
+        if (!event.data || !event.data.legend) {
+          return;
+        }
+        isDSLAnalysis(this.analysis)
+        ? this._store.dispatch(
+            new DesignerUpdateAnalysisChartLegend(event.data.legend)
+          )
+        : (<any>this.analysis).legend = event.data.legend;
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.artifacts = [...this.artifacts];
+        break;
+      case 'inversion':
+        if (!event.data) {
+          return;
+        }
+        isDSLAnalysis(this.analysis)
+          ? this._store.dispatch(
+              new DesignerUpdateAnalysisChartInversion(event.data.isInverted)
+            )
+          : ((<any>this.analysis).isInverted = event.data.isInverted);
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.artifacts = [...this.artifacts];
+        break;
+      case 'chartTitle':
+        if (!event.data) {
+          return;
+        }
+        isDSLAnalysis(this.analysis)
+          ? this._store.dispatch(
+              new DesignerUpdateAnalysisChartTitle(event.data.title)
+            )
+          : ((<AnalysisChart>this.analysis).chartTitle = event.data.title);
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.artifacts = [...this.artifacts];
+        break;
+      case 'mapSettings':
+        this.auxSettings = event.data.mapSettings;
+        this.analysis.mapSettings = this.auxSettings;
+        break;
+      case 'fetchLimit':
+        (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
+        this.requestDataIfPossible();
+        break;
+      case 'region':
+        this.updateAnalysis();
+        this.refreshDataObject();
+        break;
+      case 'chartType':
+        this.changeChartType(event.data);
+        this._store.dispatch(new DesignerClearGroupAdapters());
+        this._store.dispatch(
+          new DesignerInitGroupAdapters(
+            <ArtifactColumnChart[]>this.artifacts[0].columns,
+            this.analysis.type,
+            this.chartType
+          )
+        );
+        setTimeout(() => {
+          this.resetAnalysis();
+        });
+        break;
     }
   }
 
