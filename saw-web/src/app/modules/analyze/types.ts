@@ -53,6 +53,7 @@ export interface AnalysisStarter {
   metricName: string;
   type: AnalysisType;
   chartType?: ChartType;
+  supports?: string[];
 }
 
 export interface AnalysisDialogData {

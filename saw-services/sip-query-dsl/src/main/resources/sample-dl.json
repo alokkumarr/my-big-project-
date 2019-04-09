@@ -1,7 +1,7 @@
 {
   "sipQuery": {
-    "page" : 1,
-    "pageSize" : 25,
+    "page": 1,
+    "pageSize": 25,
     "artifacts": [
       {
         "artifactsName": "sample",
@@ -92,14 +92,17 @@
         "join": "inner",
         "criteria": [
           {
-            "artifactsName": "SALES",
-            "columnName": "string",
-            "side": "right"
-          },
-          {
-            "artifactsName": "PRODUCT",
-            "columnName": "string_2",
-            "side": "left"
+            "joinCondition": {
+              "operator": "EQ",
+              "left": {
+                "artifactsName": "SALES",
+                "columnName": "string"
+              },
+              "right": {
+                "artifactsName": "PRODUCT",
+                "columnName": "string_2"
+              }
+            }
           }
         ]
       }
