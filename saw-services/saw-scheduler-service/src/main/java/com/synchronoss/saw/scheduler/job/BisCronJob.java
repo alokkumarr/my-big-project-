@@ -1,9 +1,11 @@
 package com.synchronoss.saw.scheduler.job;
 
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
+
 import java.util.Date;
+
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.InterruptableJob;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -11,13 +13,12 @@ import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 
+@DisallowConcurrentExecution
 public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
   private static final Logger logger = LoggerFactory.getLogger(CronJob.class);

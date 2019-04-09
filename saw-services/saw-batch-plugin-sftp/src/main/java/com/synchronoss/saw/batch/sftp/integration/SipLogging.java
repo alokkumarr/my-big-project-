@@ -286,10 +286,11 @@ public class SipLogging {
    * @param channelId unique Id for the channel.
    * @param routeId unique Id for the route
    * @param processStatus status for the component process.
+   * @param source source regular or retry
    */
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
-      String fileStatus) {
+      String fileStatus, String source) {
     logger.trace(
         "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
@@ -308,6 +309,7 @@ public class SipLogging {
       bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
       bisDataMetaInfo.setComponentState(processStatus);
       bisDataMetaInfo.setProcessState(fileStatus);
+      bisDataMetaInfo.setSource(source);
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
     logger.trace(

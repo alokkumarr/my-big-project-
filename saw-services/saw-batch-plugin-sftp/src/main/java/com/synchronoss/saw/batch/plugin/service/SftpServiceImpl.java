@@ -516,7 +516,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error("Exception triggered while transferring the file", ex);
       sipLogService.upSertLogForExistingProcessStatus(Long.valueOf(payload.getChannelId()),
                 Long.valueOf(payload.getRouteId()), BisComponentState.HOST_NOT_REACHABLE.value(),
-                BisProcessState.FAILED.value());
+                BisProcessState.FAILED.value(),SourceType.REGULAR.name());
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
       if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
@@ -738,7 +738,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
       sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
-          BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value());
+          BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value(), source);
     }
     logger.trace(
         "TransferData ends here with the channelId " + channelId + " and routeId " + routeId);
@@ -1360,7 +1360,8 @@ public class SftpServiceImpl extends SipPluginContract {
               + " and with process id " + pid,
               ex);
           sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
-              BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value());
+              BisComponentState.HOST_NOT_REACHABLE.value(), 
+              BisProcessState.FAILED.value(), SourceType.RETRY.name());
         }
         break;
       case "jdbc":
