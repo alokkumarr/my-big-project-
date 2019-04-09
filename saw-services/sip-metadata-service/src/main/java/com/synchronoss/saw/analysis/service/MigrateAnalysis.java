@@ -13,7 +13,7 @@ import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
-import com.synchronoss.saw.analysis.service.migrationservice.DlReportConvertor;
+import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.util.SipMetadataUtils;
@@ -111,7 +111,7 @@ public class MigrateAnalysis {
         converter = new EsReportConverter();
         break;
       case "report":
-        converter = new DlReportConvertor();
+        converter = new DlReportConverter();
         break;
       default:
         logger.error("Unknown chart type");

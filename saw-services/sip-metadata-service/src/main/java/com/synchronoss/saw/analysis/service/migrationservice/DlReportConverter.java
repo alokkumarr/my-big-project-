@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DlReportConvertor implements AnalysisSipDslConverter {
+public class DlReportConverter implements AnalysisSipDslConverter {
 
   @Override
   public Analysis convert(JsonObject oldAnalysisDefinition) {
