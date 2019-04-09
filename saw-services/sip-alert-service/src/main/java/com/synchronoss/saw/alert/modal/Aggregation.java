@@ -7,12 +7,12 @@ import java.util.Map;
 
 /** This ENUM class contains Aggregation type for Monitoring entity. */
 public enum Aggregation {
-  AVG("avg"),
-  SUM("sum"),
-  MIN("min"),
-  MAX("max"),
-  COUNT("count"),
-  PERCENTAGE("percentage");
+  AVG("AVG"),
+  SUM("SUM"),
+  MIN("MIN"),
+  MAX("MAX"),
+  COUNT("COUNT"),
+  PERCENTAGE("PERCENTAGE");
   private static final Map<String, Aggregation> CONSTANTS = new HashMap<>();
 
   static {

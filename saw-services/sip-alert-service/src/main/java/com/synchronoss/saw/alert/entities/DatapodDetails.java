@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -23,6 +24,7 @@ public class DatapodDetails {
   @Column(name = "ALERT_CUSTOMER_SYS_ID")
   Long alertCustomerSysId;
 
+  @CreationTimestamp
   @Column(name = "CREATED_TIME")
   Date createdTime;
 

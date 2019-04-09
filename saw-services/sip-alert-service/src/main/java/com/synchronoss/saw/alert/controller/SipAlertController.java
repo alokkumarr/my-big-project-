@@ -1,17 +1,23 @@
 package com.synchronoss.saw.alert.controller;
 
+import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.modal.Alert;
 import com.synchronoss.saw.alert.modal.AlertResponse;
 import com.synchronoss.saw.alert.service.AlertService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +44,24 @@ public class SipAlertController {
   @Autowired AlertService alertService;
 
   /**
+   * Get JWT token details.
+   *
+   * @param req http Request
+   * @return String
+   * @throws IllegalAccessException If Authorization not found
+   */
+  public static String getToken(final HttpServletRequest req) throws IllegalAccessException {
+    if (!("OPTIONS".equals(req.getMethod()))) {
+      final String authHeader = req.getHeader("Authorization");
+      if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        throw new IllegalAccessException("Missing or invalid Authorization header.");
+      }
+      return authHeader.substring(7); // The part after "Bearer "
+    }
+    return null;
+  }
+
+  /**
    * create Alert API.
    *
    * @param request HttpServletRequest
@@ -45,26 +69,29 @@ public class SipAlertController {
    * @param alert alert definition
    * @return Alert
    */
-  @ApiOperation(
-      value = " create Alert API ",
-      nickname = "createAlertRule",
-      notes = "",
-      response = Object.class)
+  @ApiOperation(value = "", nickname = "createAlertRule", notes = "", response = Object.class)
   @RequestMapping(
       value = "",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public Object createAlertRule(
+  public AlertResponse createAlertRule(
       HttpServletRequest request, HttpServletResponse response, @RequestBody Alert alert) {
-
     AlertResponse alertResponse = new AlertResponse();
-    if (alert == null) {
-      alertResponse.setMessage("Alert rule definition can't be null for create request");
-      response.setStatus(400);
-      return alertResponse;
-    }
+    try {
+      String token = getToken(request);
+      Ticket ticket = TokenParser.retrieveTicket(token);
+      alertResponse.setAlert(alertService.createAlertRule(alert, ticket));
+      if (alert == null) {
+        alertResponse.setMessage("Alert rule definition can't be null for create request");
+        response.setStatus(400);
+        return alertResponse;
+      }
+      alertResponse.setMessage("Alert rule created successfully");
 
+    } catch (IllegalAccessException | IOException e) {
+      logger.error("Error occurred while creating the alert list by category", e);
+    }
     return alertResponse;
   }
 
@@ -76,24 +103,32 @@ public class SipAlertController {
    * @param alert alert definition
    * @return Alert
    */
-  @ApiOperation(
-      value = " update Alert API ",
-      nickname = "updateAlertRule",
-      notes = "",
-      response = Object.class)
+  @ApiOperation(value = "/{id}", nickname = "updateAlertRule", notes = "", response = Object.class)
   @RequestMapping(
-      value = "",
+      value = "/{id}",
       method = RequestMethod.PUT,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public Object updateAlertRule(
-      HttpServletRequest request, HttpServletResponse response, @RequestBody Alert alert) {
-
+  public AlertResponse updateAlertRule(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @PathVariable(name = "id") Long id,
+      @RequestBody Alert alert) {
     AlertResponse alertResponse = new AlertResponse();
-    if (alert == null) {
-      alertResponse.setMessage("Alert rule definition can't be null for create request");
-      response.setStatus(400);
-      return alertResponse;
+    try {
+      String token = getToken(request);
+      Ticket ticket = TokenParser.retrieveTicket(token);
+      alertResponse.setAlert(alertService.updateAlertRule(alert, id, ticket));
+      if (alert == null) {
+        alertResponse.setMessage("Alert rule definition can't be null for create request");
+        response.setStatus(400);
+        return alertResponse;
+      }
+
+      alertResponse.setMessage("Alert rule updated successfully");
+
+    } catch (IllegalAccessException | IOException e) {
+      logger.error("Error occurred while updating the alert list by category", e);
     }
 
     return alertResponse;
@@ -107,20 +142,28 @@ public class SipAlertController {
    * @return Alert
    */
   @ApiOperation(
-      value = " List Alert rule API ",
+      value = "/list/{categoryId}",
       nickname = "List Alert Rules",
       notes = "",
       response = Object.class)
   @RequestMapping(
-      value = "",
+      value = "/list/{categoryId}",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public Object listAlertRules(HttpServletRequest request, HttpServletResponse response) {
+  public List<AlertRulesDetails> listAlertRules(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @PathVariable(name = "categoryId") String categoryId) {
 
-    AlertResponse alertResponse = new AlertResponse();
-
-    return alertResponse;
+    try {
+      String token = getToken(request);
+      Ticket ticket = TokenParser.retrieveTicket(token);
+      return alertService.getAlertRulesByCategory(categoryId, ticket);
+    } catch (IllegalAccessException | IOException e) {
+      logger.error("Error occurred while fetching the alert list by category");
+    }
+    return null;
   }
 
   /**
@@ -131,19 +174,30 @@ public class SipAlertController {
    * @return Alert
    */
   @ApiOperation(
-      value = " List Alert rule API ",
+      value = "/{id}",
       nickname = "List Alert Rules",
       notes = "",
-      response = Object.class)
+      response = AlertResponse.class)
   @RequestMapping(
-      value = "",
+      value = "/{id}",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public Object getAlertRules(HttpServletRequest request, HttpServletResponse response) {
+  public AlertResponse getAlertRules(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @PathVariable(name = "id") Long id) {
 
     AlertResponse alertResponse = new AlertResponse();
 
+    try {
+      String token = getToken(request);
+      Ticket ticket = TokenParser.retrieveTicket(token);
+      alertResponse.setAlert(alertService.getAlertRule(id, ticket));
+    } catch (IllegalAccessException | IOException e) {
+      logger.error("Error occurred while fetching the alert details", e);
+    }
+    alertResponse.setMessage("Alert rule retrieved successfully");
     return alertResponse;
   }
 
@@ -158,15 +212,26 @@ public class SipAlertController {
       value = "/{id}",
       nickname = "Delete Alert Rules",
       notes = "",
-      response = Object.class)
+      response = AlertResponse.class)
   @RequestMapping(
-      value = "",
+      value = "/{id}",
       method = RequestMethod.DELETE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public Object deleteAlertRules(HttpServletRequest request, HttpServletResponse response) {
+  public AlertResponse deleteAlertRules(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @PathVariable(name = "id") Long id) {
 
     AlertResponse alertResponse = new AlertResponse();
+    try {
+      String token = getToken(request);
+      Ticket ticket = TokenParser.retrieveTicket(token);
+      alertService.deleteAlertRule(id, ticket);
+      alertResponse.setMessage("Alert rule deleted successfully");
+    } catch (IllegalAccessException | IOException e) {
+      logger.error("Error occurred while fetching the alert details");
+    }
 
     return alertResponse;
   }

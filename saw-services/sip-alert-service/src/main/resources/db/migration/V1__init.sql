@@ -30,6 +30,7 @@ CREATE TABLE `ALERT_RULES_DETAILS` (
     `DATAPOD_ID` VARCHAR(45) NOT NULL COMMENT 'Datapod ID to be used for evaluating the alert. ',
     `RULE_NAME` VARCHAR(100) NOT NULL COMMENT 'Alert Rule Name',
     `RULE_DESCRIPTIONS` VARCHAR(250) DEFAULT NULL COMMENT 'Alert Rule Descriptions',
+    `CATEGORY` VARCHAR(100) NOT NULL COMMENT 'Alert Rule Name',
     `SEVERITY` ENUM('CRITICAL', 'MEDIUM', 'LOW') NOT NULL COMMENT 'Severity of Alert , Values can be Critical , Medium and Low',
     `MONITORING_ENTITY` VARCHAR(45) NOT NULL COMMENT 'Column Name from Datapod to use to Monitor the Alert metrics. ',
     `AGGREGATION` ENUM('MAX', 'MIN', 'AVG', 'SUM', 'COUNT', 'PERCENTAGE') NOT NULL COMMENT 'Type Of Aggregation for metrics calculation.',

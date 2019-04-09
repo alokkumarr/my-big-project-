@@ -26,7 +26,7 @@ public class SipAlertSwaggerConfig extends WebMvcConfigurationSupport {
     return new Docket(DocumentationType.SWAGGER_2)
         .apiInfo(getApiInfo())
         .select()
-        .apis(RequestHandlerSelectors.basePackage("com.synchronoss.sip"))
+        .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw"))
         // .paths(PathSelectors.regex("/internal/proxy.*"))
         .build();
   }
