@@ -67,3 +67,9 @@ export class DesignerUpdateAnalysisChartType {
   static readonly type = '[Designer] Update chartType for analysis';
   constructor(public chartType: string) {}
 }
+
+export class DesignerUpdateFieldFormat {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update field format for analysis';
+  constructor() {}
+}

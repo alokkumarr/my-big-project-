@@ -70,7 +70,8 @@ import {
   DesignerInitEditAnalysis,
   DesignerInitForkAnalysis,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateFieldFormat
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 
@@ -889,6 +890,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'aggregate':
     case 'filter':
     case 'format':
+      isDSLAnalysis(this.analysis) && this._store.dispatch(new DesignerUpdateFieldFormat());
+      this.artifacts = [...this.artifacts];
       this.requestDataIfPossible();
       break;
     case 'aliasName':

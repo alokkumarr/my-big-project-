@@ -17,7 +17,8 @@ import {
   DesignerInitForkAnalysis,
   DesignerInitNewAnalysis,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateFieldFormat
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 
@@ -83,6 +84,20 @@ export class DesignerState {
     const analysis = getState().analysis;
     return patchState({
       analysis: { ...analysis, ...metadata }
+    });
+  }
+
+  @Action(DesignerUpdateFieldFormat)
+  updateFieldFormat({
+    patchState,
+    getState
+  }: StateContext<DesignerStateModel>) {
+    // not doing much right now. This placeholder makes sure the store
+    // is notified of change in analysis, and refreshes its observables.
+
+    const analysis = getState().analysis;
+    return patchState({
+      analysis
     });
   }
 

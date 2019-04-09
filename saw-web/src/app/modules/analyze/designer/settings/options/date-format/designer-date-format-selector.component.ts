@@ -45,7 +45,11 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
 
   onFormatChange(format: Format | string) {
     if (format) {
-      this.artifactColumn.format = format;
+      if (this.analysisType === 'chart') {
+        this.artifactColumn.dateFormat = <string>format;
+      } else {
+        this.artifactColumn.format = format;
+      }
       this.changeDateSample();
       this.change.emit({ subject: 'format' });
     }
