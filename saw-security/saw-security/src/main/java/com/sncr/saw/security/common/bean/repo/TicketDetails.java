@@ -3,8 +3,8 @@
  */
 package com.sncr.saw.security.common.bean.repo;
 
-import com.sncr.saw.security.common.bean.TicketDSKDetails;
-
+import com.synchronoss.bda.sip.jwt.token.Products;
+import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
