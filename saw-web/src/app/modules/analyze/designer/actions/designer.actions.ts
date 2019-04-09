@@ -73,3 +73,15 @@ export class DesignerUpdateSorts {
   static readonly type = '[Designer] Update sorts for analysis';
   constructor(public sorts: Sort[]) {}
 }
+
+export class DesignerUpdateFilters {
+  /* Use for only new DSL analyses. This is for filters in charts,  */
+  static readonly type = '[Designer] Update filters for analysis';
+  constructor(public filters: any) {}
+}
+
+export class DesignerUpdatebooleanCriteria {
+   /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
+   static readonly type = '[Designer] Update booleanCriteria for analysis';
+   constructor(public booleanCriteria: string) {}
+}

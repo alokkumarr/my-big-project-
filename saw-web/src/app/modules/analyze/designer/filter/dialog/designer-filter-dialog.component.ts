@@ -47,6 +47,11 @@ export class DesignerFilterDialogComponent implements OnInit {
 
   ngOnInit() {
     this.filters = cloneDeep(this.data.filters);
+    forEach(this.filters, filtr => {
+      if (filtr.artifactsName) {
+        filtr.tableName = filtr.artifactsName;
+      }
+    });
     this.groupedFilters = groupBy(this.filters, 'tableName');
     forEach(this.artifacts, artifact => {
       const name = artifact.artifactName;
