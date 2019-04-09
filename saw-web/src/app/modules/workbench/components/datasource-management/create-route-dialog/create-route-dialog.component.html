@@ -118,23 +118,21 @@
                 >
               </mat-error>
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Last modified time (Hrs)</mat-label>
-              <input
-                matInput
-                type="text"
-                name="lastModifiedLimitHours"
-                e2e="last-modified-limit-input"
-                formControlName="lastModifiedLimitHours"
-              />
-             </mat-form-field>
             <mat-checkbox
-              style="margin: 20px 0 65px 0;"
+              style="margin: 2px 0 63px 17px;"
               e2e="route-disable-duplicate-ch"
               formControlName="disableDuplicate"
               i18n
             >
               Disable duplicate check
+            </mat-checkbox>
+            <mat-checkbox
+              style="margin: 2px 0 63px 0;"
+              e2e="route-disable-duplicate-ch"
+              formControlName="disableDuplicate"
+              i18n
+            >
+              Disable Concurrency      
             </mat-checkbox>
           </section>
           <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
@@ -212,6 +210,16 @@
                 Batch size is <strong>required</strong>
               </mat-error>
             </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label i18n>Look back interval (Hrs)</mat-label>
+              <input
+                matInput
+                type="text"
+                name="lastModifiedLimitHours"
+                e2e="last-modified-limit-input"
+                formControlName="lastModifiedLimitHours"
+              />
+             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Description about the route</mat-label>
               <textarea
