@@ -325,7 +325,7 @@ public class Field {
     COUNT("count"),
     PERCENTAGE("percentage"),
     PERCENTAGE_BY_ROW("percentagebyrow"),
-    DISTINCT_COUNT("distinctcount");
+    DISTINCTCOUNT("distinctcount");
 
     private static final Map<String, Aggregate> CONSTANTS = new HashMap<>();
 
