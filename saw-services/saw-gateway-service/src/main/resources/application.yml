@@ -28,6 +28,9 @@ server:
 analysis:
     service:
         host: http://localhost:9300
+alert:
+  service:
+    host: http://localhost:9620
 internal-analysis:
     service:
         host: http://localhost:9200
@@ -68,6 +71,18 @@ api:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
+        -   location: ${alert.service.host}
+            method: GET
+            path: '[/]sip/alerts.*'
+        -   location: ${alert.service.host}
+            method: POST
+            path: '[/]sip/alerts.*'
+        -   location: ${alert.service.host}
+            method: PUT
+            path: '[/]sip/alerts.*'
+        -   location: ${alert.service.host}
+            method: DELETE
+            path: '[/]sip/alerts.*'
         -   location: ${internal-analysis.service.host}
             method: GET
             path: '[/]analysis.*'
@@ -141,5 +156,4 @@ api:
             method: DELETE
             path: '[/]ingestion/batch.*'
 
-            
             
