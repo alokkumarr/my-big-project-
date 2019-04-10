@@ -59,7 +59,7 @@ public class Join {
 
     @JsonCreator
     public static JoinType fromValue(String value) {
-      JoinType constant = CONSTANTS.get(value);
+      JoinType constant = CONSTANTS.get(value.toLowerCase());
       if (constant == null) {
         throw new IllegalArgumentException("Join type not implemented: " + value);
       } else {
