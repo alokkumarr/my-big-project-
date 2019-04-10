@@ -196,6 +196,7 @@ public interface AnalysisSipDslConverter {
 
   /**
    * Creates a Model object.
+   * If preset is NA in old analysis definition, don't set anything in the new analysis definition.
    *
    * @param modelObject Old Analysis model
    * @return Model Object
@@ -208,17 +209,12 @@ public interface AnalysisSipDslConverter {
           Model.BooleanCriteria.fromValue(modelObject.get("booleanCriteria").getAsString()));
     }
 
-    Model.Preset preset = null;
     if (modelObject.has("preset")) {
-//      model.setPreset(Model.Preset.fromValue(modelObject.get("preset").getAsString()));
+        String presetVal = modelObject.get("preset").getAsString();
 
-      preset = Model.Preset.fromValue(modelObject.get("preset").getAsString());
-    }
-
-    // If preset is not set, or set to NA, check if GTE and LTE are set.
-    // If both are set, operator should be BTW
-    if (preset == null || preset == Model.Preset.NA) {
-
+        if (!presetVal.equalsIgnoreCase("NA")) {
+          model.setPreset(Model.Preset.fromValue(modelObject.get("preset").getAsString()));
+        }
     }
 
     if (modelObject.has("operator")) {
