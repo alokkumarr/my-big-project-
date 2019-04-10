@@ -83,10 +83,10 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public void deleteAnalysis(String analysisID, Ticket ticket) throws SipDeleteEntityException {
+  public void deleteAnalysis(String analysisId, Ticket ticket) throws SipDeleteEntityException {
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      analysisMetadataStore.delete(analysisID);
+      analysisMetadataStore.delete(analysisId);
     } catch (Exception e) {
       logger.error("Exception occurred while deleting analysis", e);
       throw new SipDeleteEntityException("Exception occurred while deleting analysis", e);
@@ -95,13 +95,13 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   // TODO : Response to be changed back to Analysis type
   @Override
-  public ObjectNode getAnalysis(String analysisID, Ticket ticket) throws SipReadEntityException {
+  public ObjectNode getAnalysis(String analysisId, Ticket ticket) throws SipReadEntityException {
     JsonElement doc;
     Analysis analysis;
     ObjectNode analysisNode;
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      doc = analysisMetadataStore.read(analysisID);
+      doc = analysisMetadataStore.read(analysisId);
       if (doc == null) {
         return null;
       }
@@ -116,13 +116,13 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public List<ObjectNode> getAnalysisByCategory(String categoryID, Ticket ticket)
+  public List<ObjectNode> getAnalysisByCategory(String categoryId, Ticket ticket)
       throws SipReadEntityException {
     List<Document> doc = null;
     Analysis analysis;
     List<ObjectNode> objDocs = new ArrayList<>();
     Map<String, String> category = new HashMap<>();
-    category.put("category", categoryID);
+    category.put("category", categoryId);
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       doc = analysisMetadataStore.searchAll(category);
