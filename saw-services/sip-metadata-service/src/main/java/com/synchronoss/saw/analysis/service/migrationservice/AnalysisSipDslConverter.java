@@ -231,7 +231,8 @@ public interface AnalysisSipDslConverter {
   }
 
   /**
-   * Creates a Model object.
+   * Creates a Model object. If preset is NA in old analysis definition, don't set anything in the
+   * new analysis definition.
    *
    * @param modelObject Old Analysis model
    * @return Model Object
@@ -239,13 +240,17 @@ public interface AnalysisSipDslConverter {
   default Model createModel(JsonObject modelObject) {
     Model model = new Model();
 
-    if (modelObject.has("preset")) {
-      model.setPreset(Model.Preset.fromValue(modelObject.get("preset").getAsString()));
-    }
-
     if (modelObject.has("booleanCriteria")) {
       model.setBooleanCriteria(
           Model.BooleanCriteria.fromValue(modelObject.get("booleanCriteria").getAsString()));
+    }
+
+    if (modelObject.has("preset")) {
+      String presetVal = modelObject.get("preset").getAsString();
+
+      if (!presetVal.equalsIgnoreCase("NA")) {
+        model.setPreset(Model.Preset.fromValue(modelObject.get("preset").getAsString()));
+      }
     }
 
     if (modelObject.has("operator")) {
