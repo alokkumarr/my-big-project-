@@ -203,13 +203,22 @@ public interface AnalysisSipDslConverter {
   default Model createModel(JsonObject modelObject) {
     Model model = new Model();
 
-    if (modelObject.has("preset")) {
-      model.setPreset(Model.Preset.fromValue(modelObject.get("preset").getAsString()));
-    }
-
     if (modelObject.has("booleanCriteria")) {
       model.setBooleanCriteria(
           Model.BooleanCriteria.fromValue(modelObject.get("booleanCriteria").getAsString()));
+    }
+
+    Model.Preset preset = null;
+    if (modelObject.has("preset")) {
+//      model.setPreset(Model.Preset.fromValue(modelObject.get("preset").getAsString()));
+
+      preset = Model.Preset.fromValue(modelObject.get("preset").getAsString());
+    }
+
+    // If preset is not set, or set to NA, check if GTE and LTE are set.
+    // If both are set, operator should be BTW
+    if (preset == null || preset == Model.Preset.NA) {
+
     }
 
     if (modelObject.has("operator")) {
