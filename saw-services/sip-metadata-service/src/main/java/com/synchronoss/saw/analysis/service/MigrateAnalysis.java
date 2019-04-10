@@ -13,14 +13,13 @@ import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -111,6 +110,9 @@ public class MigrateAnalysis {
       case "esReport":
         converter = new EsReportConverter();
         break;
+      case "report":
+        converter = new DlReportConverter();
+        break;
       default:
         logger.error("Unknown chart type");
         break;
@@ -152,8 +154,8 @@ public class MigrateAnalysis {
     File jsonFile = new File(analysisFile);
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
-    JsonObject analyzeObject = jsonObject.getAsJsonObject("contents")
-        .getAsJsonArray("analyze").get(0).getAsJsonObject();
+    JsonObject analyzeObject =
+        jsonObject.getAsJsonObject("contents").getAsJsonArray("analyze").get(0).getAsJsonObject();
 
     MigrateAnalysis ma = new MigrateAnalysis();
 

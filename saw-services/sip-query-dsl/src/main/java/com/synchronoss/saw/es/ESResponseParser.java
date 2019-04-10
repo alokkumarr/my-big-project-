@@ -86,20 +86,20 @@ public class ESResponseParser {
         // if result contains only aggregated fields.
         else if (groupByFields.length==0 && childNode !=null)
         {
-            Map<String,String> flatValues = new LinkedHashMap<>();
+            Map<String,Object> flatValues = new LinkedHashMap<>();
             for (Field dataField : aggregationFields){
                 String columnName = dataField.getDataField();
-                flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
+                flatValues.put(columnName, childNode.get(columnName).get(VALUE));
             }
             flatStructure.add(flatValues);
         }
         else
         {
-            Map<String,String> flatValues = new LinkedHashMap<>();
+            Map<String,Object> flatValues = new LinkedHashMap<>();
             flatValues.putAll(dataObj);
             for (Field dataField : aggregationFields){
                 String columnName = dataField.getDataField();
-                flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
+                flatValues.put(columnName, childNode.get(columnName).get(VALUE));
             }
             flatStructure.add(flatValues);
         }
@@ -116,7 +116,7 @@ public class ESResponseParser {
   public List<Object> parseData(JsonNode jsonNode) {
     logger.trace(this.getClass().getName() + " parseData starts here");
     prepareGroupByFields(dataFields);
-    Map<String, String> dataObj = new LinkedHashMap<>();
+    Map<String, Object> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
     flatStructure = jsonNodeParser(jsonNode, dataObj, flatStructure, 0);
     logger.trace(this.getClass().getName() + " parseData ends here");

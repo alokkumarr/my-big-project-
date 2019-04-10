@@ -37,13 +37,6 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${metastore.analysis}")
   private String tableName;
 
-  @Value("${analysis.binary-migration-required}")
-  @NotNull
-  private boolean migrationRequired;
-
-  @Value("${analysis.fetch-analysis-url}")
-  private String listAnalysisUri;
-
   private ObjectMapper objectMapper = new ObjectMapper();
   private AnalysisMetadata analysisMetadataStore;
 
@@ -54,14 +47,6 @@ public class AnalysisServiceImpl implements AnalysisService {
       throw new SipIoException("Exception occurred while initializing the analysis metadata table");
     }
   }*/
-
-  //  private void init() throws Exception {
-  //    if (migrationRequired) {
-  //      logger.trace("Migration initiated.. " + migrationRequired);
-  //      new MigrateAnalysis().convertBinaryToJson(tableName, basePath, listAnalysisUri);
-  //    }
-  //    logger.trace("Migration ended..");
-  //  }
 
   @Override
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {

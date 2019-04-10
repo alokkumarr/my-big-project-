@@ -91,7 +91,7 @@
       matTooltip="Preview"
       mat-icon-button
       color="secondary"
-      [disabled]="!areMinRequirmentsMet"
+      [disabled]="showProgress || !areMinRequirmentsMet"
       e2e="open-preview-modal"
       (click)="requestAction.emit('preview')"
     >
@@ -104,7 +104,7 @@
       mat-icon-button
       color="secondary"
       e2e="open-sort-modal"
-      [disabled]="isInQueryMode"
+      [disabled]="showProgress || isInQueryMode"
       (click)="requestAction.emit('sort')"
     >
       <mat-icon color="primary" fontIcon="icon-sort"></mat-icon>
@@ -116,7 +116,7 @@
       mat-icon-button
       color="secondary"
       e2e="open-filter-modal"
-      [disabled]="isInQueryMode"
+      [disabled]="showProgress || isInQueryMode"
       (click)="requestAction.emit('filter')"
     >
       <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
@@ -127,7 +127,7 @@
       matTooltip="Save"
       mat-icon-button
       color="secondary"
-      [disabled]="!areMinRequirmentsMet"
+      [disabled]="showProgress || !areMinRequirmentsMet"
       e2e="designer-save-btn"
       (click)="requestAction.emit('save')"
     >

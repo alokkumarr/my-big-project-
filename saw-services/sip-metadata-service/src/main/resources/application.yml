@@ -36,6 +36,8 @@ semantic:
   migration-metadata-home: /var/sip/
 
 analysis:
-  fetch-analysis-url:  http://localhost:9200
-  binary-migration-required: true
+  store-base:  hdfs:///var/sip/
+  analysis-table: analysis
+  get-analysis-url:  http://localhost:9200
+  binary-migration-requires: true
   migration-metadata-home: /var/sip/

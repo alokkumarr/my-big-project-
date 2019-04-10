@@ -166,7 +166,7 @@ export class DesignerContainerComponent implements OnInit {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.initAuxSettings();
         this.analysis.edit = this.analysis.edit || false;
-        unset(this.analysis, 'supports');
+        this.analysis.supports = this.analysisStarter.supports;
         unset(this.analysis, 'categoryId');
       });
   }
@@ -832,7 +832,20 @@ export class DesignerContainerComponent implements OnInit {
           (<AnalysisChart>this.analysis).chartType
         )
       );
+
+      unset(this.analysis, 'chartTitle');
+      this.chartTitle = '';
+      const {align, layout} = this._chartService.initLegend({chartType: (<any>this.analysis).chartType});
+      (<any>this.analysis).legend = {align, layout};
+
+      this.auxSettings = {
+        legend: {align, layout},
+        labelOptions: {},
+        isInverted: false
+      };
+
       setTimeout(() => {
+        this.analysis.chartTitle = '';
         this.resetAnalysis();
       });
       break;

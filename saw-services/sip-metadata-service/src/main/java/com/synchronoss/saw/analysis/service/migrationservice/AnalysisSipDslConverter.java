@@ -43,6 +43,12 @@ public interface AnalysisSipDslConverter {
       analysis.setDescription(oldAnalysisDefinition.get("description").getAsString());
     }
 
+    if (oldAnalysisDefinition.has("edit")) {
+      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
+
+      analysis.setDesignerEdit(designerEdit);
+    }
+
     analysis.setSemanticId(oldAnalysisDefinition.get("semanticId").getAsString());
     analysis.setName(oldAnalysisDefinition.get("name").getAsString());
 
