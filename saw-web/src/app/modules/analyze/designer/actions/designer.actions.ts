@@ -123,3 +123,9 @@ export class DesignerUpdateAnalysisChartYAxis {
   static readonly type = '[Designer] Update chart y axis for analysis';
   constructor(public yAxis: Axis) {}
 }
+
+export class DesignerUpdateFieldFormat {
+  /* Use for only new DSL analyses */
+  static readonly type = '[Designer] Update field format for analysis';
+  constructor() {}
+}

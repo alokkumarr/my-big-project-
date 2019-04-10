@@ -12,6 +12,7 @@ export interface FieldDSL {
   area: string;
   columnName: string;
   dataField: string;
+  dateFormat: string;
   displayName: string;
   groupInterval: string;
   limitType: string; // todo

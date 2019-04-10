@@ -178,6 +178,9 @@ export class DesignerPageComponent implements OnInit {
       if (field.aggregate) {
         artifactColumn.aggregate = field.aggregate;
       }
+      if (field.dateFormat) {
+        artifactColumn.dateFormat = field.dateFormat;
+      }
     });
 
     return artifacts;

@@ -78,7 +78,8 @@ import {
   DesignerUpdateAnalysisChartType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria
+  DesignerUpdatebooleanCriteria,
+  DesignerUpdateFieldFormat
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -926,11 +927,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'aggregate':
       case 'filter':
       case 'format':
+        isDSLAnalysis(this.analysis) && this._store.dispatch(new DesignerUpdateFieldFormat());
+        this.artifacts = [...this.artifacts];
         this.requestDataIfPossible();
         break;
       case 'aliasName':
         // reload frontEnd
-        console.log('Alias Name : ', this.artifacts);
         this.updateAnalysis();
         this.artifacts = [...this.artifacts];
         if (this.analysis.type === 'chart') {
