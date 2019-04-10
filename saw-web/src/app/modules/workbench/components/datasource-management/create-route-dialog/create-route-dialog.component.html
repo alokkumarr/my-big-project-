@@ -215,10 +215,12 @@
               <input
                 matInput
                 type="text"
+                [value]="detailsFormGroup.controls.lastModifiedLimitHours.value "
                 name="lastModifiedLimitHours"
                 e2e="last-modified-limit-input"
                 formControlName="lastModifiedLimitHours"
               />
+              <span *ngIf="detailsFormGroup.controls.errors" class="errorTextMsg" i18n>Only numbers allowed</span>
              </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label i18n>Description about the route</mat-label>

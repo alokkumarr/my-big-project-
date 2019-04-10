@@ -42,6 +42,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -628,6 +630,13 @@ public class SftpServiceImpl extends SipPluginContract {
   @Override
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
       boolean isDisable) throws SipNestedRuntimeException {
+    CompletableFuture<String> completableFuture 
+            = new CompletableFuture<>();
+    Executors.newCachedThreadPool().submit(() -> {
+      Thread.sleep(500);
+      completableFuture.complete("Hello");
+      return null;
+    });
     Preconditions.checkNotNull(channelId != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(routeId != null, "payload.getRouteId() cannot be null");
     logger.trace(
@@ -677,11 +686,14 @@ public class SftpServiceImpl extends SipPluginContract {
               logger.trace("Duplicate has been disabled :" + isDisable);
             }
             int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
-            if (rootNode.get("lastModifiedLimitHours") != null) {
+            if (!rootNode.get("lastModifiedLimitHours").isNull()) {
               String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
-              lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
-              logger.trace("Last modified hours limit configured:" 
-                  + lastModifiedHoursLmt);
+              if (!lastModifiedLimitHours.isEmpty()) {
+                lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
+                logger.trace("Last modified hours limit configured:" 
+                    + lastModifiedHoursLmt);
+              }
+             
             }
             logger.trace("invocation of method transferData when "
                 + "directory is availble in destination with location starts here " + sourceLocation
