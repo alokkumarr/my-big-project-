@@ -80,12 +80,12 @@ public class BuilderUtil {
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
     LocalDateTime now = LocalDateTime.now();
     switch (dynamic) {
-      case "Yesterday":
+      case "YESTERDAY":
         LocalDateTime yesterday = now.minusDays(1);
         dynamicConvertor.setLte(yesterday.format(dateTimeFormatter) + space + dateFormatLte);
         dynamicConvertor.setGte(yesterday.format(dateTimeFormatter) + space + dateFormatGte);
         break;
-      case "Today":
+      case "TODAY":
         {
           LocalDateTime today = now;
           dynamicConvertor.setLte(today.format(dateTimeFormatter) + space + dateFormatLte);
@@ -238,7 +238,7 @@ public class BuilderUtil {
     LocalDateTime now = LocalDateTime.now();
     DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
     switch (dynamic) {
-      case "Yesterday":
+      case "YESTERDAY":
         LocalDateTime yesterday = now.minusDays(1);
         LocalDateTime dayBeforeYesterday = yesterday.minusDays(1);
         dynamicConvertor.setLte(
@@ -246,7 +246,7 @@ public class BuilderUtil {
         dynamicConvertor.setGte(
             dayBeforeYesterday.format(dateTimeFormatter) + space + dateFormatGte);
         break;
-      case "Today":
+      case "TODAY":
         {
           LocalDateTime yestday = now.minusDays(1);
           dynamicConvertor.setLte(yestday.format(dateTimeFormatter) + space + dateFormatLte);

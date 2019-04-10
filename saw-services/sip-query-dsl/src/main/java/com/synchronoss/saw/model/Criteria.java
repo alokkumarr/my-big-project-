@@ -13,6 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class Criteria implements Serializable {
 
   private static final long serialVersionUID = -6202723440049243096L;
+
   @JsonProperty("joinCondition")
   private JoinCondition joinCondition;
 
@@ -44,7 +45,7 @@ public class Criteria implements Serializable {
     if ((other instanceof Criteria) == false) {
       return false;
     }
-      Criteria rhs = ((Criteria) other);
+    Criteria rhs = ((Criteria) other);
     return new EqualsBuilder().append(joinCondition, rhs.joinCondition).isEquals();
   }
 }
