@@ -44,29 +44,36 @@ public interface AnalysisSipDslConverter {
     analysis.setCustomerCode(oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).getAsString());
     analysis.setCreatedTime(oldAnalysisDefinition.get(FieldNames.CREATED_TIMESTAMP).getAsLong());
 
-    if (oldAnalysisDefinition.has(FieldNames.EDIT) && !oldAnalysisDefinition.get(FieldNames.EDIT).isJsonNull()) {
+    if (oldAnalysisDefinition.has(FieldNames.EDIT)
+        && !oldAnalysisDefinition.get(FieldNames.EDIT).isJsonNull()) {
       Boolean designerEdit = oldAnalysisDefinition.get(FieldNames.EDIT).getAsBoolean();
       analysis.setDesignerEdit(designerEdit);
     }
 
-    if (oldAnalysisDefinition.has(FieldNames.DESCRIPTION) && !oldAnalysisDefinition.get(FieldNames.DESCRIPTION).isJsonNull()) {
+    if (oldAnalysisDefinition.has(FieldNames.DESCRIPTION)
+        && !oldAnalysisDefinition.get(FieldNames.DESCRIPTION).isJsonNull()) {
       analysis.setDescription(oldAnalysisDefinition.get(FieldNames.DESCRIPTION).getAsString());
     }
 
-    if (oldAnalysisDefinition.has(FieldNames.CATEGORY_ID) && !oldAnalysisDefinition.get(FieldNames.CATEGORY_ID).isJsonNull()) {
+    if (oldAnalysisDefinition.has(FieldNames.CATEGORY_ID)
+        && !oldAnalysisDefinition.get(FieldNames.CATEGORY_ID).isJsonNull()) {
       analysis.setCategory(oldAnalysisDefinition.get(FieldNames.CATEGORY_ID).getAsString());
     }
 
-    if (oldAnalysisDefinition.has(FieldNames.UPDATED_USER_NAME) && !oldAnalysisDefinition.get(FieldNames.UPDATED_USER_NAME).isJsonNull()) {
+    if (oldAnalysisDefinition.has(FieldNames.UPDATED_USER_NAME)
+        && !oldAnalysisDefinition.get(FieldNames.UPDATED_USER_NAME).isJsonNull()) {
       analysis.setModifiedBy(oldAnalysisDefinition.get(FieldNames.UPDATED_USER_NAME).getAsString());
     }
 
-    if (oldAnalysisDefinition.has(FieldNames.UPDATED_TIMESTAMP) && !oldAnalysisDefinition.get(FieldNames.UPDATED_TIMESTAMP).isJsonNull()) {
+    if (oldAnalysisDefinition.has(FieldNames.UPDATED_TIMESTAMP)
+        && !oldAnalysisDefinition.get(FieldNames.UPDATED_TIMESTAMP).isJsonNull()) {
       analysis.setModifiedTime(oldAnalysisDefinition.get(FieldNames.UPDATED_TIMESTAMP).getAsLong());
     }
 
-    if (oldAnalysisDefinition.has(FieldNames.PARENT_ANALYSIS_ID)  && !oldAnalysisDefinition.get(FieldNames.PARENT_ANALYSIS_ID).isJsonNull()) {
-      String parentAnalysisId = oldAnalysisDefinition.get(FieldNames.PARENT_ANALYSIS_ID).getAsString();
+    if (oldAnalysisDefinition.has(FieldNames.PARENT_ANALYSIS_ID)
+        && !oldAnalysisDefinition.get(FieldNames.PARENT_ANALYSIS_ID).isJsonNull()) {
+      String parentAnalysisId =
+          oldAnalysisDefinition.get(FieldNames.PARENT_ANALYSIS_ID).getAsString();
       analysis.setParentAnalysisId(parentAnalysisId);
     }
     return analysis;
@@ -120,7 +127,7 @@ public interface AnalysisSipDslConverter {
 
     String booleanCriteriaValue = sqlQueryBuilder.get(FieldNames.BOOLEAN_CRITERIA).getAsString();
     SipQuery.BooleanCriteria booleanCriteria =
-            SipQuery.BooleanCriteria.fromValue(booleanCriteriaValue);
+        SipQuery.BooleanCriteria.fromValue(booleanCriteriaValue);
     sipQuery.setBooleanCriteria(booleanCriteria);
     sipQuery.setFilters(generateFilters(sqlQueryBuilder));
     sipQuery.setSorts(generateSorts(artifactName, sqlQueryBuilder));
@@ -219,7 +226,8 @@ public interface AnalysisSipDslConverter {
 
     if (modelObject.has(FieldNames.BOOLEAN_CRITERIA)) {
       model.setBooleanCriteria(
-              Model.BooleanCriteria.fromValue(modelObject.get(FieldNames.BOOLEAN_CRITERIA).getAsString()));
+          Model.BooleanCriteria.fromValue(
+              modelObject.get(FieldNames.BOOLEAN_CRITERIA).getAsString()));
     }
 
     if (modelObject.has(FieldNames.PRESENT)) {
@@ -231,7 +239,8 @@ public interface AnalysisSipDslConverter {
     }
 
     if (modelObject.has(FieldNames.OPERATOR)) {
-      model.setOperator(Model.Operator.fromValue(modelObject.get(FieldNames.OPERATOR).getAsString()));
+      model.setOperator(
+          Model.Operator.fromValue(modelObject.get(FieldNames.OPERATOR).getAsString()));
     }
 
     if (modelObject.has(FieldNames.VALUE)) {
@@ -433,19 +442,23 @@ public interface AnalysisSipDslConverter {
   default Format createFormatObject(JsonObject formatObject) {
     Format format = new Format();
 
-    if (formatObject.has(FieldNames.PRECISION) && !formatObject.get(FieldNames.PRECISION).isJsonNull()) {
+    if (formatObject.has(FieldNames.PRECISION)
+        && !formatObject.get(FieldNames.PRECISION).isJsonNull()) {
       format.setPrecision(formatObject.get(FieldNames.PRECISION).getAsInt());
     }
     if (formatObject.has(FieldNames.COMMA) && !formatObject.get(FieldNames.COMMA).isJsonNull()) {
       format.setComma(formatObject.get(FieldNames.COMMA).getAsBoolean());
     }
-    if (formatObject.has(FieldNames.CURRENCY) && !formatObject.get(FieldNames.CURRENCY).isJsonNull()) {
+    if (formatObject.has(FieldNames.CURRENCY)
+        && !formatObject.get(FieldNames.CURRENCY).isJsonNull()) {
       format.setCurrency(formatObject.get(FieldNames.CURRENCY).getAsString());
     }
-    if (formatObject.has(FieldNames.PERCENTAGE) && !formatObject.get(FieldNames.PERCENTAGE).isJsonNull()) {
+    if (formatObject.has(FieldNames.PERCENTAGE)
+        && !formatObject.get(FieldNames.PERCENTAGE).isJsonNull()) {
       format.setPercentage(formatObject.get(FieldNames.PERCENTAGE).getAsBoolean());
     }
-    if (formatObject.has(FieldNames.CURRENCY_SYMBOL) && !formatObject.get(FieldNames.CURRENCY_SYMBOL).isJsonNull()) {
+    if (formatObject.has(FieldNames.CURRENCY_SYMBOL)
+        && !formatObject.get(FieldNames.CURRENCY_SYMBOL).isJsonNull()) {
       format.setCurrencySymbol(formatObject.get(FieldNames.CURRENCY_SYMBOL).getAsString());
     }
     return format;
