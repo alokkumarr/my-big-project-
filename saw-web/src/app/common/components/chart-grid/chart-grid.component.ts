@@ -83,7 +83,7 @@ export class ChartGridComponent implements OnInit {
       }
     };
     const chart = {
-      height: this.chartDimension.height
+      height: 400 //this.chartDimension.height
     };
     this.chartOptions = this._chartService.getChartConfigFor(
       analysis.chartType,
@@ -174,7 +174,8 @@ export class ChartGridComponent implements OnInit {
         { labels, labelOptions: analysis.labelOptions, sorts }
       ),
       { path: 'title.exportFilename', data: analysis.name },
-      { path: 'chart.inverted', data: analysis.isInverted }
+      { path: 'chart.inverted', data: analysis.isInverted },
+      { path: 'chart.height', data: analysis.chartDimension.height }
     ];
   }
 
