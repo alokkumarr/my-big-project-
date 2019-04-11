@@ -1,4 +1,9 @@
-import { ArtifactColumnChart, AnalysisDSL, Sort } from '../types';
+import {
+  ArtifactColumnChart,
+  AnalysisDSL,
+  Sort,
+  ArtifactColumnDSL
+} from '../types';
 import { Legend, Axis } from '../../models';
 import { LabelOptions } from '../../models';
 
@@ -124,8 +129,22 @@ export class DesignerUpdateAnalysisChartYAxis {
   constructor(public yAxis: Axis) {}
 }
 
-export class DesignerUpdateFieldFormat {
-  /* Use for only new DSL analyses */
-  static readonly type = '[Designer] Update field format for analysis';
-  constructor() {}
+export class DesignerUpdateArtifactColumn {
+  static readonly type = '[Designer] Update artifact column of analysis';
+  constructor(
+    public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
+  ) {}
+}
+
+export class DesignerAddArtifactColumn {
+  static readonly type = '[Designer] Add artifact column to analysis';
+  constructor(
+    public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
+  ) {}
+}
+export class DesignerRemoveArtifactColumn {
+  static readonly type = '[Designer] Remove artifact column from analysis';
+  constructor(
+    public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
+  ) {}
 }

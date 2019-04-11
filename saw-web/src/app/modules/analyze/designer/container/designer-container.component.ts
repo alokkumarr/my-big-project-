@@ -19,7 +19,7 @@ import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { Store, Select } from '@ngxs/store';
 import { Observable, Subscription } from 'rxjs';
-import { takeWhile, finalize } from 'rxjs/operators';
+import { takeWhile, finalize, map as map$ } from 'rxjs/operators';
 
 import {
   flattenPivotData,
@@ -78,8 +78,7 @@ import {
   DesignerUpdateAnalysisChartType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria,
-  DesignerUpdateFieldFormat
+  DesignerUpdatebooleanCriteria
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -98,12 +97,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
-  @Select(DesignerState.dslAnalysis) dslAnalysis$: Observable<AnalysisDSL>;
-  @Select(state => state.designerState.analysis.sipQuery.sorts)
-  dslSorts$: Observable<Sort[]>;
-
-  @Select(state => state.designerState.analysis.chartOptions.chartType)
-  chartType$: Observable<string>;
+  @Select(state => state.designerState.analysis) dslAnalysis$: Observable<
+    AnalysisDSL
+  >;
+  dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.sipQuery.sorts)
+  );
+  chartType$: Observable<string> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.chartOptions.chartType)
+  );
 
   public isInDraftMode = false;
   public designerState: DesignerStates;
@@ -542,7 +544,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   dslAnalysisForRequest(): AnalysisDSL {
-    return this._store.selectSnapshot(DesignerState.dslAnalysis);
+    return this._store.selectSnapshot(state => state.designerState.analysis);
   }
 
   requestData() {
@@ -700,7 +702,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
 
     const analysisForSave = isDSLAnalysis(this.analysis)
-      ? this._store.selectSnapshot(DesignerState.dslAnalysis)
+      ? this._store.selectSnapshot(state => state.designerState.analysis)
       : this.analysis;
 
     return this._analyzeDialogService
@@ -930,7 +932,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'aggregate':
       case 'filter':
       case 'format':
-        isDSLAnalysis(this.analysis) && this._store.dispatch(new DesignerUpdateFieldFormat());
         this.artifacts = [...this.artifacts];
         this.requestDataIfPossible();
         break;

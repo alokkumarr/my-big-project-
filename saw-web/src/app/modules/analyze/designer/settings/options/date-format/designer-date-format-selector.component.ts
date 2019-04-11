@@ -2,6 +2,8 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import * as moment from 'moment';
 import * as get from 'lodash/get';
 import { AnalyzeDialogService } from '../../../../services/analyze-dialog.service';
+import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
+import { Store } from '@ngxs/store';
 import {
   ArtifactColumnChart,
   Format,
@@ -37,7 +39,10 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
 
   public dateSample: string;
 
-  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
+  constructor(
+    private _analyzeDialogService: AnalyzeDialogService,
+    private store: Store
+  ) {}
 
   ngOnInit() {
     this.changeDateSample();
@@ -47,8 +52,22 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
     if (format) {
       if (this.analysisType === 'chart') {
         this.artifactColumn.dateFormat = <string>format;
+        this.store.dispatch(
+          new DesignerUpdateArtifactColumn({
+            columnName: this.artifactColumn.columnName,
+            table: this.artifactColumn.table || this.artifactColumn.table,
+            dateFormat: <string>format
+          })
+        );
       } else {
         this.artifactColumn.format = format;
+        this.store.dispatch(
+          new DesignerUpdateArtifactColumn({
+            columnName: this.artifactColumn.columnName,
+            table: this.artifactColumn.table || this.artifactColumn.table,
+            format
+          })
+        );
       }
       this.changeDateSample();
       this.change.emit({ subject: 'format' });
@@ -62,9 +81,13 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
   }
 
   openDateFormatDialog() {
+    const columnFormat =
+      this.analysisType === 'pivot'
+        ? this.artifactColumn.format
+        : this.artifactColumn.dateFormat;
     const dateFormats = get(dateFormatsMap, `${this.analysisType}.array`);
     this._analyzeDialogService
-      .openDateFormatDialog(<string>this.artifactColumn.format, dateFormats)
+      .openDateFormatDialog(<string>columnFormat, dateFormats)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }

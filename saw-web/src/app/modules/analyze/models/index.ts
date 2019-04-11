@@ -8,6 +8,8 @@ export {
   ArtifactColumnChart,
   ArtifactColumnPivot,
   ArtifactColumnReport,
+  ArtifactColumnDSL,
+  ArtifactDSL,
   Artifact,
   Axis,
   Contents,

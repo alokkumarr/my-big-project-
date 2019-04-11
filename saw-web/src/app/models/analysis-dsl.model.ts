@@ -5,25 +5,29 @@ import { Axis } from './axis.model';
 import { Schedule } from './schedule.model';
 import { Filter } from './filter.model';
 import { Sort } from './sort.model';
+import { Format } from '../modules/analyze/types';
 
-export interface FieldDSL {
-  aggregate: string;
+export interface ArtifactColumnDSL {
+  aggregate?: string;
   alias: string;
   area: string;
   columnName: string;
   dataField: string;
-  dateFormat: string;
+  displayType?: string;
+  dateFormat?: string;
+  format?: string | Format;
   displayName: string;
   groupInterval: string;
-  limitType: string; // todo
-  limitValue: any; // todo
+  limitType?: string; // todo
+  limitValue?: any; // todo
   name: string;
   type: string;
+  table: string;
 }
 
 export interface ArtifactDSL {
   artifactsName: string;
-  fields: FieldDSL[];
+  fields: ArtifactColumnDSL[];
 }
 
 export interface StorageDSL {

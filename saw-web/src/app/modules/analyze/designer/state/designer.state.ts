@@ -1,16 +1,10 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as forEach from 'lodash/forEach';
-import * as flatMap from 'lodash/flatMap';
-import * as values from 'lodash/values';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
-import {
-  DesignerStateModel,
-  AnalysisDSL,
-  DSLChartOptionsModel
-} from '../types';
+import { DesignerStateModel, DSLChartOptionsModel } from '../types';
 import {
   DesignerInitGroupAdapters,
   DesignerAddColumnToGroupAdapter,
@@ -31,7 +25,9 @@ import {
   DesignerUpdateAnalysisChartLabelOptions,
   DesignerUpdateAnalysisChartXAxis,
   DesignerUpdateAnalysisChartYAxis,
-  DesignerUpdateFieldFormat
+  DesignerAddArtifactColumn,
+  DesignerRemoveArtifactColumn,
+  DesignerUpdateArtifactColumn
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../../analyze/consts';
@@ -77,39 +73,119 @@ export class DesignerState {
     return state.groupAdapters;
   }
 
-  @Selector()
-  static dslAnalysis(state: DesignerStateModel): AnalysisDSL {
-    const fields: Array<any> = flatMap(
-      state.groupAdapters,
-      adapter => adapter.artifactColumns
-    );
-    const artifacts = {};
-    fields.forEach(field => {
-      artifacts[field.table] = artifacts[field.table] || {
-        artifactsName: field.table,
-        fields: []
-      };
-      artifacts[field.table].fields.push({
-        aggregate: field.aggregate,
-        alias: field.alias || field.aliasName,
-        area: field.area,
-        columnName: field.columnName,
-        comboType: field.comboType,
-        dataField: field.name || field.columnName,
-        displayName: field.displayName,
-        dateFormat: field.dateFormat,
-        groupInterval: field.groupInterval,
-        name: field.name,
-        type: field.type,
-        table: field.table || field.tableName
-      });
-    });
+  @Action(DesignerAddArtifactColumn)
+  addArtifactColumn(
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerAddArtifactColumn
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    let artifacts = sipQuery.artifacts;
 
-    const sipQuery = {
-      ...state.analysis.sipQuery,
-      artifacts: values(artifacts)
+    const artifactsName =
+      artifactColumn.table || (<any>artifactColumn).tableName;
+
+    /* Find the artifact inside sipQuery of analysis stored in state */
+    const artifactIndex = artifacts.findIndex(
+      artifact => artifact.artifactsName === artifactsName
+    );
+
+    const artifactColumnToBeAdded = {
+      aggregate: artifactColumn.aggregate,
+      alias: artifactColumn.alias || (<any>artifactColumn).aliasName,
+      area: artifactColumn.area,
+      columnName: artifactColumn.columnName,
+      displayType:
+        artifactColumn.displayType || (<any>artifactColumn).comboType,
+      dataField: artifactColumn.name || artifactColumn.columnName,
+      displayName: artifactColumn.displayName,
+      dateFormat: artifactColumn.dateFormat,
+      groupInterval: artifactColumn.groupInterval,
+      name: artifactColumn.name,
+      type: artifactColumn.type,
+      table: artifactColumn.table || (<any>artifactColumn).tableName
     };
-    return { ...state.analysis, sipQuery };
+
+    if (artifactIndex < 0) {
+      artifacts = [
+        ...artifacts,
+        { artifactsName, fields: [artifactColumnToBeAdded] }
+      ];
+    } else {
+      artifacts[artifactIndex].fields = [
+        ...artifacts[artifactIndex].fields,
+        artifactColumnToBeAdded
+      ];
+    }
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+    });
+  }
+
+  @Action(DesignerRemoveArtifactColumn)
+  removeArtifactColumn(
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerAddArtifactColumn
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const artifacts = sipQuery.artifacts;
+
+    /* Find the artifact inside sipQuery of analysis stored in state */
+    const artifactsName =
+      artifactColumn.table || (<any>artifactColumn).tableName;
+    const artifactIndex = artifacts.findIndex(
+      artifact => artifact.artifactsName === artifactsName
+    );
+
+    if (artifactIndex < 0) {
+      return patchState({});
+    }
+
+    const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
+      field => field.columnName === artifactColumn.columnName
+    );
+
+    artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+    });
+  }
+
+  @Action(DesignerUpdateArtifactColumn)
+  updateArtifactColumn(
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerAddArtifactColumn
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const artifacts = sipQuery.artifacts;
+
+    /* Find the artifact inside sipQuery of analysis stored in state */
+    const artifactsName =
+      artifactColumn.table || (<any>artifactColumn).tableName;
+    const artifactIndex = artifacts.findIndex(
+      artifact => artifact.artifactsName === artifactsName
+    );
+
+    if (artifactIndex < 0) {
+      return patchState({});
+    }
+
+    const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
+      field => field.columnName === artifactColumn.columnName
+    );
+
+    artifacts[artifactIndex].fields[artifactColumnIndex] = {
+      ...artifacts[artifactIndex].fields[artifactColumnIndex],
+      ...artifactColumn
+    };
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+    });
   }
 
   @Action(DesignerUpdateAnalysisMetadata)
@@ -120,20 +196,6 @@ export class DesignerState {
     const analysis = getState().analysis;
     return patchState({
       analysis: { ...analysis, ...metadata }
-    });
-  }
-
-  @Action(DesignerUpdateFieldFormat)
-  updateFieldFormat({
-    patchState,
-    getState
-  }: StateContext<DesignerStateModel>) {
-    // not doing much right now. This placeholder makes sure the store
-    // is notified of change in analysis, and refreshes its observables.
-
-    const analysis = getState().analysis;
-    return patchState({
-      analysis
     });
   }
 
@@ -306,7 +368,7 @@ export class DesignerState {
 
   @Action(DesignerAddColumnToGroupAdapter)
   addColumnToGroupAdapter(
-    { patchState, getState }: StateContext<DesignerStateModel>,
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
     {
       artifactColumn,
       columnIndex,
@@ -331,7 +393,8 @@ export class DesignerState {
     const adapter = groupAdapters[adapterIndex];
     adapter.transform(artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
-    return patchState({ groupAdapters: [...groupAdapters] });
+    patchState({ groupAdapters: [...groupAdapters] });
+    return dispatch(new DesignerAddArtifactColumn(artifactColumn));
   }
 
   @Action(DesignerClearGroupAdapters)
@@ -353,7 +416,7 @@ export class DesignerState {
 
   @Action(DesignerRemoveColumnFromGroupAdapter)
   removeColumnFromGroupAdapter(
-    { patchState, getState }: StateContext<DesignerStateModel>,
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
     { columnIndex, adapterIndex }: DesignerRemoveColumnFromGroupAdapter
   ) {
     const groupAdapters = getState().groupAdapters;
@@ -366,7 +429,8 @@ export class DesignerState {
     // });
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
-    return patchState({ groupAdapters: [...groupAdapters] });
+    patchState({ groupAdapters: [...groupAdapters] });
+    return dispatch(new DesignerAddArtifactColumn(column));
   }
 
   @Action(DesignerMoveColumnInGroupAdapter)

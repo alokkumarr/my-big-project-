@@ -12,7 +12,8 @@ import {
   Format,
   FilterModel,
   Region,
-  ArtifactColumn
+  ArtifactColumn,
+  ArtifactColumnDSL
 } from './models';
 
 export type ArtifactColumns = ArtifactColumn[];
@@ -31,7 +32,8 @@ export {
   AnalysisReport,
   AnalysisChart,
   Region,
-  ArtifactColumn
+  ArtifactColumn,
+  ArtifactColumnDSL
 };
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
