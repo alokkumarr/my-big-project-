@@ -499,6 +499,13 @@ public interface AnalysisSipDslConverter {
     return format;
   }
 
+  /**
+   * Extracts aliasName from artifacts array.
+   *
+   * @param columnName Name of the column
+   * @param artifactsArray JsonArray which contains artifacts
+   * @return aliasName - on successful extraction null - on failure
+   */
   default String extractAliasNameFromArtifactsArray(String columnName, JsonArray artifactsArray) {
     String aliasName = null;
 
@@ -513,6 +520,13 @@ public interface AnalysisSipDslConverter {
     return aliasName;
   }
 
+  /**
+   * Extracts aliasName from artifacts object.
+   *
+   * @param columnName Name of the column
+   * @param artifactObject Artifact Object
+   * @return aliasName - on successful extraction null - on failure
+   */
   default String getAliasNameFromArtifactObject(String columnName, JsonObject artifactObject) {
     String aliasName = null;
 

@@ -31,7 +31,8 @@ public class EsReportConverter implements AnalysisSipDslConverter {
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, artifactsArray, store));
+      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject,
+          artifactsArray, store));
     }
 
     return analysis;
