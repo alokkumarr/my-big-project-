@@ -71,7 +71,7 @@ export class CreateRouteDialogComponent {
       disableDuplicate: [false],
       batchSize: ['', [Validators.required]],
       fileExclusions: ['', this.validatefileExclusion],
-      lastModifiedLimitHours:['',Validators.pattern(/^-?(0|[1-9]\d*)?$/)]
+      lastModifiedLimitHours:['',Validators.pattern(/^\d*[1-9]\d*$/)]
 
     });
   }

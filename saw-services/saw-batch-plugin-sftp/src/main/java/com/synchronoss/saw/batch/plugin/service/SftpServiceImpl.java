@@ -788,7 +788,7 @@ public class SftpServiceImpl extends SipPluginContract {
         logger.trace("Last modified time::::" + lastModifiedTime);
         logger.trace("Duration::::" + durationInHours);
           
-        if (durationInHours > filesModifiedInLast) {
+        if (durationInHours >= filesModifiedInLast) {
           logger.trace("Skipping File/Folder with name " + entry.getFilename() 
                    + " older then configured time limit. Last modified time:: " 
                    + entry.getAttrs().getMTime());
