@@ -90,6 +90,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   @Select(DesignerState.dslAnalysis) dslAnalysis$: Observable<AnalysisDSL>;
 
+  @Select(state => state.designerState.analysis.chartOptions.chartType)
+  chartType$: Observable<string>;
+
   public isInDraftMode = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
