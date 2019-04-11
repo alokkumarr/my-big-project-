@@ -30,9 +30,6 @@ import {
   DesignerUpdateArtifactColumn
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
-import { CUSTOM_DATE_PRESET_VALUE } from './../../../analyze/consts';
-
-import moment from 'moment';
 
 // setAutoFreeze(false);
 
@@ -464,14 +461,6 @@ export class DesignerState {
     const sipQuery = analysis.sipQuery;
     filters.forEach(filter => {
       filter.artifactsName = filter.tableName;
-      if (filter.type === 'date' && filter.model.preset === CUSTOM_DATE_PRESET_VALUE) {
-        filter.model = {
-          operator: 'BTW',
-          otherValue: filter.model.lte ? moment(filter.model.lte).valueOf() : null,
-          value: filter.model.gte ? moment(filter.model.gte).valueOf() : null,
-          format: 'epoch_millis'
-        };
-      }
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, filters }}
