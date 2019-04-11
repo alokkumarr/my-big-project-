@@ -769,7 +769,8 @@ public class SftpServiceImpl extends SipPluginContract {
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, boolean isDisableDuplicate, String source, int filesModifiedInLast)
+      Long routeId, String exclusions, boolean isDisableDuplicate, 
+      String source, int filesModifiedInLast)
       throws IOException, ParseException {
     logger.trace("TransferDataFromChannel starts here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -827,7 +828,8 @@ public class SftpServiceImpl extends SipPluginContract {
       // Adding to a list has been removed as a part of optimization
       // SIP-6386
       transferDataFromChannel(template, sourcelocationDirectory, pattern,
-          destinationLocation, channelId, routeId, exclusions, isDisableDuplicate, source, filesModifiedInLast);
+          destinationLocation, channelId, routeId, exclusions, 
+          isDisableDuplicate, source, filesModifiedInLast);
     }
     logger.trace("TransferDataFromChannel ends here with the channelId " + channelId
         + " and routeId " + routeId);
