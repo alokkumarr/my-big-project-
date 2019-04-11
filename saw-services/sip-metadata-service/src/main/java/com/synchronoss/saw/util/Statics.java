@@ -7,7 +7,7 @@ public class Statics {
     public static final String GTE = "gte";
     public static final String LTE = "lte";
     public static final String NAME = "name";
-    public static final String SHORTS = "sorts";
+    public static final String SORTS = "sorts";
     public static final String VALUE = "value";
     public static final String COMMA = "comma";
     public static final String ORDER = "order";

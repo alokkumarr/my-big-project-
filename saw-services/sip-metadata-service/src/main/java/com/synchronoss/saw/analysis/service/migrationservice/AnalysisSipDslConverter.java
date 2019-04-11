@@ -276,8 +276,8 @@ public interface AnalysisSipDslConverter {
   default List<Sort> generateSorts(String artifactName, JsonObject sqlBuilder) {
     List<Sort> sorts = new LinkedList<>();
 
-    if (sqlBuilder.has(Statics.SHORTS)) {
-      JsonArray sortsArray = sqlBuilder.getAsJsonArray(Statics.SHORTS);
+    if (sqlBuilder.has(Statics.SORTS)) {
+      JsonArray sortsArray = sqlBuilder.getAsJsonArray(Statics.SORTS);
       for (JsonElement sortsElement : sortsArray) {
         sorts.add(generateSortObject(artifactName, sortsElement.getAsJsonObject()));
       }
