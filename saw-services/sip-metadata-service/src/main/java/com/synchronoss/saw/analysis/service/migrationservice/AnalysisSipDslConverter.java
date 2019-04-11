@@ -130,10 +130,11 @@ public interface AnalysisSipDslConverter {
    * @param store Repository
    * @return SipQuery Object
    */
-  default SipQuery generateSipQuery(String artifactName, JsonObject sqlQueryBuilder, Store store) {
+  default SipQuery generateSipQuery(String artifactName, JsonObject sqlQueryBuilder,
+      JsonArray artifactsArray, Store store) {
     SipQuery sipQuery = new SipQuery();
 
-    sipQuery.setArtifacts(generateArtifactsList(artifactName, sqlQueryBuilder));
+    sipQuery.setArtifacts(generateArtifactsList(artifactName, sqlQueryBuilder, artifactsArray));
 
     String booleanCriteriaValue = sqlQueryBuilder.get("booleanCriteria").getAsString();
     SipQuery.BooleanCriteria booleanCriteria =
@@ -154,10 +155,11 @@ public interface AnalysisSipDslConverter {
    * @param sqlBuilder sqlBuilder Object
    * @return {@link List} of {@link Artifact}
    */
-  default List<Artifact> generateArtifactsList(String artifactName, JsonObject sqlBuilder) {
+  default List<Artifact> generateArtifactsList(String artifactName, JsonObject sqlBuilder,
+      JsonArray artifactsArray) {
     List<Artifact> artifacts = new LinkedList<>();
 
-    Artifact artifact = generateArtifact(artifactName, sqlBuilder);
+    Artifact artifact = generateArtifact(artifactName, sqlBuilder, artifactsArray);
 
     artifacts.add(artifact);
 
@@ -349,11 +351,12 @@ public interface AnalysisSipDslConverter {
    * @param sqlBuilder SqlBuilder Object
    * @return Artifact Object
    */
-  default Artifact generateArtifact(String artifactName, JsonObject sqlBuilder) {
+  default Artifact generateArtifact(String artifactName, JsonObject sqlBuilder,
+      JsonArray artifactsArray) {
     Artifact artifact = new Artifact();
 
     artifact.setArtifactsName(artifactName);
-    artifact.setFields(generateArtifactFields(sqlBuilder));
+    artifact.setFields(generateArtifactFields(sqlBuilder, artifactsArray));
 
     return artifact;
   }
@@ -364,7 +367,8 @@ public interface AnalysisSipDslConverter {
    * @param sqlBuilder SqlBuilder Object
    * @return {@link List} of {@link Field}
    */
-  public abstract List<Field> generateArtifactFields(JsonObject sqlBuilder);
+  public abstract List<Field> generateArtifactFields(JsonObject sqlBuilder,
+      JsonArray artifactsArray);
 
   /**
    * Generates Field.
@@ -372,7 +376,7 @@ public interface AnalysisSipDslConverter {
    * @param fieldObject Old Analysis field definition
    * @return Field Object
    */
-  public abstract Field buildArtifactField(JsonObject fieldObject);
+  public abstract Field buildArtifactField(JsonObject fieldObject, JsonArray artifactsArray);
 
   /**
    * Build only common properties of fields across Charts, Pivots and Reports.
