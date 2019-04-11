@@ -69,6 +69,7 @@ export class CreateRouteDialogComponent {
       filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: [''],
       disableDuplicate: [false],
+      disableConcurrency: [false],
       batchSize: ['', [Validators.required]],
       fileExclusions: ['', this.validatefileExclusion],
       lastModifiedLimitHours:['',Validators.pattern(/^\d*[1-9]\d*$/)]
@@ -152,6 +153,7 @@ export class CreateRouteDialogComponent {
       schedulerExpression: this.crondetails,
       description: data.description,
       disableDuplicate: data.disableDuplicate,
+      disableConcurrency: data.disableConcurrency,
       batchSize: data.batchSize,
       fileExclusions: data.fileExclusions,
       lastModifiedLimitHours:data.lastModifiedLimitHours

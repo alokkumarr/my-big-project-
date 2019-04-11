@@ -21,6 +21,7 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
+import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import java.io.File;
 import java.io.FileFilter;
@@ -521,7 +522,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error("Exception triggered while transferring the file", ex);
       sipLogService.upSertLogForExistingProcessStatus(Long.valueOf(payload.getChannelId()),
                 Long.valueOf(payload.getRouteId()), BisComponentState.HOST_NOT_REACHABLE.value(),
-                BisProcessState.FAILED.value());
+                BisProcessState.FAILED.value(),SourceType.REGULAR.name());
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
       if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
@@ -629,14 +630,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Override
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
-      boolean isDisable) throws SipNestedRuntimeException {
-    CompletableFuture<String> completableFuture 
-            = new CompletableFuture<>();
-    Executors.newCachedThreadPool().submit(() -> {
-      Thread.sleep(500);
-      completableFuture.complete("Hello");
-      return null;
-    });
+      boolean isDisable, String source) throws SipNestedRuntimeException {
     Preconditions.checkNotNull(channelId != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(routeId != null, "payload.getRouteId() cannot be null");
     logger.trace(
@@ -653,6 +647,9 @@ public class SftpServiceImpl extends SipPluginContract {
           objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
           objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
           BisRouteEntity bisRouteEntity = routeEntity.get();
+          
+          
+          
           if (bisRouteEntity.getStatus() > 0) {
             JsonNode nodeEntity = null;
             ObjectNode rootNode = null;
@@ -684,7 +681,14 @@ public class SftpServiceImpl extends SipPluginContract {
               String disableDupFlag = rootNode.get("disableDuplicate").asText();
               isDisable = Boolean.valueOf(disableDupFlag);
               logger.trace("Duplicate has been disabled :" + isDisable);
+            }  
+            JsonNode isConcurrencyNode = rootNode.get("disableConcurrency");
+            Boolean isConcurDisable = null;
+            if (isConcurrencyNode != null) {
+              String isConcurrency = isConcurrencyNode.asText();
+              isConcurDisable = Boolean.valueOf(isConcurrency);
             }
+            
             int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
             if (!rootNode.get("lastModifiedLimitHours").isNull()) {
               String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
@@ -695,32 +699,48 @@ public class SftpServiceImpl extends SipPluginContract {
               }
              
             }
-            logger.trace("invocation of method transferData when "
-                + "directory is availble in destination with location starts here " + sourceLocation
-                + " & file pattern " + filePattern);
-            Thread thread = Thread.currentThread();
-            SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
-            logger.info(
-                "Transfer data started with routeId: " + routeId + " started time: " + new Date());
-            logger.info("Thread Id started with: " + thread);
-            ZonedDateTime fileTransStartTime = ZonedDateTime.now();
-            // Adding to a list has been removed as a part of optimization
-            // SIP-6386
-            transferDataFromChannel(template, sourceLocation, filePattern,
-                destinationLocation, channelId, routeId, fileExclusions,
-                isDisable, lastModifiedHoursLmt);
-            ZonedDateTime fileTransEndTime = ZonedDateTime.now();
-            long durationInMillis =
-                Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
-            logger.info(
-                "Transfer data ended with routeId: " + routeId + " ended time: " + new Date());
-            logger.info("Thread Id ended with: " + thread);
-            logger.info("Total time taken in seconds to complete the process with channel Id: "
-                + channelId + " routeId: " + routeId + ": "
-                + TimeUnit.MILLISECONDS.toSeconds(durationInMillis));
-            logger.trace("invocation of method transferData when "
-                + "directory is availble in destination with location ends here " + sourceLocation
-                + " & file pattern " + filePattern);
+            
+            
+            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId) 
+                     && source.equals(SourceType.REGULAR.name())) {
+            
+              logger.info("Already process running for the route" + routeId 
+                    + "and concurrency disabled hence skipping transfer");
+            
+            } else {
+              logger.trace("invocation of method transferData when "
+                         + "directory is availble in destination with "
+                         + "location starts here " + sourceLocation
+                         + " & file pattern " + filePattern);
+              Thread thread = Thread.currentThread();
+              SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
+              logger.info(
+                         "Transfer data started with routeId: " + routeId 
+                         + " started time: " + new Date());
+              logger.info("Thread Id started with: " + thread);
+              ZonedDateTime fileTransStartTime = ZonedDateTime.now();
+              // Adding to a list has been removed as a part of optimization
+              // SIP-6386
+              transferDataFromChannel(template, sourceLocation, filePattern,
+                         destinationLocation, channelId, routeId, 
+                         fileExclusions, isDisable, source,lastModifiedHoursLmt);
+              ZonedDateTime fileTransEndTime = ZonedDateTime.now();
+              long durationInMillis =
+                         Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
+              logger.info(
+                         "Transfer data ended with routeId: " + routeId 
+                         + " ended time: " + new Date());
+              logger.info("Thread Id ended with: " + thread);
+              logger.info("Total time taken in seconds to complete the "
+                          + "process with channel Id: "
+                         + channelId + " routeId: " + routeId + ": "
+                         + TimeUnit.MILLISECONDS.toSeconds(durationInMillis));
+              logger.trace("invocation of method transferData when "
+                         + "directory is availble in destination with location "
+                         + "ends here " + sourceLocation
+                         + " & file pattern " + filePattern);
+            }
+
           } else {
             logger.trace(bisRouteEntity.getBisRouteSysId() + " has been deactivated");
           }
@@ -735,19 +755,21 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
       sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
-          BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value());
+          BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value(), source);
     }
     logger.trace(
         "TransferData ends here with the channelId " + channelId + " and routeId " + routeId);
     return listOfFiles;
   }
 
+  
+
   /**
    * Transfer files from given directory, recursing into each subdirectory.
    */
   private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, boolean isDisableDuplicate, int filesModifiedInLast)
+      Long routeId, String exclusions, boolean isDisableDuplicate, String source, int filesModifiedInLast)
       throws IOException, ParseException {
     logger.trace("TransferDataFromChannel starts here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -757,7 +779,8 @@ public class SftpServiceImpl extends SipPluginContract {
     // Adding to a list has been removed as a part of optimization
     // SIP-6386
     transferDataFromChannelDirectory(template, sourcelocation, pattern,
-        destinationLocation, channelId, routeId, exclusions, getBatchId(), isDisableDuplicate);
+        destinationLocation, channelId, routeId, exclusions, 
+        getBatchId(), isDisableDuplicate, source);
     ZonedDateTime fileTransEndTime = ZonedDateTime.now();
     long durationInMillis = Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
     logger.trace("Transfer data ended time: " + new Date());
@@ -800,11 +823,11 @@ public class SftpServiceImpl extends SipPluginContract {
       //if(entry.getAttrs().getMTime())
       /* Transfer files from subdirectory */
       String sourcelocationDirectory = sourcelocation + File.separator + entry.getFilename();
+
       // Adding to a list has been removed as a part of optimization
       // SIP-6386
       transferDataFromChannel(template, sourcelocationDirectory, pattern,
-          destinationLocation, channelId, routeId, exclusions, 
-          isDisableDuplicate, filesModifiedInLast);
+          destinationLocation, channelId, routeId, exclusions, isDisableDuplicate, source, filesModifiedInLast);
     }
     logger.trace("TransferDataFromChannel ends here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -816,7 +839,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, String batchId, boolean isDisableDuplicate)
+      Long routeId, String exclusions, String batchId, boolean isDisableDuplicate, String source)
       throws IOException, ParseException {
     ZonedDateTime startTime = ZonedDateTime.now();
     logger.trace("TransferDataFromChannelDirectory starts here with the channelId " + channelId
@@ -868,6 +891,7 @@ public class SftpServiceImpl extends SipPluginContract {
               .trace("file from the source is downnloaded in the location :" + destinationLocation);
           File localDirectory = null;
           final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+          bisDataMetaInfo.setSource(source);
           long lastModifiedDate = 0L;
 
           for (List<LsEntry> entries : result) {
@@ -896,6 +920,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       + "when directory is availble in destination with location starts here "
                       + sourcelocation + " & file pattern " + pattern + " with channel Id "
                       + channelId + " & route Id" + routeId);
+
                   /*
                    * transferDataFromChannel(template, sourcelocation + File.separator +
                    * entry.getFilename(), pattern, destinationLocation, channelId, routeId,
@@ -1241,7 +1266,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
                          BisComponentState.DATA_REMOVED.value());
                     transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
-                          isDisable);
+                          isDisable, SourceType.RETRY.name());
                   } else {
                     logger.trace("Inside isDisable transferData when starts here "
                         + "log.getFileName() is null");
@@ -1278,7 +1303,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   logger
                     .trace("Inside the block of retry when file is not duplicate :" + log.getPid());
                   transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
-                      isDisable);
+                      isDisable, SourceType.RETRY.name());
                 } else {
                   // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
                   // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
@@ -1355,8 +1380,9 @@ public class SftpServiceImpl extends SipPluginContract {
                 }
                 filesInfo.addAll(
                     transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
-                        destinationLocation, channelId, routeId, fileExclusions,
-                        isDisable, lastModifiedHoursLmt));
+                        destinationLocation, channelId, routeId, 
+                        fileExclusions, isDisable, SourceType.RETRY.name(), lastModifiedHoursLmt));
+                
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);
                 logger.info(
@@ -1382,7 +1408,8 @@ public class SftpServiceImpl extends SipPluginContract {
               + " and with process id " + pid,
               ex);
           sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
-              BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value());
+              BisComponentState.HOST_NOT_REACHABLE.value(), 
+              BisProcessState.FAILED.value(), SourceType.RETRY.name());
         }
         break;
       case "jdbc":
