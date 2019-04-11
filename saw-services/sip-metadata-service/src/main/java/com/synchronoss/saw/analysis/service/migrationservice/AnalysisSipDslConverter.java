@@ -12,12 +12,14 @@ import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.Store;
+import com.synchronoss.saw.util.FieldNames;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public interface AnalysisSipDslConverter {
-  public Analysis convert(JsonObject oldAnalysisDefinition);
+  Analysis convert(JsonObject oldAnalysisDefinition);
 
   /**
    * Set all the common parameters across all types of analysis.
@@ -31,56 +33,49 @@ public interface AnalysisSipDslConverter {
       return null;
     }
 
-    analysis.setId(oldAnalysisDefinition.get("id").getAsString());
+    analysis.setId(oldAnalysisDefinition.get(FieldNames.ID).getAsString());
+    analysis.setName(oldAnalysisDefinition.get(FieldNames.NAME).getAsString());
+    analysis.setType(oldAnalysisDefinition.get(FieldNames.TYPE).getAsString());
+    analysis.setModule(oldAnalysisDefinition.get(FieldNames.MODULE).getAsString());
+    analysis.setCreatedBy(oldAnalysisDefinition.get(FieldNames.USER_NAME).getAsString());
+    analysis.setMetricName(oldAnalysisDefinition.get(FieldNames.METRIC_NAME).getAsString());
+    analysis.setSemanticId(oldAnalysisDefinition.get(FieldNames.SEMANTIC_ID).getAsString());
+    analysis.setProjectCode(oldAnalysisDefinition.get(FieldNames.PROJECT_CODE).getAsString());
+    analysis.setCustomerCode(oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).getAsString());
+    analysis.setCreatedTime(oldAnalysisDefinition.get(FieldNames.CREATED_TIMESTAMP).getAsLong());
 
-    if (oldAnalysisDefinition.has("parentAnalysisId")) {
-      String parentAnalysisId = oldAnalysisDefinition.get("parentAnalysisId").getAsString();
+    if (oldAnalysisDefinition.has(FieldNames.EDIT)
+        && !oldAnalysisDefinition.get(FieldNames.EDIT).isJsonNull()) {
+      Boolean designerEdit = oldAnalysisDefinition.get(FieldNames.EDIT).getAsBoolean();
+      analysis.setDesignerEdit(designerEdit);
+    }
 
+    if (oldAnalysisDefinition.has(FieldNames.DESCRIPTION)
+        && !oldAnalysisDefinition.get(FieldNames.DESCRIPTION).isJsonNull()) {
+      analysis.setDescription(oldAnalysisDefinition.get(FieldNames.DESCRIPTION).getAsString());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.CATEGORY_ID)
+        && !oldAnalysisDefinition.get(FieldNames.CATEGORY_ID).isJsonNull()) {
+      analysis.setCategory(oldAnalysisDefinition.get(FieldNames.CATEGORY_ID).getAsString());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.UPDATED_USER_NAME)
+        && !oldAnalysisDefinition.get(FieldNames.UPDATED_USER_NAME).isJsonNull()) {
+      analysis.setModifiedBy(oldAnalysisDefinition.get(FieldNames.UPDATED_USER_NAME).getAsString());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.UPDATED_TIMESTAMP)
+        && !oldAnalysisDefinition.get(FieldNames.UPDATED_TIMESTAMP).isJsonNull()) {
+      analysis.setModifiedTime(oldAnalysisDefinition.get(FieldNames.UPDATED_TIMESTAMP).getAsLong());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.PARENT_ANALYSIS_ID)
+        && !oldAnalysisDefinition.get(FieldNames.PARENT_ANALYSIS_ID).isJsonNull()) {
+      String parentAnalysisId =
+          oldAnalysisDefinition.get(FieldNames.PARENT_ANALYSIS_ID).getAsString();
       analysis.setParentAnalysisId(parentAnalysisId);
     }
-
-    if (oldAnalysisDefinition.has("description")) {
-      analysis.setDescription(oldAnalysisDefinition.get("description").getAsString());
-    }
-
-    if (oldAnalysisDefinition.has("edit")) {
-      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
-
-      analysis.setDesignerEdit(designerEdit);
-    }
-
-    analysis.setSemanticId(oldAnalysisDefinition.get("semanticId").getAsString());
-    analysis.setName(oldAnalysisDefinition.get("name").getAsString());
-
-    analysis.setType(oldAnalysisDefinition.get("type").getAsString());
-
-    if (oldAnalysisDefinition.has("categoryId")) {
-      analysis.setCategory(oldAnalysisDefinition.get("categoryId").getAsString());
-    }
-
-    analysis.setCustomerCode(oldAnalysisDefinition.get("customerCode").getAsString());
-    analysis.setProjectCode(oldAnalysisDefinition.get("projectCode").getAsString());
-    analysis.setModule(oldAnalysisDefinition.get("module").getAsString());
-
-    analysis.setCreatedTime(oldAnalysisDefinition.get("createdTimestamp").getAsLong());
-    analysis.setCreatedBy(oldAnalysisDefinition.get("username").getAsString());
-
-    if (oldAnalysisDefinition.has("updatedTimestamp")) {
-      analysis.setModifiedTime(oldAnalysisDefinition.get("updatedTimestamp").getAsLong());
-    }
-
-    if (oldAnalysisDefinition.has("updatedUserName")) {
-      analysis.setModifiedBy(oldAnalysisDefinition.get("updatedUserName").getAsString());
-    }
-
-    analysis.setMetricName(oldAnalysisDefinition.get("metricName").getAsString());
-
-    if (oldAnalysisDefinition.has("edit")) {
-      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
-
-      analysis.setDesignerEdit(designerEdit);
-    }
-
     return analysis;
   }
 
@@ -91,13 +86,8 @@ public interface AnalysisSipDslConverter {
    * @return Store Object
    */
   default Store buildStoreObject(JsonObject oldAnalysisDefinition) {
-    JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
-    Store store = null;
-    if (esRepository != null) {
-      store = extractStoreInfo(esRepository);
-    }
-
-    return store;
+    JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject(FieldNames.ES_REPOSITORY);
+    return esRepository != null ? extractStoreInfo(esRepository) : null;
   }
 
   /**
@@ -109,13 +99,13 @@ public interface AnalysisSipDslConverter {
   default Store extractStoreInfo(JsonObject esRepository) {
     Store store = new Store();
 
-    if (esRepository.has("storageType")) {
-      store.setStorageType(esRepository.get("storageType").getAsString());
+    if (esRepository.has(FieldNames.STORAGE_TYPE)) {
+      store.setStorageType(esRepository.get(FieldNames.STORAGE_TYPE).getAsString());
     }
 
-    if (esRepository.has("indexName") && esRepository.has("type")) {
-      String index = esRepository.get("indexName").getAsString();
-      String type = esRepository.get("type").getAsString();
+    if (esRepository.has(FieldNames.INDEX_NAME) && esRepository.has(FieldNames.TYPE)) {
+      String index = esRepository.get(FieldNames.INDEX_NAME).getAsString();
+      String type = esRepository.get(FieldNames.TYPE).getAsString();
       store.setDataStore(index + "/" + type);
     }
 
@@ -135,11 +125,10 @@ public interface AnalysisSipDslConverter {
 
     sipQuery.setArtifacts(generateArtifactsList(artifactName, sqlQueryBuilder));
 
-    String booleanCriteriaValue = sqlQueryBuilder.get("booleanCriteria").getAsString();
+    String booleanCriteriaValue = sqlQueryBuilder.get(FieldNames.BOOLEAN_CRITERIA).getAsString();
     SipQuery.BooleanCriteria booleanCriteria =
         SipQuery.BooleanCriteria.fromValue(booleanCriteriaValue);
     sipQuery.setBooleanCriteria(booleanCriteria);
-
     sipQuery.setFilters(generateFilters(sqlQueryBuilder));
     sipQuery.setSorts(generateSorts(artifactName, sqlQueryBuilder));
     sipQuery.setStore(store);
@@ -156,9 +145,7 @@ public interface AnalysisSipDslConverter {
    */
   default List<Artifact> generateArtifactsList(String artifactName, JsonObject sqlBuilder) {
     List<Artifact> artifacts = new LinkedList<>();
-
     Artifact artifact = generateArtifact(artifactName, sqlBuilder);
-
     artifacts.add(artifact);
 
     return artifacts;
@@ -173,8 +160,8 @@ public interface AnalysisSipDslConverter {
   default List<Filter> generateFilters(JsonObject sqlBuilder) {
     List<Filter> filters = new LinkedList<>();
 
-    if (sqlBuilder.has("filters")) {
-      JsonArray filtersArray = sqlBuilder.getAsJsonArray("filters");
+    if (sqlBuilder.has(FieldNames.FILTERS)) {
+      JsonArray filtersArray = sqlBuilder.getAsJsonArray(FieldNames.FILTERS);
 
       for (JsonElement filterElement : filtersArray) {
         filters.add(generateFilter(filterElement.getAsJsonObject()));
@@ -193,37 +180,34 @@ public interface AnalysisSipDslConverter {
   default Filter generateFilter(JsonObject filterObject) {
     Filter filter = new Filter();
 
-    if (filterObject.has("type")) {
-      String typeVal = filterObject.get("type").getAsString();
-
+    if (filterObject.has(FieldNames.TYPE)) {
+      String typeVal = filterObject.get(FieldNames.TYPE).getAsString();
       filter.setType(Filter.Type.fromValue(typeVal));
     }
 
-    if (filterObject.has("tableName")) {
-      filter.setArtifactsName(filterObject.get("tableName").getAsString());
+    if (filterObject.has(FieldNames.TABLE_NAME)) {
+      filter.setArtifactsName(filterObject.get(FieldNames.TABLE_NAME).getAsString());
     }
 
-    if (filterObject.has("isOptional")) {
-      filter.setIsOptional(filterObject.get("isOptional").getAsBoolean());
+    if (filterObject.has(FieldNames.IS_OPTIONAL)) {
+      filter.setIsOptional(filterObject.get(FieldNames.IS_OPTIONAL).getAsBoolean());
     }
 
-    if (filterObject.has("columnName")) {
-      filter.setColumnName(filterObject.get("columnName").getAsString());
+    if (filterObject.has(FieldNames.COLUMN_NAME)) {
+      filter.setColumnName(filterObject.get(FieldNames.COLUMN_NAME).getAsString());
     }
 
-    if (filterObject.has("isRuntimeFilter")) {
-      filter.setIsRuntimeFilter(filterObject.get("isRuntimeFilter").getAsBoolean());
+    if (filterObject.has(FieldNames.IS_RUNTIME_FILTER)) {
+      filter.setIsRuntimeFilter(filterObject.get(FieldNames.IS_RUNTIME_FILTER).getAsBoolean());
     }
 
-    if (filterObject.has("isGlobalFilter")) {
-      filter.setIsGlobalFilter(filterObject.get("isGlobalFilter").getAsBoolean());
+    if (filterObject.has(FieldNames.IS_GLOBAL_FILTER)) {
+      filter.setIsGlobalFilter(filterObject.get(FieldNames.IS_GLOBAL_FILTER).getAsBoolean());
     }
 
-    if (filterObject.has("model")) {
-      JsonObject modelObject = filterObject.getAsJsonObject("model");
-
+    if (filterObject.has(FieldNames.MODEL)) {
+      JsonObject modelObject = filterObject.getAsJsonObject(FieldNames.MODEL);
       Model model = createModel(modelObject);
-
       filter.setModel(model);
     }
 
@@ -240,45 +224,47 @@ public interface AnalysisSipDslConverter {
   default Model createModel(JsonObject modelObject) {
     Model model = new Model();
 
-    if (modelObject.has("booleanCriteria")) {
+    if (modelObject.has(FieldNames.BOOLEAN_CRITERIA)) {
       model.setBooleanCriteria(
-          Model.BooleanCriteria.fromValue(modelObject.get("booleanCriteria").getAsString()));
+          Model.BooleanCriteria.fromValue(
+              modelObject.get(FieldNames.BOOLEAN_CRITERIA).getAsString()));
     }
 
-    if (modelObject.has("preset")) {
-      String presetVal = modelObject.get("preset").getAsString();
+    if (modelObject.has(FieldNames.PRESENT)) {
+      String presetVal = modelObject.get(FieldNames.PRESENT).getAsString();
 
-      if (!presetVal.equalsIgnoreCase("NA")) {
-        model.setPreset(Model.Preset.fromValue(modelObject.get("preset").getAsString()));
+      if (!presetVal.equalsIgnoreCase(FieldNames.NA)) {
+        model.setPreset(Model.Preset.fromValue(modelObject.get(FieldNames.PRESENT).getAsString()));
       }
     }
 
-    if (modelObject.has("operator")) {
-      model.setOperator(Model.Operator.fromValue(modelObject.get("operator").getAsString()));
+    if (modelObject.has(FieldNames.OPERATOR)) {
+      model.setOperator(
+          Model.Operator.fromValue(modelObject.get(FieldNames.OPERATOR).getAsString()));
     }
 
-    if (modelObject.has("value")) {
-      model.setValue(modelObject.get("value").getAsDouble());
+    if (modelObject.has(FieldNames.VALUE)) {
+      model.setValue(modelObject.get(FieldNames.VALUE).getAsDouble());
     }
 
-    if (modelObject.has("otherValue")) {
-      model.setOtherValue(modelObject.get("otherValue").getAsDouble());
+    if (modelObject.has(FieldNames.OTHER_VALUE)) {
+      model.setOtherValue(modelObject.get(FieldNames.OTHER_VALUE).getAsDouble());
     }
 
-    if (modelObject.has("gte")) {
-      model.setGte(modelObject.get("gte").getAsString());
+    if (modelObject.has(FieldNames.GTE)) {
+      model.setGte(modelObject.get(FieldNames.GTE).getAsString());
     }
 
-    if (modelObject.has("lte")) {
-      model.setLte(modelObject.get("lte").getAsString());
+    if (modelObject.has(FieldNames.LTE)) {
+      model.setLte(modelObject.get(FieldNames.LTE).getAsString());
     }
 
-    if (modelObject.has("format")) {
-      model.setFormat(modelObject.get("format").getAsString());
+    if (modelObject.has(FieldNames.FORMAT)) {
+      model.setFormat(modelObject.get(FieldNames.FORMAT).getAsString());
     }
 
-    if (modelObject.has("modelValues")) {
-      JsonArray obj = modelObject.get("modelValues").getAsJsonArray();
+    if (modelObject.has(FieldNames.MODEL_VALUE)) {
+      JsonArray obj = modelObject.get(FieldNames.MODEL_VALUE).getAsJsonArray();
       List<Object> modelValues = new ArrayList<>();
       for (JsonElement arr : obj) {
         modelValues.add(arr.getAsJsonPrimitive());
@@ -299,9 +285,8 @@ public interface AnalysisSipDslConverter {
   default List<Sort> generateSorts(String artifactName, JsonObject sqlBuilder) {
     List<Sort> sorts = new LinkedList<>();
 
-    if (sqlBuilder.has("sorts")) {
-      JsonArray sortsArray = sqlBuilder.getAsJsonArray("sorts");
-
+    if (sqlBuilder.has(FieldNames.SORTS)) {
+      JsonArray sortsArray = sqlBuilder.getAsJsonArray(FieldNames.SORTS);
       for (JsonElement sortsElement : sortsArray) {
         sorts.add(generateSortObject(artifactName, sortsElement.getAsJsonObject()));
       }
@@ -318,25 +303,21 @@ public interface AnalysisSipDslConverter {
    */
   default Sort generateSortObject(String artifactName, JsonObject sortObject) {
     Sort sort = new Sort();
-
     sort.setArtifacts(artifactName);
 
-    if (sortObject.has("order")) {
-      String orderVal = sortObject.get("order").getAsString();
+    if (sortObject.has(FieldNames.TYPE)) {
+      String typeVal = sortObject.get(FieldNames.TYPE).getAsString();
+      sort.setType(Sort.Type.fromValue(typeVal));
+    }
 
+    if (sortObject.has(FieldNames.ORDER)) {
+      String orderVal = sortObject.get(FieldNames.ORDER).getAsString();
       sort.setOrder(Sort.Order.fromValue(orderVal));
     }
 
-    if (sortObject.has("columnName")) {
-      String columnName = sortObject.get("columnName").getAsString();
-
+    if (sortObject.has(FieldNames.COLUMN_NAME)) {
+      String columnName = sortObject.get(FieldNames.COLUMN_NAME).getAsString();
       sort.setColumnName(columnName);
-    }
-
-    if (sortObject.has("type")) {
-      String typeVal = sortObject.get("type").getAsString();
-
-      sort.setType(Sort.Type.fromValue(typeVal));
     }
 
     return sort;
@@ -383,67 +364,63 @@ public interface AnalysisSipDslConverter {
    */
   default Field setCommonFieldProperties(Field field, JsonObject fieldObject) {
 
-    if (fieldObject.has("columnName")) {
-      field.setColumnName(fieldObject.get("columnName").getAsString());
-
+    if (fieldObject.has(FieldNames.COLUMN_NAME)) {
+      field.setColumnName(fieldObject.get(FieldNames.COLUMN_NAME).getAsString());
       // For analysis migration, we will use column name as dataField
       field.setDataField(field.getColumnName());
     }
 
-    if (fieldObject.has("displayName")) {
-      field.setDisplayName(fieldObject.get("displayName").getAsString());
+    if (fieldObject.has(FieldNames.DISPLAY_NAME)) {
+      field.setDisplayName(fieldObject.get(FieldNames.DISPLAY_NAME).getAsString());
     }
 
     // alias and aliasName are used alternatively in different types of analysis.
     // Both should be handled
-    if (fieldObject.has("aliasName")) {
-      String alias = fieldObject.get("aliasName").getAsString();
+    if (fieldObject.has(FieldNames.ALIAS_NAME)) {
+      String alias = fieldObject.get(FieldNames.ALIAS_NAME).getAsString();
 
       if (alias.length() != 0) {
-        field.setAlias(fieldObject.get("aliasName").getAsString());
+        field.setAlias(fieldObject.get(FieldNames.ALIAS_NAME).getAsString());
       }
     }
 
-    if (fieldObject.has("alias")) {
-      String alias = fieldObject.get("alias").getAsString();
+    if (fieldObject.has(FieldNames.ALIAS)) {
+      String alias = fieldObject.get(FieldNames.ALIAS).getAsString();
 
       if (alias.length() != 0) {
-        field.setAlias(fieldObject.get("alias").getAsString());
+        field.setAlias(fieldObject.get(FieldNames.ALIAS).getAsString());
       }
     }
 
-    if (fieldObject.has("aggregate")) {
-      JsonElement aggValElement = fieldObject.get("aggregate");
+    if (fieldObject.has(FieldNames.AGGREGATE)) {
+      JsonElement aggValElement = fieldObject.get(FieldNames.AGGREGATE);
 
       if (!aggValElement.isJsonNull() && aggValElement != null) {
         field.setAggregate(Field.Aggregate.fromValue(aggValElement.getAsString()));
       }
     }
 
-    if (fieldObject.has("groupInterval")) {
-      String groupIntVal = fieldObject.get("groupInterval").getAsString();
+    if (fieldObject.has(FieldNames.GROUP_INTERVAL)) {
+      String groupIntVal = fieldObject.get(FieldNames.GROUP_INTERVAL).getAsString();
 
       field.setGroupInterval(Field.GroupInterval.fromValue(groupIntVal));
     }
 
-    if (fieldObject.has("type")) {
-      String typeVal = fieldObject.get("type").getAsString();
-
+    if (fieldObject.has(FieldNames.TYPE)) {
+      String typeVal = fieldObject.get(FieldNames.TYPE).getAsString();
       field.setType(Field.Type.fromValue(typeVal));
 
       if (field.getType() == Field.Type.DATE) {
-        if (fieldObject.has("dateFormat")) {
-          String dateFormat = fieldObject.get("dateFormat").getAsString();
-
+        if (fieldObject.has(FieldNames.DATE_FORMAT)) {
+          String dateFormat = fieldObject.get(FieldNames.DATE_FORMAT).getAsString();
           field.setDateFormat(dateFormat);
-        } else if (fieldObject.has("format")) {
-          String dateFormat = fieldObject.get("format").getAsString();
-
+        } else if (fieldObject.has(FieldNames.FORMAT)) {
+          String dateFormat = fieldObject.get(FieldNames.FORMAT).getAsString();
           field.setDateFormat(dateFormat);
         }
       } else {
-        if (fieldObject.has("format")) {
-          JsonObject formatObject = fieldObject.getAsJsonObject("format");
+        if (fieldObject.has(FieldNames.FORMAT)) {
+          JsonObject formatObject = fieldObject.getAsJsonObject(FieldNames.FORMAT);
 
           Format format = createFormatObject(formatObject);
           field.setFormat(format);
@@ -465,22 +442,25 @@ public interface AnalysisSipDslConverter {
   default Format createFormatObject(JsonObject formatObject) {
     Format format = new Format();
 
-    if (formatObject.has("precision")) {
-      format.setPrecision(formatObject.get("precision").getAsInt());
+    if (formatObject.has(FieldNames.PRECISION)
+        && !formatObject.get(FieldNames.PRECISION).isJsonNull()) {
+      format.setPrecision(formatObject.get(FieldNames.PRECISION).getAsInt());
     }
-    if (formatObject.has("comma")) {
-      format.setComma(formatObject.get("comma").getAsBoolean());
+    if (formatObject.has(FieldNames.COMMA) && !formatObject.get(FieldNames.COMMA).isJsonNull()) {
+      format.setComma(formatObject.get(FieldNames.COMMA).getAsBoolean());
     }
-    if (formatObject.has("currency")) {
-      format.setCurrency(formatObject.get("currency").getAsString());
+    if (formatObject.has(FieldNames.CURRENCY)
+        && !formatObject.get(FieldNames.CURRENCY).isJsonNull()) {
+      format.setCurrency(formatObject.get(FieldNames.CURRENCY).getAsString());
     }
-    if (formatObject.has("currencySymbol")) {
-      format.setCurrencySymbol(formatObject.get("currencySymbol").getAsString());
+    if (formatObject.has(FieldNames.PERCENTAGE)
+        && !formatObject.get(FieldNames.PERCENTAGE).isJsonNull()) {
+      format.setPercentage(formatObject.get(FieldNames.PERCENTAGE).getAsBoolean());
     }
-    if (formatObject.has("percentage")) {
-      format.setPercentage(formatObject.get("percentage").getAsBoolean());
+    if (formatObject.has(FieldNames.CURRENCY_SYMBOL)
+        && !formatObject.get(FieldNames.CURRENCY_SYMBOL).isJsonNull()) {
+      format.setCurrencySymbol(formatObject.get(FieldNames.CURRENCY_SYMBOL).getAsString());
     }
-
     return format;
   }
 }
