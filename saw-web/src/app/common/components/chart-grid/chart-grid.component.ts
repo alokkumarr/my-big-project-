@@ -35,7 +35,6 @@ interface ReportGridField {
   styleUrls: ['chart-grid.component.scss']
 })
 export class ChartGridComponent implements OnInit {
-  @Input() chartDimension: any;
   @Input() updater: BehaviorSubject<Object[]>;
   @Input('analysis')
   set setAnalysis(analysis: AnalysisChart) {
@@ -83,7 +82,7 @@ export class ChartGridComponent implements OnInit {
       }
     };
     const chart = {
-      height: 400 //this.chartDimension.height
+      height: 580
     };
     this.chartOptions = this._chartService.getChartConfigFor(
       analysis.chartType,
