@@ -10,6 +10,10 @@
   padding: 3px;
 }
 
+.padtop10 {
+  padding-top: 10px;
+}
+
 .add-container {
   max-width: 99%;
   max-height: 100%;
@@ -20,6 +24,28 @@
 
     &__stepper {
       height: 99%;
+
+      &__dxselect {
+        ::ng-deep .mat-form-field-infix {
+          padding: 3px 0;
+        }
+
+        ::ng-deep .mat-form-field-wrapper {
+          padding-bottom: 0px;
+        }
+
+        .dx-texteditor {
+          border: none;
+        }
+
+        ::ng-deep .dx-dropdowneditor-icon {
+          background-color: transparent;
+        }
+      }
+
+      &__errmsg {
+        width: 175px;
+      }
     }
   }
 }

@@ -22,16 +22,12 @@
         <mat-step formGroupName="0" [stepControl]="alertFormArray?.get([0])">
           <ng-template matStepLabel>Name Your Alert</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__item__elm"
-            >
+            <mat-form-field appearance="outline">
               <mat-label>Alert Name</mat-label>
               <input
                 matInput
                 placeholder="Alert Name"
                 formControlName="alertName"
-                required
                 maxlength="18"
               />
               <mat-error
@@ -52,8 +48,51 @@
               >
             </mat-form-field>
 
-            <div class="add-container__body__stepper__item__elm">
-              <button color="primary" mat-button matStepperNext>
+            <mat-form-field appearance="outline">
+              <mat-label>Alert Severity Level</mat-label>
+              <mat-select formControlName="alertSeverity" required>
+                <mat-option value="critical">Critical</mat-option>
+                <mat-option value="medium">Medium</mat-option>
+                <mat-option value="low">Low</mat-option>
+              </mat-select>
+              <mat-error>This field is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Alert Status</mat-label>
+              <mat-select formControlName="activeInd">
+                <mat-option value="true">Active</mat-option>
+                <mat-option value="false">Disabled</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Alert Description</mat-label>
+              <textarea
+                matInput
+                formControlName="alertDescription"
+                maxlength="36"
+              ></textarea>
+              <mat-error
+                *ngIf="
+                  alertFormArray
+                    .get([0])
+                    .controls.alertDescription.hasError('required')
+                "
+                >This field is required</mat-error
+              >
+              <mat-error
+                *ngIf="
+                  alertFormArray
+                    .get([0])
+                    .controls.alertDescription.hasError('maxlength')
+                "
+                >Alert Description cannot exceed 36 characters</mat-error
+              >
+            </mat-form-field>
+
+            <div>
+              <button color="primary" mat-stroked-button matStepperNext>
                 Next
               </button>
             </div>
@@ -61,23 +100,81 @@
         </mat-step>
 
         <mat-step formGroupName="1" [stepControl]="alertFormArray?.get([1])">
-          <ng-template matStepLabel>Select a Datapod</ng-template>
+          <ng-template matStepLabel>Select a metric to monitor</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
-            <mat-form-field appearance="outline">
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect"
+            >
               <mat-label>Datapod</mat-label>
-              <mat-select placeholder="Datapod" formControlName="datapodName">
-                <mat-option value="orders">Orders</mat-option>
-                <mat-option value="sales">Sales</mat-option>
-                <mat-option value="accounts">Accounts</mat-option>
-              </mat-select>
-              <mat-error>This field is required</mat-error>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                required
+                formControlName="datapodId"
+                [items]="datapods$ | async"
+                displayExpr="metricName"
+                valueExpr="id"
+                [searchEnabled]="true"
+                placeholder="Select a Datapod"
+                (onSelectionChanged)="onDatapodSelected($event)"
+              ></dx-select-box>
             </mat-form-field>
+            <mat-error
+              class="add-container__body__stepper__errmsg"
+              fxFlex
+              *ngIf="
+                alertFormArray.get([1]).touched &&
+                alertFormArray.get([1]).controls.datapodId.hasError('required')
+              "
+              ><small>This field is required </small></mat-error
+            >
 
-            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-              <button color="secondary" mat-button matStepperPrevious>
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Metric Name</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                required
+                formControlName="metricName"
+                [items]="metricsList$ | async"
+                displayExpr="displayName"
+                valueExpr="columnName"
+                [searchEnabled]="true"
+                placeholder="Select a Metric"
+                [readOnly]="
+                  alertFormArray
+                    .get([1])
+                    .controls.datapodId.hasError('required')
+                "
+              ></dx-select-box>
+            </mat-form-field>
+            <mat-error
+              class="add-container__body__stepper__errmsg"
+              fxFlex
+              *ngIf="
+                alertFormArray.get([1]).touched &&
+                alertFormArray.get([1]).controls.metricName.hasError('required')
+              "
+              ><small>This field is required </small></mat-error
+            >
+
+            <div fxFlex fxLayout="row" fxLayoutGap="36px" class="padtop10">
+              <button color="secondary" mat-stroked-button matStepperPrevious>
                 Back
               </button>
-              <button color="primary" mat-button matStepperNext>
+              <button color="primary" mat-stroked-button matStepperNext>
                 Next
               </button>
             </div>
@@ -85,64 +182,35 @@
         </mat-step>
 
         <mat-step formGroupName="2" [stepControl]="alertFormArray?.get([2])">
-          <ng-template matStepLabel>Select a Metric</ng-template>
+          <ng-template matStepLabel>Alerting Rule</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
             <mat-form-field appearance="outline">
-              <mat-label>Metric Name</mat-label>
-              <mat-select
-                placeholder="Metric Name"
-                formControlName="metricName"
-              >
-                <mat-option value="primary">Primary</mat-option>
-                <mat-option value="accent">Accent</mat-option>
-                <mat-option value="warn">Warn</mat-option>
+              <mat-label>Aggregation </mat-label>
+              <mat-select formControlName="aggregation">
+                <mat-option
+                  *ngFor="let aggr of alertAggregations"
+                  [value]="aggr.value"
+                  >{{ aggr.name }}</mat-option
+                >
               </mat-select>
               <mat-error>This field is required</mat-error>
             </mat-form-field>
 
-            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-              <button color="secondary" mat-button matStepperPrevious>
-                Back
-              </button>
-              <div fxFlex></div>
-              <button color="primary" mat-button matStepperNext>
-                Next
-              </button>
-            </div>
-          </div>
-        </mat-step>
-
-        <mat-step formGroupName="3" [stepControl]="alertFormArray?.get([3])">
-          <ng-template matStepLabel>Select a Operator</ng-template>
-          <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
             <mat-form-field appearance="outline">
               <mat-label>Operator Name</mat-label>
               <mat-select
                 placeholder="Operator Name"
-                formControlName="operatorName"
+                formControlName="operator"
               >
-                <mat-option value="gt">Greater Than</mat-option>
-                <mat-option value="lt">Less Than</mat-option>
-                <mat-option value="eq">Equal To</mat-option>
+                <mat-option
+                  *ngFor="let op of alertOperators"
+                  [value]="op.value"
+                  >{{ op.name }}</mat-option
+                >
               </mat-select>
               <mat-error>This field is required</mat-error>
             </mat-form-field>
 
-            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-              <button color="secondary" mat-button matStepperPrevious>
-                Back
-              </button>
-              <div fxFlex></div>
-              <button color="primary" mat-button matStepperNext>
-                Next
-              </button>
-            </div>
-          </div>
-        </mat-step>
-
-        <mat-step formGroupName="4" [stepControl]="alertFormArray?.get([4])">
-          <ng-template matStepLabel>Enter Threshold Value</ng-template>
-          <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
             <mat-form-field appearance="outline">
               <mat-label>Threshold Value</mat-label>
               <input
@@ -154,7 +222,7 @@
               <mat-error
                 *ngIf="
                   alertFormArray
-                    .get([4])
+                    .get([2])
                     .controls.thresholdValue.hasError('required')
                 "
                 >This field is required</mat-error
@@ -162,19 +230,25 @@
               <mat-error
                 *ngIf="
                   alertFormArray
-                    .get([4])
+                    .get([2])
                     .controls.thresholdValue.hasError('pattern')
                 "
                 >Only numbers are allowed for Threshold Value.</mat-error
               >
             </mat-form-field>
 
-            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-              <button color="secondary" mat-button matStepperPrevious>
+            <div
+              fxFlex
+              fxLayout="row"
+              fxLayoutAlign="space-between center"
+              fxLayoutGap="36px"
+              class="padtop10"
+            >
+              <button color="secondary" mat-stroked-button matStepperPrevious>
                 Back
               </button>
               <div fxFlex></div>
-              <button color="primary" mat-button matStepperNext>
+              <button color="primary" mat-stroked-button matStepperNext>
                 Next
               </button>
             </div>
@@ -189,7 +263,7 @@
             }}</pre>
           </code>
 
-          <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+          <div fxFlex fxLayout="row" fxLayoutGap="36px" class="padtop10">
             <button color="primary" mat-stroked-button matStepperPrevious>
               Back
             </button>

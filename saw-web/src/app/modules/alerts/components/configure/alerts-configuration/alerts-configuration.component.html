@@ -50,7 +50,77 @@
       </button>
     </div>
     <div fxFlex class="conf-container-content__body mat-elevation-z3">
-      Content
+      <dx-data-grid
+        fxFlex
+        e2e=""
+        [dataSource]="sourceData"
+        [showBorders]="false"
+        [columnAutoWidth]="false"
+        [showColumnLines]="false"
+        [showRowLines]="true"
+        keyExpr="bisChannelSysId"
+        [rowAlternationEnabled]="false"
+      >
+        <dxo-selection mode="single"></dxo-selection>
+        <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
+        <dxo-search-panel
+          [visible]="true"
+          [width]="220"
+          placeholder="Search..."
+        ></dxo-search-panel>
+        <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+        <dxi-column
+          caption="Alert Name"
+          dataField="channelName"
+          alignment="left"
+          cellTemplate="nameTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Alert Description"
+          dataField="hostName"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="Actions"
+          dataField="bisRouteSysId"
+          alignment="center"
+          cellTemplate="actionsTemplate"
+          [allowFiltering]="false"
+          [allowSorting]="false"
+        >
+        </dxi-column>
+        <div
+          *dxTemplate="let data of 'actionsTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          <button
+            mat-icon-button
+            i18n-matTooltip
+            [attr.e2e]="data.data.status"
+            class="grid-icon-btn"
+            [color]="data.data.status ? 'error' : 'primary'"
+            [matTooltip]="data.data.status ? 'Deactivate' : 'Activate'"
+            (click)="toggleChannelActivation(data.data)"
+          >
+            <mat-icon fontIcon="icon-logout"></mat-icon>
+          </button>
+        </div>
+        <div *dxTemplate="let data of 'sourceTypeTemplate'">
+          <div
+            fxHide.lt-lg="true"
+            class="master-detail-caption"
+            e2e="current-source-name"
+          >
+            {{ selectedSourceType | uppercase }}
+          </div>
+        </div>
+        <div *dxTemplate="let data of 'nameTemplate'">
+          <div class="s-name" [attr.e2e]="data.value" [matTooltip]="data.value">
+            {{ data.value }}
+          </div>
+        </div>
+      </dx-data-grid>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
