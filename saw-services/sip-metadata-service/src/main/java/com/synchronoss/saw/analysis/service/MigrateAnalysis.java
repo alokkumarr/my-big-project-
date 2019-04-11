@@ -150,7 +150,7 @@ public class MigrateAnalysis {
     String analysisFile = args[0];
     System.out.println("Convert analysis from file = " + analysisFile);
 
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
     File jsonFile = new File(analysisFile);
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
