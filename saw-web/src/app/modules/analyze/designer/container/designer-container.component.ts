@@ -1,4 +1,11 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
@@ -10,7 +17,9 @@ import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
-import { Store } from '@ngxs/store';
+import { Store, Select } from '@ngxs/store';
+import { Observable, Subscription } from 'rxjs';
+import { takeWhile, finalize, map as map$ } from 'rxjs/operators';
 
 import {
   flattenPivotData,
@@ -36,9 +45,11 @@ import {
   DesignerChangeEvent,
   DesignerSaveEvent,
   AnalysisReport,
+  ArtifactColumnChart,
   MapSettings,
-  ArtifactColumnChart
+  isDSLAnalysis
 } from '../types';
+import { AnalysisDSL } from '../../../../models';
 import {
   DesignerStates,
   FLOAT_TYPES,
@@ -46,15 +57,31 @@ import {
   DATE_TYPES,
   DEFAULT_MAP_SETTINGS
 } from '../consts';
+import moment from 'moment';
 
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../../../common/services/chart.service';
+import { AnalyzeService } from '../../services/analyze.service';
 import { JwtService } from '../../../../common/services';
 
 import {
   DesignerClearGroupAdapters,
-  DesignerInitGroupAdapters
+  DesignerInitGroupAdapters,
+  DesignerInitNewAnalysis,
+  DesignerInitEditAnalysis,
+  DesignerInitForkAnalysis,
+  DesignerUpdateAnalysisChartTitle,
+  DesignerUpdateAnalysisChartInversion,
+  DesignerUpdateAnalysisChartLegend,
+  DesignerUpdateAnalysisChartLabelOptions,
+  DesignerUpdateAnalysisMetadata,
+  DesignerUpdateAnalysisChartType,
+  DesignerUpdateSorts,
+  DesignerUpdateFilters,
+  DesignerUpdatebooleanCriteria
 } from '../actions/designer.actions';
+import { DesignerState } from '../state/designer.state';
+import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -63,13 +90,23 @@ const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
   templateUrl: './designer-container.component.html',
   styleUrls: ['./designer-container.component.scss']
 })
-export class DesignerContainerComponent implements OnInit {
+export class DesignerContainerComponent implements OnInit, OnDestroy {
   @Input() public analysisStarter?: AnalysisStarter;
-  @Input() public analysis?: Analysis;
+  @Input() public analysis?: Analysis | AnalysisDSL;
   @Input() public designerMode: DesignerMode;
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
+  @Select(state => state.designerState.analysis) dslAnalysis$: Observable<
+    AnalysisDSL
+  >;
+  dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.sipQuery.sorts)
+  );
+  chartType$: Observable<string> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.chartOptions.chartType)
+  );
+
   public isInDraftMode = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
@@ -85,16 +122,32 @@ export class DesignerContainerComponent implements OnInit {
   public isInQueryMode = false;
   public chartTitle = '';
   public fieldCount: number;
+  private subscriptions: Subscription[] = [];
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
+
+  get chartType(): string {
+    return isDSLAnalysis(this.analysis)
+      ? this._store.selectSnapshot(DesignerState).analysis.chartOptions
+          .chartType
+      : (<AnalysisChart>this.analysis).chartType;
+  }
 
   constructor(
     public _designerService: DesignerService,
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
+    public _analyzeService: AnalyzeService,
     private _store: Store,
     private _jwtService: JwtService
-  ) {}
+  ) {
+    window['designer'] = this;
+    window['DesignerState'] = DesignerState;
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
+  }
 
   ngOnInit() {
     const isReport = ['report', 'esReport'].includes(
@@ -112,6 +165,8 @@ export class DesignerContainerComponent implements OnInit {
       );
       break;
     case 'edit':
+      isDSLAnalysis(this.analysis) &&
+        this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
       this.initExistingAnalysis();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.layoutConfiguration = this.getLayoutConfiguration(
@@ -138,7 +193,7 @@ export class DesignerContainerComponent implements OnInit {
     }
   }
 
-  getLayoutConfiguration(analysis: Analysis | AnalysisStarter) {
+  getLayoutConfiguration(analysis: Analysis | AnalysisStarter | AnalysisDSL) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'report':
@@ -154,29 +209,58 @@ export class DesignerContainerComponent implements OnInit {
 
   initNewAnalysis() {
     const { type, semanticId } = this.analysisStarter;
-    return this._designerService
-      .createAnalysis(semanticId, type)
-      .then((newAnalysis: Analysis) => {
-        this.analysis = { ...this.analysisStarter, ...newAnalysis };
-        if (!this.analysis.sqlBuilder) {
-          this.analysis.sqlBuilder = {
-            joins: []
-          };
+    const artifacts$ = this._analyzeService.getArtifactsForDataSet(semanticId);
+    const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
+
+    return Promise.all([artifacts$, newAnalysis$]).then(
+      ([artifacts, newAnalysis]) => {
+        this.analysis = {
+          ...this.analysisStarter,
+          ...(newAnalysis['analysis'] || newAnalysis),
+          artifacts
+        };
+
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
+
+        if (!isDSLAnalysis(this.analysis)) {
+          this.analysis.edit = this.analysis.edit || false;
+          this.analysis.supports = this.analysisStarter.supports;
+          !this.analysis.sqlBuilder &&
+            (this.analysis.sqlBuilder = {
+              joins: []
+            });
+        } else if (this.analysis.type === 'chart') {
+          this._store.dispatch(
+            new DesignerUpdateAnalysisChartType(this.analysisStarter.chartType)
+          );
         }
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.initAuxSettings();
-        this.analysis.edit = this.analysis.edit || false;
-        this.analysis.supports = this.analysisStarter.supports;
         unset(this.analysis, 'categoryId');
-      });
+      }
+    );
+  }
+
+  generateDSLDateFilters(filters) {
+    forEach(filters, filtr => {
+      if (filtr.type === 'date' && filtr.model.operator === 'BTW') {
+        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
+        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
+      }
+    });
+    return filters;
   }
 
   initExistingAnalysis() {
-    const sqlBuilder = this.analysis.sqlBuilder;
+    const queryBuilder = isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery
+      : this.analysis.sqlBuilder;
     this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-    this.filters = sqlBuilder.filters;
-    this.sorts = sqlBuilder.sorts || sqlBuilder.orderByColumns;
-    this.booleanCriteria = sqlBuilder.booleanCriteria;
+    this.filters = queryBuilder.filters;
+    this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
+    this.booleanCriteria = queryBuilder.booleanCriteria;
     this.isInQueryMode = this.analysis.edit;
 
     this.initAuxSettings();
@@ -188,32 +272,40 @@ export class DesignerContainerComponent implements OnInit {
   initAuxSettings() {
     /* prettier-ignore */
     switch (this.analysis.type) {
-    case 'chart':
-      this._chartService.updateAnalysisModel(this.analysis);
-      if (this.designerMode === 'new') {
-        (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
-      }
-      this.chartTitle = this.analysis.chartTitle || this.analysis.name;
+      case 'chart':
+        this._chartService.updateAnalysisModel(this.analysis);
+        if (this.designerMode === 'new') {
+          (<any>this.analysis).isInverted = this.chartType === 'bar';
+        }
+        this.chartTitle = isDSLAnalysis(this.analysis)
+          ? this.analysis.chartOptions.chartTitle || this.analysis.name
+          : (this.chartTitle = this.analysis.chartTitle || this.analysis.name);
 
-      const chartOnlySettings = {
-        legend: (<any>this.analysis).legend,
-        labelOptions: (<any>this.analysis).labelOptions || {},
-        isInverted: (<any>this.analysis).isInverted
-      };
+          const chartOnlySettings = {
+          legend: isDSLAnalysis(<any>this.analysis)
+            ? (<any>this.analysis).chartOptions.legend
+            : (<any>this.analysis).legend,
+          labelOptions: isDSLAnalysis(<any>this.analysis)
+            ? (<any>this.analysis).chartOptions.labelOptions
+            : (<any>this.analysis).labelOptions || {},
+          isInverted: isDSLAnalysis(<any>this.analysis)
+            ? (<any>this.analysis).chartOptions.isInverted
+            : (<any>this.analysis).isInverted
+        };
 
-      this.auxSettings = {
-        ...this.auxSettings,
-        ...chartOnlySettings
-      };
-      break;
-    case 'map':
-      const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
-      this.auxSettings = {
-        ...this.auxSettings,
-        ...mapOnlySettings
-      };
-      this.analysis.mapSettings = this.auxSettings;
-      break;
+        this.auxSettings = {
+          ...this.auxSettings,
+          ...chartOnlySettings
+        };
+        break;
+      case 'map':
+        const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
+        this.auxSettings = {
+          ...this.auxSettings,
+          ...mapOnlySettings
+        };
+        this.analysis.mapSettings = this.auxSettings;
+        break;
     }
   }
 
@@ -239,7 +331,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'report':
       forEach(artifacts, table => {
         table.columns = map(table.columns, column => {
-          forEach(this.analysis.sqlBuilder.dataFields, fields => {
+          forEach((<Analysis>this.analysis).sqlBuilder.dataFields, fields => {
             forEach(fields.columns, field => {
               if (field.columnName === column.columnName) {
                 column.checked = true;
@@ -273,6 +365,8 @@ export class DesignerContainerComponent implements OnInit {
         }
       });
     });
+    isDSLAnalysis(this.analysis) &&
+      this._store.dispatch(new DesignerUpdateSorts(this.sorts));
   }
 
   addDefaultSorts() {
@@ -291,6 +385,7 @@ export class DesignerContainerComponent implements OnInit {
         });
       });
     }
+    isDSLAnalysis && this._store.dispatch(new DesignerUpdateSorts(this.sorts));
   }
 
   forkAnalysis() {
@@ -299,18 +394,29 @@ export class DesignerContainerComponent implements OnInit {
     this.analysis = null;
     return this._designerService
       .createAnalysis(semanticId, type)
-      .then((newAnalysis: Analysis) => {
+      .then((newAnalysis: Analysis | AnalysisDSL) => {
         this.analysis = {
           ...analysis,
           ...{
-            id: newAnalysis.id,
-            metric: newAnalysis.metric,
-            createdTimestamp: newAnalysis.createdTimestamp,
-            userId: newAnalysis.userId,
-            userFullName: newAnalysis.userFullName,
-            metricName: newAnalysis.metricName
-          }
+            id: newAnalysis.id
+          },
+          ...(isDSLAnalysis(newAnalysis)
+            ? {
+                id: newAnalysis.id,
+                semanticId: newAnalysis.semanticId,
+                createdTime: newAnalysis.createdTime,
+                createdBy: newAnalysis.createdBy
+              }
+            : {
+                metric: newAnalysis.metric,
+                createdTimestamp: newAnalysis.createdTimestamp,
+                userId: newAnalysis.userId,
+                userFullName: newAnalysis.userFullName,
+                metricName: newAnalysis.metricName
+              })
         };
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
       });
   }
 
@@ -384,44 +490,77 @@ export class DesignerContainerComponent implements OnInit {
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
-      this.requestData();
+      /* If it's a DSL analysis, since we're depending on group adapters
+         to generate sipQuery, wait until group adapters are loaded before
+         requesting data.
+         */
+      if (isDSLAnalysis(this.analysis)) {
+        const subscription = this._store
+          .select(DesignerState.groupAdapters)
+          .pipe(
+            takeWhile(adapters => isEmpty(adapters)),
+            finalize(() => {
+              this.requestData();
+            })
+          )
+          .subscribe();
+        this.subscriptions.push(subscription);
+      } else {
+        this.requestData();
+      }
     } else {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
     }
+  }
+
+  nonDSLAnalysisForRequest(analysis: Analysis): Analysis {
+    const dataFields = analysis.sqlBuilder.dataFields;
+    const filters = analysis.sqlBuilder.filters;
+
+    forEach(dataFields, field => {
+      if (field.checked === 'y' || field.area === 'y') {
+        this.fieldCount++;
+      }
+
+      if (dataFields.length > 1 && field.limitType) {
+        delete field.limitType;
+        delete field.limitValue;
+      }
+    });
+
+    forEach(filters, filt => {
+      if (filt.isRuntimeFilter) {
+        delete filt.model;
+      }
+    });
+
+    this.analysis =
+      this.analysis.type === 'chart'
+        ? this.formulateChartRequest(analysis)
+        : analysis;
+    return <Analysis>this.analysis;
+  }
+
+  dslAnalysisForRequest(): AnalysisDSL {
+    return this._store.selectSnapshot(state => state.designerState.analysis);
   }
 
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
 
-    forEach(this.analysis.sqlBuilder.dataFields, field => {
-      if (field.checked === 'y') {
-        this.fieldCount++;
-      }
+    const requestAnalysis = isDSLAnalysis(this.analysis)
+      ? this.dslAnalysisForRequest()
+      : this.nonDSLAnalysisForRequest(this.analysis);
 
-      if (this.analysis.sqlBuilder.dataFields.length > 1 && field.limitType) {
-        delete field.limitType;
-        delete field.limitValue;
-      }
-    });
-
-    forEach(this.analysis.sqlBuilder.filters, filt => {
-      if (filt.isRuntimeFilter) {
-        delete filt.model;
-      }
-    });
-    this.analysis =
-      this.analysis.type === 'chart'
-        ? this.formulateChartRequest(this.analysis)
-        : this.analysis;
-
-    this._designerService.getDataForAnalysis(this.analysis).then(
+    this._designerService.getDataForAnalysis(requestAnalysis).then(
       response => {
         if (
           this.isDataEmpty(
             response.data,
             this.analysis.type,
-            this.analysis.sqlBuilder
+            (<AnalysisDSL>this.analysis).sipQuery ||
+              (<Analysis>this.analysis).sqlBuilder
           )
         ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
@@ -446,11 +585,11 @@ export class DesignerContainerComponent implements OnInit {
     );
   }
 
-  flattenData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis | AnalysisDSL) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, (<Analysis>analysis).sqlBuilder || (<AnalysisDSL>analysis).sipQuery);
     case 'report':
     case 'esReport':
       return data;
@@ -458,7 +597,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'map':
       return flattenChartData(
         data,
-        analysis.sqlBuilder
+        (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder
       );
     }
   }
@@ -471,6 +610,7 @@ export class DesignerContainerComponent implements OnInit {
       this._analyzeDialogService.openSortDialog(this.sorts, this.artifacts)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
+            this._store.dispatch(new DesignerUpdateSorts(result.sorts));
             this.sorts = result.sorts;
             this.onSettingsChange({ subject: 'sort' });
           }
@@ -481,14 +621,16 @@ export class DesignerContainerComponent implements OnInit {
       this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, supportsGlobalFilters)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
+            this._store.dispatch(new DesignerUpdateFilters(result.filters));
             this.filters = result.filters;
+            this._store.dispatch(new DesignerUpdatebooleanCriteria(result.booleanCriteria));
             this.booleanCriteria = result.booleanCriteria;
             this.onSettingsChange({ subject: 'filter' });
           }
         });
       break;
     case 'preview':
-      this._analyzeDialogService.openPreviewDialog(this.analysis);
+      this._analyzeDialogService.openPreviewDialog(<Analysis>this.analysis);
       break;
     case 'description':
       this._analyzeDialogService
@@ -545,12 +687,27 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   openSaveDialog(): Promise<any> {
-    this.analysis.categoryId =
-      this.designerMode === 'new' || this.designerMode === 'fork'
-        ? this._jwtService.userAnalysisCategoryId
-        : this.analysis.categoryId;
+    if (isDSLAnalysis(this.analysis) && this.designerMode === 'new') {
+      this._store.dispatch(
+        new DesignerUpdateAnalysisMetadata({
+          category: this._jwtService.userAnalysisCategoryId
+        })
+      );
+    } else if (this.designerMode === 'new') {
+      (<Analysis>(
+        this.analysis
+      )).categoryId = this._jwtService.userAnalysisCategoryId;
+    }
+
+    const analysisForSave = isDSLAnalysis(this.analysis)
+      ? this._store.selectSnapshot(state => state.designerState.analysis)
+      : this.analysis;
+
     return this._analyzeDialogService
-      .openSaveDialog(this.analysis, this.designerMode)
+      .openSaveDialog(
+        <Analysis | AnalysisDSL>analysisForSave,
+        this.designerMode
+      )
       .afterClosed()
       .toPromise();
   }
@@ -586,7 +743,7 @@ export class DesignerContainerComponent implements OnInit {
     case 'report':
       partialSqlBuilder = {
         dataFields: this._designerService.generateReportDataField(this.artifacts),
-        joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
+        joins: ((<Analysis>this.analysis).sqlBuilder as SqlBuilderReport).joins
       };
       sortProp = 'orderByColumns';
       break;
@@ -636,7 +793,10 @@ export class DesignerContainerComponent implements OnInit {
   }
 
   checkifSortsApplied(event) {
-    forEach(this.analysis.sqlBuilder.orderByColumns, field => {
+    const query = isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery
+      : this.analysis.sqlBuilder;
+    forEach(query.orderByColumns, field => {
       if (event.column.columnName === field.columnName) {
         field.aggregate = event.column.aggregate;
       }
@@ -675,7 +835,7 @@ export class DesignerContainerComponent implements OnInit {
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
-      // this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
@@ -722,7 +882,11 @@ export class DesignerContainerComponent implements OnInit {
     case 'format':
     case 'aliasName':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
-      this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
+      if (isDSLAnalysis(this.analysis)) {
+        this.analysis.sipQuery = {...this.analysis.sipQuery};
+      } else {
+        this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
+      }
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
@@ -754,107 +918,120 @@ export class DesignerContainerComponent implements OnInit {
   handleOtherChangeEvents(event: DesignerChangeEvent) {
     /* prettier-ignore */
     switch (event.subject) {
-    case 'selectedFields':
-      this.cleanSorts();
-      this.addDefaultSorts();
-      this.artifacts = [...this.artifacts];
-      this.checkNodeForSorts();
-      this.areMinRequirmentsMet = this.canRequestData();
-      this.requestDataIfPossible();
-      break;
-    case 'dateInterval':
-    case 'aggregate':
-    case 'filter':
-    case 'format':
-      this.requestDataIfPossible();
-      break;
-    case 'aliasName':
-      // reload frontEnd
-      this.updateAnalysis();
-      this.artifacts = [...this.artifacts];
-      if (this.analysis.type === 'chart') {
+      case 'selectedFields':
+        this.cleanSorts();
+        this.addDefaultSorts();
+        this.artifacts = [...this.artifacts];
+        this.checkNodeForSorts();
+        this.areMinRequirmentsMet = this.canRequestData();
+        this.requestDataIfPossible();
+        break;
+      case 'dateInterval':
+      case 'aggregate':
+      case 'filter':
+      case 'format':
+        this.artifacts = [...this.artifacts];
+        this.requestDataIfPossible();
+        break;
+      case 'aliasName':
+        // reload frontEnd
+        this.updateAnalysis();
+        this.artifacts = [...this.artifacts];
+        if (this.analysis.type === 'chart') {
+          this.refreshDataObject();
+        }
+        break;
+      case 'sort':
+        this.cleanSorts();
+        this.addDefaultSorts();
+        this.requestDataIfPossible();
+        this.updateAnalysis();
         this.refreshDataObject();
-      }
-      break;
-    case 'sort':
-      this.cleanSorts();
-      this.addDefaultSorts();
-      this.requestDataIfPossible();
-      this.updateAnalysis();
-      this.refreshDataObject();
-      break;
-    case 'comboType':
-      this.updateAnalysis();
-      this.refreshDataObject();
-      break;
-    case 'labelOptions':
-      (<any>this.analysis).labelOptions = event.data.labelOptions;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.refreshDataObject();
-      break;
-    case 'legend':
-      if (!event.data || !event.data.legend) { return; }
-      (<any>this.analysis).legend = event.data.legend;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.artifacts = [...this.artifacts];
-      break;
-    case 'inversion':
-      if (!event.data) { return; }
-      (<any>this.analysis).isInverted = event.data.isInverted;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.artifacts = [...this.artifacts];
-      break;
-    case 'chartTitle':
-      if (!event.data) { return; }
-      this.analysis.chartTitle = event.data.title;
-      this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.artifacts = [...this.artifacts];
-      break;
-    case 'mapSettings':
-      this.auxSettings = event.data.mapSettings;
-      this.analysis.mapSettings = this.auxSettings;
-      break;
-    case 'fetchLimit':
-      this.analysis.sqlBuilder = this.getSqlBuilder();
-      this.requestDataIfPossible();
-      break;
-    case 'region':
-      this.updateAnalysis();
-      this.refreshDataObject();
-      break;
-    case 'chartType':
-      this.changeChartType(event.data);
-      this._store.dispatch(new DesignerClearGroupAdapters());
-      this._store.dispatch(
-        new DesignerInitGroupAdapters(
-          <ArtifactColumnChart[]>this.artifacts[0].columns,
-          this.analysis.type,
-          (<AnalysisChart>this.analysis).chartType
+        break;
+      case 'comboType':
+        this.updateAnalysis();
+        this.refreshDataObject();
+        break;
+      case 'labelOptions':
+      isDSLAnalysis(this.analysis)
+      ? this._store.dispatch(
+          new DesignerUpdateAnalysisChartLabelOptions(event.data.labelOptions)
         )
-      );
-
-      unset(this.analysis, 'chartTitle');
-      this.chartTitle = '';
-      const {align, layout} = this._chartService.initLegend({chartType: (<any>this.analysis).chartType});
-      (<any>this.analysis).legend = {align, layout};
-
-      this.auxSettings = {
-        legend: {align, layout},
-        labelOptions: {},
-        isInverted: false
-      };
-
-      setTimeout(() => {
-        this.analysis.chartTitle = '';
-        this.resetAnalysis();
-      });
-      break;
+      : (<any>this.analysis).labelOptions = event.data.labelOptions;
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.refreshDataObject();
+        break;
+      case 'legend':
+        if (!event.data || !event.data.legend) {
+          return;
+        }
+        isDSLAnalysis(this.analysis)
+        ? this._store.dispatch(
+            new DesignerUpdateAnalysisChartLegend(event.data.legend)
+          )
+        : (<any>this.analysis).legend = event.data.legend;
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.artifacts = [...this.artifacts];
+        break;
+      case 'inversion':
+        if (!event.data) {
+          return;
+        }
+        isDSLAnalysis(this.analysis)
+          ? this._store.dispatch(
+              new DesignerUpdateAnalysisChartInversion(event.data.isInverted)
+            )
+          : ((<any>this.analysis).isInverted = event.data.isInverted);
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.artifacts = [...this.artifacts];
+        break;
+      case 'chartTitle':
+        if (!event.data) {
+          return;
+        }
+        isDSLAnalysis(this.analysis)
+          ? this._store.dispatch(
+              new DesignerUpdateAnalysisChartTitle(event.data.title)
+            )
+          : ((<AnalysisChart>this.analysis).chartTitle = event.data.title);
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.artifacts = [...this.artifacts];
+        break;
+      case 'mapSettings':
+        this.auxSettings = event.data.mapSettings;
+        this.analysis.mapSettings = this.auxSettings;
+        break;
+      case 'fetchLimit':
+        (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
+        this.requestDataIfPossible();
+        break;
+      case 'region':
+        this.updateAnalysis();
+        this.refreshDataObject();
+        break;
+      case 'chartType':
+        this.changeChartType(event.data);
+        this._store.dispatch(new DesignerClearGroupAdapters());
+        this._store.dispatch(
+          new DesignerInitGroupAdapters(
+            <ArtifactColumnChart[]>this.artifacts[0].columns,
+            this.analysis.type,
+            this.chartType
+          )
+        );
+        setTimeout(() => {
+          this.resetAnalysis();
+        });
+        break;
     }
   }
 
   changeChartType(to: string) {
-    const analysis = <AnalysisChart>this.analysis;
-    analysis.chartType = to;
+    if (isDSLAnalysis(this.analysis)) {
+      this._store.dispatch(new DesignerUpdateAnalysisChartType(to));
+    } else {
+      (<AnalysisChart>this.analysis).chartType = to;
+    }
   }
 
   resetAnalysis() {
@@ -903,7 +1080,7 @@ export class DesignerContainerComponent implements OnInit {
         find(sqlBuilder.dataFields || [], field => field.checked === 'y'),
         find(sqlBuilder.nodeFields || [], field => field.checked === 'x'),
         /* prettier-ignore */
-        ...((<any>this.analysis).chartType === 'bubble' ?
+        ...(this.chartType === 'bubble' ?
         [
           find(sqlBuilder.dataFields || [], field => field.checked === 'z')
         ] : [])
@@ -945,7 +1122,7 @@ export class DesignerContainerComponent implements OnInit {
         forEach(artifact.column, col => (col.checked = false));
       });
     }
-    this.analysis.sqlBuilder = this.getSqlBuilder();
+    (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
   }
 
   /**

@@ -48,7 +48,7 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
 
   @Input()
   set sqlBuilder(data: SqlBuilderChart) {
-    this._sqlBuilder = data;
+    this._sqlBuilder = this.sipQueryToSQLBuilderFields(data);
     this.settings = {
       xaxis: filter(
         get(data, 'nodeFields', []),
@@ -104,6 +104,40 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit() {
     this.chartHgt.height = this.getChartHeight();
+  }
+
+  /**
+   * Converts sipQuery to sqlBuilder like object for use in chart service.
+   * This is a non-ideal work-around made until we can locate all the places
+   * we need to change.
+   *
+   * @param {*} queryOrBuilder
+   * @returns {SqlBuilderChart}
+   * @memberof DesignerChartComponent
+   */
+  sipQueryToSQLBuilderFields(queryOrBuilder): SqlBuilderChart {
+    if (queryOrBuilder.nodeFields || queryOrBuilder.dataFields) {
+      return queryOrBuilder;
+    }
+
+    const builderLike: SqlBuilderChart = {
+      dataFields: [],
+      nodeFields: [],
+      filters: queryOrBuilder.filters,
+      booleanCriteria: queryOrBuilder.booleanCriteria
+    };
+
+    (queryOrBuilder.artifacts || []).forEach(table => {
+      (table.fields || []).forEach(column => {
+        if (['y', 'z'].includes(column.area)) {
+          builderLike.dataFields.push(column);
+        } else {
+          builderLike.nodeFields.push(column);
+        }
+      });
+    });
+
+    return builderLike;
   }
 
   /**

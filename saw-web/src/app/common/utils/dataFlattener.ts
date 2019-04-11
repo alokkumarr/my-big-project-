@@ -105,6 +105,9 @@ function getNodeFieldMapChart(nodeFields) {
  * }, ..]
  */
 export function flattenChartData(data, sqlBuilder) {
+  if (sqlBuilder.artifacts) {
+    return data;
+  }
   const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
   const sorts = sqlBuilder.sorts;
 
@@ -126,9 +129,11 @@ export function flattenChartData(data, sqlBuilder) {
 
 export function checkNullinReportData(data) {
   return fpPipe(
-    fpMap(fpMapValues(value => {
-      return value === null ? 'null' : value;
-    }))
+    fpMap(
+      fpMapValues(value => {
+        return value === null ? 'null' : value;
+      })
+    )
   )(data);
 }
 

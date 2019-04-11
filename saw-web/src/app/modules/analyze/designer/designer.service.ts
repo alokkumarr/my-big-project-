@@ -19,6 +19,8 @@ import * as unset from 'lodash/unset';
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
 import { AnalysisType, Analysis } from '../types';
+import { AnalysisDSL } from '../../../models';
+
 import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
@@ -61,7 +63,10 @@ const canAcceptAnyType = () => true;
 export class DesignerService {
   constructor(private _analyzeService: AnalyzeService) {}
 
-  createAnalysis(semanticId: string, type: AnalysisType): Promise<Analysis> {
+  createAnalysis(
+    semanticId: string,
+    type: AnalysisType
+  ): Promise<Analysis | AnalysisDSL> {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 

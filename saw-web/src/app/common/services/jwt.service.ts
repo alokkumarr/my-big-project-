@@ -207,19 +207,19 @@ export class JwtService {
     // tslint:enable
     // parsedJwt.ticket.products[0].productModules.push(insightsModule);
 
-    const ratingsModule = {
-      'prodCode': 'SAWD0000012131',
-      'productModName': 'RATINGS',
-      'productModDesc': 'Ratings Module',
-      'productModCode': 'RATINGS00001',
-      'productModID': '1324244',
-      'moduleURL': 'ratings',
-      'defaultMod': '1',
-      'privilegeCode': 128,
-      'prodModFeature': []
-    };
-    // // tslint:enable
-    parsedJwt.ticket.products[0].productModules.push(ratingsModule);
+    // const ratingsModule = {
+    //   'prodCode': 'SAWD0000012131',
+    //   'productModName': 'RATINGS',
+    //   'productModDesc': 'Ratings Module',
+    //   'productModCode': 'RATINGS00001',
+    //   'productModID': '1324244',
+    //   'moduleURL': 'ratings',
+    //   'defaultMod': '1',
+    //   'privilegeCode': 128,
+    //   'prodModFeature': []
+    // };
+    // // // tslint:enable
+    // parsedJwt.ticket.products[0].productModules.push(ratingsModule);
     return parsedJwt;
   }
 

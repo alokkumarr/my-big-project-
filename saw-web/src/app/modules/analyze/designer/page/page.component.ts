@@ -6,13 +6,15 @@ import {
   EXECUTION_MODES
 } from '../../services/analyze.service';
 import { JwtService } from '../../../../common/services/jwt.service';
-import { DesignerSaveEvent, DesignerMode } from '../types';
+import { DesignerSaveEvent, DesignerMode, isDSLAnalysis } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ExecuteService } from '../../services/execute.service';
+import { Analysis, AnalysisDSL } from '../types';
 import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
+import * as find from 'lodash/find';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -34,6 +36,7 @@ interface NewDesignerQueryParams {
 interface ExistingDesignerQueryParams {
   mode: DesignerMode;
   analysisId: string;
+  isDSLAnalysis: string;
 }
 
 type DesignerQueryParams = NewDesignerQueryParams | ExistingDesignerQueryParams;
@@ -59,8 +62,8 @@ export class DesignerPageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.convertParamsToData(this.route.snapshot
-      .queryParams as DesignerQueryParams);
+    const params = this.route.snapshot.queryParams as DesignerQueryParams;
+    this.convertParamsToData(params);
   }
 
   warnUser() {
@@ -103,7 +106,10 @@ export class DesignerPageComponent implements OnInit {
       ).length;
       if (navigateToList) {
         if (navigateBackTo === 'home') {
-          this.router.navigate(['analyze', analysis.categoryId]);
+          this.router.navigate([
+            'analyze',
+            isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+          ]);
         } else {
           this.locationService.back();
         }
@@ -136,17 +142,53 @@ export class DesignerPageComponent implements OnInit {
     } else {
       const existingAnalysisParams = <ExistingDesignerQueryParams>params;
       this.analyzeService
-        .readAnalysis(existingAnalysisParams.analysisId)
+        .readAnalysis(
+          existingAnalysisParams.analysisId,
+          existingAnalysisParams.isDSLAnalysis === 'true'
+        )
         .then(analysis => {
-          this.analysis = this.forkIfNecessary({
-            ...analysis,
-            name:
-              this.designerMode === 'fork'
-                ? `${analysis.name} Copy`
-                : analysis.name
-          });
+          this.analyzeService
+            .getArtifactsForDataSet(analysis.semanticId)
+            .then(artifacts => {
+              this.analysis = this.forkIfNecessary({
+                ...analysis,
+                artifacts: this.fixArtifactsForSIPQuery(analysis, artifacts),
+                name:
+                  this.designerMode === 'fork'
+                    ? `${analysis.name} Copy`
+                    : analysis.name
+              });
+            });
         });
     }
+  }
+
+  fixArtifactsForSIPQuery(analysis, artifacts) {
+    if (!isDSLAnalysis(analysis)) {
+      return artifacts;
+    }
+
+    analysis.sipQuery.artifacts[0].fields.forEach(field => {
+      const artifactColumn = find(
+        artifacts[0].columns,
+        col => col.columnName === field.columnName
+      );
+
+      if (!artifactColumn) {
+        return;
+      }
+
+      artifactColumn.checked = true;
+      artifactColumn.area = field.area;
+      if (field.aggregate) {
+        artifactColumn.aggregate = field.aggregate;
+      }
+      if (field.dateFormat) {
+        artifactColumn.dateFormat = field.dateFormat;
+      }
+    });
+
+    return artifacts;
   }
 
   /**
@@ -161,10 +203,12 @@ export class DesignerPageComponent implements OnInit {
    * @returns
    * @memberof DesignerPageComponent
    */
-  forkIfNecessary(analysis) {
-    const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId;
+  forkIfNecessary(analysis: Analysis | AnalysisDSL) {
+    const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId.toString();
+    const analysisCategoryId =
+      (isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId) || '';
     if (
-      userAnalysisCategoryId === analysis.categoryId ||
+      userAnalysisCategoryId === analysisCategoryId.toString() ||
       this.designerMode !== 'edit'
     ) {
       /* Analysis is from user's private folder or action is not edit.
@@ -177,8 +221,7 @@ export class DesignerPageComponent implements OnInit {
         ...analysis,
         categoryId: userAnalysisCategoryId,
         parentAnalysisId: analysis.id,
-        parentCategoryId: analysis.categoryId,
-        parentLastModified: analysis.updatedTimestamp || 0
+        parentCategoryId: analysisCategoryId
       };
     }
   }

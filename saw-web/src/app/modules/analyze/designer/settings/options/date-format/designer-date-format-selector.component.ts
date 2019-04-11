@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import * as moment from 'moment';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 import * as get from 'lodash/get';
 import { AnalyzeDialogService } from '../../../../services/analyze-dialog.service';
+import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
+import { Store } from '@ngxs/store';
 import {
   ArtifactColumnChart,
   Format,
@@ -28,7 +29,7 @@ const dateFormatsMap = {
   selector: 'designer-date-format-selector',
   templateUrl: 'designer-date-format-selector.component.html'
 })
-export class DesignerDateFormatSelectorComponent implements OnInit {
+export class DesignerDateFormatSelectorComponent {
   @Output() public change: EventEmitter<
     DesignerChangeEvent
   > = new EventEmitter();
@@ -37,37 +38,53 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
 
   public dateSample: string;
 
-  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
-
-  ngOnInit() {
-    this.changeDateSample();
-  }
+  constructor(
+    private _analyzeDialogService: AnalyzeDialogService,
+    private store: Store
+  ) {}
 
   onFormatChange(format: Format | string) {
     if (format) {
-      this.artifactColumn.format = format;
-      this.changeDateSample();
+      if (this.analysisType === 'chart') {
+        this.artifactColumn.dateFormat = <string>format;
+        this.store.dispatch(
+          new DesignerUpdateArtifactColumn({
+            columnName: this.artifactColumn.columnName,
+            table: this.artifactColumn.table || this.artifactColumn.table,
+            dateFormat: <string>format
+          })
+        );
+      } else {
+        this.store.dispatch(
+          new DesignerUpdateArtifactColumn({
+            columnName: this.artifactColumn.columnName,
+            table: this.artifactColumn.table || this.artifactColumn.table,
+            format
+          })
+        );
+      }
       this.change.emit({ subject: 'format' });
     }
   }
 
   getDateLabel(artifactColumn) {
     const dateFormatsObj = get(dateFormatsMap, `${this.analysisType}.obj`);
-    return get(dateFormatsObj, `[${artifactColumn.format}].label`, '');
+    return get(
+      dateFormatsObj,
+      `[${artifactColumn.dateFormat || artifactColumn.format}].label`,
+      ''
+    );
   }
 
   openDateFormatDialog() {
+    const columnFormat =
+      this.analysisType === 'pivot'
+        ? this.artifactColumn.format
+        : this.artifactColumn.dateFormat;
     const dateFormats = get(dateFormatsMap, `${this.analysisType}.array`);
     this._analyzeDialogService
-      .openDateFormatDialog(<string>this.artifactColumn.format, dateFormats)
+      .openDateFormatDialog(<string>columnFormat, dateFormats)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
-  }
-
-  changeDateSample() {
-    const format = <string>this.artifactColumn.format;
-    if (format) {
-      this.dateSample = moment.utc().format(format);
-    }
   }
 }

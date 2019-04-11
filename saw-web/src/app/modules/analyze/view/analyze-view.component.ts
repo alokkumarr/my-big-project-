@@ -10,7 +10,7 @@ import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { AnalyzeNewDialogComponent } from './new-dialog';
-import { Analysis, AnalyzeViewActionEvent } from './types';
+import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
 
 const VIEW_KEY = 'analyseReportView';
@@ -30,8 +30,8 @@ const SEARCH_CONFIG = [
   styleUrls: ['./analyze-view.component.scss']
 })
 export class AnalyzeViewComponent implements OnInit {
-  public analyses: Analysis[] = [];
-  public filteredAnalyses: Analysis[];
+  public analyses: Array<Analysis | AnalysisDSL> = [];
+  public filteredAnalyses: Array<Analysis | AnalysisDSL>;
   public categoryName: Promise<string>;
   public cronJobs: any;
   public LIST_VIEW = 'list';

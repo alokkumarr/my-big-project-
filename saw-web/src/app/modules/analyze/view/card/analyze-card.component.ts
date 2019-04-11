@@ -6,8 +6,13 @@ import {
   IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../../services/execute.service';
-import { DesignerSaveEvent } from '../../designer/types';
-import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
+import { DesignerSaveEvent, isDSLAnalysis } from '../../designer/types';
+import {
+  Analysis,
+  AnalysisDSL,
+  AnalysisChart,
+  AnalyzeViewActionEvent
+} from '../types';
 import { JwtService } from '../../../../common/services';
 import { generateSchedule } from '../../../../common/utils/cron2Readable';
 import * as isUndefined from 'lodash/isUndefined';
@@ -19,7 +24,7 @@ import * as isUndefined from 'lodash/isUndefined';
 })
 export class AnalyzeCardComponent implements OnInit {
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
-  @Input() analysis: Analysis;
+  @Input() analysis: Analysis | AnalysisDSL;
   @Input() analysisType: string;
   @Input() highlightTerm: string;
   @Input()
@@ -29,7 +34,7 @@ export class AnalyzeCardComponent implements OnInit {
       this.schedule = '';
       return;
     }
-    const {cronExpression, activeTab, timezone} = cron.jobDetails;
+    const { cronExpression, activeTab, timezone } = cron.jobDetails;
     this.schedule = generateSchedule(cronExpression, activeTab, timezone);
   }
 
@@ -51,9 +56,14 @@ export class AnalyzeCardComponent implements OnInit {
 
   ngOnInit() {
     this.canUserFork = this._jwt.hasPrivilege('FORK', {
-      subCategoryId: this.analysis.categoryId
+      subCategoryId: isDSLAnalysis(this.analysis)
+        ? this.analysis.category
+        : this.analysis.categoryId
     });
-    const { type, id, chartType } = this.analysis as AnalysisChart;
+    const { type, id } = this.analysis;
+    const chartType = isDSLAnalysis(this.analysis)
+      ? this.analysis.chartOptions.chartType
+      : (<AnalysisChart>this.analysis).chartType;
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${
       chartType ? `:${chartType}` : ''

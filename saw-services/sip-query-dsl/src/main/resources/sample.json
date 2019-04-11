@@ -91,5 +91,14 @@
       "dataStore": "sampleAlias/sample",
       "storageType": "ES"
     }
-  }
+  },
+  "chartOptions": {
+    "isInverted": false,
+    "legend": {
+      "align": "legend-alignment",
+      "layout": "legend-layout"
+    },
+    "chartType": "chart-type"
+  },
+  "designerEdit": false
 }

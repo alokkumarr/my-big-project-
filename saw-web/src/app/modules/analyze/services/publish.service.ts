@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Analysis } from '../types';
+import { AnalysisDSL } from '../../../models';
 import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
 import { ExecuteService } from './execute.service';
 
@@ -11,7 +12,11 @@ export class PublishService {
     public _executeService: ExecuteService
   ) {}
 
-  publishAnalysis(model, execute = false, type): Promise<Analysis> {
+  publishAnalysis(
+    model,
+    execute = false,
+    type
+  ): Promise<Analysis | AnalysisDSL> {
     if (type === 'schedule') {
       this._analyzeService.changeSchedule(model);
     }

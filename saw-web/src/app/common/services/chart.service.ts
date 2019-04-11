@@ -47,6 +47,13 @@ import {
   CHART_COLORS
 } from '../../modules/analyze/consts';
 
+const removeKeyword = (input: string) => {
+  if (!input) {
+    return input;
+  }
+  return input.replace('.keyword', '');
+};
+
 const LEGEND_POSITIONING = {
   left: {
     name: 'left',
@@ -365,8 +372,10 @@ export class ChartService {
           filter(
             sorts,
             sortF =>
-              (sortF.field ? sortF.field.dataField : sortF.columnName) ===
-              field.columnName
+              (sortF.field
+                ? sortF.field.dataField
+                : removeKeyword(sortF.columnName)) ===
+              removeKeyword(field.columnName)
           )[0] || {};
         categories[k] = fpOrderBy(
           value => this.getSortValue(field, value),
@@ -429,7 +438,9 @@ export class ChartService {
     }
 
     if (DATE_TYPES.includes(field.type)) {
-      const momentDateFormat = this.getMomentDateFormat(field.format);
+      const momentDateFormat = this.getMomentDateFormat(
+        field.dateFormat || field.format
+      );
       return moment(value, momentDateFormat);
     }
 
@@ -441,8 +452,8 @@ export class ChartService {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat }) => {
           const momentDateFormat = this.getMomentDateFormat(dateFormat);
-          dataPoint[columnName] = moment
-            .utc(dataPoint[columnName])
+          dataPoint[removeKeyword(columnName)] = moment
+            .utc(dataPoint[removeKeyword(columnName)])
             .format(momentDateFormat);
         });
       });
@@ -519,7 +530,7 @@ export class ChartService {
       forEach(fields.y, (field, index) => {
         series[index].data.push(
           assign(
-            { y: dataPoint[field.columnName] },
+            { y: dataPoint[removeKeyword(field.columnName)] },
             mapValues(axesFieldNameMap, val => dataPoint[val])
           )
         );
@@ -574,7 +585,7 @@ export class ChartService {
       (accumulator, field) => {
         accumulator[
           typeof field.checked === 'string' ? field.checked : field.area
-        ] = field.columnName;
+        ] = removeKeyword(field.columnName);
         return accumulator;
       },
       {}
@@ -802,7 +813,9 @@ export class ChartService {
           return {
             gridLineWidth: 0,
             opposite: true,
-            columnName: isSingleField ? fields[0].columnName : null,
+            columnName: isSingleField
+              ? removeKeyword(fields[0].columnName)
+              : null,
             title: {
               useHtml: true,
               margin: labelHeight * fields.length,
@@ -823,7 +836,7 @@ export class ChartService {
         if (change.columnName) {
           const fieldIndex = findIndex(
             axisFields,
-            ({ columnName }) => columnName === change.columnName
+            ({ columnName }) => columnName === removeKeyword(change.columnName)
           );
           const style = { color: CHART_COLORS[fieldIndex] };
           change.title.style = change.title.style ? style : null;
@@ -1148,21 +1161,22 @@ export class ChartService {
   filterNumberTypes(attributes) {
     return filter(
       attributes,
-      attr => attr.columnName && NUMBER_TYPES.includes(attr.type)
+      attr => removeKeyword(attr.columnName) && NUMBER_TYPES.includes(attr.type)
     );
   }
 
   filterNonNumberTypes(attributes) {
     return filter(
       attributes,
-      attr => attr.columnName && !NUMBER_TYPES.includes(attr.type)
+      attr =>
+        removeKeyword(attr.columnName) && !NUMBER_TYPES.includes(attr.type)
     );
   }
 
   filterDateTypes(attributes) {
     return filter(
       attributes,
-      attr => attr.columnName && DATE_TYPES.includes(attr.type)
+      attr => removeKeyword(attr.columnName) && DATE_TYPES.includes(attr.type)
     );
   }
 

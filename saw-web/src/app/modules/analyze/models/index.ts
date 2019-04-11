@@ -1,4 +1,6 @@
 export {
+  AnalysisDSL,
+  AnalysisChartDSL,
   Analysis,
   AnalysisChart,
   AnalysisReport,
@@ -6,6 +8,8 @@ export {
   ArtifactColumnChart,
   ArtifactColumnPivot,
   ArtifactColumnReport,
+  ArtifactColumnDSL,
+  ArtifactDSL,
   Artifact,
   Axis,
   Contents,

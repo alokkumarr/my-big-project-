@@ -6,6 +6,7 @@ import {
   AnalysisDialogData,
   AnalysisStarter,
   Analysis,
+  AnalysisDSL,
   DesignerMode,
   Sort,
   Filter,
@@ -46,8 +47,13 @@ export class AnalyzeDialogService {
 
   openAnalysisDialog(data: AnalysisDialogData) {
     const mode = data.designerMode || 'new';
-    const analysisStarter = <any>(data.analysisStarter || {});
-    const analysis = data.analysis ? { analysisId: data.analysis.id } : {};
+    const analysisStarter = data.analysisStarter || {};
+    const analysis = data.analysis
+      ? {
+          analysisId: data.analysis.id,
+          isDSLAnalysis: !!(data.analysis as any).sipQuery
+        }
+      : {};
 
     return this.router.navigate(['analyze/designer'], {
       queryParams: {
@@ -152,7 +158,7 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openSaveDialog(analysis: Analysis, designerMode) {
+  openSaveDialog(analysis: Analysis | AnalysisDSL, designerMode) {
     const data = {
       action: 'save',
       analysis,

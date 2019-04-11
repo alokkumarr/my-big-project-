@@ -1,6 +1,7 @@
 import {
   AnalysisChart,
   AnalysisReport,
+  AnalysisDSL,
   Artifact,
   ArtifactColumnChart,
   ArtifactColumnPivot,
@@ -11,7 +12,8 @@ import {
   Format,
   FilterModel,
   Region,
-  ArtifactColumn
+  ArtifactColumn,
+  ArtifactColumnDSL
 } from './models';
 
 export type ArtifactColumns = ArtifactColumn[];
@@ -20,6 +22,7 @@ export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
   ArtifactColumnReport,
+  AnalysisDSL,
   Sort,
   Format,
   Filter,
@@ -29,7 +32,8 @@ export {
   AnalysisReport,
   AnalysisChart,
   Region,
-  ArtifactColumn
+  ArtifactColumn,
+  ArtifactColumnDSL
 };
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
@@ -43,15 +47,20 @@ export type ChartType =
   | 'bubble';
 
 export type Analysis = AnalysisChart | AnalysisReport;
+export const isDSLAnalysis = (
+  analysis: Analysis | AnalysisDSL
+): analysis is AnalysisDSL => {
+  return (<AnalysisDSL>analysis).sipQuery !== undefined;
+};
 
 export interface AnalysisStarter {
   name?: string;
   description?: string;
   scheduled?: null;
-  semanticId: string;
-  categoryId: string;
-  metricName: string;
-  type: AnalysisType;
+  semanticId?: string;
+  categoryId?: string;
+  metricName?: string;
+  type?: AnalysisType;
   chartType?: ChartType;
   supports?: string[];
 }

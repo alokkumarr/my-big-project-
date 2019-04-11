@@ -6,13 +6,17 @@ import {
   SqlBuilderEsReport,
   Join,
   AnalysisType,
-  MapSettings
+  MapSettings,
+  LabelOptions,
+  Legend,
+  Axis
 } from '../models';
 import { JsPlumbCanvasChangeEvent } from '../../../common/components/js-plumb/types';
 import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisDSL,
   AnalysisChart,
   AnalysisReport,
   Sort,
@@ -23,20 +27,24 @@ import {
   ArtifactColumnReport,
   ArtifactColumn,
   ArtifactColumns,
+  ArtifactColumnDSL,
   IToolbarActionData,
   DesignerToolbarAciton,
   IToolbarActionResult,
   Artifact,
   Format,
   AnalysisDialogData,
-  Region
+  Region,
+  isDSLAnalysis
 } from '../types';
 
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
   ArtifactColumnReport,
+  ArtifactColumnDSL,
   Analysis,
+  AnalysisDSL,
   AnalysisChart,
   AnalysisReport,
   DesignerMode,
@@ -61,7 +69,8 @@ export {
   JsPlumbCanvasChangeEvent,
   AnalysisDialogData,
   Region,
-  MapSettings
+  MapSettings,
+  isDSLAnalysis
 };
 
 export interface ArtifactColumnFilter {
@@ -133,9 +142,20 @@ export interface DesignerChangeEvent {
 
 export interface DesignerSaveEvent {
   requestExecution: boolean;
-  analysis: Analysis;
+  analysis: Analysis | AnalysisDSL;
 }
 
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
+  analysis: AnalysisDSL;
+}
+
+export interface DSLChartOptionsModel {
+  chartType: string;
+  chartTitle: string;
+  isInverted: boolean;
+  legend?: Legend;
+  labelOptions?: LabelOptions;
+  xAxis: Axis;
+  yAxis: Axis;
 }
