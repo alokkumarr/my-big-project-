@@ -1,10 +1,16 @@
 export const ALERT_AGGREGATIONS = [
-  { name: 'Sum', value: 'sum' },
-  { name: 'Average', value: 'avg' },
-  { name: 'Minimum', value: 'min' },
-  { name: 'Maximum', value: 'max' },
-  { name: 'Count', value: 'count' },
-  { name: 'Distinct Count', value: 'distinctCount' }
+  { name: 'Sum', value: 'SUM' },
+  { name: 'Average', value: 'AVG' },
+  { name: 'Minimum', value: 'MIN' },
+  { name: 'Maximum', value: 'MAX' },
+  { name: 'Count', value: 'COUNT' },
+  { name: 'Percentage', value: 'PERCENTAGE' }
+];
+
+export const ALERT_SEVERITY = [
+  { name: 'CRITICAL', value: 'CRITICAL' },
+  { name: 'MEDIUM', value: 'MEDIUM' },
+  { name: 'LOW', value: 'LOW' }
 ];
 
 export const ALERT_OPERATORS = [

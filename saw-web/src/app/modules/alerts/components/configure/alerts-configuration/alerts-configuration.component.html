@@ -24,7 +24,10 @@
           <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
       </div>
-      <add-alert></add-alert>
+      <add-alert
+        *ngIf="sidenav.opened"
+        (onAddAlert)="sidenav.close()"
+      ></add-alert>
     </div>
   </mat-sidenav>
   <mat-sidenav-content fxFlex fxLayout="column" class="conf-container-content">
@@ -43,7 +46,7 @@
         class="conf-container-content__header__addBtn"
         color="primary"
         mat-raised-button
-        e2e="add-alert"
+        e2e="open-add-alert"
         (click)="sidenav.toggle()"
       >
         + Alert
