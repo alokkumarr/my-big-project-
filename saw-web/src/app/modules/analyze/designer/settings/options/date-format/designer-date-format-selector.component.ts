@@ -76,8 +76,7 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
 
   getDateLabel(artifactColumn) {
     const dateFormatsObj = get(dateFormatsMap, `${this.analysisType}.obj`);
-    const format = this.analysisType === 'pivot' ? 'format' : 'dateFormat';
-    return get(dateFormatsObj, `[${artifactColumn[format]}].label`, '');
+    return get(dateFormatsObj, `[${artifactColumn.format}].label`, '');
   }
 
   openDateFormatDialog() {

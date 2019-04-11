@@ -265,8 +265,8 @@ public class Model {
   }
 
   public enum Preset {
-    Yesterday("Yesterday"),
-    Today("Today"),
+    Yesterday("YESTERDAY"),
+    Today("TODAY"),
     YTD("YTD"),
     MTD("MTD"),
     LTM("LTM"),
@@ -294,12 +294,12 @@ public class Model {
 
     @Override
     public String toString() {
-      return this.value;
+      return this.value.toUpperCase();
     }
 
     @JsonValue
     public String value() {
-      return this.value;
+      return this.value.toUpperCase();
     }
 
     /**

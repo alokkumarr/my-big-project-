@@ -324,7 +324,9 @@ public class Field {
     MAX("max"),
     COUNT("count"),
     PERCENTAGE("percentage"),
-    DISTINCT_COUNT("distinctCount");
+    PERCENTAGE_BY_ROW("percentagebyrow"),
+    DISTINCTCOUNT("distinctcount");
+
     private static final Map<String, Aggregate> CONSTANTS = new HashMap<>();
 
     static {
@@ -351,12 +353,12 @@ public class Field {
 
     @Override
     public String toString() {
-      return this.value;
+      return this.value.toLowerCase();
     }
 
     @JsonValue
     public String value() {
-      return this.value;
+      return this.value.toLowerCase();
     }
   }
 
