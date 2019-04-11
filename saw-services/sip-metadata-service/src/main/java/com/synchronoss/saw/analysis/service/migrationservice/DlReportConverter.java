@@ -32,7 +32,7 @@ public class DlReportConverter implements AnalysisSipDslConverter {
     }
 
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
-      JsonArray artifactsArray = oldAnalysisDefinition.getAsJsonArray("artifacts");
+    JsonArray artifactsArray = oldAnalysisDefinition.getAsJsonArray("artifacts");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
       SipQuery sipQuery = buildSipQuery(sqlQueryBuilderObject, artifactsArray);
