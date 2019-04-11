@@ -94,7 +94,7 @@ export class DesignerState {
         alias: field.alias || field.aliasName,
         area: field.area,
         columnName: field.columnName,
-        comboType: field.comboType || 'column',
+        comboType: field.comboType,
         dataField: field.name || field.columnName,
         displayName: field.displayName,
         dateFormat: field.dateFormat,

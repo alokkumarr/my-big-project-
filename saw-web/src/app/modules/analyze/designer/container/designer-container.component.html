@@ -19,7 +19,7 @@
     [artifacts]="artifacts"
     [auxSettings]="auxSettings"
     [analysisType]="analysis.type"
-    [analysisSubtype]="analysis.chartOptions?.chartType || analysis.chartType"
+    [analysisSubtype]="chartType"
     [data]="data"
     [sorts]="analysis.sipQuery ? (dslSorts$ | async) : sorts"
     [filters]="filters"

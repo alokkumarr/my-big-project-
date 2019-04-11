@@ -102,6 +102,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   @Select(state => state.designerState.analysis.sipQuery.sorts)
   dslSorts$: Observable<Sort[]>;
 
+  @Select(state => state.designerState.analysis.chartOptions.chartType)
+  chartType$: Observable<string>;
+
   public isInDraftMode = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
