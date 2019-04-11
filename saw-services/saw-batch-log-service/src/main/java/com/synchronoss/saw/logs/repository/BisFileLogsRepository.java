@@ -30,7 +30,8 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Transactional
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT COUNT(pid)>0 from BisFileLog Logs where Logs.fileName = :fileName "
-      + "and (Logs.mflFileStatus = 'SUCCESS' and Logs.bisProcessState = 'DATA_RECEIVED') ")
+      + "and ( (Logs.mflFileStatus = 'SUCCESS' and Logs.bisProcessState = 'DATA_RECEIVED') or "
+      + "(Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = 'DATA_INPROGRESS')) ")
   boolean isFileNameExists(@Param("fileName") String fileName);
 
   @Query("SELECT Logs from BisFileLog Logs where Logs.fileName = :fileName "
@@ -85,5 +86,10 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
   Integer updateLongRunningTranfers(@Param("minutesForLongProc") Integer minutesForLongProc);
   
+  @Query("SELECT COUNT(pid) from BisFileLog Logs where ( Logs.source = 'REGULAR' "
+        + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "
+        + "'DATA_INPROGRESS' and Logs.routeSysId = :routeId )")
+        Integer countOfInProgress(@Param("routeId") Long routeId);
+
 
 }
