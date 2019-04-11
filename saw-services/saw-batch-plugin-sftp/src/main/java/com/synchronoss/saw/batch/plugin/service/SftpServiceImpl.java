@@ -690,7 +690,8 @@ public class SftpServiceImpl extends SipPluginContract {
             }
             
             int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
-            if (!rootNode.get("lastModifiedLimitHours").isNull()) {
+            if (rootNode.get("lastModifiedLimitHours") != null 
+                &&  !rootNode.get("lastModifiedLimitHours").isNull()) {
               String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
               if (!lastModifiedLimitHours.isEmpty()) {
                 lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
