@@ -94,7 +94,7 @@ public class AlertServiceImpl implements AlertService {
       alertRulesDetails.get().setAlertSeverity(alert.getAlertSeverity());
       alertRulesDetails.get().setDatapodId(alert.getDatapodId());
       alertRulesDetails.get().setMonitoringEntity(alert.getMonitoringEntity());
-      alertRulesDetails.get().setActiveInd(true);
+      alertRulesDetails.get().setActiveInd(Boolean.parseBoolean(alert.getActiveInd()));
       alertRulesDetails.get().setOperator(alert.getOperator());
       alertRulesDetails.get().setModifiedTime(new Date());
       alertRulesDetails.get().setModifiedBy(ticket.getUserFullName());
