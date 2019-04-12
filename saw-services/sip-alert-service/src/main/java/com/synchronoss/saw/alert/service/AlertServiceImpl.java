@@ -234,9 +234,9 @@ public class AlertServiceImpl implements AlertService {
   }
 
   /**
-   * It return readable operator name
+   * It return readable operator name.
    *
-   * @param operator
+   * @param operator Operator
    * @return String
    */
   private String getReadableOperator(Operator operator) {

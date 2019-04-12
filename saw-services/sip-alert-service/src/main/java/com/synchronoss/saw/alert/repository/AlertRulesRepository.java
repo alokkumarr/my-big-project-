@@ -4,7 +4,6 @@ import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface AlertRulesRepository extends JpaRepository<AlertRulesDetails, Long> {
 
@@ -15,7 +14,8 @@ public interface AlertRulesRepository extends JpaRepository<AlertRulesDetails, L
 
   @Query(
       value =
-          "SELECT ALD.* FROM ALERT_RULES_DETAILS ALD, DATAPOD_DETAILS DD,  ALERT_CUSTOMER_DETAILS ACD\n"
+          "SELECT ALD.* FROM ALERT_RULES_DETAILS ALD, DATAPOD_DETAILS DD, ALERT_CUSTOMER_DETAILS "
+              + "ACD "
               + "where ALD.DATAPOD_ID = DD.DATAPOD_ID\n"
               + "AND ACD.ALERT_CUSTOMER_SYS_ID = DD.ALERT_CUSTOMER_SYS_ID\n"
               + "and ACD.CUSTOMER_CODE = ?1",

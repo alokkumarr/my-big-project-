@@ -163,6 +163,7 @@ public class SipAlertController {
     Ticket ticket = getTicket(request);
     return ticket != null ? alertService.retrieveOperatorsDetails(ticket) : null;
   }
+
   /**
    * List Alert rule API by category.
    *
