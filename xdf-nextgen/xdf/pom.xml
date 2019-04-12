@@ -145,7 +145,6 @@
                     <from>bin</from>
                     <excludes>
                       <exclude>templates</exclude>
-                      <exclude>xdf_info</exclude>
                     </excludes>
                   </collect>
                   <ruleset>default</ruleset>
