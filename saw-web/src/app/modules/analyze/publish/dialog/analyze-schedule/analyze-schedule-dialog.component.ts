@@ -281,7 +281,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     if (
       isEmpty(this.emails) &&
       isEmpty(this.ftp) &&
-      // ['chart', 'maps'].includes(this.data.analysis.type)
       !['chart', 'map'].includes(this.data.analysis.type)
     ) {
       this.errorFlagMsg = true;
