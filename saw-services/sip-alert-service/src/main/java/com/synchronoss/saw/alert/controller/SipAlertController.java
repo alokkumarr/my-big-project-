@@ -184,6 +184,7 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "categoryId") String categoryId) {
+
     Ticket ticket = getTicket(request);
     return ticket != null ? alertService.getAlertRulesByCategory(categoryId, ticket) : null;
   }
