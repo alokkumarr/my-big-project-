@@ -107,7 +107,7 @@ public class AlertServiceImpl implements AlertService {
    * Fetch all available alerts for the customer.
    *
    * @param ticket Ticket Id
-   * @return List<AlertRulesDetails>
+   * @return AlertRulesDetails
    */
   @Override
   public List<AlertRulesDetails> retrieveAllAlerts(Ticket ticket) {
