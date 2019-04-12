@@ -7,6 +7,7 @@ import com.synchronoss.saw.alert.entities.AlertCustomerDetails;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.entities.DatapodDetails;
 import com.synchronoss.saw.alert.modal.Alert;
+import com.synchronoss.saw.alert.modal.Operator;
 import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
 import com.synchronoss.saw.alert.repository.AlertRulesRepository;
@@ -205,6 +206,12 @@ public class AlertServiceImpl implements AlertService {
     return true;
   }
 
+  /**
+   * Retrieve operator details.
+   *
+   * @param ticket ticket Id
+   * @return String if matched
+   */
   @Override
   public String retrieveOperatorsDetails(Ticket ticket) {
     List<AlertRulesDetails> rulesDetails = alertRulesRepository.findAll();
@@ -213,12 +220,51 @@ public class AlertServiceImpl implements AlertService {
     if (rulesDetails != null && !rulesDetails.isEmpty()) {
       for (AlertRulesDetails details : rulesDetails) {
         JsonObject object = new JsonObject();
-        object.addProperty(ID, String.valueOf(details.getAlertRulesSysId()));
-        object.addProperty(NAME, details.getOperator().value());
-        elements.add(object);
+        String readableOperator = getReadableOperator(details.getOperator());
+        if (readableOperator != null) {
+          object.addProperty(ID, details.getOperator().value());
+          object.addProperty(NAME, readableOperator);
+          elements.add(object);
+        }
       }
     }
     response.add(OPERATORS, elements);
     return response.toString();
+  }
+
+  /**
+   * It return readable operator name
+   *
+   * @param operator
+   * @return String
+   */
+  private String getReadableOperator(Operator operator) {
+
+    switch (operator) {
+      case EQ:
+        return "Equal To";
+      case GT:
+        return "Greater Than";
+      case LT:
+        return "Less Than";
+      case GTE:
+        return "Greater Than and Equal To";
+      case LTE:
+        return "Less Than and Equal To";
+      case NEQ:
+        return "Not Equal To";
+      case BTW:
+        return "Between";
+      case SW:
+        return "Start With";
+      case EW:
+        return "End With";
+      case CONTAINS:
+        return "Contains";
+      case ISIN:
+        return "Is IN";
+      default:
+        return null;
+    }
   }
 }
