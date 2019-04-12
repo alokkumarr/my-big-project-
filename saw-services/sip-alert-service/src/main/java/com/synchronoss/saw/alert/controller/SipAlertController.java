@@ -1,5 +1,6 @@
 package com.synchronoss.saw.alert.controller;
 
+import com.google.gson.JsonArray;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
@@ -78,9 +79,8 @@ public class SipAlertController {
   public AlertResponse createAlertRule(
       HttpServletRequest request, HttpServletResponse response, @RequestBody Alert alert) {
     AlertResponse alertResponse = new AlertResponse();
-    try {
-      String token = getToken(request);
-      Ticket ticket = TokenParser.retrieveTicket(token);
+    Ticket ticket = getTicket(request);
+    if (ticket != null) {
       alertResponse.setAlert(alertService.createAlertRule(alert, ticket));
       if (alert == null) {
         alertResponse.setMessage("Alert rule definition can't be null for create request");
@@ -88,10 +88,8 @@ public class SipAlertController {
         return alertResponse;
       }
       alertResponse.setMessage("Alert rule created successfully");
-
-    } catch (IllegalAccessException | IOException e) {
-      logger.error("Error occurred while creating the alert list by category", e);
     }
+
     return alertResponse;
   }
 
@@ -115,27 +113,59 @@ public class SipAlertController {
       @PathVariable(name = "id") Long id,
       @RequestBody Alert alert) {
     AlertResponse alertResponse = new AlertResponse();
-    try {
-      String token = getToken(request);
-      Ticket ticket = TokenParser.retrieveTicket(token);
+    Ticket ticket = getTicket(request);
+    if (ticket != null) {
       alertResponse.setAlert(alertService.updateAlertRule(alert, id, ticket));
       if (alert == null) {
         alertResponse.setMessage("Alert rule definition can't be null for create request");
         response.setStatus(400);
         return alertResponse;
       }
-
       alertResponse.setMessage("Alert rule updated successfully");
-
-    } catch (IllegalAccessException | IOException e) {
-      logger.error("Error occurred while updating the alert list by category", e);
     }
 
     return alertResponse;
   }
 
   /**
-   * List Alert rule API.
+   * List All Alert rule API.
+   *
+   * @param request HttpServletRequest
+   * @return Alert
+   */
+  @ApiOperation(value = "", nickname = "List All Alert Rules", notes = "", response = Object.class)
+  @RequestMapping(
+      value = "",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public List<AlertRulesDetails> listAlertRules(HttpServletRequest request) {
+    Ticket ticket = getTicket(request);
+    return ticket != null ? alertService.retrieveAllAlerts(ticket) : null;
+  }
+
+  /**
+   * List All Alert rule API.
+   *
+   * @param request HttpServletRequest
+   * @return Alert
+   */
+  @ApiOperation(
+      value = "/operators",
+      nickname = "List All Alert Rules operators",
+      notes = "",
+      response = Object.class)
+  @RequestMapping(
+      value = "/operators",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public JsonArray listAlertOperators(HttpServletRequest request) {
+    Ticket ticket = getTicket(request);
+    return ticket != null ? alertService.retrieveOperatorsDetails(ticket) : null;
+  }
+  /**
+   * List Alert rule API by category.
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
@@ -151,19 +181,12 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertRulesDetails> listAlertRules(
+  public List<AlertRulesDetails> listAlertRulesByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "categoryId") String categoryId) {
-
-    try {
-      String token = getToken(request);
-      Ticket ticket = TokenParser.retrieveTicket(token);
-      return alertService.getAlertRulesByCategory(categoryId, ticket);
-    } catch (IllegalAccessException | IOException e) {
-      logger.error("Error occurred while fetching the alert list by category");
-    }
-    return null;
+    Ticket ticket = getTicket(request);
+    return ticket != null ? alertService.getAlertRulesByCategory(categoryId, ticket) : null;
   }
 
   /**
@@ -189,15 +212,11 @@ public class SipAlertController {
       @PathVariable(name = "id") Long id) {
 
     AlertResponse alertResponse = new AlertResponse();
-
-    try {
-      String token = getToken(request);
-      Ticket ticket = TokenParser.retrieveTicket(token);
+    Ticket ticket = getTicket(request);
+    if (ticket != null) {
       alertResponse.setAlert(alertService.getAlertRule(id, ticket));
-    } catch (IllegalAccessException | IOException e) {
-      logger.error("Error occurred while fetching the alert details", e);
+      alertResponse.setMessage("Alert rule retrieved successfully");
     }
-    alertResponse.setMessage("Alert rule retrieved successfully");
     return alertResponse;
   }
 
@@ -224,15 +243,27 @@ public class SipAlertController {
       @PathVariable(name = "id") Long id) {
 
     AlertResponse alertResponse = new AlertResponse();
-    try {
-      String token = getToken(request);
-      Ticket ticket = TokenParser.retrieveTicket(token);
+    Ticket ticket = getTicket(request);
+    if (ticket != null) {
       alertService.deleteAlertRule(id, ticket);
       alertResponse.setMessage("Alert rule deleted successfully");
-    } catch (IllegalAccessException | IOException e) {
-      logger.error("Error occurred while fetching the alert details");
     }
-
     return alertResponse;
+  }
+
+  /**
+   * This method to validate jwt token then return the validated ticket for further processing
+   *
+   * @param request
+   * @return Ticket
+   */
+  private Ticket getTicket(HttpServletRequest request) {
+    try {
+      String token = getToken(request);
+      return TokenParser.retrieveTicket(token);
+    } catch (IllegalAccessException | IOException e) {
+      logger.error("Error occurred while fetching the alert details", e);
+    }
+    return null;
   }
 }

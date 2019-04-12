@@ -1,5 +1,6 @@
 package com.synchronoss.saw.alert.service;
 
+import com.google.gson.JsonArray;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.modal.Alert;
@@ -11,6 +12,9 @@ public interface AlertService {
 
   Alert createAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid Alert alert, Ticket token);
+
+  List<AlertRulesDetails> retrieveAllAlerts(
+      @NotNull(message = "Fetch all alerts rule details") Ticket token);
 
   Alert updateAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid Alert alert,
@@ -25,4 +29,7 @@ public interface AlertService {
 
   List<AlertRulesDetails> getAlertRulesByCategory(
       @NotNull(message = "categoryID cannot be null") @NotNull String categoryId, Ticket token);
+
+  JsonArray retrieveOperatorsDetails(
+      @NotNull(message = "Fetch all alerts rule operators details") Ticket token);
 }

@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface AlertRulesRepository extends JpaRepository<AlertRulesDetails, Long> {
 
-  //@Query("SELECT rules from ALERT_RULES_DETAILS rules where rules.CATEGORY = :category ")
+  @Query(
+      value = "SELECT * from ALERT_RULES_DETAILS ARD WHERE ARD.CATEGORY = ?1",
+      nativeQuery = true)
   List<AlertRulesDetails> findByCategory(String category);
 }

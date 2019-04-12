@@ -1,5 +1,7 @@
 package com.synchronoss.saw.alert.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertCustomerDetails;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AlertServiceImpl implements AlertService {
+  private static final String ID = "id";
+  private static final String NAME = "name";
 
   @Autowired AlertRulesRepository alertRulesRepository;
 
@@ -96,6 +100,17 @@ public class AlertServiceImpl implements AlertService {
       alertRulesRepository.save(alertRulesDetails.get());
     }
     return alert;
+  }
+
+  /**
+   * Fetch all available alerts for the customer
+   *
+   * @param ticket
+   * @return
+   */
+  @Override
+  public List<AlertRulesDetails> retrieveAllAlerts(Ticket ticket) {
+    return alertRulesRepository.findAll();
   }
 
   /**
@@ -187,5 +202,20 @@ public class AlertServiceImpl implements AlertService {
     datapodDetails.setAlertCustomerSysId(alertCustomerSysId);
     alertDatapodRepository.save(datapodDetails);
     return true;
+  }
+
+  @Override
+  public JsonArray retrieveOperatorsDetails(Ticket ticket) {
+    List<AlertRulesDetails> rulesDetails = alertRulesRepository.findAll();
+    JsonArray elements = new JsonArray();
+    if (rulesDetails != null && !rulesDetails.isEmpty()) {
+      for (AlertRulesDetails details : rulesDetails) {
+        JsonObject object = new JsonObject();
+        object.addProperty(ID, String.valueOf(details.getAlertRulesSysId()));
+        object.addProperty(NAME, details.getOperator().value());
+        elements.add(object);
+      }
+    }
+    return elements;
   }
 }
