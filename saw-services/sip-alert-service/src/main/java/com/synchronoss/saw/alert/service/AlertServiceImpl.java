@@ -103,10 +103,10 @@ public class AlertServiceImpl implements AlertService {
   }
 
   /**
-   * Fetch all available alerts for the customer
+   * Fetch all available alerts for the customer.
    *
-   * @param ticket
-   * @return
+   * @param ticket Ticket
+   * @return List<AlertRulesDetails>
    */
   @Override
   public List<AlertRulesDetails> retrieveAllAlerts(Ticket ticket) {

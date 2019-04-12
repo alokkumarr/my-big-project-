@@ -252,9 +252,9 @@ public class SipAlertController {
   }
 
   /**
-   * This method to validate jwt token then return the validated ticket for further processing
+   * This method to validate jwt token then return the validated ticket for further processing.
    *
-   * @param request
+   * @param request HttpServletRequest
    * @return Ticket
    */
   private Ticket getTicket(HttpServletRequest request) {
