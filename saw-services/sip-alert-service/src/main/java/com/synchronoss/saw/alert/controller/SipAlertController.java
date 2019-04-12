@@ -1,6 +1,5 @@
 package com.synchronoss.saw.alert.controller;
 
-import com.google.gson.JsonArray;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
@@ -131,7 +130,7 @@ public class SipAlertController {
    * List All Alert rule API.
    *
    * @param request HttpServletRequest
-   * @return Alert
+   * @return AlertRulesDetails
    */
   @ApiOperation(value = "", nickname = "List All Alert Rules", notes = "", response = Object.class)
   @RequestMapping(
@@ -148,7 +147,7 @@ public class SipAlertController {
    * List All Alert rule API.
    *
    * @param request HttpServletRequest
-   * @return Alert
+   * @return String return all operators details
    */
   @ApiOperation(
       value = "/operators",
@@ -160,7 +159,7 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public JsonArray listAlertOperators(HttpServletRequest request) {
+  public String listAlertOperators(HttpServletRequest request) {
     Ticket ticket = getTicket(request);
     return ticket != null ? alertService.retrieveOperatorsDetails(ticket) : null;
   }
@@ -169,7 +168,7 @@ public class SipAlertController {
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
-   * @return Alert
+   * @return Alert List of alert rle details
    */
   @ApiOperation(
       value = "/list/{categoryId}",

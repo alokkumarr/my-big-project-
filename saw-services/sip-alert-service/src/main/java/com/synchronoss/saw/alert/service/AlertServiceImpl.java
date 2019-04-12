@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class AlertServiceImpl implements AlertService {
   private static final String ID = "id";
   private static final String NAME = "name";
+  private static final String OPERATORS = "operators";
 
   @Autowired AlertRulesRepository alertRulesRepository;
 
@@ -105,7 +106,7 @@ public class AlertServiceImpl implements AlertService {
   /**
    * Fetch all available alerts for the customer.
    *
-   * @param ticket Ticket
+   * @param ticket Ticket Id
    * @return List<AlertRulesDetails>
    */
   @Override
@@ -205,9 +206,10 @@ public class AlertServiceImpl implements AlertService {
   }
 
   @Override
-  public JsonArray retrieveOperatorsDetails(Ticket ticket) {
+  public String retrieveOperatorsDetails(Ticket ticket) {
     List<AlertRulesDetails> rulesDetails = alertRulesRepository.findAll();
     JsonArray elements = new JsonArray();
+    JsonObject response = new JsonObject();
     if (rulesDetails != null && !rulesDetails.isEmpty()) {
       for (AlertRulesDetails details : rulesDetails) {
         JsonObject object = new JsonObject();
@@ -216,6 +218,7 @@ public class AlertServiceImpl implements AlertService {
         elements.add(object);
       }
     }
-    return elements;
+    response.add(OPERATORS, elements);
+    return response.toString();
   }
 }
