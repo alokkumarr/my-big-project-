@@ -78,6 +78,12 @@ public class BisDataMetaInfo {
   
   @JsonProperty("fileTransferDuration")
   private Long fileTransferDuration;
+  
+  @JsonProperty("source")
+  private String source;
+
+
+
 
   public Date getFileTransferStartTime() {
     return fileTransferStartTime;
@@ -247,6 +253,13 @@ public class BisDataMetaInfo {
     this.destinationPath = destinationPath;
   }
 
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
 
 
 }

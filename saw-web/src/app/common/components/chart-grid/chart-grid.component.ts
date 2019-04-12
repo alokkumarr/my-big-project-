@@ -35,7 +35,6 @@ interface ReportGridField {
   styleUrls: ['chart-grid.component.scss']
 })
 export class ChartGridComponent implements OnInit {
-
   @Input() updater: BehaviorSubject<Object[]>;
   @Input('analysis')
   set setAnalysis(analysis: AnalysisChart) {
@@ -63,7 +62,7 @@ export class ChartGridComponent implements OnInit {
     this.customizeColumns = this.customizeColumns.bind(this);
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   customizeColumns(columns) {
     forEach(columns, (col: ReportGridField) => {
@@ -101,11 +100,11 @@ export class ChartGridComponent implements OnInit {
             ? moment
                 .utc(value)
                 .format(
-                  column.dateFormat === 'MMM d YYYY'
+                  column.format === 'MMM d YYYY'
                     ? 'MMM DD YYYY'
-                    : column.dateFormat === 'MMMM d YYYY, h:mm:ss a'
-                      ? 'MMMM DD YYYY, h:mm:ss a'
-                      : column.dateFormat
+                    : column.format === 'MMMM d YYYY, h:mm:ss a'
+                    ? 'MMMM DD YYYY, h:mm:ss a'
+                    : column.format
                 )
             : value;
         if (

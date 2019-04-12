@@ -429,7 +429,7 @@ export class ChartService {
     }
 
     if (DATE_TYPES.includes(field.type)) {
-      const momentDateFormat = this.getMomentDateFormat(field.dateFormat);
+      const momentDateFormat = this.getMomentDateFormat(field.format);
       return moment(value, momentDateFormat);
     }
 
@@ -468,11 +468,12 @@ export class ChartService {
     if (aggregate === 'percentage' || aggregate === 'percentageByRow') {
       aggrSymbol = '%';
     }
+    const nameWithAggregate =
+      aggregate === 'sum'
+        ? `Total ${displayName}`
+        : `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`;
     return {
-      name:
-        alias ||
-        aliasName ||
-        `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
+      name: alias || aliasName || nameWithAggregate,
       aggrSymbol,
       aggregate,
       type: splinifiedChartType,

@@ -61,3 +61,4 @@ bis:
   scheduler-url: http://localhost:9601
   recheck-file-modified: false
   destination-fs-user: mapr
+  duplicate-entry: true

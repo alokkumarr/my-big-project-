@@ -246,6 +246,12 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             // Done with writing - safe to rename batch directory
             finalizeBatch(strTmpPath, path);
         } //<-- if(basePath != null && !basePath.isEmpty())
+
+        /* Alert metrics collection */
+        if (logger.isTraceEnabled()) {
+          logger.trace("Alert metrics to be be collected: " + df.count());
+        }
+
         return 0;
     }
 
