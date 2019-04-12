@@ -12,6 +12,9 @@ public interface AlertService {
   Alert createAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid Alert alert, Ticket token);
 
+  List<AlertRulesDetails> retrieveAllAlerts(
+      @NotNull(message = "Fetch all alerts rule details") Ticket token);
+
   Alert updateAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid Alert alert,
       Long alertRuleId,
@@ -25,4 +28,7 @@ public interface AlertService {
 
   List<AlertRulesDetails> getAlertRulesByCategory(
       @NotNull(message = "categoryID cannot be null") @NotNull String categoryId, Ticket token);
+
+  String retrieveOperatorsDetails(
+      @NotNull(message = "Fetch all alerts rule operators details") Ticket token);
 }

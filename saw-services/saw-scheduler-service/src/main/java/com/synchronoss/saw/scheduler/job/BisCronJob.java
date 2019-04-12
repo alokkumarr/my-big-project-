@@ -1,9 +1,10 @@
 package com.synchronoss.saw.scheduler.job;
 
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
+
 import java.util.Date;
+
 import org.quartz.InterruptableJob;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -11,7 +12,6 @@ import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
@@ -31,11 +31,12 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
 
   @Override
+  // @Transactional
   protected void executeInternal(JobExecutionContext jobExecutionContext)
       throws JobExecutionException {
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
     JobKey key = jobDetail.getKey();
-    logger.info("Cron Job started with key :" + key.getName() + ", Group :" + key.getGroup()
+    logger.info("Cron Job started with key after :" + key.getName() + ", Group :" + key.getGroup()
         + " , Thread Name :" + Thread.currentThread().getName() + " ,Time now :" + new Date());
     BisSchedulerJobDetails jobRequest =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
@@ -43,9 +44,12 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
     try {
       restTemplate.postForLocation(bisTransferUrl, jobRequest);
     } catch (Exception exception) {
-      logger.error("Error during file transfer for the schedule. "
-          + "Refer Batch Ingestion logs for more details", 
-          exception.getMessage());
+      /**
+       * As BIS is async process for larger files async timesout. 
+       * This can be ignored.
+       */
+      logger.info("Async BIS transfer still running"
+          + exception.getMessage());
     }
     
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");

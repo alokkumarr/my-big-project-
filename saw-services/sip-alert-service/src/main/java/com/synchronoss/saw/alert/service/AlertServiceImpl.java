@@ -1,10 +1,13 @@
 package com.synchronoss.saw.alert.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertCustomerDetails;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.entities.DatapodDetails;
 import com.synchronoss.saw.alert.modal.Alert;
+import com.synchronoss.saw.alert.modal.Operator;
 import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
 import com.synchronoss.saw.alert.repository.AlertRulesRepository;
@@ -19,6 +22,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AlertServiceImpl implements AlertService {
+  private static final String ID = "id";
+  private static final String NAME = "name";
+  private static final String OPERATORS = "operators";
 
   @Autowired AlertRulesRepository alertRulesRepository;
 
@@ -88,7 +94,7 @@ public class AlertServiceImpl implements AlertService {
       alertRulesDetails.get().setAlertSeverity(alert.getAlertSeverity());
       alertRulesDetails.get().setDatapodId(alert.getDatapodId());
       alertRulesDetails.get().setMonitoringEntity(alert.getMonitoringEntity());
-      alertRulesDetails.get().setActiveInd(true);
+      alertRulesDetails.get().setActiveInd(Boolean.parseBoolean(alert.getActiveInd()));
       alertRulesDetails.get().setOperator(alert.getOperator());
       alertRulesDetails.get().setModifiedTime(new Date());
       alertRulesDetails.get().setModifiedBy(ticket.getUserFullName());
@@ -96,6 +102,18 @@ public class AlertServiceImpl implements AlertService {
       alertRulesRepository.save(alertRulesDetails.get());
     }
     return alert;
+  }
+
+  /**
+   * Fetch all available alerts for the customer.
+   *
+   * @param ticket Ticket Id
+   * @return AlertRulesDetails
+   */
+  @Override
+  public List<AlertRulesDetails> retrieveAllAlerts(Ticket ticket) {
+    String customerCode = ticket.getCustCode();
+    return alertRulesRepository.findByCustomer(customerCode);
   }
 
   /**
@@ -187,5 +205,67 @@ public class AlertServiceImpl implements AlertService {
     datapodDetails.setAlertCustomerSysId(alertCustomerSysId);
     alertDatapodRepository.save(datapodDetails);
     return true;
+  }
+
+  /**
+   * Retrieve operator details.
+   *
+   * @param ticket ticket Id
+   * @return String if matched
+   */
+  @Override
+  public String retrieveOperatorsDetails(Ticket ticket) {
+    List<AlertRulesDetails> rulesDetails = alertRulesRepository.findAll();
+    JsonArray elements = new JsonArray();
+    JsonObject response = new JsonObject();
+    if (rulesDetails != null && !rulesDetails.isEmpty()) {
+      for (AlertRulesDetails details : rulesDetails) {
+        JsonObject object = new JsonObject();
+        String readableOperator = getReadableOperator(details.getOperator());
+        if (readableOperator != null) {
+          object.addProperty(ID, details.getOperator().value());
+          object.addProperty(NAME, readableOperator);
+          elements.add(object);
+        }
+      }
+    }
+    response.add(OPERATORS, elements);
+    return response.toString();
+  }
+
+  /**
+   * It return readable operator name
+   *
+   * @param operator
+   * @return String
+   */
+  private String getReadableOperator(Operator operator) {
+
+    switch (operator) {
+      case EQ:
+        return "Equal To";
+      case GT:
+        return "Greater Than";
+      case LT:
+        return "Less Than";
+      case GTE:
+        return "Greater Than and Equal To";
+      case LTE:
+        return "Less Than and Equal To";
+      case NEQ:
+        return "Not Equal To";
+      case BTW:
+        return "Between";
+      case SW:
+        return "Start With";
+      case EW:
+        return "End With";
+      case CONTAINS:
+        return "Contains";
+      case ISIN:
+        return "Is IN";
+      default:
+        return null;
+    }
   }
 }
