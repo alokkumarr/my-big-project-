@@ -112,7 +112,8 @@ public class AlertServiceImpl implements AlertService {
    */
   @Override
   public List<AlertRulesDetails> retrieveAllAlerts(Ticket ticket) {
-    return alertRulesRepository.findAll();
+    String customerCode = ticket.getCustCode();
+    return alertRulesRepository.findByCustomer(customerCode);
   }
 
   /**
