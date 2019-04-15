@@ -71,7 +71,8 @@ export class CreateRouteDialogComponent {
       disableDuplicate: [false],
       disableConcurrency: [false],
       batchSize: ['', [Validators.required]],
-      fileExclusions: ['', this.validatefileExclusion]
+      fileExclusions: ['', this.validatefileExclusion],
+      lastModifiedLimitHours:['',Validators.pattern(/^\d*[1-9]\d*$/)]
 
     });
   }
@@ -154,7 +155,8 @@ export class CreateRouteDialogComponent {
       disableDuplicate: data.disableDuplicate,
       disableConcurrency: data.disableConcurrency,
       batchSize: data.batchSize,
-      fileExclusions: data.fileExclusions
+      fileExclusions: data.fileExclusions,
+      lastModifiedLimitHours:data.lastModifiedLimitHours
     };
     return routeDetails;
   }
