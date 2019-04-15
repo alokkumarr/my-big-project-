@@ -1,6 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as debounce from 'lodash/debounce';
+import { Store } from '@ngxs/store';
+
+import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
 import { COMBO_TYPES, DATE_TYPES } from '../../../../consts';
 import {
   ArtifactColumn,
@@ -29,7 +32,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public hasDateInterval = false;
   public isDataField = false;
 
-  constructor() {
+  constructor(private _store: Store) {
     this.onAliasChange = debounce(this.onAliasChange, ALIAS_CHANGE_DELAY);
   }
 
@@ -46,16 +49,23 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     this.change.emit({ subject: 'aliasName' });
   }
 
-  onAggregateChange(value) {
+  onAggregateChange(aggregate) {
     this.comboTypes = filter(COMBO_TYPES, type => {
-      if (value === 'percentageByRow' && type.value === 'column') {
+      if (aggregate === 'percentageByRow' && type.value === 'column') {
         return true;
       }
-      if (value !== 'percentageByRow') {
+      if (aggregate !== 'percentageByRow') {
         return true;
       }
     });
-    this.artifactColumn.aggregate = value;
+    const { table, columnName } = this.artifactColumn;
+    this._store.dispatch(
+      new DesignerUpdateArtifactColumn({
+        table,
+        columnName,
+        aggregate
+      })
+    );
     this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
   }
 
