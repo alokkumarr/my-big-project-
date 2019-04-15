@@ -11,6 +11,7 @@ import * as moment from 'moment';
 
 import { ChartService } from '../../services';
 import { AnalysisChart, ArtifactColumnReport } from '../../types';
+import { isUndefined } from 'util';
 
 interface ReportGridField {
   caption: string;
@@ -174,7 +175,12 @@ export class ChartGridComponent implements OnInit {
       ),
       { path: 'title.exportFilename', data: analysis.name },
       { path: 'chart.inverted', data: analysis.isInverted },
-      { path: 'chart.height', data: analysis.chartDimension.height }
+      {
+        path: 'chart.height',
+        data: isUndefined(analysis.chartDimension)
+          ? 580
+          : analysis.chartDimension.height
+      }
     ];
   }
 
