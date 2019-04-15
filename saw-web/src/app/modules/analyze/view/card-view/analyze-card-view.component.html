@@ -2,9 +2,9 @@
      fxLayoutAlign="start start"
 >
   <div *ngFor="let analysis of analyses"
-       fxFlex.gt-md="33"
        fxFlex.md="50"
-       fxFlex="100"
+       fxFlex.lt-md="100"
+       fxFlex.gt-md="33"
   >
     <analyze-card (action)="action.emit($event)"
                     [highlightTerm]="highlightTerm"

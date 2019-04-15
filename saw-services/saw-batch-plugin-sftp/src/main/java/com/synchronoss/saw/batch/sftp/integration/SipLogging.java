@@ -2,6 +2,8 @@ package com.synchronoss.saw.batch.sftp.integration;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.jcraft.jsch.ChannelSftp;
+import com.synchronoss.saw.batch.entities.BisRouteEntity;
+import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisComponentState;
@@ -12,7 +14,10 @@ import com.synchronoss.saw.logs.entities.SipJobEntity;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
+
 import java.io.File;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +45,8 @@ public class SipLogging {
   @Autowired
   private SipJobDataRepository sipJobDataRepository;
 
+  @Autowired
+  private BisRouteDataRestRepository bisRouteDataRestRepository;
 
   /**
    * To make an entry to a log table.
@@ -64,6 +71,7 @@ public class SipLogging {
       bisLog.setTransferDuration(entity.getFileTransferDuration());
       bisLog.setTransferEndTime(entity.getFileTransferEndTime());
       bisLog.setTransferStartTime(entity.getFileTransferStartTime());
+      bisLog.setSource(entity.getSource());
       bisFileLogsRepository.save(bisLog);
     } else {
       logger.trace("inserting logs when process Id is not found :" + pid);
@@ -84,6 +92,7 @@ public class SipLogging {
       bisLog.setTransferDuration(entity.getFileTransferDuration());
       bisLog.setCheckpointDate(new Date());
       bisLog.setCreatedDate(new Date());
+      bisLog.setSource(entity.getSource());
       bisFileLogsRepository.save(bisLog);
     }
     logger.trace("Integrate with logging API to update with a status ends here : "
@@ -116,8 +125,7 @@ public class SipLogging {
   public  void updateLogs(Long channelId, Long routeId, String reasonCode) {
 
     BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
-    bisDataMetaInfo
-        .setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
     bisDataMetaInfo.setDataSizeInBytes(0L);
     bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
     bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
@@ -130,8 +138,7 @@ public class SipLogging {
 
 
   /**
-   * verify duplicate check enabled and is duplicate
-   * or if duplicate check disabled.
+   * verify duplicate check enabled and is duplicate or if duplicate check disabled.
    *
    * @param isDisableDuplicate disabled duplicate check flag
    * @param sourcelocation source path
@@ -144,15 +151,36 @@ public class SipLogging {
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public boolean duplicateCheck(boolean isDisableDuplicate,
       String sourcelocation, ChannelSftp.LsEntry entry) {
-    return (!isDisableDuplicate && !checkDuplicateFile(sourcelocation + File.separator
+
+    ZonedDateTime duplicateCheckStartTime = ZonedDateTime.now();
+    logger.trace("Duplicate check starting now :: ");
+    
+   
+
+    boolean isDuplicate =  (!isDisableDuplicate
+        &&  !checkDuplicateFile(sourcelocation + File.separator
         + entry.getFilename())) || isDisableDuplicate;
+    
+    ZonedDateTime duplicateCheckEndTime = ZonedDateTime.now();
+
+    if (isDisableDuplicate) {
+      logger.trace("Duplicate check disabled. Duration to check flag in milliseconds :: " + Duration
+                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+    } else {
+      logger.trace("Total time for duplicate check in milliseconds :: " + Duration
+                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+    }
+
+
+
+    return isDuplicate;
 
   }
 
 
   /**
-   * verify the routeId & channelId exists with
-   * data received & success.
+   * verify the routeId & channelId exists with data received & success.
+   *
    * @param routeId route id to be validated
    * @param channelId channel id to be validated
    * @return true or false
@@ -261,13 +289,15 @@ public class SipLogging {
 
   /**
    * This method is used to check the status by process.
+   *
    * @param channelId unique Id for the channel.
    * @param routeId unique Id for the route
    * @param processStatus status for the component process.
+   * @param source source regular or retry
    */
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
-      String fileStatus) {
+      String fileStatus, String source) {
     logger.trace(
         "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
@@ -286,6 +316,7 @@ public class SipLogging {
       bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
       bisDataMetaInfo.setComponentState(processStatus);
       bisDataMetaInfo.setProcessState(fileStatus);
+      bisDataMetaInfo.setSource(source);
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
     logger.trace(
@@ -293,8 +324,7 @@ public class SipLogging {
   }
 
   /**
-   * verify duplicate check enabled and is duplicate
-   * or if duplicate check disabled.
+   * verify duplicate check enabled and is duplicate or if duplicate check disabled.
    *
    * @param isDisableDuplicate disabled duplicate check flag
    * @param location source path
@@ -304,10 +334,25 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public boolean duplicateCheckFilename(boolean isDisableDuplicate,
-      String location) {
+  public boolean duplicateCheckFilename(boolean isDisableDuplicate, String location) {
     return (!isDisableDuplicate && !checkDuplicateFile(location)) || isDisableDuplicate;
 
+  }
+  
+  /**
+   * check if any regular file running for the route.
+   *
+   * @param routeId Route identifier
+   * @return true or false
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean checkIfAlreadyRunning(Long routeId) {
+    boolean isInProgress =   bisFileLogsRepository.countOfInProgress(routeId) > 0;
+    logger.info("Any Inprogress regular jobs for  " + routeId + "? :: " + isInProgress);
+    return isInProgress;
   }
 
   /**

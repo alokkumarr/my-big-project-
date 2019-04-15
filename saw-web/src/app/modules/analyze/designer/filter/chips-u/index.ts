@@ -1,1 +1,1 @@
-export { FilterChipsComponent } from './filter-chips.component';
+export { FilterChipsComponent, getFilterValue } from './filter-chips.component';

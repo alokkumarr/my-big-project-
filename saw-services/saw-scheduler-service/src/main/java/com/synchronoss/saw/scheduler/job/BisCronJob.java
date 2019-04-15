@@ -5,7 +5,6 @@ import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import java.util.Date;
 
 import org.quartz.InterruptableJob;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -33,12 +32,17 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
 
   @Override
+  // @Transactional
   protected void executeInternal(JobExecutionContext jobExecutionContext)
       throws JobExecutionException {
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
     JobKey key = jobDetail.getKey();
+<<<<<<< HEAD
     
     logger.info("Cron Job started with key :" + key.getName() + ", Group :" + key.getGroup()
+=======
+    logger.info("Cron Job started with key after :" + key.getName() + ", Group :" + key.getGroup()
+>>>>>>> master
         + " , Thread Name :" + Thread.currentThread().getName() + " ,Time now :" + new Date());
     BisSchedulerJobDetails jobRequest =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
@@ -46,9 +50,12 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
     try {
       restTemplate.postForLocation(bisTransferUrl, jobRequest);
     } catch (Exception exception) {
-      logger.error("Error during file transfer for the schedule. "
-          + "Refer Batch Ingestion logs for more details", 
-          exception.getMessage());
+      /**
+       * As BIS is async process for larger files async timesout. 
+       * This can be ignored.
+       */
+      logger.info("Async BIS transfer still running"
+          + exception.getMessage());
     }
     
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");

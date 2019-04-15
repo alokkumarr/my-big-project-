@@ -28,9 +28,7 @@
   },
   "APPLYFILTERSCHARTS": {
     "applyFiltersChartsDataProvider": {
-      "ByUser": {
-        "user": "userOne"
-      }
+      "ComboChartByAdmin": { "user": "admin", "chartType": "chart:combo" }
     }
   },
   "ANALYZE": {

@@ -1,13 +1,13 @@
 
 package com.synchronoss.saw.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -36,8 +36,42 @@ public class Field {
     private Type type;
     @JsonProperty("aggregate")
     private Aggregate aggregate;
+
+    /**
+     * Gets limitType
+     *
+     * @return value of limitType
+     */
+    public LimitType getLimitType() {
+        return limitType;
+    }
+
+    /**
+     * Sets limitType
+     */
+    public void setLimitType(LimitType limitType) {
+        this.limitType = limitType;
+    }
+
+    /**
+     * Gets limitValue
+     *
+     * @return value of limitValue
+     */
+    public Integer getLimitValue() {
+        return limitValue;
+    }
+
+    public void setLimitValue(Integer limitValue) {
+        this.limitValue = limitValue;
+    }
+
     @JsonProperty("groupInterval")
     private GroupInterval groupInterval;
+    @JsonProperty("limitType")
+    private Field.LimitType limitType;
+    @JsonProperty("limitValue")
+    private Integer limitValue;
     @JsonProperty("dateFormat")
     private String dateFormat;
     @JsonIgnore
@@ -200,6 +234,7 @@ public class Field {
         MIN("min"),
         MAX("max"),
         COUNT("count"),
+        DISTINCT_COUNT("distinctCount"),
         PERCENTAGE("percentage");
         private final String value;
         private final static Map<String, Field.Aggregate> CONSTANTS = new HashMap<>();
@@ -235,6 +270,43 @@ public class Field {
         }
 
     }
+
+    public enum LimitType {
+        TOP("top"),
+        BOTTOM("bottom");
+        private final String value;
+        private final static Map<String, Field.LimitType> CONSTANTS = new HashMap<>();
+
+        static {
+            for (Field.LimitType c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+        private LimitType(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static Field.LimitType fromValue(String value) {
+            Field.LimitType constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+    }
+
 
     public enum Type {
 

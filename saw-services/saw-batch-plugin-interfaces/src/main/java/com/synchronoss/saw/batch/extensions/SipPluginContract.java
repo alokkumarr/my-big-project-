@@ -76,9 +76,10 @@ public abstract class SipPluginContract {
 
   /**
    * * This method is to test connect the source.
+ * @param source TODO
    */
   public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
-      boolean isDisable) throws SipNestedRuntimeException {
+      boolean isDisable, String source) throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because it "
         + "will be overriden on the respective plugin module if required");
     return new ArrayList<>();
@@ -121,6 +122,5 @@ public abstract class SipPluginContract {
     this.batchSize = batchSize;
   }
 
-
-
+  public abstract boolean isDataExists(String data) throws Exception;
 }

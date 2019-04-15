@@ -63,6 +63,8 @@ RUN chmod a+x /root/saw-*/sample-*/load*
 
 # Add SAW Batch sample test data
 COPY saw-batch-samples /root/saw-batch-samples/
+RUN chmod -R 0755 /root/saw-batch-samples/
+
 # Workaround: The Batch Ingestion Service uses a large number of
 # sessions when transfering a large amount of files, so increase the
 # MaxSession parameters as a workaround until Batch Ingestion Service
@@ -77,6 +79,11 @@ RUN systemctl enable systemd-journal-gatewayd.socket
 # systemd version.
 RUN systemctl mask systemd-machine-id-commit.service
 RUN systemctl mask systemd-remount-fs.service
+
+# Add script to generate large directory tree structure
+# to test saw ingestion module
+COPY batch-prepare /root/batch-prepare
+RUN /root/batch-prepare
 
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/

@@ -10,17 +10,11 @@ import {
   Sort,
   Format,
   FilterModel,
-  Region
+  Region,
+  ArtifactColumn
 } from './models';
 
-export type ArtifactColumns =
-  | ArtifactColumnPivot[]
-  | ArtifactColumnChart[]
-  | ArtifactColumnReport[];
-export type ArtifactColumn =
-  | ArtifactColumnPivot
-  | ArtifactColumnChart
-  | ArtifactColumnReport;
+export type ArtifactColumns = ArtifactColumn[];
 
 export {
   ArtifactColumnPivot,
@@ -34,7 +28,8 @@ export {
   AnalysisType,
   AnalysisReport,
   AnalysisChart,
-  Region
+  Region,
+  ArtifactColumn
 };
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
@@ -58,6 +53,7 @@ export interface AnalysisStarter {
   metricName: string;
   type: AnalysisType;
   chartType?: ChartType;
+  supports?: string[];
 }
 
 export interface AnalysisDialogData {

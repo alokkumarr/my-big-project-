@@ -49,6 +49,7 @@ export interface Analysis {
   parentAnalysisId?: string;
   parentCategoryId?: string | number;
   parentLastModified?: number;
+  supports?: string[];
   // groupByColumns should be deprecated
 }
 

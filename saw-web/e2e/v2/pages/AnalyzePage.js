@@ -59,7 +59,7 @@ class AnalyzePage extends CreateAnalysisModel {
     this._analyzeTypeSelector = element(
       by.xpath(`//*[contains(@class,"select-form-field")]`)
     ); //[e2e="analyze-type-selector"]
-    this._analysisType = name =>
+    this._analysisTypeDsiplay = name =>
       element(
         by.xpath(
           `//span[@class="mat-option-text" and contains(text(),"${name}")]`
@@ -92,6 +92,7 @@ class AnalyzePage extends CreateAnalysisModel {
 
   clickOnAddAnalysisButton() {
     commonFunctions.clickOnElement(this._addAnalysisButton);
+    browser.sleep(2000);
   }
 
   clickOnActionMenu() {
@@ -158,7 +159,9 @@ class AnalyzePage extends CreateAnalysisModel {
 
   verifyAnalysisTypeOptions(options) {
     options.forEach(option => {
-      commonFunctions.waitFor.elementToBeVisible(this._analysisType(option));
+      commonFunctions.waitFor.elementToBeVisible(
+        this._analysisTypeDsiplay(option)
+      );
     });
   }
 }

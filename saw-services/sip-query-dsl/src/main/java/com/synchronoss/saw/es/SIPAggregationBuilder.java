@@ -7,9 +7,14 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders.bucketSort;
 
 public class SIPAggregationBuilder {
 
@@ -51,6 +56,7 @@ public class SIPAggregationBuilder {
                         }
                         else {
                             aggregationBuilder = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
+                                .format(dataField.getDateFormat())
                                 .field(dataField.getColumnName()).size(querySize);
                         }
                     }
@@ -61,6 +67,19 @@ public class SIPAggregationBuilder {
                     for(Field dataField1 : aggregateFields) {
                         aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(
                                 dataField1));
+                        SortOrder sortOrder;
+                        Field.LimitType limitType = dataField1.getLimitType();
+                        if(limitType!=null) {
+                            // Default Order will be descending order.
+                            sortOrder = SortOrder.DESC;
+                            if (dataField1.getLimitType() == Field.LimitType.BOTTOM)
+                                sortOrder = SortOrder.ASC;
+                            Integer size = new Integer(BuilderUtil.SIZE);
+                            if (dataField1.getLimitValue() != null && dataField1.getLimitValue() > 0)
+                                size = dataField1.getLimitValue();
+                            aggregationBuilder.subAggregation(bucketSort("bucketSort", Arrays.asList(
+                                new FieldSortBuilder(dataField1.getColumnName()).order(sortOrder))).size(size));
+                        }
                     }
                     return reportAggregationBuilder(dataFields, aggregateFields,
                             fieldCount,aggregatedFieldCount, aggregationBuilder);
@@ -81,7 +100,7 @@ public class SIPAggregationBuilder {
                         }
                         else {
                             aggregationBuilderMain = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
-                                .field(dataField.getColumnName())
+                                .field(dataField.getColumnName()).format(dataField.getDateFormat())
                                 .subAggregation(aggregationBuilder).size(querySize);
                         }
                     }
