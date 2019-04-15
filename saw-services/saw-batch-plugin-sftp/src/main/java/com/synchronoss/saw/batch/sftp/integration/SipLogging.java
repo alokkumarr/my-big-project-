@@ -64,6 +64,7 @@ public class SipLogging {
       bisLog.setTransferDuration(entity.getFileTransferDuration());
       bisLog.setTransferEndTime(entity.getFileTransferEndTime());
       bisLog.setTransferStartTime(entity.getFileTransferStartTime());
+      bisLog.setSource(entity.getSource());
       bisFileLogsRepository.save(bisLog);
     } else {
       logger.trace("inserting logs when process Id is not found :" + pid);
@@ -84,6 +85,7 @@ public class SipLogging {
       bisLog.setTransferDuration(entity.getFileTransferDuration());
       bisLog.setCheckpointDate(new Date());
       bisLog.setCreatedDate(new Date());
+      bisLog.setSource(entity.getSource());
       bisFileLogsRepository.save(bisLog);
     }
     logger.trace("Integrate with logging API to update with a status ends here : "
@@ -145,11 +147,13 @@ public class SipLogging {
 
     ZonedDateTime duplicateCheckStartTime = ZonedDateTime.now();
     logger.trace("Duplicate check starting now :: ");
+    
+   
 
     boolean isDuplicate =  (!isDisableDuplicate
         &&  !checkDuplicateFile(sourcelocation + File.separator
         + entry.getFilename())) || isDisableDuplicate;
-
+    
     ZonedDateTime duplicateCheckEndTime = ZonedDateTime.now();
 
     if (isDisableDuplicate) {
@@ -282,10 +286,11 @@ public class SipLogging {
    * @param channelId unique Id for the channel.
    * @param routeId unique Id for the route
    * @param processStatus status for the component process.
+   * @param source source regular or retry
    */
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
-      String fileStatus) {
+      String fileStatus, String source) {
     logger.trace(
         "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
@@ -304,6 +309,7 @@ public class SipLogging {
       bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
       bisDataMetaInfo.setComponentState(processStatus);
       bisDataMetaInfo.setProcessState(fileStatus);
+      bisDataMetaInfo.setSource(source);
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
     logger.trace(
@@ -324,6 +330,22 @@ public class SipLogging {
   public boolean duplicateCheckFilename(boolean isDisableDuplicate, String location) {
     return (!isDisableDuplicate && !checkDuplicateFile(location)) || isDisableDuplicate;
 
+  }
+  
+  /**
+   * check if any regular file running for the route.
+   *
+   * @param routeId Route identifier
+   * @return true or false
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public boolean checkIfAlreadyRunning(Long routeId) {
+    boolean isInProgress =   bisFileLogsRepository.countOfInProgress(routeId) > 0;
+    logger.info("Any Inprogress regular jobs for  " + routeId + "? :: " + isInProgress);
+    return isInProgress;
   }
 
 

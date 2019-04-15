@@ -119,12 +119,18 @@
               </mat-error>
             </mat-form-field>
             <mat-checkbox
-              style="margin: 20px 0 65px 0;"
+              style="margin: 20px 0 6px 0;"
               e2e="route-disable-duplicate-ch"
               formControlName="disableDuplicate"
-              i18n
-            >
+              i18n>
               Disable duplicate check
+            </mat-checkbox>
+            <mat-checkbox
+              style="margin: 20px 0 9px 23px;"
+              e2e="route-disable-concurrent-ch"
+              formControlName="disableConcurrency"
+              i18n>
+              Disable concurrent transfer
             </mat-checkbox>
           </section>
           <mat-divider fxFlex="2" [vertical]="true"></mat-divider>

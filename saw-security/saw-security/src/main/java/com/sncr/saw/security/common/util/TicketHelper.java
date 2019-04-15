@@ -3,6 +3,7 @@
  */
 package com.sncr.saw.security.common.util;
 
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.io.StringWriter;
 import java.security.SecureRandom;
 
@@ -15,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 
 import com.sncr.saw.security.app.repository.UserRepository;
-import com.sncr.saw.security.common.bean.Ticket;
 import com.sncr.saw.security.common.bean.User;
 
 
