@@ -5,13 +5,6 @@
     mode: u+x,g+x,o+x
   with_fileglob:
     - mariadb_exporter/*
-- name: Migrate mysql exporter Service database password from old location
-  fetch:
-    src: /etc/bda/mysqld-exporter-db-password
-    dest: "{{ inventory_dir + '/mysqld-exporter-db-password' }}"
-    flat: yes
-    fail_on_missing: no
-  when: "groups['saw-services'].index(inventory_hostname) == 0"
 - name: Look up mysqld exporter database password
   set_fact:
     mysqld_exporter_db_password: >-
