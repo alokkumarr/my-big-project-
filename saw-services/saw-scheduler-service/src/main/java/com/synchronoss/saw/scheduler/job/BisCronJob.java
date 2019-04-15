@@ -37,12 +37,8 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
       throws JobExecutionException {
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
     JobKey key = jobDetail.getKey();
-<<<<<<< HEAD
     
     logger.info("Cron Job started with key :" + key.getName() + ", Group :" + key.getGroup()
-=======
-    logger.info("Cron Job started with key after :" + key.getName() + ", Group :" + key.getGroup()
->>>>>>> master
         + " , Thread Name :" + Thread.currentThread().getName() + " ,Time now :" + new Date());
     BisSchedulerJobDetails jobRequest =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
