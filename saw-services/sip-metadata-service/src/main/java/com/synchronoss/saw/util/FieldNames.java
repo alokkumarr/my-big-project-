@@ -52,4 +52,18 @@ public class FieldNames {
   public static final String UPDATED_TIMESTAMP = "updatedTimestamp";
   public static final String IS_GLOBAL_FILTER = "isGlobalFilter";
   public static final String IS_RUNTIME_FILTER = "isRuntimeFilter";
+
+  public static final String ARTIFACTS = "artifacts";
+  public static final String ARTIFACT_NAME = "artifactName";
+  public static final String SQL_BUILDER = "sqlBuilder";
+  public static final String DATAFIELDS = "dataFields";
+  public static final String NODEFIELDS = "nodeFields";
+  public static final String CHECKED = "checked";
+  public static final String AXIS = "-axis";
+  public static final String GEO_TYPE = "geoType";
+  public static final String REGION = "region";
+  public static final String SUPPORTS = "supports";
+  public static final String MAP_SETTINGS = "mapSettings";
+  public static final String MAP_STYLE = "mapStyle";
+  public static final String CHART_TYPE = "chartType";
 }

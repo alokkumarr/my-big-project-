@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.synchronoss.saw.model.geomap.GeoRegion;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -66,6 +67,12 @@ public class Field {
 
   @JsonProperty("displayType")
   private String displayType;
+
+  @JsonProperty("geoType")
+  private String geoType;
+
+  @JsonProperty("geoRegion")
+  private GeoRegion geoRegion;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -157,6 +164,26 @@ public class Field {
   @JsonProperty("format")
   public void setFormat(Format format) {
     this.format = format;
+  }
+
+  @JsonProperty("geoType")
+  public String getGeoType() {
+    return geoType;
+  }
+
+  @JsonProperty("geoType")
+  public void setGeoType(String geoType) {
+    this.geoType = geoType;
+  }
+
+  @JsonProperty("geoRegion")
+  public GeoRegion getGeoRegion() {
+    return geoRegion;
+  }
+
+  @JsonProperty("geoRegion")
+  public void setGeoRegion(GeoRegion geoRegion) {
+    this.geoRegion = geoRegion;
   }
 
   /**

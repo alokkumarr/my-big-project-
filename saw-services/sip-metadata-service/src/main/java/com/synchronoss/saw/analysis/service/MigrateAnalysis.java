@@ -15,6 +15,7 @@ import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConve
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
@@ -39,8 +40,8 @@ public class MigrateAnalysis {
    * @param basePath - Table path
    * @param listAnalysisUri - API to get list of existing analysis
    */
-  public void convertBinaryToJson(
-      String tableName, String basePath, String listAnalysisUri) throws Exception {
+  public void convertBinaryToJson(String tableName, String basePath, String listAnalysisUri)
+      throws Exception {
     logger.trace("Migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
 
@@ -72,23 +73,23 @@ public class MigrateAnalysis {
       (analysisList)
           .forEach(
               analysisElement -> {
-                  Analysis analysis =
-                      convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
-                  try {
+                Analysis analysis =
+                    convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+                try {
 
-                    logger.info("Inserting analysis " + analysis.getId() + " into json store");
-                    JsonElement parsedAnalysis =
-                        SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
-                    analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
-                  } catch (JsonProcessingException exception) {
-                    logger.error("Unable to convert analysis to json");
-                  } catch (Exception ex) {
-                    if (analysis != null) {
-                      logger.error("Unable to process analysis " + analysis.getId());
-                    } else {
-                      logger.error("Unable to process analysis");
-                    }
+                  logger.info("Inserting analysis " + analysis.getId() + " into json store");
+                  JsonElement parsedAnalysis =
+                      SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
+                  analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+                } catch (JsonProcessingException exception) {
+                  logger.error("Unable to convert analysis to json");
+                } catch (Exception ex) {
+                  if (analysis != null) {
+                    logger.error("Unable to process analysis " + analysis.getId());
+                  } else {
+                    logger.error("Unable to process analysis");
                   }
+                }
               });
     }
   }
@@ -113,6 +114,8 @@ public class MigrateAnalysis {
       case "report":
         converter = new DlReportConverter();
         break;
+      case "map":
+        converter = new GeoMapConverter();
       default:
         logger.error("Unknown chart type");
         break;
