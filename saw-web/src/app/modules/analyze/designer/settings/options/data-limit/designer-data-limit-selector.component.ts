@@ -2,7 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as isUndefined from 'lodash/isUndefined';
 import * as debounce from 'lodash/debounce';
+import { Store } from '@ngxs/store';
 import { ArtifactColumnChart, DesignerChangeEvent } from '../../../types';
+import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
 
 const LIMIT_DEBOUNCE_DELAY = 400;
 @Component({
@@ -17,7 +19,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   public limitValue;
   public isInTabletMode = false;
 
-  constructor(breakpointObserver: BreakpointObserver) {
+  constructor(private _store: Store, breakpointObserver: BreakpointObserver) {
     breakpointObserver
       .observe([Breakpoints.Medium, Breakpoints.Small])
       .subscribe(result => {
@@ -49,8 +51,27 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
       delete this.artifactColumn.limitType;
       return;
     }
-    this.artifactColumn.limitValue = this.limitValue;
-    this.artifactColumn.limitType = this.limitType;
+    this.emitChange(this.limitType, this.limitValue);
+  }
+
+  onToggleClicked(limitType) {
+    if (this.limitType === limitType) {
+      this.limitType = null;
+      this.limitValue = null;
+      this.emitChange(this.limitType, this.limitValue);
+    }
+  }
+
+  emitChange(limitType, limitValue) {
+    const { table, columnName } = this.artifactColumn;
+    this._store.dispatch(
+      new DesignerUpdateArtifactColumn({
+        table,
+        columnName,
+        limitValue,
+        limitType
+      })
+    );
     this.change.emit({ subject: 'fetchLimit' });
   }
 }
