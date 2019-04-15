@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatSidenav } from '@angular/material';
+
+import { ConfigureAlertService } from '../../../services/configure-alert.service';
 
 @Component({
   selector: 'alerts-configuration',
@@ -9,8 +12,12 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 export class AlertsConfigurationComponent implements OnInit {
   addAlertPanelMode: 'side' | 'over' = 'side';
   isInTabletMode = false;
+  configuredAlerts$;
 
-  constructor(breakpointObserver: BreakpointObserver) {
+  constructor(
+    breakpointObserver: BreakpointObserver,
+    public _configureAlertService: ConfigureAlertService
+  ) {
     breakpointObserver
       .observe([Breakpoints.Medium, Breakpoints.Small])
       .subscribe(result => {
@@ -21,7 +28,15 @@ export class AlertsConfigurationComponent implements OnInit {
           this.addAlertPanelMode = 'side';
         }
       });
+    this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
   }
 
+  @ViewChild('alertSidenav') sidenav: MatSidenav;
+
   ngOnInit() {}
+
+  onAddAlert() {
+    this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
+    this.sidenav.close();
+  }
 }

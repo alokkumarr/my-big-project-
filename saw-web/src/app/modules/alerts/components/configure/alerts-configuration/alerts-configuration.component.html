@@ -1,6 +1,6 @@
 <mat-sidenav-container fxFlex fxFill hasBackdrop="false" class="conf-container">
   <mat-sidenav
-    #sidenav
+    #alertSidenav
     position="end"
     [mode]="addAlertPanelMode"
     autoFocus="false"
@@ -19,14 +19,14 @@
           mat-icon-button
           color="warn"
           e2e="cancel-add-alert"
-          (click)="sidenav.close()"
+          (click)="alertSidenav.close()"
         >
           <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
       </div>
       <add-alert
-        *ngIf="sidenav.opened"
-        (onAddAlert)="sidenav.close()"
+        *ngIf="alertSidenav.opened"
+        (onAddAlert)="onAddAlert()"
       ></add-alert>
     </div>
   </mat-sidenav>
@@ -47,7 +47,7 @@
         color="primary"
         mat-raised-button
         e2e="open-add-alert"
-        (click)="sidenav.toggle()"
+        (click)="alertSidenav.toggle()"
       >
         + Alert
       </button>
@@ -55,73 +55,111 @@
     <div fxFlex class="conf-container-content__body mat-elevation-z3">
       <dx-data-grid
         fxFlex
-        e2e=""
-        [dataSource]="sourceData"
+        e2e="conf-alerts"
+        [dataSource]="configuredAlerts$ | async"
         [showBorders]="false"
         [columnAutoWidth]="false"
         [showColumnLines]="false"
         [showRowLines]="true"
-        keyExpr="bisChannelSysId"
-        [rowAlternationEnabled]="false"
+        keyExpr="alertRulesSysId"
+        [rowAlternationEnabled]="true"
       >
         <dxo-selection mode="single"></dxo-selection>
-        <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
+        <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
         <dxo-search-panel
-          [visible]="true"
+          [visible]="false"
           [width]="220"
           placeholder="Search..."
         ></dxo-search-panel>
         <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
-        <dxi-column
-          caption="Alert Name"
-          dataField="channelName"
-          alignment="left"
-          cellTemplate="nameTemplate"
-        ></dxi-column>
+        <dxi-column caption="Alert Name" dataField="ruleName"></dxi-column>
         <dxi-column
           caption="Alert Description"
-          dataField="hostName"
-          alignment="left"
+          dataField="ruleDescriptions"
         ></dxi-column>
+        <dxi-column dataField="alertSeverity"></dxi-column>
+        <dxi-column dataField="monitoringEntity"></dxi-column>
+        <dxi-column dataField="datapodName"></dxi-column>
+        <dxi-column dataField="operator"></dxi-column>
+        <dxi-column dataField="aggregation"></dxi-column>
+        <dxi-column dataField="thresholdValue"></dxi-column>
         <dxi-column
-          caption="Actions"
-          dataField="bisRouteSysId"
+          caption="Status"
+          dataField="activeInd"
           alignment="center"
-          cellTemplate="actionsTemplate"
+          cellTemplate="statusTemplate"
+        >
+        </dxi-column>
+
+        <dxi-column
+          caption="Edit"
+          dataField="alertRulesSysId"
+          alignment="center"
+          cellTemplate="editTemplate"
           [allowFiltering]="false"
           [allowSorting]="false"
         >
         </dxi-column>
+
+        <dxi-column
+          caption="Delete"
+          dataField="alertRulesSysId"
+          alignment="center"
+          cellTemplate="deleteTemplate"
+          [allowFiltering]="false"
+          [allowSorting]="false"
+        >
+        </dxi-column>
+
         <div
-          *dxTemplate="let data of 'actionsTemplate'"
+          *dxTemplate="let data of 'statusTemplate'"
           fxLayout="row"
           fxLayoutAlign="center center"
         >
           <button
             mat-icon-button
             i18n-matTooltip
-            [attr.e2e]="data.data.status"
-            class="grid-icon-btn"
-            [color]="data.data.status ? 'error' : 'primary'"
-            [matTooltip]="data.data.status ? 'Deactivate' : 'Activate'"
-            (click)="toggleChannelActivation(data.data)"
+            e2e="alert-status"
+            class="conf-container-content__body__gridBtn"
+            [ngClass]="data.data.activeInd ? 'active' : 'inactive'"
+            [matTooltip]="data.data.activeInd ? 'Active' : 'Inactivate'"
           >
-            <mat-icon fontIcon="icon-logout"></mat-icon>
+            <mat-icon fontIcon="icon-uniE901"></mat-icon>
           </button>
         </div>
-        <div *dxTemplate="let data of 'sourceTypeTemplate'">
-          <div
-            fxHide.lt-lg="true"
-            class="master-detail-caption"
-            e2e="current-source-name"
+
+        <div
+          *dxTemplate="let data of 'editTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          <button
+            mat-icon-button
+            i18n-matTooltip
+            color="primary"
+            e2e="edit-alert"
+            class="conf-container-content__body__gridBtn"
+            matTooltip="Edit"
           >
-            {{ selectedSourceType | uppercase }}
-          </div>
+            <mat-icon fontIcon="icon-edit"></mat-icon>
+          </button>
         </div>
-        <div *dxTemplate="let data of 'nameTemplate'">
-          <div class="s-name" [attr.e2e]="data.value" [matTooltip]="data.value">
-            {{ data.value }}
-          </div>
+
+        <div
+          *dxTemplate="let data of 'deleteTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          <button
+            mat-icon-button
+            i18n-matTooltip
+            color="warn"
+            e2e="edit-alert"
+            class="conf-container-content__body__gridBtn"
+            matTooltip="Delete"
+          >
+            <mat-icon fontIcon="icon-delete"></mat-icon>
+          </button>
         </div>
       </dx-data-grid>
     </div>

@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { AddAlertService } from '../../../services/add-alert.service';
+import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 
 import { AlertConfig } from '../../../alerts.interface';
@@ -35,7 +35,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   constructor(
     private _formBuilder: FormBuilder,
-    public _addAlertService: AddAlertService,
+    public _configureAlertService: ConfigureAlertService,
     private _notify: ToastService
   ) {}
 
@@ -44,7 +44,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.alertDefFormGroup = this._formBuilder.group({
       ruleName: ['', [Validators.required, Validators.maxLength(18)]],
-      ruleDescription: ['', [Validators.required, Validators.maxLength(36)]],
+      ruleDescriptions: ['', [Validators.required, Validators.maxLength(36)]],
       alertSeverity: ['', [Validators.required]],
       activeInd: ['true']
     });
@@ -64,7 +64,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       ]
     });
 
-    this.datapods$ = this._addAlertService.getListOfDatapods$();
+    this.datapods$ = this._configureAlertService.getListOfDatapods$();
   }
 
   ngOnDestroy() {
@@ -78,7 +78,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         selectedItem.metricName
       );
 
-      this.metricsList$ = this._addAlertService.getMetricsInDatapod$(
+      this.metricsList$ = this._configureAlertService.getMetricsInDatapod$(
         selectedItem.id
       );
     }
@@ -93,7 +93,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       product: 'SAWD000001'
     };
 
-    const createSubscriber = this._addAlertService
+    const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {
         this._notify.success(data.message);

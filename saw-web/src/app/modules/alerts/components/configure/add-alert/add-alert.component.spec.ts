@@ -5,13 +5,13 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../../material.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddAlertComponent } from './add-alert.component';
-import { AddAlertService } from '../../../services/add-alert.service';
+import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { Observable } from 'rxjs';
 
 const ToastServiceStub: Partial<ToastService> = {};
 
-const addAlertServiceStub = {
+const confAlertServiceStub = {
   createAlert: () => {
     return new Observable();
   },
@@ -39,7 +39,7 @@ describe('AddAlertComponent', () => {
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        { provide: AddAlertService, useValue: addAlertServiceStub },
+        { provide: ConfigureAlertService, useValue: confAlertServiceStub },
         { provide: ToastService, useValue: ToastServiceStub }
       ]
     }).compileComponents();

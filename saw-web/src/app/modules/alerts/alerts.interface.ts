@@ -8,7 +8,19 @@ export interface AlertConfig {
   monitoringEntity: string;
   operator: string;
   product: string;
-  ruleDescription: string;
+  ruleDescriptions: string;
   ruleName: string;
   thresholdValue: number;
+}
+
+export interface DatapodMetric {
+  aliasName?: string;
+  columnName: string;
+  displayName: string;
+  filterEligible?: boolean;
+  joinEligible?: boolean;
+  name: string;
+  table: string;
+  type: string;
+  kpiEligible?: boolean;
 }

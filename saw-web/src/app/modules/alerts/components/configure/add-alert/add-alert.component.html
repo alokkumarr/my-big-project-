@@ -70,13 +70,13 @@
               <mat-label>Alert Description</mat-label>
               <textarea
                 matInput
-                formControlName="ruleDescription"
+                formControlName="ruleDescriptions"
                 maxlength="36"
                 e2e="alertDescription"
               ></textarea>
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.ruleDescription.hasError(
+                  alertDefFormGroup.controls.ruleDescriptions.hasError(
                     'required'
                   )
                 "
@@ -84,7 +84,7 @@
               >
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.ruleDescription.hasError(
+                  alertDefFormGroup.controls.ruleDescriptions.hasError(
                     'maxlength'
                   )
                 "
