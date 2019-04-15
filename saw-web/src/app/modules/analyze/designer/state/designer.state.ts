@@ -434,7 +434,7 @@ export class DesignerState {
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
-    return dispatch(new DesignerAddArtifactColumn(column));
+    return dispatch(new DesignerRemoveArtifactColumn(column));
   }
 
   @Action(DesignerMoveColumnInGroupAdapter)
