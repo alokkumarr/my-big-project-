@@ -30,6 +30,7 @@ import {
   DesignerUpdateArtifactColumn
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
+import { DATE_TYPES, DEFAULT_DATE_FORMAT } from '../../consts';
 
 // setAutoFreeze(false);
 
@@ -78,6 +79,7 @@ export class DesignerState {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     let artifacts = sipQuery.artifacts;
+    const isDateType = DATE_TYPES.includes(artifactColumn.type);
 
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
@@ -96,11 +98,16 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
-      dateFormat: artifactColumn.dateFormat,
       groupInterval: artifactColumn.groupInterval,
       name: artifactColumn.name,
       type: artifactColumn.type,
-      table: artifactColumn.table || (<any>artifactColumn).tableName
+      table: artifactColumn.table || (<any>artifactColumn).tableName,
+      ...(isDateType
+        ? {
+            dateFormat:
+              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
+          }
+        : { format: artifactColumn.format })
     };
 
     if (artifactIndex < 0) {
