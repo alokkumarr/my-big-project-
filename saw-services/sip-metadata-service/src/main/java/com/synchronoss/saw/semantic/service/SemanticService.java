@@ -24,7 +24,7 @@ public interface SemanticService {
   SemanticNode readSemantic(SemanticNode node)
       throws SipJsonValidationException, SipReadEntityException;
 
-  SemanticNode updateSemantic(SemanticNode node)
+  SemanticNode updateSemantic(SemanticNode node, Map<String, String> headers)
       throws SipJsonValidationException, SipUpdateEntityException;
 
   SemanticNode deleteSemantic(SemanticNode node)
@@ -49,4 +49,5 @@ public interface SemanticService {
     }
     return id;
   }
+
 }

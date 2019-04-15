@@ -306,11 +306,6 @@
 									<name>/usr/lib/systemd/system/saw-batch-ingestion-proxy.socket</name>
 									<file>src/main/system/saw-batch-ingestion-proxy.socket</file>
 								</entry>
-								<entry>
-									<name>/opt/bda/saw-batch-ingestion-service/db-setup/init</name>
-									<file>src/db-setup/init</file>
-									<mode>0755</mode>
-								</entry>
 							</entries>
 							<afterInstallation>
 								<script>systemctl daemon-reload</script>

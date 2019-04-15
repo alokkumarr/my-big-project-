@@ -914,7 +914,9 @@ class DashboardFunctions {
 
   verifyAppliedGlobalFilters(dashboardGlobalFilters) {
     try {
-      commonFunctions.waitFor.elementToBeNotVisible(homePage.progressbar);
+      // Some how in automation progress bar is not working...
+      //commonFunctions.waitFor.elementToBeNotVisible(homePage.progressbar);
+      browser.sleep(3000);
       commonFunctions.waitFor.elementToBeVisible(observePage.filterButton);
       commonFunctions.waitFor.elementToBeClickable(observePage.filterButton);
       observePage.filterButton.click();

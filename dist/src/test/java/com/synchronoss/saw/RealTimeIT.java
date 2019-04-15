@@ -20,11 +20,10 @@ public class RealTimeIT extends BaseIT {
 
   @Test
   public void testSendEvent() throws JsonProcessingException {
-    String testId = testId();
     ObjectNode root = mapper.createObjectNode();
-    root.put("string", "rtps-" + testId);
+    root.put("metric", 0);
     given(authSpec)
-        .queryParam("APP_KEY", "sip-rtis")
+        .queryParam("APP_KEY", "stream_1")
         .queryParam("APP_VERSION", "1")
         .queryParam("APP_MODULE", "1")
         .queryParam("EVENT_TYPE", "1")

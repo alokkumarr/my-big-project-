@@ -22,7 +22,7 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInter
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class QueryBuilderUtil {
-	
+
 	public final static String DATE_FORMAT = "yyyy-MM-dd";
 	public final static String SPACE_REGX = "\\s+";
 	public final static String EMPTY_STRING = "";
@@ -51,18 +51,20 @@ public class QueryBuilderUtil {
 
 	{
 		AggregationBuilder aggregationBuilder = null;
-		
+
 		if (field.getType().name().equals(Field.Type.DATE.name())
 		    || field.getType().name().equals(Field.Type.TIMESTAMP.name()))
 		{
+            if(field.getDateFormat()==null|| field.getDateFormat().isEmpty())
+                field.setDateFormat(DATE_FORMAT);
 		  if (field.getGroupInterval()!=null){
 			aggregationBuilder = AggregationBuilders.
-					dateHistogram(aggregationName).field(field.getColumnName()).format(DATE_FORMAT).
+					dateHistogram(aggregationName).field(field.getColumnName()).format(field.getDateFormat()).
 					dateHistogramInterval(groupInterval(field.getGroupInterval().value())).order(BucketOrder.key(false));
 			}
 		  else {
 		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(field.getColumnName())
-		        .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+		        .format(field.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 		  }
 		}
 		else {
@@ -79,7 +81,7 @@ public class QueryBuilderUtil {
      */
      public static DateHistogramInterval groupInterval(String groupInterval)
      {
-    	 DateHistogramInterval histogramInterval = null; 
+    	 DateHistogramInterval histogramInterval = null;
     	    switch (groupInterval)
     	    {
     	    case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
@@ -103,16 +105,16 @@ public class QueryBuilderUtil {
 
 		switch (field.getAggregate())
 		{
-			case SUM: aggregationBuilder = AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName()); break;
-			case AVG: aggregationBuilder = AggregationBuilders.avg(field.getDisplayName()).field(field.getColumnName()); break;
-			case MIN: aggregationBuilder = AggregationBuilders.min(field.getDisplayName()).field(field.getColumnName()); break;
-			case MAX: aggregationBuilder = AggregationBuilders.max(field.getDisplayName()).field(field.getColumnName()); break;
-			case COUNT: aggregationBuilder = AggregationBuilders.count(field.getDisplayName()).field(field.getColumnName()); break;
-            case DISTINCT_COUNT: aggregationBuilder = AggregationBuilders.cardinality(field.getDisplayName()).field(field.getColumnName()); break;
+			case SUM: aggregationBuilder = AggregationBuilders.sum(field.getDataField()).field(field.getColumnName()); break;
+			case AVG: aggregationBuilder = AggregationBuilders.avg(field.getDataField()).field(field.getColumnName()); break;
+			case MIN: aggregationBuilder = AggregationBuilders.min(field.getDataField()).field(field.getColumnName()); break;
+			case MAX: aggregationBuilder = AggregationBuilders.max(field.getDataField()).field(field.getColumnName()); break;
+			case COUNT: aggregationBuilder = AggregationBuilders.count(field.getDataField()).field(field.getColumnName()); break;
+            case DISTINCT_COUNT: aggregationBuilder = AggregationBuilders.cardinality(field.getDataField()).field(field.getColumnName()); break;
 			case PERCENTAGE:
 				Script script = new Script("_value*100/"+field.getAdditionalProperties().get(field.getColumnName()
 						+"_sum"));
-				aggregationBuilder = AggregationBuilders.sum(field.getDisplayName()).field(field.getColumnName()).script(script); break;
+				aggregationBuilder = AggregationBuilders.sum(field.getDataField()).field(field.getColumnName()).script(script); break;
 		}
 		return aggregationBuilder;
 	}
@@ -317,13 +319,12 @@ public class QueryBuilderUtil {
                     for (Object dataField : dataFields) {
                         if (dataField instanceof com.synchronoss.saw.model.Field) {
                             Field field = (Field) dataField;
-                            if (field.getAggregate().value().equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value())) {
+                            if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
                                 preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
-                                    field.getDisplayName()).field(field.getColumnName()));
+                                    field.getDataField()).field(field.getColumnName()));
                             }
                         }
                     }
-              //  return aggregationBuilder;
     }
 
    /**

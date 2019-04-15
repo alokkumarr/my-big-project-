@@ -1,12 +1,30 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  OnInit
+} from '@angular/core';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
-import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+import * as filter from 'lodash/filter';
+import * as every from 'lodash/every';
+import * as some from 'lodash/some';
+import * as map from 'lodash/map';
+import * as mapValues from 'lodash/mapValues';
+import * as isBoolean from 'lodash/isBoolean';
+import { Select, Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
 
+import { DesignerState } from '../../state/designer.state';
+import { DesignerAddColumnToGroupAdapter } from '../../actions/designer.actions';
 import { DesignerService } from '../../designer.service';
+import { DndPubsubService } from '../../../../../common/services';
 import {
   IDEsignerSettingGroupAdapter,
   Artifact,
@@ -15,8 +33,12 @@ import {
   ArtifactColumnFilter,
   DesignerChangeEvent
 } from '../../types';
-import { TYPE_ICONS_OBJ, TYPE_ICONS } from '../../consts';
-import { getArtifactColumnTypeIcon, getArtifactColumnGeneralType } from '../../utils';
+
+import {
+  getArtifactColumnTypeIcon,
+  getArtifactColumnGeneralType,
+  getFilterTypes
+} from '../../utils';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -30,7 +52,7 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
   templateUrl: './designer-settings-single-table.component.html',
   styleUrls: ['./designer-settings-single-table.component.scss']
 })
-export class DesignerSettingsSingleTableComponent implements OnInit {
+export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input('artifacts')
@@ -45,17 +67,40 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   @Input() fieldCount: number;
   @Input() public sqlBuilder;
 
-  public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
-  public TYPE_ICONS = TYPE_ICONS;
-  public isEmpty: Function = isEmpty;
+  public dropListContainer;
+  public typeIcons = [];
+  public isEmpty: (any) => boolean = isEmpty;
   public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
+  @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
+    IDEsignerSettingGroupAdapter[]
+  >;
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
-    types: ['number', 'date', 'string', 'geo']
+    types: {
+      number: false,
+      date: false,
+      string: false,
+      geo: false,
+      coordinate: false
+    },
+    adapters: [
+      false, // first adapter
+      false // first adapter
+    ]
   };
-  constructor(private _designerService: DesignerService) {
+
+  public config: PerfectScrollbarConfigInterface = {};
+
+  public groupsThatCanRecieveColumn: IDEsignerSettingGroupAdapter[];
+  menuVisibleFor: string;
+
+  constructor(
+    private _designerService: DesignerService,
+    private _dndPubsub: DndPubsubService,
+    private _store: Store
+  ) {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
     // doesn't have to process everything with every quick change
@@ -68,25 +113,25 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       this.onTextFilterChange,
       FILTER_CHANGE_DEBOUNCE_TIME
     );
+
+    this.groupAdapters$.subscribe(adapters => {
+      this.groupAdapters = adapters;
+    });
   }
 
   ngOnInit() {
-    /* prettier-ignore */
-    switch (this.analysisType) {
-    case 'pivot':
-      this.groupAdapters = this._designerService.getPivotGroupAdapters(
-        this.artifactColumns
-      );
-      break;
-    case 'chart':
-      this.groupAdapters = this._designerService.getChartGroupAdapters(
-        this.artifactColumns, this.analysisSubtype
-      );
-      break;
-    case 'map':
-      this.groupAdapters = this._designerService.getMapGroupAdapters(
-        this.artifactColumns, this.analysisSubtype
-      );
+    this.typeIcons = getFilterTypes(this.analysisType, this.analysisSubtype);
+  }
+
+  ngOnChanges(changes) {
+    const subType = changes.analysisSubtype;
+    if (
+      subType &&
+      !subType.firstChange &&
+      subType.currentValue !== subType.previousValue
+    ) {
+      this.filterObj.types = mapValues(this.filterObj.types, () => false);
+      this.typeIcons = getFilterTypes(this.analysisType, this.analysisSubtype);
     }
   }
 
@@ -95,35 +140,8 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   onFieldsChange() {
-    this.syncMaxAllowed();
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     this._changeSettingsDebounced({ subject: 'selectedFields' });
-  }
-
-  /**
-   * syncMaxAllowed
-   * If any area has more columns than it allows, remove extra columns
-   *
-   * @returns {undefined}
-   */
-  syncMaxAllowed() {
-    forEach(this.groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
-      if (!adapter.maxAllowed) {
-        return;
-      }
-
-      const extraColumns: Array<ArtifactColumn> = adapter.artifactColumns.slice(
-        adapter.maxAllowed(adapter, this.groupAdapters)
-      );
-
-      if (!extraColumns.length) {
-        return;
-      }
-
-      forEach(extraColumns, col => {
-        this._designerService.removeArtifactColumnFromGroup(col, adapter);
-      });
-    });
   }
 
   onFieldPropChange(event: DesignerChangeEvent) {
@@ -136,31 +154,59 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
 
   getUnselectedArtifactColumns() {
     const { types, keyword } = this.filterObj;
-    return fpPipe(
+    const unselectedArtifactColumns = fpPipe(
       fpFilter(artifactColumn => {
         const { checked, alias, displayName } = artifactColumn;
         return (
           !checked &&
-          this.hasAllowedType(artifactColumn, types) &&
-          this.hasKeyword(alias || displayName, keyword)
+          this.hasKeyword(alias || displayName, keyword) &&
+          this.passesTypeFilter(types, artifactColumn)
         );
       }),
       fpSort(artifactColumn => artifactColumn.displayName)
     )(this.artifactColumns);
+
+    this.dropListContainer = { artifactColumns: unselectedArtifactColumns };
+    return unselectedArtifactColumns;
   }
 
-  hasAllowedType(artifactColumn, filterTypes) {
+  passesTypeFilter(types, artifactColumn) {
+    if (isEmpty(this.groupAdapters)) {
+      return true;
+    }
+    const adapterFilterResults = map(
+      this.filterObj.adapters,
+      (toggled, index) => {
+        const adapter = this.groupAdapters[index];
+        const acceptFn = adapter.canAcceptArtifactColumnOfType;
+        return toggled ? acceptFn(artifactColumn) : null;
+      }
+    );
+
     const generalType = this.getGeneralType(artifactColumn);
-    /* prettier-ignore */
-    return filterTypes.includes(generalType);
+    const onlyFilterResults = filter(adapterFilterResults, isBoolean);
+
+    if (every(types, toggled => !toggled) && isEmpty(onlyFilterResults)) {
+      return true;
+    }
+
+    return some(onlyFilterResults) || types[generalType];
   }
 
   getGeneralType(artifactColumn) {
-    return getArtifactColumnGeneralType(artifactColumn);
+    return getArtifactColumnGeneralType(
+      artifactColumn,
+      this.analysisType,
+      this.analysisSubtype
+    );
   }
 
   getArtifactColumnTypeIcon(artifactColumn) {
-    return getArtifactColumnTypeIcon(artifactColumn);
+    return getArtifactColumnTypeIcon(
+      artifactColumn,
+      this.analysisType,
+      this.analysisSubtype
+    );
   }
 
   hasKeyword(name, keyword) {
@@ -177,21 +223,28 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
   }
 
   onTypeFilterChange(value) {
-    this.filterObj.types = value;
+    this.filterObj.types[value] = !this.filterObj.types[value];
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
-  /**
-   * Add artifactColumn to the first group that can accept it, if possible
-   */
-  addToGroupIfPossible(artifactColumn: ArtifactColumn) {
-    const isAddSuccessful = this._designerService.addArtifactColumnIntoAGroup(
-      artifactColumn,
-      this.groupAdapters
+  onFilterChange(index) {
+    this.filterObj.adapters[index] = !this.filterObj.adapters[index];
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  }
+
+  addToGroup(
+    artifactColumn: ArtifactColumn,
+    columnIndex: number,
+    adapter: IDEsignerSettingGroupAdapter
+  ) {
+    const index = adapter.artifactColumns.length;
+    const adapterIndex = this.groupAdapters.indexOf(adapter);
+    // remove from unselected fields
+    this.unselectedArtifactColumns.splice(columnIndex, 1);
+    this._store.dispatch(
+      new DesignerAddColumnToGroupAdapter(artifactColumn, index, adapterIndex)
     );
-    if (isAddSuccessful) {
-      this.onFieldsChange();
-    }
+    this.onFieldsChange();
   }
 
   removeFromGroup(
@@ -203,5 +256,29 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       groupAdapter
     );
     this.onFieldsChange();
+  }
+
+  noReturnPredicate() {
+    return false;
+  }
+
+  dragStarted() {
+    this._dndPubsub.emit('dragStart');
+  }
+
+  dragReleased() {
+    this._dndPubsub.emit('dragEnd');
+  }
+
+  onAddToGroupMenuOpened(artifactColumn) {
+    this.menuVisibleFor = artifactColumn.displayName;
+    this.groupsThatCanRecieveColumn = this._designerService.getGroupsThatCanRecieve(
+      artifactColumn,
+      this.groupAdapters
+    );
+  }
+
+  onMenuClosed() {
+    this.menuVisibleFor = '';
   }
 }
