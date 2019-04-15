@@ -93,8 +93,8 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
     List<Supports> supports = new ArrayList<>();
 
     if (oldAnalysisDefinition.has(FieldNames.SUPPORTS)) {
-      JsonArray jObj = oldAnalysisDefinition.getAsJsonArray(FieldNames.SUPPORTS);
-      for (JsonElement support : jObj) {
+      JsonArray supportsArray = oldAnalysisDefinition.getAsJsonArray(FieldNames.SUPPORTS);
+      for (JsonElement support : supportsArray) {
         supports.add(new Gson().fromJson(support, Supports.class));
       }
       mapOptions.setSupports(supports);

@@ -14,14 +14,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AnalysisSipDSLConverterTest {
+public class AnalysisSipDslConverterTest {
   JsonObject oldAnalysisObject;
   JsonObject sqlQueryBuilderObject;
   String artifactName = null;
 
   @Before
   public void init() throws IOException {
-    ClassLoader classLoader = new AnalysisSipDSLConverterTest().getClass().getClassLoader();
+    ClassLoader classLoader = new AnalysisSipDslConverterTest().getClass().getClassLoader();
     File file =
         new File(
             classLoader.getResource("com/synchronoss/saw/analyze/sample-chart.json").getFile());
@@ -74,9 +74,8 @@ public class AnalysisSipDSLConverterTest {
   }
 
   @Test
-    public void testGenerateSorts() {
-      ChartConverter converter = new ChartConverter();
-      Assert.assertNotNull(converter.generateSorts(artifactName,sqlQueryBuilderObject));
-
+  public void testGenerateSorts() {
+    ChartConverter converter = new ChartConverter();
+    Assert.assertNotNull(converter.generateSorts(artifactName, sqlQueryBuilderObject));
   }
 }

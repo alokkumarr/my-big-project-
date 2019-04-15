@@ -14,23 +14,23 @@ public class Analysis {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonPropertyOrder({
-    "type",
-    "semanticId",
-    "metricName",
-    "name",
-    "description",
-    "id",
-    "parentAnalysisId",
-    "category",
-    "customerCode",
-    "projectCode",
-    "module",
-    "createdTime",
-    "createdBy",
-    "modifiedTime",
-    "modifiedBy",
-    "designerEdit",
-    "sipQuery"
+      "type",
+      "semanticId",
+      "metricName",
+      "name",
+      "description",
+      "id",
+      "parentAnalysisId",
+      "category",
+      "customerCode",
+      "projectCode",
+      "module",
+      "createdTime",
+      "createdBy",
+      "modifiedTime",
+      "modifiedBy",
+      "designerEdit",
+      "sipQuery"
   })
   @JsonProperty("type")
   private String type;

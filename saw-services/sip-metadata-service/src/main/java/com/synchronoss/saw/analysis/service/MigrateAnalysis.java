@@ -116,15 +116,16 @@ public class MigrateAnalysis {
         break;
       case "map":
         converter = new GeoMapConverter();
+        break;
       default:
-        logger.error("Unknown chart type");
+        logger.error("Unknown report type");
         break;
     }
 
     if (converter != null) {
       analysis = converter.convert(analysisObject);
     } else {
-      logger.error("Unknown chart type");
+      logger.error("Unknown report type");
     }
 
     return analysis;
