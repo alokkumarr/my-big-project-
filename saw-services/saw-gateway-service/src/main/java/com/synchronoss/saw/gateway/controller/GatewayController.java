@@ -5,7 +5,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -20,12 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -59,6 +56,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
+import com.synchronoss.saw.gateway.RestUtil;
 import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
 import com.synchronoss.saw.gateway.utils.ContentRequestTransformer;
 import com.synchronoss.saw.gateway.utils.HeadersRequestTransformer;
@@ -79,25 +77,40 @@ public class GatewayController {
   
   @Value("${security.service.host}")
   private String apiGatewayOtherProperties;
+  
+  @Value("${sip.trust.store:}")
+  private String trustStore;
 
+  @Value("${sip.trust.password:}")
+  private String trustStorePassword; 
+
+  @Value("${sip.key.store:}")
+  private String keyStore;
+
+  @Value("${sip.key.password:}")
+  private String keyStorePassword; 
+  
+  @Value("${sip.ssl.enable}")
+  private Boolean sipSslEnable; 
+  
   private HttpClient httpClient;
 
   @PostConstruct
-  public void init() {
-    PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-    httpClient = HttpClients.custom()
-            .setConnectionManager(cm)
-            .build();
+  public void init() throws Exception {
+    if (sipSslEnable) {
+      httpClient =
+          RestUtil.getHttpsClient(keyStore, keyStorePassword, trustStore, trustStorePassword);
+    } else {
+      PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+      httpClient = HttpClients.custom().setConnectionManager(cm).build();
+    }
   }
 
   
   /**
  * @param request
  * @return
- * @throws IOException
- * @throws URISyntaxException
-   * @throws ServletException 
-   * @throws FileUploadException 
+   * @throws Exception 
  */
   @CrossOrigin(origins = "*")
 @RequestMapping(value = "/{path:^(?!actuator).*$}/**", method = {GET, POST, DELETE, OPTIONS, PUT})
@@ -106,7 +119,7 @@ public class GatewayController {
    * to allow downstream health check requests to pass without an
    * authentication token */
   public ResponseEntity<?> proxyRequest(HttpServletRequest request, HttpServletResponse response,
-      @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles,  @RequestParam(name ="path", required = false) String filePath) throws  IOException, URISyntaxException, ServletException, FileUploadException {
+      @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles,  @RequestParam(name ="path", required = false) String filePath) throws  Exception {
   HttpUriRequest proxiedRequest = null;
     HttpResponse proxiedResponse = null;
     ResponseEntity<String> responseEntity = null;
@@ -121,24 +134,25 @@ public class GatewayController {
     logger.trace("Referer {}",request.getHeader("Referer"));
     logger.trace("User-Agent {}",request.getHeader("User-Agent"));
     try {
-    	header = request.getHeader("Authorization");
+        header = request.getHeader("Authorization");
     }
     catch (ArrayIndexOutOfBoundsException ex) {
-     throw new 	TokenMissingSAWException("Token is missing on the request header.");
+     throw new  TokenMissingSAWException("Token is missing on the request header.");
     }
     if (header!=null){
-    	HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
-    	RestTemplate restTemplate = new RestTemplate();
-    	String url = apiGatewayOtherProperties+"/auth/customer/details";
-    	logger.debug("security server URL {}", url);
-    	try {
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
+      RestTemplate restTemplate = sipSslEnable ?
+          RestUtil.restTemplate(trustStore, trustStorePassword, keyStore, keyStorePassword) : new RestTemplate();
+        String url = apiGatewayOtherProperties+"/auth/customer/details";
+        logger.debug("security server URL {}", url);
+        try {
         ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
             requestEntity, UserCustomerMetaData.class);
         logger.debug(securityResponse.getStatusCode().getReasonPhrase());
         logger.debug(securityResponse.toString());
         UserCustomerMetaData userMetadata =(UserCustomerMetaData) securityResponse.getBody();
          if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
-    	  if (!ServletFileUpload.isMultipartContent(request)) {
+          if (!ServletFileUpload.isMultipartContent(request)) {
           proxiedRequest = createHttpUriRequest(request,userMetadata);  
           proxiedResponse = httpClient.execute(proxiedRequest);
           responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()), 
@@ -192,7 +206,7 @@ public class GatewayController {
           }
         } else {responseEntity = new ResponseEntity<>("{\"message\":\"Invalid User Credential\"}",makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);}
       } catch(HttpClientErrorException e) {
-    	  //SAW-1374: Just keep the message hardcoded itself.
+          //SAW-1374: Just keep the message hardcoded itself.
         responseEntity = new ResponseEntity<>("{\"message\":\"Invalid Token\"}", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
         logger.info("Invalid Token: "+ responseEntity.toString());
         return responseEntity;
@@ -206,7 +220,7 @@ public class GatewayController {
           return new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()), 
               makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
         }
-    	responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
+        responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
     }
     logger.debug("Response {}", responseEntity.getStatusCode());
     return responseEntity;
@@ -227,42 +241,42 @@ public class GatewayController {
 
   
   private HttpHeaders makeResponseHeadersInvalid() {
-	    HttpHeaders result = new HttpHeaders();
-	    List<String> allowedHeaders = new ArrayList<String>();
-	    allowedHeaders.add("Origin");
-	    allowedHeaders.add("X-Requested-With");
-	    allowedHeaders.add("Content-Type");
-	    allowedHeaders.add("Accept");
-	    allowedHeaders.add("Authorization");
-	    result.setAccessControlAllowHeaders(allowedHeaders);
-	    List<HttpMethod> allowedMethods = new ArrayList<HttpMethod>();
-	    allowedMethods.add(HttpMethod.DELETE);
-	    allowedMethods.add(HttpMethod.POST);
-	    allowedMethods.add(HttpMethod.GET);
-	    allowedMethods.add(HttpMethod.OPTIONS);
-	    result.setAccessControlAllowMethods(allowedMethods);
-	    result.setCacheControl("no-cache, no-store, max-age=0, must-revalidate");
-	    result.setConnection("keep-alive");
-	    result.setContentType(MediaType.APPLICATION_JSON_UTF8);
-	    result.setAccessControlMaxAge(0);
-	    result.setExpires(0);
-	    result.setPragma("no-cache");
-	    result.set("Server", "nginx");
-	    result.set("X-Content-Type-Options", "nosniff");
-	    result.set("X-Frame-Options", "DENY");
-	    return result;
-	  }
+        HttpHeaders result = new HttpHeaders();
+        List<String> allowedHeaders = new ArrayList<String>();
+        allowedHeaders.add("Origin");
+        allowedHeaders.add("X-Requested-With");
+        allowedHeaders.add("Content-Type");
+        allowedHeaders.add("Accept");
+        allowedHeaders.add("Authorization");
+        result.setAccessControlAllowHeaders(allowedHeaders);
+        List<HttpMethod> allowedMethods = new ArrayList<HttpMethod>();
+        allowedMethods.add(HttpMethod.DELETE);
+        allowedMethods.add(HttpMethod.POST);
+        allowedMethods.add(HttpMethod.GET);
+        allowedMethods.add(HttpMethod.OPTIONS);
+        result.setAccessControlAllowMethods(allowedMethods);
+        result.setCacheControl("no-cache, no-store, max-age=0, must-revalidate");
+        result.setConnection("keep-alive");
+        result.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        result.setAccessControlMaxAge(0);
+        result.setExpires(0);
+        result.setPragma("no-cache");
+        result.set("Server", "nginx");
+        result.set("X-Content-Type-Options", "nosniff");
+        result.set("X-Frame-Options", "DENY");
+        return result;
+      }
 
   private HttpHeaders setRequestHeader(HttpServletRequest request){
-	HttpHeaders  requestHeaders = new HttpHeaders();
-  	requestHeaders.set("Host", request.getHeader("Host"));
+    HttpHeaders  requestHeaders = new HttpHeaders();
+    requestHeaders.set("Host", request.getHeader("Host"));
     requestHeaders.set("Accept", request.getHeader("Accept"));
-  	requestHeaders.set("Authorization", request.getHeader("Authorization"));
- 	requestHeaders.set("Origin", request.getHeader("Origin"));
-  	requestHeaders.set("Referer", request.getHeader("Referer"));
-  	requestHeaders.set("User-Agent", request.getHeader("User-Agent"));
-  	requestHeaders.set("Content-type", request.getHeader("Content-type"));
-	return requestHeaders;  
+    requestHeaders.set("Authorization", request.getHeader("Authorization"));
+    requestHeaders.set("Origin", request.getHeader("Origin"));
+    requestHeaders.set("Referer", request.getHeader("Referer"));
+    requestHeaders.set("User-Agent", request.getHeader("User-Agent"));
+    requestHeaders.set("Content-type", request.getHeader("Content-type"));
+    return requestHeaders;  
   }
   
 

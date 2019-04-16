@@ -35,7 +35,7 @@ sip-app2
 # SIP
 #
 sip_var_path=/var/sip
-
+sip_secure=false
 #
 # Spark configuration
 #
