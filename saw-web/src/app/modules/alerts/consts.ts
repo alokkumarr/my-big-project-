@@ -13,6 +13,11 @@ export const ALERT_SEVERITY = [
   { name: 'LOW', value: 'LOW' }
 ];
 
+export const ALERT_STATUS = [
+  { name: 'Active', value: true },
+  { name: 'Inactive', value: false }
+];
+
 export const ALERT_OPERATORS = [
   {
     value: 'GT',

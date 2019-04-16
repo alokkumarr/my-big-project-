@@ -3,18 +3,20 @@ import {
   OnInit,
   OnDestroy,
   EventEmitter,
-  Output
+  Output,
+  Input
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 
-import { AlertConfig } from '../../../alerts.interface';
+import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
 import {
   ALERT_AGGREGATIONS,
   ALERT_OPERATORS,
-  ALERT_SEVERITY
+  ALERT_SEVERITY,
+  ALERT_STATUS
 } from '../../../consts';
 import { SubscriptionLike } from 'rxjs';
 @Component({
@@ -31,17 +33,37 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertAggregations = ALERT_AGGREGATIONS;
   alertOperators = ALERT_OPERATORS;
   alertSeverity = ALERT_SEVERITY;
+  alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
+  endActionText = 'Add';
 
   constructor(
     private _formBuilder: FormBuilder,
     public _configureAlertService: ConfigureAlertService,
     private _notify: ToastService
-  ) {}
+  ) {
+    this.createAlertForm();
+  }
 
+  @Input() alertDefinition: AlertDefinition;
   @Output() onAddAlert = new EventEmitter<any>();
 
   ngOnInit() {
+    if (this.alertDefinition.action === 'update') {
+      this.endActionText = 'Update';
+      this.alertDefFormGroup.patchValue(this.alertDefinition.alertConfig);
+      this.alertMetricFormGroup.patchValue(this.alertDefinition.alertConfig);
+      this.alertRuleFormGroup.patchValue(this.alertDefinition.alertConfig);
+      this.endActionText = 'Update';
+    }
+    this.datapods$ = this._configureAlertService.getListOfDatapods$();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
       alertName: ['', [Validators.required, Validators.maxLength(18)]],
       alertDescriptions: ['', [Validators.required, Validators.maxLength(36)]],
@@ -63,16 +85,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern('^[0-9]*$')]
       ]
     });
-
-    this.datapods$ = this._configureAlertService.getListOfDatapods$();
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   onDatapodSelected(selectedItem) {
-    this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
+    // this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
     if (selectedItem) {
       this.alertMetricFormGroup.controls.datapodName.setValue(
         selectedItem.metricName

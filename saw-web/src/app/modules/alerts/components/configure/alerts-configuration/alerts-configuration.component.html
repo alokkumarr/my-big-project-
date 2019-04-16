@@ -13,7 +13,7 @@
         class="conf-container__add__header"
       >
         <span fxFlex class="conf-container__add__header__title" i18n
-          >Add Alert
+          >{{ navTitle }}
         </span>
         <button
           mat-icon-button
@@ -26,6 +26,7 @@
       </div>
       <add-alert
         *ngIf="alertSidenav.opened"
+        [alertDefinition]="alertDefInput"
         (onAddAlert)="onAddAlert()"
       ></add-alert>
     </div>
@@ -140,6 +141,7 @@
             e2e="edit-alert"
             class="conf-container-content__body__gridBtn"
             matTooltip="Edit"
+            (click)="editAlert(data.data)"
           >
             <mat-icon fontIcon="icon-edit"></mat-icon>
           </button>

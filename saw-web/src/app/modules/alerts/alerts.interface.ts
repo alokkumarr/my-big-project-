@@ -1,16 +1,24 @@
 export interface AlertConfig {
-  activeInd: string;
-  aggregation: string;
-  alertSeverity: string;
-  categoryId: string;
+  alertRulesSysId: number;
   datapodId: string;
-  datapodName: string;
-  monitoringEntity: string;
-  operator: string;
-  product: string;
-  alertDescriptions: string;
   alertName: string;
+  alertDescriptions?: any;
+  category: string;
+  alertSeverity: string;
+  monitoringEntity: string;
+  aggregation: string;
+  operator: string;
   thresholdValue: number;
+  activeInd: boolean;
+  createdBy?: any;
+  createdTime?: any;
+  modifiedTime?: any;
+  modifiedBy?: any;
+}
+
+export interface AlertDefinition {
+  action: string;
+  alertConfig?: AlertConfig;
 }
 
 export interface DatapodMetric {

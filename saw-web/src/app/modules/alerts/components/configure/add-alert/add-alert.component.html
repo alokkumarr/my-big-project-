@@ -63,8 +63,11 @@
             <mat-form-field appearance="outline">
               <mat-label>Alert Status</mat-label>
               <mat-select formControlName="activeInd" e2e="alertStatus">
-                <mat-option value="true">Active</mat-option>
-                <mat-option value="false">Disabled</mat-option>
+                <mat-option
+                  *ngFor="let stat of alertStatus"
+                  [value]="stat.value"
+                  >{{ stat.name }}</mat-option
+                >
               </mat-select>
             </mat-form-field>
 
