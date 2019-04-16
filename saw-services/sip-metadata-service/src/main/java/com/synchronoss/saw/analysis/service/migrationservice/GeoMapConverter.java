@@ -9,9 +9,7 @@ import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Store;
 import com.synchronoss.saw.model.geomap.GeoRegion;
 import com.synchronoss.saw.model.geomap.MapOptions;
-import com.synchronoss.saw.model.geomap.Supports;
 import com.synchronoss.saw.util.FieldNames;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -75,12 +73,6 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
       field.setArea(checkedVal + FieldNames.AXIS);
     }
 
-    if (fieldObject.has(FieldNames.GEO_TYPE)) {
-      String geoType = fieldObject.get(FieldNames.GEO_TYPE).getAsString();
-
-      field.setGeoType(geoType);
-    }
-
     if (fieldObject.has(FieldNames.REGION)) {
       JsonObject region = fieldObject.getAsJsonObject(FieldNames.REGION);
       field.setGeoRegion(new Gson().fromJson(region, GeoRegion.class));
@@ -90,15 +82,6 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
 
   private MapOptions createMapOptions(JsonObject oldAnalysisDefinition) {
     MapOptions mapOptions = new MapOptions();
-    List<Supports> supports = new ArrayList<>();
-
-    if (oldAnalysisDefinition.has(FieldNames.SUPPORTS)) {
-      JsonArray supportsArray = oldAnalysisDefinition.getAsJsonArray(FieldNames.SUPPORTS);
-      for (JsonElement support : supportsArray) {
-        supports.add(new Gson().fromJson(support, Supports.class));
-      }
-      mapOptions.setSupports(supports);
-    }
 
     if (oldAnalysisDefinition.has(FieldNames.MAP_SETTINGS)) {
       JsonObject mapSetting = oldAnalysisDefinition.getAsJsonObject(FieldNames.MAP_SETTINGS);
