@@ -7,11 +7,11 @@ import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
+import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
 
 import { ChartService } from '../../services';
 import { AnalysisChart, ArtifactColumnReport } from '../../types';
-import { isUndefined } from 'util';
 
 interface ReportGridField {
   caption: string;
