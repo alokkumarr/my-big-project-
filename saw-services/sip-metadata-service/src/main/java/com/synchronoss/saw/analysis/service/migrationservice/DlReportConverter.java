@@ -32,9 +32,10 @@ public class DlReportConverter implements AnalysisSipDslConverter {
     }
 
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
+    JsonArray artifactsArray = oldAnalysisDefinition.getAsJsonArray("artifacts");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      SipQuery sipQuery = buildSipQuery(sqlQueryBuilderObject);
+      SipQuery sipQuery = buildSipQuery(sqlQueryBuilderObject, artifactsArray);
       if (oldAnalysisDefinition.has("query")) {
         String query = oldAnalysisDefinition.get("query").getAsString();
         sipQuery.setQuery(query);
@@ -45,24 +46,24 @@ public class DlReportConverter implements AnalysisSipDslConverter {
   }
 
   @Override
-  public List<Field> generateArtifactFields(JsonObject sqlBuilder) {
+  public List<Field> generateArtifactFields(JsonObject sqlBuilder, JsonArray artifactsArray) {
 
     List<Field> fields = new LinkedList<>();
 
     if (sqlBuilder.has("columns")) {
       JsonArray columnsList = (JsonArray) sqlBuilder.get("columns");
       for (JsonElement col : columnsList) {
-        fields.add(buildArtifactField(col.getAsJsonObject()));
+        fields.add(buildArtifactField(col.getAsJsonObject(), artifactsArray));
       }
     }
     return fields;
   }
 
   @Override
-  public Field buildArtifactField(JsonObject fieldObject) {
+  public Field buildArtifactField(JsonObject fieldObject, JsonArray artifactsArray) {
 
     Field field = new Field();
-    field = setCommonFieldProperties(field, fieldObject);
+    field = setCommonFieldProperties(field, fieldObject, artifactsArray);
     return field;
   }
 
@@ -72,10 +73,10 @@ public class DlReportConverter implements AnalysisSipDslConverter {
    * @param sqlQueryBuilder oldAnalysis sqlBuilder
    * @return SipQuery Object
    */
-  public SipQuery buildSipQuery(JsonObject sqlQueryBuilder) {
+  public SipQuery buildSipQuery(JsonObject sqlQueryBuilder, JsonArray artifactsArray) {
     SipQuery sipQuery = new SipQuery();
 
-    sipQuery.setArtifacts(buildArtifactsList(sqlQueryBuilder));
+    sipQuery.setArtifacts(buildArtifactsList(sqlQueryBuilder, artifactsArray));
 
     String booleanCriteriaValue = sqlQueryBuilder.get("booleanCriteria").getAsString();
     SipQuery.BooleanCriteria booleanCriteria =
@@ -94,7 +95,7 @@ public class DlReportConverter implements AnalysisSipDslConverter {
    * @param sqlBuilder oldAnalysis sqlBuilder
    * @return {@link List} of {@link Artifact}
    */
-  public List<Artifact> buildArtifactsList(JsonObject sqlBuilder) {
+  public List<Artifact> buildArtifactsList(JsonObject sqlBuilder, JsonArray artifactsArray) {
     List<Artifact> artifacts = new LinkedList<>();
     Artifact artifact;
 
@@ -102,7 +103,7 @@ public class DlReportConverter implements AnalysisSipDslConverter {
       JsonArray dataFields = sqlBuilder.getAsJsonArray("dataFields");
       for (Object projectObj : dataFields) {
         JsonObject proj = (JsonObject) projectObj;
-        artifact = buildArtifact(proj);
+        artifact = buildArtifact(proj, artifactsArray);
         artifacts.add(artifact);
       }
     }
@@ -115,12 +116,12 @@ public class DlReportConverter implements AnalysisSipDslConverter {
    * @param sqlBuilder oldAnalysis sqlBuilder
    * @return Artifact Object
    */
-  public Artifact buildArtifact(JsonObject sqlBuilder) {
+  public Artifact buildArtifact(JsonObject sqlBuilder, JsonArray artifactsArray) {
     Artifact artifact = new Artifact();
     if (sqlBuilder.has("tableName")) {
       artifact.setArtifactsName(sqlBuilder.get("tableName").getAsString());
     }
-    artifact.setFields(generateArtifactFields(sqlBuilder));
+    artifact.setFields(generateArtifactFields(sqlBuilder, artifactsArray));
 
     return artifact;
   }

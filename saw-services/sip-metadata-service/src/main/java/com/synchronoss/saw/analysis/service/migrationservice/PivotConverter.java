@@ -19,10 +19,10 @@ public class PivotConverter implements AnalysisSipDslConverter {
 
     String artifactName = null;
 
-    JsonArray artifacts = oldAnalysisDefinition.getAsJsonArray("artifacts");
+    JsonArray artifactsArray = oldAnalysisDefinition.getAsJsonArray("artifacts");
 
     // Handling artifact name for charts and pivots
-    JsonObject artifact = artifacts.get(0).getAsJsonObject();
+    JsonObject artifact = artifactsArray.get(0).getAsJsonObject();
     artifactName = artifact.get("artifactName").getAsString();
 
     Store store = buildStoreObject(oldAnalysisDefinition);
@@ -30,21 +30,22 @@ public class PivotConverter implements AnalysisSipDslConverter {
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, store));
+      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject,
+          artifactsArray, store));
     }
 
     return analysis;
   }
 
   @Override
-  public List<Field> generateArtifactFields(JsonObject sqlBuilder) {
+  public List<Field> generateArtifactFields(JsonObject sqlBuilder, JsonArray artifactsArray) {
     List<Field> fields = new LinkedList<>();
 
     if (sqlBuilder.has("dataFields")) {
       JsonArray dataFields = sqlBuilder.getAsJsonArray("dataFields");
 
       for (JsonElement dataField : dataFields) {
-        fields.add(buildArtifactField(dataField.getAsJsonObject()));
+        fields.add(buildArtifactField(dataField.getAsJsonObject(), artifactsArray));
       }
     }
 
@@ -52,7 +53,7 @@ public class PivotConverter implements AnalysisSipDslConverter {
       JsonArray rowFields = sqlBuilder.getAsJsonArray("rowFields");
 
       for (JsonElement rowField : rowFields) {
-        fields.add(buildArtifactField(rowField.getAsJsonObject()));
+        fields.add(buildArtifactField(rowField.getAsJsonObject(), artifactsArray));
       }
     }
 
@@ -60,7 +61,7 @@ public class PivotConverter implements AnalysisSipDslConverter {
       JsonArray columnFields = sqlBuilder.getAsJsonArray("columnFields");
 
       for (JsonElement columnField : columnFields) {
-        fields.add(buildArtifactField(columnField.getAsJsonObject()));
+        fields.add(buildArtifactField(columnField.getAsJsonObject(), artifactsArray));
       }
     }
 
@@ -68,9 +69,9 @@ public class PivotConverter implements AnalysisSipDslConverter {
   }
 
   @Override
-  public Field buildArtifactField(JsonObject fieldObject) {
+  public Field buildArtifactField(JsonObject fieldObject, JsonArray artifactsArray) {
     Field field = new Field();
-    field = setCommonFieldProperties(field, fieldObject);
+    field = setCommonFieldProperties(field, fieldObject, artifactsArray);
 
     // Set area
     if (fieldObject.has("area")) {

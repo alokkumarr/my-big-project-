@@ -275,12 +275,13 @@ public class Field {
   }
 
   public enum GroupInterval {
+    ALL("all"),
     YEAR("year"),
     MONTH("month"),
     DAY("day"),
     QUARTER("quarter"),
-    HOUR("hour"),
-    WEEK("week");
+    WEEK("week"),
+    HOUR("hour");
     private static final Map<String, GroupInterval> CONSTANTS =
         new HashMap<String, GroupInterval>();
 
