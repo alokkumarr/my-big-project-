@@ -1,5 +1,6 @@
 package com.sncr.saw.security.common.bean.repo;
 
+import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import java.io.Serializable;
 import java.util.ArrayList;
 

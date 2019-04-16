@@ -27,6 +27,7 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.TicketHelper;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
