@@ -29,11 +29,11 @@ public class AlertRulesDetails {
   @Column(name = "DATAPOD_ID")
   String datapodId;
 
-  @Column(name = "RULE_NAME")
-  String ruleName;
+  @Column(name = "ALERT_NAME")
+  String alertName;
 
-  @Column(name = "RULE_DESCRIPTIONS")
-  String ruleDescriptions;
+  @Column(name = "ALERT_DESCRIPTIONS")
+  String alertDescriptions;
 
   @Column(name = "CATEGORY")
   String category;
@@ -101,31 +101,31 @@ public class AlertRulesDetails {
   }
 
   /**
-   * Gets ruleName.
+   * Gets AlertName.
    *
-   * @return value of ruleName
+   * @return value of AlertName
    */
-  public String getRuleName() {
-    return ruleName;
+  public String getAlertName() {
+    return alertName;
   }
 
-  /** Sets ruleName. */
-  public void setRuleName(String ruleName) {
-    this.ruleName = ruleName;
+  /** Sets AlertName. */
+  public void setAlertName(String alertName) {
+    this.alertName = alertName;
   }
 
   /**
-   * Gets ruleDescriptions.
+   * Gets alertDescriptions.
    *
-   * @return value of ruleDescriptions
+   * @return value of alertDescriptions
    */
-  public String getRuleDescriptions() {
-    return ruleDescriptions;
+  public String getAlertDescriptions() {
+    return alertDescriptions;
   }
 
-  /** Sets ruleDescriptions. */
-  public void setRuleDescriptions(String ruleDescriptions) {
-    this.ruleDescriptions = ruleDescriptions;
+  /** Sets alertDescriptions. */
+  public void setAlertDescriptions(String alertDescriptions) {
+    this.alertDescriptions = alertDescriptions;
   }
 
   /**

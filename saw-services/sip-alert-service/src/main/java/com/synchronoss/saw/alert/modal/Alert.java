@@ -2,18 +2,33 @@ package com.synchronoss.saw.alert.modal;
 
 public class Alert {
 
+  Long alertRulesSysId;
   String datapodId;
   String datapodName;
   String categoryId;
   String product;
-  String ruleName;
-  String ruleDescription;
+  String alertName;
+  String alertDescription;
   String monitoringEntity;
   Aggregation aggregation;
   Operator operator;
   AlertSeverity alertSeverity;
   Double thresholdValue;
-  String activeInd;
+  Boolean activeInd;
+
+  /**
+   * Gets alertRulesSysId.
+   *
+   * @return value of alertRulesSysId
+   */
+  public Long getAlertRulesSysId() {
+    return alertRulesSysId;
+  }
+
+  /** Sets alertRulesSysId. */
+  public void setAlertRulesSysId(Long alertRulesSysId) {
+    this.alertRulesSysId = alertRulesSysId;
+  }
 
   /**
    * Gets datapodId.
@@ -72,31 +87,31 @@ public class Alert {
   }
 
   /**
-   * Gets ruleName.
+   * Gets alertName.
    *
-   * @return value of ruleName
+   * @return value of alertName
    */
-  public String getRuleName() {
-    return ruleName;
+  public String getAlertName() {
+    return alertName;
   }
 
-  /** Sets ruleName. */
-  public void setRuleName(String ruleName) {
-    this.ruleName = ruleName;
+  /** Sets alertName. */
+  public void setAlertName(String alertName) {
+    this.alertName = alertName;
   }
 
   /**
-   * Gets ruleDescription.
+   * Gets alertDescription.
    *
-   * @return value of ruleDescription
+   * @return value of alertDescription
    */
-  public String getRuleDescription() {
-    return ruleDescription;
+  public String getAlertDescription() {
+    return alertDescription;
   }
 
-  /** Sets ruleDescription. */
-  public void setRuleDescription(String ruleDescription) {
-    this.ruleDescription = ruleDescription;
+  /** Sets alertDescription. */
+  public void setAlertDescription(String alertDescription) {
+    this.alertDescription = alertDescription;
   }
 
   /**
@@ -174,12 +189,12 @@ public class Alert {
    *
    * @return value of activeInd
    */
-  public String getActiveInd() {
+  public Boolean getActiveInd() {
     return activeInd;
   }
 
   /** Sets activeInd. */
-  public void setActiveInd(String activeInd) {
+  public void setActiveInd(Boolean activeInd) {
     this.activeInd = activeInd;
   }
 }
