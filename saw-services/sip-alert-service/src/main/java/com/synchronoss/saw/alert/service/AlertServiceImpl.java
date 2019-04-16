@@ -12,6 +12,7 @@ import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
 import com.synchronoss.saw.alert.repository.AlertRulesRepository;
 import com.synchronoss.saw.alert.repository.AlertTriggerLog;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,8 @@ public class AlertServiceImpl implements AlertService {
     if (alertCustomerDetails == null || !alertCustomerDetails.isPresent()) {
       alertCustomerSysId =
           createCustomerDetails(ticket.getUserFullName(), alert.getProduct(), ticket.getCustCode());
+    } else {
+      alertCustomerSysId = alertCustomerDetails.get().getAlertCustomerSysId();
     }
     Optional<DatapodDetails> datapodDetail = alertDatapodRepository.findById(alert.getDatapodId());
 
@@ -61,18 +64,20 @@ public class AlertServiceImpl implements AlertService {
           alertCustomerSysId);
     }
     AlertRulesDetails alertRulesDetails = new AlertRulesDetails();
-    alertRulesDetails.setRuleName(alert.getRuleName());
+    alertRulesDetails.setAlertName(alert.getAlertName());
+    alertRulesDetails.setAlertDescriptions(alert.getAlertDescription());
     alertRulesDetails.setAggregation(alert.getAggregation());
     alertRulesDetails.setAlertSeverity(alert.getAlertSeverity());
     alertRulesDetails.setDatapodId(alert.getDatapodId());
     alertRulesDetails.setMonitoringEntity(alert.getMonitoringEntity());
-    alertRulesDetails.setActiveInd(true);
+    alertRulesDetails.setActiveInd(alert.getActiveInd());
     alertRulesDetails.setCategory(alert.getCategoryId());
     alertRulesDetails.setCreatedBy(ticket.getUserFullName());
     alertRulesDetails.setOperator(alert.getOperator());
     alertRulesDetails.setCreatedTime(new Date());
     alertRulesDetails.setThresholdValue(alert.getThresholdValue());
     alertRulesRepository.save(alertRulesDetails);
+    alert.setAlertRulesSysId(alertRulesDetails.getAlertRulesSysId());
     return alert;
   }
 
@@ -89,17 +94,19 @@ public class AlertServiceImpl implements AlertService {
       Ticket ticket) {
     Optional<AlertRulesDetails> alertRulesDetails = alertRulesRepository.findById(alertRuleId);
     if (alertRulesDetails.isPresent()) {
-      alertRulesDetails.get().setRuleName(alert.getRuleName());
+      alertRulesDetails.get().setAlertName(alert.getAlertName());
       alertRulesDetails.get().setAggregation(alert.getAggregation());
+      alertRulesDetails.get().setAlertDescriptions(alert.getAlertDescription());
       alertRulesDetails.get().setAlertSeverity(alert.getAlertSeverity());
       alertRulesDetails.get().setDatapodId(alert.getDatapodId());
       alertRulesDetails.get().setMonitoringEntity(alert.getMonitoringEntity());
-      alertRulesDetails.get().setActiveInd(Boolean.parseBoolean(alert.getActiveInd()));
+      alertRulesDetails.get().setActiveInd(alert.getActiveInd());
       alertRulesDetails.get().setOperator(alert.getOperator());
       alertRulesDetails.get().setModifiedTime(new Date());
       alertRulesDetails.get().setModifiedBy(ticket.getUserFullName());
       alertRulesDetails.get().setThresholdValue(alert.getThresholdValue());
       alertRulesRepository.save(alertRulesDetails.get());
+      alert.setAlertRulesSysId(alertRulesDetails.get().getAlertRulesSysId());
     }
     return alert;
   }
@@ -141,16 +148,17 @@ public class AlertServiceImpl implements AlertService {
     AlertRulesDetails alertRulesDetails = alertRulesRepository.findById(alertRuleId).get();
     alert.setThresholdValue(alertRulesDetails.getThresholdValue());
     alert.setAlertSeverity(alertRulesDetails.getAlertSeverity());
-    alert.setActiveInd(alertRulesDetails.getActiveInd().toString());
+    alert.setActiveInd(alertRulesDetails.getActiveInd());
     alert.setAggregation(alertRulesDetails.getAggregation());
     alert.setDatapodId(alertRulesDetails.getDatapodId());
     alert.setMonitoringEntity(alertRulesDetails.getMonitoringEntity());
     alert.setOperator(alertRulesDetails.getOperator());
-    alert.setRuleDescription(alertRulesDetails.getRuleDescriptions());
-    alert.setRuleName(alertRulesDetails.getRuleName());
+    alert.setAlertDescription(alertRulesDetails.getAlertDescriptions());
+    alert.setAlertName(alertRulesDetails.getAlertName());
     Optional<DatapodDetails> datapodDetail = alertDatapodRepository.findById(alert.getDatapodId());
     alert.setDatapodName(datapodDetail.get().getDatapodName());
     alert.setCategoryId(alertRulesDetails.getCategory());
+    alert.setAlertRulesSysId(alertRulesDetails.getAlertRulesSysId());
     return alert;
   }
 
@@ -215,18 +223,16 @@ public class AlertServiceImpl implements AlertService {
    */
   @Override
   public String retrieveOperatorsDetails(Ticket ticket) {
-    List<AlertRulesDetails> rulesDetails = alertRulesRepository.findAll();
     JsonArray elements = new JsonArray();
     JsonObject response = new JsonObject();
-    if (rulesDetails != null && !rulesDetails.isEmpty()) {
-      for (AlertRulesDetails details : rulesDetails) {
-        JsonObject object = new JsonObject();
-        String readableOperator = getReadableOperator(details.getOperator());
-        if (readableOperator != null) {
-          object.addProperty(ID, details.getOperator().value());
-          object.addProperty(NAME, readableOperator);
-          elements.add(object);
-        }
+    List<Operator> operatorList = Arrays.asList(Operator.values());
+    for (Operator operator : operatorList) {
+      JsonObject object = new JsonObject();
+      String readableOperator = getReadableOperator(operator);
+      if (readableOperator != null) {
+        object.addProperty(ID, operator.value());
+        object.addProperty(NAME, readableOperator);
+        elements.add(object);
       }
     }
     response.add(OPERATORS, elements);
