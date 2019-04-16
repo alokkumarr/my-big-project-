@@ -8,7 +8,6 @@ import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Filter.Type;
 import com.synchronoss.saw.model.Model;
-import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
@@ -266,8 +265,9 @@ public class ElasticSearchQueryBuilder {
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
-          } else if ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
-              || (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND))) {
+          } else if ((item.getModel().getFormat() != null)
+              && ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
+                  || (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)))) {
             if (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)) {
               logger.info("Filter format : epoch");
               logger.info("TimeStamp in Epoch(in seconds),Value " + item.getModel().getValue());
@@ -321,7 +321,8 @@ public class ElasticSearchQueryBuilder {
               builder.add(rangeQueryBuilder);
               logger.debug("Builder Obj : " + builder);
             }
-          } else if (item.getModel().getFormat().equalsIgnoreCase(ONLY_YEAR_FORMAT)) {
+          } else if ((item.getModel().getFormat() != null)
+              && (item.getModel().getFormat().equalsIgnoreCase(ONLY_YEAR_FORMAT))) {
             DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             GregorianCalendar startDate =
@@ -376,7 +377,8 @@ public class ElasticSearchQueryBuilder {
               /*In yyyy-MM format GT is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
                * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
                * */
-              if (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM")) {
+              if ((item.getModel().getFormat() != null)
+                  && (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
                 String date = item.getModel().getGt();
                 date = date + appenderForGTLTE;
                 rangeQueryBuilder.gt(date);
@@ -389,7 +391,8 @@ public class ElasticSearchQueryBuilder {
               /*In yyyy-MM format LTE is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
                * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
                * */
-              if (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM")) {
+              if ((item.getModel().getFormat() != null)
+                  && (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
                 String date = item.getModel().getLte();
                 date = date + appenderForGTLTE;
                 rangeQueryBuilder.lte(date);
@@ -409,10 +412,7 @@ public class ElasticSearchQueryBuilder {
         }
 
         if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
-                || item.getType()
-                    .value()
-                    .toLowerCase()
-                    .equals(Type.INTEGER.value().toLowerCase()))
+                || item.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
             || item.getType()
                 .value()
@@ -450,10 +450,7 @@ public class ElasticSearchQueryBuilder {
           builder = QueryBuilderUtil.stringFilter(item, builder);
         }
         if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
-                || item.getType()
-                    .value()
-                    .toLowerCase()
-                    .equals(Type.INTEGER.value().toLowerCase()))
+                || item.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
             || item.getType()
                 .value()

@@ -23,13 +23,136 @@ public class ChartConverter implements AnalysisSipDslConverter {
     // there will be 2 objects
     String artifactName = null;
 
-    JsonArray artifacts = oldAnalysisDefinition.getAsJsonArray("artifacts");
+    JsonArray artifactsArray = oldAnalysisDefinition.getAsJsonArray("artifacts");
 
     // Handling artifact name for charts and pivots
-    JsonObject artifact = artifacts.get(0).getAsJsonObject();
+    JsonObject artifact = artifactsArray.get(0).getAsJsonObject();
     artifactName = artifact.get("artifactName").getAsString();
 
     // Set chartProperties
+    analysis.setChartOptions(createChartOptions(oldAnalysisDefinition));
+
+    Store store = buildStoreObject(oldAnalysisDefinition);
+
+    JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
+    if (sqlQueryBuilderElement != null) {
+      JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
+      analysis.setSipQuery(
+          generateSipQuery(artifactName, sqlQueryBuilderObject, artifactsArray, store));
+    }
+    return analysis;
+  }
+
+  @Override
+  public List<Field> generateArtifactFields(JsonObject sqlBuilder, JsonArray artifactsArray) {
+    List<Field> fields = new LinkedList<>();
+
+    if (sqlBuilder.has("dataFields")) {
+      JsonArray dataFields = sqlBuilder.getAsJsonArray("dataFields");
+
+      for (JsonElement dataField : dataFields) {
+        fields.add(buildArtifactField(dataField.getAsJsonObject(), artifactsArray));
+      }
+    }
+
+    if (sqlBuilder.has("nodeFields")) {
+      JsonArray nodeFields = sqlBuilder.getAsJsonArray("nodeFields");
+
+      for (JsonElement dataField : nodeFields) {
+        fields.add(buildArtifactField(dataField.getAsJsonObject(), artifactsArray));
+      }
+    }
+
+    return fields;
+  }
+
+  @Override
+  public Field buildArtifactField(JsonObject fieldObject, JsonArray artifactsArray) {
+    Field field = new Field();
+    field = setCommonFieldProperties(field, fieldObject, artifactsArray);
+
+    if (fieldObject.has("comboType")) {
+      field.setDisplayType(fieldObject.get("comboType").getAsString());
+    }
+
+    if (fieldObject.has("checked")) {
+      String checkedVal = fieldObject.get("checked").getAsString();
+
+      field.setArea(checkedVal + "-axis");
+    }
+
+    // Set limit fields
+    // If limits are set in field object in sqlbuilder, that has to be used,
+    // else it has to be checked in artifacts array
+
+    if (fieldObject.has("limitType") && fieldObject.has("limitValue")) {
+      LimitType limitType = LimitType.fromValue(fieldObject.get("limitType").getAsString());
+      field.setLimitType(limitType);
+
+      int limitValue = fieldObject.get("limitValue").getAsInt();
+      field.setLimitValue(limitValue);
+    } else {
+      // Check if limit is set in artifacts
+      String columnName = field.getColumnName();
+
+      Limit limit = extractLimitArtifactsArray(columnName, artifactsArray);
+
+      if (limit != null) {
+        field.setLimitType(limit.limitType);
+        field.setLimitValue(limit.limitValue);
+      }
+    }
+
+    return field;
+  }
+
+  private Limit extractLimitArtifactsArray(String columnName, JsonArray artifactsArray) {
+    Limit limit = null;
+
+    for (JsonElement artifactElement : artifactsArray) {
+      limit = getLimitFromArtifactObject(columnName, artifactElement.getAsJsonObject());
+
+      if (limit != null) {
+        break;
+      }
+    }
+
+    return limit;
+  }
+
+  private Limit getLimitFromArtifactObject(String columnName, JsonObject artifactObject) {
+    Limit limit = null;
+
+    if (artifactObject.has("columns")) {
+      JsonArray columns = artifactObject.getAsJsonArray("columns");
+
+      for (JsonElement columnElement : columns) {
+        JsonObject column = columnElement.getAsJsonObject();
+
+        String artifactColumnName = column.get("columnName").getAsString();
+
+        if (columnName.equalsIgnoreCase(artifactColumnName)) {
+          if (column.has("limitType") && column.has("limitValue")) {
+            String limitType = column.get("limitType").getAsString();
+
+            int limitValue = column.get("limitValue").getAsInt();
+
+            limit = new Limit();
+
+            limit.limitType = LimitType.fromValue(limitType);
+
+            limit.limitValue = limitValue;
+
+            break;
+          }
+        }
+      }
+    }
+
+    return limit;
+  }
+
+  private ChartOptions createChartOptions(JsonObject oldAnalysisDefinition) {
     Boolean isInverted = null;
     JsonObject legendObject = null;
     String chartType = null;
@@ -65,99 +188,20 @@ public class ChartConverter implements AnalysisSipDslConverter {
     if (oldAnalysisDefinition.has("yAxis")) {
       yaxis = oldAnalysisDefinition.get("yAxis");
     }
-
-    analysis.setChartOptions(
-        createChartOptions(
-            isInverted, legendObject, chartTitle, chartType, labelOptions, xaxis, yaxis));
-
-    if (oldAnalysisDefinition.has("edit")) {
-      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
-
-      analysis.setDesignerEdit(designerEdit);
-    }
-
-    JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
-    Store store = null;
-    if (esRepository != null) {
-      store = extractStoreInfo(esRepository);
-    }
-    JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
-    if (sqlQueryBuilderElement != null) {
-      JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, store));
-    }
-    return analysis;
-  }
-
-  @Override
-  public List<Field> generateArtifactFields(JsonObject sqlBuilder) {
-    List<Field> fields = new LinkedList<>();
-
-    if (sqlBuilder.has("dataFields")) {
-      JsonArray dataFields = sqlBuilder.getAsJsonArray("dataFields");
-
-      for (JsonElement dataField : dataFields) {
-        fields.add(buildArtifactField(dataField.getAsJsonObject()));
-      }
-    }
-
-    if (sqlBuilder.has("nodeFields")) {
-      JsonArray nodeFields = sqlBuilder.getAsJsonArray("nodeFields");
-
-      for (JsonElement dataField : nodeFields) {
-        fields.add(buildArtifactField(dataField.getAsJsonObject()));
-      }
-    }
-
-    return fields;
-  }
-
-  @Override
-  public Field buildArtifactField(JsonObject fieldObject) {
-    Field field = new Field();
-    field = buildCommonsInArtifactField(field, fieldObject);
-
-    if (fieldObject.has("comboType")) {
-      field.setDisplayType(fieldObject.get("comboType").getAsString());
-    }
-
-    if (fieldObject.has("checked")) {
-      String checkedVal = fieldObject.get("checked").getAsString();
-
-      field.setArea(checkedVal + "-axis");
-    }
-
-    // Set limit fields
-    if (fieldObject.has("limitType")) {
-      LimitType limitType = LimitType.fromValue(fieldObject.get("limitType").getAsString());
-      field.setLimitType(limitType);
-    }
-
-    if (fieldObject.has("limitValue")) {
-      int limitValue = fieldObject.get("limitValue").getAsInt();
-      field.setLimitValue(limitValue);
-    }
-
-    return field;
-  }
-
-  private ChartOptions createChartOptions(
-      boolean isInverted,
-      JsonObject legend,
-      String chartTitle,
-      String chartType,
-      JsonObject labelOptions,
-      JsonElement xaxis,
-      JsonElement yaxis) {
     ChartOptions chartOptions = new ChartOptions();
 
     chartOptions.setInverted(isInverted);
-    chartOptions.setLegend(legend);
+    chartOptions.setLegend(legendObject);
     chartOptions.setChartTitle(chartTitle);
     chartOptions.setChartType(chartType);
     chartOptions.setLabelOptions(labelOptions);
     chartOptions.setxAxis(xaxis);
     chartOptions.setyAxis(yaxis);
     return chartOptions;
+  }
+
+  class Limit {
+    LimitType limitType;
+    Integer limitValue;
   }
 }

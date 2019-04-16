@@ -275,12 +275,13 @@ public class Field {
   }
 
   public enum GroupInterval {
+    ALL("all"),
     YEAR("year"),
     MONTH("month"),
     DAY("day"),
     QUARTER("quarter"),
-    HOUR("hour"),
-    WEEK("week");
+    WEEK("week"),
+    HOUR("hour");
     private static final Map<String, GroupInterval> CONSTANTS =
         new HashMap<String, GroupInterval>();
 
@@ -324,7 +325,9 @@ public class Field {
     MAX("max"),
     COUNT("count"),
     PERCENTAGE("percentage"),
-    DISTINCT_COUNT("distinctCount");
+    PERCENTAGE_BY_ROW("percentagebyrow"),
+    DISTINCTCOUNT("distinctcount");
+
     private static final Map<String, Aggregate> CONSTANTS = new HashMap<>();
 
     static {
@@ -351,12 +354,12 @@ public class Field {
 
     @Override
     public String toString() {
-      return this.value;
+      return this.value.toLowerCase();
     }
 
     @JsonValue
     public String value() {
-      return this.value;
+      return this.value.toLowerCase();
     }
   }
 

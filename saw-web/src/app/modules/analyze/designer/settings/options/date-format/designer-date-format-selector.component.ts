@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import * as moment from 'moment';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 import * as get from 'lodash/get';
 import { AnalyzeDialogService } from '../../../../services/analyze-dialog.service';
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
@@ -30,7 +29,7 @@ const dateFormatsMap = {
   selector: 'designer-date-format-selector',
   templateUrl: 'designer-date-format-selector.component.html'
 })
-export class DesignerDateFormatSelectorComponent implements OnInit {
+export class DesignerDateFormatSelectorComponent {
   @Output() public change: EventEmitter<
     DesignerChangeEvent
   > = new EventEmitter();
@@ -44,10 +43,6 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
     private store: Store
   ) {}
 
-  ngOnInit() {
-    this.changeDateSample();
-  }
-
   onFormatChange(format: Format | string) {
     if (format) {
       if (this.analysisType === 'chart') {
@@ -60,7 +55,6 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
           })
         );
       } else {
-        this.artifactColumn.format = format;
         this.store.dispatch(
           new DesignerUpdateArtifactColumn({
             columnName: this.artifactColumn.columnName,
@@ -69,15 +63,17 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
           })
         );
       }
-      this.changeDateSample();
       this.change.emit({ subject: 'format' });
     }
   }
 
   getDateLabel(artifactColumn) {
     const dateFormatsObj = get(dateFormatsMap, `${this.analysisType}.obj`);
-    const format = this.analysisType === 'pivot' ? 'format' : 'dateFormat';
-    return get(dateFormatsObj, `[${artifactColumn[format]}].label`, '');
+    return get(
+      dateFormatsObj,
+      `[${artifactColumn.dateFormat || artifactColumn.format}].label`,
+      ''
+    );
   }
 
   openDateFormatDialog() {
@@ -90,12 +86,5 @@ export class DesignerDateFormatSelectorComponent implements OnInit {
       .openDateFormatDialog(<string>columnFormat, dateFormats)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
-  }
-
-  changeDateSample() {
-    const format = <string>this.artifactColumn.format;
-    if (format) {
-      this.dateSample = moment.utc().format(format);
-    }
   }
 }

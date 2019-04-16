@@ -122,7 +122,7 @@ public class QueryBuilderUtil {
         aggregationBuilder =
             AggregationBuilders.count(field.getDataField()).field(field.getColumnName());
         break;
-      case DISTINCT_COUNT:
+      case DISTINCTCOUNT:
         aggregationBuilder =
             AggregationBuilders.cardinality(field.getDataField()).field(field.getColumnName());
         break;

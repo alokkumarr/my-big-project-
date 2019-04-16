@@ -56,7 +56,12 @@ export class AnalyzeDialogService {
       : {};
 
     return this.router.navigate(['analyze/designer'], {
-      queryParams: { ...analysisStarter, ...analysis, mode }
+      queryParams: {
+        ...analysisStarter,
+        ...analysis,
+        mode,
+        supports: JSON.stringify(analysisStarter.supports)
+      }
     });
   }
 

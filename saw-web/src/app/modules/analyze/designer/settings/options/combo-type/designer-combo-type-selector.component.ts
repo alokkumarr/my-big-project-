@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngxs/store';
-
 import {
   COMBO_TYPES,
   COMBO_TYPES_OBJ,
@@ -46,7 +45,7 @@ export class DesignerComboTypeSelectorComponent {
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
-        comboType
+        displayType: comboType
       })
     );
     this.change.emit({ subject: 'comboType', column: this.artifactColumn });

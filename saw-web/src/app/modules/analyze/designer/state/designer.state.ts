@@ -4,6 +4,7 @@ import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
+import moment from 'moment';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -31,12 +32,15 @@ import {
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
-  DesignerReorderArtifactColumns
+  DesignerReorderArtifactColumns,
+  DesignerRemoveAllArtifactColumns
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
-import { CUSTOM_DATE_PRESET_VALUE } from './../../../analyze/consts';
-
-import moment from 'moment';
+import {
+  DATE_TYPES,
+  DEFAULT_DATE_FORMAT,
+  CUSTOM_DATE_PRESET_VALUE
+} from '../../consts';
 
 // setAutoFreeze(false);
 
@@ -85,6 +89,7 @@ export class DesignerState {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     let artifacts = sipQuery.artifacts;
+    const isDateType = DATE_TYPES.includes(artifactColumn.type);
 
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
@@ -103,11 +108,16 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
-      dateFormat: artifactColumn.dateFormat,
       groupInterval: artifactColumn.groupInterval,
       name: artifactColumn.name,
       type: artifactColumn.type,
-      table: artifactColumn.table || (<any>artifactColumn).tableName
+      table: artifactColumn.table || (<any>artifactColumn).tableName,
+      ...(isDateType
+        ? {
+            dateFormat:
+              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
+          }
+        : { format: artifactColumn.format })
     };
 
     if (artifactIndex < 0) {
@@ -216,6 +226,19 @@ export class DesignerState {
         field.areaIndex = areaIndexMap[field.columnName];
       });
     });
+  }
+
+  @Action(DesignerRemoveAllArtifactColumns)
+  removeAllArtifactColumns({
+    patchState,
+    getState
+  }: StateContext<DesignerStateModel>) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const artifacts = (sipQuery.artifacts || []).map(artifact => ({
+      ...artifact,
+      fields: []
+    }));
 
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
@@ -433,7 +456,7 @@ export class DesignerState {
 
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
-    { patchState, getState }: StateContext<DesignerStateModel>,
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
     {  }: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
@@ -445,7 +468,8 @@ export class DesignerState {
 
       adapter.artifactColumns = [];
     });
-    return patchState({ groupAdapters: [...groupAdapters] });
+    patchState({ groupAdapters: [...groupAdapters] });
+    return dispatch(new DesignerRemoveAllArtifactColumns());
   }
 
   @Action(DesignerRemoveColumnFromGroupAdapter)

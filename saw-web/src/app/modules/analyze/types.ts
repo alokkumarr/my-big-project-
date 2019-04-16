@@ -57,11 +57,12 @@ export interface AnalysisStarter {
   name?: string;
   description?: string;
   scheduled?: null;
-  semanticId: string;
-  categoryId: string;
-  metricName: string;
-  type: AnalysisType;
+  semanticId?: string;
+  categoryId?: string;
+  metricName?: string;
+  type?: AnalysisType;
   chartType?: ChartType;
+  supports?: string[];
 }
 
 export interface AnalysisDialogData {

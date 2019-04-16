@@ -19,15 +19,9 @@ public class EsReportConverter implements AnalysisSipDslConverter {
     String artifactName = null;
 
     // Extract artifact name from "artifacts"
-    JsonArray artifacts = oldAnalysisDefinition.getAsJsonArray("artifacts");
-    JsonObject artifact = artifacts.get(0).getAsJsonObject();
+    JsonArray artifactsArray = oldAnalysisDefinition.getAsJsonArray("artifacts");
+    JsonObject artifact = artifactsArray.get(0).getAsJsonObject();
     artifactName = artifact.get("artifactName").getAsString();
-
-    if (oldAnalysisDefinition.has("edit")) {
-      Boolean designerEdit = oldAnalysisDefinition.get("edit").getAsBoolean();
-
-      analysis.setDesignerEdit(designerEdit);
-    }
 
     JsonObject esRepository = oldAnalysisDefinition.getAsJsonObject("esRepository");
     Store store = null;
@@ -37,14 +31,15 @@ public class EsReportConverter implements AnalysisSipDslConverter {
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, store));
+      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject,
+          artifactsArray, store));
     }
 
     return analysis;
   }
 
   @Override
-  public List<Field> generateArtifactFields(JsonObject sqlBuilder) {
+  public List<Field> generateArtifactFields(JsonObject sqlBuilder, JsonArray artifactsArray) {
     List<Field> fields = new LinkedList<>();
 
     if (sqlBuilder.has("dataFields")) {
@@ -54,7 +49,7 @@ public class EsReportConverter implements AnalysisSipDslConverter {
         JsonObject proj = (JsonObject) projectObj;
         JsonArray columnsList = (JsonArray) proj.get("columns");
         for (JsonElement col : columnsList) {
-          fields.add(buildArtifactField(col.getAsJsonObject()));
+          fields.add(buildArtifactField(col.getAsJsonObject(), artifactsArray));
         }
       }
     }
@@ -63,9 +58,9 @@ public class EsReportConverter implements AnalysisSipDslConverter {
   }
 
   @Override
-  public Field buildArtifactField(JsonObject fieldObject) {
+  public Field buildArtifactField(JsonObject fieldObject, JsonArray artifactsArray) {
     Field field = new Field();
-    field = buildCommonsInArtifactField(field, fieldObject);
+    field = setCommonFieldProperties(field, fieldObject, artifactsArray);
     return field;
   }
 }

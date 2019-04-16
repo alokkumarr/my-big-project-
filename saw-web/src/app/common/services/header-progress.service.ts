@@ -10,23 +10,25 @@ export class HeaderProgressService {
 
   subscribe(fn) {
     return this._subject$
-      .pipe(distinctUntilChanged(), debounce(() => timer(100)))
+      .pipe(
+        distinctUntilChanged(),
+        debounce(() => timer(100))
+      )
       .subscribe(fn);
   }
 
   show() {
     this._progressCounter++;
-    this._showProgress = this._get();
+    this.onChange();
   }
 
   hide() {
     this._progressCounter--;
-    this._showProgress = this._get();
+    this.onChange();
   }
 
-  public _get() {
+  public onChange() {
     const showProgress = this._progressCounter > 0;
     this._subject$.next(showProgress);
-    return showProgress;
   }
 }
