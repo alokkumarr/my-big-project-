@@ -40,15 +40,28 @@ write_files:
       fi
       hosted_zone_id="/hostedzone/ZAO306VHTKPTB"
       public_ip=$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)
+      local_dns=$(curl -sS http://169.254.169.254/latest/meta-data/local-hostname).sncrbda.dev.cloud.synchronoss.net
       changes=$(cat <<EOF
-      {
         "ChangeBatch": {
-          "Comment": "Update host entry in DNS",
+          "Comment": "Update host entry in DNS and Deleting AWS private hostname entry in route53",
           "Changes": [
             {
               "Action": "UPSERT",
               "ResourceRecordSet": {
                 "Name": "$(hostname).sncrbda.dev.cloud.synchronoss.net",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                  {
+                    "Value": "$public_ip"
+                  }
+                ]
+              }
+            },
+            {
+              "Action": "DELETE",
+              "ResourceRecordSet": {
+                "Name": "$local_dns",
                 "Type": "A",
                 "TTL": 300,
                 "ResourceRecords": [
