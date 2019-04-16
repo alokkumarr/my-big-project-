@@ -275,7 +275,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'chart':
         this._chartService.updateAnalysisModel(this.analysis);
         if (this.designerMode === 'new') {
-          (<any>this.analysis).isInverted = this.chartType === 'bar';
+          if (isDSLAnalysis(this.analysis)) {
+            this.analysis.chartOptions.isInverted = this.chartType === 'bar';
+          } else {
+            (<any>this.analysis).isInverted = this.chartType === 'bar';
+          }
         }
         this.chartTitle = isDSLAnalysis(this.analysis)
           ? this.analysis.chartOptions.chartTitle || this.analysis.name
@@ -1029,9 +1033,17 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   changeChartType(to: string) {
     if (isDSLAnalysis(this.analysis)) {
       this._store.dispatch(new DesignerUpdateAnalysisChartType(to));
+      isDSLAnalysis(this.analysis);
+      this._store.dispatch(
+        new DesignerUpdateAnalysisChartInversion(to === 'bar')
+      );
     } else {
       (<AnalysisChart>this.analysis).chartType = to;
+      (<any>this.analysis).isInverted = to === 'bar';
     }
+
+    this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
+    // this.artifacts = [...this.artifacts];
   }
 
   resetAnalysis() {

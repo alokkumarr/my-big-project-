@@ -184,6 +184,9 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
   }
 
   reloadChart(data, changes = []) {
+    if (this._sqlBuilder.dataFields.length === 0) {
+      return;
+    }
     const changeConfig = this._chartService.dataToChangeConfig(
       this.chartType,
       this.settings,
