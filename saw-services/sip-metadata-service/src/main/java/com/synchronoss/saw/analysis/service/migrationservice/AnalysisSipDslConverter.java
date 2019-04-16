@@ -120,10 +120,11 @@ public interface AnalysisSipDslConverter {
    * @param store Repository
    * @return SipQuery Object
    */
-  default SipQuery generateSipQuery(String artifactName, JsonObject sqlQueryBuilder, Store store) {
+  default SipQuery generateSipQuery(
+      String artifactName, JsonObject sqlQueryBuilder, JsonArray artifactsArray, Store store) {
     SipQuery sipQuery = new SipQuery();
 
-    sipQuery.setArtifacts(generateArtifactsList(artifactName, sqlQueryBuilder));
+    sipQuery.setArtifacts(generateArtifactsList(artifactName, sqlQueryBuilder, artifactsArray));
 
     String booleanCriteriaValue = sqlQueryBuilder.get(FieldNames.BOOLEAN_CRITERIA).getAsString();
     SipQuery.BooleanCriteria booleanCriteria =
@@ -143,9 +144,12 @@ public interface AnalysisSipDslConverter {
    * @param sqlBuilder sqlBuilder Object
    * @return {@link List} of {@link Artifact}
    */
-  default List<Artifact> generateArtifactsList(String artifactName, JsonObject sqlBuilder) {
+  default List<Artifact> generateArtifactsList(
+      String artifactName, JsonObject sqlBuilder, JsonArray artifactsArray) {
     List<Artifact> artifacts = new LinkedList<>();
-    Artifact artifact = generateArtifact(artifactName, sqlBuilder);
+
+    Artifact artifact = generateArtifact(artifactName, sqlBuilder, artifactsArray);
+
     artifacts.add(artifact);
 
     return artifacts;
@@ -330,11 +334,12 @@ public interface AnalysisSipDslConverter {
    * @param sqlBuilder SqlBuilder Object
    * @return Artifact Object
    */
-  default Artifact generateArtifact(String artifactName, JsonObject sqlBuilder) {
+  default Artifact generateArtifact(
+      String artifactName, JsonObject sqlBuilder, JsonArray artifactsArray) {
     Artifact artifact = new Artifact();
 
     artifact.setArtifactsName(artifactName);
-    artifact.setFields(generateArtifactFields(sqlBuilder));
+    artifact.setFields(generateArtifactFields(sqlBuilder, artifactsArray));
 
     return artifact;
   }
@@ -345,7 +350,8 @@ public interface AnalysisSipDslConverter {
    * @param sqlBuilder SqlBuilder Object
    * @return {@link List} of {@link Field}
    */
-  public abstract List<Field> generateArtifactFields(JsonObject sqlBuilder);
+  public abstract List<Field> generateArtifactFields(
+      JsonObject sqlBuilder, JsonArray artifactsArray);
 
   /**
    * Generates Field.
@@ -353,7 +359,7 @@ public interface AnalysisSipDslConverter {
    * @param fieldObject Old Analysis field definition
    * @return Field Object
    */
-  public abstract Field buildArtifactField(JsonObject fieldObject);
+  public abstract Field buildArtifactField(JsonObject fieldObject, JsonArray artifactsArray);
 
   /**
    * Build only common properties of fields across Charts, Pivots and Reports.
@@ -362,7 +368,8 @@ public interface AnalysisSipDslConverter {
    * @param fieldObject Old Analysis field definition
    * @return Field Object
    */
-  default Field setCommonFieldProperties(Field field, JsonObject fieldObject) {
+  default Field setCommonFieldProperties(
+      Field field, JsonObject fieldObject, JsonArray artifactsArray) {
 
     if (fieldObject.has(FieldNames.COLUMN_NAME)) {
       field.setColumnName(fieldObject.get(FieldNames.COLUMN_NAME).getAsString());
@@ -376,19 +383,29 @@ public interface AnalysisSipDslConverter {
 
     // alias and aliasName are used alternatively in different types of analysis.
     // Both should be handled
-    if (fieldObject.has(FieldNames.ALIAS_NAME)) {
-      String alias = fieldObject.get(FieldNames.ALIAS_NAME).getAsString();
+    if (fieldObject.has(FieldNames.ALIAS) || fieldObject.has(FieldNames.ALIAS_NAME)) {
+      if (fieldObject.has(FieldNames.ALIAS_NAME)) {
+        String alias = fieldObject.get(FieldNames.ALIAS_NAME).getAsString();
 
-      if (alias.length() != 0) {
-        field.setAlias(fieldObject.get(FieldNames.ALIAS_NAME).getAsString());
+        if (alias.length() != 0) {
+          field.setAlias(fieldObject.get(FieldNames.ALIAS_NAME).getAsString());
+        }
       }
-    }
 
-    if (fieldObject.has(FieldNames.ALIAS)) {
-      String alias = fieldObject.get(FieldNames.ALIAS).getAsString();
+      if (fieldObject.has(FieldNames.ALIAS)) {
+        String alias = fieldObject.get(FieldNames.ALIAS).getAsString();
 
-      if (alias.length() != 0) {
-        field.setAlias(fieldObject.get(FieldNames.ALIAS).getAsString());
+        if (alias.length() != 0) {
+          field.setAlias(fieldObject.get(FieldNames.ALIAS).getAsString());
+        }
+      }
+    } else {
+      // If both alias and aliasName are not set, check in the artifacts if aliasName is set
+      if (field.getAlias() == null || field.getAlias().length() == 0) {
+        String columnName = field.getColumnName();
+        String fieldAlias = extractAliasNameFromArtifactsArray(columnName, artifactsArray);
+
+        field.setAlias(fieldAlias);
       }
     }
 
@@ -461,6 +478,59 @@ public interface AnalysisSipDslConverter {
         && !formatObject.get(FieldNames.CURRENCY_SYMBOL).isJsonNull()) {
       format.setCurrencySymbol(formatObject.get(FieldNames.CURRENCY_SYMBOL).getAsString());
     }
+
     return format;
+  }
+
+  /**
+   * Extracts aliasName from artifacts array.
+   *
+   * @param columnName Name of the column
+   * @param artifactsArray JsonArray which contains artifacts
+   * @return aliasName - on successful extraction null - on failure
+   */
+  default String extractAliasNameFromArtifactsArray(String columnName, JsonArray artifactsArray) {
+    String aliasName = null;
+
+    for (JsonElement artifactElement : artifactsArray) {
+      aliasName = getAliasNameFromArtifactObject(columnName, artifactElement.getAsJsonObject());
+
+      if (aliasName != null) {
+        break;
+      }
+    }
+
+    return aliasName;
+  }
+
+  /**
+   * Extracts aliasName from artifacts object.
+   *
+   * @param columnName Name of the column
+   * @param artifactObject Artifact Object
+   * @return aliasName - on successful extraction null - on failure
+   */
+  default String getAliasNameFromArtifactObject(String columnName, JsonObject artifactObject) {
+    String aliasName = null;
+
+    if (artifactObject.has("columns")) {
+      JsonArray columns = artifactObject.getAsJsonArray("columns");
+
+      for (JsonElement columnElement : columns) {
+        JsonObject column = columnElement.getAsJsonObject();
+
+        String artifactColumnName = column.get("columnName").getAsString();
+
+        if (columnName.equalsIgnoreCase(artifactColumnName)) {
+          if (column.has("aliasName")) {
+            aliasName = column.get("aliasName").getAsString();
+
+            break;
+          }
+        }
+      }
+    }
+
+    return aliasName;
   }
 }

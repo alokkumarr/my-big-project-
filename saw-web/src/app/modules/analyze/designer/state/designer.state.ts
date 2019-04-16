@@ -27,9 +27,11 @@ import {
   DesignerUpdateAnalysisChartYAxis,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
-  DesignerUpdateArtifactColumn
+  DesignerUpdateArtifactColumn,
+  DesignerRemoveAllArtifactColumns
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
+import { DATE_TYPES, DEFAULT_DATE_FORMAT } from '../../consts';
 
 // setAutoFreeze(false);
 
@@ -78,6 +80,7 @@ export class DesignerState {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     let artifacts = sipQuery.artifacts;
+    const isDateType = DATE_TYPES.includes(artifactColumn.type);
 
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
@@ -95,11 +98,16 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
-      dateFormat: artifactColumn.dateFormat,
       groupInterval: artifactColumn.groupInterval,
       name: artifactColumn.name,
       type: artifactColumn.type,
-      table: artifactColumn.table || (<any>artifactColumn).tableName
+      table: artifactColumn.table || (<any>artifactColumn).tableName,
+      ...(isDateType
+        ? {
+            dateFormat:
+              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
+          }
+        : { format: artifactColumn.format })
     };
 
     if (artifactIndex < 0) {
@@ -178,6 +186,23 @@ export class DesignerState {
       ...artifacts[artifactIndex].fields[artifactColumnIndex],
       ...artifactColumn
     };
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+    });
+  }
+
+  @Action(DesignerRemoveAllArtifactColumns)
+  removeAllArtifactColumns({
+    patchState,
+    getState
+  }: StateContext<DesignerStateModel>) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const artifacts = (sipQuery.artifacts || []).map(artifact => ({
+      ...artifact,
+      fields: []
+    }));
 
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
@@ -396,7 +421,7 @@ export class DesignerState {
 
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
-    { patchState, getState }: StateContext<DesignerStateModel>,
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
     {  }: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
@@ -408,7 +433,8 @@ export class DesignerState {
 
       adapter.artifactColumns = [];
     });
-    return patchState({ groupAdapters: [...groupAdapters] });
+    patchState({ groupAdapters: [...groupAdapters] });
+    return dispatch(new DesignerRemoveAllArtifactColumns());
   }
 
   @Action(DesignerRemoveColumnFromGroupAdapter)
@@ -427,7 +453,7 @@ export class DesignerState {
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
-    return dispatch(new DesignerAddArtifactColumn(column));
+    return dispatch(new DesignerRemoveArtifactColumn(column));
   }
 
   @Action(DesignerMoveColumnInGroupAdapter)
@@ -463,7 +489,7 @@ export class DesignerState {
       filter.artifactsName = filter.tableName;
     });
     return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, filters }}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, filters } }
     });
   }
 
@@ -475,7 +501,7 @@ export class DesignerState {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria }}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria } }
     });
   }
 }

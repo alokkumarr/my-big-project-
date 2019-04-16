@@ -88,9 +88,9 @@ export class DesignerUpdateFilters {
 }
 
 export class DesignerUpdatebooleanCriteria {
-   /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
-   static readonly type = '[Designer] Update booleanCriteria for analysis';
-   constructor(public booleanCriteria: string) {}
+  /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
+  static readonly type = '[Designer] Update booleanCriteria for analysis';
+  constructor(public booleanCriteria: string) {}
 }
 
 export class DesignerUpdateAnalysisChartTitle {
@@ -147,4 +147,8 @@ export class DesignerRemoveArtifactColumn {
   constructor(
     public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
   ) {}
+}
+export class DesignerRemoveAllArtifactColumns {
+  static readonly type = '[Designer] Remove all artifact columns from analysis';
+  constructor() {}
 }
