@@ -1027,6 +1027,7 @@ public class SftpServiceImpl extends SipPluginContract {
                                       + bisDataMetaInfo.getFileTransferDuration());
                                   sipLogService.upsert(bisDataMetaInfo,
                                       bisDataMetaInfo.getProcessId());
+                                 // sipLogService.updateJobLog("SUCCESS", successCnt, totalCnt)
                                   // Adding to a list has been removed as a part of optimization
                                   // SIP-6386
                                   //list.add(bisDataMetaInfo);

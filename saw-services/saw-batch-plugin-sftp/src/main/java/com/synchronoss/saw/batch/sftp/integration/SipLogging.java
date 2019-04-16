@@ -14,7 +14,6 @@ import com.synchronoss.saw.logs.entities.SipJobEntity;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
-
 import java.io.File;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -287,14 +286,6 @@ public class SipLogging {
     return updatedRecords;
   }
 
-  /**
-   * This method is used to check the status by process.
-   *
-   * @param channelId unique Id for the channel.
-   * @param routeId unique Id for the route
-   * @param processStatus status for the component process.
-   * @param source source regular or retry
-   */
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
       String fileStatus, String source) {
@@ -382,6 +373,32 @@ public class SipLogging {
     sipJob.setUpdatedDate(new Date());
     sipJobDataRepository.save(sipJob);
     return sipJob.getJobId() == null;
+    
+  }
+  
+  /**
+   * Adds entry to job log.
+   * 
+   * @param status job status.
+   * @param successCnt number of files succssfully transferred
+   * @param totalCnt total number of files to be processed
+   * @return job log udated or not
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public SipJobEntity updateJobLog(String status, long successCnt, long totalCnt) {
+    SipJobEntity sipJob = new SipJobEntity();
+    sipJob.setJobStatus(status);
+    sipJob.setTotalCount(totalCnt);
+    sipJob.setSuccessCount(successCnt);
+    sipJob.setCreatedBy("system");
+    sipJob.setUpdatedBy("system");
+    sipJob.setCreatedDate(new Date()); 
+    sipJob.setUpdatedDate(new Date());
+    SipJobEntity updateJob = sipJobDataRepository.save(sipJob);
+    return updateJob;
     
   }
   
