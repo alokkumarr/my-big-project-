@@ -223,18 +223,10 @@ export class DashboardGridComponent
       return;
     }
 
-    // This updater property is only getting changed when the tiles are resized.
-    // Height and Width property is not available when the tiles are loaded/refreshed.
-    // Due to which creating a property 'chartDimension' in analysis object.
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
       { path: 'chart.width', data: dimensions.width }
     ]);
-
-    item.analysis.chartDimension = {
-      height: dimensions.height,
-      width: dimensions.width
-    };
   }
 
   refreshAllTiles() {

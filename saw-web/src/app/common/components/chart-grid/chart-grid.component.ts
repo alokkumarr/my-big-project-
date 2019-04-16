@@ -7,7 +7,6 @@ import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
-import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
 
 import { ChartService } from '../../services';
@@ -162,7 +161,6 @@ export class ChartGridComponent implements OnInit {
         map(sorts, 'order')
       );
     }
-
     this.chartToggleData = this.trimKeyword(data);
 
     return [
@@ -177,11 +175,27 @@ export class ChartGridComponent implements OnInit {
       { path: 'chart.inverted', data: analysis.isInverted },
       {
         path: 'chart.height',
-        data: isUndefined(analysis.chartDimension)
-          ? 580
-          : analysis.chartDimension.height
+        data: this.getChartHeight()
       }
     ];
+  }
+
+  getChartHeight() {
+    let parentUpdater = [];
+
+    this.updater.asObservable().source.forEach(val => {
+      parentUpdater = val;
+    });
+
+    let chartHeight = 430; //Default chart height for 'execute-chart-view' and 'zoom-analysis' components.
+    if (parentUpdater.length > 0) {
+      parentUpdater.forEach(val => {
+        if (val.path == 'chart.height') {
+          chartHeight = val.data;
+        }
+      });
+    }
+    return chartHeight;
   }
 
   viewToggle(value) {

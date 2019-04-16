@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { Filter, Artifact, ArtifactColumn } from './../../../analyze/types';
@@ -12,13 +12,14 @@ import {
 } from './../../../analyze/consts';
 import { reduce } from 'lodash';
 
+let chartGridUpdater = [];
+let oldChartGridUpdater = [];
 @Component({
   selector: 'zoom-analysis',
   templateUrl: './zoom-analysis.component.html',
   styleUrls: ['./zoom-analysis.component.scss']
 })
-
-export class ZoomAnalysisComponent implements OnInit {
+export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   public analysisData: Array<any>;
   public nameMap;
 
@@ -43,6 +44,31 @@ export class ZoomAnalysisComponent implements OnInit {
       },
       {}
     );
+
+    /* By default the updater of zoom-analysis component is taking value of chart-grid component.
+    Since the chart height in chart-grid is lesser as compared to zoom-analysis, so chart height was getting
+    reduced. In this piece of code zoom-analysis updater (i.e. this.data.updater) is updated without 'chart.height' path.
+    So that chart height in zoom-analysis component is not reduced. When user close the dialog box then again
+    zoom-analysis updater (i.e. this.data.updater) is updated with chart-grid updater value.
+    */
+    this.data.updater.asObservable().source.forEach(val => {
+      chartGridUpdater = val;
+    });
+    let zoomAnalysisUpdater = [];
+    oldChartGridUpdater = [];
+    chartGridUpdater.forEach(val => {
+      oldChartGridUpdater.push(val);
+      if (val.path != 'chart.height') {
+        zoomAnalysisUpdater.push(val);
+      }
+    });
+    this.data.updater.next(zoomAnalysisUpdater);
+  }
+
+  ngOnDestroy(): void {
+    // Just making sure that when the dialog box is closed,
+    // updater should update it's value with chart-grid updater.
+    this.data.updater.next(oldChartGridUpdater);
   }
 
   getDisplayName(filter: Filter) {
