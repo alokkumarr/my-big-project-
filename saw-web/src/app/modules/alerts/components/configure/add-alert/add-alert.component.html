@@ -26,17 +26,19 @@
               <input
                 matInput
                 placeholder="Alert Name"
-                formControlName="ruleName"
+                formControlName="alertName"
                 maxlength="18"
                 e2e="alertName"
               />
               <mat-error
-                *ngIf="alertDefFormGroup.controls.ruleName.hasError('required')"
+                *ngIf="
+                  alertDefFormGroup.controls.alertName.hasError('required')
+                "
                 >This field is required</mat-error
               >
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.ruleName.hasError('maxlength')
+                  alertDefFormGroup.controls.alertName.hasError('maxlength')
                 "
                 >Alert Name cannot exceed 18 characters</mat-error
               >
@@ -70,13 +72,13 @@
               <mat-label>Alert Description</mat-label>
               <textarea
                 matInput
-                formControlName="ruleDescriptions"
+                formControlName="alertDescriptions"
                 maxlength="36"
                 e2e="alertDescription"
               ></textarea>
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.ruleDescriptions.hasError(
+                  alertDefFormGroup.controls.alertDescriptions.hasError(
                     'required'
                   )
                 "
@@ -84,7 +86,7 @@
               >
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.ruleDescriptions.hasError(
+                  alertDefFormGroup.controls.alertDescriptions.hasError(
                     'maxlength'
                   )
                 "

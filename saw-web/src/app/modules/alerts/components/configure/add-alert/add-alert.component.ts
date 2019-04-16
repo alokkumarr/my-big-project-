@@ -43,8 +43,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.alertDefFormGroup = this._formBuilder.group({
-      ruleName: ['', [Validators.required, Validators.maxLength(18)]],
-      ruleDescriptions: ['', [Validators.required, Validators.maxLength(36)]],
+      alertName: ['', [Validators.required, Validators.maxLength(18)]],
+      alertDescriptions: ['', [Validators.required, Validators.maxLength(36)]],
       alertSeverity: ['', [Validators.required]],
       activeInd: ['true']
     });

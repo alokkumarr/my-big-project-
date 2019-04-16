@@ -16,8 +16,8 @@ export const alertPayload: AlertConfig = {
   monitoringEntity: 'string',
   operator: 'GT',
   product: 'string',
-  ruleDescriptions: 'string',
-  ruleName: 'string',
+  alertDescriptions: 'string',
+  alertName: 'string',
   thresholdValue: 0
 };
 

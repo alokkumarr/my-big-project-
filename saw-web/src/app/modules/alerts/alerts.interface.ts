@@ -8,8 +8,8 @@ export interface AlertConfig {
   monitoringEntity: string;
   operator: string;
   product: string;
-  ruleDescriptions: string;
-  ruleName: string;
+  alertDescriptions: string;
+  alertName: string;
   thresholdValue: number;
 }
 
