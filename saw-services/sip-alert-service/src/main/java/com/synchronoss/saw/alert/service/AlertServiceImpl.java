@@ -12,6 +12,7 @@ import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
 import com.synchronoss.saw.alert.repository.AlertRulesRepository;
 import com.synchronoss.saw.alert.repository.AlertTriggerLog;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -215,20 +216,18 @@ public class AlertServiceImpl implements AlertService {
    */
   @Override
   public String retrieveOperatorsDetails(Ticket ticket) {
-    List<AlertRulesDetails> rulesDetails = alertRulesRepository.findAll();
     JsonArray elements = new JsonArray();
     JsonObject response = new JsonObject();
-    if (rulesDetails != null && !rulesDetails.isEmpty()) {
-      for (AlertRulesDetails details : rulesDetails) {
+      List<Operator> operatorList = Arrays.asList(Operator.values());
+      for (Operator operator : operatorList) {
         JsonObject object = new JsonObject();
-        String readableOperator = getReadableOperator(details.getOperator());
+        String readableOperator = getReadableOperator(operator);
         if (readableOperator != null) {
-          object.addProperty(ID, details.getOperator().value());
+          object.addProperty(ID, operator.value());
           object.addProperty(NAME, readableOperator);
           elements.add(object);
         }
       }
-    }
     response.add(OPERATORS, elements);
     return response.toString();
   }
