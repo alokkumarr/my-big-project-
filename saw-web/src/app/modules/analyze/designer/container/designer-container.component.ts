@@ -219,7 +219,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           ...(newAnalysis['analysis'] || newAnalysis),
           artifacts
         };
-
         isDSLAnalysis(this.analysis) &&
           this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
 
@@ -552,7 +551,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
-
+    console.log(requestAnalysis.sipQuery);
     this._designerService.getDataForAnalysis(requestAnalysis).then(
       response => {
         if (
@@ -589,7 +588,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, (<Analysis>analysis).sqlBuilder || (<AnalysisDSL>analysis).sipQuery);
+      return flattenPivotData(
+        data,
+        (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder
+      );
     case 'report':
     case 'esReport':
       return data;

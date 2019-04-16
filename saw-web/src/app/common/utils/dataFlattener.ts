@@ -17,6 +17,9 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
 
 export function flattenPivotData(data, sqlBuilder) {
+  if (sqlBuilder.artifacts) {
+    return data;
+  }
   const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
   return parseNodePivot(data, {}, nodeFieldMap, 0);
 }

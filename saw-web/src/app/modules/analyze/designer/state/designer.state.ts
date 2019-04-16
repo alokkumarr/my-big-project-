@@ -86,7 +86,6 @@ export class DesignerState {
     const artifactIndex = artifacts.findIndex(
       artifact => artifact.artifactsName === artifactsName
     );
-
     const artifactColumnToBeAdded = {
       aggregate: artifactColumn.aggregate,
       alias: artifactColumn.alias || (<any>artifactColumn).aliasName,
@@ -338,6 +337,7 @@ export class DesignerState {
     }: DesignerInitGroupAdapters
   ) {
     let groupAdapters;
+    console.log(analysisType);
     switch (analysisType) {
       case 'pivot':
         groupAdapters = this._designerService.getPivotGroupAdapters(
