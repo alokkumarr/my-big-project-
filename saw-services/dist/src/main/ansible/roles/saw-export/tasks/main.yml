@@ -11,6 +11,8 @@
     - restart saw-export
 - name: Install SAW export Service ftp details file
   template: src=ftp-details.json dest=/opt/bda/saw-export-service/conf
+- name: Install SAW export Service s3 details file
+  template: src=S3-details.json dest=/opt/bda/saw-export-service/conf
   notify:
     - restart saw-export
 # Workaround: The service restart handler will run only after all

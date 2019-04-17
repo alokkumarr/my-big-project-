@@ -1,5 +1,7 @@
 package com.synchronoss.saw.export.generate;
 
+import com.synchronoss.saw.export.model.S3.S3Customer;
+import com.synchronoss.saw.export.model.S3.S3Details;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,6 +64,10 @@ public class ExportServiceImpl implements ExportService{
   @Value("${analysis.ftpExportSize}")
   private String ftpExportSize;
 
+  // s3 export size
+  @Value("${analysis.s3ExportSize}")
+  private String s3ExportSize;
+
   @Value("${published.path}")
   private String publishedPath;
 
@@ -70,6 +76,9 @@ public class ExportServiceImpl implements ExportService{
 
   @Value("${ftp.details.file}")
   private String ftpDetailsFile;
+
+  @Value("${s3.details.file}")
+  private String s3DetailsFile;
 
   @Value("${exportChunkSize}")
   private String exportChunkSize;
@@ -698,4 +707,30 @@ public class ExportServiceImpl implements ExportService{
     }
     return aliases;
   }
+
+    @Override
+    public List<String> listS3ForCustomer(RequestEntity requestEntity) {
+        Object dispatchBean = requestEntity.getBody();
+        String jobGroup = null;
+        List<String> aliases = new ArrayList<String>();
+
+        if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
+            jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
+            ObjectMapper jsonMapper = new ObjectMapper();
+            try {
+                File f = new File(s3DetailsFile);
+                if (f.exists() && !f.isDirectory()) {
+                    S3Customer obj = jsonMapper.readValue(f, S3Customer.class);
+                    for (S3Details alias : obj.getS3List()) {
+                        if (alias.getCustomerCode().equals(jobGroup)) {
+                            aliases.add(alias.getAlias());
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+            }
+        }
+        return aliases;
+    }
 }

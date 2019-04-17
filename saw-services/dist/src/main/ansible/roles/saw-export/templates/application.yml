@@ -40,6 +40,7 @@ analysis:
     uiExportSize: "{{ saw_ui_export_size | default('10000') }}"
     emailExportSize: "{{ saw_email_export_size | default('50000') }}"
     ftpExportSize: "{{ saw_ftp_export_size | default('1000000') }}"
+    s3ExportSize: "{{ saw_s3_export_size | default('1000000') }}"
 
 
 logging:
@@ -51,6 +52,10 @@ published:
 ftp:
   details:
     file: /opt/bda/saw-export-service/conf/ftp-details.json
+
+s3:
+  details:
+    file: /opt/bda/saw-export-service/conf/S3-details.json
 
 
 exportChunkSize: "{{ saw_export_chunk_size | default('10000') }}"

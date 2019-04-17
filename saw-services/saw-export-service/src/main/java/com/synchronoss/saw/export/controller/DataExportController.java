@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export.controller;
 
+import com.synchronoss.saw.export.model.S3.S3;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -89,4 +90,12 @@ public class DataExportController {
     ftpList.setFtp(exportService.listFtpsForCustomer(request));
     return ftpList;
   }
+
+    @RequestMapping(value = "/listS3", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public S3 listS3(RequestEntity request) {
+        S3 s3List = new S3();
+        s3List.setS3(exportService.listS3ForCustomer(request));
+        return s3List;
+    }
 }
