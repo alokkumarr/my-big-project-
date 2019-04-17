@@ -10,7 +10,13 @@ import * as forEach from 'lodash/forEach';
 import * as moment from 'moment';
 
 import { ChartService } from '../../services';
-import { AnalysisChart, ArtifactColumnReport } from '../../types';
+import {
+  AnalysisChart,
+  ArtifactColumnReport,
+  AnalysisDSL,
+  SqlBuilderChart
+} from '../../types';
+import { isDSLAnalysis } from 'src/app/modules/analyze/types';
 
 interface ReportGridField {
   caption: string;
@@ -37,7 +43,7 @@ interface ReportGridField {
 export class ChartGridComponent implements OnInit {
   @Input() updater: BehaviorSubject<Object[]>;
   @Input('analysis')
-  set setAnalysis(analysis: AnalysisChart) {
+  set setAnalysis(analysis: AnalysisChart | AnalysisDSL) {
     this.analysis = analysis;
     this.initChartOptions(analysis);
   }
@@ -52,7 +58,7 @@ export class ChartGridComponent implements OnInit {
   }
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
-  public analysis: AnalysisChart;
+  public analysis: AnalysisChart | AnalysisDSL;
   public chartOptions: Object;
   public toggleToGrid = false;
   public chartToggleData: any;
@@ -68,6 +74,42 @@ export class ChartGridComponent implements OnInit {
     forEach(columns, (col: ReportGridField) => {
       col.alignment = 'left';
     });
+  }
+
+  /**
+   * Converts sipQuery to sqlBuilder like object for use in chart service.
+   * This is a non-ideal work-around made until we can locate all the places
+   * we need to change.
+   *
+   * @param {*} queryOrBuilder
+   * @returns {SqlBuilderChart}
+   * @memberof DesignerChartComponent
+   */
+  sipQueryToSQLBuilderFields(queryOrBuilder): SqlBuilderChart {
+    if (queryOrBuilder.nodeFields || queryOrBuilder.dataFields) {
+      return queryOrBuilder;
+    }
+
+    const builderLike: SqlBuilderChart = {
+      dataFields: [],
+      nodeFields: [],
+      filters: queryOrBuilder.filters,
+      sorts: queryOrBuilder.sorts,
+      orderByColumns: queryOrBuilder.orderByColumns,
+      booleanCriteria: queryOrBuilder.booleanCriteria
+    };
+
+    (queryOrBuilder.artifacts || []).forEach(table => {
+      (table.fields || []).forEach(column => {
+        if (['y', 'z'].includes(column.area)) {
+          builderLike.dataFields.push(column);
+        } else {
+          builderLike.nodeFields.push(column);
+        }
+      });
+    });
+
+    return builderLike;
   }
 
   initChartOptions(analysis) {
@@ -92,7 +134,10 @@ export class ChartGridComponent implements OnInit {
 
   fetchColumnData(axisName, value) {
     let aliasName = axisName;
-    forEach(this.analysis.artifacts[0].columns, column => {
+    const columns = isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery.artifacts[0].fields
+      : this.analysis.artifacts[0].columns;
+    forEach(columns, column => {
       if (axisName === column.name) {
         aliasName = column.aliasName || column.displayName;
         value =
@@ -148,7 +193,7 @@ export class ChartGridComponent implements OnInit {
       analysis.artifacts,
       analysis
     );
-    const sorts = analysis.sqlBuilder.sorts;
+    const sorts = (analysis.sqlBuilder || analysis.sipQuery).sorts;
     const labels = {
       x: get(analysis, 'xAxis.title', null),
       y: get(analysis, 'yAxis.title', null)
@@ -166,9 +211,13 @@ export class ChartGridComponent implements OnInit {
 
     return [
       ...this._chartService.dataToChangeConfig(
-        analysis.chartType,
+        isDSLAnalysis(analysis)
+          ? analysis.chartOptions.chartType
+          : analysis.chartType,
         settings,
-        analysis.sqlBuilder,
+        this.sipQueryToSQLBuilderFields(
+          analysis.sipQuery || analysis.sqlBuilder
+        ),
         orderedData || data,
         { labels, labelOptions: analysis.labelOptions, sorts }
       ),
