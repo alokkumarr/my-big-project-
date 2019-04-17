@@ -7,16 +7,16 @@ import { AlertConfig } from '../alerts.interface';
 import { Observable } from 'rxjs';
 
 export const alertPayload: AlertConfig = {
-  activeInd: 'string',
+  activeInd: true,
   aggregation: 'AVG',
   alertSeverity: 'CRITICAL',
-  categoryId: 'string',
+  category: 'string',
   datapodId: 'string',
   datapodName: 'string',
   monitoringEntity: 'string',
   operator: 'GT',
   product: 'string',
-  alertDescriptions: 'string',
+  alertDescription: 'string',
   alertName: 'string',
   thresholdValue: 0
 };
@@ -46,9 +46,21 @@ describe('ConfigureAlertService', () => {
     ).toBeTruthy();
   });
 
-  it('getMetricsInDatapod should return an Observable', () => {
+  it('createAlert should return an Observable', () => {
     expect(
       configureAlertService.createAlert(alertPayload) instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('updateAlert should return an Observable', () => {
+    expect(
+      configureAlertService.updateAlert('1', alertPayload) instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('deleteAlert should return an Observable', () => {
+    expect(
+      configureAlertService.deleteAlert('1') instanceof Observable
     ).toBeTruthy();
   });
 

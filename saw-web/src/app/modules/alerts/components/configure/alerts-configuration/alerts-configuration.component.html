@@ -19,7 +19,7 @@
           mat-icon-button
           color="warn"
           e2e="cancel-add-alert"
-          (click)="alertSidenav.close()"
+          (click)="cancelAddalert()"
         >
           <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
@@ -48,7 +48,7 @@
         color="primary"
         mat-raised-button
         e2e="open-add-alert"
-        (click)="alertSidenav.toggle()"
+        (click)="alertSidenav.open()"
       >
         + Alert
       </button>
@@ -76,7 +76,7 @@
         <dxi-column caption="Alert Name" dataField="alertName"></dxi-column>
         <dxi-column
           caption="Alert Description"
-          dataField="alertDescriptions"
+          dataField="alertDescription"
         ></dxi-column>
         <dxi-column dataField="alertSeverity"></dxi-column>
         <dxi-column dataField="monitoringEntity"></dxi-column>

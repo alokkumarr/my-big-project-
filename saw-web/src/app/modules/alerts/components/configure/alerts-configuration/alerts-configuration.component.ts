@@ -40,10 +40,15 @@ export class AlertsConfigurationComponent implements OnInit {
 
   ngOnInit() {}
 
+  cancelAddalert() {
+    this.sidenav.close();
+    this.resetAlertDefInput();
+  }
+
   onAddAlert() {
     this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
     this.sidenav.close();
-    this.alertDefInput.action = 'create';
+    this.resetAlertDefInput();
   }
 
   editAlert(data: AlertConfig) {
@@ -51,5 +56,11 @@ export class AlertsConfigurationComponent implements OnInit {
     this.alertDefInput.action = 'update';
     this.alertDefInput.alertConfig = data;
     this.sidenav.open();
+  }
+
+  resetAlertDefInput() {
+    this.alertDefInput = {
+      action: 'create'
+    };
   }
 }

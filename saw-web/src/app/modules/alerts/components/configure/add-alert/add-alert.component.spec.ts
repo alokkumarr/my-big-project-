@@ -5,6 +5,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../../material.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddAlertComponent } from './add-alert.component';
+import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { Observable } from 'rxjs';
@@ -15,11 +16,36 @@ const confAlertServiceStub = {
   createAlert: () => {
     return new Observable();
   },
+  updateAlert: (id: string, alertConfig: AlertConfig) => {
+    return new Observable();
+  },
   getListOfDatapods$: () => {
     return new Observable();
   },
   getMetricsInDatapod$: id => {
     return new Observable();
+  }
+};
+
+const alertDefinitionStub: AlertDefinition = {
+  action: 'create',
+  alertConfig: {
+    alertRulesSysId: '1',
+    datapodId: '1',
+    datapodName: 'abc',
+    alertName: 'abc',
+    alertDescription: 'abc',
+    category: '1',
+    alertSeverity: 'CRITICAL',
+    monitoringEntity: 'abc123',
+    aggregation: 'AVG',
+    operator: 'GT',
+    thresholdValue: 2,
+    activeInd: false,
+    createdBy: 'admin',
+    createdTime: 1555524407000,
+    modifiedTime: null,
+    modifiedBy: null
   }
 };
 
@@ -48,6 +74,7 @@ describe('AddAlertComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AddAlertComponent);
     component = fixture.componentInstance;
+    component.alertDefinition = alertDefinitionStub;
     fixture.detectChanges();
   });
 
@@ -60,7 +87,7 @@ describe('AddAlertComponent', () => {
       id: '1',
       metricName: 'sample'
     };
-    component.alertMetricFormGroup.controls['monitoringEntity'].setValue('');
+    // component.alertMetricFormGroup.controls['monitoringEntity'].setValue('');
     component.alertMetricFormGroup.controls['datapodName'].setValue(
       selectedItem.metricName
     );
@@ -68,7 +95,15 @@ describe('AddAlertComponent', () => {
     component.onDatapodSelected(selectedItem);
   });
 
+  it('should create alert payload', () => {
+    component.constructPayload();
+  });
+
   it('should create alert', () => {
     component.createAlert();
+  });
+
+  it('should update alert', () => {
+    component.updateAlert();
   });
 });

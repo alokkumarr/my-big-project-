@@ -64,6 +64,32 @@ export class ConfigureAlertService {
   }
 
   /**
+   * Update the corresponding alert definition
+   * matching the ID
+   *
+   * @param {string} id
+   * @param {AlertConfig} alertConfig
+   * @returns {Observable<any>}
+   * @memberof ConfigureAlertService
+   */
+  updateAlert(id: string, alertConfig: AlertConfig): Observable<any> {
+    const endpoint = `${this.api}/sip/alerts/${id}`;
+    return this.http.put(endpoint, alertConfig);
+  }
+
+  /**
+   * Deletes the alert with given ID
+   *
+   * @param {string} id
+   * @returns {Observable<any>}
+   * @memberof ConfigureAlertService
+   */
+  deleteAlert(id: string): Observable<any> {
+    const endpoint = `${this.api}/sip/alerts/${id}`;
+    return this.http.delete(endpoint);
+  }
+
+  /**
    * Returns all configured alerts definitions
    *
    * @returns {Observable<any>}

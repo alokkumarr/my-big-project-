@@ -66,9 +66,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
       alertName: ['', [Validators.required, Validators.maxLength(18)]],
-      alertDescriptions: ['', [Validators.required, Validators.maxLength(36)]],
+      alertDescription: ['', [Validators.required, Validators.maxLength(36)]],
       alertSeverity: ['', [Validators.required]],
-      activeInd: ['true']
+      activeInd: [true]
     });
 
     this.alertMetricFormGroup = this._formBuilder.group({
@@ -100,7 +100,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     }
   }
 
-  createAlert() {
+  constructPayload() {
     const payload: AlertConfig = {
       ...this.alertDefFormGroup.value,
       ...this.alertMetricFormGroup.value,
@@ -109,6 +109,12 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       product: 'SAWD000001'
     };
 
+    return payload;
+  }
+
+  createAlert() {
+    const payload = this.constructPayload();
+
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {
@@ -116,5 +122,17 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.onAddAlert.emit(true);
       });
     this.subscriptions.push(createSubscriber);
+  }
+
+  updateAlert() {
+    const payload = this.constructPayload();
+    const alertID = this.alertDefinition.alertConfig.alertRulesSysId;
+    const updateSubscriber = this._configureAlertService
+      .updateAlert(alertID, payload)
+      .subscribe((data: any) => {
+        this._notify.success(data.message);
+        this.onAddAlert.emit(true);
+      });
+    this.subscriptions.push(updateSubscriber);
   }
 }

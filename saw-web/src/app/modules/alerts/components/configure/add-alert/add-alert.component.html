@@ -75,13 +75,13 @@
               <mat-label>Alert Description</mat-label>
               <textarea
                 matInput
-                formControlName="alertDescriptions"
+                formControlName="alertDescription"
                 maxlength="36"
                 e2e="alertDescription"
               ></textarea>
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.alertDescriptions.hasError(
+                  alertDefFormGroup.controls.alertDescription.hasError(
                     'required'
                   )
                 "
@@ -89,7 +89,7 @@
               >
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.alertDescriptions.hasError(
+                  alertDefFormGroup.controls.alertDescription.hasError(
                     'maxlength'
                   )
                 "
@@ -323,12 +323,22 @@
           </button>
           <div fxFlex></div>
           <button
+            *ngIf="alertDefinition.action === 'create'"
             (click)="createAlert()"
             color="primary"
             mat-stroked-button
-            e2e="addAlert"
+            e2e="add-alert"
           >
             Add
+          </button>
+          <button
+            *ngIf="alertDefinition.action === 'update'"
+            (click)="updateAlert()"
+            color="primary"
+            mat-stroked-button
+            e2e="update-alert"
+          >
+            Update
           </button>
         </div>
       </mat-step>
