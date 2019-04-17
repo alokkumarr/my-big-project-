@@ -8,10 +8,10 @@ import { COMBO_TYPES, DATE_TYPES } from '../../../../consts';
 import {
   ArtifactColumn,
   DesignerChangeEvent,
-  SqlBuilder,
   ArtifactColumnChart,
   ArtifactColumnPivot
 } from '../../../types';
+import { QueryDSL } from 'src/app/models';
 
 const ALIAS_CHANGE_DELAY = 500;
 
@@ -25,7 +25,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   @Input() artifactColumn: ArtifactColumn;
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
-  @Input() sqlBuilder: SqlBuilder;
+  @Input() sipQuery: QueryDSL;
   @Input() fieldCount: number;
 
   public comboTypes = COMBO_TYPES;

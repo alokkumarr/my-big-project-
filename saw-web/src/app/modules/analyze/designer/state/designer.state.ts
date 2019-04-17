@@ -175,7 +175,7 @@ export class DesignerState {
     { getState, patchState }: StateContext<DesignerStateModel>,
     { artifactColumn }: DesignerUpdateArtifactColumn
   ) {
-    const analysis = getState().analysis;
+    const { analysis } = getState();
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
 

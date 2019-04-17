@@ -34,10 +34,10 @@
         [columnType]="artifactColumn.type"
         [analysisType]="analysisType"
         [aggregate]="artifactColumn.aggregate"
-        [sqlBuilder]="sqlBuilder"
+        [sipQuery]="sipQuery"
         [analysisSubtype]="analysisSubtype"
         [enablePercentByRow]="
-          asChartColumn(artifactColumn).comboType === 'column'
+          asChartColumn(artifactColumn).displayType === 'column'
         "
         fxFlex="75"
       >

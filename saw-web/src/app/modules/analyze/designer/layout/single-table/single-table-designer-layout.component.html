@@ -42,8 +42,7 @@
       (change)="change.emit($event)"
       [analysisType]="analysisType"
       [analysisSubtype]="analysisSubtype"
-      [sqlBuilder]="sqlBuilder"
-      [artifacts]="artifacts"
+      [sipQuery]="sipQuery"
       [fieldCount]="fieldCount"
       [auxSettings]="auxSettings"
       [chartTitle]="chartTitle"
@@ -193,7 +192,7 @@
             [sorts]="sorts"
             [auxSettings]="auxSettings"
             [data]="data"
-            [sqlBuilder]="sqlBuilder"
+            [sipQuery]="sipQuery"
           >
           </designer-chart>
         </mat-card>

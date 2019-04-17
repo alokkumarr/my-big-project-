@@ -191,6 +191,19 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     default:
       break;
     }
+    this.dslAnalysis$.subscribe(analysis => {
+      if (!analysis || ['report', 'esReport'].includes(this.analysis.type)) {
+        return;
+      }
+      this.analysis = analysis;
+      // const sqlBuilder = this._designerService.getSqlBuilder(
+      //   this.analysis,
+      //   this.booleanCriteria,
+      //   this.filters,
+      //   this.sorts
+      // );
+      // set(this.analysis, 'sqlBuilder', sqlBuilder);
+    });
   }
 
   getLayoutConfiguration(analysis: Analysis | AnalysisStarter | AnalysisDSL) {
