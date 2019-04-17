@@ -96,4 +96,4 @@ export interface AnalysisPivotDSL extends AnalysisBaseDSL {
   sample: string;
 }
 
-export type AnalysisDSL = AnalysisChartDSL | AnalysisPivotDSL;
+export type AnalysisDSL = AnalysisChartDSL;

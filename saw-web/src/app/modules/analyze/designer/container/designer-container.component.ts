@@ -551,7 +551,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
-    console.log(requestAnalysis.sipQuery);
+
     this._designerService.getDataForAnalysis(requestAnalysis).then(
       response => {
         if (
