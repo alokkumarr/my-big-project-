@@ -65,7 +65,7 @@ public class AlertServiceImpl implements AlertService {
     }
     AlertRulesDetails alertRulesDetails = new AlertRulesDetails();
     alertRulesDetails.setAlertName(alert.getAlertName());
-    alertRulesDetails.setAlertDescriptions(alert.getAlertDescription());
+    alertRulesDetails.setAlertDescription(alert.getAlertDescription());
     alertRulesDetails.setAggregation(alert.getAggregation());
     alertRulesDetails.setAlertSeverity(alert.getAlertSeverity());
     alertRulesDetails.setDatapodId(alert.getDatapodId());
@@ -96,7 +96,7 @@ public class AlertServiceImpl implements AlertService {
     if (alertRulesDetails.isPresent()) {
       alertRulesDetails.get().setAlertName(alert.getAlertName());
       alertRulesDetails.get().setAggregation(alert.getAggregation());
-      alertRulesDetails.get().setAlertDescriptions(alert.getAlertDescription());
+      alertRulesDetails.get().setAlertDescription(alert.getAlertDescription());
       alertRulesDetails.get().setAlertSeverity(alert.getAlertSeverity());
       alertRulesDetails.get().setDatapodId(alert.getDatapodId());
       alertRulesDetails.get().setMonitoringEntity(alert.getMonitoringEntity());
@@ -153,7 +153,7 @@ public class AlertServiceImpl implements AlertService {
     alert.setDatapodId(alertRulesDetails.getDatapodId());
     alert.setMonitoringEntity(alertRulesDetails.getMonitoringEntity());
     alert.setOperator(alertRulesDetails.getOperator());
-    alert.setAlertDescription(alertRulesDetails.getAlertDescriptions());
+    alert.setAlertDescription(alertRulesDetails.getAlertDescription());
     alert.setAlertName(alertRulesDetails.getAlertName());
     Optional<DatapodDetails> datapodDetail = alertDatapodRepository.findById(alert.getDatapodId());
     alert.setDatapodName(datapodDetail.get().getDatapodName());
