@@ -273,13 +273,15 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 logger.debug("Total files = " + files.length);
 
                 int archiveCounter = 0;
+                String currentTimestamp = LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
+
+                Path archivePath = new Path(archiveDir + "/" + currentTimestamp
+                    + "_" + UUID.randomUUID() + "/");
+                ctx.fs.mkdirs(archivePath);
+                logger.debug("Archive directory " + archivePath);
 
                 for(FileStatus fiile: files) {
-                    String currentTimestamp = LocalDateTime.now()
-                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
-
-                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
-                    ctx.fs.mkdirs(archivePath);
 
                     if (archiveSingleFile(fiile.getPath(), archivePath)) {
                         archiveCounter++;
