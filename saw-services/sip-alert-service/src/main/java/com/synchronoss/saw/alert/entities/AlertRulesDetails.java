@@ -32,8 +32,8 @@ public class AlertRulesDetails {
   @Column(name = "ALERT_NAME")
   String alertName;
 
-  @Column(name = "ALERT_DESCRIPTIONS")
-  String alertDescriptions;
+  @Column(name = "ALERT_DESCRIPTION")
+  String alertDescription;
 
   @Column(name = "CATEGORY")
   String category;
@@ -115,17 +115,17 @@ public class AlertRulesDetails {
   }
 
   /**
-   * Gets alertDescriptions.
+   * Gets alertDescription.
    *
-   * @return value of alertDescriptions
+   * @return value of alertDescription
    */
-  public String getAlertDescriptions() {
-    return alertDescriptions;
+  public String getAlertDescription() {
+    return alertDescription;
   }
 
-  /** Sets alertDescriptions. */
-  public void setAlertDescriptions(String alertDescriptions) {
-    this.alertDescriptions = alertDescriptions;
+  /** Sets alertDescription. */
+  public void setAlertDescription(String alertDescription) {
+    this.alertDescription = alertDescription;
   }
 
   /**
