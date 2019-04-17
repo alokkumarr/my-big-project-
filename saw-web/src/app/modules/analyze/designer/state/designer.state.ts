@@ -362,7 +362,6 @@ export class DesignerState {
     }: DesignerInitGroupAdapters
   ) {
     let groupAdapters;
-    console.log(analysisType);
     switch (analysisType) {
       case 'pivot':
         groupAdapters = this._designerService.getPivotGroupAdapters(
