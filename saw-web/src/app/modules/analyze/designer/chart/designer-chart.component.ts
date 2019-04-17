@@ -10,6 +10,9 @@ import { BehaviorSubject } from 'rxjs';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
 
 import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
@@ -161,6 +164,13 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
   }
 
   reloadChart(data, changes = []) {
+    const dataFields = fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpFilter(field => field.area === 'y')
+    )(this.sipQuery.artifacts);
+    if (dataFields.length === 0) {
+      return;
+    }
     const changeConfig = this._chartService.dataToChangeConfig(
       this.chartType,
       this.sipQuery,
