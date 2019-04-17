@@ -42,16 +42,11 @@ class FilterDialog {
     this._filterStringIsInIsNotInInput = element(
       by.xpath(`//input[@e2e="designer-filter-string-input"]`)
     );
-    this._applyFiltersBtn = element(
-      by.xpath('//span[contains(text(),"Apply Filters")]')
-    );
-    /* this._promptCheckBox = element(
-      by.xpath(`//span[contains(text(),'Prompt')]/parent::*`)
-    ); */
+    this._applyFiltersBtn = element(by.css(`button[e2e="apply-filter-btn"]`));
+
     this._promptCheckBox = element(
       by.css(`mat-checkbox[e2e="filter-dialog-prompt-checkbox"]`)
     );
-    // this._filterDialogText = element(by.xpath(`//strong[text()='Filter']`));
     this._filterDialogText = element(
       by.css(`strong[e2e="filter-dialog-header-text"]`)
     );
