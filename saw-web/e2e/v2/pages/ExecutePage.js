@@ -22,8 +22,6 @@ class ExecutePage extends ConfirmationModel {
     this._executeButton = element(
       by.css(`button[e2e="actions-menu-selector-execute"]`)
     );
-    /* this._selectedFilter = value =>
-      element(by.xpath(`//*[contains(text(),"${value}")]`)); */
     this._selectedFilter = value =>
       element(by.css(`mat-chip[e2e=applied-filter-"${value}"]`));
   }
