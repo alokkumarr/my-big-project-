@@ -10,6 +10,8 @@ import {
   NUMBER_FILTER_OPERATORS_OBJ
 } from '../../../consts';
 
+import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
+
 export const getFilterValue = (filter: Filter) => {
   const { type } = filter;
   if (!filter.model) {
@@ -53,15 +55,18 @@ export class FilterChipsComponent {
   @Output() removeAll: EventEmitter<null> = new EventEmitter();
   @Input() filters: Filter[];
   @Input('artifacts')
-  set artifacts(artifacts: Artifact[]) {
+  set artifacts(artifacts: Artifact[] | ArtifactDSL[]) {
     if (!artifacts) {
       return;
     }
     this.nameMap = reduce(
       artifacts,
-      (acc, artifact: Artifact) => {
-        acc[artifact.artifactName] = reduce(
-          artifact.columns,
+      (acc, artifact: Artifact | ArtifactDSL) => {
+        acc[
+          (<Artifact>artifact).artifactName ||
+            (<ArtifactDSL>artifact).artifactsName
+        ] = reduce(
+          (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields,
           (accum, col: ArtifactColumn) => {
             accum[col.columnName] = col.displayName;
             return accum;
@@ -78,7 +83,9 @@ export class FilterChipsComponent {
   public nameMap;
 
   getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName][filter.columnName];
+    return this.nameMap[filter.tableName || filter.artifactsName][
+      filter.columnName
+    ];
   }
 
   onRemove(index) {
