@@ -1,0 +1,58 @@
+{
+  "REPORT_PROMPT_FILTER": {
+    "positiveTests": {
+      "ESPFL001": {
+        "user": "admin",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date",
+        "displayedValue": "TW",
+        "description": "Admin should be apply prompt filter wih Date attribute"
+      },
+      "ESPFL002": {
+        "user": "userOne",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date",
+        "displayedValue": "TW",
+        "description": "userOne should be apply prompt filter wih Date attribute"
+      },
+      "ESPFL003": {
+        "user": "userOne",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double",
+        "displayedValue": "Equal to",
+        "description": "userOne should be apply prompt filter wih Number attribute"
+      },
+      "ESPFL004": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String",
+        "displayedValue": "Equals",
+        "description": "Admin should be apply prompt filter wih String attribute"
+      },
+      "ESPFL005": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String",
+        "displayedValue": "Equals",
+        "description": "userOne should be apply prompt filter wih String attribute"
+      },
+      "ESPFL006": {
+        "user": "admin",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double",
+        "displayedValue": "Equal to",
+        "description": "Admin should be apply prompt filter wih Number attribute"
+      }
+    }
+  }
+}
