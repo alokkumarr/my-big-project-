@@ -160,8 +160,9 @@ public class SawBisRouteController {
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
         schedulerRequest.setRouteId(String.valueOf(routeEntity.getBisRouteSysId()));
-        schedulerRequest.setJobName(BisChannelType.SFTP.name() + routeEntity.getBisChannelSysId()
+        schedulerRequest.setJobName(channel.getChannelType() + routeEntity.getBisChannelSysId()
             + routeEntity.getBisRouteSysId().toString());
+        schedulerRequest.setChannelType(channel.getChannelType());
         schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
 
         // If activeTab is immediate the its immediate job.

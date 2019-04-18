@@ -1,18 +1,23 @@
 package com.synchronoss.saw.batch.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.synchronoss.saw.batch.AsyncConfiguration;
+import com.synchronoss.saw.batch.entities.BisChannelEntity;
+import com.synchronoss.saw.batch.entities.BisRouteEntity;
+import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
+import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
+import com.synchronoss.saw.batch.plugin.SipIngestionPluginFactory;
 import com.synchronoss.saw.logs.constants.SourceType;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -20,9 +25,11 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +49,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 
 
+
+
 @RestController
 @RequestMapping("/ingestion/batch/sftp")
 public class SawBisSftpPluginController {
@@ -55,7 +64,16 @@ public class SawBisSftpPluginController {
   @Qualifier(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
   private Executor transactionPostExecutor;
 
+  @Autowired
+  private SipIngestionPluginFactory factory;
+  
+  @Autowired
+  private BisRouteDataRestRepository bisRouteDataRestRepository;
 
+  
+  @Autowired
+  private BisChannelDataRestRepository bisChannelRepository;
+  
   /**
    * This end-point to test connectivity for existing route.
    */
@@ -70,8 +88,11 @@ public class SawBisSftpPluginController {
   @ResponseStatus(HttpStatus.OK)
   public String connectRoute(@ApiParam(value = "Route id to test connectivity",
       required = true) @PathVariable(name = "routeId", required = true) Long routeId) {
-    return JSON.toJSONString(sftpServiceImpl.connectRoute(routeId));
+    String channelType = findChannelTypeFromRouteId(routeId);
+    SipPluginContract sipConnService = factory.getInstance(channelType);
+    return sipConnService.connectRoute(routeId);
   }
+
 
   /**
    * This end-point to test connectivity for route.
@@ -90,7 +111,9 @@ public class SawBisSftpPluginController {
       @ApiParam(value = "Payload to test connectivity",
           required = true) @Valid @RequestBody BisConnectionTestPayload payload)
       throws SipNestedRuntimeException, IOException {
-    return JSON.toJSONString(sftpServiceImpl.immediateConnectRoute((payload)));
+    SipPluginContract sipConnService = factory
+        .getInstance(payload.getChannelType().toString());
+    return sipConnService.immediateConnectRoute(payload);
   }
 
   /**
@@ -107,7 +130,10 @@ public class SawBisSftpPluginController {
   @ResponseStatus(HttpStatus.OK)
   public String connectChannel(@ApiParam(value = "Channel id to test connectivity",
       required = true) @PathVariable(name = "channelId", required = true) Long channelId) {
-    return JSON.toJSONString(sftpServiceImpl.connectChannel(channelId));
+    String channelType = findChannelTypeFromChannelId(Long.valueOf(channelId));
+    logger.info("Channel type:: " + channelType);
+    SipPluginContract sipConnService = factory.getInstance(channelType);
+    return sipConnService.connectChannel(channelId);
   }
 
   /**
@@ -127,7 +153,9 @@ public class SawBisSftpPluginController {
   public String connectImmediateChannel(@ApiParam(value = "Payload to test connectivity",
       required = true) @Valid @RequestBody BisConnectionTestPayload payload) {
 
-    return JSON.toJSONString(sftpServiceImpl.immediateConnectChannel(payload));
+    SipPluginContract sipConnService = factory.getInstance(
+        payload.getChannelType().toString());
+    return sipConnService.immediateConnectChannel(payload);
   }
 
   /**
@@ -150,14 +178,15 @@ public class SawBisSftpPluginController {
       value = "Payload structure which " + "to be used to " + "initiate the transfer",
       required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
     List<BisDataMetaInfo> response = null;
-
+    SipPluginContract sipTransferService = factory
+            .getInstance(requestBody.getChannelType().toString());
     try {
       if (requestBody.getBatchSize() > 0) {
         sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
       }
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
-        response = sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
+        response = sipTransferService.transferData(Long.valueOf(requestBody.getChannelId()),
             Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
       } else {
         response = sftpServiceImpl.immediateTransfer(requestBody);
@@ -213,11 +242,14 @@ public class SawBisSftpPluginController {
     if (requestBody.getBatchSize() > 0) {
       sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
     }
+    SipPluginContract sipTransferService = factory
+            .getInstance(requestBody.getChannelType().toString());
     DeferredResult<ResponseEntity<List<BisDataMetaInfo>>> deferredResult = new DeferredResult<>();
     if (Long.valueOf(requestBody.getChannelId()) > 0L
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
       CompletableFuture
-          .supplyAsync(() -> sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
+          .supplyAsync(() -> sipTransferService.transferData(
+              Long.valueOf(requestBody.getChannelId()),
               Long.valueOf(requestBody.getRouteId()), null, false,
               SourceType.REGULAR.name()), transactionPostExecutor)
           .whenComplete((p, throwable) -> {
@@ -248,7 +280,7 @@ public class SawBisSftpPluginController {
             deferredResult.setResult(ResponseEntity.ok(p));
           });
     } else {
-      CompletableFuture.supplyAsync(() -> sftpServiceImpl.immediateTransfer(requestBody),
+      CompletableFuture.supplyAsync(() -> sipTransferService.immediateTransfer(requestBody),
           transactionPostExecutor).whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {
@@ -302,8 +334,10 @@ public class SawBisSftpPluginController {
       required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
     logger.trace("Checking for data path: " + requestBody.getDestinationLocation());
     boolean result = false;
+    SipPluginContract sipTransferService = factory
+            .getInstance(requestBody.getChannelType().toString());
     try {
-      result = sftpServiceImpl.isDataExists(requestBody.getDestinationLocation());
+      result = sipTransferService.isDataExists(requestBody.getDestinationLocation());
     } catch (Exception e) {
       logger.trace("Exception occurred while checking the data location" + e);
       throw new SftpProcessorException("Exception occurred while checking the data location", e);
@@ -313,5 +347,31 @@ public class SawBisSftpPluginController {
     return responseMap;
   }
 
+  private String findChannelTypeFromRouteId(Long routeId) {
+    Optional<BisRouteEntity> routeOptional = bisRouteDataRestRepository.findById(routeId);
+    String channelType = "";
+    if (routeOptional.isPresent()) {
+      BisRouteEntity route = routeOptional.get();
+      Optional<BisChannelEntity> bisChannelOptional 
+          = bisChannelRepository.findById(route.getBisChannelSysId());
+      if (bisChannelOptional.isPresent()) {
+        BisChannelEntity bisChannel = bisChannelOptional.get();
+        channelType = bisChannel.getChannelType();
+      }
+    }
+    return channelType;
+  }
+
+  private String findChannelTypeFromChannelId(Long channelId) {
+    String channelType = "";
+    Optional<BisChannelEntity> bisChannelOptional = bisChannelRepository.findById(channelId);
+    if (bisChannelOptional.isPresent()) {
+      BisChannelEntity bisChannel = bisChannelOptional.get();
+      channelType = bisChannel.getChannelType();
+    }
+
+    return channelType;
+
+  }
 }
 
