@@ -11,6 +11,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AmazonS3Handler {
   private final String bucket;
@@ -21,6 +23,7 @@ public class AmazonS3Handler {
   private final String accessKey;
   private final String secretKey;
   private final AmazonS3 s3Client;
+  private static final Logger logger = LoggerFactory.getLogger(AmazonS3Handler.class);
 
   public AmazonS3Handler(S3Config config) throws Exception {
     if (config == null) {
@@ -57,6 +60,7 @@ public class AmazonS3Handler {
   public void uploadObject(File file) {
     PutObjectRequest request = new PutObjectRequest(bucket, outputLocation, file);
     putObject(s3Client, request);
+    logger.info("Success uploading to S3");
   }
 
   public void uploadObject(File file, ObjectMetadata metadata) {

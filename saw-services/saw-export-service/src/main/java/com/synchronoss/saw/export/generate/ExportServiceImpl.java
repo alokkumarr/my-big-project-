@@ -1,25 +1,42 @@
 package com.synchronoss.saw.export.generate;
 
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.synchronoss.saw.export.AmazonS3Handler;
-import com.synchronoss.saw.export.S3Config;
-import com.synchronoss.saw.export.model.S3.S3Customer;
-import com.synchronoss.saw.export.model.S3.S3Details;
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.export.AmazonS3Handler;
+import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
+import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
+import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.AnalysisMetaData;
+import com.synchronoss.saw.export.model.DataResponse;
+import com.synchronoss.saw.export.model.S3.S3Customer;
+import com.synchronoss.saw.export.model.S3.S3Details;
 import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -28,7 +45,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -36,17 +58,6 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
-
-import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.export.generate.interfaces.ExportService;
-import com.synchronoss.saw.export.model.DataResponse;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Service
 public class ExportServiceImpl implements ExportService{
@@ -522,14 +533,23 @@ public class ExportServiceImpl implements ExportService{
           zos.close();
 
           for (String aliastemp : finalS3.split(",")) {
+              logger.info("AliasTemp : "+aliastemp);
             ObjectMapper jsonMapper = new ObjectMapper();
             try {
               S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
               for (S3Details alias : obj.getS3List()) {
                 if (alias.getCustomerCode().equals(finalJobGroup)
-                   //TODO : && aliastemp.equals(alias.getAlias())
+                   && aliastemp.equals(alias.getAlias())
                     ) {
-                  S3Config s3Config =
+                    logger.info("Final Obj to be dispatched for S3 : ");
+                    logger.info("BucketName : "+alias.getBucketName());
+                    logger.info("AccessKey : "+alias.getAccessKey());
+                    logger.info("SecretKey : "+alias.getSecretKey());
+                    logger.info("Region : "+alias.getRegion());
+                    logger.info("getOutputLocation : "+alias.getOutputLocation());
+                    logger.info("FileName : "+ zipFileName);
+
+                    S3Config s3Config =
                       new S3Config(
                           alias.getBucketName(),
                           alias.getAccessKey(),
@@ -538,10 +558,10 @@ public class ExportServiceImpl implements ExportService{
                           alias.getOutputLocation());
 
                     AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
-                    ObjectMetadata metadata = new ObjectMetadata();
-                    metadata.setContentType("plain/text");
-                    metadata.addUserMetadata("x-amz-meta-title", "someTitle");
-                    s3Handler.uploadObject(new File(zipFileName),metadata);
+//                    ObjectMetadata metadata = new ObjectMetadata();
+//                    metadata.setContentType("plain/text");
+//                    metadata.addUserMetadata("x-amz-meta-title", "someTitle");
+                    s3Handler.uploadObject(cfile.getAbsoluteFile());
                 }
               }
             } catch (IOException e) {
