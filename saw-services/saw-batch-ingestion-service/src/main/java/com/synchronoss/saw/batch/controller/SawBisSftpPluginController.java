@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.synchronoss.saw.batch.AsyncConfiguration;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
@@ -90,7 +91,7 @@ public class SawBisSftpPluginController {
       required = true) @PathVariable(name = "routeId", required = true) Long routeId) {
     String channelType = findChannelTypeFromRouteId(routeId);
     SipPluginContract sipConnService = factory.getInstance(channelType);
-    return sipConnService.connectRoute(routeId);
+    return JSON.toJSONString(sipConnService.connectRoute(routeId));
   }
 
 
@@ -113,7 +114,7 @@ public class SawBisSftpPluginController {
       throws SipNestedRuntimeException, IOException {
     SipPluginContract sipConnService = factory
         .getInstance(payload.getChannelType().toString());
-    return sipConnService.immediateConnectRoute(payload);
+    return JSON.toJSONString(sipConnService.immediateConnectRoute(payload));
   }
 
   /**
@@ -133,7 +134,7 @@ public class SawBisSftpPluginController {
     String channelType = findChannelTypeFromChannelId(Long.valueOf(channelId));
     logger.info("Channel type:: " + channelType);
     SipPluginContract sipConnService = factory.getInstance(channelType);
-    return sipConnService.connectChannel(channelId);
+    return JSON.toJSONString(sipConnService.connectChannel(channelId));
   }
 
   /**
@@ -155,7 +156,7 @@ public class SawBisSftpPluginController {
 
     SipPluginContract sipConnService = factory.getInstance(
         payload.getChannelType().toString());
-    return sipConnService.immediateConnectChannel(payload);
+    return JSON.toJSONString(sipConnService.immediateConnectChannel(payload));
   }
 
   /**

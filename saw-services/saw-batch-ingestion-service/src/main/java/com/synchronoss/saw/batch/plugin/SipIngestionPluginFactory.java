@@ -19,7 +19,7 @@ public class SipIngestionPluginFactory {
   private SipPluginContract sftpServiceImpl;
 
   @Autowired
-  S3ServiceImpl s3ConnsService;
+  S3ServiceImpl s3ServiceImpl;
 
   private static final Logger logger = LoggerFactory.getLogger(SipIngestionPluginFactory.class);
 
@@ -36,7 +36,7 @@ public class SipIngestionPluginFactory {
     if (ingestionType.toUpperCase().equals(ChannelType.SFTP.name())) {
       sipConnectionService = this.sftpServiceImpl;
     } else if (ingestionType.equals(ChannelType.S3.name())) {
-      sipConnectionService = this.s3ConnsService;
+      sipConnectionService = this.s3ServiceImpl;
     }
 
     return sipConnectionService;
