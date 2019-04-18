@@ -65,7 +65,7 @@
         keyExpr="alertRulesSysId"
         [rowAlternationEnabled]="true"
       >
-        <dxo-selection mode="single"></dxo-selection>
+        <dxo-selection mode="none"></dxo-selection>
         <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
         <dxo-search-panel
           [visible]="false"
@@ -156,9 +156,10 @@
             mat-icon-button
             i18n-matTooltip
             color="warn"
-            e2e="edit-alert"
+            e2e="delete-alert"
             class="conf-container-content__body__gridBtn"
             matTooltip="Delete"
+            (click)="deleteAlert(data.data)"
           >
             <mat-icon fontIcon="icon-delete"></mat-icon>
           </button>

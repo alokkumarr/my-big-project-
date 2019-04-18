@@ -57,6 +57,7 @@
     }
 
     &__body {
+      height: calc(100% - 45px);
       background-color: white;
       border-radius: 3px;
 

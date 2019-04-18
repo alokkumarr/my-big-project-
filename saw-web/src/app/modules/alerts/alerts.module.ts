@@ -14,7 +14,8 @@ import { AlertsPageComponent } from './components/alerts-page/alerts-page.compon
 import { AlertsViewComponent } from './components/alerts-view/alerts-view.component';
 import {
   AlertsConfigurationComponent,
-  AddAlertComponent
+  AddAlertComponent,
+  ConfirmActionDialogComponent
 } from './components/configure/index';
 
 import { IsAdminGuard } from '../admin/guards';
@@ -23,7 +24,8 @@ const components = [
   AlertsPageComponent,
   AlertsViewComponent,
   AlertsConfigurationComponent,
-  AddAlertComponent
+  AddAlertComponent,
+  ConfirmActionDialogComponent
 ];
 
 @NgModule({

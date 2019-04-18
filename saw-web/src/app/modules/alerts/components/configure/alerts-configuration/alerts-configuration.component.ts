@@ -1,8 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MatSidenav } from '@angular/material';
-import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
+import { MatSidenav, MatDialog } from '@angular/material';
+import { SubscriptionLike } from 'rxjs';
 
+import { ConfirmActionDialogComponent } from '../confirm-action-dialog/confirm-action-dialog.component';
+
+import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
+import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 
 @Component({
@@ -10,7 +14,8 @@ import { ConfigureAlertService } from '../../../services/configure-alert.service
   templateUrl: './alerts-configuration.component.html',
   styleUrls: ['./alerts-configuration.component.scss']
 })
-export class AlertsConfigurationComponent implements OnInit {
+export class AlertsConfigurationComponent implements OnDestroy {
+  subscriptions: SubscriptionLike[] = [];
   addAlertPanelMode: 'side' | 'over' = 'side';
   isInTabletMode = false;
   configuredAlerts$;
@@ -21,9 +26,11 @@ export class AlertsConfigurationComponent implements OnInit {
 
   constructor(
     breakpointObserver: BreakpointObserver,
-    public _configureAlertService: ConfigureAlertService
+    public _configureAlertService: ConfigureAlertService,
+    public dialog: MatDialog,
+    private _notify: ToastService
   ) {
-    breakpointObserver
+    const breakpointObserverSub = breakpointObserver
       .observe([Breakpoints.Medium, Breakpoints.Small])
       .subscribe(result => {
         this.isInTabletMode = result.matches;
@@ -33,12 +40,15 @@ export class AlertsConfigurationComponent implements OnInit {
           this.addAlertPanelMode = 'side';
         }
       });
+    this.subscriptions.push(breakpointObserverSub);
     this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
   }
 
   @ViewChild('alertSidenav') sidenav: MatSidenav;
 
-  ngOnInit() {}
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
   cancelAddalert() {
     this.sidenav.close();
@@ -62,5 +72,27 @@ export class AlertsConfigurationComponent implements OnInit {
     this.alertDefInput = {
       action: 'create'
     };
+  }
+
+  deleteAlert(alertConfig: AlertConfig) {
+    const dialogRef = this.dialog.open(ConfirmActionDialogComponent, {
+      width: '400px',
+      data: {
+        typeTitle: 'Alert Name',
+        typeName: alertConfig.alertName
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        const delConfirmSubscription = this._configureAlertService
+          .deleteAlert(alertConfig.alertRulesSysId)
+          .subscribe((data: any) => {
+            this._notify.success(data.message);
+            this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
+          });
+        this.subscriptions.push(delConfirmSubscription);
+      }
+    });
   }
 }

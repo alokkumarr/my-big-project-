@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as get from 'lodash/get';
-
 import * as fpGet from 'lodash/fp/get';
 import { map } from 'rxjs/operators';
 
