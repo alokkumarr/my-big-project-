@@ -28,6 +28,7 @@ interface NewDesignerQueryParams {
   semanticId: string;
   type: string;
   chartType?: string;
+  supports: string;
 }
 
 interface ExistingDesignerQueryParams {
@@ -85,7 +86,10 @@ export class DesignerPageComponent implements OnInit {
   }
 
   onSave({ analysis, requestExecution }: DesignerSaveEvent) {
-    const navigateBackTo = this.designerMode === 'fork' || this.designerMode === 'new'  ? 'home' : 'back';
+    const navigateBackTo =
+      this.designerMode === 'fork' || this.designerMode === 'new'
+        ? 'home'
+        : 'back';
     if (requestExecution) {
       this._executeService.executeAnalysis(
         analysis,
@@ -113,6 +117,9 @@ export class DesignerPageComponent implements OnInit {
     /* If new analysis, setup a basic analysis starter */
     if (params.mode === 'new') {
       const newAnalysisParams = <NewDesignerQueryParams>params;
+      const supports = newAnalysisParams.supports
+        ? JSON.parse(newAnalysisParams.supports)
+        : [];
       this.analysisStarter = {
         categoryId: newAnalysisParams.categoryId,
         metricName: newAnalysisParams.metricName,
@@ -121,7 +128,8 @@ export class DesignerPageComponent implements OnInit {
         chartType: newAnalysisParams.chartType,
         name: 'Untitled Analysis',
         description: '',
-        scheduled: null
+        scheduled: null,
+        supports
       };
 
       /* Else, load existing analysis */

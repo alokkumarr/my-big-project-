@@ -46,11 +46,16 @@ export class AnalyzeDialogService {
 
   openAnalysisDialog(data: AnalysisDialogData) {
     const mode = data.designerMode || 'new';
-    const analysisStarter = data.analysisStarter || {};
+    const analysisStarter = <any>(data.analysisStarter || {});
     const analysis = data.analysis ? { analysisId: data.analysis.id } : {};
 
     return this.router.navigate(['analyze/designer'], {
-      queryParams: { ...analysisStarter, ...analysis, mode }
+      queryParams: {
+        ...analysisStarter,
+        ...analysis,
+        mode,
+        supports: JSON.stringify(analysisStarter.supports)
+      }
     });
   }
 
