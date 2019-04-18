@@ -49,6 +49,13 @@
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
 
+	<dependency>
+		<groupId>com.synchronoss.bda.sip</groupId>
+		<artifactId>sip-common-components</artifactId>
+		<version>${revision}</version>
+	</dependency>
+		
+
 		<!-- flyway dependency to execute sql files automatically on server startup. -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>

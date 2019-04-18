@@ -27,8 +27,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
@@ -54,9 +52,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
-import com.synchronoss.saw.gateway.RestUtil;
 import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
 import com.synchronoss.saw.gateway.utils.ContentRequestTransformer;
 import com.synchronoss.saw.gateway.utils.HeadersRequestTransformer;
@@ -78,32 +76,17 @@ public class GatewayController {
   @Value("${security.service.host}")
   private String apiGatewayOtherProperties;
   
-  @Value("${sip.trust.store:}")
-  private String trustStore;
-
-  @Value("${sip.trust.password:}")
-  private String trustStorePassword; 
-
-  @Value("${sip.key.store:}")
-  private String keyStore;
-
-  @Value("${sip.key.password:}")
-  private String keyStorePassword; 
-  
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable; 
   
+  @Autowired
+  private RestUtil restUtil;
+
   private HttpClient httpClient;
 
   @PostConstruct
   public void init() throws Exception {
-    if (sipSslEnable) {
-      httpClient =
-          RestUtil.getHttpsClient(keyStore, keyStorePassword, trustStore, trustStorePassword);
-    } else {
-      PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-      httpClient = HttpClients.custom().setConnectionManager(cm).build();
-    }
+    httpClient = restUtil.getHttpClient();
   }
 
   
@@ -141,8 +124,7 @@ public class GatewayController {
     }
     if (header!=null){
         HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
-      RestTemplate restTemplate = sipSslEnable ?
-          RestUtil.restTemplate(trustStore, trustStorePassword, keyStore, keyStorePassword) : new RestTemplate();
+      RestTemplate restTemplate = restUtil.restTemplate();
         String url = apiGatewayOtherProperties+"/auth/customer/details";
         logger.debug("security server URL {}", url);
         try {

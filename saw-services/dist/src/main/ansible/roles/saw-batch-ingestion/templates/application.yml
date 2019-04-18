@@ -34,7 +34,7 @@ server:
   port: 9904
   servlet:
     context-path: ''
-  maxHttpHeaderSize: 65536
+  max-http-header-size: 65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
@@ -67,8 +67,8 @@ sip:
     retry.diff.mins: {{ sip_bis_retry_diffs_in_minutes  | default(5) }}
     retry.page.size: 20
     max.inprogress.mins: 45
-    ssl:
-     enable : {{ sip_secure  | default('false') }}
+  ssl:
+    enable : {{ sip_secure  | default('false') }}
    {% if sip_secure is sameas true  %}
    trust:
        store: ${server.ssl.trust-store}
@@ -78,11 +78,17 @@ sip:
       password: ${server.ssl.key-store-password}
    {% endif %}
 
+{% if sip_secure is sameas true  %}
+connector: https
+{% else %}
+connector: http
+{% endif %}
+
 bis:
   transfer-batch-size: 10
   modified-retries: 3
   default-data-drop-location: "{{ 'maprfs://' + sip_var_path + '/workbench'  | default('maprfs:///var/sip/workbench') }}"
-  scheduler-url: http://localhost:9600
+  scheduler-url: ${connector}://localhost:9600
   recheck-file-modified: {{ sip_bis_recheck_file_modified  | default('false') }}
   destination-fs-user: mapr
   duplicate-entry: {{ sip_bis_duplicate_entry  | default('true') }}

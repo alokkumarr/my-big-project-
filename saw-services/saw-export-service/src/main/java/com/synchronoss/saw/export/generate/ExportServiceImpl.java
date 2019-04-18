@@ -3,10 +3,12 @@ package com.synchronoss.saw.export.generate;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
@@ -43,6 +45,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+// TODO : AsyncRestTemplate needs to be replaced WebClient
+@SuppressWarnings("deprecation")
 @Service
 public class ExportServiceImpl implements ExportService{
 
@@ -73,7 +77,19 @@ public class ExportServiceImpl implements ExportService{
 
   @Value("${exportChunkSize}")
   private String exportChunkSize;
+  
+  private AsyncRestTemplate asyncRestTemplate = null;
 
+  @Autowired
+  private RestUtil restUtil;
+
+  
+  @PostConstruct
+  public void init() {
+    asyncRestTemplate = restUtil.asyncRestTemplate();
+  }
+
+  
   @Autowired
   private ApplicationContext appContext;
 
@@ -123,7 +139,7 @@ public class ExportServiceImpl implements ExportService{
     else
         url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType;
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    //AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
         requestEntity, DataResponse.class);
     responseStringFuture.addCallback(new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
@@ -147,7 +163,7 @@ public class ExportServiceImpl implements ExportService{
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    // AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     // at times we need synchronous processing even in async as becasue of massive parallelism
     // it may halt entire system or may not complete the request
     RestTemplate restTemplate = new RestTemplate();
@@ -486,7 +502,7 @@ public class ExportServiceImpl implements ExportService{
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    //AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     Object dispatchBean = request.getBody();
     String recipients = null;
     String ftp = null;

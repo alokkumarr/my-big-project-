@@ -1,9 +1,9 @@
 package com.synchronoss.saw.scheduler.job;
 
+import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
-
 import java.util.Date;
-
+import javax.annotation.PostConstruct;
 import org.quartz.InterruptableJob;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -12,6 +12,7 @@ import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
@@ -27,7 +28,20 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
   @Value("${bis-transfer-url}")
   private String bisTransferUrl;
 
-  RestTemplate restTemplate = new RestTemplate();
+  @Value("${sip.trust.store:}")
+  private String trustStore;
+
+  @Autowired
+  private RestUtil restUtil;
+
+  
+  RestTemplate restTemplate = null;
+
+  @PostConstruct
+  public void init() throws Exception {
+    restTemplate = restUtil.restTemplate();
+        
+  }
 
 
   @Override
@@ -58,7 +72,15 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
   @Override
   public void interrupt() throws UnableToInterruptJobException {
     logger.info("Stopping thread... ");
-    toStopFlag = false;
+    this.setToStopFlag(false);
+  }
+
+  public boolean isToStopFlag() {
+    return toStopFlag;
+  }
+
+  public void setToStopFlag(boolean toStopFlag) {
+    this.toStopFlag = toStopFlag;
   }
 
 }

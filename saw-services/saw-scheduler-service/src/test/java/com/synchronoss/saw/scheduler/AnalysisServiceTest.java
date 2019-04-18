@@ -32,7 +32,7 @@ public class AnalysisServiceTest {
     private MockRestServiceServer server;
 
     @Test
-    public void testAnalysisExecute() {
+    public void testAnalysisExecute() throws Exception {
         /* Set up mock response */
         String json = "{}";
         log.trace("Mock execute analysis JSON: {}", json);

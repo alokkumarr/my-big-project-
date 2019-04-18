@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
@@ -26,6 +27,7 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -34,6 +36,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
@@ -51,6 +54,9 @@ public class MigrationService {
 
   private static final Logger logger = LoggerFactory.getLogger(MigrationService.class);
   private String existingBinarySemanticPath = "/services/metadata/semantic_metadata";
+
+  @Autowired
+  private RestUtil restUtil;
 
   /**
    * Run migration.
@@ -130,10 +136,11 @@ public class MigrationService {
 
   /**
    * This method will get the data from binary store & make it sure. binary & maprDB store are in
-   * sync
+   * sync.
+   * @throws Exception exception
    */
   public void convertHBaseBinaryToMaprdbStore(String transportUri, String basePath,
-      String migrationMetadataHome) throws JsonProcessingException, IOException {
+      String migrationMetadataHome) throws Exception {
     logger.trace("migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
     // Constructing the request structure to get the list of semantic from Binary
@@ -146,7 +153,7 @@ public class MigrationService {
         new HttpEntity<Object>(semanticNodeQuery("search"), requestHeaders);
     logger.debug("transportMetadataURIL server URL {}", transportUri + "/md");
     String url = transportUri + "/md";
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = restUtil.restTemplate();
     ResponseEntity<MetaDataObjects> binarySemanticStoreData =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, MetaDataObjects.class);
     logger.trace(

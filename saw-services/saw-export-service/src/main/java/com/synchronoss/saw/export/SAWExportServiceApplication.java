@@ -17,7 +17,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss.saw.export")
+@ComponentScan(basePackages= {"com.synchronoss.saw.export", "com.synchronoss.bda.util"})
 @EnableAsync
 public class SAWExportServiceApplication {
 

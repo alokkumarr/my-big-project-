@@ -1,7 +1,6 @@
 package com.synchronoss.saw.semantic.service;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
+import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
@@ -20,7 +20,6 @@ import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.Content;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +28,11 @@ import javax.validation.constraints.NotNull;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.store.generic.schema.Action;
@@ -66,7 +67,11 @@ public class SemanticServiceImpl implements SemanticService {
   @Value("${semantic.migration-metadata-home}")
   @NotNull
   private String migrationMetadataHome;
+  
+  @Autowired
+  private RestUtil restUtil;
 
+  
   @PostConstruct
   private void init() throws Exception {
     if (migrationRequires) {
@@ -112,10 +117,11 @@ public class SemanticServiceImpl implements SemanticService {
 
   /**
    * This method to set the physicalLocation, format & name under repository section. when it is
-   * from DataLake
+   * from DataLake.
+   * @throws Exception  exception
    */
   private SemanticNode setRepository(SemanticNode semanticNode)
-      throws JsonProcessingException, IOException {
+      throws Exception {
     logger.trace("Setting repository starts here..");
     String requestUrl = workbenchURl + "/internal/workbench/projects/"
         + semanticNode.getProjectCode() + "/datasets/";
@@ -134,7 +140,7 @@ public class SemanticServiceImpl implements SemanticService {
     ArrayNode respository = objectMapper.createArrayNode();
     for (String dataSetId : semanticNode.getParentDataSetIds()) {
       logger.trace("Request URL to pull DataSet Details : " + requestUrl + dataSetId);
-      RestTemplate restTemplate = new RestTemplate();
+      RestTemplate restTemplate = restUtil.restTemplate();
       dataSet = restTemplate.getForObject(requestUrl + dataSetId, DataSet.class);
       node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
       rootNode = (ObjectNode) node;

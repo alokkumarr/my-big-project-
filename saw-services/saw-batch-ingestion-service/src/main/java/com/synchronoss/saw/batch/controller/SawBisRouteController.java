@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -32,7 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 
+
 @RestController
 @Api(value = "The controller provides operations related Route Entity "
     + "synchronoss analytics platform ")
@@ -74,7 +76,6 @@ public class SawBisRouteController {
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
   private String scheduleUri = "/scheduler/bisscheduler";
-
 
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
@@ -93,7 +94,16 @@ public class SawBisRouteController {
   private BisRouteService bisRouteService;
 
 
-  RestTemplate restTemplate = new RestTemplate();
+  @Autowired
+  private RestUtil restUtil;
+
+  
+  private RestTemplate restTemplate = null;
+  
+  @PostConstruct
+  public void init() {
+    restTemplate = restUtil.restTemplate();
+  }
 
   /**
    * This API provides an ability to add a source.
@@ -184,7 +194,6 @@ public class SawBisRouteController {
           // E.g.: 2019-02-07T00:00:26+05:30
           // This will be converted to machine time
           
-
           try {
             if (startDateStr != null) {
               logger.debug("Start Date = " + startDateStr.asText());
@@ -210,7 +219,6 @@ public class SawBisRouteController {
           }
         }
         // }
-        RestTemplate restTemplate = new RestTemplate();
         logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + scheduleUri
             + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + insertUrl, schedulerRequest);
@@ -382,7 +390,6 @@ public class SawBisRouteController {
           routeEntity.setStatus(STATUS_ACTIVE);
         }
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
-        RestTemplate restTemplate = new RestTemplate();
         logger.info(
             "scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + updateUrl);
         try {

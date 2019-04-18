@@ -10,10 +10,12 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 import info.faljse.SDNotify.SDNotify;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.synchronoss.bda.util", "com.synchronoss.saw"})
 public class SAWSchedulerServiceApplication extends SpringBootServletInitializer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SAWSchedulerServiceApplication.class);

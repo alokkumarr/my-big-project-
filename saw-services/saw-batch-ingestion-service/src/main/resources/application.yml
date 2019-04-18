@@ -59,11 +59,22 @@ sip:
     retry.diff.mins: 1
     retry.page.size: 20
     max.inprogress.mins: 45
+  ssl:
+     enable : false
+  trust:
+      store: /Users/spau0004/Desktop/keystore/truststore.jks
+      password: sip@123
+  key:
+     store: /Users/spau0004/Desktop/keystore/keystore.jks
+     password: sip@123
+
+connector: http     
+    
 bis:
   transfer-batch-size: 10
   modified-retries: 3
   default-data-drop-location: /Users/spau0004/Desktop/workbench
-  scheduler-url: http://localhost:9601
+  scheduler-url: ${connector}://localhost:9601
   recheck-file-modified: false
   destination-fs-user: mapr
   duplicate-entry: true
