@@ -33,4 +33,7 @@ interface DispatchBean {
 
     String jobGroup();
 
+    @Nullable
+    String s3();
+
 }

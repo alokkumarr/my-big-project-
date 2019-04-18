@@ -78,43 +78,4 @@ public class AmazonS3Handler {
       e.printStackTrace();
     }
   }
-
-
-
-  public static void main(String[] args) {
-    String bucketName = "xdftest";
-    String fileName =
-        "/Users/pras0004/Workspace/Projects/sip/saw-services/saw-export-service/src/main/resources/ftp-details.json";
-    String fileObjKeyName = "TestDir";
-    String accesskey = "AKIAJMRWBPAZY4AECBVQ";
-    String secretkey = "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";
-    String name = "details.json";
-
-    AWSCredentials credentials = new BasicAWSCredentials(accesskey, secretkey);
-
-    try {
-      AmazonS3 s3Client =
-          AmazonS3ClientBuilder.standard()
-              .withRegion(Regions.US_EAST_1)
-              .withCredentials(new AWSStaticCredentialsProvider(credentials))
-              .build();
-
-      PutObjectRequest request =
-          new PutObjectRequest(bucketName, fileObjKeyName+"/"+name, new File(fileName));
-      ObjectMetadata metadata = new ObjectMetadata();
-      metadata.setContentType("plain/text");
-      metadata.addUserMetadata("x-amz-meta-title", "someTitle");
-      request.setMetadata(metadata);
-      s3Client.putObject(request);
-
-    } catch (AmazonServiceException e) {
-      // The call was transmitted successfully, but Amazon S3 couldn't process
-      // it, so it returned an error response.
-      e.printStackTrace();
-    } catch (SdkClientException e) {
-      // Amazon S3 couldn't be contacted for a response, or the client
-      // couldn't parse the response from Amazon S3.
-      e.printStackTrace();
-    }
-  }
 }

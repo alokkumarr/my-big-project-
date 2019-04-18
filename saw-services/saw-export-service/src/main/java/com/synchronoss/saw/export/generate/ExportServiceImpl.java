@@ -1,5 +1,8 @@
 package com.synchronoss.saw.export.generate;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.synchronoss.saw.export.AmazonS3Handler;
+import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.model.S3.S3Customer;
 import com.synchronoss.saw.export.model.S3.S3Details;
 import java.io.*;
@@ -163,6 +166,7 @@ public class ExportServiceImpl implements ExportService{
     Object dispatchBean = request.getBody();
     String recipients = null;
     String ftp = null;
+    String s3 = null;
     String jobGroup = null;
 
     // presetting the variables, as their presence will determine which URLs to process
@@ -171,6 +175,10 @@ public class ExportServiceImpl implements ExportService{
         recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
         if(((LinkedHashMap) dispatchBean).get("ftp") !=null )
         ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
+
+        if(((LinkedHashMap) dispatchBean).get("s3") !=null )
+        s3 = String.valueOf(((LinkedHashMap) dispatchBean).get("s3"));
+
         jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
         ExportBean exportBean = new ExportBean();
         String dir = UUID.randomUUID().toString();
@@ -244,6 +252,17 @@ public class ExportServiceImpl implements ExportService{
         });
       }
 
+      if (s3!=null && s3 != "") {
+        dispatchS3List(
+            exportBean,
+            s3,
+            jobGroup,
+            analysisId,
+            executionId,
+            analysisType,
+            requestEntity,
+            restTemplate);
+      }
       // this export is synchronous
       if (ftp!=null && ftp != "") {
 
@@ -374,6 +393,173 @@ public class ExportServiceImpl implements ExportService{
           } catch (Exception e) {
             logger.error("ftp error: "+e.getMessage());
           }
+        }
+      }
+    }
+  }
+
+  public void dispatchS3List(
+      ExportBean exportBean,
+      String s3,
+      String jobGroup,
+      String analysisId,
+      String executionId,
+      String analysisType,
+      HttpEntity<?> requestEntity,
+      RestTemplate restTemplate) {
+    if (s3 != null && s3 != "") {
+
+      // Do the background work beforehand
+      String finalS3 = s3;
+      String finalJobGroup = jobGroup;
+      String fileType = exportBean.getFileType();
+
+      long limitPerPage = Long.parseLong(exportChunkSize);
+      long page = 0; // just to keep hold of last not processed data in for loop
+
+      double noOfPages = Math.ceil(Double.parseDouble(ftpExportSize) / limitPerPage);
+      boolean flag = true;
+      long totalRowCount = 0;
+
+      for (int i = 1; i < noOfPages; i += 1) {
+        // get data in pages and keep storing it to file
+        // do not use entire ftpexportsize else there will be no data
+        // this happens because of memory issues / JVM configuration.
+        // This page number will make sure that we process the last bit of info
+        page = i;
+        // Paginated URL for limitPerPage records till the end of the file.
+        String url =
+            apiExportOtherProperties
+                + "/"
+                + analysisId
+                + "/executions/"
+                + executionId
+                + "/data?page="
+                + page
+                + "&pageSize="
+                + limitPerPage
+                + "&analysisType="
+                + analysisType;
+        // we directly get response and start processing this.
+        ResponseEntity<DataResponse> entity =
+            restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
+        totalRowCount = entity.getBody().getTotalRows();
+        if (totalRowCount <= Double.parseDouble(s3ExportSize) && flag) {
+          noOfPages = Math.ceil(totalRowCount / limitPerPage);
+          flag = false;
+        }
+        streamResponseToFile(exportBean, limitPerPage, entity);
+      }
+      // final rows to process
+      long leftOutRows = 0;
+      if (totalRowCount <= Double.parseDouble(s3ExportSize)) {
+        leftOutRows = totalRowCount - page * limitPerPage;
+      } else {
+        leftOutRows = Long.parseLong(s3ExportSize) - page * limitPerPage;
+      }
+
+      // if limits are set in such a way that no of pages becomes zero, then there's just one page
+      // to process for entire data.
+      // process the remaining page
+      page += 1;
+      if (leftOutRows > 0) {
+        // Paginated URL for limitPerPage records till the end of the file.
+        String url =
+            apiExportOtherProperties
+                + "/"
+                + analysisId
+                + "/executions/"
+                + executionId
+                + "/data?page="
+                + page
+                + "&pageSize="
+                + leftOutRows
+                + "&analysisType="
+                + analysisType;
+        // we directly get response and start processing this.
+        ResponseEntity<DataResponse> entity =
+            restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
+
+        streamResponseToFile(exportBean, leftOutRows, entity);
+      }
+
+      // zip the contents of the file
+      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+      LocalDateTime now = LocalDateTime.now();
+
+      File cfile = new File(exportBean.getFileName());
+      String zipFileName = cfile.getAbsolutePath().concat(".zip");
+
+      if (finalS3 != null && finalS3 != "") {
+
+        try {
+
+          FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+          ZipOutputStream zos = new ZipOutputStream(fos_zip);
+
+          zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+          byte[] readBuffer = new byte[2048];
+          int amountRead;
+          int written = 0;
+
+          try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+
+            while ((amountRead = inputStream.read(readBuffer)) > 0) {
+              zos.write(readBuffer, 0, amountRead);
+              written += amountRead;
+            }
+
+            logger.info("Written " + written + " bytes to " + zipFileName);
+
+          } catch (Exception e) {
+            logger.error("Error while writing to zip: " + e.getMessage());
+          }
+
+          //            byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
+          //            zos.write(bytes, 0, bytes.length);
+          zos.closeEntry();
+          zos.close();
+
+          for (String aliastemp : finalS3.split(",")) {
+            ObjectMapper jsonMapper = new ObjectMapper();
+            try {
+              S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
+              for (S3Details alias : obj.getS3List()) {
+                if (alias.getCustomerCode().equals(finalJobGroup)
+                   //TODO : && aliastemp.equals(alias.getAlias())
+                    ) {
+                  S3Config s3Config =
+                      new S3Config(
+                          alias.getBucketName(),
+                          alias.getAccessKey(),
+                          alias.getSecretKey(),
+                          alias.getRegion(),
+                          alias.getOutputLocation());
+
+                    AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
+                    ObjectMetadata metadata = new ObjectMetadata();
+                    metadata.setContentType("plain/text");
+                    metadata.addUserMetadata("x-amz-meta-title", "someTitle");
+                    s3Handler.uploadObject(new File(zipFileName),metadata);
+                }
+              }
+            } catch (IOException e) {
+              logger.error(e.getMessage());
+            }
+          }
+
+          // deleting the files
+          logger.debug("Deleting exported file.");
+          serviceUtils.deleteFile(exportBean.getFileName(), true);
+          serviceUtils.deleteFile(zipFileName, true);
+
+          // close the streams
+          zos.close();
+          fos_zip.close();
+
+        } catch (Exception e) {
+          logger.error("S3 error: " + e.getMessage());
         }
       }
     }
@@ -708,29 +894,29 @@ public class ExportServiceImpl implements ExportService{
     return aliases;
   }
 
-    @Override
-    public List<String> listS3ForCustomer(RequestEntity requestEntity) {
-        Object dispatchBean = requestEntity.getBody();
-        String jobGroup = null;
-        List<String> aliases = new ArrayList<String>();
+  @Override
+  public List<String> listS3ForCustomer(RequestEntity requestEntity) {
+    Object dispatchBean = requestEntity.getBody();
+    String jobGroup = null;
+    List<String> aliases = new ArrayList<String>();
 
-        if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
-            jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
-            ObjectMapper jsonMapper = new ObjectMapper();
-            try {
-                File f = new File(s3DetailsFile);
-                if (f.exists() && !f.isDirectory()) {
-                    S3Customer obj = jsonMapper.readValue(f, S3Customer.class);
-                    for (S3Details alias : obj.getS3List()) {
-                        if (alias.getCustomerCode().equals(jobGroup)) {
-                            aliases.add(alias.getAlias());
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage());
+    if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
+      jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
+      ObjectMapper jsonMapper = new ObjectMapper();
+      try {
+        File f = new File(s3DetailsFile);
+        if (f.exists() && !f.isDirectory()) {
+          S3Customer obj = jsonMapper.readValue(f, S3Customer.class);
+          for (S3Details alias : obj.getS3List()) {
+            if (alias.getCustomerCode().equals(jobGroup)) {
+              aliases.add(alias.getAlias());
             }
+          }
         }
-        return aliases;
+      } catch (IOException e) {
+        logger.error(e.getMessage());
+      }
     }
+    return aliases;
+  }
 }

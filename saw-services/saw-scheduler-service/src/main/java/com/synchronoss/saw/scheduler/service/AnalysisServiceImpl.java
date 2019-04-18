@@ -70,6 +70,14 @@ public class AnalysisServiceImpl implements AnalysisService {
             ftpServers = "";
         }
 
+        String s3List = null;
+        try {
+            s3List = prepareStringFromList(analysis.getS3());
+        } catch (Exception e) {
+            logger.error("Error reading s3 List: "+ e.getMessage());
+            s3List = "";
+        }
+        
         ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
         String[] latestexection = findLatestExecution(executionBeans);
         Date date = new Date(Long.parseLong(latestexection[1]));
@@ -78,7 +86,17 @@ public class AnalysisServiceImpl implements AnalysisService {
         String formatted = format.format(date);
         DispatchBean execution;
 
-        if (!recipients.equals("") && !ftpServers.equals("")) {
+        if (!recipients.equals("") && !ftpServers.equals("") && !s3List.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                    .emailList(recipients).fileType(analysis.getFileType())
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .ftp(ftpServers)
+                    .jobGroup(analysis.getJobGroup())
+                    .publishedTime(formatted).s3(s3List).build();
+        } else if (!recipients.equals("") && !ftpServers.equals("")) {
             execution = ImmutableDispatchBean.builder()
                     .emailList(recipients).fileType(analysis.getFileType())
                     .description(analysis.getDescription())
@@ -88,16 +106,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .ftp(ftpServers)
                     .jobGroup(analysis.getJobGroup())
                     .publishedTime(formatted).build();
-        } else if (!recipients.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                    .emailList(recipients).fileType(analysis.getFileType())
-                    .description(analysis.getDescription())
-                    .name(analysis.getAnalysisName())
-                    .userFullName(analysis.getUserFullName())
-                    .metricName(analysis.getMetricName())
-                    .jobGroup(analysis.getJobGroup())
-                    .publishedTime(formatted).build();
-        } else if (!ftpServers.equals("")) {
+        } else if (!ftpServers.equals("") && !s3List.equals("")) {
             execution = ImmutableDispatchBean.builder()
                     .description(analysis.getDescription())
                     .fileType(analysis.getFileType())
@@ -106,7 +115,46 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .metricName(analysis.getMetricName())
                     .ftp(ftpServers)
                     .jobGroup(analysis.getJobGroup())
-                    .publishedTime(formatted).build();
+                    .publishedTime(formatted).s3(s3List).build();
+        } else if (!recipients.equals("") && !s3List.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                .emailList(recipients).fileType(analysis.getFileType())
+                .description(analysis.getDescription())
+                .fileType(analysis.getFileType())
+                .name(analysis.getAnalysisName())
+                .userFullName(analysis.getUserFullName())
+                .metricName(analysis.getMetricName())
+                .jobGroup(analysis.getJobGroup())
+                .publishedTime(formatted).s3(s3List).build();
+        } else if (!recipients.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                .emailList(recipients).fileType(analysis.getFileType())
+                .description(analysis.getDescription())
+                .fileType(analysis.getFileType())
+                .name(analysis.getAnalysisName())
+                .userFullName(analysis.getUserFullName())
+                .metricName(analysis.getMetricName())
+                .jobGroup(analysis.getJobGroup())
+                .publishedTime(formatted).build();
+        } else if (!s3List.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                .description(analysis.getDescription())
+                .fileType(analysis.getFileType())
+                .name(analysis.getAnalysisName())
+                .userFullName(analysis.getUserFullName())
+                .metricName(analysis.getMetricName())
+                .jobGroup(analysis.getJobGroup())
+                .publishedTime(formatted).s3(s3List).build();
+        } else if (!ftpServers.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                .description(analysis.getDescription())
+                .fileType(analysis.getFileType())
+                .name(analysis.getAnalysisName())
+                .userFullName(analysis.getUserFullName())
+                .metricName(analysis.getMetricName())
+                .ftp(ftpServers)
+                .jobGroup(analysis.getJobGroup())
+                .publishedTime(formatted).build();
         } else {
             execution = ImmutableDispatchBean.builder()
                     .description(analysis.getDescription())
