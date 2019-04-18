@@ -58,7 +58,7 @@ public class AmazonS3Handler {
   }
 
   public void uploadObject(File file) {
-    PutObjectRequest request = new PutObjectRequest(bucket, outputLocation, file);
+    PutObjectRequest request = new PutObjectRequest(bucket, outputLocation+"PrabhuTest.txt", file);
     putObject(s3Client, request);
     logger.info("Success uploading to S3");
   }
