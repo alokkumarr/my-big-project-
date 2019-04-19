@@ -34,7 +34,7 @@ import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
 
 
-@Service
+@Service("SFTP")
 public class SftpRetryServiceImpl implements SipRetryContract {
 
   private static final Logger logger = LoggerFactory.getLogger(SftpRetryServiceImpl.class);
@@ -93,7 +93,8 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                 int lastModifiedHoursLmt = SftpServiceImpl.LAST_MODIFIED_DEFAUTL_VAL;
                 String sourceLocation = rootNode.get("sourceLocation").asText();
                 SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
-                if (rootNode.get("lastModifiedLimitHours") != null && !rootNode.get("lastModifiedLimitHours").equals("")) {
+                if (rootNode.get("lastModifiedLimitHours") != null
+                    && !rootNode.get("lastModifiedLimitHours").equals("")) {
                   String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
                   lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
                   logger.trace("Last modified hours limit configured:" 
