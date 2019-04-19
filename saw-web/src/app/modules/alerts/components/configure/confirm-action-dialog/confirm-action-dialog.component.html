@@ -21,7 +21,7 @@
     mat-raised-button
     color="primary"
     e2e="alert-delete-no"
-    (click)="onNoClick()"
+    (click)="onNoClick(false)"
   >
     No
   </button>
@@ -30,7 +30,7 @@
     e2e="alert-delete-yes"
     mat-raised-button
     color="warn"
-    (click)="onYesClick()"
+    (click)="onYesClick(true)"
     cdkFocusInitial
   >
     Yes

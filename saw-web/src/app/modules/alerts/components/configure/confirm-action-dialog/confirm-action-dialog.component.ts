@@ -16,11 +16,11 @@ export class ConfirmActionDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {}
 
-  onNoClick(): void {
-    this.dialogRef.close(false);
+  onNoClick(signal: boolean) {
+    this.dialogRef.close(signal);
   }
 
-  onYesClick(): void {
-    this.dialogRef.close(true);
+  onYesClick(signal: boolean) {
+    this.dialogRef.close(signal);
   }
 }

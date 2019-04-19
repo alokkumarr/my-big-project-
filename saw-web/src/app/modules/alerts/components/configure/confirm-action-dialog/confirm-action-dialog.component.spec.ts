@@ -3,6 +3,10 @@ import { MaterialModule } from '../../../../../material.module';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ConfirmActionDialogComponent } from './confirm-action-dialog.component';
 
+class MatDialogRefStub {
+  close(param: boolean) {}
+}
+
 describe('ConfirmActionDialogComponent', () => {
   let component: ConfirmActionDialogComponent;
   let fixture: ComponentFixture<ConfirmActionDialogComponent>;
@@ -14,7 +18,7 @@ describe('ConfirmActionDialogComponent', () => {
         // workaround: Can't inject MatDialogRef in the unit test?
         {
           provide: MatDialogRef,
-          useValue: {}
+          useClass: MatDialogRefStub
         },
         {
           provide: MAT_DIALOG_DATA,
@@ -33,5 +37,13 @@ describe('ConfirmActionDialogComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should close on NO clicked', () => {
+    component.onNoClick(false);
+  });
+
+  it('should close on YES clicked', () => {
+    component.onYesClick(true);
   });
 });
