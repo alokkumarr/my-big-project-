@@ -1,4 +1,4 @@
-package com.synchronoss.saw.ingestion.s3.connections;
+package com.synchronoss.saw.batch.plugin.service;
 
 import java.io.IOException;
 

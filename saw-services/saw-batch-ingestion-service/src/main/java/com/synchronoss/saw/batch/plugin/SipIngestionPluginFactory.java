@@ -1,22 +1,19 @@
 package com.synchronoss.saw.batch.plugin;
 
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
-import com.synchronoss.saw.ingestion.s3.connections.S3ServiceImpl;
+import com.synchronoss.saw.batch.plugin.service.S3ServiceImpl;
+import com.synchronoss.saw.batch.plugin.service.SftpServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-
 
 @Service
 public class SipIngestionPluginFactory {
 
   @Autowired
-  @Qualifier("sftpService")
-  private SipPluginContract sftpServiceImpl;
+  private SftpServiceImpl sftpServiceImpl;
 
   @Autowired
   S3ServiceImpl s3ServiceImpl;

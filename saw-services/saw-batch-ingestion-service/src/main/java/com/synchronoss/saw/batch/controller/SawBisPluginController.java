@@ -2,16 +2,13 @@ package com.synchronoss.saw.batch.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.synchronoss.saw.batch.AsyncConfiguration;
-import com.synchronoss.saw.batch.entities.BisChannelEntity;
-import com.synchronoss.saw.batch.entities.BisRouteEntity;
-import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
-import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.plugin.SipIngestionPluginFactory;
+import com.synchronoss.saw.batch.service.ChannelTypeService;
 import com.synchronoss.saw.logs.constants.SourceType;
 
 import io.swagger.annotations.ApiOperation;
@@ -26,9 +23,9 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -54,13 +51,13 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 @RestController
 @RequestMapping("/ingestion/batch/sftp")
-public class SawBisSftpPluginController {
+public class SawBisPluginController {
 
   @Autowired
   @Qualifier("sftpService")
   private SipPluginContract sftpServiceImpl;
 
-  private static final Logger logger = LoggerFactory.getLogger(SawBisSftpPluginController.class);
+  private static final Logger logger = LoggerFactory.getLogger(SawBisPluginController.class);
   @Autowired
   @Qualifier(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
   private Executor transactionPostExecutor;
@@ -69,11 +66,9 @@ public class SawBisSftpPluginController {
   private SipIngestionPluginFactory factory;
   
   @Autowired
-  private BisRouteDataRestRepository bisRouteDataRestRepository;
-
+  ChannelTypeService channelTypeService;
   
-  @Autowired
-  private BisChannelDataRestRepository bisChannelRepository;
+
   
   /**
    * This end-point to test connectivity for existing route.
@@ -89,7 +84,7 @@ public class SawBisSftpPluginController {
   @ResponseStatus(HttpStatus.OK)
   public String connectRoute(@ApiParam(value = "Route id to test connectivity",
       required = true) @PathVariable(name = "routeId", required = true) Long routeId) {
-    String channelType = findChannelTypeFromRouteId(routeId);
+    String channelType = channelTypeService.findChannelTypeFromRouteId(routeId);
     SipPluginContract sipConnService = factory.getInstance(channelType);
     return JSON.toJSONString(sipConnService.connectRoute(routeId));
   }
@@ -131,7 +126,7 @@ public class SawBisSftpPluginController {
   @ResponseStatus(HttpStatus.OK)
   public String connectChannel(@ApiParam(value = "Channel id to test connectivity",
       required = true) @PathVariable(name = "channelId", required = true) Long channelId) {
-    String channelType = findChannelTypeFromChannelId(Long.valueOf(channelId));
+    String channelType = channelTypeService.findChannelTypeFromChannelId(Long.valueOf(channelId));
     logger.info("Channel type:: " + channelType);
     SipPluginContract sipConnService = factory.getInstance(channelType);
     return JSON.toJSONString(sipConnService.connectChannel(channelId));
@@ -348,31 +343,6 @@ public class SawBisSftpPluginController {
     return responseMap;
   }
 
-  private String findChannelTypeFromRouteId(Long routeId) {
-    Optional<BisRouteEntity> routeOptional = bisRouteDataRestRepository.findById(routeId);
-    String channelType = "";
-    if (routeOptional.isPresent()) {
-      BisRouteEntity route = routeOptional.get();
-      Optional<BisChannelEntity> bisChannelOptional 
-          = bisChannelRepository.findById(route.getBisChannelSysId());
-      if (bisChannelOptional.isPresent()) {
-        BisChannelEntity bisChannel = bisChannelOptional.get();
-        channelType = bisChannel.getChannelType();
-      }
-    }
-    return channelType;
-  }
-
-  private String findChannelTypeFromChannelId(Long channelId) {
-    String channelType = "";
-    Optional<BisChannelEntity> bisChannelOptional = bisChannelRepository.findById(channelId);
-    if (bisChannelOptional.isPresent()) {
-      BisChannelEntity bisChannel = bisChannelOptional.get();
-      channelType = bisChannel.getChannelType();
-    }
-
-    return channelType;
-
-  }
+  
 }
 
