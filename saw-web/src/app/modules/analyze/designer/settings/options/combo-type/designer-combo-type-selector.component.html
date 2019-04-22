@@ -1,12 +1,10 @@
-<div *ngIf="asChartColumn(artifactColumn).comboType">
+<div *ngIf="comboType">
   <button
     mat-icon-button
     [matMenuTriggerFor]="comboTypeSelect"
     class="expandable-field__option-button"
   >
-    <mat-icon
-      [fontIcon]="getComboIcon(asChartColumn(artifactColumn).comboType)"
-    ></mat-icon>
+    <mat-icon [fontIcon]="getComboIcon(comboType)"></mat-icon>
   </button>
   <mat-menu #comboTypeSelect="matMenu">
     <button

@@ -76,6 +76,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
   }
 
+  get chartDisplayType(): string {
+    return (
+      (<ArtifactColumnChart>this.artifactColumn).comboType ||
+      (<any>this.artifactColumn).displayType
+    );
+  }
+
   /**
    * asChartColumn - Typecasts artifact column to ArtifactColumnChart
    * For use in templates. Angular's AOT compiler is strict about types.
