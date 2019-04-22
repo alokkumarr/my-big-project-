@@ -167,6 +167,10 @@
         "file": {
           "type": "string"
         },
+        "schemaValidationRequired": {
+          "type": "boolean",
+          "default": false
+        },
         "parserInputFileFormat" : {
           "enum" : [ "csv", "json", "parquet" ],
           "default" : "csv"

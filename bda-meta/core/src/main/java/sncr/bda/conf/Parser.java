@@ -1,9 +1,7 @@
 package sncr.bda.conf;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -21,7 +19,11 @@ public class Parser {
 
   @SerializedName("parserInputFileFormat")
   @Expose
-  private ParserInputFileFormat fileFormat = ParserInputFileFormat.fromValue("csv");
+  private ParserInputFileFormat parserInputFileFormat = ParserInputFileFormat.fromValue("csv");
+
+  @SerializedName("schemaValidationRequired")
+  @Expose
+  private Boolean schemaValidationRequired = false;
 
   @SerializedName("fields")
   @Expose
@@ -93,17 +95,37 @@ public class Parser {
     this.file = file;
   }
 
-  public ParserInputFileFormat getParserInputFileFormat() {
-    return this.fileFormat;
-  }
-
-  public void setParserInputFileFormat(ParserInputFileFormat fileFormat) {
-    this.fileFormat = fileFormat;
-  }
-
   public Parser withFile(String file) {
     this.file = file;
     return this;
+  }
+
+  public ParserInputFileFormat getParserInputFileFormat() {
+    return this.parserInputFileFormat;
+  }
+
+  public void setParserInputFileFormat(ParserInputFileFormat fileFormat) {
+    this.parserInputFileFormat = fileFormat;
+  }
+
+  public Parser withParserInputFileFormat(ParserInputFileFormat parserInputFileFormat) {
+    this.parserInputFileFormat = parserInputFileFormat;
+
+    return this;
+  }
+
+  public Boolean getSchemaValidationRequired() {
+    return schemaValidationRequired;
+  }
+
+  public void setSchemaValidationRequired(Boolean schemaValidationRequired) {
+    this.schemaValidationRequired = schemaValidationRequired;
+  }
+
+  public Parser withSchemaValidationRequired(Boolean schemaValidationRequired) {
+      this.schemaValidationRequired = schemaValidationRequired;
+
+      return this;
   }
 
   /** @return The fields */
@@ -228,7 +250,8 @@ public class Parser {
   public int hashCode() {
     return new HashCodeBuilder()
         .append(file)
-        .append(fileFormat)
+        .append(parserInputFileFormat)
+        .append(schemaValidationRequired)
         .append(fields)
         .append(lineSeparator)
         .append(delimiter)
@@ -250,7 +273,8 @@ public class Parser {
     Parser rhs = ((Parser) other);
     return new EqualsBuilder()
         .append(file, rhs.file)
-        .append(fileFormat, rhs.fileFormat)
+        .append(parserInputFileFormat, rhs.parserInputFileFormat)
+        .append(schemaValidationRequired, rhs.schemaValidationRequired)
         .append(fields, rhs.fields)
         .append(lineSeparator, rhs.lineSeparator)
         .append(delimiter, rhs.delimiter)
