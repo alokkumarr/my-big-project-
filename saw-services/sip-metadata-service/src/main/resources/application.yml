@@ -39,5 +39,5 @@ analysis:
   store-base:  hdfs:///var/sip/
   analysis-table: analysis
   get-analysis-url:  http://localhost:9200
-  binary-migration-requires: true
+  binary-migration-requires: false
   migration-metadata-home: /var/sip/
