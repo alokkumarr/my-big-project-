@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 public class AlertServiceImpl implements AlertService {
   private static final String ID = "id";
   private static final String NAME = "name";
-  private static final String OPERATORS = "operators";
-  private static final String AGGREGATION = "aggregation";
 
   @Autowired AlertRulesRepository alertRulesRepository;
 
@@ -226,7 +224,6 @@ public class AlertServiceImpl implements AlertService {
   @Override
   public String retrieveOperatorsDetails(Ticket ticket) {
     JsonArray elements = new JsonArray();
-    JsonObject response = new JsonObject();
     List<Operator> operatorList = Arrays.asList(Operator.values());
     for (Operator operator : operatorList) {
       JsonObject object = new JsonObject();
@@ -237,14 +234,12 @@ public class AlertServiceImpl implements AlertService {
         elements.add(object);
       }
     }
-    response.add(OPERATORS, elements);
-    return response.toString();
+    return elements.toString();
   }
 
   @Override
   public String retrieveAggregations(Ticket ticket) {
     JsonArray elements = new JsonArray();
-    JsonObject response = new JsonObject();
     List<Aggregation> aggregationList = Arrays.asList(Aggregation.values());
     for (Aggregation aggregation : aggregationList) {
       JsonObject object = new JsonObject();
@@ -255,8 +250,7 @@ public class AlertServiceImpl implements AlertService {
         elements.add(object);
       }
     }
-    response.add(AGGREGATION, elements);
-    return response.toString();
+    return elements.toString();
   }
 
   /**
