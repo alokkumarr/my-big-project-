@@ -171,12 +171,12 @@ public class SipAlertController {
    * @return String return all operators details
    */
   @ApiOperation(
-      value = "/aggregation",
+      value = "/aggregations",
       nickname = "List All Alert aggregation",
       notes = "",
       response = Object.class)
   @RequestMapping(
-      value = "/aggregation",
+      value = "/aggregations",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
