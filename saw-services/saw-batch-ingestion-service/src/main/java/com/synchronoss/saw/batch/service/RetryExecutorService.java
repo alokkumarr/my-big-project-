@@ -11,12 +11,10 @@ import com.synchronoss.saw.batch.extensions.SipRetryContract;
 import com.synchronoss.saw.batch.model.BisComponentState;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.plugin.SipRetryPluginFactory;
-import com.synchronoss.saw.batch.plugin.service.SftpServiceImpl;
-import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
-import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisFileLog;
+import com.synchronoss.saw.logs.service.SipLogging;
 
 import java.io.File;
 import java.io.FileFilter;

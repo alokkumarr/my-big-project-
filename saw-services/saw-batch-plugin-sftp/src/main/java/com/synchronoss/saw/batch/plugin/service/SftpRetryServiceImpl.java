@@ -13,8 +13,8 @@ import com.synchronoss.saw.batch.model.BisComponentState;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
-import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.logs.constants.SourceType;
+import com.synchronoss.saw.logs.service.SipLogging;
 
 import java.util.ArrayList;
 import java.util.List;

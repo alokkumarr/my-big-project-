@@ -53,10 +53,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 @RequestMapping("/ingestion/batch/sftp")
 public class SawBisPluginController {
 
-  @Autowired
-  @Qualifier("sftpService")
-  private SipPluginContract sftpServiceImpl;
-
   private static final Logger logger = LoggerFactory.getLogger(SawBisPluginController.class);
   @Autowired
   @Qualifier(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
@@ -178,14 +174,14 @@ public class SawBisPluginController {
             .getInstance(requestBody.getChannelType().toString());
     try {
       if (requestBody.getBatchSize() > 0) {
-        sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
+        sipTransferService.setBatchSize(requestBody.getBatchSize());
       }
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
         response = sipTransferService.transferData(Long.valueOf(requestBody.getChannelId()),
             Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
       } else {
-        response = sftpServiceImpl.immediateTransfer(requestBody);
+        response = sipTransferService.immediateTransfer(requestBody);
       }
       for (BisDataMetaInfo info : response) {
         if (info.getDestinationPath() != null) {
@@ -235,11 +231,12 @@ public class SawBisPluginController {
     if (result.hasErrors()) {
       throw new SftpProcessorException("Exception occured while transferring the file");
     }
-    if (requestBody.getBatchSize() > 0) {
-      sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
-    }
     SipPluginContract sipTransferService = factory
-            .getInstance(requestBody.getChannelType().toString());
+        .getInstance(requestBody.getChannelType().toString());
+    if (requestBody.getBatchSize() > 0) {
+      sipTransferService.setBatchSize(requestBody.getBatchSize());
+    }
+    
     DeferredResult<ResponseEntity<List<BisDataMetaInfo>>> deferredResult = new DeferredResult<>();
     if (Long.valueOf(requestBody.getChannelId()) > 0L
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
