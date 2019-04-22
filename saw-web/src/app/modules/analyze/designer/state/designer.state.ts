@@ -4,6 +4,7 @@ import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
+import { tap } from 'rxjs/operators';
 import moment from 'moment';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
@@ -33,9 +34,11 @@ import {
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
   DesignerReorderArtifactColumns,
-  DesignerRemoveAllArtifactColumns
+  DesignerRemoveAllArtifactColumns,
+  DesignerLoadMetric
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
+import { AnalyzeService } from '../../services/analyze.service';
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
@@ -46,7 +49,8 @@ import {
 
 const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
-  analysis: null
+  analysis: null,
+  metric: null
 };
 
 const defaultDSLChartOptions: DSLChartOptionsModel = {
@@ -74,11 +78,31 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   defaults: <DesignerStateModel>cloneDeep(defaultDesignerState)
 })
 export class DesignerState {
-  constructor(private _designerService: DesignerService) {}
+  constructor(
+    private _designerService: DesignerService,
+    private _analyzeService: AnalyzeService
+  ) {}
 
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
     return state.groupAdapters;
+  }
+
+  @Action(DesignerLoadMetric)
+  loadMetrics(
+    { patchState }: StateContext<DesignerStateModel>,
+    { metricId }: DesignerLoadMetric
+  ) {
+    return this._analyzeService.getArtifactsForDataSet(metricId).pipe(
+      tap(({ metricName, artifacts }) =>
+        patchState({
+          metric: {
+            metricName,
+            artifacts
+          }
+        })
+      )
+    );
   }
 
   @Action(DesignerAddArtifactColumn)

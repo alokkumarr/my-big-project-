@@ -7,6 +7,11 @@ import {
 import { Legend, Axis } from '../../models';
 import { LabelOptions } from '../../models';
 
+export class DesignerLoadMetric {
+  static readonly type = '[Designer] Load metric';
+  constructor(public metricId: string /* also known as semanticId */) {}
+}
+
 export class DesignerInitGroupAdapters {
   static readonly type = '[Designer] Init group adapters';
   constructor(

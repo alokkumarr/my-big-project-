@@ -582,9 +582,7 @@ export class AnalyzeService {
   }
 
   getArtifactsForDataSet(semanticId: string) {
-    return this.getRequest(`internal/semantic/workbench/${semanticId}`)
-      .toPromise()
-      .then((data: any) => data.artifacts);
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {

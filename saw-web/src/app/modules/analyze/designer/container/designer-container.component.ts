@@ -78,7 +78,8 @@ import {
   DesignerUpdateAnalysisChartType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria
+  DesignerUpdatebooleanCriteria,
+  DesignerLoadMetric
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -222,37 +223,39 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   initNewAnalysis() {
     const { type, semanticId } = this.analysisStarter;
-    const artifacts$ = this._analyzeService.getArtifactsForDataSet(semanticId);
+    const artifacts$ = this._store.dispatch(new DesignerLoadMetric(semanticId))
+      .toPromise;
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
 
-    return Promise.all([artifacts$, newAnalysis$]).then(
-      ([artifacts, newAnalysis]) => {
-        this.analysis = {
-          ...this.analysisStarter,
-          ...(newAnalysis['analysis'] || newAnalysis),
-          artifacts
-        };
+    return Promise.all([artifacts$, newAnalysis$]).then(([_, newAnalysis]) => {
+      const artifacts = this._store.selectSnapshot(
+        state => state.designerState.metric.artifacts
+      );
+      this.analysis = {
+        ...this.analysisStarter,
+        ...(newAnalysis['analysis'] || newAnalysis),
+        artifacts
+      };
 
-        isDSLAnalysis(this.analysis) &&
-          this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
+      isDSLAnalysis(this.analysis) &&
+        this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
 
-        if (!isDSLAnalysis(this.analysis)) {
-          this.analysis.edit = this.analysis.edit || false;
-          this.analysis.supports = this.analysisStarter.supports;
-          !this.analysis.sqlBuilder &&
-            (this.analysis.sqlBuilder = {
-              joins: []
-            });
-        } else if (this.analysis.type === 'chart') {
-          this._store.dispatch(
-            new DesignerUpdateAnalysisChartType(this.analysisStarter.chartType)
-          );
-        }
-        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-        this.initAuxSettings();
-        unset(this.analysis, 'categoryId');
+      if (!isDSLAnalysis(this.analysis)) {
+        this.analysis.edit = this.analysis.edit || false;
+        this.analysis.supports = this.analysisStarter.supports;
+        !this.analysis.sqlBuilder &&
+          (this.analysis.sqlBuilder = {
+            joins: []
+          });
+      } else if (this.analysis.type === 'chart') {
+        this._store.dispatch(
+          new DesignerUpdateAnalysisChartType(this.analysisStarter.chartType)
+        );
       }
-    );
+      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      this.initAuxSettings();
+      unset(this.analysis, 'categoryId');
+    });
   }
 
   generateDSLDateFilters(filters) {
