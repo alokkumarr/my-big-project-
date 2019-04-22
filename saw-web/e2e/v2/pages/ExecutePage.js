@@ -7,6 +7,7 @@ class ExecutePage extends ConfirmationModel {
   constructor() {
     super();
     this._actionMenuLink = element(by.css(`[e2e='actions-menu-toggle']`));
+    this._actionMenuContents = element(by.xpath(`//*[@class="mat-menu-content"]`));
     this._analysisTitle = element(by.css(`[class="analysis__title"]`));
     this._actionDetailsLink = element(
       by.css(`[e2e="actions-menu-selector-details"]`)
@@ -44,6 +45,7 @@ class ExecutePage extends ConfirmationModel {
 
   clickOnActionLink() {
     commonFunctions.clickOnElement(this._actionMenuLink);
+    commonFunctions.waitFor.elementToBeVisible(this._actionMenuContents);
   }
 
   clickOnDetails() {
