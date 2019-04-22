@@ -4,12 +4,12 @@ import {
   Sort,
   ArtifactColumnDSL
 } from '../types';
-import { Legend, Axis } from '../../models';
+import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
 
 export class DesignerLoadMetric {
   static readonly type = '[Designer] Load metric';
-  constructor(public metricId: string /* also known as semanticId */) {}
+  constructor(public metric: { metricName: string; artifacts: Artifact[] }) {}
 }
 
 export class DesignerInitGroupAdapters {

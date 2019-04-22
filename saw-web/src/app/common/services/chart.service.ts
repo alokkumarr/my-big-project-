@@ -143,21 +143,6 @@ export class ChartService {
   LAYOUT_POSITIONS = LAYOUT_POSITIONS;
   constructor() {}
 
-  updateAnalysisModel(analysis) {
-    /* prettier-ignore */
-    switch (analysis.chartType) {
-    case 'pie':
-      analysis.labelOptions = analysis.labelOptions || {
-        enabled: true,
-        value: 'percentage'
-      };
-      break;
-    default:
-      break;
-    }
-    return analysis;
-  }
-
   analysisLegend2ChartLegend(legend) {
     const align = LEGEND_POSITIONING[get(legend, 'align')];
     const layout = LAYOUT_POSITIONS[get(legend, 'layout')];

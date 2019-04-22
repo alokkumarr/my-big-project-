@@ -150,10 +150,16 @@ export class DesignerPageComponent implements OnInit {
           existingAnalysisParams.isDSLAnalysis === 'true'
         )
         .then(analysis => {
-          this.store
-            .dispatch(new DesignerLoadMetric(analysis.semanticId))
+          return this.analyzeService
+            .getArtifactsForDataSet(analysis.semanticId)
             .toPromise()
-            .then(() => {
+            .then(metric => {
+              this.store.dispatch(
+                new DesignerLoadMetric({
+                  metricName: metric.metricName,
+                  artifacts: metric.artifacts
+                })
+              );
               const { artifacts } = this.store.selectSnapshot(
                 state => state.designerState.metric
               );

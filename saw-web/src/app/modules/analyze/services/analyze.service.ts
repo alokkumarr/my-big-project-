@@ -647,10 +647,6 @@ export class AnalyzeService {
           align: 'right',
           layout: 'vertical'
         },
-        labelOptions: {
-          enabled: false,
-          value: ''
-        },
         xAxis: {
           title: null
         },

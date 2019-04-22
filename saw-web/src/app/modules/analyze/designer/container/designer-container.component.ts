@@ -49,7 +49,7 @@ import {
   MapSettings,
   isDSLAnalysis
 } from '../types';
-import { AnalysisDSL } from '../../../../models';
+import { AnalysisDSL, LabelOptions } from '../../../../models';
 import {
   DesignerStates,
   FLOAT_TYPES,
@@ -223,39 +223,48 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   initNewAnalysis() {
     const { type, semanticId } = this.analysisStarter;
-    const artifacts$ = this._store.dispatch(new DesignerLoadMetric(semanticId))
-      .toPromise;
+    const artifacts$ = this._analyzeService
+      .getArtifactsForDataSet(semanticId)
+      .toPromise();
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
 
-    return Promise.all([artifacts$, newAnalysis$]).then(([_, newAnalysis]) => {
-      const artifacts = this._store.selectSnapshot(
-        state => state.designerState.metric.artifacts
-      );
-      this.analysis = {
-        ...this.analysisStarter,
-        ...(newAnalysis['analysis'] || newAnalysis),
-        artifacts
-      };
-
-      isDSLAnalysis(this.analysis) &&
-        this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
-
-      if (!isDSLAnalysis(this.analysis)) {
-        this.analysis.edit = this.analysis.edit || false;
-        this.analysis.supports = this.analysisStarter.supports;
-        !this.analysis.sqlBuilder &&
-          (this.analysis.sqlBuilder = {
-            joins: []
-          });
-      } else if (this.analysis.type === 'chart') {
+    return Promise.all([artifacts$, newAnalysis$]).then(
+      ([metric, newAnalysis]) => {
         this._store.dispatch(
-          new DesignerUpdateAnalysisChartType(this.analysisStarter.chartType)
+          new DesignerLoadMetric({
+            metricName: metric.metricName,
+            artifacts: metric.artifacts
+          })
         );
+        const artifacts = this._store.selectSnapshot(
+          state => state.designerState.metric.artifacts
+        );
+        this.analysis = {
+          ...this.analysisStarter,
+          ...(newAnalysis['analysis'] || newAnalysis),
+          artifacts
+        };
+
+        isDSLAnalysis(this.analysis) &&
+          this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
+
+        if (!isDSLAnalysis(this.analysis)) {
+          this.analysis.edit = this.analysis.edit || false;
+          this.analysis.supports = this.analysisStarter.supports;
+          !this.analysis.sqlBuilder &&
+            (this.analysis.sqlBuilder = {
+              joins: []
+            });
+        } else if (this.analysis.type === 'chart') {
+          this._store.dispatch(
+            new DesignerUpdateAnalysisChartType(this.analysisStarter.chartType)
+          );
+        }
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+        this.initAuxSettings();
+        unset(this.analysis, 'categoryId');
       }
-      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-      this.initAuxSettings();
-      unset(this.analysis, 'categoryId');
-    });
+    );
   }
 
   generateDSLDateFilters(filters) {
@@ -289,27 +298,28 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (this.analysis.type) {
       case 'chart':
-        this._chartService.updateAnalysisModel(this.analysis);
+        this.addDefaultLabelOptions();
         if (this.designerMode === 'new') {
           if (isDSLAnalysis(this.analysis)) {
-            this.analysis.chartOptions.isInverted = this.chartType === 'bar';
+            this._store.dispatch(new DesignerUpdateAnalysisChartInversion(this.chartType === 'bar'));
           } else {
             (<any>this.analysis).isInverted = this.chartType === 'bar';
           }
         }
+        const chartOptions = this._store.selectSnapshot(state => state.designerState.analysis.chartOptions);
         this.chartTitle = isDSLAnalysis(this.analysis)
-          ? this.analysis.chartOptions.chartTitle || this.analysis.name
+          ? chartOptions.chartTitle || this.analysis.name
           : (this.chartTitle = this.analysis.chartTitle || this.analysis.name);
 
           const chartOnlySettings = {
           legend: isDSLAnalysis(<any>this.analysis)
-            ? (<any>this.analysis).chartOptions.legend
+            ? chartOptions.legend
             : (<any>this.analysis).legend,
           labelOptions: isDSLAnalysis(<any>this.analysis)
-            ? (<any>this.analysis).chartOptions.labelOptions
+            ? chartOptions.labelOptions
             : (<any>this.analysis).labelOptions || {},
           isInverted: isDSLAnalysis(<any>this.analysis)
-            ? (<any>this.analysis).chartOptions.isInverted
+            ? chartOptions.isInverted
             : (<any>this.analysis).isInverted
         };
 
@@ -327,6 +337,32 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.analysis.mapSettings = this.auxSettings;
         break;
     }
+  }
+
+  addDefaultLabelOptions() {
+    if (this.analysis.type !== 'chart' || this.designerMode !== 'new') {
+      return;
+    }
+
+    let labelOptions: LabelOptions;
+
+    switch (this.chartType) {
+      case 'pie':
+        labelOptions = {
+          enabled: true,
+          value: 'percentage'
+        };
+        break;
+      default:
+        labelOptions = {
+          enabled: false,
+          value: ''
+        };
+    }
+
+    this._store.dispatch(
+      new DesignerUpdateAnalysisChartLabelOptions(labelOptions)
+    );
   }
 
   fixLegacyArtifacts(artifacts): Array<Artifact> {
