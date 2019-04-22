@@ -35,7 +35,8 @@ import {
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
   DesignerReorderArtifactColumns,
-  DesignerRemoveAllArtifactColumns
+  DesignerRemoveAllArtifactColumns,
+  DesignerLoadMetric
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import {
@@ -48,7 +49,8 @@ import {
 
 const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
-  analysis: null
+  analysis: null,
+  metric: null
 };
 
 const defaultDSLChartOptions: DSLChartOptionsModel = {
@@ -81,6 +83,19 @@ export class DesignerState {
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
     return state.groupAdapters;
+  }
+
+  @Action(DesignerLoadMetric)
+  async loadMetrics(
+    { patchState }: StateContext<DesignerStateModel>,
+    { metric }: DesignerLoadMetric
+  ) {
+    patchState({
+      metric: {
+        metricName: metric.metricName,
+        artifacts: metric.artifacts
+      }
+    });
   }
 
   @Action(DesignerAddArtifactColumn)

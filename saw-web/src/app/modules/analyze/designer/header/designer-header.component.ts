@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Select } from '@ngxs/store';
+import { Observable } from 'rxjs';
 import { Analysis, DesignerToolbarAciton } from '../types';
 import { DesignerStates } from '../consts';
 import { DesignerChangeEvent } from '../types';
@@ -21,6 +23,9 @@ export class DesignerHeaderComponent {
   @Input() public isInQueryMode: boolean;
   @Input() public designerState: DesignerStates;
   @Input() public areMinRequirmentsMet: boolean;
+
+  @Select(state => state.designerState.metric.metricName)
+  metricName$: Observable<string>;
 
   public DesignerStates = DesignerStates;
   public progressSub;

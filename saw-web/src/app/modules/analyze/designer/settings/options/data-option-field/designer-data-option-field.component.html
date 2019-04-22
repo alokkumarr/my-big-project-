@@ -45,13 +45,11 @@
     </div>
 
     <div
-      *ngIf="
-        analysisType === 'chart' && asChartColumn(artifactColumn).comboType
-      "
+      *ngIf="analysisType === 'chart' && chartDisplayType"
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Chart type :</label>
+      <label fxFlex i18n>Chart type:</label>
       <designer-combo-type-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
