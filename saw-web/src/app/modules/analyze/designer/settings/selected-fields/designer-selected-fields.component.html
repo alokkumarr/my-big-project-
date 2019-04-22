@@ -38,7 +38,6 @@
       (removed)="removeFromGroup(col, adapter)"
     >
       <ng-container *ngIf="col.aggregate; else defaultTemplate">
-        {{ col.aggregate }}
         <span
           [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate].label"
           [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
