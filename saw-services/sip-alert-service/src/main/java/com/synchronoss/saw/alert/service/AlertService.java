@@ -31,4 +31,6 @@ public interface AlertService {
 
   String retrieveOperatorsDetails(
       @NotNull(message = "Fetch all alerts rule operators details") Ticket token);
+
+    String retrieveAggregations(Ticket ticket);
 }
