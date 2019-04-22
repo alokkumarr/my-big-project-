@@ -60,9 +60,7 @@ public class FieldNames {
   public static final String NODEFIELDS = "nodeFields";
   public static final String CHECKED = "checked";
   public static final String AXIS = "-axis";
-  public static final String GEO_TYPE = "geoType";
   public static final String REGION = "region";
-  public static final String SUPPORTS = "supports";
   public static final String MAP_SETTINGS = "mapSettings";
   public static final String MAP_STYLE = "mapStyle";
   public static final String CHART_TYPE = "chartType";

@@ -68,9 +68,6 @@ public class Field {
   @JsonProperty("displayType")
   private String displayType;
 
-  @JsonProperty("geoType")
-  private String geoType;
-
   @JsonProperty("geoRegion")
   private GeoRegion geoRegion;
 
@@ -164,16 +161,6 @@ public class Field {
   @JsonProperty("format")
   public void setFormat(Format format) {
     this.format = format;
-  }
-
-  @JsonProperty("geoType")
-  public String getGeoType() {
-    return geoType;
-  }
-
-  @JsonProperty("geoType")
-  public void setGeoType(String geoType) {
-    this.geoType = geoType;
   }
 
   @JsonProperty("geoRegion")

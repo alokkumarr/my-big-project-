@@ -339,12 +339,14 @@ export class ChartService {
     const categories = {};
     const isHighStock = chartType.substring(0, 2) === 'ts';
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
+    const dateFields = filter(fieldsArray, ({ type }) =>
+      DATE_TYPES.includes(type)
+    );
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
-      const dateFields = filter(fieldsArray, ({ type }) =>
-        DATE_TYPES.includes(type)
-      );
       this.formatDatesIfNeeded(parsedData, dateFields);
+    } else {
+      this.dateStringToTimestamp(parsedData, dateFields);
     }
     const series = this.splitToSeries(parsedData, fields, chartType);
     // split out categories frem the data
@@ -447,6 +449,28 @@ export class ChartService {
     return value;
   }
 
+  /**
+   * Converts date strings to unix epoch time. This is used primarily for
+   * time series charts because they need timestamps.
+   *
+   * @param {Array<any>} parsedData
+   * @param {Array<{ columnName: string }>} dateFields
+   * @memberof ChartService
+   */
+  dateStringToTimestamp(
+    parsedData: Array<any>,
+    dateFields: Array<{ columnName: string }>
+  ) {
+    if (!isEmpty(dateFields)) {
+      forEach(parsedData, dataPoint => {
+        forEach(dateFields, ({ columnName }) => {
+          dataPoint[removeKeyword(columnName)] =
+            moment.utc(dataPoint[removeKeyword(columnName)]).unix() * 1000;
+        });
+      });
+    }
+  }
+
   formatDatesIfNeeded(parsedData, dateFields) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
@@ -461,21 +485,32 @@ export class ChartService {
   }
 
   getSerie(
-    { alias, aliasName, type, displayName, comboType, aggregate, chartType },
+    {
+      alias,
+      aliasName,
+      type,
+      displayName,
+      displayType,
+      comboType,
+      aggregate,
+      chartType
+    },
     index,
     fields,
     chartTypeOverride
   ) {
     let aggrSymbol = '';
     const comboGroups = fpPipe(
-      fpMap('comboType'),
+      map(field => field.comboType || field.displayType),
       fpUniq,
       fpInvert,
       fpMapValues(parseInt)
     )(fields);
 
-    const splinifiedChartType = this.splinifyChartType(comboType);
-    const zIndex = this.getZIndex(comboType);
+    const splinifiedChartType = this.splinifyChartType(
+      comboType || displayType
+    );
+    const zIndex = this.getZIndex(comboType || displayType);
     if (aggregate === 'percentage' || aggregate === 'percentageByRow') {
       aggrSymbol = '%';
     }
@@ -492,7 +527,7 @@ export class ChartService {
       yAxis:
         chartType === 'tsPane' || chartTypeOverride === 'tsPane'
           ? index
-          : comboGroups[comboType],
+          : comboGroups[comboType || displayType],
       zIndex,
       data: []
     };
@@ -542,7 +577,7 @@ export class ChartService {
 
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-    let comboType = fields.y[0].comboType;
+    let comboType = fields.y[0].comboType || fields.y[0].displayType;
     let aggrsymbol = '';
     if (
       fields.y[0].aggregate === 'percentage' ||
@@ -789,7 +824,7 @@ export class ChartService {
     const labelHeight = 15;
     if (type !== 'tsPane') {
       const changes = fpPipe(
-        fpGroupBy('comboType'),
+        fpGroupBy(field => field.comboType || field.displayType),
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
@@ -958,7 +993,6 @@ export class ChartService {
       g: find(selectedFields, attr => attr.checked === 'g' || attr.area === 'g')
     };
 
-    /* prettier-ignore */
     switch (type) {
       case 'pie':
         changes = this.getPieChangeConfig(
