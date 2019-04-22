@@ -150,9 +150,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const isReport = ['report', 'esReport'].includes(
-      get(this.analysis, 'type') || get(this.analysisStarter, 'type')
-    );
+    const analysisType: string =
+      get(this.analysis, 'type') || get(this.analysisStarter, 'type');
+    const isReport = ['report', 'esReport'].includes(analysisType);
     this.designerState = DesignerStates.WAITING_FOR_COLUMNS;
     /* prettier-ignore */
     switch (this.designerMode) {
@@ -192,7 +192,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     }
     this.dslAnalysis$.subscribe(analysis => {
-      if (!analysis || ['report', 'esReport'].includes(this.analysis.type)) {
+      if (!analysis || ['report', 'esReport'].includes(analysisType)) {
         return;
       }
       this.analysis = analysis;

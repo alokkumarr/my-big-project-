@@ -450,7 +450,10 @@ export class AnalyzeService {
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(first())
+      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(
+        first(),
+        map((res: { analysis: AnalysisDSL }) => res.analysis)
+      )
     );
   }
 
