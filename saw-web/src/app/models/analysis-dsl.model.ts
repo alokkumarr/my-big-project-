@@ -59,7 +59,9 @@ export interface AnalysisBaseDSL {
   description: string; // todo
   edit: boolean; // todo - this field needs to be removed and worked around
   id: string;
-  mapSettings: any; // todo - fix 'any'
+  mapOptions?: {
+    mapType: string;
+  };
   modifiedBy: string; // email
   modifiedTime: string;
   module: string;

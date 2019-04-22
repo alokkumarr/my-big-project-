@@ -9,11 +9,7 @@ import { LabelOptions } from '../../models';
 
 export class DesignerInitGroupAdapters {
   static readonly type = '[Designer] Init group adapters';
-  constructor(
-    public artifactColumns: ArtifactColumnChart[],
-    public analysisType: string,
-    public analysisSubType: string
-  ) {}
+  constructor() {}
 }
 
 export class DesignerClearGroupAdapters {

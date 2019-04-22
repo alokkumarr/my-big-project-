@@ -45,7 +45,6 @@ import {
   DesignerChangeEvent,
   DesignerSaveEvent,
   AnalysisReport,
-  ArtifactColumnChart,
   MapSettings,
   isDSLAnalysis
 } from '../types';
@@ -321,7 +320,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           ...this.auxSettings,
           ...mapOnlySettings
         };
-        this.analysis.mapSettings = this.auxSettings;
+        (<AnalysisDSL>this.analysis).mapOptions = this.auxSettings;
         break;
     }
   }
@@ -1016,7 +1015,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'mapSettings':
         this.auxSettings = event.data.mapSettings;
-        this.analysis.mapSettings = this.auxSettings;
+        (<AnalysisDSL>this.analysis).mapOptions = this.auxSettings;
         break;
       case 'fetchLimit':
         (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
@@ -1030,11 +1029,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.changeChartType(event.data);
         this._store.dispatch(new DesignerClearGroupAdapters());
         this._store.dispatch(
-          new DesignerInitGroupAdapters(
-            <ArtifactColumnChart[]>this.artifacts[0].columns,
-            this.analysis.type,
-            this.chartType
-          )
+          new DesignerInitGroupAdapters()
         );
         setTimeout(() => {
           this.resetAnalysis();

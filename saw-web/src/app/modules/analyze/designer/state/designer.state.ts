@@ -1,5 +1,7 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as get from 'lodash/get';
+import * as findIndex from 'lodash/findIndex';
 import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -175,7 +177,7 @@ export class DesignerState {
     { getState, patchState }: StateContext<DesignerStateModel>,
     { artifactColumn }: DesignerUpdateArtifactColumn
   ) {
-    const { analysis } = getState();
+    const { analysis, groupAdapters } = getState();
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
 
@@ -199,8 +201,29 @@ export class DesignerState {
       ...artifactColumn
     };
 
+    const targetAdapterIndex = findIndex(
+      groupAdapters,
+      adapter =>
+        adapter.marker ===
+        artifacts[artifactIndex].fields[artifactColumnIndex].area
+    );
+    const targetAdapter = groupAdapters[targetAdapterIndex];
+    const adapterColumnIndex = findIndex(
+      targetAdapter.artifactColumns,
+      col => col.columnName === artifactColumn.columnName
+    );
+    const adapterColumn = targetAdapter.artifactColumns[adapterColumnIndex];
+
+    forEach(artifactColumn, (value, prop) => {
+      adapterColumn[prop] = value;
+    });
+
     return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+      analysis: {
+        ...analysis,
+        sipQuery: { ...sipQuery, artifacts }
+      },
+      groupAdapters: [...groupAdapters]
     });
   }
 
@@ -389,31 +412,27 @@ export class DesignerState {
   }
 
   @Action(DesignerInitGroupAdapters)
-  initGroupAdapter(
-    { patchState }: StateContext<DesignerStateModel>,
-    {
-      artifactColumns,
-      analysisType,
-      analysisSubType
-    }: DesignerInitGroupAdapters
-  ) {
+  initGroupAdapter({ patchState, getState }: StateContext<DesignerStateModel>) {
+    const analysis = getState().analysis;
+    const { type } = analysis;
+    const fields = get(analysis, 'artifacts[0].columns', []);
     let groupAdapters;
-    switch (analysisType) {
+    switch (type) {
       case 'pivot':
-        groupAdapters = this._designerService.getPivotGroupAdapters(
-          artifactColumns
-        );
+        groupAdapters = this._designerService.getPivotGroupAdapters(fields);
         break;
       case 'chart':
+        const { chartOptions } = analysis;
         groupAdapters = this._designerService.getChartGroupAdapters(
-          artifactColumns,
-          analysisSubType
+          fields,
+          chartOptions.chartType
         );
         break;
       case 'map':
+        const { mapOptions } = analysis;
         groupAdapters = this._designerService.getMapGroupAdapters(
-          artifactColumns,
-          analysisSubType
+          fields,
+          mapOptions.mapType
         );
         break;
       default:
