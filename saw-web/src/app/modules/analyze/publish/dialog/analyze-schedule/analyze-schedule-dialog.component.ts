@@ -66,6 +66,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   loadCronLayout = false;
   ftp = [];
   locations = [];
+  s3Bucket = [];
+  s3Locations = [];
   scheduleState: 'new' | 'exist' | 'delete';
   token: any;
   errorFlagMsg = false;
@@ -128,6 +130,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     const { type, id, categoryId } = this.data.analysis;
     if (type !== 'chart') {
       this.getFTPLocations();
+      this.getS3Locations();
     }
     const requestCron = {
       jobName: id,
@@ -152,7 +155,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               analysisID,
               emailList,
               fileType,
-              ftp
+              ftp,
+              s3
             } = jobDetails;
             this.crondetails = {
               cronexp: cronExpression,
@@ -169,6 +173,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
             this.hasSchedule = true;
             if (type !== 'chart') {
               this.ftp = ftp;
+              this.s3Bucket = s3;
             }
             this.emails = emailList;
             this.hasSchedule = true;
@@ -191,6 +196,15 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     });
   }
 
+  getS3Locations() {
+    const request = {
+      jobGroup: this.token.ticket.custCode
+    };
+    this._analyzeService.getlistS3Buckets(request).then((response: any) => {
+      this.s3Locations = response.S3;
+    });
+  }
+
   onCronChanged(cronexpression) {
     this.crondetails = cronexpression;
   }
@@ -208,7 +222,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       categoryId: analysis.categoryId,
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
-      scheduleState: this.scheduleState
+      scheduleState: this.scheduleState,
+      zip: this.fileType == 'zip' ? true : false
     };
     this.triggerSchedule();
   }
@@ -222,7 +237,9 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         this.scheduleState = 'new';
         cronJobName = cronJobName + '-' + this.alphanumericUnique();
         crondetails.cronexp = '';
-        crondetails.startDate = moment().local().format();
+        crondetails.startDate = moment()
+          .local()
+          .format();
       }
 
       analysis.schedule = {
@@ -235,6 +252,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         description: '',
         emailList: this.emails,
         ftp: this.ftp,
+        s3: this.s3Bucket,
+        zip: this.fileType == 'zip' ? true : false,
         fileType: this.fileType,
         jobName: cronJobName,
         endDate: crondetails.endDate,
@@ -260,12 +279,16 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.cronValidateField = false;
     let validationCheck = true;
 
-    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
+    this.startDateCorrectFlag =
+      moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
     const validateFields = {
-      emails: ['chart', 'map'].includes(this.data.analysis.type) ? true : this.validateEmails(this.emails),
+      emails: ['chart', 'map'].includes(this.data.analysis.type)
+        ? true
+        : this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
       publish: this.validatePublishSelection(),
-      startDate: moment(this.crondetails.startDate) > moment().subtract(2, 'minutes')
+      startDate:
+        moment(this.crondetails.startDate) > moment().subtract(2, 'minutes')
     };
     fpPipe(
       fpMap(check => {
@@ -281,6 +304,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     if (
       isEmpty(this.emails) &&
       isEmpty(this.ftp) &&
+      isEmpty(this.s3Bucket) &&
       !['chart', 'map'].includes(this.data.analysis.type)
     ) {
       this.errorFlagMsg = true;
@@ -345,6 +369,10 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   onLocationSelected(value) {
     this.ftp = value;
+  }
+
+  onS3LocationSelected(value) {
+    this.s3Bucket = value;
   }
 
   close() {
