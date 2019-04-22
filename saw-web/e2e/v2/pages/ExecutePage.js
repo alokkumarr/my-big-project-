@@ -19,12 +19,12 @@ class ExecutePage extends ConfirmationModel {
     );
     this._delete = element(by.css(`[e2e='actions-menu-selector-delete']`));
     this._editLink = element(by.css(`[e2e="action-edit-btn"]`));
-    this._forlAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
+    this._forkAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
     this._executeButton = element(
       by.css(`button[e2e="actions-menu-selector-execute"]`)
     );
     this._selectedFilter = value =>
-      element(by.xpath(`//*[contains(text(),"${value}")]`));
+      element(by.css(`[e2e="filters-execute-${value}"]`));
   }
 
   verifyTitle(title) {
@@ -87,8 +87,8 @@ class ExecutePage extends ConfirmationModel {
   }
 
   clickOnForkAndEditLink() {
-    commonFunctions.clickOnElement(this._forlAndEditLink);
-    commonFunctions.waitFor.pageToBeReady(/edit/);
+    commonFunctions.clickOnElement(this._forkAndEditLink);
+    commonFunctions.waitFor.pageToBeReady(/fork/);
   }
 
   clickOnExecuteButton() {
