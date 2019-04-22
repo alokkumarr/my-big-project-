@@ -7,7 +7,7 @@ class ExecutePage extends ConfirmationModel {
   constructor() {
     super();
     this._actionMenuLink = element(by.css(`[e2e='actions-menu-toggle']`));
-    this._analysisTitle = element(by.css(`span[e2e="analysis__title"]`));
+    this._analysisTitle = element(by.css(`[class="analysis__title"]`));
     this._actionDetailsLink = element(
       by.css(`[e2e="actions-menu-selector-details"]`)
     );
@@ -18,7 +18,7 @@ class ExecutePage extends ConfirmationModel {
     );
     this._delete = element(by.css(`[e2e='actions-menu-selector-delete']`));
     this._editLink = element(by.css(`[e2e="action-edit-btn"]`));
-    this._forlAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
+    this._forkAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
     this._executeButton = element(
       by.css(`button[e2e="actions-menu-selector-execute"]`)
     );
@@ -85,8 +85,8 @@ class ExecutePage extends ConfirmationModel {
   }
 
   clickOnForkAndEditLink() {
-    commonFunctions.clickOnElement(this._forlAndEditLink);
-    commonFunctions.waitFor.pageToBeReady(/edit/);
+    commonFunctions.clickOnElement(this._forkAndEditLink);
+    commonFunctions.waitFor.pageToBeReady(/fork/);
   }
 
   clickOnExecuteButton() {
