@@ -23,7 +23,7 @@ class ExecutePage extends ConfirmationModel {
       by.css(`button[e2e="actions-menu-selector-execute"]`)
     );
     this._selectedFilter = value =>
-      element(by.css(`[e2e=filters-execute-"${value}"]`));
+      element(by.css(`[e2e="filters-execute-${value}"]`));
   }
 
   verifyTitle(title) {

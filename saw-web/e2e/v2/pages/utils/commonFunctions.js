@@ -142,6 +142,7 @@ module.exports = {
       .then(classes => classes.split(' ').includes(cls));
   },
   clickOnElement(el) {
+    this.waitFor.elementToBePresent(el);
     this.waitFor.elementToBeVisible(el);
     this.waitFor.elementToBeClickable(el);
     el.click();
