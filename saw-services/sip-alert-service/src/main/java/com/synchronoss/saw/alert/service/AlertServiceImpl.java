@@ -295,27 +295,27 @@ public class AlertServiceImpl implements AlertService {
     }
   }
 
-    /**
-     * It return readable aggregation name.
-     *
-     * @param aggregation Aggregation
-     * @return String
-     */
-    private String getReadableAggregation(Aggregation aggregation) {
+  /**
+   * It return readable aggregation name.
+   *
+   * @param aggregation Aggregation
+   * @return String
+   */
+  private String getReadableAggregation(Aggregation aggregation) {
 
-        switch (aggregation) {
-            case AVG:
-                return "Average";
-            case SUM:
-                return "SUM";
-            case MIN:
-                return "Minimum";
-            case MAX:
-                return "Maximum";
-            case COUNT:
-                return "Count Values";
-            default:
-                return null;
-        }
+    switch (aggregation) {
+      case AVG:
+        return "Average";
+      case SUM:
+        return "SUM";
+      case MIN:
+        return "Minimum";
+      case MAX:
+        return "Maximum";
+      case COUNT:
+        return "Count Values";
+      default:
+        return null;
     }
+  }
 }
