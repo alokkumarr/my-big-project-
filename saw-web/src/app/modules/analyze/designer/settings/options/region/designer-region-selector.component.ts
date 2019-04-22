@@ -26,7 +26,7 @@ export class DesignerRegionSelectorComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
-    const defaultRegion = this.artifactColumn.region || { name: '' };
+    const defaultRegion = this.artifactColumn.geoRegion || { name: '' };
     this.filteredRegions = this.stateForm.get('regionCtrl').valueChanges.pipe(
       startWith(defaultRegion),
       map(value => {
@@ -39,8 +39,8 @@ export class DesignerRegionSelectorComponent implements OnInit {
   }
 
   onRegionSelected(region) {
-    this.artifactColumn.region = region;
-    this.change.emit({ subject: 'region' });
+    this.artifactColumn.geoRegion = region;
+    this.change.emit({ subject: 'geoRegion' });
   }
 
   displayWithRegion(option) {

@@ -40,8 +40,8 @@ export class MapChartViewerComponent {
     )([dataFields, nodeFields]);
 
     const xField = this._fields.x;
-    if (xField.region) {
-      this._mapData = this._mapDataService.getMapData(xField.region);
+    if (xField.geoRegion) {
+      this._mapData = this._mapDataService.getMapData(xField.geoRegion);
       this.setSeries();
     }
 

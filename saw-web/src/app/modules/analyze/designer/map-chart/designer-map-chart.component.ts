@@ -50,11 +50,11 @@ export class DesignerMapChartComponent implements OnInit {
     )([dataFields, nodeFields]);
 
     const xField = this._fields.x;
-    if (xField.region) {
+    if (xField.geoRegion) {
       const oldState = this.currentState;
       this.currentState = MapChartStates.OK;
       if (oldState === MapChartStates.NO_MAP_SELECTED) {
-        this._mapData = this._mapDataService.getMapData(xField.region);
+        this._mapData = this._mapDataService.getMapData(xField.geoRegion);
         this.setSeries();
       }
     } else {

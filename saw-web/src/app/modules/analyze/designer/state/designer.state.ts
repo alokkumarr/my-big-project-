@@ -1,6 +1,8 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as forEach from 'lodash/forEach';
+import * as reduce from 'lodash/reduce';
+import * as set from 'lodash/set';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -27,7 +29,9 @@ import {
   DesignerUpdateAnalysisChartYAxis,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
-  DesignerUpdateArtifactColumn
+  DesignerUpdateArtifactColumn,
+  DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns,
+  DesignerMergeSupportsIntoAnalysis
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 
@@ -68,6 +72,54 @@ export class DesignerState {
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
     return state.groupAdapters;
+  }
+
+  @Action(DesignerMergeSupportsIntoAnalysis)
+  mergeSupportsIntoAnalysis(
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { supports }: DesignerMergeSupportsIntoAnalysis
+  ) {
+    const analysis = getState().analysis;
+
+    set(analysis, 'supports', supports);
+
+    return patchState({
+      analysis: { ...analysis }
+    });
+  }
+
+  @Action(DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns)
+  mergeMetricArtifactColumnWithAnalysisArtifactColumns(
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    {
+      metricArtifactColumns
+    }: DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const artifacts = sipQuery.artifacts;
+
+    const metricArtifactMap = reduce(
+      metricArtifactColumns,
+      (accumulator, column) => {
+        accumulator[column.columnName] = column;
+        return accumulator;
+      },
+      {}
+    );
+
+    forEach(artifacts, artifact => {
+      forEach(artifact.fields, column => {
+        const metricColumn = metricArtifactMap[column.columnName];
+        if (metricColumn.geoType) {
+          column.geoType = metricColumn.geoType;
+        }
+      });
+    });
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+    });
   }
 
   @Action(DesignerAddArtifactColumn)
@@ -463,7 +515,7 @@ export class DesignerState {
       filter.artifactsName = filter.tableName;
     });
     return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, filters }}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, filters } }
     });
   }
 
@@ -475,7 +527,7 @@ export class DesignerState {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria }}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria } }
     });
   }
 }

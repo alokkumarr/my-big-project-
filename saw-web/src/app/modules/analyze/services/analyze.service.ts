@@ -584,6 +584,12 @@ export class AnalyzeService {
       .then((data: any) => data.artifacts);
   }
 
+  getSemanticObect(semanticId: string) {
+    return this.getRequest(
+      `internal/semantic/workbench/${semanticId}`
+    ).toPromise();
+  }
+
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {
     // return this.createAnalysisNonDSL(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)

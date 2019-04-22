@@ -649,7 +649,7 @@ export class DesignerService {
             limitValue: artifactColumn.limitValue,
             limitType: artifactColumn.limitType,
             geoType: artifactColumn.geoType,
-            region: artifactColumn.region,
+            geoRegion: artifactColumn.geoRegion,
             // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {

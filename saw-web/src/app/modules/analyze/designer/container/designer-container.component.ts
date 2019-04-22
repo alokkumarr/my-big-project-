@@ -78,7 +78,9 @@ import {
   DesignerUpdateAnalysisChartType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria
+  DesignerUpdatebooleanCriteria,
+  DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns,
+  DesignerMergeSupportsIntoAnalysis
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -172,6 +174,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.layoutConfiguration = this.getLayoutConfiguration(
         this.analysis
       );
+
+      this._analyzeService.getSemanticObect(this.analysis.semanticId).then(semanticObj => {
+        this._store.dispatch(new DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns(semanticObj.artifacts[0].columns));
+        this._store.dispatch(new DesignerMergeSupportsIntoAnalysis(semanticObj.supports));
+      });
+
       if (!isReport) {
         this.requestDataIfPossible();
       }
@@ -192,6 +200,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     }
   }
+
+  mergeSemnticArtifactColumnsWithAnalysisArtifactColumn() {}
 
   getLayoutConfiguration(analysis: Analysis | AnalysisStarter | AnalysisDSL) {
     /* prettier-ignore */
@@ -553,7 +563,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
 
-    this._designerService.getDataForAnalysis(requestAnalysis).then(
+    const clonedAnalysis = cloneDeep(requestAnalysis);
+    // unset properties that are set by merging data from semantic layer
+    // because these properties are not part of dsl analysis definition
+    unset(clonedAnalysis, 'supports');
+    forEach(clonedAnalysis.sipQuery.artifacts, artifact => {
+      forEach(artifact.fields, column => {
+        unset(column, 'geoType');
+      });
+    });
+    this._designerService.getDataForAnalysis(clonedAnalysis).then(
       response => {
         if (
           this.isDataEmpty(
@@ -1005,7 +1024,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
         this.requestDataIfPossible();
         break;
-      case 'region':
+      case 'geoRegion':
         this.updateAnalysis();
         this.refreshDataObject();
         break;

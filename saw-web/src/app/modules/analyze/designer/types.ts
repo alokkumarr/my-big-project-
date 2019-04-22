@@ -133,7 +133,7 @@ export interface DesignerChangeEvent {
     | 'chartTitle'
     | 'fetchLimit'
     | 'changeQuery'
-    | 'region'
+    | 'geoRegion'
     | 'chartType'
     | 'mapSettings';
   column?: ArtifactColumn;
