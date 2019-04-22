@@ -125,7 +125,6 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
 
           executePage.clickOnEditLink();
           const chartDesignerPage = new ChartDesignerPage();
-          browser.sleep(2000); // Added because of SIP-6613
           chartDesignerPage.clickOnFilterButton();
           if (analysisType === Constants.REPORT) {
             chartDesignerPage.clickOnAddFilterButtonByTableName('SALES');
