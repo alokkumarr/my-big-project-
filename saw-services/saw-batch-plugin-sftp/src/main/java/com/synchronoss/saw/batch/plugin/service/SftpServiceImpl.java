@@ -1375,11 +1375,15 @@ public class SftpServiceImpl extends SipPluginContract {
                 int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
                 String sourceLocation = rootNode.get("sourceLocation").asText();
                 SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
-                if (rootNode.get("lastModifiedLimitHours") != null) {
+                if (rootNode.get("lastModifiedLimitHours") != null  
+                    && !rootNode.get("lastModifiedLimitHours").isNull()) {
                   String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
-                  lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
-                  logger.trace("Last modified hours limit configured:" 
-                        + lastModifiedHoursLmt);
+                  if (!lastModifiedLimitHours.isEmpty()) {
+                    lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
+                    logger.trace("Last modified hours limit configured:" 
+                          + lastModifiedHoursLmt);
+                  }
+                 
                 }
                 filesInfo.addAll(
                     transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
