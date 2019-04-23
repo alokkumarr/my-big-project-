@@ -17,7 +17,7 @@ FROM centos:7.4.1708
 RUN yum -q -y install epel-release
 
 # listing the R version
-RUN yum -q --showduplicates list R
+RUN yum list R
 
 # Install the R language environment
 RUN yum -q -y install R

@@ -50,4 +50,7 @@
     - restart haproxy_exporter
 - name: Enable and start Prometheus HAProxy exporter
   systemd: name=haproxy_exporter enabled=true state=started
+- name: sleep for 40 seconds and continue with play
+  wait_for: timeout=40
+  delegate_to: localhost
 
