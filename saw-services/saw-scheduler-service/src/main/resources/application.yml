@@ -16,8 +16,7 @@ spring:
     validationQuery: SELECT 1
     testWhileIdle: true
     logValidationErrors: true
-  flyway:
-    baseline-on-migrate: true
+flyway.baselineOnMigrate: true
 logging:
   level:
     com.synchronoss.saw.scheduler: INFO
@@ -28,12 +27,12 @@ logging:
 server:
   address: localhost
   port: 9601
-  servlet:
-    context-path: ''
+  context-path: ''
   maxHttpHeaderSize: 65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+
   #ssl:
   #  key-store: /Users/spau0004/Desktop/keystore/keystore.jks
   #  key-store-password: sip@123

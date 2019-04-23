@@ -40,6 +40,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		
     <dependency>
 	    <groupId>io.micrometer</groupId>
 	    <artifactId>micrometer-registry-prometheus</artifactId>
@@ -49,11 +50,7 @@
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
 
-	<dependency>
-		<groupId>com.synchronoss.bda.sip</groupId>
-		<artifactId>sip-common-components</artifactId>
-		<version>${revision}</version>
-	</dependency>
+	
 		
 
 		<!-- flyway dependency to execute sql files automatically on server startup. -->
@@ -139,11 +136,17 @@
 			<artifactId>spring-aspects</artifactId>
 		</dependency>
 
-    <dependency>
-      <groupId>com.synchronoss.bda.sip</groupId>
-      <artifactId>sip-common-components</artifactId>
-      <version>${revision}</version>
-    </dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda.sip</groupId>
+			<artifactId>sip-common-components</artifactId>
+			<version>${revision}</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+		</dependency>
+    
 	</dependencies>
 
 	<build>
