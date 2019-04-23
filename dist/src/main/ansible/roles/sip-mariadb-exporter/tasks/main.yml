@@ -41,7 +41,7 @@
    state: present
   when: "groups['saw-services'].index(inventory_hostname) == 0"
   tags: mariadb
-- name: Create mysqld_exporter user
+- name: Update mysqld_exporter users max_user_connections on database
   command: mysql -u root -p"{{ root_password }}" -e "ALTER USER 'mysqld_exporter'@'localhost' WITH MAX_USER_CONNECTIONS 2;"
 - name: Copy mysqld_exporter.cnf file to /etc/bda
   template:
@@ -57,8 +57,10 @@
     owner: root
     group: root
     mode: 0644
-  notify:
-    - restart mysqld_exporter
+#  notify:
+#    - restart mysqld_exporter
+- name: restart mysqld_exporter service
+  systemd: name=mysqld_exporter state=restarted daemon_reload=true
 - name: Enable Prometheus node exporter service
   systemd: name=mysqld_exporter enabled=true
 
