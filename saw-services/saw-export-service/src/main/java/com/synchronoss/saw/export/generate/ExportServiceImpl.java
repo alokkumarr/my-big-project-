@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
@@ -17,6 +16,7 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
+import com.synchronoss.sip.utils.RestUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;

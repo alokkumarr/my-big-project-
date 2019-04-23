@@ -1,9 +1,8 @@
+info:
+  component: Synchronoss Batch Ingestion Service
 spring:
   application:
     name: saw-batch-ingestion-service
-  output:
-    ansi:
-      enabled: never
   flyway:
     baseline-on-migrate: true
   datasource:
@@ -11,41 +10,44 @@ spring:
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver
+    dbcp2:
+      test-while-idle: true
+      validation-query: SELECT 1
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: none
     properties:
       hibernate:
         format_sql : true
-    open-in-view: false
 
 logging:
   level:
-    com.synchronoss.saw: TRACE
+    com.synchronoss.saw: INFO
     org.springframework: INFO
     org.hibernate.type.descriptor.sql.BasicBinder : INFO
     org.hibernate.SQL: INFO
-    org.springframework.retry: TRACE
+    org.springframework.retry: INFO
 
 server:
   address: localhost
-  port: 9642
+  port: 9904
   servlet:
     context-path: ''
-  maxHttpHeaderSize: 65536
+  maxHttpHeaderSize:  65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-  #ssl:
-  #  key-store: /Users/spau0004/Desktop/keystore/keystore.jks
-  #  key-store-password: sip@123
-  #  trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
-  #  trust-store-password: sip@123  
+
 management:
   endpoint:
     health:
       show-details: always
+  endipoints:
+    web:
+      exposure:
+        include: info, health, prometheus
+
 application:
     async:
         core-pool-size: 10
@@ -56,25 +58,21 @@ sip:
     index: 0
     max.attempts : 3
     retry.delay: 5000
-    retry.diff.mins: 1
+    retry.diff.mins: 5
     retry.page.size: 20
     max.inprogress.mins: 45
   ssl:
-     enable : false
-  trust:
-      store: /Users/spau0004/Desktop/keystore/truststore.jks
-      password: sip@123
-  key:
-     store: /Users/spau0004/Desktop/keystore/keystore.jks
-     password: sip@123
+    enable : false
+  
+connector: http
 
-connector: http     
-    
 bis:
   transfer-batch-size: 10
   modified-retries: 3
-  default-data-drop-location: /Users/spau0004/Desktop/workbench
-  scheduler-url: ${connector}://localhost:9601
+  default-data-drop-location: "/Users/spau0004/Desktop/workbench"
+  scheduler-url: ${connector}://localhost:9600
   recheck-file-modified: false
   destination-fs-user: mapr
   duplicate-entry: true
+  
+

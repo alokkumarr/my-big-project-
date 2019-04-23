@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.synchronoss.saw" , "com.synchronoss.bda.util"})
+@ComponentScan(basePackages = {"com.synchronoss.saw", "com.synchronoss.sip.utils"})
 public class SAWGatewayServiceApplication {
 
   private static final Logger LOG = LoggerFactory.getLogger(SAWGatewayServiceApplication.class);

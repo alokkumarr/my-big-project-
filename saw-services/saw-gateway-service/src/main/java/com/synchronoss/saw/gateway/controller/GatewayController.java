@@ -52,7 +52,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
 import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
@@ -60,6 +59,7 @@ import com.synchronoss.saw.gateway.utils.ContentRequestTransformer;
 import com.synchronoss.saw.gateway.utils.HeadersRequestTransformer;
 import com.synchronoss.saw.gateway.utils.URLRequestTransformer;
 import com.synchronoss.saw.gateway.utils.UserCustomerMetaData;
+import com.synchronoss.sip.utils.RestUtil;
 
 /**
  * @author spau0004

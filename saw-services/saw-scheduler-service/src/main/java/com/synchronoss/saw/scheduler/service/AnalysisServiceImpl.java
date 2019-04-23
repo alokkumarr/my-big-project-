@@ -15,8 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.sip.utils.RestUtil;
 
 @Service
 public class AnalysisServiceImpl implements AnalysisService {

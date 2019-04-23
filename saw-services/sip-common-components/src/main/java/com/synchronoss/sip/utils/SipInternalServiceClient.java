@@ -1,49 +1,32 @@
-package sncr.service;
+package com.synchronoss.sip.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * This generic class can be used as to access internal services.
  *
  * @author spau0004
  */
-public class InternalServiceClient {
+@Service
+public class SipInternalServiceClient {
 
-  private static final Logger logger = LoggerFactory.getLogger(InternalServiceClient.class);
-  private String url = "";
+  private static final Logger logger = LoggerFactory.getLogger(SipInternalServiceClient.class);
   private String dataLocation;
 
-  public InternalServiceClient(String url) {
-    super();
-    this.url = url;
-  }
-
-  /**
-   * Run .
-   *
-   * @param args Args
-   * @throws IOException when no document found.
-   */
-  public static void main(String[] args) throws IOException {
-    InternalServiceClient client =
-        new InternalServiceClient(
-            "http://localhost:9901/internal/semantic/workbench/09941a80-6375-44ab-a180-"
-                + "9250afcd5510::semanticDataSet::1534795521556");
-    ObjectMapper mapper = new ObjectMapper();
-    System.out.println(mapper.writeValueAsString(client.retrieveObject(new SemanticNode())));
-  }
-
+  @Autowired
+  private RestUtil restUtil;
+  
+  
   public String getDataLocation() {
     return dataLocation;
   }
@@ -55,12 +38,13 @@ public class InternalServiceClient {
   /**
    * This method will be used to access the semantic service to get the details of semantic a
    * particular semantic node.
+   * @throws Exception  exception.
    */
-  public Object retrieveObject(Object object) throws IOException {
+  public Object retrieveObject(Object object, String url) throws Exception {
     logger.trace("request from retrieveObject :" + object);
     Object node = null;
     ObjectMapper mapper = new ObjectMapper();
-    HttpClient client = HttpClientBuilder.create().build();
+    HttpClient client = restUtil.getHttpClient();
     HttpGet request = new HttpGet(url);
     HttpResponse response = client.execute(request);
     BufferedReader rd =

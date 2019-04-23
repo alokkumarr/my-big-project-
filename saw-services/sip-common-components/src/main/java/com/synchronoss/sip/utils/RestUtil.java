@@ -1,4 +1,4 @@
-package com.synchronoss.bda.util;
+package com.synchronoss.sip.utils;
 
 import java.io.File;
 import java.io.IOException;

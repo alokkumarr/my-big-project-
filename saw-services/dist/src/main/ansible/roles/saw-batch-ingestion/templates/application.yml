@@ -32,12 +32,12 @@ logging:
 server:
   address: localhost
   port: 9904
-  servlet:
-    context-path: ''
-  max-http-header-size: 65536
+  context-path: ''
+  maxHttpHeaderSize:  65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+
   {% if sip_secure is sameas true  %}
   ssl:
    key-store: /xxxx/xxxxx/xxx.jks
@@ -45,6 +45,7 @@ server:
    trust-store: /xxxx/xxxxx/xxx.jks
    trust-store-password: xxxx
   {% endif %}
+
 management:
   endpoint:
     health:
@@ -69,6 +70,7 @@ sip:
     max.inprogress.mins: 45
   ssl:
     enable : {{ sip_secure  | default('false') }}
+
    {% if sip_secure is sameas true  %}
    trust:
        store: ${server.ssl.trust-store}

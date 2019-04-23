@@ -32,6 +32,7 @@ server:
    trust-store: /xxxx/xxxxx/xxx.jks
    trust-store-password: xxxx
   {% endif %}
+
 management:
   endpoint:
     health:

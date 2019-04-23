@@ -51,28 +51,28 @@ saw-security-port: 9000
 
 internal-analysis:
     service:
-        host: http://localhost:9200
+        host: ${connector}://localhost:9200
 metadata:
     service:
-        host: http://localhost:9500
+        host: ${connector}://localhost:9500
 semantic:
     service:
-        host: http://localhost:9200
+        host: ${connector}://localhost:9200
 security:
     service:
         host: ${connector}://localhost:${saw-security-port}/saw-security
 export:
     service:
-        host: http://localhost:9400
+        host: ${connector}://localhost:9400
 scheduler:
     service:
-        host: http://localhost:9600
+        host: ${connector}://localhost:9600
 workbench:
     service:
-        host: http://localhost:9700
+        host: ${connector}://localhost:9700
 proxy:
     service:
-        host: http://localhost:9800
+        host: ${connector}://localhost:9800
 batch:
    service:
         host: ${connector}://localhost:9903
@@ -152,7 +152,6 @@ api:
         -   location: ${metadata.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
-
         -   location: ${batch.service.host}
             method: PUT
             path: '[/]ingestion/batch.*'

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
-import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
@@ -20,6 +19,7 @@ import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.Content;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
+import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,14 +70,17 @@ public class SemanticServiceImpl implements SemanticService {
   
   @Autowired
   private RestUtil restUtil;
+  
+  private RestTemplate restTemplate = null;
 
   
   @PostConstruct
   private void init() throws Exception {
+    restTemplate = restUtil.restTemplate();
     if (migrationRequires) {
       logger.trace("Migration initiated.. " + migrationRequires);
       new MigrationService().convertHBaseBinaryToMaprdbStore(transportUri, basePath,
-          migrationMetadataHome);
+          migrationMetadataHome, restTemplate);
     }
     logger.trace("Migration ended..");
   }
@@ -140,7 +143,6 @@ public class SemanticServiceImpl implements SemanticService {
     ArrayNode respository = objectMapper.createArrayNode();
     for (String dataSetId : semanticNode.getParentDataSetIds()) {
       logger.trace("Request URL to pull DataSet Details : " + requestUrl + dataSetId);
-      RestTemplate restTemplate = restUtil.restTemplate();
       dataSet = restTemplate.getForObject(requestUrl + dataSetId, DataSet.class);
       node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
       rootNode = (ObjectNode) node;

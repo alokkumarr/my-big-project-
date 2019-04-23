@@ -6,7 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import com.synchronoss.bda.util.RestUtil;
+import com.synchronoss.sip.utils.RestUtil;
+
 
 public class RestTemplateErrorHandler implements ResponseErrorHandler {
 

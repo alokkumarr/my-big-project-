@@ -1,7 +1,7 @@
 package com.synchronoss.saw.scheduler.job;
 
-import com.synchronoss.bda.util.RestUtil;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
+import com.synchronoss.sip.utils.RestUtil;
 import javax.annotation.PostConstruct;
 import org.quartz.InterruptableJob;
 import org.quartz.JobDetail;
