@@ -51,6 +51,28 @@ export class ConfigureAlertService {
   }
 
   /**
+   * Fetches all the supported operators
+   *
+   * @returns {Observable<any>}
+   * @memberof ConfigureAlertService
+   */
+  getOperators(): Observable<any> {
+    const endpoint = `${this.api}/sip/alerts/operators`;
+    return this.http.get(endpoint);
+  }
+
+  /**
+   * Fetches all the supported aggregations
+   *
+   * @returns {Observable<any>}
+   * @memberof ConfigureAlertService
+   */
+  getAggregations(): Observable<any> {
+    const endpoint = `${this.api}/sip/alerts/aggregations`;
+    return this.http.get(endpoint);
+  }
+
+  /**
    * Used to add a new alert
    *
    * @param {AlertConfig} alertConfig

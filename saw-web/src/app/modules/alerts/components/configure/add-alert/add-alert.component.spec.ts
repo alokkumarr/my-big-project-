@@ -16,6 +16,12 @@ const confAlertServiceStub = {
   createAlert: () => {
     return new Observable();
   },
+  getOperators: () => {
+    return new Observable();
+  },
+  getAggregations: () => {
+    return new Observable();
+  },
   updateAlert: (id: string, alertConfig: AlertConfig) => {
     return new Observable();
   },

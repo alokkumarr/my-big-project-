@@ -215,8 +215,8 @@
               <mat-label>Aggregation </mat-label>
               <mat-select formControlName="aggregation" e2e="alertAggregation">
                 <mat-option
-                  *ngFor="let aggr of alertAggregations"
-                  [value]="aggr.value"
+                  *ngFor="let aggr of (aggregations$ | async)"
+                  [value]="aggr.id"
                   >{{ aggr.name }}</mat-option
                 >
               </mat-select>
@@ -231,8 +231,8 @@
                 e2e="alertOperator"
               >
                 <mat-option
-                  *ngFor="let op of alertOperators"
-                  [value]="op.value"
+                  *ngFor="let op of (operators$ | async)"
+                  [value]="op.id"
                   >{{ op.name }}</mat-option
                 >
               </mat-select>
@@ -286,6 +286,7 @@
                 mat-stroked-button
                 matStepperNext
                 e2e="toAddStep"
+                (click)="constructPayload()"
               >
                 Next
               </button>
@@ -298,17 +299,7 @@
         <ng-template matStepLabel>Validate and Create</ng-template>
         <code>
           <pre class="add-container__body__stepper__validate">{{
-            alertDefFormGroup.value | json
-          }}</pre>
-        </code>
-        <code>
-          <pre class="add-container__body__stepper__validate">{{
-            alertMetricFormGroup.value | json
-          }}</pre>
-        </code>
-        <code>
-          <pre class="add-container__body__stepper__validate">{{
-            alertRuleFormGroup.value | json
+            endPayload | json
           }}</pre>
         </code>
 

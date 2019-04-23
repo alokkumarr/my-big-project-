@@ -12,12 +12,7 @@ import { ConfigureAlertService } from '../../../services/configure-alert.service
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
-import {
-  ALERT_AGGREGATIONS,
-  ALERT_OPERATORS,
-  ALERT_SEVERITY,
-  ALERT_STATUS
-} from '../../../consts';
+import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike } from 'rxjs';
 @Component({
   selector: 'add-alert',
@@ -30,12 +25,13 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertRuleFormGroup: FormGroup;
   datapods$;
   metricsList$;
-  alertAggregations = ALERT_AGGREGATIONS;
-  alertOperators = ALERT_OPERATORS;
+  operators$;
+  aggregations$;
   alertSeverity = ALERT_SEVERITY;
   alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
   endActionText = 'Add';
+  endPayload: AlertConfig;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -57,6 +53,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       this.endActionText = 'Update';
     }
     this.datapods$ = this._configureAlertService.getListOfDatapods$();
+    this.aggregations$ = this._configureAlertService.getAggregations();
+    this.operators$ = this._configureAlertService.getOperators();
   }
 
   ngOnDestroy() {
@@ -108,6 +106,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       categoryId: '1',
       product: 'SAWD000001'
     };
+
+    this.endPayload = payload;
 
     return payload;
   }
