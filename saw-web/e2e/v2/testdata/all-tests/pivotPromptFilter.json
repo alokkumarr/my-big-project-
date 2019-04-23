@@ -1,7 +1,7 @@
 {
-  "REPORT_PROMPT_FILTER": {
+  "PIVOT_PROMPT_FILTER": {
     "positiveTests": {
-      "REPFL001": {
+      "PVPFL001": {
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -9,7 +9,7 @@
         "displayedValue": "TW",
         "description": "Admin should be apply prompt filter wih Date attribute"
       },
-      "REPFL002": {
+      "PVPFL002": {
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -17,7 +17,7 @@
         "displayedValue": "TW",
         "description": "userOne should be apply prompt filter wih Date attribute"
       },
-      "REPFL003": {
+      "PVPFL003": {
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -26,7 +26,7 @@
         "displayedValue": "Equal to",
         "description": "userOne should be apply prompt filter wih Number attribute"
       },
-      "REPFL004": {
+      "PVPFL004": {
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -35,7 +35,7 @@
         "displayedValue": "Equals",
         "description": "Admin should be apply prompt filter wih String attribute"
       },
-      "REPFL005": {
+      "PVPFL005": {
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -44,7 +44,7 @@
         "displayedValue": "Equals",
         "description": "userOne should be apply prompt filter wih String attribute"
       },
-      "REPFL006": {
+      "PVPFL006": {
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
