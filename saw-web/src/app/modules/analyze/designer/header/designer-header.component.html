@@ -26,7 +26,11 @@
       </div>
       <div matTooltip="Metric Name" class="header__description">
         &#40;&nbsp;<mat-icon fontIcon="icon-report"></mat-icon>
-        <span i18n>{{ analysis.metricName | titlecase }}</span
+        <span i18n>{{
+          analysis.sipQuery
+            ? (metricName$ | async)
+            : (analysis.metricName | titlecase)
+        }}</span
         >&nbsp;&#41;
       </div>
     </div>

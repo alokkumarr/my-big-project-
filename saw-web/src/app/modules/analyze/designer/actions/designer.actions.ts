@@ -4,16 +4,22 @@ import {
   Sort,
   ArtifactColumnDSL
 } from '../types';
-import { Legend, Axis } from '../../models';
+import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
+
+export class DesignerResetState {
+  static readonly type = '[Designer] Reset state on destroy';
+  constructor() {}
+}
+
+export class DesignerLoadMetric {
+  static readonly type = '[Designer] Load metric';
+  constructor(public metric: { metricName: string; artifacts: Artifact[] }) {}
+}
 
 export class DesignerInitGroupAdapters {
   static readonly type = '[Designer] Init group adapters';
-  constructor(
-    public artifactColumns: ArtifactColumnChart[],
-    public analysisType: string,
-    public analysisSubType: string
-  ) {}
+  constructor() {}
 }
 
 export class DesignerClearGroupAdapters {

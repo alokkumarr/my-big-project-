@@ -2,6 +2,7 @@ import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
+import * as fpFlatMap from 'lodash/fp/flatMap';
 
 import {
   AGGREGATE_TYPES,
@@ -9,6 +10,7 @@ import {
   NUMBER_TYPES
 } from '../../consts';
 import { AnalysisType } from '../../types';
+import { QueryDSL } from 'src/app/models';
 
 @Component({
   selector: 'aggregate-chooser-u',
@@ -20,7 +22,7 @@ export class AggregateChooserComponent implements OnInit {
   @Input() public aggregate: string;
   @Input() public columnType: string;
   @Input() public analysisType: AnalysisType;
-  @Input() public sqlBuilder;
+  @Input() public sipQuery: QueryDSL;
   @Input() analysisSubtype: string;
   @Input() enablePercentByRow: boolean;
 
@@ -55,12 +57,12 @@ export class AggregateChooserComponent implements OnInit {
     });
   }
 
-  checkColumn(value, sqlBuilder) {
+  checkColumn(value, sipQuery) {
     let enableByRowPercentage = false;
     if (this.analysisType !== 'chart') {
       return true;
     }
-    const isGroupBy = this.getGroupByPresent(sqlBuilder);
+    const isGroupBy = this.getGroupByPresent(sipQuery);
     if (['column', 'bar', 'stack', 'combo'].includes(this.analysisSubtype)) {
       if (isGroupBy) {
         if (value === 'percentageByRow' && !this.enablePercentByRow) {
@@ -80,16 +82,19 @@ export class AggregateChooserComponent implements OnInit {
     if (isGroupBy && this.enablePercentByRow) {
       return true;
     }
-    return (value === 'percentageByRow' && !isGroupBy && !enableByRowPercentage) ? false : true;
+    return value === 'percentageByRow' && !isGroupBy && !enableByRowPercentage
+      ? false
+      : true;
   }
 
-  getGroupByPresent(sqlBuilder) {
-    return fpPipe(
-      fpFilter(({ checked }) => {
-        return (
-          checked === 'g'
-        );
-      })
-    )(sqlBuilder.nodeFields).length > 0;
+  getGroupByPresent(sipQuery: QueryDSL) {
+    return (
+      fpPipe(
+        fpFlatMap(artifact => artifact.fields),
+        fpFilter(({ area }) => {
+          return area === 'g';
+        })
+      )(sipQuery.artifacts).length > 0
+    );
   }
 }

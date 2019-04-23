@@ -148,6 +148,10 @@ export interface DesignerSaveEvent {
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
   analysis: AnalysisDSL;
+  metric: {
+    metricName: string;
+    artifacts: Artifact[];
+  };
 }
 
 export interface DSLChartOptionsModel {

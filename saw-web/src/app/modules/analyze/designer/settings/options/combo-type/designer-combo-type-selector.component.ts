@@ -51,6 +51,17 @@ export class DesignerComboTypeSelectorComponent {
     this.change.emit({ subject: 'comboType', column: this.artifactColumn });
   }
 
+  get comboType(): string {
+    if (!this.artifactColumn) {
+      return '';
+    }
+
+    return (
+      (<ArtifactColumnChart>this.artifactColumn).comboType ||
+      (<any>this.artifactColumn).displayType
+    );
+  }
+
   getComboIcon(comboType) {
     // Since there are some old analyses taht are wrongly using the TSCOMBO_TYPES,
     // we have to add this hack
