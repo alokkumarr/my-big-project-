@@ -157,9 +157,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Input() isEditable = false;
   @Input() columnHeaders;
 
-  public dataLoader: (
-    options: {}
-  ) => Promise<{ data: any[]; totalCount: number }>;
+  public dataLoader: (options: {}) => Promise<{
+    data: any[];
+    totalCount: number;
+  }>;
 
   public sorts: {};
   public artifacts: Artifact[];
@@ -349,10 +350,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   renameColumn({ payload, changeColumnProp }: ReportGridField) {
     this.getNewDataThroughDialog(
       AliasRenameDialogComponent,
-      { alias: payload.aliasName || '' },
+      { alias: payload.alias || '' },
       alias => {
-        changeColumnProp('aliasName', alias);
-        this.change.emit({ subject: 'aliasName' });
+        changeColumnProp('alias', alias);
+        this.change.emit({ subject: 'alias' });
       }
     );
   }
@@ -412,7 +413,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
           ? { formatter: getFormatter(preprocessedFormat) }
           : column.format;
         const field: ReportGridField = {
-          caption: column.aliasName || column.displayName,
+          caption: column.alias || column.displayName,
           dataField: this.getDataField(column),
           dataType: isNumberType ? 'number' : type,
           type,
