@@ -36,7 +36,8 @@ import {
   DesignerUpdateArtifactColumn,
   DesignerReorderArtifactColumns,
   DesignerRemoveAllArtifactColumns,
-  DesignerLoadMetric
+  DesignerLoadMetric,
+  DesignerResetState
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import {
@@ -586,5 +587,10 @@ export class DesignerState {
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria } }
     });
+  }
+
+  @Action(DesignerResetState)
+  resetState({ patchState }: StateContext<DesignerStateModel>) {
+    patchState(cloneDeep(defaultDesignerState));
   }
 }

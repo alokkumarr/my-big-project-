@@ -78,7 +78,8 @@ import {
   DesignerUpdateSorts,
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
-  DesignerLoadMetric
+  DesignerLoadMetric,
+  DesignerResetState
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -147,6 +148,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe());
+    this._store.dispatch(new DesignerResetState());
   }
 
   ngOnInit() {
