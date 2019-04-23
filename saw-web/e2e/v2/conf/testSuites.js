@@ -7,7 +7,8 @@ const SMOKE = [
   TEST_BASE_DIR + 'login-logout/logout.test.js'
 ];
 
-const SANITY = [...SMOKE,
+const SANITY = [
+  ...SMOKE,
   TEST_BASE_DIR + 'createReport.test.js',
   TEST_BASE_DIR + 'charts/createAndDeleteCharts.test.js',
   TEST_BASE_DIR + 'ForgotPassword/preResetPwd.test.js',
@@ -37,10 +38,12 @@ const CRITICAL = [
   TEST_BASE_DIR + 'create-delete-dashboards/chartsGlobalFilter.test.js',
   TEST_BASE_DIR + 'create-delete-dashboards/pivotWithGlobalFilter.test.js',
   TEST_BASE_DIR + 'create-delete-dashboards/esReportGlobalFilter.test.js',
-  TEST_BASE_DIR + 'create-delete-dashboards/esReport.test.js'
+  TEST_BASE_DIR + 'create-delete-dashboards/esReport.test.js',
+  TEST_BASE_DIR + 'prompt-filter/chartPromptFilters.test.js'
 ];
 // All tests which were executed in critical with larger data set
-const REGRESSION = [...CRITICAL,
+const REGRESSION = [
+  ...CRITICAL,
   TEST_BASE_DIR + 'change-password/changepassword.test.js'
 ];
 // Used for local development and testing some implementations
