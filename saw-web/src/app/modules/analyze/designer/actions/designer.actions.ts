@@ -7,6 +7,11 @@ import {
 import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
 
+export class DesignerResetState {
+  static readonly type = '[Designer] Reset state on destroy';
+  constructor() {}
+}
+
 export class DesignerLoadMetric {
   static readonly type = '[Designer] Load metric';
   constructor(public metric: { metricName: string; artifacts: Artifact[] }) {}

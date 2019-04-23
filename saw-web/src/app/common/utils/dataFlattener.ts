@@ -15,6 +15,7 @@ import * as fpReduce from 'lodash/fp/reduce';
 import * as mapKeys from 'lodash/mapKeys';
 import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
+import { ArtifactColumnDSL } from 'src/app/models';
 
 export function flattenPivotData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
@@ -96,6 +97,14 @@ function getNodeFieldMapChart(nodeFields) {
   return map(nodeFields, 'columnName');
 }
 
+export function getStringFieldsFromDSLArtifact(
+  fields: ArtifactColumnDSL[]
+): string[] {
+  return fields
+    .filter(field => field.type === 'string')
+    .map(field => field.columnName.replace('.keyword', ''));
+}
+
 /** parse the tree structure data and return a flattened array:
  * [{
  *   x: ..,
@@ -106,8 +115,26 @@ function getNodeFieldMapChart(nodeFields) {
  */
 export function flattenChartData(data, sqlBuilder) {
   if (sqlBuilder.artifacts) {
-    return data;
+    const stringFields = getStringFieldsFromDSLArtifact(
+      sqlBuilder.artifacts[0].fields
+    );
+    if (stringFields.length === 0) {
+      return data;
+    } else {
+      /* If any string data is blank, replace it with 'Undefined'. This avoids
+      highcharts giving default 'Series 1' label to blank data
+      */
+      const result = data.map(row => {
+        const res = { ...row };
+        stringFields.forEach(field => {
+          res[field] = res[field] || 'Undefined';
+        });
+        return res;
+      });
+      return result;
+    }
   }
+
   const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
   const sorts = sqlBuilder.sorts;
 
