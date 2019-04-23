@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngxs/store';
 import { AnalyzeService } from '../../services/analyze.service';
 import { ExecuteService } from '../../services/execute.service';
 import { JwtService } from '../../../../common/services';
@@ -41,6 +42,18 @@ class JwtServiceStub {
 
 class MatDialogStub {}
 
+class StoreStub {
+  dispatch() {
+    return {
+      toPromise: () => Promise.resolve(true)
+    };
+  }
+
+  selectSnapshot() {
+    return { artifacts: [] };
+  }
+}
+
 describe('DesignerPageComponent', () => {
   let component: DesignerPageComponent;
   let fixture: ComponentFixture<DesignerPageComponent>;
@@ -56,7 +69,8 @@ describe('DesignerPageComponent', () => {
         { provide: Router, useValue: new RouterStub() },
         { provide: ExecuteService, useValue: new ExecuteServiceStub() },
         { provide: JwtService, useValue: new JwtServiceStub() },
-        { provide: MatDialog, useValue: new MatDialogStub() }
+        { provide: MatDialog, useValue: new MatDialogStub() },
+        { provide: Store, useValue: new StoreStub() }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();

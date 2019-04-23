@@ -150,22 +150,22 @@ export class DesignerPageComponent implements OnInit {
           existingAnalysisParams.isDSLAnalysis === 'true'
         )
         .then(analysis => {
-          this.store
-            .dispatch(new DesignerLoadMetric(analysis.semanticId))
-            .toPromise()
-            .then(() => {
-              const { artifacts } = this.store.selectSnapshot(
-                state => state.designerState.metric
-              );
-              this.analysis = this.forkIfNecessary({
-                ...analysis,
-                artifacts: this.fixArtifactsForSIPQuery(analysis, artifacts),
-                name:
-                  this.designerMode === 'fork'
-                    ? `${analysis.name} Copy`
-                    : analysis.name
-              });
+          const dispatch = this.store.dispatch(
+            new DesignerLoadMetric(analysis.semanticId)
+          );
+          dispatch.toPromise().then(() => {
+            const { artifacts } = this.store.selectSnapshot(
+              state => state.designerState.metric
+            );
+            this.analysis = this.forkIfNecessary({
+              ...analysis,
+              artifacts: this.fixArtifactsForSIPQuery(analysis, artifacts),
+              name:
+                this.designerMode === 'fork'
+                  ? `${analysis.name} Copy`
+                  : analysis.name
             });
+          });
         });
     }
   }
