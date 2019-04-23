@@ -41,5 +41,5 @@ semantic:
   migration-metadata-home: {{  sip_var_path | default('/var/sip/') }}
 analysis:
   get-analysis-url:  http://localhost:9200
-  binary-migration-requires: false
+  binary-migration-requires: true
   migration-metadata-home: /var/sip/
