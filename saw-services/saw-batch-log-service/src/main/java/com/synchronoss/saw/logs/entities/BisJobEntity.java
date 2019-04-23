@@ -15,9 +15,9 @@ import io.swagger.annotations.ApiModel;
 
 @ApiModel(value="SIP_JOB", 
 description="Model for storing sip job entity")
-@Table(name = "SIP_JOB", catalog = "sip_bis", schema = "")
+@Table(name = "BIS_JOB", catalog = "sip_bis", schema = "")
 @Entity
-public class SipJobEntity implements Serializable {
+public class BisJobEntity implements Serializable {
   
   /**
    * 

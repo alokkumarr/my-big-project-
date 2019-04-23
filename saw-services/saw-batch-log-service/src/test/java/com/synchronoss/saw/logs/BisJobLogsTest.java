@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.synchronoss.saw.logs.entities.SipJobEntity;
+import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
 @RunWith(SpringRunner.class)
@@ -20,7 +20,7 @@ public class BisJobLogsTest {
   
   @Test
   public void testFindByJobType() {
-    List<SipJobEntity> list = jobRepository.findByjobType("BIS");
+    List<BisJobEntity> list = jobRepository.findByjobType("BIS");
     Assert.assertNotNull(list);
     Assert.assertTrue(list.size()>0);
   }

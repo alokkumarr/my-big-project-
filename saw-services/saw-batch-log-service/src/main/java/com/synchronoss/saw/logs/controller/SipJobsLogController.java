@@ -1,6 +1,6 @@
 package com.synchronoss.saw.logs.controller;
 
-import com.synchronoss.saw.logs.entities.SipJobEntity;
+import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.models.SipJobDetails;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
@@ -55,7 +55,7 @@ public class SipJobsLogController {
               message = "Unsupported Type. " + "Representation not supported for the resource")})
   public List<SipJobDetails> logsByJobType(@PathVariable("jobType") String jobType) {
     logger.info("fetching job logs");
-    List<SipJobEntity> jobLogs = this.jobRepository.findByjobType(jobType);
+    List<BisJobEntity> jobLogs = this.jobRepository.findByjobType(jobType);
     logger.info("job logs fetching done");
     return jobLogs.stream().map(sipJobEntity -> {
       SipJobDetails sipJobDto = new SipJobDetails();

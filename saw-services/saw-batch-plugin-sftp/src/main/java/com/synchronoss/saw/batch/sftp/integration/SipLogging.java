@@ -10,7 +10,7 @@ import com.synchronoss.saw.batch.model.BisComponentState;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.entities.BisFileLog;
-import com.synchronoss.saw.logs.entities.SipJobEntity;
+import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -285,7 +286,16 @@ public class SipLogging {
     }
     return updatedRecords;
   }
-
+  
+  /**
+   * Update existing log process status.
+   * 
+   * @param channelId channel identifier
+   * @param routeId route id entifier
+   * @param processStatus status
+   * @param fileStatus file status
+   * @param source source
+   */
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
       String fileStatus, String source) {
@@ -358,8 +368,8 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public boolean createJobLog(Long channelId, Long routeId, String filePattern) {
-    SipJobEntity sipJob = new SipJobEntity();
+  public BisJobEntity createJobLog(Long channelId, Long routeId, String filePattern) {
+    BisJobEntity sipJob = new BisJobEntity();
     sipJob.setFilePattern(filePattern);
     sipJob.setJobName(channelId + "-" +  routeId.toString());
     sipJob.setJobStatus("OPEN");
@@ -372,7 +382,7 @@ public class SipLogging {
     sipJob.setCreatedDate(new Date());
     sipJob.setUpdatedDate(new Date());
     sipJobDataRepository.save(sipJob);
-    return sipJob.getJobId() == null;
+    return sipJob;
     
   }
   
@@ -382,26 +392,45 @@ public class SipLogging {
    * @param status job status.
    * @param successCnt number of files succssfully transferred
    * @param totalCnt total number of files to be processed
-   * @return job log udated or not
    */
   @Transactional(TxType.REQUIRED)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public SipJobEntity updateJobLog(String status, long successCnt, long totalCnt) {
-    SipJobEntity sipJob = new SipJobEntity();
-    sipJob.setJobStatus(status);
-    sipJob.setTotalCount(totalCnt);
-    sipJob.setSuccessCount(successCnt);
-    sipJob.setCreatedBy("system");
-    sipJob.setUpdatedBy("system");
-    sipJob.setCreatedDate(new Date()); 
-    sipJob.setUpdatedDate(new Date());
-    SipJobEntity updateJob = sipJobDataRepository.save(sipJob);
-    return updateJob;
+  public void  updateJobLog(long jobId, String status, long successCnt, long totalCnt) {
+    Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
+    if (sipJob.isPresent()) {
+      BisJobEntity jobEntity = sipJob.get();
+      jobEntity.setJobStatus(status);
+      jobEntity.setTotalCount(totalCnt);
+      jobEntity.setSuccessCount(successCnt);
+      jobEntity.setCreatedBy("system");
+      jobEntity.setUpdatedBy("system");
+      jobEntity.setCreatedDate(new Date()); 
+      jobEntity.setUpdatedDate(new Date());
+      sipJobDataRepository.save(jobEntity);
+    }
+    
     
   }
   
+  /**
+   * Returns Job entity by Id.
+   * 
+   * @param jobId job identifier
+   * @return JobEntity
+   */
+  public BisJobEntity retriveJobById(long jobId) {
+    Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
+    BisJobEntity jobEntity = null;
+    if (sipJob.isPresent()) {
+      jobEntity =   sipJob.get();
+    }
+    
+    return jobEntity;
+    
+  }
   
+
 
 }
