@@ -21,9 +21,7 @@ import { DndPubsubService, DndEvent } from '../../../../../common/services';
 import { getArtifactColumnGeneralType } from '../../utils';
 import {
   IDEsignerSettingGroupAdapter,
-  Artifact,
   ArtifactColumn,
-  ArtifactColumns,
   Filter,
   DesignerChangeEvent
 } from '../../types';
@@ -35,6 +33,7 @@ import {
   DesignerRemoveColumnFromGroupAdapter
 } from '../../actions/designer.actions';
 import { getFilterValue } from '../../filter/chips-u';
+import { ArtifactDSL, ArtifactColumnDSL } from 'src/app/models';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
 @Component({
@@ -50,19 +49,19 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   @Input() analysisSubtype: string;
   @Input() filters: Filter[];
   public groupAdapters: IDEsignerSettingGroupAdapter[];
-  public artifactColumns: ArtifactColumns;
+  public artifactColumns: ArtifactColumnDSL[];
   private _dndSubscription;
   @Input('artifacts')
-  public set setArtifactColumns(artifacts: Artifact[]) {
+  public set setArtifactColumns(artifacts: ArtifactDSL[]) {
     if (!isEmpty(artifacts)) {
-      this.artifactColumns = artifacts[0].columns;
+      this.artifactColumns = artifacts[0].fields;
     }
     this.nameMap = reduce(
       artifacts,
-      (acc, artifact: Artifact) => {
-        acc[artifact.artifactName] = reduce(
-          artifact.columns,
-          (accum, col: ArtifactColumn) => {
+      (acc, artifact: ArtifactDSL) => {
+        acc[artifact.artifactsName] = reduce(
+          artifact.fields,
+          (accum, col: ArtifactColumnDSL) => {
             accum[col.columnName] = col.displayName;
             return accum;
           },
@@ -96,13 +95,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._store.dispatch(
-      new DesignerInitGroupAdapters(
-        this.artifactColumns,
-        this.analysisType,
-        this.analysisSubtype
-      )
-    );
+    this._store.dispatch(new DesignerInitGroupAdapters());
     this._dndSubscription = this._dndPubsub.subscribe(
       this.onDndEvent.bind(this)
     );

@@ -4,16 +4,17 @@ import {
   Sort,
   ArtifactColumnDSL
 } from '../types';
-import { Legend, Axis } from '../../models';
+import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
+
+export class DesignerLoadMetric {
+  static readonly type = '[Designer] Load metric';
+  constructor(public metric: { metricName: string; artifacts: Artifact[] }) {}
+}
 
 export class DesignerInitGroupAdapters {
   static readonly type = '[Designer] Init group adapters';
-  constructor(
-    public artifactColumns: ArtifactColumnChart[],
-    public analysisType: string,
-    public analysisSubType: string
-  ) {}
+  constructor() {}
 }
 
 export class DesignerClearGroupAdapters {
@@ -88,9 +89,9 @@ export class DesignerUpdateFilters {
 }
 
 export class DesignerUpdatebooleanCriteria {
-   /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
-   static readonly type = '[Designer] Update booleanCriteria for analysis';
-   constructor(public booleanCriteria: string) {}
+  /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
+  static readonly type = '[Designer] Update booleanCriteria for analysis';
+  constructor(public booleanCriteria: string) {}
 }
 
 export class DesignerUpdateAnalysisChartTitle {
@@ -135,6 +136,10 @@ export class DesignerUpdateArtifactColumn {
     public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
   ) {}
 }
+export class DesignerReorderArtifactColumns {
+  static readonly type = '[Designer] Reorder artifact columns of analysis';
+  constructor() {}
+}
 
 export class DesignerAddArtifactColumn {
   static readonly type = '[Designer] Add artifact column to analysis';
@@ -147,4 +152,8 @@ export class DesignerRemoveArtifactColumn {
   constructor(
     public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
   ) {}
+}
+export class DesignerRemoveAllArtifactColumns {
+  static readonly type = '[Designer] Remove all artifact columns from analysis';
+  constructor() {}
 }

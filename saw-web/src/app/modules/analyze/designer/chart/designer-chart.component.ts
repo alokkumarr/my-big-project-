@@ -10,11 +10,14 @@ import { BehaviorSubject } from 'rxjs';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
-import * as filter from 'lodash/filter';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
 
 import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../../../common/services/chart.service';
+import { QueryDSL } from 'src/app/models';
 
 @Component({
   selector: 'designer-chart',
@@ -22,13 +25,11 @@ import { ChartService } from '../../../../common/services/chart.service';
   styleUrls: ['./designer-chart.component.scss']
 })
 export class DesignerChartComponent implements AfterViewInit, OnInit {
-  _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
   chartType: string;
   _auxSettings: any = {};
   CHART_TYPES_OBJ = CHART_TYPES_OBJ;
 
-  settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
   chartOptions: any;
   @Input() updater;
 
@@ -46,28 +47,7 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
 
   @Input() sorts: Array<Sort> = [];
 
-  @Input()
-  set sqlBuilder(data: SqlBuilderChart) {
-    this._sqlBuilder = this.sipQueryToSQLBuilderFields(data);
-    this.settings = {
-      xaxis: filter(
-        get(data, 'nodeFields', []),
-        f => f.area === 'x' || f.checked === 'x'
-      ),
-      yaxis: filter(
-        get(data, 'dataFields', []),
-        f => f.area === 'y' || f.checked === 'y'
-      ),
-      zaxis: filter(
-        get(data, 'dataFields', []),
-        f => f.area === 'z' || f.checked === 'z'
-      ),
-      groupBy: filter(
-        get(data, 'nodeFields', []),
-        f => f.area === 'g' || f.checked === 'g'
-      )
-    };
-  }
+  @Input() sipQuery: QueryDSL;
 
   @Input()
   set auxSettings(settings) {
@@ -184,10 +164,16 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
   }
 
   reloadChart(data, changes = []) {
+    const dataFields = fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpFilter(field => field.area === 'y')
+    )(this.sipQuery.artifacts);
+    if (dataFields.length === 0) {
+      return;
+    }
     const changeConfig = this._chartService.dataToChangeConfig(
       this.chartType,
-      this.settings,
-      this._sqlBuilder,
+      this.sipQuery,
       map(data || [], clone),
       {
         labels: {},

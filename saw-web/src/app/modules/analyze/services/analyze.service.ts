@@ -450,7 +450,10 @@ export class AnalyzeService {
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(first())
+      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(
+        first(),
+        map((res: { analysis: AnalysisDSL }) => res.analysis)
+      )
     );
   }
 
@@ -579,9 +582,7 @@ export class AnalyzeService {
   }
 
   getArtifactsForDataSet(semanticId: string) {
-    return this.getRequest(`internal/semantic/workbench/${semanticId}`)
-      .toPromise()
-      .then((data: any) => data.artifacts);
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
   createAnalysis(metricId, type): Promise<Analysis | AnalysisDSL> {
@@ -645,10 +646,6 @@ export class AnalyzeService {
         legend: {
           align: 'right',
           layout: 'vertical'
-        },
-        labelOptions: {
-          enabled: false,
-          value: ''
         },
         xAxis: {
           title: null

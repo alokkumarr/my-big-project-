@@ -144,11 +144,7 @@ export class ChartGridComponent implements OnInit {
   }
 
   getChartUpdates(data, analysis) {
-    const settings = this._chartService.fillSettings(
-      analysis.artifacts,
-      analysis
-    );
-    const sorts = analysis.sqlBuilder.sorts;
+    const sorts = analysis.sipQuery.sorts;
     const labels = {
       x: get(analysis, 'xAxis.title', null),
       y: get(analysis, 'yAxis.title', null)
@@ -167,8 +163,7 @@ export class ChartGridComponent implements OnInit {
     return [
       ...this._chartService.dataToChangeConfig(
         analysis.chartType,
-        settings,
-        analysis.sqlBuilder,
+        analysis.sipQuery,
         orderedData || data,
         { labels, labelOptions: analysis.labelOptions, sorts }
       ),

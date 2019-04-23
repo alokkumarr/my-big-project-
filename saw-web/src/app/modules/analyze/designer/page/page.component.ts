@@ -5,6 +5,7 @@ import {
   AnalyzeService,
   EXECUTION_MODES
 } from '../../services/analyze.service';
+import { Store } from '@ngxs/store';
 import { JwtService } from '../../../../common/services/jwt.service';
 import { DesignerSaveEvent, DesignerMode, isDSLAnalysis } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
@@ -15,6 +16,7 @@ import { Analysis, AnalysisDSL } from '../types';
 import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
+import { DesignerLoadMetric } from '../actions/designer.actions';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -58,7 +60,8 @@ export class DesignerPageComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private jwtService: JwtService,
-    public _executeService: ExecuteService
+    public _executeService: ExecuteService,
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -147,9 +150,19 @@ export class DesignerPageComponent implements OnInit {
           existingAnalysisParams.isDSLAnalysis === 'true'
         )
         .then(analysis => {
-          this.analyzeService
+          return this.analyzeService
             .getArtifactsForDataSet(analysis.semanticId)
-            .then(artifacts => {
+            .toPromise()
+            .then(metric => {
+              this.store.dispatch(
+                new DesignerLoadMetric({
+                  metricName: metric.metricName,
+                  artifacts: metric.artifacts
+                })
+              );
+              const { artifacts } = this.store.selectSnapshot(
+                state => state.designerState.metric
+              );
               this.analysis = this.forkIfNecessary({
                 ...analysis,
                 artifacts: this.fixArtifactsForSIPQuery(analysis, artifacts),

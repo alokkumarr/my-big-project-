@@ -18,7 +18,6 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpInvert from 'lodash/fp/invert';
 import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
@@ -37,8 +36,6 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import { flattenChartData } from '../utils/dataFlattener';
-
 import {
   NUMBER_TYPES,
   FLOAT_TYPES,
@@ -46,6 +43,7 @@ import {
   AGGREGATE_TYPES_OBJ,
   CHART_COLORS
 } from '../../modules/analyze/consts';
+import { QueryDSL } from 'src/app/models';
 
 const removeKeyword = (input: string) => {
   if (!input) {
@@ -144,21 +142,6 @@ export class ChartService {
   LEGEND_POSITIONING = LEGEND_POSITIONING;
   LAYOUT_POSITIONS = LAYOUT_POSITIONS;
   constructor() {}
-
-  updateAnalysisModel(analysis) {
-    /* prettier-ignore */
-    switch (analysis.chartType) {
-    case 'pie':
-      analysis.labelOptions = analysis.labelOptions || {
-        enabled: true,
-        value: 'percentage'
-      };
-      break;
-    default:
-      break;
-    }
-    return analysis;
-  }
 
   analysisLegend2ChartLegend(legend) {
     const align = LEGEND_POSITIONING[get(legend, 'align')];
@@ -339,12 +322,14 @@ export class ChartService {
     const categories = {};
     const isHighStock = chartType.substring(0, 2) === 'ts';
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
+    const dateFields = filter(fieldsArray, ({ type }) =>
+      DATE_TYPES.includes(type)
+    );
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
-      const dateFields = filter(fieldsArray, ({ type }) =>
-        DATE_TYPES.includes(type)
-      );
       this.formatDatesIfNeeded(parsedData, dateFields);
+    } else {
+      this.dateStringToTimestamp(parsedData, dateFields);
     }
     const series = this.splitToSeries(parsedData, fields, chartType);
     // split out categories frem the data
@@ -447,6 +432,28 @@ export class ChartService {
     return value;
   }
 
+  /**
+   * Converts date strings to unix epoch time. This is used primarily for
+   * time series charts because they need timestamps.
+   *
+   * @param {Array<any>} parsedData
+   * @param {Array<{ columnName: string }>} dateFields
+   * @memberof ChartService
+   */
+  dateStringToTimestamp(
+    parsedData: Array<any>,
+    dateFields: Array<{ columnName: string }>
+  ) {
+    if (!isEmpty(dateFields)) {
+      forEach(parsedData, dataPoint => {
+        forEach(dateFields, ({ columnName }) => {
+          dataPoint[removeKeyword(columnName)] =
+            moment.utc(dataPoint[removeKeyword(columnName)]).unix() * 1000;
+        });
+      });
+    }
+  }
+
   formatDatesIfNeeded(parsedData, dateFields) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
@@ -461,21 +468,32 @@ export class ChartService {
   }
 
   getSerie(
-    { alias, aliasName, type, displayName, comboType, aggregate, chartType },
+    {
+      alias,
+      aliasName,
+      type,
+      displayName,
+      displayType,
+      comboType,
+      aggregate,
+      chartType
+    },
     index,
     fields,
     chartTypeOverride
   ) {
     let aggrSymbol = '';
     const comboGroups = fpPipe(
-      fpMap('comboType'),
+      map(field => field.comboType || field.displayType),
       fpUniq,
       fpInvert,
       fpMapValues(parseInt)
     )(fields);
 
-    const splinifiedChartType = this.splinifyChartType(comboType);
-    const zIndex = this.getZIndex(comboType);
+    const splinifiedChartType = this.splinifyChartType(
+      comboType || displayType
+    );
+    const zIndex = this.getZIndex(comboType || displayType);
     if (aggregate === 'percentage' || aggregate === 'percentageByRow') {
       aggrSymbol = '%';
     }
@@ -492,7 +510,7 @@ export class ChartService {
       yAxis:
         chartType === 'tsPane' || chartTypeOverride === 'tsPane'
           ? index
-          : comboGroups[comboType],
+          : comboGroups[comboType || displayType],
       zIndex,
       data: []
     };
@@ -542,7 +560,7 @@ export class ChartService {
 
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-    let comboType = fields.y[0].comboType;
+    let comboType = fields.y[0].comboType || fields.y[0].displayType;
     let aggrsymbol = '';
     if (
       fields.y[0].aggregate === 'percentage' ||
@@ -727,7 +745,7 @@ export class ChartService {
     }
   }
 
-  getPieChangeConfig(type, settings, fields, gridData, opts) {
+  getPieChangeConfig(type, fields, gridData, opts) {
     const changes = [];
     const yField = get(fields, 'y.0', {});
     const yLabel =
@@ -789,7 +807,7 @@ export class ChartService {
     const labelHeight = 15;
     if (type !== 'tsPane') {
       const changes = fpPipe(
-        fpGroupBy('comboType'),
+        fpGroupBy(field => field.comboType || field.displayType),
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
@@ -885,7 +903,7 @@ export class ChartService {
     return `${top}%`;
   }
 
-  getBarChangeConfig(type, settings, fields, gridData, opts) {
+  getBarChangeConfig(type, fields, gridData, opts) {
     const labels = {
       x:
         get(fields, 'x.alias') ||
@@ -928,14 +946,8 @@ export class ChartService {
     return changes;
   }
 
-  dataToChangeConfig(
-    type,
-    settings,
-    { dataFields, nodeFields },
-    gridData,
-    opts
-  ) {
-    const selectedFields = fpFlatMap(x => x, [dataFields, nodeFields]);
+  dataToChangeConfig(type, { artifacts }: QueryDSL, gridData, opts) {
+    const selectedFields = fpFlatMap(x => x.fields, artifacts);
 
     let changes;
     const fields = {
@@ -958,16 +970,9 @@ export class ChartService {
       g: find(selectedFields, attr => attr.checked === 'g' || attr.area === 'g')
     };
 
-    /* prettier-ignore */
     switch (type) {
       case 'pie':
-        changes = this.getPieChangeConfig(
-          type,
-          settings,
-          fields,
-          gridData,
-          opts
-        );
+        changes = this.getPieChangeConfig(type, fields, gridData, opts);
         break;
       case 'column':
       case 'bar':
@@ -979,13 +984,7 @@ export class ChartService {
       case 'tsspline':
       case 'tsPane':
       default:
-        changes = this.getBarChangeConfig(
-          type,
-          settings,
-          fields,
-          gridData,
-          opts
-        );
+        changes = this.getBarChangeConfig(type, fields, gridData, opts);
         break;
     }
 
@@ -1152,79 +1151,5 @@ export class ChartService {
     });
 
     return changes;
-  }
-
-  parseData(data, sqlBuilder) {
-    return flattenChartData(data, sqlBuilder);
-  }
-
-  filterNumberTypes(attributes) {
-    return filter(
-      attributes,
-      attr => removeKeyword(attr.columnName) && NUMBER_TYPES.includes(attr.type)
-    );
-  }
-
-  filterNonNumberTypes(attributes) {
-    return filter(
-      attributes,
-      attr =>
-        removeKeyword(attr.columnName) && !NUMBER_TYPES.includes(attr.type)
-    );
-  }
-
-  filterDateTypes(attributes) {
-    return filter(
-      attributes,
-      attr => removeKeyword(attr.columnName) && DATE_TYPES.includes(attr.type)
-    );
-  }
-
-  fillSettings(artifacts, model) {
-    /* Flatten the artifacts into a single array and sort them */
-    const attributes = fpPipe(
-      fpFlatMap(metric => {
-        return map(metric.columns, attr => {
-          attr.tableName = metric.artifactName;
-          return attr;
-        });
-      }),
-      fpSortBy('displayName')
-    )(artifacts);
-
-    let settingsObj;
-    let zaxis;
-    const yaxis = this.filterNumberTypes(attributes);
-    let xaxis = attributes;
-    const groupBy = this.filterNonNumberTypes(attributes);
-
-    /* prettier-ignore */
-    switch (model.chartType) {
-    case 'bubble':
-      zaxis = this.filterNumberTypes(attributes);
-      settingsObj = {
-        xaxis,
-        yaxis,
-        zaxis,
-        groupBy
-      };
-      break;
-    case 'tsspline':
-    case 'tsPane':
-      xaxis = this.filterDateTypes(attributes);
-      settingsObj = {
-        xaxis,
-        yaxis,
-        groupBy
-      };
-      break;
-    default:
-      settingsObj = {
-        yaxis,
-        xaxis,
-        groupBy
-      };
-    }
-    return settingsObj;
   }
 }
