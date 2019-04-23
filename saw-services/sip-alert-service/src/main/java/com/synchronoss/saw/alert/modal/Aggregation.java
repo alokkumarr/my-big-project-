@@ -11,8 +11,7 @@ public enum Aggregation {
   SUM("SUM"),
   MIN("MIN"),
   MAX("MAX"),
-  COUNT("COUNT"),
-  PERCENTAGE("PERCENTAGE");
+  COUNT("COUNT");
   private static final Map<String, Aggregation> CONSTANTS = new HashMap<>();
 
   static {

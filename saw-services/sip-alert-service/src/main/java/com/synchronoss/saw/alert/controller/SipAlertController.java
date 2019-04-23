@@ -144,7 +144,7 @@ public class SipAlertController {
   }
 
   /**
-   * List All Alert rule API.
+   * List Alert operators API.
    *
    * @param request HttpServletRequest
    * @return String return all operators details
@@ -162,6 +162,27 @@ public class SipAlertController {
   public String listAlertOperators(HttpServletRequest request) {
     Ticket ticket = getTicket(request);
     return ticket != null ? alertService.retrieveOperatorsDetails(ticket) : null;
+  }
+
+  /**
+   * List Alert aggregation API.
+   *
+   * @param request HttpServletRequest
+   * @return String return all operators details
+   */
+  @ApiOperation(
+      value = "/aggregations",
+      nickname = "List All Alert aggregation",
+      notes = "",
+      response = Object.class)
+  @RequestMapping(
+      value = "/aggregations",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public String listAlertAggregation(HttpServletRequest request) {
+    Ticket ticket = getTicket(request);
+    return ticket != null ? alertService.retrieveAggregations(ticket) : null;
   }
 
   /**

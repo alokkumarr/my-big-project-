@@ -6,6 +6,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertCustomerDetails;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.entities.DatapodDetails;
+import com.synchronoss.saw.alert.modal.Aggregation;
 import com.synchronoss.saw.alert.modal.Alert;
 import com.synchronoss.saw.alert.modal.Operator;
 import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 public class AlertServiceImpl implements AlertService {
   private static final String ID = "id";
   private static final String NAME = "name";
-  private static final String OPERATORS = "operators";
 
   @Autowired AlertRulesRepository alertRulesRepository;
 
@@ -224,7 +224,6 @@ public class AlertServiceImpl implements AlertService {
   @Override
   public String retrieveOperatorsDetails(Ticket ticket) {
     JsonArray elements = new JsonArray();
-    JsonObject response = new JsonObject();
     List<Operator> operatorList = Arrays.asList(Operator.values());
     for (Operator operator : operatorList) {
       JsonObject object = new JsonObject();
@@ -235,8 +234,23 @@ public class AlertServiceImpl implements AlertService {
         elements.add(object);
       }
     }
-    response.add(OPERATORS, elements);
-    return response.toString();
+    return elements.toString();
+  }
+
+  @Override
+  public String retrieveAggregations(Ticket ticket) {
+    JsonArray elements = new JsonArray();
+    List<Aggregation> aggregationList = Arrays.asList(Aggregation.values());
+    for (Aggregation aggregation : aggregationList) {
+      JsonObject object = new JsonObject();
+      String readableOperator = getReadableAggregation(aggregation);
+      if (readableOperator != null) {
+        object.addProperty(ID, aggregation.value());
+        object.addProperty(NAME, readableOperator);
+        elements.add(object);
+      }
+    }
+    return elements.toString();
   }
 
   /**
@@ -270,6 +284,30 @@ public class AlertServiceImpl implements AlertService {
         return "Contains";
       case ISIN:
         return "Is IN";
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * It return readable aggregation name.
+   *
+   * @param aggregation Aggregation
+   * @return String
+   */
+  private String getReadableAggregation(Aggregation aggregation) {
+
+    switch (aggregation) {
+      case AVG:
+        return "Average";
+      case SUM:
+        return "SUM";
+      case MIN:
+        return "Minimum";
+      case MAX:
+        return "Maximum";
+      case COUNT:
+        return "Count Values";
       default:
         return null;
     }
