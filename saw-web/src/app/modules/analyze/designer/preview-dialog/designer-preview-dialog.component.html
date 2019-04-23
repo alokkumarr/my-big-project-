@@ -52,7 +52,7 @@
     [sorts]="analysis.sqlBuilder.sorts"
     [auxSettings]="{ isInverted: analysis.isInverted, legend: analysis.legend }"
     [data]="previewData"
-    [sqlBuilder]="analysis.sqlBuilder"
+    [sipQuery]="analysis.sipQuery"
   >
   </designer-chart>
   <div
@@ -60,7 +60,7 @@
     class="map-container"
   >
     <designer-map
-      [auxSettings]="analysis.mapSettings"
+      [auxSettings]="analysis.mapOptions"
       [data]="previewData"
       [sqlBuilder]="analysis.sqlBuilder"
     >

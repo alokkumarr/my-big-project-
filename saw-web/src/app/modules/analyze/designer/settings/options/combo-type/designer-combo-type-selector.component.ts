@@ -23,9 +23,9 @@ export class DesignerComboTypeSelectorComponent {
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public comboTypes;
 
-  constructor(private store: Store) {}
-
   public enablePercentByRow = true;
+
+  constructor(private _store: Store) {}
 
   /**
    * asChartColumn - Typecasts artifact column to ArtifactColumnChart
@@ -40,15 +40,26 @@ export class DesignerComboTypeSelectorComponent {
 
   onComboTypeChange(comboType) {
     this.enablePercentByRow = comboType === 'column' ? true : false;
-    (this.artifactColumn as ArtifactColumnChart).comboType = comboType;
-    this.store.dispatch(
+    const { table, columnName } = this.artifactColumn;
+    this._store.dispatch(
       new DesignerUpdateArtifactColumn({
-        columnName: this.artifactColumn.columnName,
-        table: this.artifactColumn.table,
+        table,
+        columnName,
         displayType: comboType
       })
     );
     this.change.emit({ subject: 'comboType', column: this.artifactColumn });
+  }
+
+  get comboType(): string {
+    if (!this.artifactColumn) {
+      return '';
+    }
+
+    return (
+      (<ArtifactColumnChart>this.artifactColumn).comboType ||
+      (<any>this.artifactColumn).displayType
+    );
   }
 
   getComboIcon(comboType) {

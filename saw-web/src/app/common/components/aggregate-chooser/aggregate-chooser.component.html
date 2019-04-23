@@ -15,7 +15,7 @@
       [attr.e2e]="aggregateType.value"
       mat-menu-item
       (click)="onAggregateChange(aggregateType.value)"
-      *ngIf="checkColumn(aggregateType.value, sqlBuilder)"
+      *ngIf="checkColumn(aggregateType.value, sipQuery)"
       [ngStyle]="{
         color: aggregate === aggregateType.value ? '#0077BE' : '#737373'
       }"
