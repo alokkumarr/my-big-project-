@@ -34,7 +34,7 @@ import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
 
 
-@Service("SFTP")
+@Service("SFTPRetryServiceImpl")
 public class SftpRetryServiceImpl implements SipRetryContract {
 
   private static final Logger logger = LoggerFactory.getLogger(SftpRetryServiceImpl.class);

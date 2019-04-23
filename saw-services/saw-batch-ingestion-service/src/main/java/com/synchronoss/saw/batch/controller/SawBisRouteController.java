@@ -19,6 +19,7 @@ import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
 import com.synchronoss.saw.batch.service.BisRouteService;
+import com.synchronoss.saw.batch.service.ChannelTypeService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -92,6 +93,9 @@ public class SawBisRouteController {
 
   @Autowired
   private BisRouteService bisRouteService;
+  
+  @Autowired
+  ChannelTypeService channelTypeService;
 
 
   RestTemplate restTemplate = new RestTemplate();
@@ -331,7 +335,10 @@ public class SawBisRouteController {
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
         schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
         schedulerRequest.setRouteId(String.valueOf(routeId.toString()));
-        schedulerRequest.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+        String channelType = channelTypeService
+            .findChannelTypeFromChannelId(channelId);
+        schedulerRequest.setJobName(channelType + channelId + routeId);
+        schedulerRequest.setChannelType(channelType);
         schedulerRequest.setJobGroup(String.valueOf(routeId));
         JsonNode schedulerData = null;
         try {
@@ -449,7 +456,9 @@ public class SawBisRouteController {
           "scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + deleteUrl);
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
-      scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+      String channelType = channelTypeService
+          .findChannelTypeFromChannelId(channelId);
+      scheduleKeys.setJobName(channelType + channelId + routeId);
       restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + deleteUrl, scheduleKeys);
 
       logger.trace("Route deleted :" + route);
@@ -474,7 +483,9 @@ public class SawBisRouteController {
     logger.trace("Inside deactivating route  channelID " + channelId + "routeId: " + routeId);
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
-    scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+    String channelType = channelTypeService
+        .findChannelTypeFromChannelId(channelId);
+    scheduleKeys.setJobName(channelType + channelId + routeId);
     bisRouteService.activateOrDeactivateRoute(channelId, routeId, false);
     Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
     responseMap.put("isDeactivated",Boolean.TRUE);
@@ -497,7 +508,9 @@ public class SawBisRouteController {
     logger.trace("Inside activate route  channelID " + channelId + "routeId: " + routeId);
     BisScheduleKeys scheduleKeys = new BisScheduleKeys();
     scheduleKeys.setGroupName(String.valueOf(routeId));
-    scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+    String channelType = channelTypeService
+        .findChannelTypeFromChannelId(channelId);
+    scheduleKeys.setJobName(channelType + channelId + routeId);
     bisRouteService.activateOrDeactivateRoute(channelId, routeId, true);
     Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
     responseMap.put("isActivated", Boolean.TRUE);

@@ -1,6 +1,7 @@
 package com.synchronoss.saw.batch.plugin;
 
 import com.synchronoss.saw.batch.extensions.SipRetryContract;
+import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.plugin.service.S3RetryServiceImpl;
 import com.synchronoss.saw.batch.plugin.service.SftpRetryServiceImpl;
 
@@ -30,9 +31,9 @@ public class SipRetryPluginFactory {
 
     SipRetryContract sipRetryService = null;
 
-    if (ingestionType.toUpperCase().equals(ChannelType.SFTP.name())) {
+    if (ingestionType.equals(BisChannelType.SFTP.value())) {
       sipRetryService = this.sftpRetryServiceImpl;
-    } else if (ingestionType.equals(ChannelType.S3.name())) {
+    } else if (ingestionType.equals(BisChannelType.S3.value())) {
       sipRetryService = this.s3RetryServiceImpl;
     }
 

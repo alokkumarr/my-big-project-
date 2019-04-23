@@ -231,8 +231,20 @@ public class SawBisPluginController {
     if (result.hasErrors()) {
       throw new SftpProcessorException("Exception occured while transferring the file");
     }
+    
+    /**
+     * Below line is added to support existing schedules
+     * which doesnt have channel type stored in job info
+     * as part of scheduler.
+     */
+    String channelType = requestBody.getChannelType() == null 
+        ?  "sftp" : requestBody.getChannelType().value();
+    
+    logger.trace("channel type from job scheduled :: " 
+        + requestBody.getChannelType());
+    
     SipPluginContract sipTransferService = factory
-        .getInstance(requestBody.getChannelType().toString());
+        .getInstance(channelType);
     if (requestBody.getBatchSize() > 0) {
       sipTransferService.setBatchSize(requestBody.getBatchSize());
     }

@@ -1,6 +1,7 @@
 package com.synchronoss.saw.batch.plugin;
 
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
+import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.plugin.service.S3ServiceImpl;
 import com.synchronoss.saw.batch.plugin.service.SftpServiceImpl;
 
@@ -30,9 +31,9 @@ public class SipIngestionPluginFactory {
 
     SipPluginContract sipConnectionService = null;
 
-    if (ingestionType.toUpperCase().equals(ChannelType.SFTP.name())) {
+    if (ingestionType.equals(BisChannelType.SFTP.value())) {
       sipConnectionService = this.sftpServiceImpl;
-    } else if (ingestionType.equals(ChannelType.S3.name())) {
+    } else if (ingestionType.equals(BisChannelType.S3.value())) {
       sipConnectionService = this.s3ServiceImpl;
     }
 
