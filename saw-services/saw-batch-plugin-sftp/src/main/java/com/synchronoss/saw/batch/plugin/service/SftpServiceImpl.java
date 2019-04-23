@@ -43,15 +43,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javassist.NotFoundException;
+
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -71,6 +75,7 @@ import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.integration.sftp.session.SftpSession;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
 
@@ -1370,11 +1375,11 @@ public class SftpServiceImpl extends SipPluginContract {
                 int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
                 String sourceLocation = rootNode.get("sourceLocation").asText();
                 SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
-                if (rootNode.get("lastModifiedLimitHours") != null
-                    || !rootNode.get("lastModifiedLimitHours").asText().isEmpty()) {
+                if (rootNode.get("lastModifiedLimitHours") != null) {
                   String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
                   lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
-                  logger.trace("Last modified hours limit configured:" + lastModifiedHoursLmt);
+                  logger.trace("Last modified hours limit configured:" 
+                        + lastModifiedHoursLmt);
                 }
                 filesInfo.addAll(
                     transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
