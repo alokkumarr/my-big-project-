@@ -1,3 +1,54 @@
-<p>
-  alerts-view works!
-</p>
+<mat-sidenav-container fxFlex fxFill hasBackdrop="false" class="view-container">
+  <mat-sidenav
+    #alertViewSidenav
+    position="end"
+    [mode]="viewAlertPanelMode"
+    autoFocus="false"
+  >
+    <div fxFlex fxLayout="column" class="view-container__add">
+      <div
+        fxFlex="45px"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        class="view-container__add__header"
+      >
+        <span fxFlex class="view-container__add__header__title" i18n
+          >{{ navTitle }}
+        </span>
+        <button
+          mat-icon-button
+          color="warn"
+          e2e="close-nav"
+          (click)="alertViewSidenav.close()"
+        >
+          <mat-icon fontIcon="icon-close"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content fxFlex fxLayout="column" class="view-container-content">
+    <div
+      fxFlex="45px"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      class="view-container-content__header"
+    >
+      <span fxFlex class="view-container-content__header__title" i18n
+        >Alert History
+      </span>
+      <button
+        *ngIf="!alertViewSidenav.opened"
+        mat-icon-button
+        class="view-container-content__header__filterBtn"
+        color="primary"
+        e2e="open-filter-panel"
+        (click)="alertViewSidenav.open()"
+      >
+        <mat-icon fontIcon="icon-filter"></mat-icon>
+      </button>
+    </div>
+    <div fxFlex class="view-container-content__body">
+      <alerts-grid></alerts-grid>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

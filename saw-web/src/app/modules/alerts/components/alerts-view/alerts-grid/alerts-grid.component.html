@@ -1,0 +1,56 @@
+<dx-data-grid
+  fxFlex
+  e2e="alert-history-grid"
+  [dataSource]="configuredAlerts$ | async"
+  [showBorders]="false"
+  [columnAutoWidth]="false"
+  [showColumnLines]="false"
+  [showRowLines]="true"
+  keyExpr="alertRulesSysId"
+  [rowAlternationEnabled]="true"
+>
+  <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
+  <dxo-paging [pageSize]="12"></dxo-paging>
+  <dxo-pager
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[25, 50, 75, 100]"
+  ></dxo-pager>
+  <dxo-selection mode="none"></dxo-selection>
+  <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
+  <dxo-search-panel
+    [visible]="false"
+    [width]="220"
+    placeholder="Search..."
+  ></dxo-search-panel>
+  <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+  <dxi-column caption="Alert Name" dataField="alertName"></dxi-column>
+  <dxi-column caption="Severity" dataField="alertSeverity"></dxi-column>
+  <dxi-column dataField="time"></dxi-column>
+  <dxi-column caption="Metric" dataField="metricValue"></dxi-column>
+  <dxi-column caption="Threshold" dataField="thresholdValue"></dxi-column>
+  <dxi-column
+    caption="Status"
+    dataField="activeInd"
+    alignment="center"
+    cellTemplate="statusTemplate"
+  >
+  </dxi-column>
+
+  <div
+    *dxTemplate="let data of 'deleteTemplate'"
+    fxLayout="row"
+    fxLayoutAlign="center center"
+  >
+    <button
+      mat-icon-button
+      i18n-matTooltip
+      color="warn"
+      e2e="delete-alert"
+      class="view-container-content__body__gridBtn"
+      matTooltip="Delete"
+      (click)="deleteAlert(data.data)"
+    >
+      <mat-icon fontIcon="icon-plus"></mat-icon>
+    </button>
+  </div>
+</dx-data-grid>
