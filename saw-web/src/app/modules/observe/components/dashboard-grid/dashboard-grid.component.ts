@@ -235,7 +235,11 @@ export class DashboardGridComponent
   addGlobalFilters(analysis) {
     const columns = flatMap(analysis.artifacts, table => table.columns);
 
-    const filters = get(analysis, 'sqlBuilder.filters', []);
+    const filters = get(
+      analysis,
+      'sqlBuilder.filters',
+      get(analysis, 'sipQuery.filters', [])
+    );
 
     this.filters.addFilter(
       filter(
@@ -259,7 +263,7 @@ export class DashboardGridComponent
             ...{
               semanticId: analysis.semanticId,
               metricName: analysis.metricName,
-              esRepository: analysis.esRepository,
+              esRepository: this.getESRepository(analysis),
               displayName: this.filters.getDisplayNameFor(
                 columns,
                 flt.columnName,
@@ -271,6 +275,22 @@ export class DashboardGridComponent
         f => f.isGlobalFilter
       )
     );
+  }
+
+  getESRepository(analysis) {
+    if (analysis.esRepository) {
+      return analysis.esRepository;
+    } else if (analysis.sipQuery) {
+      const store = analysis.sipQuery.store;
+      const [indexName, indexType] = store.dataStore.split('/');
+      return {
+        storageType: store.storageType,
+        indexName,
+        type: indexType
+      };
+    } else {
+      return {};
+    }
   }
 
   /**
@@ -301,18 +321,27 @@ export class DashboardGridComponent
           return f;
         }),
 
-        tile.origAnalysis.sqlBuilder.filters,
+        (tile.origAnalysis.sqlBuilder || tile.origAnalysis.sipQuery).filters,
         (gFilt, filt) =>
           gFilt.tableName === filt.tableName &&
           gFilt.columnName === filt.columnName
       );
 
-      const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
-      tile.analysis = {
-        ...tile.origAnalysis,
-        ...{ sqlBuilder },
-        _executeTile: true
-      };
+      if (tile.origAnalysis.sqlBuilder) {
+        const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
+        tile.analysis = {
+          ...tile.origAnalysis,
+          ...{ sqlBuilder },
+          _executeTile: true
+        };
+      } else {
+        const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters } };
+        tile.analysis = {
+          ...tile.origAnalysis,
+          ...{ sipQuery },
+          _executeTile: true
+        };
+      }
 
       this.dashboard.splice(id, 1, { ...tile });
     });
@@ -453,15 +482,20 @@ export class DashboardGridComponent
   onAnalysisRemove() {
     const analysisTiles = filter(this.dashboard, tile => tile.analysis);
     const globalFilters = filter(
-      flatMap(analysisTiles, tile =>
-        map(
-          get(tile.origAnalysis || tile.analysis, 'sqlBuilder.filters') || [],
+      flatMap(analysisTiles, tile => {
+        const analysis = tile.origAnalysis || tile.analysis;
+        return map(
+          get(
+            analysis,
+            'sqlBuilder.filters',
+            get(analysis, 'sipQuery.filters', [])
+          ),
           f => {
             f.semanticId = tile.analysis.semanticId;
             return f;
           }
-        )
-      ),
+        );
+      }),
       f => f.isGlobalFilter
     );
 
