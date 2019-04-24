@@ -55,7 +55,7 @@ export class ValidateSemanticComponent implements OnDestroy {
       value.schema.fields = map(value.schema.fields, val => {
         const colName = val.isKeyword ? `${val.name}.keyword` : val.name;
         return {
-          aliasName: val.name,
+          alias: val.name,
           columnName: colName,
           displayName: val.name,
           filterEligible: true,
