@@ -43,7 +43,7 @@ public class AnalysisServiceImpl implements AnalysisService {
   @NotNull
   private String analysisUri;
 
-  @Value("${analysis.binary-migration-requires}")
+  @Value("${analysis.binary-migration-required}")
   @NotNull
   private boolean migrationRequires;
 

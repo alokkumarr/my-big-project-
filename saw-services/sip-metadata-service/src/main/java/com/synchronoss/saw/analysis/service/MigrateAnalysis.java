@@ -3,6 +3,7 @@ package com.synchronoss.saw.analysis.service;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,7 +17,6 @@ import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
-import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -43,52 +43,44 @@ public class MigrateAnalysis {
       String tableName, String basePath, String listAnalysisUri) throws Exception {
     logger.trace("Migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
-
     AnalysisMetadata analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(semanticNodeQuery(), requestHeaders);
     logger.debug("Analysis server URL {}", listAnalysisUri + "/analysis");
-
     String url = listAnalysisUri + "/analysis";
     RestTemplate restTemplate = new RestTemplate();
     ResponseEntity analysisBinaryData =
-        restTemplate.exchange(url, HttpMethod.GET, requestEntity, Analysis.class);
-
+        restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
     if (analysisBinaryData.getBody() != null) {
-      Gson gson = new GsonBuilder().create();
       logger.debug("Analysis data = " + analysisBinaryData.getBody());
-
-      // TODO: Check if this works
-      JsonObject analysisBinaryObject =
-          gson.toJsonTree(analysisBinaryData.getBody()).getAsJsonObject();
-
+      JsonNode jsonNode = (JsonNode) analysisBinaryData.getBody();
+      JsonElement jelement = new com.google.gson.JsonParser().parse(jsonNode.toString());
+      JsonObject analysisBinaryObject = jelement.getAsJsonObject();
       JsonArray analysisList =
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
-
       (analysisList)
           .forEach(
               analysisElement -> {
-                  Analysis analysis =
-                      convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
-                  try {
+                Analysis analysis =
+                    convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+                try {
 
-                    logger.info("Inserting analysis " + analysis.getId() + " into json store");
-                    JsonElement parsedAnalysis =
-                        SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
-                    analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
-                  } catch (JsonProcessingException exception) {
-                    logger.error("Unable to convert analysis to json");
-                  } catch (Exception ex) {
-                    if (analysis != null) {
-                      logger.error("Unable to process analysis " + analysis.getId());
-                    } else {
-                      logger.error("Unable to process analysis");
-                    }
+                  logger.info("Inserting analysis " + analysis.getId() + " into json store");
+                  Gson gson = new GsonBuilder().create();
+                  JsonElement parsedAnalysis = gson.toJsonTree(analysis, Analysis.class);
+                  analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+                } catch (JsonProcessingException exception) {
+                  logger.error("Unable to convert analysis to json");
+                } catch (Exception ex) {
+                  if (analysis != null) {
+                    logger.error("Unable to process analysis " + analysis.getId());
+                  } else {
+                    logger.error("Unable to process analysis");
                   }
+                }
               });
     }
   }
