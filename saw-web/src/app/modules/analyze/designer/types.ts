@@ -114,7 +114,7 @@ export interface DesignerChangeEvent {
     | 'format'
     | 'aggregate'
     | 'dateInterval'
-    | 'aliasName'
+    | 'alias'
     | 'sort'
     | 'filter'
     | 'filterRemove'

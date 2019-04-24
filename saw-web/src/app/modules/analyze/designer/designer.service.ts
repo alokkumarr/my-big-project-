@@ -307,7 +307,6 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.checked = false;
       artifactColumn.alias = artifactColumn.displayName || '';
-      artifactColumn.aliasName = artifactColumn.alias;
       unset(artifactColumn, 'comboType');
       unset(artifactColumn, 'limitType');
       unset(artifactColumn, 'limitValue');
@@ -637,7 +636,7 @@ export class DesignerService {
           const isDateType = DATE_TYPES.includes(artifactColumn.type);
           return {
             ...(isDataArea ? { aggregate: artifactColumn.aggregate } : {}),
-            alias: artifactColumn.aliasName,
+            alias: artifactColumn.alias,
             checked: artifactColumn.area,
             columnName: artifactColumn.columnName,
             name: artifactColumn.columnName,

@@ -107,15 +107,12 @@ export class MapBoxComponent implements OnChanges {
         fpToPairs,
         fpFilter(([key]) => key !== coordinatesKey),
         fpMap(([key, value]) => {
-          const { alias, aliasName, displayName, aggregate } = get(
-            fieldsMap,
-            key
-          );
+          const { alias, displayName, aggregate } = get(fieldsMap, key);
           const aggregateFun = AGGREGATE_TYPES_OBJ[aggregate].designerLabel;
           return {
             key,
             value,
-            label: `${aggregateFun}(${alias || aliasName || displayName})`
+            label: `${aggregateFun}(${alias || displayName})`
           };
         })
       )(datum);

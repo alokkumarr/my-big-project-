@@ -91,10 +91,10 @@ export class ChartGridComponent implements OnInit {
   }
 
   fetchColumnData(axisName, value) {
-    let aliasName = axisName;
+    let alias = axisName;
     forEach(this.analysis.artifacts[0].columns, column => {
       if (axisName === column.name) {
-        aliasName = column.aliasName || column.displayName;
+        alias = column.alias || column.displayName;
         value =
           column.type === 'date'
             ? moment
@@ -117,7 +117,7 @@ export class ChartGridComponent implements OnInit {
         value = value === 'Undefined' ? '' : value;
       }
     });
-    return { aliasName, value };
+    return { alias, value };
   }
 
   trimKeyword(data) {
@@ -129,7 +129,7 @@ export class ChartGridComponent implements OnInit {
       for (const key in row) {
         if (row.hasOwnProperty(key)) {
           const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
-          obj[trimKey.aliasName] = trimKey.value;
+          obj[trimKey.alias] = trimKey.value;
         }
       }
       return obj;

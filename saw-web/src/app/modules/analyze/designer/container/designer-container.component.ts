@@ -965,7 +965,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     // only front end data refresh needed
     case 'format':
-    case 'aliasName':
+    case 'alias':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       if (isDSLAnalysis(this.analysis)) {
         this.analysis.sipQuery = {...this.analysis.sipQuery};
@@ -1023,7 +1023,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = [...this.artifacts];
         this.requestDataIfPossible();
         break;
-      case 'aliasName':
+      case 'alias':
         // reload frontEnd
         this.updateAnalysis();
         this.artifacts = [...this.artifacts];

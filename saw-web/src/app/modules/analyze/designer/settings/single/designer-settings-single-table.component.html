@@ -73,7 +73,7 @@
           [cdkDragData]="artifactColumn"
           [attr.e2e]="
             'designer-unselected-field-' +
-            (artifactColumn.aliasName || artifactColumn.displayName)
+            (artifactColumn.alias || artifactColumn.displayName)
           "
           class="settings__list-item"
           [ngClass]="{
@@ -98,7 +98,7 @@
                 class="settings__list-item__icon"
               >
               </mat-icon>
-              {{ artifactColumn.displayName || artifactColumn.aliasName }}
+              {{ artifactColumn.displayName || artifactColumn.alias }}
             </div>
 
             <button
@@ -108,7 +108,7 @@
               [matMenuTriggerFor]="addToGroupsMenu"
               [attr.e2e]="
                 'designer-add-menu-btn-' +
-                (artifactColumn.aliasName || artifactColumn.displayName)
+                (artifactColumn.alias || artifactColumn.displayName)
               "
               (menuOpened)="onAddToGroupMenuOpened(artifactColumn)"
               (menuClosed)="onMenuClosed()"
@@ -126,7 +126,7 @@
                 "
                 [attr.e2e]="
                   'designer-add-option-btn-' +
-                  (artifactColumn.aliasName || artifactColumn.displayName) +
+                  (artifactColumn.alias || artifactColumn.displayName) +
                   '-' +
                   adapter.title
                 "

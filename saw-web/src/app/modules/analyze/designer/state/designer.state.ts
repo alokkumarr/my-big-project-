@@ -121,7 +121,7 @@ export class DesignerState {
     );
     const artifactColumnToBeAdded = {
       aggregate: artifactColumn.aggregate,
-      alias: artifactColumn.alias || (<any>artifactColumn).aliasName,
+      alias: artifactColumn.alias,
       area: artifactColumn.area,
       columnName: artifactColumn.columnName,
       displayType:

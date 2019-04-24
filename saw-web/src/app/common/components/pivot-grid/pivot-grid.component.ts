@@ -381,8 +381,8 @@ export class PivotGridComponent implements OnDestroy {
           cloned.sortBy = 'value';
         }
 
-        if (!isUndefined(cloned.aliasName) && cloned.aliasName !== '') {
-          cloned.displayName = cloned.aliasName;
+        if (!isUndefined(cloned.alias) && cloned.alias !== '') {
+          cloned.displayName = cloned.alias;
         }
 
         return cloned;
