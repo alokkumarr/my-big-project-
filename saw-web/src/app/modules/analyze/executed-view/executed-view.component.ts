@@ -473,7 +473,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder);
     case 'chart':
     case 'map':
       return flattenChartData(data, isDSLAnalysis(analysis) ? analysis.sipQuery : analysis.sqlBuilder);
