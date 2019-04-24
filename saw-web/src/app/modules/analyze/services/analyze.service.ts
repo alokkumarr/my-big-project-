@@ -480,12 +480,12 @@ export class AnalyzeService {
         map((resp: any) => {
           return {
             data: resp,
-            executionId: resp.executionId,
+            executionId: resp.executionId || (model.sipQuery ? '123456' : null),
             executionType: mode,
             executedBy: this._jwtService.getLoginId(),
             executedAt: Date.now(),
             designerQuery: fpGet(`query`, resp),
-            queryBuilder: { ...model.sqlQuery },
+            queryBuilder: { ...model.sipQuery },
             count: fpGet(`totalRows`, resp)
           };
         })

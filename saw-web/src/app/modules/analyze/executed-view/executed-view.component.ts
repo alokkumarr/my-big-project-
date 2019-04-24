@@ -34,9 +34,10 @@ import {
 import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeActionsService } from '../actions';
 
-import { Analysis } from '../types';
+import { Analysis, AnalysisDSL } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
 import { isUndefined } from 'util';
+import { isDSLAnalysis } from '../designer/types';
 
 @Component({
   selector: 'executed-view',
@@ -44,8 +45,8 @@ import { isUndefined } from 'util';
   styleUrls: ['./executed-view.component.scss']
 })
 export class ExecutedViewComponent implements OnInit, OnDestroy {
-  analysis: Analysis; // the latest analysis definition
-  executedAnalysis: Analysis; // the exact analysis that was executed
+  analysis: Analysis | AnalysisDSL; // the latest analysis definition
+  executedAnalysis: Analysis | AnalysisDSL; // the exact analysis that was executed
   analyses: Analysis[];
   onetimeExecution: boolean;
   executedBy: string;
@@ -107,7 +108,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.executionId = executionId;
 
     this.loadAnalysisById(analysisId, isDSL === 'true').then(
-      (analysis: Analysis) => {
+      (analysis: Analysis | AnalysisDSL) => {
         this.analysis = analysis;
         this.setPrivileges(analysis);
 
@@ -383,8 +384,16 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         // and the paginated data after that
         this.executedAnalysis = {
           ...this.analysis,
-          sqlBuilder:
-            executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
+          ...(isDSLAnalysis(this.executedAnalysis)
+            ? {
+                sipQuery:
+                  executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+              }
+            : {
+                sqlBuilder:
+                  executeResponse.queryBuilder ||
+                  this.executedAnalysis.sqlBuilder
+              })
         };
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = moment
@@ -430,8 +439,16 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       if (executeResponse) {
         this.executedAnalysis = {
           ...this.analysis,
-          sqlBuilder:
-            executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
+          ...(isDSLAnalysis(this.executedAnalysis)
+            ? {
+                sipQuery:
+                  executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+              }
+            : {
+                sqlBuilder:
+                  executeResponse.queryBuilder ||
+                  this.executedAnalysis.sqlBuilder
+              })
         };
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = moment
@@ -459,7 +476,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       return flattenPivotData(data, analysis.sqlBuilder);
     case 'chart':
     case 'map':
-      return flattenChartData(data, analysis.sqlBuilder);
+      return flattenChartData(data, isDSLAnalysis(analysis) ? analysis.sipQuery : analysis.sqlBuilder);
     default:
       return data;
     }
@@ -481,7 +498,11 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
-          this.executedAnalysis.sqlBuilder = queryBuilder;
+          if (isDSLAnalysis(this.executedAnalysis)) {
+            this.executedAnalysis.sipQuery = queryBuilder;
+          } else {
+            this.executedAnalysis.sqlBuilder = queryBuilder;
+          }
         }
 
         const isReportType = ['report', 'esReport'].includes(analysisType);
@@ -499,7 +520,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  setPrivileges({ categoryId, userId }: Analysis) {
+  setPrivileges(analysis: Analysis | AnalysisDSL) {
+    const categoryId = isDSLAnalysis(analysis)
+      ? analysis.category
+      : analysis.categoryId;
+    const userId = isDSLAnalysis(analysis)
+      ? analysis.createdBy
+      : analysis.userId;
     this.canUserPublish = this._jwt.hasPrivilege('PUBLISH', {
       subCategoryId: categoryId
     });
@@ -516,7 +543,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   goBackToMainPage(analysis) {
-    this._router.navigate(['analyze', get(analysis, 'categoryId')]);
+    this._router.navigate([
+      'analyze',
+      isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+    ]);
   }
 
   edit() {

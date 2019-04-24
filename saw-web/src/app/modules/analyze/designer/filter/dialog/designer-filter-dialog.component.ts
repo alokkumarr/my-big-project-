@@ -16,11 +16,12 @@ import {
   NUMBER_TYPES
 } from '../../../consts';
 import { Artifact, FilterModel, Filter } from '../../types';
+import { ArtifactDSL } from '../../../../../models';
 
 export interface DesignerFilterDialogData {
   filters: Filter[];
   booleanCriteria?: string;
-  artifacts: Artifact[];
+  artifacts: Artifact[] | ArtifactDSL[];
   isInRuntimeMode: boolean;
   supportsGlobalFilters?: boolean;
 }
@@ -35,7 +36,7 @@ export interface DesignerFilterDialogResult {
   styleUrls: ['./designer-filter-dialog.component.scss']
 })
 export class DesignerFilterDialogComponent implements OnInit {
-  artifacts: Artifact[];
+  artifacts: Artifact[] | ArtifactDSL[];
   filters: Filter[];
   groupedFilters;
   areFiltersValid = false;
@@ -54,7 +55,9 @@ export class DesignerFilterDialogComponent implements OnInit {
     });
     this.groupedFilters = groupBy(this.filters, 'tableName');
     forEach(this.artifacts, artifact => {
-      const name = artifact.artifactName;
+      const name =
+        (<Artifact>artifact).artifactName ||
+        (<ArtifactDSL>artifact).artifactsName;
       if (!this.groupedFilters[name]) {
         this.addFilter(name, true);
       }
@@ -110,8 +113,10 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.areFiltersValid = this.validateFilters(this.filters);
   }
 
-  artifactTrackByFn(_, artifact: Artifact) {
-    return artifact.artifactName;
+  artifactTrackByFn(_, artifact: Artifact | ArtifactDSL) {
+    return (
+      (<Artifact>artifact).artifactName || (<ArtifactDSL>artifact).artifactsName
+    );
   }
 
   onBooleanCriteriaChange(booleanCriteria) {
