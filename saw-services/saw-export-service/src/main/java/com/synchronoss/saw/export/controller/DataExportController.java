@@ -76,6 +76,8 @@ public class DataExportController {
                                 @PathVariable("type") String analysisType,
                                 RequestEntity request, HttpServletResponse response){
     logger.debug("executionId in dispatch {}", executionId);
+    logger.debug("Request body {}", request.getBody());
+
     if (analysisType.equalsIgnoreCase("report") || analysisType.equalsIgnoreCase("esReport"))
       exportService.reportToBeDispatchedAsync(executionId, request,analysisId, analysisType);
     else if(analysisType.equalsIgnoreCase("pivot"))

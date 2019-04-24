@@ -263,7 +263,9 @@ public class ExportServiceImpl implements ExportService{
         });
       }
 
+      logger.debug("S3 details = " +  s3);
       if (s3!=null && s3 != "") {
+        logger.debug("S3 details set. Dispatching to S3");
         dispatchS3List(
             exportBean,
             s3,
@@ -419,7 +421,7 @@ public class ExportServiceImpl implements ExportService{
       HttpEntity<?> requestEntity,
       RestTemplate restTemplate) {
     if (s3 != null && s3 != "") {
-
+      logger.trace("Inside S3 dispatcher");
       // Do the background work beforehand
       String finalS3 = s3;
       String finalJobGroup = jobGroup;
@@ -501,6 +503,7 @@ public class ExportServiceImpl implements ExportService{
       File cfile = new File(exportBean.getFileName());
       String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
+      logger.debug("finalS3 = " + finalS3);
       if (finalS3 != null && finalS3 != "") {
 
         try {

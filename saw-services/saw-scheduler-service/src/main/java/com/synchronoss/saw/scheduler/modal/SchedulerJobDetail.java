@@ -411,9 +411,7 @@ public class SchedulerJobDetail implements Serializable {
             metricName = (String) in.readObject();
             type = (String) in.readObject();
             userFullName = (String) in.readObject();
-            s3 = (List<String>) obj;
-        }else
-        {
+        } else {
             jobGroup = (String) obj;
             jobName = (String) in.readObject();
             jobScheduleTime = (Date) in.readObject();
@@ -440,6 +438,16 @@ public class SchedulerJobDetail implements Serializable {
             }
         } catch(OptionalDataException e)
 	    { /* catch block to avoid serialization for newly added fields.*/ }
+
+	    try {
+            Object s3List = in.readObject();
+
+            if (s3List instanceof List) {
+                s3 = (List<String>) s3List;
+            }
+        } catch (OptionalDataException e) {
+            /* catch block to avoid serialization for newly added fields.*/
+        }
 
     }
 

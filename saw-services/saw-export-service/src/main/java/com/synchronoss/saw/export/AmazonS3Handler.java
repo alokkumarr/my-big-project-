@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.File;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,13 @@ public class AmazonS3Handler {
   }
 
   public void uploadObject(File file) {
-    PutObjectRequest request = new PutObjectRequest(bucket, outputLocation+"PrabhuTest.txt", file);
+    DateTime currentTime = new DateTime();
+    String timeStampStr = currentTime.toString("yyyy-MM-dd_HH:mm:ss.SSS");
+
+    String s3Key = outputLocation + "/" + timeStampStr + "/" + file.getName();
+    logger.debug("S3 key = " + s3Key);
+
+    PutObjectRequest request = new PutObjectRequest(bucket, s3Key, file);
     putObject(s3Client, request);
     logger.info("Success uploading to S3");
   }
@@ -71,6 +78,8 @@ public class AmazonS3Handler {
 
   public void putObject(AmazonS3 s3, PutObjectRequest request) {
     try {
+      logger.debug("s3 key in put object" + request.getKey());
+      logger.debug("S3 Bucket " + request.getBucketName());
       s3.putObject(request);
     } catch (AmazonServiceException e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process
