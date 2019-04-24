@@ -12,6 +12,8 @@ import {
   DxDataGridComponent,
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
+import { DxRangeSliderModule } from 'devextreme-angular/ui/range-slider';
+import { DxNumberBoxModule } from 'devextreme-angular/ui/number-box';
 
 import { MaterialModule } from '../../material.module';
 import { JwtService, UserService } from '../../common/services';
@@ -30,6 +32,7 @@ import { ObservePageComponent } from './components/observe-page/observe-page.com
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
 import { ObserveMapChartComponent } from './components/observe-map-chart/observe-map-chart.component';
+import { ObserveMapComponent } from './components/observe-map/observe-map.component';
 import { ObserveReportComponent } from './components/observe-report/observe-report.component';
 import { ObservePivotComponent } from './components/observe-pivot/observe-pivot.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
@@ -63,6 +66,7 @@ const components = [
   CreateDashboardComponent,
   ObserveChartComponent,
   ObserveMapChartComponent,
+  ObserveMapComponent,
   ObserveReportComponent,
   ObservePivotComponent,
   ObserveKPIComponent,
@@ -84,6 +88,8 @@ const GUARDS = [FirstDashboardGuard];
     MaterialModule,
     GridsterModule,
     HttpClientModule,
+    DxRangeSliderModule,
+    DxNumberBoxModule,
     CommonModuleTs,
     AddWidgetModule,
     EditWidgetModule,

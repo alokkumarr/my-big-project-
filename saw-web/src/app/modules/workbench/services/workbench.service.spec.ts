@@ -5,7 +5,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { WorkbenchService } from './workbench.service';
 import { JwtService } from '../../../common/services';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 const mockService = {};
 const jwtMockService = {

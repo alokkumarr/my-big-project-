@@ -1,0 +1,104 @@
+{
+  "CREATEREPORT": {
+    "dlreport": {
+      "REPOR001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "description": "userOne should be able create dl report with sales table",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "REPOR002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "description": "Admin should be able to create dl report with sales table",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "REPOR003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "description": "Admin should be able to create dl report with product table",
+        "tables": [
+          {
+            "name": "PRODUCT",
+            "fields": ["Integer_2", "String_2", "Date_2"]
+          }
+        ]
+      },
+      "REPOR004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "description": "userOne should be able create dl report with product table",
+        "tables": [
+          {
+            "name": "PRODUCT",
+            "fields": ["Integer_2", "String_2", "Date_2"]
+          }
+        ]
+      },
+      "REPOR005": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "description": "userOne should be able create dl report with sales & product table",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          },
+          {
+            "name": "PRODUCT",
+            "fields": ["Integer_2", "String_2", "Date_2"]
+          }
+        ]
+      },
+      "REPOR006": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "description": "Admin should be able create dl report with sales & product table",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          },
+          {
+            "name": "PRODUCT",
+            "fields": ["Integer_2", "String_2", "Date_2"]
+          }
+        ]
+      }
+    },
+    "esreport": {
+      "REPOR007": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "description": "Admin should be able to create es report",
+        "tables": [
+          {
+            "name": "sample",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "REPOR008": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "description": "userOne should be able create es report",
+        "tables": [
+          {
+            "name": "sample",
+            "fields": ["Long", "Float", "Double"]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -37,7 +37,7 @@ export const UPDATE_PATHS = {
   // tslint:disable-next-line:component-selector
   selector: 'chart',
   template: `
-    <div #container></div>
+    <div style="width: 100%;" #container></div>
   `
 })
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -86,6 +86,9 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.enableExport) {
       this.enableExporting(this.config);
     }
+    setTimeout(() => {
+      this.reflow();
+    });
   }
 
   ngOnInit() {
@@ -115,6 +118,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // set the appropriate config based on chart type
     this.chartSettingsType = this.getChartSettingsType(this.chartType);
     this.config = defaultsDeep(
+      {},
       options,
       this.config,
       get(
@@ -184,10 +188,19 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
+  reflow() {
+    if (this.chart) {
+      this.chart.reflow();
+    }
+  }
+
   onOptionsChartUpdate(updates) {
     if (!isArray(updates)) {
       if (updates.export) {
         this.onExport();
+      }
+      if (updates.reflow) {
+        this.reflow();
       }
       return;
     }

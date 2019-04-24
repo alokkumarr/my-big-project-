@@ -1,13 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import {
-  Router,
-  Event,
-  RouteConfigLoadStart,
-  RouteConfigLoadEnd,
-  NavigationEnd,
-  NavigationStart
-} from '@angular/router';
+import { Router, Event, NavigationEnd, NavigationStart } from '@angular/router';
 import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import {
   map,
@@ -26,7 +19,6 @@ import {
   UserService,
   MenuService,
   JwtService,
-  HeaderProgressService,
   DynamicModuleService
 } from '../../../common/services';
 import { SidenavMenuService } from '../../../common/components/sidenav';
@@ -37,7 +29,7 @@ const TIMEOUT_TRIGGER = 60;
 // nr of seconds before the user is timed out
 const TIMEOUT = 20 * 60;
 
-const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH'];
+const baseModuleNames = ['ANALYZE', 'OBSERVE', 'WORKBENCH', 'ADMIN'];
 
 @Component({
   selector: 'layout-content',
@@ -49,7 +41,6 @@ export class LayoutContentComponent implements OnInit {
   public modules: any[];
   constructor(
     public _user: UserService,
-    public _headerProgress: HeaderProgressService,
     public _router: Router,
     public _title: Title,
     public _sidenav: SidenavMenuService,
@@ -81,20 +72,29 @@ export class LayoutContentComponent implements OnInit {
         } else {
           loadExternalModulesOnce = once(() => this.loadExternalModules());
         }
-      } else if (event instanceof RouteConfigLoadStart) {
-        this._headerProgress.show();
-      } else if (event instanceof RouteConfigLoadEnd) {
-        this._headerProgress.hide();
       }
     });
+  }
+
+  get adminModule(): any[] {
+    return this.jwt.isAdmin()
+      ? [
+          {
+            label: 'ADMIN',
+            path: 'admin',
+            name: 'admin',
+            moduleName: 'AdminModule',
+            moduleUrl: '/admin'
+          }
+        ]
+      : [];
   }
 
   loadInternalModules(): any[] {
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
-    const modules = map(
-      product.productModules,
-      ({ productModName, moduleURL }) => {
+    const modules = [
+      ...map(product.productModules, ({ productModName, moduleURL }) => {
         const lowerCaseName = lowerCase(productModName);
         return {
           label: productModName,
@@ -103,12 +103,15 @@ export class LayoutContentComponent implements OnInit {
           moduleName: `${startCase(lowerCaseName)}Module`,
           moduleURL
         };
-      }
-    );
+      }),
+      ...this.adminModule
+    ];
+
     const baseModules = filter(modules, ({ label }) =>
       baseModuleNames.includes(label)
     );
     this.modules = baseModules;
+
     return modules;
   }
 

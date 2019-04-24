@@ -1,0 +1,260 @@
+{
+  "PIVOT_GLOBAL_FILTER": {
+    "dashboard": {
+      "PIVGL001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should be able to create and delete Pivot with Float global filter."
+      },
+      "PIVGL002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "float",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "float",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "float",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should be able to create and delete Pivot with Float global filter."
+      },
+      "PIVGL003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "string",
+            "value": "string 499"
+          }
+        ],
+        "filters": [
+          {
+            "type": "string",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "string.keyword",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should be able to create and delete Pivot with String global filter."
+      },
+      "PIVGL004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "string",
+            "value": "string 499"
+          }
+        ],
+        "filters": [
+          {
+            "type": "string",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "string.keyword",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should be able to create and delete Pivot with String global filter."
+      },
+      "PIVGL005": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "double",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "double",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should be able to create and delete Pivot with Double global filter."
+      },
+      "PIVGL006": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "double",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "double",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should be able to create and delete Pivot with Double global filter."
+      },
+      "PIVGL007": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "date",
+            "value": null,
+            "preset": "Last Month"
+          }
+        ],
+        "filters": [
+          {
+            "type": "date",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "date",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should be able to create and delete Pivot with Date global filter."
+      },
+      "PIVGL008": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "date",
+            "value": null,
+            "preset": "Last 6 Months"
+          }
+        ],
+        "filters": [
+          {
+            "type": "date",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "date",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should be able to create and delete Pivot with Date global filter."
+      },
+      "PIVGL009": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "long",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "long",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "long",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should be able to create and delete Pivot with Long global filter."
+      },
+      "PIVGL010": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "long",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "long",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "long",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should be able to create and delete Pivot with Long global filter."
+      },
+      "PIVGL011": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "integer",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "integer",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "integer",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "User should be able to create and delete Pivot with Integer global filter."
+      },
+      "PIVGL012": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "integer",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "integer",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "integer",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ],
+        "description": "Admin should be able to create and delete Pivot with Integer global filter."
+      }
+    }
+  }
+}

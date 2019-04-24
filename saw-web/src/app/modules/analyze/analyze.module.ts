@@ -1,7 +1,6 @@
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { NgxsModule } from '@ngxs/store';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
@@ -9,8 +8,7 @@ import { AnalyzeViewModule } from './view';
 import { ExecutedViewModule } from './executed-view';
 import { AnalyzeActionsModule } from './actions';
 
-import { MaterialModule } from '../../material.module';
-import { AceEditorModule } from 'ng2-ace-editor';
+import { AnalyzeDesignerModule } from './designer/index';
 
 import { routes } from './routes';
 
@@ -21,33 +19,7 @@ import { UChartModule } from '../../common/components/charts';
 import { AnalyzePublishDialogModule } from './publish';
 import { AnalyzeModuleGlobal } from './analyze.global.module';
 import {
-  AnalyzeReportQueryComponent,
   DesignerPageComponent,
-  DesignerContainerComponent,
-  DesignerHeaderComponent,
-  DesignerToolbarComponent,
-  DesignerPivotComponent,
-  DesignerChartComponent,
-  DesignerMapChartComponent,
-  DesignerReportComponent,
-  DesignerSettingsSingleTableComponent,
-  DesignerSettingsMultiTableComponent,
-  DesignerSettingsQueryComponent,
-  DesignerSettingsGroupComponent,
-  DesignerSettingsAuxComponent,
-  DesignerSettingsAuxChartComponent,
-  DesignerSettingsAuxMapChartComponent,
-  ExpandableFieldComponent,
-  ExpandDetailPivotComponent,
-  ExpandDetailChartComponent,
-  ToolbarActionDialogComponent,
-  DesignerSortComponent,
-  DesignerDescriptionComponent,
-  DesignerSaveComponent,
-  DesignerPreviewDialogComponent,
-  SingleTableDesignerLayoutComponent,
-  MultiTableDesignerLayoutComponent,
-  ArtifactColumns2PivotFieldsPipe
 } from './designer';
 
 import { AnalyzeFilterModule } from './designer/filter';
@@ -56,36 +28,9 @@ import { AnalyzePageComponent } from './page';
 import { AnalyzeState } from './state/analyze.state';
 
 const COMPONENTS = [
-  AnalyzeReportQueryComponent,
   DesignerPageComponent,
-  DesignerContainerComponent,
-  DesignerHeaderComponent,
-  DesignerToolbarComponent,
-  DesignerPivotComponent,
-  DesignerChartComponent,
-  DesignerMapChartComponent,
-  DesignerReportComponent,
-  DesignerSettingsSingleTableComponent,
-  DesignerSettingsMultiTableComponent,
-  DesignerSettingsQueryComponent,
-  DesignerSettingsGroupComponent,
-  DesignerSettingsAuxComponent,
-  DesignerSettingsAuxChartComponent,
-  DesignerSettingsAuxMapChartComponent,
-  ExpandableFieldComponent,
-  ExpandDetailPivotComponent,
-  ExpandDetailChartComponent,
-  ToolbarActionDialogComponent,
-  DesignerSortComponent,
-  DesignerDescriptionComponent,
-  DesignerSaveComponent,
-  DesignerPreviewDialogComponent,
-  SingleTableDesignerLayoutComponent,
-  MultiTableDesignerLayoutComponent,
   AnalyzePageComponent
 ];
-
-const PIPES = [ArtifactColumns2PivotFieldsPipe];
 
 const GUARDS = [DefaultAnalyzeCategoryGuard];
 
@@ -97,12 +42,10 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
       prefix: 'symmetra',
       storageType: 'localStorage'
     }),
+    AnalyzeDesignerModule,
     AnalyzeModuleGlobal.forRoot(),
     RouterModule.forChild(routes),
     CommonModuleTs,
-    MaterialModule,
-    FlexLayoutModule,
-    AceEditorModule,
     FormsModule,
     ReactiveFormsModule,
     UChartModule,
@@ -112,7 +55,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
     AnalyzeFilterModule,
     AnalyzePublishDialogModule
   ],
-  declarations: [...COMPONENTS, ...PIPES],
+  declarations: [...COMPONENTS],
   entryComponents: COMPONENTS,
   providers: [...GUARDS],
   exports: [AnalyzePageComponent]

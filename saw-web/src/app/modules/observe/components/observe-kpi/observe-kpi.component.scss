@@ -16,7 +16,7 @@
   .header-row {
     display: flex;
     flex-flow: row wrap;
-    justify-content: start;
+    justify-content: flex-start;
     align-content: center;
     padding-bottom: 12px;
     flex-grow: 0;
@@ -62,7 +62,7 @@
     .kpi-measure {
       display: flex;
       align-items: center;
-      justify-content: start;
+      justify-content: flex-start;
       flex-wrap: wrap;
 
       span {

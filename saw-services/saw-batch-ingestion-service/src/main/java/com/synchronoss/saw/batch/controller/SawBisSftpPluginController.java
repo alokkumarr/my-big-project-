@@ -7,6 +7,8 @@ import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
+import com.synchronoss.saw.logs.constants.SourceType;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -15,7 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import javax.validation.Valid;
@@ -146,7 +150,7 @@ public class SawBisSftpPluginController {
       value = "Payload structure which " + "to be used to " + "initiate the transfer",
       required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
     List<BisDataMetaInfo> response = null;
-    
+
     try {
       if (requestBody.getBatchSize() > 0) {
         sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
@@ -154,9 +158,27 @@ public class SawBisSftpPluginController {
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
         response = sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
-            Long.valueOf(requestBody.getRouteId()));
+            Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
       } else {
         response = sftpServiceImpl.immediateTransfer(requestBody);
+      }
+      for (BisDataMetaInfo info : response) {
+        if (info.getDestinationPath() != null) {
+          File folderWhereFilesDumped = new File(info.getDestinationPath());
+          if (folderWhereFilesDumped.exists() && folderWhereFilesDumped.isDirectory()) {
+            logger.trace("Thread with Name :" + Thread.currentThread().getName()
+                + "has completed & created folder to put the files in "
+                + info.getDestinationPath());
+            File[] listOfFiles = folderWhereFilesDumped.listFiles();
+            if (listOfFiles != null && listOfFiles.length == 0) {
+              folderWhereFilesDumped.delete();
+              logger.trace("Thread with Name :" + Thread.currentThread().getName()
+                  + "has completed & created folder to put the files in "
+                  + info.getDestinationPath()
+                  + " & it is empty so it has been deleted after completion of the thread.");
+            }
+          }
+        }
       }
     } catch (Exception e) {
       throw new SftpProcessorException("Exception occured while transferring the file", e);
@@ -196,7 +218,8 @@ public class SawBisSftpPluginController {
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
       CompletableFuture
           .supplyAsync(() -> sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
-              Long.valueOf(requestBody.getRouteId())), transactionPostExecutor)
+              Long.valueOf(requestBody.getRouteId()), null, false,
+              SourceType.REGULAR.name()), transactionPostExecutor)
           .whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {
@@ -266,5 +289,29 @@ public class SawBisSftpPluginController {
 
     return deferredResult;
   }
+  
+  /**
+   * This end-point will be used to get the status of the destination.
+   * @param requestBody object to send the payload.
+   * @return Object {@link Map}
+   */
+  @RequestMapping(value = "/data/status", method = RequestMethod.POST,
+      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public Map<String, Boolean> isDestinationExist(@ApiParam(
+      value = "Payload structure which to be used to initiate the transfer",
+      required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
+    logger.trace("Checking for data path: " + requestBody.getDestinationLocation());
+    boolean result = false;
+    try {
+      result = sftpServiceImpl.isDataExists(requestBody.getDestinationLocation());
+    } catch (Exception e) {
+      logger.trace("Exception occurred while checking the data location" + e);
+      throw new SftpProcessorException("Exception occurred while checking the data location", e);
+    }
+    Map<String, Boolean> responseMap = new HashMap<String, Boolean>();
+    responseMap.put("status", result);
+    return responseMap;
+  }
+
 }
 

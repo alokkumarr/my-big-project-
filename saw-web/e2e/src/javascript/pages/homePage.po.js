@@ -17,8 +17,9 @@ module.exports = {
   cardViewButton: element(by.css('[e2e="analyze-card-view"]')),
   cardViewInput: element(by.css('[e2e="analyze-card-view"]')),
   listViewInput: element(by.css('[e2e="analyze-list-view"]')),
-  observeLink: element(by.xpath('//div[contains(text(),"OBSERVE")]')),
   progressbar: element(by.css('mat-progress-bar[mode="indeterminate"]')),
+  launcherButton: element(by.css('[class="header__module-launcher-button"]')),
+  observeLink: element(by.xpath('//a[contains(@class,"module-observe")]')),
 
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {
@@ -46,17 +47,17 @@ module.exports = {
       )
     );
   },
+  category: catName => {
+    return element(
+      by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`)
+    );
+  },
   isCategoryExpanded: name =>
     element(
       by.xpath(
         `//span[contains(text(),'${name}')]//parent::*//parent::*//parent::mat-expansion-panel-header`
       )
     ),
-  category: catName => {
-    return element(
-      by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`)
-    );
-  },
   subCategory: subCategoryName => {
     return element(by.xpath(`//a[contains(text(),"${subCategoryName}")]`));
   },
@@ -108,7 +109,6 @@ const navigateToSubCategoryUpdated = (
         browser.sleep(1000);
       }
     });
-
   const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickable(subCategory);
   subCategory.click();

@@ -13,7 +13,6 @@ const SuiteSetup = require('./v2/helpers/SuiteSetup');
  * extended timeouts
  */
 
-
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
@@ -25,8 +24,8 @@ const pageLoadTimeout = webpackHelper.distRun() ? 300000 : 150000;
  */
 
 const implicitlyWait = webpackHelper.distRun() ? 40000 : 30000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 30000;//30000 // = 30 sec; Sometimes element will not
-                                                                          // appear so fast
+const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 30000; //30000 // = 30 sec; Sometimes element will not
+// appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
@@ -40,7 +39,9 @@ const extendedFluentWait = webpackHelper.distRun() ? 60000 : 40000;
  */
 const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 300000;
 // = 30 | 5 min. Sometimes test can execute for a long time
-const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 12600000 : 10800000;
+const extendedDefaultTimeoutInterval = webpackHelper.distRun()
+  ? 12600000
+  : 10800000;
 
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
@@ -77,7 +78,7 @@ const tempts = 10;
  * All tests are running for customer
  */
 const customerCode = 'SYNCHRONOSS';
-
+let run = SuiteSetup.islocalRun();
 let token;
 
 exports.timeouts = {
@@ -85,7 +86,7 @@ exports.timeouts = {
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
   pageResolveTimeout: pageResolveTimeout,
-  extendedFluentWait:extendedFluentWait,
+  extendedFluentWait: extendedFluentWait,
   tempts: tempts
 };
 
@@ -93,10 +94,10 @@ exports.config = {
   framework: 'jasmine2',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
-  customerCode:customerCode,
+  customerCode: customerCode,
   useAllAngular2AppRoots: true,
-  testData:webpackHelper.getTestData(),
-  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
+  testData: webpackHelper.getTestData(),
+  directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
   baseUrl: 'http://localhost:3000',
   capabilities: {
@@ -129,9 +130,7 @@ exports.config = {
     /**
      * This suite will be run as part of main bamboo build plan.
      */
-    smoke: [
-      testBaseDir + 'login.test.js'
-    ],
+    smoke: [testBaseDir + 'login.test.js'],
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for sanity check
      */
@@ -167,7 +166,8 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir +
+        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
       testBaseDir + 'observe/dashboardGlobalFilter.test.js',
       testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
@@ -197,11 +197,18 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir +
+        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
       testBaseDir + 'observe/dashboardGlobalFilter.test.js',
       testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js',
+      testBaseDir + 'workbench/bis/createAndDeleteChannel.test.js',
+      testBaseDir + 'workbench/bis/updateAndDeleteChannel.test.js',
+      testBaseDir + 'workbench/bis/activateDeActivateChannel.test.js',
+      testBaseDir + 'workbench/bis/createAndDeleteRoute.test.js',
+      testBaseDir + 'workbench/bis/activateAndDeActivateRoute.test.js',
+      testBaseDir + 'workbench/bis/scheduleRoute.test.js'
     ],
     /**
      * This suite is for development environment and always all dev tests will be executed.
@@ -211,22 +218,29 @@ exports.config = {
       testBaseDir + 'dummyDevelopmentTests2.js'
     ]
   },
-  onCleanUp: function (results) {
+  onCleanUp: function(results) {
     retry.onCleanUp(results);
   },
   onPrepare() {
     retry.onPrepare();
 
     //console.log('Running instance at '+ new Date());
-    jasmine.getEnv().addReporter(new SpecReporter({
-      displayStacktrace: true,
-      displaySpecDuration: true,
-      displaySuiteNumber: true
-    }));
+    jasmine.getEnv().addReporter(
+      new SpecReporter({
+        displayStacktrace: true,
+        displaySpecDuration: true,
+        displaySuiteNumber: true
+      })
+    );
 
-
-    browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
-    browser.manage().timeouts().implicitlyWait(2000);
+    browser
+      .manage()
+      .timeouts()
+      .pageLoadTimeout(pageLoadTimeout);
+    browser
+      .manage()
+      .timeouts()
+      .implicitlyWait(2000);
 
     let jasmineReporters = require('jasmine-reporters');
     let junitReporter = new jasmineReporters.JUnitXmlReporter({
@@ -241,25 +255,33 @@ exports.config = {
       consolidateAll: true
     });
 
-    jasmine.getEnv().addReporter(new JSONReporter({
-      file: 'target/jasmine-results.json', // by default it writes to jasmine.json
-      beautify: true,
-      indentationLevel: 4 // used if beautify === true
-    }));
+    jasmine.getEnv().addReporter(
+      new JSONReporter({
+        file: 'target/jasmine-results.json', // by default it writes to jasmine.json
+        beautify: true,
+        indentationLevel: 4 // used if beautify === true
+      })
+    );
 
     jasmine.getEnv().addReporter(junitReporter);
 
     var AllureReporter = require('jasmine-allure-reporter');
-    jasmine.getEnv().addReporter(new AllureReporter({
-      resultsDir: 'target/allure-results'
-    }));
-    jasmine.getEnv().afterEach(function(done){
-      browser.takeScreenshot().then(function (png) {
-        allure.createAttachment('Screenshot', function () {
-          return new Buffer(png, 'base64')
-        }, 'image/png')();
-        done();
+    jasmine.getEnv().addReporter(
+      new AllureReporter({
+        resultsDir: 'target/allure-results'
       })
+    );
+    jasmine.getEnv().afterEach(function(done) {
+      browser.takeScreenshot().then(function(png) {
+        allure.createAttachment(
+          'Screenshot',
+          function() {
+            return new Buffer(png, 'base64');
+          },
+          'image/png'
+        )();
+        done();
+      });
     });
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
@@ -270,7 +292,7 @@ exports.config = {
       });
     }, pageResolveTimeout);
   },
-  beforeLaunch: function () {
+  beforeLaunch: function() {
     //clean up any residual/leftover from a previous run. Ensure we have clean
     //files for both locking and merging.
     if (fs.existsSync('jasmine-results.json.lock')) {
@@ -279,70 +301,93 @@ exports.config = {
     if (fs.existsSync('jasmine-results.json')) {
       fs.unlink('jasmine-results.json');
     }
-    // Generate test data
-    let appUrl = SuiteSetup.getSawWebUrl();
+    if (!run.localRun || (run.localRun && run.firstRun)) {
+      // Generate test data
+      let appUrl = SuiteSetup.getSawWebUrl();
 
-    if (!appUrl) {
-      logger.error('appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' + appUrl
-        + ', hence exiting test suite and failing it...');
-      process.exit(1);
-    }
-
-    try {
-      logger.info('Generating test for this run...');
-
-      let APICommonHelpers = require('./v2/helpers/api/APICommonHelpers');
-
-      let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
-      let token = APICommonHelpers.generateToken(apiBaseUrl);
-
-      if (!token) {
-        logger.error('cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.');
+      if (!appUrl) {
+        logger.error(
+          'appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' +
+            appUrl +
+            ', hence exiting test suite and failing it...'
+        );
         process.exit(1);
       }
-      let TestDataGenerator = require('./v2/helpers/data-generation/TestDataGenerator');
-      new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
 
-    } catch (e) {
-      logger.error('There is some error during cleanup and setting up test data for e2e tests, ' +
-        'hence exiting test suite and failing it....' + e);
-      process.exit(1);
+      try {
+        logger.info('Generating test for this run...');
+
+        let APICommonHelpers = require('./v2/helpers/api/APICommonHelpers');
+
+        let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
+        console.log('api data -----' + apiBaseUrl);
+        let token = APICommonHelpers.generateToken(apiBaseUrl);
+
+        if (!token) {
+          logger.error(
+            'cleanup and setup stage : Token generation failed hence marking test suite failure, Please refer the logs for more information.'
+          );
+          process.exit(1);
+        }
+        let TestDataGenerator = require('./v2/helpers/data-generation/TestDataGenerator');
+        new TestDataGenerator().generateUsersRolesPrivilegesCategories(
+          apiBaseUrl,
+          token
+        );
+      } catch (e) {
+        logger.error(
+          'There is some error during cleanup and setting up test data for e2e tests, ' +
+            'hence exiting test suite and failing it....' +
+            e
+        );
+        process.exit(1);
+      }
     }
-
   },
   afterLaunch: function() {
-    if (fs.existsSync('target/e2e/e2eId.json')) {
-      // delete and create new always
-      //console.log('deleting e2e id json file....')
-      fs.unlinkSync('target/e2e/e2eId.json');
-    }
+    if (!run.localRun) {
+      if (fs.existsSync('target/e2e/e2eId.json')) {
+        // delete and create new always
+        //console.log('deleting e2e id json file....')
+        fs.unlinkSync('target/e2e/e2eId.json');
+      }
 
-    let retryCounter = 1;
-    if (argv.retry) {
-      retryCounter = ++argv.retry;
-    }
+      let retryCounter = 1;
+      if (argv.retry) {
+        retryCounter = ++argv.retry;
+      }
 
-    webpackHelper.generateFailedTests('target/allure-results');
+      webpackHelper.generateFailedTests('target/allure-results');
 
-    let retryStatus = retry.afterLaunch(maxRetryForFailedTests);
-    if(retryStatus === 1) {
-      // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
+      let retryStatus = retry.afterLaunch(maxRetryForFailedTests);
+      if (retryStatus === 1) {
+        // retryStatus 1 means there are some failures & there are no retry left, hence mark test suite failure
         let failedTests;
         if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
-          failedTests = JSON.parse(fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8'));
+          failedTests = JSON.parse(
+            fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8')
+          );
         }
-      logger.error('There are some failures hence marking test suite failed. Failed tests are: '+JSON.stringify(failedTests));
-      process.exit(1);
-
-    } else if(retryStatus === 0) {
-      // retryStatus 0 means there are no failures but to be double sure check the finalfail json file
-      if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
-        let failedTests = JSON.parse(fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8'));
-        logger.error('There are some failures hence marking test suite failed. Failed tests are: '+JSON.stringify(failedTests));
+        logger.error(
+          'There are some failures hence marking test suite failed. Failed tests are: ' +
+            JSON.stringify(failedTests)
+        );
         process.exit(1);
+      } else if (retryStatus === 0) {
+        // retryStatus 0 means there are no failures but to be double sure check the finalfail json file
+        if (fs.existsSync('target/e2e/testData/failed/finalFail.json')) {
+          let failedTests = JSON.parse(
+            fs.readFileSync('target/e2e/testData/failed/finalFail.json', 'utf8')
+          );
+          logger.error(
+            'There are some failures hence marking test suite failed. Failed tests are: ' +
+              JSON.stringify(failedTests)
+          );
+          process.exit(1);
+        }
       }
-    }
 
-    return retryStatus;
+      return retryStatus;
+    }
   }
 };

@@ -14,7 +14,7 @@ import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
-const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot'];
+const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot', 'map'];
 
 @Component({
   selector: 'widget-analysis',
@@ -76,9 +76,18 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
     this.analyze.getAnalysesFor(id.toString()).then(
       result => {
         this.showProgress = false;
+
+        // Excluding mapbox analysis from being able to add in dashboard
+        // until mapbox chart download issue is fixed.
+        // https://jira.synchronoss.net:8443/jira/browse/SIP-6083
+        const EXCLUDE_CHARTTYPE = ['map'];
+
         this.analyses = filter(
           result,
-          analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
+          analysis =>
+            analysis &&
+            ALLOWED_ANALYSIS_TYPES.includes(analysis.type) &&
+            !EXCLUDE_CHARTTYPE.includes(analysis.chartType)
         );
       },
       () => {

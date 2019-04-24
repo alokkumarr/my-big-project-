@@ -6,11 +6,16 @@ import 'mottle';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import { ClickOutsideModule } from 'ng-click-outside';
+import { AngularSplitModule } from 'angular-split';
+
 import {
   NgModule,
   CUSTOM_ELEMENTS_SCHEMA,
   ModuleWithProviders
 } from '@angular/core';
+import { NgxPopperModule } from 'ngx-popper';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgxsModule } from '@ngxs/store';
 import { CommonState } from './state/common.state';
@@ -23,6 +28,12 @@ import {
   DxDataGridComponent,
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
+import {
+  DxTextBoxModule,
+  DxButtonModule,
+  DxSliderModule,
+  DxTooltipModule
+} from 'devextreme-angular';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
@@ -67,6 +78,7 @@ import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-p
 import { ChartGridComponent } from './components/chart-grid';
 
 import { UChartModule } from './components/charts';
+import { MapBoxModule } from './map-box/map-box.module';
 
 import {
   RemoteFolderSelectorComponent,
@@ -87,26 +99,35 @@ import {
   WindowService,
   HeaderProgressService,
   DynamicModuleService,
-  CustomIconService
+  CustomIconService,
+  DndPubsubService
 } from './services';
 
 const MODULES = [
   CommonModuleAngular4,
+  DxDataGridModule,
+  DxPivotGridModule,
+  DxDataGridModule,
+  DxTextBoxModule,
+  DxButtonModule,
+  DxSliderModule,
+  DxTooltipModule,
   RouterModule,
   FormsModule,
   ReactiveFormsModule,
-  DxDataGridModule,
   DxTemplateModule,
   MaterialModule,
+  NgxPopperModule,
   FlexLayoutModule,
   DndModule,
-  DxPivotGridModule,
-  DxDataGridModule,
+  DragDropModule,
   CommonPipesModule,
   HttpClientModule,
   OwlDateTimeModule,
   OwlNativeDateTimeModule,
-  UChartModule
+  UChartModule,
+  ClickOutsideModule,
+  MapBoxModule
 ];
 
 const COMPONENTS = [
@@ -162,7 +183,8 @@ const SERVICES = [
   ToastService,
   UserService,
   WindowService,
-  CustomIconService
+  CustomIconService,
+  DndPubsubService
 ];
 
 const INTERCEPTORS = [
@@ -186,7 +208,7 @@ const INTERCEPTORS = [
 
 const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
 @NgModule({
-  imports: [NgxsModule.forFeature([CommonState]), ...MODULES],
+  imports: [NgxsModule.forFeature([CommonState]), AngularSplitModule.forRoot(), ...MODULES],
   declarations: [...COMPONENTS, ...DIRECTIVES],
   entryComponents: COMPONENTS,
   exports: [

@@ -5,13 +5,15 @@ import {
   SqlBuilderReport,
   SqlBuilderEsReport,
   Join,
-  AnalysisType
+  AnalysisType,
+  MapSettings
 } from '../models';
 import { JsPlumbCanvasChangeEvent } from '../../../common/components/js-plumb/types';
 import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisChart,
   AnalysisReport,
   Sort,
   Filter,
@@ -35,6 +37,7 @@ export {
   ArtifactColumnChart,
   ArtifactColumnReport,
   Analysis,
+  AnalysisChart,
   AnalysisReport,
   DesignerMode,
   AnalysisStarter,
@@ -57,12 +60,20 @@ export {
   Join,
   JsPlumbCanvasChangeEvent,
   AnalysisDialogData,
-  Region
+  Region,
+  MapSettings
 };
 
 export interface ArtifactColumnFilter {
   keyword: string;
-  types: ('number' | 'date' | 'string' | 'geo')[];
+  types: {
+    number: boolean;
+    date: boolean;
+    string: boolean;
+    geo: boolean;
+    coordinate: boolean;
+  };
+  adapters: boolean[];
 }
 
 export type PivotArea = 'data' | 'row' | 'column';
@@ -77,6 +88,7 @@ export interface IDEsignerSettingGroupAdapter {
     groupAdapters: Array<IDEsignerSettingGroupAdapter>
   ) => number;
   artifactColumns: ArtifactColumns;
+  canAcceptArtifactColumnOfType: (artifactColumn: ArtifactColumn) => boolean;
   canAcceptArtifactColumn: (
     groupAdapter: IDEsignerSettingGroupAdapter,
     groupAdapters: Array<IDEsignerSettingGroupAdapter>
@@ -112,7 +124,9 @@ export interface DesignerChangeEvent {
     | 'chartTitle'
     | 'fetchLimit'
     | 'changeQuery'
-    | 'region';
+    | 'region'
+    | 'chartType'
+    | 'mapSettings';
   column?: ArtifactColumn;
   data?: any;
 }
@@ -120,4 +134,8 @@ export interface DesignerChangeEvent {
 export interface DesignerSaveEvent {
   requestExecution: boolean;
   analysis: Analysis;
+}
+
+export interface DesignerStateModel {
+  groupAdapters: IDEsignerSettingGroupAdapter[];
 }

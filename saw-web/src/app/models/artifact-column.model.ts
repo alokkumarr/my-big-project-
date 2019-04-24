@@ -14,8 +14,17 @@ export interface ArtifactColumn {
   format: Format | string | null;
   aliasName: string;
   alias?: string;
-  aggregate?: 'sum' | 'avg' | 'min' | 'max' | 'count' | 'percentage' | 'percentageByRow';
+  aggregate?:
+    | 'sum'
+    | 'avg'
+    | 'min'
+    | 'max'
+    | 'count'
+    | 'distinctCount'
+    | 'percentage'
+    | 'percentageByRow';
   name?: string;
+  geoType?: string;
 }
 
 export interface ArtifactColumnChart extends ArtifactColumn {

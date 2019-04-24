@@ -13,11 +13,11 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import javax.management.OperationsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +38,8 @@ import org.springframework.web.client.RestTemplate;
 public class SawBisFileLogsController {
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
+  
+  private String scheduleUri = "/scheduler/bisscheduler";
 
   RestTemplate restTemplate = new RestTemplate();
   private static final Logger logger = LoggerFactory.getLogger(SawBisFileLogsController.class);
@@ -47,7 +49,7 @@ public class SawBisFileLogsController {
   @ApiOperation(value = "Retrieve all logs of all routes", 
       nickname = "all routes history", notes = "",
       response = BisRouteHistory.class)
-  @RequestMapping(value = "", method = RequestMethod.GET)
+  @RequestMapping(value = "/internal/logs", method = RequestMethod.GET)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -57,7 +59,7 @@ public class SawBisFileLogsController {
           @ApiResponse(code = 415,
               message = "Unsupported Type. " + "Representation not supported for the resource")})
   public List<BisFileLog> retrieveAllLogs() {
-    return this.bisLogsRepository.findAll();
+    return this.bisLogsRepository.findAll(bisLogsRepository.orderBy("createdDate"));
   }
 
   @ApiOperation(value = "Retrieve log record by log Id", nickname = "routeLogWithId", notes = "",
@@ -106,7 +108,7 @@ public class SawBisFileLogsController {
         + "values. URL :  " + bisSchedulerUrl + "/jobs?categoryId=" 
         + channelId + "&groupkey=" + routeId);
     String response = restTemplate
-        .getForObject(bisSchedulerUrl + "/jobs?categoryId=" 
+        .getForObject(bisSchedulerUrl + scheduleUri + "/jobs?categoryId=" 
             + channelId + "&groupkey=" + routeId, String.class);
 
     logger.trace("response from scheduler on last fire, next fire" + response);
@@ -122,12 +124,14 @@ public class SawBisFileLogsController {
       if (dataNode.isArray() && dataNode.size() > 0) {
         JsonNode objNode = dataNode.get(0);
         if (!objNode.get("lastFiredTime").isNull()) {
-          latFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-                    .parse(objNode.get("lastFiredTime").asText()).getTime();
+          logger.trace(
+              "Retreive from Database lastFiredTime :" + objNode.get("lastFiredTime").asLong());
+          latFired = objNode.get("lastFiredTime").asLong();
         }
         if (!objNode.get("nextFireTime").isNull()) {
-          nextFired = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-                    .parse(objNode.get("nextFireTime").asText()).getTime();
+          logger.trace(
+              "Retreive from Database nextFireTime :" + objNode.get("nextFireTime").asLong());
+          nextFired = objNode.get("nextFireTime").asLong();
         }
         
         logger.trace("latFired from response after parsing in long" + latFired);
@@ -136,11 +140,10 @@ public class SawBisFileLogsController {
       }
     } catch (IOException exception) {
       logger.error(exception.getMessage());
-    } catch (ParseException exception) {
-      logger.error(exception.getMessage());
-    }
+    } 
     
-    List<BisFileLog> bisFileLogs = this.bisLogsRepository.findByRouteSysId(routeId);
+    List<BisFileLog> bisFileLogs =
+        this.bisLogsRepository.findByRouteSysId(routeId, bisLogsRepository.orderBy("createdDate"));
     List<BisFileLogDetails> bisFileLogDtos = new ArrayList<BisFileLogDetails>();
     for (BisFileLog bisFIleLog : bisFileLogs) {
       BisFileLogDetails logDto = new BisFileLogDetails();
@@ -164,4 +167,27 @@ public class SawBisFileLogsController {
     return bisRouteHistory;
 
   }
+
+  /**
+   * This method is used for integration test cases for tear down the entries.
+   * Note : should not be used from outside
+   * @return boolean true or false
+   * @throws OperationsException exception.
+   */
+  @RequestMapping(value = "/internal/logs", method = RequestMethod.DELETE,
+      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public Map<String, Boolean> removeAll() throws OperationsException {
+    Map<String, Boolean> responseMap = new HashMap<String, Boolean>();
+    Boolean result = false;
+    logger.trace("deleting all records");
+    try {
+      bisLogsRepository.deleteAll();
+      result = true;
+    } catch (Exception ex) {
+      throw new OperationsException("Exception occurred while performing delete operation");
+    }
+    responseMap.put("isDuplicate", result);
+    return responseMap;
+  }
+
 }

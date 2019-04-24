@@ -19,13 +19,12 @@ import * as AngularSplit from 'angular-split';
 import * as AngularCountTo from 'angular2-counto';
 import * as CoreJs from 'core-js';
 import * as DevextremeAngular from 'devextreme-angular';
-import * as Ng2Nouslider from 'ng2-nouislider';
-import * as Nouslider from 'nouislider';
-import * as RxJsCompat from 'rxjs-compat';
 import * as Lodash from 'lodash';
 import * as LodashFp from 'lodash/fp';
-import * as Rxjs from 'rxjs';
 import * as RxjsOperators from 'rxjs/operators';
+import * as Rxjs from 'rxjs';
+import * as mapboxgl from 'mapbox-gl';
+import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import * as get from 'lodash/get';
 import APP_CONFIG from '../../../../appConfig';
 
@@ -49,13 +48,12 @@ const dependencies = {
   'angular2-counto': AngularCountTo,
   'core-js': CoreJs,
   'devextreme-angular': DevextremeAngular,
-  'ng2-nouislider': Ng2Nouslider,
-  'nouislider': Nouslider,
-  'rxjs-compat': RxJsCompat,
   'rxjs': Rxjs,
   'rxjs/operators': RxjsOperators,
   'lodash': Lodash,
-  'lodash/fp': LodashFp
+  'lodash/fp': LodashFp,
+  'mapbox-gl': mapboxgl,
+  '@mapbox/mapbox-gl-geocoder': MapboxGeocoder
 };
 
 interface ModuleInfo {
@@ -80,6 +78,7 @@ export class DynamicModuleService {
     // Also it is expected that plugin code should be placed in saw/web folder in server
 
     const moduleServerURL = `${this.api}/${moduleInfo.moduleURL}.umd.js`;
+    // const moduleServerURL = moduleInfo.moduleURL;
     forEach(dependencies, (dep, key) =>
       SystemJS.set(key, SystemJS.newModule(dep))
     );

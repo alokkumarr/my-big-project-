@@ -27,6 +27,7 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.TicketHelper;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -1736,7 +1737,7 @@ public class SecurityController {
 	 * service.  Used by load balancer to route requests to healthy
 	 * instances of the service to provide high availability.
 	 */
-	@RequestMapping("/actuator/health")
+	@RequestMapping("/saw-security/actuator/health")
 	public ResponseEntity<ObjectNode> health() {
 		String status = "UP";
 		HttpStatus httpStatus = HttpStatus.OK;

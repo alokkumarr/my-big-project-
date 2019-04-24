@@ -54,10 +54,9 @@ export const AnalyseTypes = {
   Report: 'report',
   ESReport: 'esReport',
   Chart: 'chart',
+  Map: 'map',
   Pivot: 'pivot'
 };
-
-export const DRAFT_CATEGORY_ID = 5;
 
 export const ENTRY_MODES = {
   EDIT: 'edit',
@@ -69,7 +68,7 @@ export const TYPE_MAP = reduce(
   [
     ...map(NUMBER_TYPES, type => ({ type, generalType: 'number' })),
     ...map(DATE_TYPES, type => ({ type, generalType: 'date' })),
-    { type: 'string', generalType: 'string' },
+    { type: 'string', generalType: 'string' }
   ],
   (typeMap, { type, generalType }) => {
     typeMap[type] = generalType;
@@ -78,23 +77,33 @@ export const TYPE_MAP = reduce(
   {}
 );
 
-export const TYPE_ICONS = [{
-  icon: 'icon-number-type',
-  label: 'Number',
-  value: 'number'
-}, {
-  icon: 'icon-string-type',
-  label: 'String',
-  value: 'string'
-}, {
-  icon: 'icon-geo-chart',
-  label: 'Geo',
-  value: 'geo'
-}, {
-  icon: 'icon-calendar',
-  label: 'Date',
-  value: 'date'
-}];
+export const TYPE_ICONS = [
+  {
+    icon: 'icon-number-type',
+    label: 'Number',
+    value: 'number'
+  },
+  {
+    icon: 'icon-string-type',
+    label: 'String',
+    value: 'string'
+  },
+  {
+    icon: 'icon-geo-chart',
+    label: 'Geo',
+    value: 'geo'
+  },
+  {
+    icon: 'icon-geo-chart',
+    label: 'Coordinate',
+    value: 'coordinate'
+  },
+  {
+    icon: 'icon-calendar',
+    label: 'Date',
+    value: 'date'
+  }
+];
 
 export const TYPE_ICONS_OBJ = fpPipe(
   fpGroupBy('value'),
@@ -178,58 +187,91 @@ export const ANALYSIS_METHODS = [
         children: [
           {
             label: 'Column Chart',
-            icon: { font: 'icon-vert-bar-chart' },
+            icon: {
+              font: 'icon-vert-bar-chart',
+              svg: 'column-chart-col'
+            },
             type: 'chart:column'
           },
           {
             label: 'Bar Chart',
-            icon: { font: 'icon-hor-bar-chart' },
+            icon: {
+              font: 'icon-hor-bar-chart',
+              svg: 'bar-chart-col'
+            },
             type: 'chart:bar'
           },
           {
             label: 'Stacked Chart',
-            icon: { font: 'icon-vert-bar-chart' },
+            icon: {
+              font: 'icon-vert-bar-chart',
+              svg: 'stack-chart-col'
+            },
             type: 'chart:stack'
           },
           {
             label: 'Line Chart',
-            icon: { font: 'icon-line-chart' },
+            icon: {
+              font: 'icon-line-chart',
+              svg: 'line-chart-col'
+            },
             type: 'chart:line'
           },
           {
             label: 'Area Chart',
-            icon: { font: 'icon-area-chart' },
+            icon: {
+              font: 'icon-area-chart',
+              svg: 'area-chart-col'
+            },
             type: 'chart:area'
           },
           {
             label: 'Combo Chart',
-            icon: { font: 'icon-combo-chart' },
+            icon: {
+              font: 'icon-combo-chart',
+              svg: 'combo-chart-col'
+            },
             type: 'chart:combo'
           },
           {
             label: 'Scatter Plot',
-            icon: { font: 'icon-scatter-chart' },
+            icon: {
+              font: 'icon-scatter-chart',
+              svg: 'scatter-chart-col'
+            },
             type: 'chart:scatter'
           },
           {
             label: 'Bubble Chart',
-            icon: { font: 'icon-bubble-chart' },
+            icon: {
+              font: 'icon-bubble-chart',
+              svg: 'bubble-chart-col'
+            },
             type: 'chart:bubble'
           },
           {
             label: 'Pie Chart',
-            icon: { font: 'icon-pie-chart' },
+            icon: {
+              font: 'icon-pie-chart',
+              svg: 'pie-chart-col'
+            },
             type: 'chart:pie'
           },
           {
             label: 'Time series chart',
-            icon: { font: 'icon-timeseries-chart' },
+            icon: {
+              font: 'icon-timeseries-chart',
+              svg: 'time-series-chart-col'
+            },
             type: 'chart:tsspline',
             typeOnBackEnd: 'chart:tsline'
           },
           {
             label: 'Time series multi pane',
-            icon: { font: 'icon-Candlestick-icon' },
+            icon: {
+              font: 'icon-Candlestick-icon',
+              svg: 'time-series-multi-chart-col'
+            },
             type: 'chart:tsPane',
             typeOnBackEnd: 'chart:tsareaspline'
           }
@@ -250,12 +292,20 @@ export const ANALYSIS_METHODS = [
         label: 'Geolocation',
         icon: { font: 'icon-geo-chart' },
         type: '',
-        children: [{
-          label: 'Geolocation',
-          icon: { font: 'icon-geo-chart' },
-          type: 'chart:geo',
-          typeOnBackEnd: 'chart:geo'
-        }]
+        children: [
+          {
+            label: 'Geolocation',
+            icon: { font: 'icon-geo-chart', svg: 'map-chart-col' },
+            type: 'map:chart_scale',
+            typeOnBackEnd: 'map:chart_scale'
+          },
+          {
+            label: 'Map',
+            icon: { font: 'icon-geo-chart', svg: 'map-col' },
+            type: 'map:map',
+            typeOnBackEnd: 'map-map'
+          }
+        ]
       }
     ]
   }

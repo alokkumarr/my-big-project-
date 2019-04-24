@@ -447,6 +447,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     case 'pivot':
       return flattenPivotData(data, analysis.sqlBuilder);
     case 'chart':
+    case 'map':
       return flattenChartData(data, analysis.sqlBuilder);
     default:
       return data;
@@ -545,6 +546,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       });
       break;
     case 'chart':
+      // TODO add export for Maps
       this.chartUpdater$.next({ export: true });
       this.chartActionBus$.next({ export: true });
       break;

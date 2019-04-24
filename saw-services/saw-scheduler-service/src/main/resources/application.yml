@@ -9,7 +9,7 @@ spring:
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver
-    max-active: 25
+    max-active: 103
     testOnBorrow: true
     testOnConnect: true
     testOnReturn: true
@@ -17,6 +17,13 @@ spring:
     testWhileIdle: true
     logValidationErrors: true
 flyway.baselineOnMigrate: true
+logging:
+  level:
+    com.synchronoss.saw.scheduler: INFO
+    org.springframework: INFO
+    org.hibernate.type : INFO
+    org.quartz: TRACE
+
 server:
   address: localhost
   port: 9601
@@ -28,6 +35,7 @@ server:
 sip:
  service:
    index: 0
+     
 saw-analysis-service-url: http://localhost:9200/analysis
 saw-dispatch-service-url: http://localhost:9400/exports
 bis-transfer-url: http://localhost:9642/ingestion/batch/sftp/channel/transfers/data

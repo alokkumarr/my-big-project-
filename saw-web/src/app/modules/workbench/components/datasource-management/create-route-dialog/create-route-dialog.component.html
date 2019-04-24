@@ -1,8 +1,12 @@
 <mat-card class="createroute-dialog">
   <mat-card-header>
     <mat-card-title class="details-title mat-subheading-2">
-      <span *ngIf="opType === 'create'"> Create route for </span>
-      <span *ngIf="opType === 'update'"> Editing route for </span>
+      <span *ngIf="opType === 'create'" e2e="create-route-label">
+        Create route for
+      </span>
+      <span *ngIf="opType === 'update'" e2e="update-route-label">
+        Editing route for
+      </span>
       <strong>{{ channelName }}</strong></mat-card-title
     >
     <div fxFlex></div>
@@ -40,15 +44,18 @@
                 matInput
                 name="routeName"
                 formControlName="routeName"
+                e2e="route-name-input"
                 required
               />
               <mat-error
+                e2e="route-name-error"
                 *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
                 i18n
               >
                 Route Name is <strong>required</strong>
               </mat-error>
               <mat-error
+                e2e="route-name-exist"
                 *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
                 i18n
               >
@@ -61,9 +68,11 @@
                 matInput
                 name="filePattern"
                 formControlName="filePattern"
+                e2e="route-file-pattern-input"
                 required
               />
               <mat-error
+                e2e="route-file-pattern-error"
                 *ngIf="
                   detailsFormGroup.controls.filePattern.hasError('required')
                 "
@@ -72,6 +81,7 @@
                 File Pattern is <strong>required</strong>
               </mat-error>
               <mat-error
+                e2e="route-file-pattern-invalid"
                 *ngIf="
                   detailsFormGroup.controls.filePattern.hasError(
                     'inValidPattern'
@@ -90,9 +100,11 @@
                 matInput
                 type="text"
                 name="fileExclusions"
+                e2e="route-file-exclusions-input"
                 formControlName="fileExclusions"
               />
               <mat-error
+                e2e="route-file-exclusions-error"
                 *ngIf="
                   detailsFormGroup.controls.fileExclusions.hasError(
                     'inValidPattern'
@@ -106,12 +118,18 @@
                 >
               </mat-error>
             </mat-form-field>
-            <mat-checkbox
-              style="margin: 20px 0 65px 0;"
+            <mat-checkbox id = "disableDuplicate"
+              e2e="route-disable-duplicate-ch"
               formControlName="disableDuplicate"
+              i18n>
+              Disable duplicate check
+            </mat-checkbox>
+            <mat-checkbox id = "disableConcurrency"
+              e2e="route-disable-duplicate-ch"
+              formControlName="disableConcurrency"
               i18n
             >
-              Disable duplicate check
+              Disable Concurrency      
             </mat-checkbox>
           </section>
           <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
@@ -125,10 +143,12 @@
               <input
                 matInput
                 name="sourceLocation"
+                e2e="route-source-location-input"
                 formControlName="sourceLocation"
                 required
               />
               <mat-error
+                e2e="route-source-error"
                 *ngIf="
                   detailsFormGroup.controls.sourceLocation.hasError('required')
                 "
@@ -142,6 +162,7 @@
               <input
                 matInput
                 name="destinationLocation"
+                e2e="route-dest-location-input"
                 formControlName="destinationLocation"
                 required
               />
@@ -157,6 +178,7 @@
                 ></mat-icon>
               </button>
               <mat-error
+                e2e="route-dest-location-error"
                 *ngIf="
                   detailsFormGroup.controls.destinationLocation.hasError(
                     'required'
@@ -172,11 +194,13 @@
               <input
                 matInput
                 type="number"
+                e2e="route-batch-size-input"
                 name="batchSize"
                 formControlName="batchSize"
                 required
               />
               <mat-error
+                e2e="route-batch-size-error"
                 *ngIf="detailsFormGroup.controls.batchSize.hasError('required')"
                 i18n
               >
@@ -184,8 +208,24 @@
               </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
+              <mat-label i18n>Look back interval (Hrs)</mat-label>
+              <input
+                matInput
+                type="text"
+                [value]="detailsFormGroup.controls.lastModifiedLimitHours.value "
+                name="lastModifiedLimitHours"
+                e2e="last-modified-limit-input"
+                formControlName="lastModifiedLimitHours"
+              />
+              <span *ngIf="detailsFormGroup.controls.errors" class="errorTextMsg" i18n>Only numbers allowed</span>
+             </mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label i18n>Description about the route</mat-label>
-              <textarea matInput formControlName="description"></textarea>
+              <textarea
+                matInput
+                formControlName="description"
+                e2e="route-description-input"
+              ></textarea>
             </mat-form-field>
           </section>
         </form>
@@ -201,6 +241,7 @@
             color="primary"
             color="warn"
             (click)="onCancelClick()"
+            e2e="route-cancel-btn"
             i18n
           >
             Cancel
@@ -210,6 +251,7 @@
             color="primary"
             (click)="testRoute(detailsFormGroup.value)"
             [disabled]="!detailsFormGroup.valid"
+            e2e="route-test-connectivity-btn"
             i18n
           >
             <mat-icon
@@ -221,6 +263,7 @@
           <button
             mat-raised-button
             color="primary"
+            e2e="route-next-btn"
             matStepperNext
             [disabled]="!detailsFormGroup.valid"
             i18n
@@ -236,6 +279,10 @@
             (onCronChanged)="onCronChanged($event)"
           ></cron-job-schedular>
         </div>
+        <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n
+          >Start date cannot be in past. Please select a Date that is current or
+          in future.</span
+        >
         <mat-divider></mat-divider>
         <div
           fxFlex
@@ -243,7 +290,13 @@
           fxLayoutAlign="space-between center"
           style="height: 20%;"
         >
-          <button mat-raised-button color="primary" matStepperPrevious i18n>
+          <button
+            mat-raised-button
+            color="primary"
+            e2e="route-schd-previous-btn"
+            matStepperPrevious
+            i18n
+          >
             Previous
           </button>
           <button
@@ -251,6 +304,7 @@
             color="primary"
             (click)="testRoute(detailsFormGroup.value)"
             [disabled]="!detailsFormGroup.valid"
+            e2e="route-schd-test-conn-btn"
             i18n
           >
             <mat-icon
@@ -265,6 +319,7 @@
             *ngIf="opType === 'create'"
             [disabled]="!detailsFormGroup.valid || !isCronExpressionValid"
             (click)="createRoute(detailsFormGroup.value)"
+            e2e="route-schd-create-btn"
             i18n
           >
             Create
@@ -272,6 +327,7 @@
           <button
             mat-raised-button
             color="primary"
+            e2e="route-schd-update-btn"
             *ngIf="opType === 'update'"
             [disabled]="!detailsFormGroup.valid"
             (click)="createRoute(detailsFormGroup.value)"

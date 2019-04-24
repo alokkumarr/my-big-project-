@@ -1,106 +1,91 @@
-var testDataReader = require('../testdata/testDataReader.js');
+const testDataReader = require('../testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
-const login = require('../javascript/pages/loginPage.po');
-const analyzePage = require('../javascript/pages/analyzePage.po');
-const designModePage = require('../javascript/pages/designModePage.po');
-const previewPage = require('../javascript/pages/previewPage.po');
-const commonFunctions = require('../javascript/helpers/commonFunctions');
-const homePage = require('../javascript/pages/homePage.po');
+const commonFunctions = require('../../v2/pages/utils/commonFunctions');
 const protractorConf = require('../../protractor.conf');
-const categories = require('../javascript/data/categories');
-const subCategories = require('../javascript/data/subCategories');
 const dataSets = require('../javascript/data/datasets');
-const AnalyzePage = require('../javascript/v2/pages/AnalyzePage');
+const ChartDesignerPage = require('../../v2/pages/ChartDesignerPage');
+const LoginPage = require('../../v2/pages/LoginPage');
+const AnalyzePage = require('../../v2/pages/AnalyzePage');
+const PreviewPage = require('../../v2/pages/PreviewPage');
+const logger = require('../../v2/conf/logger')(__filename);
 
 describe('Verify preview for charts: previewForCharts.test.js', () => {
-  const defaultCategory = categories.privileges.name;
-  const categoryName = categories.analyses.name;
-  const subCategoryName = subCategories.createAnalysis.name;
-  const chartDesigner = analyzePage.designerDialog.chart;
   const yAxisName = 'Double';
   const xAxisName = 'Date';
-  const yAxisName2 = 'Long';
   const groupName = 'String';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
+  const yAxisName2 = 'Long';
+  beforeAll(() => {
+    logger.info('Starting charts/previewForCharts.test.js.....');
 
-  beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+    protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
-  beforeEach(function (done) {
-    setTimeout(function () {
+  beforeEach(done => {
+    setTimeout(() => {
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function (done) {
-    setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
+  afterEach(done => {
+    setTimeout(() => {
+      // Logout by clearing the storage
+      commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['PREVIEWCHARTS']['previewChartsDataProvider'], function (data, description) {
-    it('should verify preview for '+ description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'PREVIEWCHARTS', dp:'previewChartsDataProvider'}), () => {
-      try {
+  using(
+    testDataReader.testData['PREVIEWCHARTS']['previewChartsDataProvider'],
+    function(data, description) {
+      it(
+        'should verify preview for ' +
+          description +
+          ' testDataMetaInfo: ' +
+          JSON.stringify({
+            test: description,
+            feature: 'PREVIEWCHARTS',
+            dp: 'previewChartsDataProvider'
+          }),
+        () => {
+          try {
+            const chartType = data.chartType.split(':')[1];
+            const loginPage = new LoginPage();
+            loginPage.loginAs(data.user, /analyze/);
 
-        let chartTyp = data.chartType.split(":")[1];
-        login.loginAs(data.user);
-        homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
+            const analyzePage = new AnalyzePage();
+            analyzePage.clickOnAddAnalysisButton();
+            analyzePage.clickOnChartType(data.chartType);
+            analyzePage.clickOnNextButton();
+            analyzePage.clickOnDataPods(metricName);
+            analyzePage.clickOnCreateButton();
 
-        let chartName = `e2e ${description} ${(new Date()).toString()}`;
-        let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
+            const chartDesignerPage = new ChartDesignerPage();
+            chartDesignerPage.searchInputPresent();
+            chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
+            chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
 
-        // Create analysis
-        let analyzePageV2 = new AnalyzePage();
-        analyzePageV2.clickOnAddAnalysisButton();
-        analyzePageV2.clickOnAnalysisType('');
-        analyzePageV2.clickOnChartType(data.chartType);
-        analyzePageV2.clickOnNextButton();
-        analyzePageV2.clickOnDataPods(metricName);
-        analyzePageV2.clickOnCreateButton();
+            if (data.chartType === 'chart:bubble') {
+              chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+              chartDesignerPage.clickOnAttribute(groupName, 'Color By');
+            }
+            // If Combo then add one more metric field
+            if (data.chartType === 'chart:combo') {
+              chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
+            } else if (data.chartType !== 'chart:bubble') {
+              chartDesignerPage.clickOnAttribute(groupName, 'Group By');
+            }
+            chartDesignerPage.clickOnPreviewButton();
 
-        //Select fields
-        // Wait for field input box.
-        commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-
-        // Dimension section.
-        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
-        designModePage.chart.addFieldButton(xAxisName).click();
-
-        // Group by section. i.e. Color by
-        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
-        designModePage.chart.addFieldButton(groupName).click();
-
-        // Metric section.
-        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
-        designModePage.chart.addFieldButton(yAxisName).click();
-
-        // Size section.
-        if (data.chartType === 'chart:bubble') {
-          commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(sizeByName));
-          designModePage.chart.addFieldButton(sizeByName).click();
+            const previewPage = new PreviewPage();
+            previewPage.verifyAxisTitle(chartType, yAxisName, 'yaxis');
+            previewPage.verifyAxisTitle(chartType, xAxisName, 'xaxis');
+          } catch (e) {
+            console.log(e);
+          }
         }
-        //If Combo then add one more field
-        if (data.chartType === 'chart:combo') {
-          commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
-          designModePage.chart.addFieldButton(yAxisName2).click();
-        }
-
-        // Navigate to Preview
-        commonFunctions.waitFor.elementToBeClickable(designModePage.previewBtn);
-        designModePage.previewBtn.click();
-
-        // Verify axis to be present on Preview Mode
-        commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
-        commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
-        commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
-        commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
-
-      }catch (e) {
-        console.log(e);
-      }
-    });
-  });
+      );
+    }
+  );
 });

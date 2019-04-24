@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum BisProcessState {
-  SUCCESS("SUCCESS"), FAILED("FAILED"), DUPLICATE("DUPLICATE"), INPROGRESS("INPROGRESS");
+  SUCCESS("SUCCESS"), FAILED("FAILED"), INPROGRESS("INPROGRESS");
   private final String value;
   private static final Map<String, BisProcessState> CONSTANTS =
       new HashMap<String, BisProcessState>();

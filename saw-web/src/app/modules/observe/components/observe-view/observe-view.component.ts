@@ -49,7 +49,8 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   public privileges = {
     create: false,
     delete: false,
-    edit: false
+    edit: false,
+    download: false
   };
   @ViewChild('filterSidenav') sidenav: MatSidenav;
   @ViewChild('downloadContainer') downloadContainer: ElementRef;
@@ -357,6 +358,12 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     });
 
     this.privileges.delete = this.jwt.hasPrivilege('DELETE', {
+      module: moduleName,
+      subCategoryId: this.subCategoryId,
+      creatorId: this.dashboard.createdBy
+    });
+
+    this.privileges.download = this.jwt.hasPrivilege('EXPORT', {
       module: moduleName,
       subCategoryId: this.subCategoryId,
       creatorId: this.dashboard.createdBy

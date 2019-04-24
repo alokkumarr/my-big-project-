@@ -9,6 +9,7 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
+import * as find from 'lodash/find';
 
 import { ANALYSIS_METHODS, DATAPOD_CATEGORIES_OBJ } from '../../consts';
 import { IAnalysisMethod } from '../../types';
@@ -73,9 +74,37 @@ export class AnalyzeNewDialogComponent {
 
     this.supportedMetricCategories = fpPipe(
       fpFilter(metric => {
-        if (startsWith(method.type, 'chart:geo')) {
-          const doesSupportsChartMap = some(metric.supports, ({category}) => category === 'mapChart');
-          return doesSupportsChartMap;
+        if (method.type === 'map:map') {
+          const mapSupport = find(
+            metric.supports,
+            ({ category }) => category === 'map'
+          );
+
+          if (!mapSupport) {
+            return false;
+          }
+
+          const doesSupportsMap = some(
+            mapSupport.children,
+            ({ type }) => type === 'map:map'
+          );
+          return doesSupportsMap;
+        }
+        if (startsWith(method.type, 'map:chart')) {
+          const mapChartSupport = find(
+            metric.supports,
+            ({ category }) => category === 'map'
+          );
+
+          if (!mapChartSupport) {
+            return false;
+          }
+
+          const doesSupportsMapChart = some(
+            mapChartSupport.children,
+            ({ type }) => type === 'map:chart'
+          );
+          return doesSupportsMapChart;
         }
         const isEsMetric = get(metric, 'esRepository.storageType') === 'ES';
         return isEsMetric || method.type === 'table:report';
@@ -130,6 +159,7 @@ export class AnalyzeNewDialogComponent {
     const [first, second] = method.type.split(':');
     switch (first) {
       case 'chart':
+      case 'map':
         return {
           type: first,
           chartType: second
@@ -146,18 +176,19 @@ export class AnalyzeNewDialogComponent {
   }
 
   createAnalysis() {
-    const semanticId = this.selectedMetric.id;
-    const metricName = this.selectedMetric.metricName;
+    const { id: semanticId, metricName, supports } = this.selectedMetric;
     const { type, chartType } = this.getAnalysisType(
       this.selectedMethod,
       this.selectedMetric
     );
+
     const model = {
       type,
       chartType,
       categoryId: this.data.id,
       semanticId,
-      metricName
+      metricName,
+      supports
     };
     this._dialogRef.afterClosed().subscribe(() => {
       this._analyzeDialogService.openNewAnalysisDialog(model);

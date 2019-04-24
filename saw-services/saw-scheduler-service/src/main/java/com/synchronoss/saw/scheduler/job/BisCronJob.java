@@ -5,7 +5,6 @@ import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import java.util.Date;
 
 import org.quartz.InterruptableJob;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -24,37 +23,35 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
   private volatile boolean toStopFlag = true;
 
   protected static final String JOB_DATA_MAP_ID = "JOB_DATA_MAP";
-  
+
   @Value("${bis-transfer-url}")
   private String bisTransferUrl;
-  
+
   RestTemplate restTemplate = new RestTemplate();
 
 
   @Override
+  // @Transactional
   protected void executeInternal(JobExecutionContext jobExecutionContext)
       throws JobExecutionException {
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
     JobKey key = jobDetail.getKey();
-    logger.info("Cron Job started with key :" + key.getName() + ", Group :" + key.getGroup()
+    logger.info("Cron Job started with key after :" + key.getName() + ", Group :" + key.getGroup()
         + " , Thread Name :" + Thread.currentThread().getName() + " ,Time now :" + new Date());
     BisSchedulerJobDetails jobRequest =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
-    /**
-     * For retrieving stored key-value pairs.
-     */
-    JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
-    String myValue = dataMap.getString("myKey");
-    logger.info("Value:" + myValue);
-   
     try {
       restTemplate.postForLocation(bisTransferUrl, jobRequest);
     } catch (Exception exception) {
-      logger.info("Exception during file transfer call from scheduler  "
-          + "URL::  " + bisTransferUrl + exception.getMessage());
+      /**
+       * As BIS is async process for larger files async timesout. 
+       * This can be ignored.
+       */
+      logger.info("Async BIS transfer still running"
+          + exception.getMessage());
     }
-
+    
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 

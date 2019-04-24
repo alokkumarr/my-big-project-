@@ -17,6 +17,11 @@
 
     .mat-horizontal-stepper-content {
       height: 98%;
+
+      span.errorTextMsg {
+        color: $secondary-red;
+        margin-left: 3.5%;
+      }
     }
   }
 
@@ -62,4 +67,13 @@
   .selected {
     border: 3px $primary-blue-b1 solid;
   }
+  
+  #disableDuplicate{
+  		margin: 2px 0 63px 17px;
+  }
+  
+  #disableConcurrency{
+  		margin: 2px 0 63px 0;
+  }
 }
+

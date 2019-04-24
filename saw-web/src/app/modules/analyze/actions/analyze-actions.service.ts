@@ -10,6 +10,7 @@ import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish';
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
+import { CUSTOM_HEADERS } from '../../../common/consts';
 
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
@@ -79,6 +80,7 @@ export class AnalyzeActionsService {
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
+    case AnalyseTypes.Map:
       return this._analyzeDialogService
         .openEditAnalysisDialog(analysis, mode);
     default:
@@ -133,7 +135,7 @@ export class AnalyzeActionsService {
     }
 
     return this._analyzeService
-      .readAnalysis(analysis.parentAnalysisId)
+      .readAnalysis(analysis.parentAnalysisId, { [CUSTOM_HEADERS.SKIP_TOAST]: '1' })
       .then(parentAnalysis => {
         /* The destination category is different from parent analysis's category. Publish it normally */
         if (
@@ -158,6 +160,13 @@ export class AnalyzeActionsService {
             });
         }
         return overwriteParent(parentAnalysis, analysis);
+      },
+      err => {
+        delete analysis.parentAnalysisId;
+        delete analysis.parentCategoryId;
+        delete analysis.parentLastModified;
+
+        return publish();
       });
   }
 
@@ -233,6 +242,17 @@ export class AnalyzeActionsService {
   }
 
   removeAnalysis(analysis) {
+    // Delete schedule if exists
+    if (analysis.schedule) {
+      const deleteScheduleBody = {
+        scheduleState: 'delete',
+        jobName: analysis.id,
+        groupName: analysis.customerCode,
+        categoryId: analysis.categoryId
+      };
+      analysis.schedule = deleteScheduleBody;
+      this._analyzeService.changeSchedule(analysis);
+    }
     return this._analyzeService.deleteAnalysis(analysis).then(
       () => {
         this._toastMessage.info('Analysis deleted.');

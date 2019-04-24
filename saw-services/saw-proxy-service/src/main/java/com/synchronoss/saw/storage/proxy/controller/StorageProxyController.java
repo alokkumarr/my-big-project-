@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import com.esotericsoftware.kryo.serializers.FieldSerializer.Optional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonParser;
@@ -170,7 +172,7 @@ public class StorageProxyController {
      logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(requestBody));
      responseObjectFuture= proxyService.execute(requestBody);
     } catch (IOException e){
-      logger.error("expected missing on the request body.", e);
+      logger.error("expected missing on the request body.", e.getMessage());
       throw new JSONProcessingSAWException("expected missing on the request body");
     } catch (ReadEntitySAWException ex){
       logger.error("Problem on the storage while reading data from storage.", ex);
@@ -190,7 +192,7 @@ public class StorageProxyController {
     @RequestMapping(value = "/internal/proxy/storage/fetch", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public List<?> retrieveStorageDataSync(@ApiParam(value = "Storage object that needs to be added/updated/deleted to the store" ,required=true )
-                                                @Valid @RequestBody SIPDSL sipdsl) throws JsonProcessingException {
+                                                @Valid @RequestBody SIPDSL sipdsl, @RequestParam (name ="size", required = false) Integer size) throws JsonProcessingException {
         logger.debug("Request Body:{}", sipdsl);
         if (sipdsl == null) {
             throw new JSONMissingSAWException("json body is missing in request body");
@@ -202,7 +204,7 @@ public class StorageProxyController {
         try {
             //proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
             logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipdsl));
-            responseObjectFuture = proxyService.execute(sipdsl);
+            responseObjectFuture = proxyService.execute(sipdsl,size );
         } catch (IOException e){
             logger.error("expected missing on the request body.", e);
             throw new JSONProcessingSAWException("expected missing on the request body");

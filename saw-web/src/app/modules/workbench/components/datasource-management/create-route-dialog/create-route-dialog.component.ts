@@ -15,6 +15,7 @@ import { isUnique } from '../../../../../common/validators';
 
 import { SourceFolderDialogComponent } from '../select-folder-dialog';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
+import * as moment from 'moment';
 
 @Component({
   selector: 'create-route-dialog',
@@ -27,6 +28,7 @@ export class CreateRouteDialogComponent {
   opType: 'create' | 'update' = 'create';
   channelName = '';
   isCronExpressionValid = false;
+  startDateCorrectFlag = true;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -67,8 +69,10 @@ export class CreateRouteDialogComponent {
       filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: [''],
       disableDuplicate: [false],
+      disableConcurrency: [false],
       batchSize: ['', [Validators.required]],
-      fileExclusions: ['', this.validatefileExclusion]
+      fileExclusions: ['', this.validatefileExclusion],
+      lastModifiedLimitHours:['',Validators.pattern(/^\d*[1-9]\d*$/)]
 
     });
   }
@@ -132,6 +136,10 @@ export class CreateRouteDialogComponent {
   }
 
   createRoute(data) {
+    this.startDateCorrectFlag = this.crondetails.activeTab === 'immediate' || moment(this.crondetails.startDate) > moment();
+    if (!this.startDateCorrectFlag) {
+      return false;
+    }
     const routeDetails = this.mapData(data);
     this.dialogRef.close({ routeDetails, opType: this.opType });
   }
@@ -145,8 +153,10 @@ export class CreateRouteDialogComponent {
       schedulerExpression: this.crondetails,
       description: data.description,
       disableDuplicate: data.disableDuplicate,
+      disableConcurrency: data.disableConcurrency,
       batchSize: data.batchSize,
-      fileExclusions: data.fileExclusions
+      fileExclusions: data.fileExclusions,
+      lastModifiedLimitHours:data.lastModifiedLimitHours
     };
     return routeDetails;
   }

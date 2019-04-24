@@ -7,7 +7,8 @@ const logger = require('../../../../v2/conf/logger')(__filename);
 class DashboardFunctions {
   goToObserve() {
     try {
-      commonFunctions.waitFor.elementToBeVisible(homePage.observeLink);
+      commonFunctions.waitFor.elementToBeClickable(homePage.launcherButton);
+      homePage.launcherButton.click();
       commonFunctions.waitFor.elementToBeClickable(homePage.observeLink);
       homePage.observeLink.click();
     } catch (e) {
@@ -885,14 +886,15 @@ class DashboardFunctions {
           currentFilter.name.toLowerCase() === 'float' ||
           currentFilter.name.toLowerCase() === 'double'
         ) {
-          browser.sleep(2000);
+          browser.sleep(5000);
           commonFunctions.waitFor.elementToBeVisible(
             observePage.globalFilters.numberSlider
           );
           commonFunctions.slideHorizontally(
-            observePage.globalFilters.numberSlider,
+            observePage.globalFilters.numberSliderLow,
             currentFilter.value
           );
+          browser.sleep(2000);
         }
       });
 
@@ -912,7 +914,9 @@ class DashboardFunctions {
 
   verifyAppliedGlobalFilters(dashboardGlobalFilters) {
     try {
-      commonFunctions.waitFor.elementToBeNotVisible(homePage.progressbar);
+      // Some how in automation progress bar is not working...
+      //commonFunctions.waitFor.elementToBeNotVisible(homePage.progressbar);
+      browser.sleep(3000);
       commonFunctions.waitFor.elementToBeVisible(observePage.filterButton);
       commonFunctions.waitFor.elementToBeClickable(observePage.filterButton);
       observePage.filterButton.click();

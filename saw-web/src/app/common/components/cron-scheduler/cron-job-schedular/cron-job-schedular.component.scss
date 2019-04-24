@@ -6,7 +6,7 @@
 }
 
 .schedule-container {
-  height: 300px;
+  height: auto;
   border-radius: 5px;
 
   ::ng-deep .mat-tab-body-wrapper {
@@ -91,4 +91,9 @@
 
 ::ng-deep .owl-dt-container-info .owl-dt-container-info-active {
   color: $primary-blue-b2 !important;
+}
+
+.timezone-field-container {
+  margin-top: 15px;
+  padding-left: 30px;
 }

@@ -135,5 +135,30 @@ module.exports = {
         return /saw/.test(url);
       });
     }, protractorConf.timeouts.fluentWait);
+  },
+  hasClass(element, cls) {
+    return element
+      .getAttribute('class')
+      .then(classes => classes.split(' ').includes(cls));
+  },
+  clickOnElement(el) {
+    this.waitFor.elementToBePresent(el);
+    this.waitFor.elementToBeVisible(el);
+    this.waitFor.elementToBeClickable(el);
+    el.click();
+  },
+  fillInput(el, value) {
+    this.waitFor.elementToBeVisible(el);
+    el.clear().sendKeys(value);
+  },
+  validateText(el, msg) {
+    el.getText().then(text => {
+      expect(text.trim().toLowerCase()).toEqual(msg.trim().toLowerCase());
+    });
+  },
+  getDashboardId() {
+    browser.getCurrentUrl().then(url => {
+      return url.split('=')[1];
+    });
   }
 };

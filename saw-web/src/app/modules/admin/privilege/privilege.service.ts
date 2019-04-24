@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import { AdminService } from '../main-view/admin.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { map, tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { IAdminDataService } from '../admin-data-service.interface';
 import { getPrivilegeDescription } from './privilege-code-transformer';
 import { Observable, of } from 'rxjs';
-import { map as map$ } from 'rxjs/operators';
 
 interface PrivilegeResponse {
   privileges: any[];
@@ -67,10 +66,7 @@ export class PrivilegeService implements IAdminDataService {
       });
   }
 
-  getPrivilegeList(
-    customerId,
-    allowedPrivileges: { [moduleId: string]: string[] }
-  ) {
+  getPrivilegeList(customerId, allowedPrivileges: PrivilegeMap) {
     return this._adminService
       .request<PrivilegeResponse>('privileges/fetch', customerId)
       .pipe(
@@ -85,7 +81,7 @@ export class PrivilegeService implements IAdminDataService {
             ...privilege,
             privilegeDesc: getPrivilegeDescription(
               privilege.privilegeCode,
-              allowedPrivileges[privilege.moduleId]
+              allowedPrivileges[privilege.moduleName]
             )
           }))
         )
@@ -108,11 +104,11 @@ export class PrivilegeService implements IAdminDataService {
       return of(this.privilegeMap);
     }
     return (<any>this.getModulePrivilegeMap('')).pipe(
-      map$((resp: any[]) => {
+      map((resp: any[]) => {
         this.privilegeMap = (resp || []).reduce(
-          (accum, { moduleSysId, privilegeCodeName }) => {
-            accum[moduleSysId] = accum[moduleSysId] || [];
-            accum[moduleSysId].push(privilegeCodeName);
+          (accum, { moduleName, privilegeCodeName }) => {
+            accum[moduleName] = accum[moduleName] || [];
+            accum[moduleName].push(privilegeCodeName);
             return accum;
           },
           {}
@@ -129,12 +125,12 @@ export class PrivilegeService implements IAdminDataService {
     );
   }
 
-  getPrivilegesForModule(moduleId: string): Observable<string[]> {
+  getPrivilegesForModule(moduleName: string): Observable<string[]> {
     if (this.privilegeMap) {
-      return of(this.privilegeMap[moduleId]);
+      return of(this.privilegeMap[moduleName]);
     }
     return this.getAllPrivilegeMap().pipe(
-      map$((privilegeMap: PrivilegeMap) => privilegeMap[moduleId])
+      map((privilegeMap: PrivilegeMap) => privilegeMap[moduleName])
     );
   }
 

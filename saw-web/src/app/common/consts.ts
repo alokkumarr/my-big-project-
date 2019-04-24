@@ -16,13 +16,17 @@ export const DATE_TYPES = ['timestamp', 'date'];
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
   country: ['name', 'fips'],
+  lngLat: [''],
   zip: []
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) =>
-    map(identifiers, identifier => `${geoType}:${identifier}`)
-  )
+  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
+    if (!identifier) {
+      return geoType;
+    }
+    return `${geoType}:${identifier}`;
+  }))
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
@@ -142,38 +146,52 @@ export const CHART_DATE_FORMATS_OBJ = fpPipe(
 
 export const AGGREGATE_TYPES = [
   {
-    label: 'Total',
+    label: 'Sum',
+    designerLabel: 'SUM',
     value: 'sum',
     icon: 'icon-Sum',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Average',
+    designerLabel: 'AVG',
     value: 'avg',
     icon: 'icon-ic-average',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Mininum',
+    designerLabel: 'MIN',
     value: 'min',
     icon: 'icon-ic-min',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Maximum',
+    designerLabel: 'MAX',
     value: 'max',
     icon: 'icon-ic-max',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Count',
+    designerLabel: 'CNT',
     value: 'count',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+  },
+  {
+    label: 'Distinct Count',
+    designerLabel: 'CNTD',
+    value: 'distinctCount',
+    icon: 'icon-Count',
+    type: 'long',
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
   },
   {
     label: 'Percentage',
+    designerLabel: 'PCTC',
     value: 'percentage',
     icon: 'icon-Percentage',
     type: 'float',
@@ -181,6 +199,7 @@ export const AGGREGATE_TYPES = [
   },
   {
     label: 'Percentage By Row',
+    designerLabel: 'PCTR',
     value: 'percentageByRow',
     icon: 'icon-Percentage',
     type: 'float',
@@ -188,17 +207,47 @@ export const AGGREGATE_TYPES = [
   },
   {
     label: 'Percentage by Column',
+    designerLabel: 'PCTC',
     value: 'percentage',
     icon: 'icon-Percentage',
     type: 'float',
     valid: ['chart']
   }
+  // {
+  //   label: 'Median',
+  //   designerLabel: 'MEDIAN',
+  //   value: 'median',
+  //   icon: 'icon-Percentage',
+  //   type: 'float',
+  //   valid: ['chart']
+  // },
+  // {
+  //   label: 'Std.Deviation',
+  //   designerLabel: 'STDEV',
+  //   value: 'stdev',
+  //   icon: 'icon-Percentage',
+  //   type: 'float',
+  //   valid: ['chart']
+  // },
+  // {
+  //   label: 'Varience',
+  //   designerLabel: 'VARI',
+  //   value: 'varience',
+  //   icon: 'icon-Percentage',
+  //   type: 'float',
+  //   valid: ['chart']
+  // }
 ];
 
 export const AGGREGATE_STRING_TYPES = [
   {
     label: 'Count',
     value: 'count',
+    icon: 'icon-Count'
+  },
+  {
+    label: 'Distinct Count',
+    value: 'distinctCount',
     icon: 'icon-Count'
   }
 ];

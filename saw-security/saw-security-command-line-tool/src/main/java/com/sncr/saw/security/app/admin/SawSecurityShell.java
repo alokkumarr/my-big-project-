@@ -1,39 +1,34 @@
 package com.sncr.saw.security.app.admin;
 
 import com.sncr.saw.security.app.model.Customer;
-import com.sncr.saw.security.app.repository.impl.CustomerProductModuleFeatureRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.CustomerProductModuleRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.CustomerProductRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.CustomerRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.PrivilegeRepositoryDao;
-import com.sncr.saw.security.app.repository.impl.RoleRepositoryDaoImpl;
-import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
+import com.sncr.saw.security.app.repository.impl.*;
 import com.sncr.saw.security.app.service.OnBoardService;
 import com.sncr.saw.security.common.bean.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
 
 /**
  * Created by Pawan
  */
 
-
-@ShellComponent
+/** -- Depricated
+ * This File is no longer used. A separate file OnBoardShell.java is written to address the needs of onBoarding customer.
+ * This File will be removed in future by a separate ticket while cleaning up Saw_security.
+ */
+//@ShellComponent
 class SawSecurityShell {
 
   private static final Logger logger = LoggerFactory.getLogger(SawSecurityShell.class);
 
-  @Autowired
+ // @Autowired
   public OnBoardService onboard;
 
-  @ShellMethod("Onboard the customer")
+ // @ShellMethod("Onboard the customer")
   public void onboardCustomer() {
     try {
       CustomerRepositoryDaoImpl custDao = onboard.getCustomerDao();

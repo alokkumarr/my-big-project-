@@ -65,7 +65,9 @@
       </mat-expansion-panel>
     </mat-card>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content
+    [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''"
+  >
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
         <div fxLayout="row">
@@ -81,7 +83,9 @@
           </button>
           <div fxLayout="column" fxLayoutAlign="center center">
             <div *ngIf="analysis">
-              <span class="analysis__title">{{ analysis.name }}</span>
+              <span class="analysis__title" e2e="analysis__title">{{
+                analysis.name
+              }}</span>
               <label *ngIf="isExecuting" class="execution-tag" i18n
                 >Executing</label
               >
@@ -176,16 +180,28 @@
             [updater]="pivotUpdater$"
           >
           </executed-pivot-view>
-          <div *ngSwitchCase="'chart'">
-            <executed-chart-view
-              *ngIf="analysis.chartType !== 'geo'"
+          <executed-chart-view
+            *ngSwitchCase="'chart'"
+            [analysis]="executedAnalysis"
+            [data]="data"
+            [updater]="chartUpdater$"
+            class="executed-chart-analysis"
+          >
+          </executed-chart-view>
+
+          <div *ngSwitchCase="'map'">
+            <executed-map-view
+              *ngIf="
+                (analysis.type | isAnalysisType: 'map':analysis?.chartType)
+              "
               [analysis]="executedAnalysis"
               [data]="data"
-              [updater]="chartUpdater$"
             >
-            </executed-chart-view>
+            </executed-map-view>
             <executed-map-chart-view
-              *ngIf="analysis.chartType === 'geo'"
+              *ngIf="
+                (analysis.type | isAnalysisType: 'mapChart':analysis?.chartType)
+              "
               [analysis]="executedAnalysis"
               [data]="data"
               [updater]="chartUpdater$"
