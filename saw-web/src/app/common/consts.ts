@@ -21,12 +21,14 @@ const GEO_TYPES_WITH_IDENTIFIER = {
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
-    if (!identifier) {
-      return geoType;
-    }
-    return `${geoType}:${identifier}`;
-  }))
+  fpFlatMap(([geoType, identifiers]) =>
+    map(identifiers, identifier => {
+      if (!identifier) {
+        return geoType;
+      }
+      return `${geoType}:${identifier}`;
+    })
+  )
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
@@ -212,7 +214,7 @@ export const AGGREGATE_TYPES = [
   {
     label: 'Distinct Count',
     designerLabel: 'CNTD',
-    value: 'distinctCount',
+    value: 'distinctcount',
     icon: 'icon-Count',
     type: 'long',
     valid: ['chart', 'pivot', 'report', 'esReport', 'map']
