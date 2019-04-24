@@ -291,7 +291,7 @@ public class SipAlertController {
       value = "/{id}/states",
       nickname = "List Alert Rules",
       notes = "",
-      response = AlertResponse.class)
+      response = List.class)
   @RequestMapping(
       value = "/{id}/states",
       method = RequestMethod.GET,
@@ -332,7 +332,7 @@ public class SipAlertController {
       value = "/states",
       nickname = "List Alert Rules",
       notes = "",
-      response = AlertResponse.class)
+      response = List.class)
   @RequestMapping(
       value = "/states",
       method = RequestMethod.GET,
