@@ -39,6 +39,9 @@ class ChartsDesignerPage extends Designer {
     this._reportSelectedFilters = element.all(
       by.xpath('//filter-chips-u/descendant::mat-chip')
     );
+    this._selectedFiltersText= element(
+      by.xpath('//filter-chips-u/descendant::mat-chip')
+    )
     this._reportFilterText = element(
       by.xpath('//span[@class="filter-counter"]')
     );
@@ -114,7 +117,7 @@ class ChartsDesignerPage extends Designer {
   validateReportSelectedFilters(filters) {
     commonFunctions.waitFor.elementToBeVisible(this._reportFilterText);
     commonFunctions.waitFor.elementToBeVisible(this._reportFilterClear);
-    commonFunctions.waitFor.elementToBeVisible(this._reportSelectedFilters);
+    commonFunctions.waitFor.elementToBeVisible(this._selectedFiltersText);
     this._reportSelectedFilters
       .map(function(elm) {
         return elm.getText();
