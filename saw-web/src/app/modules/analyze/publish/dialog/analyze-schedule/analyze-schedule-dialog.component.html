@@ -1,13 +1,17 @@
 <header class="base-dialog__header">
-  <div i18n>Schedule Analysis</div>
+  <div i18n [attr.e2e]="'schedule-analysis-header'">Schedule Analysis</div>
   <div fxFlex></div>
-  <button mat-icon-button color="warn" (click)="close()">
+  <button
+    mat-icon-button
+    color="warn"
+    (click)="close()"
+    [attr.e2e]="'schedule-analysis-warning'"
+  >
     <mat-icon fontIcon="icon-close"></mat-icon>
   </button>
 </header>
 <mat-divider></mat-divider>
 <div class="base-dialog__content dialog__content" fxLayout="column">
-
   <div class="ars-content" layout-padding>
     <!-- <div class="form-container" layout="column">
         <mat-checkbox [(ngModel)]="hasSchedule">
@@ -16,62 +20,195 @@
       </div> -->
 
     <div class="schedule-container" fxLayout="column">
-      <cron-job-schedular *ngIf="loadCron" [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
+      <cron-job-schedular
+        *ngIf="loadCron"
+        [crondetails]="crondetails"
+        (onCronChanged)="onCronChanged($event)"
+      ></cron-job-schedular>
 
       <div class="form-container" fxLayout="column">
         <div class="output-format" *ngIf="isReport">
           <label i18n>Output Format</label><br />
-          <mat-radio-group [(ngModel)]="fileType" fxLayout="row" fxLayoutGap="10px">
-            <mat-radio-button class="format-csv" value="csv">CSV</mat-radio-button>
-            <mat-radio-button class="format-xlsx" value="xlsx">XLSX</mat-radio-button>
+          <mat-radio-group
+            [(ngModel)]="fileType"
+            fxLayout="row"
+            fxLayoutGap="10px"
+          >
+            <mat-radio-button
+              class="format-csv"
+              value="csv"
+              [attr.e2e]="'schedule-analysis-filetype-' + fileType"
+              >CSV</mat-radio-button
+            >
+            <mat-radio-button
+              class="format-xlsx"
+              value="xlsx"
+              [attr.e2e]="'schedule-analysis-filetype-' + fileType"
+              >XLSX</mat-radio-button
+            >
+
+            <mat-radio-button
+              class="format-zip"
+              value="zip"
+              *ngIf="s3Bucket.length > 0"
+              [attr.e2e]="'schedule-analysis-filetype-' + fileType"
+              >ZIP</mat-radio-button
+            >
           </mat-radio-group>
         </div>
-        <label i18n>Publish to Email</label>
-        <mat-form-field flex="20">
-          <mat-chip-list #chipList>
-            <mat-chip *ngFor="let email of emails; trackBy: trackByIndex; let i = index" (removed)="removeEmail(i)">
-              <div *ngIf="!validateThisEmail(email)" class="errorMsg">?</div>
-              {{email}}
-              <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
-            </mat-chip>
-            <input placeholder="Emails separate by ';'" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeys"
-              [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addEmail($event)" />
-          </mat-chip-list>
-        </mat-form-field>
-      </div>
+        <div
+          *ngIf="data.analysis.type !== 'chart' && data.analysis.type !== 'map'"
+          class="form-container"
+          fxLayout="column"
+        >
+          <label i18n>Publish to Email</label>
+          <mat-form-field flex="20" *ngIf="data.analysis.type !== 'chart'">
+            <mat-chip-list #chipList>
+              <mat-chip
+                *ngFor="
+                  let email of emails;
+                  trackBy: trackByIndex;
+                  let i = index
+                "
+                (removed)="removeEmail(i)"
+                [attr.e2e]="'email-address-' + email"
+              >
+                <div
+                  *ngIf="!validateThisEmail(email)"
+                  class="errorMsg"
+                  [attr.e2e]="'wrong-email-type-' + email"
+                >
+                  ?
+                </div>
+                {{ email }}
+                <mat-icon
+                  matChipRemove
+                  fontIcon="icon-close"
+                  [attr.e2e]="'remove-email-' + email"
+                ></mat-icon>
+              </mat-chip>
+              <input
+                placeholder="Emails separate by ';'"
+                [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeys"
+                [matChipInputAddOnBlur]="true"
+                (matChipInputTokenEnd)="addEmail($event)"
+                [attr.e2e]="'email-list-input'"
+              />
+            </mat-chip-list>
+          </mat-form-field>
 
-      <div *ngIf="data.analysis.type !== 'chart'" class="form-container" fxLayout="column">
-
-        <label i18n>Publish to FTP</label>
-        <div class="publish-form" fxLayout="row" fxLayoutAlign="start center">
-          <div>
-            <mat-form-field class="select-form-field" appearance="outline">
-              <mat-label>FTP Location</mat-label>
-              <mat-select [value]="ftp" (selectionChange)="onLocationSelected($event.value)" multiple>
-                <mat-option *ngFor="let location of locations" [value]="location">{{ location }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+          <label i18n>Publish to FTP</label>
+          <div class="publish-form" fxLayout="row" fxLayoutAlign="start center">
+            <div>
+              <mat-form-field class="select-form-field" appearance="outline">
+                <mat-label>FTP Location</mat-label>
+                <mat-select
+                  [value]="ftp"
+                  (selectionChange)="onLocationSelected($event.value)"
+                  multiple
+                  [attr.e2e]="'ftp-bucket-list'"
+                >
+                  <mat-option
+                    *ngFor="let location of locations"
+                    [value]="location"
+                    >{{ location }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <button
+              mat-button
+              color="warn"
+              (click)="ftp = []"
+              [attr.e2e]="'clear-ftp-bucket'"
+            >
+              Clear
+            </button>
           </div>
-          <button mat-button color="warn" (click)="ftp = []">Clear</button>
+
+          <label i18n>Publish to S3</label>
+          <div class="publish-form" fxLayout="row" fxLayoutAlign="start center">
+            <div>
+              <mat-form-field class="select-form-field" appearance="outline">
+                <mat-label>S3 Location</mat-label>
+                <mat-select
+                  [value]="s3Bucket"
+                  (selectionChange)="onS3LocationSelected($event.value)"
+                  multiple
+                  [attr.e2e]="'s3-bucket-list'"
+                >
+                  <mat-option
+                    *ngFor="let location of s3Locations"
+                    [value]="location"
+                    >{{ location }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+              <button
+                mat-button
+                color="warn"
+                (click)="s3Bucket = []"
+                [attr.e2e]="'clear-s3-bucket'"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <span *ngIf="emailValidateFlag" class="errorTextMsg" i18n>Invalid Email-Id Found: Please provide valid Email-Id's
-        in list</span>
-        <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n>Start date cannot be in past. Please select a Date that is current or in future.</span>
-      <span *ngIf="errorFlagMsg" class="errorTextMsg" i18n>Please enter valid Email ids or Select option for Publish</span>
-      <span *ngIf="cronValidateField" class="errorTextMsg" i18n>Please Select a valid Schedule</span>
+      <span
+        *ngIf="emailValidateFlag"
+        class="errorTextMsg"
+        i18n
+        [attr.e2e]="'invalid-email-msg'"
+        >Invalid Email-Id Found: Please provide valid Email-Id's in list</span
+      >
+      <span
+        *ngIf="!startDateCorrectFlag"
+        class="errorTextMsg"
+        i18n
+        [attr.e2e]="'invalid-date-msg'"
+        >Start date cannot be in past. Please select a Date that is current or
+        in future.</span
+      >
+      <span
+        *ngIf="errorFlagMsg"
+        class="errorTextMsg"
+        i18n
+        [attr.e2e]="'invalid-option-msg'"
+        >Please enter valid Email ids or Select option for Publish</span
+      >
+      <span
+        *ngIf="cronValidateField"
+        class="errorTextMsg"
+        i18n
+        [attr.e2e]="'invalid-schedule-msg'"
+        >Please Select a valid Schedule</span
+      >
     </div>
-
   </div>
-
 </div>
 <div class="base-dialog__actions">
   <div fxLayout="row" fxLayoutAlign="start center" class="form-buttons">
-
-    <button mat-stroked-button i18n color="warn" [disabled]="!hasSchedule" (click)="removeSchedule()">Remove
-      Schedule</button>
+    <button
+      mat-stroked-button
+      color="warn"
+      [disabled]="!hasSchedule"
+      (click)="removeSchedule()"
+      i18n
+      [attr.e2e]="'remove-schedule-analysis'"
+    >
+      Remove Schedule
+    </button>
     <div fxFlex></div>
-    <button (click)="publish()" mat-raised-button color="primary" i18n>
+    <button
+      (click)="publish()"
+      mat-raised-button
+      color="primary"
+      i18n
+      [attr.e2e]="'schedule-analysis-publish'"
+    >
       Schedule
     </button>
   </div>

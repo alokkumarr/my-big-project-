@@ -9,6 +9,7 @@
         <mat-radio-button
           value="currenttime"
           (click)="generateImmediateSchedule(immediate.immediatetype)"
+          [attr.e2e]="scheduleType + '-schedule'"
           >Schedule Immediately
         </mat-radio-button>
       </mat-radio-group>
@@ -27,6 +28,7 @@
             placeholder="Hour"
             [(ngModel)]="hourly.hours"
             (selectionChange)="regenerateCron('')"
+            [attr.e2e]="scheduleType + '-schedule-hourly-hours'"
           >
             <mat-option *ngFor="let hour of hours" [value]="hour">
               {{ hour }}
@@ -39,6 +41,7 @@
             placeholder="Minute"
             [(ngModel)]="hourly.minutes"
             (selectionChange)="regenerateCron('')"
+            [attr.e2e]="scheduleType + '-schedule-hourly-minutes'"
           >
             <mat-option *ngFor="let minute of minutes" [value]="minute">
               {{ minute }}
@@ -61,6 +64,7 @@
             class="everyDay"
             value="everyDay"
             (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyday'"
           >
           </mat-radio-button>
           <span class="mat-h4 text-content">Every</span>
@@ -70,6 +74,7 @@
               [(ngModel)]="daily.days"
               (selectionChange)="regenerateCron(dailyTypeDay)"
               [disabled]="daily.dailyType !== 'everyDay'"
+              [attr.e2e]="scheduleType + '-schedule-daily-days'"
             >
               <mat-option *ngFor="let day of days" [value]="day">
                 {{ day }}
@@ -81,6 +86,7 @@
             [model]="dailyTypeDay"
             (onDateChange)="onDateChange($event)"
             [class.no-click]="daily.dailyType !== 'everyDay'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-everyday'"
           ></cron-date-picker>
         </div>
 
@@ -89,6 +95,7 @@
             class="everyWeek"
             value="everyWeek"
             (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyweekday'"
           ></mat-radio-button
           ><br />
           <span class="mat-h4 text-content"
@@ -98,6 +105,7 @@
             [model]="dailyTypeWeek"
             (onDateChange)="onDateChange($event)"
             [class.no-click]="daily.dailyType !== 'everyWeek'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-everyweekday'"
           ></cron-date-picker>
         </div>
       </mat-radio-group>
@@ -123,6 +131,7 @@
             *ngFor="let day of dayStrings"
             [(ngModel)]="weekly[day]"
             (change)="regenerateCron(weeklybasisDate)"
+            [attr.e2e]="scheduleType + '-schedule-' + day"
             >{{ day | i18nPlural: DayMapping }}</mat-checkbox
           >
         </div>
@@ -133,6 +142,7 @@
             style="height: 40px;"
             [model]="weeklybasisDate"
             (onDateChange)="onDateChange($event)"
+            [attr.e2e]="scheduleType + '-cron-date-picker-week-basis-date'"
           ></cron-date-picker>
         </div>
       </div>
@@ -151,6 +161,7 @@
             class="everyDay"
             value="monthlyDay"
             (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyday'"
           ></mat-radio-button>
           <span class="mat-h4 text-content">On the </span>
           <mat-form-field appearance="outline" class="form-select align-select">
@@ -159,6 +170,7 @@
               [(ngModel)]="monthly.specificDay"
               (selectionChange)="regenerateCron(specificDayMonth)"
               [disabled]="monthly.monthlyType !== 'monthlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-day'"
             >
               <mat-option *ngFor="let day of days" [value]="day">
                 {{ day | i18nPlural: NumberMapping }}
@@ -173,6 +185,7 @@
               [(ngModel)]="monthly.specificMonth"
               (selectionChange)="regenerateCron(specificDayMonth)"
               [disabled]="monthly.monthlyType !== 'monthlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-month'"
             >
               <mat-option *ngFor="let month of months" [value]="month">
                 {{ month }}
@@ -184,6 +197,7 @@
             [model]="specificDayMonth"
             (onDateChange)="onDateChange($event)"
             [class.no-click]="monthly.monthlyType !== 'monthlyDay'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-day-month'"
           ></cron-date-picker>
         </div>
         <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="3px">
@@ -191,6 +205,7 @@
             class="everyWeek"
             value="monthlyWeek"
             (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyweek'"
           ></mat-radio-button>
           <span class="mat-h4 text-content">On the</span>
           <mat-form-field
@@ -202,6 +217,7 @@
               [(ngModel)]="monthly.specificWeekDayMonth"
               (selectionChange)="regenerateCron(specificWeekDayMonth)"
               [disabled]="monthly.monthlyType !== 'monthlyWeek'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-week-day-month'"
             >
               <mat-option *ngFor="let week of weeks" [value]="week.value">
                 {{ week.label }}
@@ -217,6 +233,7 @@
               [(ngModel)]="monthly.specificWeekDayDay"
               (selectionChange)="regenerateCron(specificWeekDayMonth)"
               [disabled]="monthly.monthlyType !== 'monthlyWeek'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-week-day-day'"
             >
               <mat-option
                 *ngFor="let dayString of dayStrings"
@@ -237,6 +254,9 @@
               [(ngModel)]="monthly.specificWeekDayMonthWeek"
               (selectionChange)="regenerateCron(specificWeekDayMonth)"
               [disabled]="monthly.monthlyType !== 'monthlyWeek'"
+              [attr.e2e]="
+                scheduleType + '-schedule-monthly-week-day-month-week'
+              "
             >
               <mat-option *ngFor="let month of months" [value]="month">
                 {{ month }}
@@ -248,6 +268,7 @@
             [model]="specificWeekDayMonth"
             (onDateChange)="onDateChange($event)"
             [class.no-click]="monthly.monthlyType !== 'monthlyWeek'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-week-day-month'"
           ></cron-date-picker>
         </div>
       </mat-radio-group>
@@ -266,6 +287,7 @@
             class="everyDay"
             value="yearlyMonth"
             (click)="resetData()"
+            [attr.e2e]="scheduleType + '-cron-schedule-everyday'"
           >
           </mat-radio-button>
           <span class="mat-h4 text-content">Every </span>
@@ -275,6 +297,7 @@
               [(ngModel)]="yearly.specificMonthDayMonth"
               (selectionChange)="regenerateCron(specificMonthDayYear)"
               [disabled]="yearly.yearlyType !== 'yearlyMonth'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-day-month'"
             >
               <mat-option
                 *ngFor="let monthString of monthStrings"
@@ -291,6 +314,7 @@
               [(ngModel)]="yearly.specificMonthDayDay"
               (selectionChange)="regenerateCron(specificMonthDayYear)"
               [disabled]="yearly.yearlyType !== 'yearlyMonth'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-day-day'"
             >
               <mat-option *ngFor="let day of days" [value]="day">
                 {{ day | i18nPlural: NumberMapping }}
@@ -302,6 +326,7 @@
             [model]="specificMonthDayYear"
             (onDateChange)="onDateChange($event)"
             [class.no-click]="yearly.yearlyType !== 'yearlyMonth'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-month-day-year'"
           ></cron-date-picker>
         </div>
 
@@ -310,6 +335,7 @@
             class="everyWeek"
             value="yearlyDay"
             (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyweek'"
           ></mat-radio-button>
           <span class="mat-h4 text-content">On the </span>
           <mat-form-field appearance="outline" class="form-select align-select">
@@ -318,6 +344,9 @@
               [(ngModel)]="yearly.specificMonthWeekMonthWeek"
               (selectionChange)="regenerateCron(specificMonthWeekYear)"
               [disabled]="yearly.yearlyType !== 'yearlyDay'"
+              [attr.e2e]="
+                scheduleType + '-schedule-yearly-month-week-month-week'
+              "
             >
               <mat-option *ngFor="let week of weeks" [value]="week.value">
                 {{ week.label }}
@@ -330,6 +359,7 @@
               [(ngModel)]="yearly.specificMonthWeekDay"
               (selectionChange)="regenerateCron(specificMonthWeekYear)"
               [disabled]="yearly.yearlyType !== 'yearlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-week-day'"
             >
               <mat-option
                 *ngFor="let dayString of dayStrings"
@@ -346,6 +376,7 @@
               [(ngModel)]="yearly.specificMonthWeekMonth"
               (selectionChange)="regenerateCron(specificMonthWeekYear)"
               [disabled]="yearly.yearlyType !== 'yearlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-week-month'"
             >
               <mat-option
                 *ngFor="let monthString of monthStrings"
@@ -360,6 +391,7 @@
             [model]="specificMonthWeekYear"
             (onDateChange)="onDateChange($event)"
             [class.no-click]="yearly.yearlyType !== 'yearlyDay'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-month-week-year'"
           ></cron-date-picker>
         </div>
       </mat-radio-group>
@@ -390,6 +422,7 @@
         [max]="selectedMoments[1]"
         #startDateInput
         (ngModelChange)="cronChange()"
+        [attr.e2e]="'schedule-start-date-time'"
       />
       <owl-date-time
         #dt12
@@ -412,6 +445,7 @@
         [selectMode]="'rangeTo'"
         #endDateInput
         (ngModelChange)="cronChange()"
+        [attr.e2e]="'schedule-end-date-time'"
       />
       <owl-date-time
         #dt13
@@ -419,7 +453,12 @@
       ></owl-date-time>
     </div>
     <div fxFlex="20">
-      <button mat-button color="warn" (click)="selectedMoments = []">
+      <button
+        mat-button
+        color="warn"
+        (click)="selectedMoments = []"
+        [attr.e2e]="'clear-date-time'"
+      >
         Clear
       </button>
     </div>
@@ -440,6 +479,7 @@
         [(value)]="timezone"
         [disabled]="true"
         (selectionChange)="cronChange()"
+        [attr.e2e]="'schedule-time-zone'"
       >
         <mat-option *ngFor="let zone of timezones" [value]="zone.name">
           {{ zone.label }}

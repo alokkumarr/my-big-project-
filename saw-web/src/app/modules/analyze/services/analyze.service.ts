@@ -280,6 +280,10 @@ export class AnalyzeService {
     return this.postRequest(`exports/listFTP`, custCode);
   }
 
+  getlistS3Buckets(custCode) {
+    return this.postRequest(`exports/listS3`, custCode);
+  }
+
   deleteAnalysis(model) {
     if (
       !this._jwtService.hasPrivilege('DELETE', {
