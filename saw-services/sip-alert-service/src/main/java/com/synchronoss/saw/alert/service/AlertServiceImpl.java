@@ -8,6 +8,7 @@ import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.entities.DatapodDetails;
 import com.synchronoss.saw.alert.modal.Aggregation;
 import com.synchronoss.saw.alert.modal.Alert;
+import com.synchronoss.saw.alert.modal.AlertStates;
 import com.synchronoss.saw.alert.modal.Operator;
 import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
@@ -20,6 +21,9 @@ import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -129,9 +133,16 @@ public class AlertServiceImpl implements AlertService {
    * @param alertRuleId Alert rule Id
    */
   @Override
-  public void deleteAlertRule(
+  public Boolean deleteAlertRule(
       @NotNull(message = "Alert Id cannot be null") @NotNull Long alertRuleId, Ticket ticket) {
-    alertRulesRepository.deleteById(alertRuleId);
+    Long alertRuleSysId =
+        alertRulesRepository.findAlertByCustomer(ticket.getCustCode(), alertRuleId);
+    if (alertRuleSysId != null) {
+      alertRulesRepository.deleteById(alertRuleId);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -251,6 +262,42 @@ public class AlertServiceImpl implements AlertService {
       }
     }
     return elements.toString();
+  }
+
+  /**
+   * Get alert state by alert ID.
+   *
+   * @param alertRuleId alertRuleId
+   * @param ticket Ticket
+   * @return List of AlertStates
+   */
+  @Override
+  public List<AlertStates> getAlertStates(
+      @NotNull(message = "alertRuleId cannot be null") Long alertRuleId,
+      Integer pageNumber,
+      Integer pageSize,
+      Ticket ticket) {
+    Long alertRuleSysId =
+        alertRulesRepository.findAlertByCustomer(ticket.getCustCode(), alertRuleId);
+    List<AlertStates> alertStates = null;
+    if (alertRuleSysId != null) {
+      Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
+      alertStates = alertTriggerLog.findByAlertRulesSysId(alertRuleId, pageable);
+    }
+    return alertStates;
+  }
+
+  /**
+   * Get list of pageable Alerts by time order.
+   *
+   * @param ticket Ticket
+   * @return List of AlertStates
+   */
+  @Override
+  public List<AlertStates> listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket) {
+    Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
+    List<AlertStates> alertStates = alertTriggerLog.findByAlertStates(pageable);
+    return alertStates;
   }
 
   /**
