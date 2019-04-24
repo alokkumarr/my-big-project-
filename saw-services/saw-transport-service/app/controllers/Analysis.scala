@@ -123,6 +123,7 @@ class Analysis extends BaseController {
   private def doProcess(json: JValue, ticket: Option[Ticket]): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     var dataSecurityKey : java.util.List[Object]= null
+    //below condition is temporary change made for migration of Analysis as part of sip-6784
     if (!action.equalsIgnoreCase("export")) {
       dataSecurityKey = ticket match {
         case None => throw new ClientException(
