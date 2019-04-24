@@ -233,8 +233,8 @@ export class PivotGridComponent implements OnDestroy {
         switch (column.dateInterval) {
         case 'day':
           cloned.groupInterval = 1;
-          momentFormat = this.getMomentFormat(cloned.format);
-          cloned.manualFormat = cloned.format;
+          momentFormat = this.getMomentFormat(cloned.dateFormat);
+          cloned.manualFormat = cloned.dateFormat;
           cloned.format = {
             formatter: this.getFormatter(momentFormat)
           };
@@ -353,7 +353,6 @@ export class PivotGridComponent implements OnDestroy {
             !isFinite(get(artifactColumn, 'format.precision'))
               ? DEFAULT_PRECISION
               : 0;
-
           cloned.format = {
             formatter: getFormatter(
               artifactColumn.format ||

@@ -38,8 +38,7 @@ import {
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
   DesignerResetState,
-  DesignerUpdatePivotGroupIntreval,
-  DesignerUpdateAnalysDateDateFormat
+  DesignerUpdatePivotGroupIntreval
 
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
@@ -140,7 +139,6 @@ export class DesignerState {
         : { format: artifactColumn.format })
     };
 
-    console.log(artifactColumnToBeAdded)
     if (artifactIndex < 0) {
       artifacts = [
         ...artifacts,
@@ -156,7 +154,6 @@ export class DesignerState {
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
-    console.log(analysis);
     return dispatch(new DesignerReorderArtifactColumns());
   }
 
@@ -237,7 +234,6 @@ export class DesignerState {
     forEach(artifactColumn, (value, prop) => {
       adapterColumn[prop] = value;
     });
-
     return patchState({
       analysis: {
         ...analysis,
@@ -610,28 +606,13 @@ export class DesignerState {
         table.fields.forEach(row => {
           if (row.columnName === artifactColumn.columnName) {
             row.groupInterval = artifactColumn.dateInterval;
+            delete row.format;
           }
         })
       }
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
-    });
-  }
-
-  @Action(DesignerUpdateAnalysDateDateFormat)
-  updateAnalysDateDateFormat(
-    { patchState, getState }: StateContext<DesignerStateModel>,
-  ) {
-    const analysis = getState().analysis;
-    const sipQuery = analysis.sipQuery;
-    console.log(analysis);
-    forEach(sipQuery.artifacts, tables => {
-      forEach(tables, table=> {
-        forEach(table.fields, field => {
-          console.log(field);
-        })
-      })
     });
   }
 

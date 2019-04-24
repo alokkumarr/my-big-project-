@@ -168,8 +168,3 @@ export class DesignerUpdatePivotGroupIntreval {
   static readonly type = '[Designer] update group intrevals for pivots';
   constructor(public artifactColumn:  Partial<ArtifactColumnPivot>) {}
 }
-
-export class DesignerUpdateAnalysDateDateFormat {
-  static readonly type = '[Designer] update date data formats';
-  constructor() {}
-}

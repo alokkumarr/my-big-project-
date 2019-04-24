@@ -79,8 +79,7 @@ import {
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
   DesignerLoadMetric,
-  DesignerResetState,
-  DesignerUpdateAnalysDateDateFormat
+  DesignerResetState
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -625,9 +624,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
-      : this.nonDSLAnalysisForRequest(this.analysis);
-
-    console.log(requestAnalysis);
+      : this.nonDSLAnalysisForRequest(this.analysis);    
       // forEach(requestAnalysis.sipQuery.artifacts[0].fields, field => {
       //   if (field.type === 'date') {
       //     // field.dateFormat = field.format;
@@ -1015,12 +1012,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'aggregate':
       case 'filter':
       case 'format':
-        if (isDSLAnalysis(this.analysis)) {
-          this._store.dispatch(
-            new DesignerUpdateAnalysDateDateFormat()
-          );
-        }
-        this.artifacts = [...this.artifacts];
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();
         break;
       case 'alias':
