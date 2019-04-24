@@ -560,6 +560,8 @@ export class DesignerState {
       filter.artifactsName = filter.tableName;
       if (
         filter.type === 'date' &&
+        !filter.isRuntimeFilter &&
+        !filter.isGlobalFilter &&
         filter.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
         filter.model = {
