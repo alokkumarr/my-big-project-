@@ -37,7 +37,10 @@ import {
   DesignerReorderArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
-  DesignerResetState
+  DesignerResetState,
+  DesignerUpdatePivotGroupIntreval,
+  DesignerUpdateAnalysDateDateFormat
+
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import {
@@ -125,7 +128,7 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
-      groupInterval: artifactColumn.groupInterval,
+      groupInterval: artifactColumn.dateInterval,
       name: artifactColumn.name,
       type: artifactColumn.type,
       table: artifactColumn.table || (<any>artifactColumn).tableName,
@@ -137,6 +140,7 @@ export class DesignerState {
         : { format: artifactColumn.format })
     };
 
+    console.log(artifactColumnToBeAdded)
     if (artifactIndex < 0) {
       artifacts = [
         ...artifacts,
@@ -152,6 +156,7 @@ export class DesignerState {
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
+    console.log(analysis);
     return dispatch(new DesignerReorderArtifactColumns());
   }
 
@@ -592,4 +597,42 @@ export class DesignerState {
   resetState({ patchState }: StateContext<DesignerStateModel>) {
     patchState(cloneDeep(defaultDesignerState));
   }
+
+  @Action(DesignerUpdatePivotGroupIntreval)
+  updatePivotGroupIntreval(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerUpdatePivotGroupIntreval
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    sipQuery.artifacts.forEach(table => {
+      if (table.artifactsName === artifactColumn.table) {
+        table.fields.forEach(row => {
+          if (row.columnName === artifactColumn.columnName) {
+            row.groupInterval = artifactColumn.dateInterval;
+          }
+        })
+      }
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysDateDateFormat)
+  updateAnalysDateDateFormat(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    console.log(analysis);
+    forEach(sipQuery.artifacts, tables => {
+      forEach(tables, table=> {
+        forEach(table.fields, field => {
+          console.log(field);
+        })
+      })
+    });
+  }
+
 }

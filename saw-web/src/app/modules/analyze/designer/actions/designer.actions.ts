@@ -4,6 +4,7 @@ import {
   Sort,
   ArtifactColumnDSL
 } from '../types';
+import { ArtifactColumnPivot } from '../../../../models/artifact-column.model';
 import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
 
@@ -160,5 +161,15 @@ export class DesignerRemoveArtifactColumn {
 }
 export class DesignerRemoveAllArtifactColumns {
   static readonly type = '[Designer] Remove all artifact columns from analysis';
+  constructor() {}
+}
+
+export class DesignerUpdatePivotGroupIntreval {
+  static readonly type = '[Designer] update group intrevals for pivots';
+  constructor(public artifactColumn:  Partial<ArtifactColumnPivot>) {}
+}
+
+export class DesignerUpdateAnalysDateDateFormat {
+  static readonly type = '[Designer] update date data formats';
   constructor() {}
 }

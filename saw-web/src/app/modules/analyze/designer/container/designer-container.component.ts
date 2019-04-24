@@ -79,7 +79,8 @@ import {
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
   DesignerLoadMetric,
-  DesignerResetState
+  DesignerResetState,
+  DesignerUpdateAnalysDateDateFormat
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -398,6 +399,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       });
       break;
+
+    case 'pivot':
+      if (isDSLAnalysis(this.analysis)) {
+        forEach(artifacts, table => {
+          table.columns = map(table.columns, columns => {
+            forEach((<AnalysisDSL>this.analysis).sipQuery.artifacts, fields => {
+              forEach(fields.fields, field => {
+                if (field.columnName === columns.columnName) {
+                  columns.format = field.format;
+                  columns.dateInterval = field.groupInterval;
+                }
+              });
+            });
+            return columns;
+          });
+        });
+      }
     }
     return artifacts;
   }
@@ -608,6 +626,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
+
+    console.log(requestAnalysis);
+      // forEach(requestAnalysis.sipQuery.artifacts[0].fields, field => {
+      //   if (field.type === 'date') {
+      //     // field.dateFormat = field.format;
+      //     delete field.format;
+      //   }
+      // });
 
     this._designerService.getDataForAnalysis(requestAnalysis).then(
       response => {
@@ -989,6 +1015,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'aggregate':
       case 'filter':
       case 'format':
+        if (isDSLAnalysis(this.analysis)) {
+          this._store.dispatch(
+            new DesignerUpdateAnalysDateDateFormat()
+          );
+        }
         this.artifacts = [...this.artifacts];
         this.requestDataIfPossible();
         break;

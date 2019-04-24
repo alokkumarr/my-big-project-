@@ -241,10 +241,14 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
     columnIndex: number,
     adapter: IDEsignerSettingGroupAdapter
   ) {
+    console.log("add data");
     const index = adapter.artifactColumns.length;
     const adapterIndex = this.groupAdapters.indexOf(adapter);
     // remove from unselected fields
     this.unselectedArtifactColumns.splice(columnIndex, 1);
+    console.log(artifactColumn);
+    console.log(index);
+    console.log(adapterIndex);
     this._store.dispatch(
       new DesignerAddColumnToGroupAdapter(artifactColumn, index, adapterIndex)
     );
