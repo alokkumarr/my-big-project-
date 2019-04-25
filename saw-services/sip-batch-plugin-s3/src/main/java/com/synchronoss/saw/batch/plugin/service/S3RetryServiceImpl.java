@@ -11,7 +11,7 @@ public class S3RetryServiceImpl implements SipRetryContract{
 
 	@Override
 	public void retryFailedJob(Long channelId, Long routeId, String channelType, boolean isDisable, String pid,
-			String status) throws NotFoundException {
+			String status, Long jobId) throws NotFoundException {
 		// TODO Auto-generated method stub
 		
 	}

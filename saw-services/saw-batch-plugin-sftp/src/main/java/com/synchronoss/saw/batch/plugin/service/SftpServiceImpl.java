@@ -141,6 +141,7 @@ public class SftpServiceImpl extends SipPluginContract {
   private Integer maxInprogressMins = 45;
   
   public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
+  
 
   @PostConstruct
   private void init() throws Exception {
@@ -718,7 +719,7 @@ public class SftpServiceImpl extends SipPluginContract {
                          + "location starts here " + sourceLocation
                          + " & file pattern " + filePattern);
               Thread thread = Thread.currentThread();
-              SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
+              
               logger.info(
                          "Transfer data started with routeId: " + routeId 
                          + " started time: " + new Date());
@@ -726,9 +727,13 @@ public class SftpServiceImpl extends SipPluginContract {
               ZonedDateTime fileTransStartTime = ZonedDateTime.now();
               // Adding to a list has been removed as a part of optimization
               // SIP-6386
+              logger.info("Job id before callling transfer channel :: " 
+                  + jobEntity.getJobId());
+              SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
               transferDataFromChannel(template, sourceLocation, filePattern,
                          destinationLocation, channelId, routeId, 
-                         fileExclusions, isDisable, source,lastModifiedHoursLmt);
+                         fileExclusions, isDisable, source,lastModifiedHoursLmt,
+                         jobEntity.getJobId());
               ZonedDateTime fileTransEndTime = ZonedDateTime.now();
               long durationInMillis =
                          Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
@@ -775,10 +780,12 @@ public class SftpServiceImpl extends SipPluginContract {
   public List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId, String exclusions, boolean isDisableDuplicate, 
-      String source, int filesModifiedInLast)
+      String source, int filesModifiedInLast, Long jobId)
       throws IOException, ParseException {
     logger.trace("TransferDataFromChannel starts here with the channelId " + channelId
         + " and routeId " + routeId);
+    logger.info("Inside from channel :: " 
+        + jobId);
     /* First transfer the files from the directory */
     ZonedDateTime fileTransStartTime = ZonedDateTime.now();
     logger.trace("Transfer data started time: " + new Date());
@@ -786,7 +793,7 @@ public class SftpServiceImpl extends SipPluginContract {
     // SIP-6386
     transferDataFromChannelDirectory(template, sourcelocation, pattern,
         destinationLocation, channelId, routeId, exclusions, 
-        getBatchId(), isDisableDuplicate, source);
+        getBatchId(), isDisableDuplicate, source, jobId);
     ZonedDateTime fileTransEndTime = ZonedDateTime.now();
     long durationInMillis = Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
     logger.trace("Transfer data ended time: " + new Date());
@@ -834,7 +841,7 @@ public class SftpServiceImpl extends SipPluginContract {
       // SIP-6386
       transferDataFromChannel(template, sourcelocationDirectory, pattern,
           destinationLocation, channelId, routeId, exclusions, 
-          isDisableDuplicate, source, filesModifiedInLast);
+          isDisableDuplicate, source, filesModifiedInLast, jobId);
     }
     logger.trace("TransferDataFromChannel ends here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -847,8 +854,11 @@ public class SftpServiceImpl extends SipPluginContract {
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId, String exclusions, String batchId, boolean isDisableDuplicate,
-      String source)
+      String source, long jobId)
       throws IOException, ParseException {
+    
+    logger.info("Inside from channel Directory :: " 
+        + jobId);
     ZonedDateTime startTime = ZonedDateTime.now();
     logger.trace("TransferDataFromChannelDirectory starts here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -889,11 +899,12 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("partitionSize :" + partitionSize);
           List<LsEntry> filesArray = Arrays.asList(filteredFiles);
           logger.trace("number of files on this pull :" + filesArray.size());
-          Long jobId = 1L;
           BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);
           Long toatalCount = bisJobEntity.getTotalCount();
-          sipLogService.updateJobLog(jobId,"INPROGRESS", 0L,
-              toatalCount == null ? filesArray.size() : toatalCount + filesArray.size());
+          long total = toatalCount + filesArray.size();
+          logger.trace("Files count ::" +  total);
+          sipLogService.updateJobLog(jobId,"INPROGRESS", 0L, total);
+              
           
           List<List<LsEntry>> result = IntStream.range(0, partitionSize)
               .mapToObj(i -> filesArray.subList(iterationOfBatches * i,
@@ -972,12 +983,16 @@ public class SftpServiceImpl extends SipPluginContract {
                           + entry.getFilename() + " batchSize " + batchSize);
                       final File localFile = createTargetFile(localDirectory, entry);
                       fileTobeDeleted = localFile;
+                      logger.info("Before Inprogress log jobId :: " 
+                          + jobId);
                       prepareLogInfo(bisDataMetaInfo, pattern, getFilePath(localDirectory, entry),
                           getActualRecDate(entry), entry.getAttrs().getSize(),
                           sourcelocation + File.separator + entry.getFilename(), channelId, routeId,
                           localDirectory.getPath(), jobId);
 
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                      logger.info("After Inprogress log jobId :: " 
+                          + jobId);
                       logId = bisDataMetaInfo.getProcessId();
                       logger.trace("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
@@ -1037,9 +1052,12 @@ public class SftpServiceImpl extends SipPluginContract {
                                       bisDataMetaInfo.getProcessId());
                                   BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);
                                   Long successCnt = bisJobEntity.getSuccessCount();
-                                  
-                                  sipLogService.updateJobLog(jobId,"INPROGRESS", 0L,
-                                      toatalCount == null ? 1L : successCnt + 1);
+                                  logger.info("Before Success file log success cnt :: " 
+                                      + successCnt);
+                                  sipLogService.updateSuccessCnt(jobId,"INPROGRESS",
+                                       successCnt + 1);
+                                  logger.info("After Success file log success cnt :: " 
+                                      + successCnt + 1);
                                   // Adding to a list has been removed as a part of optimization
                                   // SIP-6386
                                   //list.add(bisDataMetaInfo);
@@ -1089,8 +1107,8 @@ public class SftpServiceImpl extends SipPluginContract {
                         bisDataMetaInfo.setComponentState(BisComponentState.DUPLICATE.value());
                         
                         Long successCnt = bisJobEntity.getSuccessCount();
-                        sipLogService.updateJobLog(jobId,"INPROGRESS", 0L,
-                            toatalCount == null ? 1L : successCnt + 1);
+                        sipLogService.updateSuccessCnt(jobId,"INPROGRESS",
+                             successCnt + 1);
                         // This check has been added as a part of optimization ticket
                         // SIP-6386
                         if (duplicateEntry) {
@@ -1407,7 +1425,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
                         destinationLocation, channelId, routeId, 
                         fileExclusions, isDisable, SourceType.RETRY.name(),
-                        lastModifiedHoursLmt));
+                        lastModifiedHoursLmt, jobId));
                 
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);

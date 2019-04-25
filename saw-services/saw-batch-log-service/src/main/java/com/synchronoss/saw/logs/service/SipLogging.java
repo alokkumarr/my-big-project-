@@ -68,6 +68,7 @@ public class SipLogging {
       bisLog.setTransferEndTime(entity.getFileTransferEndTime());
       bisLog.setTransferStartTime(entity.getFileTransferStartTime());
       bisLog.setSource(entity.getSource());
+      bisLog.setJobId(entity.getJobId());
       bisFileLogsRepository.save(bisLog);
     } else {
       logger.trace("inserting logs when process Id is not found :" + pid);
@@ -89,6 +90,7 @@ public class SipLogging {
       bisLog.setCheckpointDate(new Date());
       bisLog.setCreatedDate(new Date());
       bisLog.setSource(entity.getSource());
+      bisLog.setJobId(entity.getJobId());
       bisFileLogsRepository.save(bisLog);
     }
     logger.trace("Integrate with logging API to update with a status ends here : "
@@ -404,7 +406,30 @@ public class SipLogging {
       jobEntity.setUpdatedBy("system");
       jobEntity.setCreatedDate(new Date()); 
       jobEntity.setUpdatedDate(new Date());
-      sipJobDataRepository.save(jobEntity);
+      sipJobDataRepository.saveAndFlush(jobEntity);
+    }
+    
+    
+  }
+  
+  /**
+   * Adds entry to job log.
+   * 
+   * @param status job status.
+   * @param successCnt number of files succssfully transferred
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public void  updateSuccessCnt(long jobId, String status, long successCnt) {
+    Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
+    if (sipJob.isPresent()) {
+      BisJobEntity jobEntity = sipJob.get();
+      jobEntity.setJobStatus(status);
+      jobEntity.setSuccessCount(successCnt);
+      jobEntity.setUpdatedDate(new Date());
+      sipJobDataRepository.saveAndFlush(jobEntity);
     }
     
     

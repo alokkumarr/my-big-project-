@@ -55,7 +55,7 @@ public class SftpRetryServiceImpl implements SipRetryContract {
 
   @Override
   public void retryFailedJob(Long channelId, Long routeId, String channelType, boolean isDisable,
-      String pid, String status) throws NotFoundException {
+      String pid, String status, Long jobId) throws NotFoundException {
 
     logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
         + channelId + " starts here");
@@ -104,7 +104,8 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                     sftpServiceImpl.transferDataFromChannel(
                         template, sourceLocation, metaInfo.getFilePattern(),
                         destinationLocation, channelId, routeId, 
-                        fileExclusions, isDisable, SourceType.RETRY.name(), lastModifiedHoursLmt));
+                        fileExclusions, isDisable, SourceType.RETRY.name(),
+                        lastModifiedHoursLmt, jobId));
                 
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);

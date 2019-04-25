@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,6 +40,7 @@ public class BisJobEntity implements Serializable {
   private String jobStatus;
   @Column(name = "TOTAL_FILES_COUNT")
   private long totalCount;
+  
   @Column(name = "SUCCESS_FILES_COUNT")
   private long successCount;
   @Column(name = "FILE_PATTERN")
