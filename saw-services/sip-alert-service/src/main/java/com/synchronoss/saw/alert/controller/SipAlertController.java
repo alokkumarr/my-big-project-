@@ -5,7 +5,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.modal.Alert;
 import com.synchronoss.saw.alert.modal.AlertResponse;
-import com.synchronoss.saw.alert.modal.AlertStates;
+import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.service.AlertService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -285,19 +285,19 @@ public class SipAlertController {
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
-   * @return Alert
+   * @return AlertStatesResponse alertStatesResponse
    */
   @ApiOperation(
       value = "/{id}/states",
       nickname = "List Alert Rules",
       notes = "",
-      response = List.class)
+      response = AlertStatesResponse.class)
   @RequestMapping(
       value = "/{id}/states",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertStates> getAlertState(
+  public AlertStatesResponse getAlertState(
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") Long id,
@@ -311,9 +311,11 @@ public class SipAlertController {
       if (pageSize == null) {
         pageSize = 25;
       }
-      List<AlertStates> alertStates = alertService.getAlertStates(id, pageNumber, pageSize, ticket);
-      if (alertStates != null) {
-        return alertStates;
+      AlertStatesResponse alertStatesResponse =
+          alertService.getAlertStates(id, pageNumber, pageSize, ticket);
+      if (alertStatesResponse != null) {
+        alertStatesResponse.setMessage("Success");
+        return alertStatesResponse;
       } else {
         response.setStatus(401);
       }
@@ -326,19 +328,19 @@ public class SipAlertController {
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
-   * @return Alert
+   * @return AlertStatesResponse alertStatesResponse
    */
   @ApiOperation(
       value = "/states",
       nickname = "List Alert Rules",
       notes = "",
-      response = List.class)
+      response = AlertStatesResponse.class)
   @RequestMapping(
       value = "/states",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertStates> listAlertStates(
+  public AlertStatesResponse listAlertStates(
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestParam(name = "pageNumber", required = false) Integer pageNumber,

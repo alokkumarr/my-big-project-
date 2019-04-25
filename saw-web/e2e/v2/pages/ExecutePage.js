@@ -7,6 +7,7 @@ class ExecutePage extends ConfirmationModel {
   constructor() {
     super();
     this._actionMenuLink = element(by.css(`[e2e='actions-menu-toggle']`));
+    this._actionMenuContents = element(by.xpath(`//*[@class="mat-menu-content"]`));
     this._analysisTitle = element(by.css(`[class="analysis__title"]`));
     this._actionDetailsLink = element(
       by.css(`[e2e="actions-menu-selector-details"]`)
@@ -18,7 +19,12 @@ class ExecutePage extends ConfirmationModel {
     );
     this._delete = element(by.css(`[e2e='actions-menu-selector-delete']`));
     this._editLink = element(by.css(`[e2e="action-edit-btn"]`));
-    this._forlAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
+    this._forkAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
+    this._executeButton = element(
+      by.css(`button[e2e="actions-menu-selector-execute"]`)
+    );
+    this._selectedFilter = value =>
+      element(by.css(`[e2e="filters-execute-${value}"]`));
   }
 
   verifyTitle(title) {
@@ -39,6 +45,7 @@ class ExecutePage extends ConfirmationModel {
 
   clickOnActionLink() {
     commonFunctions.clickOnElement(this._actionMenuLink);
+    commonFunctions.waitFor.elementToBeVisible(this._actionMenuContents);
   }
 
   clickOnDetails() {
@@ -73,12 +80,33 @@ class ExecutePage extends ConfirmationModel {
       return commonFunctions.getAnalysisIdFromUrl(url);
     });
   }
+
   clickOnEditLink() {
     commonFunctions.clickOnElement(this._editLink);
+    commonFunctions.waitFor.pageToBeReady(/edit/);
   }
 
   clickOnForkAndEditLink() {
-    commonFunctions.clickOnElement(this._forlAndEditLink);
+    commonFunctions.clickOnElement(this._forkAndEditLink);
+    commonFunctions.waitFor.pageToBeReady(/fork/);
+  }
+
+  clickOnExecuteButton() {
+    commonFunctions.clickOnElement(this._executeButton);
+  }
+
+  /*
+  @filters is array of object contains schema e.g.
+  `[{
+  "field":"Date",
+  "displayedValue":"TW" // This week
+  }]`
+   */
+  verifyAppliedFilter(filters) {
+    filters.forEach(filter => {
+      const value = `${filter.field}: ${filter.displayedValue}`;
+      commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
+    });
   }
 }
 module.exports = ExecutePage;
