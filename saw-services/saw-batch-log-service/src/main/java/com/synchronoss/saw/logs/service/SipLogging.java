@@ -8,13 +8,16 @@ import com.synchronoss.saw.batch.model.BisComponentState;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.entities.BisFileLog;
+import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
+import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
 import java.io.File;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -36,6 +39,9 @@ public class SipLogging {
 
   @Autowired
   private BisFileLogsRepository bisFileLogsRepository;
+  
+  @Autowired
+  private SipJobDataRepository sipJobDataRepository;
 
 
   /**
@@ -276,14 +282,15 @@ public class SipLogging {
     }
     return updatedRecords;
   }
-
+  
   /**
-   * This method is used to check the status by process.
-   *
-   * @param channelId unique Id for the channel.
-   * @param routeId unique Id for the route
-   * @param processStatus status for the component process.
-   * @param source source regular or retry
+   * Update existing log process status.
+   * 
+   * @param channelId channel identifier
+   * @param routeId route id entifier
+   * @param processStatus status
+   * @param fileStatus file status
+   * @param source source
    */
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
@@ -344,6 +351,82 @@ public class SipLogging {
     logger.info("Any Inprogress regular jobs for  " + routeId + "? :: " + isInProgress);
     return isInProgress;
   }
+
+  /**
+   * Adds entry to job log.
+   * 
+   * @param channelId channel identifier.
+   * @param routeId route identifier
+   * @param filePattern pattern expression
+   * @return job log created or not
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public BisJobEntity createJobLog(Long channelId, Long routeId, String filePattern) {
+    BisJobEntity sipJob = new BisJobEntity();
+    sipJob.setFilePattern(filePattern);
+    sipJob.setJobName(channelId + "-" +  routeId.toString());
+    sipJob.setJobStatus("OPEN");
+    sipJob.setJobType("SFTP");
+    sipJob.setStartTime(new Date());
+    sipJob.setTotalCount(0L);
+    sipJob.setSuccessCount(0L);
+    sipJob.setCreatedBy("system");
+    sipJob.setUpdatedBy("system");
+    sipJob.setCreatedDate(new Date());
+    sipJob.setUpdatedDate(new Date());
+    sipJobDataRepository.save(sipJob);
+    return sipJob;
+    
+  }
+  
+  /**
+   * Adds entry to job log.
+   * 
+   * @param status job status.
+   * @param successCnt number of files succssfully transferred
+   * @param totalCnt total number of files to be processed
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public void  updateJobLog(long jobId, String status, long successCnt, long totalCnt) {
+    Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
+    if (sipJob.isPresent()) {
+      BisJobEntity jobEntity = sipJob.get();
+      jobEntity.setJobStatus(status);
+      jobEntity.setTotalCount(totalCnt);
+      jobEntity.setSuccessCount(successCnt);
+      jobEntity.setCreatedBy("system");
+      jobEntity.setUpdatedBy("system");
+      jobEntity.setCreatedDate(new Date()); 
+      jobEntity.setUpdatedDate(new Date());
+      sipJobDataRepository.save(jobEntity);
+    }
+    
+    
+  }
+  
+  /**
+   * Returns Job entity by Id.
+   * 
+   * @param jobId job identifier
+   * @return JobEntity
+   */
+  public BisJobEntity retriveJobById(long jobId) {
+    Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
+    BisJobEntity jobEntity = null;
+    if (sipJob.isPresent()) {
+      jobEntity =   sipJob.get();
+    }
+    
+    return jobEntity;
+    
+  }
+  
 
 
 }

@@ -17,6 +17,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
 
 
+
 public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
   private static final Logger logger = LoggerFactory.getLogger(CronJob.class);
@@ -36,7 +37,8 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
       throws JobExecutionException {
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
     JobKey key = jobDetail.getKey();
-    logger.info("Cron Job started with key after :" + key.getName() + ", Group :" + key.getGroup()
+    
+    logger.info("Cron Job started with key :" + key.getName() + ", Group :" + key.getGroup()
         + " , Thread Name :" + Thread.currentThread().getName() + " ,Time now :" + new Date());
     BisSchedulerJobDetails jobRequest =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);

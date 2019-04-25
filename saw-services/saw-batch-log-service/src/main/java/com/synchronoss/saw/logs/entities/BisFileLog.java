@@ -104,7 +104,16 @@ public class BisFileLog implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date checkpointDate;
   
-  
+  @Column(name = "JOB_ID")
+  private Long jobId;
+
+  public Long getJobId() {
+    return jobId;
+  }
+
+  public void setJobId(Long jobId) {
+    this.jobId = jobId;
+  }
 
   public String getPid() {
     return pid;

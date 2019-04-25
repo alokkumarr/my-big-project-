@@ -81,9 +81,21 @@ public class BisDataMetaInfo {
   
   @JsonProperty("source")
   private String source;
+  
+  @JsonProperty("jobId")
+  private Long jobId;
 
 
 
+
+
+  public Long getJobId() {
+    return jobId;
+  }
+
+  public void setJobId(Long jobId) {
+    this.jobId = jobId;
+  }
 
   public Date getFileTransferStartTime() {
     return fileTransferStartTime;
