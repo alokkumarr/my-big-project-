@@ -1,9 +1,11 @@
 'use strict';
 
 const commonFunctions = require('../utils/commonFunctions');
+const FilterDialog = require('./FilterDialog');
 
-class SaveDialog {
+class SaveDialog extends FilterDialog {
   constructor() {
+    super();
     this._analysisNameInput = element(by.css(`[e2e="save-dialog-name"]`));
     this._analysisDescriptionInput = element(
       by.css(`[e2e="save-dialog-description"]`)
@@ -27,13 +29,17 @@ class SaveDialog {
 
   clickOnSaveAndCloseDialogButton(landingPageAfterSave = null) {
     commonFunctions.clickOnElement(this._saveAndCloseButton);
+    commonFunctions.waitFor.elementToBeVisible(this._saveAndCloseButton);
     if (landingPageAfterSave) {
       commonFunctions.waitFor.pageToBeReady(landingPageAfterSave);
+    } else {
+      browser.sleep(2000);
     }
   }
 
   clickOnSaveDialogButton() {
     commonFunctions.clickOnElement(this._saveDialogButton);
+    commonFunctions.waitFor.pageToBeReady(/edit/);
   }
 
   clickOnCancelDialogButton() {

@@ -46,16 +46,20 @@
               [attr.e2e]="'schedule-analysis-filetype-' + fileType"
               >XLSX</mat-radio-button
             >
-
-            <mat-radio-button
+            <!-- To Test the functionality Commenting this-->
+            <!-- <mat-checkbox
               class="format-zip"
               value="zip"
+              [(ngModel)]="zipFormatFlag"
               *ngIf="s3Bucket.length > 0"
+              (change)="checkZipped($event)"
               [attr.e2e]="'schedule-analysis-filetype-' + fileType"
-              >ZIP</mat-radio-button
             >
+              <strong>Zip/Compress the file</strong>
+            </mat-checkbox> -->
           </mat-radio-group>
         </div>
+
         <div
           *ngIf="data.analysis.type !== 'chart' && data.analysis.type !== 'map'"
           class="form-container"
@@ -116,15 +120,15 @@
                   >
                 </mat-select>
               </mat-form-field>
+              <button
+                mat-button
+                color="warn"
+                (click)="ftp = []"
+                [attr.e2e]="'clear-ftp-bucket'"
+              >
+                Clear
+              </button>
             </div>
-            <button
-              mat-button
-              color="warn"
-              (click)="ftp = []"
-              [attr.e2e]="'clear-ftp-bucket'"
-            >
-              Clear
-            </button>
           </div>
 
           <label i18n>Publish to S3</label>
