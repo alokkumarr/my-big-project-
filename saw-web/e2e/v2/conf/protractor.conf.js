@@ -167,6 +167,7 @@ exports.config = {
     );
 
     browser.get(browser.baseUrl);
+    browser.waitForAngular();
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
         return /login/.test(url);
