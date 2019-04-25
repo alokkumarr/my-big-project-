@@ -724,7 +724,6 @@ public class SftpServiceImpl extends SipPluginContract {
                          "Transfer data started with routeId: " + routeId 
                          + " started time: " + new Date());
               logger.info("Thread Id started with: " + thread);
-              ZonedDateTime fileTransStartTime = ZonedDateTime.now();
               // Adding to a list has been removed as a part of optimization
               // SIP-6386
               logger.info("Job id before callling transfer channel :: " 
@@ -735,6 +734,10 @@ public class SftpServiceImpl extends SipPluginContract {
                          fileExclusions, isDisable, source,lastModifiedHoursLmt,
                          jobEntity.getJobId());
               ZonedDateTime fileTransEndTime = ZonedDateTime.now();
+              BisJobEntity job = sipLogService.retriveJobById(jobEntity.getJobId());
+              job.setJobStatus("INPROGRESS");
+              sipLogService.saveJob(job);
+              ZonedDateTime fileTransStartTime = ZonedDateTime.now();
               long durationInMillis =
                          Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
               logger.info(
@@ -903,7 +906,6 @@ public class SftpServiceImpl extends SipPluginContract {
           Long toatalCount = bisJobEntity.getTotalCount();
           long total = toatalCount + filesArray.size();
           logger.trace("Files count ::" +  total);
-          sipLogService.updateJobLog(jobId,"INPROGRESS", 0L, total);
               
           
           List<List<LsEntry>> result = IntStream.range(0, partitionSize)

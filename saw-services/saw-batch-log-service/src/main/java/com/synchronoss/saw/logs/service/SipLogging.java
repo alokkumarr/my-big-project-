@@ -452,6 +452,17 @@ public class SipLogging {
     
   }
   
+  
+  /**
+   * Returns Job entity by Id.
+   * 
+   */
+  public void saveJob(BisJobEntity jobEntity) {
+    sipJobDataRepository.saveAndFlush(jobEntity);
+    
+  }
+  
+  
 
 
 }
