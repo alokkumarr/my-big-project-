@@ -159,11 +159,13 @@ public class AlertServiceImpl implements AlertService {
 
     Alert alert = new Alert();
     AlertRulesDetails alertRulesDetails = alertRulesRepository.findById(alertRuleId).get();
+    DatapodDetails datapodDetails =  alertDatapodRepository.findByDatapodId(alertRulesDetails.getDatapodId()).get();
     alert.setThresholdValue(alertRulesDetails.getThresholdValue());
     alert.setAlertSeverity(alertRulesDetails.getAlertSeverity());
     alert.setActiveInd(alertRulesDetails.getActiveInd());
     alert.setAggregation(alertRulesDetails.getAggregation());
     alert.setDatapodId(alertRulesDetails.getDatapodId());
+      alert.setDatapodName(datapodDetails.getDatapodName());
     alert.setMonitoringEntity(alertRulesDetails.getMonitoringEntity());
     alert.setOperator(alertRulesDetails.getOperator());
     alert.setAlertDescription(alertRulesDetails.getAlertDescription());
