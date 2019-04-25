@@ -122,6 +122,10 @@ export const CHART_DATE_FORMATS = [
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {
+    label: 'September 1, 2017',
+    value: 'MMMM D, YYYY'
+  },
+  {
     value: 'MMM d YYYY',
     label: ' Sep 1st 2017'
   },
@@ -141,24 +145,32 @@ export const CHART_DATE_FORMATS = [
 
 export const PIVOT_DATE_FORMATS = [
   {
-    value: 'MMMM d YYYY, h:mm:ss a',
-    label: 'September 1st 2017, 1:28:31 pm'
+    label: 'Default',
+    value: 'yyyy-MM-dd'
   },
   {
-    value: 'MMM d YYYY',
-    label: ' Sep 1st 2017'
+    label: 'September 1, 2017',
+    value: 'MMMM D, YYYY'
   },
   {
-    value: 'MMM YYYY',
-    label: 'September 2017'
+    label: '09/01/2017 (MM/DD/YYYY)',
+    value: 'MM/DD/YYYY'
   },
   {
-    value: 'MM YYYY',
-    label: '09 2017'
+    label: '01/09/2017 (DD/MM/YYYY)',
+    value: 'DD/MM/YYYY'
   },
   {
-    value: 'YYYY',
-    label: '2017'
+    label: 'September 2017',
+    value: 'MMMM YYYY'
+  },
+  {
+    label: 'September 1',
+    value: 'MMMM D'
+  },
+  {
+    label: '09/01/2017 11:20:36',
+    value: 'MM/DD/YYYY HH:mm:ss'
   }
 ];
 

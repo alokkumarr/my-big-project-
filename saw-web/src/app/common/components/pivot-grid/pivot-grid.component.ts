@@ -34,7 +34,6 @@ import {
   DEFAULT_DATE_FORMAT
 } from '../../../modules/analyze/consts';
 import { getFormatter } from '../../utils/numberFormatter';
-import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
