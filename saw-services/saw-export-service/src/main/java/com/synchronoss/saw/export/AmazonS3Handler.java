@@ -60,9 +60,18 @@ public class AmazonS3Handler {
 
   public void uploadObject(File file) {
     DateTime currentTime = new DateTime();
-    String timeStampStr = currentTime.toString("yyyy-MM-dd_HH:mm:ss.SSS");
 
-    String s3Key = outputLocation + "/" + timeStampStr + "/" + file.getName();
+    String currentFileName = file.getName();
+
+    // Assumption is there will be extension for the file
+    String extension = currentFileName.substring(currentFileName.lastIndexOf('.') + 1);
+
+    String fileName = currentFileName.substring(0, currentFileName.lastIndexOf('.'));
+
+    String timeStampStr = currentTime.toString("yyyy-MM-dd_HH:mm:ss.SSS");
+    String finalFileName = fileName + "_" + timeStampStr + "." + extension;
+
+    String s3Key = outputLocation + "/" + finalFileName;
     logger.debug("S3 key = " + s3Key);
 
     PutObjectRequest request = new PutObjectRequest(bucket, s3Key, file);
@@ -78,8 +87,9 @@ public class AmazonS3Handler {
 
   public void putObject(AmazonS3 s3, PutObjectRequest request) {
     try {
-      logger.debug("s3 key in put object" + request.getKey());
+      logger.debug("s3 key in put object " + request.getKey());
       logger.debug("S3 Bucket " + request.getBucketName());
+      logger.debug("File = " + request.getFile().getName());
       s3.putObject(request);
     } catch (AmazonServiceException e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process

@@ -166,6 +166,7 @@ public class ExportServiceImpl implements ExportService{
   @Async
   public void reportToBeDispatchedAsync(String executionId, RequestEntity request,
       String analysisId, String analysisType) {
+      String zipFileName = null;
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
@@ -245,9 +246,6 @@ public class ExportServiceImpl implements ExportService{
                       exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
                   exportBean.getFileName());
               logger.debug("Email sent successfully");
-
-              logger.debug("Deleting exported file.");
-              serviceUtils.deleteFile(exportBean.getFileName(), true);
 
             } catch (IOException e) {
               logger.error(
@@ -339,7 +337,7 @@ public class ExportServiceImpl implements ExportService{
         LocalDateTime now = LocalDateTime.now();
 
         File cfile = new File(exportBean.getFileName());
-        String zipFileName = cfile.getAbsolutePath().concat(".zip");
+        zipFileName = cfile.getAbsolutePath().concat(".zip");
 
         if (finalFtp != null && finalFtp != "") {
 
@@ -394,10 +392,6 @@ public class ExportServiceImpl implements ExportService{
               }
             }
 
-            // deleting the files
-            logger.debug("Deleting exported file.");
-            serviceUtils.deleteFile(exportBean.getFileName(),true);
-            serviceUtils.deleteFile(zipFileName,true);
 
             // close the streams
             zos.close();
@@ -407,6 +401,28 @@ public class ExportServiceImpl implements ExportService{
             logger.error("ftp error: "+e.getMessage());
           }
         }
+      }
+
+      if (ftp!=null && ftp != "") {
+          // deleting the files
+          logger.debug("Deleting exported file.");
+          try {
+              serviceUtils.deleteFile(exportBean.getFileName(),true);
+              serviceUtils.deleteFile(zipFileName,true);
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+
+      }
+      else {
+          // deleting the files
+          logger.debug("Deleting exported file.");
+          try {
+              serviceUtils.deleteFile(exportBean.getFileName(),true);
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+
       }
     }
   }
@@ -436,7 +452,7 @@ public class ExportServiceImpl implements ExportService{
 
       for (int i = 1; i < noOfPages; i += 1) {
         // get data in pages and keep storing it to file
-        // do not use entire ftpexportsize else there will be no data
+        // do not use entire s3exportsize else there will be no data
         // this happens because of memory issues / JVM configuration.
         // This page number will make sure that we process the last bit of info
         page = i;
@@ -503,86 +519,36 @@ public class ExportServiceImpl implements ExportService{
       File cfile = new File(exportBean.getFileName());
       String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
-      logger.debug("finalS3 = " + finalS3);
-      if (finalS3 != null && finalS3 != "") {
-
+      for (String aliastemp : finalS3.split(",")) {
+        logger.info("AliasTemp : " + aliastemp);
+        ObjectMapper jsonMapper = new ObjectMapper();
         try {
+          S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
+          for (S3Details alias : obj.getS3List()) {
+            if (alias.getCustomerCode().equals(finalJobGroup)
+                && aliastemp.equals(alias.getAlias())) {
+              logger.info("Final Obj to be dispatched for S3 : ");
+              logger.info("BucketName : " + alias.getBucketName());
+              logger.info("AccessKey : " + alias.getAccessKey());
+              logger.info("SecretKey : " + alias.getSecretKey());
+              logger.info("Region : " + alias.getRegion());
+              logger.info("getOutputLocation : " + alias.getOutputLocation());
+              logger.info("FileName : " + exportBean.getFileName());
 
-          FileOutputStream fos_zip = new FileOutputStream(zipFileName);
-          ZipOutputStream zos = new ZipOutputStream(fos_zip);
+              S3Config s3Config =
+                  new S3Config(
+                      alias.getBucketName(),
+                      alias.getAccessKey(),
+                      alias.getSecretKey(),
+                      alias.getRegion(),
+                      alias.getOutputLocation());
 
-          zos.putNextEntry(new ZipEntry(cfile.getName()));
-
-          byte[] readBuffer = new byte[2048];
-          int amountRead;
-          int written = 0;
-
-          try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
-
-            while ((amountRead = inputStream.read(readBuffer)) > 0) {
-              zos.write(readBuffer, 0, amountRead);
-              written += amountRead;
-            }
-
-            logger.info("Written " + written + " bytes to " + zipFileName);
-
-          } catch (Exception e) {
-            logger.error("Error while writing to zip: " + e.getMessage());
-          }
-
-          //            byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
-          //            zos.write(bytes, 0, bytes.length);
-          zos.closeEntry();
-          zos.close();
-
-          for (String aliastemp : finalS3.split(",")) {
-              logger.info("AliasTemp : "+aliastemp);
-            ObjectMapper jsonMapper = new ObjectMapper();
-            try {
-              S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
-              for (S3Details alias : obj.getS3List()) {
-                if (alias.getCustomerCode().equals(finalJobGroup)
-                   && aliastemp.equals(alias.getAlias())
-                    ) {
-                    logger.info("Final Obj to be dispatched for S3 : ");
-                    logger.info("BucketName : "+alias.getBucketName());
-                    logger.info("AccessKey : "+alias.getAccessKey());
-                    logger.info("SecretKey : "+alias.getSecretKey());
-                    logger.info("Region : "+alias.getRegion());
-                    logger.info("getOutputLocation : "+alias.getOutputLocation());
-                    logger.info("FileName : "+ zipFileName);
-
-                    S3Config s3Config =
-                      new S3Config(
-                          alias.getBucketName(),
-                          alias.getAccessKey(),
-                          alias.getSecretKey(),
-                          alias.getRegion(),
-                          alias.getOutputLocation());
-
-                    AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
-//                    ObjectMetadata metadata = new ObjectMetadata();
-//                    metadata.setContentType("plain/text");
-//                    metadata.addUserMetadata("x-amz-meta-title", "someTitle");
-                    s3Handler.uploadObject(cfile.getAbsoluteFile());
-                }
-              }
-            } catch (IOException e) {
-              logger.error(e.getMessage());
+              AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
+              s3Handler.uploadObject(cfile.getAbsoluteFile());
             }
           }
-
-          // deleting the files
-          logger.debug("Deleting exported file.");
-          serviceUtils.deleteFile(exportBean.getFileName(), true);
-          serviceUtils.deleteFile(zipFileName, true);
-
-          // close the streams
-          zos.close();
-          fos_zip.close();
-
         } catch (Exception e) {
-          logger.error("S3 error: " + e.getMessage());
+          logger.error(e.getMessage());
         }
       }
     }
@@ -708,16 +674,20 @@ public class ExportServiceImpl implements ExportService{
     Object dispatchBean = request.getBody();
     String recipients = null;
     String ftp = null;
+    String s3 = null;
     String jobGroup = null;
+    ExportBean exportBean = new ExportBean();
 
     // check beforehand if the request is not null
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
       recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
       ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
+      s3 = String.valueOf(((LinkedHashMap) dispatchBean).get("s3"));
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
 
       logger.debug("recipients: " + recipients);
       logger.debug("ftp: " + ftp);
+      logger.debug("s3: "+s3);
 
       if(recipients!=null && !recipients.equals("")) {
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
@@ -732,7 +702,6 @@ public class ExportServiceImpl implements ExportService{
           public void onSuccess(ResponseEntity<JsonNode> entity) {
             logger.debug("[Success] Response :" + entity.getStatusCode());
             IFileExporter iFileExporter = new XlsxExporter();
-            ExportBean exportBean = new ExportBean();
             String dir = UUID.randomUUID().toString();
             MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
               exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
@@ -767,6 +736,13 @@ public class ExportServiceImpl implements ExportService{
             logger.error("[Failed] Getting string response:" + t);
           }
         });
+      }
+
+      logger.debug("S3 details = " + s3);
+      if (s3 != null && s3 != "") {
+        logger.debug("S3 details set. Dispatching to S3");
+        s3DispatcherPivot(
+            analysisId, executionId, s3, asyncRestTemplate, dispatchBean, requestEntity, jobGroup);
       }
 
       if(ftp!=null && !ftp.equals("")) {
@@ -878,6 +854,119 @@ public class ExportServiceImpl implements ExportService{
         });
       }
     }
+  }
+
+  public void s3DispatcherPivot(
+      String analysisId,
+      String executionId,
+      String s3,
+      AsyncRestTemplate asyncRestTemplate,
+      Object dispatchBean,
+      HttpEntity<?> requestEntity,
+      String jobGroup) {
+    String url =
+        apiExportOtherProperties
+            + "/"
+            + analysisId
+            + "/executions/"
+            + executionId
+            + "/data?page=1&pageSize="
+            + s3ExportSize
+            + "&analysisType=pivot";
+    ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
+        asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
+
+    logger.debug("dispatchBean for Pivot: " + dispatchBean.toString());
+    String finalS3 = s3;
+    String finalJobGroup = jobGroup;
+    responseStringFuture.addCallback(
+        new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
+          @Override
+          public void onSuccess(ResponseEntity<JsonNode> entity) {
+            logger.debug("[Success] Response :" + entity.getStatusCode());
+            IFileExporter iFileExporter = new XlsxExporter();
+            ExportBean exportBean = new ExportBean();
+            String dir = UUID.randomUUID().toString();
+
+            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+            exportBean.setFileName(
+                publishedPath
+                    + File.separator
+                    + dir
+                    + File.separator
+                    + String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
+                    + "."
+                    + exportBean.getFileType());
+            exportBean.setReportDesc(
+                String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+            exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+            exportBean.setPublishDate(
+                String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+            exportBean.setCreatedBy(
+                String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+
+            File cfile = new File(exportBean.getFileName());
+
+            try {
+              File file = new File(exportBean.getFileName());
+              file.getParentFile().mkdir();
+              AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
+              ElasticSearchAggeragationParser elasticSearchAggeragationParser =
+                  new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
+              List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
+              elasticSearchAggeragationParser.setColumnDataType(
+                  exportBean, analysisMetaData.getAnalyses().get(0));
+              Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
+              CreatePivotTable createPivotTable =
+                  new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
+              createPivotTable.createPivot(workbook, file);
+            } catch (FileNotFoundException e) {
+                logger.error("Zip file error FileNotFound: " + e.getMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+              logger.debug("s3 List: " + finalS3);
+
+            for (String aliastemp : finalS3.split(",")) {
+              ObjectMapper jsonMapper = new ObjectMapper();
+              try {
+                S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
+                for (S3Details alias : obj.getS3List()) {
+                  if (alias.getCustomerCode().equals(finalJobGroup)
+                      && aliastemp.equals(alias.getAlias())) {
+                    logger.info("Final Obj to be dispatched for S3 : ");
+                    logger.info("BucketName : " + alias.getBucketName());
+                    logger.info("AccessKey : " + alias.getAccessKey());
+                    logger.info("SecretKey : " + alias.getSecretKey());
+                    logger.info("Region : " + alias.getRegion());
+                    logger.info("getOutputLocation : " + alias.getOutputLocation());
+                    logger.info("FileName : " + exportBean.getFileName());
+
+                    S3Config s3Config =
+                        new S3Config(
+                            alias.getBucketName(),
+                            alias.getAccessKey(),
+                            alias.getSecretKey(),
+                            alias.getRegion(),
+                            alias.getOutputLocation());
+
+                    AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
+                    s3Handler.uploadObject(cfile.getAbsoluteFile());
+                  }
+                }
+              } catch (IOException e) {
+                logger.error(e.getMessage());
+              } catch (Exception e) {
+                logger.error(e.getMessage());
+              }
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            logger.error("[Failed] Getting string response:" + t);
+          }
+        });
   }
 
   @Override
