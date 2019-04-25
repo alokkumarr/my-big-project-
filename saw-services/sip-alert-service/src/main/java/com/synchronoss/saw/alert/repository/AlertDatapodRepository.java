@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AlertDatapodRepository extends JpaRepository<DatapodDetails, String> {
 
-    Optional<DatapodDetails> findByDatapodId(String datapodId);
-
+  Optional<DatapodDetails> findByDatapodId(String datapodId);
 }
