@@ -119,9 +119,7 @@
             (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
               .length > 0
           "
-          [filters]="
-            (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
-          "
+          [filters]="filters"
           [readonly]="true"
           [artifacts]="
             analysis.sipQuery ? analysis.sipQuery.artifacts : analysis.artifacts

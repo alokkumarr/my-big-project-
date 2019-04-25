@@ -13,6 +13,7 @@ import {
 } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
+import * as forEach from 'lodash/forEach';
 
 import {
   AnalyzeService,
@@ -37,7 +38,8 @@ import { AnalyzeActionsService } from '../actions';
 import { Analysis, AnalysisDSL } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
 import { isUndefined } from 'util';
-import { isDSLAnalysis } from '../designer/types';
+import { isDSLAnalysis, Filter } from '../designer/types';
+import { CUSTOM_DATE_PRESET_VALUE } from './../consts';
 
 @Component({
   selector: 'executed-view',
@@ -67,6 +69,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
   chartActionBus$: Subject<Object> = new Subject<Object>();
+  public filters: Filter[] = [];
 
   @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
 
@@ -96,6 +99,30 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     );
   }
 
+  fetchFilters(analysis) {
+    console.log(analysis);
+    const queryBuilder = isDSLAnalysis(analysis)
+      ? analysis.sipQuery
+      : analysis.sqlBuilder;
+    this.filters = isDSLAnalysis(analysis)
+    ? this.generateDSLDateFilters(queryBuilder.filters)
+    : queryBuilder.filters;
+  }
+
+  generateDSLDateFilters(filters) {
+    forEach(filters, filtr => {
+      console.log(filtr);
+      if (!filtr.isRuntimeFilter && (filtr.type === 'date' && filtr.model.operator === 'BTW')) {
+        console.log("inside if");
+        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
+        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
+      }
+    });
+    console.log(filters);
+    return filters;
+  }
+
   onParamsChange(params, queryParams) {
     const { analysisId } = params;
     const {
@@ -111,7 +138,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       (analysis: Analysis | AnalysisDSL) => {
         this.analysis = analysis;
         this.setPrivileges(analysis);
-
+        this.fetchFilters(analysis);
         /* If an execution is not already going on, create a new execution
          * as applicable. */
         this.executeIfNotWaiting(

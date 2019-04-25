@@ -21,7 +21,7 @@
   <pivot-grid
     *ngIf="previewData && analysis.type === 'pivot'"
     [artifactColumns]="artifactColumns"
-    [sorts]="data.analysis.sqlBuilder.sorts"
+    [sorts]="data.analysis.sipQuery.sorts"
     [data]="previewData"
     mode="preview"
   >

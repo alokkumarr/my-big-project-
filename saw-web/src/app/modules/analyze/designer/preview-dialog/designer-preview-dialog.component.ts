@@ -87,7 +87,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, (<Analysis>analysis).sqlBuilder);
+    return flattenPivotData(data, (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder);
     case 'report':
     case 'esReport':
       return data;
