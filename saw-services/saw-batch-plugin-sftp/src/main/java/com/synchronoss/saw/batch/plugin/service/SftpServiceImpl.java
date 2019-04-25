@@ -971,10 +971,10 @@ public class SftpServiceImpl extends SipPluginContract {
                       logger.trace("Actual file name after downloaded in the  :"
                           + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
                       logger.trace("Thread starts downloading file with Id  : " + logId);
-                      FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
-                      template.get(sourcelocation + File.separator + entry.getFilename(),
-                          new InputStreamCallback() {
-                            @Override
+                     // FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
+                     // template.get(sourcelocation + File.separator + entry.getFilename(),
+                     // new InputStreamCallback() {
+                     /*   @Override
                             public void doWithInputStream(InputStream stream) throws IOException {
 
 
@@ -1051,10 +1051,10 @@ public class SftpServiceImpl extends SipPluginContract {
                                 }
                               }
                             }
-                          });
-                      bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
-                      bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
-                      sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
+                         }); */
+                     // bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
+                     // bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
+                     // sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                       // Adding to a list has been removed as a part of optimization
                       // SIP-6386
                       //list.add(bisDataMetaInfo);
@@ -1140,8 +1140,8 @@ public class SftpServiceImpl extends SipPluginContract {
     bisDataMetaInfo.setDataSizeInBytes(size);
     bisDataMetaInfo.setActualDataName(actualDataName);
     bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-    bisDataMetaInfo.setProcessState(BisProcessState.INPROGRESS.value());
-    bisDataMetaInfo.setComponentState(BisComponentState.DATA_INPROGRESS.value());
+    bisDataMetaInfo.setProcessState(BisProcessState.OPEN.value());
+    bisDataMetaInfo.setComponentState(BisComponentState.OPEN.value());
     bisDataMetaInfo.setActualReceiveDate(recieveDate);
     bisDataMetaInfo.setChannelId(channelId);
     bisDataMetaInfo.setRouteId(routeId);
