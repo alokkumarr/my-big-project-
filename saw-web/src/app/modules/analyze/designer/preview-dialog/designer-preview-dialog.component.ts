@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Analysis, ArtifactColumns } from '../types';
+import { Analysis, ArtifactColumns, AnalysisDSL } from '../types';
 import { DesignerService } from '../designer.service';
 import {
   flattenPivotData,
@@ -22,12 +22,13 @@ import * as map from 'lodash/map';
 export class DesignerPreviewDialogComponent implements OnInit {
   public previewData = null;
   public artifactColumns: ArtifactColumns;
-  public analysis: Analysis;
+  public analysis: Analysis | AnalysisDSL;
   public chartType: string;
   public state = DesignerStates.SELECTION_WITH_DATA;
-  public dataLoader: (
-    options: {}
-  ) => Promise<{ data: any[]; totalCount: number }>;
+  public dataLoader: (options: {}) => Promise<{
+    data: any[];
+    totalCount: number;
+  }>;
 
   constructor(
     public _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
@@ -35,7 +36,9 @@ export class DesignerPreviewDialogComponent implements OnInit {
     public _designerService: DesignerService
   ) {
     this.analysis = data.analysis;
-    this.chartType = this.analysis['chartType'];
+    this.chartType =
+      this.analysis['chartType'] ||
+      get(this.analysis, 'chartOptions.chartType');
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
@@ -80,11 +83,11 @@ export class DesignerPreviewDialogComponent implements OnInit {
     }
   }
 
-  flattenData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis | AnalysisDSL) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, (<Analysis>analysis).sqlBuilder);
     case 'report':
     case 'esReport':
       return data;
@@ -92,11 +95,11 @@ export class DesignerPreviewDialogComponent implements OnInit {
     case 'map':
       let chartData = flattenChartData(
         data,
-        analysis.sqlBuilder
+        (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder
       );
 
       /* Order chart data manually. Backend doesn't sort chart data. */
-      const sorts = get(this.analysis, 'sqlBuilder.sorts', []);
+      const sorts = get(this.analysis, 'sqlBuilder.sorts', get(this.analysis, 'sipQuery.sorts', []));
       if (!isEmpty(sorts)) {
         chartData = orderBy(
           chartData,

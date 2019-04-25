@@ -118,7 +118,7 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openPreviewDialog(analysis: Analysis) {
+  openPreviewDialog(analysis: Analysis | AnalysisDSL) {
     const data = {
       analysis
     };
