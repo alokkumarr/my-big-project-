@@ -3,7 +3,7 @@ package com.synchronoss.saw.alert.service;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.modal.Alert;
-import com.synchronoss.saw.alert.modal.AlertStates;
+import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -35,11 +35,11 @@ public interface AlertService {
 
   String retrieveAggregations(Ticket ticket);
 
-  List<AlertStates> getAlertStates(
+  AlertStatesResponse getAlertStates(
       @NotNull(message = "alertRuleId cannot be null") Long alertRuleId,
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket);
 
-  List<AlertStates> listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket);
+  AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket);
 }

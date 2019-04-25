@@ -9,6 +9,7 @@ import com.synchronoss.saw.alert.entities.DatapodDetails;
 import com.synchronoss.saw.alert.modal.Aggregation;
 import com.synchronoss.saw.alert.modal.Alert;
 import com.synchronoss.saw.alert.modal.AlertStates;
+import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.modal.Operator;
 import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -272,32 +274,39 @@ public class AlertServiceImpl implements AlertService {
    * @return List of AlertStates
    */
   @Override
-  public List<AlertStates> getAlertStates(
+  public AlertStatesResponse getAlertStates(
       @NotNull(message = "alertRuleId cannot be null") Long alertRuleId,
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket) {
+    AlertStatesResponse alertStatesResponse = null;
     Long alertRuleSysId =
         alertRulesRepository.findAlertByCustomer(ticket.getCustCode(), alertRuleId);
-    List<AlertStates> alertStates = null;
     if (alertRuleSysId != null) {
+      alertStatesResponse = new AlertStatesResponse();
       Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
-      alertStates = alertTriggerLog.findByAlertRulesSysId(alertRuleId, pageable);
+      Page<AlertStates> alertStates = alertTriggerLog.findByAlertRulesSysId(alertRuleId, pageable);
+      alertStatesResponse.setAlertStatesList(alertStates.getContent());
+      alertStatesResponse.setNumberOfRecords(alertStates.getTotalElements());
     }
-    return alertStates;
+    return alertStatesResponse;
   }
 
   /**
    * Get list of pageable Alerts by time order.
    *
    * @param ticket Ticket
-   * @return List of AlertStates
+   * @return List of AlertStates, number of records.
    */
   @Override
-  public List<AlertStates> listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket) {
+  public AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket) {
     Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
-    List<AlertStates> alertStates = alertTriggerLog.findByAlertStates(pageable);
-    return alertStates;
+    AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
+    Page<AlertStates> alertStates = alertTriggerLog.findByAlertStates(pageable);
+    alertStatesResponse.setAlertStatesList(alertStates.getContent());
+    alertStatesResponse.setNumberOfRecords(alertStates.getTotalElements());
+    alertStatesResponse.setMessage("Success");
+    return alertStatesResponse;
   }
 
   /**
