@@ -30,7 +30,7 @@ public interface AlertTriggerLog extends JpaRepository<AlertTriggerDetailsLog, L
               + "    ATDL.ALERT_RULES_SYS_ID = :alertRuleSysId",
       countQuery =
           "select"
-              + "        count(*) "
+              + "        count(ATDL.ALERT_TRIGGER_SYS_ID) "
               + "    FROM "
               + "        ALERT_TRIGGER_DETAILS_LOG ATDL "
               + "    INNER JOIN "
@@ -60,7 +60,7 @@ public interface AlertTriggerLog extends JpaRepository<AlertTriggerDetailsLog, L
               + "    ON ATDL.ALERT_RULES_SYS_ID = ALD.ALERT_RULES_SYS_ID ",
       countQuery =
           "select"
-              + "        count(*) "
+              + "        count(ATDL.ALERT_TRIGGER_SYS_ID) "
               + "    FROM "
               + "        ALERT_TRIGGER_DETAILS_LOG ATDL "
               + "    INNER JOIN "
