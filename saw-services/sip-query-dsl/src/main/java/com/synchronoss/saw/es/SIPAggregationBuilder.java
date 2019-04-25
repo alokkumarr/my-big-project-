@@ -56,6 +56,7 @@ public class SIPAggregationBuilder {
                         }
                         else {
                             aggregationBuilder = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
+                                .format(dataField.getDateFormat())
                                 .field(dataField.getColumnName()).size(querySize);
                         }
                     }
@@ -99,7 +100,7 @@ public class SIPAggregationBuilder {
                         }
                         else {
                             aggregationBuilderMain = AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
-                                .field(dataField.getColumnName())
+                                .field(dataField.getColumnName()).format(dataField.getDateFormat())
                                 .subAggregation(aggregationBuilder).size(querySize);
                         }
                     }
