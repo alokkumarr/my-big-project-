@@ -34,6 +34,7 @@ import {
   DEFAULT_DATE_FORMAT
 } from '../../../modules/analyze/consts';
 import { getFormatter } from '../../utils/numberFormatter';
+import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
@@ -269,7 +270,7 @@ export class PivotGridComponent implements OnDestroy {
   getFormatter(format) {
     // Pivot grid auto converts given moment to local dates. It's important to
     // re-convert it to the zone we used to provide dates to normalise it.
-    return value => moment.utc(value).format(format);
+    return value => moment.utc(value, format).format(format);
   }
 
   preProcessData(data) {
@@ -311,7 +312,7 @@ export class PivotGridComponent implements OnDestroy {
     switch (dateInterval) {
     case 'day':
       formatToApply = this.getMomentFormat(format);
-      return moment.utc(value);
+      return moment.utc(value, format);
     case 'quarter':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
       const formattedValue = moment.utc(value).format(formatToApply);
