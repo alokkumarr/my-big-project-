@@ -48,8 +48,6 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
   @Input() sorts: Array<Sort> = [];
 
   @Input('sipQuery') set setSipQuery(sipQuery: QueryDSL) {
-    console.log('sipQuery', sipQuery);
-
     this.sipQuery = sipQuery;
   }
 
