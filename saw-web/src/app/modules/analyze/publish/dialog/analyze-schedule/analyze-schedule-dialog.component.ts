@@ -76,7 +76,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   isReport: boolean;
   fileType: string;
   startDateCorrectFlag = true;
-  zipFormatFlag: boolean = false;
+  // zipFormatFlag: boolean = false;
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
@@ -222,8 +222,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       categoryId: analysis.categoryId,
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
-      scheduleState: this.scheduleState,
-      zip: this.zipFormatFlag
+      scheduleState: this.scheduleState
+      //zip: this.zipFormatFlag
     };
     this.triggerSchedule();
   }
@@ -253,7 +253,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         emailList: this.emails,
         ftp: this.ftp,
         s3: this.s3Bucket,
-        zip: this.zipFormatFlag,
         fileType: this.fileType,
         jobName: cronJobName,
         endDate: crondetails.endDate,
@@ -373,14 +372,14 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   onS3LocationSelected(value) {
     this.s3Bucket = value;
-    if (this.s3Bucket.length <= 0) {
+    /* if (this.s3Bucket.length <= 0) {
       this.zipFormatFlag = false;
-    }
+    } */
   }
 
-  checkZipped(event) {
+  /* checkZipped(event) {
     this.zipFormatFlag = event.checked;
-  }
+  } */
 
   close() {
     this._dialogRef.close();
