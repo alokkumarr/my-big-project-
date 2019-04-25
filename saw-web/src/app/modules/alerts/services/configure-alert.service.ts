@@ -57,7 +57,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   getOperators(): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts/operators`;
+    const endpoint = `${this.api}/alerts/operators`;
     return this.http.get(endpoint);
   }
 
@@ -68,7 +68,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   getAggregations(): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts/aggregations`;
+    const endpoint = `${this.api}/alerts/aggregations`;
     return this.http.get(endpoint);
   }
 
@@ -80,7 +80,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   createAlert(alertConfig: AlertConfig): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts`;
+    const endpoint = `${this.api}/alerts`;
     return this.http.post(endpoint, alertConfig);
   }
 
@@ -94,7 +94,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   updateAlert(id: string, alertConfig: AlertConfig): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts/${id}`;
+    const endpoint = `${this.api}/alerts/${id}`;
     return this.http.put(endpoint, alertConfig);
   }
 
@@ -106,7 +106,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   deleteAlert(id: string): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts/${id}`;
+    const endpoint = `${this.api}/alerts/${id}`;
     return this.http.delete(endpoint);
   }
 
@@ -117,7 +117,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   getAllAlerts(): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts`;
+    const endpoint = `${this.api}/alerts`;
     return this.http.get(endpoint);
   }
 }
