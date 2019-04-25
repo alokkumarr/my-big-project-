@@ -687,7 +687,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       break;
     case 'preview':
-      this._analyzeDialogService.openPreviewDialog(<Analysis>this.analysis);
+      this._analyzeDialogService.openPreviewDialog(<Analysis | AnalysisDSL>this.analysis);
       break;
     case 'description':
       this._analyzeDialogService
