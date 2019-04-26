@@ -42,6 +42,7 @@ public class SIPAggregationBuilder {
         histogramInterval = DateHistogramInterval.MONTH;
         break;
       case "day":
+      case "all":
         histogramInterval = DateHistogramInterval.DAY;
         break;
       case "year":
