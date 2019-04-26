@@ -1,13 +1,13 @@
 [Unit]
-Description=SAW test deployer
+Description=SIP test deployer
 After=default.target
 
 [Service]
 Type=oneshot
-ExecStart=/root/saw-deploy
+ExecStart=/root/sip-deploy
 Environment=container=docker
 Environment=service=1
-SyslogIdentifier=saw-deploy
+SyslogIdentifier=sip-deploy
 
 [Install]
 WantedBy=default.target

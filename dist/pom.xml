@@ -4,13 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.synchronoss.saw</groupId>
-    <artifactId>saw</artifactId>
+    <artifactId>sip</artifactId>
     <version>${revision}</version>
   </parent>
   <artifactId>dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
-  <name>saw-dist</name>
+  <name>sip-dist</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Name used for Docker Machine.  Should include the username to
