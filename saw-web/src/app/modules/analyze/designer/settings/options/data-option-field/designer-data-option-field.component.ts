@@ -1,6 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as debounce from 'lodash/debounce';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
 import { Store } from '@ngxs/store';
 
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
@@ -25,9 +28,17 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   @Input() artifactColumn: ArtifactColumn;
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
-  @Input() sipQuery: QueryDSL;
-  @Input() fieldCount: number;
+  @Input('sipQuery') set setSipQuery(sipQuery: QueryDSL) {
+    this.sipQuery = sipQuery;
+    const fields = fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpFilter(artifact => artifact.area === 'y')
+    )(sipQuery.artifacts);
+    this.fieldCount = fields.length;
+  }
 
+  public fieldCount: number;
+  public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
   public hasDateInterval = false;
   public isDataField = false;

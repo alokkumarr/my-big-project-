@@ -68,7 +68,6 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   }
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
-  @Input() fieldCount: number;
   @Input() public sqlBuilder;
 
   public dropListContainer;

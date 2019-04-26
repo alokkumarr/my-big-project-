@@ -31,7 +31,6 @@ export class SingleTableDesignerLayoutComponent {
   @Input() sqlBuilder: SqlBuilderChart;
   @Input() designerState: DesignerStates;
   @Input() chartTitle: string;
-  @Input() fieldCount: number;
 
   public DesignerStates = DesignerStates;
   public isOptionsPanelOpen = false;
