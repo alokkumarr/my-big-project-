@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { Filter, Artifact, ArtifactColumn } from './../../../analyze/types';
+import { isDSLAnalysis } from './../../../analyze/types';
 import {
   NUMBER_TYPES,
   DATE_TYPES,
@@ -11,6 +12,8 @@ import {
   NUMBER_FILTER_OPERATORS_OBJ
 } from './../../../analyze/consts';
 import { reduce } from 'lodash';
+import * as forEach from 'lodash/forEach';
+import moment from 'moment';
 
 @Component({
   selector: 'zoom-analysis',
@@ -21,13 +24,19 @@ import { reduce } from 'lodash';
 export class ZoomAnalysisComponent implements OnInit {
   public analysisData: Array<any>;
   public nameMap;
-
+  public filters: Filter;
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,
     @Inject(MAT_DIALOG_DATA) public data
   ) {}
 
   ngOnInit() {
+    const queryBuilder = isDSLAnalysis(this.data.analysis)
+      ? this.data.analysis.sipQuery
+      : this.data.analysis.sqlBuilder;
+    this.filters = isDSLAnalysis(this.data.analysis)
+    ? this.generateDSLDateFilters(queryBuilder.filters)
+    : queryBuilder.filters;
     this.nameMap = reduce(
       this.data.origAnalysis.artifacts,
       (acc, artifact: Artifact) => {
@@ -43,6 +52,17 @@ export class ZoomAnalysisComponent implements OnInit {
       },
       {}
     );
+  }
+
+  generateDSLDateFilters(filters) {
+    forEach(filters, filtr => {
+      if (!filtr.isRuntimeFilter && (filtr.type === 'date' && filtr.model.operator === 'BTW')) {
+        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
+        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
+      }
+    });
+    return filters;
   }
 
   getDisplayName(filter: Filter) {

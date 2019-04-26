@@ -100,7 +100,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   fetchFilters(analysis) {
-    console.log(analysis);
     const queryBuilder = isDSLAnalysis(analysis)
       ? analysis.sipQuery
       : analysis.sqlBuilder;
@@ -111,15 +110,12 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   generateDSLDateFilters(filters) {
     forEach(filters, filtr => {
-      console.log(filtr);
       if (!filtr.isRuntimeFilter && (filtr.type === 'date' && filtr.model.operator === 'BTW')) {
-        console.log("inside if");
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
       }
     });
-    console.log(filters);
     return filters;
   }
 

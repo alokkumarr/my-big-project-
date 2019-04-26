@@ -275,7 +275,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
       }
     });
-    console.log(filters);
     return filters;
   }
 
@@ -627,7 +626,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
-      : this.nonDSLAnalysisForRequest(this.analysis);    
+      : this.nonDSLAnalysisForRequest(this.analysis);
       // forEach(requestAnalysis.sipQuery.artifacts[0].fields, field => {
       //   if (field.type === 'date') {
       //     // field.dateFormat = field.format;

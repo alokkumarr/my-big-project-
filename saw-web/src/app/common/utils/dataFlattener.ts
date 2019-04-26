@@ -17,13 +17,33 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
 
+function substituteEmptyValues(data, fields) {
+  return flatMap(fields, field =>
+    fpPipe(
+      fpMap(value => {
+        // As per AC on 5216, if key is empty show undefined
+        if (isEmpty(value[field.name])) {
+          value[field.name] = 'undefined';
+        }
+        return value;
+      })
+    )(data)
+  );
+}
+
 export function flattenPivotData(data, sqlBuilder) {
   if (sqlBuilder.artifacts) {
+    const columnRowFields = sqlBuilder.artifacts[0].fields
+          .filter(field => ['row', 'column'].includes(field.area));
+    // As per AC on 5216, if key is empty show undefined
+    data = substituteEmptyValues(data, columnRowFields);
     return data;
   }
   const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
   return parseNodePivot(data, {}, nodeFieldMap, 0);
 }
+
+
 
 /** Map the tree level to the columnName of the field
  * Example:

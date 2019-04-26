@@ -109,6 +109,7 @@ export class AnalyzeService {
     analysisType,
     executionType = EXECUTION_DATA_MODES.NORMAL
   ) {
+    console.log('sinde');
     const onetimeExecution =
       executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
@@ -182,6 +183,7 @@ export class AnalyzeService {
   }
 
   getPublishedAnalysesByAnalysisId(id) {
+    console.log('sinde');
     return <Promise<Analysis[]>>this.getRequest(`analysis/${id}/executions`)
       .toPromise()
       .then(fpGet(`executions`))
@@ -197,6 +199,7 @@ export class AnalyzeService {
   }
 
   getLastExecutionData(analysisId, options: ExecutionRequestOptions = {}) {
+    console.log('sinde');
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
@@ -228,6 +231,7 @@ export class AnalyzeService {
     executionId,
     options: ExecutionRequestOptions = {}
   ) {
+    console.log('sinde');
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
