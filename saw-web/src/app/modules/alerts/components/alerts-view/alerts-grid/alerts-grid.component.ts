@@ -16,23 +16,28 @@ export class AlertsGridComponent implements OnInit {
     showPageSizeSelector: true
   };
   data: any = {};
-  dataLoader: (options: {}) => Promise<{ data: any[]; totalCount: number }>;
+  alertsDataLoader: (options: {}) => Promise<{
+    data: any[];
+    totalCount: number;
+  }>;
 
   constructor() {}
 
-  @Input('dataLoader')
-  set setDataLoader(
-    dataLoader: (options: {}) => Promise<{ data: any[]; totalCount: number }>
+  @Input('alertsDataLoader')
+  set setAlertsDataLoader(
+    alertsDataLoader: (options: {}) => Promise<{
+      data: any[];
+      totalCount: number;
+    }>
   ) {
-    if (isFunction(dataLoader)) {
-      this.dataLoader = dataLoader;
+    if (isFunction(alertsDataLoader)) {
+      this.alertsDataLoader = alertsDataLoader;
       this.data = new CustomStore({
-        load: options => this.dataLoader(options)
+        load: options => this.alertsDataLoader(options),
+        key: ['alertTriggerSysId']
       });
-      this.remoteOperations = { paging: true };
-      this.paging = { pageSize: 25, pageIndex: 0 };
     } else {
-      throw new Error('Data loader requires a Function');
+      throw new Error('alertsDataLoader should be a function');
     }
   }
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import * as floor from 'lodash/floor';
-import * as fpGet from 'lodash/fp/get';
+import * as get from 'lodash/get';
 import { GridPagingOptions } from '../alerts.interface';
 import AppConfig from '../../../../../appConfig';
 
@@ -22,10 +22,10 @@ export class AlertsService {
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
     const url = `${basePath}${queryParams}`;
 
-    return this.getRequest(url).then(resp => {
-      const data = fpGet(`alertStatesList`, resp);
-      const count = fpGet(`numberOfRecords`, resp) || data.length;
-      return { data, count };
+    return this.getRequest(url).then(response => {
+      const data = get(response, `alertStatesList`);
+      const totalCount = get(response, `numberOfRecords`) || data.length;
+      return { data, totalCount };
     });
   }
 

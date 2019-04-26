@@ -36,7 +36,7 @@
       <span fxFlex class="view-container-content__header__title" i18n
         >Alert History
       </span>
-      <button
+      <!-- <button
         *ngIf="!alertViewSidenav.opened"
         mat-icon-button
         class="view-container-content__header__filterBtn"
@@ -45,10 +45,20 @@
         (click)="alertViewSidenav.open()"
       >
         <mat-icon fontIcon="icon-filter"></mat-icon>
-      </button>
+      </button> -->
     </div>
-    <div fxFlex class="view-container-content__body">
-      <alerts-grid [dataLoader]="dataLoader"></alerts-grid>
+    <div
+      fxFlex
+      fxLayout="column"
+      fxLayoutGap="5px"
+      class="view-container-content__body"
+    >
+      <div
+        fxFlex="100"
+        class="view-container-content__body__grid mat-elevation-z3"
+      >
+        <alerts-grid [alertsDataLoader]="alertsDataLoader"></alerts-grid>
+      </div>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

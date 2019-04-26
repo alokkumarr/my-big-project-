@@ -6,17 +6,17 @@ import { AlertsService } from '../../services/alerts.service';
   styleUrls: ['./alerts-view.component.scss']
 })
 export class AlertsViewComponent implements OnInit {
-  public dataLoader: (options: {}) => Promise<{
+  public alertsDataLoader: (options: {}) => Promise<{
     data: any[];
     totalCount: number;
   }>;
   constructor(public _alertService: AlertsService) {
-    this.dataLoader = (options: {}) => {
+    this.alertsDataLoader = (options: {}) => {
       return this._alertService
         .getAlertsStatesForGrid(options)
         .then(result => ({
           data: result.data,
-          totalCount: result.count
+          totalCount: result.totalCount
         }));
     };
   }

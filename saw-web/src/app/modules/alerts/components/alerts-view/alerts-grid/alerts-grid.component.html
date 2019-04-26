@@ -1,18 +1,20 @@
 <dx-data-grid
+  class="alerts-grid"
   fxFlex
   e2e="alert-history-grid"
   [dataSource]="data"
   [showBorders]="false"
   [columnAutoWidth]="false"
   [showColumnLines]="false"
-  [showRowLines]="true"
+  [showRowLines]="false"
   [rowAlternationEnabled]="true"
+  [masterDetail]="{ enabled: true, template: 'detailTemplate' }"
 >
   <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
-  <dxo-paging [pageSize]="12"></dxo-paging>
+  <dxo-paging [pageSize]="25"></dxo-paging>
   <dxo-pager
     [showPageSizeSelector]="true"
-    [allowedPageSizes]="[8, 12, 20]"
+    [allowedPageSizes]="[10, 25, 50]"
   ></dxo-pager>
   <dxo-selection mode="none"></dxo-selection>
   <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
@@ -23,32 +25,46 @@
   ></dxo-search-panel>
   <!-- <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling> -->
   <dxi-column caption="Alert Name" dataField="alertName"></dxi-column>
-  <dxi-column dataField="severity"></dxi-column>
-  <dxi-column dataField="startTime"></dxi-column>
-  <dxi-column caption="Metric" dataField="metricValue"></dxi-column>
-  <dxi-column caption="Threshold" dataField="thresholdValue"></dxi-column>
-  <dxi-column
-    caption="More"
-    dataField="alertRulesSysId"
-    alignment="center"
-    cellTemplate="moreTemplate"
-  >
+  <dxi-column dataField="severity" cellTemplate="severityTemplate">
   </dxi-column>
+  <dxi-column dataField="category"></dxi-column>
+
+  <dxi-column
+    caption="Time"
+    dataField="startTime"
+    alignment="left"
+    cellTemplate="dateTemplate"
+  ></dxi-column>
+  <dxi-column
+    caption="Metric Value"
+    alignment="center"
+    dataField="metricValue"
+  ></dxi-column>
+  <dxi-column
+    caption="Threshold Value"
+    alignment="center"
+    dataField="thresholdValue"
+  ></dxi-column>
 
   <div
-    *dxTemplate="let data of 'moreTemplate'"
+    *dxTemplate="let data of 'severityTemplate'"
     fxLayout="row"
-    fxLayoutAlign="center center"
+    fxLayoutAlign="start center"
+    fxLayoutGap="5px"
   >
-    <button
-      mat-icon-button
-      color="primary"
-      e2e="delete-alert"
-      class="view-container-content__body__gridBtn"
-      matTooltip="Delete"
-      (click)="deleteAlert(data.data)"
-    >
-      <mat-icon fontIcon="icon-plus"></mat-icon>
-    </button>
+    <mat-icon
+      class="alerts-grid__gridIcon"
+      [ngClass]="data.data.severity"
+      fontIcon="icon-uniE901"
+    ></mat-icon>
+    <span fxFelx="50px" i18n>{{ data.data.severity | titlecase }}</span>
+  </div>
+
+  <div *dxTemplate="let data of 'dateTemplate'">
+    <span>{{ data.data.startTime | date: 'short' }}</span>
+  </div>
+
+  <div *dxTemplate="let alertDetail of 'detailTemplate'">
+    <alert-detail></alert-detail>
   </div>
 </dx-data-grid>

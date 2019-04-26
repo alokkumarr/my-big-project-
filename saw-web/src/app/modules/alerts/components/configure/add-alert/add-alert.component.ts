@@ -72,6 +72,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.alertMetricFormGroup = this._formBuilder.group({
       datapodId: ['', Validators.required],
       datapodName: [''],
+      categoryId: [''],
       monitoringEntity: ['', Validators.required]
     });
 
@@ -92,6 +93,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         selectedItem.metricName
       );
 
+      this.alertMetricFormGroup.controls.categoryId.setValue(
+        selectedItem.categoryId || 'Default'
+      );
+
       this.metricsList$ = this._configureAlertService.getMetricsInDatapod$(
         selectedItem.id
       );
@@ -103,7 +108,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       ...this.alertDefFormGroup.value,
       ...this.alertMetricFormGroup.value,
       ...this.alertRuleFormGroup.value,
-      categoryId: '1',
       product: 'SAWD000001'
     };
 

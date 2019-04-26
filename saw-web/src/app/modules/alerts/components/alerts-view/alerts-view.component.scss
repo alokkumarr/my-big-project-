@@ -50,8 +50,11 @@
 
     &__body {
       height: calc(100% - 45px);
-      background-color: white;
-      border-radius: 3px;
+      padding: 0 7px;
+
+      &__grid {
+        border-radius: 3px;
+      }
     }
   }
 }
