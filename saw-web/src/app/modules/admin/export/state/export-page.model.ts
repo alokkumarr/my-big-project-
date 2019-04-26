@@ -6,6 +6,11 @@ export interface ExportPageModel {
   selectedModule: string;
   selectedCategory: MenuItem;
 
+  /* Metrics by metric id */
+  metrics: {
+    [id: string]: any;
+  };
+
   /* Analyses in currently selected category */
   categoryAnalyses: Analysis[];
 

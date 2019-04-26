@@ -44,6 +44,11 @@ export class RemoveAllAnalysesFromExport {
   constructor() {}
 }
 
+export class ExportLoadMetrics {
+  static readonly type = '[Admin Export Page] Load metrics for all analyses';
+  constructor() {}
+}
+
 export class AddDashboardToExport {
   static readonly type = '[Admin Export Page] Add dashboard to export';
   constructor(public dashboard: Dashboard) {}
