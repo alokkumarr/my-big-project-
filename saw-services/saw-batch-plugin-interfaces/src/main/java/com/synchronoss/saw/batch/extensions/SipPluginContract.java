@@ -84,6 +84,14 @@ public abstract class SipPluginContract {
         + "will be overriden on the respective plugin module if required");
     return new ArrayList<>();
   }
+  
+  /**
+   * This method  executes actual file transfer
+   * used by worker threads.
+   */
+  public  abstract void executeFileTransfer(String logId, Long jobId, Long channelId, 
+      Long routeId, String fileName);
+
 
   /**
    * This method are the requires to complete the transfer.

@@ -906,7 +906,7 @@ public class SftpServiceImpl extends SipPluginContract {
           Long toatalCount = bisJobEntity.getTotalCount();
           long total = toatalCount + filesArray.size();
           logger.trace("Files count ::" +  total);
-              
+          sipLogService.updateJobLog(jobId,"OPEN", 0L, total);
           
           List<List<LsEntry>> result = IntStream.range(0, partitionSize)
               .mapToObj(i -> filesArray.subList(iterationOfBatches * i,
@@ -1327,7 +1327,8 @@ public class SftpServiceImpl extends SipPluginContract {
                         + " will be triggered by retry in case of isDisable duplicate " + isDisable
                         + " : " + channelId);
                     transferRetry(channelId, routeId, log.getBisChannelType(), isDisable,
-                        log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value(), log.getJobId());
+                        log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value(),
+                        log.getJob().getJobId());
                   }
                 }
                 logger.trace("Inside isDisable ends here");
@@ -1362,7 +1363,8 @@ public class SftpServiceImpl extends SipPluginContract {
                       + " will be triggered by retry in case of isDisable duplicate " + isDisable
                       + " : " + channelId);
                   transferRetry(channelId, routeId, log.getBisChannelType(), isDisable,
-                      log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value(), log.getJobId());
+                      log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value(),
+                      log.getJob().getJobId());
                 }
               }
             }
@@ -1535,6 +1537,37 @@ public class SftpServiceImpl extends SipPluginContract {
     return sipLogService.createJobLog(channelId, routeId, filePattern);
     
   }
+
+  @Override
+  public void executeFileTransfer(String logId, Long jobId, Long channelId,
+      Long routeId, String fileName) {
+
+    SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory
+        .getSessionFactory(channelId);
+    try (Session<?> session = sesionFactory.getSession()) {
+      if (session != null & session.isOpen()) {
+        logger.trace("connected successfully " + channelId);
+        logger.trace("session opened starts here ");
+        Optional<BisRouteEntity> routeEntity = this.findRouteById(routeId);
+        if (routeEntity.isPresent()) {
+          ObjectMapper objectMapper = new ObjectMapper();
+          objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES,
+              true);
+          objectMapper
+              .enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+          BisRouteEntity bisRouteEntity = routeEntity.get();
+
+          if (bisRouteEntity.getStatus() > 0) {
+            logger.info("Transfer logic goes here $$$$$$");
+          }
+        }
+      }
+    } catch (Exception exception) {
+      logger.error(exception.getLocalizedMessage());
+    }
+
+  }
+}
   
  
-}
+

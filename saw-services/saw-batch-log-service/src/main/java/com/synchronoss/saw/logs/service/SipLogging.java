@@ -68,7 +68,7 @@ public class SipLogging {
       bisLog.setTransferEndTime(entity.getFileTransferEndTime());
       bisLog.setTransferStartTime(entity.getFileTransferStartTime());
       bisLog.setSource(entity.getSource());
-      bisLog.setJobId(entity.getJobId());
+      bisLog.getJob().setJobId(entity.getJobId());
       bisFileLogsRepository.save(bisLog);
     } else {
       logger.trace("inserting logs when process Id is not found :" + pid);
@@ -90,7 +90,8 @@ public class SipLogging {
       bisLog.setCheckpointDate(new Date());
       bisLog.setCreatedDate(new Date());
       bisLog.setSource(entity.getSource());
-      bisLog.setJobId(entity.getJobId());
+      BisJobEntity jobEntity = this.retriveJobById(entity.getJobId());
+      bisLog.setJob(jobEntity);
       bisFileLogsRepository.save(bisLog);
     }
     logger.trace("Integrate with logging API to update with a status ends here : "
@@ -435,6 +436,8 @@ public class SipLogging {
     
   }
   
+  
+  
   /**
    * Returns Job entity by Id.
    * 
@@ -462,6 +465,18 @@ public class SipLogging {
     
   }
   
+  /**
+   * Returns Job entity by Id.
+   * 
+   */
+  public BisFileLog retreiveOpenLogs() {
+    List<BisFileLog> logs = bisFileLogsRepository.findFirstOpenLog();
+    BisFileLog log = null;
+    if (!logs.isEmpty()) {
+      log = logs.get(0);
+    } 
+    return log;
+  }
   
 
 

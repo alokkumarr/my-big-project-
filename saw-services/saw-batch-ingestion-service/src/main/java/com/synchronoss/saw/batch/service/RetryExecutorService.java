@@ -204,7 +204,7 @@ public class RetryExecutorService {
                         + isDisable + " : " + channelId);
                     sipRetryContract.retryFailedJob(channelId, routeId,
                         log.getBisChannelType(), isDisable, log.getPid(),
-                        BisComponentState.HOST_NOT_REACHABLE.value(), log.getJobId());
+                        BisComponentState.HOST_NOT_REACHABLE.value(), log.getJob().getJobId());
                     // transferRetry(channelId, routeId,
                     // log.getBisChannelType(), isDisable,
                     // log.getPid(),

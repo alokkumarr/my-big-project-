@@ -90,6 +90,10 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
         + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "
         + "'DATA_INPROGRESS' and Logs.routeSysId = :routeId )")
         Integer countOfInProgress(@Param("routeId") Long routeId);
+  
+  @Query("SELECT Logs FROM BisFileLog Logs  JOIN Logs.job BisJobEntity  "
+      + "WHERE Logs.mflFileStatus = 'OPEN' and Logs.job.jobStatus = 'INPROGRESS'")
+  List<BisFileLog> findFirstOpenLog();
 
 
 }

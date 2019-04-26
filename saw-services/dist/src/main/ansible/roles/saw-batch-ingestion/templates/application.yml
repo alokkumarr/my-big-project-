@@ -26,7 +26,8 @@ logging:
     com.synchronoss.saw: INFO
     org.springframework: INFO
     org.hibernate.type.descriptor.sql.BasicBinder : INFO
-    org.hibernate.SQL: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
     org.springframework.retry: INFO
 
 server:
@@ -60,6 +61,7 @@ sip:
     retry.diff.mins: {{ sip_bis_retry_diffs_in_minutes  | default(5) }}
     retry.page.size: 20
     max.inprogress.mins: 45
+    worker.delay: 5000
 
 bis:
   transfer-batch-size: 10

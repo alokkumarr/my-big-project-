@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 import io.swagger.annotations.ApiModel;
 
-@ApiModel(value="SIP_JOB", 
+@ApiModel(value="BIS_JOB", 
 description="Model for storing sip job entity")
 @Table(name = "BIS_JOB", catalog = "sip_bis", schema = "")
 @Entity
