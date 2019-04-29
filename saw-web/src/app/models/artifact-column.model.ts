@@ -22,7 +22,7 @@ export interface ArtifactColumn {
     | 'count'
     | 'distinctCount'
     | 'percentage'
-    | 'percentageByRow';
+    | 'percentagebyrow';
   name?: string;
   geoType?: string;
 }

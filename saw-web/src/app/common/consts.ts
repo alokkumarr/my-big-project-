@@ -202,7 +202,7 @@ export const AGGREGATE_TYPES = [
   {
     label: 'Percentage By Row',
     designerLabel: 'PCTR',
-    value: 'percentageByRow',
+    value: 'percentagebyrow',
     icon: 'icon-Percentage',
     type: 'float',
     valid: ['chart']
@@ -239,19 +239,6 @@ export const AGGREGATE_TYPES = [
   //   type: 'float',
   //   valid: ['chart']
   // }
-];
-
-export const AGGREGATE_STRING_TYPES = [
-  {
-    label: 'Count',
-    value: 'count',
-    icon: 'icon-Count'
-  },
-  {
-    label: 'Distinct Count',
-    value: 'distinctCount',
-    icon: 'icon-Count'
-  }
 ];
 
 export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];

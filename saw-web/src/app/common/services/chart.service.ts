@@ -485,7 +485,7 @@ export class ChartService {
       comboType || displayType
     );
     const zIndex = this.getZIndex(comboType || displayType);
-    if (aggregate === 'percentage' || aggregate === 'percentageByRow') {
+    if (aggregate === 'percentage' || aggregate === 'percentagebyrow') {
       aggrSymbol = '%';
     }
     const nameWithAggregate =
@@ -555,7 +555,7 @@ export class ChartService {
     let aggrsymbol = '';
     if (
       fields.y[0].aggregate === 'percentage' ||
-      fields.y[0].aggregate === 'percentageByRow'
+      fields.y[0].aggregate === 'percentagebyrow'
     ) {
       aggrsymbol = '%';
     }
@@ -996,7 +996,7 @@ export class ChartService {
      * @returns {undefined}
      */
     const getPrecision = (aggregate, type) => {
-      return ['percentage', 'avg', 'percentageByRow'].includes(aggregate) ||
+      return ['percentage', 'avg', 'percentagebyrow'].includes(aggregate) ||
         FLOAT_TYPES.includes(type)
         ? 2
         : 0;
@@ -1045,7 +1045,7 @@ export class ChartService {
         <td>${
           point
             ? round(
-                options.aggregate === 'percentageByRow'
+                options.aggregate === 'percentagebyrow'
                   ? round(point.percentage, 2)
                   : point.y,
                 getPrecision(options.aggregate, options.dataType)

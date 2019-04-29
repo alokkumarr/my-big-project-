@@ -69,10 +69,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   onAggregateChange(aggregate) {
     this.comboTypes = filter(COMBO_TYPES, type => {
-      if (aggregate === 'percentageByRow' && type.value === 'column') {
+      if (aggregate === 'percentagebyrow' && type.value === 'column') {
         return true;
       }
-      if (aggregate !== 'percentageByRow') {
+      if (aggregate !== 'percentagebyrow') {
         return true;
       }
     });

@@ -530,14 +530,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     if (!isGroupByPresent) {
       forEach(analysis.sqlBuilder.dataFields, dataField => {
         dataField.aggregate =
-          dataField.aggregate === 'percentageByRow'
+          dataField.aggregate === 'percentagebyrow'
             ? 'percentage'
             : dataField.aggregate;
       });
 
       forEach(this.artifacts[0].columns, col => {
         col.aggregate =
-          col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+          col.aggregate === 'percentagebyrow' ? 'percentage' : col.aggregate;
       });
     }
     return analysis;

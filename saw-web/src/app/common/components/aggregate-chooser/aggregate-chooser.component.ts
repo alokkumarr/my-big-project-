@@ -65,24 +65,24 @@ export class AggregateChooserComponent implements OnInit {
     const isGroupBy = this.getGroupByPresent(sipQuery);
     if (['column', 'bar', 'stack', 'combo'].includes(this.analysisSubtype)) {
       if (isGroupBy) {
-        if (value === 'percentageByRow' && !this.enablePercentByRow) {
+        if (value === 'percentagebyrow' && !this.enablePercentByRow) {
           return false;
         }
         enableByRowPercentage = true;
       }
     } else {
-      if (value === 'percentageByRow') {
+      if (value === 'percentagebyrow') {
         return false;
       }
     }
-    if (!isGroupBy && this.aggregate === 'percentageByRow') {
+    if (!isGroupBy && this.aggregate === 'percentagebyrow') {
       this.aggregate = 'percentage';
     }
 
     if (isGroupBy && this.enablePercentByRow) {
       return true;
     }
-    return value === 'percentageByRow' && !isGroupBy && !enableByRowPercentage
+    return value === 'percentagebyrow' && !isGroupBy && !enableByRowPercentage
       ? false
       : true;
   }
