@@ -64,6 +64,8 @@ public class SchedulerJobDetail implements Serializable {
 
     private List<String> s3;
 
+    private boolean zip;
+
     /**
      * Gets analysisID
      *
@@ -355,6 +357,10 @@ public class SchedulerJobDetail implements Serializable {
         this.s3 = s3;
     }
 
+    public boolean getZip() { return zip; }
+
+    public void setZip(boolean zip) { this.zip = zip; }
+
     /**
      *
      * @param out
@@ -381,7 +387,9 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(userFullName);
         out.writeObject(endDate);
         out.writeObject(timezone);
-        out.writeObject(s3);
+        if (s3!=null && s3.size()>0)
+            out.writeObject(s3);
+        out.writeObject(zip);
     }
 
     /**
@@ -473,6 +481,7 @@ public class SchedulerJobDetail implements Serializable {
             ", endDate=" + endDate +
             ", timezone='" + timezone + '\'' +
             ", s3=" + s3 +
+            ", zip" + zip +
             '}';
     }
 }
