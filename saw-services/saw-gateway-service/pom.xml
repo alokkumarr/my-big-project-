@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-gateway-service</artifactId>
+	<artifactId>sip-gateway-service</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description>This layer is responsible to merge the service serve the user interface.
@@ -186,8 +186,9 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-gateway</packageName>
+							<packageName>sip-gateway</packageName>
 							<version>${revision.nodash}</version>
+							<obsoletes>saw-gateway</obsoletes>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-gateway-service</name>
@@ -199,7 +200,7 @@
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-gateway-service/saw-gateway.jar</name>
-									<file>target/saw-gateway-service-${revision}-exec.jar</file>
+									<file>target/sip-gateway-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
 									<name>/usr/lib/systemd/system/saw-gateway.service</name>

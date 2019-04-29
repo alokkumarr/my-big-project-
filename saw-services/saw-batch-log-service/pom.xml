@@ -11,8 +11,8 @@
 		<relativePath></relativePath>
 	</parent>
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-batch-log-service</artifactId>
-	<name>saw-batch-log-service</name>
+	<artifactId>sip-batch-log-service</artifactId>
+	<name>sip-batch-log-service</name>
 	<version>${revision}</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

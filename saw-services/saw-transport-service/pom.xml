@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.synchronoss</groupId>
-        <artifactId>saw-services</artifactId>
+        <artifactId>sip-services</artifactId>
         <version>1.0.0</version>
     </parent>
     <groupId>com.synchronoss.saw</groupId>
-    <artifactId>saw-transport-service</artifactId>
+    <artifactId>sip-transport-service</artifactId>
     <packaging>jar</packaging>
     <version>${revision}</version>
     <properties>
@@ -75,7 +75,7 @@
       </dependency>
 	<dependency>
 		<groupId>com.synchronoss</groupId>
-		<artifactId>saw-common</artifactId>
+		<artifactId>sip-common</artifactId>
 		<version>${project.version}</version>
 		<exclusions>
 			<exclusion>
@@ -86,7 +86,7 @@
 	</dependency>
 	<dependency>
 		<groupId>com.synchronoss</groupId>
-		<artifactId>saw-es-querybuilder</artifactId>
+		<artifactId>sip-es-querybuilder</artifactId>
 		<version>${project.version}</version>
 	</dependency>
 			<dependency>
@@ -121,12 +121,12 @@
         </dependency>
         <dependency>
             <groupId>com.synchronoss</groupId>
-            <artifactId>saw-metadata-service</artifactId>
+            <artifactId>sip-metadata-service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.synchronoss</groupId>
-            <artifactId>saw-data-access</artifactId>
+            <artifactId>sip-data-access</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -588,8 +588,9 @@
                     <goal>rpm</goal>
                   </goals>
                   <configuration>
-                    <packageName>saw-transport</packageName>
+                    <packageName>sip-transport</packageName>
                     <version>${revision.nodash}</version>
+                    <obsoletes>saw-transport</obsoletes>
                     <skipSigning>true</skipSigning>
                     <rulesets>
                       <ruleset>

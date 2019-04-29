@@ -24,7 +24,7 @@
   template: src=saw-security.vars dest=/etc/bda/saw-security.vars
 - name: Copy SAW Security package
   copy: src="{{ item }}" dest=/tmp/saw-security.rpm
-  with_fileglob: ["../rpms/saw-security-*.rpm"]
+  with_fileglob: ["../rpms/sip-security-*.rpm"]
 - name: Install SAW Security package
   yum: name=/tmp/saw-security.rpm state=present
   notify:
