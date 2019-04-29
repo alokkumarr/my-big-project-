@@ -10,7 +10,7 @@ user:    mapr
 group:   mapr
 #
 optdir:  /opt/sip/sip-xdf
-vardir:  /var/sip/sip-xdf
+vardir:  /var/opt/sip/sip-xdf
 #
 dl.root:   hdfs:///var/sip/data
 http.port: 15010
