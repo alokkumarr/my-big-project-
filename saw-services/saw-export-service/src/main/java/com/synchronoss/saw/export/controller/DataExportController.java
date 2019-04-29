@@ -98,7 +98,7 @@ public class DataExportController {
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public S3 listS3(RequestEntity request) {
+  public S3 listS3Buckets(RequestEntity request) {
     S3 s3List = new S3();
     s3List.setS3(exportService.listS3ForCustomer(request));
     return s3List;
