@@ -6,7 +6,7 @@
 ansible_connection=ssh
 ansible_user=root
 ansible_ssh_pass=root
-
+sip_secure=true
 # The EPEL is installed in the SIP container base images, so mark it
 # as provided
 sip_epel_yum_provided=true
@@ -35,7 +35,6 @@ sip-app2
 # SIP
 #
 sip_var_path=/var/sip
-sip_secure=false
 #
 # Spark configuration
 #

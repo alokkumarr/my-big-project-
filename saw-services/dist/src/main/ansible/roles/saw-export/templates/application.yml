@@ -24,12 +24,15 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-  {% if sip_secure is sameas true  %}
+  {% if sip_secure %}
+
   ssl:
-   key-store: /xxxx/xxxxx/xxx.jks
-   key-store-password: xxxx
-   trust-store: /xxxx/xxxxx/xxx.jks
-   trust-store-password: xxxx
+   key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   key-alias: sip
+   key-store-password: "{{ sip_keystore_password }}"
+   trust-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   trust-store-password: "{{ sip_keystore_password }}"
+
   {% endif %}
 
 
@@ -45,17 +48,19 @@ management:
 sip:
    ssl:
      enable : {{ sip_secure  | default('false') }}
-   {% if sip_secure is sameas true  %}
+   {% if sip_secure %}
+
    trust:
        store: ${server.ssl.trust-store}
        password: ${server.ssl.trust-store-password}
    key:
       store: ${server.ssl.key-store}
       password: ${server.ssl.key-store-password}
+
   {% endif %}
 
 
-{% if sip_secure is sameas true  %}
+{% if sip_secure %}
 connector: https
 {% else %}
 connector: http

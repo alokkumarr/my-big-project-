@@ -2,6 +2,10 @@
   hosts: saw-services
   become: true
   roles:
+    # This role to be executed when sip environment
+    # tend to have secured communication across.
+    - { role: sip-secure, when: sip_secure }
+    #- sip-secure
     - saw-transport
     - saw-workbench
     - saw-export

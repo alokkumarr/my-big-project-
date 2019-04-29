@@ -24,11 +24,11 @@ server:
     mime-types: text/html,text/css,application/javascript,application/json
   servlet:
     context-path: ''
-  #ssl:
-   # key-store: /Users/spau0004/Desktop/keystore/keystore.jks
-   # key-store-password: sip@123
-   # trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
-   # trust-store-password: sip@123  
+  ssl:
+    key-store: /Users/spau0004/Desktop/keystore/keystore.jks
+    key-store-password: sip@123
+    trust-store: /Users/spau0004/Desktop/keystore/keystore.jks
+    trust-store-password: sip@123
 
 connector: http
 saw-security-port: 9000
@@ -152,7 +152,7 @@ api:
 
 sip:
    ssl:
-     enable : false
+     enable : true
    trust:
        store: /Users/spau0004/Desktop/keystore/truststore.jks
        password: sip@123
