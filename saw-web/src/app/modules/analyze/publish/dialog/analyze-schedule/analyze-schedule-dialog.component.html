@@ -47,16 +47,14 @@
               >XLSX</mat-radio-button
             >
             <!-- To Test the functionality Commenting this-->
-            <!-- <mat-checkbox
+            <mat-checkbox
               class="format-zip"
               value="zip"
               [(ngModel)]="zipFormatFlag"
-              *ngIf="s3Bucket.length > 0"
-              (change)="checkZipped($event)"
               [attr.e2e]="'schedule-analysis-filetype-' + fileType"
             >
               <strong>Zip/Compress the file</strong>
-            </mat-checkbox> -->
+            </mat-checkbox>
           </mat-radio-group>
         </div>
 
