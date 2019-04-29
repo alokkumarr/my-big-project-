@@ -6,7 +6,7 @@ public class S3Customer {
     public S3Customer() {
     }
 
-    public List<S3Details> s3List;
+    private List<S3Details> s3List;
 
     public List<S3Details> getS3List() {
         return s3List;

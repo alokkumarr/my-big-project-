@@ -1,6 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,86 +86,30 @@ public class AnalysisServiceImpl implements AnalysisService {
         format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         String formatted = format.format(date);
         DispatchBean execution;
+        Builder executionBuilder = ImmutableDispatchBean.builder()
+            .description(analysis.getDescription())
+            .name(analysis.getAnalysisName())
+            .userFullName(analysis.getUserFullName())
+            .metricName(analysis.getMetricName())
+            .jobGroup(analysis.getJobGroup())
+            .publishedTime(formatted);
 
-        if (!recipients.equals("") && !ftpServers.equals("") && !s3List.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                    .emailList(recipients).fileType(analysis.getFileType())
-                    .description(analysis.getDescription())
-                    .name(analysis.getAnalysisName())
-                    .userFullName(analysis.getUserFullName())
-                    .metricName(analysis.getMetricName())
-                    .ftp(ftpServers)
-                    .jobGroup(analysis.getJobGroup())
-                    .publishedTime(formatted).s3(s3List).build();
-        } else if (!recipients.equals("") && !ftpServers.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                    .emailList(recipients).fileType(analysis.getFileType())
-                    .description(analysis.getDescription())
-                    .name(analysis.getAnalysisName())
-                    .userFullName(analysis.getUserFullName())
-                    .metricName(analysis.getMetricName())
-                    .ftp(ftpServers)
-                    .jobGroup(analysis.getJobGroup())
-                    .publishedTime(formatted).build();
-        } else if (!ftpServers.equals("") && !s3List.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                    .description(analysis.getDescription())
-                    .fileType(analysis.getFileType())
-                    .name(analysis.getAnalysisName())
-                    .userFullName(analysis.getUserFullName())
-                    .metricName(analysis.getMetricName())
-                    .ftp(ftpServers)
-                    .jobGroup(analysis.getJobGroup())
-                    .publishedTime(formatted).s3(s3List).build();
-        } else if (!recipients.equals("") && !s3List.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                .emailList(recipients).fileType(analysis.getFileType())
-                .description(analysis.getDescription())
-                .fileType(analysis.getFileType())
-                .name(analysis.getAnalysisName())
-                .userFullName(analysis.getUserFullName())
-                .metricName(analysis.getMetricName())
-                .jobGroup(analysis.getJobGroup())
-                .publishedTime(formatted).s3(s3List).build();
-        } else if (!recipients.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                .emailList(recipients).fileType(analysis.getFileType())
-                .description(analysis.getDescription())
-                .fileType(analysis.getFileType())
-                .name(analysis.getAnalysisName())
-                .userFullName(analysis.getUserFullName())
-                .metricName(analysis.getMetricName())
-                .jobGroup(analysis.getJobGroup())
-                .publishedTime(formatted).build();
-        } else if (!s3List.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                .description(analysis.getDescription())
-                .fileType(analysis.getFileType())
-                .name(analysis.getAnalysisName())
-                .userFullName(analysis.getUserFullName())
-                .metricName(analysis.getMetricName())
-                .jobGroup(analysis.getJobGroup())
-                .publishedTime(formatted).s3(s3List).build();
-        } else if (!ftpServers.equals("")) {
-            execution = ImmutableDispatchBean.builder()
-                .description(analysis.getDescription())
-                .fileType(analysis.getFileType())
-                .name(analysis.getAnalysisName())
-                .userFullName(analysis.getUserFullName())
-                .metricName(analysis.getMetricName())
-                .ftp(ftpServers)
-                .jobGroup(analysis.getJobGroup())
-                .publishedTime(formatted).build();
-        } else {
-            execution = ImmutableDispatchBean.builder()
-                    .description(analysis.getDescription())
-                    .fileType(analysis.getFileType())
-                    .name(analysis.getAnalysisName())
-                    .userFullName(analysis.getUserFullName())
-                    .metricName(analysis.getMetricName())
-                    .jobGroup(analysis.getJobGroup())
-                    .publishedTime(formatted).build();
+        if (!recipients.equals("")) {
+            executionBuilder
+                .emailList(recipients).fileType(analysis.getFileType());
         }
+
+        if (!ftpServers.equals("")) {
+            executionBuilder
+                .ftp(ftpServers);
+        }
+
+        if (!s3List.equals("")) {
+            executionBuilder
+                .s3(s3List);
+        }
+
+        execution = executionBuilder.build();
         String[] param = new String[3];
         param[0] = analysis.getAnalysisID();
         param[1] = latestexection[0];
