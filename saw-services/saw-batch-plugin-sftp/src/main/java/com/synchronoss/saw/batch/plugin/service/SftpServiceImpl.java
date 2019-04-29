@@ -1210,53 +1210,5 @@ public class SftpServiceImpl extends SipPluginContract {
   }
   
   
-  
-  
-  
-
-  /**
-   * This is a common method to update the status.
-   *
-   * @param log log instance which has the details.
-   * @param fileStatus file status to be entered
-   * @param procesStatus component status to be updated
-   */
-  private void updateAndDeleteCorruptFiles(BisFileLog log, String fileStatus, String procesStatus) {
-    int rowId = 0;
-    rowId = sipLogService.updateStatusFailed(fileStatus, procesStatus, log.getPid());
-    logger.info("rowId updateAndDeleteCorruptFiles: " + log.getPid());
-    if (rowId <= 0) {
-      throw new PersistenceException(
-          "Exception occured while updating the bis log table to handle inconsistency");
-    }
-    // The below code fix which will be part of 
-    // TODO : SIP-6148
-    // This is known issue with this feature branch
-    String fileName = null;
-    if (log.getRecdFileName() != null) {
-      fileName = log.getRecdFileName();
-      logger.trace("Delete the corrupted file :" + fileName);
-      File fileDelete = new File(fileName);
-      if (fileDelete != null) {
-        logger.trace("Parent Directory deleted : " + fileDelete);
-        File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
-          @Override
-          public boolean accept(File file) {
-            return !file.isHidden();
-          }
-        });
-        if (files != null && files.length > 1) {
-          fileDelete.delete();
-        } else {
-          logger.trace("Directory deleted :", fileDelete);
-          IntegrationUtils.removeDirectory(fileDelete.getParentFile());
-        }
-      }
-    } else {
-      logger.trace("Corrupted file does not exist.");
-    }
-  }
-  
-  
  
 }
