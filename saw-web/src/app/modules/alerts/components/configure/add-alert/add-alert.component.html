@@ -135,6 +135,7 @@
                 valueExpr="id"
                 [searchEnabled]="true"
                 placeholder="Select a Datapod"
+                (onValueChanged)="onDatapodChanged()"
                 (onSelectionChanged)="onDatapodSelected($event?.selectedItem)"
                 e2e="datapodId"
               ></dx-select-box>

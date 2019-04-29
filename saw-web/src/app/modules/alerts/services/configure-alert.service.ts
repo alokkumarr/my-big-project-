@@ -20,6 +20,8 @@ export class ConfigureAlertService {
 
   /**
    * Gets list of all datapods avialble for that particular project
+   * Initial version of alert only supports with single artifact
+   * So filtering the list with that condition.
    *
    * @returns {Observable<any>}
    * @memberof ConfigureAlertService
@@ -27,7 +29,12 @@ export class ConfigureAlertService {
   getListOfDatapods$(): Observable<any> {
     return this.http
       .get(`${this.api}/internal/semantic/md?projectId=${PROJECTID}`)
-      .pipe(map(fpGet('contents.[0].ANALYZE')));
+      .pipe(
+        map(fpGet('contents.[0].ANALYZE')),
+        map((artifacts: Array<any>) =>
+          artifacts.filter(artifact => artifact.repository.length === 1)
+        )
+      );
   }
 
   /**

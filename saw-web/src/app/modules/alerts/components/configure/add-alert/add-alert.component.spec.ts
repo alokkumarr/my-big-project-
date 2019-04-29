@@ -10,7 +10,9 @@ import { ConfigureAlertService } from '../../../services/configure-alert.service
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { Observable } from 'rxjs';
 
-const ToastServiceStub: Partial<ToastService> = {};
+const ToastServiceStub: Partial<ToastService> = {
+  success(msg, title = '', options = {}) {}
+};
 
 const confAlertServiceStub = {
   createAlert: () => {
@@ -34,7 +36,7 @@ const confAlertServiceStub = {
 };
 
 const alertDefinitionStub: AlertDefinition = {
-  action: 'create',
+  action: 'update',
   alertConfig: {
     alertRulesSysId: '1',
     datapodId: '1',
@@ -101,6 +103,10 @@ describe('AddAlertComponent', () => {
     component.onDatapodSelected(selectedItem);
   });
 
+  it('should reset monitoringEntity formControl value', () => {
+    component.onDatapodChanged();
+  });
+
   it('should create alert payload', () => {
     component.constructPayload();
   });
@@ -111,5 +117,13 @@ describe('AddAlertComponent', () => {
 
   it('should update alert', () => {
     component.updateAlert();
+  });
+
+  it('should notifyOnAction', () => {
+    const data = {
+      alert: {},
+      message: 'Alert rule updated successfully'
+    };
+    component.notifyOnAction(data);
   });
 });

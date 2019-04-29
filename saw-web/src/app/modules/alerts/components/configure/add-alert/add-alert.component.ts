@@ -86,8 +86,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     });
   }
 
+  onDatapodChanged() {
+    this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
+  }
+
   onDatapodSelected(selectedItem) {
-    // this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
     if (selectedItem) {
       this.alertMetricFormGroup.controls.datapodName.setValue(
         selectedItem.metricName
@@ -122,8 +125,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {
-        this._notify.success(data.message);
-        this.onAddAlert.emit(true);
+        this.notifyOnAction(data);
       });
     this.subscriptions.push(createSubscriber);
   }
@@ -134,9 +136,13 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const updateSubscriber = this._configureAlertService
       .updateAlert(alertID, payload)
       .subscribe((data: any) => {
-        this._notify.success(data.message);
-        this.onAddAlert.emit(true);
+        this.notifyOnAction(data);
       });
     this.subscriptions.push(updateSubscriber);
+  }
+
+  notifyOnAction(data) {
+    this._notify.success(data.message);
+    this.onAddAlert.emit(true);
   }
 }
