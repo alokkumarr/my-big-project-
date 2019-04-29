@@ -14,12 +14,13 @@ import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
-import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
-import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
+import com.synchronoss.saw.util.FieldNames;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -31,6 +32,23 @@ import org.springframework.web.client.RestTemplate;
 
 public class MigrateAnalysis {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
+  public String statusFilePath = "/opt/bda/migrationstatus.json";
+
+  private AnalysisMetadata analysisMetadataStore = null;
+  private String listAnalysisUrl;
+  private String tableName;
+  private String basePath;
+
+  public MigrateAnalysis() {}
+
+  public MigrateAnalysis(
+      String tableName, String basePath, String listAnalysisUri, String statusFilePath) {
+
+    this.basePath = basePath;
+    this.tableName = tableName;
+    this.listAnalysisUrl = listAnalysisUri;
+    this.statusFilePath = statusFilePath;
+  }
 
   /**
    * Converts analysis definition in binary table to new SIP DSL format.
@@ -39,11 +57,11 @@ public class MigrateAnalysis {
    * @param basePath - Table path
    * @param listAnalysisUri - API to get list of existing analysis
    */
-  public void convertBinaryToJson(
-      String tableName, String basePath, String listAnalysisUri) throws Exception {
+  public void convertBinaryToJson(String tableName, String basePath, String listAnalysisUri)
+      throws Exception {
     logger.trace("Migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
-    AnalysisMetadata analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+    analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -61,28 +79,71 @@ public class MigrateAnalysis {
       JsonObject analysisBinaryObject = jelement.getAsJsonObject();
       JsonArray analysisList =
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
-      (analysisList)
-          .forEach(
-              analysisElement -> {
-                Analysis analysis =
-                    convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
-                try {
 
-                  logger.info("Inserting analysis " + analysis.getId() + " into json store");
-                  Gson gson = new GsonBuilder().create();
-                  JsonElement parsedAnalysis = gson.toJsonTree(analysis, Analysis.class);
-                  analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
-                } catch (JsonProcessingException exception) {
-                  logger.error("Unable to convert analysis to json");
-                } catch (Exception ex) {
-                  if (analysis != null) {
-                    logger.error("Unable to process analysis " + analysis.getId());
-                  } else {
-                    logger.error("Unable to process analysis");
-                  }
-                }
-              });
+      JsonObject migrationStatus = convertAllAnalysis(analysisList);
+
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+      System.out.println(gson.toJson(migrationStatus));
     }
+  }
+
+  private JsonObject convertAllAnalysis(JsonArray analysisList) {
+    JsonObject migrationStatus = new JsonObject();
+    JsonArray analysisStatus = new JsonArray();
+
+    migrationStatus.addProperty("totalAnalysis", analysisList.size());
+
+    AtomicInteger successfulMigration = new AtomicInteger();
+    AtomicInteger failedMigration = new AtomicInteger();
+
+    (analysisList)
+        .forEach(
+            analysisElement -> {
+              JsonObject migrationStatusObject = new JsonObject();
+              JsonObject analysisObject = analysisElement.getAsJsonObject();
+              String analysisId = analysisObject.get(FieldNames.ID).getAsString();
+
+              migrationStatusObject.addProperty("analysisId", analysisId);
+              migrationStatusObject.add("type", analysisObject.get("type"));
+              Analysis analysis = null;
+
+              try {
+                analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+                logger.info("Inserting analysis " + analysis.getId() + " into json store");
+                Gson gson = new GsonBuilder().create();
+                JsonElement parsedAnalysis = gson.toJsonTree(analysis, Analysis.class);
+                analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+
+                migrationStatusObject.addProperty("migrationStatus", true);
+                migrationStatusObject.addProperty("message", "Success");
+                successfulMigration.incrementAndGet();
+              } catch (JsonProcessingException exception) {
+                logger.error("Unable to convert analysis to json");
+
+                migrationStatusObject.addProperty("migrationStatus", false);
+                migrationStatusObject.addProperty("message", exception.getMessage());
+                failedMigration.incrementAndGet();
+              } catch (Exception exception) {
+                if (analysis != null) {
+                  logger.error("Unable to process analysis " + analysis.getId());
+                } else {
+                  logger.error("Unable to process analysis");
+                }
+
+                migrationStatusObject.addProperty("migrationStatus", false);
+                migrationStatusObject.addProperty("message", exception.getMessage());
+                failedMigration.incrementAndGet();
+              }
+
+              analysisStatus.add(migrationStatusObject);
+            });
+
+    migrationStatus.addProperty("success", successfulMigration.get());
+    migrationStatus.addProperty("failed", failedMigration.get());
+
+    migrationStatus.add("analysisStatus", analysisStatus);
+    return migrationStatus;
   }
 
   private Analysis convertOldAnalysisObjtoSipDsl(JsonObject analysisObject) {
@@ -100,11 +161,9 @@ public class MigrateAnalysis {
         converter = new PivotConverter();
         break;
       case "esReport":
-        converter = new EsReportConverter();
-        break;
+        throw new UnsupportedOperationException("DL Report migration not supported yet");
       case "report":
-        converter = new DlReportConverter();
-        break;
+        throw new UnsupportedOperationException("ES Report migration not supported yet");
       default:
         logger.error("Unknown chart type");
         break;
@@ -117,6 +176,19 @@ public class MigrateAnalysis {
     }
 
     return analysis;
+  }
+
+  private boolean saveMigrationStatus(JsonObject migrationStatus, String location) {
+    boolean status = true;
+
+    try {
+      File file = new File(location);
+
+    } catch (Exception exception) {
+
+    }
+
+    return status;
   }
 
   private String semanticNodeQuery() {
@@ -138,7 +210,7 @@ public class MigrateAnalysis {
    * @param args - command line args
    * @throws IOException - In case of file errors
    */
-  public static void main(String[] args) throws IOException {
+  public static void main1(String[] args) throws IOException {
     String analysisFile = args[0];
     System.out.println("Convert analysis from file = " + analysisFile);
 
@@ -154,5 +226,28 @@ public class MigrateAnalysis {
     Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(analyzeObject);
 
     System.out.println(gson.toJson(analysis, Analysis.class));
+  }
+
+  public static void main(String[] args) throws IOException {
+    String analysisFile = args[0];
+    System.out.println("Convert analysis from file = " + analysisFile);
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    File jsonFile = new File(analysisFile);
+
+    JsonObject analysisBinaryObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
+
+    JsonArray analysisList =
+        analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
+
+    MigrateAnalysis ma = new MigrateAnalysis();
+
+    JsonObject migrationStatus = ma.convertAllAnalysis(analysisList);
+
+    //    System.out.println(gson.toJson(migrationStatus));
+
+    PrintWriter out = new PrintWriter(ma.statusFilePath);
+    out.println(gson.toJson(migrationStatus));
+    out.close();
   }
 }
