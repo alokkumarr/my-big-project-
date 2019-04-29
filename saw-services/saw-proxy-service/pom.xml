@@ -281,8 +281,8 @@
 									<file>target/saw-storage-proxy-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-storage-proxy.service</name>
-									<file>src/main/system/saw-storage-proxy.service</file>
+									<name>/usr/lib/systemd/system/sip-storage-proxy.service</name>
+									<file>src/main/system/sip-storage-proxy.service</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-storage-proxy-service/conf/proxy-schema.json</name>

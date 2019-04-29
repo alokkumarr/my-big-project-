@@ -1,12 +1,12 @@
 [Unit]
-Description=SAW Transport Executor
+Description=SIP Transport Executor
 
 [Service]
 ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxj
-SyslogIdentifier=saw-transport-executor
+SyslogIdentifier=sip-transport-executor
 User=mapr
 Restart=always
 Environment="JAVA_OPTS=-Dsaw.executor=%i"
 
 [Install]
-WantedBy=saw-transport.service
+WantedBy=sip-transport.service

@@ -202,8 +202,8 @@
 									<file>target/saw-gateway-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-gateway.service</name>
-									<file>src/main/system/saw-gateway.service</file>
+									<name>/usr/lib/systemd/system/sip-gateway.service</name>
+									<file>src/main/system/sip-gateway.service</file>
 								</entry>
 							</entries>
 							<afterInstallation>

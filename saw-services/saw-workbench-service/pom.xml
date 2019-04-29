@@ -424,16 +424,16 @@
                   <file>target/saw-workbench-service-${revision}-jar-with-dependencies.jar</file>
                 </entry>
                 <entry>
-                  <name>/usr/lib/systemd/system/saw-workbench.service</name>
-                  <file>src/main/system/saw-workbench.service</file>
+                  <name>/usr/lib/systemd/system/sip-workbench.service</name>
+                  <file>src/main/system/sip-workbench.service</file>
                 </entry>
                 <entry>
-                  <name>/usr/lib/systemd/system/saw-workbench-proxy.service</name>
-                  <file>src/main/system/saw-workbench-proxy.service</file>
+                  <name>/usr/lib/systemd/system/sip-workbench-proxy.service</name>
+                  <file>src/main/system/sip-workbench-proxy.service</file>
                 </entry>
                 <entry>
-                  <name>/usr/lib/systemd/system/saw-workbench-proxy.socket</name>
-                  <file>src/main/system/saw-workbench-proxy.socket</file>
+                  <name>/usr/lib/systemd/system/sip-workbench-proxy.socket</name>
+                  <file>src/main/system/sip-workbench-proxy.socket</file>
                 </entry>
               </entries>
               <afterInstallation>

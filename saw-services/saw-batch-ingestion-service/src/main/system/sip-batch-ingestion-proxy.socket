@@ -1,5 +1,5 @@
 [Unit]
-Description=SAW Batch Ingestion Socket
+Description=SIP Batch Ingestion Socket
 
 [Socket]
 ListenStream=9903

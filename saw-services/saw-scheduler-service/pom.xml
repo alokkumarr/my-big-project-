@@ -246,16 +246,16 @@
 									<file>target/saw-scheduler-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-scheduler.service</name>
-									<file>src/main/system/saw-scheduler.service</file>
+									<name>/usr/lib/systemd/system/sip-scheduler.service</name>
+									<file>src/main/system/sip-scheduler.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-scheduler-proxy.service</name>
-									<file>src/main/system/saw-scheduler-proxy.service</file>
+									<name>/usr/lib/systemd/system/sip-scheduler-proxy.service</name>
+									<file>src/main/system/sip-scheduler-proxy.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-scheduler-proxy.socket</name>
-									<file>src/main/system/saw-scheduler-proxy.socket</file>
+									<name>/usr/lib/systemd/system/sip-scheduler-proxy.socket</name>
+									<file>src/main/system/sip-scheduler-proxy.socket</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-scheduler-service/conf/logback.xml</name>

@@ -9,5 +9,5 @@
   template: src=application.yml dest=/opt/bda/saw-gateway-service/conf
   notify:
     - restart saw-gateway
-- name: Enable SAW Gateway Service
-  systemd: name=saw-gateway enabled=true
+- name: Enable SIP Gateway Service
+  systemd: name=sip-gateway enabled=true

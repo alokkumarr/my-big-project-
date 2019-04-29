@@ -25,11 +25,11 @@
 - meta: flush_handlers
 - name: Run SAW migration of Semantic id
   command: sh /opt/saw/service/bin/AnalysisUtility.sh
-- name: Enable SAW Transport Service
-  systemd: name=saw-transport-proxy.socket enabled=true state=started
-- name: Enable SAW Transport Service Executor (regular)
-  systemd: name="saw-transport-executor@regular-{{ item }}" enabled=true daemon_reload=true
+- name: Enable SIP Transport Service
+  systemd: name=sip-transport-proxy.socket enabled=true state=started
+- name: Enable SIP Transport Service Executor (regular)
+  systemd: name="sip-transport-executor@regular-{{ item }}" enabled=true daemon_reload=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
-- name: Enable SAW Transport Service Executor (fast)
-  systemd: name="saw-transport-executor@fast-{{ item }}" enabled=true daemon_reload=true
+- name: Enable SIP Transport Service Executor (fast)
+  systemd: name="sip-transport-executor@fast-{{ item }}" enabled=true daemon_reload=true
   with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}

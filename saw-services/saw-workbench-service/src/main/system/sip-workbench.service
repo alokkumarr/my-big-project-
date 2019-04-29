@@ -1,11 +1,11 @@
 [Unit]
-Description=SAW Workbench
+Description=SIP Workbench
 
 [Service]
 Type=notify
 ExecStart=/bin/sh -c "exec java -Xmx1G -Dloader.path=BOOT-INF/lib,$(sip-mapr-classpath) -jar /opt/bda/saw-workbench-service/saw-workbench.jar --spring.config.location=/opt/bda/saw-workbench-service/conf/application.yml"
 TimeoutStartSec=300
-SyslogIdentifier=saw-workbench
+SyslogIdentifier=sip-workbench
 User=mapr
 Restart=on-failure
 # Allow service to exit on SIGTERM, if socket-activated
