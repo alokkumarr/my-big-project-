@@ -3,6 +3,7 @@ package com.synchronoss.saw.export.generate.interfaces;
 import javax.servlet.http.HttpServletRequest;
 
 import com.synchronoss.saw.export.model.AnalysisMetaData;
+import com.synchronoss.saw.model.SipQuery;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -19,8 +20,10 @@ public interface ExportService {
                                                                               HttpServletRequest request, String analysisId, String analysisType, String executionType)throws JSONValidationSAWException;
   public void reportToBeDispatchedAsync(String executionId, RequestEntity request,
       String analysisId, String analysisType)throws JSONValidationSAWException;
-  public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId)throws JSONValidationSAWException;
+  public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId, String analysisType)throws JSONValidationSAWException;
   public List<String> listFtpsForCustomer(RequestEntity request);
 
   AnalysisMetaData getAnalysisMetadata(String analysisId);
+
+  SipQuery getSipQuery(String analysisId);
 }

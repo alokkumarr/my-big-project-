@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
@@ -15,6 +16,8 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -73,6 +76,9 @@ public class ExportServiceImpl implements ExportService{
 
   @Value("${exportChunkSize}")
   private String exportChunkSize;
+
+  @Value ("${analysis.dsl-analysis-url}")
+  private String apiDslMetaData;
 
   @Autowired
   private ApplicationContext appContext;
@@ -481,7 +487,7 @@ public class ExportServiceImpl implements ExportService{
 
     @Override
   @Async
-  public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId) {
+  public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId, String analysisType) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
@@ -491,6 +497,7 @@ public class ExportServiceImpl implements ExportService{
     String recipients = null;
     String ftp = null;
     String jobGroup = null;
+    final SipQuery sipQuery = getSipQuery(analysisId);
 
     // check beforehand if the request is not null
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
@@ -502,10 +509,15 @@ public class ExportServiceImpl implements ExportService{
       logger.debug("ftp: " + ftp);
 
       if(recipients!=null && !recipients.equals("")) {
-        String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
-            +emailExportSize+"&analysisType=pivot";
-        ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
-            requestEntity, JsonNode.class);
+        ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture;
+        if(analysisType.equalsIgnoreCase("pivot")) {
+          requestEntity = new HttpEntity<>(sipQuery);
+          String url = "http://localhost:9800/internal/proxy/storage/execute";
+          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
+        } else {
+          String url = apiExportOtherProperties + "/" + analysisId + "/executions/" + executionId + "/data?page=1&pageSize=" + emailExportSize + "&analysisType=pivot";
+          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
+        }
 
         logger.debug("dispatchBean for Pivot: "+ dispatchBean.toString());
         String finalRecipients = recipients;
@@ -528,14 +540,30 @@ public class ExportServiceImpl implements ExportService{
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
               file.getParentFile().mkdir();
-              AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
-              ElasticSearchAggeragationParser elasticSearchAggeragationParser
-                  = new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
-              List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
-              elasticSearchAggeragationParser.setColumnDataType(exportBean,analysisMetaData.getAnalyses().get(0));
-              Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
-              CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
-              createPivotTable.createPivot(workbook,file);
+
+              if (analysisType.equalsIgnoreCase("pivot")) {
+                List<Field> fieldList = sipQuery.getArtifacts().get(0).getFields();
+                ElasticSearchAggeragationParser responseParser = new ElasticSearchAggeragationParser(fieldList);
+                responseParser.setColumnDataType(exportBean);
+                JsonNode jsonNode = entity.getBody();
+                List<Object> dataObj = responseParser.parsePivotData(jsonNode);
+                logger.trace("Parse data for workbook writing : " + dataObj);
+
+                Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
+                logger.debug("workbook successfully with DSL" + workbook);
+                CreatePivotTable createPivotTable = new CreatePivotTable();
+                createPivotTable.createPivot(workbook, file, fieldList);
+              } else {
+                AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
+                ElasticSearchAggeragationParser elasticSearchAggeragationParser
+                    = new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
+                List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
+                elasticSearchAggeragationParser.setColumnDataType(exportBean,analysisMetaData.getAnalyses().get(0));
+                Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
+                CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
+                createPivotTable.createPivot(workbook,file);
+              }
+
               MailSender.sendMail(finalRecipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
                   serviceUtils.prepareMailBody(exportBean,mailBody)
                   ,exportBean.getFileName());
@@ -552,10 +580,15 @@ public class ExportServiceImpl implements ExportService{
       }
 
       if(ftp!=null && !ftp.equals("")) {
-        String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
-            +ftpExportSize+"&analysisType=pivot";
-        ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
-            requestEntity, JsonNode.class);
+        ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture;
+        if(analysisType.equalsIgnoreCase("pivot")) {
+          requestEntity = new HttpEntity<>(sipQuery);
+          String url = "http://localhost:9800/internal/proxy/storage/execute";
+          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
+        } else {
+          String url = apiExportOtherProperties + "/" + analysisId + "/executions/" + executionId + "/data?page=1&pageSize=" + emailExportSize + "&analysisType=pivot";
+          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
+        }
 
         logger.debug("dispatchBean for Pivot: "+ dispatchBean.toString());
         String finalFtp = ftp;
@@ -583,14 +616,30 @@ public class ExportServiceImpl implements ExportService{
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
               file.getParentFile().mkdir();
-              AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
-              ElasticSearchAggeragationParser elasticSearchAggeragationParser
-                  = new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
-              List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
-              elasticSearchAggeragationParser.setColumnDataType(exportBean,analysisMetaData.getAnalyses().get(0));
-              Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
-              CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
-              createPivotTable.createPivot(workbook,file);
+
+              if (analysisType.equalsIgnoreCase("pivot")) {
+                List<Field> fieldList = sipQuery.getArtifacts().get(0).getFields();
+
+                ElasticSearchAggeragationParser responseParser = new ElasticSearchAggeragationParser(fieldList);
+                responseParser.setColumnDataType(exportBean);
+                JsonNode jsonNode = entity.getBody();
+                List<Object> dataObj = responseParser.parsePivotData(jsonNode);
+                logger.trace("Parse data for workbook writing : " + dataObj);
+
+                Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
+                logger.debug("workbook successfully with DSL" + workbook);
+                CreatePivotTable createPivotTable = new CreatePivotTable();
+                createPivotTable.createPivot(workbook, file, fieldList);
+              } else {
+                AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
+                ElasticSearchAggeragationParser elasticSearchAggeragationParser
+                    = new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
+                List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
+                elasticSearchAggeragationParser.setColumnDataType(exportBean,analysisMetaData.getAnalyses().get(0));
+                Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
+                CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
+                createPivotTable.createPivot(workbook,file);
+              }
 
               DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
               LocalDateTime now = LocalDateTime.now();
@@ -697,5 +746,36 @@ public class ExportServiceImpl implements ExportService{
       }
     }
     return aliases;
+  }
+
+  /**
+   *
+   * This will fetch the SIP query from metadata and provide.
+   *
+   * @param analysisId
+   * @return SipQuery
+   */
+  @Override
+  public SipQuery getSipQuery(String analysisId){
+    SipQuery sipQuery  = null;
+    try{
+      ObjectMapper objectMapper = new ObjectMapper();
+      RestTemplate restTemplate = new RestTemplate();
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+
+      String url = apiDslMetaData + "/dslanalysis/" + analysisId;
+      logger.debug("SIP query url for analysis fetch : " + url);
+
+      TempAnalysisResponse analysisResponse = restTemplate.getForObject(url, TempAnalysisResponse.class);
+      JsonNode jsonNode = analysisResponse.getAnalysis().get("sipQuery");
+      logger.debug("SIP query : " + jsonNode.textValue());
+
+      sipQuery = objectMapper.readValue(jsonNode.toString(), SipQuery.class);
+      logger.debug("Fetched SIP query for analysis : " + sipQuery.toString());
+    } catch (IOException ex) {
+      logger.debug("Sip query not fetched from analysis");
+    }
+    return sipQuery;
   }
 }
