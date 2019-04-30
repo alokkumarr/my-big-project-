@@ -17,6 +17,7 @@ import * as reduce from 'lodash/reduce';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as toString from 'lodash/toString';
+import * as pick from 'lodash/pick';
 import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -30,8 +31,9 @@ import { SidenavMenuService } from '../../../common/components/sidenav';
 import { executeAllPromises } from '../../../common/utils/executeAllPromises';
 import { getFileContents } from '../../../common/utils/fileManager';
 import { AdminMenuData } from '../consts';
-import { Analysis } from '../../../models';
+import { Analysis, AnalysisDSL } from '../../../models';
 import { ExportService } from '../export/export.service';
+import { isDSLAnalysis } from '../../analyze/types';
 
 const DUPLICATE_GRID_OBJECT_PROPS = {
   logColor: 'brown',
@@ -54,11 +56,24 @@ interface FileInfo {
   name: string;
   count: number;
 }
+
 interface FileContent {
   name: string;
   count: number;
-  analyses: Array<Analysis>;
+  analyses: Array<Analysis | AnalysisDSL>;
 }
+
+interface AnalysisGridObject {
+  selection?: boolean;
+  logColor: string;
+  log: string;
+  errorMsg: string;
+  duplicateAnalysisInd: boolean;
+  errorInd: boolean;
+  noMetricInd: boolean;
+  analysis: Analysis | AnalysisDSL;
+}
+
 @Component({
   selector: 'admin-import-view',
   templateUrl: './admin-import-view.component.html',
@@ -72,8 +87,8 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
 
   files: Array<FileInfo>;
   fileContents: Array<FileContent>;
-  selectedCategory;
-  analyses: Array<any>;
+  selectedCategory: string | number;
+  analyses: Array<AnalysisGridObject>;
   userCanExportErrors = false;
   atLeast1AnalysisIsSelected = false;
 
@@ -97,46 +112,17 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ClearImport());
   }
 
-  onRemoveFile(fileName) {
-    this.fileContents = filter(
-      this.fileContents,
-      ({ name, analyses }) => fileName !== name
-    );
-    this.splitFileContents(this.fileContents);
-  }
-
-  splitFileContents(contents) {
-    let hasErrors = false;
-    this.atLeast1AnalysisIsSelected = false;
-    this.files = map(contents, ({ name, count }) => ({ name, count }));
-    this.analyses = fpPipe(
-      fpFlatMap(({ analyses }) => analyses),
-      fpMap(analysis => {
-        analysis.categoryId = this.selectedCategory || '';
-        const gridObj = this.getAnalysisObjectForGrid(analysis);
-        if (gridObj.errorInd) {
-          hasErrors = true;
-        }
-        return gridObj;
-      })
-    )(contents);
-    this.userCanExportErrors = hasErrors;
-  }
-
-  updateGridObject(analysisId) {
-    const id = this.analyses.findIndex(
-      ({ analysis }) => analysis.id === analysisId
-    );
-    const newGridObject = this.getAnalysisObjectForGrid(
-      this.analyses[id].analysis,
-      this.analyses[id].selection
-    );
-    this.analyses.splice(id, 1, newGridObject);
-  }
-
+  /**
+   * Reads a file that user just added. Tries to parse it
+   * and add analyses to list for selection.
+   *
+   * @param {*} event
+   * @memberof AdminImportViewComponent
+   */
   readFiles(event) {
     const files = event.target.files;
 
+    /* Filter out non-json files */
     const contentPromises = <Promise<FileContent>[]>fpPipe(
       fpFilter(file => file.type === 'application/json'),
       fpMap(file =>
@@ -160,6 +146,47 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
     });
   }
 
+  splitFileContents(contents: FileContent[]) {
+    let hasErrors = false;
+    this.atLeast1AnalysisIsSelected = false;
+    this.files = map(contents, ({ name, count }) => ({ name, count }));
+    this.analyses = fpPipe(
+      fpFlatMap(({ analyses }) => analyses),
+      fpMap((analysis: Analysis | AnalysisDSL) => {
+        if (isDSLAnalysis(analysis)) {
+          analysis.category = this.selectedCategory || '';
+        } else {
+          analysis.categoryId = +(this.selectedCategory || '');
+        }
+        const gridObj = this.getAnalysisObjectForGrid(analysis);
+        if (gridObj.errorInd) {
+          hasErrors = true;
+        }
+        return gridObj;
+      })
+    )(contents);
+    this.userCanExportErrors = hasErrors;
+  }
+
+  onRemoveFile(fileName: string) {
+    this.fileContents = filter(
+      this.fileContents,
+      ({ name }) => fileName !== name
+    );
+    this.splitFileContents(this.fileContents);
+  }
+
+  updateGridObject(analysisId: string) {
+    const id = this.analyses.findIndex(
+      ({ analysis }) => analysis.id === analysisId
+    );
+    const newGridObject = this.getAnalysisObjectForGrid(
+      this.analyses[id].analysis,
+      this.analyses[id].selection
+    );
+    this.analyses.splice(id, 1, newGridObject);
+  }
+
   onCategoryChange(categoryId: string) {
     this.selectedCategory = categoryId;
     this.store
@@ -178,14 +205,21 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
       });
   }
 
-  setAnalysisCategory(categoryId, analysisId) {
+  setAnalysisCategory(categoryId: string | number, analysisId: string) {
     const a = this.analyses.find(({ analysis }) => analysis.id === analysisId);
     if (a && a.analysis) {
-      a.analysis.categoryId = toString(categoryId);
+      if (isDSLAnalysis(a.analysis)) {
+        a.analysis.category = toString(categoryId);
+      } else {
+        a.analysis.categoryId = toString(categoryId);
+      }
     }
   }
 
-  getAnalysisObjectForGrid(analysis, selection = false) {
+  getAnalysisObjectForGrid(
+    analysis: Analysis | AnalysisDSL,
+    selection = false
+  ): AnalysisGridObject {
     const { metrics, referenceAnalyses } = this.store.selectSnapshot(
       state => state.admin.importPage
     );
@@ -193,8 +227,10 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
     if (metric) {
       analysis.semanticId = metric.id;
     }
-    const analysisCategory =
-      referenceAnalyses[analysis.categoryId.toString()] || {};
+    const categoryId = isDSLAnalysis(analysis)
+      ? analysis.category
+      : analysis.categoryId;
+    const analysisCategory = referenceAnalyses[categoryId.toString()] || {};
     const analysisFromBE =
       analysisCategory[
         `${analysis.name}:${analysis.metricName}:${analysis.type}`
@@ -220,9 +256,9 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
 
   getPossibleGridObjects(
     selector: 'noMetric' | 'duplicate' | 'normal',
-    analysis,
-    analysisFromBE
-  ) {
+    analysis: Analysis | AnalysisDSL,
+    analysisFromBE: Analysis | AnalysisDSL
+  ): AnalysisGridObject {
     switch (selector) {
       case 'noMetric':
         return {
@@ -251,34 +287,46 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  getModifiedAnalysis(analysis, analysisFromBE) {
-    const {
-      isScheduled,
-      scheduled,
-      createdTimestamp,
-      esRepository,
-      id,
-      repository
-    } = analysisFromBE;
+  getModifiedAnalysis(
+    analysis: Analysis | AnalysisDSL,
+    analysisFromBE: Analysis | AnalysisDSL
+  ): Analysis | AnalysisDSL {
+    let fields: Partial<Analysis | AnalysisDSL>;
+    if (isDSLAnalysis(analysisFromBE)) {
+      const { id, createdTime, schedule } = analysisFromBE;
+      fields = { id, createdTime, schedule };
+    } else {
+      const {
+        isScheduled,
+        scheduled,
+        createdTimestamp,
+        esRepository,
+        id,
+        repository
+      } = analysisFromBE;
+      fields = {
+        isScheduled,
+        scheduled,
+        createdTimestamp,
+        esRepository,
+        id,
+        repository
+      };
+    }
     const { userFullName, userId } = this._jwtService.getTokenObj().ticket;
 
     return {
       ...analysis,
-      isScheduled,
-      scheduled,
-      createdTimestamp,
+      ...fields,
       userFullName,
-      id,
-      userId,
-      esRepository,
-      repository
+      userId
     };
   }
 
   import() {
     const importPromises = fpPipe(
       fpFilter('selection'),
-      fpMap(gridObj => {
+      fpMap((gridObj: AnalysisGridObject) => {
         const { duplicateAnalysisInd, analysis } = gridObj;
         if (duplicateAnalysisInd) {
           return this.importExistingAnalysis(analysis);
@@ -293,7 +341,10 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
 
     executeAllPromises(importPromises).then(
       results => {
-        const selectedAnalyses = filter(this.analyses, 'selection');
+        const selectedAnalyses: AnalysisGridObject[] = filter(
+          this.analyses,
+          'selection'
+        );
 
         const updatedAnalysesMap = reduce(
           results,
@@ -315,7 +366,7 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
         let hasErrors = false;
         let someImportsWereSuccesful = false;
         // update the logs
-        forEach(this.analyses, gridObj => {
+        forEach(this.analyses, (gridObj: AnalysisGridObject) => {
           if (gridObj.selection) {
             const id = gridObj.analysis.id;
             const container = updatedAnalysesMap[id];
@@ -355,7 +406,7 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
   exportErrors() {
     const logMessages = fpPipe(
       fpFilter('errorInd'),
-      fpMap(gridObj => {
+      fpMap((gridObj: AnalysisGridObject) => {
         const { analysis, errorMsg } = gridObj;
         const { metricName, name, type } = analysis;
         return {
@@ -379,38 +430,41 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  getLogFileName() {
+  getLogFileName(): string {
     const formatedDate = moment().format('YYYYMMDDHHmmss');
     return `log${formatedDate}.csv`;
   }
 
-  importNewAnalysis(analysis: Analysis) {
+  importNewAnalysis(analysis: Analysis | AnalysisDSL) {
     const { semanticId, type } = analysis;
-    return new Promise<Analysis>((resolve, reject) => {
+    return new Promise<Analysis | AnalysisDSL>((resolve, reject) => {
       this._importService
         .createAnalysis(semanticId, type)
-        .then((initializedAnalysis: Analysis) => {
-          const {
-            isScheduled,
-            scheduled,
-            createdTimestamp,
-            id,
-            userFullName,
-            userId,
-            esRepository,
-            repository
-          } = initializedAnalysis;
+        .then((initializedAnalysis: Analysis | AnalysisDSL) => {
+          let fields: Partial<Analysis | AnalysisDSL>;
+          if (isDSLAnalysis(initializedAnalysis)) {
+            fields = pick(initializedAnalysis, [
+              'id',
+              'createdBy',
+              'createdTime',
+              'schedule'
+            ]);
+          } else {
+            fields = pick(initializedAnalysis, [
+              'isScheduled',
+              'scheduled',
+              'createdTimestamp',
+              'id',
+              'userFullName',
+              'userId',
+              'esRepository',
+              'repository'
+            ]);
+          }
 
           this.importExistingAnalysis({
             ...analysis,
-            isScheduled,
-            scheduled,
-            createdTimestamp,
-            id,
-            userFullName,
-            userId,
-            esRepository,
-            repository
+            ...fields
           }).then(
             updatedAnalysis => resolve(updatedAnalysis),
             err => reject(err)
@@ -420,18 +474,25 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
   }
 
   canImport() {
-    const selectedAnalyses = filter(this.analyses, 'selection') || [];
+    const selectedAnalyses: AnalysisGridObject[] =
+      filter(this.analyses, 'selection') || [];
     return (
       selectedAnalyses.length &&
-      selectedAnalyses.every(({ analysis }) => Boolean(analysis.categoryId))
+      selectedAnalyses.every(({ analysis }) =>
+        Boolean(
+          isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+        )
+      )
     );
   }
 
-  importExistingAnalysis(analysis): Promise<Analysis> {
+  importExistingAnalysis(
+    analysis: Analysis | AnalysisDSL
+  ): Promise<Analysis | AnalysisDSL> {
     return this._importService.updateAnalysis(analysis);
   }
 
-  onAnalysesValiditychange(atLeast1AnalysisIsSelected) {
+  onAnalysesValiditychange(atLeast1AnalysisIsSelected: boolean) {
     this.atLeast1AnalysisIsSelected = atLeast1AnalysisIsSelected;
   }
 }
