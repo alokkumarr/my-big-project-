@@ -141,8 +141,8 @@ export class DesignerUpdateArtifactColumn {
     public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
   ) {}
 }
-export class DesignerReorderArtifactColumns {
-  static readonly type = '[Designer] Reorder artifact columns of analysis';
+export class DesignerApplyChangesToArtifactColumns {
+  static readonly type = '[Designer] Apply changes to artifactColumns';
   constructor() {}
 }
 
