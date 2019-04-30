@@ -3,10 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss.saw</groupId>
-  <artifactId>saw</artifactId>
+  <artifactId>sip</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
-  <name>saw</name>
+  <name>sip</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -136,7 +136,10 @@
       <modules>
         <module>bda-meta</module>
         <module>xdf-nextgen</module>
-        <module>a2</module>
+        <!--
+        This has been commented due to issue SIP-7037
+        and it will reverted back once it is fixed.
+        <module>a2</module> -->
         <module>a2sipr/inst/json</module>
         <module>rtis</module>
         <module>rtps</module>
