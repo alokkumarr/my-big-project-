@@ -35,7 +35,7 @@ LIB_DIR=$XDF_DIR/lib
 ( cd $LIB_DIR ) || exit
 
 # Uber jar
-APP_JAR=$LIB_DIR/xdf-${VERSION}-full.jar
+APP_JAR=$LIB_DIR/xdf-full.jar
 ( <$APP_JAR ) || exit
 
 CONF_DIR=$XDF_DIR/conf

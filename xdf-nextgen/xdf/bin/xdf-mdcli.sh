@@ -34,7 +34,7 @@ VAR_DIR=$( xdf_info vardir )
 CONF_DIR=$XDF_DIR/conf
 ( cd $CONF_DIR ) || exit
 
-LOG_DIR=/dfs/var/xdf-nextgen/log/meta
+LOG_DIR=/var/opt/sip/sip-xdf/log
 ( cd $LOG_DIR ) || mkdir -p $LOG_DIR
 
 export XDF_DATA_ROOT=hdfs:///data/bda
