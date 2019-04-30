@@ -20,7 +20,7 @@ public interface ExportService {
                                                                               HttpServletRequest request, String analysisId, String analysisType, String executionType)throws JSONValidationSAWException;
   public void reportToBeDispatchedAsync(String executionId, RequestEntity request,
       String analysisId, String analysisType)throws JSONValidationSAWException;
-  public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId, String analysisType)throws JSONValidationSAWException;
+  public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId)throws JSONValidationSAWException;
   public List<String> listFtpsForCustomer(RequestEntity request);
 
   AnalysisMetaData getAnalysisMetadata(String analysisId);
