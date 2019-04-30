@@ -80,6 +80,8 @@ public class SawBisRouteController {
   private String updateUrl = "/update";
   private String deleteUrl = "/delete";
   private static final Long STATUS_ACTIVE = 1L;
+  private static final Long STATUS_DEACTIVE = 0L;
+  
 
   @Value("${bis.default-data-drop-location}")
   private String dropLocation;
@@ -373,6 +375,9 @@ public class SawBisRouteController {
         routeEntity.setBisChannelSysId(channelId);
         routeEntity.setBisRouteSysId(routeId);
         routeEntity.setModifiedDate(new Date());
+        if (routeEntity.getStatus() == STATUS_DEACTIVE) {
+          throw new BisException("Update not allowed on a a deactivated route");
+        }
         if (routeEntity.getStatus() == null) {
           routeEntity.setStatus(STATUS_ACTIVE);
         }

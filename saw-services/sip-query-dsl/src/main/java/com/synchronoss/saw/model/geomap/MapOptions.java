@@ -9,26 +9,38 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MapOptions {
   @JsonProperty("mapStyle")
-  String mapStyle;
+  private String mapStyle;
 
   @JsonProperty("mapType")
-  String mapType;
+  private String mapType;
 
+  /**
+   * Assets path used by FE can be retrieved from here.
+   *
+   * @return String path
+   */
   @JsonProperty("mapStyle")
   public String getMapStyle() {
     return mapStyle;
   }
 
+  /** Sets mapStyle */
   @JsonProperty("mapStyle")
   public void setMapStyle(String mapStyle) {
     this.mapStyle = mapStyle;
   }
 
+  /**
+   * This property used to retrieve the type of Map.
+   *
+   * @return String mapType.
+   */
   @JsonProperty("mapType")
   public String getMapType() {
     return mapType;
   }
 
+  /** Sets Type - Map */
   @JsonProperty("mapType")
   public void setMapType(String mapType) {
     this.mapType = mapType;

@@ -267,11 +267,17 @@ public class Analysis {
     this.sipQuery = sipQuery;
   }
 
+  /**
+   * Retrieves Map related properties like Type and Style.
+   *
+   * @return MapOptions Object
+   */
   @JsonProperty("mapOptions")
   public MapOptions getMapOptions() {
     return mapOptions;
   }
 
+  /** Sets Map - Styling properties */
   @JsonProperty("mapOptions")
   public void setMapOptions(MapOptions mapOptions) {
     this.mapOptions = mapOptions;

@@ -200,6 +200,12 @@
       <artifactId>sip-common-components</artifactId>
       <version>${revision}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.mapr.ojai</groupId>
+      <artifactId>mapr-ojai-driver</artifactId>
+      <version>6.0.1-mapr</version>
+    </dependency>
 	</dependencies>
 	<build>
 	<pluginManagement>

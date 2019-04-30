@@ -6,7 +6,6 @@ const SideNav = require('./SideNav');
 
 class Header extends SideNav {
   constructor() {
-
     super();
     this._accountSettingIcon = element(
       by.css(`[e2e='account-settings-menu-btn']`)
@@ -36,6 +35,7 @@ class Header extends SideNav {
     this._workbenchLink = element(
       by.xpath('//a[contains(@class,"module-workbench")]')
     );
+    this._toastMessage = element(by.css(`[id="toast-container"]`));
   }
 
   clickOnModuleLauncher() {
@@ -45,7 +45,6 @@ class Header extends SideNav {
   clickOnObserveLink() {
     commonFunctions.clickOnElement(this._observeLink);
   }
-
 
   doChangePassword() {
     logger.silly('Clicking on ChangePassword button..');
@@ -59,8 +58,7 @@ class Header extends SideNav {
     commonFunctions.waitFor.pageToBeReady(/changePwd/);
   }
 
-  verifyChangePassword()
-  {
+  verifyChangePassword() {
     commonFunctions.waitFor.pageToBeReady(/login/);
   }
 
@@ -94,6 +92,10 @@ class Header extends SideNav {
 
   clickOnWorkBench() {
     commonFunctions.clickOnElement(this._workbenchLink);
+  }
+
+  clickOnToastMessage() {
+    commonFunctions.clickOnElement(this._toastMessage);
   }
 }
 module.exports = Header;

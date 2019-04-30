@@ -34,20 +34,20 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get(FieldNames.SQL_BUILDER);
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, store));
+      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject, artifacts, store));
     }
     return analysis;
   }
 
   @Override
-  public List<Field> generateArtifactFields(JsonObject sqlBuilder) {
+  public List<Field> generateArtifactFields(JsonObject sqlBuilder, JsonArray artifactsArray) {
     List<Field> fields = new LinkedList<>();
 
     if (sqlBuilder.has(FieldNames.DATAFIELDS)) {
       JsonArray dataFields = sqlBuilder.getAsJsonArray(FieldNames.DATAFIELDS);
 
       for (JsonElement dataField : dataFields) {
-        fields.add(buildArtifactField(dataField.getAsJsonObject()));
+        fields.add(buildArtifactField(dataField.getAsJsonObject(), artifactsArray));
       }
     }
 
@@ -55,7 +55,7 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
       JsonArray nodeFields = sqlBuilder.getAsJsonArray(FieldNames.NODEFIELDS);
 
       for (JsonElement dataField : nodeFields) {
-        fields.add(buildArtifactField(dataField.getAsJsonObject()));
+        fields.add(buildArtifactField(dataField.getAsJsonObject(), artifactsArray));
       }
     }
 
@@ -63,9 +63,9 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
   }
 
   @Override
-  public Field buildArtifactField(JsonObject fieldObject) {
+  public Field buildArtifactField(JsonObject fieldObject, JsonArray artifactsArray) {
     Field field = new Field();
-    field = setCommonFieldProperties(field, fieldObject);
+    field = setCommonFieldProperties(field, fieldObject, artifactsArray);
 
     if (fieldObject.has(FieldNames.CHECKED)) {
       String checkedVal = fieldObject.get(FieldNames.CHECKED).getAsString();
