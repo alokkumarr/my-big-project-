@@ -18,7 +18,7 @@ Imports:
     zoo,
     checkmate (>= 1.8.2),
     purrr,
-    forecast (>= 8.6),
+    forecast,
     a2munge,
     lubridate,
     foreach,
