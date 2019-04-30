@@ -1,6 +1,15 @@
 - name: Copy SAW Transport Service package
   copy: src="{{ item }}" dest=/tmp/saw-transport.rpm
   with_fileglob: ["../rpms/sip-transport-*.rpm"]
+# Workaround: The remove "/opt/saw/service" link operation in the RPM
+# scripts of the "saw-transport" service package seems to be run after
+# the creation of the same link in the new "sip-transport" package
+# during upgrade using the "Obsoletes" RPM header, causing the
+# installation to end up without any link at all.  So as a workaround,
+# explicitly remove the old "saw-transport" package.  This workaround
+# can be removed once all environments have been upgraded to SIP 3.3.
+- name: Remove old differently named Transport Service package
+  yum: name=saw-transport state=absent
 - name: Install SAW Transport Service package
   yum: name=/tmp/saw-transport.rpm state=present
   notify:
