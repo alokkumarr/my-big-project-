@@ -18,6 +18,7 @@ public class AnalysisSipDslConverterTest {
   JsonObject oldAnalysisObject;
   JsonObject sqlQueryBuilderObject;
   String artifactName = null;
+  JsonArray artifacts;
 
   @Before
   public void init() throws IOException {
@@ -39,7 +40,7 @@ public class AnalysisSipDslConverterTest {
             .get(0)
             .getAsJsonObject();
 
-    JsonArray artifacts = oldAnalysisObject.getAsJsonArray("artifacts");
+    artifacts = oldAnalysisObject.getAsJsonArray("artifacts");
 
     JsonObject artifact = artifacts.get(0).getAsJsonObject();
     artifactName = artifact.get("artifactName").getAsString();
@@ -63,7 +64,8 @@ public class AnalysisSipDslConverterTest {
   public void testGenerateSipQuery() {
     ChartConverter converter = new ChartConverter();
     Store store = converter.buildStoreObject(oldAnalysisObject);
-    SipQuery sipQuery = converter.generateSipQuery(artifactName, sqlQueryBuilderObject, store);
+    SipQuery sipQuery =
+        converter.generateSipQuery(artifactName, sqlQueryBuilderObject, artifacts, store);
     Assert.assertNotNull(sipQuery);
   }
 
