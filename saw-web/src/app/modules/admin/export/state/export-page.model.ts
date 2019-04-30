@@ -1,6 +1,6 @@
 import { MenuItem } from '../../../../common/state/common.state.model';
 import { Dashboard } from '../../../observe/models/dashboard.interface';
-import { Analysis } from '../../../analyze/models';
+import { Analysis, AnalysisDSL } from '../../../analyze/models';
 
 export interface ExportPageModel {
   selectedModule: string;
@@ -12,7 +12,7 @@ export interface ExportPageModel {
   };
 
   /* Analyses in currently selected category */
-  categoryAnalyses: Analysis[];
+  categoryAnalyses: (Analysis | AnalysisDSL)[];
 
   /* Dashboards in currently selected category */
   categoryDashboards: Dashboard[];
@@ -21,7 +21,7 @@ export interface ExportPageModel {
 
   /* Data marked for export */
   exportData: {
-    analyses: Analysis[];
+    analyses: (Analysis | AnalysisDSL)[];
     dashboards: Dashboard[];
     metrics: any[];
   };
