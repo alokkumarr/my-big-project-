@@ -355,6 +355,7 @@
               <amazonec2-userdata>${project.build.directory}/test-classes/cloud-config.yaml</amazonec2-userdata>
               <!-- Set IAM instance profile to get AWS Route 53 permissions -->
               <amazonec2-iam-instance-profile>UserEnvironment</amazonec2-iam-instance-profile>
+	      <amazonec2-tags>environment,sip-development</amazonec2-tags>
               <amazonec2-monitoring/>
               <!--
                   Workaround: Docker Machine defaults to devicemapper,

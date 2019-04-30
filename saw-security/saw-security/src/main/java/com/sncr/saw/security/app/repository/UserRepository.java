@@ -6,7 +6,6 @@ import com.sncr.saw.security.common.bean.Module;
 import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
-import com.sncr.saw.security.common.bean.Ticket;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
@@ -18,6 +17,7 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.util.List;
 
 public interface UserRepository {

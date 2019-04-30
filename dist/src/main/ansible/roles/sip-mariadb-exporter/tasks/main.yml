@@ -1,0 +1,66 @@
+- name: Install Prometheus mysqld files
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/bin/
+    mode: u+x,g+x,o+x
+  with_fileglob:
+    - mariadb_exporter/*
+- name: Look up mysqld exporter database password
+  set_fact:
+    mysqld_exporter_db_password: >-
+      {{ lookup('password', inventory_dir
+        + '/mysqld-exporter-db-password chars=ascii_letters,digits') }}
+- name: lookup & setting database root password
+  set_fact:
+    root_password: >-
+        {{ lookup('password', inventory_dir
+        + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Set the mysqld exporter database password
+  copy:
+    content: "{{ mysqld_exporter_db_password }}"
+    dest: /etc/bda/mysqld-exporter-db-password
+- name: Ensure a list of packages installed
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - python
+    - python-setuptools
+    - python2-pip
+    - python2-PyMySQL
+- name: Create the mysqld_exporter users
+  mysql_user:
+   name: "mysqld_exporter"
+   password: "{{ mysqld_exporter_db_password }}"
+   host: "localhost"
+   priv: "*.*:PROCESS,SELECT,REPLICATION CLIENT"
+   append_privs: "true"
+   login_user: root
+   login_password: "{{ root_password }}"
+   state: present
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+  tags: mariadb
+- name: Update mysqld_exporter users max_user_connections on database
+  command: mysql -u root -p"{{ root_password }}" -e "ALTER USER 'mysqld_exporter'@'localhost' WITH MAX_USER_CONNECTIONS 2;"
+- name: Copy mysqld_exporter.cnf file to /etc/bda
+  template:
+    src: mysqld_exporter.cnf
+    dest: /etc/bda/mysqld_exporter.cnf
+    owner: root
+    group: prometheus
+    mode: 0600
+- name: Copy the mysqld_exporter systemd service file
+  template:
+    src: mysqld_exporter.service
+    dest: /etc/systemd/system/mysqld_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+#  notify:
+#    - restart mysqld_exporter
+- name: restart mysqld_exporter service
+  systemd: name=mysqld_exporter state=restarted daemon_reload=true
+- name: Enable Prometheus node exporter service
+  systemd: name=mysqld_exporter enabled=true
+
