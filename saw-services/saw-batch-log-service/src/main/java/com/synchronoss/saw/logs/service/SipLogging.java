@@ -119,6 +119,21 @@ public class SipLogging {
    * To make an entry to a log table.
    */
   @Transactional(TxType.REQUIRED)
+  public void upsertFailedStatus(String pid) throws SipNestedRuntimeException {
+    BisFileLog bisLog = null;
+    if (bisFileLogsRepository.existsById(pid)) {
+      logger.trace("updating logs when process Id is found :" + pid);
+      bisLog = bisFileLogsRepository.findByPid(pid);
+     
+      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.FAILED.value(),
+            BisComponentState.FAILED.value(), pid);
+    }
+  }
+  
+  /**
+   * To make an entry to a log table.
+   */
+  @Transactional(TxType.REQUIRED)
   public void upsertSuccessStatus(String pid) throws SipNestedRuntimeException {
     BisFileLog bisLog = null;
     if (bisFileLogsRepository.existsById(pid)) {
@@ -468,7 +483,28 @@ public class SipLogging {
     
   }
   
-  
+  /**
+   * Adds entry to job log.
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {
+      RuntimeException.class }, maxAttemptsExpression = 
+          "#{${sip.service.max.attempts}}", backoff = 
+          @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public void updateJobStatus(long jobId) {
+    Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
+    if (sipJob.isPresent()) {
+      BisJobEntity jobEntity = sipJob.get();
+      if (jobEntity.getJobStatus().equals("INPROGRESS")
+          && jobEntity.getTotalCount() == jobEntity.getSuccessCount()) {
+        jobEntity.setJobStatus("SUCCESS");
+        jobEntity.setUpdatedDate(new Date());
+        sipJobDataRepository.saveAndFlush(jobEntity);
+      }
+
+    }
+
+  }
   
   /**
    * Returns Job entity by Id.

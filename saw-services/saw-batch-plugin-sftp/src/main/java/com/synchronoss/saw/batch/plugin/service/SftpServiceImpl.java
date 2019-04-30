@@ -1588,9 +1588,11 @@ public class SftpServiceImpl extends SipPluginContract {
 
           logger.trace(
               "executeFileTransfer :: creating sftp template with session factory");
-
+         
           SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(
               sesionFactory);
+          
+          //LsEntry[] files = template.list(fileName);
           logger.trace(
               "executeFileTransfer :: created sftp template with session factory");
           if (bisRouteEntity.getStatus() > 0) {
@@ -1611,16 +1613,18 @@ public class SftpServiceImpl extends SipPluginContract {
             }
            
             final File localFile = createTargetFile(localDirectory, fileName);
+            final File fileTobeDeleted = localFile;
             logger.trace("Actual file name after downloaded in the  :"
                 + localDirectory.getAbsolutePath() 
                 + " file name " + localFile.getName());
             FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
-            template.get(localFile.getName(),
+            logger.trace("starting template get for file ::" + fileName);
+            template.get(fileName,
                 new InputStreamCallback() {
                   @Override
                   public void doWithInputStream(InputStream stream)
                       throws IOException {
-
+                    logger.trace("found template get for file ::" + fileName);
                     logger.trace(
                         "Streaming the content of the file in the directory starts here "
                             + fileName);
@@ -1662,10 +1666,8 @@ public class SftpServiceImpl extends SipPluginContract {
                         logger.trace(
                             "closing the stream for the file " + fileName);
                         bisDataMetaInfo.setProcessId(logId);
-                        prepareLogInfo(bisDataMetaInfo, null, "",
-                            null, null,
-                            fileName, channelId, routeId,
-                            "", jobId);
+                       
+                        sipLogService.upsertSuccessStatus(logId);
                         bisDataMetaInfo
                             .setProcessState(BisProcessState.SUCCESS.value());
                         bisDataMetaInfo.setComponentState(
@@ -1677,8 +1679,8 @@ public class SftpServiceImpl extends SipPluginContract {
                             .toMillis());
                         logger.trace("File transfer duration :: "
                             + bisDataMetaInfo.getFileTransferDuration());
-                        sipLogService.upsert(bisDataMetaInfo,
-                            bisDataMetaInfo.getProcessId());
+                        //sipLogService.upsert(bisDataMetaInfo,
+                        //  logIdx);
                         BisJobEntity bisJobEntity = sipLogService
                             .retriveJobById(jobId);
                         Long successCnt = bisJobEntity.getSuccessCount();
@@ -1688,6 +1690,8 @@ public class SftpServiceImpl extends SipPluginContract {
                             successCnt + 1);
                         logger.info("After Success file log success cnt :: "
                             + successCnt + 1);
+                        
+                        sipLogService.updateJobStatus(jobId);
                         // Adding to a list has been removed as a part of
                         // optimization
                         // SIP-6386
@@ -1695,27 +1699,37 @@ public class SftpServiceImpl extends SipPluginContract {
                       }
 
                     } catch (Exception ex) {
-                      logger.error(
-                          "Exception occurred while writting to file system "
-                              + fileName,
-                          ex);
-                      throw new SftpProcessorException(
-                          "Exception throw while streaming the file " + fileName
-                              + " : ",
-                          ex);
+
+                      logger.error("Exception occurred while "
+                          + "transferring the file from channel", ex);
+
+                      sipLogService.upsertFailedStatus(logId);
+
+                      logger.trace(" files or directory to be "
+                          + "deleted on exception " + fileTobeDeleted);
+                          
+
+                      try {
+                        if (fileTobeDeleted != null
+                            && processor.isDestinationExists(fileTobeDeleted.getPath())) {
+                          processor.deleteFile(fileTobeDeleted.getPath(),
+                               defaultDestinationLocation, mapRfsUser);
+                          }
+                      } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                      }
+                      if (template.getSession() != null) {
+                        template.getSession().close();
+                      }
                     } finally {
                       if (stream != null) {
                         logger.trace(
                             "closing the stream for the file in finally block "
                                 + fileName);
-                        if (!processor
+                        if (processor
                             .isDestinationMapR(defaultDestinationLocation)) {
-                          // processor.closeStream(stream);
-                        } else {
                           fos.close();
-                          // stream.close();
-                          // stream = null;
-                          // org.apache.hadoop.io.IOUtils.cleanup(null, stream);
                         }
                       }
                     }
