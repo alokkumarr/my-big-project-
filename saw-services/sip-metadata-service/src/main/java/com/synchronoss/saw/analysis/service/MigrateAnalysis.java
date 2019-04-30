@@ -32,7 +32,9 @@ import org.springframework.web.client.RestTemplate;
 
 public class MigrateAnalysis {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
-  public String statusFilePath = "/opt/bda/migrationstatus.json";
+
+  public String migrationDirectory = "/opt/migration/";
+  public String migrationStatusFile = "migrationStatus.json";
 
   private AnalysisMetadata analysisMetadataStore = null;
   private String listAnalysisUrl;
@@ -41,13 +43,21 @@ public class MigrateAnalysis {
 
   public MigrateAnalysis() {}
 
+  /**
+   * Parameterized constructor.
+   *
+   * @param tableName MAPR DB table
+   * @param basePath MAPR DB location
+   * @param listAnalysisUri List analysis API endpoint
+   * @param statusFilePath Output location for migration status
+   */
   public MigrateAnalysis(
       String tableName, String basePath, String listAnalysisUri, String statusFilePath) {
 
     this.basePath = basePath;
     this.tableName = tableName;
     this.listAnalysisUrl = listAnalysisUri;
-    this.statusFilePath = statusFilePath;
+    //    this.statusFilePath = statusFilePath;
   }
 
   /**
@@ -82,12 +92,16 @@ public class MigrateAnalysis {
 
       JsonObject migrationStatus = convertAllAnalysis(analysisList);
 
-      Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-      System.out.println(gson.toJson(migrationStatus));
+      saveMigrationStatus(migrationStatus, migrationDirectory, migrationStatusFile);
     }
   }
 
+  /**
+   * Migrates a list of analysis to new SIP DSL Structure and writes to mapr db json table.
+   *
+   * @param analysisList List of old analysis definitions
+   * @return
+   */
   private JsonObject convertAllAnalysis(JsonArray analysisList) {
     JsonObject migrationStatus = new JsonObject();
     JsonArray analysisStatus = new JsonArray();
@@ -146,6 +160,12 @@ public class MigrateAnalysis {
     return migrationStatus;
   }
 
+  /**
+   * Converts old analysis object to new SIP DSL definition.
+   *
+   * @param analysisObject Single analysis object in old definition
+   * @return
+   */
   private Analysis convertOldAnalysisObjtoSipDsl(JsonObject analysisObject) {
     Analysis analysis = null;
 
@@ -178,14 +198,31 @@ public class MigrateAnalysis {
     return analysis;
   }
 
-  private boolean saveMigrationStatus(JsonObject migrationStatus, String location) {
+  /**
+   * Saves migration status to a file.
+   *
+   * @param migrationStatus Migration status JSON object
+   * @param migrationDirectory Directory into which the migration status file needs to be written
+   * @param migrationStatusFile Output file location
+   * @return
+   */
+  private boolean saveMigrationStatus(
+      JsonObject migrationStatus, String migrationDirectory, String migrationStatusFile) {
     boolean status = true;
 
+    String migrationStatusPath = migrationDirectory + "/" + migrationStatusFile;
     try {
-      File file = new File(location);
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      PrintWriter out = new PrintWriter(migrationStatusPath);
+      out.println(gson.toJson(migrationStatus));
+      out.close();
 
     } catch (Exception exception) {
+      logger.error(
+          "Error occurred while writing the status to location: " + migrationStatusPath,
+          exception.getMessage());
 
+      status = false;
     }
 
     return status;
@@ -228,6 +265,12 @@ public class MigrateAnalysis {
     System.out.println(gson.toJson(analysis, Analysis.class));
   }
 
+  /**
+   * Main function.
+   *
+   * @param args Command-line args
+   * @throws IOException In-case of file error
+   */
   public static void main(String[] args) throws IOException {
     String analysisFile = args[0];
     System.out.println("Convert analysis from file = " + analysisFile);
@@ -243,10 +286,8 @@ public class MigrateAnalysis {
     MigrateAnalysis ma = new MigrateAnalysis();
 
     JsonObject migrationStatus = ma.convertAllAnalysis(analysisList);
-
-    //    System.out.println(gson.toJson(migrationStatus));
-
-    PrintWriter out = new PrintWriter(ma.statusFilePath);
+    String migrationStatusPath = ma.migrationDirectory + "/" + ma.migrationStatusFile;
+    PrintWriter out = new PrintWriter(migrationStatusPath);
     out.println(gson.toJson(migrationStatus));
     out.close();
   }
