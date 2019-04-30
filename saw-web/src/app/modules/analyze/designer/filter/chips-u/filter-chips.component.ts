@@ -11,6 +11,7 @@ import {
 } from '../../../consts';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
+import moment from 'moment';
 
 export const getFilterValue = (filter: Filter) => {
   const { type } = filter;
@@ -38,8 +39,10 @@ export const getFilterValue = (filter: Filter) => {
     }
     return `: ${otherValue} ${operatoLabel} ${value}`;
   } else if (DATE_TYPES.includes(type)) {
-    if (preset === CUSTOM_DATE_PRESET_VALUE) {
+    if (preset === CUSTOM_DATE_PRESET_VALUE ) {
       return `: From ${gte} To ${lte}`;
+    } else if (operator === 'BTW') {
+      return `: From ${moment(value).format('YYYY-MM-DD')} to ${moment(otherValue).format('YYYY-MM-DD')}`;
     }
     return `: ${preset}`;
   }
