@@ -44,6 +44,10 @@ provided in the environment:
   dedicated to SIP and not run other applications.  The hosts should
   have time synchronization enabled.
 
+. Configure networking to block incoming connections to SIP nodes
+  (from other than SIP nodes themselves) on all ports, except for port
+  80 on the SIP proxy hosts
+
 . Install and configure MapR client on the SAW target host.
 
 . Configure SAW server to use UTC timezone in all places where date and timezones are involved.

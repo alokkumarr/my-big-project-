@@ -30,5 +30,5 @@ elastic-xpack :
           cluster-username: elastic
           cluster-password: xuw3dUraHapret
 metastore:
-    base:  hdfs:///main/        
+    base:  hdfs:///main/
          
