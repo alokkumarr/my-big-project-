@@ -6,13 +6,14 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+/** This POJO is typical used for Geo Maps. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GeoRegion {
   @JsonProperty("name")
-  String name;
+  private String name;
 
   @JsonProperty("path")
-  String path;
+  private String path;
 
   @JsonProperty("name")
   public String getName() {
@@ -24,11 +25,17 @@ public class GeoRegion {
     this.name = name;
   }
 
+  /**
+   * Geo region asset path.
+   *
+   * @return String path
+   */
   @JsonProperty("path")
   public String getPath() {
     return path;
   }
 
+  /** Sets property file path used by UI */
   @JsonProperty("path")
   public void setPath(String path) {
     this.path = path;
