@@ -211,37 +211,37 @@
                 </entry>
                 <entry>
                   <name>${app.optDir}/bin/appl_info</name>
-                  <file>../saw-security/bin/appl_info</file>
+                  <file>../sip-security/bin/appl_info</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/bin/ccode.sh</name>
-                  <file>../saw-security/bin/ccode.sh</file>
+                  <file>../sip-security/bin/ccode.sh</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/bin/conf_init</name>
-                  <file>../saw-security/bin/conf_init</file>
+                  <file>../sip-security/bin/conf_init</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/bin/mk_conf.sh</name>
-                  <file>../saw-security/bin/mk_conf.sh</file>
+                  <file>../sip-security/bin/mk_conf.sh</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/bin/saw-security-runner.sh</name>
-                  <file>../saw-security/bin/saw-security-runner.sh</file>
+                  <file>../sip-security/bin/saw-security-runner.sh</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/bin/saw-security.sh</name>
-                  <file>../saw-security/bin/saw-security.sh</file>
+                  <file>../sip-security/bin/saw-security.sh</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/bin/customer_onboard.sh</name>
-                  <file>../saw-security/bin/customer_onboard.sh</file>
+                  <file>../sip-security/bin/customer_onboard.sh</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
@@ -251,7 +251,7 @@
                 </entry>
                 <entry>
                   <name>${app.optDir}/conf/logback.xml</name>
-                  <file>../saw-security/conf/logback.xml</file>
+                  <file>../sip-security/conf/logback.xml</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
@@ -262,7 +262,7 @@
                 <entry>
                   <name>${app.optDir}/conf/templates</name>
                   <collect>
-                    <from>../saw-security/conf/templates</from>
+                    <from>../sip-security/conf/templates</from>
                   </collect>
                   <ruleset>default</ruleset>
                 </entry>
@@ -273,12 +273,12 @@
                 </entry>
                 <entry>
                   <name>${app.optDir}/lib/saw-security-${revision}.war</name>
-                  <file>../saw-security/target/sip-security-${revision}.war</file>
+                  <file>../sip-security/target/sip-security-${revision}.war</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/lib/saw-security-${revision}-classes.jar</name>
-                  <file>../saw-security/target/sip-security-${revision}-classes.jar</file>
+                  <file>../sip-security/target/sip-security-${revision}-classes.jar</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
@@ -294,13 +294,13 @@
                 <entry>
                   <name>${app.optDir}/db</name>
                   <collect>
-                    <from>../saw-security/db</from>
+                    <from>../sip-security/db</from>
                   </collect>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>/usr/lib/systemd/system/sip-security.service</name>
-                  <file>../saw-security/src/main/system/sip-security.service</file>
+                  <file>../sip-security/src/main/system/sip-security.service</file>
                   <ruleset>default</ruleset>
                 </entry>
               </entries>

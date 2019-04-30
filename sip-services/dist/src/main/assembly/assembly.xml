@@ -7,7 +7,7 @@
   <formats>
     <format>tgz</format>
   </formats>
-  <baseDirectory>saw-services</baseDirectory>
+  <baseDirectory>sip-services</baseDirectory>
   <moduleSets>
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>

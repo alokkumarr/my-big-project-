@@ -7,7 +7,7 @@
   <formats>
     <format>tgz</format>
   </formats>
-  <baseDirectory>saw-web</baseDirectory>
+  <baseDirectory>sip-web</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${project.basedir}/src/main/ansible</directory>

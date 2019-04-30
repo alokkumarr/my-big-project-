@@ -7,21 +7,21 @@
   <formats>
     <format>tgz</format>
   </formats>
-  <baseDirectory>saw-security</baseDirectory>
+  <baseDirectory>sip-security</baseDirectory>
   <fileSets>
     <fileSet>
-      <directory>saw-security-command-line-tool/target</directory>
+      <directory>sip-security-command-line-tool/target</directory>
       <outputDirectory>rpms</outputDirectory>
       <includes>
       	<include>sip-security-*.rpm</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>saw-security/src/main/ansible</directory>
+      <directory>sip-security/src/main/ansible</directory>
       <outputDirectory>ansible</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>saw-security/db/customer-onboard-script</directory>
+      <directory>sip-security/db/customer-onboard-script</directory>
       <outputDirectory>customer-onboard-script</outputDirectory>
     </fileSet>
   </fileSets>

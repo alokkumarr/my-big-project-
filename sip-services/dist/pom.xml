@@ -55,7 +55,7 @@
           <descriptors>
             <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
           </descriptors>
-          <finalName>saw-services-${project.version}</finalName>
+          <finalName>sip-services-${project.version}</finalName>
           <!-- Enable long file names without Maven warning -->
           <tarLongFileMode>posix</tarLongFileMode>
         </configuration>

@@ -11,8 +11,8 @@
 
 
   <modules>
-    <module>saw-security</module>
-    <module>saw-security-command-line-tool</module>
+    <module>sip-security</module>
+    <module>sip-security-command-line-tool</module>
   </modules>
 
 
@@ -32,7 +32,7 @@
             <descriptor>src/main/assembly/assembly.xml</descriptor>
           </descriptors>
           <!-- Enable long file names without Maven warning -->
-          <finalName>saw-security-${project.version}</finalName>
+          <finalName>sip-security-${project.version}</finalName>
           <tarLongFileMode>posix</tarLongFileMode>
         </configuration>
         <executions>

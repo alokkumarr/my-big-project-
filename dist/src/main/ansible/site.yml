@@ -6,9 +6,9 @@
   roles:
     - saw-host
     - sip-prometheus-node
-- import_playbook: modules/saw-security/ansible/site.yml
-- import_playbook: modules/saw-services/ansible/site.yml
-- import_playbook: modules/saw-web/ansible/site.yml
+- import_playbook: modules/sip-security/ansible/site.yml
+- import_playbook: modules/sip-services/ansible/site.yml
+- import_playbook: modules/sip-web/ansible/site.yml
 - import_playbook: modules/sip-xdf/ansible/site.yml
 - import_playbook: modules/sip-a2/ansible/site.yml
 - import_playbook: modules/sip-rtis/ansible/site.yml
