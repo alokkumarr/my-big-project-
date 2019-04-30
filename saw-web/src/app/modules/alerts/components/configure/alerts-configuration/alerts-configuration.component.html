@@ -89,7 +89,7 @@
         <dxi-column dataField="aggregation"></dxi-column>
         <dxi-column dataField="thresholdValue" alignment="center"></dxi-column>
         <dxi-column
-          caption="Status"
+          caption="Is Active"
           dataField="activeInd"
           alignment="center"
           cellTemplate="statusTemplate"
@@ -124,9 +124,9 @@
           <mat-icon
             i18n-matTooltip
             class="conf-container-content__body__statusIcon"
-            [ngClass]="data.data.activeInd ? 'LOW' : 'CRITICAL'"
+            [ngClass]="data.data.activeInd ? 'active' : 'inactive'"
             fontIcon="icon-logout"
-            [matTooltip]="data.data.activeInd ? 'Active' : 'Inactivate'"
+            [matTooltip]="data.data.activeInd ? 'Active' : 'Inactive'"
           ></mat-icon>
         </div>
 
