@@ -10,6 +10,7 @@ import { DesignerSaveEvent, isDSLAnalysis } from '../../designer/types';
 import {
   Analysis,
   AnalysisDSL,
+  AnalysisChartDSL,
   AnalysisChart,
   AnalyzeViewActionEvent
 } from '../types';
@@ -62,7 +63,7 @@ export class AnalyzeCardComponent implements OnInit {
     });
     const { type, id } = this.analysis;
     const chartType = isDSLAnalysis(this.analysis)
-      ? this.analysis.chartOptions.chartType
+      ? (<AnalysisChartDSL>this.analysis).chartOptions.chartType
       : (<AnalysisChart>this.analysis).chartType;
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${

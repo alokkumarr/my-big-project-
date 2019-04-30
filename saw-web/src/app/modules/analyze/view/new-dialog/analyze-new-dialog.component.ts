@@ -182,14 +182,28 @@ export class AnalyzeNewDialogComponent {
       this.selectedMetric
     );
 
+    const mapOptions = {
+      mapType: 'chart_scale',
+      labelOptions: {
+        enabled: false,
+        value: ''
+      },
+      legend: {
+        align: 'right',
+        layout: 'vertical'
+      }
+    };
+
     const model = {
       type,
       chartType,
       categoryId: this.data.id,
       semanticId,
       metricName,
-      supports
+      supports,
+      mapOptions: type === 'map' ? mapOptions : null
     };
+
     this._dialogRef.afterClosed().subscribe(() => {
       this._analyzeDialogService.openNewAnalysisDialog(model);
     });

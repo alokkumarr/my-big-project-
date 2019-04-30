@@ -12,7 +12,8 @@ import {
   Filter,
   IToolbarActionData,
   Artifact,
-  Format
+  Format,
+  isDSLAnalysis
 } from '../types';
 import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
 import {
@@ -101,10 +102,12 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterPromptDialog(filters, analysis) {
+  openFilterPromptDialog(filters, analysis: Analysis | AnalysisDSL) {
     const data: DesignerFilterDialogData = {
       filters,
-      artifacts: analysis.artifacts,
+      artifacts: isDSLAnalysis(analysis)
+        ? analysis.sipQuery.artifacts
+        : analysis.artifacts,
       isInRuntimeMode: true
     };
     return this.dialog.open(DesignerFilterDialogComponent, {
@@ -115,7 +118,7 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openPreviewDialog(analysis: Analysis) {
+  openPreviewDialog(analysis: Analysis | AnalysisDSL) {
     const data = {
       analysis
     };

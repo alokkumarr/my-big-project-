@@ -46,7 +46,7 @@ export {
   DEFAULT_PRECISION
 };
 
-export const DSL_ANALYSIS_TYPES = ['chart'];
+export const DSL_ANALYSIS_TYPES = ['chart', 'map'];
 
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'

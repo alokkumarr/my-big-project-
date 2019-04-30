@@ -21,12 +21,14 @@ const GEO_TYPES_WITH_IDENTIFIER = {
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
-    if (!identifier) {
-      return geoType;
-    }
-    return `${geoType}:${identifier}`;
-  }))
+  fpFlatMap(([geoType, identifiers]) =>
+    map(identifiers, identifier => {
+      if (!identifier) {
+        return geoType;
+      }
+      return `${geoType}:${identifier}`;
+    })
+  )
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
@@ -184,7 +186,7 @@ export const AGGREGATE_TYPES = [
   {
     label: 'Distinct Count',
     designerLabel: 'CNTD',
-    value: 'distinctCount',
+    value: 'distinctcount',
     icon: 'icon-Count',
     type: 'long',
     valid: ['chart', 'pivot', 'report', 'esReport', 'map']
@@ -200,7 +202,7 @@ export const AGGREGATE_TYPES = [
   {
     label: 'Percentage By Row',
     designerLabel: 'PCTR',
-    value: 'percentageByRow',
+    value: 'percentagebyrow',
     icon: 'icon-Percentage',
     type: 'float',
     valid: ['chart']
@@ -237,19 +239,6 @@ export const AGGREGATE_TYPES = [
   //   type: 'float',
   //   valid: ['chart']
   // }
-];
-
-export const AGGREGATE_STRING_TYPES = [
-  {
-    label: 'Count',
-    value: 'count',
-    icon: 'icon-Count'
-  },
-  {
-    label: 'Distinct Count',
-    value: 'distinctCount',
-    icon: 'icon-Count'
-  }
 ];
 
 export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];

@@ -45,11 +45,15 @@ import {
   DesignerChangeEvent,
   DesignerSaveEvent,
   AnalysisReport,
-  ArtifactColumnChart,
   MapSettings,
   isDSLAnalysis
 } from '../types';
-import { AnalysisDSL } from '../../../../models';
+import {
+  AnalysisDSL,
+  LabelOptions,
+  AnalysisChartDSL,
+  AnalysisMapDSL
+} from '../../../../models';
 import {
   DesignerStates,
   FLOAT_TYPES,
@@ -80,7 +84,9 @@ import {
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
   DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns,
-  DesignerMergeSupportsIntoAnalysis
+  DesignerMergeSupportsIntoAnalysis,
+  DesignerLoadMetric,
+  DesignerResetState
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -106,7 +112,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     map$(analysis => analysis.sipQuery.sorts)
   );
   chartType$: Observable<string> = this.dslAnalysis$.pipe(
-    map$(analysis => analysis.chartOptions.chartType)
+    map$(analysis => (<AnalysisChartDSL>analysis).chartOptions.chartType)
   );
 
   public isInDraftMode = false;
@@ -123,15 +129,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
-  public fieldCount: number;
   private subscriptions: Subscription[] = [];
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
   get chartType(): string {
     return isDSLAnalysis(this.analysis)
-      ? this._store.selectSnapshot(DesignerState).analysis.chartOptions
-          .chartType
+      ? (<AnalysisChartDSL>this._store.selectSnapshot(DesignerState).analysis)
+          .chartOptions.chartType
       : (<AnalysisChart>this.analysis).chartType;
   }
 
@@ -149,12 +154,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe());
+    this._store.dispatch(new DesignerResetState());
   }
 
   ngOnInit() {
-    const isReport = ['report', 'esReport'].includes(
-      get(this.analysis, 'type') || get(this.analysisStarter, 'type')
-    );
+    const analysisType: string =
+      get(this.analysis, 'type') || get(this.analysisStarter, 'type');
+    const isReport = ['report', 'esReport'].includes(analysisType);
     this.designerState = DesignerStates.WAITING_FOR_COLUMNS;
     /* prettier-ignore */
     switch (this.designerMode) {
@@ -199,6 +205,19 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     default:
       break;
     }
+    this.dslAnalysis$.subscribe(analysis => {
+      if (!analysis || ['report', 'esReport'].includes(analysisType)) {
+        return;
+      }
+      this.analysis = analysis;
+      // const sqlBuilder = this._designerService.getSqlBuilder(
+      //   this.analysis,
+      //   this.booleanCriteria,
+      //   this.filters,
+      //   this.sorts
+      // );
+      // set(this.analysis, 'sqlBuilder', sqlBuilder);
+    });
   }
 
   mergeSemnticArtifactColumnsWithAnalysisArtifactColumn() {}
@@ -219,11 +238,22 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   initNewAnalysis() {
     const { type, semanticId } = this.analysisStarter;
-    const artifacts$ = this._analyzeService.getArtifactsForDataSet(semanticId);
+    const artifacts$ = this._analyzeService
+      .getArtifactsForDataSet(semanticId)
+      .toPromise();
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
 
     return Promise.all([artifacts$, newAnalysis$]).then(
-      ([artifacts, newAnalysis]) => {
+      ([metric, newAnalysis]) => {
+        this._store.dispatch(
+          new DesignerLoadMetric({
+            metricName: metric.metricName,
+            artifacts: metric.artifacts
+          })
+        );
+        const artifacts = this._store.selectSnapshot(
+          state => state.designerState.metric.artifacts
+        );
         this.analysis = {
           ...this.analysisStarter,
           ...(newAnalysis['analysis'] || newAnalysis),
@@ -283,23 +313,28 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (this.analysis.type) {
       case 'chart':
-        this._chartService.updateAnalysisModel(this.analysis);
+        this.addDefaultLabelOptions();
         if (this.designerMode === 'new') {
-          (<any>this.analysis).isInverted = this.chartType === 'bar';
+          if (isDSLAnalysis(this.analysis)) {
+            this._store.dispatch(new DesignerUpdateAnalysisChartInversion(this.chartType === 'bar'));
+          } else {
+            (<any>this.analysis).isInverted = this.chartType === 'bar';
+          }
         }
+        const chartOptions = this._store.selectSnapshot(state => (<AnalysisChartDSL>state.designerState.analysis).chartOptions);
         this.chartTitle = isDSLAnalysis(this.analysis)
-          ? this.analysis.chartOptions.chartTitle || this.analysis.name
+          ? chartOptions.chartTitle || this.analysis.name
           : (this.chartTitle = this.analysis.chartTitle || this.analysis.name);
 
           const chartOnlySettings = {
           legend: isDSLAnalysis(<any>this.analysis)
-            ? (<any>this.analysis).chartOptions.legend
+            ? chartOptions.legend
             : (<any>this.analysis).legend,
           labelOptions: isDSLAnalysis(<any>this.analysis)
-            ? (<any>this.analysis).chartOptions.labelOptions
+            ? chartOptions.labelOptions
             : (<any>this.analysis).labelOptions || {},
           isInverted: isDSLAnalysis(<any>this.analysis)
-            ? (<any>this.analysis).chartOptions.isInverted
+            ? chartOptions.isInverted
             : (<any>this.analysis).isInverted
         };
 
@@ -314,9 +349,35 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           ...this.auxSettings,
           ...mapOnlySettings
         };
-        this.analysis.mapSettings = this.auxSettings;
+        (<AnalysisMapDSL>this.analysis).mapOptions = this.auxSettings;
         break;
     }
+  }
+
+  addDefaultLabelOptions() {
+    if (this.analysis.type !== 'chart' || this.designerMode !== 'new') {
+      return;
+    }
+
+    let labelOptions: LabelOptions;
+
+    switch (this.chartType) {
+      case 'pie':
+        labelOptions = {
+          enabled: true,
+          value: 'percentage'
+        };
+        break;
+      default:
+        labelOptions = {
+          enabled: false,
+          value: ''
+        };
+    }
+
+    this._store.dispatch(
+      new DesignerUpdateAnalysisChartLabelOptions(labelOptions)
+    );
   }
 
   fixLegacyArtifacts(artifacts): Array<Artifact> {
@@ -484,14 +545,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     if (!isGroupByPresent) {
       forEach(analysis.sqlBuilder.dataFields, dataField => {
         dataField.aggregate =
-          dataField.aggregate === 'percentageByRow'
+          dataField.aggregate === 'percentagebyrow'
             ? 'percentage'
             : dataField.aggregate;
       });
 
       forEach(this.artifacts[0].columns, col => {
         col.aggregate =
-          col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+          col.aggregate === 'percentagebyrow' ? 'percentage' : col.aggregate;
       });
     }
     return analysis;
@@ -528,10 +589,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const filters = analysis.sqlBuilder.filters;
 
     forEach(dataFields, field => {
-      if (field.checked === 'y' || field.area === 'y') {
-        this.fieldCount++;
-      }
-
       if (dataFields.length > 1 && field.limitType) {
         delete field.limitType;
         delete field.limitValue;
@@ -557,7 +614,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
-    this.fieldCount = 0;
 
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
@@ -649,7 +705,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       break;
     case 'preview':
-      this._analyzeDialogService.openPreviewDialog(<Analysis>this.analysis);
+      this._analyzeDialogService.openPreviewDialog(<Analysis | AnalysisDSL>this.analysis);
       break;
     case 'description':
       this._analyzeDialogService
@@ -899,7 +955,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     // only front end data refresh needed
     case 'format':
-    case 'aliasName':
+    case 'alias':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       if (isDSLAnalysis(this.analysis)) {
         this.analysis.sipQuery = {...this.analysis.sipQuery};
@@ -952,7 +1008,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = [...this.artifacts];
         this.requestDataIfPossible();
         break;
-      case 'aliasName':
+      case 'alias':
         // reload frontEnd
         this.updateAnalysis();
         this.artifacts = [...this.artifacts];
@@ -1018,7 +1074,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'mapSettings':
         this.auxSettings = event.data.mapSettings;
-        this.analysis.mapSettings = this.auxSettings;
+        (<AnalysisMapDSL>this.analysis).mapOptions = this.auxSettings;
         break;
       case 'fetchLimit':
         (<Analysis>this.analysis).sqlBuilder = this.getSqlBuilder();
@@ -1032,11 +1088,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.changeChartType(event.data);
         this._store.dispatch(new DesignerClearGroupAdapters());
         this._store.dispatch(
-          new DesignerInitGroupAdapters(
-            <ArtifactColumnChart[]>this.artifacts[0].columns,
-            this.analysis.type,
-            this.chartType
-          )
+          new DesignerInitGroupAdapters()
         );
         setTimeout(() => {
           this.resetAnalysis();
@@ -1048,9 +1100,17 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   changeChartType(to: string) {
     if (isDSLAnalysis(this.analysis)) {
       this._store.dispatch(new DesignerUpdateAnalysisChartType(to));
+      isDSLAnalysis(this.analysis);
+      this._store.dispatch(
+        new DesignerUpdateAnalysisChartInversion(to === 'bar')
+      );
     } else {
       (<AnalysisChart>this.analysis).chartType = to;
+      (<any>this.analysis).isInverted = to === 'bar';
     }
+
+    this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
+    // this.artifacts = [...this.artifacts];
   }
 
   resetAnalysis() {

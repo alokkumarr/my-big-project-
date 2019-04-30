@@ -24,10 +24,8 @@
     [sorts]="analysis.sipQuery ? (dslSorts$ | async) : sorts"
     [filters]="filters"
     [chartTitle]="chartTitle"
-    [fieldCount]="fieldCount"
-    [sqlBuilder]="
-      analysis.sipQuery ? (dslAnalysis$ | async).sipQuery : analysis.sqlBuilder
-    "
+    [sipQuery]="analysis.sipQuery"
+    [sqlBuilder]="analysis.sqlBuilder"
     [designerState]="designerState"
   >
   </single-table-designer-layout>

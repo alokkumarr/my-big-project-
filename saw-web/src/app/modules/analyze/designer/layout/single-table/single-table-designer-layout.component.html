@@ -12,7 +12,6 @@
       [analysisType]="analysisType"
       [analysisSubtype]="analysisSubtype"
       (change)="change.emit($event)"
-      [fieldCount]="fieldCount"
       [sqlBuilder]="sqlBuilder"
       [artifacts]="artifacts"
     >
@@ -42,9 +41,7 @@
       (change)="change.emit($event)"
       [analysisType]="analysisType"
       [analysisSubtype]="analysisSubtype"
-      [sqlBuilder]="sqlBuilder"
-      [artifacts]="artifacts"
-      [fieldCount]="fieldCount"
+      [sipQuery]="sipQuery"
       [auxSettings]="auxSettings"
       [chartTitle]="chartTitle"
     >
@@ -69,7 +66,7 @@
           (removeFilter)="onRemoveFilter($event)"
           [analysisType]="analysisType"
           [analysisSubtype]="analysisSubtype"
-          [artifacts]="artifacts"
+          [artifacts]="sipQuery.artifacts"
           [filters]="filters"
           class="designer__selected-fields__container"
         >
@@ -193,7 +190,7 @@
             [sorts]="sorts"
             [auxSettings]="auxSettings"
             [data]="data"
-            [sqlBuilder]="sqlBuilder"
+            [sipQuery]="sipQuery"
           >
           </designer-chart>
         </mat-card>

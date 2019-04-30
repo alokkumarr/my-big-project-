@@ -450,7 +450,10 @@ export class AnalyzeService {
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(first())
+      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(
+        first(),
+        map((res: { analysis: AnalysisDSL }) => res.analysis)
+      )
     );
   }
 
@@ -477,12 +480,12 @@ export class AnalyzeService {
         map((resp: any) => {
           return {
             data: resp,
-            executionId: resp.executionId,
+            executionId: resp.executionId || (model.sipQuery ? '123456' : null),
             executionType: mode,
             executedBy: this._jwtService.getLoginId(),
             executedAt: Date.now(),
             designerQuery: fpGet(`query`, resp),
-            queryBuilder: { ...model.sqlQuery },
+            queryBuilder: { ...model.sipQuery },
             count: fpGet(`totalRows`, resp)
           };
         })
@@ -579,9 +582,7 @@ export class AnalyzeService {
   }
 
   getArtifactsForDataSet(semanticId: string) {
-    return this.getRequest(`internal/semantic/workbench/${semanticId}`)
-      .toPromise()
-      .then((data: any) => data.artifacts);
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
   getSemanticObect(semanticId: string) {
@@ -651,10 +652,6 @@ export class AnalyzeService {
         legend: {
           align: 'right',
           layout: 'vertical'
-        },
-        labelOptions: {
-          enabled: false,
-          value: ''
         },
         xAxis: {
           title: null

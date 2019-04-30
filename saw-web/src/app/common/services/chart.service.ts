@@ -18,7 +18,6 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpInvert from 'lodash/fp/invert';
 import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
@@ -37,8 +36,6 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import { flattenChartData } from '../utils/dataFlattener';
-
 import {
   NUMBER_TYPES,
   FLOAT_TYPES,
@@ -46,6 +43,7 @@ import {
   AGGREGATE_TYPES_OBJ,
   CHART_COLORS
 } from '../../modules/analyze/consts';
+import { QueryDSL } from 'src/app/models';
 
 const removeKeyword = (input: string) => {
   if (!input) {
@@ -144,21 +142,6 @@ export class ChartService {
   LEGEND_POSITIONING = LEGEND_POSITIONING;
   LAYOUT_POSITIONS = LAYOUT_POSITIONS;
   constructor() {}
-
-  updateAnalysisModel(analysis) {
-    /* prettier-ignore */
-    switch (analysis.chartType) {
-    case 'pie':
-      analysis.labelOptions = analysis.labelOptions || {
-        enabled: true,
-        value: 'percentage'
-      };
-      break;
-    default:
-      break;
-    }
-    return analysis;
-  }
 
   analysisLegend2ChartLegend(legend) {
     const align = LEGEND_POSITIONING[get(legend, 'align')];
@@ -485,16 +468,7 @@ export class ChartService {
   }
 
   getSerie(
-    {
-      alias,
-      aliasName,
-      type,
-      displayName,
-      displayType,
-      comboType,
-      aggregate,
-      chartType
-    },
+    { alias, type, displayName, displayType, comboType, aggregate, chartType },
     index,
     fields,
     chartTypeOverride
@@ -511,7 +485,7 @@ export class ChartService {
       comboType || displayType
     );
     const zIndex = this.getZIndex(comboType || displayType);
-    if (aggregate === 'percentage' || aggregate === 'percentageByRow') {
+    if (aggregate === 'percentage' || aggregate === 'percentagebyrow') {
       aggrSymbol = '%';
     }
     const nameWithAggregate =
@@ -519,7 +493,7 @@ export class ChartService {
         ? `Total ${displayName}`
         : `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`;
     return {
-      name: alias || aliasName || nameWithAggregate,
+      name: alias || nameWithAggregate,
       aggrSymbol,
       aggregate,
       type: splinifiedChartType,
@@ -581,7 +555,7 @@ export class ChartService {
     let aggrsymbol = '';
     if (
       fields.y[0].aggregate === 'percentage' ||
-      fields.y[0].aggregate === 'percentageByRow'
+      fields.y[0].aggregate === 'percentagebyrow'
     ) {
       aggrsymbol = '%';
     }
@@ -762,13 +736,12 @@ export class ChartService {
     }
   }
 
-  getPieChangeConfig(type, settings, fields, gridData, opts) {
+  getPieChangeConfig(type, fields, gridData, opts) {
     const changes = [];
     const yField = get(fields, 'y.0', {});
     const yLabel =
       get(opts, 'labels.y') ||
       yField.alias ||
-      yField.aliasName ||
       `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
 
     const labelOptions = get(opts, 'labelOptions', {
@@ -828,10 +801,9 @@ export class ChartService {
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
-            if (!isUndefined(field.alias) || !isUndefined(field.aliasName)) {
+            if (!isUndefined(field.alias)) {
               return (
                 field.alias ||
-                field.aliasName ||
                 `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${
                   field.displayName
                 }`
@@ -884,7 +856,6 @@ export class ChartService {
     forEach(axisFields, (field, index) => {
       const titleText =
         field.alias ||
-        field.aliasName ||
         `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
       chartChanges.push({
         labels: {
@@ -920,11 +891,10 @@ export class ChartService {
     return `${top}%`;
   }
 
-  getBarChangeConfig(type, settings, fields, gridData, opts) {
+  getBarChangeConfig(type, fields, gridData, opts) {
     const labels = {
       x:
         get(fields, 'x.alias') ||
-        get(fields, 'x.aliasName') ||
         get(opts, 'labels.x') ||
         get(fields, 'x.displayName', '')
     };
@@ -963,14 +933,8 @@ export class ChartService {
     return changes;
   }
 
-  dataToChangeConfig(
-    type,
-    settings,
-    { dataFields, nodeFields },
-    gridData,
-    opts
-  ) {
-    const selectedFields = fpFlatMap(x => x, [dataFields, nodeFields]);
+  dataToChangeConfig(type, { artifacts }: QueryDSL, gridData, opts) {
+    const selectedFields = fpFlatMap(x => x.fields, artifacts);
 
     let changes;
     const fields = {
@@ -995,13 +959,7 @@ export class ChartService {
 
     switch (type) {
       case 'pie':
-        changes = this.getPieChangeConfig(
-          type,
-          settings,
-          fields,
-          gridData,
-          opts
-        );
+        changes = this.getPieChangeConfig(type, fields, gridData, opts);
         break;
       case 'column':
       case 'bar':
@@ -1013,13 +971,7 @@ export class ChartService {
       case 'tsspline':
       case 'tsPane':
       default:
-        changes = this.getBarChangeConfig(
-          type,
-          settings,
-          fields,
-          gridData,
-          opts
-        );
+        changes = this.getBarChangeConfig(type, fields, gridData, opts);
         break;
     }
 
@@ -1044,7 +996,7 @@ export class ChartService {
      * @returns {undefined}
      */
     const getPrecision = (aggregate, type) => {
-      return ['percentage', 'avg', 'percentageByRow'].includes(aggregate) ||
+      return ['percentage', 'avg', 'percentagebyrow'].includes(aggregate) ||
         FLOAT_TYPES.includes(type)
         ? 2
         : 0;
@@ -1081,7 +1033,6 @@ export class ChartService {
 
       const xString = `<tr>
         <th>${fields.x.alias ||
-          fields.x.aliasName ||
           get(opts, 'labels.x', '') ||
           fields.x.displayName}:</th>
         <td>{${xStringValue}}</td>
@@ -1089,13 +1040,12 @@ export class ChartService {
 
       const yString = `<tr>
         <th>${fields.y.alias ||
-          fields.y.aliasName ||
           get(opts, 'labels.y', '') ||
           (point ? point.series.name : '{series.name}')}:</th>
         <td>${
           point
             ? round(
-                options.aggregate === 'percentageByRow'
+                options.aggregate === 'percentagebyrow'
                   ? round(point.percentage, 2)
                   : point.y,
                 getPrecision(options.aggregate, options.dataType)
@@ -1111,7 +1061,6 @@ export class ChartService {
       const zString = fields.z
         ? `<tr><th>${AGGREGATE_TYPES_OBJ[fields.z.aggregate].label} ${fields.z
             .alias ||
-            fields.z.aliasName ||
             get(opts, 'labels.z', '') ||
             fields.z.displayName}:</th><td>${
             point ? round(point.z, 2) : '{point.z:,.2f}'
@@ -1186,79 +1135,5 @@ export class ChartService {
     });
 
     return changes;
-  }
-
-  parseData(data, sqlBuilder) {
-    return flattenChartData(data, sqlBuilder);
-  }
-
-  filterNumberTypes(attributes) {
-    return filter(
-      attributes,
-      attr => removeKeyword(attr.columnName) && NUMBER_TYPES.includes(attr.type)
-    );
-  }
-
-  filterNonNumberTypes(attributes) {
-    return filter(
-      attributes,
-      attr =>
-        removeKeyword(attr.columnName) && !NUMBER_TYPES.includes(attr.type)
-    );
-  }
-
-  filterDateTypes(attributes) {
-    return filter(
-      attributes,
-      attr => removeKeyword(attr.columnName) && DATE_TYPES.includes(attr.type)
-    );
-  }
-
-  fillSettings(artifacts, model) {
-    /* Flatten the artifacts into a single array and sort them */
-    const attributes = fpPipe(
-      fpFlatMap(metric => {
-        return map(metric.columns, attr => {
-          attr.tableName = metric.artifactName;
-          return attr;
-        });
-      }),
-      fpSortBy('displayName')
-    )(artifacts);
-
-    let settingsObj;
-    let zaxis;
-    const yaxis = this.filterNumberTypes(attributes);
-    let xaxis = attributes;
-    const groupBy = this.filterNonNumberTypes(attributes);
-
-    /* prettier-ignore */
-    switch (model.chartType) {
-    case 'bubble':
-      zaxis = this.filterNumberTypes(attributes);
-      settingsObj = {
-        xaxis,
-        yaxis,
-        zaxis,
-        groupBy
-      };
-      break;
-    case 'tsspline':
-    case 'tsPane':
-      xaxis = this.filterDateTypes(attributes);
-      settingsObj = {
-        xaxis,
-        yaxis,
-        groupBy
-      };
-      break;
-    default:
-      settingsObj = {
-        yaxis,
-        xaxis,
-        groupBy
-      };
-    }
-    return settingsObj;
   }
 }

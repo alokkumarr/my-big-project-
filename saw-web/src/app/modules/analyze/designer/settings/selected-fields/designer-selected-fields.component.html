@@ -26,9 +26,7 @@
     <mat-chip
       *ngFor="let col of adapter.artifactColumns"
       class="selected-fields__item"
-      [attr.e2e]="
-        'designer-selected-field-' + (col.displayName || col.aliasName)
-      "
+      [attr.e2e]="'designer-selected-field-' + (col.displayName || col.alias)"
       [ngClass]="getFieldItemClass(col)"
       cdkDrag
       (cdkDragStarted)="dragStarted($event)"
@@ -43,10 +41,10 @@
           [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
         >
         </span>
-        <span> (&nbsp;{{ col.displayName || col.aliasName }}&nbsp;) </span>
+        <span> (&nbsp;{{ col.displayName || col.alias }}&nbsp;) </span>
       </ng-container>
       <ng-template #defaultTemplate>
-        {{ col.displayName || col.aliasName }}
+        {{ col.displayName || col.alias }}
       </ng-template>
 
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>

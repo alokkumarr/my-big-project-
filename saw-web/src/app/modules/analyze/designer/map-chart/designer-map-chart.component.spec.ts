@@ -1,10 +1,16 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { of } from 'rxjs';
-import { DesignerMapChartComponent, MapChartStates } from './designer-map-chart.component';
+import {
+  DesignerMapChartComponent,
+  MapChartStates
+} from './designer-map-chart.component';
 import { ChartService } from '../../../../common/services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
-import { ArtifactColumn, ArtifactColumnChart } from '../../../../models/artifact-column.model';
+import {
+  ArtifactColumn,
+  ArtifactColumnChart
+} from '../../../../models/artifact-column.model';
 
 @Component({
   // tslint:disable-next-line
@@ -28,10 +34,12 @@ const normalSqlBuilder = {
   booleanCriteria: 'AND'
 };
 const sqlBuilderWithXFieldContainingRegion = {
-  nodeFields: [{
-    checked: 'x',
-    region: { name: '', path: ''}
-  } as ArtifactColumnChart],
+  nodeFields: [
+    ({
+      checked: 'x',
+      region: { name: '', path: '' }
+    } as unknown) as ArtifactColumnChart
+  ],
   dataFields: [{ checked: 'y' } as ArtifactColumn],
   filters: [],
   booleanCriteria: 'AND'
@@ -40,22 +48,20 @@ const sqlBuilderWithXFieldContainingRegion = {
 describe('Designer Map Chart Component', () => {
   let fixture: ComponentFixture<DesignerMapChartComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        providers: [
-          { provide: ChartService, useValue: ChartStubService },
-          { provide: MapDataService, useClass: MapDataStubService }
-        ],
-        declarations: [DesignerMapChartComponent, ChartStubComponent],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      })
-        .compileComponents()
-        .then(() => {
-          fixture = TestBed.createComponent(DesignerMapChartComponent);
-        });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: ChartService, useValue: ChartStubService },
+        { provide: MapDataService, useClass: MapDataStubService }
+      ],
+      declarations: [DesignerMapChartComponent, ChartStubComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
-  );
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(DesignerMapChartComponent);
+      });
+  }));
 
   it('should set x and y fields from sqlBuilder', () => {
     const component = fixture.componentInstance;

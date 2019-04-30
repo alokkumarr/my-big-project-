@@ -121,7 +121,7 @@ export class ObserveService {
     const payload = {
       globalFilters: [
         {
-          tableName: filter.tableName,
+          tableName: filter.tableName || filter.artifactsName,
           semanticId: filter.semanticId,
           filters: [
             {

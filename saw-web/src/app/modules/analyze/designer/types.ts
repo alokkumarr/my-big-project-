@@ -9,7 +9,9 @@ import {
   MapSettings,
   LabelOptions,
   Legend,
-  Axis
+  Axis,
+  AnalysisChartDSL,
+  AnalysisMapDSL
 } from '../models';
 import { JsPlumbCanvasChangeEvent } from '../../../common/components/js-plumb/types';
 import {
@@ -70,7 +72,9 @@ export {
   AnalysisDialogData,
   Region,
   MapSettings,
-  isDSLAnalysis
+  isDSLAnalysis,
+  AnalysisChartDSL,
+  AnalysisMapDSL
 };
 
 export interface ArtifactColumnFilter {
@@ -114,7 +118,7 @@ export interface DesignerChangeEvent {
     | 'format'
     | 'aggregate'
     | 'dateInterval'
-    | 'aliasName'
+    | 'alias'
     | 'sort'
     | 'filter'
     | 'filterRemove'
@@ -148,6 +152,10 @@ export interface DesignerSaveEvent {
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
   analysis: AnalysisDSL;
+  metric: {
+    metricName: string;
+    artifacts: Artifact[];
+  };
 }
 
 export interface DSLChartOptionsModel {
