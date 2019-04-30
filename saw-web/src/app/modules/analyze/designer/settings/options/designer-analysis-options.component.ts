@@ -14,7 +14,6 @@ export class DesignerAnalysisOptionsComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
-  @Input() fieldCount: number;
   @Input() auxSettings: any;
   @Input() chartTitle: string;
   @Input('sipQuery') set setArtifacts(sipQuery: QueryDSL) {

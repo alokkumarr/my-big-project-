@@ -122,7 +122,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
-  public fieldCount: number;
   private subscriptions: Subscription[] = [];
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
@@ -549,14 +548,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     if (!isGroupByPresent) {
       forEach(analysis.sqlBuilder.dataFields, dataField => {
         dataField.aggregate =
-          dataField.aggregate === 'percentageByRow'
+          dataField.aggregate === 'percentagebyrow'
             ? 'percentage'
             : dataField.aggregate;
       });
 
       forEach(this.artifacts[0].columns, col => {
         col.aggregate =
-          col.aggregate === 'percentageByRow' ? 'percentage' : col.aggregate;
+          col.aggregate === 'percentagebyrow' ? 'percentage' : col.aggregate;
       });
     }
     return analysis;
@@ -593,10 +592,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const filters = analysis.sqlBuilder.filters;
 
     forEach(dataFields, field => {
-      if (field.checked === 'y' || field.area === 'y') {
-        this.fieldCount++;
-      }
-
       if (dataFields.length > 1 && field.limitType) {
         delete field.limitType;
         delete field.limitValue;
@@ -622,7 +617,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
-    this.fieldCount = 0;
 
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()

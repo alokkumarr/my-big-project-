@@ -1,11 +1,13 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as get from 'lodash/get';
+import * as unset from 'lodash/unset';
 import * as findIndex from 'lodash/findIndex';
 import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
+import * as fpFilter from 'lodash/fp/filter';
 import moment from 'moment';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
@@ -34,7 +36,7 @@ import {
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
-  DesignerReorderArtifactColumns,
+  DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
   DesignerResetState,
@@ -154,7 +156,7 @@ export class DesignerState {
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
-    return dispatch(new DesignerReorderArtifactColumns());
+    return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerRemoveArtifactColumn)
@@ -186,7 +188,7 @@ export class DesignerState {
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
-    return dispatch(new DesignerReorderArtifactColumns());
+    return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerUpdateArtifactColumn)
@@ -243,7 +245,7 @@ export class DesignerState {
     });
   }
 
-  @Action(DesignerReorderArtifactColumns)
+  @Action(DesignerApplyChangesToArtifactColumns)
   reorderArtifactColumns({
     getState,
     patchState
@@ -252,6 +254,7 @@ export class DesignerState {
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
 
+    // reorder artifactColumns
     const areaIndexMap = fpPipe(
       fpFlatMap(adapter => adapter.artifactColumns),
       fpReduce((accumulator, artifactColumn) => {
@@ -265,6 +268,20 @@ export class DesignerState {
         field.areaIndex = areaIndexMap[field.columnName];
       });
     });
+
+    // unset fetch limit if there are more thatn 1 y fields
+
+    const dataFields = fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpFilter(field => field.area === 'y')
+    )(artifacts);
+
+    if (dataFields.length === 2) {
+      forEach(dataFields, field => {
+        unset(field, 'limitType');
+        unset(field, 'limitValue');
+      });
+    }
   }
 
   @Action(DesignerRemoveAllArtifactColumns)
@@ -468,11 +485,9 @@ export class DesignerState {
     }: DesignerAddColumnToGroupAdapter
   ) {
     const groupAdapters = getState().groupAdapters;
-    groupAdapters[adapterIndex].artifactColumns.splice(
-      columnIndex,
-      0,
-      artifactColumn
-    );
+    const adapter = groupAdapters[adapterIndex];
+
+    adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     // disabled immer because having immutability for groupAdapters causes conflicts in the designer
     // so it will stay disabled until a refactoring of the whole designer to ngxs
     // const groupAdapters = produce(getState().groupAdapters, draft => {
@@ -482,7 +497,7 @@ export class DesignerState {
     //     artifactColumn
     //   );
     // });
-    const adapter = groupAdapters[adapterIndex];
+
     adapter.transform(artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
@@ -546,7 +561,7 @@ export class DesignerState {
     // });
     adapter.onReorder(adapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
-    return dispatch(new DesignerReorderArtifactColumns());
+    return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerUpdateFilters)

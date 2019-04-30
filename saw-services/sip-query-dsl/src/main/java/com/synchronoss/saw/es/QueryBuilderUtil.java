@@ -138,6 +138,10 @@ public class QueryBuilderUtil {
                 .field(field.getColumnName())
                 .script(script);
         break;
+      case PERCENTAGE_BY_ROW:
+        aggregationBuilder =
+               AggregationBuilders.sum(field.getDataField()).field(field.getColumnName());
+        break;
     }
     return aggregationBuilder;
   }
