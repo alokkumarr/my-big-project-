@@ -49,7 +49,11 @@
       # as required by Spring "loader.path" option
       echo $classpath | sed -e 's/ /,/g'
 # Workaround: Services have been renamed from "saw-*" to "sip-*", so
-# stop any units with the old name before upgrading.  Can be removed
-# once all environments have been upgraded to SIP 3.3.
+# stop any units with the old name before upgrading.  Stop sockets
+# separately first, so that socket-activated units are not reactivated
+# while stopping.  Can be removed once all environments have been
+# upgraded to SIP 3.3.
+- name: Stop systemd sockets with old SAW prefix before upgrading
+  command: systemctl stop saw-*.socket
 - name: Stop systemd units with old SAW prefix before upgrading
   command: systemctl stop saw-*
