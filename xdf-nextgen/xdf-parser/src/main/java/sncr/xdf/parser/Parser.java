@@ -20,6 +20,7 @@ import org.apache.spark.util.LongAccumulator;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
 import sncr.bda.conf.Output;
+import sncr.bda.conf.ParserInputFileFormat;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.DLBatchWriter;
@@ -29,6 +30,8 @@ import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithMovableResult;
 import sncr.xdf.component.WithSparkContext;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.parser.parsers.JsonFileParser;
+import sncr.xdf.parser.parsers.ParquetFileParser;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
@@ -45,6 +48,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
     private static final Logger logger = Logger.getLogger(Parser.class);
 
+    private ParserInputFileFormat parserInputFileFormat;
     private String lineSeparator;
     private char delimiter;
     private char quoteChar;
@@ -101,30 +105,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         int retval = 0;
 
+        parserInputFileFormat = ctx.componentConfiguration.getParser().getParserInputFileFormat();
         sourcePath = ctx.componentConfiguration.getParser().getFile();
-        headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
         tempDir = generateTempLocation(new DataSetServiceAux(ctx, md), null, null);
         archiveDir = generateArchiveLocation(new DataSetServiceAux(ctx, md));
-
-        lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
-        delimiter = (ctx.componentConfiguration.getParser().getDelimiter() != null)? ctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
-        quoteChar = (ctx.componentConfiguration.getParser().getQuoteChar() != null)? ctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
-        quoteEscapeChar = (ctx.componentConfiguration.getParser().getQuoteEscape() != null)? ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
-
-        errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
-        recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
-
-        schema = createSchema(ctx.componentConfiguration.getParser().getFields(), false, false);
-        tsFormats = createTsFormatList(ctx.componentConfiguration.getParser().getFields());
-        logger.info(tsFormats);
-
-        internalSchema = createSchema(ctx.componentConfiguration.getParser().getFields(), true, true);
-
-        // Output data set
-        if (outputDataSets.size() == 0) {
-            logger.error("Output dataset not defined");
-            return -1;
-        }
 
         Map<String, Object> outputDataset = getOutputDatasetDetails();
         logger.debug("Output dataset details = " + outputDataset);
@@ -137,70 +121,119 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         outputFormat = outputDataset.get(DataSetProperties.Format.name()).toString();
         outputNOF =  (Integer) outputDataset.get(DataSetProperties.NumberOfFiles.name());
         outputDsPartitionKeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
+        errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
+        recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
-        logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
+        logger.debug("Input file format = " + this.parserInputFileFormat);
 
-        Map<String, Object> rejDs = getRejectDatasetDetails();
+        if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
+            headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
 
-        logger.debug("Rejected dataset details = " + rejDs);
-        if (rejDs != null) {
+            lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
+            delimiter = (ctx.componentConfiguration.getParser().getDelimiter() != null)? ctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
+            quoteChar = (ctx.componentConfiguration.getParser().getQuoteChar() != null)? ctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
+            quoteEscapeChar = (ctx.componentConfiguration.getParser().getQuoteEscape() != null)? ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
+
+            schema = createSchema(ctx.componentConfiguration.getParser().getFields(), false, false);
+            tsFormats = createTsFormatList(ctx.componentConfiguration.getParser().getFields());
+            logger.info(tsFormats);
+
+            internalSchema = createSchema(ctx.componentConfiguration.getParser().getFields(), true, true);
+
+            // Output data set
+            if (outputDataSets.size() == 0) {
+                logger.error("Output dataset not defined");
+                return -1;
+            }
+
+            logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
+
+            Map<String, Object> rejDs = getRejectDatasetDetails();
+
+            logger.debug("Rejected dataset details = " + rejDs);
+            if (rejDs != null) {
 //            rejectedDatasetName = DATASET.rejected.toString();
-            rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
-            rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
-            rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
-            rejectedDataSetMode = rejDs.get(DataSetProperties.Mode.name()).toString();
+                rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
+                rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
+                rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
+                rejectedDataSetMode = rejDs.get(DataSetProperties.Mode.name()).toString();
 
-            logger.debug("Rejected dataset " + rejectedDatasetName + " at "
-                + rejectedDatasetLocation + " with format " + rejectedDataFormat);
+                logger.debug("Rejected dataset " + rejectedDatasetName + " at "
+                    + rejectedDatasetLocation + " with format " + rejectedDataFormat);
 
-            if (rejectedDataFormat == null || rejectedDataFormat.length() == 0) {
-                rejectedDataFormat = "parquet";
+                if (rejectedDataFormat == null || rejectedDataFormat.length() == 0) {
+                    rejectedDataFormat = "parquet";
+                }
+
+                logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
+                    + " with format " + rejectedDataFormat);
             }
 
-            logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
-                + " with format " + rejectedDataFormat);
+            //TODO: If data set exists and flag is not append - error
+            // This is good for UI what about pipeline? Talk to Suren
+
+
+            // Check what sourcePath referring
+            FileSystem fs = HFileOperations.getFileSystem();
+
+            //new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter);
+            //System.exit(0);
+
+            try {
+                if(headerSize >= 1) {
+                    logger.debug("Header present");
+                    FileStatus[] files = fs.globStatus(new Path(sourcePath));
+
+                    logger.debug("Total number of files in the directory = " + files.length);
+                    // Check if directory has been given
+                    if(files.length == 1 && files[0].isDirectory()){
+                        logger.debug("Files length = 1 and is a directory");
+                        // If so - we have to process all the files inside - create the mask
+                        sourcePath += Path.SEPARATOR + "*";
+                        // ... and query content
+                        files = fs.globStatus(new Path(sourcePath));
+                    }
+                    retval = parseFiles(files,  outputDataSetMode);
+                } else {
+                    logger.debug("No Header");
+                    retval = parse(outputDataSetMode);
+                }
+                //Write rejected data
+                if (this.rejectedDataCollector != null) {
+                    boolean status = writeRejectedData();
+
+                    if (!status) {
+                        logger.warn("Unable to write rejected data");
+                    }
+                }
+            }catch (IOException e){
+                retval =  -1;
+            }
+
+        } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON)) {
+            JsonFileParser jsonFileParser = new JsonFileParser(ctx);
+
+            Dataset<Row> inputDataset = jsonFileParser.parseInput(sourcePath);
+
+            this.recCounter.setValue(inputDataset.count());
+
+            writeDataset(inputDataset, outputFormat, tempDir);
+
+            resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                outputDataSetName, outputDataSetMode, outputFormat, outputDsPartitionKeys));
+        } else if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET)) {
+            ParquetFileParser parquetFileParser = new ParquetFileParser(ctx);
+            Dataset<Row> inputDataset = parquetFileParser.parseInput(sourcePath);
+
+            this.recCounter.setValue(inputDataset.count());
+
+            writeDataset(inputDataset, outputFormat, tempDir);
+
+            resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                outputDataSetName, outputDataSetMode, outputFormat, outputDsPartitionKeys));
         }
 
-        //TODO: If data set exists and flag is not append - error
-        // This is good for UI what about pipeline? Talk to Suren
 
-
-        // Check what sourcePath referring
-        FileSystem fs = HFileOperations.getFileSystem();
-
-        //new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter);
-        //System.exit(0);
-
-        try {
-            if(headerSize >= 1) {
-                logger.debug("Header present");
-                FileStatus[] files = fs.globStatus(new Path(sourcePath));
-
-                logger.debug("Total number of files in the directory = " + files.length);
-                // Check if directory has been given
-                if(files.length == 1 && files[0].isDirectory()){
-                    logger.debug("Files length = 1 and is a directory");
-                    // If so - we have to process all the files inside - create the mask
-                    sourcePath += Path.SEPARATOR + "*";
-                    // ... and query content
-                    files = fs.globStatus(new Path(sourcePath));
-                }
-                retval = parseFiles(files,  outputDataSetMode);
-            } else {
-                logger.debug("No Header");
-                retval = parse(outputDataSetMode);
-            }
-            //Write rejected data
-            if (this.rejectedDataCollector != null) {
-                boolean status = writeRejectedData();
-
-                if (!status) {
-                    logger.warn("Unable to write rejected data");
-                }
-            }
-        }catch (IOException e){
-            retval =  -1;
-        }
         return retval;
     }
 
@@ -220,9 +253,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
         }
 
-        if(parserProps.getFields() == null || parserProps.getFields().size() == 0){
-            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
-        }
+        // Schema configuration is no required, as schema validation cannot be done
+//        if(parserProps.getFields() == null || parserProps.getFields().size() == 0){
+//            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+//        }
         return compConf;
     }
 
@@ -239,13 +273,15 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 logger.debug("Total files = " + files.length);
 
                 int archiveCounter = 0;
+                String currentTimestamp = LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
+
+                Path archivePath = new Path(archiveDir + "/" + currentTimestamp
+                    + "_" + UUID.randomUUID() + "/");
+                ctx.fs.mkdirs(archivePath);
+                logger.debug("Archive directory " + archivePath);
 
                 for(FileStatus fiile: files) {
-                    String currentTimestamp = LocalDateTime.now()
-                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
-
-                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
-                    ctx.fs.mkdirs(archivePath);
 
                     if (archiveSingleFile(fiile.getPath(), archivePath)) {
                         archiveCounter++;
@@ -437,7 +473,12 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, outputDsPartitionKeys);
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
-            outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
+
+            logger.debug("Output DS = " + outputDS);
+            logger.debug("Output schema = " + dataset.schema().json());
+            outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset));
+
+            logger.debug("Record count = " + this.recCounter.value());
             outputDS.put(DataSetProperties.RecordCount.name(), this.recCounter.value());
             return true;
         } catch (Exception e) {
