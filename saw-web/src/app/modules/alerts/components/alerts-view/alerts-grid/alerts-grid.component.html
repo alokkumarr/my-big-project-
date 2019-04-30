@@ -9,6 +9,7 @@
   [showRowLines]="false"
   [rowAlternationEnabled]="true"
   [masterDetail]="{ enabled: true, template: 'detailTemplate' }"
+  (onRowExpanding)="onRowExpanding($event.key)"
 >
   <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
   <dxo-paging [pageSize]="25"></dxo-paging>
@@ -65,6 +66,6 @@
   </div>
 
   <div *dxTemplate="let alertDetail of 'detailTemplate'">
-    <alert-detail></alert-detail>
+    <alert-detail [alertIds]="selectedAlertIds"></alert-detail>
   </div>
 </dx-data-grid>

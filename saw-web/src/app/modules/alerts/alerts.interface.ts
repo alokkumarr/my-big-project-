@@ -39,3 +39,13 @@ export interface GridPagingOptions {
   take?: number;
   skip?: number;
 }
+
+export interface GridData {
+  data: any[];
+  totalCount: number;
+}
+
+export interface AlertIds {
+  alertRulesSysId: number;
+  alertTriggerSysId: number;
+}
