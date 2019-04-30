@@ -674,6 +674,7 @@
               <configuration>
                 <packageName>sip-web</packageName>
                 <version>${revision.nodash}</version>
+                <obsoletes>saw-web</obsoletes>
                 <skipSigning>true</skipSigning>
                 <entries>
                   <entry>

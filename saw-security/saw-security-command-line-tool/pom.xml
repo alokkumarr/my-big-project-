@@ -139,6 +139,7 @@
             <configuration>
               <packageName>sip-security</packageName>
               <version>${revision.nodash}</version>
+              <obsoletes>saw-security</obsoletes>
               <skipSigning>true</skipSigning>
               <rulesets>
                 <ruleset>
