@@ -60,7 +60,7 @@ export class AdminService {
   }
 
   getAnalysesByCategoryId(subCategoryId: string | number) {
-    return from(this._analyzeService.getAnalysesFor(subCategoryId));
+    return from(this._analyzeService.getAnalysesFor(subCategoryId.toString()));
   }
 
   getRequest<T>(path, options: RequestOptions = {}) {
