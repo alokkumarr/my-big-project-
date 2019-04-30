@@ -97,6 +97,38 @@ public class SipLogging {
     logger.trace("Integrate with logging API to update with a status ends here : "
         + entity.getProcessState() + " with an process Id " + bisLog.getPid());
   }
+  
+  
+  /**
+   * To make an entry to a log table.
+   */
+  @Transactional(TxType.REQUIRED)
+  public void upsertInProgressStatus(String pid) throws SipNestedRuntimeException {
+    BisFileLog bisLog = null;
+    if (bisFileLogsRepository.existsById(pid)) {
+      logger.trace("updating logs when process Id is found :" + pid);
+      bisLog = bisFileLogsRepository.findByPid(pid);
+     
+      
+      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.INPROGRESS.value(),
+          BisComponentState.DATA_INPROGRESS.value(), pid);
+    }
+  }
+    
+  /**
+   * To make an entry to a log table.
+   */
+  @Transactional(TxType.REQUIRED)
+  public void upsertSuccessStatus(String pid) throws SipNestedRuntimeException {
+    BisFileLog bisLog = null;
+    if (bisFileLogsRepository.existsById(pid)) {
+      logger.trace("updating logs when process Id is found :" + pid);
+      bisLog = bisFileLogsRepository.findByPid(pid);
+     
+      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.SUCCESS.value(),
+            BisComponentState.DATA_RECEIVED.value(), pid);
+    }
+  }
 
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",

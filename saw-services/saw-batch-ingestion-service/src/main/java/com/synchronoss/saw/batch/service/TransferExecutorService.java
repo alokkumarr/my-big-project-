@@ -37,9 +37,10 @@ public class TransferExecutorService {
       logger.info("No records found to process");
       
     } else {
-      logger.info("One record found to process");
+      logger.info("One record found to process" + bisFileLog.getFileName());
       SipPluginContract sipTransferService = factory
           .getInstance(bisFileLog.getBisChannelType());
+      
 
       sipTransferService.executeFileTransfer(bisFileLog.getPid(),
           bisFileLog.getJob().getJobId(), bisFileLog.getBisChannelSysId(),
