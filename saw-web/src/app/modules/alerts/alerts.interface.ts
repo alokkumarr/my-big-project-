@@ -34,3 +34,8 @@ export interface DatapodMetric {
   type: string;
   kpiEligible?: boolean;
 }
+
+export interface GridPagingOptions {
+  take?: number;
+  skip?: number;
+}

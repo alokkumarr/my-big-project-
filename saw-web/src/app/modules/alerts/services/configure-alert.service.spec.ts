@@ -69,4 +69,16 @@ describe('ConfigureAlertService', () => {
       configureAlertService.getAllAlerts() instanceof Observable
     ).toBeTruthy();
   });
+
+  it('getAggregations should return an Observable', () => {
+    expect(
+      configureAlertService.getAggregations() instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('getOperators should return an Observable', () => {
+    expect(
+      configureAlertService.getOperators() instanceof Observable
+    ).toBeTruthy();
+  });
 });

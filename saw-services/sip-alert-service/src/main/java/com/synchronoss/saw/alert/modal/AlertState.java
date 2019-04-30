@@ -2,13 +2,16 @@ package com.synchronoss.saw.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.gson.annotations.SerializedName;
 import java.util.HashMap;
 import java.util.Map;
 
 /** This ENUM defines Alert state changes. */
 public enum AlertState {
-  CRITICAL("ALARM"),
-  MEDIUM("OK");
+  @SerializedName("ALARM")
+  ALARM("ALARM"),
+  @SerializedName("OK")
+  OK("OK");
   private static final Map<String, AlertState> CONSTANTS = new HashMap<>();
 
   static {

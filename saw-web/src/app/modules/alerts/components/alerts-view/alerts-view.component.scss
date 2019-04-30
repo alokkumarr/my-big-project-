@@ -1,0 +1,60 @@
+@import 'src/themes/base/colors';
+
+:host {
+  width: 100%;
+  max-width: 100% !important;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  padding-bottom: 3px;
+  background-color: $background-color;
+}
+
+.titleClass {
+  text-align: left;
+  color: $primary-blue-b1;
+  padding-left: 10px;
+  font-weight: 600 !important;
+  font-size: 18px;
+}
+
+.view-container {
+  &__add {
+    width: 400px;
+
+    &__header {
+      padding: 0 9px;
+      background-color: $background-color;
+
+      &__title {
+        @extend .titleClass;
+      }
+    }
+  }
+  .view-container-content {
+    padding: 3px;
+
+    &__header {
+      padding: 0 9px;
+      background-color: $background-color;
+
+      &__title {
+        @extend .titleClass;
+      }
+
+      &__filterBtn {
+        height: 32px;
+        line-height: 32px;
+      }
+    }
+
+    &__body {
+      height: calc(100% - 45px);
+      padding: 0 7px;
+
+      &__grid {
+        border-radius: 3px;
+      }
+    }
+  }
+}

@@ -136,7 +136,10 @@
       <modules>
         <module>bda-meta</module>
         <module>xdf-nextgen</module>
-        <module>a2</module>
+        <!--
+        This has been commented due to issue SIP-7037
+        and it will reverted back once it is fixed.
+        <module>a2</module> -->
         <module>a2sipr/inst/json</module>
         <module>rtis</module>
         <module>rtps</module>

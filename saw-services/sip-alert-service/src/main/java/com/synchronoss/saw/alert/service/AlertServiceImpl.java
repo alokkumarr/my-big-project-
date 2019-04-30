@@ -6,7 +6,10 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertCustomerDetails;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.entities.DatapodDetails;
+import com.synchronoss.saw.alert.modal.Aggregation;
 import com.synchronoss.saw.alert.modal.Alert;
+import com.synchronoss.saw.alert.modal.AlertStates;
+import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.modal.Operator;
 import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
@@ -19,13 +22,16 @@ import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AlertServiceImpl implements AlertService {
   private static final String ID = "id";
   private static final String NAME = "name";
-  private static final String OPERATORS = "operators";
 
   @Autowired AlertRulesRepository alertRulesRepository;
 
@@ -129,9 +135,16 @@ public class AlertServiceImpl implements AlertService {
    * @param alertRuleId Alert rule Id
    */
   @Override
-  public void deleteAlertRule(
+  public Boolean deleteAlertRule(
       @NotNull(message = "Alert Id cannot be null") @NotNull Long alertRuleId, Ticket ticket) {
-    alertRulesRepository.deleteById(alertRuleId);
+    Long alertRuleSysId =
+        alertRulesRepository.findAlertByCustomer(ticket.getCustCode(), alertRuleId);
+    if (alertRuleSysId != null) {
+      alertRulesRepository.deleteById(alertRuleId);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -146,11 +159,14 @@ public class AlertServiceImpl implements AlertService {
 
     Alert alert = new Alert();
     AlertRulesDetails alertRulesDetails = alertRulesRepository.findById(alertRuleId).get();
+    DatapodDetails datapodDetails =
+        alertDatapodRepository.findByDatapodId(alertRulesDetails.getDatapodId()).get();
     alert.setThresholdValue(alertRulesDetails.getThresholdValue());
     alert.setAlertSeverity(alertRulesDetails.getAlertSeverity());
     alert.setActiveInd(alertRulesDetails.getActiveInd());
     alert.setAggregation(alertRulesDetails.getAggregation());
     alert.setDatapodId(alertRulesDetails.getDatapodId());
+    alert.setDatapodName(datapodDetails.getDatapodName());
     alert.setMonitoringEntity(alertRulesDetails.getMonitoringEntity());
     alert.setOperator(alertRulesDetails.getOperator());
     alert.setAlertDescription(alertRulesDetails.getAlertDescription());
@@ -224,7 +240,6 @@ public class AlertServiceImpl implements AlertService {
   @Override
   public String retrieveOperatorsDetails(Ticket ticket) {
     JsonArray elements = new JsonArray();
-    JsonObject response = new JsonObject();
     List<Operator> operatorList = Arrays.asList(Operator.values());
     for (Operator operator : operatorList) {
       JsonObject object = new JsonObject();
@@ -235,8 +250,66 @@ public class AlertServiceImpl implements AlertService {
         elements.add(object);
       }
     }
-    response.add(OPERATORS, elements);
-    return response.toString();
+    return elements.toString();
+  }
+
+  @Override
+  public String retrieveAggregations(Ticket ticket) {
+    JsonArray elements = new JsonArray();
+    List<Aggregation> aggregationList = Arrays.asList(Aggregation.values());
+    for (Aggregation aggregation : aggregationList) {
+      JsonObject object = new JsonObject();
+      String readableOperator = getReadableAggregation(aggregation);
+      if (readableOperator != null) {
+        object.addProperty(ID, aggregation.value());
+        object.addProperty(NAME, readableOperator);
+        elements.add(object);
+      }
+    }
+    return elements.toString();
+  }
+
+  /**
+   * Get alert state by alert ID.
+   *
+   * @param alertRuleId alertRuleId
+   * @param ticket Ticket
+   * @return List of AlertStates
+   */
+  @Override
+  public AlertStatesResponse getAlertStates(
+      @NotNull(message = "alertRuleId cannot be null") Long alertRuleId,
+      Integer pageNumber,
+      Integer pageSize,
+      Ticket ticket) {
+    AlertStatesResponse alertStatesResponse = null;
+    Long alertRuleSysId =
+        alertRulesRepository.findAlertByCustomer(ticket.getCustCode(), alertRuleId);
+    if (alertRuleSysId != null) {
+      alertStatesResponse = new AlertStatesResponse();
+      Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
+      Page<AlertStates> alertStates = alertTriggerLog.findByAlertRulesSysId(alertRuleId, pageable);
+      alertStatesResponse.setAlertStatesList(alertStates.getContent());
+      alertStatesResponse.setNumberOfRecords(alertStates.getTotalElements());
+    }
+    return alertStatesResponse;
+  }
+
+  /**
+   * Get list of pageable Alerts by time order.
+   *
+   * @param ticket Ticket
+   * @return List of AlertStates, number of records.
+   */
+  @Override
+  public AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket) {
+    Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
+    AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
+    Page<AlertStates> alertStates = alertTriggerLog.findByAlertStates(pageable);
+    alertStatesResponse.setAlertStatesList(alertStates.getContent());
+    alertStatesResponse.setNumberOfRecords(alertStates.getTotalElements());
+    alertStatesResponse.setMessage("Success");
+    return alertStatesResponse;
   }
 
   /**
@@ -270,6 +343,30 @@ public class AlertServiceImpl implements AlertService {
         return "Contains";
       case ISIN:
         return "Is IN";
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * It return readable aggregation name.
+   *
+   * @param aggregation Aggregation
+   * @return String
+   */
+  private String getReadableAggregation(Aggregation aggregation) {
+
+    switch (aggregation) {
+      case AVG:
+        return "Average";
+      case SUM:
+        return "SUM";
+      case MIN:
+        return "Minimum";
+      case MAX:
+        return "Maximum";
+      case COUNT:
+        return "Count Values";
       default:
         return null;
     }

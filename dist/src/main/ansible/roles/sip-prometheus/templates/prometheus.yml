@@ -71,3 +71,9 @@ scrape_configs:
 {% for host in groups['sip-elastic'] %}
           - '{{ host }}:{{ sip_elastic_port | default('8200') }}'
 {% endfor %}
+  - job_name: 'mariadb'
+    static_configs:
+      - targets:
+{% for host in groups['saw-security'] %}
+          - '{{ host }}:9104'
+{% endfor %}

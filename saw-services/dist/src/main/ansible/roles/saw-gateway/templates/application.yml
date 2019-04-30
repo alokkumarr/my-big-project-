@@ -71,16 +71,16 @@ api:
             path: '[/]md*'
         -   location: ${alert.service.host}
             method: GET
-            path: '[/]sip/alerts.*'
+            path: '[/]alerts.*'
         -   location: ${alert.service.host}
             method: POST
-            path: '[/]sip/alerts.*'
+            path: '[/]alerts.*'
         -   location: ${alert.service.host}
             method: PUT
-            path: '[/]sip/alerts.*'
+            path: '[/]alerts.*'
         -   location: ${alert.service.host}
             method: DELETE
-            path: '[/]sip/alerts.*'
+            path: '[/]alerts.*'
         -   location: ${internal-analysis.service.host}
             method: GET
             path: '[/]analysis.*'

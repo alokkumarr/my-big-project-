@@ -20,6 +20,8 @@ export class ConfigureAlertService {
 
   /**
    * Gets list of all datapods avialble for that particular project
+   * Initial version of alert only supports with single artifact
+   * So filtering the list with that condition.
    *
    * @returns {Observable<any>}
    * @memberof ConfigureAlertService
@@ -27,7 +29,12 @@ export class ConfigureAlertService {
   getListOfDatapods$(): Observable<any> {
     return this.http
       .get(`${this.api}/internal/semantic/md?projectId=${PROJECTID}`)
-      .pipe(map(fpGet('contents.[0].ANALYZE')));
+      .pipe(
+        map(fpGet('contents.[0].ANALYZE')),
+        map((artifacts: Array<any>) =>
+          artifacts.filter(artifact => artifact.repository.length === 1)
+        )
+      );
   }
 
   /**
@@ -51,6 +58,28 @@ export class ConfigureAlertService {
   }
 
   /**
+   * Fetches all the supported operators
+   *
+   * @returns {Observable<any>}
+   * @memberof ConfigureAlertService
+   */
+  getOperators(): Observable<any> {
+    const endpoint = `${this.api}/alerts/operators`;
+    return this.http.get(endpoint);
+  }
+
+  /**
+   * Fetches all the supported aggregations
+   *
+   * @returns {Observable<any>}
+   * @memberof ConfigureAlertService
+   */
+  getAggregations(): Observable<any> {
+    const endpoint = `${this.api}/alerts/aggregations`;
+    return this.http.get(endpoint);
+  }
+
+  /**
    * Used to add a new alert
    *
    * @param {AlertConfig} alertConfig
@@ -58,7 +87,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   createAlert(alertConfig: AlertConfig): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts`;
+    const endpoint = `${this.api}/alerts`;
     return this.http.post(endpoint, alertConfig);
   }
 
@@ -72,7 +101,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   updateAlert(id: string, alertConfig: AlertConfig): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts/${id}`;
+    const endpoint = `${this.api}/alerts/${id}`;
     return this.http.put(endpoint, alertConfig);
   }
 
@@ -84,7 +113,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   deleteAlert(id: string): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts/${id}`;
+    const endpoint = `${this.api}/alerts/${id}`;
     return this.http.delete(endpoint);
   }
 
@@ -95,7 +124,7 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   getAllAlerts(): Observable<any> {
-    const endpoint = `${this.api}/sip/alerts`;
+    const endpoint = `${this.api}/alerts`;
     return this.http.get(endpoint);
   }
 }

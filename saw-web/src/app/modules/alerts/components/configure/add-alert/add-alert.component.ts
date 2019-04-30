@@ -12,12 +12,7 @@ import { ConfigureAlertService } from '../../../services/configure-alert.service
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
-import {
-  ALERT_AGGREGATIONS,
-  ALERT_OPERATORS,
-  ALERT_SEVERITY,
-  ALERT_STATUS
-} from '../../../consts';
+import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike } from 'rxjs';
 @Component({
   selector: 'add-alert',
@@ -30,12 +25,13 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertRuleFormGroup: FormGroup;
   datapods$;
   metricsList$;
-  alertAggregations = ALERT_AGGREGATIONS;
-  alertOperators = ALERT_OPERATORS;
+  operators$;
+  aggregations$;
   alertSeverity = ALERT_SEVERITY;
   alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
   endActionText = 'Add';
+  endPayload: AlertConfig;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -57,6 +53,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       this.endActionText = 'Update';
     }
     this.datapods$ = this._configureAlertService.getListOfDatapods$();
+    this.aggregations$ = this._configureAlertService.getAggregations();
+    this.operators$ = this._configureAlertService.getOperators();
   }
 
   ngOnDestroy() {
@@ -74,6 +72,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.alertMetricFormGroup = this._formBuilder.group({
       datapodId: ['', Validators.required],
       datapodName: [''],
+      categoryId: [''],
       monitoringEntity: ['', Validators.required]
     });
 
@@ -87,11 +86,18 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     });
   }
 
+  onDatapodChanged() {
+    this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
+  }
+
   onDatapodSelected(selectedItem) {
-    // this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
     if (selectedItem) {
       this.alertMetricFormGroup.controls.datapodName.setValue(
         selectedItem.metricName
+      );
+
+      this.alertMetricFormGroup.controls.categoryId.setValue(
+        selectedItem.categoryId || 'Default'
       );
 
       this.metricsList$ = this._configureAlertService.getMetricsInDatapod$(
@@ -105,9 +111,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       ...this.alertDefFormGroup.value,
       ...this.alertMetricFormGroup.value,
       ...this.alertRuleFormGroup.value,
-      categoryId: '1',
       product: 'SAWD000001'
     };
+
+    this.endPayload = payload;
 
     return payload;
   }
@@ -118,8 +125,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {
-        this._notify.success(data.message);
-        this.onAddAlert.emit(true);
+        this.notifyOnAction(data);
       });
     this.subscriptions.push(createSubscriber);
   }
@@ -130,9 +136,13 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const updateSubscriber = this._configureAlertService
       .updateAlert(alertID, payload)
       .subscribe((data: any) => {
-        this._notify.success(data.message);
-        this.onAddAlert.emit(true);
+        this.notifyOnAction(data);
       });
     this.subscriptions.push(updateSubscriber);
+  }
+
+  notifyOnAction(data) {
+    this._notify.success(data.message);
+    this.onAddAlert.emit(true);
   }
 }

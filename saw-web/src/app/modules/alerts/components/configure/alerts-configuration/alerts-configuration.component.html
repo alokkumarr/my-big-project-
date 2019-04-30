@@ -78,12 +78,16 @@
           caption="Alert Description"
           dataField="alertDescription"
         ></dxi-column>
-        <dxi-column dataField="alertSeverity"></dxi-column>
-        <dxi-column dataField="monitoringEntity"></dxi-column>
+        <dxi-column
+          caption="Severity"
+          dataField="alertSeverity"
+          cellTemplate="severityTemplate"
+        ></dxi-column>
         <dxi-column dataField="datapodName"></dxi-column>
+        <dxi-column caption="Metric" dataField="monitoringEntity"></dxi-column>
         <dxi-column dataField="operator"></dxi-column>
         <dxi-column dataField="aggregation"></dxi-column>
-        <dxi-column dataField="thresholdValue"></dxi-column>
+        <dxi-column dataField="thresholdValue" alignment="center"></dxi-column>
         <dxi-column
           caption="Status"
           dataField="activeInd"
@@ -117,16 +121,13 @@
           fxLayout="row"
           fxLayoutAlign="center center"
         >
-          <button
-            mat-icon-button
+          <mat-icon
             i18n-matTooltip
-            e2e="alert-status"
-            class="conf-container-content__body__gridBtn"
-            [ngClass]="data.data.activeInd ? 'active' : 'inactive'"
+            class="conf-container-content__body__statusIcon"
+            [ngClass]="data.data.activeInd ? 'LOW' : 'CRITICAL'"
+            fontIcon="icon-logout"
             [matTooltip]="data.data.activeInd ? 'Active' : 'Inactivate'"
-          >
-            <mat-icon fontIcon="icon-uniE901"></mat-icon>
-          </button>
+          ></mat-icon>
         </div>
 
         <div
@@ -163,6 +164,22 @@
           >
             <mat-icon fontIcon="icon-delete"></mat-icon>
           </button>
+        </div>
+
+        <div
+          *dxTemplate="let data of 'severityTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="start center"
+          fxLayoutGap="5px"
+        >
+          <mat-icon
+            class="conf-container-content__body__gridIcon"
+            [ngClass]="data.data.alertSeverity"
+            fontIcon="icon-uniE901"
+          ></mat-icon>
+          <span fxFelx="50px" i18n>{{
+            data.data.alertSeverity | titlecase
+          }}</span>
         </div>
       </dx-data-grid>
     </div>

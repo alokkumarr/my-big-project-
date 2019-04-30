@@ -1,16 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgModule } from '@angular/core';
-
+import { MatDialog } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../../../material.module';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AlertDefinition } from '../../../alerts.interface';
 import { AlertsConfigurationComponent } from './alerts-configuration.component';
-import { ConfirmActionDialogComponent } from '../confirm-action-dialog/confirm-action-dialog.component';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 
@@ -44,13 +42,13 @@ const alertDefinitionStub: AlertDefinition = {
     modifiedBy: null
   }
 };
-
-@NgModule({
-  declarations: [ConfirmActionDialogComponent],
-  entryComponents: [ConfirmActionDialogComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
-})
-export class ConfirmActionModule {}
+export class MatDialogMock {
+  open() {
+    return {
+      afterClosed: () => of({ action: true })
+    };
+  }
+}
 
 describe('AlertsConfigurationComponent', () => {
   let component: AlertsConfigurationComponent;
@@ -63,14 +61,14 @@ describe('AlertsConfigurationComponent', () => {
         MaterialModule,
         HttpClientTestingModule,
         DxTemplateModule,
-        DxDataGridModule,
-        ConfirmActionModule
+        DxDataGridModule
       ],
       declarations: [AlertsConfigurationComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: ConfigureAlertService, useValue: confAlertServiceStub },
-        { provide: ToastService, useValue: ToastServiceStub }
+        { provide: ToastService, useValue: ToastServiceStub },
+        { provide: MatDialog, useClass: MatDialogMock }
       ]
     }).compileComponents();
   }));
