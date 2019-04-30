@@ -309,7 +309,8 @@ public class RetryExecutorService {
       fileName = log.getRecdFileName();
       logger.trace("Delete the corrupted file :" + fileName);
       File fileDelete = new File(fileName);
-      if (fileDelete != null) {
+      if (fileDelete != null && fileDelete
+          .getParentFile() != null) {
         logger.trace("Parent Directory deleted : " + fileDelete);
         File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
           @Override

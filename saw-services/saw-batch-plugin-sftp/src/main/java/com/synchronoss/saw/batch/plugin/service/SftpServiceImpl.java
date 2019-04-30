@@ -1494,7 +1494,8 @@ public class SftpServiceImpl extends SipPluginContract {
     // TODO : SIP-6148
     // This is known issue with this feature branch
     String fileName = null;
-    if (log.getRecdFileName() != null) {
+    if (log.getRecdFileName() != null 
+        && !log.getRecdFileName().isEmpty()) {
       fileName = log.getRecdFileName();
       logger.trace("Delete the corrupted file :" + fileName);
       File fileDelete = new File(fileName);
@@ -1546,7 +1547,7 @@ public class SftpServiceImpl extends SipPluginContract {
   public void executeFileTransfer(String logId, Long jobId, Long channelId,
       Long routeId, String fileName) {
 
-    sipLogService.upsertInProgressStatus(logId);
+    
     
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory
         .getSessionFactory(channelId);
@@ -1613,6 +1614,7 @@ public class SftpServiceImpl extends SipPluginContract {
             }
            
             final File localFile = createTargetFile(localDirectory, fileName);
+           
             final File fileTobeDeleted = localFile;
             logger.trace("Actual file name after downloaded in the  :"
                 + localDirectory.getAbsolutePath() 
@@ -1634,9 +1636,9 @@ public class SftpServiceImpl extends SipPluginContract {
                     try {
                       final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
                       bisDataMetaInfo.setProcessId(logId);
-                      bisDataMetaInfo.setFileTransferStartTime(
+                     
+                      sipLogService.upsertInProgressStatus(logId, localFile.getPath(), 
                           Date.from(fileTransStartTime.toInstant()));
-
                       if (stream != null) {
                         if (processor
                             .isDestinationMapR(defaultDestinationLocation)) {
@@ -1667,16 +1669,14 @@ public class SftpServiceImpl extends SipPluginContract {
                             "closing the stream for the file " + fileName);
                         bisDataMetaInfo.setProcessId(logId);
                        
-                        sipLogService.upsertSuccessStatus(logId);
-                        bisDataMetaInfo
-                            .setProcessState(BisProcessState.SUCCESS.value());
-                        bisDataMetaInfo.setComponentState(
-                            BisComponentState.DATA_RECEIVED.value());
+                       
                         bisDataMetaInfo.setFileTransferEndTime(
                             Date.from(fileTransEndTime.toInstant()));
                         bisDataMetaInfo.setFileTransferDuration(Duration
                             .between(fileTransStartTime, fileTransEndTime)
                             .toMillis());
+                        bisDataMetaInfo.setReceivedDataName(localFile.getPath());
+                        sipLogService.upsertSuccessStatus(logId, bisDataMetaInfo);
                         logger.trace("File transfer duration :: "
                             + bisDataMetaInfo.getFileTransferDuration());
                         //sipLogService.upsert(bisDataMetaInfo,

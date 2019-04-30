@@ -103,12 +103,15 @@ public class SipLogging {
    * To make an entry to a log table.
    */
   @Transactional(TxType.REQUIRED)
-  public void upsertInProgressStatus(String pid) throws SipNestedRuntimeException {
+  public void upsertInProgressStatus(String pid, 
+      String recdFilePath, Date startTime)
+      throws SipNestedRuntimeException {
     BisFileLog bisLog = null;
     if (bisFileLogsRepository.existsById(pid)) {
       logger.trace("updating logs when process Id is found :" + pid);
       bisLog = bisFileLogsRepository.findByPid(pid);
-     
+      bisLog.setRecdFileName(recdFilePath);
+      bisLog.setTransferStartTime(startTime);
       
       this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.INPROGRESS.value(),
           BisComponentState.DATA_INPROGRESS.value(), pid);
@@ -134,11 +137,14 @@ public class SipLogging {
    * To make an entry to a log table.
    */
   @Transactional(TxType.REQUIRED)
-  public void upsertSuccessStatus(String pid) throws SipNestedRuntimeException {
+  public void upsertSuccessStatus(String pid, BisDataMetaInfo metaInfo) 
+      throws SipNestedRuntimeException {
     BisFileLog bisLog = null;
     if (bisFileLogsRepository.existsById(pid)) {
       logger.trace("updating logs when process Id is found :" + pid);
       bisLog = bisFileLogsRepository.findByPid(pid);
+      bisLog.setTransferEndTime(metaInfo.getFileTransferEndTime());
+      bisLog.setTransferDuration(metaInfo.getFileTransferDuration());
      
       this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.SUCCESS.value(),
             BisComponentState.DATA_RECEIVED.value(), pid);
