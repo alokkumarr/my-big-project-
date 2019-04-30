@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import * as forEach from 'lodash/forEach';
-import * as set from 'lodash/set';
-import { Analysis } from '../../../models';
-import * as fpGet from 'lodash/fp/get';
-import { map } from 'rxjs/operators';
-
+import { Analysis, AnalysisDSL } from '../../../models';
 import { AdminService } from '../main-view/admin.service';
 import { JwtService } from '../../../common/services';
+
+import * as fpGet from 'lodash/fp/get';
+import * as forEach from 'lodash/forEach';
+import * as set from 'lodash/set';
+import { map } from 'rxjs/operators';
 
 const MODULE_NAME = 'ANALYZE';
 
@@ -31,11 +31,11 @@ export class ImportService {
    * @memberof ImportService
    */
   createReferenceMapFor(
-    analyses: Analysis[]
+    analyses: (Analysis | AnalysisDSL)[]
   ): { [reference: string]: Analysis } {
     return analyses.reduce((acc, analysis) => {
       acc[
-        `${analysis.name}:${analysis.metricName}:${analysis.type}`
+        `${analysis.name}:${analysis.semanticId}:${analysis.type}`
       ] = analysis;
       return acc;
     }, {});
@@ -49,17 +49,6 @@ export class ImportService {
       set(reqParams, tuple[0], tuple[1]);
     });
     return reqParams;
-  }
-
-  getAnalysesFor(subCategoryId) {
-    const params = this.getRequestParams([
-      ['contents.action', 'search'],
-      ['contents.keys.[0].categoryId', subCategoryId]
-    ]);
-    return this._adminService
-      .request<AnalysisResponse>('analysis', params, { forWhat: 'import' })
-      .pipe(map(fpGet(`contents.analyze`)))
-      .toPromise();
   }
 
   createAnalysis(semanticId, type) {
