@@ -62,6 +62,7 @@ export interface AnalysisBaseDSL {
   mapOptions?: {
     mapType: string;
   };
+  metricName?: string; // required for exporting analyses from admin module
   modifiedBy: string; // email
   modifiedTime: string;
   module: string;
