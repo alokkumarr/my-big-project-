@@ -18,18 +18,31 @@
           {{ analysis.userFullName | changeCase: 'title' }}
         </div>
         <div>
-          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
-          {{ analysis.scheduleHuman }}
+          <strong *ngIf="analysis.createdTimestamp">Created Time:</strong>
+          {{ utcToLocal(analysis.createdTimestamp) }}
+        </div>
+        <div>
+          <strong *ngIf="analysis.updatedUserName">Last Modified By:</strong>
+          {{ analysis.updatedUserName }}
+        </div>
+        <div>
+          <strong *ngIf="analysis.updatedTimestamp">Last Modified Time:</strong>
+          {{ utcToLocal(analysis.updatedTimestamp) }}
         </div>
         <div>
           <strong *ngIf="executedBy">Executed By:</strong> {{ executedBy }}
         </div>
         <div>
-          <strong *ngIf="executedAt">Executed At:</strong> {{ executedAt }}
+          <strong *ngIf="executedAt">Execution Time:</strong>
+          {{ executedAt }}
         </div>
         <div class="analysis-detail-description">
           <strong *ngIf="analysis.description">Description</strong>
           <p>{{ analysis.description }}</p>
+        </div>
+        <div>
+          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
+          {{ analysis.scheduleHuman }}
         </div>
       </mat-expansion-panel>
     </mat-card>
@@ -52,7 +65,9 @@
       </mat-expansion-panel>
     </mat-card>
   </mat-sidenav>
-  <mat-sidenav-content [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''">
+  <mat-sidenav-content
+    [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''"
+  >
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
         <div fxLayout="row">
@@ -68,13 +83,15 @@
           </button>
           <div fxLayout="column" fxLayoutAlign="center center">
             <div *ngIf="analysis">
-              <span class="analysis__title">{{ analysis.name }}</span>
+              <span class="analysis__title" e2e="analysis__title">{{
+                analysis.name
+              }}</span>
               <label *ngIf="isExecuting" class="execution-tag" i18n
                 >Executing</label
               >
             </div>
             <div *ngIf="analysis" class="analysis__subheader">
-              {{ analysis.metrics }}
+              <!-- {{ analysis.metrics }} -->
             </div>
           </div>
         </div>
@@ -112,12 +129,18 @@
         <filter-chips-u
           *ngIf="
             analysis &&
+            executedAnalysis &&
             !(analysis.type === 'report' && analysis.edit) &&
-            executedAnalysis.sqlBuilder.filters.length > 0
+            (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
+              .length > 0
           "
-          [filters]="executedAnalysis.sqlBuilder.filters"
+          [filters]="
+            (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
+          "
           [readonly]="true"
-          [artifacts]="analysis.artifacts"
+          [artifacts]="
+            analysis.sipQuery ? analysis.sipQuery.artifacts : analysis.artifacts
+          "
         ></filter-chips-u>
 
         <div *ngIf="!executionId && !hasExecution && noPreviousExecution">
@@ -163,25 +186,32 @@
             [updater]="pivotUpdater$"
           >
           </executed-pivot-view>
-          <executed-chart-view *ngSwitchCase="'chart'"
-                                [analysis]="executedAnalysis"
-                                [data]="data"
-                                [updater]="chartUpdater$"
-                                class="executed-chart-analysis"
+          <executed-chart-view
+            *ngSwitchCase="'chart'"
+            [analysis]="executedAnalysis"
+            [data]="data"
+            [updater]="chartUpdater$"
+            class="executed-chart-analysis"
           >
           </executed-chart-view>
 
           <div *ngSwitchCase="'map'">
-            <executed-map-view *ngIf="analysis.type | isAnalysisType:'map':analysis?.chartType"
-                              [analysis]="executedAnalysis"
-                              [data]="data"
-                              >
+            <executed-map-view
+              *ngIf="
+                (analysis.type | isAnalysisType: 'map':analysis?.chartType)
+              "
+              [analysis]="executedAnalysis"
+              [data]="data"
+            >
             </executed-map-view>
-            <executed-map-chart-view *ngIf="analysis.type | isAnalysisType:'mapChart':analysis?.chartType"
-                                  [analysis]="executedAnalysis"
-                                  [data]="data"
-                                  [updater]="chartUpdater$"
-                                  [actionBus]="chartActionBus$"
+            <executed-map-chart-view
+              *ngIf="
+                (analysis.type | isAnalysisType: 'mapChart':analysis?.chartType)
+              "
+              [analysis]="executedAnalysis"
+              [data]="data"
+              [updater]="chartUpdater$"
+              [actionBus]="chartActionBus$"
             >
             </executed-map-chart-view>
           </div>

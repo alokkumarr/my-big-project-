@@ -1,7 +1,7 @@
-import { Analysis } from '../../../analyze/models';
+import { Analysis, AnalysisDSL } from '../../../analyze/models';
 
 export interface ImportAnalysisRecord {
-  analysis: Analysis;
+  analysis: Analysis | AnalysisDSL;
   checked: boolean;
   log: string;
   overwrite: boolean;
@@ -10,7 +10,7 @@ export interface ImportAnalysisRecord {
 
 export interface ImportAnalysesDictionary {
   [categoryId: string]: {
-    [analysisReference: string]: Analysis;
+    [analysisReference: string]: Analysis | AnalysisDSL;
   };
 }
 

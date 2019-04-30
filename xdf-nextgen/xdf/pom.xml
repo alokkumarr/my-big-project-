@@ -127,6 +127,13 @@
                       </when>
                       <mode>0755</mode>
                     </rule>
+                    <rule>
+                      <when>
+                        <prefix>/var/opt/sip/sip-xdf/log</prefix>
+                      </when>
+                      <user>mapr</user>
+                      <group>mapr</group>
+                    </rule>
                   </rules>
                 </ruleset>
               </rulesets>
@@ -145,7 +152,6 @@
                     <from>bin</from>
                     <excludes>
                       <exclude>templates</exclude>
-                      <exclude>xdf_info</exclude>
                     </excludes>
                   </collect>
                   <ruleset>default</ruleset>
@@ -165,7 +171,7 @@
                   <directory>true</directory>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/lib/xdf-${project.version}-full.jar</name>
+                  <name>/opt/sip/sip-xdf/lib/xdf-full.jar</name>
                   <file>${project.build.directory}/${project.artifactId}-${project.version}-full.jar</file>
                 </entry>
                 <entry>
@@ -177,6 +183,11 @@
                   <collect>
                     <from>test</from>
                   </collect>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>/var/opt/sip/sip-xdf/log</name>
+                  <directory>true</directory>
                   <ruleset>default</ruleset>
                 </entry>
               </entries>

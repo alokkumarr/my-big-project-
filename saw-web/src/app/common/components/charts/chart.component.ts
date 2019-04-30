@@ -242,7 +242,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         this.addExportConfig(this.config);
         const requestConfig = cloneDeep(this.config);
         forEach(this.config.series, seriesOptions => {
-          if (['percentageByRow'].includes(seriesOptions.aggregate)) {
+          if (['percentagebyrow'].includes(seriesOptions.aggregate)) {
             set(requestConfig, 'plotOptions.column.stacking', 'percent');
           }
         });

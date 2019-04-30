@@ -1,5 +1,6 @@
 export {
   AnalysisType,
+  AnalysisDSL,
   AnalysisTypeFE,
   AnalysisChart,
   ArtifactColumnReport,

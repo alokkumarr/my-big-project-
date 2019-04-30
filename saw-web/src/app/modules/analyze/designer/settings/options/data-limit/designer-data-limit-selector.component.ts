@@ -3,7 +3,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as isUndefined from 'lodash/isUndefined';
 import * as debounce from 'lodash/debounce';
 import { Store } from '@ngxs/store';
-import * as isEmpty from 'lodash/isEmpty';
 import { ArtifactColumnChart, DesignerChangeEvent } from '../../../types';
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
 
@@ -48,9 +47,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     this.resetInvalidValueIfNeeded(this.limitValue);
     if (
       !this.limitType ||
-      (this.limitValue === null ||
-        isUndefined(this.limitValue) ||
-        isEmpty(this.limitValue))
+      (this.limitValue === null || isUndefined(this.limitValue))
     ) {
       return;
     }

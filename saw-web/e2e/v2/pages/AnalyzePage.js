@@ -16,8 +16,8 @@ class AnalyzePage extends CreateAnalysisModel {
     this._cardView = element(by.css('[e2e="analyze-card-view"]'));
     this._actionMenuButton = element(by.css(`[e2e='actions-menu-toggle']`));
     this._forkButton = element(by.css(`[e2e='action-fork-btn']`));
-    this._executeButton = element(
-      by.css(`[e2e="actions-menu-selector-execute"]`)
+    this._analyzeExecuteButton = element(
+      by.css(`button[e2e="actions-menu-selector-execute"]`)
     );
     this._editButton = element(by.css(`[e2e="actions-menu-selector-edit"]`));
     this._publishButton = element(
@@ -65,6 +65,7 @@ class AnalyzePage extends CreateAnalysisModel {
           `//span[@class="mat-option-text" and contains(text(),"${name}")]`
         )
       );
+    this._actionLinkByAnalysisName=name=>element(by.xpath(`(//*[text()="${name}"]/following::*[@e2e="actions-menu-toggle"])[1]`))
   }
 
   goToView(viewName) {
@@ -163,6 +164,15 @@ class AnalyzePage extends CreateAnalysisModel {
         this._analysisTypeDsiplay(option)
       );
     });
+  }
+
+  clickOnExecuteButtonAnalyzePage() {
+      browser.sleep(2000);
+    commonFunctions.clickOnElement(this._analyzeExecuteButton);
+  }
+
+  clickOnActionLinkByAnalysisName(name){
+      commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
   }
 }
 module.exports = AnalyzePage;

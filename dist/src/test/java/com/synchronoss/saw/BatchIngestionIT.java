@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,8 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "log");
     routeMetadata.put("disableDuplicate", "false");
+    routeMetadata.put("disableConcurrency", "false");
+    routeMetadata.put("lastModifiedLimitHours", "");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -140,6 +143,8 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "log");
     routeMetadata.put("disableDuplicate", "false");
+    routeMetadata.put("disableConcurrency", "false");
+    routeMetadata.put("lastModifiedLimitHours", "");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -167,6 +172,8 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "log");
     routeMetadata.put("disableDuplicate", "true");
+    routeMetadata.put("disableConcurrency", "false");
+    routeMetadata.put("lastModifiedLimitHours", "");
     ObjectNode schedulerNode = mapper.createObjectNode();
     schedulerNode.put("activeTab", "immediate");
     routeMetadata.set("schedulerExpression", schedulerNode);
@@ -252,6 +259,8 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("destinationLocation", "/log/updated");
     childNode.put("filePattern", "*.csv");
     childNode.put("disableDuplicate", "false");
+    childNode.put("disableConcurrency", "false");
+    childNode.put("lastModifiedLimitHours", "");
     childNode.put("batchSize", "10");
     childNode.set("schedulerExpression", prepareSchedulerNode());
     childNode.put("description", "route has been updated");
@@ -278,6 +287,35 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("filePattern", "*.log");
     childNode.put("fileExclusions", "csv");
     childNode.put("disableDuplicate", "false");
+    childNode.put("disableConcurrency", "false");
+    childNode.put("lastModifiedLimitHours", "");
+    childNode.put("batchSize", "10");
+    childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
+    childNode.put("description", "route has been created for scheduled test case");
+    ObjectNode root = mapper.createObjectNode();
+    root.put("createdBy", "sysadmin@synchronoss.com");
+    root.put("routeMetadata", new ObjectMapper().writeValueAsString(childNode));
+    root.put("status", 1);
+    return root;
+  }
+  
+  /**
+   * This method is used to prepare a route to use it while scheduling transfer. data on hourly
+   * basis
+   * 
+   * @return object {@link ObjectNode}
+   * @throws JsonProcessingException exception.
+   */
+  private ObjectNode prepareRouteDataSetForDisableConcurrency() throws JsonProcessingException {
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("routeName", "route-scheduled-transfer-" + testId());
+    childNode.put("sourceLocation", "/root/saw-batch-samples/log/small");
+    childNode.put("destinationLocation", "log/scheduled");
+    childNode.put("filePattern", "*.log");
+    childNode.put("fileExclusions", "csv");
+    childNode.put("disableDuplicate", "false");
+    childNode.put("disableConcurrency", "true");
+    childNode.put("lastModifiedLimitHours", "");
     childNode.put("batchSize", "10");
     childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
     childNode.put("description", "route has been created for scheduled test case");
@@ -944,7 +982,11 @@ public class BatchIngestionIT extends BaseIT {
       assertEquals(true, jsonPath.getBoolean("status"));
     }
     assertEquals("SUCCESS", result);
+    this.tearDownRoute();
+    this.tearDownChannel();
+    this.tearDownLogs();
   }
+  
 
   private void waitForFileTobeAvailable(int retries, Long channelId, Long routeId) {
     JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)

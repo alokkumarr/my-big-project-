@@ -22,7 +22,7 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInter
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class QueryBuilderUtil {
-	
+
 	public final static String DATE_FORMAT = "yyyy-MM-dd";
 	public final static String SPACE_REGX = "\\s+";
 	public final static String EMPTY_STRING = "";
@@ -51,18 +51,20 @@ public class QueryBuilderUtil {
 
 	{
 		AggregationBuilder aggregationBuilder = null;
-		
+
 		if (field.getType().name().equals(Field.Type.DATE.name())
 		    || field.getType().name().equals(Field.Type.TIMESTAMP.name()))
 		{
+            if(field.getDateFormat()==null|| field.getDateFormat().isEmpty())
+                field.setDateFormat(DATE_FORMAT);
 		  if (field.getGroupInterval()!=null){
 			aggregationBuilder = AggregationBuilders.
-					dateHistogram(aggregationName).field(field.getColumnName()).format(DATE_FORMAT).
+					dateHistogram(aggregationName).field(field.getColumnName()).format(field.getDateFormat()).
 					dateHistogramInterval(groupInterval(field.getGroupInterval().value())).order(BucketOrder.key(false));
 			}
 		  else {
 		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(field.getColumnName())
-		        .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+		        .format(field.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 		  }
 		}
 		else {
@@ -79,7 +81,7 @@ public class QueryBuilderUtil {
      */
      public static DateHistogramInterval groupInterval(String groupInterval)
      {
-    	 DateHistogramInterval histogramInterval = null; 
+    	 DateHistogramInterval histogramInterval = null;
     	    switch (groupInterval)
     	    {
     	    case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
@@ -135,6 +137,10 @@ public class QueryBuilderUtil {
             AggregationBuilders.sum(field.getDataField())
                 .field(field.getColumnName())
                 .script(script);
+        break;
+      case PERCENTAGE_BY_ROW:
+        aggregationBuilder =
+               AggregationBuilders.sum(field.getDataField()).field(field.getColumnName());
         break;
     }
     return aggregationBuilder;
