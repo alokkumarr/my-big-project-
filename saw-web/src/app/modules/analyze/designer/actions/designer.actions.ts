@@ -75,10 +75,10 @@ export class DesignerUpdateAnalysisMetadata {
   constructor(public metadata: Partial<AnalysisDSL>) {}
 }
 
-export class DesignerUpdateAnalysisChartType {
+export class DesignerUpdateAnalysisSubType {
   /* Use for only new DSL analyses */
-  static readonly type = '[Designer] Update chartType for analysis';
-  constructor(public chartType: string) {}
+  static readonly type = '[Designer] Update subType for analysis';
+  constructor(public subType: string) {}
 }
 
 export class DesignerUpdateSorts {

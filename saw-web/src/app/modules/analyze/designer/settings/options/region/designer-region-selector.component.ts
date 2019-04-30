@@ -2,7 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as isString from 'lodash/isString';
 import { FormControl, FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { Store } from '@ngxs/store';
 import { map, startWith } from 'rxjs/operators';
+import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
 import { ArtifactColumnChart, Region } from '../../../types';
 import { getMapDataIndexByGeoType } from '../../../../../../common/components/charts/map-data-index';
 import { DesignerChangeEvent } from '../../../types';
@@ -23,7 +25,7 @@ export class DesignerRegionSelectorComponent implements OnInit {
   public regionCtrl = new FormControl();
   public filteredRegions: Observable<Region>;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private _store: Store, private fb: FormBuilder) {}
 
   ngOnInit() {
     const defaultRegion = this.artifactColumn.geoRegion || { name: '' };
@@ -38,8 +40,15 @@ export class DesignerRegionSelectorComponent implements OnInit {
     );
   }
 
-  onRegionSelected(region) {
-    this.artifactColumn.geoRegion = region;
+  onRegionSelected(geoRegion) {
+    const { table, columnName } = this.artifactColumn;
+    this._store.dispatch(
+      new DesignerUpdateArtifactColumn({
+        table,
+        columnName,
+        geoRegion
+      })
+    );
     this.change.emit({ subject: 'geoRegion' });
   }
 

@@ -100,7 +100,7 @@ export class MapBoxComponent implements OnChanges {
       {}
     );
     return map(data, (datum, index) => {
-      const coordinatesKey = coordinateField.columnName;
+      const [coordinatesKey] = split(coordinateField.columnName, '.');
       const [lng, lat] = split(datum[coordinatesKey], ',');
       const lnglat = [parseFloat(lng), parseFloat(lat)];
       const aggregates: MarkerDataPoint = fpPipe(

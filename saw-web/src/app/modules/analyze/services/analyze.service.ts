@@ -21,6 +21,7 @@ import AppConfig from '../../../../../appConfig';
 import { zip, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
+import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
@@ -627,6 +628,22 @@ export class AnalyzeService {
     semanticId: string,
     type: AnalysisType
   ): Partial<AnalysisDSL> {
+    const chartOptions = {
+      chartType: 'column',
+      chartTitle: 'Untitled Analysis',
+      isInverted: false,
+      legend: {
+        align: 'right',
+        layout: 'vertical'
+      },
+      xAxis: {
+        title: null
+      },
+      yAxis: {
+        title: null
+      }
+    };
+    const mapOptions = DEFAULT_MAP_SETTINGS;
     return {
       type,
       semanticId,
@@ -645,21 +662,8 @@ export class AnalyzeService {
           storageType: 'ES'
         }
       },
-      chartOptions: {
-        chartType: 'column',
-        chartTitle: 'Untitled Analysis',
-        isInverted: false,
-        legend: {
-          align: 'right',
-          layout: 'vertical'
-        },
-        xAxis: {
-          title: null
-        },
-        yAxis: {
-          title: null
-        }
-      }
+      chartOptions: type === 'chart' ? chartOptions : null,
+      mapOptions: type === 'map' ? mapOptions : null
     };
   }
 

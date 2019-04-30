@@ -30,7 +30,7 @@ import {
   DesignerInitForkAnalysis,
   DesignerInitNewAnalysis,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType,
+  DesignerUpdateAnalysisSubType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
@@ -188,6 +188,7 @@ export class DesignerState {
       groupInterval: artifactColumn.groupInterval,
       name: artifactColumn.name,
       type: artifactColumn.type,
+      geoType: artifactColumn.geoType,
       table: artifactColumn.table || (<any>artifactColumn).tableName,
       ...(isDateType
         ? {
@@ -369,20 +370,31 @@ export class DesignerState {
     });
   }
 
-  @Action(DesignerUpdateAnalysisChartType)
+  @Action(DesignerUpdateAnalysisSubType)
   updateChartType(
     { patchState, getState }: StateContext<DesignerStateModel>,
-    { chartType }: DesignerUpdateAnalysisChartType
+    { subType }: DesignerUpdateAnalysisSubType
   ) {
     const analysis = getState().analysis;
-    const chartOptions =
-      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
-    return patchState({
-      analysis: {
-        ...analysis,
-        chartOptions: { ...chartOptions, chartType }
-      }
-    });
+    switch (analysis.type) {
+      case 'chart':
+        const chartOptions =
+          (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
+        return patchState({
+          analysis: {
+            ...analysis,
+            chartOptions: { ...chartOptions, chartType: subType }
+          }
+        });
+      case 'map':
+        const mapOptions = (<AnalysisMapDSL>analysis).mapOptions;
+        return patchState({
+          analysis: {
+            ...analysis,
+            mapOptions: { ...mapOptions, mapType: subType }
+          }
+        });
+    }
   }
 
   @Action(DesignerUpdateAnalysisChartInversion)

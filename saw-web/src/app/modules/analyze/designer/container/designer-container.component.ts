@@ -45,7 +45,6 @@ import {
   DesignerChangeEvent,
   DesignerSaveEvent,
   AnalysisReport,
-  MapSettings,
   isDSLAnalysis
 } from '../types';
 import {
@@ -58,8 +57,7 @@ import {
   DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES,
-  DEFAULT_MAP_SETTINGS
+  DATE_TYPES
 } from '../consts';
 import moment from 'moment';
 
@@ -79,7 +77,7 @@ import {
   DesignerUpdateAnalysisChartLegend,
   DesignerUpdateAnalysisChartLabelOptions,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType,
+  DesignerUpdateAnalysisSubType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
@@ -111,9 +109,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
   );
-  chartType$: Observable<string> = this.dslAnalysis$.pipe(
-    map$(analysis => (<AnalysisChartDSL>analysis).chartOptions.chartType)
-  );
 
   public isInDraftMode = false;
   public designerState: DesignerStates;
@@ -133,11 +128,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
-  get chartType(): string {
+  get analysisSubType(): string {
+    const analysis = this._store.selectSnapshot(DesignerState).analysis;
+    const normalAnalysisSubType = (<AnalysisChart>this.analysis).chartType;
+    const subTypePath =
+      this.analysis.type === 'chart'
+        ? 'chartOptions.chartType'
+        : 'mapOptions.mapType';
     return isDSLAnalysis(this.analysis)
-      ? (<AnalysisChartDSL>this._store.selectSnapshot(DesignerState).analysis)
-          .chartOptions.chartType
-      : (<AnalysisChart>this.analysis).chartType;
+      ? get(analysis, subTypePath)
+      : normalAnalysisSubType;
   }
 
   constructor(
@@ -237,7 +237,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   initNewAnalysis() {
-    const { type, semanticId } = this.analysisStarter;
+    const { type, semanticId, chartType } = this.analysisStarter;
     const artifacts$ = this._analyzeService
       .getArtifactsForDataSet(semanticId)
       .toPromise();
@@ -254,6 +254,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const artifacts = this._store.selectSnapshot(
           state => state.designerState.metric.artifacts
         );
+
+        if (type === 'map') {
+          (<AnalysisMapDSL>newAnalysis).mapOptions.mapType = chartType;
+        }
         this.analysis = {
           ...this.analysisStarter,
           ...(newAnalysis['analysis'] || newAnalysis),
@@ -272,7 +276,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             });
         } else if (this.analysis.type === 'chart') {
           this._store.dispatch(
-            new DesignerUpdateAnalysisChartType(this.analysisStarter.chartType)
+            new DesignerUpdateAnalysisSubType(this.analysisStarter.chartType)
           );
         }
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
@@ -316,9 +320,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.addDefaultLabelOptions();
         if (this.designerMode === 'new') {
           if (isDSLAnalysis(this.analysis)) {
-            this._store.dispatch(new DesignerUpdateAnalysisChartInversion(this.chartType === 'bar'));
+            this._store.dispatch(new DesignerUpdateAnalysisChartInversion(this.analysisSubType === 'bar'));
           } else {
-            (<any>this.analysis).isInverted = this.chartType === 'bar';
+            (<any>this.analysis).isInverted = this.analysisSubType === 'bar';
           }
         }
         const chartOptions = this._store.selectSnapshot(state => (<AnalysisChartDSL>state.designerState.analysis).chartOptions);
@@ -344,12 +348,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         };
         break;
       case 'map':
-        const mapOnlySettings: MapSettings = DEFAULT_MAP_SETTINGS;
         this.auxSettings = {
-          ...this.auxSettings,
-          ...mapOnlySettings
+          ...(<AnalysisMapDSL>this.analysis).mapOptions
         };
-        (<AnalysisMapDSL>this.analysis).mapOptions = this.auxSettings;
         break;
     }
   }
@@ -361,7 +362,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
     let labelOptions: LabelOptions;
 
-    switch (this.chartType) {
+    switch (this.analysisSubType) {
       case 'pie':
         labelOptions = {
           enabled: true,
@@ -1085,7 +1086,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.refreshDataObject();
         break;
       case 'chartType':
-        this.changeChartType(event.data);
+        this.changeSubType(event.data);
         this._store.dispatch(new DesignerClearGroupAdapters());
         this._store.dispatch(
           new DesignerInitGroupAdapters()
@@ -1097,13 +1098,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  changeChartType(to: string) {
+  changeSubType(to: string) {
     if (isDSLAnalysis(this.analysis)) {
-      this._store.dispatch(new DesignerUpdateAnalysisChartType(to));
+      this._store.dispatch(new DesignerUpdateAnalysisSubType(to));
       isDSLAnalysis(this.analysis);
-      this._store.dispatch(
-        new DesignerUpdateAnalysisChartInversion(to === 'bar')
-      );
+      if (this.analysis.type === 'chart') {
+        this._store.dispatch(
+          new DesignerUpdateAnalysisChartInversion(to === 'bar')
+        );
+      }
     } else {
       (<AnalysisChart>this.analysis).chartType = to;
       (<any>this.analysis).isInverted = to === 'bar';
@@ -1159,7 +1162,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         find(sqlBuilder.dataFields || [], field => field.checked === 'y'),
         find(sqlBuilder.nodeFields || [], field => field.checked === 'x'),
         /* prettier-ignore */
-        ...(this.chartType === 'bubble' ?
+        ...(this.analysisSubType === 'bubble' ?
         [
           find(sqlBuilder.dataFields || [], field => field.checked === 'z')
         ] : [])

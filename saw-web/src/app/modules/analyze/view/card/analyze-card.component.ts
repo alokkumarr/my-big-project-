@@ -10,7 +10,6 @@ import { DesignerSaveEvent, isDSLAnalysis } from '../../designer/types';
 import {
   Analysis,
   AnalysisDSL,
-  AnalysisChartDSL,
   AnalysisChart,
   AnalyzeViewActionEvent
 } from '../types';
@@ -62,12 +61,17 @@ export class AnalyzeCardComponent implements OnInit {
         : this.analysis.categoryId
     });
     const { type, id } = this.analysis;
-    const chartType = isDSLAnalysis(this.analysis)
-      ? (<AnalysisChartDSL>this.analysis).chartOptions.chartType
+    const subTypePaths = {
+      map: 'mapOptions.mapType',
+      chart: 'chartOptions.chartType'
+    };
+    const subTypePath = isDSLAnalysis(this.analysis)
+      ? subTypePaths[this.analysisType]
       : (<AnalysisChart>this.analysis).chartType;
-    this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
+
+    this.placeholderClass = `m-${type}${subTypePath ? `-${subTypePath}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${
-      chartType ? `:${chartType}` : ''
+      subTypePath ? `:${subTypePath}` : ''
     }`;
 
     this._executeService.subscribe(id, this.onExecutionsEvent);
