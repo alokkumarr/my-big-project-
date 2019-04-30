@@ -37,7 +37,7 @@ const sqlBuilderWithXFieldContainingRegion = {
   nodeFields: [
     ({
       checked: 'x',
-      region: { name: '', path: '' }
+      geoRegion: { name: '', path: '' }
     } as unknown) as ArtifactColumnChart
   ],
   dataFields: [{ checked: 'y' } as ArtifactColumn],
