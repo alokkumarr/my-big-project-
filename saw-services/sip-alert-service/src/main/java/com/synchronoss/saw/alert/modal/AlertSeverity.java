@@ -13,7 +13,9 @@ public enum AlertSeverity {
   @SerializedName("MEDIUM")
   MEDIUM("MEDIUM"),
   @SerializedName("LOW")
-  LOW("LOW");
+  LOW("LOW"),
+  @SerializedName("WARNING")
+  WARNING("WARNING");
   private static final Map<String, AlertSeverity> CONSTANTS = new HashMap<>();
 
   static {

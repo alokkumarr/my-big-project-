@@ -31,7 +31,7 @@ CREATE TABLE `ALERT_RULES_DETAILS` (
     `ALERT_NAME` VARCHAR(100) NOT NULL COMMENT 'Alert Rule Name',
     `ALERT_DESCRIPTION` VARCHAR(250) DEFAULT NULL COMMENT 'Alert Rule Description',
     `CATEGORY` VARCHAR(100) NOT NULL COMMENT 'Alert Rule Name',
-    `SEVERITY` ENUM('CRITICAL', 'MEDIUM', 'LOW') NOT NULL COMMENT 'Severity of Alert , Values can be Critical , Medium and Low',
+    `SEVERITY` ENUM('CRITICAL', 'MEDIUM','LOW','WARNING') NOT NULL COMMENT 'Severity of Alert , Values can be Critical , Medium and Low',
     `MONITORING_ENTITY` VARCHAR(45) NOT NULL COMMENT 'Column Name from Datapod to use to Monitor the Alert metrics. ',
     `AGGREGATION` ENUM('MAX', 'MIN', 'AVG', 'SUM', 'COUNT', 'PERCENTAGE') NOT NULL COMMENT 'Type Of Aggregation for metrics calculation.',
     `OPERATOR` ENUM('EQ', 'NEQ', 'GT', 'LT', 'GTE', 'LTE', 'SW', 'EW', 'CONTAINS', 'ISIN', 'ISNOTIN', 'BTW') NOT NULL COMMENT 'List of Operators to check the threshold values.',
