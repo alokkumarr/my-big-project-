@@ -49,6 +49,7 @@ export class ChartGridComponent implements OnInit {
       // defer updating the chart so that the chart has time to initialize
       this.updater.next(this.updates);
     });
+    this.data = data;
   }
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
@@ -57,6 +58,7 @@ export class ChartGridComponent implements OnInit {
   public toggleToGrid = false;
   public chartToggleData: any;
   public updates: any;
+  public data: any[];
 
   constructor(private _chartService: ChartService) {
     this.customizeColumns = this.customizeColumns.bind(this);
