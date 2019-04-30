@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -111,7 +112,7 @@ public class RetryExecutorService {
    * destination and update logs with 'Data_removed' Step3: Triggers transfer
    * call as part of retry
    */
-  @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
+  @Async("retryWorkerExecutor")
   public void recoverFromInconsistentState() {
 
     // Mark long running 'InProgress to 'Failed'

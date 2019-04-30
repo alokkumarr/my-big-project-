@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -26,6 +27,7 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 
 @EnableJpaAuditing
@@ -109,6 +111,37 @@ public class SawBatchServiceApplication {
     template.setBackOffPolicy(backOffPolicy);
     return template;
   }
+  
+  /**
+   * Thread pool executor with initial
+   * configuration for worker threads
+   * to transfer files.
+   * 
+   * @return task executor
+   */
+  @Bean
+  public TaskExecutor transferWorkerExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(1);
+    executor.setMaxPoolSize(10);
+    executor.setQueueCapacity(25);
 
+    return executor;
+  }
+  
+  /**
+   * Threadpool exeuctor with initial
+   * configuration for retry threads.
+   * @return task executor
+   */
+  @Bean
+  public TaskExecutor retryWorkerExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(1);
+    executor.setMaxPoolSize(10);
+    executor.setQueueCapacity(25);
+
+    return executor;
+  }
 
 }

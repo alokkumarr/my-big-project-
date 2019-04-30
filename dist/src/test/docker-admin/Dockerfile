@@ -36,12 +36,12 @@ RUN yum -y -q install ansible rsync
 RUN yum -y -q install openssh-clients
 
 # Add oneshot service to start application deployment at startup
-COPY saw-deploy/saw-deploy /root/
-COPY saw-deploy/saw-config /root/
-COPY saw-deploy/saw-deploy.service /etc/systemd/system/
-RUN systemctl enable saw-deploy
+COPY sip-deploy/sip-deploy /root/
+COPY sip-deploy/sip-config /root/
+COPY sip-deploy/sip-deploy.service /etc/systemd/system/
+RUN systemctl enable sip-deploy
 # Workaround: Set execute bit for Windows users
-RUN chmod a+x /root/saw-deploy
+RUN chmod a+x /root/sip-deploy
 
 RUN chmod a+x /root
 # Add SAW Analyze test data

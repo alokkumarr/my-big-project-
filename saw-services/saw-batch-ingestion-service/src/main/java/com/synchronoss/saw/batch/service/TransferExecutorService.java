@@ -8,12 +8,14 @@ import com.synchronoss.saw.logs.service.SipLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+
 
 @Service
 public class TransferExecutorService {
-
+  
   @Autowired
   private SipIngestionPluginFactory factory;
 
@@ -24,10 +26,12 @@ public class TransferExecutorService {
       .getLogger(TransferExecutorService.class);
   
   /**
-   * executes the file transfer logic.
+   * Invokes file transfer logic based on
+   * channel type.
    */
-  @Scheduled(fixedDelayString = "${sip.service.worker.delay}")
+  @Async("transferWorkerExecutor")
   public void processFileTransfer() {
+
 
     // factory.getInstance(ingestionType)
 
@@ -48,6 +52,7 @@ public class TransferExecutorService {
     }
     
 
+  
   }
 
 }
