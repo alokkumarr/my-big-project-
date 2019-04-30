@@ -541,7 +541,7 @@ public class ExportServiceImpl implements ExportService{
               List<Field> fieldList = sipQuery.getArtifacts().get(0).getFields();
               ElasticSearchAggeragationParser responseParser = new ElasticSearchAggeragationParser(fieldList);
               responseParser.setColumnDataType(exportBean);
-              JsonNode jsonNode = entity.getBody();
+              JsonNode jsonNode = entity.getBody().get("data");
               List<Object> dataObj = responseParser.parsePivotData(jsonNode);
               logger.trace("Parse data for workbook writing : " + dataObj);
 
@@ -600,7 +600,7 @@ public class ExportServiceImpl implements ExportService{
 
               ElasticSearchAggeragationParser responseParser = new ElasticSearchAggeragationParser(fieldList);
               responseParser.setColumnDataType(exportBean);
-              JsonNode jsonNode = entity.getBody();
+              JsonNode jsonNode = entity.getBody().get("data");
               List<Object> dataObj = responseParser.parsePivotData(jsonNode);
               logger.trace("Parse data for workbook writing : " + dataObj);
 
