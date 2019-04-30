@@ -9,7 +9,8 @@ import java.util.Map;
 public enum AlertSeverity {
   CRITICAL("CRITICAL"),
   MEDIUM("MEDIUM"),
-  LOW("LOW");
+  LOW("LOW"),
+  WARNING("WARNING");
   private static final Map<String, AlertSeverity> CONSTANTS = new HashMap<>();
 
   static {
