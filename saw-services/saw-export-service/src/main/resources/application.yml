@@ -31,8 +31,7 @@ analysis:
     uiExportSize: 10000
     emailExportSize: 50000
     ftpExportSize: 100000
-    dsl-analysis-url: http://localhost:9502
-    proxy-storage-url: http://localhost:9800
+    dsl-analysis-url:  http://localhost:9502
 
 published:
   path: /tmp

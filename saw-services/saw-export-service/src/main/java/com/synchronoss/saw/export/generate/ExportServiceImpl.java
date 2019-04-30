@@ -80,9 +80,6 @@ public class ExportServiceImpl implements ExportService{
   @Value ("${analysis.dsl-analysis-url}")
   private String apiDslMetaData;
 
-  @Value ("${analysis.proxy-storage-url}")
-  private String proxyStorageUrl;
-
   @Autowired
   private ApplicationContext appContext;
 
@@ -514,8 +511,9 @@ public class ExportServiceImpl implements ExportService{
       if(recipients!=null && !recipients.equals("")) {
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture;
         if(analysisType.equalsIgnoreCase("pivot")) {
-          String url = proxyStorageUrl + "/internal/proxy/storage/" + executionId + "/executions/data";
-          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
+          requestEntity = new HttpEntity<>(sipQuery);
+          String url = "http://localhost:9800/internal/proxy/storage/execute";
+          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
         } else {
           String url = apiExportOtherProperties + "/" + analysisId + "/executions/" + executionId + "/data?page=1&pageSize=" + emailExportSize + "&analysisType=pivot";
           responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
@@ -584,8 +582,9 @@ public class ExportServiceImpl implements ExportService{
       if(ftp!=null && !ftp.equals("")) {
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture;
         if(analysisType.equalsIgnoreCase("pivot")) {
-          String url = proxyStorageUrl + "/internal/proxy/storage/" + executionId + "/executions/data";
-          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
+          requestEntity = new HttpEntity<>(sipQuery);
+          String url = "http://localhost:9800/internal/proxy/storage/execute";
+          responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
         } else {
           String url = apiExportOtherProperties + "/" + analysisId + "/executions/" + executionId + "/data?page=1&pageSize=" + emailExportSize + "&analysisType=pivot";
           responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
