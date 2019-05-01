@@ -42,6 +42,7 @@
       [checked]="cell.data.selection"
       [disabled]="
         cell.data.noMetricInd ||
+        cell.data.legacyInd ||
         (cell.data.duplicateAnalysisInd && !cell.data.selection)
       "
     >
@@ -77,11 +78,7 @@
   <div *dxTemplate="let cell of 'categoryCellTemplate'">
     <admin-import-category-select
       [categories]="categories"
-      [value]="
-        (
-          cell.data.analysis.categoryId || cell.data.analysis.category
-        ).toString()
-      "
+      [value]="getCategoryId(cell.data.analysis).toString()"
       (change)="onSelectCategory($event, cell.data)"
     ></admin-import-category-select>
   </div>

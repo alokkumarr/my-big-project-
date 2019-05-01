@@ -34,6 +34,7 @@ import { AdminMenuData } from '../consts';
 import { Analysis, AnalysisDSL } from '../../../models';
 import { ExportService } from '../export/export.service';
 import { isDSLAnalysis } from '../../analyze/types';
+import { DSL_ANALYSIS_TYPES } from '../../analyze/consts';
 
 const DUPLICATE_GRID_OBJECT_PROPS = {
   logColor: 'brown',
@@ -43,12 +44,23 @@ const DUPLICATE_GRID_OBJECT_PROPS = {
   errorInd: false,
   noMetricInd: false
 };
+
 const NORMAL_GRID_OBJECT_PROPS = {
   logColor: 'transparent',
   log: '',
   errorMsg: '',
   duplicateAnalysisInd: false,
   errorInd: false,
+  noMetricInd: false
+};
+
+const LEGACY_GRID_OBJECT_PROPS = {
+  logColor: 'red',
+  log: 'Invalid analysis structure. Missing sipQuery property.',
+  errorMsg: 'Invalid analysis structure. Missing sipQuery property.',
+  duplicateAnalysisInd: false,
+  errorInd: true,
+  legacyInd: true,
   noMetricInd: false
 };
 
@@ -236,11 +248,14 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
         `${analysis.name}:${analysis.metricName}:${analysis.type}`
       ];
 
-    const possibilitySelector = metric
-      ? analysisFromBE
-        ? 'duplicate'
-        : 'normal'
-      : 'noMetric';
+    const possibilitySelector =
+      !isDSLAnalysis(analysis) && DSL_ANALYSIS_TYPES.includes(analysis.type)
+        ? 'legacy'
+        : metric
+        ? analysisFromBE
+          ? 'duplicate'
+          : 'normal'
+        : 'noMetric';
 
     const possibility = this.getPossibleGridObjects(
       possibilitySelector,
@@ -255,7 +270,7 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
   }
 
   getPossibleGridObjects(
-    selector: 'noMetric' | 'duplicate' | 'normal',
+    selector: 'noMetric' | 'duplicate' | 'normal' | 'legacy',
     analysis: Analysis | AnalysisDSL,
     analysisFromBE: Analysis | AnalysisDSL
   ): AnalysisGridObject {
@@ -269,6 +284,11 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
           errorInd: true,
           noMetricInd: true,
           analysis
+        };
+      case 'legacy':
+        return {
+          analysis,
+          ...LEGACY_GRID_OBJECT_PROPS
         };
       case 'duplicate':
         const modifiedAnalysis = this.getModifiedAnalysis(
