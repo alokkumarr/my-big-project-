@@ -232,7 +232,9 @@ export class DesignerPageComponent implements OnInit {
       this.designerMode = 'fork';
       return {
         ...analysis,
-        categoryId: userAnalysisCategoryId,
+        ...(isDSLAnalysis(analysis)
+          ? { category: userAnalysisCategoryId }
+          : { categoryId: userAnalysisCategoryId }),
         parentAnalysisId: analysis.id,
         parentCategoryId: analysisCategoryId
       };
