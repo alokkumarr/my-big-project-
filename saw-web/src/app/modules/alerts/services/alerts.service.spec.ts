@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { GridPagingOptions } from '../alerts.interface';
 import { AlertsService } from './alerts.service';
+import { Observable } from 'rxjs';
 
 const pagingOptions: GridPagingOptions = {
   take: 10,
@@ -25,5 +26,15 @@ describe('AlertsService', () => {
 
   it('should getAlertsStatesForGrid', () => {
     service.getAlertsStatesForGrid(pagingOptions);
+  });
+
+  it('getAlertRuleDetails should return  observable', () => {
+    expect(service.getAlertRuleDetails(1) instanceof Observable).toBeTruthy();
+  });
+
+  it('getRequest should return  observable', () => {
+    expect(
+      service.getRequest('alerts/states') instanceof Observable
+    ).toBeTruthy();
   });
 });

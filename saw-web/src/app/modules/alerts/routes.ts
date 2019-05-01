@@ -35,7 +35,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'configure'
+        redirectTo: 'view'
       }
     ]
   }

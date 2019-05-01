@@ -1,0 +1,19 @@
+@import 'src/themes/base/colors';
+
+:host {
+  width: 100%;
+  max-width: 100% !important;
+  height: 250px;
+  max-height: 100%;
+  min-height: 250px;
+  padding: 7px;
+}
+
+.alert-detail {
+  &__info {
+    strong {
+      font-size: 12px;
+      color: #727272;
+    }
+  }
+}
