@@ -2,7 +2,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import * as map from 'lodash/map';
-import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
@@ -76,7 +75,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   isReport: boolean;
   fileType: string;
   startDateCorrectFlag = true;
-  // zipFormatFlag: boolean = false;
+
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
@@ -223,7 +222,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
       scheduleState: this.scheduleState
-      //zip: this.zipFormatFlag
     };
     this.triggerSchedule();
   }
@@ -323,21 +321,18 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     return true;
   }
 
-  validateEmails(emails) {
-    const emailsList = emails;
+  validateEmails(emailsList) {
     let emailsAreValid = true;
-    if (isEmpty(emailsList)) {
-      emailsAreValid = false;
-      this.emailValidateFlag = true;
+    if (!isEmpty(emailsList)) {
+      fpPipe(
+        fpMap(email => {
+          if (!this.validateThisEmail(email)) {
+            emailsAreValid = false;
+            this.emailValidateFlag = true;
+          }
+        })
+      )(emailsList);
     }
-    forEach(emailsList, email => {
-      const isEmailvalid = this.regexOfEmail.test(email.toLowerCase());
-      if (!isEmailvalid) {
-        emailsAreValid = false;
-        // cancel forEach
-        this.emailValidateFlag = true;
-      }
-    });
     return emailsAreValid;
   }
 
@@ -372,14 +367,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   onS3LocationSelected(value) {
     this.s3Bucket = value;
-    /* if (this.s3Bucket.length <= 0) {
-      this.zipFormatFlag = false;
-    } */
   }
-
-  /* checkZipped(event) {
-    this.zipFormatFlag = event.checked;
-  } */
 
   close() {
     this._dialogRef.close();
