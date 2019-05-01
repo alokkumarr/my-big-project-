@@ -765,13 +765,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   openSaveDialog(): Promise<any> {
-    if (isDSLAnalysis(this.analysis) && this.designerMode === 'new') {
+    if (
+      isDSLAnalysis(this.analysis) &&
+      ['new', 'fork'].includes(this.designerMode)
+    ) {
       this._store.dispatch(
         new DesignerUpdateAnalysisMetadata({
           category: this._jwtService.userAnalysisCategoryId
         })
       );
-    } else if (this.designerMode === 'new') {
+    } else if (['new', 'fork'].includes(this.designerMode)) {
       (<Analysis>(
         this.analysis
       )).categoryId = this._jwtService.userAnalysisCategoryId;
