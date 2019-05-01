@@ -47,11 +47,14 @@ export class DesignerDateFormatSelectorComponent {
     if (format) {
       if (this.analysisType === 'chart') {
         this.artifactColumn.dateFormat = <string>format;
+        const groupInterval = dateFormatsMap.chart.obj[format].groupInterval;
+
         this.store.dispatch(
           new DesignerUpdateArtifactColumn({
             columnName: this.artifactColumn.columnName,
             table: this.artifactColumn.table || this.artifactColumn.table,
-            dateFormat: <string>format
+            dateFormat: <string>format,
+            groupInterval
           })
         );
       } else {
