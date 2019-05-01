@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Analysis, ArtifactColumns, AnalysisDSL } from '../types';
+import { Analysis, ArtifactColumns, AnalysisDSL, isDSLAnalysis } from '../types';
 import { DesignerService } from '../designer.service';
 import {
   flattenPivotData,
@@ -52,7 +52,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
           return this._designerService.getDataForExecution(
             this.analysis.id,
             execId,
-            {...options, analysisType: this.analysis.type, executionType: 'onetime'}
+            {...options, analysisType: this.analysis.type, executionType: 'onetime', isDSL: isDSLAnalysis(this.analysis)}
           )
             .then((result) => ({data: flattenReportData(result.data, this.analysis), totalCount: result.count}));
         } else {

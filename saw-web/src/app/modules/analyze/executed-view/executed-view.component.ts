@@ -129,7 +129,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     } = queryParams;
 
     this.executionId = executionId;
-
     this.loadAnalysisById(analysisId, isDSL === 'true').then(
       (analysis: Analysis | AnalysisDSL) => {
         this.analysis = analysis;
@@ -189,7 +188,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   onSidenavChange(isOpen: boolean) {
     if (isOpen && !this.analyses) {
-      this.loadExecutedAnalyses(this.analysis.id).then(analyses => {
+      this.loadExecutedAnalyses(this.analysis.id, isDSLAnalysis(this.analysis)).then(analyses => {
         const lastExecutionId = get(analyses, '[0].id', null);
         if (!this.executionId && lastExecutionId) {
           this.executionId = lastExecutionId;
@@ -281,7 +280,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         queryParams: {
           executionId,
           awaitingExecution: false,
-          loadLastExecution: false
+          loadLastExecution: false,
+          isDSL: isDSLAnalysis(this.analysis)
         }
       }
     );
@@ -353,9 +353,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       : this.executedAt;
   }
 
-  loadExecutedAnalyses(analysisId) {
+  loadExecutedAnalyses(analysisId, isDSL) {
     return this._analyzeService
-      .getPublishedAnalysesByAnalysisId(analysisId)
+      .getPublishedAnalysesByAnalysisId(analysisId, isDSL)
       .then(
         (analyses: Analysis[]) => {
           this.analyses = analyses;
@@ -507,7 +507,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;
-
+    options.isDSL = isDSLAnalysis(this.analysis);
+    console.log(executionId);
     return (executionId
       ? this._analyzeService.getExecutionData(analysisId, executionId, options)
       : this._analyzeService.getLastExecutionData(analysisId, options)
@@ -520,6 +521,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution data as well, then we can deduce there's no previous
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
+        console.log(this.executedAnalysis);
         if (this.executedAnalysis && queryBuilder) {
           if (isDSLAnalysis(this.executedAnalysis)) {
             this.executedAnalysis.sipQuery = queryBuilder;

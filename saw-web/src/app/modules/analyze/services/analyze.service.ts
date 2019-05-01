@@ -31,6 +31,7 @@ interface ExecutionRequestOptions {
   executionType?: string;
   forcePaginate?: boolean;
   analysisType?: string;
+  isDSL?: boolean;
 }
 export const EXECUTION_MODES = {
   PREVIEW: 'preview',
@@ -182,12 +183,18 @@ export class AnalyzeService {
       .toPromise();
   }
 
-  getPublishedAnalysesByAnalysisId(id) {
-    console.log('sinde');
-    return <Promise<Analysis[]>>this.getRequest(`analysis/${id}/executions`)
+  getPublishedAnalysesByAnalysisId(id, isDSL) {
+    const path = isDSL ? `internal/proxy/storage/${id}/executions` : `analysis/${id}/executions`;
+    if (isDSL) {
+      return <Promise<Analysis[]>>this.getRequest(path)
+      .toPromise()
+      .then(fpSortBy([obj =>  -obj.finishedTime]));
+    } else {
+      return <Promise<Analysis[]>>this.getRequest(path)
       .toPromise()
       .then(fpGet(`executions`))
       .then(fpSortBy([obj => -obj.finished]));
+    }
   }
 
   forcePagination(data, options: ExecutionRequestOptions = {}) {
@@ -200,6 +207,7 @@ export class AnalyzeService {
 
   getLastExecutionData(analysisId, options: ExecutionRequestOptions = {}) {
     console.log('sinde');
+    console.log(options.isDSL);
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
@@ -231,7 +239,6 @@ export class AnalyzeService {
     executionId,
     options: ExecutionRequestOptions = {}
   ) {
-    console.log('sinde');
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
@@ -239,11 +246,18 @@ export class AnalyzeService {
       options.executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
         : '';
-    const path = `analysis/${analysisId}/executions/${executionId}/data`;
-    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
-      options.analysisType
-    }${onetimeExecution}`;
-    const url = `${path}${queryParams}`;
+
+    let url = '';
+    if (options.isDSL) {
+      const path = `internal/proxy/storage/${executionId}/executions/data`;
+      url = `${path}`;
+    } else {
+      const path = `analysis/${analysisId}/executions/${executionId}/data`;
+      const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
+        options.analysisType
+      }${onetimeExecution}`;
+      url = `${path}${queryParams}`;
+    }
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
@@ -477,9 +491,7 @@ export class AnalyzeService {
     options: ExecutionRequestOptions = {}
   ) {
     return this._http
-      .post(`${apiUrl}/internal/proxy/storage/fetch`, {
-        sipQuery: model.sipQuery
-      })
+    .post(`${apiUrl}/internal/proxy/storage/execute?id=${model.id}&size=25&ExecutionType=${mode}`, model.sipQuery)
       .pipe(
         map((resp: any) => {
           return {
