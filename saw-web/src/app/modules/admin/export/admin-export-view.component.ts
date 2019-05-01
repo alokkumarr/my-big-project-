@@ -131,9 +131,7 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
    */
   export() {
     const zip = new JSZip();
-    const { analyses } = this.store.selectSnapshot(
-      state => state.admin.exportPage.exportData
-    );
+    const { analyses } = this.store.selectSnapshot(ExportPageState.exportData);
 
     const fileName = this.getFileName('ANALYZE');
     zip.file(

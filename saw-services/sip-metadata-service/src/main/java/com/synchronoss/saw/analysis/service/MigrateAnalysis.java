@@ -181,9 +181,9 @@ public class MigrateAnalysis {
         converter = new PivotConverter();
         break;
       case "esReport":
-        throw new UnsupportedOperationException("DL Report migration not supported yet");
-      case "report":
         throw new UnsupportedOperationException("ES Report migration not supported yet");
+      case "report":
+        throw new UnsupportedOperationException("DL Report migration not supported yet");
       default:
         logger.error("Unknown chart type");
         break;
