@@ -8,6 +8,10 @@ import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.entities.DatapodDetails;
 import com.synchronoss.saw.alert.modal.Aggregation;
 import com.synchronoss.saw.alert.modal.Alert;
+import com.synchronoss.saw.alert.modal.AlertCount;
+import com.synchronoss.saw.alert.modal.AlertCount.GroupBy;
+import com.synchronoss.saw.alert.modal.AlertCount.Preset;
+import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertStates;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.modal.Operator;
@@ -15,9 +19,16 @@ import com.synchronoss.saw.alert.repository.AlertCustomerRepository;
 import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
 import com.synchronoss.saw.alert.repository.AlertRulesRepository;
 import com.synchronoss.saw.alert.repository.AlertTriggerLog;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -27,6 +38,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.threeten.extra.YearQuarter;
 
 @Service
 public class AlertServiceImpl implements AlertService {
@@ -370,5 +382,195 @@ public class AlertServiceImpl implements AlertService {
       default:
         return null;
     }
+  }
+  /**
+   * It returns alert count for each day based on the preset value.
+   *
+   * @param alertCount AlertCount
+   * @return AlertCountResponse
+   */
+
+  public List<AlertCountResponse> alertCount(AlertCount alertCount,Long alertRuleSysId) {
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    String dateFormatLte = "23:59:59";
+    String dateFormatGte = "00:00:00";
+    String space = " ";
+    Long epochGte = null;
+    Long epochLte = null;
+    String startDate = null;
+    String endDate = null;
+    LocalDateTime now = LocalDateTime.now();
+    if (alertCount.getPreset() == null) {
+      throw new IllegalArgumentException("Preset cannot be null");
+    }
+    if (alertCount.getGroupBy() == null) {
+      throw new IllegalArgumentException("GroupBy cannot be null");
+    }
+    switch (alertCount.getPreset().value()) {
+      case "Yesterday": {
+        LocalDateTime yesterday = now.minusDays(1);
+        endDate = yesterday.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = yesterday.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "Today": {
+        LocalDateTime today = now;
+        endDate = today.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = today.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "YTD": {
+        LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
+        endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = firstDay.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "MTD": {
+        LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
+        endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = firstDayOfMonth.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "LW": {
+        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        LocalDateTime priorLastWeek = now.minusWeeks(1);
+        LocalDateTime startOfWeek =
+              priorLastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+        LocalDateTime endOfWeek =
+            priorLastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
+        startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
+        endDate = (endOfWeek.format(dateTimeFormatter) + space + dateFormatLte);
+        break;
+      }
+      case "TW": {
+        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        LocalDateTime lastWeek = now;
+        LocalDateTime startOfWeek =
+            lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+        startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
+        endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
+        break;
+      }
+      case "LTW": {
+        LocalDateTime last2Week = now.minusWeeks(2);
+        endDate =
+            now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "LSW": {
+        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        LocalDateTime lastWeek = now.minusWeeks(6);
+        endDate =
+            now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            lastWeek.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+
+      case "LQ": {
+        YearQuarter quarter = YearQuarter.now();
+        endDate = quarter.minusQuarters(1).atEndOfQuarter().toString() + space + dateFormatLte;
+        startDate = quarter.minusQuarters(1).atDay(1).toString() + space + dateFormatGte;
+        break;
+      }
+      case "LM": {
+        LocalDateTime lastMonth = now.minusMonths(1);
+        startDate =
+            lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatGte;
+        endDate =
+            lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        break;
+      }
+      case "LTM": {
+        LocalDateTime last3Month = now.minusMonths(3);
+        endDate =
+            now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            last3Month.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatGte;
+        break;
+      }
+      case "LSM": {
+        LocalDateTime last6Months = now.minusMonths(6);
+        endDate =
+            now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatGte;
+        break;
+      }
+      case "LY": {
+        LocalDateTime currentDayOflastYearDate = now.minusMonths(12);
+        endDate =
+            currentDayOflastYearDate
+                .with(TemporalAdjusters.lastDayOfYear())
+                .format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            currentDayOflastYearDate
+                .with(TemporalAdjusters.firstDayOfYear())
+                .format(dateTimeFormatter)
+                + space
+                + dateFormatGte;
+        break;
+      }
+      case "BTW": {
+        if (alertCount.getStartTime() == null) {
+          throw new IllegalArgumentException("Start time is missing for custom date filter");
+        } else if (alertCount.getEndTime() == null) {
+          throw new IllegalArgumentException("End date is missing for custom date filter");
+        }
+        break;
+      }
+      default:
+        throw new IllegalArgumentException(alertCount.getPreset() + " not present");
+    }
+    if (!(alertCount.getPreset() == Preset.BTW)) {
+      epochGte = getEpochFromDateTime(startDate);
+      epochLte = getEpochFromDateTime(endDate);
+    } else {
+      epochGte = alertCount.getStartTime();
+      epochLte = alertCount.getEndTime();
+    }
+
+    if (alertCount.getGroupBy() == GroupBy.Severity) {
+      if (alertRuleSysId != null) {
+        return alertTriggerLog.alertCountBySeverityForalertId(
+            epochGte, epochLte, alertRuleSysId);
+      }
+      return alertTriggerLog.alertCountBySeverity(epochGte, epochLte);
+    } else {
+      if (alertRuleSysId != null) {
+        return alertTriggerLog.alertCountByDateForAlertId(
+            epochGte, epochLte, alertRuleSysId);
+      }
+      return alertTriggerLog.alertCountByDate(epochGte, epochLte);
+    }
+  }
+
+  private Long getEpochFromDateTime(String date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" ");
+    LocalDateTime ldt =
+        LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    ZoneId zoneId = ZoneId.systemDefault();
+    Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
+    return epochValue;
   }
 }

@@ -3,6 +3,8 @@ package com.synchronoss.saw.alert.service;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.entities.AlertRulesDetails;
 import com.synchronoss.saw.alert.modal.Alert;
+import com.synchronoss.saw.alert.modal.AlertCount;
+import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import java.util.List;
 import javax.validation.Valid;
@@ -42,4 +44,6 @@ public interface AlertService {
       Ticket ticket);
 
   AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket);
+
+  List<AlertCountResponse> alertCount(AlertCount alertCount,Long alertRuleSysId);
 }
