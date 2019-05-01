@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.synchronoss.saw</groupId>
-    <artifactId>saw</artifactId>
+    <artifactId>sip</artifactId>
     <version>${revision}</version>
   </parent>
   <artifactId>a2</artifactId>

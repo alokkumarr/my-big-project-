@@ -4,13 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.synchronoss.saw</groupId>
-    <artifactId>saw</artifactId>
+    <artifactId>sip</artifactId>
     <version>${revision}</version>
   </parent>
   <artifactId>dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
-  <name>saw-dist</name>
+  <name>sip-dist</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Name used for Docker Machine.  Should include the username to
@@ -659,7 +659,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/ --suite=${saw.e2e.suite}</arguments>
+              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/sip/web/ --suite=${saw.e2e.suite}</arguments>
             </configuration>
           </execution>
            <execution>
