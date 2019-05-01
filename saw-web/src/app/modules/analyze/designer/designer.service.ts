@@ -221,6 +221,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'geoRegion');
     };
 
     const maxAllowedDecorator = (
