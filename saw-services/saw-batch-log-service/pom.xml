@@ -173,7 +173,7 @@
 		</dependency>
 		<dependency>
 		   <groupId>com.synchronoss.saw</groupId>
-            <artifactId>saw-batch-plugin-interfaces</artifactId>
+            <artifactId>sip-batch-plugin-interfaces</artifactId>
             <version>${revision}</version>
 		</dependency>
 
