@@ -504,7 +504,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;
     options.isDSL = isDSLAnalysis(this.analysis);
-    console.log(executionId);
     return (executionId
       ? this._analyzeService.getExecutionData(analysisId, executionId, options)
       : this._analyzeService.getLastExecutionData(analysisId, options)
@@ -517,7 +516,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution data as well, then we can deduce there's no previous
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
-        console.log(this.executedAnalysis);
         if (this.executedAnalysis && queryBuilder) {
           if (isDSLAnalysis(this.executedAnalysis)) {
             this.executedAnalysis.sipQuery = queryBuilder;

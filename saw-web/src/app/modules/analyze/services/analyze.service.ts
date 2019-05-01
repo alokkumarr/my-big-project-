@@ -110,7 +110,6 @@ export class AnalyzeService {
     analysisType,
     executionType = EXECUTION_DATA_MODES.NORMAL
   ) {
-    console.log('sinde');
     const onetimeExecution =
       executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
@@ -206,17 +205,22 @@ export class AnalyzeService {
   }
 
   getLastExecutionData(analysisId, options: ExecutionRequestOptions = {}) {
-    console.log('sinde');
-    console.log(options.isDSL);
     options.skip = options.skip || 0;
     options.take = options.take || 10;
-    const page = floor(options.skip / options.take) + 1;
-    const path = `analysis/${analysisId}/executions/data`;
-    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
-      options.analysisType
-    }`;
+    let url = '';
+    if (options.isDSL) {
+      const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
+      url = `${path}`;
+    } else {
+      const page = floor(options.skip / options.take) + 1;
+      const path = `analysis/${analysisId}/executions/data`;
+      const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
+        options.analysisType
+      }`;
+      url = `${path}${queryParams}`;
+    }
 
-    return this.getRequest(`${path}?${queryParams}`)
+    return this.getRequest(url)
       .toPromise()
       .then(resp => {
         const data = fpGet(`data`, resp);
