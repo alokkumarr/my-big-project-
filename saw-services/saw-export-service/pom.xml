@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-export-service</artifactId>
+	<artifactId>sip-export-service</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description></description>
@@ -247,8 +247,9 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-export</packageName>
+							<packageName>sip-export</packageName>
 							<version>${revision.nodash}</version>
+							<obsoletes>saw-export</obsoletes>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-export-service</name>
@@ -256,7 +257,7 @@
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-export-service/saw-export.jar</name>
-									<file>target/saw-export-service-${revision}-exec.jar</file>
+									<file>target/sip-export-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
 									<name>/usr/lib/systemd/system/saw-export.service</name>

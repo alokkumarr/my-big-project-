@@ -7,15 +7,15 @@ const CHART = 'chart';
 const NUMBER_TYPES = ['long', 'integer', 'double', 'float'];
 
 const API_ROUTES = {
-  AUTH: '/saw/security/doAuthenticate',
-  ANALYSIS: '/saw/services/analysis',
-  CATEGORIES_FETCH: '/saw/security/auth/admin/cust/manage/categories/fetch',
-  SEMANTIC: '/saw/services/internal/semantic/md?projectId=workbench',
-  ROLES: '/saw/security/auth/admin/cust/manage/roles/add',
-  USERS: '/saw/security/auth/admin/cust/manage/users/add',
-  ADD_CATEGORIES: '/saw/security/auth/admin/cust/manage/categories/add',
-  PRIVILEGES: '/saw/security/auth/admin/cust/manage/privileges/upsert',
-  DELETE_DASHBOARD: '/saw/services/observe/dashboards'
+  AUTH: '/sip/security/doAuthenticate',
+  ANALYSIS: '/sip/services/analysis',
+  CATEGORIES_FETCH: '/sip/security/auth/admin/cust/manage/categories/fetch',
+  SEMANTIC: '/sip/services/internal/semantic/md?projectId=workbench',
+  ROLES: '/sip/security/auth/admin/cust/manage/roles/add',
+  USERS: '/sip/security/auth/admin/cust/manage/users/add',
+  ADD_CATEGORIES: '/sip/security/auth/admin/cust/manage/categories/add',
+  PRIVILEGES: '/sip/security/auth/admin/cust/manage/privileges/upsert',
+  DELETE_DASHBOARD: '/sip/services/observe/dashboards'
 };
 
 const LOG_LEVELS = {

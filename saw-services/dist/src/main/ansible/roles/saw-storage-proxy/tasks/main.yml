@@ -1,6 +1,6 @@
 - name: Copy SAW Storage Proxy Service package
   copy: src="{{ item }}" dest=/tmp/saw-storage-proxy.rpm
-  with_fileglob: ["../rpms/saw-storage-proxy-*.rpm"]
+  with_fileglob: ["../rpms/sip-storage-proxy-*.rpm"]
 - name: Install SAW Storage Proxy Service package
   yum: name=/tmp/saw-storage-proxy.rpm state=present
   notify:

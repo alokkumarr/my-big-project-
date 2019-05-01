@@ -12,7 +12,7 @@
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-scheduler-service</artifactId>
+	<artifactId>sip-scheduler-service</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description></description>
@@ -234,8 +234,9 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-scheduler</packageName>
+							<packageName>sip-scheduler</packageName>
 							<version>${revision.nodash}</version>
+							<obsoletes>saw-scheduler</obsoletes>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-scheduler-service</name>
@@ -243,7 +244,7 @@
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-scheduler-service/saw-scheduler.jar</name>
-									<file>target/saw-scheduler-service-${revision}-exec.jar</file>
+									<file>target/sip-scheduler-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
 									<name>/usr/lib/systemd/system/saw-scheduler.service</name>
