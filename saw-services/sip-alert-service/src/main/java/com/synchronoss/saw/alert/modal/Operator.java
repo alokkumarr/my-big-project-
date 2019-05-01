@@ -16,11 +16,12 @@ public enum Operator {
   LTE("LTE"),
   EQ("EQ"),
   NEQ("NEQ"),
-  BTW("BTW"),
-  SW("SW"),
-  EW("EW"),
-  CONTAINS("CONTAINS"),
+  /* BTW("BTW"),
+   SW("SW"),
+   EW("EW"),
+   CONTAINS("CONTAINS"),
   ISIN("ISIN"),
+  */
   ISNOTIN("ISNOTIN");
   private static final Map<String, Operator> CONSTANTS = new HashMap<>();
 

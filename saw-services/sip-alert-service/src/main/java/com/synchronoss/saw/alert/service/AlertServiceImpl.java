@@ -333,16 +333,10 @@ public class AlertServiceImpl implements AlertService {
         return "Less Than and Equal To";
       case NEQ:
         return "Not Equal To";
-      case BTW:
-        return "Between";
-      case SW:
-        return "Start With";
-      case EW:
-        return "End With";
-      case CONTAINS:
-        return "Contains";
-      case ISIN:
-        return "Is IN";
+        /**
+         * case BTW: return "Between"; case SW: return "Start With"; case EW: return "End With";
+         * case CONTAINS: return "Contains"; case ISIN: return "Is IN";
+         */
       default:
         return null;
     }
