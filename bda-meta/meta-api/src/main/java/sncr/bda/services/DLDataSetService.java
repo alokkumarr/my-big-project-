@@ -233,13 +233,13 @@ public class DLDataSetService {
 
             if (userData.has(DataSetProperties.createdBy.name())) {
                 String createdBy = userData.get(DataSetProperties.createdBy.name()).getAsString();
-                logger.error("Created by " + DataSetProperties.createdBy.name() + " " + createdBy);
+                logger.debug("Created by " + DataSetProperties.createdBy.name() + " " + createdBy);
                 dl.add(DataSetProperties.createdBy.toString(), new JsonPrimitive(createdBy));
             }
 
             if (userData.has(DataSetProperties.modifiedBy.name())) {
                 String modifiedBy = userData.get(DataSetProperties.modifiedBy.name()).getAsString();
-                logger.error("Modified by " + DataSetProperties.modifiedBy.name() + " " + modifiedBy);
+                logger.debug("Modified by " + DataSetProperties.modifiedBy.name() + " " + modifiedBy);
                 dl.add(DataSetProperties.modifiedBy.toString(), new JsonPrimitive(modifiedBy));
             }
         }

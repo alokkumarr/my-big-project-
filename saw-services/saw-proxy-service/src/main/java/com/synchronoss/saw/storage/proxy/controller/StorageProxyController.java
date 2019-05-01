@@ -349,4 +349,27 @@ public class StorageProxyController {
     }
     return null;
   }
+
+    /**
+     * API to fetch the execution Data.
+     *
+     * @param executionId
+     * @return ExecutionResponse
+     */
+    @RequestMapping(
+        value = "/internal/proxy/storage/{id}/lastExecutions/data",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ExecutionResponse lastExecutionsData(
+        @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
+            String executionId) {
+        try {
+            logger.info("Storage Proxy request to fetch list of executions");
+            return proxyService.fetchLastExecutionsData(executionId);
+        } catch (Exception e) {
+            logger.error("error occurred while fetching execution data", e);
+        }
+        return null;
+    }
 }

@@ -11,12 +11,14 @@ import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
+import com.synchronoss.saw.semantic.service.MigrationService;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -37,6 +39,14 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${metastore.analysis}")
   private String tableName;
 
+  @Value("${analysis.get-analysis-url}")
+  @NotNull
+  private String analysisUri;
+
+  @Value("${analysis.binary-migration-required}")
+  @NotNull
+  private boolean migrationRequires;
+
   private ObjectMapper objectMapper = new ObjectMapper();
   private AnalysisMetadata analysisMetadataStore;
 
@@ -47,6 +57,15 @@ public class AnalysisServiceImpl implements AnalysisService {
       throw new SipIoException("Exception occurred while initializing the analysis metadata table");
     }
   }*/
+  @PostConstruct
+  private void init() throws Exception {
+    if (migrationRequires) {
+      logger.trace("Migration initiated.. " + migrationRequires);
+      new MigrateAnalysis()
+          .convertBinaryToJson(tableName,basePath,analysisUri);
+    }
+    logger.trace("Migration ended..");
+  }
 
   @Override
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {
