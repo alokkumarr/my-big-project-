@@ -194,7 +194,9 @@ public class ExportServiceImpl implements ExportService{
         jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
         ExportBean exportBean = new ExportBean();
         String dir = UUID.randomUUID().toString();
-        exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+        if(((LinkedHashMap) dispatchBean).get("fileType") != null) {
+            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+        }
         exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
         exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
         exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
@@ -218,47 +220,59 @@ public class ExportServiceImpl implements ExportService{
         ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
             requestEntity, DataResponse.class);
         String finalRecipients = recipients;
-        responseStringFuture.addCallback(new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
-          @Override
-          public void onSuccess(ResponseEntity<DataResponse> entity) {
-            logger.debug("Email async success");
-            logger.debug("[Success] Response :" + entity.getStatusCode());
+        responseStringFuture.addCallback(
+            new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
+              @Override
+              public void onSuccess(ResponseEntity<DataResponse> entity) {
+                logger.debug("Email async success");
+                logger.debug("[Success] Response :" + entity.getStatusCode());
 
-            try {
-              // create a directory with unique name in published location to avoid file conflict for dispatch.
-              File file = new File(exportBean.getFileName());
-              file.getParentFile().mkdir();
+                try {
+                  // create a directory with unique name in published location to avoid file
+                  // conflict for dispatch.
+                  File file = new File(exportBean.getFileName());
+                  file.getParentFile().mkdir();
 
-              FileOutputStream fos = new FileOutputStream(file);
-              OutputStreamWriter osw = new OutputStreamWriter(fos);
+                  FileOutputStream fos = new FileOutputStream(file);
+                  OutputStreamWriter osw = new OutputStreamWriter(fos);
 
-              if(fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty())  {
-                  streamToCSVReport(entity, Long.parseLong(emailExportSize), exportBean, osw);
-                  osw.close();
-                  fos.close();
+                  if (fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty()) {
+                    streamToCSVReport(entity, Long.parseLong(emailExportSize), exportBean, osw);
+                    osw.close();
+                    fos.close();
+                  } else {
+                    streamToXlsxReport(
+                        entity.getBody(), Long.parseLong(emailExportSize), exportBean);
+                  }
+
+                  MailSender.sendMail(
+                      finalRecipients,
+                      exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+                      serviceUtils.prepareMailBody(exportBean, mailBody),
+                      exportBean.getFileName());
+                  logger.debug("Email sent successfully");
+
+                  logger.debug("Deleting exported file.");
+                  try {
+                    serviceUtils.deleteFile(exportBean.getFileName(), true);
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                  }
+
+                } catch (IOException e) {
+                  logger.error(
+                      "Exception occurred while dispatching report :"
+                          + this.getClass().getName()
+                          + "  method dataToBeDispatchedAsync()");
+                }
               }
-              else {
-                  streamToXlsxReport(entity.getBody(), Long.parseLong(emailExportSize), exportBean);
+
+              @Override
+              public void onFailure(Throwable t) {
+
+                logger.error("[Failed] Getting string response:" + t);
               }
-
-
-              MailSender.sendMail(finalRecipients, exportBean.getReportName() + " | " +
-                      exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
-                  exportBean.getFileName());
-              logger.debug("Email sent successfully");
-
-            } catch (IOException e) {
-              logger.error(
-                  "Exception occurred while dispatching report :" + this.getClass().getName()
-                      + "  method dataToBeDispatchedAsync()");
-            }
-          }
-          @Override
-          public void onFailure(Throwable t) {
-
-              logger.error("[Failed] Getting string response:" + t);
-          }
-        });
+            });
       }
 
       logger.debug("S3 details = " +  s3);
@@ -397,32 +411,19 @@ public class ExportServiceImpl implements ExportService{
             zos.close();
             fos_zip.close();
 
+            // deleting the files
+            logger.debug("Deleting exported file.");
+            try {
+              serviceUtils.deleteFile(exportBean.getFileName(), true);
+              serviceUtils.deleteFile(zipFileName, true);
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+
           } catch (Exception e) {
             logger.error("ftp error: "+e.getMessage());
           }
         }
-      }
-
-      if (ftp!=null && ftp != "") {
-          // deleting the files
-          logger.debug("Deleting exported file.");
-          try {
-              serviceUtils.deleteFile(exportBean.getFileName(),true);
-              serviceUtils.deleteFile(zipFileName,true);
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
-
-      }
-      else {
-          // deleting the files
-          logger.debug("Deleting exported file.");
-          try {
-              serviceUtils.deleteFile(exportBean.getFileName(),true);
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
-
       }
     }
   }
@@ -512,12 +513,7 @@ public class ExportServiceImpl implements ExportService{
         streamResponseToFile(exportBean, leftOutRows, entity);
       }
 
-      // zip the contents of the file
-      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
-      LocalDateTime now = LocalDateTime.now();
-
       File cfile = new File(exportBean.getFileName());
-      String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
       for (String aliastemp : finalS3.split(",")) {
         logger.info("AliasTemp : " + aliastemp);
@@ -527,13 +523,13 @@ public class ExportServiceImpl implements ExportService{
           for (S3Details alias : obj.getS3List()) {
             if (alias.getCustomerCode().equals(finalJobGroup)
                 && aliastemp.equals(alias.getAlias())) {
-              logger.info("Final Obj to be dispatched for S3 : ");
-              logger.info("BucketName : " + alias.getBucketName());
-              logger.info("AccessKey : " + alias.getAccessKey());
-              logger.info("SecretKey : " + alias.getSecretKey());
-              logger.info("Region : " + alias.getRegion());
-              logger.info("getOutputLocation : " + alias.getOutputLocation());
-              logger.info("FileName : " + exportBean.getFileName());
+              logger.debug("Final Obj to be dispatched for S3 : ");
+              logger.debug("BucketName : " + alias.getBucketName());
+              logger.debug("AccessKey : " + alias.getAccessKey());
+              logger.debug("SecretKey : " + alias.getSecretKey());
+              logger.debug("Region : " + alias.getRegion());
+              logger.debug("getOutputLocation : " + alias.getOutputLocation());
+              logger.debug("FileName : " + exportBean.getFileName());
 
               S3Config s3Config =
                   new S3Config(
@@ -545,6 +541,12 @@ public class ExportServiceImpl implements ExportService{
 
               AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
               s3Handler.uploadObject(cfile.getAbsoluteFile());
+              logger.debug("Deleting exported file.");
+              try {
+                serviceUtils.deleteFile(exportBean.getFileName(), true);
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
             }
           }
         } catch (Exception e) {
@@ -680,9 +682,21 @@ public class ExportServiceImpl implements ExportService{
 
     // check beforehand if the request is not null
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
-      recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
-      ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
-      s3 = String.valueOf(((LinkedHashMap) dispatchBean).get("s3"));
+      Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
+      Object ftpObj = ((LinkedHashMap) dispatchBean).get("ftp");
+      Object s3Obj = ((LinkedHashMap) dispatchBean).get("s3");
+
+      if (recipientsObj != null) {
+        recipients = String.valueOf(recipientsObj);
+      }
+
+      if (ftpObj != null) {
+        ftp = String.valueOf(ftpObj);
+      }
+
+      if (s3Obj != null) {
+        s3 = String.valueOf(s3Obj);
+      }
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
 
       logger.debug("recipients: " + recipients);
@@ -727,6 +741,8 @@ public class ExportServiceImpl implements ExportService{
                   serviceUtils.prepareMailBody(exportBean,mailBody)
                   ,exportBean.getFileName());
               logger.debug("Email sent successfully ");
+              logger.debug("Removing the file from published location");
+              serviceUtils.deleteFile(exportBean.getFileName(),true);
             } catch (IOException e) {
               logger.error("Exception occurred while dispatching pivot :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
             }
@@ -745,7 +761,8 @@ public class ExportServiceImpl implements ExportService{
             analysisId, executionId, s3, asyncRestTemplate, dispatchBean, requestEntity, jobGroup);
       }
 
-      if(ftp!=null && !ftp.equals("")) {
+
+      if(ftp != null && !ftp.equals("")) {
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
             +ftpExportSize+"&analysisType=pivot";
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
@@ -921,11 +938,11 @@ public class ExportServiceImpl implements ExportService{
                   new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
               createPivotTable.createPivot(workbook, file);
             } catch (FileNotFoundException e) {
-                logger.error("Zip file error FileNotFound: " + e.getMessage());
+              logger.error("file error FileNotFound: " + e.getMessage());
             } catch (IOException e) {
-                e.printStackTrace();
+              e.printStackTrace();
             }
-              logger.debug("s3 List: " + finalS3);
+            logger.debug("s3 List: " + finalS3);
 
             for (String aliastemp : finalS3.split(",")) {
               ObjectMapper jsonMapper = new ObjectMapper();
@@ -934,13 +951,13 @@ public class ExportServiceImpl implements ExportService{
                 for (S3Details alias : obj.getS3List()) {
                   if (alias.getCustomerCode().equals(finalJobGroup)
                       && aliastemp.equals(alias.getAlias())) {
-                    logger.info("Final Obj to be dispatched for S3 : ");
-                    logger.info("BucketName : " + alias.getBucketName());
-                    logger.info("AccessKey : " + alias.getAccessKey());
-                    logger.info("SecretKey : " + alias.getSecretKey());
-                    logger.info("Region : " + alias.getRegion());
-                    logger.info("getOutputLocation : " + alias.getOutputLocation());
-                    logger.info("FileName : " + exportBean.getFileName());
+                    logger.debug("Final Obj to be dispatched for S3 : ");
+                    logger.debug("BucketName : " + alias.getBucketName());
+                    logger.debug("AccessKey : " + alias.getAccessKey());
+                    logger.debug("SecretKey : " + alias.getSecretKey());
+                    logger.debug("Region : " + alias.getRegion());
+                    logger.debug("getOutputLocation : " + alias.getOutputLocation());
+                    logger.debug("FileName : " + exportBean.getFileName());
 
                     S3Config s3Config =
                         new S3Config(
@@ -952,6 +969,9 @@ public class ExportServiceImpl implements ExportService{
 
                     AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
                     s3Handler.uploadObject(cfile.getAbsoluteFile());
+
+                    logger.debug("Removing the file from published location");
+                    serviceUtils.deleteFile(exportBean.getFileName(), true);
                   }
                 }
               } catch (IOException e) {
