@@ -1,6 +1,6 @@
 - name: Copy SAW Batch Ingestion Service package
   copy: src="{{ item }}" dest=/tmp/saw-batch-ingestion.rpm
-  with_fileglob: ["../rpms/saw-batch-*.rpm"]
+  with_fileglob: ["../rpms/sip-batch-*.rpm"]
 - name: Install SAW Batch Ingestion package
   yum: name=/tmp/saw-batch-ingestion.rpm state=present
   notify:
