@@ -7,12 +7,15 @@ import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
+import com.synchronoss.saw.batch.plugin.SipIngestionPluginFactory;
+import com.synchronoss.saw.batch.service.ChannelTypeService;
 import com.synchronoss.saw.logs.constants.SourceType;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -22,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +47,25 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 
 
+
+
 @RestController
 @RequestMapping("/ingestion/batch/sftp")
-public class SawBisSftpPluginController {
+public class SawBisPluginController {
 
-  @Autowired
-  @Qualifier("sftpService")
-  private SipPluginContract sftpServiceImpl;
-
-  private static final Logger logger = LoggerFactory.getLogger(SawBisSftpPluginController.class);
+  private static final Logger logger = LoggerFactory.getLogger(SawBisPluginController.class);
   @Autowired
   @Qualifier(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
   private Executor transactionPostExecutor;
 
+  @Autowired
+  private SipIngestionPluginFactory factory;
+  
+  @Autowired
+  ChannelTypeService channelTypeService;
+  
 
+  
   /**
    * This end-point to test connectivity for existing route.
    */
@@ -70,8 +80,11 @@ public class SawBisSftpPluginController {
   @ResponseStatus(HttpStatus.OK)
   public String connectRoute(@ApiParam(value = "Route id to test connectivity",
       required = true) @PathVariable(name = "routeId", required = true) Long routeId) {
-    return JSON.toJSONString(sftpServiceImpl.connectRoute(routeId));
+    String channelType = channelTypeService.findChannelTypeFromRouteId(routeId);
+    SipPluginContract sipConnService = factory.getInstance(channelType);
+    return JSON.toJSONString(sipConnService.connectRoute(routeId));
   }
+
 
   /**
    * This end-point to test connectivity for route.
@@ -90,7 +103,9 @@ public class SawBisSftpPluginController {
       @ApiParam(value = "Payload to test connectivity",
           required = true) @Valid @RequestBody BisConnectionTestPayload payload)
       throws SipNestedRuntimeException, IOException {
-    return JSON.toJSONString(sftpServiceImpl.immediateConnectRoute((payload)));
+    SipPluginContract sipConnService = factory
+        .getInstance(payload.getChannelType().toString());
+    return JSON.toJSONString(sipConnService.immediateConnectRoute(payload));
   }
 
   /**
@@ -107,7 +122,10 @@ public class SawBisSftpPluginController {
   @ResponseStatus(HttpStatus.OK)
   public String connectChannel(@ApiParam(value = "Channel id to test connectivity",
       required = true) @PathVariable(name = "channelId", required = true) Long channelId) {
-    return JSON.toJSONString(sftpServiceImpl.connectChannel(channelId));
+    String channelType = channelTypeService.findChannelTypeFromChannelId(Long.valueOf(channelId));
+    logger.info("Channel type:: " + channelType);
+    SipPluginContract sipConnService = factory.getInstance(channelType);
+    return JSON.toJSONString(sipConnService.connectChannel(channelId));
   }
 
   /**
@@ -127,7 +145,9 @@ public class SawBisSftpPluginController {
   public String connectImmediateChannel(@ApiParam(value = "Payload to test connectivity",
       required = true) @Valid @RequestBody BisConnectionTestPayload payload) {
 
-    return JSON.toJSONString(sftpServiceImpl.immediateConnectChannel(payload));
+    SipPluginContract sipConnService = factory.getInstance(
+        payload.getChannelType().toString());
+    return JSON.toJSONString(sipConnService.immediateConnectChannel(payload));
   }
 
   /**
@@ -150,17 +170,18 @@ public class SawBisSftpPluginController {
       value = "Payload structure which " + "to be used to " + "initiate the transfer",
       required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
     List<BisDataMetaInfo> response = null;
-
+    SipPluginContract sipTransferService = factory
+            .getInstance(requestBody.getChannelType().toString());
     try {
       if (requestBody.getBatchSize() > 0) {
-        sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
+        sipTransferService.setBatchSize(requestBody.getBatchSize());
       }
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
-        response = sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
+        response = sipTransferService.transferData(Long.valueOf(requestBody.getChannelId()),
             Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
       } else {
-        response = sftpServiceImpl.immediateTransfer(requestBody);
+        response = sipTransferService.immediateTransfer(requestBody);
       }
       for (BisDataMetaInfo info : response) {
         if (info.getDestinationPath() != null) {
@@ -210,14 +231,30 @@ public class SawBisSftpPluginController {
     if (result.hasErrors()) {
       throw new SftpProcessorException("Exception occured while transferring the file");
     }
+    
+    /**
+     * Below line is added to support existing schedules
+     * which doesnt have channel type stored in job info
+     * as part of scheduler.
+     */
+    String channelType = requestBody.getChannelType() == null 
+        ?  "sftp" : requestBody.getChannelType().value();
+    
+    logger.trace("channel type from job scheduled :: " 
+        + requestBody.getChannelType());
+    
+    SipPluginContract sipTransferService = factory
+        .getInstance(channelType);
     if (requestBody.getBatchSize() > 0) {
-      sftpServiceImpl.setBatchSize(requestBody.getBatchSize());
+      sipTransferService.setBatchSize(requestBody.getBatchSize());
     }
+    
     DeferredResult<ResponseEntity<List<BisDataMetaInfo>>> deferredResult = new DeferredResult<>();
     if (Long.valueOf(requestBody.getChannelId()) > 0L
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
       CompletableFuture
-          .supplyAsync(() -> sftpServiceImpl.transferData(Long.valueOf(requestBody.getChannelId()),
+          .supplyAsync(() -> sipTransferService.transferData(
+              Long.valueOf(requestBody.getChannelId()),
               Long.valueOf(requestBody.getRouteId()), null, false,
               SourceType.REGULAR.name()), transactionPostExecutor)
           .whenComplete((p, throwable) -> {
@@ -248,7 +285,7 @@ public class SawBisSftpPluginController {
             deferredResult.setResult(ResponseEntity.ok(p));
           });
     } else {
-      CompletableFuture.supplyAsync(() -> sftpServiceImpl.immediateTransfer(requestBody),
+      CompletableFuture.supplyAsync(() -> sipTransferService.immediateTransfer(requestBody),
           transactionPostExecutor).whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {
@@ -302,8 +339,10 @@ public class SawBisSftpPluginController {
       required = true) @Valid @RequestBody(required = true) BisConnectionTestPayload requestBody) {
     logger.trace("Checking for data path: " + requestBody.getDestinationLocation());
     boolean result = false;
+    SipPluginContract sipTransferService = factory
+            .getInstance(requestBody.getChannelType().toString());
     try {
-      result = sftpServiceImpl.isDataExists(requestBody.getDestinationLocation());
+      result = sipTransferService.isDataExists(requestBody.getDestinationLocation());
     } catch (Exception e) {
       logger.trace("Exception occurred while checking the data location" + e);
       throw new SftpProcessorException("Exception occurred while checking the data location", e);
@@ -313,5 +352,6 @@ public class SawBisSftpPluginController {
     return responseMap;
   }
 
+  
 }
 

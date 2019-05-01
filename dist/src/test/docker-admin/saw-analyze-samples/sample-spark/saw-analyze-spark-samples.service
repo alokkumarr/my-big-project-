@@ -1,6 +1,6 @@
 [Unit]
 Description=SAW Analyze Spark samples loader
-After=saw-deploy.service
+After=sip-deploy.service
 
 [Service]
 Type=oneshot
@@ -8,4 +8,4 @@ ExecStart=/root/saw-analyze-samples/sample-spark/load-metric
 SyslogIdentifier=saw-analyze-spark-samples
 
 [Install]
-WantedBy=saw-deploy.service
+WantedBy=sip-deploy.service

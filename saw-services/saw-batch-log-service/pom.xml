@@ -171,6 +171,11 @@
 			<artifactId>commons-io</artifactId>
 			<version>${common.io}</version>
 		</dependency>
+		<dependency>
+		   <groupId>com.synchronoss.saw</groupId>
+            <artifactId>saw-batch-plugin-interfaces</artifactId>
+            <version>${revision}</version>
+		</dependency>
 
 		<!-- This is for mariadb -->
 		<dependency>
