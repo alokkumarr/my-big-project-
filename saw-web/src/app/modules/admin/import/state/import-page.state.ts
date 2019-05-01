@@ -101,7 +101,11 @@ export class AdminImportPageState {
     }
     return this.exportService.getAnalysesByCategoryId(category).pipe(
       tap(analyses => {
-        const referenceMap = this.importService.createReferenceMapFor(analyses);
+        const metrics = getState().metrics;
+        const referenceMap = this.importService.createReferenceMapFor(
+          analyses,
+          metrics
+        );
         patchState({
           referenceAnalyses: { ...referenceAnalyses, [category]: referenceMap }
         });

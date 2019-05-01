@@ -18,18 +18,31 @@
           {{ analysis.userFullName | changeCase: 'title' }}
         </div>
         <div>
-          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
-          {{ analysis.scheduleHuman }}
+          <strong *ngIf="analysis.createdTimestamp">Created Time:</strong>
+          {{ utcToLocal(analysis.createdTimestamp) }}
+        </div>
+        <div>
+          <strong *ngIf="analysis.updatedUserName">Last Modified By:</strong>
+          {{ analysis.updatedUserName }}
+        </div>
+        <div>
+          <strong *ngIf="analysis.updatedTimestamp">Last Modified Time:</strong>
+          {{ utcToLocal(analysis.updatedTimestamp) }}
         </div>
         <div>
           <strong *ngIf="executedBy">Executed By:</strong> {{ executedBy }}
         </div>
         <div>
-          <strong *ngIf="executedAt">Executed At:</strong> {{ executedAt }}
+          <strong *ngIf="executedAt">Execution Time:</strong>
+          {{ executedAt }}
         </div>
         <div class="analysis-detail-description">
           <strong *ngIf="analysis.description">Description</strong>
           <p>{{ analysis.description }}</p>
+        </div>
+        <div>
+          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
+          {{ analysis.scheduleHuman }}
         </div>
       </mat-expansion-panel>
     </mat-card>
@@ -52,7 +65,7 @@
     </mat-card>
   </mat-sidenav>
   <mat-sidenav-content
-    [ngClass]="analysis && analysis.type === 'chart' ? 'executed-view' : ''"
+    [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''"
   >
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
@@ -69,7 +82,9 @@
           </button>
           <div fxLayout="column" fxLayoutAlign="center center">
             <div *ngIf="analysis">
-              <span class="analysis__title">{{ analysis.name }}</span>
+              <span class="analysis__title" e2e="analysis__title">{{
+                analysis.name
+              }}</span>
               <label *ngIf="isExecuting" class="execution-tag" i18n
                 >Executing</label
               >

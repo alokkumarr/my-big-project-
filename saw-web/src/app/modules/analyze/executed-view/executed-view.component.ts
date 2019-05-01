@@ -345,12 +345,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       }
     ).finished;
 
-    this.executedAt = finished
-      ? moment
-          .utc(finished)
-          .local()
-          .format('YYYY/MM/DD h:mm A')
-      : this.executedAt;
+    this.executedAt = finished ? this.utcToLocal(finished) : this.executedAt;
   }
 
   loadExecutedAnalyses(analysisId, isDSL) {
@@ -419,10 +414,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
               })
         };
         this.setExecutedBy(executeResponse.executedBy);
-        this.executedAt = moment
-          .utc(executeResponse.executedAt)
-          .local()
-          .format('YYYY/MM/DD h:mm A');
+        this.executedAt = this.utcToLocal(executeResponse.executedAt);
 
         let isItFirstTime = true;
         this.dataLoader = options => {
@@ -474,10 +466,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
               })
         };
         this.setExecutedBy(executeResponse.executedBy);
-        this.executedAt = moment
-          .utc(executeResponse.executedAt)
-          .local()
-          .format('YYYY/MM/DD h:mm A');
+        this.executedAt = this.utcToLocal(executeResponse.executedAt);
         this.data = this.flattenData(
           executeResponse.data,
           this.executedAnalysis
@@ -490,6 +479,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         );
       }
     }
+  }
+
+  utcToLocal(utcTime) {
+    return moment
+      .utc(utcTime)
+      .local()
+      .format('YYYY/MM/DD h:mm A');
   }
 
   flattenData(data, analysis) {

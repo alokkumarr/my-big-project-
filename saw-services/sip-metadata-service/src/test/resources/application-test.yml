@@ -1,5 +1,6 @@
-metastore.base:  hdfs:///main
-    
+metastore:
+  base: hdfs:///main
+  analysis: analysisMetadata
   
 
        

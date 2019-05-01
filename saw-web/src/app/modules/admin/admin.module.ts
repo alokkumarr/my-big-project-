@@ -15,6 +15,7 @@ import { ImportService } from './import/import.service';
 import { UserAssignmentService } from './datasecurity/userassignment.service';
 import { routes } from './routes';
 import { FormsModule } from '@angular/forms';
+import { AnalyzeService } from '../analyze/services/analyze.service';
 
 import { AdminState } from './state/admin.state';
 
@@ -119,7 +120,8 @@ const SERVICES = [
   ExportService,
   ImportService,
   UserAssignmentService,
-  CategoryService
+  CategoryService,
+  AnalyzeService
 ];
 @NgModule({
   imports: [

@@ -137,7 +137,7 @@ public class StorageProxyController {
       response = StorageProxy.class)
   @ApiResponses(
       value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 200, message = "Success"),
         @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
         @ApiResponse(
             code = 403,
@@ -149,7 +149,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public StorageProxy retrieveStorageDataSync(
       @ApiParam(
               value = "Storage object that needs to be added/updated/deleted to the store",
@@ -195,7 +195,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/fetch",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public List<?> retrieveStorageDataSync(
       @ApiParam(
               value = "Storage object that needs to be added/updated/deleted to the store",
@@ -243,7 +243,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/execute",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public List<?> executeAnalysis(
       @ApiParam(
               value = "Storage object that needs to be added/updated/deleted to the store",
@@ -253,7 +253,7 @@ public class StorageProxyController {
           SipQuery sipQuery,
       @RequestParam(name = "id", required = false) String queryId,
       @RequestParam(name = "size", required = false) Integer size,
-      @RequestParam(name = "ExecutionType", required = false) ExecutionType executionType)
+      @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime") ExecutionType executionType)
       throws JsonProcessingException {
     logger.debug("Request Body:{}", sipQuery);
     if (sipQuery == null) {
@@ -314,7 +314,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/{id}/executions",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public List<?> listExecutions(
       @ApiParam(value = "DSL query Id", required = true) @PathVariable(name = "id")
           String queryId) {
@@ -337,7 +337,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/{executionId}/executions/data",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse executionsData(
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId) {
@@ -349,4 +349,27 @@ public class StorageProxyController {
     }
     return null;
   }
+
+    /**
+     * API to fetch the execution Data.
+     *
+     * @param executionId
+     * @return ExecutionResponse
+     */
+    @RequestMapping(
+        value = "/internal/proxy/storage/{id}/lastExecutions/data",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ExecutionResponse lastExecutionsData(
+        @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
+            String executionId) {
+        try {
+            logger.info("Storage Proxy request to fetch list of executions");
+            return proxyService.fetchLastExecutionsData(executionId);
+        } catch (Exception e) {
+            logger.error("error occurred while fetching execution data", e);
+        }
+        return null;
+    }
 }

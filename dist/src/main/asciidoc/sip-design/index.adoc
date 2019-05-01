@@ -379,6 +379,31 @@ structure to visualize the data into platform.
 .Figure: SIP-DSL sequence Diagram with platform integration
 plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
 
+= Monitoring
+
+== Prometheus
+
+Prometheus is used for metrics collection and storage.  It allows
+developers to troubleshoot the system and operations to monitor health
+and resource usage.  Prometheus consoles are used to create views of
+metrics that are typically of high interest.
+
+== Grafana
+
+Grafana is additionally provided for visualization of metrics in the
+Prometheus database, due to the wide availability of dashboards for
+standard components.
+
+.Monitoring using Prometheus and Grafana
+[plantuml]
+----
+database Prometheus
+Prometheus --> [Service #1]
+Prometheus --> [Service #2]
+Prometheus --> [Service #N]
+[Grafana] -> Prometheus
+----
+
 = High availability
 
 SIP is required to provide high availability of its services.  If one
