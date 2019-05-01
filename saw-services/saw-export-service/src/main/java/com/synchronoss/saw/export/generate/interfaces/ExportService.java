@@ -24,6 +24,4 @@ public interface ExportService {
   public List<String> listFtpsForCustomer(RequestEntity request);
 
   AnalysisMetaData getAnalysisMetadata(String analysisId);
-
-  SipQuery getSipQuery(String analysisId);
 }

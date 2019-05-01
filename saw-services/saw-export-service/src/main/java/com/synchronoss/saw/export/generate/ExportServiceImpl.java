@@ -77,10 +77,7 @@ public class ExportServiceImpl implements ExportService{
   @Value("${exportChunkSize}")
   private String exportChunkSize;
 
-  @Value ("${analysis.dsl-analysis-url}")
-  private String apiDslMetaData;
-
-  @Value ("${analysis.storage-proxy-url}")
+  @Value ("${proxy.service.host}")
   private String storageProxyUrl;
 
 
@@ -501,7 +498,6 @@ public class ExportServiceImpl implements ExportService{
     String recipients = null;
     String ftp = null;
     String jobGroup = null;
-    final SipQuery sipQuery = getSipQuery(analysisId);
 
     // check beforehand if the request is not null
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
@@ -537,7 +533,8 @@ public class ExportServiceImpl implements ExportService{
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
               file.getParentFile().mkdir();
-
+              ObjectMapper objectMapper = new ObjectMapper();
+              SipQuery sipQuery = objectMapper.readValue(entity.getBody().get("sipQuery").toString(), SipQuery.class);
               List<Field> fieldList = sipQuery.getArtifacts().get(0).getFields();
               ElasticSearchAggeragationParser responseParser = new ElasticSearchAggeragationParser(fieldList);
               responseParser.setColumnDataType(exportBean);
@@ -596,6 +593,8 @@ public class ExportServiceImpl implements ExportService{
               File file = new File(exportBean.getFileName());
               file.getParentFile().mkdir();
 
+              ObjectMapper objectMapper = new ObjectMapper();
+              SipQuery sipQuery = objectMapper.readValue(entity.getBody().get("sipQuery").toString(), SipQuery.class);
               List<Field> fieldList = sipQuery.getArtifacts().get(0).getFields();
 
               ElasticSearchAggeragationParser responseParser = new ElasticSearchAggeragationParser(fieldList);
@@ -714,36 +713,5 @@ public class ExportServiceImpl implements ExportService{
       }
     }
     return aliases;
-  }
-
-  /**
-   *
-   * This will fetch the SIP query from metadata and provide.
-   *
-   * @param analysisId
-   * @return SipQuery
-   */
-  @Override
-  public SipQuery getSipQuery(String analysisId){
-    SipQuery sipQuery  = null;
-    try{
-      ObjectMapper objectMapper = new ObjectMapper();
-      RestTemplate restTemplate = new RestTemplate();
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
-
-      String url = apiDslMetaData + "/dslanalysis/" + analysisId;
-      logger.debug("SIP query url for analysis fetch : " + url);
-
-      TempAnalysisResponse analysisResponse = restTemplate.getForObject(url, TempAnalysisResponse.class);
-      JsonNode jsonNode = analysisResponse.getAnalysis().get("sipQuery");
-      logger.debug("SIP query : " + jsonNode.textValue());
-
-      sipQuery = objectMapper.readValue(jsonNode.toString(), SipQuery.class);
-      logger.debug("Fetched SIP query for analysis : " + sipQuery.toString());
-    } catch (IOException ex) {
-      logger.debug("Sip query not fetched from analysis");
-    }
-    return sipQuery;
   }
 }
