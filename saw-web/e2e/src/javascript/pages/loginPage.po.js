@@ -33,7 +33,7 @@ module.exports = {
     browser.ignoreSynchronization = false;
     analyzePage.goToHome();
     browser.ignoreSynchronization = true;
-    commonFunctions.waitFor.pageToBeReady(/saw/);
+    commonFunctions.waitFor.pageToBeReady(/sip/);
     element(this.loginElements.userNameField.isPresent().then(function(isPresent) {
       if(isPresent) {
         console.log('Doing login...');

@@ -46,7 +46,7 @@ this is what you have to to in order to solve it
 - This will create a `dist` directory at root of your project.
 - Run `mkdir saw/web && mv dist/* saw/web/ && mv saw dist/` from root directory (where package.json is located.)
 - Change to `dist` directory and use a file server. If you don't have one, try `python -m SimpleHTTPServer 8000`
-- Visit `localhost:8000/saw/web` in your browser.
+- Visit `localhost:8000/sip/web` in your browser.
 
 ## The Angular styleguide to follow
 
