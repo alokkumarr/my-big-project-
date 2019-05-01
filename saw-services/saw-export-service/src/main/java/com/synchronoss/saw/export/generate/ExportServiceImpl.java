@@ -703,173 +703,261 @@ public class ExportServiceImpl implements ExportService{
       logger.debug("ftp: " + ftp);
       logger.debug("s3: "+s3);
 
-      if(recipients!=null && !recipients.equals("")) {
+      if ((recipients != null && !recipients.equals(""))
+          || ((s3 != null && s3 != ""))
+          || ((ftp != null && ftp != ""))) {
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
             +emailExportSize+"&analysisType=pivot";
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
             requestEntity, JsonNode.class);
 
         logger.debug("dispatchBean for Pivot: "+ dispatchBean.toString());
+        String s3bucket = s3;
         String finalRecipients = recipients;
-        responseStringFuture.addCallback(new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
-          @Override
-          public void onSuccess(ResponseEntity<JsonNode> entity) {
-            logger.debug("[Success] Response :" + entity.getStatusCode());
-            IFileExporter iFileExporter = new XlsxExporter();
-            String dir = UUID.randomUUID().toString();
-            MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-              exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-              exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "." + exportBean.getFileType());
-              exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-              exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-              exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-              exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-            try {
-              // create a directory with unique name in published location to avoid file conflict for dispatch.
-              File file = new File(exportBean.getFileName());
-              file.getParentFile().mkdir();
-              AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
-              ElasticSearchAggeragationParser elasticSearchAggeragationParser
-                  = new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
-              List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
-              elasticSearchAggeragationParser.setColumnDataType(exportBean,analysisMetaData.getAnalyses().get(0));
-              Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
-              CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
-              createPivotTable.createPivot(workbook,file);
-              MailSender.sendMail(finalRecipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-                  serviceUtils.prepareMailBody(exportBean,mailBody)
-                  ,exportBean.getFileName());
-              logger.debug("Email sent successfully ");
-              logger.debug("Removing the file from published location");
-              serviceUtils.deleteFile(exportBean.getFileName(),true);
-            } catch (IOException e) {
-              logger.error("Exception occurred while dispatching pivot :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
-            }
-          }
-          @Override
-          public void onFailure(Throwable t) {
-            logger.error("[Failed] Getting string response:" + t);
-          }
-        });
-      }
-
-      logger.debug("S3 details = " + s3);
-      if (s3 != null && s3 != "") {
-        logger.debug("S3 details set. Dispatching to S3");
-        s3DispatcherPivot(
-            analysisId, executionId, s3, asyncRestTemplate, dispatchBean, requestEntity, jobGroup);
-      }
-
-
-      if(ftp != null && !ftp.equals("")) {
-        String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
-            +ftpExportSize+"&analysisType=pivot";
-        ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
-            requestEntity, JsonNode.class);
-
-        logger.debug("dispatchBean for Pivot: "+ dispatchBean.toString());
         String finalFtp = ftp;
         String finalJobGroup = jobGroup;
-        responseStringFuture.addCallback(new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
-          @Override
-          public void onSuccess(ResponseEntity<JsonNode> entity) {
-            logger.debug("[Success] Response :" + entity.getStatusCode());
-            IFileExporter iFileExporter = new XlsxExporter();
-            ExportBean exportBean = new ExportBean();
-            String dir = UUID.randomUUID().toString();
-
-              exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-              exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "." + exportBean.getFileType());
-              exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-              exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-              exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-              exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-
-            File cfile = new File(exportBean.getFileName());
-            String zipFileName = cfile.getAbsolutePath().concat(".zip");
-
-            try {
-              // create a directory with unique name in published location to avoid file conflict for dispatch.
-              File file = new File(exportBean.getFileName());
-              file.getParentFile().mkdir();
-              AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
-              ElasticSearchAggeragationParser elasticSearchAggeragationParser
-                  = new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
-              List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
-              elasticSearchAggeragationParser.setColumnDataType(exportBean,analysisMetaData.getAnalyses().get(0));
-              Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
-              CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
-              createPivotTable.createPivot(workbook,file);
-
-              DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
-              LocalDateTime now = LocalDateTime.now();
-
-              try {
-                FileOutputStream fos = new FileOutputStream(zipFileName);
-                ZipOutputStream zos = new ZipOutputStream(fos);
-
-                zos.putNextEntry(new ZipEntry(cfile.getName()));
-
-                byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
-                zos.write(bytes, 0, bytes.length);
-                zos.closeEntry();
-                zos.close();
-
-                logger.debug("ftp servers: " + finalFtp);
-
-                for (String aliastemp : finalFtp.split(",")) {
-                  ObjectMapper jsonMapper = new ObjectMapper();
+        responseStringFuture.addCallback(
+            new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
+              @Override
+              public void onSuccess(ResponseEntity<JsonNode> entity) {
+                if (finalRecipients != null && !finalRecipients.equals("")) {
+                    logger.debug("In Email dispatcher: [Success] Response :" + entity.getStatusCode());
+                    IFileExporter iFileExporter = new XlsxExporter();
+                  String dir = UUID.randomUUID().toString();
+                  MailSenderUtil MailSender =
+                      new MailSenderUtil(appContext.getBean(JavaMailSender.class));
+                  exportBean.setFileType(
+                      String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+                  exportBean.setFileName(
+                      publishedPath
+                          + File.separator
+                          + dir
+                          + File.separator
+                          + String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
+                          + "."
+                          + exportBean.getFileType());
+                  exportBean.setReportDesc(
+                      String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+                  exportBean.setReportName(
+                      String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+                  exportBean.setPublishDate(
+                      String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+                  exportBean.setCreatedBy(
+                      String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
                   try {
-                    FtpCustomer obj = jsonMapper
-                        .readValue(new File(ftpDetailsFile), FtpCustomer.class);
-                    for (FTPDetails alias : obj.getFtpList()) {
-                      logger.debug("Processing Host: " + alias.getHost());
-                      logger.debug("jobGroup: " + alias.getCustomerName());
-                      logger.debug("Alias: " + aliastemp.equals(alias.getAlias()));
-                      if (alias.getCustomerName().equals(finalJobGroup) && aliastemp
-                          .equals(alias.getAlias())) {
-                        logger.debug("Inside If");
-                        serviceUtils.uploadToFtp(alias.getHost(),
-                            alias.getPort(),
-                            alias.getUsername(),
-                            alias.getPassword(),
-                            zipFileName,
-                            alias.getLocation(),
-                            cfile.getName().substring(0, cfile.getName().lastIndexOf(".") + 1) + dtf
-                                .format(now).toString() + "." + exportBean.getFileType() + ".zip",
-                            alias.getType());
-                        logger.debug(
-                            "Uploaded to ftp alias: " + alias.getCustomerName() + ":" + alias
-                                .getHost());
-                      }
-                    }
+                    // create a directory with unique name in published location to avoid file
+                    // conflict for dispatch.
+                    File file = new File(exportBean.getFileName());
+                    file.getParentFile().mkdir();
+                    AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
+                    ElasticSearchAggeragationParser elasticSearchAggeragationParser =
+                        new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
+                    List<Object> dataObj =
+                        elasticSearchAggeragationParser.parseData(entity.getBody());
+                    elasticSearchAggeragationParser.setColumnDataType(
+                        exportBean, analysisMetaData.getAnalyses().get(0));
+                    Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
+                    CreatePivotTable createPivotTable =
+                        new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
+                    createPivotTable.createPivot(workbook, file);
+                    MailSender.sendMail(
+                        finalRecipients,
+                        exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+                        serviceUtils.prepareMailBody(exportBean, mailBody),
+                        exportBean.getFileName());
+                    logger.debug("Email sent successfully ");
+                    logger.debug("Removing the file from published location");
+                    serviceUtils.deleteFile(exportBean.getFileName(), true);
                   } catch (IOException e) {
-                    logger.error(e.getMessage());
-                  } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    logger.error(
+                        "Exception occurred while dispatching pivot :"
+                            + this.getClass().getName()
+                            + "  method dataToBeDispatchedAsync()");
                   }
                 }
-              } catch (FileNotFoundException e) {
-                logger.error("Zip file error FileNotFound: " + e.getMessage());
-              } catch (IOException e) {
-                logger.error("Zip file error IOException: " + e.getMessage());
+
+                logger.debug("S3 details = " + s3bucket);
+                if (s3bucket != null && s3bucket != "") {
+                  logger.debug("S3 details set. Dispatching to S3");
+                  s3DispatcherPivot(
+                      analysisId,
+                      executionId,
+                      s3bucket,
+                      asyncRestTemplate,
+                      dispatchBean,
+                      requestEntity,
+                      finalJobGroup);
+                }
+
+                logger.debug("ftp details = " + finalFtp);
+                if (finalFtp != null && finalFtp != "") {
+                  logger.debug("FTP details set. Dispatching to FTP");
+                  ftpDispatcherPivot(
+                      analysisId,
+                      executionId,
+                      finalFtp,
+                      asyncRestTemplate,
+                      dispatchBean,
+                      requestEntity,
+                      finalJobGroup);
+                }
               }
 
-              logger.debug("Removing the file from published location");
-              serviceUtils.deleteFile(exportBean.getFileName(),true);
-              serviceUtils.deleteFile(zipFileName,true);
-            } catch (IOException e) {
-              logger.error("Exception occurred while dispatching pivot :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
-            }
-          }
-          @Override
-          public void onFailure(Throwable t) {
-            logger.error("[Failed] Getting string response:" + t);
-          }
-        });
+              @Override
+              public void onFailure(Throwable t) {
+                logger.error("[Failed] Getting string response:" + t);
+              }
+            });
       }
+    }
+  }
+
+  public void ftpDispatcherPivot(
+      String analysisId,
+      String executionId,
+      String ftp,
+      AsyncRestTemplate asyncRestTemplate,
+      Object dispatchBean,
+      HttpEntity<?> requestEntity,
+      String jobGroup) {
+    if (ftp != null && !ftp.equals("")) {
+      String url =
+          apiExportOtherProperties
+              + "/"
+              + analysisId
+              + "/executions/"
+              + executionId
+              + "/data?page=1&pageSize="
+              + ftpExportSize
+              + "&analysisType=pivot";
+      ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
+          asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
+
+      logger.debug("dispatchBean for Pivot: " + dispatchBean.toString());
+      String finalFtp = ftp;
+      String finalJobGroup = jobGroup;
+      responseStringFuture.addCallback(
+          new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
+            @Override
+            public void onSuccess(ResponseEntity<JsonNode> entity) {
+              logger.debug("In FTP dispatcher: [Success] Response :" + entity.getStatusCode());
+              IFileExporter iFileExporter = new XlsxExporter();
+              ExportBean exportBean = new ExportBean();
+              String dir = UUID.randomUUID().toString();
+
+              exportBean.setFileType(
+                  String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+              exportBean.setFileName(
+                  publishedPath
+                      + File.separator
+                      + dir
+                      + File.separator
+                      + String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
+                      + "."
+                      + exportBean.getFileType());
+              exportBean.setReportDesc(
+                  String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+              exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+              exportBean.setPublishDate(
+                  String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+              exportBean.setCreatedBy(
+                  String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+
+              File cfile = new File(exportBean.getFileName());
+              String zipFileName = cfile.getAbsolutePath().concat(".zip");
+
+              try {
+                // create a directory with unique name in published location to avoid file conflict
+                // for dispatch.
+                File file = new File(exportBean.getFileName());
+                file.getParentFile().mkdir();
+                AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
+                ElasticSearchAggeragationParser elasticSearchAggeragationParser =
+                    new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
+                List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
+                elasticSearchAggeragationParser.setColumnDataType(
+                    exportBean, analysisMetaData.getAnalyses().get(0));
+                Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
+                CreatePivotTable createPivotTable =
+                    new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
+                createPivotTable.createPivot(workbook, file);
+
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+                LocalDateTime now = LocalDateTime.now();
+
+                try {
+                  FileOutputStream fos = new FileOutputStream(zipFileName);
+                  ZipOutputStream zos = new ZipOutputStream(fos);
+
+                  zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+                  byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
+                  zos.write(bytes, 0, bytes.length);
+                  zos.closeEntry();
+                  zos.close();
+
+                  logger.debug("ftp servers: " + finalFtp);
+
+                  for (String aliastemp : finalFtp.split(",")) {
+                    ObjectMapper jsonMapper = new ObjectMapper();
+                    try {
+                      FtpCustomer obj =
+                          jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
+                      for (FTPDetails alias : obj.getFtpList()) {
+                        logger.debug("Processing Host: " + alias.getHost());
+                        logger.debug("jobGroup: " + alias.getCustomerName());
+                        logger.debug("Alias: " + aliastemp.equals(alias.getAlias()));
+                        if (alias.getCustomerName().equals(finalJobGroup)
+                            && aliastemp.equals(alias.getAlias())) {
+                          logger.debug("Inside If");
+                          serviceUtils.uploadToFtp(
+                              alias.getHost(),
+                              alias.getPort(),
+                              alias.getUsername(),
+                              alias.getPassword(),
+                              zipFileName,
+                              alias.getLocation(),
+                              cfile.getName().substring(0, cfile.getName().lastIndexOf(".") + 1)
+                                  + dtf.format(now).toString()
+                                  + "."
+                                  + exportBean.getFileType()
+                                  + ".zip",
+                              alias.getType());
+                          logger.debug(
+                              "Uploaded to ftp alias: "
+                                  + alias.getCustomerName()
+                                  + ":"
+                                  + alias.getHost());
+                        }
+                      }
+                    } catch (IOException e) {
+                      logger.error(e.getMessage());
+                    } catch (Exception e) {
+                      logger.error(e.getMessage());
+                    }
+                  }
+                } catch (FileNotFoundException e) {
+                  logger.error("Zip file error FileNotFound: " + e.getMessage());
+                } catch (IOException e) {
+                  logger.error("Zip file error IOException: " + e.getMessage());
+                }
+
+                logger.debug("Removing the file from published location");
+                serviceUtils.deleteFile(exportBean.getFileName(), true);
+                serviceUtils.deleteFile(zipFileName, true);
+              } catch (IOException e) {
+                logger.error(
+                    "Exception occurred while dispatching pivot :"
+                        + this.getClass().getName()
+                        + "  method dataToBeDispatchedAsync()");
+              }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+              logger.error("[Failed] Getting string response:" + t);
+            }
+          });
     }
   }
 
@@ -900,7 +988,7 @@ public class ExportServiceImpl implements ExportService{
         new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
           @Override
           public void onSuccess(ResponseEntity<JsonNode> entity) {
-            logger.debug("[Success] Response :" + entity.getStatusCode());
+            logger.debug("In S3 dispatcher: [Success] Response :" + entity.getStatusCode());
             IFileExporter iFileExporter = new XlsxExporter();
             ExportBean exportBean = new ExportBean();
             String dir = UUID.randomUUID().toString();
