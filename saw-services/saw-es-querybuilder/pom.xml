@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.synchronoss</groupId>
-	<artifactId>saw-es-querybuilder</artifactId>
+	<artifactId>sip-es-querybuilder</artifactId>
 	<packaging>jar</packaging>
-	<name>saw-es-querybuilder</name>
+	<name>sip-es-querybuilder</name>
 	<url>http://www.synchronoss.com</url>
 	<version>${revision}</version>
 	<properties>

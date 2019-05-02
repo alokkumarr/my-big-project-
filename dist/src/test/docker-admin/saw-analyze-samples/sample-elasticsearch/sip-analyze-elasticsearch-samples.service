@@ -1,0 +1,11 @@
+[Unit]
+Description=SIP Analyze Elasticsearch samples loader
+After=sip-deploy.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/saw-analyze-samples/sample-elasticsearch/load-metric
+SyslogIdentifier=sip-analyze-elasticsearch-samples
+
+[Install]
+WantedBy=sip-deploy.service

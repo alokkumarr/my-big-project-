@@ -37,6 +37,9 @@ public class BisRouteService {
   BisRouteDataRestRepository bisRouteRepository;
   RestTemplate restTemplate = new RestTemplate();
   
+  @Autowired
+  private ChannelTypeService channelTypeService;
+  
   /**
    * Temporarily deactivate or re activate a route 
    * and schedules of the route.
@@ -59,7 +62,9 @@ public class BisRouteService {
       
       BisScheduleKeys scheduleKeys = new BisScheduleKeys();
       scheduleKeys.setGroupName(String.valueOf(routeId));
-      scheduleKeys.setJobName(BisChannelType.SFTP.name() + channelId + routeId);
+      String channelType = channelTypeService
+          .findChannelTypeFromChannelId(channelId);
+      scheduleKeys.setJobName(channelType + channelId + routeId);
       updateScheduledJobsStatus(isActivate, scheduleKeys);
 
     } else {
@@ -97,7 +102,9 @@ public class BisRouteService {
         
         BisScheduleKeys scheduleKeys = new BisScheduleKeys();
         scheduleKeys.setGroupName(String.valueOf(bisRouteEntity.getBisRouteSysId()));
-        scheduleKeys.setJobName(BisChannelType.SFTP.name() 
+        String channelType = channelTypeService
+            .findChannelTypeFromChannelId(channelId);
+        scheduleKeys.setJobName(channelType 
             + channelId + bisRouteEntity.getBisRouteSysId());
         updateScheduledJobsStatus(isActivate, scheduleKeys);
       }

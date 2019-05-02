@@ -1,6 +1,15 @@
 - name: Copy SAW Transport Service package
   copy: src="{{ item }}" dest=/tmp/saw-transport.rpm
-  with_fileglob: ["../rpms/saw-transport-*.rpm"]
+  with_fileglob: ["../rpms/sip-transport-*.rpm"]
+# Workaround: The remove "/opt/saw/service" link operation in the RPM
+# scripts of the "saw-transport" service package seems to be run after
+# the creation of the same link in the new "sip-transport" package
+# during upgrade using the "Obsoletes" RPM header, causing the
+# installation to end up without any link at all.  So as a workaround,
+# explicitly remove the old "saw-transport" package.  This workaround
+# can be removed once all environments have been upgraded to SIP 3.3.
+- name: Remove old differently named Transport Service package
+  yum: name=saw-transport state=absent
 - name: Install SAW Transport Service package
   yum: name=/tmp/saw-transport.rpm state=present
   notify:
@@ -25,11 +34,11 @@
 - meta: flush_handlers
 - name: Run SAW migration of Semantic id
   command: sh /opt/saw/service/bin/AnalysisUtility.sh
-- name: Enable SAW Transport Service
-  systemd: name=saw-transport-proxy.socket enabled=true state=started
-- name: Enable SAW Transport Service Executor (regular)
-  systemd: name="saw-transport-executor@regular-{{ item }}" enabled=true daemon_reload=true
+- name: Enable SIP Transport Service
+  systemd: name=sip-transport-proxy.socket enabled=true state=started
+- name: Enable SIP Transport Service Executor (regular)
+  systemd: name="sip-transport-executor@regular-{{ item }}" enabled=true daemon_reload=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
-- name: Enable SAW Transport Service Executor (fast)
-  systemd: name="saw-transport-executor@fast-{{ item }}" enabled=true daemon_reload=true
+- name: Enable SIP Transport Service Executor (fast)
+  systemd: name="sip-transport-executor@fast-{{ item }}" enabled=true daemon_reload=true
   with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}

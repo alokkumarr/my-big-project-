@@ -1,0 +1,8 @@
+[Unit]
+Description=SIP Workbench Proxy Socket
+
+[Socket]
+ListenStream=9700
+
+[Install]
+WantedBy=sockets.target

@@ -66,7 +66,7 @@ RUN systemctl enable sip-mapr-configure
 # Note: Installing Apache Spark in standalone mode is disabled by
 # default for now, while there are developers still deploying using
 # local Docker with memory constraints.  Instead local Spark contexts
-# are used (see the development `saw-config`).  When all developers
+# are used (see the development `sip-config`).  When all developers
 # have moved to cloud environments, enable Apache Spark in standalone
 # mode again.
 #

@@ -13,7 +13,7 @@ if (environment.production) {
   // apiUrl = 'https://saw-pac-sip-vaste.sncrcorp.net';
 }
 /* eslint-enable */
-apiUrl += '/saw';
+apiUrl += '/sip';
 
 export default {
   login: {
