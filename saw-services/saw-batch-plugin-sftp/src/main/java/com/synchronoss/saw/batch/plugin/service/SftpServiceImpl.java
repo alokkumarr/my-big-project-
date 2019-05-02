@@ -1286,7 +1286,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory
         .getSessionFactory(channelId);
-    
+
     logger.trace("executeFileTransfer :: opening connection.... " + channelId);
     try (Session<?> session = sesionFactory.getSession()) {
       if (session != null & session.isOpen()) {
@@ -1324,153 +1324,144 @@ public class SftpServiceImpl extends SipPluginContract {
 
           logger.trace(
               "executeFileTransfer :: creating sftp template with session factory");
-         
-          SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(
-              sesionFactory);
-          
-          //LsEntry[] files = template.list(fileName);
+
+          // LsEntry[] files = template.list(fileName);
           logger.trace(
               "executeFileTransfer :: created sftp template with session factory");
-          if (bisRouteEntity.getStatus() > 0) {
-            String destination = constructDestinationPath(destinationLocation);
-            String path = processor.getFilePath(defaultDestinationLocation,
-                destination, getBatchId());
-            File localDirectory = new File(path);
-            if (localDirectory != null
-                && !this.processor.isDestinationExists(localDirectory.getPath())) {
 
-              logger.trace("directory where the file will be"
-                  + " downnloaded does not exist so it will be created :"
-                  + localDirectory.getAbsolutePath());
-              logger.trace("directory where the file will be downnloaded  :"
-                  + localDirectory.getAbsolutePath());
-              this.processor.createDestination(localDirectory.getPath(),
-                  new StringBuffer());
-            }
-           
-            final File localFile = createTargetFile(localDirectory, fileName);
-           
-            final File fileTobeDeleted = localFile;
-            logger.trace("Actual file name after downloaded in the  :"
-                + localDirectory.getAbsolutePath() 
-                + " file name " + localFile.getName());
-            FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
-            logger.trace("starting template get for file ::" + fileName);
-            template.get(fileName,
-                new InputStreamCallback() {
-                  @Override
-                  public void doWithInputStream(InputStream stream)
-                      throws IOException {
-                    logger.trace("found template get for file ::" + fileName);
-                    logger.trace(
-                        "Streaming the content of the file in the directory starts here "
-                            + fileName);
-                    ZonedDateTime fileTransStartTime = ZonedDateTime.now();
-                    logger.trace("File" + fileName + " transfer strat time:: "
-                        + fileTransStartTime);
-                    try {
-                      final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
-                      bisDataMetaInfo.setProcessId(logId);
-                     
-                      sipLogService.upsertInProgressStatus(logId, localFile.getPath(), 
-                          Date.from(fileTransStartTime.toInstant()));
-                      if (stream != null) {
-                        if (processor
-                            .isDestinationMapR(defaultDestinationLocation)) {
-                          logger.trace("COPY BYTES STARTS HERE 8");
-                          org.apache.hadoop.io.IOUtils.copyBytes(stream, fos,
-                              5120, false);
+          String destination = constructDestinationPath(destinationLocation);
+          String path = processor.getFilePath(defaultDestinationLocation,
+              destination, getBatchId());
+          File localDirectory = new File(path);
+          if (localDirectory != null && !this.processor
+              .isDestinationExists(localDirectory.getPath())) {
 
-                          logger.trace("COPY BYTES COMPLETES HERE 8");
+            logger.trace("directory where the file will be"
+                + " downnloaded does not exist so it will be created :"
+                + localDirectory.getAbsolutePath());
+            logger.trace("directory where the file will be downnloaded  :"
+                + localDirectory.getAbsolutePath());
+            this.processor.createDestination(localDirectory.getPath(),
+                new StringBuffer());
+          }
 
-                        } else {
-                          final File localFile = createTargetFile(
-                              localDirectory, fileName);
-                          processor.transferFile(stream, localFile,
-                              defaultDestinationLocation, mapRfsUser);
-                          if (!processor
-                              .isDestinationMapR(defaultDestinationLocation)) {
-                            processor.closeStream(stream);
-                          }
-                        }
+          final File localFile = createTargetFile(localDirectory, fileName);
 
-                        logger.trace("Streaming the content of "
-                            + "the file in the directory " + "ends here "
-                            + fileName);
-                        ZonedDateTime fileTransEndTime = ZonedDateTime.now();
-                        logger.trace("File" + fileName + "transfer end time:: "
-                            + fileTransEndTime);
-                        logger.trace(
-                            "closing the stream for the file " + fileName);
-                        bisDataMetaInfo.setProcessId(logId);
-                       
-                       
-                        bisDataMetaInfo.setFileTransferEndTime(
-                            Date.from(fileTransEndTime.toInstant()));
-                        bisDataMetaInfo.setFileTransferDuration(Duration
-                            .between(fileTransStartTime, fileTransEndTime)
-                            .toMillis());
-                        bisDataMetaInfo.setReceivedDataName(localFile.getPath());
-                        sipLogService.upsertSuccessStatus(logId, bisDataMetaInfo);
-                        logger.trace("File transfer duration :: "
-                            + bisDataMetaInfo.getFileTransferDuration());
-                        //sipLogService.upsert(bisDataMetaInfo,
-                        //  logIdx);
-                        BisJobEntity bisJobEntity = sipLogService
-                            .retriveJobById(jobId);
-                        Long successCnt = bisJobEntity.getSuccessCount();
-                        logger.info("Before Success file log success cnt :: "
-                            + successCnt);
-                        sipLogService.updateSuccessCnt(jobId, "INPROGRESS",
-                            successCnt + 1);
-                        logger.info("After Success file log success cnt :: "
-                            + successCnt + 1);
-                        
-                        sipLogService.updateJobStatus(jobId);
-                        // Adding to a list has been removed as a part of
-                        // optimization
-                        // SIP-6386
-                        // list.add(bisDataMetaInfo);
-                      }
+          final File fileTobeDeleted = localFile;
+          logger.trace("Actual file name after downloaded in the  :"
+              + localDirectory.getAbsolutePath() + " file name "
+              + localFile.getName());
+          FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
+          logger.trace("starting template get for file ::" + fileName);
+          SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(
+              sesionFactory);
+          template.get(fileName, new InputStreamCallback() {
+            @Override
+            public void doWithInputStream(InputStream stream)
+                throws IOException {
+              logger.trace("found template get for file ::" + fileName);
+              logger.trace(
+                  "Streaming the content of the file in the directory starts here "
+                      + fileName);
+              ZonedDateTime fileTransStartTime = ZonedDateTime.now();
+              logger.trace("File" + fileName + " transfer strat time:: "
+                  + fileTransStartTime);
+              try {
+                final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+                bisDataMetaInfo.setProcessId(logId);
 
-                    } catch (Exception ex) {
+                sipLogService.upsertInProgressStatus(logId, localFile.getPath(),
+                    Date.from(fileTransStartTime.toInstant()));
+                if (stream != null) {
+                  if (processor.isDestinationMapR(defaultDestinationLocation)) {
+                    logger.trace("COPY BYTES STARTS HERE 8");
+                    org.apache.hadoop.io.IOUtils.copyBytes(stream, fos, 5120,
+                        false);
 
-                      logger.error("Exception occurred while "
-                          + "transferring the file from channel", ex);
+                    logger.trace("COPY BYTES COMPLETES HERE 8");
 
-                      sipLogService.upsertFailedStatus(logId);
-
-                      logger.trace(" files or directory to be "
-                          + "deleted on exception " + fileTobeDeleted);
-                          
-
-                      try {
-                        if (fileTobeDeleted != null
-                            && processor.isDestinationExists(fileTobeDeleted.getPath())) {
-                          processor.deleteFile(fileTobeDeleted.getPath(),
-                               defaultDestinationLocation, mapRfsUser);
-                          }
-                      } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                      }
-                      if (template.getSession() != null) {
-                        template.getSession().close();
-                      }
-                    } finally {
-                      if (stream != null) {
-                        logger.trace(
-                            "closing the stream for the file in finally block "
-                                + fileName);
-                        if (processor
-                            .isDestinationMapR(defaultDestinationLocation)) {
-                          fos.close();
-                        }
-                      }
+                  } else {
+                    final File localFile = createTargetFile(localDirectory,
+                        fileName);
+                    processor.transferFile(stream, localFile,
+                        defaultDestinationLocation, mapRfsUser);
+                    if (!processor
+                        .isDestinationMapR(defaultDestinationLocation)) {
+                      processor.closeStream(stream);
                     }
                   }
-                });
-          }
+
+                  logger.trace("Streaming the content of "
+                      + "the file in the directory " + "ends here " + fileName);
+                  ZonedDateTime fileTransEndTime = ZonedDateTime.now();
+                  logger.trace("File" + fileName + "transfer end time:: "
+                      + fileTransEndTime);
+                  logger.trace("closing the stream for the file " + fileName);
+                  bisDataMetaInfo.setProcessId(logId);
+
+                  bisDataMetaInfo.setFileTransferEndTime(
+                      Date.from(fileTransEndTime.toInstant()));
+                  bisDataMetaInfo.setFileTransferDuration(
+                      Duration.between(fileTransStartTime, fileTransEndTime)
+                          .toMillis());
+                  bisDataMetaInfo.setReceivedDataName(localFile.getPath());
+                  sipLogService.upsertSuccessStatus(logId, bisDataMetaInfo);
+                  logger.trace("File transfer duration :: "
+                      + bisDataMetaInfo.getFileTransferDuration());
+                  // sipLogService.upsert(bisDataMetaInfo,
+                  // logIdx);
+                  BisJobEntity bisJobEntity = sipLogService
+                      .retriveJobById(jobId);
+                  Long successCnt = bisJobEntity.getSuccessCount();
+                  logger.info(
+                      "Before Success file log success cnt :: " + successCnt);
+                  sipLogService.updateSuccessCnt(jobId, "INPROGRESS",
+                      successCnt + 1);
+                  logger.info("After Success file log success cnt :: "
+                      + successCnt + 1);
+
+                  sipLogService.updateJobStatus(jobId);
+                  // Adding to a list has been removed as a part of
+                  // optimization
+                  // SIP-6386
+                  // list.add(bisDataMetaInfo);
+                }
+
+              } catch (Exception ex) {
+
+                logger.error("Exception occurred while "
+                    + "transferring the file from channel", ex);
+
+                sipLogService.upsertFailedStatus(logId);
+
+                logger.trace(" files or directory to be "
+                    + "deleted on exception " + fileTobeDeleted);
+
+                try {
+                  if (fileTobeDeleted != null && processor
+                      .isDestinationExists(fileTobeDeleted.getPath())) {
+                    processor.deleteFile(fileTobeDeleted.getPath(),
+                        defaultDestinationLocation, mapRfsUser);
+                  }
+                } catch (Exception e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+                }
+                if (template.getSession() != null) {
+                  template.getSession().close();
+                }
+              } finally {
+                if (stream != null) {
+                  logger
+                      .trace("closing the stream for the file in finally block "
+                          + fileName);
+                  if (processor.isDestinationMapR(defaultDestinationLocation)) {
+                    fos.close();
+                  }
+                }
+              }
+            }
+          });
         }
       }
     } catch (Exception exception) {

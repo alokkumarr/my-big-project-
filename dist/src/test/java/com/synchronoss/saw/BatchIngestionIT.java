@@ -700,7 +700,8 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Interrupted");
     }
     
-    JsonPath afterWaitPath = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+    JsonPath afterWaitPath = given(authSpec).when().get(
+        ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     String fileName = afterWaitPath.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName);
@@ -1001,7 +1002,7 @@ public class BatchIngestionIT extends BaseIT {
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     log.debug("Json Path for transferDataSchedule :" + path.prettyPrint());
     if (path.getList("logs").size() == 0 || !path.getString("logs[0].mflFileStatus")
-        .equals("SUCCESS") ) {
+        .equals("SUCCESS")) {
       if (retries == 0) {
         throw new RuntimeException("Timed out waiting while waiting for dataset");
       }
