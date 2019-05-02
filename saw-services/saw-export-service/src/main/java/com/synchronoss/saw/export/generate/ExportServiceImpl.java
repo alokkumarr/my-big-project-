@@ -275,6 +275,10 @@ public class ExportServiceImpl implements ExportService{
             });
       }
 
+      String enteredFileName =
+          String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
+              + "."
+              + exportBean.getFileType();
       logger.debug("S3 details = " +  s3);
       if (s3!=null && s3 != "") {
         logger.debug("S3 details set. Dispatching to S3");
@@ -286,7 +290,8 @@ public class ExportServiceImpl implements ExportService{
             executionId,
             analysisType,
             requestEntity,
-            restTemplate);
+            restTemplate,
+            enteredFileName);
       }
       // this export is synchronous
       if (ftp!=null && ftp != "") {
@@ -320,6 +325,16 @@ public class ExportServiceImpl implements ExportService{
                 noOfPages = Math.ceil(totalRowCount / limitPerPage);
                 flag =false;
             }
+
+          String ftpDir = UUID.randomUUID().toString();
+          // create a directory with unique name in published location to avoid file conflict for dispatch.
+          exportBean.setFileName(
+              publishedPath
+                  + File.separator
+                  + ftpDir
+                  + "export"
+                  + File.separator
+                  + enteredFileName);
           streamResponseToFile(exportBean, limitPerPage, entity);
 
         }
@@ -436,13 +451,13 @@ public class ExportServiceImpl implements ExportService{
       String executionId,
       String analysisType,
       HttpEntity<?> requestEntity,
-      RestTemplate restTemplate) {
+      RestTemplate restTemplate,
+      String enteredFileName) {
     if (s3 != null && s3 != "") {
       logger.trace("Inside S3 dispatcher");
       // Do the background work beforehand
       String finalS3 = s3;
       String finalJobGroup = jobGroup;
-      String fileType = exportBean.getFileType();
 
       long limitPerPage = Long.parseLong(exportChunkSize);
       long page = 0; // just to keep hold of last not processed data in for loop
@@ -478,7 +493,13 @@ public class ExportServiceImpl implements ExportService{
           noOfPages = Math.ceil(totalRowCount / limitPerPage);
           flag = false;
         }
-        streamResponseToFile(exportBean, limitPerPage, entity);
+        String s3Dir = UUID.randomUUID().toString();
+
+        // create a directory with unique name in published location to avoid file conflict for dispatch.
+        exportBean.setFileName(
+            publishedPath + File.separator + s3Dir + "export" + File.separator + enteredFileName);
+
+          streamResponseToFile(exportBean, limitPerPage, entity);
       }
       // final rows to process
       long leftOutRows = 0;
@@ -559,7 +580,7 @@ public class ExportServiceImpl implements ExportService{
   private void streamResponseToFile(ExportBean exportBean, long limitPerPage,
       ResponseEntity<DataResponse> entity) {
     try {
-      // create a directory with unique name in published location to avoid file conflict for dispatch.
+
       File file = new File(exportBean.getFileName());
       file.getParentFile().mkdirs();
 
