@@ -49,7 +49,7 @@
   <designer-chart
     *ngIf="analysis.type === 'chart'"
     [chartType]="chartType"
-    [sorts]="analysis.sqlBuilder.sorts"
+    [sorts]="analysis.sipQuery.sorts"
     [auxSettings]="{ isInverted: analysis.isInverted, legend: analysis.legend }"
     [data]="previewData"
     [sipQuery]="analysis.sipQuery"
