@@ -12,6 +12,7 @@ import { LocalSearchService } from '../../../common/services/local-search.servic
 import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
+import { isDSLAnalysis } from '../designer/types';
 
 const VIEW_KEY = 'analyseReportView';
 const SEARCH_CONFIG = [
@@ -153,7 +154,10 @@ export class AnalyzeViewComponent implements OnInit {
   afterPublish(analysis) {
     this.getCronJobs(this.analysisId);
     /* Update the new analysis in the current list */
-    this._router.navigate(['analyze', analysis.categoryId]);
+    this._router.navigate([
+      'analyze',
+      isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+    ]);
   }
 
   spliceAnalyses(analysis, replace) {
