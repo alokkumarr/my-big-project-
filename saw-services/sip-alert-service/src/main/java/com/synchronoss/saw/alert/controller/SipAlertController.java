@@ -361,6 +361,32 @@ public class SipAlertController {
   }
 
   /**
+   * List of alert count by date or severity based on request payload API.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @return AlertStatesResponse alertStatesResponse
+   */
+  @ApiOperation(
+      value = "/count ",
+      nickname = "alertCount",
+      notes = "returns alertCount by date or severity based on request payload",
+      response = AlertCountResponse.class)
+  @RequestMapping(
+      value = "/count",
+      method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public List<AlertCountResponse> alertCountResponses(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody AlertCount alertCount,
+      @RequestParam(name = "alertRuleId", required = false) Long alertRuleId) {
+    Ticket ticket = getTicket(request);
+    return ticket != null ? alertService.alertCount(alertCount, alertRuleId) : null;
+  }
+
+  /**
    * This method to validate jwt token then return the validated ticket for further processing.
    *
    * @param request HttpServletRequest
@@ -374,24 +400,5 @@ public class SipAlertController {
       logger.error("Error occurred while fetching the alert details", e);
     }
     return null;
-  }
-
-  @ApiOperation(
-      value = "/count ",
-      nickname = "alertCount",
-      notes = "returns alertCount by date or severity based on request payload",
-      response = AlertCountResponse.class)
-  @RequestMapping(
-      value = "/count",
-      method = RequestMethod.POST,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseBody
-  public List<AlertCountResponse> alertCount1(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      @RequestBody AlertCount alertCount,
-      @RequestParam(name = "alertRuleId", required = false) Long alertRuleId) {
-    Ticket ticket = getTicket(request);
-    return ticket != null ? alertService.alertCount(alertCount, alertRuleId) : null;
   }
 }

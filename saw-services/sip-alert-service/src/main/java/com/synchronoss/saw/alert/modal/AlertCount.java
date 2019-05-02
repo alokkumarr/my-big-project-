@@ -44,8 +44,8 @@ public class AlertCount {
   }
 
   public enum Preset {
-    Yesterday("Yesterday"),
-    Today("Today"),
+    YESTERDAY("Yesterday"),
+    TODAY("Today"),
     YTD("YTD"),
     MTD("MTD"),
     LTM("LTM"),
@@ -100,8 +100,8 @@ public class AlertCount {
   }
 
   public enum GroupBy {
-    Date("StartTime"),
-    Severity("Severity");
+    DATE("StartTime"),
+    SEVERITY("Severity");
     private final String value;
     private static final Map<String, AlertCount.GroupBy> CONSTANTS =
         new HashMap<String, AlertCount.GroupBy>();

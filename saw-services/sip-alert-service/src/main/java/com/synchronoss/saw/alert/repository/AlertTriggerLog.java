@@ -92,7 +92,7 @@ public interface AlertTriggerLog extends JpaRepository<AlertTriggerDetailsLog, L
 
   @Query(
       value =
-          "select  ard.SEVERITY as alertSeverity,count(*) as count "
+          "select  ard.SEVERITY as alertSeverity, count(*) as count "
               + "FROM alert_trigger_details_log atd INNER JOIN  alert_rules_details ard "
               + "ON atd.ALERT_RULES_SYS_ID=ard.ALERT_RULES_SYS_ID "
               + "WHERE atd.START_TIME>=:fromEpoch AND atd.START_TIME<=:toEpoch"
@@ -102,13 +102,13 @@ public interface AlertTriggerLog extends JpaRepository<AlertTriggerDetailsLog, L
 
   @Query(
       value =
-          "select  ard.SEVERITY as alertSeverity,count(*) as count "
+          "select  ard.SEVERITY as alertSeverity, count(*) as count "
               + "FROM alert_trigger_details_log atd INNER JOIN  alert_rules_details ard "
               + "ON atd.ALERT_RULES_SYS_ID=ard.ALERT_RULES_SYS_ID "
               + "WHERE atd.ALERT_RULES_SYS_ID=:alertRuleSysId AND "
               + "atd.START_TIME>=:fromEpoch AND atd.START_TIME<=:toEpoch"
               + " GROUP BY alertSeverity ORDER BY alertSeverity ASC ;",
       nativeQuery = true)
-  List<AlertCountResponse> alertCountBySeverityForalertId(
+  List<AlertCountResponse> alertCountBySeverityForAlertId(
       Long fromEpoch, Long toEpoch, Long alertRuleSysId);
 }
