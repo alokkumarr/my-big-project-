@@ -5,14 +5,16 @@
   [dataSource]="data"
   [showBorders]="false"
   [columnAutoWidth]="false"
+  [allowColumnReordering]="true"
+  [allowColumnResizing]="true"
   [showColumnLines]="false"
   [showRowLines]="false"
   [rowAlternationEnabled]="true"
-  [masterDetail]="{ enabled: true, template: 'detailTemplate' }"
+  [masterDetail]="{ enabled: false, template: 'detailTemplate' }"
   (onRowExpanding)="onRowExpanding($event.key)"
 >
   <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
-  <dxo-paging [pageSize]="25"></dxo-paging>
+  <dxo-paging [pageSize]="50"></dxo-paging>
   <dxo-pager
     [showPageSizeSelector]="true"
     [allowedPageSizes]="[10, 25, 50]"
@@ -62,7 +64,7 @@
   </div>
 
   <div *dxTemplate="let data of 'dateTemplate'">
-    <span>{{ data.data.startTime | date: 'short' }}</span>
+    <span>{{ data.data.startTime * 1000 | date: 'medium' }}</span>
   </div>
 
   <div *dxTemplate="let alertDetail of 'detailTemplate'">

@@ -28,4 +28,12 @@ describe('AlertsViewComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('setAlertLoaderForGrid should set alerts Loader', () => {
+    component.setAlertLoaderForGrid();
+  });
+
+  it('fetchLateshAlerts should call setAlertLoaderForGrid', () => {
+    component.fetchLateshAlerts();
+  });
 });

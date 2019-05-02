@@ -42,9 +42,11 @@
         @extend .titleClass;
       }
 
-      &__filterBtn {
-        height: 32px;
-        line-height: 32px;
+      &__iconBtn {
+        height: 36px;
+        width: 36px;
+        line-height: 36px;
+        font-size: 18px;
       }
     }
 

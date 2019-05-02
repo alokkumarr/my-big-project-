@@ -11,6 +11,16 @@ export class AlertsViewComponent implements OnInit {
   public alertsDataLoader: (options: {}) => Promise<GridData>;
 
   constructor(public _alertService: AlertsService) {
+    this.setAlertLoaderForGrid();
+  }
+
+  ngOnInit() {}
+
+  fetchLateshAlerts() {
+    this.setAlertLoaderForGrid();
+  }
+
+  setAlertLoaderForGrid() {
     this.alertsDataLoader = (options: {}) => {
       return this._alertService
         .getAlertsStatesForGrid(options)
@@ -20,6 +30,4 @@ export class AlertsViewComponent implements OnInit {
         }));
     };
   }
-
-  ngOnInit() {}
 }

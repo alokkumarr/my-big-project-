@@ -36,6 +36,16 @@
       <span fxFlex class="view-container-content__header__title" i18n
         >Alert History
       </span>
+      <button
+        matTooltip="Refresh"
+        mat-mini-fab
+        class="view-container-content__header__iconBtn"
+        e2e="refresh-btn"
+        color="secondary"
+        (click)="fetchLateshAlerts()"
+      >
+        <mat-icon color="primary" fontIcon="icon-Refresh"></mat-icon>
+      </button>
       <!-- <button
         *ngIf="!alertViewSidenav.opened"
         mat-icon-button
