@@ -12,9 +12,9 @@
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-batch-ingestion-service</artifactId>
+	<artifactId>sip-batch-ingestion-service</artifactId>
 	<version>${revision}</version>
-	<name>saw-batch-ingestion-service</name>
+	<name>sip-batch-ingestion-service</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -148,17 +148,17 @@
 		<!-- This is the SIP Batch plug-ins -->
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-batch-plugin-interfaces</artifactId>
+			<artifactId>sip-batch-plugin-interfaces</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-batch-plugin-sftp</artifactId>
+			<artifactId>sip-batch-plugin-sftp</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-batch-log-service</artifactId>
+			<artifactId>sip-batch-log-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
                 <dependency>
@@ -284,8 +284,9 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-batch-ingestion</packageName>
+							<packageName>sip-batch-ingestion</packageName>
 							<version>${revision.nodash}</version>
+							<obsoletes>saw-batch-ingestion</obsoletes>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-batch-ingestion-service</name>
@@ -297,19 +298,19 @@
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-batch-ingestion-service/saw-batch-ingestion.jar</name>
-									<file>target/saw-batch-ingestion-service-${revision}-exec.jar</file>
+									<file>target/sip-batch-ingestion-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion.service</name>
-									<file>src/main/system/saw-batch-ingestion.service</file>
+									<name>/usr/lib/systemd/system/sip-batch-ingestion.service</name>
+									<file>src/main/system/sip-batch-ingestion.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion-proxy.service</name>
-									<file>src/main/system/saw-batch-ingestion-proxy.service</file>
+									<name>/usr/lib/systemd/system/sip-batch-ingestion-proxy.service</name>
+									<file>src/main/system/sip-batch-ingestion-proxy.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion-proxy.socket</name>
-									<file>src/main/system/saw-batch-ingestion-proxy.socket</file>
+									<name>/usr/lib/systemd/system/sip-batch-ingestion-proxy.socket</name>
+									<file>src/main/system/sip-batch-ingestion-proxy.socket</file>
 								</entry>
 							</entries>
 							<afterInstallation>

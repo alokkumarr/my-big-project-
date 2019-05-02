@@ -1,5 +1,5 @@
 [Unit]
-Description=SAW Transport Proxy Socket
+Description=SIP Transport Proxy Socket
 
 [Socket]
 ListenStream=9200

@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-storage-proxy-service</artifactId>
+	<artifactId>sip-storage-proxy-service</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description></description>
@@ -269,8 +269,9 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-storage-proxy-service</packageName>
+							<packageName>sip-storage-proxy-service</packageName>
 							<version>${revision.nodash}</version>
+							<obsoletes>saw-storage-proxy-service</obsoletes>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-storage-proxy-service</name>
@@ -278,11 +279,11 @@
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-storage-proxy-service/saw-storage-proxy.jar</name>
-									<file>target/saw-storage-proxy-service-${revision}-exec.jar</file>
+									<file>target/sip-storage-proxy-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-storage-proxy.service</name>
-									<file>src/main/system/saw-storage-proxy.service</file>
+									<name>/usr/lib/systemd/system/sip-storage-proxy.service</name>
+									<file>src/main/system/sip-storage-proxy.service</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-storage-proxy-service/conf/proxy-schema.json</name>

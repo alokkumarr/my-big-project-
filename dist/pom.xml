@@ -45,7 +45,7 @@
   <dependencies>
     <dependency>
       <groupId>com.sncr</groupId>
-      <artifactId>saw-security</artifactId>
+      <artifactId>sip-security</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <exclusions>
@@ -64,7 +64,7 @@
     </dependency>
     <dependency>
       <groupId>com.synchronoss.saw</groupId>
-      <artifactId>saw-services-dist</artifactId>
+      <artifactId>sip-services-dist</artifactId>
       <version>${project.version}</version>
       <exclusions>
         <exclusion>
@@ -87,7 +87,7 @@
     </dependency>
     <dependency>
       <groupId>com.sncr</groupId>
-      <artifactId>saw-security-command-line-tool</artifactId>
+      <artifactId>sip-security-command-line-tool</artifactId>
       <version>${project.version}</version>
       <exclusions>
         <exclusion>
@@ -98,7 +98,7 @@
     </dependency>
     <dependency>
       <groupId>com.sncr</groupId>
-      <artifactId>saw-security-parent</artifactId>
+      <artifactId>sip-security-parent</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
       <exclusions>
@@ -659,7 +659,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/ --suite=${saw.e2e.suite}</arguments>
+              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/sip/web/ --suite=${saw.e2e.suite}</arguments>
             </configuration>
           </execution>
            <execution>

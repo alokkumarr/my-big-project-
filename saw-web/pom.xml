@@ -7,7 +7,7 @@
   <artifactId>bda-saw</artifactId>
   <version>${revision}</version>
   <packaging>war</packaging>
-  <name>saw-web</name>
+  <name>sip-web</name>
   <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -672,8 +672,9 @@
                 <goal>rpm</goal>
               </goals>
               <configuration>
-                <packageName>saw-web</packageName>
+                <packageName>sip-web</packageName>
                 <version>${revision.nodash}</version>
+                <obsoletes>saw-web</obsoletes>
                 <skipSigning>true</skipSigning>
                 <entries>
                   <entry>
@@ -682,7 +683,7 @@
                   </entry>
                   <entry>
                     <name>${app.optDir}/saw-web.war</name>
-                    <file>target/saw-web.war</file>
+                    <file>target/sip-web.war</file>
                   </entry>
                   <entry>
                     <name>/usr/share/tomcat/webapps/saw.war</name>
