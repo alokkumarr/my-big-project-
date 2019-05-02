@@ -298,24 +298,28 @@ public class XlsxExporter implements IFileExporter {
     return workBook;
   }
 
-    /**
-     * Function accepts workbook and auto adjusts the size of columns to fit the size of any row in that column.
-     * @param workbook
-     */
-    public void autoSizeColumns(Workbook workbook) {
-        int numberOfSheets = workbook.getNumberOfSheets();
-        for (int i = 0; i < numberOfSheets; i++) {
-            Sheet sheet = workbook.getSheetAt(i);
-            if (sheet.getPhysicalNumberOfRows() > 0) {
-                Row row = sheet.getRow(0);
-                Iterator<Cell> cellIterator = row.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    int columnIndex = cell.getColumnIndex();
-                    sheet.autoSizeColumn(columnIndex);
-                }
-            }
+  /**
+   * Function accepts workbook and auto adjusts the size of columns to fit the size of any row in
+   * that column.
+   *
+   * @param workbook
+   */
+  public void autoSizeColumns(Workbook workbook) {
+    int numberOfSheets = workbook.getNumberOfSheets();
+    for (int i = 0; i < numberOfSheets; i++) {
+      Sheet sheet = workbook.getSheetAt(i);
+      if (sheet.getPhysicalNumberOfRows() > 0) {
+        Row row = sheet.getRow(0);
+        if (row != null) {
+          Iterator<Cell> cellIterator = row.cellIterator();
+          while (cellIterator.hasNext()) {
+            Cell cell = cellIterator.next();
+            int columnIndex = cell.getColumnIndex();
+            sheet.autoSizeColumn(columnIndex);
+          }
         }
+      }
     }
+  }
 }
 

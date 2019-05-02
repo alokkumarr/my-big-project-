@@ -12,7 +12,7 @@
   </parent>
 
   <groupId>com.synchronoss.saw</groupId>
-  <artifactId>saw-workbench-service</artifactId>
+  <artifactId>sip-workbench-service</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <description></description>
@@ -163,7 +163,7 @@
     </dependency>
     <dependency>
       <groupId>com.synchronoss.saw</groupId>
-      <artifactId>saw-date-extract-api</artifactId>
+      <artifactId>sip-date-extract-api</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
@@ -173,7 +173,7 @@
     </dependency>
     <dependency>
       <groupId>com.synchronoss.saw</groupId>
-      <artifactId>saw-inspect-data-api</artifactId>
+      <artifactId>sip-inspect-data-api</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
@@ -404,8 +404,9 @@
               <goal>rpm</goal>
             </goals>
             <configuration>
-              <packageName>saw-workbench</packageName>
+              <packageName>sip-workbench</packageName>
               <version>${revision.nodash}</version>
+              <obsoletes>saw-workbench</obsoletes>
               <entries>
                 <entry>
                   <name>/opt/bda/saw-workbench-service</name>
@@ -417,11 +418,11 @@
                 </entry>
                 <entry>
                   <name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>
-                  <file>target/saw-workbench-service-${revision}-exec.jar</file>
+                  <file>target/sip-workbench-service-${revision}-exec.jar</file>
                 </entry>
                 <entry>
                   <name>/opt/bda/saw-workbench-service/saw-workbench-spark.jar</name>
-                  <file>target/saw-workbench-service-${revision}-jar-with-dependencies.jar</file>
+                  <file>target/sip-workbench-service-${revision}-jar-with-dependencies.jar</file>
                 </entry>
                 <entry>
                   <name>/usr/lib/systemd/system/saw-workbench.service</name>

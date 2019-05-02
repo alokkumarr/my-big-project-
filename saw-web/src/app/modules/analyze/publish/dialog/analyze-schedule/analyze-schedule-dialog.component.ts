@@ -2,7 +2,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import * as map from 'lodash/map';
-import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
@@ -324,21 +323,18 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     return true;
   }
 
-  validateEmails(emails) {
-    const emailsList = emails;
+  validateEmails(emailsList) {
     let emailsAreValid = true;
-    if (isEmpty(emailsList)) {
-      emailsAreValid = false;
-      this.emailValidateFlag = true;
+    if (!isEmpty(emailsList)) {
+      fpPipe(
+        fpMap(email => {
+          if (!this.validateThisEmail(email)) {
+            emailsAreValid = false;
+            this.emailValidateFlag = true;
+          }
+        })
+      )(emailsList);
     }
-    forEach(emailsList, email => {
-      const isEmailvalid = this.regexOfEmail.test(email.toLowerCase());
-      if (!isEmailvalid) {
-        emailsAreValid = false;
-        // cancel forEach
-        this.emailValidateFlag = true;
-      }
-    });
     return emailsAreValid;
   }
 

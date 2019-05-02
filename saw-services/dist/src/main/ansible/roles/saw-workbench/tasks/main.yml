@@ -1,6 +1,6 @@
 - name: Copy SAW Workbench Service package
   copy: src="{{ item }}" dest=/tmp/saw-workbench.rpm
-  with_fileglob: ["../rpms/saw-workbench-*.rpm"]
+  with_fileglob: ["../rpms/sip-workbench-*.rpm"]
 - name: Install SAW Workbench Service package
   yum: name=/tmp/saw-workbench.rpm state=present
   notify:

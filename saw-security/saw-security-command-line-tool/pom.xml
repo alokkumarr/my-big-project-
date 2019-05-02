@@ -41,7 +41,7 @@
   <packaging>jar</packaging>
 
   <groupId>com.sncr</groupId>
-  <artifactId>saw-security-command-line-tool</artifactId>
+  <artifactId>sip-security-command-line-tool</artifactId>
   <version>${revision}</version>
 
   <dependencyManagement>
@@ -84,7 +84,7 @@
     </dependency>
     <dependency>
       <groupId>com.sncr</groupId>
-      <artifactId>saw-security</artifactId>
+      <artifactId>sip-security</artifactId>
       <version>${revision}</version>
       <classifier>classes</classifier>
     </dependency>
@@ -137,8 +137,9 @@
               <goal>rpm</goal>
             </goals>
             <configuration>
-              <packageName>saw-security</packageName>
+              <packageName>sip-security</packageName>
               <version>${revision.nodash}</version>
+              <obsoletes>saw-security</obsoletes>
               <skipSigning>true</skipSigning>
               <rulesets>
                 <ruleset>
@@ -272,17 +273,17 @@
                 </entry>
                 <entry>
                   <name>${app.optDir}/lib/saw-security-${revision}.war</name>
-                  <file>../saw-security/target/saw-security-${revision}.war</file>
+                  <file>../saw-security/target/sip-security-${revision}.war</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/lib/saw-security-${revision}-classes.jar</name>
-                  <file>../saw-security/target/saw-security-${revision}-classes.jar</file>
+                  <file>../saw-security/target/sip-security-${revision}-classes.jar</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
                   <name>${app.optDir}/lib/saw-security-command-line-tool-${revision}.jar</name>
-                  <file>target/saw-security-command-line-tool-${revision}.jar</file>
+                  <file>target/sip-security-command-line-tool-${revision}.jar</file>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>

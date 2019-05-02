@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-inspect-data-api</artifactId>
+	<artifactId>sip-inspect-data-api</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description></description>
@@ -37,7 +37,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-date-extract-api</artifactId>
+			<artifactId>sip-date-extract-api</artifactId>
 			<version>${revision}</version>
 		</dependency>
 	</dependencies>
