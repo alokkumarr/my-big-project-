@@ -50,7 +50,10 @@
     *ngIf="analysis.type === 'chart'"
     [chartType]="chartType"
     [sorts]="analysis.sipQuery.sorts"
-    [auxSettings]="{ isInverted: analysis.isInverted, legend: analysis.legend }"
+    [auxSettings]="{
+      isInverted: analysis.isInverted || analysis.chartOptions.isInverted,
+      legend: analysis.legend || analysis.chartOptions.legend
+    }"
     [data]="previewData"
     [sipQuery]="analysis.sipQuery"
   >

@@ -104,13 +104,17 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       ? analysis.sipQuery
       : analysis.sqlBuilder;
     this.filters = isDSLAnalysis(analysis)
-    ? this.generateDSLDateFilters(queryBuilder.filters)
-    : queryBuilder.filters;
+      ? this.generateDSLDateFilters(queryBuilder.filters)
+      : queryBuilder.filters;
   }
 
   generateDSLDateFilters(filters) {
     forEach(filters, filtr => {
-      if (!filtr.isRuntimeFilter && (filtr.type === 'date' && filtr.model.operator === 'BTW')) {
+      if (
+        !filtr.isRuntimeFilter &&
+        !filtr.isGlobalFilter &&
+        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+      ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
@@ -188,7 +192,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   onSidenavChange(isOpen: boolean) {
     if (isOpen && !this.analyses) {
-      this.loadExecutedAnalyses(this.analysis.id, isDSLAnalysis(this.analysis)).then(analyses => {
+      this.loadExecutedAnalyses(
+        this.analysis.id,
+        isDSLAnalysis(this.analysis)
+      ).then(analyses => {
         const lastExecutionId = get(analyses, '[0].id', null);
         if (!this.executionId && lastExecutionId) {
           this.executionId = lastExecutionId;
