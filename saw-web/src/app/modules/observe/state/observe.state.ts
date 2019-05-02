@@ -1,6 +1,9 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { ObserveStateModel } from './observe-state.model';
-import { ObserveLoadMetrics } from '../actions/observe.actions';
+import {
+  ObserveLoadMetrics,
+  ObserveLoadArtifactsForMetric
+} from '../actions/observe.actions';
 import { ObserveService } from '../services/observe.service';
 
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -24,7 +27,11 @@ export class ObserveState {
   }
 
   @Action(ObserveLoadMetrics)
-  loadMetric({ patchState, getState }: StateContext<ObserveStateModel>) {
+  loadMetric({
+    patchState,
+    getState,
+    dispatch
+  }: StateContext<ObserveStateModel>) {
     const metrics = getState().metrics;
     if (values(metrics).length > 0) {
       return patchState({ metrics: { ...metrics } });
@@ -37,7 +44,23 @@ export class ObserveState {
           resultMetrics[metric.id] = metric;
         });
 
-        return patchState({ metrics: resultMetrics });
+        patchState({ metrics: resultMetrics });
+        return dispatch(
+          resp.map(metric => new ObserveLoadArtifactsForMetric(metric.id))
+        );
+      })
+    );
+  }
+
+  @Action(ObserveLoadArtifactsForMetric)
+  loadArtifactsForMetric(
+    { patchState, getState, dispatch }: StateContext<ObserveStateModel>,
+    { semanticId }: ObserveLoadArtifactsForMetric
+  ) {
+    return this.observe.getArtifactsForDataSet$(semanticId).pipe(
+      tap((metric: any) => {
+        const metrics = getState().metrics;
+        patchState({ metrics: { ...metrics, [metric.id]: metric } });
       })
     );
   }

@@ -1,24 +1,16 @@
 <div class="dialog-container">
   <div class="dialog__content" fxLayout="column">
-    <div
-      fxLayout="row"
-      fxLayoutAlign="start center"
-      *ngIf="filters.length > 0"
-    >
+    <div fxLayout="row" fxLayoutAlign="start center" *ngIf="filters.length > 0">
       <div fxLayout="column">
         <span class="filter-counter" i18n
-          >{filters.length, plural, =1 {1 Filter}
-          other {{{filters.length}} Filters} }
-          Applied</span
+          >{filters.length, plural, =1 {1 Filter} other
+          {{{filters.length}} Filters} } Applied</span
         >
       </div>
 
       <mat-chip-list #chipList>
         <mat-chip
-          *ngFor="
-            let filter of filters;
-            let i = index
-          "
+          *ngFor="let filter of filters; let i = index"
           style="padding-bottom: 1px;padding-top: 3px;"
         >
           {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
@@ -33,7 +25,7 @@
     >
       <observe-map
         *ngIf="
-          (data.analysis.type | isAnalysisType: 'map':data.analysis?.chartType)
+          data.analysis.type | isAnalysisType: 'map':data.analysis?.chartType
         "
         class="analysis-container"
         [item]="data"
@@ -45,8 +37,8 @@
       </observe-map>
       <observe-map-chart
         *ngIf="
-          (data.analysis.type
-            | isAnalysisType: 'mapChart':data.analysis?.chartType)
+          data.analysis.type
+            | isAnalysisType: 'mapChart':data.analysis?.chartType
         "
         class="analysis-container"
         [item]="data"
@@ -60,8 +52,7 @@
 
       <observe-chart
         *ngIf="
-          (data.analysis.type
-            | isAnalysisType: 'chart':data.analysis?.chartType)
+          data.analysis.type | isAnalysisType: 'chart':data.analysis?.chartType
         "
         class="analysis-container"
         [item]="data"

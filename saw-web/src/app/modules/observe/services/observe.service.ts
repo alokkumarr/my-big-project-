@@ -52,6 +52,10 @@ export class ObserveService {
     ).pipe(mapObservable(fpGet(`contents.[0].${ANALYZE_MODULE_NAME}`)));
   }
 
+  getArtifactsForDataSet$(semanticId: string) {
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
+  }
+
   /* Saves dashboard. If @model.entityId not present, uses create operation.
      Otherwise uses update operation.
   */

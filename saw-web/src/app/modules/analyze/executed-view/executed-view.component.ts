@@ -50,6 +50,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   analysis: Analysis | AnalysisDSL; // the latest analysis definition
   executedAnalysis: Analysis | AnalysisDSL; // the exact analysis that was executed
   analyses: Analysis[];
+  metric: any;
   onetimeExecution: boolean;
   executedBy: string;
   executedAt: any;
@@ -371,9 +372,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       );
   }
 
-  loadAnalysisById(analysisId, isDSLAnalysis: boolean) {
-    return this._analyzeService.readAnalysis(analysisId, isDSLAnalysis).then(
-      (analysis: Analysis) => {
+  loadAnalysisById(analysisId, isDSL: boolean) {
+    return this._analyzeService
+      .readAnalysis(analysisId, isDSL)
+      .then((analysis: Analysis) => {
         this.analysis = analysis;
         // this._analyzeService
         //   .getLastExecutionData(this.analysis.id, {
@@ -383,12 +385,16 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         //     console.log(data);
         //   });
         this.executedAnalysis = { ...this.analysis };
-        return analysis;
-      },
-      err => {
-        throw err;
-      }
-    );
+        /* Get metrics to get full artifacts. Needed to show filters for fields
+        that aren't selected for data */
+        return this._analyzeService
+          .getArtifactsForDataSet(this.analysis.semanticId)
+          .toPromise();
+      })
+      .then(metric => {
+        this.metric = metric;
+        return this.analysis;
+      });
   }
 
   loadDataOrSetDataLoader(
