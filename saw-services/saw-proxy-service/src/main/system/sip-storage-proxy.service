@@ -1,0 +1,11 @@
+[Unit]
+Description=SIP Storage Proxy
+
+[Service]
+ExecStart=/bin/sh -c "exec java -Xmx1G -Dloader.path=BOOT-INF/lib,$(sip-mapr-classpath) -jar /opt/bda/saw-storage-proxy-service/saw-storage-proxy.jar --spring.config.location=/opt/bda/saw-storage-proxy-service/conf/application.yml"
+SyslogIdentifier=sip-storage-proxy
+User=mapr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

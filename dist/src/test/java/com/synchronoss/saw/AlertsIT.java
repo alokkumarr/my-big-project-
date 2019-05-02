@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
 import io.restassured.http.ContentType;
 
 import java.io.IOException;
@@ -73,10 +72,7 @@ public class AlertsIT extends BaseIT {
 
     log.debug("alertObject : " + alertObject);
 
-    Gson gson = new Gson();
-    String alertsResponse = gson.toJson(alertObject);
-
-    JsonNode jsonNode = mapper.readTree(alertsResponse);
+    JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
     Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
     log.debug("alertRulesSysId : " + alertRulesSysId);
     assertFalse(alertRulesSysId <= 0);
@@ -104,10 +100,7 @@ public class AlertsIT extends BaseIT {
 
     log.debug("alertObject : " + alertObject);
 
-    Gson gson = new Gson();
-    String alertsResponse = gson.toJson(alertObject);
-
-    JsonNode jsonNode = mapper.readTree(alertsResponse);
+    JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
     Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
     log.debug("alertRulesSysId : " + alertRulesSysId);
 
@@ -136,10 +129,8 @@ public class AlertsIT extends BaseIT {
             .getJsonObject("alert");
 
     log.debug("alertObject : " + alertObject);
-    Gson gson = new Gson();
-    String alertsResponse = gson.toJson(alertObject);
 
-    JsonNode jsonNode = mapper.readTree(alertsResponse);
+    JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
     Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
     log.debug("alertRulesSysId : " + alertRulesSysId);
 
@@ -189,10 +180,7 @@ public class AlertsIT extends BaseIT {
 
     log.debug("alertObject : " + alertObject);
 
-    Gson gson = new Gson();
-    String alertsResponse = gson.toJson(alertObject);
-
-    JsonNode jsonNode = mapper.readTree(alertsResponse);
+    JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
     Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
     log.debug("alertRulesSysId : " + alertRulesSysId);
     assertFalse(alertRulesSysId <= 0);
@@ -213,8 +201,8 @@ public class AlertsIT extends BaseIT {
             .jsonPath()
             .getJsonObject("alert");
 
-    alertsResponse = gson.toJson(alertObject1);
-    String activeInd = mapper.readTree(alertsResponse).get("activeInd").toString();
+    String activeInd =
+        mapper.convertValue(alertObject1, JsonNode.class).get("activeInd").toString();
     log.debug("activeInd :" + activeInd);
     assertEquals("false", activeInd);
 
@@ -250,10 +238,7 @@ public class AlertsIT extends BaseIT {
 
     log.debug("alertObject : " + alertObject);
 
-    Gson gson = new Gson();
-    String alertsResponse = gson.toJson(alertObject);
-
-    JsonNode jsonNode = mapper.readTree(alertsResponse);
+    JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
     Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
 
     log.debug("alertRulesSysId : " + alertRulesSysId);
@@ -300,10 +285,7 @@ public class AlertsIT extends BaseIT {
 
     log.debug("alertObject : " + alertObject);
 
-    Gson gson = new Gson();
-    String alertsResponse = gson.toJson(alertObject);
-
-    JsonNode jsonNode = mapper.readTree(alertsResponse);
+    JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
     Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
 
     log.debug("alertRulesSysId : " + alertRulesSysId);

@@ -11,7 +11,7 @@ if (environment.production) {
   apiUrl = 'https://saw01-rd-sip-vaste.sncrcorp.net';
 }
 /* eslint-enable */
-apiUrl += '/saw';
+apiUrl += '/sip';
 
 export default {
   login: {

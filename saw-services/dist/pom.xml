@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss.saw</groupId>
-  <artifactId>saw-services-dist</artifactId>
+  <artifactId>sip-services-dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <properties>
@@ -12,32 +12,32 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-transport-service</artifactId>
+      <artifactId>sip-transport-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-scheduler-service</artifactId>
+      <artifactId>sip-scheduler-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-gateway-service</artifactId>
+      <artifactId>sip-gateway-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-workbench-service</artifactId>
+      <artifactId>sip-workbench-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-export-service</artifactId>
+      <artifactId>sip-export-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-storage-proxy-service</artifactId>
+      <artifactId>sip-storage-proxy-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>

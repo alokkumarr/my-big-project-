@@ -140,7 +140,7 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertRulesDetails> listAlertRules(HttpServletRequest request) {
+  public List<Alert> listAlertRules(HttpServletRequest request) {
     Ticket ticket = getTicket(request);
     return ticket != null ? alertService.retrieveAllAlerts(ticket) : null;
   }

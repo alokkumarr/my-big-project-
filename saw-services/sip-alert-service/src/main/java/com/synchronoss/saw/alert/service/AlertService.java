@@ -13,8 +13,7 @@ public interface AlertService {
   Alert createAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid Alert alert, Ticket token);
 
-  List<AlertRulesDetails> retrieveAllAlerts(
-      @NotNull(message = "Fetch all alerts rule details") Ticket token);
+  List<Alert> retrieveAllAlerts(@NotNull(message = "Fetch all alerts rule details") Ticket token);
 
   Alert updateAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid Alert alert,
