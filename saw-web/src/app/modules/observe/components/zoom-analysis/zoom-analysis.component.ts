@@ -1,5 +1,14 @@
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
 
 import { Filter, Artifact, ArtifactColumn } from './../../../analyze/types';
 import {
@@ -12,8 +21,7 @@ import {
 } from './../../../analyze/consts';
 import { reduce } from 'lodash';
 
-let chartGridUpdater = [];
-let oldChartGridUpdater = [];
+let initialChartHeight = 0;
 @Component({
   selector: 'zoom-analysis',
   templateUrl: './zoom-analysis.component.html',
@@ -22,6 +30,8 @@ let oldChartGridUpdater = [];
 export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   public analysisData: Array<any>;
   public nameMap;
+
+  @ViewChild('zoomAnalysisChartContainer') chartContainer: ElementRef;
 
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,
@@ -45,30 +55,56 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
       {}
     );
 
-    /* By default the updater of zoom-analysis component is taking value of chart-grid component.
-    Since the chart height in chart-grid is lesser as compared to zoom-analysis, so chart height was getting
-    reduced. In this piece of code zoom-analysis updater (i.e. this.data.updater) is updated without 'chart.height' path.
-    So that chart height in zoom-analysis component is not reduced. When user close the dialog box then again
-    zoom-analysis updater (i.e. this.data.updater) is updated with chart-grid updater value.
-    */
-    this.data.updater.asObservable().source.forEach(val => {
-      chartGridUpdater = val;
-    });
-    let zoomAnalysisUpdater = [];
-    oldChartGridUpdater = [];
-    chartGridUpdater.forEach(val => {
-      oldChartGridUpdater.push(val);
-      if (val.path != 'chart.height') {
-        zoomAnalysisUpdater.push(val);
-      }
-    });
-    this.data.updater.next(zoomAnalysisUpdater);
+    fpPipe(
+      fpMap(val => {
+        if (val.path === 'chart.height') {
+          initialChartHeight = val.data;
+        }
+      })
+    )(this.data.updater.getValue());
+
+    // map-chart-viewer component is floating to left
+    // When analysis is loaded for the fisrt time.
+    // Due to which updating the map-chart-viewer height here.
+    if (this.data.analysis.type === 'map') {
+      this.data.updater.next([
+        {
+          path: 'chart.height',
+          data: 500
+        }
+      ]);
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.data.analysis.type !== 'map') {
+      setTimeout(() => {
+        this.data.updater.next([
+          {
+            path: 'chart.height',
+            data: this.getChartHeight(initialChartHeight)
+          }
+        ]);
+      });
+    }
   }
 
   ngOnDestroy(): void {
-    // Just making sure that when the dialog box is closed,
-    // updater should update it's value with chart-grid updater.
-    this.data.updater.next(oldChartGridUpdater);
+    this.data.updater.next([
+      {
+        path: 'chart.height',
+        data: initialChartHeight
+      }
+    ]);
+  }
+
+  getChartHeight(chartHeight) {
+    return Math.max(
+      chartHeight,
+      this.chartContainer.nativeElement.offsetHeight > 500
+        ? 500
+        : this.chartContainer.nativeElement.offsetHeight
+    );
   }
 
   getDisplayName(filter: Filter) {

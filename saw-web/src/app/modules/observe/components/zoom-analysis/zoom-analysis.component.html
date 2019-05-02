@@ -1,4 +1,4 @@
-<div class="dialog-container">
+<div class="dialog-container" #zoomAnalysisChartContainer>
   <div class="dialog__content" fxLayout="column">
     <div
       fxLayout="row"
@@ -60,8 +60,7 @@
 
       <observe-chart
         *ngIf="
-          (data.analysis.type
-            | isAnalysisType: 'chart':data.analysis?.chartType)
+          data.analysis.type | isAnalysisType: 'chart':data.analysis?.chartType
         "
         class="analysis-container"
         [item]="data"

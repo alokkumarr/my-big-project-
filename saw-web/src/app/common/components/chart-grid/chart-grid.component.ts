@@ -186,8 +186,7 @@ export class ChartGridComponent implements OnInit {
     this.updater.asObservable().source.forEach(val => {
       parentUpdater = val;
     });
-
-    let chartHeight = 430; //Default chart height for 'execute-chart-view' and 'zoom-analysis' components.
+    let chartHeight = 400; //Default chart height for 'execute-chart-view' and 'zoom-analysis' components.
     if (parentUpdater.length > 0) {
       parentUpdater.forEach(val => {
         if (val.path == 'chart.height') {

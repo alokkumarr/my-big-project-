@@ -2,9 +2,10 @@
   <h1 class="title" [textContent]="analysis.chartTitle || analysis.name"></h1>
 </div>
 
-<map-chart-viewer [chartType]="analysis.chartType"
-                  [data]="data"
-                  [analysis]="analysis"
-                  [updater]="updater"
+<map-chart-viewer
+  [chartType]="analysis.chartType"
+  [data]="data"
+  [analysis]="analysis"
+  [updater]="chartUpdater"
 >
 </map-chart-viewer>

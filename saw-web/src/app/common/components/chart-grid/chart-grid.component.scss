@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 $header-padding-top: 12px;
 $header-padding-bottom: 12px;
 $header-font-size: 18px;
@@ -26,7 +26,7 @@ $header-font-size: 18px;
     height: 100%;
 
     dx-data-grid {
-      height: calc(100% - 45px);
+      height: calc(100% + 25px);
     }
   }
 }
