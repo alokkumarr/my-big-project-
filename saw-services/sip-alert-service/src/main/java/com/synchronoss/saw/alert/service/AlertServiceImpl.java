@@ -16,6 +16,7 @@ import com.synchronoss.saw.alert.repository.AlertDatapodRepository;
 import com.synchronoss.saw.alert.repository.AlertRulesRepository;
 import com.synchronoss.saw.alert.repository.AlertTriggerLog;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -124,9 +125,35 @@ public class AlertServiceImpl implements AlertService {
    * @return AlertRulesDetails
    */
   @Override
-  public List<AlertRulesDetails> retrieveAllAlerts(Ticket ticket) {
+  public List<Alert> retrieveAllAlerts(Ticket ticket) {
     String customerCode = ticket.getCustCode();
-    return alertRulesRepository.findByCustomer(customerCode);
+    List<Alert> alerts = new ArrayList<>();
+    List<AlertRulesDetails> rulesDetails = alertRulesRepository.findByCustomer(customerCode);
+    AlertCustomerDetails alertCustomerDetails =
+        alertCustomerRepository.findByCustomerCode(ticket.getCustCode()).get();
+
+    if (rulesDetails != null && !rulesDetails.isEmpty()) {
+      for (AlertRulesDetails details : rulesDetails) {
+        DatapodDetails datapodDetails =
+            alertDatapodRepository.findByDatapodId(details.getDatapodId()).get();
+        Alert alert = new Alert();
+        alert.setActiveInd(details.getActiveInd());
+        alert.setAlertRulesSysId(details.getAlertRulesSysId());
+        alert.setDatapodId(details.getDatapodId());
+        alert.setDatapodName(datapodDetails.getDatapodName());
+        alert.setAlertName(details.getAlertName());
+        alert.setCategoryId(details.getCategory());
+        alert.setAlertSeverity(details.getAlertSeverity());
+        alert.setAggregation(details.getAggregation());
+        alert.setOperator(details.getOperator());
+        alert.setProduct(alertCustomerDetails.getProductCode());
+        alert.setAlertDescription(details.getAlertDescription());
+        alert.setThresholdValue(details.getThresholdValue());
+        alert.setMonitoringEntity(details.getMonitoringEntity());
+        alerts.add(alert);
+      }
+    }
+    return alerts;
   }
 
   /**
