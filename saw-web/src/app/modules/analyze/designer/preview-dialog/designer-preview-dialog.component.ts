@@ -1,6 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Analysis, ArtifactColumns, AnalysisDSL, isDSLAnalysis } from '../types';
+import { Store } from '@ngxs/store';
+import {
+  Analysis,
+  ArtifactColumns,
+  AnalysisDSL,
+  isDSLAnalysis
+} from '../types';
 import { DesignerService } from '../designer.service';
 import {
   flattenPivotData,
@@ -13,6 +19,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as orderBy from 'lodash/orderBy';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'designer-preview-dialog',
@@ -33,7 +40,8 @@ export class DesignerPreviewDialogComponent implements OnInit {
   constructor(
     public _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { analysis: Analysis },
-    public _designerService: DesignerService
+    public _designerService: DesignerService,
+    private _store: Store
   ) {
     this.analysis = data.analysis;
     this.chartType =
@@ -66,6 +74,10 @@ export class DesignerPreviewDialogComponent implements OnInit {
       };
       break;
     }
+  }
+
+  get metricName(): Observable<string> {
+    return this._store.select(state => state.designerState.metric.metricName);
   }
 
   ngOnInit() {
