@@ -233,8 +233,8 @@ export class PivotGridComponent implements OnDestroy {
         switch (column.dateInterval) {
         case 'day':
           cloned.groupInterval = 1;
-          momentFormat = this.getMomentFormat(cloned.format);
-          cloned.manualFormat = cloned.format;
+          momentFormat = this.getMomentFormat(cloned.dateFormat);
+          cloned.manualFormat = cloned.dateFormat;
           cloned.format = {
             formatter: this.getFormatter(momentFormat)
           };
@@ -269,7 +269,7 @@ export class PivotGridComponent implements OnDestroy {
   getFormatter(format) {
     // Pivot grid auto converts given moment to local dates. It's important to
     // re-convert it to the zone we used to provide dates to normalise it.
-    return value => moment.utc(value).format(format);
+    return value => moment.utc(value, format).format(format);
   }
 
   preProcessData(data) {
@@ -311,7 +311,7 @@ export class PivotGridComponent implements OnDestroy {
     switch (dateInterval) {
     case 'day':
       formatToApply = this.getMomentFormat(format);
-      return moment.utc(value);
+      return moment.utc(value, format);
     case 'quarter':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
       const formattedValue = moment.utc(value).format(formatToApply);
@@ -353,7 +353,6 @@ export class PivotGridComponent implements OnDestroy {
             !isFinite(get(artifactColumn, 'format.precision'))
               ? DEFAULT_PRECISION
               : 0;
-
           cloned.format = {
             formatter: getFormatter(
               artifactColumn.format ||

@@ -57,6 +57,17 @@ export class ExportPageState {
     return analyses;
   }
 
+  @Selector()
+  static exportData(state: ExportPageModel): ExportPageModel['exportData'] {
+    return {
+      ...state.exportData,
+      analyses: state.exportData.analyses.map(analysis => ({
+        ...analysis,
+        metricName: (state.metrics[analysis.semanticId] || {}).name
+      }))
+    };
+  }
+
   @Action(ExportSelectTreeItem)
   treeItemSelected(
     { patchState, dispatch }: StateContext<ExportPageModel>,

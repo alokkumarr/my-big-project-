@@ -90,13 +90,12 @@
       >
       </designer-date-interval-selector>
     </div>
-
     <div
       *ngIf="
         (analysisType !== 'pivot' && hasDateInterval) ||
         (analysisType === 'pivot' &&
           hasDateInterval &&
-          asPivotColumn(artifactColumn).dateInterval === 'day')
+          (asPivotColumn(artifactColumn).dateInterval === 'day' || asPivotColumn(artifactColumn).groupInterval === 'day'))
       "
       fxLayout="row"
       fxLayoutAlign="start center"

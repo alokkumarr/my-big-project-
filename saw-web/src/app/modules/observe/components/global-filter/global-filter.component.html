@@ -1,10 +1,18 @@
 <div class="filter-header-actions">
-  <button mat-button e2e="dashboard-global-filters-cancel-button" (click)="onCancel()">Cancel</button>
-  <button mat-raised-button
+  <button
+    mat-button
+    e2e="dashboard-global-filters-cancel-button"
+    (click)="onCancel()"
+  >
+    Cancel
+  </button>
+  <button
+    mat-raised-button
     e2e="dashboard-global-filters-apply-button"
     color="primary"
     [disabled]="globalFilters.length <= 0 && !showKPIFilter"
-    (click)="onApply()">
+    (click)="onApply()"
+  >
     Apply Filters
   </button>
 </div>
@@ -14,39 +22,58 @@
     <mat-expansion-panel-header>
       <mat-panel-title>KPI Filter</mat-panel-title>
 
-      <mat-panel-description>Applies to all the KPIs in this dashboard</mat-panel-description>
+      <mat-panel-description
+        >Applies to all the KPIs in this dashboard</mat-panel-description
+      >
     </mat-expansion-panel-header>
 
     <kpi-filter (onModelChange)="onKPIFilterUpdate($event)"></kpi-filter>
   </mat-expansion-panel>
 
-  <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters; index as idx" [ngSwitch]="gFilter.uiType" [attr.e2e]="'dashboard-global-filters-panel-' + idx">
+  <mat-expansion-panel
+    expanded="true"
+    *ngFor="let gFilter of globalFilters; index as idx"
+    [ngSwitch]="gFilter.uiType"
+    [attr.e2e]="'dashboard-global-filters-panel-' + idx"
+  >
     <mat-expansion-panel-header>
       <mat-panel-title [textContent]="gFilter.displayName"></mat-panel-title>
 
-      <mat-panel-description [textContent]="tableNameFor(gFilter)"></mat-panel-description>
+      <mat-panel-description
+        [textContent]="tableNameFor(gFilter) | async"
+      ></mat-panel-description>
     </mat-expansion-panel-header>
 
     <g-date-filter
       class="panel-body"
       *ngSwitchCase="'date'"
       [filter]="gFilter"
-      (onModelChange)="onFilterUpdate($event)"></g-date-filter>
+      (onModelChange)="onFilterUpdate($event)"
+    ></g-date-filter>
 
     <g-number-filter
       class="panel-body"
       *ngSwitchCase="'number'"
       [filter]="gFilter"
-      (onModelChange)="onFilterUpdate($event)"></g-number-filter>
+      (onModelChange)="onFilterUpdate($event)"
+    ></g-number-filter>
 
     <g-string-filter
       class="panel-body"
       *ngSwitchCase="'string'"
       [filter]="gFilter"
-      (onModelChange)="onFilterUpdate($event)"></g-string-filter>
+      (onModelChange)="onFilterUpdate($event)"
+    ></g-string-filter>
   </mat-expansion-panel>
 </div>
 
 <div class="filter-footer-actions">
-  <button mat-button color="warn" e2e="dashboard-global-filters-clear-button" (click)="onClearFilters()">Clear All Filters</button>
+  <button
+    mat-button
+    color="warn"
+    e2e="dashboard-global-filters-clear-button"
+    (click)="onClearFilters()"
+  >
+    Clear All Filters
+  </button>
 </div>

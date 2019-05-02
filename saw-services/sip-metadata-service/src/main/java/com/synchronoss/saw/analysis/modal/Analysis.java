@@ -277,7 +277,11 @@ public class Analysis {
     return mapOptions;
   }
 
-  /** Sets Map - Styling properties */
+  /**
+   * Set map options.
+   *
+   * @param mapOptions Map options
+   */
   @JsonProperty("mapOptions")
   public void setMapOptions(MapOptions mapOptions) {
     this.mapOptions = mapOptions;

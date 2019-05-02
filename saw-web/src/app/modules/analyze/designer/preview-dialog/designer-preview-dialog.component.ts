@@ -1,6 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Analysis, ArtifactColumns, AnalysisDSL } from '../types';
+import { Store } from '@ngxs/store';
+import {
+  Analysis,
+  ArtifactColumns,
+  AnalysisDSL,
+  isDSLAnalysis
+} from '../types';
 import { DesignerService } from '../designer.service';
 import {
   flattenPivotData,
@@ -13,6 +19,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as orderBy from 'lodash/orderBy';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'designer-preview-dialog',
@@ -33,7 +40,8 @@ export class DesignerPreviewDialogComponent implements OnInit {
   constructor(
     public _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { analysis: Analysis },
-    public _designerService: DesignerService
+    public _designerService: DesignerService,
+    private _store: Store
   ) {
     this.analysis = data.analysis;
     this.chartType =
@@ -52,7 +60,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
           return this._designerService.getDataForExecution(
             this.analysis.id,
             execId,
-            {...options, analysisType: this.analysis.type, executionType: 'onetime'}
+            {...options, analysisType: this.analysis.type, executionType: 'onetime', isDSL: isDSLAnalysis(this.analysis)}
           )
             .then((result) => ({data: flattenReportData(result.data, this.analysis), totalCount: result.count}));
         } else {
@@ -66,6 +74,10 @@ export class DesignerPreviewDialogComponent implements OnInit {
       };
       break;
     }
+  }
+
+  get metricName(): Observable<string> {
+    return this._store.select(state => state.designerState.metric.metricName);
   }
 
   ngOnInit() {
@@ -87,7 +99,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, (<Analysis>analysis).sqlBuilder);
+    return flattenPivotData(data, (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder);
     case 'report':
     case 'esReport':
       return data;

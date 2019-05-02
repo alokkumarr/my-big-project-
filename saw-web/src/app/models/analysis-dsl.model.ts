@@ -59,6 +59,7 @@ export interface AnalysisBaseDSL {
   description: string; // todo
   edit: boolean; // todo - this field needs to be removed and worked around
   id: string;
+  metricName?: string; // required for exporting analyses from admin module
   modifiedBy: string; // email
   modifiedTime: string;
   module: string;

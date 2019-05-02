@@ -117,8 +117,18 @@ export class ChartGridComponent implements OnInit {
     this.toggleToGrid = false;
     const { LEGEND_POSITIONING, LAYOUT_POSITIONS } = this._chartService;
     const legend = {
-      align: get(analysis, 'legend.align', 'right'),
-      layout: get(analysis, 'legend.layout', 'vertical'),
+      align: get(
+        analysis,
+        isDSLAnalysis(analysis) ? 'chartOptions.legend.align' : 'legend.align',
+        'right'
+      ),
+      layout: get(
+        analysis,
+        isDSLAnalysis(analysis)
+          ? 'chartOptions.legend.layout'
+          : 'legend.layout',
+        'vertical'
+      ),
       options: {
         align: values(LEGEND_POSITIONING),
         layout: values(LAYOUT_POSITIONS)
@@ -128,7 +138,9 @@ export class ChartGridComponent implements OnInit {
       height: 580
     };
     this.chartOptions = this._chartService.getChartConfigFor(
-      analysis.chartType,
+      isDSLAnalysis(analysis)
+        ? analysis.chartOptions.chartType
+        : analysis.chartType,
       { chart, legend }
     );
   }

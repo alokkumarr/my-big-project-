@@ -2,11 +2,11 @@ import { Component, Input } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
-import { Analysis, ArtifactColumn, Sort } from '../../types';
-import { SqlBuilderPivot } from '../../models';
+import { ArtifactColumn, Sort, isDSLAnalysis, AnalysisDSL } from '../../types';
 
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
 
 @Component({
   selector: 'executed-pivot-view',
@@ -15,25 +15,43 @@ import * as find from 'lodash/find';
 })
 export class ExecutedPivotViewComponent {
   @Input('analysis')
-  set setAnalysis(analysis: Analysis) {
+  set setAnalysis(analysis: AnalysisDSL) {
     this.analysis = analysis;
     this.artifactColumns = this.getArtifactColumns(analysis);
-    this.sorts = analysis.sqlBuilder.sorts;
+    this.sorts = analysis.sipQuery.sorts;
   }
   @Input() data: any[];
   @Input() updater: Subject<IPivotGridUpdate>;
 
-  analysis: Analysis;
+  analysis: AnalysisDSL;
   artifactColumns: ArtifactColumn[];
   sorts: Sort[];
 
   constructor() {}
 
   /* Use sqlBuilder to update selected fields in artifacts */
-  getArtifactColumns(analysis: Analysis) {
-    const row = (analysis.sqlBuilder as SqlBuilderPivot).rowFields;
-    const column = (analysis.sqlBuilder as SqlBuilderPivot).columnFields;
-    const data = (analysis.sqlBuilder as SqlBuilderPivot).dataFields;
+  getArtifactColumns(analysis: AnalysisDSL) {
+    const row = [];
+    const data = [];
+    const column = [];
+    if (isDSLAnalysis(analysis)) {
+      forEach(analysis.sipQuery.artifacts, table => {
+        forEach(table.fields, field => {
+          if (field.type === 'date') {
+            field.dateInterval = field.groupInterval;
+          }
+          if (field.area === 'row') {
+            row.push(field);
+          }
+          if (field.area === 'data') {
+            data.push(field);
+          }
+          if (field.area === 'column') {
+            column.push(field);
+          }
+        });
+      });
+    }
 
     /* These counters are for legacy purpose. If areaIndex is not saved
      * in a field in sqlBuilder, then these will be used to get an area
@@ -41,8 +59,7 @@ export class ExecutedPivotViewComponent {
     let rowId = 0,
       colId = 0,
       dataId = 0;
-
-    return map(analysis.artifacts[0].columns, artifactColumn => {
+    return map((<AnalysisDSL>analysis).sipQuery.artifacts[0].fields, artifactColumn => {
       /* Find out if this column has been selected in row, column or data area */
       const isRow = find(row, c => c.columnName === artifactColumn.columnName);
       const isColumn = find(

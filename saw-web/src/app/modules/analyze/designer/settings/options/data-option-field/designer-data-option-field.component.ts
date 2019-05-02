@@ -55,16 +55,16 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     );
   }
 
-  onAliasChange(alias) {
+  onAliasChange(aliasName) {
     const { table, columnName } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
-        alias
+        aliasName
       })
     );
-    this.change.emit({ subject: 'alias' });
+    this.change.emit({ subject: 'aliasName' });
   }
 
   onAggregateChange(aggregate) {

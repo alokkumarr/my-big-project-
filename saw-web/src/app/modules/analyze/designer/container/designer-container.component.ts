@@ -263,7 +263,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           ...(newAnalysis['analysis'] || newAnalysis),
           artifacts
         };
-
         isDSLAnalysis(this.analysis) &&
           this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
 
@@ -288,7 +287,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   generateDSLDateFilters(filters) {
     forEach(filters, filtr => {
-      if (filtr.type === 'date' && filtr.model.operator === 'BTW') {
+      if (
+        !filtr.isRuntimeFilter &&
+        !filtr.isGlobalFilter &&
+        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+      ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
@@ -302,7 +305,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       ? this.analysis.sipQuery
       : this.analysis.sqlBuilder;
     this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
-    this.filters = queryBuilder.filters;
+    this.filters = isDSLAnalysis(this.analysis)
+      ? this.generateDSLDateFilters(queryBuilder.filters)
+      : queryBuilder.filters;
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
     this.booleanCriteria = queryBuilder.booleanCriteria;
     this.isInQueryMode = this.analysis.edit;
@@ -414,6 +419,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       });
       break;
+
+    case 'pivot':
+      if (isDSLAnalysis(this.analysis)) {
+        forEach(artifacts, table => {
+          table.columns = map(table.columns, columns => {
+            forEach((<AnalysisDSL>this.analysis).sipQuery.artifacts, fields => {
+              forEach(fields.fields, field => {
+                if (field.columnName === columns.columnName) {
+                  columns.format = field.format;
+                  columns.dateInterval = field.groupInterval;
+                }
+              });
+            });
+            return columns;
+          });
+        });
+      }
     }
     return artifacts;
   }
@@ -619,6 +641,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
+    // forEach(requestAnalysis.sipQuery.artifacts[0].fields, field => {
+    //   if (field.type === 'date') {
+    //     // field.dateFormat = field.format;
+    //     delete field.format;
+    //   }
+    // });
 
     const clonedAnalysis = cloneDeep(requestAnalysis);
     // unset properties that are set by merging data from semantic layer
@@ -665,7 +693,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, (<Analysis>analysis).sqlBuilder || (<AnalysisDSL>analysis).sipQuery);
+      return flattenPivotData(
+        data,
+        (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder
+      );
     case 'report':
     case 'esReport':
       return data;
@@ -763,13 +794,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   openSaveDialog(): Promise<any> {
-    if (isDSLAnalysis(this.analysis) && this.designerMode === 'new') {
+    if (
+      isDSLAnalysis(this.analysis) &&
+      ['new', 'fork'].includes(this.designerMode)
+    ) {
       this._store.dispatch(
         new DesignerUpdateAnalysisMetadata({
           category: this._jwtService.userAnalysisCategoryId
         })
       );
-    } else if (this.designerMode === 'new') {
+    } else if (['new', 'fork'].includes(this.designerMode)) {
       (<Analysis>(
         this.analysis
       )).categoryId = this._jwtService.userAnalysisCategoryId;
@@ -1006,7 +1040,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'aggregate':
       case 'filter':
       case 'format':
-        this.artifacts = [...this.artifacts];
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();
         break;
       case 'alias':

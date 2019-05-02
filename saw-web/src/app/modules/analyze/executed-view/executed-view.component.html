@@ -54,7 +54,6 @@
         </mat-expansion-panel-header>
 
         <mat-divider></mat-divider>
-
         <executed-list
           *ngIf="analysis && analyses && analyses.length"
           style="padding-top: 20px;"
@@ -66,7 +65,7 @@
     </mat-card>
   </mat-sidenav>
   <mat-sidenav-content
-    [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''"
+    [ngClass]="analysis && analysis.type === 'chart' ? 'executed-view' : ''"
   >
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
@@ -134,13 +133,9 @@
             (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
               .length > 0
           "
-          [filters]="
-            (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
-          "
+          [filters]="filters"
           [readonly]="true"
-          [artifacts]="
-            analysis.sipQuery ? analysis.sipQuery.artifacts : analysis.artifacts
-          "
+          [artifacts]="metric && metric.artifacts"
         ></filter-chips-u>
 
         <div *ngIf="!executionId && !hasExecution && noPreviousExecution">
@@ -197,16 +192,14 @@
 
           <div *ngSwitchCase="'map'">
             <executed-map-view
-              *ngIf="
-                (analysis.type | isAnalysisType: 'map':analysis?.chartType)
-              "
+              *ngIf="analysis.type | isAnalysisType: 'map':analysis?.chartType"
               [analysis]="executedAnalysis"
               [data]="data"
             >
             </executed-map-view>
             <executed-map-chart-view
               *ngIf="
-                (analysis.type | isAnalysisType: 'mapChart':analysis?.chartType)
+                analysis.type | isAnalysisType: 'mapChart':analysis?.chartType
               "
               [analysis]="executedAnalysis"
               [data]="data"

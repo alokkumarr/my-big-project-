@@ -85,7 +85,9 @@ public class QueryBuilderUtil {
     	    switch (groupInterval)
     	    {
     	    case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
-    	    case "day" : histogramInterval =  DateHistogramInterval.DAY; break;
+    	    case "day" :
+            case "all":
+    	        histogramInterval =  DateHistogramInterval.DAY; break;
     	    case "year" : histogramInterval =  DateHistogramInterval.YEAR; break;
     	    case "quarter" : histogramInterval =  DateHistogramInterval.QUARTER; break;
     	    case "hour" : histogramInterval =  DateHistogramInterval.HOUR;break;

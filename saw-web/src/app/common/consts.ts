@@ -119,23 +119,63 @@ export const DATE_FORMATS_OBJ = fpPipe(
 export const CHART_DATE_FORMATS = [
   {
     value: 'MMMM d YYYY, h:mm:ss a',
+    groupInterval: 'day',
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {
+    label: 'September 1, 2017',
+    value: 'MMMM D, YYYY'
+  },
+  {
     value: 'MMM d YYYY',
+    groupInterval: 'day',
     label: ' Sep 1st 2017'
   },
   {
     value: 'MMM YYYY',
+    groupInterval: 'month',
     label: 'September 2017'
   },
   {
     value: 'MM YYYY',
+    groupInterval: 'month',
     label: '09 2017'
   },
   {
     value: 'YYYY',
+    groupInterval: 'year',
     label: '2017'
+  }
+];
+
+export const PIVOT_DATE_FORMATS = [
+  {
+    label: 'Default',
+    value: 'yyyy-MM-dd'
+  },
+  {
+    label: 'September 1, 2017',
+    value: 'MMMM D, YYYY'
+  },
+  {
+    label: '09/01/2017 (MM/DD/YYYY)',
+    value: 'MM/DD/YYYY'
+  },
+  {
+    label: '01/09/2017 (DD/MM/YYYY)',
+    value: 'DD/MM/YYYY'
+  },
+  {
+    label: 'September 2017',
+    value: 'MMMM YYYY'
+  },
+  {
+    label: 'September 1',
+    value: 'MMMM D'
+  },
+  {
+    label: '09/01/2017 11:20:36',
+    value: 'MM/DD/YYYY HH:mm:ss'
   }
 ];
 
@@ -145,6 +185,11 @@ export const CHART_DATE_FORMATS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(CHART_DATE_FORMATS);
+
+export const PIVOT_DATE_FORMATS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(PIVOT_DATE_FORMATS);
 
 export const AGGREGATE_TYPES = [
   {

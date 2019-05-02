@@ -445,6 +445,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     String query;
     query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size);
+    logger.trace("ES -Query {} "+query);
     List<Object> result = null;
     JsonNode response = storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
@@ -512,6 +513,31 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
             element = executionResultStore.read(executionId);
            ExecutionResult executionResult = gson.fromJson(element,ExecutionResult.class);
+            executionResponse.setData(executionResult.getData());
+            executionResponse.setExecutedBy("");
+            executionResponse.setSipQuery(executionResult.getSipQuery());
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching the execution result data" , e);
+        }
+        return executionResponse;
+    }
+
+    @Override
+    public ExecutionResponse fetchLastExecutionsData(String dslQueryId)
+    {
+        ExecutionResponse executionResponse = new ExecutionResponse();
+        JsonElement element = null;
+        try {
+            MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+            String fields[] = {"executionId","dslQueryId","status","startTime","finishedTime", "executedBy", "executionType","data","sipQuery"};
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode node = objectMapper.createObjectNode();
+            ObjectNode objectNode =  node.putObject("$eq");
+            objectNode.put("dslQueryId",dslQueryId);
+            List<JsonNode> elements = maprConnection.runMaprDBQuery(fields,node.toString(),"finishedTime",1);
+            // its last execution for the for Query Id , So consider 0 index.
+            objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+            ExecutionResult executionResult = objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
             executionResponse.setExecutedBy("");
             executionResponse.setSipQuery(executionResult.getSipQuery());

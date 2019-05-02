@@ -48,7 +48,9 @@ import {
   DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
-  DesignerResetState
+  DesignerResetState,
+  DesignerUpdatePivotGroupIntreval
+
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import {
@@ -175,7 +177,6 @@ export class DesignerState {
     const artifactIndex = artifacts.findIndex(
       artifact => artifact.artifactsName === artifactsName
     );
-
     const artifactColumnToBeAdded = {
       aggregate: artifactColumn.aggregate,
       alias: artifactColumn.alias,
@@ -185,7 +186,7 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
-      groupInterval: artifactColumn.groupInterval,
+      groupInterval: artifactColumn.dateInterval,
       name: artifactColumn.name,
       type: artifactColumn.type,
       geoType: artifactColumn.geoType,
@@ -293,7 +294,6 @@ export class DesignerState {
     forEach(artifactColumn, (value, prop) => {
       adapterColumn[prop] = value;
     });
-
     return patchState({
       analysis: {
         ...analysis,
@@ -686,4 +686,27 @@ export class DesignerState {
   resetState({ patchState }: StateContext<DesignerStateModel>) {
     patchState(cloneDeep(defaultDesignerState));
   }
+
+  @Action(DesignerUpdatePivotGroupIntreval)
+  updatePivotGroupIntreval(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerUpdatePivotGroupIntreval
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    sipQuery.artifacts.forEach(table => {
+      if (table.artifactsName === artifactColumn.table) {
+        table.fields.forEach(row => {
+          if (row.columnName === artifactColumn.columnName) {
+            row.groupInterval = artifactColumn.dateInterval;
+            delete row.format;
+          }
+        })
+      }
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
+    });
+  }
+
 }
