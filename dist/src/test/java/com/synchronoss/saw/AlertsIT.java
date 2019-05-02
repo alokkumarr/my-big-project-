@@ -201,7 +201,8 @@ public class AlertsIT extends BaseIT {
             .jsonPath()
             .getJsonObject("alert");
 
-    String activeInd = mapper.convertValue(alertObject1, JsonNode.class).get("activeInd").toString();
+    String activeInd =
+        mapper.convertValue(alertObject1, JsonNode.class).get("activeInd").toString();
     log.debug("activeInd :" + activeInd);
     assertEquals("false", activeInd);
 
