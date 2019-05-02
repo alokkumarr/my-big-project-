@@ -33,6 +33,12 @@ public class AlertTriggerDetailsLog {
   @Column(name = "START_TIME")
   Date startTime;
 
+  @Column(name = "THRESHOLD_VALUE")
+  Double thresholdValue;
+
+  @Column(name = "METRIC_VALUE")
+  Double metricValue;
+
   /**
    * Gets alertTriggerSysId.
    *
@@ -87,5 +93,33 @@ public class AlertTriggerDetailsLog {
   /** Sets startTime. */
   public void setStartTime(Date startTime) {
     this.startTime = startTime;
+  }
+
+  /**
+   * Gets thresholdValue.
+   *
+   * @return value of thresholdValue
+   */
+  public Double getThresholdValue() {
+    return thresholdValue;
+  }
+
+  /** Sets thresholdValue. */
+  public void setThresholdValue(Double thresholdValue) {
+    this.thresholdValue = thresholdValue;
+  }
+
+  /**
+   * Gets metricValue.
+   *
+   * @return value of metricValue
+   */
+  public Double getMetricValue() {
+    return metricValue;
+  }
+
+  /** Sets metricValue. */
+  public void setMetricValue(Double metricValue) {
+    this.metricValue = metricValue;
   }
 }

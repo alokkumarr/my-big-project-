@@ -21,4 +21,20 @@ public interface AlertRulesRepository extends JpaRepository<AlertRulesDetails, L
               + "and ACD.CUSTOMER_CODE = ?1",
       nativeQuery = true)
   List<AlertRulesDetails> findByCustomer(String customerCode);
+
+  @Query(
+      value =
+          "SELECT "
+              + "    ALD.ALERT_RULES_SYS_ID AS alertRulesSysId "
+              + "FROM "
+              + "    ALERT_RULES_DETAILS ALD, "
+              + "    DATAPOD_DETAILS DD, "
+              + "    ALERT_CUSTOMER_DETAILS ACD "
+              + "WHERE "
+              + "    ALD.DATAPOD_ID = DD.DATAPOD_ID "
+              + "        AND DD.ALERT_CUSTOMER_SYS_ID = ACD.ALERT_CUSTOMER_SYS_ID "
+              + "        AND ACD.CUSTOMER_CODE= :customerCode "
+              + "        AND ALD.ALERT_RULES_SYS_ID = :alertRulesSysId ",
+      nativeQuery = true)
+  Long findAlertByCustomer(String customerCode, Long alertRulesSysId);
 }
