@@ -51,7 +51,7 @@ export class GlobalFilterService {
       artifacts,
       column =>
         column.columnName === columnName &&
-        (column.table || column.tableName) === tableName
+        (column.table || column.tableName || column.artifactsName) === tableName
     );
     return col ? col.displayName || col.columnName : columnName;
   }

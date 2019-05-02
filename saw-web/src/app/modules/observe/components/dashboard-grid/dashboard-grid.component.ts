@@ -16,6 +16,7 @@ import {
   GridsterItem,
   GridsterComponent
 } from 'angular-gridster2';
+import { Store } from '@ngxs/store';
 import { Subscription, BehaviorSubject } from 'rxjs';
 
 import * as get from 'lodash/get';
@@ -42,6 +43,8 @@ import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
+import { isDSLAnalysis } from 'src/app/modules/analyze/types';
+import { ObserveLoadMetrics } from '../../actions/observe.actions';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -89,11 +92,13 @@ export class DashboardGridComponent
     private dashboardService: DashboardService,
     private windowService: WindowService,
     private sidenav: SideNavService,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    private store: Store
   ) {}
 
   ngOnInit() {
     this.subscribeToRequester();
+    this.store.dispatch(new ObserveLoadMetrics());
 
     this.columns = this.getMinColumns();
     this.options = {
@@ -233,7 +238,12 @@ export class DashboardGridComponent
   }
 
   addGlobalFilters(analysis) {
-    const columns = flatMap(analysis.artifacts, table => table.columns);
+    const columns = flatMap(
+      isDSLAnalysis(analysis)
+        ? analysis.sipQuery.artifacts
+        : analysis.artifacts,
+      table => table.columns || table.fields
+    );
 
     const filters = get(
       analysis,
@@ -267,7 +277,7 @@ export class DashboardGridComponent
               displayName: this.filters.getDisplayNameFor(
                 columns,
                 flt.columnName,
-                flt.tableName
+                flt.tableName || flt.artifactsName
               )
             }
           };
