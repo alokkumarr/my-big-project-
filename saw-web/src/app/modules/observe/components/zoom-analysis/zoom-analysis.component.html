@@ -33,7 +33,7 @@
     >
       <observe-map
         *ngIf="
-          (data.analysis.type | isAnalysisType: 'map':data.analysis?.chartType)
+          data.analysis.type | isAnalysisType: 'map':data.analysis?.chartType
         "
         class="analysis-container"
         [item]="data"
@@ -41,12 +41,13 @@
         [analysis]="data.analysis"
         [updater]="data.updater"
         [ViewMode]="true"
+        [isZoomAnalysis]="true"
       >
       </observe-map>
       <observe-map-chart
         *ngIf="
-          (data.analysis.type
-            | isAnalysisType: 'mapChart':data.analysis?.chartType)
+          data.analysis.type
+            | isAnalysisType: 'mapChart':data.analysis?.chartType
         "
         class="analysis-container"
         [item]="data"
@@ -55,6 +56,7 @@
         [enableChartDownload]="true"
         [updater]="data.updater"
         [ViewMode]="true"
+        [isZoomAnalysis]="true"
       >
       </observe-map-chart>
 
@@ -69,6 +71,7 @@
         [enableChartDownload]="true"
         [updater]="data.updater"
         [ViewMode]="true"
+        [isZoomAnalysis]="true"
       >
       </observe-chart>
 

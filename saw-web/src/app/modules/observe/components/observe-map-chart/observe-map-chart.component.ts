@@ -19,11 +19,12 @@ import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
   templateUrl: './observe-map-chart.component.html',
   styleUrls: ['./observe-map-chart.component.scss']
 })
-
-export class ObserveMapChartComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ObserveMapChartComponent
+  implements OnInit, OnDestroy, AfterViewInit {
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
+  @Input() isZoomAnalysis: boolean;
   @Input() updater: BehaviorSubject<Array<any>>;
   @Input() ViewMode: boolean;
   @Output() onRefresh = new EventEmitter<any>();
@@ -32,9 +33,7 @@ export class ObserveMapChartComponent implements OnInit, OnDestroy, AfterViewIni
   public requesterSubscription: Subscription;
   public data: Array<any>;
 
-  constructor(
-    public analyzeService: AnalyzeService
-  ) {}
+  constructor(public analyzeService: AnalyzeService) {}
 
   ngOnInit() {
     this.subscribeToRequester();

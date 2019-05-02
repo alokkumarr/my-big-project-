@@ -17,20 +17,22 @@ import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 @Component({
   selector: 'observe-map',
   templateUrl: './observe-map.component.html',
-  styles: [`
-    :host {
-      height: 100%;
-      width: 100%;
-      display: block;
-    }
-  `]
+  styles: [
+    `
+      :host {
+        height: 100%;
+        width: 100%;
+        display: block;
+      }
+    `
+  ]
   // styleUrls: ['./observe-map.component.scss']
 })
-
 export class ObserveMapComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
+  @Input() isZoomAnalysis: boolean;
   @Input() updater: BehaviorSubject<Array<any>>;
   @Input() ViewMode: boolean;
   @Output() onRefresh = new EventEmitter<any>();
@@ -39,9 +41,7 @@ export class ObserveMapComponent implements OnInit, OnDestroy, AfterViewInit {
   public requesterSubscription: Subscription;
   public data: Array<any>;
 
-  constructor(
-    public analyzeService: AnalyzeService
-  ) {}
+  constructor(public analyzeService: AnalyzeService) {}
 
   ngOnInit() {
     this.subscribeToRequester();

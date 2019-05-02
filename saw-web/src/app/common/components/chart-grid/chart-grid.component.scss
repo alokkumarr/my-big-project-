@@ -29,8 +29,11 @@ $header-font-size: 18px;
       height: calc(100% + 25px);
     }
   }
-}
 
+  .zoom-analysis-grid {
+    height: calc(100% - 45px) !important;
+  }
+}
 .report-toggle {
   height: calc(100vh - 273px);
 }
