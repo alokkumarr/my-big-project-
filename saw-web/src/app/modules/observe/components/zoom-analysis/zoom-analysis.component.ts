@@ -20,7 +20,6 @@ import moment from 'moment';
   templateUrl: './zoom-analysis.component.html',
   styleUrls: ['./zoom-analysis.component.scss']
 })
-
 export class ZoomAnalysisComponent implements OnInit {
   public analysisData: Array<any>;
   public nameMap;
@@ -35,13 +34,15 @@ export class ZoomAnalysisComponent implements OnInit {
       ? this.data.analysis.sipQuery
       : this.data.analysis.sqlBuilder;
     this.filters = isDSLAnalysis(this.data.analysis)
-    ? this.generateDSLDateFilters(queryBuilder.filters)
-    : queryBuilder.filters;
+      ? this.generateDSLDateFilters(queryBuilder.filters)
+      : queryBuilder.filters;
     this.nameMap = reduce(
-      this.data.origAnalysis.artifacts,
+      isDSLAnalysis(this.data.origAnalysis)
+        ? this.data.origAnalysis.sipQuery.artifacts
+        : this.data.origAnalysis.artifacts,
       (acc, artifact: Artifact) => {
-        acc[artifact.artifactName] = reduce(
-          artifact.columns,
+        acc[artifact.artifactName || artifact['artifactsName']] = reduce(
+          artifact.columns || artifact['fields'],
           (accum, col: ArtifactColumn) => {
             accum[col.columnName] = col.displayName;
             return accum;
@@ -56,7 +57,10 @@ export class ZoomAnalysisComponent implements OnInit {
 
   generateDSLDateFilters(filters) {
     forEach(filters, filtr => {
-      if (!filtr.isRuntimeFilter && (filtr.type === 'date' && filtr.model.operator === 'BTW')) {
+      if (
+        !filtr.isRuntimeFilter &&
+        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+      ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
@@ -66,7 +70,9 @@ export class ZoomAnalysisComponent implements OnInit {
   }
 
   getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName][filter.columnName];
+    return this.nameMap[filter.tableName || filter.artifactsName][
+      filter.columnName
+    ];
   }
 
   getFilterValue(filter: Filter) {
