@@ -68,7 +68,7 @@ public class BatchIngestionIT extends BaseIT {
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
-    root.put("channelType", "SFTP");
+    root.put("channelType", "sftp");
     root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));;
     return root;
   }
@@ -94,7 +94,7 @@ public class BatchIngestionIT extends BaseIT {
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
-    root.put("channelType", "SFTP");
+    root.put("channelType", "sftp");
     root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));;
     return root;
   }
@@ -205,7 +205,7 @@ public class BatchIngestionIT extends BaseIT {
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
-    root.put("channelType", "SFTP");
+    root.put("channelType", "sftp");
     root.put("status", "1");
     root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));
     root.put("modifiedBy", "sncr@synchronoss.com");
@@ -1032,7 +1032,7 @@ public class BatchIngestionIT extends BaseIT {
     channel.put("productCode", "SIP");
     channel.put("customerCode", "SNCR");
     channel.put("projectCode", "workbench");
-    channel.put("channelType", "SFTP");
+    channel.put("channelType", "sftp");
     channel.put("channelMetadata", new ObjectMapper().writeValueAsString(channelMetadata));;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");

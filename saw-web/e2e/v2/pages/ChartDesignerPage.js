@@ -2,7 +2,8 @@
 
 const Designer = require('./components/Designer');
 const commonFunctions = require('./utils/commonFunctions');
-
+const Constants = require('../helpers/Constants');
+const Utils = require('../pages/utils/Utils');
 class ChartsDesignerPage extends Designer {
   constructor() {
     super();
@@ -17,7 +18,6 @@ class ChartsDesignerPage extends Designer {
     this._unselectedField = name =>
       element(by.css(`[e2e="designer-unselected-field-${name}"]`));
     this._previewBtn = element(by.css('button[e2e="open-preview-modal"]'));
-    this._filterBtn = element(by.css(`[e2e="open-filter-modal"]`));
     this._dataOptions = name =>
       element(by.css(`[e2e="designer-data-option-${name}"]`));
     this._groupBySelector = element(by.css(`designer-date-interval-selector`));
@@ -36,6 +36,18 @@ class ChartsDesignerPage extends Designer {
           `//*[@e2e="designer-applied-filters"]/descendant::*[contains(text(),"${filter}")]`
         )
       );
+    this._reportSelectedFilters = element.all(
+      by.xpath('//filter-chips-u/descendant::mat-chip')
+    );
+    this._selectedFiltersText= element(
+      by.xpath('//filter-chips-u/descendant::mat-chip')
+    )
+    this._reportFilterText = element(
+      by.xpath('//span[@class="filter-counter"]')
+    );
+    this._reportFilterClear = element(
+      by.xpath('//button[contains(@class,"filter-clear-all")]')
+    );
   }
 
   searchAttribute(attribute) {
@@ -78,10 +90,6 @@ class ChartsDesignerPage extends Designer {
     commonFunctions.clickOnElement(this._previewBtn);
   }
 
-  clickOnFilterButton() {
-    commonFunctions.clickOnElement(this._filterBtn);
-  }
-
   clickOnDataOptions(type) {
     commonFunctions.clickOnElement(this._dataOptions(type));
   }
@@ -104,6 +112,37 @@ class ChartsDesignerPage extends Designer {
     filters.forEach(filter => {
       commonFunctions.waitFor.elementToBeVisible(this._appliedFilter(filter));
     });
+  }
+
+  validateReportSelectedFilters(filters) {
+    commonFunctions.waitFor.elementToBeVisible(this._reportFilterText);
+    commonFunctions.waitFor.elementToBeVisible(this._reportFilterClear);
+    commonFunctions.waitFor.elementToBeVisible(this._selectedFiltersText);
+    this._reportSelectedFilters
+      .map(function(elm) {
+        return elm.getText();
+      })
+      .then(function(displayedFilters) {
+        expect(
+          Utils.arrayContainsArray(displayedFilters, filters)
+        ).toBeTruthy();
+      });
+  }
+
+  /**
+   * analysisType: CHART/PIVOT/REPORT/ES_REPORT
+   * filters: array of string
+   */
+  validateAppliedFilters(analysisType, filters) {
+    browser.sleep(1000);
+    if (analysisType === Constants.CHART || analysisType === Constants.PIVOT) {
+      this.verifyAppliedFilters(filters);
+    } else if (
+      analysisType === Constants.REPORT ||
+      analysisType === Constants.ES_REPORT
+    ) {
+      this.validateReportSelectedFilters(filters);
+    }
   }
 }
 module.exports = ChartsDesignerPage;

@@ -11,9 +11,9 @@
 		<relativePath></relativePath>
 	</parent>
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-batch-plugin-interfaces</artifactId>
+	<artifactId>sip-batch-plugin-interfaces</artifactId>
 	<version>${revision}</version>
-	<name>saw-batch-plugin-interfaces</name>
+	<name>sip-batch-plugin-interfaces</name>
   <properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<json.validate>2.2.6</json.validate>

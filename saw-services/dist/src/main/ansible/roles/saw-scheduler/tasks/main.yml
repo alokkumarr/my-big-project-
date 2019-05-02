@@ -1,6 +1,6 @@
 - name: Copy SAW Scheduler Service package
   copy: src="{{ item }}" dest=/tmp/saw-scheduler.rpm
-  with_fileglob: ["../rpms/saw-scheduler-*.rpm"]
+  with_fileglob: ["../rpms/sip-scheduler-*.rpm"]
 - name: Install SAW Scheduler package
   yum: name=/tmp/saw-scheduler.rpm state=present
   notify:
@@ -29,6 +29,25 @@
   command: /opt/bda/saw-scheduler-service/db-setup/init
   # Note: Run database initialization only on one of the nodes
   when: "groups['saw-security'].index(inventory_hostname) == 0"
+- name: Fetch mariadb database password from existing
+  fetch:
+    src: /etc/bda/mariadb-root-password
+    dest: "{{ inventory_dir + '/mariadb-root-password' }}"
+    flat: yes
+    fail_on_missing: no
+- name: Look up mariadb database password
+  set_fact:
+    saw_mariadb_db_password: >-
+      {{ lookup('password', inventory_dir+'/mariadb-root-password chars=ascii_letters,digits') }}
+- name: create MariaDB user for saw_scheduler to other sip-nodes
+  command: >
+    mysql -u root -e "CREATE USER IF NOT EXISTS 'saw_scheduler'@'{{ hostvars[inventory_hostname]
+    ['ansible_default_ipv4']['address'] }}' IDENTIFIED BY
+    '{{ saw_scheduler_db_password }}'" -p{{ saw_mariadb_db_password }}
+- name: GRANT PRIVILEGES for saw_scheduler to other sip-nodes
+  command: >
+    mysql -u root -e "GRANT ALL PRIVILEGES ON saw_scheduler.* TO 'saw_scheduler'@'{{ hostvars
+    [inventory_hostname]['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password }}
 # Workaround: The service restart handler will run only after all
 # tasks have completed.  This causes the service to remain running
 # using the old port when the new socket activation proxy starts up,
@@ -37,11 +56,11 @@
 # setting before starting the socket activation proxy.  Can be removed
 # as no longer needed after the next SAW release.
 - meta: flush_handlers
-- name: Enable SAW Scheduler Service
-  systemd: name=saw-scheduler-proxy.socket enabled=true state=started
+- name: Enable SIP Scheduler Service
+  systemd: name=sip-scheduler-proxy.socket enabled=true state=started
 # Note: In difference to other socket-activates services, the
 # Scheduler Service is by default also enabled itself to ensure that
 # scheduled tasks are executed even without traffic to activate the
 # service
-- name: Enable SAW Scheduler Service
-  systemd: name=saw-scheduler enabled=true
+- name: Enable SIP Scheduler Service
+  systemd: name=sip-scheduler enabled=true

@@ -1,0 +1,11 @@
+[Unit]
+Description=SIP Export
+
+[Service]
+Type=notify
+ExecStart=/bin/sh -c "exec java -Xmx1G -jar /opt/bda/saw-export-service/saw-export.jar --spring.config.location=/opt/bda/saw-export-service/conf/application.yml"
+SyslogIdentifier=sip-export
+User=mapr
+Restart=on-failure
+# Allow service to exit on SIGTERM, if socket-activated
+SuccessExitStatus=143

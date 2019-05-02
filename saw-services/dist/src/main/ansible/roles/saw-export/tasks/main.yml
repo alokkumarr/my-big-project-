@@ -1,6 +1,6 @@
 - name: Copy SAW Export package
   copy: src="{{ item }}" dest=/tmp/saw-export.rpm
-  with_fileglob: ["../rpms/saw-export-*.rpm"]
+  with_fileglob: ["../rpms/sip-export-*.rpm"]
 - name: Install SAW Export Service package
   yum: name=/tmp/saw-export.rpm state=present
   notify:
@@ -21,5 +21,5 @@
 # setting before starting the socket activation proxy.  Can be removed
 # as no longer needed after the next SAW release.
 - meta: flush_handlers
-- name: Enable SAW Export Service
-  systemd: name=saw-export-proxy.socket enabled=true state=started
+- name: Enable SIP Export Service
+  systemd: name=sip-export-proxy.socket enabled=true state=started

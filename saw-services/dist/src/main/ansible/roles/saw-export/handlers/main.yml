@@ -1,6 +1,6 @@
 - name: restart saw-export
   # Stop service, to trigger restart by socket activation
-  systemd: name=saw-export state=stopped daemon_reload=true
+  systemd: name=sip-export state=stopped daemon_reload=true
   # Workaround: Occasionally deployments will fail with "Job for
   # service canceled".  The root cause is not known, but retry as a
   # workaround for now.

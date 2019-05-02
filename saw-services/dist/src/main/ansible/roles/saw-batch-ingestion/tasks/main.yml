@@ -1,6 +1,6 @@
 - name: Copy SAW Batch Ingestion Service package
   copy: src="{{ item }}" dest=/tmp/saw-batch-ingestion.rpm
-  with_fileglob: ["../rpms/saw-batch-*.rpm"]
+  with_fileglob: ["../rpms/sip-batch-*.rpm"]
 - name: Install SAW Batch Ingestion package
   yum: name=/tmp/saw-batch-ingestion.rpm state=present
   notify:
@@ -67,6 +67,14 @@
    state: present
   when: "groups['saw-services'].index(inventory_hostname) == 0"
   tags: mariadb
-
-- name: Enable SAW Batch Ingestion Service
-  systemd: name=saw-batch-ingestion-proxy.socket enabled=true state=started
+- name: create MariaDB user for sip_bis to other sip-nodes
+  command: >
+    mysql -u root -e "CREATE USER IF NOT EXISTS 'sip_bis'@'{{ hostvars[inventory_hostname]
+    ['ansible_default_ipv4']['address'] }}' IDENTIFIED BY
+    '{{ saw_batch_ingestion_db_password }}'" -p{{ saw_mariadb_db_password }}
+- name: GRANT PRIVILEGES for sip_bis to other sip-nodes
+  command: >
+    mysql -u root -e "GRANT ALL PRIVILEGES ON sip_bis.* TO 'sip_bis'@'{{ hostvars[inventory_hostname]
+    ['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password }}
+- name: Enable SIP Batch Ingestion Service
+  systemd: name=sip-batch-ingestion-proxy.socket enabled=true state=started
