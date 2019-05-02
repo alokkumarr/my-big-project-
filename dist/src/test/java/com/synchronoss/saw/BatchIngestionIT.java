@@ -68,7 +68,7 @@ public class BatchIngestionIT extends BaseIT {
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
-    root.put("channelType", "SFTP");
+    root.put("channelType", "sftp");
     root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));;
     return root;
   }
@@ -94,7 +94,7 @@ public class BatchIngestionIT extends BaseIT {
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
-    root.put("channelType", "SFTP");
+    root.put("channelType", "sftp");
     root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));;
     return root;
   }
@@ -205,7 +205,7 @@ public class BatchIngestionIT extends BaseIT {
     root.put("productCode", "SIP");
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
-    root.put("channelType", "SFTP");
+    root.put("channelType", "sftp");
     root.put("status", "1");
     root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));
     root.put("modifiedBy", "sncr@synchronoss.com");
@@ -299,32 +299,6 @@ public class BatchIngestionIT extends BaseIT {
     return root;
   }
   
-  /**
-   * This method is used to prepare a route to use it while scheduling transfer. data on hourly
-   * basis
-   * 
-   * @return object {@link ObjectNode}
-   * @throws JsonProcessingException exception.
-   */
-  private ObjectNode prepareRouteDataSetForDisableConcurrency() throws JsonProcessingException {
-    ObjectNode childNode = mapper.createObjectNode();
-    childNode.put("routeName", "route-scheduled-transfer-" + testId());
-    childNode.put("sourceLocation", "/root/saw-batch-samples/log/small");
-    childNode.put("destinationLocation", "log/scheduled");
-    childNode.put("filePattern", "*.log");
-    childNode.put("fileExclusions", "csv");
-    childNode.put("disableDuplicate", "false");
-    childNode.put("disableConcurrency", "true");
-    childNode.put("lastModifiedLimitHours", "");
-    childNode.put("batchSize", "10");
-    childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
-    childNode.put("description", "route has been created for scheduled test case");
-    ObjectNode root = mapper.createObjectNode();
-    root.put("createdBy", "sysadmin@synchronoss.com");
-    root.put("routeMetadata", new ObjectMapper().writeValueAsString(childNode));
-    root.put("status", 1);
-    return root;
-  }
 
   /**
    * This test-case is check the scenario to create a channel.
@@ -719,10 +693,22 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("Json Path for transfer data :" + path.prettyPrint());
     String result = path.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result);
-    assertEquals("SUCCESS", result);
-    String fileName = path.getString("logs[0].recdFileName");
+    
+    try {
+      Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
+    } catch (InterruptedException e) {
+      log.debug("Interrupted");
+    }
+    
+    JsonPath afterWaitPath = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    String fileName = afterWaitPath.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName);
     assertNotNull(fileName);
+    String afterWaitStatus = afterWaitPath.getString("logs[0].mflFileStatus");
+    log.debug("Status of download : " + result);
+    
+    assertEquals("SUCCESS", afterWaitStatus);
     this.tearDownRoute();
     this.tearDownChannel();
     this.tearDownLogs();
@@ -811,11 +797,13 @@ public class BatchIngestionIT extends BaseIT {
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
     given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
-        .statusCode(200);
+      .statusCode(200);
+    waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     log.debug("Request URL for transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for transferDataWithExclusion :" + caller1.prettyPrint());
+    
     String result1 = caller1.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result1);
     String fileName1 = caller1.getString("logs[0].recdFileName");
@@ -880,7 +868,7 @@ public class BatchIngestionIT extends BaseIT {
 
     given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
         .statusCode(200);
-
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     // Second Call to simulate duplicate file
     JsonPath caller2 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
@@ -1007,6 +995,28 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Data has been downloaded");
     }
   }
+  
+  private void waitForSuccessFileTobeAvailable(int retries, Long channelId, Long routeId) {
+    JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    log.debug("Json Path for transferDataSchedule :" + path.prettyPrint());
+    if (path.getList("logs").size() == 0 || !path.getString("logs[0].mflFileStatus")
+        .equals("SUCCESS") ) {
+      if (retries == 0) {
+        throw new RuntimeException("Timed out waiting while waiting for dataset");
+      }
+      try {
+        Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
+      } catch (InterruptedException e) {
+        log.debug("Interrupted");
+      }
+      log.debug("waitForFileTobeAvailable triggered with number of retries : " + retries);
+      waitForFileTobeAvailable(retries - 1, channelId, routeId);
+    } else {
+      log.debug("Data has been downloaded");
+    }
+  }
+  
 
 
   /**
@@ -1032,7 +1042,7 @@ public class BatchIngestionIT extends BaseIT {
     channel.put("productCode", "SIP");
     channel.put("customerCode", "SNCR");
     channel.put("projectCode", "workbench");
-    channel.put("channelType", "SFTP");
+    channel.put("channelType", "sftp");
     channel.put("channelMetadata", new ObjectMapper().writeValueAsString(channelMetadata));;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
