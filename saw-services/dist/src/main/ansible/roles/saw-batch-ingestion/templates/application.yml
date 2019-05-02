@@ -61,7 +61,7 @@ sip:
     retry.diff.mins: {{ sip_bis_retry_diffs_in_minutes  | default(5) }}
     retry.page.size: 20
     max.inprogress.mins: 45
-    worker.delay: 5000
+    worker.delay: 1000
 
 bis:
   transfer-batch-size: 10
