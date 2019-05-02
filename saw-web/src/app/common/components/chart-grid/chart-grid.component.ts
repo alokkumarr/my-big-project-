@@ -139,7 +139,7 @@ export class ChartGridComponent implements OnInit {
     };
     this.chartOptions = this._chartService.getChartConfigFor(
       isDSLAnalysis(analysis)
-        ? analysis.chartOptions.chartType
+        ? (<AnalysisChartDSL>analysis).chartOptions.chartType
         : analysis.chartType,
       { chart, legend }
     );

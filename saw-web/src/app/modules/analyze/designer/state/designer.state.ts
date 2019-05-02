@@ -6,6 +6,8 @@ import * as findIndex from 'lodash/findIndex';
 import * as forEach from 'lodash/forEach';
 import * as reduce from 'lodash/reduce';
 import * as set from 'lodash/set';
+import * as remove from 'lodash/remove';
+import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
@@ -50,7 +52,6 @@ import {
   DesignerLoadMetric,
   DesignerResetState,
   DesignerUpdatePivotGroupIntreval
-
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import {
@@ -210,6 +211,11 @@ export class DesignerState {
         artifactColumnToBeAdded
       ];
     }
+
+    // cleanup empty artifacts
+    remove(sipQuery.artifacts, artifact => {
+      return isEmpty(artifact.fields);
+    });
 
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
@@ -701,12 +707,11 @@ export class DesignerState {
             row.groupInterval = artifactColumn.dateInterval;
             delete row.format;
           }
-        })
+        });
       }
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
   }
-
 }
