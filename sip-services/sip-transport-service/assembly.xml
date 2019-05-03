@@ -22,7 +22,7 @@
 	  </fileSet>
 	  <fileSet>
 		  <directoryMode>755</directoryMode>
-		  <directory>${project.basedir}/../saw-data-access/target</directory>
+		  <directory>${project.basedir}/../sip-data-access/target</directory>
 		  <outputDirectory>sparklib</outputDirectory>
 		  <includes>
 			  <include>sip-data-access-${project.version}-jar-with-dependencies.jar</include>

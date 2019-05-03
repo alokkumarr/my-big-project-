@@ -677,7 +677,7 @@
                       <entry>
                         <name>${rpm.ts.root}/bin</name>
                         <collect>
-                          <from>${project.basedir}/../saw-data-access/src/main/scripts</from>
+                          <from>${project.basedir}/../sip-data-access/src/main/scripts</from>
                         </collect>
                         <ruleset>default</ruleset>
                       </entry>

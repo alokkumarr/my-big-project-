@@ -178,24 +178,24 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<modules>
-		<module>saw-common</module>
+		<module>sip-common</module>
     <module>sip-query-dsl</module>
 		<module>sip-metadata-service</module>
     <module>saw-metadata-service</module>
-		<module>saw-data-access</module>
-		<module>saw-transport-service</module>
-		<module>saw-es-querybuilder</module>
-		<module>saw-gateway-service</module>
-		<module>saw-export-service</module>
-		<module>saw-workbench-service</module>
-		<module>saw-date-extract-api</module>
-		<module>saw-inspect-data-api</module>
-		<module>saw-scheduler-service</module>
-		<module>saw-proxy-service</module>
-		<module>saw-batch-log-service</module>
-		<module>saw-batch-ingestion-service</module>
-		<module>saw-batch-plugin-interfaces</module>
-		<module>saw-batch-plugin-sftp</module>
+		<module>sip-data-access</module>
+		<module>sip-transport-service</module>
+		<module>sip-es-querybuilder</module>
+		<module>sip-gateway-service</module>
+		<module>sip-export-service</module>
+		<module>sip-workbench-service</module>
+		<module>sip-date-extract-api</module>
+		<module>sip-inspect-data-api</module>
+		<module>sip-scheduler-service</module>
+		<module>sip-proxy-service</module>
+		<module>sip-batch-log-service</module>
+		<module>sip-batch-ingestion-service</module>
+		<module>sip-batch-plugin-interfaces</module>
+		<module>sip-batch-plugin-sftp</module>
 		<module>sip-batch-plugin-s3</module>
     <module>sip-common-components</module>
 		<module>dist</module>
