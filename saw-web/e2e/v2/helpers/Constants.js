@@ -9,6 +9,7 @@ const NUMBER_TYPES = ['long', 'integer', 'double', 'float'];
 const API_ROUTES = {
   AUTH: '/saw/security/doAuthenticate',
   ANALYSIS: '/saw/services/analysis',
+  DSL_ANALYSIS: '/saw/services/dslanalysis/',
   CATEGORIES_FETCH: '/saw/security/auth/admin/cust/manage/categories/fetch',
   SEMANTIC: '/saw/services/internal/semantic/md?projectId=workbench',
   ROLES: '/saw/security/auth/admin/cust/manage/roles/add',
