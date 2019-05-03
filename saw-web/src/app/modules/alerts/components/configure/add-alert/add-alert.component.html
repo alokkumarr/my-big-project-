@@ -187,7 +187,12 @@
               ><small>This field is required </small></mat-error
             >
 
-            <div fxFlex fxLayout="row" fxLayoutGap="36px" class="padtop10">
+            <div
+              fxFlex="45px"
+              fxLayout="row"
+              fxLayoutGap="36px"
+              class="padtop10"
+            >
               <button
                 color="secondary"
                 mat-stroked-button
@@ -217,7 +222,7 @@
               <mat-label>Aggregation </mat-label>
               <mat-select formControlName="aggregation" e2e="alertAggregation">
                 <mat-option
-                  *ngFor="let aggr of (aggregations$ | async)"
+                  *ngFor="let aggr of aggregations$ | async"
                   [value]="aggr.id"
                   >{{ aggr.name }}</mat-option
                 >
@@ -233,7 +238,7 @@
                 e2e="alertOperator"
               >
                 <mat-option
-                  *ngFor="let op of (operators$ | async)"
+                  *ngFor="let op of operators$ | async"
                   [value]="op.id"
                   >{{ op.name }}</mat-option
                 >
