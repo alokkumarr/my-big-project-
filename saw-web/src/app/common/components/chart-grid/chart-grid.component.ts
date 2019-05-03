@@ -165,7 +165,6 @@ export class ChartGridComponent implements OnInit {
       );
     }
     this.chartToggleData = this.trimKeyword(data);
-    console.log('chartToggleData : ', this.chartToggleData);
 
     return [
       ...this._chartService.dataToChangeConfig(
