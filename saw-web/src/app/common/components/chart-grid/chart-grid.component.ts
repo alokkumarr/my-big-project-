@@ -7,6 +7,7 @@ import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
+import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
 
 import { ChartService } from '../../services';
@@ -51,7 +52,10 @@ export class ChartGridComponent implements OnInit {
     });
     this.data = data;
   }
-  @Input() isZoomAnalysis: boolean;
+  @Input('isZoomAnalysis')
+  set setZoomAnalysis(data) {
+    this.isZoomAnalysis = isUndefined(data) ? false : data;
+  }
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
   public analysis: AnalysisChart;
@@ -60,6 +64,7 @@ export class ChartGridComponent implements OnInit {
   public chartToggleData: any;
   public updates: any;
   public data: any[];
+  public isZoomAnalysis: boolean = false;
 
   constructor(private _chartService: ChartService) {
     this.customizeColumns = this.customizeColumns.bind(this);
