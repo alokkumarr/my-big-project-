@@ -9,15 +9,15 @@ import {
 } from '../../../types';
 import {
   CHART_DATE_FORMATS,
-  DATE_FORMATS,
-  DATE_FORMATS_OBJ,
+  PIVOT_DATE_FORMATS,
+  PIVOT_DATE_FORMATS_OBJ,
   CHART_DATE_FORMATS_OBJ
 } from '../../../../consts';
 
 const dateFormatsMap = {
   pivot: {
-    array: DATE_FORMATS,
-    obj: DATE_FORMATS_OBJ
+    array: PIVOT_DATE_FORMATS,
+    obj: PIVOT_DATE_FORMATS_OBJ
   },
   chart: {
     array: CHART_DATE_FORMATS,
