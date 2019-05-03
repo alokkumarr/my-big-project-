@@ -18,6 +18,7 @@ import {
 } from 'angular-gridster2';
 import { Store } from '@ngxs/store';
 import { Subscription, BehaviorSubject } from 'rxjs';
+import { first, tap } from 'rxjs/operators';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
@@ -169,7 +170,18 @@ export class DashboardGridComponent
     );
     this.listeners.push(globalFiltersSubscription);
 
-    setTimeout(_ => this.initialiseDashboard(), 100);
+    setTimeout(_ => {
+      /* Wait for metrics to load before initialising dashboard.
+      Metrics are needed to get full artifacts for filters */
+      const listener = this.store
+        .select(state => state.observe.metrics)
+        .pipe(
+          first(metrics => values(metrics).length > 0),
+          tap(() => this.initialiseDashboard())
+        )
+        .subscribe();
+      this.listeners.push(listener);
+    }, 100);
   }
 
   isViewMode() {
@@ -238,8 +250,12 @@ export class DashboardGridComponent
   }
 
   addGlobalFilters(analysis) {
+    const metrics = this.store.selectSnapshot(state => state.observe.metrics);
+    const metric = metrics[analysis.semanticId];
     const columns = flatMap(
-      isDSLAnalysis(analysis)
+      metric
+        ? metric.artifacts
+        : isDSLAnalysis(analysis)
         ? analysis.sipQuery.artifacts
         : analysis.artifacts,
       table => table.columns || table.fields

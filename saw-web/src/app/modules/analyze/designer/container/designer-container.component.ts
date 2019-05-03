@@ -641,12 +641,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
-    // forEach(requestAnalysis.sipQuery.artifacts[0].fields, field => {
-    //   if (field.type === 'date') {
-    //     // field.dateFormat = field.format;
-    //     delete field.format;
-    //   }
-    // });
 
     const clonedAnalysis = cloneDeep(requestAnalysis);
     // unset properties that are set by merging data from semantic layer
@@ -1045,8 +1039,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'alias':
         // reload frontEnd
+        this.updateAnalysis();
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.artifacts = [...this.artifacts];
-        if (this.analysis.type === 'chart') {
+        if (this.analysis.type === 'chart' || this.analysis.type === 'pivot') {
           this.refreshDataObject();
         }
         break;
