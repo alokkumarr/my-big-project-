@@ -116,7 +116,7 @@ export interface IDEsignerSettingGroupAdapter {
 export interface DesignerChangeEvent {
   subject:
     | 'format'
-    | 'aliasName'
+    | 'alias'
     | 'aliasname'
     | 'aggregate'
     | 'dateInterval'

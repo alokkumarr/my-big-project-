@@ -192,14 +192,19 @@
 
           <div *ngSwitchCase="'map'">
             <executed-map-view
-              *ngIf="analysis.type | isAnalysisType: 'map':analysis?.chartType"
+              *ngIf="
+                analysis.type
+                  | isAnalysisType: 'map':analysis?.mapOptions?.mapType
+              "
               [analysis]="executedAnalysis"
               [data]="data"
             >
             </executed-map-view>
+
             <executed-map-chart-view
               *ngIf="
-                analysis.type | isAnalysisType: 'mapChart':analysis?.chartType
+                analysis.type
+                  | isAnalysisType: 'mapChart':analysis?.mapOptions?.mapType
               "
               [analysis]="executedAnalysis"
               [data]="data"

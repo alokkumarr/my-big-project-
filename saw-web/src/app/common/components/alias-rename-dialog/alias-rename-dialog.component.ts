@@ -19,8 +19,8 @@ export class AliasRenameDialogComponent {
     this.alias = this.data.alias;
   }
 
-  onAliasChange(aliasName) {
-    this.alias = aliasName;
+  onAliasChange(alias) {
+    this.alias = alias;
   }
 
   close() {

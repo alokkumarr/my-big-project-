@@ -16,6 +16,7 @@ import {
 import { JwtService } from '../../../../common/services';
 import { generateSchedule } from '../../../../common/utils/cron2Readable';
 import * as isUndefined from 'lodash/isUndefined';
+import * as get from 'lodash/get';
 
 @Component({
   selector: 'analyze-card',
@@ -65,13 +66,14 @@ export class AnalyzeCardComponent implements OnInit {
       map: 'mapOptions.mapType',
       chart: 'chartOptions.chartType'
     };
-    const subTypePath = isDSLAnalysis(this.analysis)
-      ? subTypePaths[this.analysisType]
+    const subTypePath = subTypePaths[this.analysisType];
+    const subType = isDSLAnalysis(this.analysis)
+      ? get(this.analysis, subTypePath)
       : (<AnalysisChart>this.analysis).chartType;
 
-    this.placeholderClass = `m-${type}${subTypePath ? `-${subTypePath}` : ''}`;
+    this.placeholderClass = `m-${type}${subType ? `-${subType}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${
-      subTypePath ? `:${subTypePath}` : ''
+      subType ? `:${subType}` : ''
     }`;
 
     this._executeService.subscribe(id, this.onExecutionsEvent);
