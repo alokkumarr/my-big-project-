@@ -50,7 +50,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 
 @RestController
-@RequestMapping("/ingestion/batch/sftp")
+@RequestMapping("/ingestion/batch")
 public class SawBisPluginController {
 
   private static final Logger logger = LoggerFactory.getLogger(SawBisPluginController.class);
@@ -178,7 +178,7 @@ public class SawBisPluginController {
       }
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
-        response = sipTransferService.transferData(Long.valueOf(requestBody.getChannelId()),
+        response = sipTransferService.scanFilesForPattern(Long.valueOf(requestBody.getChannelId()),
             Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
       } else {
         response = sipTransferService.immediateTransfer(requestBody);
@@ -253,7 +253,7 @@ public class SawBisPluginController {
     if (Long.valueOf(requestBody.getChannelId()) > 0L
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
       CompletableFuture
-          .supplyAsync(() -> sipTransferService.transferData(
+          .supplyAsync(() -> sipTransferService.scanFilesForPattern(
               Long.valueOf(requestBody.getChannelId()),
               Long.valueOf(requestBody.getRouteId()), null, false,
               SourceType.REGULAR.name()), transactionPostExecutor)

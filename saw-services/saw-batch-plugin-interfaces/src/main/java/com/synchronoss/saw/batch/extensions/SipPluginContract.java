@@ -78,7 +78,7 @@ public abstract class SipPluginContract {
    * * This method is to test connect the source.
  * @param source TODO
    */
-  public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
+  public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
       boolean isDisable, String source) throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because it "
         + "will be overriden on the respective plugin module if required");

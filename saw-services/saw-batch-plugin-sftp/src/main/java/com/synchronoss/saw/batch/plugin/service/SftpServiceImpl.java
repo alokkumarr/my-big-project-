@@ -631,7 +631,7 @@ public class SftpServiceImpl extends SipPluginContract {
   }
 
   @Override
-  public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
+  public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
       boolean isDisable, String source) throws SipNestedRuntimeException {
     Preconditions.checkNotNull(channelId != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(routeId != null, "payload.getRouteId() cannot be null");
@@ -759,9 +759,11 @@ public class SftpServiceImpl extends SipPluginContract {
           }
           logger.trace("opened session has been closed here.");
         } else {
-          throw new SftpProcessorException("Exception occurred while connecting to channel from "
-              + "factory of connections because channel is not present with the Id " + channelId
-              + " & routeId " + routeId);
+          throw new SftpProcessorException("Exception occurred "
+              + "while connecting to channel from "
+              + "factory of connections because route "
+              + "is not present with the Id channel ID:" + channelId
+              + " & routeId: " + routeId);
         }
       }
     } catch (Exception ex) {
@@ -1112,8 +1114,8 @@ public class SftpServiceImpl extends SipPluginContract {
                         bisDataMetaInfo.setComponentState(BisComponentState.DUPLICATE.value());
                         
                         Long successCnt = bisJobEntity.getSuccessCount();
-                        sipLogService.updateSuccessCnt(jobId,"INPROGRESS",
-                             successCnt + 1);
+                        //sipLogService.updateSuccessCnt(jobId,"INPROGRESS",
+                        //     successCnt + 1);
                         // This check has been added as a part of optimization ticket
                         // SIP-6386
                         if (duplicateEntry) {

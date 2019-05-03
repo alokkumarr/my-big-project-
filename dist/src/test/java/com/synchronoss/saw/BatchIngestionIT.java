@@ -35,9 +35,9 @@ public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_PATH = "/services/ingestion/batch";
 
   private static final String TRANSFER_DATA_PATH =
-      "/services/ingestion/batch/sftp/channel/transfers/data";
+      "/services/ingestion/batch/channel/transfers/data";
 
-  private static final String PLUGNIN_PATH = "/services/ingestion/batch/sftp";
+  private static final String PLUGNIN_PATH = "/services/ingestion/batch";
 
   private static final String ROUTE_HISTORY_PATH = "/services/ingestion/batch/logs/";
   private static final String LOGS_HISTORY_INTERNAL = "/services/ingestion/batch/internal/logs";
@@ -662,7 +662,7 @@ public class BatchIngestionIT extends BaseIT {
         .jsonPath().getLong("bisChannelSysId");
     log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
     String connectRouteUri =
-        BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
+        BATCH_PATH + "/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
     this.tearDownChannel();
   }
@@ -970,6 +970,7 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Json Path for wait for file to be available :" + jsonPath.prettify());
       assertEquals(true, jsonPath.getBoolean("status"));
     }
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     assertEquals("SUCCESS", result);
     this.tearDownRoute();
     this.tearDownChannel();

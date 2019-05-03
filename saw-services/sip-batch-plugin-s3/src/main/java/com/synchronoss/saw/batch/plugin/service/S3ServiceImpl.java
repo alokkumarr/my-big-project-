@@ -1,12 +1,14 @@
 package com.synchronoss.saw.batch.plugin.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
+import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 
 @Service
 public class S3ServiceImpl extends SipPluginContract {
@@ -48,7 +50,13 @@ public class S3ServiceImpl extends SipPluginContract {
     // TODO Auto-generated method stub
     
   }
-
+  
+  @Override
+  public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
+      boolean isDisable, String source) throws SipNestedRuntimeException {
+    
+    return null;
+  }
   
 	
 	
