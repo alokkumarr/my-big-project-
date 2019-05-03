@@ -25,8 +25,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -411,6 +411,7 @@ public class AlertServiceImpl implements AlertService {
    * @param alertCount AlertCount
    * @return AlertCountResponse
    */
+  @Override
   public List<AlertCountResponse> alertCount(AlertCount alertCount, Long alertRuleSysId) {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String dateFormatLte = "23:59:59";
@@ -428,152 +429,138 @@ public class AlertServiceImpl implements AlertService {
       throw new IllegalArgumentException("GroupBy cannot be null");
     }
     switch (alertCount.getPreset().value()) {
-      case "Yesterday":
-        {
-          LocalDateTime yesterday = now.minusDays(1);
-          endDate = yesterday.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = yesterday.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "Today":
-        {
-          LocalDateTime today = now;
-          endDate = today.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = today.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "YTD":
-        {
-          LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
-          endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = firstDay.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "MTD":
-        {
-          LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
-          endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = firstDayOfMonth.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "LW":
-        {
-          DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-          LocalDateTime priorLastWeek = now.minusWeeks(1);
-          LocalDateTime startOfWeek =
-              priorLastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-          LocalDateTime endOfWeek =
-              priorLastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-          startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
-          endDate = (endOfWeek.format(dateTimeFormatter) + space + dateFormatLte);
-          break;
-        }
-      case "TW":
-        {
-          DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-          LocalDateTime lastWeek = now;
-          LocalDateTime startOfWeek =
-              lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-          startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
-          endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
-          break;
-        }
-      case "LTW":
-        {
-          LocalDateTime last2Week = now.minusWeeks(2);
-          endDate =
-              now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "LSW":
-        {
-          DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-          LocalDateTime lastWeek = now.minusWeeks(6);
-          endDate =
-              now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              lastWeek.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
+      case "Yesterday": {
+        LocalDateTime yesterday = now.minusDays(1);
+        endDate = yesterday.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = yesterday.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "Today": {
+        LocalDateTime today = now;
+        endDate = today.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = today.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "YTD": {
+        LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
+        endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = firstDay.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "MTD": {
+        LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
+        endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
+        startDate = firstDayOfMonth.format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "LW": {
+        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        LocalDateTime priorLastWeek = now.minusWeeks(1);
+        LocalDateTime startOfWeek =
+            priorLastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+        LocalDateTime endOfWeek =
+            priorLastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
+        startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
+        endDate = (endOfWeek.format(dateTimeFormatter) + space + dateFormatLte);
+        break;
+      }
+      case "TW": {
+        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        LocalDateTime lastWeek = now;
+        LocalDateTime startOfWeek =
+            lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+        startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
+        endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
+        break;
+      }
+      case "LTW": {
+        LocalDateTime last2Week = now.minusWeeks(2);
+        endDate =
+            now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
+      case "LSW": {
+        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        LocalDateTime lastWeek = now.minusWeeks(6);
+        endDate =
+            now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            lastWeek.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
+        break;
+      }
 
-      case "LQ":
-        {
-          YearQuarter quarter = YearQuarter.now();
-          endDate = quarter.minusQuarters(1).atEndOfQuarter().toString() + space + dateFormatLte;
-          startDate = quarter.minusQuarters(1).atDay(1).toString() + space + dateFormatGte;
-          break;
+      case "LQ": {
+        YearQuarter quarter = YearQuarter.now();
+        endDate = quarter.minusQuarters(1).atEndOfQuarter().toString() + space + dateFormatLte;
+        startDate = quarter.minusQuarters(1).atDay(1).toString() + space + dateFormatGte;
+        break;
+      }
+      case "LM": {
+        LocalDateTime lastMonth = now.minusMonths(1);
+        startDate =
+             lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
+                 + space
+                 + dateFormatGte;
+        endDate =
+            lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        break;
+      }
+      case "LTM": {
+        LocalDateTime last3Month = now.minusMonths(3);
+        endDate =
+            now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            last3Month.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatGte;
+        break;
+      }
+      case "LSM": {
+        LocalDateTime last6Months = now.minusMonths(6);
+        endDate =
+            now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
+                + space
+                + dateFormatGte;
+        break;
+      }
+      case "LY": {
+        LocalDateTime currentDayOflastYearDate = now.minusMonths(12);
+        endDate =
+            currentDayOflastYearDate
+                .with(TemporalAdjusters.lastDayOfYear())
+                .format(dateTimeFormatter)
+                + space
+                + dateFormatLte;
+        startDate =
+            currentDayOflastYearDate
+                .with(TemporalAdjusters.firstDayOfYear())
+                .format(dateTimeFormatter)
+                + space
+                + dateFormatGte;
+        break;
+      }
+      case "BTW": {
+        if (alertCount.getStartTime() == null) {
+          throw new IllegalArgumentException("Start time is missing for custom date filter");
+        } else if (alertCount.getEndTime() == null) {
+          throw new IllegalArgumentException("End date is missing for custom date filter");
         }
-      case "LM":
-        {
-          LocalDateTime lastMonth = now.minusMonths(1);
-          startDate =
-              lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          endDate =
-              lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          break;
-        }
-      case "LTM":
-        {
-          LocalDateTime last3Month = now.minusMonths(3);
-          endDate =
-              now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              last3Month.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          break;
-        }
-      case "LSM":
-        {
-          LocalDateTime last6Months = now.minusMonths(6);
-          endDate =
-              now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          break;
-        }
-      case "LY":
-        {
-          LocalDateTime currentDayOflastYearDate = now.minusMonths(12);
-          endDate =
-              currentDayOflastYearDate
-                      .with(TemporalAdjusters.lastDayOfYear())
-                      .format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              currentDayOflastYearDate
-                      .with(TemporalAdjusters.firstDayOfYear())
-                      .format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          break;
-        }
-      case "BTW":
-        {
-          if (alertCount.getStartTime() == null) {
-            throw new IllegalArgumentException("Start time is missing for custom date filter");
-          } else if (alertCount.getEndTime() == null) {
-            throw new IllegalArgumentException("End date is missing for custom date filter");
-          }
-          break;
-        }
+        break;
+      }
       default:
         throw new IllegalArgumentException(alertCount.getPreset() + " not present");
     }
@@ -601,8 +588,8 @@ public class AlertServiceImpl implements AlertService {
   /**
    * Return timestamp from the given date.
    *
-   * @param date
-   * @return Long epochValue
+   * @param date String
+   * @return Long
    */
   private Long getEpochFromDateTime(String date) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

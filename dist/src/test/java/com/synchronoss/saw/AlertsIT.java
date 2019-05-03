@@ -356,4 +356,22 @@ public class AlertsIT extends BaseIT {
     root.put("thresholdValue", "2");
     return root;
   }
+
+  /** This test-case is check the alert count. */
+  @Test
+  public void testAlertCount() throws IOException {
+    String urlForAlertCount = ALERT_PATH + "/" + "count";
+    log.debug("URL for Alert count : " + urlForAlertCount);
+    ObjectNode root = mapper.createObjectNode();
+    root.put("preset", "YTD");
+    root.put("groupBy", "StartTime");
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(root)
+        .when()
+        .post(urlForAlertCount)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
 }
