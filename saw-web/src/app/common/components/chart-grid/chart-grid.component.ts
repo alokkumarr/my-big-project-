@@ -227,7 +227,12 @@ export class ChartGridComponent implements OnInit {
         { labels, labelOptions: analysis.labelOptions, sorts }
       ),
       { path: 'title.exportFilename', data: analysis.name },
-      { path: 'chart.inverted', data: analysis.isInverted }
+      {
+        path: 'chart.inverted',
+        data: isDSLAnalysis(analysis)
+          ? analysis.chartOptions.isInverted
+          : analysis.isInverted
+      }
     ];
   }
 

@@ -1,12 +1,14 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  ViewChild,
   OnInit,
   OnDestroy,
   Input,
   Output,
   EventEmitter
 } from '@angular/core';
+import { DxRangeSliderComponent } from 'devextreme-angular/ui/range-slider';
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';
 
@@ -21,6 +23,7 @@ import * as get from 'lodash/get';
 })
 export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
+  @ViewChild('slider') slider: DxRangeSliderComponent;
 
   public _filter;
   public step = 1; // tslint:disable-line
@@ -56,6 +59,11 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       state => {
         if (!state) {
           this.loadDefaults(true); // load cached filter data since last apply
+        } else {
+          /* When slider is painted in display: none component, tooltips look incorrect.
+          Need to call repaint when container sidenav is opened to recalculate correct
+          styles */
+          this.slider.instance.repaint();
         }
       }
     );
