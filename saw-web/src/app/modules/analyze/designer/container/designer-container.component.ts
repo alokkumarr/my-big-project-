@@ -268,7 +268,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   generateDSLDateFilters(filters) {
     forEach(filters, filtr => {
-      if (!filtr.isRuntimeFilter && (filtr.type === 'date' && filtr.model.operator === 'BTW')) {
+      if (
+        !filtr.isRuntimeFilter &&
+        !filtr.isGlobalFilter &&
+        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+      ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
@@ -283,8 +287,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       : this.analysis.sqlBuilder;
     this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
     this.filters = isDSLAnalysis(this.analysis)
-    ? this.generateDSLDateFilters(queryBuilder.filters)
-    : queryBuilder.filters;
+      ? this.generateDSLDateFilters(queryBuilder.filters)
+      : queryBuilder.filters;
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
     this.booleanCriteria = queryBuilder.booleanCriteria;
     this.isInQueryMode = this.analysis.edit;

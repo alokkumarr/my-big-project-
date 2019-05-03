@@ -217,7 +217,7 @@ export class AnalyzeService {
       const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
         options.analysisType
       }`;
-      url = `${path}${queryParams}`;
+      url = `${path}?${queryParams}`;
     }
 
     return this.getRequest(url)

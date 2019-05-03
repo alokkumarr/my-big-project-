@@ -50,6 +50,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   analysis: Analysis | AnalysisDSL; // the latest analysis definition
   executedAnalysis: Analysis | AnalysisDSL; // the exact analysis that was executed
   analyses: Analysis[];
+  metric: any;
   onetimeExecution: boolean;
   executedBy: string;
   executedAt: any;
@@ -105,13 +106,17 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       ? analysis.sipQuery
       : analysis.sqlBuilder;
     this.filters = isDSLAnalysis(analysis)
-    ? this.generateDSLDateFilters(queryBuilder.filters)
-    : queryBuilder.filters;
+      ? this.generateDSLDateFilters(queryBuilder.filters)
+      : queryBuilder.filters;
   }
 
   generateDSLDateFilters(filters) {
     forEach(filters, filtr => {
-      if (!filtr.isRuntimeFilter && (filtr.type === 'date' && filtr.model.operator === 'BTW')) {
+      if (
+        !filtr.isRuntimeFilter &&
+        !filtr.isGlobalFilter &&
+        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+      ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
@@ -190,7 +195,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   onSidenavChange(isOpen: boolean) {
     if (isOpen && !this.analyses) {
-      this.loadExecutedAnalyses(this.analysis.id, isDSLAnalysis(this.analysis)).then(analyses => {
+      this.loadExecutedAnalyses(
+        this.analysis.id,
+        isDSLAnalysis(this.analysis)
+      ).then(analyses => {
         const lastExecutionId = get(analyses, '[0].id', null);
         if (!this.executionId && lastExecutionId) {
           this.executionId = lastExecutionId;
@@ -367,9 +375,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       );
   }
 
-  loadAnalysisById(analysisId, isDSLAnalysis: boolean) {
-    return this._analyzeService.readAnalysis(analysisId, isDSLAnalysis).then(
-      (analysis: Analysis) => {
+  loadAnalysisById(analysisId, isDSL: boolean) {
+    return this._analyzeService
+      .readAnalysis(analysisId, isDSL)
+      .then((analysis: Analysis) => {
         this.analysis = analysis;
         // this._analyzeService
         //   .getLastExecutionData(this.analysis.id, {
@@ -379,12 +388,16 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         //     console.log(data);
         //   });
         this.executedAnalysis = { ...this.analysis };
-        return analysis;
-      },
-      err => {
-        throw err;
-      }
-    );
+        /* Get metrics to get full artifacts. Needed to show filters for fields
+        that aren't selected for data */
+        return this._analyzeService
+          .getArtifactsForDataSet(this.analysis.semanticId)
+          .toPromise();
+      })
+      .then(metric => {
+        this.metric = metric;
+        return this.analysis;
+      });
   }
 
   loadDataOrSetDataLoader(

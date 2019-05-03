@@ -32,6 +32,10 @@ analysis:
     emailExportSize: 50000
     ftpExportSize: 100000
 
+proxy:
+    service:
+        host: http://localhost:9800
+
 published:
   path: /tmp
 

@@ -28,6 +28,16 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>sip-query-dsl</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>sip-metadata-service</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>

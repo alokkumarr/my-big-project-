@@ -158,7 +158,7 @@ export class AnalyzeActionsService {
           /* If the parent has been modified since fork/editing, allow user to choose whether
            they want to overwrite the parent analysis */
           if (
-            analysis.parentLastModified !==
+            analysis.updatedTimestamp <
             (<Analysis>parentAnalysis).updatedTimestamp
           ) {
             return this.showPublishOverwriteConfirmation()

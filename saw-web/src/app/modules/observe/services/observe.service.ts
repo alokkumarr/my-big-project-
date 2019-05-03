@@ -15,6 +15,12 @@ import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../appConfig';
 import { BULLET_CHART_COLORS } from '../consts';
 
+interface MetricResponse {
+  data: { contents: Array<{}> };
+}
+
+const ANALYZE_MODULE_NAME = 'ANALYZE';
+
 @Injectable()
 export class ObserveService {
   public api = fpGet('api.url', APP_CONFIG);
@@ -33,6 +39,21 @@ export class ObserveService {
         observe: [model]
       }
     };
+  }
+
+  getRequest<T>(path) {
+    return this.http.get<T>(`${this.api}/${path}`);
+  }
+
+  getMetricList$(): Observable<any[]> {
+    const projectId = 'workbench';
+    return this.getRequest<MetricResponse>(
+      `internal/semantic/md?projectId=${projectId}`
+    ).pipe(mapObservable(fpGet(`contents.[0].${ANALYZE_MODULE_NAME}`)));
+  }
+
+  getArtifactsForDataSet$(semanticId: string) {
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
   /* Saves dashboard. If @model.entityId not present, uses create operation.

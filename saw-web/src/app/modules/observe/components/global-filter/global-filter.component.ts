@@ -6,8 +6,10 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs';
+import { map as map$ } from 'rxjs/operators';
 
 import * as isArray from 'lodash/isArray';
 import * as map from 'lodash/map';
@@ -15,6 +17,7 @@ import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
 
 import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
+import { ObserveState } from '../../state/observe.state';
 
 @Component({
   selector: 'global-filter',
@@ -28,7 +31,7 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   public kpiFilter;
   public filterChangeSubscription: Subscription;
 
-  constructor(private filters: GlobalFilterService) {}
+  constructor(private filters: GlobalFilterService, private store: Store) {}
 
   ngAfterViewInit() {
     this.globalFilters = [];
@@ -89,7 +92,15 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   }
 
   tableNameFor(f) {
-    return f.tableName + (f.metricName ? ` (${f.metricName})` : '');
+    const tableName = f.tableName || f.artifactsName;
+
+    return this.store.select(ObserveState.metrics).pipe(
+      map$(metrics => {
+        const metric = metrics[f.semanticId];
+        const metricName = metric ? metric.metricName : f.metricName;
+        return tableName + (metricName ? ` (${metricName})` : '');
+      })
+    );
   }
 
   ngOnDestroy() {
