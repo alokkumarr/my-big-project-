@@ -64,7 +64,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         aliasName
       })
     );
-    this.change.emit({ subject: 'aliasName' });
+    this.change.emit({ subject: 'alias' });
   }
 
   onAggregateChange(aggregate) {

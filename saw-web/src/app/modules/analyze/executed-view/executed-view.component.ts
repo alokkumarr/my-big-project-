@@ -100,6 +100,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   fetchFilters(analysis) {
+    console.log(analysis);
     const queryBuilder = isDSLAnalysis(analysis)
       ? analysis.sipQuery
       : analysis.sqlBuilder;
@@ -116,6 +117,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
       }
     });
+    console.log(filters);
     return filters;
   }
 
@@ -293,6 +295,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       .then(executionStarted => {
         // this.afterExecuteLaunched(analysis);
         if (!executionStarted && !this.analyses) {
+          console.log(analysis);
           // at least load the executed analyses if none are loaded
           this.loadExecutedAnalysesAndExecutionData(
             analysis.id,
@@ -413,6 +416,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
                   this.executedAnalysis.sqlBuilder
               })
         };
+        this.fetchFilters(this.executedAnalysis);
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = this.utcToLocal(executeResponse.executedAt);
 
