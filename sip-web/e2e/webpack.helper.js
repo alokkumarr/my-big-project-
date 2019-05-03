@@ -93,7 +93,7 @@ function generateFailedTests(dir) {
     }
 
     let mainTestData = JSON.parse(
-      fs.readFileSync('../saw-web/e2e/src/testdata/data.json', 'utf8')
+      fs.readFileSync('../sip-web/e2e/src/testdata/data.json', 'utf8')
     );
 
     filesToProcess.forEach(function(file) {
@@ -294,14 +294,14 @@ module.exports = {
         //console.log('Executing critical suite.....');
         let data = JSON.parse(
           fs.readFileSync(
-            '../saw-web/e2e/src/testdata/data.critical.json',
+            '../sip-web/e2e/src/testdata/data.critical.json',
             'utf8'
           )
         );
         return data;
       } else {
         let data = JSON.parse(
-          fs.readFileSync('../saw-web/e2e/src/testdata/data.json', 'utf8')
+          fs.readFileSync('../sip-web/e2e/src/testdata/data.json', 'utf8')
         );
         return data;
       }

@@ -161,7 +161,7 @@ class SuiteSetup {
     if (dir) {
       location = dir;
     } else {
-      location = '../saw-web/e2e/v2/testdata/all-tests';
+      location = '../sip-web/e2e/v2/testdata/all-tests';
     }
     const dirCont = fs.readdirSync(location);
     const files = dirCont.filter(elm => /.*\.(json)/gi.test(elm));
