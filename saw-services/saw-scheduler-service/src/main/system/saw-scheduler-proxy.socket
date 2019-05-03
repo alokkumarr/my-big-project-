@@ -1,8 +1,0 @@
-[Unit]
-Description=SAW Scheduler Proxy Socket
-
-[Socket]
-ListenStream=9600
-
-[Install]
-WantedBy=sockets.target

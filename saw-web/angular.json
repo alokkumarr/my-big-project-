@@ -45,8 +45,8 @@
           },
           "configurations": {
             "production": {
-              "baseHref": "/saw/web/",
-              "deployUrl": "/saw/web/",
+              "baseHref": "/sip/web/",
+              "deployUrl": "/sip/web/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 
 import { AnalysisChart } from '../../types';
 
@@ -15,4 +15,5 @@ export class ExecutedMapViewComponent {
   @Input() actionBus: Subject<Object[]>;
   @Input() analysis: AnalysisChart;
   @Input() data: any[];
+  @Input() updater: BehaviorSubject<Object[]>;
 }

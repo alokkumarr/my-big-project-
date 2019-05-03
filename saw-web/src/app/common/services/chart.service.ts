@@ -1047,7 +1047,9 @@ export class ChartService {
             ? round(
                 options.aggregate === 'percentagebyrow'
                   ? round(point.percentage, 2)
-                  : point.y,
+                  : point.y
+                  ? point.y
+                  : point.value,
                 getPrecision(options.aggregate, options.dataType)
               ).toLocaleString()
             : '{point.y:,.2f}'

@@ -1,8 +1,0 @@
-[Unit]
-Description=SAW Transport Proxy Socket
-
-[Socket]
-ListenStream=9200
-
-[Install]
-WantedBy=sockets.target
