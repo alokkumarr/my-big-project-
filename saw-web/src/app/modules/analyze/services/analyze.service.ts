@@ -495,7 +495,7 @@ export class AnalyzeService {
     options: ExecutionRequestOptions = {}
   ) {
     return this._http
-    .post(`${apiUrl}/internal/proxy/storage/execute?id=${model.id}&size=25&ExecutionType=${mode}`, model.sipQuery)
+    .post(`${apiUrl}/internal/proxy/storage/execute?id=${model.id}&ExecutionType=${mode}`, model.sipQuery)
       .pipe(
         map((resp: any) => {
           return {
@@ -646,6 +646,7 @@ export class AnalyzeService {
       semanticId,
       name: 'Untitled Analysis',
       description: '',
+      createdBy: this._jwtService.getLoginId(),
       customerCode: 'SYNCHRONOSS',
       projectCode: 'workbench',
       module: 'ANALYZE',

@@ -142,11 +142,10 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   goToAnalysis(analysis) {
+    const isDSL = analysis.sipQuery ? true : false;
     this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
       queryParams: {
-        executedAnalysis: null,
-        awaitingExecution: true,
-        loadLastExecution: false
+        isDSL
       }
     });
   }

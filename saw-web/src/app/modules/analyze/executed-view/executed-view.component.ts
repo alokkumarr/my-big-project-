@@ -101,7 +101,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   fetchFilters(analysis) {
-    console.log(analysis);
     const queryBuilder = isDSLAnalysis(analysis)
       ? analysis.sipQuery
       : analysis.sqlBuilder;
@@ -122,7 +121,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
       }
     });
-    console.log(filters);
     return filters;
   }
 
@@ -240,6 +238,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = get(this.analysis, 'type') === 'report';
     this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
+    this.filters = isDSLAnalysis(this.analysis)
+      ? this.generateDSLDateFilters(response.queryBuilder.filters)
+      : response.queryBuilder.filters;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',
@@ -303,7 +304,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       .then(executionStarted => {
         // this.afterExecuteLaunched(analysis);
         if (!executionStarted && !this.analyses) {
-          console.log(analysis);
           // at least load the executed analyses if none are loaded
           this.loadExecutedAnalysesAndExecutionData(
             analysis.id,

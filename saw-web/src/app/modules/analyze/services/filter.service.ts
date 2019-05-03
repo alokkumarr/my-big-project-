@@ -230,7 +230,6 @@ export class FilterService {
             ),
             runtimeFilters => [...runtimeFilters, ...nonRuntimeFilters]
           )(result.filters);
-          console.log(allFilters);
           if (isDSLAnalysis(analysis)) {
             analysis.sipQuery.filters = allFilters;
           } else {
@@ -241,7 +240,6 @@ export class FilterService {
           // );
 
           resolve(analysis);
-          console.log(analysis);
           if (navigateBack === 'home') {
             this.router.navigate([
               'analyze',

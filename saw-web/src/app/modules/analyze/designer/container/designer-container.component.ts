@@ -1015,8 +1015,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'alias':
         // reload frontEnd
         this.updateAnalysis();
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.artifacts = [...this.artifacts];
-        if (this.analysis.type === 'chart') {
+        if (this.analysis.type === 'chart' || this.analysis.type === 'pivot') {
           this.refreshDataObject();
         }
         break;
