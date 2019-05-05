@@ -230,7 +230,6 @@ export class FilterService {
             ),
             runtimeFilters => [...runtimeFilters, ...nonRuntimeFilters]
           )(result.filters);
-
           if (isDSLAnalysis(analysis)) {
             analysis.sipQuery.filters = allFilters;
           } else {

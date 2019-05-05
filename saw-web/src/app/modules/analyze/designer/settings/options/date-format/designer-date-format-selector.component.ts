@@ -47,7 +47,8 @@ export class DesignerDateFormatSelectorComponent {
 
   onFormatChange(format: Format | string) {
     if (format) {
-      if (this.analysisType === 'chart' || this.analysisType === 'pivot') {
+      switch (this.analysisType) {
+      case 'chart':
         this.artifactColumn.dateFormat = <string>format;
         const groupInterval = dateFormatsMap.chart.obj[format].groupInterval;
 
@@ -59,14 +60,28 @@ export class DesignerDateFormatSelectorComponent {
             groupInterval
           })
         );
-      } else {
-        this.store.dispatch(
-          new DesignerUpdateArtifactColumn({
-            columnName: this.artifactColumn.columnName,
-            table: this.artifactColumn.table || this.artifactColumn.table,
-            format
-          })
-        );
+        break;
+
+      case 'pivot':
+      this.artifactColumn.dateFormat = <string>format;
+
+      this.store.dispatch(
+        new DesignerUpdateArtifactColumn({
+          columnName: this.artifactColumn.columnName,
+          table: this.artifactColumn.table || this.artifactColumn.table,
+          dateFormat: <string>format
+        })
+      );
+      break;
+
+      default:
+      this.store.dispatch(
+        new DesignerUpdateArtifactColumn({
+          columnName: this.artifactColumn.columnName,
+          table: this.artifactColumn.table || this.artifactColumn.table,
+          format
+        })
+      );
       }
       this.change.emit({ subject: 'format' });
     }

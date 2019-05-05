@@ -625,12 +625,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
-    // forEach(requestAnalysis.sipQuery.artifacts[0].fields, field => {
-    //   if (field.type === 'date') {
-    //     // field.dateFormat = field.format;
-    //     delete field.format;
-    //   }
-    // });
 
     this._designerService.getDataForAnalysis(requestAnalysis).then(
       response => {
@@ -1021,8 +1015,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'alias':
         // reload frontEnd
         this.updateAnalysis();
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.artifacts = [...this.artifacts];
-        if (this.analysis.type === 'chart') {
+        if (this.analysis.type === 'chart' || this.analysis.type === 'pivot') {
           this.refreshDataObject();
         }
         break;

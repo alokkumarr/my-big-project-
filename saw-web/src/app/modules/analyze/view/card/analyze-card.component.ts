@@ -61,9 +61,10 @@ export class AnalyzeCardComponent implements OnInit {
         : this.analysis.categoryId
     });
     const { type, id } = this.analysis;
-    const chartType = isDSLAnalysis(this.analysis)
+    let chartType = isDSLAnalysis(this.analysis)
       ? this.analysis.chartOptions.chartType
       : (<AnalysisChart>this.analysis).chartType;
+    chartType = type === 'chart' ? chartType : '';
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${
       chartType ? `:${chartType}` : ''

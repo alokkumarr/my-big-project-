@@ -22,6 +22,9 @@ function substituteEmptyValues(data, fields) {
     fpPipe(
       fpMap(value => {
         // As per AC on 5216, if key is empty show undefined
+        if (field.area === 'data') {
+          return value;
+        }
         if (isEmpty(value[field.name])) {
           value[field.name] = 'undefined';
         }
@@ -34,7 +37,7 @@ function substituteEmptyValues(data, fields) {
 export function flattenPivotData(data, sqlBuilder) {
   if (sqlBuilder.artifacts) {
     const columnRowFields = sqlBuilder.artifacts[0].fields
-          .filter(field => ['row', 'column'].includes(field.area));
+          .filter(field => ['row', 'column', 'data'].includes(field.area));
     // As per AC on 5216, if key is empty show undefined
     data = substituteEmptyValues(data, columnRowFields);
     return data;

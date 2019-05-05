@@ -238,6 +238,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = get(this.analysis, 'type') === 'report';
     this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
+    this.filters = isDSLAnalysis(this.analysis)
+      ? this.generateDSLDateFilters(response.queryBuilder.filters)
+      : response.queryBuilder.filters;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',
@@ -426,6 +429,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
                   this.executedAnalysis.sqlBuilder
               })
         };
+        this.fetchFilters(this.executedAnalysis);
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = this.utcToLocal(executeResponse.executedAt);
 

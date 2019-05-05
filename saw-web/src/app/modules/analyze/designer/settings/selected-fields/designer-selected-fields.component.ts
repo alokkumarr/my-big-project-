@@ -121,7 +121,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   getDisplayName(filter) {
     const table = filter.artifactsName || filter.tableName;
-    return this.nameMap[table][filter.columnName];
+    return this.nameMap[table][filter.columnName] || [filter.columnName];
   }
 
   onDndEvent(event: DndEvent) {
