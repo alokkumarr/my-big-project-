@@ -260,16 +260,16 @@
 									<file>target/sip-export-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-export.service</name>
-									<file>src/main/system/saw-export.service</file>
+									<name>/usr/lib/systemd/system/sip-export.service</name>
+									<file>src/main/system/sip-export.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-export-proxy.service</name>
-									<file>src/main/system/saw-export-proxy.service</file>
+									<name>/usr/lib/systemd/system/sip-export-proxy.service</name>
+									<file>src/main/system/sip-export-proxy.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-export-proxy.socket</name>
-									<file>src/main/system/saw-export-proxy.socket</file>
+									<name>/usr/lib/systemd/system/sip-export-proxy.socket</name>
+									<file>src/main/system/sip-export-proxy.socket</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-export-service/conf/logback.xml</name>

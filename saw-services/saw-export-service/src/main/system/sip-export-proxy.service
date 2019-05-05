@@ -1,0 +1,10 @@
+[Unit]
+Description=SIP Export Proxy
+Requires=sip-export.service
+After=sip-export.service
+Requires=sip-export-proxy.socket
+After=sip-export-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9401
+PrivateTmp=yes

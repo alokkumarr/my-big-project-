@@ -1,5 +1,5 @@
 [Unit]
-Description=SAW Transport
+Description=SIP Transport
 
 [Service]
 Type=notify

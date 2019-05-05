@@ -1,5 +1,5 @@
 [Unit]
-Description=SAW Scheduler Proxy Socket
+Description=SIP Scheduler Proxy Socket
 
 [Socket]
 ListenStream=9600

@@ -1,5 +1,5 @@
 [Unit]
-Description=SAW Workbench Proxy Socket
+Description=SIP Workbench Proxy Socket
 
 [Socket]
 ListenStream=9700
