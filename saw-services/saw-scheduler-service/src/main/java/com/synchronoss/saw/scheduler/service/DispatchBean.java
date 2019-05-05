@@ -1,7 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -37,6 +36,4 @@ interface DispatchBean {
     @Nullable
     String s3();
 
-    @JsonProperty("zip")
-    boolean zip();
 }

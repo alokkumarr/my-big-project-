@@ -78,7 +78,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             logger.error("Error reading s3 List: "+ e.getMessage());
             s3List = "";
         }
-        
+
         ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
         String[] latestexection = findLatestExecution(executionBeans);
         Date date = new Date(Long.parseLong(latestexection[1]));
@@ -119,7 +119,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<DispatchBean> entity = new HttpEntity<>(
-                execution, headers);
+            execution, headers);
 
         if (latestexection[0] != null) {
             restTemplate.postForObject(url, entity, String.class, param);
@@ -131,7 +131,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         String url = analysisUrl + "/{analysisId}/executions";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-       return restTemplate.getForObject(url, ExecutionResponse.class, analysisId).executions();
+        return restTemplate.getForObject(url, ExecutionResponse.class, analysisId).executions();
 
     }
 
@@ -149,15 +149,15 @@ public class AnalysisServiceImpl implements AnalysisService {
             latestExecutionID = executionBeans[0].id();
             latestFinish = executionBeans[0].finished();
             for (ExecutionBean executionBean : executionBeans) {
-               if (Long.parseLong(executionBean.finished()) > Long.parseLong(latestFinish)
-                       && (executionBean.status()==null || executionBean.status().equalsIgnoreCase("Success")))
-               {
-                   latestExecutionID = executionBean.id();
-                   latestFinish = executionBean.finished();
-               }
+                if (Long.parseLong(executionBean.finished()) > Long.parseLong(latestFinish)
+                    && (executionBean.status()==null || executionBean.status().equalsIgnoreCase("Success")))
+                {
+                    latestExecutionID = executionBean.id();
+                    latestFinish = executionBean.finished();
+                }
             }
         }
-         String[] val = new String [2];
+        String[] val = new String [2];
         val[0] = latestExecutionID;
         val[1] = latestFinish;
         return val;

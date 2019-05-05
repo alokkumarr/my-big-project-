@@ -22,49 +22,47 @@ public class SchedulerJobDetail implements Serializable {
 
     private static final long serialVersionUID =8510739855197957265l;
 
-   private String analysisID;
+    private String analysisID;
 
     private String analysisName;
 
-   private String description;
+    private String description;
 
-   private String metricName;
+    private String metricName;
 
-   private String userFullName;
+    private String userFullName;
 
-   private String type;
+    private String type;
 
-   private String jobName;
+    private String jobName;
 
-   private String jobGroup;
+    private String jobGroup;
 
-   private String categoryID;
+    private String categoryID;
 
     // TODO: DateTimeFormat has no effect here, can be removed.
-   @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
-   private Date jobScheduleTime;
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
+    private Date jobScheduleTime;
 
-   private String cronExpression;
+    private String cronExpression;
 
-   private String activeTab;
+    private String activeTab;
 
-   private String activeRadio;
+    private String activeRadio;
 
-   private List<String> emailList;
+    private List<String> emailList;
 
-   private List<String> ftp;
+    private List<String> ftp;
 
-   private String fileType ;
+    private String fileType ;
 
-   // TODO: DateTimeFormat has no effect here, can be removed.
-   @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
-   private Date endDate;
+    // TODO: DateTimeFormat has no effect here, can be removed.
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
+    private Date endDate;
 
     private String timezone;
 
     private List<String> s3;
-
-    private boolean zip;
 
     /**
      * Gets analysisID
@@ -357,10 +355,6 @@ public class SchedulerJobDetail implements Serializable {
         this.s3 = s3;
     }
 
-    public boolean getZip() { return zip; }
-
-    public void setZip(boolean zip) { this.zip = zip; }
-
     /**
      *
      * @param out
@@ -387,9 +381,7 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(userFullName);
         out.writeObject(endDate);
         out.writeObject(timezone);
-        if (s3!=null && s3.size()>0)
-            out.writeObject(s3);
-        out.writeObject(zip);
+        out.writeObject(s3);
     }
 
     /**
@@ -427,27 +419,27 @@ public class SchedulerJobDetail implements Serializable {
             type = (String) in.readObject();
             userFullName = (String) in.readObject();
         }
-       try {
+        try {
             /* End date is optional data field and it will contains null value for existing schedules
             generated prior to sip v2.6.0 , handle the Optional Data Exception explicitly to identify the end of stream*/
             Object endDt = in.readObject();
             if (endDt instanceof Date)
-            endDate = (Date) endDt;
+                endDate = (Date) endDt;
         }
         catch (OptionalDataException e)
-         {/* catch block to avoid serialization for newly added fields.*/ }
+        {/* catch block to avoid serialization for newly added fields.*/ }
 
         try {
-	    /* Considering timezone is optional data field since it will contains null value for existing schedules                                                                            
+	    /* Considering timezone is optional data field since it will contains null value for existing schedules
             generated prior to sip v3.2.2 , handle the Optional Data Exception explicitly to identify the end of stream*/
-	    Object tzObj = in.readObject();
-	     if (tzObj instanceof  String) {
-              timezone = (String) tzObj;
+            Object tzObj = in.readObject();
+            if (tzObj instanceof  String) {
+                timezone = (String) tzObj;
             }
         } catch(OptionalDataException e)
-	    { /* catch block to avoid serialization for newly added fields.*/ }
+        { /* catch block to avoid serialization for newly added fields.*/ }
 
-	    try {
+        try {
             Object s3List = in.readObject();
 
             if (s3List instanceof List) {
@@ -481,7 +473,6 @@ public class SchedulerJobDetail implements Serializable {
             ", endDate=" + endDate +
             ", timezone='" + timezone + '\'' +
             ", s3=" + s3 +
-            ", zip" + zip +
             '}';
     }
 }
