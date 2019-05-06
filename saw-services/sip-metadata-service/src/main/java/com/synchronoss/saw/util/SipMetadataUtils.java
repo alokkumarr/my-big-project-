@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -64,6 +67,7 @@ public class SipMetadataUtils {
 
   /**
    * This is used to set the audit information.
+   *
    * @param node {@link SemanticNode}
    * @param headers {@link Map}
    * @return {@link SemanticNode}
@@ -114,13 +118,14 @@ public class SipMetadataUtils {
    * @param basePath base path.
    * @param id unique id.
    * @param action crud operation.
-   * @param category
-   *        {@link com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category}}
+   * @param category {@link
+   *     com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category}}
    * @return {@link MetaDataStoreStructure}
    * @throws JsonProcessingException exception
    */
-  public static List<MetaDataStoreStructure> node2JsonObject(SemanticNode node, String basePath,
-      String id, Action action, Category category) throws JsonProcessingException {
+  public static List<MetaDataStoreStructure> node2JsonObject(
+      SemanticNode node, String basePath, String id, Action action, Category category)
+      throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
     if (node != null) {
       metaDataStoreStructure.setSource(node);
@@ -148,8 +153,9 @@ public class SipMetadataUtils {
    * @return String SemanticNode as JsonString.
    * @throws JsonProcessingException when json parse error
    */
-  public static String node2JsonString(SemanticNode node, String basePath, String id, Action action,
-      Category category, Query query) throws JsonProcessingException {
+  public static String node2JsonString(
+      SemanticNode node, String basePath, String id, Action action, Category category, Query query)
+      throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
 
     if (node != null) {
@@ -178,8 +184,8 @@ public class SipMetadataUtils {
    * @param separator separator
    * @return String
    */
-  private static String getSeperatedColumns(Set<String> headers, Map<String, Object> map,
-      String separator) {
+  private static String getSeperatedColumns(
+      Set<String> headers, Map<String, Object> map, String separator) {
     List<Object> items = new ArrayList<Object>();
     for (String header : headers) {
       Object value = map.get(header) == null ? "" : map.get(header);
@@ -196,8 +202,8 @@ public class SipMetadataUtils {
    * @param separator separator
    * @return List CSV data
    */
-  public static List<Object> getTabularFormat(List<Map<String, Object>> flatJson,
-      String separator) {
+  public static List<Object> getTabularFormat(
+      List<Map<String, Object>> flatJson, String separator) {
     List<Object> data = new ArrayList<>();
     Set<String> headers = collectHeaders(flatJson);
     String csvString = StringUtils.join(headers.toArray(), separator);
@@ -407,5 +413,45 @@ public class SipMetadataUtils {
    */
   public Resource getClassPathResources(String filename) {
     return new ClassPathResource(filename);
+  }
+
+  /**
+   * This method to validate jwt token then return the validated ticket for further processing.
+   *
+   * @param request HttpServletRequest
+   * @return Ticket
+   */
+  public static Ticket getTicket(HttpServletRequest request) {
+    try {
+      String token = getToken(request);
+      return TokenParser.retrieveTicket(token);
+    } catch (IllegalAccessException | IOException e) {
+      logger.error("Error occurred while fetching the alert details", e);
+    }
+    return null;
+  }
+
+  /**
+   * Get JWT token details.
+   *
+   * @param req http Request
+   * @return String
+   * @throws IllegalAccessException If Authorization not found
+   */
+  public static String getToken(final HttpServletRequest req) throws IllegalAccessException {
+
+    if (!("OPTIONS".equals(req.getMethod()))) {
+
+      final String authHeader = req.getHeader("Authorization");
+
+      if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+
+        throw new IllegalAccessException("Missing or invalid Authorization header.");
+      }
+
+      return authHeader.substring(7); // The part after "Bearer "
+    }
+
+    return null;
   }
 }
