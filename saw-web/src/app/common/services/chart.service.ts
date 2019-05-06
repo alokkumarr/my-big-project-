@@ -446,9 +446,12 @@ export class ChartService {
   ) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
-        forEach(dateFields, ({ columnName }) => {
+        forEach(dateFields, ({ columnName, dateFormat }) => {
+          const momentDateFormat = this.getMomentDateFormat(dateFormat);
           dataPoint[removeKeyword(columnName)] =
-            moment.utc(dataPoint[removeKeyword(columnName)]).unix() * 1000;
+            moment
+              .utc(dataPoint[removeKeyword(columnName)], momentDateFormat)
+              .unix() * 1000;
         });
       });
     }
@@ -460,7 +463,7 @@ export class ChartService {
         forEach(dateFields, ({ columnName, dateFormat }) => {
           const momentDateFormat = this.getMomentDateFormat(dateFormat);
           dataPoint[removeKeyword(columnName)] = moment
-            .utc(dataPoint[removeKeyword(columnName)])
+            .utc(dataPoint[removeKeyword(columnName)], momentDateFormat)
             .format(momentDateFormat);
         });
       });
