@@ -1,18 +1,17 @@
 package com.synchronoss.saw.analysis.controller;
 
+import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.modal.Ticket;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,24 +66,7 @@ public class AnalysisController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public AnalysisResponse createAnalysis(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      @RequestBody Analysis analysis,
-      @RequestHeader("Authorization") String authToken) {
-
-    logger.debug("Auth token = " + authToken);
-    if (authToken.startsWith("Bearer")) {
-      authToken = authToken.substring("Bearer ".length());
-    }
-
-    // TODO: Remove the hardcoded key
-    Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(authToken).getBody();
-
-    Map<String, Object> authTicket = ((Map<String, Object>) ssoToken.get("ticket"));
-    logger.debug("Auth ticket = " + authTicket);
-    String userName = (String) authTicket.get("userFullName");
-    logger.debug("Username = " + userName);
-
+      HttpServletRequest request, HttpServletResponse response, @RequestBody Analysis analysis) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     if (analysis == null) {
       analysisResponse.setMessage("Analysis definition can't be null for create request");
@@ -95,7 +76,13 @@ public class AnalysisController {
 
     String id = UUID.randomUUID().toString();
     analysis.setId(id);
-    analysis.setCreatedBy(userName);
+
+    com.synchronoss.bda.sip.jwt.token.Ticket authTicket = getTicket(request);
+    if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication tol=ken");
+    }
+    analysis.setCreatedBy(authTicket.getUserFullName());
     Ticket ticket = new Ticket();
     analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, ticket));
     analysisResponse.setAnalysisId(id);
@@ -125,21 +112,7 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestBody Analysis analysis,
-      @PathVariable(name = "id") String id,
-      @RequestHeader("Authorization") String authToken) {
-
-    logger.debug("Auth token = " + authToken);
-    if (authToken.startsWith("Bearer")) {
-      authToken = authToken.substring("Bearer ".length());
-    }
-
-    // TODO: Remove the hardcoded key
-    Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(authToken).getBody();
-
-    Map<String, Object> authTicket = ((Map<String, Object>) ssoToken.get("ticket"));
-    logger.debug("Auth ticket = " + authTicket);
-    String userName = (String) authTicket.get("userFullName");
-    logger.debug("Username = " + userName);
+      @PathVariable(name = "id") String id) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
 
     if (analysis == null) {
@@ -148,7 +121,14 @@ public class AnalysisController {
       return analysisResponse;
     }
     analysis.setId(id);
-    analysis.setModifiedBy(userName);
+
+    com.synchronoss.bda.sip.jwt.token.Ticket authTicket = getTicket(request);
+
+    if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication tol=ken");
+    }
+    analysis.setModifiedBy(authTicket.getUserFullName());
     Ticket ticket = new Ticket();
     analysisResponse.setAnalysis(analysisService.updateAnalysis(analysis, ticket));
     analysisResponse.setAnalysisId(id);
