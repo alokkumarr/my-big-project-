@@ -84,14 +84,14 @@ public class QueryBuilderUtil {
     	 DateHistogramInterval histogramInterval = null;
     	    switch (groupInterval)
     	    {
-                case "all": break;
-                case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
-
-                case "day" : histogramInterval =  DateHistogramInterval.DAY; break;
-                case "year" : histogramInterval =  DateHistogramInterval.YEAR; break;
-                case "quarter" : histogramInterval =  DateHistogramInterval.QUARTER; break;
-                case "hour" : histogramInterval =  DateHistogramInterval.HOUR;break;
-                case "week" : histogramInterval =  DateHistogramInterval.WEEK;break;
+    	    case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
+    	    case "day" :
+            case "all":
+    	        histogramInterval =  DateHistogramInterval.DAY; break;
+    	    case "year" : histogramInterval =  DateHistogramInterval.YEAR; break;
+    	    case "quarter" : histogramInterval =  DateHistogramInterval.QUARTER; break;
+    	    case "hour" : histogramInterval =  DateHistogramInterval.HOUR;break;
+    	    case "week" : histogramInterval =  DateHistogramInterval.WEEK;break;
     	    }
     	    return histogramInterval;
      }

@@ -3,7 +3,6 @@ package com.synchronoss.saw.es;
 import static org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders.bucketSort;
 
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.util.BuilderUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,13 +38,11 @@ public class SIPAggregationBuilder {
   public static DateHistogramInterval groupInterval(String groupInterval) {
     DateHistogramInterval histogramInterval = null;
     switch (groupInterval) {
-      case "all":
-        // For groupinterval ALL, no need to set any value. Refer line: 87.
-        break;
       case "month":
         histogramInterval = DateHistogramInterval.MONTH;
         break;
       case "day":
+      case "all":
         histogramInterval = DateHistogramInterval.DAY;
         break;
       case "year":
@@ -84,7 +81,7 @@ public class SIPAggregationBuilder {
             || dataField.getType().name().equals(Field.Type.TIMESTAMP.name())) {
           if (dataField.getDateFormat() == null || dataField.getDateFormat().isEmpty())
             dataField.setDateFormat(DATE_FORMAT);
-          if (dataField.getGroupInterval() != null && dataField.getGroupInterval() != GroupInterval.ALL) {
+          if (dataField.getGroupInterval() != null) {
             aggregationBuilder =
                 AggregationBuilders.dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount)
                     .field(dataField.getColumnName())
