@@ -4,7 +4,7 @@
   hosts: all
   become: true
   roles:
-    - saw-host
+    - sip-host
     - sip-prometheus-node
 - import_playbook: modules/sip-security/ansible/site.yml
 - import_playbook: modules/sip-services/ansible/site.yml
@@ -26,7 +26,7 @@
   hosts: saw-proxy
   become: true
   roles:
-    - saw-proxy
+    - sip-proxy
 - name: Mariadb Prometheus
   hosts: saw-security
   become: true

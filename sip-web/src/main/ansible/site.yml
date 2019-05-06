@@ -2,4 +2,4 @@
   hosts: saw-web
   become: true
   roles:
-    - saw-web
+    - sip-web
