@@ -123,10 +123,6 @@ export const CHART_DATE_FORMATS = [
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {
-    label: 'September 1, 2017',
-    value: 'MMMM D, YYYY'
-  },
-  {
     value: 'MMM d YYYY',
     groupInterval: 'day',
     label: ' Sep 1st 2017'
