@@ -1,13 +1,11 @@
 package com.synchronoss.saw.scheduler.modal;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.io.IOException;
 import java.io.OptionalDataException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /*** Important Note :
  *  @Since   SAW2.5.0.
@@ -63,6 +61,8 @@ public class SchedulerJobDetail implements Serializable {
    private Date endDate;
 
     private String timezone;
+
+    private List<String> s3;
 
     /**
      * Gets analysisID
@@ -347,6 +347,14 @@ public class SchedulerJobDetail implements Serializable {
         this.timezone = timezone;
     }
 
+    public List<String> getS3() {
+        return s3;
+    }
+
+    public void setS3(List<String> s3) {
+        this.s3 = s3;
+    }
+
     /**
      *
      * @param out
@@ -373,6 +381,7 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(userFullName);
         out.writeObject(endDate);
         out.writeObject(timezone);
+        out.writeObject(s3);
     }
 
     /**
@@ -402,8 +411,7 @@ public class SchedulerJobDetail implements Serializable {
             metricName = (String) in.readObject();
             type = (String) in.readObject();
             userFullName = (String) in.readObject();
-        }else
-        {
+        } else {
             jobGroup = (String) obj;
             jobName = (String) in.readObject();
             jobScheduleTime = (Date) in.readObject();
@@ -431,6 +439,16 @@ public class SchedulerJobDetail implements Serializable {
         } catch(OptionalDataException e)
 	    { /* catch block to avoid serialization for newly added fields.*/ }
 
+	    try {
+            Object s3List = in.readObject();
+
+            if (s3List instanceof List) {
+                s3 = (List<String>) s3List;
+            }
+        } catch (OptionalDataException e) {
+            /* catch block to avoid serialization for newly added fields.*/
+        }
+
     }
 
     @Override
@@ -454,6 +472,7 @@ public class SchedulerJobDetail implements Serializable {
             ", fileType='" + fileType + '\'' +
             ", endDate=" + endDate +
             ", timezone='" + timezone + '\'' +
+            ", s3=" + s3 +
             '}';
     }
 }

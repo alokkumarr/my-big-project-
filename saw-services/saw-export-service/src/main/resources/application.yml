@@ -31,6 +31,7 @@ analysis:
     uiExportSize: 10000
     emailExportSize: 50000
     ftpExportSize: 100000
+    s3ExportSize: 1000000
 
 published:
   path: /tmp
@@ -40,5 +41,8 @@ ftp:
   details:
     file: /opt/bda/saw-export-service/conf/ftp-details.json
 
+s3:
+  details:
+    file: /opt/bda/saw-export-service/conf/S3-details.json
 
 exportChunkSize: 10000

@@ -2,7 +2,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import * as map from 'lodash/map';
-import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
@@ -66,6 +65,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   loadCronLayout = false;
   ftp = [];
   locations = [];
+  s3Bucket = [];
+  s3Locations = [];
   scheduleState: 'new' | 'exist' | 'delete';
   token: any;
   errorFlagMsg = false;
@@ -128,6 +129,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     const { type, id, categoryId } = this.data.analysis;
     if (type !== 'chart') {
       this.getFTPLocations();
+      this.getS3Locations();
     }
     const requestCron = {
       jobName: id,
@@ -152,7 +154,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               analysisID,
               emailList,
               fileType,
-              ftp
+              ftp,
+              s3
             } = jobDetails;
             this.crondetails = {
               cronexp: cronExpression,
@@ -169,6 +172,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
             this.hasSchedule = true;
             if (type !== 'chart') {
               this.ftp = ftp;
+              this.s3Bucket = s3;
             }
             this.emails = emailList;
             this.hasSchedule = true;
@@ -188,6 +192,15 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     };
     this._analyzeService.getlistFTP(request).then((response: any) => {
       this.locations = response.ftp;
+    });
+  }
+
+  getS3Locations() {
+    const request = {
+      jobGroup: this.token.ticket.custCode
+    };
+    this._analyzeService.getlistS3Buckets(request).then((response: any) => {
+      this.s3Locations = response.S3;
     });
   }
 
@@ -222,7 +235,9 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         this.scheduleState = 'new';
         cronJobName = cronJobName + '-' + this.alphanumericUnique();
         crondetails.cronexp = '';
-        crondetails.startDate = moment().local().format();
+        crondetails.startDate = moment()
+          .local()
+          .format();
       }
 
       analysis.schedule = {
@@ -235,6 +250,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         description: '',
         emailList: this.emails,
         ftp: this.ftp,
+        s3: this.s3Bucket,
         fileType: this.fileType,
         jobName: cronJobName,
         endDate: crondetails.endDate,
@@ -260,12 +276,16 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.cronValidateField = false;
     let validationCheck = true;
 
-    this.startDateCorrectFlag = moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
+    this.startDateCorrectFlag =
+      moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
     const validateFields = {
-      emails: ['chart', 'map'].includes(this.data.analysis.type) ? true : this.validateEmails(this.emails),
+      emails: ['chart', 'map'].includes(this.data.analysis.type)
+        ? true
+        : this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
       publish: this.validatePublishSelection(),
-      startDate: moment(this.crondetails.startDate) > moment().subtract(2, 'minutes')
+      startDate:
+        moment(this.crondetails.startDate) > moment().subtract(2, 'minutes')
     };
     fpPipe(
       fpMap(check => {
@@ -281,6 +301,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     if (
       isEmpty(this.emails) &&
       isEmpty(this.ftp) &&
+      isEmpty(this.s3Bucket) &&
       !['chart', 'map'].includes(this.data.analysis.type)
     ) {
       this.errorFlagMsg = true;
@@ -300,21 +321,18 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     return true;
   }
 
-  validateEmails(emails) {
-    const emailsList = emails;
+  validateEmails(emailsList) {
     let emailsAreValid = true;
-    if (isEmpty(emailsList)) {
-      emailsAreValid = false;
-      this.emailValidateFlag = true;
+    if (!isEmpty(emailsList)) {
+      fpPipe(
+        fpMap(email => {
+          if (!this.validateThisEmail(email)) {
+            emailsAreValid = false;
+            this.emailValidateFlag = true;
+          }
+        })
+      )(emailsList);
     }
-    forEach(emailsList, email => {
-      const isEmailvalid = this.regexOfEmail.test(email.toLowerCase());
-      if (!isEmailvalid) {
-        emailsAreValid = false;
-        // cancel forEach
-        this.emailValidateFlag = true;
-      }
-    });
     return emailsAreValid;
   }
 
@@ -345,6 +363,10 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   onLocationSelected(value) {
     this.ftp = value;
+  }
+
+  onS3LocationSelected(value) {
+    this.s3Bucket = value;
   }
 
   close() {

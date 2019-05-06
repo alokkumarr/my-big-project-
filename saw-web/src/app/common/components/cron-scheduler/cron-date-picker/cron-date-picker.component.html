@@ -1,30 +1,44 @@
 <div fxFlex fxLayout="row" fxLayoutGap="7px" fxLayoutAlign="start center">
-
   <mat-form-field appearance="outline" class="form-select">
     <mat-label>Hours</mat-label>
-    <mat-select [(ngModel)]="model.hour" (selectionChange)="triggerChange()">
+    <mat-select
+      [(ngModel)]="model.hour"
+      (selectionChange)="triggerChange()"
+      [attr.e2e]="'cron-schedule-hours'"
+    >
       <mat-option *ngFor="let hour of selectOptions.hours" [value]="hour">
-        {{hour}}
+        {{ hour }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="form-select">
     <mat-label>Minutes</mat-label>
-    <mat-select placeholder="Minutes" [(ngModel)]="model.minute" (selectionChange)="triggerChange()">
+    <mat-select
+      placeholder="Minutes"
+      [(ngModel)]="model.minute"
+      (selectionChange)="triggerChange()"
+      [attr.e2e]="'cron-schedule-minutes'"
+    >
       <mat-option *ngFor="let minute of selectOptions.minutes" [value]="minute">
-        {{minute}}
+        {{ minute }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="form-select">
     <mat-label>AM/PM</mat-label>
-    <mat-select [(ngModel)]="model.hourType" (selectionChange)="triggerChange()">
-      <mat-option *ngFor="let hourType of selectOptions.hourTypes" [value]="hourType">
-        {{hourType}}
+    <mat-select
+      [(ngModel)]="model.hourType"
+      (selectionChange)="triggerChange()"
+      [attr.e2e]="'cron-schedule-hour-type'"
+    >
+      <mat-option
+        *ngFor="let hourType of selectOptions.hourTypes"
+        [value]="hourType"
+      >
+        {{ hourType }}
       </mat-option>
     </mat-select>
   </mat-form-field>
-
 </div>

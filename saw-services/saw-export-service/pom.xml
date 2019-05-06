@@ -24,9 +24,16 @@
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
 		<jwt.version>0.7.0</jwt.version>
+    <amazon-s3-version>1.11.534</amazon-s3-version>
 	</properties>
 
 	<dependencies>
+
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${amazon-s3-version}</version>
+    </dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>

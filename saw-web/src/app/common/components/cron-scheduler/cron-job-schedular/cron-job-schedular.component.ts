@@ -398,7 +398,10 @@ export class CronJobSchedularComponent implements OnInit {
     if (this.scheduleType === 'hourly') {
       parseCronValue = this.crondetails.cronexp.split(' ');
     } else {
-      const localCronExpression = convertToLocal(this.crondetails.cronexp, this.crondetails.timezone);
+      const localCronExpression = convertToLocal(
+        this.crondetails.cronexp,
+        this.crondetails.timezone
+      );
       parseCronValue = cronstrue.toString(localCronExpression).split(' ');
       const fetchTime = parseCronValue[1].split(':');
       const meridium = parseCronValue[2].split(',');
@@ -416,8 +419,8 @@ export class CronJobSchedularComponent implements OnInit {
           this.hourly.hours = 0;
           const extractHour = parseCronValue[1].split('/');
           this.hourly.minutes = isNaN(parseInt(extractHour[1], 10))
-          ? 0
-          : parseInt(extractHour[1], 10);
+            ? 0
+            : parseInt(extractHour[1], 10);
         } else {
           // Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
           const extractHour = parseCronValue[2].split('/');
