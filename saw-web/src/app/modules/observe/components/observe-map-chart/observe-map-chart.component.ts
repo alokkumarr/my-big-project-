@@ -24,7 +24,6 @@ export class ObserveMapChartComponent
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
-  @Input() isZoomAnalysis: boolean;
   @Input() updater: BehaviorSubject<Array<any>>;
   @Input() ViewMode: boolean;
   @Output() onRefresh = new EventEmitter<any>();

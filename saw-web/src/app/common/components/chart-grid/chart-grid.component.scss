@@ -26,12 +26,8 @@ $header-font-size: 18px;
     height: 100%;
 
     dx-data-grid {
-      height: calc(100% + 25px);
+      height: calc(100% - 45px);
     }
-  }
-
-  .zoom-analysis-grid {
-    height: calc(100% - 45px) !important;
   }
 }
 .report-toggle {
