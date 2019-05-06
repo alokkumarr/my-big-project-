@@ -13,7 +13,11 @@ const AnalyzeServiceStub = {
 
 const analysisStub = {
   artifacts: [{ columns: [] }],
-  sqlBuilder: { sorts: [], filters: [], dataFields: [], nodeFields: [] }
+  sipQuery: {
+    artifacts: [{ artifactsName: 'abc', fields: [] }],
+    sorts: [],
+    filters: []
+  }
 };
 
 @Component({
@@ -42,10 +46,7 @@ describe('Observe Pivot Component', () => {
       });
   });
 
-  // Temporarily disabled for build to pass.
-  // TODO: Need to be fixed.
-
-  // it('should exist', () => {
-  //   expect(fixture.componentInstance).not.toBeNull();
-  // });
+  it('should exist', () => {
+    expect(fixture.componentInstance).not.toBeNull();
+  });
 });
