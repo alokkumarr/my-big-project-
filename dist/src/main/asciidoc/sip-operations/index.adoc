@@ -580,14 +580,14 @@ The SAW systemd services system logs can be accessed using the `sudo
 journalctl` command.  To view the logs of individual services, use the
 `-u` option:
 
-        $ sudo journalctl -u saw-\*
+        $ sudo journalctl -u sip-\*
 
 === Listing services and their statuses
 
 To list services and check the status of all SAW systemd units,
 execute the following commands:
 
-        $ sudo systemctl list-units saw-\*
+        $ sudo systemctl list-units sip-\*
 
 NOTE: Some services use
 http://0pointer.de/blog/projects/socket-activation.html[socket
@@ -602,13 +602,13 @@ Under normal circumstances there should be no need to start, stop or
 restart SAW services manually.  However, if needed it can be done
 using the following commands:
 
-        $ sudo systemctl start <saw-service>
-        $ sudo systemctl stop <saw-service>
-        $ sudo systemctl restart <saw-service>
+        $ sudo systemctl start <sip-service>
+        $ sudo systemctl stop <sip-service>
+        $ sudo systemctl restart <sip-service>
 
-Where `<saw-service>` is one of the SAW systemd services (for example
-`saw-gateway`), which can be listed using the `sudo systemctl
-list-units saw-\*` command shown in the previous section.
+Where `<sip-service>` is one of the SAW systemd services (for example
+`sip-gateway`), which can be listed using the `sudo systemctl
+list-units sip-\*` command shown in the previous section.
 
 === Location of SIP data in MapR-FS
 
@@ -767,7 +767,7 @@ configure the `sip_bis_retry_diffs_in_minutes` accordingly.
 
 To enable creating analyses in SAW, load semantic metadata as follows:
 
-        $ ssh <saw-services-host>
+        $ ssh <sip-services-host>
         $ sudo -u mapr /opt/saw/service/bin/mdcli.sh -i \
             file://<nodes-json> -o file:///tmp/log.json
 

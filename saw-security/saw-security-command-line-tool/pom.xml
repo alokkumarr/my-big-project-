@@ -299,8 +299,8 @@
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
-                  <name>/usr/lib/systemd/system/saw-security.service</name>
-                  <file>../saw-security/src/main/system/saw-security.service</file>
+                  <name>/usr/lib/systemd/system/sip-security.service</name>
+                  <file>../saw-security/src/main/system/sip-security.service</file>
                   <ruleset>default</ruleset>
                 </entry>
               </entries>

@@ -301,16 +301,16 @@
 									<file>target/sip-batch-ingestion-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion.service</name>
-									<file>src/main/system/saw-batch-ingestion.service</file>
+									<name>/usr/lib/systemd/system/sip-batch-ingestion.service</name>
+									<file>src/main/system/sip-batch-ingestion.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion-proxy.service</name>
-									<file>src/main/system/saw-batch-ingestion-proxy.service</file>
+									<name>/usr/lib/systemd/system/sip-batch-ingestion-proxy.service</name>
+									<file>src/main/system/sip-batch-ingestion-proxy.service</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-batch-ingestion-proxy.socket</name>
-									<file>src/main/system/saw-batch-ingestion-proxy.socket</file>
+									<name>/usr/lib/systemd/system/sip-batch-ingestion-proxy.socket</name>
+									<file>src/main/system/sip-batch-ingestion-proxy.socket</file>
 								</entry>
 							</entries>
 							<afterInstallation>

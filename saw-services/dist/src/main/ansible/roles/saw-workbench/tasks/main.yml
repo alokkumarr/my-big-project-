@@ -9,5 +9,5 @@
   template: src=application.yml dest=/opt/bda/saw-workbench-service/conf
   notify:
     - restart saw-workbench
-- name: Enable SAW Workbench Service
-  systemd: name=saw-workbench-proxy.socket enabled=true state=started
+- name: Enable SIP Workbench Service
+  systemd: name=sip-workbench-proxy.socket enabled=true state=started
