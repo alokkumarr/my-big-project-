@@ -733,10 +733,12 @@ public class SftpServiceImpl extends SipPluginContract {
                          destinationLocation, channelId, routeId, 
                          fileExclusions, isDisable, source,lastModifiedHoursLmt,
                          jobEntity.getJobId());
-              ZonedDateTime fileTransEndTime = ZonedDateTime.now();
+             
               BisJobEntity job = sipLogService.retriveJobById(jobEntity.getJobId());
               job.setJobStatus("INPROGRESS");
               sipLogService.saveJob(job);
+              sipLogService.updateJobStatus(job.getJobId());
+              ZonedDateTime fileTransEndTime = ZonedDateTime.now();
               ZonedDateTime fileTransStartTime = ZonedDateTime.now();
               long durationInMillis =
                          Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
@@ -799,8 +801,15 @@ public class SftpServiceImpl extends SipPluginContract {
     transferDataFromChannelDirectory(template, sourcelocation, pattern,
         destinationLocation, channelId, routeId, exclusions, 
         getBatchId(), isDisableDuplicate, source, jobId);
+    
     ZonedDateTime fileTransEndTime = ZonedDateTime.now();
-    long durationInMillis = Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
+    long durationInMillis = Duration.between(fileTransStartTime,
+        fileTransEndTime).toMillis();
+    BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);
+    logger.info("success count after root file level" 
+        + bisJobEntity.getSuccessCount());
+
+   
     logger.trace("Transfer data ended time: " + new Date());
     logger.trace("Total time taken in seconds to complete interation " + " with route Id: "
         + TimeUnit.MILLISECONDS.toSeconds(durationInMillis));
@@ -908,7 +917,8 @@ public class SftpServiceImpl extends SipPluginContract {
           Long toatalCount = bisJobEntity.getTotalCount();
           long total = toatalCount + filesArray.size();
           logger.trace("Files count ::" +  total);
-          sipLogService.updateJobLog(jobId,"OPEN", 0L, total);
+          sipLogService.updateJobLog(jobId,"OPEN", bisJobEntity
+              .getSuccessCount(), total);
           
           List<List<LsEntry>> result = IntStream.range(0, partitionSize)
               .mapToObj(i -> filesArray.subList(iterationOfBatches * i,
@@ -969,25 +979,12 @@ public class SftpServiceImpl extends SipPluginContract {
                   logger.trace("File location at destination:: " + path);
                   // localDirectory = new File(path);
                   String logId = "";
+                  
                   try {
                     if (entry.getAttrs().getSize() != 0 && sipLogService
                         .duplicateCheck(isDisableDuplicate, sourcelocation, entry)) {
-                      /*if (localDirectory != null
-                          && !this.processor.isDestinationExists(localDirectory.getPath())) {
-
-                        logger.trace("directory where the file will be"
-                            + " downnloaded does not exist so it will be created :"
-                            + localDirectory.getAbsolutePath());
-                        logger.trace("directory where the file will be downnloaded  :"
-                            + localDirectory.getAbsolutePath());
-                        this.processor.createDestination(localDirectory.getPath(),
-                            new StringBuffer());
-                      }*/
                       logger.trace("file duplication completed " + sourcelocation + File.separator
                           + entry.getFilename() + " batchSize " + batchSize);
-                      //final File localFile = createTargetFile
-                      //(localDirectory, entry.getFilename());
-                      //   fileTobeDeleted = localFile;
                       logger.info("Before Inprogress log jobId :: " 
                           + jobId);
                       prepareLogInfo(bisDataMetaInfo, pattern, "",
@@ -999,105 +996,7 @@ public class SftpServiceImpl extends SipPluginContract {
                       logger.info("After Inprogress log jobId :: " 
                           + jobId);
                       logId = bisDataMetaInfo.getProcessId();
-                      // logger.trace("Actual file name after downloaded in the  :"
-                      //     + localDirectory.getAbsolutePath() +
-                      //" file name " + localFile.getName());
                       logger.trace("Thread starts downloading file with Id  : " + logId);
-                      // FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
-                      // template.get(sourcelocation + File.separator + entry.getFilename(),
-                      // new InputStreamCallback() {
-                      /*   @Override
-                            public void doWithInputStream(InputStream stream) throws IOException {
-
-
-
-                              logger.trace(
-                                  "Streaming the content of the file in the directory starts here "
-                                      + entry.getFilename());
-                              ZonedDateTime fileTransStartTime = ZonedDateTime.now();
-                              logger.trace("File" + entry.getFilename() + " transfer strat time:: "
-                                  + fileTransStartTime);
-                              try {
-                                bisDataMetaInfo.setFileTransferStartTime(
-                                    Date.from(fileTransStartTime.toInstant()));
-
-                                if (stream != null) {
-                                  if (processor.isDestinationMapR(defaultDestinationLocation)) {
-                                    logger.trace("COPY BYTES STARTS HERE 8");
-                                    org.apache.hadoop.io.IOUtils.copyBytes(stream, fos, 5120,
-                                        false);
-
-                                    logger.trace("COPY BYTES COMPLETES HERE 8");
-
-                                  } else {
-                                    processor.transferFile(stream, localFile,
-                                        defaultDestinationLocation, mapRfsUser);
-                                    if (!processor.isDestinationMapR(defaultDestinationLocation)) {
-                                      processor.closeStream(stream);
-                                    }
-                                  }
-
-                                  logger.trace(
-                                      "Streaming the content of " + "the file in the directory "
-                                          + "ends here " + entry.getFilename());
-                                  ZonedDateTime fileTransEndTime = ZonedDateTime.now();
-                                  logger.trace("File" + entry.getFilename() + "transfer end time:: "
-                                      + fileTransEndTime);
-                                  logger.trace(
-                                      "closing the stream for the file " + entry.getFilename());
-                                  bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
-                                  bisDataMetaInfo
-                                      .setComponentState(BisComponentState.DATA_RECEIVED.value());
-                                  bisDataMetaInfo.setFileTransferEndTime(
-                                      Date.from(fileTransEndTime.toInstant()));
-                                  bisDataMetaInfo.setFileTransferDuration(Duration
-                                      .between(fileTransStartTime, fileTransEndTime).toMillis());
-                                  logger.trace("File transfer duration :: "
-                                      + bisDataMetaInfo.getFileTransferDuration());
-                                  sipLogService.upsert(bisDataMetaInfo,
-                                      bisDataMetaInfo.getProcessId());
-                                  BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);
-                                  Long successCnt = bisJobEntity.getSuccessCount();
-                                  logger.info("Before Success file log success cnt :: " 
-                                      + successCnt);
-                                  sipLogService.updateSuccessCnt(jobId,"INPROGRESS",
-                                       successCnt + 1);
-                                  logger.info("After Success file log success cnt :: " 
-                                      + successCnt + 1);
-                                  // Adding to a list has been removed as a part of optimization
-                                  // SIP-6386
-                                  //list.add(bisDataMetaInfo);
-                                }
-
-                              } catch (Exception ex) {
-                                logger.error("Exception occurred while writting to file system "
-                                    + entry.getFilename(), ex);
-                                throw new SftpProcessorException(
-                                    "Exception throw while streaming the file "
-                                        + entry.getFilename() + " : ",
-                                    ex);
-                              } finally {
-                                if (stream != null) {
-                                  logger.trace("closing the stream for the file in finally block "
-                                      + entry.getFilename());
-                                  if (!processor.isDestinationMapR(defaultDestinationLocation)) {
-                                    // processor.closeStream(stream);
-                                  } else {
-                                    fos.close();
-                                    // stream.close();
-                                    // stream = null;
-                                    // org.apache.hadoop.io.IOUtils.cleanup(null, stream);
-                                  }
-                                }
-                              }
-                            }
-                         }); */
-                     // bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
-                     // bisDataMetaInfo.setComponentState(BisComponentState.DATA_RECEIVED.value());
-                     // sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                      // Adding to a list has been removed as a part of optimization
-                      // SIP-6386
-                      //list.add(bisDataMetaInfo);
                     } else {
                       if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
                           sourcelocation + File.separator + entry.getFilename())) {
@@ -1112,15 +1011,19 @@ public class SftpServiceImpl extends SipPluginContract {
                             new UUIDGenerator().generateId(bisDataMetaInfo).toString());
                         bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                         bisDataMetaInfo.setComponentState(BisComponentState.DUPLICATE.value());
-                        
+                        bisJobEntity = sipLogService.retriveJobById(jobId);
                         Long successCnt = bisJobEntity.getSuccessCount();
-                        //sipLogService.updateSuccessCnt(jobId,"INPROGRESS",
-                        //     successCnt + 1);
+                        logger.info("count before failed duplicate" + successCnt);
+                        sipLogService.updateSuccessCnt(jobId,
+                             successCnt + 1);
+                        BisJobEntity entity = sipLogService.retriveJobById(jobId);
+                        logger.info("count after failed duplicate" + entity.getSuccessCount());
                         // This check has been added as a part of optimization ticket
                         // SIP-6386
                         if (duplicateEntry) {
                           sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                         }
+                        sipLogService.updateJobStatus(jobId);
                         //list.add(bisDataMetaInfo);
                       }
                     }
@@ -1141,6 +1044,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     bisDataMetaInfo.setComponentState(BisComponentState.FAILED.value());
                     bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
                     sipLogService.upsert(bisDataMetaInfo, logId);
+                    sipLogService.updateJobStatus(jobId);
                     //if (fileTobeDeleted != null
                     //    && this.processor.isDestinationExists(fileTobeDeleted.getPath())) {
                     //   this.processor.deleteFile(fileTobeDeleted.getPath(),
@@ -1417,7 +1321,7 @@ public class SftpServiceImpl extends SipPluginContract {
                   Long successCnt = bisJobEntity.getSuccessCount();
                   logger.info(
                       "Before Success file log success cnt :: " + successCnt);
-                  sipLogService.updateSuccessCnt(jobId, "INPROGRESS",
+                  sipLogService.updateSuccessCnt(jobId, 
                       successCnt + 1);
                   logger.info("After Success file log success cnt :: "
                       + successCnt + 1);
@@ -1435,6 +1339,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     + "transferring the file from channel", ex);
 
                 sipLogService.upsertFailedStatus(logId);
+                sipLogService.updateJobStatus(jobId);
 
                 logger.trace(" files or directory to be "
                     + "deleted on exception " + fileTobeDeleted);

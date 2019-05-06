@@ -17,7 +17,9 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -94,8 +96,10 @@ public class SipLogging {
       bisLog.setJob(jobEntity);
       bisFileLogsRepository.save(bisLog);
     }
-    logger.trace("Integrate with logging API to update with a status ends here : "
-        + entity.getProcessState() + " with an process Id " + bisLog.getPid());
+    logger.trace("Integrate with logging "
+        + "API to update with a status ends here : "
+        + entity.getProcessState() + " with an process Id " 
+        + bisLog.getPid());
   }
   
   
@@ -131,6 +135,8 @@ public class SipLogging {
       this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.FAILED.value(),
             BisComponentState.FAILED.value(), pid);
     }
+    
+    
   }
   
   /**
@@ -332,9 +338,21 @@ public class SipLogging {
     logger.trace("Long running process count: " +    longCount);
     if (longCount > 0) {
       logger.trace("Updating long running transfers to failed");
-      updatedRecords = bisFileLogsRepository
-          .updateLongRunningTranfers(minutesToCheck);
+      List<BisFileLog> inProgLogs = bisFileLogsRepository
+          .selectLongRunningTranfers(minutesToCheck);
       logger.trace("long running transfer update completed");
+      
+      inProgLogs.stream().map(bisFileLog -> {
+        bisFileLog.setMflFileStatus("FAILED");
+        bisFileLog.setBisProcessState("FAILED");
+        return bisFileLog;
+      }).forEach(bisFileLogsRepository::saveAndFlush);
+
+      Map<BisJobEntity, Long> jobs = inProgLogs.stream().collect(
+          Collectors.groupingBy(BisFileLog::getJob, Collectors.counting()));
+      
+      jobs.forEach((job, count) -> this.updateJobStatus(job.getJobId()));
+      updatedRecords = inProgLogs.size();
     }
     return updatedRecords;
   }
@@ -469,18 +487,16 @@ public class SipLogging {
   /**
    * Adds entry to job log.
    * 
-   * @param status job status.
    * @param successCnt number of files succssfully transferred
    */
   @Transactional(TxType.REQUIRED)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public void  updateSuccessCnt(long jobId, String status, long successCnt) {
+  public void  updateSuccessCnt(long jobId, long successCnt) {
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     if (sipJob.isPresent()) {
       BisJobEntity jobEntity = sipJob.get();
-      jobEntity.setJobStatus(status);
       jobEntity.setSuccessCount(successCnt);
       jobEntity.setUpdatedDate(new Date());
       sipJobDataRepository.saveAndFlush(jobEntity);
@@ -498,18 +514,57 @@ public class SipLogging {
           "#{${sip.service.max.attempts}}", backoff = 
           @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public void updateJobStatus(long jobId) {
+    logger.info("Updating job status:: ");
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     if (sipJob.isPresent()) {
       BisJobEntity jobEntity = sipJob.get();
-      if (jobEntity.getJobStatus().equals("INPROGRESS")
+      logger.info("Job status::" + jobEntity.getJobStatus());
+      logger.info("Job total count::" + jobEntity.getTotalCount());
+      logger.info("Job total count::" + jobEntity.getSuccessCount());
+      
+      if (!jobEntity.getJobStatus().equals("OPEN")
           && jobEntity.getTotalCount() == jobEntity.getSuccessCount()) {
+        logger.info("Count matched success");
         jobEntity.setJobStatus("SUCCESS");
-        jobEntity.setUpdatedDate(new Date());
-        sipJobDataRepository.saveAndFlush(jobEntity);
+       
+      } else if (!jobEntity.getJobStatus().equals("OPEN") 
+          && isJobPartiallyCompleted(jobId, jobEntity.getTotalCount())) {
+        logger.info("Count matched partial");
+        jobEntity.setJobStatus("PARTIALLY_COMPLETED");
+      } else if (!jobEntity.getJobStatus().equals("OPEN") 
+          && isJobFailed(jobId, jobEntity.getTotalCount())) {
+        logger.info("Count matched failed");
+        jobEntity.setJobStatus("FAILED");
+      } else {
+        logger.info("update job status none matched");
       }
+      
+      
+      jobEntity.setUpdatedDate(new Date());
+      sipJobDataRepository.saveAndFlush(jobEntity);
 
     }
 
+  }
+  
+  
+  private boolean isJobFailed(long jobId, Long total) {
+    return bisFileLogsRepository
+        .countByMflFileStatusAndBisProcessStateAndJob_JobId("FAILED",
+            "FAILED", jobId) == total;
+  }
+
+
+  private boolean isJobPartiallyCompleted(Long jobId, Long total) {
+    Long failedCnt = bisFileLogsRepository
+        .countByMflFileStatusAndBisProcessStateAndJob_JobId("FAILED",
+        "FAILED", jobId);
+    Long successCnt = bisFileLogsRepository
+        .countByMflFileStatusAndBisProcessStateAndJob_JobId("SUCCESS",
+        "SUCCESS", jobId);
+    
+    
+    return total == failedCnt + successCnt; 
   }
   
   /**
@@ -518,7 +573,12 @@ public class SipLogging {
    * @param jobId job identifier
    * @return JobEntity
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  @Transactional(TxType.REQUIRED)
   public BisJobEntity retriveJobById(long jobId) {
+    
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     BisJobEntity jobEntity = null;
     if (sipJob.isPresent()) {
@@ -528,6 +588,9 @@ public class SipLogging {
     return jobEntity;
     
   }
+  
+  
+  
   
   
   /**

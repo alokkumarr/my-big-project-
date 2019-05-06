@@ -53,7 +53,7 @@ public class BisFileLog implements Serializable {
 
  
 
-@ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
+  @ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
       allowEmptyValue = false)
   @Column(name = "BIS_FILE_NAME")
   String fileName;

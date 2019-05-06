@@ -80,11 +80,11 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   Integer countOfLongRunningTransfers(@Param("minutesForLongProc") Integer minutesForLongProc);
   
   @Modifying
-  @Query("UPDATE  BisFileLog Logs set Logs.mflFileStatus = 'FAILED', "
-      + "Logs.bisProcessState = 'FAILED' where (Logs.mflFileStatus = 'INPROGRESS' " 
+  @Query("SELECT  Logs from BisFileLog Logs  where (Logs.mflFileStatus = 'INPROGRESS' " 
       + "and Logs.bisProcessState = 'DATA_INPROGRESS') and "
       + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
-  Integer updateLongRunningTranfers(@Param("minutesForLongProc") Integer minutesForLongProc);
+  List<BisFileLog> selectLongRunningTranfers(@Param("minutesForLongProc") 
+      Integer minutesForLongProc);
   
   @Query("SELECT COUNT(pid) from BisFileLog Logs where ( Logs.source = 'REGULAR' "
         + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "
@@ -94,6 +94,12 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   @Query("SELECT Logs FROM BisFileLog Logs  JOIN Logs.job BisJobEntity  "
       + "WHERE Logs.mflFileStatus = 'OPEN' and Logs.job.jobStatus = 'INPROGRESS'")
   List<BisFileLog> findFirstOpenLog();
+  
+  
+  Long countByMflFileStatusAndBisProcessStateAndJob_JobId(
+      String name, String processState, Long jobId);
+  
+  Long countByJob_JobId(Long jobId);
 
 
 }
