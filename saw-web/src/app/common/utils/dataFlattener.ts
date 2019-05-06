@@ -17,30 +17,40 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
 
-function substituteEmptyValues(data, fields) {
-  return flatMap(fields, field =>
-    fpPipe(
-      fpMap(value => {
-        // As per AC on 5216, if key is empty show undefined
-        if (field.area === 'data') {
-          return value;
-        }
-        if (isEmpty(value[field.name])) {
-          value[field.name] = 'undefined';
-        }
-        return value;
+// function substituteEmptyValues(data, fields) {
+//   return flatMap(fields, field =>
+//     fpPipe(
+//       fpMap(value => {
+//         // As per AC on 5216, if key is empty show undefined
+//         if (field.area === 'data') {
+//           return value;
+//         }
+//         if (isEmpty(value[field.name])) {
+//           value[field.name] = 'undefined';
+//         }
+//         return value;
+//       })
+//     )(data)
+//   );
+// }
+
+export function substituteEmptyValues(data) {
+  return fpPipe(
+    fpMap(
+      fpMapValues(value => {
+        return value === '' ? 'Undefined' : value;
       })
-    )(data)
-  );
+    )
+  )(data);
 }
 
 export function flattenPivotData(data, sipQuery) {
   if (sipQuery.artifacts) {
-    const columnRowFields = sipQuery.artifacts[0].fields.filter(field =>
-      ['row', 'column', 'data'].includes(field.area)
-    );
+    // const columnRowFields = sipQuery.artifacts[0].fields.filter(field =>
+    //   ['row', 'column', 'data'].includes(field.area)
+    // );
     // As per AC on 5216, if key is empty show undefined
-    data = substituteEmptyValues(data, columnRowFields);
+    data = substituteEmptyValues(data);
     return data;
   }
   const nodeFieldMap = getNodeFieldMapPivot(sipQuery);

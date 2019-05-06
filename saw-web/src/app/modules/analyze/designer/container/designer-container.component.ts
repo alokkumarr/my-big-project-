@@ -413,6 +413,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
                 if (field.columnName === columns.columnName) {
                   columns.format = field.format;
                   columns.dateInterval = field.groupInterval;
+                  columns.aliasName = field.aliasName;
                 }
               });
             });

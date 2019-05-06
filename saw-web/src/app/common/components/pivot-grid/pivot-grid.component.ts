@@ -383,7 +383,8 @@ export class PivotGridComponent implements OnDestroy {
         if (!isUndefined(cloned.aliasName) && cloned.aliasName !== '') {
           cloned.displayName = cloned.aliasName;
         }
-
+        cloned.manualFormat = isUndefined(cloned.dateFormat) ? 'yyyy-MM-dd' : cloned.dateFormat;
+        delete cloned.dateFormat;
         return cloned;
       }),
       fpMap(
