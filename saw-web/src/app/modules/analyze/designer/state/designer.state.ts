@@ -41,13 +41,13 @@ import {
   DesignerLoadMetric,
   DesignerResetState,
   DesignerUpdatePivotGroupIntreval
-
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
-  CUSTOM_DATE_PRESET_VALUE
+  CUSTOM_DATE_PRESET_VALUE,
+  CHART_DATE_FORMATS_OBJ
 } from '../../consts';
 
 // setAutoFreeze(false);
@@ -113,6 +113,17 @@ export class DesignerState {
     let artifacts = sipQuery.artifacts;
     const isDateType = DATE_TYPES.includes(artifactColumn.type);
 
+    /* If analysis is chart and this is a date field, assign a default
+      groupInterval. For pivots, use dateInterval if available */
+    const groupInterval = {
+      groupInterval:
+        analysis.type === 'chart' && artifactColumn.type === 'date'
+          ? CHART_DATE_FORMATS_OBJ[
+              artifactColumn.dateFormat || <string>artifactColumn.format
+            ].groupInterval
+          : artifactColumn.dateInterval
+    };
+
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
 
@@ -129,7 +140,7 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
-      groupInterval: artifactColumn.dateInterval,
+      ...groupInterval,
       name: artifactColumn.name,
       type: artifactColumn.type,
       table: artifactColumn.table || (<any>artifactColumn).tableName,
@@ -625,12 +636,11 @@ export class DesignerState {
             row.groupInterval = artifactColumn.dateInterval;
             delete row.format;
           }
-        })
+        });
       }
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
   }
-
 }
