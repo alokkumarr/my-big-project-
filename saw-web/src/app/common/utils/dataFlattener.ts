@@ -34,19 +34,18 @@ function substituteEmptyValues(data, fields) {
   );
 }
 
-export function flattenPivotData(data, sqlBuilder) {
-  if (sqlBuilder.artifacts) {
-    const columnRowFields = sqlBuilder.artifacts[0].fields
-          .filter(field => ['row', 'column', 'data'].includes(field.area));
+export function flattenPivotData(data, sipQuery) {
+  if (sipQuery.artifacts) {
+    const columnRowFields = sipQuery.artifacts[0].fields.filter(field =>
+      ['row', 'column', 'data'].includes(field.area)
+    );
     // As per AC on 5216, if key is empty show undefined
     data = substituteEmptyValues(data, columnRowFields);
     return data;
   }
-  const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
+  const nodeFieldMap = getNodeFieldMapPivot(sipQuery);
   return parseNodePivot(data, {}, nodeFieldMap, 0);
 }
-
-
 
 /** Map the tree level to the columnName of the field
  * Example:
