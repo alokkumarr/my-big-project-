@@ -151,17 +151,19 @@ export class ChartGridComponent implements OnInit {
       : this.analysis.artifacts[0].columns;
     forEach(columns, column => {
       if (axisName === column.name) {
+        const columnFormat =
+          column.type === 'date' ? column.dateFormat : column.format;
         alias = column.alias || column.displayName;
         value =
           column.type === 'date'
             ? moment
                 .utc(value)
                 .format(
-                  column.format === 'MMM d YYYY'
+                  columnFormat === 'MMM d YYYY'
                     ? 'MMM DD YYYY'
-                    : column.format === 'MMMM d YYYY, h:mm:ss a'
+                    : columnFormat === 'MMMM d YYYY, h:mm:ss a'
                     ? 'MMMM DD YYYY, h:mm:ss a'
-                    : column.format
+                    : columnFormat
                 )
             : value;
         if (
