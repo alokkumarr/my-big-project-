@@ -112,6 +112,8 @@ export class DesignerState {
     const sipQuery = analysis.sipQuery;
     let artifacts = sipQuery.artifacts;
     const isDateType = DATE_TYPES.includes(artifactColumn.type);
+    const fillMissingDataWithZeros =
+      analysis.type === 'chart' && artifactColumn.type === 'date';
 
     /* If analysis is chart and this is a date field, assign a default
       groupInterval. For pivots, use dateInterval if available */
@@ -141,6 +143,7 @@ export class DesignerState {
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
       ...groupInterval,
+      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {}),
       name: artifactColumn.name,
       type: artifactColumn.type,
       table: artifactColumn.table || (<any>artifactColumn).tableName,
@@ -210,6 +213,8 @@ export class DesignerState {
     const { analysis, groupAdapters } = getState();
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
+    const fillMissingDataWithZeros =
+      analysis.type === 'chart' && artifactColumn.type === 'date';
 
     /* Find the artifact inside sipQuery of analysis stored in state */
     const artifactsName =
@@ -228,7 +233,8 @@ export class DesignerState {
 
     artifacts[artifactIndex].fields[artifactColumnIndex] = {
       ...artifacts[artifactIndex].fields[artifactColumnIndex],
-      ...artifactColumn
+      ...artifactColumn,
+      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {})
     };
 
     const targetAdapterIndex = findIndex(
