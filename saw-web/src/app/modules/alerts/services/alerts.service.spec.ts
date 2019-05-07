@@ -24,8 +24,10 @@ describe('AlertsService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should getAlertsStatesForGrid', () => {
-    service.getAlertsStatesForGrid(pagingOptions);
+  it('getAlertsStatesForGrid should return Promise', () => {
+    expect(
+      service.getAlertsStatesForGrid(pagingOptions) instanceof Promise
+    ).toBeTruthy();
   });
 
   it('getAlertRuleDetails should return  observable', () => {

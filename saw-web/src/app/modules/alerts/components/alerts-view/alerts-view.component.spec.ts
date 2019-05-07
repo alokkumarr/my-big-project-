@@ -30,10 +30,14 @@ describe('AlertsViewComponent', () => {
   });
 
   it('setAlertLoaderForGrid should set alerts Loader', () => {
+    const loaderSpy = spyOn(component, 'alertsDataLoader');
     component.setAlertLoaderForGrid();
+    expect(loaderSpy instanceof Function).toBeTruthy();
   });
 
   it('fetchLateshAlerts should call setAlertLoaderForGrid', () => {
+    const setAlertLoaderSpy = spyOn(component, 'setAlertLoaderForGrid');
     component.fetchLateshAlerts();
+    expect(setAlertLoaderSpy).toHaveBeenCalled();
   });
 });

@@ -11,7 +11,6 @@ import { GridData, AlertIds } from '../../../alerts.interface';
 })
 export class AlertsGridComponent implements OnInit {
   public remoteOperations = {};
-  public paging;
   public pager = {
     showNavigationButtons: true,
     allowedPageSizes: [25, 50, 75, 100],

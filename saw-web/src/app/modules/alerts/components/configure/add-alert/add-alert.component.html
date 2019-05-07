@@ -55,7 +55,7 @@
                 <mat-option
                   *ngFor="let sev of alertSeverity"
                   [value]="sev.value"
-                  >{{ sev.name }}</mat-option
+                  >{{ sev.value | titlecase }}</mat-option
                 >
               </mat-select>
               <mat-error>This field is required</mat-error>

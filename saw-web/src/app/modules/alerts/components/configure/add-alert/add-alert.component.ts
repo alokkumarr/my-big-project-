@@ -36,7 +36,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   constructor(
     private _formBuilder: FormBuilder,
     public _configureAlertService: ConfigureAlertService,
-    private _notify: ToastService
+    public _notify: ToastService
   ) {
     this.createAlertForm();
   }

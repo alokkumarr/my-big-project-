@@ -35,26 +35,24 @@ const confAlertServiceStub = {
   }
 };
 
+const payload = {
+  alertName: 'abc',
+  alertDescription: 'abc',
+  alertSeverity: 'CRITICAL',
+  activeInd: false,
+  datapodId: '1',
+  datapodName: 'abc',
+  categoryId: '',
+  monitoringEntity: 'abc123',
+  aggregation: 'AVG',
+  operator: 'GT',
+  thresholdValue: 2,
+  product: 'SAWD000001'
+};
+
 const alertDefinitionStub: AlertDefinition = {
   action: 'update',
-  alertConfig: {
-    alertRulesSysId: '1',
-    datapodId: '1',
-    datapodName: 'abc',
-    alertName: 'abc',
-    alertDescription: 'abc',
-    category: '1',
-    alertSeverity: 'CRITICAL',
-    monitoringEntity: 'abc123',
-    aggregation: 'AVG',
-    operator: 'GT',
-    thresholdValue: 2,
-    activeInd: false,
-    createdBy: 'admin',
-    createdTime: 1555524407000,
-    modifiedTime: null,
-    modifiedBy: null
-  }
+  alertConfig: { ...payload }
 };
 
 describe('AddAlertComponent', () => {
@@ -95,28 +93,37 @@ describe('AddAlertComponent', () => {
       id: '1',
       metricName: 'sample'
     };
-    // component.alertMetricFormGroup.controls['monitoringEntity'].setValue('');
     component.alertMetricFormGroup.controls['datapodName'].setValue(
       selectedItem.metricName
     );
-
     component.onDatapodSelected(selectedItem);
+    expect(component.metricsList$ instanceof Observable).toBe(true);
   });
 
   it('should reset monitoringEntity formControl value', () => {
     component.onDatapodChanged();
+    expect(
+      component.alertMetricFormGroup.controls['monitoringEntity'].value
+    ).toEqual('');
   });
 
   it('should create alert payload', () => {
     component.constructPayload();
+    expect(component.endPayload).toEqual(payload);
   });
 
   it('should create alert', () => {
+    const payloadSpy = spyOn(component, 'constructPayload');
     component.createAlert();
+    expect(payloadSpy).toHaveBeenCalled();
+    expect(component.subscriptions).not.toBeNull();
   });
 
   it('should update alert', () => {
+    const payloadSpy = spyOn(component, 'constructPayload');
     component.updateAlert();
+    expect(payloadSpy).toHaveBeenCalled();
+    expect(component.subscriptions).not.toBeNull();
   });
 
   it('should notifyOnAction', () => {
@@ -124,6 +131,11 @@ describe('AddAlertComponent', () => {
       alert: {},
       message: 'Alert rule updated successfully'
     };
+    const addAlertSpy = spyOn(component.onAddAlert, 'emit');
+    const notifySpy = spyOn(component._notify, 'success');
+
     component.notifyOnAction(data);
+    expect(notifySpy).toHaveBeenCalled();
+    expect(addAlertSpy).toHaveBeenCalled();
   });
 });
