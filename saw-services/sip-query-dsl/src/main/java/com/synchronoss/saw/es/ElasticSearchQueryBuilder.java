@@ -58,10 +58,6 @@ public class ElasticSearchQueryBuilder {
     // The below call is to build sort
     searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
 
-//    if (dataSecurityString != null && !dataSecurityString.trim().equals("")) {
-//      dataSecurityKeyNode = buildDsk(dataSecurityString);
-//    }
-
     // The below code to build filters
     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
     if (sipQuery.getBooleanCriteria() != null) {

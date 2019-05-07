@@ -212,7 +212,7 @@ public class StorageProxyController {
           @Valid
           @RequestBody
           SIPDSL sipdsl,
-      @RequestParam(name = "size", required = false) HttpServletRequest request, HttpServletResponse response, Integer size)
+      @RequestParam(name = "size", required = false) Integer size, HttpServletRequest request, HttpServletResponse response)
       throws JsonProcessingException {
     logger.debug("Request Body:{}", sipdsl);
     if (sipdsl == null) {
@@ -271,7 +271,10 @@ public class StorageProxyController {
           SipQuery sipQuery,
       @RequestParam(name = "id", required = false) String queryId,
       @RequestParam(name = "size", required = false) Integer size,
-      @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime") HttpServletRequest request, HttpServletResponse response, ExecutionType executionType)
+      @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime")
+          ExecutionType executionType,
+      HttpServletRequest request,
+      HttpServletResponse response)
       throws JsonProcessingException {
     logger.debug("Request Body:{}", sipQuery);
     if (sipQuery == null) {
