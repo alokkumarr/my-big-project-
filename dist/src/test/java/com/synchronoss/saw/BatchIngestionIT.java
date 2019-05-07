@@ -942,6 +942,9 @@ public class BatchIngestionIT extends BaseIT {
    * disableDuplicate :false. filePattern : *.csv. fileExclusions : log. disableDuplicate : false.
    * batchSize:10 And to make sure, it has been triggered & downloaded. wait for the file to be
    * available has been implemented
+   * 
+   * This test case is temporary ignored due to build failures.
+   * It will be reenabled as part of SIP-7169 after investigation
    */
   @Ignore
   @Test
