@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.sncr</groupId>
-  <artifactId>saw-security-parent</artifactId>
+  <artifactId>sip-security-parent</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
 

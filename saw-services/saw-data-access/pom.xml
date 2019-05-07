@@ -3,10 +3,10 @@
 <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.synchronoss</groupId>
-        <artifactId>saw-services</artifactId>
+        <artifactId>sip-services</artifactId>
         <version>1.0.0</version>
     </parent>
-	<artifactId>saw-data-access</artifactId>
+	<artifactId>sip-data-access</artifactId>
 	<packaging>jar</packaging>
 	<version>${revision}</version>
 	<properties>
@@ -24,12 +24,12 @@
 		<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->
 		<dependency>
 			<groupId>com.synchronoss</groupId>
-			<artifactId>saw-common</artifactId>
+			<artifactId>sip-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss</groupId>
-			<artifactId>saw-metadata-service</artifactId>
+			<artifactId>sip-metadata-service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

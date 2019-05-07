@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.synchronoss</groupId>
-        <artifactId>saw-services</artifactId>
+        <artifactId>sip-services</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>saw-metadata-service</artifactId>
+    <artifactId>sip-metadata-service</artifactId>
     <packaging>jar</packaging>
     <version>${revision}</version>
     <properties>
@@ -24,7 +24,7 @@
     <dependencies>
         <dependency>
             <groupId>com.synchronoss</groupId>
-            <artifactId>saw-common</artifactId>
+            <artifactId>sip-common</artifactId>
             <version>${project.version}</version>
 		</dependency>
         <dependency>
