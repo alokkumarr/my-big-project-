@@ -44,10 +44,11 @@ public class ElasticSearchQueryBuilder {
   String dataSecurityString;
   private static String appenderForGTLTE = "||/M";
 
-  public String buildDataQuery(SipQuery sipQuery, Integer size)
+  public String buildDataQuery(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
       throws IOException, ProcessingException {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
+      DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
     if (size == null || size.equals(0)) size = 1000;
     searchSourceBuilder.size(size);
     if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
@@ -57,9 +58,9 @@ public class ElasticSearchQueryBuilder {
     // The below call is to build sort
     searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
 
-    if (dataSecurityString != null && !dataSecurityString.trim().equals("")) {
-      DataSecurityKey dataSecurityKeyNode = buildDsk(dataSecurityString);
-    }
+//    if (dataSecurityString != null && !dataSecurityString.trim().equals("")) {
+//      dataSecurityKeyNode = buildDsk(dataSecurityString);
+//    }
 
     // The below code to build filters
     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
@@ -69,8 +70,7 @@ public class ElasticSearchQueryBuilder {
 
       builder = buildFilters(filters, builder);
 
-      //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder); TODO: Future
-      // Implementation
+        builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder); 
 
       boolQueryBuilder = buildBooleanQuery(sipQuery, builder);
       searchSourceBuilder.query(boolQueryBuilder);

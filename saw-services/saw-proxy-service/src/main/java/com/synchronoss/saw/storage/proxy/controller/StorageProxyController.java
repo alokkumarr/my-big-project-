@@ -1,10 +1,16 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
@@ -22,10 +28,13 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,22 +212,31 @@ public class StorageProxyController {
           @Valid
           @RequestBody
           SIPDSL sipdsl,
-      @RequestParam(name = "size", required = false) Integer size)
+      @RequestParam(name = "size", required = false) HttpServletRequest request, HttpServletResponse response, Integer size)
       throws JsonProcessingException {
     logger.debug("Request Body:{}", sipdsl);
     if (sipdsl == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
+    Ticket authTicket = getTicket(request);
+    if (authTicket == null) {
+      response.setStatus(401);
+      logger.error("Invalid authentication token");
+      return Collections.singletonList("Invalid authentication token");
+    }
+    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     List<Object> responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    DataSecurityKey dataSecurityKey = new DataSecurityKey();
+    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipdsl));
-      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size);
+      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size,dataSecurityKey);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -253,23 +271,32 @@ public class StorageProxyController {
           SipQuery sipQuery,
       @RequestParam(name = "id", required = false) String queryId,
       @RequestParam(name = "size", required = false) Integer size,
-      @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime") ExecutionType executionType)
+      @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime") HttpServletRequest request, HttpServletResponse response, ExecutionType executionType)
       throws JsonProcessingException {
     logger.debug("Request Body:{}", sipQuery);
     if (sipQuery == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
+    Ticket authTicket = getTicket(request);
+    if (authTicket == null) {
+      response.setStatus(401);
+      logger.error("Invalid authentication token");
+      return Collections.singletonList("Invalid authentication token");
+    }
+    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     List<Object> responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    DataSecurityKey dataSecurityKey = new DataSecurityKey();
+    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipQuery));
-      responseObjectFuture = proxyService.execute(sipQuery, size);
+      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKey);
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
