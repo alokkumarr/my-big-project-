@@ -18,7 +18,7 @@
           maxlength="20"
           autocomplete="off"
           (input)="onAliasChange($event.target.value)"
-          [value]="artifactColumn.alias || ''"
+          [value]="artifactColumn.alias || artifactColumn.aliasName || ''"
         />
       </mat-form-field>
     </div>
