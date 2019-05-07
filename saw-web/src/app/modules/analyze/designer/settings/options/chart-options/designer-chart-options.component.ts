@@ -7,7 +7,6 @@ import {
   EventEmitter
 } from '@angular/core';
 import { ChartService } from '../../../../../../common/services/chart.service';
-import * as isEmpty from 'lodash/isEmpty';
 
 @Component({
   selector: 'designer-chart-options',
