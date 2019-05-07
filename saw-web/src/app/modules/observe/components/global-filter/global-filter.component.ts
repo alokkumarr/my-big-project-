@@ -17,7 +17,6 @@ import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
 
 import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
-import { ObserveState } from '../../state/observe.state';
 
 @Component({
   selector: 'global-filter',
@@ -94,13 +93,15 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   tableNameFor(f) {
     const tableName = f.tableName || f.artifactsName;
 
-    return this.store.select(ObserveState.metrics).pipe(
-      map$(metrics => {
-        const metric = metrics[f.semanticId];
-        const metricName = metric ? metric.metricName : f.metricName;
-        return tableName + (metricName ? ` (${metricName})` : '');
-      })
-    );
+    return this.store
+      .select(state => state.common.metrics)
+      .pipe(
+        map$(metrics => {
+          const metric = metrics[f.semanticId];
+          const metricName = metric ? metric.metricName : f.metricName;
+          return tableName + (metricName ? ` (${metricName})` : '');
+        })
+      );
   }
 
   ngOnDestroy() {

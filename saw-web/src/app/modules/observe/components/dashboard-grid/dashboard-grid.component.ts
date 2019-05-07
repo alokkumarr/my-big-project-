@@ -45,7 +45,6 @@ import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
 import { isDSLAnalysis } from 'src/app/modules/analyze/types';
-import { ObserveLoadMetrics } from '../../actions/observe.actions';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -99,7 +98,6 @@ export class DashboardGridComponent
 
   ngOnInit() {
     this.subscribeToRequester();
-    this.store.dispatch(new ObserveLoadMetrics());
 
     this.columns = this.getMinColumns();
     this.options = {
@@ -174,7 +172,7 @@ export class DashboardGridComponent
       /* Wait for metrics to load before initialising dashboard.
       Metrics are needed to get full artifacts for filters */
       const listener = this.store
-        .select(state => state.observe.metrics)
+        .select(state => state.common.metrics)
         .pipe(
           first(metrics => values(metrics).length > 0),
           tap(() => this.initialiseDashboard())
@@ -250,7 +248,7 @@ export class DashboardGridComponent
   }
 
   addGlobalFilters(analysis) {
-    const metrics = this.store.selectSnapshot(state => state.observe.metrics);
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
     const metric = metrics[analysis.semanticId];
     const columns = flatMap(
       metric
