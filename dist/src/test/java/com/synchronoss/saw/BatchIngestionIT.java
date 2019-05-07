@@ -944,6 +944,7 @@ public class BatchIngestionIT extends BaseIT {
    * available has been implemented
    */
   @Ignore
+  @Test
   public void transferDataSchedule() throws JsonProcessingException {
     ObjectNode routeMetadata = prepareRouteDataSetForTransferSchedule();
     log.debug("route metadata used to schedule :" + mapper.writeValueAsString(routeMetadata));
