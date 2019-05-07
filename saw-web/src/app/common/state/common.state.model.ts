@@ -14,4 +14,5 @@ export interface CommonStateModel {
   analyzeMenu: Menu;
   observeMenu: Menu;
   adminMenu: Menu;
+  metrics: { [id: string]: any };
 }

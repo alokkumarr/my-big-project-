@@ -1,20 +1,32 @@
 import { State, Action, StateContext } from '@ngxs/store';
 import {
   CommonStateUpdateMenu,
-  AdminExportLoadMenu
+  AdminExportLoadMenu,
+  CommonLoadAllMetrics,
+  CommonLoadMetricById
 } from '../actions/menu.actions';
 import { CommonStateModel, Menu } from './common.state.model';
+import { tap } from 'rxjs/operators';
 
-import { MenuService } from '../services';
+import { MenuService, CommonSemanticService } from '../services';
 
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as values from 'lodash/values';
 
 @State<CommonStateModel>({
   name: 'common',
-  defaults: { analyzeMenu: null, observeMenu: null, adminMenu: null }
+  defaults: {
+    analyzeMenu: null,
+    observeMenu: null,
+    adminMenu: null,
+    metrics: {}
+  }
 })
 export class CommonState {
-  constructor(private menuService: MenuService) {}
+  constructor(
+    private menuService: MenuService,
+    private semantic: CommonSemanticService
+  ) {}
 
   @Action(CommonStateUpdateMenu)
   updateMenu(
@@ -37,5 +49,44 @@ export class CommonState {
     } catch (err) {
       // TODO: Handle error
     }
+  }
+
+  @Action(CommonLoadAllMetrics)
+  loadMetric({
+    patchState,
+    getState,
+    dispatch
+  }: StateContext<CommonStateModel>) {
+    const metrics = getState().metrics;
+    if (values(metrics).length > 0) {
+      return patchState({ metrics: { ...metrics } });
+    }
+
+    return this.semantic.getMetricList$().pipe(
+      tap(resp => {
+        const resultMetrics = {};
+        resp.forEach(metric => {
+          resultMetrics[metric.id] = metric;
+        });
+
+        patchState({ metrics: resultMetrics });
+        return dispatch(
+          resp.map(metric => new CommonLoadMetricById(metric.id))
+        );
+      })
+    );
+  }
+
+  @Action(CommonLoadMetricById)
+  loadArtifactsForMetric(
+    { patchState, getState, dispatch }: StateContext<CommonStateModel>,
+    { metricId }: CommonLoadMetricById
+  ) {
+    return this.semantic.getArtifactsForDataSet$(metricId).pipe(
+      tap((metric: any) => {
+        const metrics = getState().metrics;
+        patchState({ metrics: { ...metrics, [metric.id]: metric } });
+      })
+    );
   }
 }
