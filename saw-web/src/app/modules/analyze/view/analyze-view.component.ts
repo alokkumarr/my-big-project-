@@ -150,7 +150,8 @@ export class AnalyzeViewComponent implements OnInit {
     const isDSL = analysis.sipQuery ? true : false;
     this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
       queryParams: {
-        isDSL
+        isDSL,
+        awaitingExecution: true
       }
     });
   }
