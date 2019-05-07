@@ -18,6 +18,10 @@ sip_openweathermap_api_token = 1d60893d260345b7c4a62ec0842ed731
 # Elasticsearch port number for Prometheus monitoring, if the below value is not set the default port will be taken as 8200
 #sip_elastic_port=8200
 
+# Enable encryption of data in flight and data at rest in SIP
+# environment
+#sip_secure=True
+
 [sip-admin]
 #sip-host
 
@@ -151,6 +155,7 @@ sip_bis_duplicate_entry=true
 #
 # ##########################################
 # ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
+# s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"US_EAST_1", "outputLocation": "Analysis", "accessKey": "AKIAJMRWBPAZY4AECBVQ", "secretKey": "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", "type": "s3"}]}'
 
 
 #
@@ -160,6 +165,7 @@ sip_bis_duplicate_entry=true
 saw_ui_export_size = 10000
 saw_email_export_size=50000
 saw_ftp_export_size=1000000
+saw_s3_export_size=1000000
 
 ## chunk size for export functionality
 saw_export_chunk_size=10000
