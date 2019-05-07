@@ -236,6 +236,7 @@ public class ExportServiceImpl implements ExportService {
     String ftp = null;
     String s3 = null;
     String jobGroup = null;
+    boolean zip = false;
 
     // Read Additional props
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
@@ -246,6 +247,9 @@ public class ExportServiceImpl implements ExportService {
 
       if (((LinkedHashMap) dispatchBean).get("s3") != null)
         s3 = String.valueOf(((LinkedHashMap) dispatchBean).get("s3"));
+
+      if (((LinkedHashMap) dispatchBean).get("zip") != null)
+        zip = (boolean) ((LinkedHashMap) dispatchBean).get("zip");
 
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
     }
@@ -262,6 +266,7 @@ public class ExportServiceImpl implements ExportService {
           requestEntity,
           s3,
           ftp,
+          zip,
           jobGroup,
           restTemplate);
     }
@@ -960,6 +965,7 @@ public class ExportServiceImpl implements ExportService {
       String analysisType,
       ExportBean bean,
       String finalS3,
+      boolean zip,
       String finalJobGroup,
       HttpEntity<?> requestEntity,
       RestTemplate restTemplate, String userFileName) {
@@ -1043,6 +1049,7 @@ public class ExportServiceImpl implements ExportService {
       HttpEntity<?> requestEntity,
       String s3,
       String ftp,
+      boolean zip,
       String jobGroup,
       RestTemplate restTemplate) {
       String userFileName = exportBean.getFileName();
@@ -1076,6 +1083,7 @@ public class ExportServiceImpl implements ExportService {
                       analysisType,
                       exportBean,
                       s3,
+                      zip,
                       jobGroup,
                       requestEntity,
                       restTemplate,
@@ -1090,6 +1098,7 @@ public class ExportServiceImpl implements ExportService {
                       analysisType,
                       exportBean,
                       ftp,
+                      zip,
                       jobGroup,
                       requestEntity,
                       restTemplate,
@@ -1201,6 +1210,7 @@ public class ExportServiceImpl implements ExportService {
       String analysisType,
       ExportBean bean,
       String finalFtp,
+      boolean zip,
       String finalJobGroup,
       HttpEntity<?> requestEntity,
       RestTemplate restTemplate, String userFileName) {

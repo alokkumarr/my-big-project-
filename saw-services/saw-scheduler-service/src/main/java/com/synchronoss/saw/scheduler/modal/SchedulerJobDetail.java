@@ -64,6 +64,8 @@ public class SchedulerJobDetail implements Serializable {
 
     private List<String> s3;
 
+    private Boolean zip;
+
     /**
      * Gets analysisID
      *
@@ -355,6 +357,10 @@ public class SchedulerJobDetail implements Serializable {
         this.s3 = s3;
     }
 
+    public Boolean getZip() { return zip; }
+
+    public void setZip(Boolean zip) { this.zip = zip; }
+
     /**
      *
      * @param out
@@ -382,6 +388,7 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(endDate);
         out.writeObject(timezone);
         out.writeObject(s3);
+        out.writeObject(zip);
     }
 
     /**
@@ -449,6 +456,16 @@ public class SchedulerJobDetail implements Serializable {
             /* catch block to avoid serialization for newly added fields.*/
         }
 
+        try {
+            Object zipObj = in.readObject();
+
+            if (zipObj instanceof Boolean) {
+                zip = (Boolean) zipObj;
+            }
+        } catch (OptionalDataException e) {
+            /* catch block to avoid serialization for newly added fields.*/
+        }
+
     }
 
     @Override
@@ -473,6 +490,7 @@ public class SchedulerJobDetail implements Serializable {
             ", endDate=" + endDate +
             ", timezone='" + timezone + '\'' +
             ", s3=" + s3 +
+            ", zip=" + zip +
             '}';
     }
 }
