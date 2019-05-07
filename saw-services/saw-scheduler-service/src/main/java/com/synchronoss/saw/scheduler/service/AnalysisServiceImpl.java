@@ -1,14 +1,15 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
+import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,6 +26,12 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     @Value("${saw-analysis-service-url}")
     private String analysisUrl;
+
+    @Value("${sip-analysis-proxy-url}")
+    private String proxyAnalysisUrl;
+
+    @Value("${sip-metadata-service-url}")
+    private String metadataAnalysisUrl;
 
     @Value("${saw-dispatch-service-url}")
     private String dispatchUrl;
@@ -69,10 +76,16 @@ public class AnalysisServiceImpl implements AnalysisService {
             logger.error("Error reading ftp servers list: "+ e.getMessage());
             ftpServers = "";
         }
+        String[] latestExecution;
+        if (analysis.getType() != null && analysis.getType().equalsIgnoreCase("pivot")) {
+            latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
+        } else {
+            ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
+            latestExecution = findLatestExecution(executionBeans);
+        }
 
-        ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
-        String[] latestexection = findLatestExecution(executionBeans);
-        Date date = new Date(Long.parseLong(latestexection[1]));
+        logger.debug("latestExecution : " + latestExecution[1]);
+        Date date = latestExecution != null ? new Date(Long.parseLong(latestExecution[1])) : new Date();
         DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ssZ");
         format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         String formatted = format.format(date);
@@ -119,7 +132,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         }
         String[] param = new String[3];
         param[0] = analysis.getAnalysisID();
-        param[1] = latestexection[0];
+        param[1] = latestExecution != null && latestExecution.length> 0 ? latestExecution[0] : null;
         param[2] = analysis.getType();
         String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
         HttpHeaders headers = new HttpHeaders();
@@ -127,7 +140,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         HttpEntity<DispatchBean> entity = new HttpEntity<>(
                 execution, headers);
 
-        if (latestexection[0] != null) {
+        if (latestExecution.length > 0 && latestExecution[0] != null) {
             restTemplate.postForObject(url, entity, String.class, param);
         }
     }
@@ -173,4 +186,60 @@ public class AnalysisServiceImpl implements AnalysisService {
         return String.join(",", source);
     }
 
+    private String[] fetchLatestFinishedTime(String analysisId) {
+        logger.debug("New dsl analysis start here..");
+        String url = proxyAnalysisUrl + "/{analysisId}/executions";
+        logger.debug("proxyAnalysisUrl :" + proxyAnalysisUrl);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            DSLExecutionBean[] dslExecutionBeans = restTemplate.getForObject(url, DSLExecutionBean[].class, analysisId);
+            logger.debug("DSLExecutionBean response :" + dslExecutionBeans.length);
+
+            String latestExecutionID = null;
+            String latestFinish =null;
+            if (dslExecutionBeans != null && dslExecutionBeans.length > 0) {
+                // Initialize latestExecution.
+                latestExecutionID = dslExecutionBeans[0].getExecutionId();
+                logger.debug("latestExecutionID :" + latestExecutionID);
+                latestFinish = dslExecutionBeans[0].getFinishedTime();
+                logger.debug("latestFinish :" + latestFinish);
+                for (DSLExecutionBean executionBean : dslExecutionBeans) {
+                    if (Long.parseLong(executionBean.getFinishedTime()) > Long.parseLong(latestFinish)
+                        && (executionBean.getStatus()==null || executionBean.getStatus().equalsIgnoreCase("Success")))
+                    {
+                        latestExecutionID = executionBean.getExecutionId();
+                        latestFinish = executionBean.getFinishedTime();
+                    }
+                }
+            }
+            String[] val = new String [2];
+            logger.debug("latestExecutionID :" + latestExecutionID);
+            logger.debug("latestFinish :" + latestFinish);
+            val[0] = latestExecutionID;
+            val[1] = latestFinish;
+            return val;
+        } catch (Exception ex) {
+            logger.debug(ex.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public void executeDslAnalysis(String analysisId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String dslUrl = metadataAnalysisUrl + "/" + analysisId;
+        logger.debug("URL for SIP Query :" + dslUrl);
+        TempAnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, TempAnalysisResponse.class);
+
+        logger.debug("Analysis body :" + analysisResponse.getAnalysis());
+        JsonNode sipQuery = analysisResponse.getAnalysis().get("sipQuery");
+        logger.debug("SIP Query :" + analysisResponse.getAnalysis());
+
+        String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=regularExecution";
+        HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery, headers);
+
+        restTemplate.postForObject(url, requestEntity, String.class);
+    }
 }
