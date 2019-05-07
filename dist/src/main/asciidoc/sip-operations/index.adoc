@@ -68,7 +68,7 @@ Currently SAW only supports deploying to a single target host.
 
 Each SAW environment requires its own SAW environment configuration
 file.  A sample configuration is provided inside the SAW release
-package in the `saw-config` file, which defaults to installing SAW on
+package in the `sip-config` file, which defaults to installing SAW on
 `localhost`.  At a minimum, copy this sample file and change the
 `localhost` entries to the SAW target host.
 
@@ -86,7 +86,7 @@ location.
 
 Execute the following steps to install SAW:
 
-. Get the SAW release package (named `saw-*.tgz`)
+. Get the SAW release package (named `sip-*.tgz`)
 
 . Prepare a SAW environment configuration file, as described in the
   previous section
@@ -94,9 +94,9 @@ Execute the following steps to install SAW:
 . Extract the package and execute the deploy command, giving it the
   path to the environment configuration file as an argument
 
-        tar -xzf saw-*.tgz
+        tar -xzf sip-*.tgz
         cd saw
-        ./saw-deploy <config>
+        ./sip-deploy <config>
 
 TIP: Configure passwordless SSH access to the SAW target host for a
 smoother installation experience.  The deploy command should be run as
@@ -108,7 +108,7 @@ for relevant operations.
 To support offline installation SIP allows specifying alternative URLs
 for used YUM repositories and RPM packages, for example local mirrors.
 These can be configured in the SIP environment configuration
-(`saw-config`) as follows:
+(`sip-config`) as follows:
 
         [saw-proxy:vars]
         sip_epel_yum_url = https://download.fedoraproject.org/pub/epel/$releasever/$basearch
@@ -121,7 +121,7 @@ TIP: If the EPEL repository is already provided on the system by other
 means, installation of the EPEL repository file in `/etc/yum.repos.d`
 by SIP can be skipped by adding `sip_epel_yum_provided = true` under
 the `saw-proxy:vars` section in the SIP environment configuration
-`saw-config`.
+`sip-config`.
 
 ==== Upgrading
 
@@ -153,13 +153,13 @@ be installed.
 Before upgrading, install and configure Apache Livy from the MapR
 Ecosystem Pack as described in the updated <<Prerequisites>>.  Also
 add the `saw_workbench_livy_uri` parameter to the SAW environment
-configuration (`saw-config`).
+configuration (`sip-config`).
 
 ==== Upgrading to SAW 2.6
 
 Before upgrading, If SAW require to run saw-executor in YARN mode
 configure as described in the updated <<Running SAW on YARN>>. Update
-to the below SAW environment configuration (`saw-config`).
+to the below SAW environment configuration (`sip-config`).
 
     saw_spark_master_url=yarn
     saw_spark_yarn_queue_regular=saw-regular
@@ -183,7 +183,7 @@ this parameter can be set lower value.
 Support for running SAW-executors on YARN (Hadoop NextGen) was added to SAW
 in version v2.6.0.
 To configure and run the saw-executor in yarn mode default configuration properties
-are provided in `saw-config` copy those properties change as per enviroment.
+are provided in `sip-config` copy those properties change as per enviroment.
 
 To configuring additional properties for spark and yarn,set configuration as java
 option since SparkConf loads defaults from system properties(start with spark.*)
@@ -196,7 +196,7 @@ SIP executors uses random ports for flexibility to increase the number of
 sip executors in future if required, but in case any SIP enviroment has limited port
 accessibility and other ports are blocked for security reasons. SIP executors required
 to be allocated with reserved series of port to SIP Executors to work properly.
-sip_executors_reserved_port properties can be set in `saw-config` file for starting port
+sip_executors_reserved_port properties can be set in `sip-config` file for starting port
 number and SIP will auto calculate the number of required port based on number of SIP-Nodes,
 like Number of open series ports required as (Number of SIP-node * 4 port).
 For example: if we have assigned 9801 is starting port and number of sip-node is 2 then (2* 4)
@@ -271,7 +271,7 @@ Execute the following steps to install XDF-NG:
 ==== Installing
 
 RTPS is installed as part of SIP.  Ensure the SIP environment
-configuration (`saw-config`) has an entry for RTPS:
+configuration (`sip-config`) has an entry for RTPS:
 
         [sip-rtps]
         host
@@ -318,7 +318,7 @@ consumption.
 ==== Installing
 
 RTIS is installed as part of SIP.  Ensure the SIP environment
-configuration (`saw-config`) has an entry for RTIS:
+configuration (`sip-config`) has an entry for RTIS:
 
         [sip-rtis]
         host
@@ -326,7 +326,7 @@ configuration (`saw-config`) has an entry for RTIS:
 RTIS will get installed at the location `/opt/bda/sip-rtis` on the
 given host.
 
-See the SIP environment configuration (`saw-config`) for how to set
+See the SIP environment configuration (`sip-config`) for how to set
 RTIS configuration parameters.
 
 ==== Upgrading
@@ -360,7 +360,7 @@ Execute the following steps to install SIP product modules:
 . Get the SIP product module package (`sip-module-*.tgz`)
 
 . Copy the SIP product module package to the SIP deploy host, where
-  the SIP package and SIP environment configuration (`saw-config`) is
+  the SIP package and SIP environment configuration (`sip-config`) is
   located
 
 . Execute the product module deploy command, giving it the path to the
@@ -460,6 +460,43 @@ is available at the URL `http://<sip-admin>/prometheus/api/v1`, where
 The {prometheus_query}[Prometheus querying] documentation describes
 the full range of querying expressions available.
 
+=== Prometheus Elasticsearch Exporter Plugin
+
+Elasticsearch-exporter is a service which collects all relevant
+metricsfrom Elasticsearch cluster and makes them available to
+Prometheus via the Elasticsearch REST API. Currently monitoring is
+available cluster settings, status of the cluster, nodes and indices.
+
+==== Installation:
+
+On each elasticsearch nodes run the following command to install plugin
+
+        /usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://distfiles.compuscene.net/elasticsearch/elasticsearch-prometheus-exporter-6.3.1.0.zip
+
+Once the Installation is finished metrics are directly available at
+
+        http://<your-elasticsearch-host>:9200/_prometheus/metric
+
+NOTE: These mertics are collected at the Prometheus server and then
+visualised on Grafana Dashboard. Prometheus is already configured to
+collect the metrics from elasticsearch nodes.
+
+==== Upgrading
+
+Exporter plugin version has to be updated whenever we update the
+elasticsearch version on our environments. Compatibility matrix for
+plugin version with respective elasticsearch version can be found on
+the below location
+
+        https://github.com/vvanholl/elasticsearch-prometheus-exporter#compatibility-matrix
+
+=== Mariadb Prometheus Monitoring:
+
+Prometheus MySQL exporter is configured on sip servers where database
+is running for monitoring MariaDB and then visualizing data with
+Grafana. This will enable users to have a good view of database
+performance and know where to check whenever there is an issues.
+
 == High availability
 
 SIP supports high availability, so that if a single node in the
@@ -470,7 +507,7 @@ available configuration.
 === Highly available configuration
 
 To ensure a highly available SIP environment, each role in the SIP
-environment configuration (`saw-config`) must have at least two hosts.
+environment configuration (`sip-config`) must have at least two hosts.
 Additionally the `saw-security-arbitrator` role should have a separate
 third host (required for the MariaDB Galera Cluster).
 
@@ -519,10 +556,10 @@ to ensure high availability.  Do this using the following steps:
 
 . If the hostname of the new host is different from the hostname of
   the failed host, update references to the old hostname in the SIP
-  environment configuration (`saw-config`) to refer to the new
+  environment configuration (`sip-config`) to refer to the new
   hostname
 
-. Rerun the SIP deployment (`saw-deploy <config>`) to install software
+. Rerun the SIP deployment (`sip-deploy <config>`) to install software
   and configuration on the new host and update the configurations of
   other hosts to include the new host
 
@@ -580,14 +617,14 @@ The SAW systemd services system logs can be accessed using the `sudo
 journalctl` command.  To view the logs of individual services, use the
 `-u` option:
 
-        $ sudo journalctl -u saw-\*
+        $ sudo journalctl -u sip-\*
 
 === Listing services and their statuses
 
 To list services and check the status of all SAW systemd units,
 execute the following commands:
 
-        $ sudo systemctl list-units saw-\*
+        $ sudo systemctl list-units sip-\*
 
 NOTE: Some services use
 http://0pointer.de/blog/projects/socket-activation.html[socket
@@ -602,19 +639,19 @@ Under normal circumstances there should be no need to start, stop or
 restart SAW services manually.  However, if needed it can be done
 using the following commands:
 
-        $ sudo systemctl start <saw-service>
-        $ sudo systemctl stop <saw-service>
-        $ sudo systemctl restart <saw-service>
+        $ sudo systemctl start <sip-service>
+        $ sudo systemctl stop <sip-service>
+        $ sudo systemctl restart <sip-service>
 
-Where `<saw-service>` is one of the SAW systemd services (for example
-`saw-gateway`), which can be listed using the `sudo systemctl
-list-units saw-\*` command shown in the previous section.
+Where `<sip-service>` is one of the SAW systemd services (for example
+`sip-gateway`), which can be listed using the `sudo systemctl
+list-units sip-\*` command shown in the previous section.
 
 === Location of SIP data in MapR-FS
 
 SIP data is stored under a single specific directory in MapR-FS.  The
 location of this directory is configured using the `sip_var_path`
-variable in the SIP environment configuration (the `saw-config` file)
+variable in the SIP environment configuration (the `sip-config` file)
 and its default value is `/var/sip`.
 
 By knowing where the SIP data is located, it is possible to configure
@@ -767,7 +804,7 @@ configure the `sip_bis_retry_diffs_in_minutes` accordingly.
 
 To enable creating analyses in SAW, load semantic metadata as follows:
 
-        $ ssh <saw-services-host>
+        $ ssh <sip-services-host>
         $ sudo -u mapr /opt/saw/service/bin/mdcli.sh -i \
             file://<nodes-json> -o file:///tmp/log.json
 
@@ -877,7 +914,7 @@ Recommended key size is 256 bits.
    Command to generate key : openssl rand 32 -base64
    Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=
 
-After generating the key, add it to the SAW environment configuration ({{saw-config}}) in the {{saw_security_sso_secret}} parameter and redeploy.
+After generating the key, add it to the SAW environment configuration ({{sip-config}}) in the {{saw_security_sso_secret}} parameter and redeploy.
 
 == Export Configuration
 
@@ -889,10 +926,10 @@ SAW supports *exporting* reports and pivots:
 . to email
 . to ftp/sftp servers
 
-In saw-config, we can configure how many number of rows we want to extract for all the
+In sip-config, we can configure how many number of rows we want to extract for all the
 reports / pivots:
 
-.saw-config
+.sip-config
 [source, yaml]
 ----
 saw_ui_export_size=10000
@@ -904,7 +941,7 @@ Saw reports are exported chunks of rows, we can configure how many rows to take
 at a time for processign reports, can be configured using following config parameter:
 
 
-.saw-config
+.sip-config
 [source, yaml]
 ----
 saw_export_chunk_size=10000
@@ -917,10 +954,10 @@ SAW supports exporting of pivots and reports to ftp/sftp servers.
 By default an empty configuration is installed in
 `/opt/bda/saw-export-service/conf/ftp-details.json` file on saw nodes.
 
-The contents of this configuration can be changed using `saw-config`.
+The contents of this configuration can be changed using `sip-config`.
 An example configuration has been included in config file.
 
-.saw-config
+.sip-config
 ----
 # FTP JSON config
 # ##########################################

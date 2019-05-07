@@ -4,7 +4,7 @@
   hosts: all
   become: true
   roles:
-    - saw-host
+    - sip-host
     - sip-prometheus-node
 
 - name: Admin
@@ -41,13 +41,12 @@
         store_path: /etc/bda/keystore
       when: sip_secure
 
-- import_playbook: modules/saw-security/ansible/site.yml
-- import_playbook: modules/saw-services/ansible/site.yml
-- import_playbook: modules/saw-web/ansible/site.yml
+- import_playbook: modules/sip-security/ansible/site.yml
+- import_playbook: modules/sip-services/ansible/site.yml
+- import_playbook: modules/sip-web/ansible/site.yml
 - import_playbook: modules/sip-xdf/ansible/site.yml
 - import_playbook: modules/sip-a2/ansible/site.yml
 - import_playbook: modules/sip-rtis/ansible/site.yml
-- import_playbook: modules/sip-rtps/ansible/site.yml
 # Note: Keep Prometheus at the end to avoid starting socket-activated
 # services during metrics collection until all Ansible handlers have
 # been run (which might otherwise cause unnecessary restarts of
@@ -61,7 +60,7 @@
   hosts: saw-proxy
   become: true
   roles:
-    - saw-proxy
+    - sip-proxy
 - name: Mariadb Prometheus
   hosts: saw-security
   become: true

@@ -1,0 +1,14 @@
+- name: Create the PM directory to maintain the umd.js files
+  file:
+    path: /usr/share/tomcat/webapps/pm/
+    state: directory
+    owner: tomcat
+    group: tomcat
+- name: Copy product module web files into web app directory
+  copy:
+    src: "{{ item }}"
+    dest: /usr/share/tomcat/webapps/pm/
+    owner: tomcat
+    group: tomcat
+  with_fileglob:
+    - "{{ lookup('env','SIP_PRODUCT_MODULE') }}/sip-web/*.js"

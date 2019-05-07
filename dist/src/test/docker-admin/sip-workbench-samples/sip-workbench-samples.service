@@ -1,0 +1,11 @@
+[Unit]
+Description=SIP Workbench samples loader
+After=sip-deploy.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/saw-workbench-samples/sample-csv/load
+SyslogIdentifier=sip-workbench-samples
+
+[Install]
+WantedBy=sip-deploy.service

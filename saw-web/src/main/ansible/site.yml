@@ -1,5 +1,0 @@
-- name: SAW Web
-  hosts: saw-web
-  become: true
-  roles:
-    - saw-web
