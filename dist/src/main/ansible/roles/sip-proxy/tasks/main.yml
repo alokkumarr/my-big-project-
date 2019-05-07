@@ -25,6 +25,11 @@
   template: src=haproxy.cfg dest=/etc/haproxy
   notify:
     - restart haproxy
+- name: Copy proxy certificate to host
+  copy:
+    src: "{{ sip_secure_proxy_certificate }}"
+    dest: /etc/sip/sip-proxy.crt
+  when: sip_secure_proxy_certificate is defined
 - name: Copy internal CA certificate to host
   copy:
     src: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
