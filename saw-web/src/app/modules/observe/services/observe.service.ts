@@ -10,16 +10,14 @@ import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as add from 'lodash/add';
 
-import { JwtService, MenuService } from '../../../common/services';
+import {
+  JwtService,
+  MenuService,
+  CommonSemanticService
+} from '../../../common/services';
 import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../appConfig';
 import { BULLET_CHART_COLORS } from '../consts';
-
-interface MetricResponse {
-  data: { contents: Array<{}> };
-}
-
-const ANALYZE_MODULE_NAME = 'ANALYZE';
 
 @Injectable()
 export class ObserveService {
@@ -30,7 +28,8 @@ export class ObserveService {
     public jwt: JwtService,
     public router: Router,
     public route: ActivatedRoute,
-    public menu: MenuService
+    public menu: MenuService,
+    private semantic: CommonSemanticService
   ) {}
 
   addModelStructure(model) {
@@ -46,14 +45,11 @@ export class ObserveService {
   }
 
   getMetricList$(): Observable<any[]> {
-    const projectId = 'workbench';
-    return this.getRequest<MetricResponse>(
-      `internal/semantic/md?projectId=${projectId}`
-    ).pipe(mapObservable(fpGet(`contents.[0].${ANALYZE_MODULE_NAME}`)));
+    return this.semantic.getMetricList$();
   }
 
   getArtifactsForDataSet$(semanticId: string) {
-    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
+    return this.semantic.getArtifactsForDataSet$(semanticId);
   }
 
   /* Saves dashboard. If @model.entityId not present, uses create operation.

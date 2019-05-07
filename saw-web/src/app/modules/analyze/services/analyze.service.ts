@@ -183,16 +183,18 @@ export class AnalyzeService {
   }
 
   getPublishedAnalysesByAnalysisId(id, isDSL) {
-    const path = isDSL ? `internal/proxy/storage/${id}/executions` : `analysis/${id}/executions`;
+    const path = isDSL
+      ? `internal/proxy/storage/${id}/executions`
+      : `analysis/${id}/executions`;
     if (isDSL) {
       return <Promise<Analysis[]>>this.getRequest(path)
-      .toPromise()
-      .then(fpSortBy([obj =>  -obj.finishedTime]));
+        .toPromise()
+        .then(fpSortBy([obj => -obj.finishedTime]));
     } else {
       return <Promise<Analysis[]>>this.getRequest(path)
-      .toPromise()
-      .then(fpGet(`executions`))
-      .then(fpSortBy([obj => -obj.finished]));
+        .toPromise()
+        .then(fpGet(`executions`))
+        .then(fpSortBy([obj => -obj.finished]));
     }
   }
 
@@ -257,9 +259,9 @@ export class AnalyzeService {
       url = `${path}`;
     } else {
       const path = `analysis/${analysisId}/executions/${executionId}/data`;
-      const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
-        options.analysisType
-      }${onetimeExecution}`;
+      const queryParams = `?page=${page}&pageSize=${
+        options.take
+      }&analysisType=${options.analysisType}${onetimeExecution}`;
       url = `${path}${queryParams}`;
     }
     return this.getRequest(url)
@@ -495,7 +497,12 @@ export class AnalyzeService {
     options: ExecutionRequestOptions = {}
   ) {
     return this._http
-    .post(`${apiUrl}/internal/proxy/storage/execute?id=${model.id}&ExecutionType=${mode}`, model.sipQuery)
+      .post(
+        `${apiUrl}/internal/proxy/storage/execute?id=${
+          model.id
+        }&ExecutionType=${mode}`,
+        model.sipQuery
+      )
       .pipe(
         map((resp: any) => {
           return {
@@ -662,7 +669,7 @@ export class AnalyzeService {
       },
       chartOptions: {
         chartType: 'column',
-        chartTitle: 'Untitled Analysis',
+        chartTitle: '',
         isInverted: false,
         legend: {
           align: 'right',
