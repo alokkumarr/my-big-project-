@@ -206,9 +206,11 @@ export class ChartGridComponent implements OnInit {
   }
 
   get chartTitle() {
-    return isDSLAnalysis(this.analysis)
-      ? this.analysis.chartOptions.chartTitle
-      : this.analysis.chartTitle || this.analysis.name;
+    return (
+      (isDSLAnalysis(this.analysis)
+        ? this.analysis.chartOptions.chartTitle
+        : this.analysis.chartTitle) || this.analysis.name
+    );
   }
 
   getChartUpdates(data, analysis) {

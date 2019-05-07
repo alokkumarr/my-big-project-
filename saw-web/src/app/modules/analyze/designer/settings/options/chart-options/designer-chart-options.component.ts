@@ -99,13 +99,11 @@ export class DesignerChartOptionsComponent implements OnInit, AfterViewInit {
   }
 
   onTitleChange() {
-    if (!isEmpty(this.chartTitle)) {
-      this.change.emit({
-        subject: 'chartTitle',
-        data: {
-          title: this.chartTitle
-        }
-      });
-    }
+    this.change.emit({
+      subject: 'chartTitle',
+      data: {
+        title: this.chartTitle || ''
+      }
+    });
   }
 }
