@@ -25,21 +25,32 @@
         </button>
       </div>
     </div>
-    <div *ngIf="item.analysis" style="width: 100%; height: 78%;">
-      <mat-icon class="zoom-icon"  fontIcon="icon-full-screen" (click)="zoomAnalysis(item)" matTooltip="View Full Screen"></mat-icon>
+    <div *ngIf="item.analysis" style="width: 100%; height: 100%;">
+      <mat-icon
+        class="zoom-icon"
+        fontIcon="icon-full-screen"
+        (click)="zoomAnalysis(item)"
+        matTooltip="View Full Screen"
+      ></mat-icon>
 
-      <observe-map *ngIf="item.analysis.type | isAnalysisType:'map':item.analysis?.chartType"
-                   class="analysis-container"
-                   [item]="item"
-                   (onRefresh)="refreshTile($event)"
-                   [analysis]="item.analysis"
-                   [updater]="item.updater"
-                   [ViewMode]="isViewMode()"
+      <observe-map
+        *ngIf="
+          item.analysis.type | isAnalysisType: 'map':item.analysis?.chartType
+        "
+        class="analysis-container"
+        [item]="item"
+        (onRefresh)="refreshTile($event)"
+        [analysis]="item.analysis"
+        [updater]="item.updater"
+        [ViewMode]="isViewMode()"
       >
       </observe-map>
 
       <observe-map-chart
-        *ngIf="item.analysis.type | isAnalysisType:'mapChart':item.analysis?.chartType"
+        *ngIf="
+          item.analysis.type
+            | isAnalysisType: 'mapChart':item.analysis?.chartType
+        "
         class="analysis-container"
         [item]="item"
         (onRefresh)="refreshTile($event)"
@@ -51,7 +62,7 @@
       </observe-map-chart>
 
       <observe-chart
-        *ngIf="item.analysis.type | isAnalysisType:'chart'"
+        *ngIf="item.analysis.type | isAnalysisType: 'chart'"
         class="analysis-container"
         [item]="item"
         (onRefresh)="refreshTile($event)"

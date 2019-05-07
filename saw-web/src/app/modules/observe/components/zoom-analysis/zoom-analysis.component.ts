@@ -1,5 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
 
 import { Filter, Artifact, ArtifactColumn } from './../../../analyze/types';
 import {
@@ -12,15 +21,17 @@ import {
 } from './../../../analyze/consts';
 import { reduce } from 'lodash';
 
+let initialChartHeight = 0;
 @Component({
   selector: 'zoom-analysis',
   templateUrl: './zoom-analysis.component.html',
   styleUrls: ['./zoom-analysis.component.scss']
 })
-
-export class ZoomAnalysisComponent implements OnInit {
+export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   public analysisData: Array<any>;
   public nameMap;
+
+  @ViewChild('zoomAnalysisChartContainer') chartContainer: ElementRef;
 
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,
@@ -42,6 +53,57 @@ export class ZoomAnalysisComponent implements OnInit {
         return acc;
       },
       {}
+    );
+
+    fpPipe(
+      fpMap(val => {
+        if (val.path === 'chart.height') {
+          initialChartHeight = val.data;
+        }
+      })
+    )(this.data.updater.getValue());
+
+    // map-chart-viewer component is floating to left
+    // When analysis is loaded for the fisrt time.
+    // Due to which updating the map-chart-viewer height here.
+    if (this.data.analysis.type === 'map') {
+      this.data.updater.next([
+        {
+          path: 'chart.height',
+          data: 500
+        }
+      ]);
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.data.analysis.type !== 'map') {
+      setTimeout(() => {
+        this.data.updater.next([
+          {
+            path: 'chart.height',
+            data: this.getChartHeight(initialChartHeight)
+          }
+        ]);
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.data.updater.next([
+      {
+        path: 'chart.height',
+        data: initialChartHeight
+      }
+    ]);
+  }
+
+  getChartHeight(chartHeight) {
+    return Math.max(
+      chartHeight,
+      this.chartContainer.nativeElement.offsetHeight > 500
+        ? 500
+        : this.chartContainer.nativeElement.offsetHeight
     );
   }
 

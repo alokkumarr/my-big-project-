@@ -18,7 +18,6 @@ import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
   selector: 'observe-chart',
   templateUrl: './observe-chart.component.html'
 })
-
 export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() analysis: any;
   @Input() item: any;
@@ -31,9 +30,7 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
   public requesterSubscription: Subscription;
   public data: Array<any>;
 
-  constructor(
-    public analyzeService: AnalyzeService
-  ) {}
+  constructor(public analyzeService: AnalyzeService) {}
 
   ngOnInit() {
     this.subscribeToRequester();

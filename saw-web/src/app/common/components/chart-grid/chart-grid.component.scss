@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 $header-padding-top: 12px;
 $header-padding-bottom: 12px;
 $header-font-size: 18px;
@@ -30,7 +30,6 @@ $header-font-size: 18px;
     }
   }
 }
-
 .report-toggle {
   height: calc(100vh - 273px);
 }

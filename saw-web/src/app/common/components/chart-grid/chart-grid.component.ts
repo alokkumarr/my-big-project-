@@ -163,7 +163,6 @@ export class ChartGridComponent implements OnInit {
         map(sorts, 'order')
       );
     }
-
     this.chartToggleData = this.trimKeyword(data);
 
     return [
@@ -175,8 +174,29 @@ export class ChartGridComponent implements OnInit {
         { labels, labelOptions: analysis.labelOptions, sorts }
       ),
       { path: 'title.exportFilename', data: analysis.name },
-      { path: 'chart.inverted', data: analysis.isInverted }
+      { path: 'chart.inverted', data: analysis.isInverted },
+      {
+        path: 'chart.height',
+        data: this.getChartHeight()
+      }
     ];
+  }
+
+  getChartHeight() {
+    let parentUpdater = [];
+
+    this.updater.asObservable().source.forEach(val => {
+      parentUpdater = val;
+    });
+    let chartHeight = 400; //Default chart height for 'execute-chart-view' and 'zoom-analysis' components.
+    if (parentUpdater.length > 0) {
+      parentUpdater.forEach(val => {
+        if (val.path == 'chart.height') {
+          chartHeight = val.data;
+        }
+      });
+    }
+    return chartHeight;
   }
 
   viewToggle(value) {

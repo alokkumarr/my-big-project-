@@ -41,7 +41,7 @@ import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component'
+import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -89,7 +89,7 @@ export class DashboardGridComponent
     private dashboardService: DashboardService,
     private windowService: WindowService,
     private sidenav: SideNavService,
-    private _dialog: MatDialog,
+    private _dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -222,6 +222,7 @@ export class DashboardGridComponent
       item.dimensions = dimensions;
       return;
     }
+
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
       { path: 'chart.width', data: dimensions.width }
