@@ -1023,7 +1023,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         if (duplicateEntry) {
                           sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
                         }
-                        sipLogService.updateJobStatus(jobId);
+                        //sipLogService.updateJobStatus(jobId);
                         //list.add(bisDataMetaInfo);
                       }
                     }
@@ -1190,6 +1190,7 @@ public class SftpServiceImpl extends SipPluginContract {
   public void executeFileTransfer(String logId, Long jobId, Long channelId,
       Long routeId, String fileName) {
 
+    sipLogService.upsertInProgressStatus(logId);
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory
         .getSessionFactory(channelId);
 
@@ -1322,9 +1323,12 @@ public class SftpServiceImpl extends SipPluginContract {
                   logger.info(
                       "Before Success file log success cnt :: " + successCnt);
                   sipLogService.updateSuccessCnt(jobId, 
-                      successCnt + 1);
+                      ++successCnt);
+                  BisJobEntity bisJobEntity2 = sipLogService
+                      .retriveJobById(jobId);
+                  Long successCnt2 = bisJobEntity2.getSuccessCount();
                   logger.info("After Success file log success cnt :: "
-                      + successCnt + 1);
+                      + (successCnt2));
 
                   sipLogService.updateJobStatus(jobId);
                   // Adding to a list has been removed as a part of

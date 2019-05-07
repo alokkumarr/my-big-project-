@@ -121,6 +121,22 @@ public class SipLogging {
           BisComponentState.DATA_INPROGRESS.value(), pid);
     }
   }
+  
+  /**
+   * To make an entry to a log table.
+   */
+  @Transactional(TxType.REQUIRED)
+  public void upsertInProgressStatus(String pid)
+      throws SipNestedRuntimeException {
+    BisFileLog bisLog = null;
+    if (bisFileLogsRepository.existsById(pid)) {
+      logger.trace("updating logs when process Id is found :" + pid);
+      bisLog = bisFileLogsRepository.findByPid(pid);
+      
+      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.INPROGRESS.value(),
+          BisComponentState.DATA_INPROGRESS.value(), pid);
+    }
+  }
     
   /**
    * To make an entry to a log table.
@@ -520,8 +536,7 @@ public class SipLogging {
       BisJobEntity jobEntity = sipJob.get();
       logger.info("Job status::" + jobEntity.getJobStatus());
       logger.info("Job total count::" + jobEntity.getTotalCount());
-      logger.info("Job total count::" + jobEntity.getSuccessCount());
-      
+      logger.info("Job success count::" + jobEntity.getSuccessCount());
       if (!jobEntity.getJobStatus().equals("OPEN")
           && jobEntity.getTotalCount() == jobEntity.getSuccessCount()) {
         logger.info("Count matched success");
