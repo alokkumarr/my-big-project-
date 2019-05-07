@@ -699,7 +699,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this._store.dispatch(new DesignerUpdateFilters(result.filters));
-            this.filters = result.filters;
+            this.filters = this.generateDSLDateFilters(result.filters);
             this._store.dispatch(new DesignerUpdatebooleanCriteria(result.booleanCriteria));
             this.booleanCriteria = result.booleanCriteria;
             this.onSettingsChange({ subject: 'filter' });
