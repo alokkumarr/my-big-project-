@@ -37,6 +37,10 @@
 - name: Generate an OpenSSL private key.
   openssl_privatekey:
     path: "{{ inventory_dir }}/certificate/main-private.pem"
+- name: Generate the OpenSSL public key
+  openssl_publickey:
+    path: "{{ inventory_dir }}/certificate/main-public.pem"
+    privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
 
 - name: Generate an OpenSSL CSR.
   openssl_csr:

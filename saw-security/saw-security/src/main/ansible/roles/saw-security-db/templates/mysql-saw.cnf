@@ -10,3 +10,9 @@ wsrep_cluster_address=gcomm://
 {%- for host in groups['saw-security'] + groups['saw-security-arbitrator'] -%}
   {{ host }}{% if not loop.last %},{% endif %}
 {%- endfor %}
+{% if sip_secure %}
+ssl_cert = {{ sip_server.ssl.certificate }}
+ssl_key = {{ sip_server.ssl.key }}
+ssl_ca = {{ sip_server.ssl.ca }}
+wsrep_provider_options="socket.ssl_cert= {{ sip_server.ssl.certificate }} ;socket.ssl_key= {{ sip_server.ssl.key }} ;socket.ssl_ca= {{ sip_server.ssl.ca }}"
+{% endif %}
