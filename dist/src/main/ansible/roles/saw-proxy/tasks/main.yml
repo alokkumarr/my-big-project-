@@ -29,7 +29,7 @@
   copy:
     src: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
     dest: /etc/sip/internal-ca.crt
-  when: sip_secure
+  when: "sip_secure | default(false)"
 - name: Create HAProxy error pages directory
   file: path=/etc/haproxy/errors state=directory
 - name: Install HAProxy error pages
