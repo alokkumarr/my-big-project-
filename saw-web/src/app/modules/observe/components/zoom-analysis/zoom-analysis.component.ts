@@ -28,7 +28,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   public analysisData: Array<any>;
   public nameMap;
   public filters: Filter;
-  @Select(state => state.observe.metrics) metrics$: Observable<{
+  @Select(state => state.common.metrics) metrics$: Observable<{
     [metricId: string]: any;
   }>;
   displayNameBuilder$ = this.metrics$.pipe(

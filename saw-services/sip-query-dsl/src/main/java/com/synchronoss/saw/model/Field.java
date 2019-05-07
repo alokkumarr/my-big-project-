@@ -70,6 +70,9 @@ public class Field {
 
   @JsonProperty("geoRegion")
   private GeoRegion geoRegion;
+  
+  @JsonProperty("min_doc_count")
+  private Integer minDocCount;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -207,6 +210,25 @@ public class Field {
 
   public void setDisplayType(String displayType) {
     this.displayType = displayType;
+  }
+
+  /**
+   * document count to response by filling gaps in the histogram empty buckets.
+   *
+   * @return
+   */
+  @JsonProperty("min_doc_count")
+  public Integer getMinDocCount() {
+    return minDocCount;
+  }
+
+  /**
+   * Sets document count to be used to control response by filling gaps in the histogram empty
+   * buckets *
+   */
+  @JsonProperty("min_doc_count")
+  public void setMinDocCount(Integer minDocCount) {
+    this.minDocCount = minDocCount;
   }
 
   @JsonAnyGetter

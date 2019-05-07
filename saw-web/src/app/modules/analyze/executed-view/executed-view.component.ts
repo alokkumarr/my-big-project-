@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
+import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
 import {
   Subscription,
@@ -37,7 +38,6 @@ import { AnalyzeActionsService } from '../actions';
 
 import { Analysis, AnalysisDSL } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
-import { isUndefined } from 'util';
 import { isDSLAnalysis, Filter } from '../designer/types';
 import { CUSTOM_DATE_PRESET_VALUE } from './../consts';
 
@@ -499,10 +499,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   utcToLocal(utcTime) {
-    return moment
-      .utc(utcTime)
-      .local()
-      .format('YYYY/MM/DD h:mm A');
+    if (isUndefined(utcTime)) {
+      return;
+    }
+    return moment(utcTime).local().format('YYYY/MM/DD h:mm A');
   }
 
   flattenData(data, analysis) {

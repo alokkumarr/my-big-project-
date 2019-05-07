@@ -1,8 +1,10 @@
 package com.synchronoss.saw.analysis.controller;
 
+import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.analysis.modal.Ticket;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
@@ -65,9 +67,7 @@ public class AnalysisController {
   @ResponseBody
   public AnalysisResponse createAnalysis(
       HttpServletRequest request, HttpServletResponse response, @RequestBody Analysis analysis) {
-
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    Ticket ticket = new Ticket();
     if (analysis == null) {
       analysisResponse.setMessage("Analysis definition can't be null for create request");
       response.setStatus(400);
@@ -76,7 +76,14 @@ public class AnalysisController {
 
     String id = UUID.randomUUID().toString();
     analysis.setId(id);
-    analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, ticket));
+
+    Ticket authTicket = getTicket(request);
+    if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication tol=ken");
+    }
+    analysis.setCreatedBy(authTicket.getUserFullName());
+    analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, authTicket));
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
   }
@@ -105,7 +112,6 @@ public class AnalysisController {
       HttpServletResponse response,
       @RequestBody Analysis analysis,
       @PathVariable(name = "id") String id) {
-    Ticket ticket = new Ticket();
     AnalysisResponse analysisResponse = new AnalysisResponse();
 
     if (analysis == null) {
@@ -114,7 +120,15 @@ public class AnalysisController {
       return analysisResponse;
     }
     analysis.setId(id);
-    analysisResponse.setAnalysis(analysisService.updateAnalysis(analysis, ticket));
+
+    com.synchronoss.bda.sip.jwt.token.Ticket authTicket = getTicket(request);
+
+    if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication tol=ken");
+    }
+    analysis.setModifiedBy(authTicket.getUserFullName());
+    analysisResponse.setAnalysis(analysisService.updateAnalysis(analysis, authTicket));
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
   }
@@ -140,9 +154,13 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id) {
-    Ticket ticket = new Ticket();
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    analysisService.deleteAnalysis(id, ticket);
+    Ticket authTicket = getTicket(request);
+    if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication tol=ken");
+    }
+    analysisService.deleteAnalysis(id, authTicket);
     analysisResponse.setMessage("Analysis deleted successfully");
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
@@ -169,9 +187,14 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id) {
-    Ticket ticket = new Ticket();
+
     TempAnalysisResponse analysisResponse = new TempAnalysisResponse();
-    analysisResponse.setAnalysis(analysisService.getAnalysis(id, ticket));
+    Ticket authTicket = getTicket(request);
+    /**if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication token");
+    }*/
+    analysisResponse.setAnalysis(analysisService.getAnalysis(id, authTicket));
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
@@ -198,7 +221,14 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestParam(name = "category") String id) {
-    Ticket ticket = new Ticket();
-    return analysisService.getAnalysisByCategory(id, ticket);
+    AnalysisResponse analysisResponse = new AnalysisResponse();
+    Ticket authTicket = getTicket(request);
+    if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication tol=ken");
+
+      // TODO: return analysis response here. Will be taken care in the future.
+    }
+    return analysisService.getAnalysisByCategory(id, authTicket);
   }
 }

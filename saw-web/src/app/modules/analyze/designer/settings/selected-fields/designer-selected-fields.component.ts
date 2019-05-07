@@ -152,6 +152,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     artifactColumn: ArtifactColumn,
     groupAdapter: IDEsignerSettingGroupAdapter
   ) {
+    artifactColumn.aliasName = '';
     const columnIndex = findIndex(
       groupAdapter.artifactColumns,
       ({ columnName }) => artifactColumn.columnName === columnName

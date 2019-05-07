@@ -57,7 +57,8 @@ import { DesignerService } from '../designer.service';
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
-  CUSTOM_DATE_PRESET_VALUE
+  CUSTOM_DATE_PRESET_VALUE,
+  CHART_DATE_FORMATS_OBJ
 } from '../../consts';
 
 // setAutoFreeze(false);
@@ -170,6 +171,19 @@ export class DesignerState {
     const sipQuery = analysis.sipQuery;
     let artifacts = sipQuery.artifacts;
     const isDateType = DATE_TYPES.includes(artifactColumn.type);
+    const fillMissingDataWithZeros =
+      analysis.type === 'chart' && artifactColumn.type === 'date';
+
+    /* If analysis is chart and this is a date field, assign a default
+      groupInterval. For pivots, use dateInterval if available */
+    const groupInterval = {
+      groupInterval:
+        analysis.type === 'chart' && artifactColumn.type === 'date'
+          ? CHART_DATE_FORMATS_OBJ[
+              artifactColumn.dateFormat || <string>artifactColumn.format
+            ].groupInterval
+          : artifactColumn.dateInterval
+    };
 
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
@@ -187,7 +201,8 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
-      groupInterval: artifactColumn.dateInterval,
+      ...groupInterval,
+      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {}),
       name: artifactColumn.name,
       type: artifactColumn.type,
       geoType: artifactColumn.geoType,
@@ -263,6 +278,8 @@ export class DesignerState {
     const { analysis, groupAdapters } = getState();
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
+    const fillMissingDataWithZeros =
+      analysis.type === 'chart' && artifactColumn.type === 'date';
 
     /* Find the artifact inside sipQuery of analysis stored in state */
     const artifactsName =
@@ -281,7 +298,8 @@ export class DesignerState {
 
     artifacts[artifactIndex].fields[artifactColumnIndex] = {
       ...artifacts[artifactIndex].fields[artifactColumnIndex],
-      ...artifactColumn
+      ...artifactColumn,
+      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {})
     };
 
     const targetAdapterIndex = findIndex(

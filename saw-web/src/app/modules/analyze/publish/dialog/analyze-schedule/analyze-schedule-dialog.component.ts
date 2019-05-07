@@ -214,7 +214,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   publish() {
-    const analysis = this.data.analysis;
+    const analysis: Analysis = this.data.analysis;
     if (this.validateForm()) {
       let cronJobName = analysis.id;
       const crondetails = this.crondetails;
@@ -224,7 +224,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         crondetails.cronexp = '';
         crondetails.startDate = moment().local().format();
       }
-
       analysis.schedule = {
         scheduleState: this.scheduleState,
         activeRadio: crondetails.activeRadio,
@@ -240,7 +239,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         endDate: crondetails.endDate,
         metricName: analysis.metricName,
         type: analysis.type,
-        userFullName: analysis.userFullName,
+        userFullName: analysis.userFullName || analysis.createdBy,
         jobScheduleTime: crondetails.startDate,
         timezone: crondetails.timezone,
         categoryID: analysis.categoryId,

@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
+import { Store } from '@ngxs/store';
 import * as findIndex from 'lodash/findIndex';
 import * as reduce from 'lodash/reduce';
+import * as values from 'lodash/values';
 
 import { JwtService } from '../../../common/services';
 import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
@@ -13,6 +15,8 @@ import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
 import { isDSLAnalysis } from '../designer/types';
+import { CommonLoadAllMetrics } from 'src/app/common/actions/menu.actions';
+import { first, map } from 'rxjs/operators';
 
 const VIEW_KEY = 'analyseReportView';
 const SEARCH_CONFIG = [
@@ -65,7 +69,8 @@ export class AnalyzeViewComponent implements OnInit {
     public _localSearch: LocalSearchService,
     public _toastMessage: ToastService,
     public _dialog: MatDialog,
-    public _executeService: ExecuteService
+    public _executeService: ExecuteService,
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -146,7 +151,8 @@ export class AnalyzeViewComponent implements OnInit {
     const isDSL = analysis.sipQuery ? true : false;
     this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
       queryParams: {
-        isDSL
+        isDSL,
+        awaitingExecution: true
       }
     });
   }
@@ -176,42 +182,63 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   openNewAnalysisModal() {
-    this._analyzeService.getSemanticLayerData().then(metrics => {
-      this._dialog
-        .open(AnalyzeNewDialogComponent, {
-          width: 'auto',
-          height: 'auto',
-          autoFocus: false,
-          data: {
-            metrics,
-            id: this.analysisId
-          }
-        } as MatDialogConfig)
-        .afterClosed()
-        .subscribe(event => {
-          if (!event) {
-            return;
-          }
-          const { analysis, requestExecution } = event;
-          if (analysis) {
-            this.loadAnalyses(this.analysisId).then(() => {
-              if (requestExecution) {
-                this._executeService.executeAnalysis(
-                  analysis,
-                  EXECUTION_MODES.PUBLISH
-                );
-              }
-            });
-          }
-        });
-    });
+    this.store.dispatch(new CommonLoadAllMetrics());
+    this.store
+      .select(state => state.common.metrics)
+      .pipe(
+        first(metrics => values(metrics).length > 0),
+        map(metrics => values(metrics))
+      )
+      .toPromise()
+      .then(metrics => {
+        this._dialog
+          .open(AnalyzeNewDialogComponent, {
+            width: 'auto',
+            height: 'auto',
+            autoFocus: false,
+            data: {
+              metrics,
+              id: this.analysisId
+            }
+          } as MatDialogConfig)
+          .afterClosed()
+          .subscribe(event => {
+            if (!event) {
+              return;
+            }
+            const { analysis, requestExecution } = event;
+            if (analysis) {
+              this.loadAnalyses(this.analysisId).then(() => {
+                if (requestExecution) {
+                  this._executeService.executeAnalysis(
+                    analysis,
+                    EXECUTION_MODES.PUBLISH
+                  );
+                }
+              });
+            }
+          });
+      });
   }
 
   loadAnalyses(analysisId) {
-    return this._analyzeService.getAnalysesFor(analysisId).then(analyses => {
-      this.analyses = analyses;
-      this.filteredAnalyses = [...analyses];
-    });
+    return this.store
+      .dispatch(new CommonLoadAllMetrics())
+      .toPromise()
+      .then(() =>
+        this._analyzeService.getAnalysesFor(analysisId).then(analyses => {
+          this.analyses = this.applyMetricNames(analyses);
+          this.filteredAnalyses = [...this.analyses];
+        })
+      );
+  }
+
+  applyMetricNames(analyses: Array<Analysis | AnalysisDSL>) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    return analyses.map(analysis => ({
+      ...analysis,
+      metricName: metrics[analysis.semanticId].metricName
+    }));
   }
 
   getCronJobs(analysisId) {

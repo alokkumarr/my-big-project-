@@ -36,6 +36,10 @@ proxy:
     service:
         host: http://localhost:9800
 
+metadata:
+  service:
+    host: http://localhost:9501
+
 published:
   path: /tmp
 

@@ -14,20 +14,20 @@
         <mat-divider></mat-divider>
 
         <div class="detail-top">
-          <strong *ngIf="analysis.userFullName">Created By:</strong>
-          {{ analysis.userFullName | changeCase: 'title' }}
+          <strong *ngIf="analysis.userFullName || analysis.createdBy">Created By:</strong>
+          {{ analysis.userFullName || analysis.createdBy | changeCase: 'title' }}
         </div>
         <div>
-          <strong *ngIf="analysis.createdTimestamp">Created Time:</strong>
-          {{ utcToLocal(analysis.createdTimestamp) }}
+          <strong *ngIf="analysis.createdTimestamp || analysis.createdTime">Created Time:</strong>
+          {{ utcToLocal(analysis.createdTimestamp) || utcToLocal(analysis.createdTime)}}
         </div>
         <div>
-          <strong *ngIf="analysis.updatedUserName">Last Modified By:</strong>
-          {{ analysis.updatedUserName }}
+          <strong *ngIf="analysis.updatedUserName || analysis.modifiedBy">Last Modified By:</strong>
+          {{ analysis.updatedUserName || analysis.modifiedBy}}
         </div>
         <div>
-          <strong *ngIf="analysis.updatedTimestamp">Last Modified Time:</strong>
-          {{ utcToLocal(analysis.updatedTimestamp) }}
+          <strong *ngIf="analysis.updatedTimestamp || analysis.modifiedTime">Last Modified Time:</strong>
+          {{ utcToLocal(analysis.updatedTimestamp) || utcToLocal(analysis.modifiedTime) }}
         </div>
         <div>
           <strong *ngIf="executedBy">Executed By:</strong> {{ executedBy }}

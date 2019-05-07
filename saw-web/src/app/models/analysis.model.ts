@@ -52,6 +52,7 @@ export interface Analysis {
   updatedTimestamp?: number;
   updatedUserName?: string;
   userFullName: string;
+  createdBy?: string;
   userId: number;
   // groupByColumns should be deprecated
 }
