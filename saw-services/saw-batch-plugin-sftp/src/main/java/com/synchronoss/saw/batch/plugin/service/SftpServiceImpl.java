@@ -139,7 +139,7 @@ public class SftpServiceImpl extends SipPluginContract {
   @NotNull
   private Integer maxInprogressMins = 45;
 
-  private static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
+  public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
 
   @PostConstruct
   private void init() throws Exception {
