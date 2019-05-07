@@ -1,0 +1,10 @@
+[Unit]
+Description=SIP Workbench Proxy
+Requires=sip-workbench.service
+After=sip-workbench.service
+Requires=sip-workbench-proxy.socket
+After=sip-workbench-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9701
+PrivateTmp=yes

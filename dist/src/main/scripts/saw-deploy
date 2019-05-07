@@ -1,21 +1,9 @@
 #!/bin/bash
 #
-# Deploy SAW to an environment
+# Compatibility script to allow invoking "sip-deploy" using the old
+# name "saw-deploy"
 #
 set -eu
 
-if [ $# -lt 1 -o $# -gt 2 ]; then
-    echo "Usage: $0 <sip-config> [<ansible-options>]"
-    exit 1
-fi
-
-config=$1
-options="${2:-}"
 dir=$(dirname $0)
-
-# Include common SIP deploy library
-. $dir/lib/sip-deploy-common.sh
-
-echo "Starting deployment"
-ansible-playbook -i $config $options $dir/site.yml
-echo "Finished deployment"
+$dir/sip-deploy "$@"
