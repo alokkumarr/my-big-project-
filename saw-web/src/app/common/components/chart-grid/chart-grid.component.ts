@@ -157,7 +157,10 @@ export class ChartGridComponent implements OnInit {
         value =
           column.type === 'date'
             ? moment
-                .utc(value)
+                .utc(
+                  value,
+                  this._chartService.getMomentDateFormat(columnFormat)
+                )
                 .format(
                   columnFormat === 'MMM d YYYY'
                     ? 'MMM DD YYYY'
