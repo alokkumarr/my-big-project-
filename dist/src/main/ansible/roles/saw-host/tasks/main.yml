@@ -27,6 +27,25 @@
   file:
     path: /etc/bda
     state: directory
+# Creating env file to hold the connector streaming
+- name: Create the /etc/bda directory
+  file:
+    path: /etc/bda/secure.env
+    state: touch
+    mode: 0755
+
+- name: Copy the content of the file when it is secure
+  copy:
+    content: "SECURE=https:"
+    dest: "/etc/bda/secure.env"
+  when: sip_secure
+
+- name: Copy the content of the file when it is not secure
+  copy:
+    content: "SECURE=http:"
+    dest: "/etc/bda/secure.env"
+  when: not sip_secure
+
 - name: Add MapR classpath utility for services
   copy:
     dest: /usr/bin/sip-mapr-classpath

@@ -21,6 +21,10 @@ service_env=${app_home}/conf/service.env
     echo "SAW_SERVICE_PORT=9201"
     echo "declare -r SAW_SERVICE_USER=mapr"
     echo "declare -r SAW_SERVICE_CURRENT_HOME=${app_home}"
+    echo "# BEGIN SECURE"
+    echo "# END SECURE"
+    echo "# BEGIN ANSIBLE MANAGED BLOCK"
+    echo "# END ANSIBLE MANAGED BLOCK"
 } >$service_env
 
 chown mapr:mapr $service_env

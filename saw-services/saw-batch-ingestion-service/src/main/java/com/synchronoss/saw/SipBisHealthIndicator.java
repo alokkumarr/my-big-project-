@@ -1,13 +1,16 @@
 package com.synchronoss.saw;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.synchronoss.sip.utils.RestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
 
 @Component
 public class SipBisHealthIndicator implements HealthIndicator {
@@ -16,19 +19,22 @@ public class SipBisHealthIndicator implements HealthIndicator {
   @Value("${bis.scheduler-url}")
   private String bisSchedulerUrl;
 
+  @Autowired
+  private RestUtil restUtil;
+
+  private RestTemplate restTemplate;
+
   @Override
   public Health health() {
     log.debug("Checking health for uri :" + bisSchedulerUrl + "/actuator/health");
     String uri = bisSchedulerUrl + "/actuator/health";
+    
     String error = null;
-    HttpURLConnection connection = null;
     try {
+      restTemplate = restUtil.restTemplate();
       log.debug("Checking health: {}", uri);
-      URL url = new URL(uri);
-      connection = (HttpURLConnection) url.openConnection();
-      connection.setRequestMethod("GET");
-      connection.connect();
-      int code = connection.getResponseCode();
+      ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
+      int code = result.getStatusCodeValue();
       log.debug("Health check respose code: {}", code);
       if (code != 200) {
         error = uri + ": respose code: " + code;
@@ -36,14 +42,6 @@ public class SipBisHealthIndicator implements HealthIndicator {
     } catch (Exception e) {
       log.debug("Health check error: {}", e.getMessage());
       error = uri + ": health check error: " + e.getMessage();
-    } finally {
-      if (connection != null) {
-        /*
-         * Disconnect explicitly to avoid keeping too many connections open which might exhaust
-         * socket resources on the host
-         */
-        connection.disconnect();
-      }
     }
     if (error != null) {
       return Health.down().withDetail("errors", error).build();

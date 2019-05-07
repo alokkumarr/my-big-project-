@@ -136,7 +136,7 @@
       <modules>
         <module>bda-meta</module>
         <module>xdf-nextgen</module>
-        <module>a2</module>
+      <!--  <module>a2</module> -->
         <module>a2sipr/inst/json</module>
         <module>rtis</module>
         <module>rtps</module>

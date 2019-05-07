@@ -19,11 +19,12 @@ server:
   servlet:
     context-path: ''
   max-http-header-size:  65536
-  #ssl:
-   # key-store: /Users/spau0004/Desktop/keystore/keystore.jks
-   # key-store-password: sip@123
-   # trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
-   # trust-store-password: sip@123  
+  ssl:
+    key-store: /Users/spau0004/Desktop/keystore/keystore.jks
+    key-alias: sipcert
+    key-store-password: sip@123
+    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
+    trust-store-password: sip@123  
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
@@ -36,16 +37,16 @@ application:
 metastore:
   base:  hdfs:///main/
   
-connector: http  
+connector: https  
 semantic:
   workbench-url:  ${connector}://localhost:9700
-  transport-metadata-url:  ${connector}://localhost:9200
-  binary-migration-requires: false
+  transport-metadata-url:  ${connector}://localhost:9642
+  binary-migration-requires: true
   migration-metadata-home: /var/sip/
   
 sip:
    ssl:
-     enable : false
+     enable : true
    trust:
        store: /Users/spau0004/Desktop/keystore/truststore.jks
        password: sip@123

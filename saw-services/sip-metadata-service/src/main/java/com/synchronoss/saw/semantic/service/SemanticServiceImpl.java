@@ -23,7 +23,6 @@ import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -73,17 +72,20 @@ public class SemanticServiceImpl implements SemanticService {
   
   private RestTemplate restTemplate = null;
 
-  
-  @PostConstruct
-  private void init() throws Exception {
+  /**
+   * This method provides an entry point to migration service.
+   * @throws Exception exception
+   */
+  /*@PostConstruct
+  public void init() throws Exception {
     restTemplate = restUtil.restTemplate();
     if (migrationRequires) {
       logger.trace("Migration initiated.. " + migrationRequires);
-      new MigrationService().convertHBaseBinaryToMaprdbStore(transportUri, basePath,
-          migrationMetadataHome, restTemplate);
+      migrationService.convertHBaseBinaryToMaprdbStore(transportUri, basePath,
+          migrationMetadataHome);
     }
     logger.trace("Migration ended..");
-  }
+  }*/
 
 
   @Override
@@ -141,6 +143,7 @@ public class SemanticServiceImpl implements SemanticService {
     String dataSetFormat = null;
     ObjectNode repoNode = null;
     ArrayNode respository = objectMapper.createArrayNode();
+    restTemplate = restUtil.restTemplate();
     for (String dataSetId : semanticNode.getParentDataSetIds()) {
       logger.trace("Request URL to pull DataSet Details : " + requestUrl + dataSetId);
       dataSet = restTemplate.getForObject(requestUrl + dataSetId, DataSet.class);

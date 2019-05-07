@@ -28,20 +28,10 @@
     name: pyOpenSSL
     autoremove: true
 
-- name: Look up for keystore password
-  set_fact:
-    sip_keystore_password: >-
-      {{ lookup('password', inventory_dir
-        + '/sip-keystore-password chars=ascii_letters,digits') }}
-
 - name: Create keystore configuration directory
   file:
     path: /etc/bda/keystore
     state: directory
-
-- name: Setting the keystore store path
-  set_fact:
-    store_path: /etc/bda/keystore
 
 - name: Ensure directory exists for local self-signed TLS certs.
   file:

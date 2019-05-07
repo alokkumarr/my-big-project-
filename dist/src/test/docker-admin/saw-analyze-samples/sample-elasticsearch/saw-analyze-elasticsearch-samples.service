@@ -6,6 +6,6 @@ After=saw-deploy.service
 Type=oneshot
 ExecStart=/root/saw-analyze-samples/sample-elasticsearch/load-metric
 SyslogIdentifier=saw-analyze-elasticsearch-samples
-
+EnvironmentFile=/etc/bda/secure.env
 [Install]
 WantedBy=saw-deploy.service

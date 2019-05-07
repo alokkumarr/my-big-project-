@@ -61,9 +61,15 @@ sip:
 
 
 {% if sip_secure %}
+
 connector: https
+
+
 {% else %}
+
+
 connector: http
+
 {% endif %}
 
 analysis:

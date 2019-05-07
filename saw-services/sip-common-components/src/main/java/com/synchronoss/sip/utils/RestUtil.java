@@ -20,7 +20,6 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.client.AsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -49,21 +48,18 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
 
-  private static CloseableHttpClient client;
-
-  /**
-   * isError method.
-   */
-  public static boolean isError(HttpStatus status) {
-    HttpStatus.Series series = status.series();
-    return (HttpStatus.Series.CLIENT_ERROR.equals(series)
-        || HttpStatus.Series.SERVER_ERROR.equals(series));
-  }
+  private CloseableHttpClient client;
 
   /**
    * creating rest template using SSL connection.
    */
   public RestTemplate restTemplate() {
+    System.out.println("Invoking restTemplate starts here");
+    System.out.println("trustStore: " + trustStore);
+    System.out.println("trustStorePassword: " + trustStorePassword);
+    System.out.println("keyStore: " + keyStore);
+    System.out.println("keyStorePassword: " + keyStorePassword);
+    System.out.println("sipSslEnable: " + sipSslEnable);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -75,7 +71,8 @@ public class RestUtil {
       } catch (Exception e) {
         logger.error("Exception :" + e);
       }
-      HttpClient client = HttpClients.custom().setSSLContext(sslContext).build();
+      HttpClient client = HttpClients.custom().setSSLContext(sslContext)
+          .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
       HttpComponentsClientHttpRequestFactory factory =
           new HttpComponentsClientHttpRequestFactory(client);
       restTemplate = new RestTemplate(factory);
@@ -144,4 +141,5 @@ public class RestUtil {
         .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
     return sslContext;
   }
+  
 }

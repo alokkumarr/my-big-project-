@@ -13,6 +13,30 @@
     - restart saw-transport
     - restart saw-transport-executor-regular
     - restart saw-transport-executor-fast
+- name: Updating a environment variable in /opt/saw/service/conf/service.env
+  blockinfile:
+    path: /opt/saw/service/conf/service.env
+    marker: "# {mark} SECURE"
+    block: |
+        SIP_SECURE={{ sip_secure }}
+  notify:
+    - restart saw-transport
+    - restart saw-transport-executor-regular
+    - restart saw-transport-executor-fast
+- name: Updating a environment variable in /opt/saw/service/conf/service.env
+  blockinfile:
+    path: /opt/saw/service/conf/service.env
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+        KEY_STORE_PATH={{ store_path }}/{{ ansible_host }}/keystore.jks
+        KEY_STORE_PASSWORD={{ sip_keystore_password }}
+        HTTP_DISABLED=-Dhttp.port=disabled
+  notify:
+    - restart saw-transport
+    - restart saw-transport-executor-regular
+    - restart saw-transport-executor-fast
+  when: sip_secure
+
 - name: Create Transport Service environment file
   file: path=/etc/bda/saw-transport-service-env state=touch
 # Workaround: The service restart handler will run only after all

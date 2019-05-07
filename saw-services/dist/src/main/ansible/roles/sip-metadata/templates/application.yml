@@ -10,6 +10,7 @@ spring:
 logging:
   level:
     com.synchronoss.saw: INFO
+    org.springframework: INFO
 server:
   address: localhost
   port: 9501
@@ -63,9 +64,13 @@ sip:
    {% endif %}
 
 {% if sip_secure %}
+
 connector : https
+
 {% else %}
+
 connector : http
+
 {% endif %}
 
 metastore:

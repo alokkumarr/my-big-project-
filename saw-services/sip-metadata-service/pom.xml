@@ -257,10 +257,12 @@
                   <name>/usr/lib/systemd/system/sip-metadata-proxy.socket</name>
                   <file>src/main/system/sip-metadata-proxy.socket</file>
                 </entry>
+                <!--
                 <entry>
                   <name>/opt/bda/sip-metadata-service/conf/logback.xml</name>
                   <file>src/main/resources/logback.xml</file>
                 </entry>
+                -->
                 <entry>
                   <name>/opt/bda/sip-metadata-service/conf/application.yml</name>
                   <file>src/main/resources/application.yml</file>

@@ -46,6 +46,8 @@ public class NSSOApplication extends SpringBootServletInitializer {
 	  @Value("${sip.key.password:}")
 	  private String keyStorePassword; 
 	  
+      @Value("${sip.key.alias:}")
+      private String keyAlias; 
 
 	/**
      * TomcatServletWebServerFactory has been overridden.
@@ -79,6 +81,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
         protocol.setKeystorePass(keyStorePassword);
         protocol.setTruststoreFile(trustStoreLocation);
         protocol.setTruststorePass(trustPassword);
+        protocol.setKeyAlias(keyAlias);
   
       } catch (Exception ex) {
         throw new IllegalStateException(

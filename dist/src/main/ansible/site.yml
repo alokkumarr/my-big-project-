@@ -29,6 +29,18 @@
         dest: /etc/bda/{{ ansible_host }}-key.pem
       when: sip_secure
 
+    - name: Look up for keystore password
+      set_fact:
+        sip_keystore_password: >-
+          {{ lookup('password', inventory_dir
+            + '/sip-keystore-password chars=ascii_letters,digits') }}
+        when: sip_secure
+
+    - name: Setting the keystore store path
+      set_fact:
+        store_path: /etc/bda/keystore
+      when: sip_secure
+
 - import_playbook: modules/saw-security/ansible/site.yml
 - import_playbook: modules/saw-services/ansible/site.yml
 - import_playbook: modules/saw-web/ansible/site.yml

@@ -18,14 +18,18 @@ import com.synchronoss.saw.semantic.model.DataSemanticObjects;
 import com.synchronoss.saw.semantic.model.MetaDataObjects;
 import com.synchronoss.saw.semantic.model.request.BinarySemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -33,6 +37,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import sncr.bda.cli.MetaDataStoreRequestAPI;
@@ -48,11 +53,56 @@ import sncr.bda.store.generic.schema.MetaDataStoreStructure;
  *
  * @author spau0004
  */
+@Service
 public class MigrationService {
 
   private static final Logger logger = LoggerFactory.getLogger(MigrationService.class);
   private String existingBinarySemanticPath = "/services/metadata/semantic_metadata";
 
+  @Autowired
+  private RestUtil restUtil;
+  
+  private RestTemplate restTemplate = null;
+
+  @Value("${semantic.binary-migration-requires}")
+  @NotNull
+  private boolean migrationRequires;
+ 
+  @Value("${metastore.base}")
+  @NotNull
+  private String basePath;
+
+  @Value("${semantic.workbench-url}")
+  @NotNull
+  private String workbenchURl;
+
+  @Value("${semantic.transport-metadata-url}")
+  @NotNull
+  private String transportUri;
+
+  @Value("${semantic.migration-metadata-home}")
+  @NotNull
+  private String migrationMetadataHome;
+  
+  /**
+   * This method provides an entry point to migration service.
+   * 
+   * @throws Exception exception
+   */
+  public void init() throws Exception {
+    logger.info("Migration initiated.. " + migrationRequires);
+    System.out.println("Migration initiated.. " + migrationRequires);
+    if (migrationRequires) {
+      try {
+        convertHBaseBinaryToMaprdbStore(transportUri, basePath, migrationMetadataHome);
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
+    }
+    logger.info("Migration ended.." + migrationRequires);
+    System.out.println("Migration ended.." + migrationRequires);
+  }
+  
   /**
    * Run migration.
    *
@@ -135,7 +185,7 @@ public class MigrationService {
    * @throws Exception exception
    */
   public void convertHBaseBinaryToMaprdbStore(String transportUri, String basePath,
-      String migrationMetadataHome, RestTemplate restTemplate) throws Exception {
+      String migrationMetadataHome) throws Exception {
     logger.trace("migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
     // Constructing the request structure to get the list of semantic from Binary
@@ -144,12 +194,14 @@ public class MigrationService {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    logger.debug("transportMetadataURIL server URL {}", transportUri + "/md");
     HttpEntity<?> requestEntity =
         new HttpEntity<Object>(semanticNodeQuery("search"), requestHeaders);
-    logger.debug("transportMetadataURIL server URL {}", transportUri + "/md");
     String url = transportUri + "/md";
+    restTemplate = restUtil.restTemplate();
     ResponseEntity<MetaDataObjects> binarySemanticStoreData =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, MetaDataObjects.class);
+    
     logger.trace(
         "binarySemanticStoreData status Code :" + binarySemanticStoreData.getStatusCode().value());
     logger.trace("binarySemanticStoreData hasBody :" + binarySemanticStoreData.hasBody());
@@ -207,11 +259,11 @@ public class MigrationService {
             if (indexName != null && !indexName.trim().equals("")) {
               semanticNode.setEsRepository(binarySemanticNode.getEsRepository());
             } else {
-              semanticNode = settingRepositories(binarySemanticNode, url, restTemplate,
+              semanticNode = settingRepositories(binarySemanticNode, url,
                   requestHeaders, semanticNode);
             }
           } else {
-            semanticNode = settingRepositories(binarySemanticNode, url, restTemplate,
+            semanticNode = settingRepositories(binarySemanticNode, url,
                 requestHeaders, semanticNode);
           }
           semanticNode.setArtifacts(binarySemanticNode.getArtifacts());
@@ -239,7 +291,7 @@ public class MigrationService {
         } else {
           logger.info("This " + semanticNode.get_id() + " already exists on the store");
         }
-      }
+      } 
     } else {
       logger.info("migration has been completed on previous installation");
     }
@@ -257,7 +309,7 @@ public class MigrationService {
   }
 
   private SemanticNode settingRepositories(BinarySemanticNode binarySemanticNode, String url,
-      RestTemplate restTemplate, HttpHeaders requestHeaders, SemanticNode semanticNode)
+      HttpHeaders requestHeaders, SemanticNode semanticNode)
       throws JsonProcessingException, IOException {
     List<String> listOfDataObjectIds = new ArrayList<>();
     List<String> listOfDataObjectNames = new ArrayList<>();
@@ -283,6 +335,7 @@ public class MigrationService {
       logger.trace(
           "dataObjectRequestEntity : " + objectMapper.writeValueAsString(dataObjectRequestEntity));
       logger.debug("transportMetadataURIL server URL {}", url);
+      restTemplate = restUtil.restTemplate();
       binaryDataObjectNode = restTemplate.exchange(url, HttpMethod.POST, dataObjectRequestEntity,
           DataSemanticObjects.class);
       dataObjectData = objectMapper.readTree(

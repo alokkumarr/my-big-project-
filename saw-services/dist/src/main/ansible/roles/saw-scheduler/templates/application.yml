@@ -52,18 +52,25 @@ sip:
   ssl:
     enable : {{ sip_secure  | default('false') }}
    {% if sip_secure %}
+
   trust:
       store: ${server.ssl.trust-store}
       password: ${server.ssl.trust-store-password}
   key:
     store: ${server.ssl.key-store}
     password: ${server.ssl.key-store-password}
+
    {% endif %}
 
 {% if sip_secure  %}
+
 connector: https
+
 {% else %}
+
 connector: http
+
+
 {% endif %}
 
 saw-analysis-service-url: ${connector}://localhost:9200/analysis

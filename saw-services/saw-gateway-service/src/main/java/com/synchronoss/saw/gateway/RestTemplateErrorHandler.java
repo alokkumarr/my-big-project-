@@ -4,9 +4,10 @@ package com.synchronoss.saw.gateway;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import com.synchronoss.sip.utils.RestUtil;
+
 
 
 public class RestTemplateErrorHandler implements ResponseErrorHandler {
@@ -20,6 +21,16 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
 
   @Override
   public boolean hasError(ClientHttpResponse response) throws IOException {
-    return RestUtil.isError(response.getStatusCode());
+    return isError(response.getStatusCode());
   }
+  
+  /**
+   * isError method.
+   */
+  public boolean isError(HttpStatus status) {
+    HttpStatus.Series series = status.series();
+    return (HttpStatus.Series.CLIENT_ERROR.equals(series)
+        || HttpStatus.Series.SERVER_ERROR.equals(series));
+  }
+
 }

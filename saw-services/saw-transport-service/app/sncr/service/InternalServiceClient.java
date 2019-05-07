@@ -22,6 +22,7 @@ import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import org.apache.http.ssl.SSLContextBuilder;
 import sncr.saw.common.config.SAWServiceConfig;
@@ -35,7 +36,7 @@ import sncr.saw.common.config.SAWServiceConfig;
 public class InternalServiceClient {
 
     private static final Logger logger = LoggerFactory.getLogger(InternalServiceClient.class);
-    private String url = "";
+    private String url = null;
     public InternalServiceClient(String url) {
         super();
         this.url = url;
@@ -79,12 +80,12 @@ public class InternalServiceClient {
         Boolean sipSslEnable = SAWServiceConfig.sipSsl().getBoolean("enable");
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         if (sipSslEnable) {
-            String trustStore = SAWServiceConfig.sslConfig().atPath("trustManager").
-                    getConfigList("stores").get(0).getString("path");
-            String trustStorePassword = SAWServiceConfig.sslConfig().atPath("trustManager").
-                    getConfigList("stores").get(0).getString("password");
+            String trustStore = SAWServiceConfig.sipSsl().getString("trust.store");
+            String trustStorePassword = SAWServiceConfig.sipSsl().getString("trust.password");
+            String keyStore = SAWServiceConfig.sipSsl().getString("key.store");
+            String keyStorePassword = SAWServiceConfig.sipSsl().getString("key.password");
             SSLContext sslcontext =
-                    getSsLContext(trustStore, trustStorePassword);
+                    getSsLContext(trustStore, trustStorePassword, keyStore, keyStorePassword);
             SSLConnectionSocketFactory factory =
                     new SSLConnectionSocketFactory(sslcontext, new NoopHostnameVerifier());
             client = HttpClients.custom().setConnectionManager(cm).setSSLSocketFactory(factory).build();
@@ -99,10 +100,13 @@ public class InternalServiceClient {
      * ssl context using store passcode.
      */
     private SSLContext getSsLContext(String trustStore,
-                                     String trustPassword) throws KeyStoreException, NoSuchAlgorithmException,
-            CertificateException, IOException, KeyManagementException {
+                                     String trustPassword, String keyStore, String keyStorePassword) throws KeyStoreException, NoSuchAlgorithmException,
+            CertificateException, IOException, KeyManagementException, UnrecoverableKeyException {
         SSLContext sslContext = SSLContextBuilder.create()
-                .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
+                .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray())
+                .loadKeyMaterial(new File(keyStore), keyStorePassword.toCharArray(),
+                        keyStorePassword.toCharArray())
+                .build();
         return sslContext;
     }
 

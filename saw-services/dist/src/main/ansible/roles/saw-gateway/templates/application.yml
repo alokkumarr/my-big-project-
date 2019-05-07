@@ -46,12 +46,16 @@ management:
       exposure:
         include: info, health, prometheus
 
-{% if sip_secure is sameas true  %}
+{% if sip_secure %}
+
 connector: https
 saw-security-port: 9001
+
 {% else %}
+
 connector: http
 saw-security-port: 9000
+
 {% endif %}
 
 internal-analysis:

@@ -31,7 +31,16 @@ object Service {
 
   private def isPortOpen(): Boolean = {
     try {
-      val port = SAWServiceConfig.conf.getInt("http.port")
+      val sipSslEnable = SAWServiceConfig.sipSsl.getBoolean("enable")
+      var port = 0
+      if (sipSslEnable) {
+        log.info("secure communication is activated.")
+        port = SAWServiceConfig.conf.getInt("https.port")
+      }
+      else {
+        log.info("secure communication is deactivated.")
+        port = SAWServiceConfig.conf.getInt("http.port")
+      }
       val socket = new Socket("localhost", port)
       socket.close()
       return true
@@ -44,5 +53,6 @@ object Service {
   private def sendNotify() = {
     log.info("Notifying service manager about start-up completion")
     SDNotify.sendNotify()
+    log.info("Notifying service manager about start-up completed.")
   }
 }

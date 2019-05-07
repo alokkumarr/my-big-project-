@@ -64,9 +64,13 @@ sip:
    {% endif %}
 
 {% if sip_secure %}
+
 connector : https
+
 {% else %}
+
 connector : http
+
 {% endif %}
 
 workbench:

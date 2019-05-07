@@ -6,6 +6,6 @@ After=saw-deploy.service
 Type=oneshot
 ExecStart=/root/saw-analyze-samples/sample-spark/load-metric
 SyslogIdentifier=saw-analyze-spark-samples
-
+EnvironmentFile=/etc/bda/secure.env
 [Install]
 WantedBy=saw-deploy.service
