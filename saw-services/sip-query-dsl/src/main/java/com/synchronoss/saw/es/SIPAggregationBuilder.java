@@ -86,6 +86,9 @@ public class SIPAggregationBuilder {
             dataField.setDateFormat(DATE_FORMAT);
           if (dataField.getGroupInterval() != null
               && dataField.getGroupInterval() != GroupInterval.ALL) {
+            if (dataField.getMinDocCount() == null) {
+              dataField.setMinDocCount(1);
+            }
             aggregationBuilder =
                 AggregationBuilders.dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount)
                     .field(dataField.getColumnName())
@@ -137,6 +140,9 @@ public class SIPAggregationBuilder {
           if (dataField.getDateFormat() == null || dataField.getDateFormat().isEmpty())
             dataField.setDateFormat(DATE_FORMAT);
           if (dataField.getGroupInterval() != null) {
+            if (dataField.getMinDocCount() == null) {
+              dataField.setMinDocCount(1);
+            }
             aggregationBuilderMain =
                 AggregationBuilders.dateHistogram(GROUP_BY_FIELD + "_" + ++fieldCount)
                     .field(dataField.getColumnName())
