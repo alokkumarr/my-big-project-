@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss.saw")
+@ComponentScan(basePackages = {"com.synchronoss.saw", "com.synchronoss.sip.utils"})
 @EnableAsync
 public class SipMetadataServiceApplication {
 

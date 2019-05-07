@@ -17,6 +17,7 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +37,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -97,9 +99,16 @@ public class ExportServiceImpl implements ExportService {
   @Value("${exportChunkSize}")
   private String exportChunkSize;
 
-  @Autowired private ApplicationContext appContext;
+  private AsyncRestTemplate asyncRestTemplate = null;
 
+  @Autowired private ApplicationContext appContext;
+  @Autowired private RestUtil restUtil;
   @Autowired private ServiceUtils serviceUtils;
+
+  @PostConstruct
+  public void init() {
+    asyncRestTemplate = restUtil.asyncRestTemplate();
+  }
 
   @Override
   public DataResponse dataToBeExportedSync(
@@ -225,7 +234,7 @@ public class ExportServiceImpl implements ExportService {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    // AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     // at times we need synchronous processing even in async as becasue of massive parallelism
     // it may halt entire system or may not complete the request
     RestTemplate restTemplate = new RestTemplate();
@@ -415,7 +424,7 @@ public class ExportServiceImpl implements ExportService {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    // AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     Object dispatchBean = request.getBody();
     String recipients = null;
     String ftp = null;

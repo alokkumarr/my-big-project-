@@ -34,7 +34,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableRetry
 @SpringBootApplication
 @EnableScheduling
-@ComponentScan(basePackages = {"com.synchronoss.saw.batch", "com.synchronoss.saw.logs"})
+@ComponentScan(basePackages = {"com.synchronoss.saw.batch","com.synchronoss.sip.utils","com.synchronoss.saw.logs"})
 public class SawBatchServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 

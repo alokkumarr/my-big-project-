@@ -19,6 +19,7 @@ import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
 import com.synchronoss.saw.batch.service.BisRouteService;
+import com.synchronoss.sip.utils.RestUtil;
 import com.synchronoss.saw.batch.service.ChannelTypeService;
 
 import io.swagger.annotations.Api;
@@ -34,7 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,12 +94,21 @@ public class SawBisRouteController {
 
   @Autowired
   private BisRouteService bisRouteService;
-  
+
   @Autowired
   ChannelTypeService channelTypeService;
 
 
-  RestTemplate restTemplate = new RestTemplate();
+  @Autowired
+  private RestUtil restUtil;
+
+
+  private RestTemplate restTemplate = null;
+
+  @PostConstruct
+  public void init() {
+    restTemplate = restUtil.restTemplate();
+  }
 
   /**
    * This API provides an ability to add a source.
@@ -216,7 +226,6 @@ public class SawBisRouteController {
           }
         }
         // }
-        RestTemplate restTemplate = new RestTemplate();
         logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + scheduleUri
             + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + insertUrl, schedulerRequest);
@@ -391,7 +400,6 @@ public class SawBisRouteController {
           routeEntity.setStatus(STATUS_ACTIVE);
         }
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
-        RestTemplate restTemplate = new RestTemplate();
         logger.info(
             "scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + updateUrl);
         try {

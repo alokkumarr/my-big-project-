@@ -34,6 +34,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
@@ -130,10 +131,11 @@ public class MigrationService {
 
   /**
    * This method will get the data from binary store & make it sure. binary & maprDB store are in
-   * sync
+   * sync.
+   * @throws Exception exception
    */
   public void convertHBaseBinaryToMaprdbStore(String transportUri, String basePath,
-      String migrationMetadataHome) throws JsonProcessingException, IOException {
+      String migrationMetadataHome, RestTemplate restTemplate) throws Exception {
     logger.trace("migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
     // Constructing the request structure to get the list of semantic from Binary
@@ -146,7 +148,6 @@ public class MigrationService {
         new HttpEntity<Object>(semanticNodeQuery("search"), requestHeaders);
     logger.debug("transportMetadataURIL server URL {}", transportUri + "/md");
     String url = transportUri + "/md";
-    RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<MetaDataObjects> binarySemanticStoreData =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, MetaDataObjects.class);
     logger.trace(

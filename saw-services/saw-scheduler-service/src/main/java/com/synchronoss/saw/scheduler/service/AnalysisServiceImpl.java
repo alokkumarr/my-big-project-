@@ -2,16 +2,18 @@ package com.synchronoss.saw.scheduler.service;
 
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.sip.utils.RestUtil;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,13 +31,18 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     @Value("${saw-dispatch-service-url}")
     private String dispatchUrl;
+
+    @Autowired
+    private RestUtil restUtil;
+
     private RestTemplate restTemplate;
 
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    @Autowired
-    public AnalysisServiceImpl(RestTemplateBuilder restTemplateBuilder) {
-        restTemplate = restTemplateBuilder.build();
+
+    @PostConstruct
+    public void init() throws Exception {
+      restTemplate = restUtil.restTemplate();
     }
 
 
@@ -78,7 +85,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             logger.error("Error reading s3 List: "+ e.getMessage());
             s3List = "";
         }
-        
+
         ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
         String[] latestexection = findLatestExecution(executionBeans);
         Date date = new Date(Long.parseLong(latestexection[1]));
