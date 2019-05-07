@@ -157,7 +157,10 @@ export class ChartGridComponent implements OnInit {
         value =
           column.type === 'date'
             ? moment
-                .utc(value)
+                .utc(
+                  value,
+                  this._chartService.getMomentDateFormat(columnFormat)
+                )
                 .format(
                   columnFormat === 'MMM d YYYY'
                     ? 'MMM DD YYYY'
@@ -200,6 +203,14 @@ export class ChartGridComponent implements OnInit {
     if (!isEmpty(this.chartToggleData)) {
       this.dataGrid.instance.exportToExcel(false);
     }
+  }
+
+  get chartTitle() {
+    return (
+      (isDSLAnalysis(this.analysis)
+        ? this.analysis.chartOptions.chartTitle
+        : this.analysis.chartTitle) || this.analysis.name
+    );
   }
 
   getChartUpdates(data, analysis) {

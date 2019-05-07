@@ -300,23 +300,27 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   initAuxSettings() {
-    /* prettier-ignore */
     switch (this.analysis.type) {
       case 'chart':
         this.addDefaultLabelOptions();
         if (this.designerMode === 'new') {
           if (isDSLAnalysis(this.analysis)) {
-            this._store.dispatch(new DesignerUpdateAnalysisChartInversion(this.chartType === 'bar'));
+            this._store.dispatch(
+              new DesignerUpdateAnalysisChartInversion(this.chartType === 'bar')
+            );
           } else {
             (<any>this.analysis).isInverted = this.chartType === 'bar';
           }
         }
-        const chartOptions = this._store.selectSnapshot(state => state.designerState.analysis.chartOptions);
-        this.chartTitle = isDSLAnalysis(this.analysis)
-          ? chartOptions.chartTitle || this.analysis.name
-          : (this.chartTitle = this.analysis.chartTitle || this.analysis.name);
+        const chartOptions = this._store.selectSnapshot(
+          state => state.designerState.analysis.chartOptions
+        );
+        this.chartTitle =
+          (isDSLAnalysis(this.analysis)
+            ? this.analysis.chartOptions.chartTitle
+            : this.analysis.chartTitle) || this.analysis.name;
 
-          const chartOnlySettings = {
+        const chartOnlySettings = {
           legend: isDSLAnalysis(<any>this.analysis)
             ? chartOptions.legend
             : (<any>this.analysis).legend,
@@ -699,7 +703,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this._store.dispatch(new DesignerUpdateFilters(result.filters));
-            this.filters = result.filters;
+            this.filters = this.generateDSLDateFilters(result.filters);
             this._store.dispatch(new DesignerUpdatebooleanCriteria(result.booleanCriteria));
             this.booleanCriteria = result.booleanCriteria;
             this.onSettingsChange({ subject: 'filter' });

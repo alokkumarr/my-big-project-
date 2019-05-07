@@ -62,7 +62,6 @@ export class ExecuteService {
       id,
       subject: exec$
     });
-
     this._analyzeService.applyAnalysis(analysis, mode, { take: 25 }).then(
       response => {
         exec$.next({

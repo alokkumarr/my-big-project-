@@ -10,6 +10,7 @@ import {
 import * as find from 'lodash/find';
 import * as unset from 'lodash/unset';
 import * as orderBy from 'lodash/orderBy';
+import * as isUndefined from 'lodash/isUndefined';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
@@ -46,20 +47,22 @@ export class DesignerFilterRowComponent implements OnInit {
   }
 
   ngOnInit() {
-    const target = find(
+    let target = find(
       this.artifactColumns,
       ({ columnName }) => columnName === this.filter.columnName
     );
+    if (isUndefined(target)) {
+      target = this.filter;
+    }
     this.formControl = new FormControl({
       value: target,
       disabled: this.isInRuntimeMode
     });
     this.filteredColumns = this.formControl.valueChanges.pipe(
       startWith<string | ArtifactColumn>(''),
-      map(value => (typeof value === 'string' ? value : value.displayName)),
+      map(value => (typeof value === 'string' ? value : value.displayName || value.columnName)),
       map(name => (name ? this.nameFilter(name) : this.artifactColumns.slice()))
     );
-
     if (this.filter.isRuntimeFilter) {
       delete this.filter.model;
     }
@@ -76,7 +79,7 @@ export class DesignerFilterRowComponent implements OnInit {
 
   nameFilter(name: string): ArtifactColumn[] {
     return this.artifactColumns.filter(option => {
-      const optionName = option.displayName;
+      const optionName = option.displayName || option.columnName;
       return optionName.toLowerCase().indexOf(name.toLowerCase()) > -1;
     });
   }
@@ -128,6 +131,6 @@ export class DesignerFilterRowComponent implements OnInit {
   }
 
   displayWith(artifactColumn) {
-    return artifactColumn ? artifactColumn.displayName : '';
+    return artifactColumn ? artifactColumn.displayName || artifactColumn.columnName : '';
   }
 }
