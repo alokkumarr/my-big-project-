@@ -1,8 +1,8 @@
 package com.synchronoss.saw.analysis.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.analysis.modal.Ticket;
 
 import java.util.List;
 import javax.validation.Valid;
