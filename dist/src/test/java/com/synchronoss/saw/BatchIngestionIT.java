@@ -943,7 +943,7 @@ public class BatchIngestionIT extends BaseIT {
    * batchSize:10 And to make sure, it has been triggered & downloaded. wait for the file to be
    * available has been implemented
    */
-  @Test
+  @Ignore
   public void transferDataSchedule() throws JsonProcessingException {
     ObjectNode routeMetadata = prepareRouteDataSetForTransferSchedule();
     log.debug("route metadata used to schedule :" + mapper.writeValueAsString(routeMetadata));
