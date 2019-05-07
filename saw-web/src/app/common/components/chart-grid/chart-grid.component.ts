@@ -205,6 +205,14 @@ export class ChartGridComponent implements OnInit {
     }
   }
 
+  get chartTitle() {
+    return (
+      (isDSLAnalysis(this.analysis)
+        ? this.analysis.chartOptions.chartTitle
+        : this.analysis.chartTitle) || this.analysis.name
+    );
+  }
+
   getChartUpdates(data, analysis) {
     const sorts = analysis.sipQuery.sorts;
     const labels = {
