@@ -4,10 +4,15 @@ import { TestBed, inject } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ObserveService } from './observe.service';
-import { JwtService, MenuService } from '../../../common/services';
+import {
+  JwtService,
+  MenuService,
+  CommonSemanticService
+} from '../../../common/services';
 import { Observable } from 'rxjs';
 
 const mockService = {};
+class CommonSemanticServiceStub {}
 
 describe('Observe Service', () => {
   beforeEach(() => {
@@ -18,7 +23,11 @@ describe('Observe Service', () => {
         { provide: JwtService, useValue: mockService },
         { provide: MenuService, useValue: mockService },
         { provide: Router, useValue: mockService },
-        { provide: ActivatedRoute, useValue: mockService }
+        { provide: ActivatedRoute, useValue: mockService },
+        {
+          provide: CommonSemanticService,
+          useValue: new CommonSemanticServiceStub()
+        }
       ]
     }).compileComponents();
   });
