@@ -239,7 +239,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         JsonNode sipQuery = analysisResponse.getAnalysis().get("sipQuery");
         logger.debug("SIP Query :" + analysisResponse.getAnalysis());
 
-        String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=regularExecution";
+        String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType="+"scheduled";
         HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery, headers);
 
         restTemplate.postForObject(url, requestEntity, String.class);
