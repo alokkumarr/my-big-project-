@@ -131,6 +131,6 @@ export class DesignerFilterRowComponent implements OnInit {
   }
 
   displayWith(artifactColumn) {
-    return artifactColumn ? artifactColumn.displayName || artifactColumn.columnName : '';
+    return artifactColumn ? artifactColumn.displayName || artifactColumn.columnName.split('.keyword')[0] : '';
   }
 }
