@@ -3,6 +3,7 @@ const observePage = require('../../pages/observe/observePage.po');
 const homePage = require('../../pages/homePage.po.js');
 let AnalysisHelper = require('../../../../v2/helpers/api/AnalysisHelper');
 const utils = require('../utils');
+const Constants = require('../../../../v2/helpers/Constants');
 const logger = require('../../../../v2/conf/logger')(__filename);
 class DashboardFunctions {
   goToObserve() {
@@ -162,7 +163,7 @@ class DashboardFunctions {
     filters = null
   ) {
     try {
-      let createdAnalysis = new AnalysisHelper().createNewAnalysis(
+      const createdAnalysis = new AnalysisHelper().createNewAnalysis(
         host,
         token,
         name,
@@ -174,8 +175,11 @@ class DashboardFunctions {
       if (!createdAnalysis) {
         return null;
       }
-      let analysisId = createdAnalysis.analysis.id;
-      let analysis = {
+      const analysisId =
+      analysisType === Constants.CHART || analysisType == Constants.PIVOT
+        ? createdAnalysis.analysis.id
+        : createdAnalysis.contents.analyze[0].id;
+      const analysis = {
         analysisName: name,
         analysisId: analysisId
       };
