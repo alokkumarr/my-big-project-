@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Deploy SAW to an environment
+# Deploy SIP to an environment
 #
 set -eu
 

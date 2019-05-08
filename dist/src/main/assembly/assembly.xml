@@ -47,15 +47,15 @@
     </fileSet>
     <!-- following 2 filesets are hacks, modify it later -->
     <fileSet>
-      <directory>../saw-security/saw-security-command-line-tool/target</directory>
-      <outputDirectory>modules/saw-security/rpms</outputDirectory>
+      <directory>../sip-security/sip-security-command-line-tool/target</directory>
+      <outputDirectory>modules/sip-security/rpms</outputDirectory>
       <includes>
         <include>sip-security-*.rpm</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>../saw-security/saw-security/src/main/ansible</directory>
-      <outputDirectory>modules/saw-security/ansible</outputDirectory>
+      <directory>../sip-security/sip-security/src/main/ansible</directory>
+      <outputDirectory>modules/sip-security/ansible</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
