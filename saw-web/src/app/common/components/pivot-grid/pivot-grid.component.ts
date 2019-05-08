@@ -147,7 +147,6 @@ export class PivotGridComponent implements OnDestroy {
         store: this.data || [],
         fields: this.artifactColumns || []
       });
-
       /* Try to apply existing sorts (if any) to the new data source */
       this.updateSorts(this._sorts, dataSource);
       this.updateDataSource(dataSource);
@@ -269,7 +268,7 @@ export class PivotGridComponent implements OnDestroy {
   getFormatter(format) {
     // Pivot grid auto converts given moment to local dates. It's important to
     // re-convert it to the zone we used to provide dates to normalise it.
-    return value => moment.utc(value, format).format(format);
+    return value => moment(value, format).format(format);
   }
 
   preProcessData(data) {

@@ -165,7 +165,10 @@ export class DesignerPageComponent implements OnInit {
               );
               this.analysis = this.forkIfNecessary({
                 ...analysis,
-                artifacts: this.fixArtifactsForSIPQuery(analysis, artifacts),
+                artifacts: this.fixArtifactsForSIPQuery(
+                  analysis,
+                  isDSLAnalysis(analysis) ? artifacts : analysis.artifacts
+                ),
                 name:
                   this.designerMode === 'fork'
                     ? `${analysis.name} Copy`

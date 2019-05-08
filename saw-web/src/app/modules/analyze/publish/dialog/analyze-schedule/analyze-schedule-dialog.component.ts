@@ -15,6 +15,7 @@ import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../common/services';
 import { Analysis } from '../../../types';
 import { PRIVILEGES } from '../../../consts';
+import { isDSLAnalysis } from '../../../designer/types';
 
 const SEMICOLON = 186;
 
@@ -214,7 +215,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   publish() {
-    const analysis: Analysis = this.data.analysis;
+    const analysis = this.data.analysis;
     if (this.validateForm()) {
       let cronJobName = analysis.id;
       const crondetails = this.crondetails;
@@ -242,7 +243,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         userFullName: analysis.userFullName || analysis.createdBy,
         jobScheduleTime: crondetails.startDate,
         timezone: crondetails.timezone,
-        categoryID: analysis.categoryId,
+        categoryID: isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId,
         jobGroup: this.token.ticket.custCode
       };
       this.triggerSchedule();

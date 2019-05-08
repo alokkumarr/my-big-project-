@@ -315,7 +315,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, t => {
-        return t.value === 'count' || t.value === 'distinctCount';
+        return t.value === 'count' || t.value.toLowerCase() === 'distinctcount';
       });
     }
   }
@@ -329,7 +329,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   aggregateColumn(payload, value) {
-    payload.aggregate = value;
+    payload.aggregate = value === 'distinctcount' ? 'distinctCount' : value;
     if (value === 'clear') {
       delete payload.aggregate;
     }
@@ -397,9 +397,17 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
-        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
+        const aggregate =
+          AGGREGATE_TYPES_OBJ[
+            column.aggregate && column.aggregate.toLowerCase()
+          ];
         let type = column.type;
-        if (aggregate && ['count', 'distinctCount'].includes(aggregate.value)) {
+        if (
+          aggregate &&
+          ['count', 'distinctcount'].includes(
+            aggregate.value && aggregate.value.toLowerCase()
+          )
+        ) {
           type = aggregate.type || column.type;
           isNumberType = true;
         }
