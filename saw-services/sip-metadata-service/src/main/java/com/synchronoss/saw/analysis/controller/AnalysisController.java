@@ -190,10 +190,10 @@ public class AnalysisController {
 
     TempAnalysisResponse analysisResponse = new TempAnalysisResponse();
     Ticket authTicket = getTicket(request);
-    if (authTicket == null) {
+    /**if (authTicket == null) {
       response.setStatus(401);
       analysisResponse.setMessage("Invalid authentication token");
-    }
+    }*/
     analysisResponse.setAnalysis(analysisService.getAnalysis(id, authTicket));
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);

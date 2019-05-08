@@ -33,7 +33,11 @@ public class SimpleJob extends QuartzJobBean implements InterruptableJob{
 
         SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
-        analysisService.executeAnalysis(job.getAnalysisID());
+        if (job.getType().equalsIgnoreCase("pivot")) {
+					analysisService.executeDslAnalysis(job.getAnalysisID());
+				} else {
+					analysisService.executeAnalysis(job.getAnalysisID());
+				}
         analysisService.scheduleDispatch(job);
 
 		logger.info("Thread: "+ Thread.currentThread().getName() +" stopped.");
