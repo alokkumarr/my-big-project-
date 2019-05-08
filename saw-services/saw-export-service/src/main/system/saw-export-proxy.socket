@@ -1,8 +1,0 @@
-[Unit]
-Description=SAW Export Proxy Socket
-
-[Socket]
-ListenStream=9400
-
-[Install]
-WantedBy=sockets.target

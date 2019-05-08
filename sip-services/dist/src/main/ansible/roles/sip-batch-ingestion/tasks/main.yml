@@ -1,0 +1,80 @@
+- name: Copy SAW Batch Ingestion Service package
+  copy: src="{{ item }}" dest=/tmp/saw-batch-ingestion.rpm
+  with_fileglob: ["../rpms/sip-batch-*.rpm"]
+- name: Install SAW Batch Ingestion package
+  yum: name=/tmp/saw-batch-ingestion.rpm state=present
+  notify:
+    - restart saw-batch-ingestion
+- name: Migrate Batch Service database password from old location
+  fetch:
+    src: /etc/bda/saw-batch-ingestion-db-password
+    dest: "{{ inventory_dir + '/sip-batch-ingestion-db-password' }}"
+    flat: yes
+    fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+
+- name: Look up Batch Ingestion Service database password
+  set_fact:
+    saw_batch_ingestion_db_password: >-
+      {{ lookup('password', inventory_dir
+        + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
+
+- name: lookup & setting database root password
+  set_fact:
+    root_password: >-
+        {{ lookup('password', inventory_dir
+        + '/mariadb-root-password chars=ascii_letters,digits') }}
+
+- name: Install SAW Batch Ingestion Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
+  notify:
+    - restart saw-batch-ingestion
+
+- name: Set the SAW Batch Ingestion Service database password
+  copy:
+    content: "{{ saw_batch_ingestion_db_password }}"
+    dest: /etc/bda/saw-batch-ingestion-db-password
+
+- name: Ensure a list of packages installed
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - python
+    - python-setuptools
+    - python2-pip
+    - python2-PyMySQL
+
+- name: Create user defined sip_bis databases
+  mysql_db:
+    name: "sip_bis"
+    login_user: root
+    login_password: "{{ root_password }}"
+    state: present
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+  tags: mariadb
+
+- name: Create the sip_bis users
+  mysql_user:
+   name: "sip_bis"
+   password: "{{ saw_batch_ingestion_db_password }}"
+   host: "localhost"
+   priv: "sip_bis.*:ALL,GRANT"
+   append_privs: "true"
+   login_user: root
+   login_password: "{{ root_password }}"
+   state: present
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
+  tags: mariadb
+- name: create MariaDB user for sip_bis to other sip-nodes
+  command: >
+    mysql -u root -e "CREATE USER IF NOT EXISTS 'sip_bis'@'{{ hostvars[inventory_hostname]
+    ['ansible_default_ipv4']['address'] }}' IDENTIFIED BY
+    '{{ saw_batch_ingestion_db_password }}'" -p{{ saw_mariadb_db_password }}
+- name: GRANT PRIVILEGES for sip_bis to other sip-nodes
+  command: >
+    mysql -u root -e "GRANT ALL PRIVILEGES ON sip_bis.* TO 'sip_bis'@'{{ hostvars[inventory_hostname]
+    ['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password }}
+- name: Enable SIP Batch Ingestion Service
+  systemd: name=sip-batch-ingestion-proxy.socket enabled=true state=started

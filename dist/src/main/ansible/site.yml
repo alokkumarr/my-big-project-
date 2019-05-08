@@ -4,11 +4,11 @@
   hosts: all
   become: true
   roles:
-    - saw-host
+    - sip-host
     - sip-prometheus-node
-- import_playbook: modules/saw-security/ansible/site.yml
-- import_playbook: modules/saw-services/ansible/site.yml
-- import_playbook: modules/saw-web/ansible/site.yml
+- import_playbook: modules/sip-security/ansible/site.yml
+- import_playbook: modules/sip-services/ansible/site.yml
+- import_playbook: modules/sip-web/ansible/site.yml
 - import_playbook: modules/sip-xdf/ansible/site.yml
 - import_playbook: modules/sip-a2/ansible/site.yml
 - import_playbook: modules/sip-rtis/ansible/site.yml
@@ -26,4 +26,9 @@
   hosts: saw-proxy
   become: true
   roles:
-    - saw-proxy
+    - sip-proxy
+- name: Mariadb Prometheus
+  hosts: saw-security
+  become: true
+  roles:
+    - sip-mariadb-exporter 

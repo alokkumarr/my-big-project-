@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Start SAW deployment for container
+#
+set -eux
+
+# Save SIP system logs to build directory in case needed for
+# troubleshooting after a failed run
+trap "journalctl -u sip-\* > /build/saw-system.log" EXIT
+
+# Install old SIP version for upgrade testing purposes, if provided
+sip_old=/maven/sip-old
+if [ -d $sip_old ]; then
+    cd $sip_old
+    # Workaround: Rename old package name to new package name.  Can be
+    # removed when old version of SIP has been upgraded to a version
+    # that uses the new package name.
+    if [ -f saw-*.tgz ]; then
+        mv saw-*.tgz sip-1.tgz
+    fi
+    tar -xzf sip-*.tgz
+    # Workaround: Rename old base directory name to new name.  Can be
+    # removed when old version of SIP has been upgraded to a version
+    # that uses the new base directory name.
+    if [ -d saw ]; then
+        mv saw/saw-deploy saw/sip-deploy
+        mv saw sip
+    fi
+    sip/sip-deploy /root/sip-config
+fi
+
+# Install new SIP version
+cd /maven
+tar -xzf sip-*.tgz
+
+# Workaround: Building on Windows causes execute permissions on files
+# getting lost, and the permissions "auto" setting on the Docker Maven
+# plug-in does not seem to help, so set the execute bit explicitly
+# here as a workaround.
+chmod a+x sip/saw-deploy
+
+sip/sip-deploy /root/sip-config
