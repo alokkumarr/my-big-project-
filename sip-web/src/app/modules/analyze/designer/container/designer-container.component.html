@@ -1,0 +1,47 @@
+<designer-header
+  class="designer__header"
+  [analysis]="analysis"
+  [areMinRequirmentsMet]="areMinRequirmentsMet"
+  [isInDraftMode]="isInDraftMode"
+  [designerState]="designerState"
+  [isInQueryMode]="isInQueryMode"
+  (onBack)="onBack.emit(isInDraftMode)"
+  (change)="onSettingsChange($event)"
+  (requestAction)="onToolbarAction($event)"
+>
+</designer-header>
+
+<div *ngIf="analysis" [ngSwitch]="layoutConfiguration" class="designer__main">
+  <single-table-designer-layout
+    *ngSwitchCase="'single'"
+    cdkDropListGroup
+    (change)="onSettingsChange($event)"
+    [artifacts]="artifacts"
+    [auxSettings]="auxSettings"
+    [analysisType]="analysis.type"
+    [analysisSubtype]="analysis.chartType"
+    [data]="data"
+    [sorts]="sorts"
+    [filters]="filters"
+    [chartTitle]="chartTitle"
+    [fieldCount]="fieldCount"
+    [sqlBuilder]="analysis.sqlBuilder"
+    [designerState]="designerState"
+  >
+  </single-table-designer-layout>
+
+  <multi-table-designer-layout
+    *ngSwitchCase="'multi'"
+    (change)="onSettingsChange($event)"
+    [isInQueryMode]="isInQueryMode"
+    [analysis]="analysis"
+    [artifacts]="artifacts"
+    [data]="data"
+    [dataCount]="dataCount"
+    [sorts]="sorts"
+    [filters]="filters"
+    [sqlBuilder]="analysis.sqlBuilder"
+    [designerState]="designerState"
+  >
+  </multi-table-designer-layout>
+</div>

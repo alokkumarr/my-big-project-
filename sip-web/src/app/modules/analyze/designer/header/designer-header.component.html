@@ -1,0 +1,139 @@
+<div
+  fxLayout="row"
+  fxLayoutAlign="space-between center"
+  class="header__container"
+>
+  <div fxLayout="row" fxLayoutAlign="start center">
+    <button mat-icon-button (click)="onBack.emit()" style="margin-right: 10px;">
+      <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
+    </button>
+    <div
+      fxLayout="row"
+      fxLayout.lt-md="column"
+      fxLayoutAlign="start"
+      fxLayoutGap.gt-md="10px"
+      *ngIf="analysis"
+    >
+      <div
+        class="header__name header__name__small"
+        [ngClass.lt-md]="{ header__name__small: true, header__name: false }"
+        [ngClass.gt-md]="{ header__name__small: false, header__name: true }"
+      >
+        <strong class="e2e-designer-title">
+          {{ analysis.name | titlecase }}
+        </strong>
+        <label i18n *ngIf="isInDraftMode">Draft</label>
+      </div>
+      <div matTooltip="Metric Name" class="header__description">
+        &#40;&nbsp;<mat-icon fontIcon="icon-report"></mat-icon>
+        <span i18n>{{ analysis.metricName | titlecase }}</span
+        >&nbsp;&#41;
+      </div>
+    </div>
+  </div>
+
+  <analysis-sub-type-chooser
+    *ngIf="analysis"
+    (change)="onChartTypeChange($event)"
+    [category]="analysis.type"
+    [subType]="analysis.chartType"
+    [supports]="analysis.supports"
+  >
+  </analysis-sub-type-chooser>
+
+  <div
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    fxLayoutGap.gt-md="5px"
+  >
+    <mat-button-toggle-group
+      *ngIf="analysis?.type === 'report'"
+      (change)="requestAction.emit('modeToggle')"
+      [value]="isInQueryMode"
+      [disabled]="analysis?.edit"
+    >
+      <mat-button-toggle [value]="false" [disabled]="analysis?.edit">
+        <mat-icon fontIcon="icon-designer-mode"></mat-icon>
+        <ng-container i18n>Designer</ng-container>
+      </mat-button-toggle>
+      <mat-button-toggle [value]="true">
+        <mat-icon fontIcon="icon-query-mode"></mat-icon>
+        <ng-container i18n>Query</ng-container>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <button
+      mat-button
+      e2e="refresh-data-btn"
+      *ngIf="
+        (analysis?.type === 'report' || analysis?.type === 'esReport') &&
+        !isInQueryMode
+      "
+      [disabled]="!areMinRequirmentsMet"
+      [color]="
+        designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA
+          ? 'primary'
+          : ''
+      "
+      (click)="requestAction.emit('refresh')"
+    >
+      <span i18n>Refresh Data</span>
+    </button>
+
+    <!-- <button mat-button
+            e2e="open-description-modal"
+            (click)="requestAction.emit('description')">
+      <mat-icon fontIcon="icon-description"></mat-icon>
+      <ng-container i18n>Description</ng-container>
+    </button> -->
+
+    <button
+      matTooltip="Preview"
+      mat-icon-button
+      color="secondary"
+      [disabled]="showProgress || !areMinRequirmentsMet"
+      e2e="open-preview-modal"
+      (click)="requestAction.emit('preview')"
+    >
+      <mat-icon color="primary" fontIcon="icon-fullscreen"></mat-icon>
+      <span fxHide i18n>Preview</span>
+    </button>
+
+    <button
+      matTooltip="Sort"
+      mat-icon-button
+      color="secondary"
+      e2e="open-sort-modal"
+      [disabled]="showProgress || isInQueryMode"
+      (click)="requestAction.emit('sort')"
+    >
+      <mat-icon color="primary" fontIcon="icon-sort"></mat-icon>
+      <span fxHide i18n>Sort</span>
+    </button>
+
+    <button
+      matTooltip="Filter"
+      mat-icon-button
+      color="secondary"
+      e2e="open-filter-modal"
+      [disabled]="showProgress || isInQueryMode"
+      (click)="requestAction.emit('filter')"
+    >
+      <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
+      <span fxHide i18n>Filter</span>
+    </button>
+
+    <button
+      matTooltip="Save"
+      mat-icon-button
+      color="secondary"
+      [disabled]="showProgress || !areMinRequirmentsMet"
+      e2e="designer-save-btn"
+      (click)="requestAction.emit('save')"
+    >
+      <mat-icon color="primary" fontIcon="icon-save"></mat-icon>
+
+      <span fxHide i18n>Save</span>
+    </button>
+  </div>
+</div>

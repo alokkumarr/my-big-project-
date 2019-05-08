@@ -45,7 +45,7 @@ To build and test the project execute the following commands:
         $ mvn verify
 
 This includes running both unit and integration tests.  The release
-package will be located at `dist/target/saw-*.tgz`.
+package will be located at `dist/target/sip-*.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
 integration tests can run.

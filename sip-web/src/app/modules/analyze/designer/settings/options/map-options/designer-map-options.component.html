@@ -1,0 +1,15 @@
+<mat-card fxLayout="column" class="map-option__list mat-elevation-z2">
+  <div class="map-option__list" fxLayout="row" fxLayoutAlign="start center">
+    <div fxFlex="25" i18n>Map style:</div>
+    <mat-form-field fxFlex="75" appearance="outline">
+      <mat-select
+        [(ngModel)]="mapSettings.mapStyle"
+        (selectionChange)="onMapStyleChange($event.value)"
+      >
+        <mat-option *ngFor="let style of MAP_STYLES" [value]="style.value">
+          {{ style.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</mat-card>

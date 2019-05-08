@@ -36,33 +36,35 @@ RUN yum -y -q install ansible rsync
 RUN yum -y -q install openssh-clients
 
 # Add oneshot service to start application deployment at startup
-COPY saw-deploy/saw-deploy /root/
-COPY saw-deploy/saw-config /root/
-COPY saw-deploy/saw-deploy.service /etc/systemd/system/
-RUN systemctl enable saw-deploy
+COPY sip-deploy/sip-deploy /root/
+COPY sip-deploy/sip-config /root/
+COPY sip-deploy/sip-deploy.service /etc/systemd/system/
+RUN systemctl enable sip-deploy
 # Workaround: Set execute bit for Windows users
-RUN chmod a+x /root/saw-deploy
+RUN chmod a+x /root/sip-deploy
 
 RUN chmod a+x /root
 # Add SAW Analyze test data
-COPY saw-analyze-samples /root/saw-analyze-samples/
-COPY saw-analyze-samples/sample-spark/saw-analyze-spark-samples.service /etc/systemd/system/
-COPY saw-analyze-samples/sample-elasticsearch/saw-analyze-elasticsearch-samples.service /etc/systemd/system/
+COPY sip-analyze-samples /root/saw-analyze-samples/
+COPY sip-analyze-samples/sample-spark/sip-analyze-spark-samples.service /etc/systemd/system/
+COPY sip-analyze-samples/sample-elasticsearch/sip-analyze-elasticsearch-samples.service /etc/systemd/system/
 # workaround: Set recursive execute bit for Windows (cygwin rsync) users
 RUN chmod -R 0755 /root/saw-analyze-samples
-RUN systemctl enable saw-analyze-spark-samples
-RUN systemctl enable saw-analyze-elasticsearch-samples
+RUN systemctl enable sip-analyze-spark-samples
+RUN systemctl enable sip-analyze-elasticsearch-samples
 # Add SAW Workbench test data
-COPY saw-workbench-samples /root/saw-workbench-samples/
-COPY saw-workbench-samples/saw-workbench-samples.service /etc/systemd/system/
+COPY sip-workbench-samples /root/saw-workbench-samples/
+COPY sip-workbench-samples/sip-workbench-samples.service /etc/systemd/system/
 # workaround: Set recursive execute bit for Windows (cygwin rsync) users
 RUN chmod -R 0755 /root/saw-workbench-samples
-RUN systemctl enable saw-workbench-samples
+RUN systemctl enable sip-workbench-samples
 # Workaround: Set execute bit for Windows users
 RUN chmod a+x /root/saw-*/sample-*/load*
 
 # Add SAW Batch sample test data
-COPY saw-batch-samples /root/saw-batch-samples/
+COPY sip-batch-samples /root/saw-batch-samples/
+RUN chmod -R 0755 /root/saw-batch-samples/
+
 # Workaround: The Batch Ingestion Service uses a large number of
 # sessions when transfering a large amount of files, so increase the
 # MaxSession parameters as a workaround until Batch Ingestion Service
@@ -77,6 +79,11 @@ RUN systemctl enable systemd-journal-gatewayd.socket
 # systemd version.
 RUN systemctl mask systemd-machine-id-commit.service
 RUN systemctl mask systemd-remount-fs.service
+
+# Add script to generate large directory tree structure
+# to test saw ingestion module
+COPY batch-prepare /root/batch-prepare
+RUN /root/batch-prepare
 
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/

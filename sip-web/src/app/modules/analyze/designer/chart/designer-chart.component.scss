@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  height: 100% !important;
+  width: calc(100% - 20px);
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.designer-chart-container {
+  height: 100%;
+
+  chart {
+    height: 100%;
+  }
+}
