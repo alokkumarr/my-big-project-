@@ -10,6 +10,7 @@ import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
@@ -422,9 +423,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SipQuery sipQuery, Integer size) throws Exception {
+  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
+    logger.debug("DataSecurity Key : "+dataSecurityKey.toString());
     boolean isPercentage =
         dataFields.stream()
             .anyMatch(
@@ -444,7 +446,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           sipQuery.getArtifacts().get(0).getFields(), percentageData);
     }
     String query;
-    query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size);
+    query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
     logger.trace("ES -Query {} "+query);
     List<Object> result = null;
     JsonNode response = storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
