@@ -77,7 +77,9 @@ public class AnalysisServiceImpl implements AnalysisService {
             ftpServers = "";
         }
         String[] latestExecution;
-        if (analysis.getType() != null && analysis.getType().equalsIgnoreCase("pivot")) {
+        boolean isDslScheduled =  analysis.getType() != null && (analysis.getType().equalsIgnoreCase("pivot")
+            || analysis.getType().equalsIgnoreCase("chart"));
+        if (isDslScheduled) {
             latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
         } else {
             ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
