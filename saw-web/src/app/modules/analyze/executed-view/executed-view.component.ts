@@ -548,6 +548,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
         this.setExecutedBy(executedBy);
         this.setExecutedAt(executionId);
+        this.fetchFilters(this.executedAnalysis);
         return { data: data, totalCount: count };
       },
       err => {
