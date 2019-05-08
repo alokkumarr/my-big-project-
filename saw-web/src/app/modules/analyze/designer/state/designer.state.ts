@@ -599,9 +599,9 @@ export class DesignerState {
         filter.model = {
           operator: 'BTW',
           otherValue: filter.model.lte
-            ? moment(filter.model.lte).valueOf()
+            ? moment(filter.model.lte).endOf('day').valueOf()
             : null,
-          value: filter.model.gte ? moment(filter.model.gte).valueOf() : null,
+          value: filter.model.gte ? moment(filter.model.gte).startOf('day').valueOf() : null,
           format: 'epoch_millis'
         };
       }
