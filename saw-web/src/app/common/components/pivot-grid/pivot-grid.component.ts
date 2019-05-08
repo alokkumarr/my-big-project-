@@ -70,7 +70,6 @@ export class PivotGridComponent implements OnDestroy {
   }
   @Input('artifactColumns')
   set setArtifactColumns(artifactColumns: ArtifactColumnPivot[]) {
-    console.log(artifactColumns);
     this.artifactColumns = fpPipe(
       fpFilter('checked'),
       this.preProcessArtifactColumns(),
@@ -80,7 +79,6 @@ export class PivotGridComponent implements OnDestroy {
   }
   @Input('data')
   set setData(data: any[]) {
-    console.log(data);
     setTimeout(() => {
       this.data = this.preProcessData(data);
       this.setPivotData();
@@ -149,7 +147,6 @@ export class PivotGridComponent implements OnDestroy {
         store: this.data || [],
         fields: this.artifactColumns || []
       });
-      console.log(dataSource);
       /* Try to apply existing sorts (if any) to the new data source */
       this.updateSorts(this._sorts, dataSource);
       this.updateDataSource(dataSource);
@@ -387,7 +384,6 @@ export class PivotGridComponent implements OnDestroy {
         }
         cloned.manualFormat = isUndefined(cloned.dateFormat) ? 'yyyy-MM-dd' : cloned.dateFormat;
         delete cloned.dateFormat;
-        console.log(cloned);
         return cloned;
       }),
       fpMap(
