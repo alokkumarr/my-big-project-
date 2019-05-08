@@ -174,10 +174,7 @@ class DashboardFunctions {
       if (!createdAnalysis) {
         return null;
       }
-      let analysisId = createdAnalysis.contents.analyze[0].executionId.split(
-        '::'
-      )[0];
-
+      let analysisId = createdAnalysis.analysis.id;
       let analysis = {
         analysisName: name,
         analysisId: analysisId
