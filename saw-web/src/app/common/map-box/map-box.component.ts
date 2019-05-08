@@ -1,6 +1,13 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  HostBinding,
+  ElementRef
+} from '@angular/core';
 import map from 'lodash/map';
 import first from 'lodash/first';
+import last from 'lodash/last';
 import split from 'lodash/split';
 import reduce from 'lodash/reduce';
 import get from 'lodash/get';
@@ -8,6 +15,7 @@ import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
 import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
+import { environment } from '../../../environments/environment';
 import { MarkerDataPoint } from './types';
 
 @Component({
@@ -20,6 +28,7 @@ export class MapBoxComponent implements OnChanges {
   dataFields: any[];
   coordinateField: any;
   center: number[];
+  zoom = 6;
   mapStyle: string;
   geoJson: GeoJSON.GeoJSON;
 
@@ -34,7 +43,9 @@ export class MapBoxComponent implements OnChanges {
 
   @Input() data: any[];
 
-  constructor() {
+  @HostBinding('attr.data-image-url') imageUrl: string;
+
+  constructor(private _elemRef: ElementRef) {
     // preserveDrawingBuffer has to be set to true so that when downloading the dashboard,
     // so that when using canvas.toDataURL() it still has the data preserved
     HTMLCanvasElement.prototype.getContext = (function(origFn) {
@@ -53,8 +64,28 @@ export class MapBoxComponent implements OnChanges {
     if (this.data && this.coordinateField && this.dataFields) {
       setTimeout(() => {
         this.setGeoJson(this.data, this.coordinateField, this.dataFields);
+        setTimeout(() => {
+          this.setImageUrl();
+        }, 10);
       }, 10);
     }
+  }
+
+  setImageUrl() {
+    const token = environment.mapbox.accessToken;
+    const canvas = this._elemRef.nativeElement.querySelector(
+      '.mapboxgl-canvas'
+    );
+    const { height, width } = canvas.style;
+    const size = `${parseInt(width, 10)}x${parseInt(height, 10)}`;
+    // console.log('attributeStyleMap', canvas[0]);
+    const [lng, lat] = this.center;
+    const style = last(split(this.mapStyle, '/'));
+    const base = 'https://api.mapbox.com/styles/v1/mapbox';
+    const url = `${base}/${style}/static/${lng},${lat},${
+      this.zoom
+    },0,0/${size}?access_token=${token}`;
+    this.imageUrl = url;
   }
 
   setGeoJson(data, coordinateField, dataFields) {

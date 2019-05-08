@@ -25,6 +25,8 @@ import { map, catchError, flatMap } from 'rxjs/operators';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as isEmpty from 'lodash/isEmpty';
+import * as lodashMap from 'lodash/map';
+import * as forEach from 'lodash/forEach';
 
 function downloadDataUrlFromJavascript(filename, dataUrl) {
   const blob = dataURItoBlob(dataUrl);
@@ -226,7 +228,53 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       });
   }
 
+  changeMapCanvasesToImage() {
+    const mapBoxComponents = Array.from(
+      this.downloadContainer.nativeElement.getElementsByTagName('map-box')
+    );
+
+    const backupImgCanvasPairs = [];
+    const onImgLoadPromises = lodashMap(mapBoxComponents, comp => {
+      const imageUrl = comp.dataset['imageUrl'];
+      const canvasContainer = comp.querySelector('.mapboxgl-canvas-container');
+      const canvas = canvasContainer.querySelector('canvas');
+      const { height, width } = canvas.style;
+      const imageElem = document.createElement('img');
+
+      imageElem.src = imageUrl;
+      imageElem.height = parseInt(height, 10);
+      imageElem.width = parseInt(width, 10);
+      backupImgCanvasPairs.push({ canvas, imageElem });
+      canvas.replaceWith(imageElem);
+
+      return new Promise(resolve => {
+        imageElem.addEventListener('load', () => {
+          resolve();
+        });
+      });
+    });
+
+    if (isEmpty(onImgLoadPromises)) {
+      return Promise.resolve([]);
+    } else {
+      return Promise.all(onImgLoadPromises).then(() => {
+        return backupImgCanvasPairs;
+      });
+    }
+  }
+
   downloadDashboard() {
+    this.changeMapCanvasesToImage().then(backupImgCanvasPairs => {
+      this.turnHtml2pdf().then(() => {
+        console.log('backupCanvases', backupImgCanvasPairs);
+        forEach(backupImgCanvasPairs, ({ canvas, imageElem }) => {
+          imageElem.replaceWith(canvas);
+        });
+      });
+    });
+  }
+
+  turnHtml2pdf() {
     const FILE_NAME = this.dashboard.name;
     const elem = this.downloadContainer.nativeElement.getElementsByTagName(
       'gridster'
@@ -237,32 +285,34 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     const overflow = elem.style.overflow;
     elem.style.overflow = 'visible';
 
-    html2pdf()
-      .from(elem)
-      .set({
-        margin: 1,
-        filename: `${FILE_NAME}.pdf`,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: {
-          backgroundColor: '#f4f5f4',
-          scale: 2,
-          width: elem.scrollWidth,
-          height: elem.scrollHeight,
-          windowWidth: elem.scrollWidth,
-          windowHeight: elem.scrollHeight
-        },
-        jsPDF: {
-          unit: 'px',
-          orientation: 'landscape',
-          format: [elem.scrollHeight + 50, elem.scrollWidth]
-        }
-      })
-      // .save(); // comment this and uncomment following lines if png is needed instead of pdf
-      .outputImg('datauristring')
-      .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri))
-      .then(() => {
-        elem.style.overflow = overflow;
-      });
+    return (
+      html2pdf()
+        .from(elem)
+        .set({
+          margin: 1,
+          filename: `${FILE_NAME}.pdf`,
+          image: { type: 'jpeg', quality: 1 },
+          html2canvas: {
+            backgroundColor: '#f4f5f4',
+            scale: 2,
+            width: elem.scrollWidth,
+            height: elem.scrollHeight,
+            windowWidth: elem.scrollWidth,
+            windowHeight: elem.scrollHeight
+          },
+          jsPDF: {
+            unit: 'px',
+            orientation: 'landscape',
+            format: [elem.scrollHeight + 50, elem.scrollWidth]
+          }
+        })
+        // .save(); // comment this and uncomment following lines if png is needed instead of pdf
+        .outputImg('datauristring')
+        .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri))
+        .then(() => {
+          elem.style.overflow = overflow;
+        })
+    );
   }
 
   editDashboard(): void {
