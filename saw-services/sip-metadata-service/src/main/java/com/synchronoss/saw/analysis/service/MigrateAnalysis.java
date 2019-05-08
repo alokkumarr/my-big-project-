@@ -92,7 +92,8 @@ public class MigrateAnalysis {
 
       JsonObject migrationStatus = convertAllAnalysis(analysisList);
 
-      saveMigrationStatus(migrationStatus, migrationDirectory, migrationStatusFile);
+      // Currently disabled. Will be enabled in future
+      // saveMigrationStatus(migrationStatus, migrationDirectory, migrationStatusFile);
     }
   }
 
