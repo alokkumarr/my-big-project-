@@ -78,11 +78,10 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
     if (data.model) {
       this.cacheFilters();
       this.loadDateRange(true);
+      this.onPresetChange({ value: this.model.preset });
     } else {
       this.loadDateRange(false);
     }
-
-    this.onPresetChange({ value: this.model.preset });
   }
 
   /**

@@ -66,28 +66,18 @@
   </dx-data-grid>
 </div>
 
-<div *ngIf="!toggleToGrid">
-  <chart
-    [updater]="updater"
-    [options]="chartOptions"
-    [chartType]="
-      analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType
-    "
-    [enableExport]="true"
-    [attr.e2e]="
-      'chart-type:' +
-      (analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType)
-    "
-  >
-  </chart>
-</div>
 <chart
   *ngIf="!toggleToGrid && analysis.type == 'chart'"
   [updater]="updater"
   [options]="chartOptions"
-  [chartType]="analysis.chartType"
+  [chartType]="
+    analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType
+  "
   [enableExport]="true"
-  [attr.e2e]="'chart-type:' + analysis.chartType"
+  [attr.e2e]="
+    'chart-type:' +
+    (analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType)
+  "
 >
 </chart>
 
@@ -108,4 +98,3 @@
   [attr.e2e]="'map-type-' + analysis.chartType"
 >
 </map-chart-viewer>
-
