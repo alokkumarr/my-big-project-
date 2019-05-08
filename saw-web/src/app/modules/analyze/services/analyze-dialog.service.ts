@@ -103,6 +103,7 @@ export class AnalyzeDialogService {
   }
 
   openFilterPromptDialog(filters, analysis: Analysis | AnalysisDSL) {
+    console.log(analysis);
     const data: DesignerFilterDialogData = {
       filters,
       artifacts: isDSLAnalysis(analysis)
