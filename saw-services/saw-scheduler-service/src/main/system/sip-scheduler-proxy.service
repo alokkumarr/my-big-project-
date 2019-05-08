@@ -1,0 +1,10 @@
+[Unit]
+Description=SIP Scheduler Proxy
+Requires=sip-scheduler.service
+After=sip-scheduler.service
+Requires=sip-scheduler-proxy.socket
+After=sip-scheduler-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9601
+PrivateTmp=yes

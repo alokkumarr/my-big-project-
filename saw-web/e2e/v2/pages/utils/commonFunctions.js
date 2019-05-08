@@ -132,7 +132,7 @@ module.exports = {
     browser.get(browser.baseUrl);
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
-        return /saw/.test(url);
+        return /sip/.test(url);
       });
     }, protractorConf.timeouts.fluentWait);
   },
