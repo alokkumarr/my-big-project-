@@ -496,6 +496,8 @@ export class AnalyzeService {
     mode = EXECUTION_MODES.LIVE,
     options: ExecutionRequestOptions = {}
   ) {
+    // This addition is a part of SIP-7145 as this is required for DSK implementation. This is a request from BE.
+    model.sipQuery.semanticId = model.semanticId;
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
