@@ -16,7 +16,6 @@ import * as split from 'lodash/split';
 import * as isPlainObject from 'lodash/isPlainObject';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
-import * as fpFilter from 'lodash/fp/filter';
 import * as filter from 'lodash/filter';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
@@ -70,8 +69,8 @@ export class PivotGridComponent implements OnDestroy {
   }
   @Input('artifactColumns')
   set setArtifactColumns(artifactColumns: ArtifactColumnPivot[]) {
-    this.artifactColumns = fpPipe(
-      fpFilter('checked'),
+    this.artifactColumns = this.preProcessArtifactColumns()(artifactColumns);
+    this.pivotFields = fpPipe(
       this.preProcessArtifactColumns(),
       this.artifactColumn2PivotField()
     )(artifactColumns);
@@ -85,7 +84,7 @@ export class PivotGridComponent implements OnDestroy {
     }, 100);
   }
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
-  public fields: any[];
+  public pivotFields: any[];
   public data: any[];
   public _sorts: Array<Sort> = [];
   public artifactColumns;
@@ -142,10 +141,10 @@ export class PivotGridComponent implements OnDestroy {
   }
 
   setPivotData() {
-    if (isArray(this.data) && isArray(this.artifactColumns)) {
+    if (isArray(this.data) && isArray(this.pivotFields)) {
       const dataSource = new PivotGridDataSource({
         store: this.data || [],
-        fields: this.artifactColumns || []
+        fields: this.pivotFields || []
       });
       /* Try to apply existing sorts (if any) to the new data source */
       this.updateSorts(this._sorts, dataSource);
@@ -223,38 +222,47 @@ export class PivotGridComponent implements OnDestroy {
   }
 
   preProcessArtifactColumns() {
-    return fpMap((column: ArtifactColumnPivot) => {
-      // manually format dates for day quarter and month dateIntervals
+    return fpMap(column => {
+      // manually format dates for day quarter and month groupIntervals
       if (DATE_TYPES.includes(column.type)) {
         let momentFormat;
         const cloned = clone(column);
         /* prettier-ignore */
-        switch (column.dateInterval) {
+        switch (column.groupInterval) {
         case 'day':
-          cloned.groupInterval = 1;
           momentFormat = this.getMomentFormat(cloned.dateFormat);
+          cloned.groupInterval = 1;
           cloned.manualFormat = cloned.dateFormat;
           cloned.format = {
             formatter: this.getFormatter(momentFormat)
           };
           break;
         case 'month':
+          momentFormat = DATE_INTERVALS_OBJ[cloned.groupInterval].momentFormat;
           cloned.groupInterval = 1;
-          momentFormat = DATE_INTERVALS_OBJ[cloned.dateInterval].momentFormat;
           cloned.format = {
             formatter: this.getFormatter(momentFormat)
           };
           break;
         case 'quarter':
-          unset(cloned, 'format');
+          momentFormat = DATE_INTERVALS_OBJ[cloned.groupInterval].momentFormat;
           cloned.groupInterval = 1;
+          cloned.format = {
+            formatter: this.getFormatter(momentFormat)
+          };
           break;
         case 'year':
-          cloned.groupInterval = cloned.dateInterval;
+          cloned.groupInterval = cloned.groupInterval;
           // the format usually sent by the backend: 'YYYY-MM-DD' does not work with the pivot grid
           unset(cloned, 'format');
           break;
         case 'all':
+          momentFormat = PIVOT_DEFAULT_DATE_FORMAT.momentValue;
+          cloned.format = {
+            formatter: this.getFormatter(momentFormat)
+          };
+          unset(cloned, 'groupInterval');
+          break;
         default:
           // do nothing
           break;
@@ -292,10 +300,10 @@ export class PivotGridComponent implements OnDestroy {
 
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      forEach(columnsToFormat, ({ name, dateInterval, manualFormat }) => {
+      forEach(columnsToFormat, ({ name, groupInterval, manualFormat }) => {
         clonedDataPoint[name] = this.getFormattedDataValue(
           clonedDataPoint[name],
-          dateInterval,
+          groupInterval,
           manualFormat
         );
       });
@@ -304,20 +312,20 @@ export class PivotGridComponent implements OnDestroy {
     return formattedData;
   }
 
-  getFormattedDataValue(value, dateInterval, format) {
+  getFormattedDataValue(value, groupInterval, format) {
     let formatToApply;
     /* prettier-ignore */
-    switch (dateInterval) {
+    switch (groupInterval) {
     case 'day':
       formatToApply = this.getMomentFormat(format);
       return moment.utc(value, formatToApply).format(formatToApply);
     case 'quarter':
-      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
+      formatToApply = DATE_INTERVALS_OBJ[groupInterval].momentFormat;
       const formattedValue = moment.utc(value).format(formatToApply);
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;
     case 'month':
-      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
+      formatToApply = DATE_INTERVALS_OBJ[groupInterval].momentFormat;
       return moment.utc(value).format(formatToApply);
     case 'year':
     default:
@@ -382,7 +390,9 @@ export class PivotGridComponent implements OnDestroy {
         if (!isUndefined(cloned.aliasName) && cloned.aliasName !== '') {
           cloned.displayName = cloned.aliasName;
         }
-        cloned.manualFormat = isUndefined(cloned.dateFormat) ? 'yyyy-MM-dd' : cloned.dateFormat;
+        cloned.manualFormat = isUndefined(cloned.dateFormat)
+          ? 'yyyy-MM-dd'
+          : cloned.dateFormat;
         delete cloned.dateFormat;
         return cloned;
       }),

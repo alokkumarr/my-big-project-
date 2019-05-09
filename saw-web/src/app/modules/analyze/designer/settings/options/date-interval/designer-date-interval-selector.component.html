@@ -2,7 +2,7 @@
   <mat-form-field appearance="outline">
     <mat-select
       (selectionChange)="onDateIntervalChange($event.value)"
-      [value]="artifactColumn.dateInterval || artifactColumn.groupInterval"
+      [value]="artifactColumn.groupInterval"
     >
       <mat-option
         *ngFor="let dateInterval of DATE_INTERVALS"
