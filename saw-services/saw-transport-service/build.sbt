@@ -43,8 +43,8 @@ libraryDependencies += "org.apache.hbase" % "hbase-common" % "1.1.8-mapr-1710-m7
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0-mapr-1808"
 libraryDependencies += "com.mapr.streams" % "mapr-streams" % "6.1.0-mapr"
 libraryDependencies += "org.apache.kafka" % "kafka-clients" % "1.0.1-mapr-1808"
-libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "2.3.2"
-libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "2.3.2"
+libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "2.3.1"
+libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "2.3.1"
 
 libraryDependencies += "org.asynchttpclient" % "async-http-client" % "2.0.0"
 libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.2"

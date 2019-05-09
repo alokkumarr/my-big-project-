@@ -6,10 +6,11 @@ gpgcheck=1
 gpgkey=http://package.mapr.com/releases/pub/maprgpg.key
 protect=1
 
-[maprecosystem]
-name=MapR Technologies
-baseurl=http://package.mapr.com/releases/MEP/MEP-6.1.0/redhat
-enabled=1
-gpgcheck=1
-gpgkey=http://package.mapr.com/releases/pub/maprgpg.key
-protect=1
+# TODO: Enable appropriate MEP version compatible for Mapr v6.1.0
+# [maprecosystem]
+# name=MapR Technologies
+# baseurl=http://package.mapr.com/releases/MEP/MEP-6.0.0/redhat
+# enabled=1
+# gpgcheck=1
+# gpgkey=http://package.mapr.com/releases/pub/maprgpg.key
+# protect=1

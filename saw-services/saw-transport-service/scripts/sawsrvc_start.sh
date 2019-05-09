@@ -132,7 +132,7 @@ declare lib_classpath=$(
     $lib_dir
   )
 
-for j in `ls /opt/mapr/spark/spark-2.3.2/jars/*.jar`; do
+for j in `ls /opt/mapr/spark/spark-2.3.1/jars/*.jar`; do
  lib_classpath=${lib_classpath}:"${j}"
 done
 lib_classpath=${lib_classpath}:$(mapr classpath):$(hadoop classpath):$(hbase classpath)

@@ -798,7 +798,7 @@
                     </beforeRemoval>
                     <requires>
                       <require>mapr-client &gt;= 6.1.0</require>
-                      <require>mapr-spark &gt;= 2.3.2</require>
+                      <require>mapr-spark &gt;= 2.3.1</require>
                       <require>mapr-kafka &gt;= 1.1.1</require>
                       <require>mapr-hbase &gt;= 1.1.8</require>
                       <require>perl &gt;= 5.16.3</require>
