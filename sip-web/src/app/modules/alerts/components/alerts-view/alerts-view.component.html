@@ -5,15 +5,15 @@
     [mode]="viewAlertPanelMode"
     autoFocus="false"
   >
-    <div fxFlex fxLayout="column" class="view-container__add">
+    <div fxFlex fxLayout="column" class="view-container__filter">
       <div
         fxFlex="45px"
         fxLayout="row"
         fxLayoutAlign="center center"
-        class="view-container__add__header"
+        class="view-container__filter__header"
       >
-        <span fxFlex class="view-container__add__header__title" i18n
-          >{{ navTitle }}
+        <span fxFlex class="view-container__filter__header__title" i18n
+          >Filter Alerts
         </span>
         <button
           mat-icon-button
@@ -24,6 +24,7 @@
           <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
       </div>
+      <alerts-filter fxFlex></alerts-filter>
     </div>
   </mat-sidenav>
   <mat-sidenav-content fxFlex fxLayout="column" class="view-container-content">
@@ -31,6 +32,7 @@
       fxFlex="45px"
       fxLayout="row"
       fxLayoutAlign="center center"
+      fxLayoutGap="9px"
       class="view-container-content__header"
     >
       <span fxFlex class="view-container-content__header__title" i18n
@@ -46,16 +48,17 @@
       >
         <mat-icon color="primary" fontIcon="icon-Refresh"></mat-icon>
       </button>
-      <!-- <button
+      <button
         *ngIf="!alertViewSidenav.opened"
-        mat-icon-button
-        class="view-container-content__header__filterBtn"
-        color="primary"
+        matTooltip="Filter"
+        mat-mini-fab
+        class="view-container-content__header__iconBtn"
+        color="secondary"
         e2e="open-filter-panel"
         (click)="alertViewSidenav.open()"
       >
-        <mat-icon fontIcon="icon-filter"></mat-icon>
-      </button> -->
+        <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
+      </button>
     </div>
     <div
       fxFlex

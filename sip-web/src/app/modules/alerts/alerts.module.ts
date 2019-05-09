@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { NgxsModule } from '@ngxs/store';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxSelectBoxModule } from 'devextreme-angular/ui/select-box';
@@ -19,9 +19,10 @@ import {
 import {
   AlertsViewComponent,
   AlertsGridComponent,
-  AlertDetailComponent
+  AlertDetailComponent,
+  AlertsFilterComponent
 } from './components/alerts-view/index';
-
+import { AlertsState } from './components/alerts-view/state/alerts.state';
 import { IsAdminGuard } from '../admin/guards';
 
 const components = [
@@ -31,7 +32,8 @@ const components = [
   AddAlertComponent,
   ConfirmActionDialogComponent,
   AlertsGridComponent,
-  AlertDetailComponent
+  AlertDetailComponent,
+  AlertsFilterComponent
 ];
 
 @NgModule({
@@ -45,7 +47,8 @@ const components = [
     FlexLayoutModule,
     DxTemplateModule,
     DxDataGridModule,
-    DxSelectBoxModule
+    DxSelectBoxModule,
+    NgxsModule.forFeature([AlertsState])
   ],
   entryComponents: components,
   providers: [IsAdminGuard],

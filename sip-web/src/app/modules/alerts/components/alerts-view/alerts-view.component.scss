@@ -14,20 +14,21 @@
   text-align: left;
   color: $primary-blue-b1;
   padding-left: 10px;
-  font-weight: 600 !important;
+  font-weight: bold !important;
   font-size: 18px;
 }
 
 .view-container {
-  &__add {
-    width: 400px;
+  &__filter {
+    width: 350px;
+    background-color: $background-color;
 
     &__header {
       padding: 0 9px;
-      background-color: $background-color;
 
       &__title {
         @extend .titleClass;
+        padding-left: 30px;
       }
     }
   }
