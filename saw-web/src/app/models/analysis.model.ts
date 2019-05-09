@@ -14,6 +14,7 @@ import { MapSettings } from './map-settings.model';
 // Most text editors have a sort functionality
 export interface Analysis {
   artifacts: Artifact[];
+  category: string;
   categoryId: number;
   chartTitle: string;
   checked: null | boolean | string;
