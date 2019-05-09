@@ -109,7 +109,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   );
 
   public isInDraftMode = false;
-  public designerState: DesignerStates;
+  public designerState = DesignerStates.WAITING_FOR_COLUMNS;
   public DesignerStates = DesignerStates;
   public artifacts: Artifact[] = [];
   public data: any = [];
@@ -578,6 +578,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
          requesting data.
          */
       if (isDSLAnalysis(this.analysis)) {
+        this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
         const subscription = this._store
           .select(DesignerState.groupAdapters)
           .pipe(
@@ -589,6 +590,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           .subscribe();
         this.subscriptions.push(subscription);
       } else {
+        this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
         this.requestData();
       }
     } else {
@@ -625,8 +627,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   requestData() {
-    this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
-
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);

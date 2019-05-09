@@ -226,7 +226,7 @@ export class AnalyzeService {
       .toPromise()
       .then(resp => {
         const data = fpGet(`data`, resp);
-        const queryBuilder = fpGet(`queryBuilder`, resp);
+        const queryBuilder = options.isDSL ? fpGet(`sipQuery`, resp) : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
         return {
@@ -268,7 +268,7 @@ export class AnalyzeService {
       .toPromise()
       .then(resp => {
         const data = fpGet(`data`, resp);
-        const queryBuilder = fpGet(`queryBuilder`, resp);
+        const queryBuilder = options.isDSL ? fpGet(`sipQuery`, resp) : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
         return {
