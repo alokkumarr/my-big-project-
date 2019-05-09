@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -93,9 +94,12 @@ public class StorageProxyUtil {
    */
   public static SipQuery getSipQuery(
       String semanticId, String metaDataServiceExport, HttpServletRequest request) {
-    System.out.println("URI being prepared" + metaDataServiceExport + "/internal/semantic/workbench/" + semanticId);
-    logger.info("URI being prepared" + metaDataServiceExport + "/internal/semantic/workbench/" + semanticId);
-      SipQuery semanticSipQuery = new SipQuery();
+    logger.info(
+        "URI being prepared"
+            + metaDataServiceExport
+            + "/internal/semantic/workbench/"
+            + semanticId);
+    SipQuery semanticSipQuery = new SipQuery();
     try {
       RestTemplate restTemplate = new RestTemplate();
       HttpHeaders headers = new HttpHeaders();
@@ -121,7 +125,9 @@ public class StorageProxyUtil {
 
       for (Object artifact : artifactList) {
         Artifact dslArtifact = new Artifact();
-        JsonObject artifactObj = (JsonObject) artifact;
+        Gson gson = new Gson();
+        logger.info("Gson String " + gson.toJson(artifact));
+        JsonObject artifactObj = gson.toJsonTree(artifact).getAsJsonObject();
         dslArtifact.setArtifactsName(artifactObj.get("artifactName").getAsString());
         JsonArray columns = artifactObj.getAsJsonArray("columns");
         for (JsonElement columnElement : columns) {
@@ -134,6 +140,7 @@ public class StorageProxyUtil {
           field.setDisplayName(column.get("displayName").getAsString());
           fields.add(field);
         }
+        dslArtifact.setFields(fields);
         artifacts.add(dslArtifact);
       }
       semanticSipQuery.setArtifacts(artifacts);
