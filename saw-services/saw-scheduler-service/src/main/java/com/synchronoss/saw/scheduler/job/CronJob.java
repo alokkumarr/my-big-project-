@@ -34,7 +34,9 @@ public class CronJob extends QuartzJobBean implements InterruptableJob{
 				+ " , Thread Name :"+Thread.currentThread().getName() + " ,Time now :"+new Date());
 		SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
-		if (job.getType() != null && job.getType().equalsIgnoreCase("pivot")) {
+    boolean isDslScheduled =  job.getType() != null && (job.getType().equalsIgnoreCase("pivot")
+        || job.getType().equalsIgnoreCase("chart"));
+    if (isDslScheduled) {
 			analysisService.executeDslAnalysis(job.getAnalysisID());
 		} else {
 			analysisService.executeAnalysis(job.getAnalysisID());

@@ -126,13 +126,13 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   fetchCronDetails() {
-    const { type, id, categoryId } = this.data.analysis;
+    const { type, id } = this.data.analysis;
     if (type !== 'chart') {
       this.getFTPLocations();
     }
     const requestCron = {
       jobName: id,
-      categoryId: categoryId,
+      categoryId: isDSLAnalysis(this.data.analysis) ? this.data.analysis.category : this.data.analysis.categoryId,
       groupName: this.token.ticket.custCode
     };
     this._analyzeService.getCronDetails(requestCron).then(
