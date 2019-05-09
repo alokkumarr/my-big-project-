@@ -248,6 +248,7 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append("Path does not exists or Access Denied.");
         connectionLogs.append(newLineChar);
         connectionLogs.append(status);
+        connectionLogs.append(e.getMessage());
         logger.error("Path does not exist or access denied for the entity" + entityId, e);
       } catch (IOException e) {
         status = HttpStatus.UNAUTHORIZED;
@@ -255,6 +256,7 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append("Exception occured");
         connectionLogs.append(newLineChar);
         connectionLogs.append(status);
+        connectionLogs.append(e.getMessage());
         logger.error("Exception occurred during " + entityId, e);
       } catch (InvalidPathException | NullPointerException ex) {
         status = HttpStatus.UNAUTHORIZED;
@@ -262,13 +264,19 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append("Invalid path or some exception");
         connectionLogs.append(newLineChar);
         connectionLogs.append(status);
+        connectionLogs.append(ex.getMessage());
         logger.error("Invalid directory path " + entityId, ex);
       } catch (Exception ex) {
+        connectionLogs.append("Starting Test connectivity....");
+        connectionLogs.append(newLineChar);
+        connectionLogs.append("Establishing connection to host");
         status = HttpStatus.UNAUTHORIZED;
         connectionLogs.append(newLineChar);
         connectionLogs.append("Exception");
         connectionLogs.append(newLineChar);
         connectionLogs.append(status);
+        connectionLogs.append(newLineChar);
+        connectionLogs.append(ex.getMessage());
         logger.error("Exception: " + ex.getMessage());
       }
     } else {
@@ -492,6 +500,8 @@ public class SftpServiceImpl extends SipPluginContract {
   @Override
   public List<BisDataMetaInfo> immediateTransfer(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
+    BisJobEntity jobEntity = this.executeSipJob(Long.valueOf(payload.getChannelId()),
+        Long.valueOf(payload.getRouteId()), payload.getFilePattern());
     Preconditions.checkNotNull(payload.getChannelId() != null,
         "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(payload.getRouteId() != null, "payload.getRouteId() cannot be null");
@@ -524,7 +534,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error("Exception triggered while transferring the file", ex);
       sipLogService.upSertLogForExistingProcessStatus(Long.valueOf(payload.getChannelId()),
                 Long.valueOf(payload.getRouteId()), BisComponentState.HOST_NOT_REACHABLE.value(),
-                BisProcessState.FAILED.value(),SourceType.REGULAR.name());
+                BisProcessState.FAILED.value(),SourceType.REGULAR.name(), 1L);
       throw new SftpProcessorException("Exception triggered while transferring the file", ex);
     } finally {
       if (defaultSftpSessionFactory != null && defaultSftpSessionFactory.getSession() != null) {
@@ -638,8 +648,10 @@ public class SftpServiceImpl extends SipPluginContract {
     
     BisJobEntity jobEntity = this.executeSipJob(channelId, routeId, filePattern);
     
-    logger.trace(
-        "TransferData starts here with the channelId " + channelId + " and routeId " + routeId);
+    logger.info(
+        "TransferData starts here with the channelId " + channelId + " and routeId " + routeId
+        + "for job Id::" + jobEntity.getJobId());
+    
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
     try (Session<?> session = sesionFactory.getSession()) {
@@ -772,7 +784,8 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.error(
           "Exception occurred while connecting to channel with the channel Id:" + channelId, ex);
       sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
-          BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value(), source);
+          BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value(),
+          source, jobEntity.getJobId());
     }
     logger.trace(
         "TransferData ends here with the channelId " + channelId + " and routeId " + routeId);
@@ -1004,7 +1017,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         //    .trace("local Directory before calling 
                         //getPath() ::" + localDirectory);
                         prepareLogInfo(bisDataMetaInfo, pattern, "",
-                            getActualRecDate(entry), entry.getAttrs().getSize(),
+                            getActualRecDate(entry), 0L,
                             sourcelocation + File.separator + entry.getFilename(), channelId,
                             routeId, "", jobId);
                         bisDataMetaInfo.setProcessId(

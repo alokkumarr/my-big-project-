@@ -112,13 +112,13 @@ public class RetryExecutorService {
    * destination and update logs with 'Data_removed' Step3: Triggers transfer
    * call as part of retry
    */
-  @Async("retryWorkerExecutor")
+  @Async("retryExecutor")
   public void recoverFromInconsistentState() {
 
     // Mark long running 'InProgress to 'Failed'
     sipLogService.updateLongRunningTransfers(maxInprogressMins);
 
-    logger.trace("recoverFromInconsistentState execution starts here");
+    logger.info("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
     int totalNoOfPages = IntegrationUtils.calculatePages(countOfRecords,

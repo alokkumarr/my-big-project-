@@ -136,7 +136,7 @@ public class SftpRetryServiceImpl implements SipRetryContract {
               ex);
           sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
               BisComponentState.HOST_NOT_REACHABLE.value(), 
-              BisProcessState.FAILED.value(), SourceType.RETRY.name());
+              BisProcessState.FAILED.value(), SourceType.RETRY.name(), jobId);
         }
         break;
       case "jdbc":

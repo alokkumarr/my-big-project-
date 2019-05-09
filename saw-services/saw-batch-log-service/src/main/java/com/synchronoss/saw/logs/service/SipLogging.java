@@ -92,7 +92,11 @@ public class SipLogging {
       bisLog.setCheckpointDate(new Date());
       bisLog.setCreatedDate(new Date());
       bisLog.setSource(entity.getSource());
-      BisJobEntity jobEntity = this.retriveJobById(entity.getJobId());
+      BisJobEntity jobEntity = null;
+      if (entity.getJobId() != null) {
+        jobEntity = this.retriveJobById(entity.getJobId());
+      }
+      
       bisLog.setJob(jobEntity);
       bisFileLogsRepository.save(bisLog);
     }
@@ -384,7 +388,7 @@ public class SipLogging {
    */
   @Transactional(TxType.REQUIRED)
   public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
-      String fileStatus, String source) {
+      String fileStatus, String source, Long jobId) {
     logger.trace(
         "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
@@ -404,6 +408,7 @@ public class SipLogging {
       bisDataMetaInfo.setComponentState(processStatus);
       bisDataMetaInfo.setProcessState(fileStatus);
       bisDataMetaInfo.setSource(source);
+      bisDataMetaInfo.setJobId(jobId);
       upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
     logger.trace(

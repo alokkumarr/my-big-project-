@@ -135,7 +135,7 @@ public class SawBatchServiceApplication {
    * @return task executor
    */
   @Bean
-  public TaskExecutor retryWorkerExecutor() {
+  public TaskExecutor retryExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
     executor.setMaxPoolSize(10);
