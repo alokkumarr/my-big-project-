@@ -1,15 +1,28 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.storage.proxy.model.SemanticNode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 public class StorageProxyUtil {
 
@@ -70,5 +83,65 @@ public class StorageProxyUtil {
       dskDefList.add(dataSecurityKeyDef);
     }
     return (dskDefList);
+  }
+
+  /**
+   * This will fetch the SIP query from metadata and provide.
+   *
+   * @param semanticId
+   * @return SipQuery
+   */
+  public static SipQuery getSipQuery(
+      String semanticId, String metaDataServiceExport, HttpServletRequest request) {
+    System.out.println("URI being prepared" + metaDataServiceExport + "/internal/semantic/workbench/" + semanticId);
+    logger.info("URI being prepared" + metaDataServiceExport + "/internal/semantic/workbench/" + semanticId);
+      SipQuery semanticSipQuery = new SipQuery();
+    try {
+      RestTemplate restTemplate = new RestTemplate();
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+
+      String url = metaDataServiceExport + "/internal/semantic/workbench/" + semanticId;
+      logger.debug("SIP query url for analysis fetch : " + url);
+      HttpHeaders requestHeaders = new HttpHeaders();
+      requestHeaders.set("Host", request.getHeader("Host"));
+      requestHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+      requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_VALUE);
+      requestHeaders.set("Authorization", request.getHeader("Authorization"));
+
+      HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+      ResponseEntity<SemanticNode> analysisResponse =
+          restTemplate.exchange(url, HttpMethod.GET, requestEntity, SemanticNode.class);
+
+      List<Object> artifactList = analysisResponse.getBody().getArtifacts();
+
+      List<Artifact> artifacts = new ArrayList<>();
+      List<Field> fields = new ArrayList<>();
+
+      for (Object artifact : artifactList) {
+        Artifact dslArtifact = new Artifact();
+        JsonObject artifactObj = (JsonObject) artifact;
+        dslArtifact.setArtifactsName(artifactObj.get("artifactName").getAsString());
+        JsonArray columns = artifactObj.getAsJsonArray("columns");
+        for (JsonElement columnElement : columns) {
+          JsonObject column = columnElement.getAsJsonObject();
+          Field field = new Field();
+          // Only columnName will be sufficient for applying DSK. If you are using this method to
+          // extract complete sipQuery Obj, you can set the other variables of sipQuery based on
+          // the needs and this doesn't affect DSK functionality.
+          field.setColumnName(column.get("columnName").getAsString());
+          field.setDisplayName(column.get("displayName").getAsString());
+          fields.add(field);
+        }
+        artifacts.add(dslArtifact);
+      }
+      semanticSipQuery.setArtifacts(artifacts);
+
+      logger.debug("Fetched SIP query for analysis : " + semanticSipQuery.toString());
+    } catch (Exception ex) {
+      logger.error("Sip query not fetched from semantic");
+    }
+    return semanticSipQuery;
   }
 }
