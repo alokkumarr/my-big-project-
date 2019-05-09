@@ -31,7 +31,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
 	private static String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 	private static final String pidPath = "/var/bda/saw-security/run/saw-security.pid";
 
-	  @Value("${sip.ssl.enable}")
+	 /* @Value("${sip.ssl.enable}")
 	  private Boolean sipSslEnable;
 	  
 	  @Value("${sip.trust.store:}")
@@ -49,6 +49,9 @@ public class NSSOApplication extends SpringBootServletInitializer {
       @Value("${sip.key.alias:}")
       private String keyAlias; 
 
+      @Value("${server.port}")
+      private int serverPort; 
+      */
 	/**
      * TomcatServletWebServerFactory has been overridden.
      */
@@ -56,10 +59,10 @@ public class NSSOApplication extends SpringBootServletInitializer {
     @Bean
     public TomcatServletWebServerFactory tomcatEmbedded() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-        if (sipSslEnable) {
+        /*if (sipSslEnable) {
           tomcat.addAdditionalTomcatConnectors(createSslConnector(trustStore,
           trustStorePassword, keyStorePassword, keyStore));
-        }
+        }*/
         tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
             if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
                 ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
@@ -68,27 +71,40 @@ public class NSSOApplication extends SpringBootServletInitializer {
         return tomcat;
     }
 
-    private Connector createSslConnector(String trustStoreLocation,
+    /*private Connector createSslConnector(String trustStoreLocation,
         String trustPassword, String keyStorePassword, String keyStoreLocation) {
       Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
       Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
       try {
+        if (sipSslEnable) {
         connector.setScheme("https");
         connector.setSecure(true);
-        connector.setPort(9001);
+        connector.setPort(serverPort);
         protocol.setSSLEnabled(true);
         protocol.setKeystoreFile(keyStoreLocation);
         protocol.setKeystorePass(keyStorePassword);
         protocol.setTruststoreFile(trustStoreLocation);
         protocol.setTruststorePass(trustPassword);
         protocol.setKeyAlias(keyAlias);
-  
+        }
+        else {
+          connector.setScheme("http");
+          connector.setSecure(false);
+          connector.setPort(serverPort);
+          protocol.setSSLEnabled(false);
+          protocol.setKeystoreFile(keyStoreLocation);
+          protocol.setKeystorePass(keyStorePassword);
+          protocol.setTruststoreFile(trustStoreLocation);
+          protocol.setTruststorePass(trustPassword);
+          protocol.setKeyAlias(keyAlias);
+          
+        }
       } catch (Exception ex) {
         throw new IllegalStateException(
             "can't access keystore: [" + "keystore" + "] or truststore: [" + "keystore" + "]", ex);
       }
       return connector;
-    }
+    }*/
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {

@@ -30,7 +30,7 @@ server:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
    key-alias: sip
    key-store-password: "{{ sip_keystore_password }}"
-   trust-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
    trust-store-password: "{{ sip_keystore_password }}"
 
   {% endif %}

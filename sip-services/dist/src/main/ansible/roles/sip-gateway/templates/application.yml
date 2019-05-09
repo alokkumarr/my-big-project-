@@ -13,7 +13,7 @@ spring:
     banner-mode: 'off'
 logging:
   level:
-    com.synchronoss.saw.gateway: INFO
+    com.synchronoss.saw.gateway: TRACE
 server:
   # Note: Bind to all available addresses (not just localhost) so that
   # a proxy which might be on another host can connect
@@ -32,7 +32,7 @@ server:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
    key-alias: sip
    key-store-password: "{{ sip_keystore_password }}"
-   trust-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
    trust-store-password: "{{ sip_keystore_password }}"
 
   {% endif %}
@@ -49,12 +49,12 @@ management:
 {% if sip_secure %}
 
 connector: https
-saw-security-port: 9001
+
 
 {% else %}
 
 connector: http
-saw-security-port: 9000
+
 
 {% endif %}
 
@@ -69,7 +69,7 @@ semantic:
         host: ${connector}://localhost:9200
 security:
     service:
-        host: ${connector}://localhost:${saw-security-port}/saw-security
+        host: ${connector}://localhost:9000/saw-security
 export:
     service:
         host: ${connector}://localhost:9400

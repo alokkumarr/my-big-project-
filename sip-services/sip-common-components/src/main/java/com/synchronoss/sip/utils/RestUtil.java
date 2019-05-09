@@ -54,6 +54,10 @@ public class RestUtil {
    * creating rest template using SSL connection.
    */
   public RestTemplate restTemplate() {
+    logger.info("restTemplate trustStore: " + trustStore);
+    logger.info("restTemplate keyStore: " + keyStore);
+    logger.info("restTemplate keyStorePassword: " + keyStorePassword);
+    logger.info("restTemplate trustStorePassword: " + trustStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -77,10 +81,47 @@ public class RestUtil {
   }
 
   /**
+   * creating rest template using SSL connection.
+   */
+  public RestTemplate restTemplate(String keyStore, String keyPassword, String trustStore,
+      String trustPassword) {
+    logger.info("restTemplate with parameter trustStore: " + trustStore);
+    logger.info("restTemplate with parameter keyStore: " + keyStore);
+    logger.info("restTemplate with parameter keyStorePassword: " + keyPassword);
+    logger.info("restTemplate with parameter trustStorePassword: " + trustPassword);
+    RestTemplate restTemplate = null;
+    if (sipSslEnable) {
+      SSLContext sslContext = null;
+      try {
+        sslContext = SSLContextBuilder.create()
+            .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(),
+                keyPassword.toCharArray())
+            .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
+      } catch (Exception e) {
+        logger.error("Exception :" + e);
+      }
+      HttpClient client = HttpClients.custom().setSSLContext(sslContext)
+          .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+      HttpComponentsClientHttpRequestFactory factory =
+          new HttpComponentsClientHttpRequestFactory(client);
+      restTemplate = new RestTemplate(factory);
+    } else {
+      restTemplate = new RestTemplate();
+    }
+    return restTemplate;
+  }
+  
+  
+  /**
    * creating async rest template using SSL connection. TODO: This method should be changed when
    * AsyncRestTemplate changes to WebClient
    */
   public AsyncRestTemplate asyncRestTemplate() {
+    logger.info("asyncRestTemplate trustStore: " + trustStore);
+    logger.info("asyncRestTemplate keyStore: " + keyStore);
+    logger.info("asyncRestTemplate keyStorePassword: " + keyStorePassword);
+    logger.info("asyncRestTemplate trustStorePassword: " + trustStore);
+
     AsyncRestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -109,6 +150,11 @@ public class RestUtil {
    * creating a https client.
    */
   public HttpClient getHttpClient() throws Exception {
+    logger.info("getHttpClient trustStore: " + trustStore);
+    logger.info("getHttpClient keyStore: " + keyStore);
+    logger.info("getHttpClient keyStorePassword: " + keyStorePassword);
+    logger.info("getHttpClient trustStorePassword: " + trustStore);
+
     if (client != null) {
       return client;
     }
@@ -131,7 +177,13 @@ public class RestUtil {
   private SSLContext getSsLContext(String keyStore, String keyPassword, String trustStore,
       String trustPassword) throws KeyStoreException, NoSuchAlgorithmException,
       CertificateException, IOException, KeyManagementException, UnrecoverableKeyException {
+    logger.info("getSsLContext trustStore: " + trustStore);
+    logger.info("getSsLContext keyStore: " + keyStore);
+    logger.info("getSsLContext keyStorePassword: " + keyPassword);
+    logger.info("getSsLContext trustStorePassword: " + trustStore);
+
     SSLContext sslContext = SSLContextBuilder.create()
+        .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
         .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
     return sslContext;
   }

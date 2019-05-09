@@ -20,7 +20,7 @@ server:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
    key-alias: sip
    key-store-password: "{{ sip_keystore_password }}"
-   trust-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
    trust-store-password: "{{ sip_keystore_password }}"
 
   {% endif %}
@@ -40,7 +40,7 @@ application:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
-        
+
 schema:
     file: /opt/bda/saw-storage-proxy-service/conf/proxy-schema.json
 elastic-search:

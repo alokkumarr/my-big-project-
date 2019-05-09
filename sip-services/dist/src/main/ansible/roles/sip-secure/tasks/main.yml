@@ -57,9 +57,9 @@
 
 - name: Import certificate to a truststore, create it if it doesn't exist
   java_cert:
-    cert_alias: "{{ ansible_host }}"
+    cert_alias: sip
     cert_path: "/etc/bda/{{ ansible_host }}-certificate.crt"
-    keystore_path: "{{ store_path }}/{{ ansible_host }}/keystore.jks"
+    keystore_path: "{{ store_path }}/{{ ansible_host }}/truststore.jks"
     keystore_pass: "{{ sip_keystore_password }}"
     keystore_create: yes
     state: present

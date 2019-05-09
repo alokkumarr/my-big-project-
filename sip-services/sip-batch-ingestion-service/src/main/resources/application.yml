@@ -31,7 +31,7 @@ logging:
 
 server:
   address: localhost
-  htport: 9642
+  port: 9642
   servlet:
     context-path: ''
   maxHttpHeaderSize:  65536
