@@ -277,6 +277,7 @@ public class StorageProxyController {
       @RequestParam(name = "size", required = false) Integer size,
       @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
+      @RequestParam(name = "executedBy", required = false) String executedBy,
       HttpServletRequest request,
       HttpServletResponse response)
       throws JsonProcessingException {
@@ -292,7 +293,8 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     List<Object> responseObjectFuture = null;
-//    SipQuery savedQuery = getSipQuery(sipQuery.getSemanticId(),metaDataServiceExport,request);
+      // TODO: Change this to sipQuer.getSipQuery()
+  //  SipQuery savedQuery = getSipQuery("workbench::sample-spark",metaDataServiceExport,request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -307,8 +309,7 @@ public class StorageProxyController {
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipQuery));
-      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKey);
-      // TODO: Change this to datasecNode
+      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKey); //TODO: Chnage to dataSecurityNode
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
@@ -321,6 +322,7 @@ public class StorageProxyController {
         executionResult.setData(responseObjectFuture);
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
+        executionResult.setExecutedBy(executedBy);
         proxyService.saveDslExecutionResult(executionResult);
       }
     } catch (IOException e) {

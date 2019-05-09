@@ -426,8 +426,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
-    logger.debug("DataSecurity Key : "+dataSecurityKey.toString());
-    boolean isPercentage =
+      if (dataSecurityKey == null) {
+          logger.info("DataSecurity key is not set !!");
+      } else {
+          logger.info("DataSecurityKey : " + dataSecurityKey.toString());
+      }
+      boolean isPercentage =
         dataFields.stream()
             .anyMatch(
                 dataField ->
