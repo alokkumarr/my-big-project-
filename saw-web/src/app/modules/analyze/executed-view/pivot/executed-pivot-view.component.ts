@@ -37,9 +37,6 @@ export class ExecutedPivotViewComponent {
     if (isDSLAnalysis(analysis)) {
       forEach(analysis.sipQuery.artifacts, table => {
         forEach(table.fields, field => {
-          if (field.type === 'date') {
-            field.dateInterval = field.groupInterval;
-          }
           if (field.area === 'row') {
             row.push(field);
           }
@@ -59,51 +56,57 @@ export class ExecutedPivotViewComponent {
     let rowId = 0,
       colId = 0,
       dataId = 0;
-    return map((<AnalysisDSL>analysis).sipQuery.artifacts[0].fields, artifactColumn => {
-      /* Find out if this column has been selected in row, column or data area */
-      const isRow = find(row, c => c.columnName === artifactColumn.columnName);
-      const isColumn = find(
-        column,
-        c => c.columnName === artifactColumn.columnName
-      );
-      const isData = find(
-        data,
-        c => c.columnName === artifactColumn.columnName
-      );
+    return map(
+      (<AnalysisDSL>analysis).sipQuery.artifacts[0].fields,
+      artifactColumn => {
+        /* Find out if this column has been selected in row, column or data area */
+        const isRow = find(
+          row,
+          c => c.columnName === artifactColumn.columnName
+        );
+        const isColumn = find(
+          column,
+          c => c.columnName === artifactColumn.columnName
+        );
+        const isData = find(
+          data,
+          c => c.columnName === artifactColumn.columnName
+        );
 
-      /* If column wasn't selected in any area, mark it unselected and return */
-      if (!isRow && !isColumn && !isData) {
-        return {
-          ...artifactColumn,
-          checked: false,
-          area: null,
-          areaIndex: null
-        };
-      }
+        /* If column wasn't selected in any area, mark it unselected and return */
+        if (!isRow && !isColumn && !isData) {
+          return {
+            ...artifactColumn,
+            checked: false,
+            area: null,
+            areaIndex: null
+          };
+        }
 
-      /* Otherwise, update area related fields accordingly */
-      if (isRow) {
-        return {
-          ...artifactColumn,
-          checked: true,
-          area: 'row',
-          areaIndex: isRow.areaIndex || rowId++
-        };
-      } else if (isColumn) {
-        return {
-          ...artifactColumn,
-          checked: true,
-          area: 'column',
-          areaIndex: isColumn.areaIndex || colId++
-        };
-      } else if (isData) {
-        return {
-          ...artifactColumn,
-          checked: true,
-          area: 'data',
-          areaIndex: isData.areaIndex || dataId++
-        };
+        /* Otherwise, update area related fields accordingly */
+        if (isRow) {
+          return {
+            ...artifactColumn,
+            checked: true,
+            area: 'row',
+            areaIndex: isRow.areaIndex || rowId++
+          };
+        } else if (isColumn) {
+          return {
+            ...artifactColumn,
+            checked: true,
+            area: 'column',
+            areaIndex: isColumn.areaIndex || colId++
+          };
+        } else if (isData) {
+          return {
+            ...artifactColumn,
+            checked: true,
+            area: 'data',
+            areaIndex: isData.areaIndex || dataId++
+          };
+        }
       }
-    });
+    );
   }
 }

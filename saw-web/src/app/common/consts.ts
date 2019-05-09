@@ -194,7 +194,7 @@ export const PIVOT_DATE_FORMATS_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(PIVOT_DATE_FORMATS);
 
-export const PIVOT_DEFAULT_DATE_FORMAT = PIVOT_DATE_FORMATS[1];
+export const PIVOT_DEFAULT_DATE_FORMAT = PIVOT_DATE_FORMATS[0];
 
 export const AGGREGATE_TYPES = [
   {

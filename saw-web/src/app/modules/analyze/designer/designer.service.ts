@@ -146,7 +146,7 @@ export class DesignerService {
     };
 
     const applyNonDatafieldDefaults = artifactColumn => {
-      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+      artifactColumn.groupInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
     const canAcceptDataType = canAcceptNumberType;

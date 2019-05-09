@@ -411,17 +411,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'pivot':
       if (isDSLAnalysis(this.analysis)) {
         forEach(artifacts, table => {
-          table.columns = map(table.columns, columns => {
+          table.columns = map(table.columns, column => {
             forEach((<AnalysisDSL>this.analysis).sipQuery.artifacts, fields => {
               forEach(fields.fields, field => {
-                if (field.columnName === columns.columnName) {
-                  columns.format = field.format;
-                  columns.dateInterval = field.groupInterval;
-                  columns.aliasName = field.aliasName;
+                if (field.columnName === column.columnName) {
+                  column.format = field.format;
+                  column.aliasName = field.aliasName;
                 }
               });
             });
-            return columns;
+            return column;
           });
         });
       }

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import * as isEmpty from 'lodash/isEmpty';
+import * as flatMap from 'lodash/flatMap';
 import { BehaviorSubject } from 'rxjs';
 
 import { Artifact, ArtifactColumnPivot } from '../types';
@@ -13,9 +13,7 @@ import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot
 export class DesignerPivotComponent {
   @Input('artifacts')
   set setArtifactColumns(artifacts: Artifact[]) {
-    if (!isEmpty(artifacts)) {
-      this.artifactColumns = [...artifacts[0].columns] as ArtifactColumnPivot[];
-    }
+    this.artifactColumns = flatMap(artifacts, artifact => artifact.fields);
   }
   @Input() data;
   @Input() sorts: any[];
