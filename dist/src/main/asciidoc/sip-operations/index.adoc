@@ -370,6 +370,39 @@ Execute the following steps to install SIP product modules:
         cd saw
         ./sip-deploy-module <sip-config> <sip-module-package>
 
+== Security
+
+SIP sends data over the network and store data in persistent storage
+in an unencrypted form by default.  Optionally, SIP can be configured
+to encrypt data in flight and at rest.  Encryption can be enabled by
+adding the following to the SIP environment configuration file
+(`sip-config`), before the initial installation.
+
+        [all:vars]
+        sip_secure=True
+ 
+NOTE: The `sip_secure` configuration parameter must be set before the
+first installation of SIP and not changed thereafter.  Changing the
+value after the initial installation for an existing environment is
+not supported.
+
+=== Data in flight
+
+Enabling the secure mode will make SIP use HTTPS for communication
+between services and when acting as a client to the internal MariaDB
+Galera cluster, Elasticsearch cluster and MapR cluster.
+
+Connections between SIP services are secured using certificates signed
+by an internal certificate authority (CA).  The CA is located on the
+SIP node with the `sip-admin` role.
+
+=== Data at rest
+
+Enabling the secure mode will make the SIP internal MariaDB Galera
+cluster encrypt data stored in the database.  Database encryption is
+set up automatically on the first installation and happens thereafter
+transparently.
+
 == Monitoring
 
 To support monitoring of a SIP environment, services expose health
