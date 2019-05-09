@@ -96,3 +96,4 @@ export interface AnalysisChartDSL extends AnalysisBaseDSL {
 }
 
 export type AnalysisDSL = AnalysisChartDSL;
+export type AnalysisPivotDSL = AnalysisBaseDSL;

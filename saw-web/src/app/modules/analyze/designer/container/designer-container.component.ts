@@ -127,6 +127,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   public areMinRequirmentsMet = false;
 
   get chartType(): string {
+    if (!['map', 'chart'].includes(this.analysis.type)) {
+      return;
+    }
     return isDSLAnalysis(this.analysis)
       ? this._store.selectSnapshot(DesignerState).analysis.chartOptions
           .chartType
@@ -227,7 +230,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       .getArtifactsForDataSet(semanticId)
       .toPromise();
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
-
     return Promise.all([artifacts$, newAnalysis$]).then(
       ([metric, newAnalysis]) => {
         this._store.dispatch(

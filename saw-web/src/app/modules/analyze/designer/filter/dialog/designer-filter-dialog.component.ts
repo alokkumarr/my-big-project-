@@ -21,7 +21,7 @@ import { ArtifactDSL } from '../../../../../models';
 export interface DesignerFilterDialogData {
   filters: Filter[];
   booleanCriteria?: string;
-  artifacts: Artifact[] | ArtifactDSL[];
+  artifacts;
   isInRuntimeMode: boolean;
   supportsGlobalFilters?: boolean;
 }

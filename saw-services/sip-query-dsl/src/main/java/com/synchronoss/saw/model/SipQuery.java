@@ -37,6 +37,9 @@ public class SipQuery {
   @JsonProperty("query")
   private String query;
 
+  @JsonProperty("semanticId")
+  private String semanticId;
+
   @JsonProperty("artifacts")
   public List<Artifact> getArtifacts() {
     return artifacts;
@@ -107,7 +110,17 @@ public class SipQuery {
     this.query = query;
   }
 
-  @Override
+  @JsonProperty("semanticId")
+  public String getSemanticId() {
+    return semanticId;
+  }
+
+  @JsonProperty("semanticId")
+  public void setSemanticId(String semanticId) {
+    this.semanticId = semanticId;
+  }
+
+    @Override
   public String toString() {
     return new ToStringBuilder(this)
         .append("artifacts", artifacts)

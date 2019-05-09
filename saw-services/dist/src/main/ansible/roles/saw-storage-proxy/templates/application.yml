@@ -39,3 +39,7 @@ elastic-xpack :
 
 metastore:
     base:  {{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip/') }}
+
+metadata:
+  service:
+    host: http://localhost:9501
