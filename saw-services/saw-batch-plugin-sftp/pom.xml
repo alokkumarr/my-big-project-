@@ -11,8 +11,8 @@
 		<relativePath></relativePath>
 	</parent>
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-batch-plugin-sftp</artifactId>
-	<name>saw-batch-plugin-sftp</name>
+	<artifactId>sip-batch-plugin-sftp</artifactId>
+	<name>sip-batch-plugin-sftp</name>
 	<packaging>jar</packaging>
 	<version>${revision}</version>
 	<properties>
@@ -180,12 +180,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-batch-plugin-interfaces</artifactId>
+			<artifactId>sip-batch-plugin-interfaces</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-batch-log-service</artifactId>
+			<artifactId>sip-batch-log-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>

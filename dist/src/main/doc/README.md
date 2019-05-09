@@ -9,11 +9,11 @@ modules themselves in a single package.
 To deploy SAW to an environment, execute the following command in this
 directory:
 
-        ./saw-deploy <saw-config>
+        ./sip-deploy <sip-config>
 
 The lone argument is the path to a SAW environment configuration file,
 which needs to be set up for each environment individually.  A sample
-configuration can be found in the `saw-config` file, which defaults to
+configuration can be found in the `sip-config` file, which defaults to
 installing on "localhost".
 
 For more details on deploying SAW, see the SAW Operations Guide, which

@@ -1,9 +1,3 @@
-<div fxLayout="row" fxLayoutAlign="center center">
-  <h1 class="title" [textContent]="analysis.chartTitle || analysis.name"></h1>
-</div>
+<chart-grid [data]="data" [analysis]="analysis" [updater]="updater">
+</chart-grid>
 
-<map-box
-  [data]="data"
-  [sqlBuilder]="analysis.sqlBuilder"
-  [mapSettings]="analysis.mapOptions"
-></map-box>

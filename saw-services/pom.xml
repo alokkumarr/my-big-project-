@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.synchronoss</groupId>
-	<artifactId>saw-services</artifactId>
+	<artifactId>sip-services</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>saw-services</name>
+	<name>sip-services</name>
 	<url>http://www.synchronoss.com</url>
 
 	<inceptionYear>2016</inceptionYear>
@@ -196,6 +196,7 @@
 		<module>saw-batch-ingestion-service</module>
 		<module>saw-batch-plugin-interfaces</module>
 		<module>saw-batch-plugin-sftp</module>
+		<module>sip-batch-plugin-s3</module>
     <module>sip-common-components</module>
 		<module>dist</module>
 	</modules>

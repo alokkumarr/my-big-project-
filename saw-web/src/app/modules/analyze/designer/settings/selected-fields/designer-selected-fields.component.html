@@ -37,8 +37,8 @@
     >
       <ng-container *ngIf="col.aggregate; else defaultTemplate">
         <span
-          [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate].label"
-          [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate].designerLabel"
+          [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].label"
+          [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].designerLabel"
         >
         </span>
         <span> (&nbsp;{{ col.displayName || col.alias }}&nbsp;) </span>

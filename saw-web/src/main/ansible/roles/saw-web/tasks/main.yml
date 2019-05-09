@@ -6,7 +6,7 @@
   systemd: name=tomcat enabled=true state=started
 - name: Copy SAW Web package
   copy: src="{{ item }}" dest=/tmp/saw-web.rpm
-  with_fileglob: ["../rpms/saw-web-*.rpm"]
+  with_fileglob: ["../rpms/sip-web-*.rpm"]
 - name: Install SAW Web package
   yum: name=/tmp/saw-web.rpm state=present
   # Workaround: Any previously deployed and exploded WAR needs to be

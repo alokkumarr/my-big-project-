@@ -6,7 +6,7 @@
     <mat-icon
       *ngIf="toggleToGrid"
       class="mat-icon material-icons"
-      roleπ="img"
+      role="img"
       (click)="exportGridToExcel()"
       matTooltip="Export Grid Data"
     >
@@ -20,10 +20,19 @@
     >
     </mat-icon>
     <mat-icon
+      *ngIf="analysis.type == 'chart'"
       fontIcon="icon-vert-bar-chart"
       (click)="viewToggle(false)"
       [class.active]="!toggleToGrid"
       matTooltip="Toggle to Chart"
+    >
+    </mat-icon>
+    <mat-icon
+      *ngIf="analysis.type == 'map'"
+      fontIcon="icon-geo-chart"
+      (click)="viewToggle(false)"
+      [class.active]="!toggleToGrid"
+      matTooltip="Toggle to Map"
     >
     </mat-icon>
   </div>
@@ -57,18 +66,35 @@
   </dx-data-grid>
 </div>
 
-<div *ngIf="!toggleToGrid">
-  <chart
-    [updater]="updater"
-    [options]="chartOptions"
-    [chartType]="
-      analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType
-    "
-    [enableExport]="true"
-    [attr.e2e]="
-      'chart-type:' +
-      (analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType)
-    "
-  >
-  </chart>
-</div>
+<chart
+  *ngIf="!toggleToGrid && analysis.type == 'chart'"
+  [updater]="updater"
+  [options]="chartOptions"
+  [chartType]="
+    analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType
+  "
+  [enableExport]="true"
+  [attr.e2e]="
+    'chart-type:' +
+    (analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType)
+  "
+>
+</chart>
+
+<map-box
+  *ngIf="!toggleToGrid && analysis.chartType == 'map'"
+  [data]="data"
+  [sqlBuilder]="analysis.sqlBuilder"
+  [mapSettings]="analysis.mapSettings"
+  [attr.e2e]="'map-type-' + analysis.chartType"
+></map-box>
+
+<map-chart-viewer
+  *ngIf="!toggleToGrid && analysis.chartType == 'chart_scale'"
+  [chartType]="analysis.chartType"
+  [data]="data"
+  [analysis]="analysis"
+  [updater]="updater"
+  [attr.e2e]="'map-type-' + analysis.chartType"
+>
+</map-chart-viewer>

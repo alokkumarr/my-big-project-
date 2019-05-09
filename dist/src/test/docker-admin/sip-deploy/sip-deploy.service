@@ -1,0 +1,13 @@
+[Unit]
+Description=SIP test deployer
+After=default.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/sip-deploy
+Environment=container=docker
+Environment=service=1
+SyslogIdentifier=sip-deploy
+
+[Install]
+WantedBy=default.target

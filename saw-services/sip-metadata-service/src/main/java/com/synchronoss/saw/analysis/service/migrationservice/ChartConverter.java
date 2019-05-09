@@ -78,7 +78,7 @@ public class ChartConverter implements AnalysisSipDslConverter {
     if (fieldObject.has("checked")) {
       String checkedVal = fieldObject.get("checked").getAsString();
 
-      field.setArea(checkedVal + "-axis");
+      field.setArea(checkedVal);
     }
 
     // Set limit fields

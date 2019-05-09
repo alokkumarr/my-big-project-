@@ -19,10 +19,10 @@ import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
-import com.synchronoss.saw.batch.sftp.integration.SipLogging;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisFileLog;
+import com.synchronoss.saw.logs.service.SipLogging;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -138,8 +138,8 @@ public class SftpServiceImpl extends SipPluginContract {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
-  
-  private static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
+
+  public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
 
   @PostConstruct
   private void init() throws Exception {
@@ -698,16 +698,16 @@ public class SftpServiceImpl extends SipPluginContract {
                 logger.trace("Last modified hours limit configured:" 
                     + lastModifiedHoursLmt);
               }
-             
+
             }
-            
-            
-            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId) 
+
+
+            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId)
                      && source.equals(SourceType.REGULAR.name())) {
-            
-              logger.info("Already process running for the route" + routeId 
+
+              logger.info("Already process running for the route" + routeId
                     + "and concurrency disabled hence skipping transfer");
-            
+
             } else {
               logger.trace("invocation of method transferData when "
                          + "directory is availble in destination with "
@@ -716,20 +716,20 @@ public class SftpServiceImpl extends SipPluginContract {
               Thread thread = Thread.currentThread();
               SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
               logger.info(
-                         "Transfer data started with routeId: " + routeId 
+                         "Transfer data started with routeId: " + routeId
                          + " started time: " + new Date());
               logger.info("Thread Id started with: " + thread);
               ZonedDateTime fileTransStartTime = ZonedDateTime.now();
               // Adding to a list has been removed as a part of optimization
               // SIP-6386
               transferDataFromChannel(template, sourceLocation, filePattern,
-                         destinationLocation, channelId, routeId, 
+                         destinationLocation, channelId, routeId,
                          fileExclusions, isDisable, source,lastModifiedHoursLmt);
               ZonedDateTime fileTransEndTime = ZonedDateTime.now();
               long durationInMillis =
                          Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
               logger.info(
-                         "Transfer data ended with routeId: " + routeId 
+                         "Transfer data ended with routeId: " + routeId
                          + " ended time: " + new Date());
               logger.info("Thread Id ended with: " + thread);
               logger.info("Total time taken in seconds to complete the "
@@ -768,7 +768,7 @@ public class SftpServiceImpl extends SipPluginContract {
   /**
    * Transfer files from given directory, recursing into each subdirectory.
    */
-  private List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
+  public List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId, String exclusions, boolean isDisableDuplicate, 
       String source, int filesModifiedInLast)
@@ -1208,7 +1208,7 @@ public class SftpServiceImpl extends SipPluginContract {
     }
     return exists;
   }
-  
+
   /**
    * This is method to handle inconsistency during failure.
    * Step1: Check if any long running process with 'InProgress'
@@ -1472,7 +1472,7 @@ public class SftpServiceImpl extends SipPluginContract {
       logger.trace("Corrupted file does not exist.");
     }
   }
-  
-  
- 
+
+
+
 }
