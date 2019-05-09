@@ -462,6 +462,10 @@
                 </network>
                 <ports>
                   <port>+saw.docker.ip:saw.docker.port:80</port>
+                  <!-- Allow browsers to connect to "https://" URLs
+                       using the default HTTPS port 443, when SIP has
+                       been deployed with sip_secure=True -->
+                  <port>+saw.docker.ip:443:80</port>
                   <port>+saw.docker.ip:saw.squid.port:3128</port>
                 </ports>
                 <privileged>true</privileged>
