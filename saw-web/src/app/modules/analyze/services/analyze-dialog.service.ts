@@ -16,6 +16,7 @@ import {
   isDSLAnalysis
 } from '../types';
 import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
+import { Store } from '@ngxs/store';
 import {
   DesignerFilterDialogComponent,
   DesignerFilterDialogData
@@ -28,7 +29,7 @@ import { ConfirmDialogData } from '../../../common/types';
 
 @Injectable()
 export class AnalyzeDialogService {
-  constructor(public dialog: MatDialog, private router: Router) {}
+  constructor(public dialog: MatDialog, private router: Router,  private _store: Store) {}
 
   openNewAnalysisDialog(analysisStarter: AnalysisStarter) {
     const data: AnalysisDialogData = {
@@ -103,11 +104,10 @@ export class AnalyzeDialogService {
   }
 
   openFilterPromptDialog(filters, analysis: Analysis | AnalysisDSL) {
-    console.log(analysis);
     const data: DesignerFilterDialogData = {
       filters,
       artifacts: isDSLAnalysis(analysis)
-        ? analysis.sipQuery.artifacts
+        ? this._store.selectSnapshot(state => state.common.metrics[analysis.semanticId]).artifacts
         : analysis.artifacts,
       isInRuntimeMode: true
     };
