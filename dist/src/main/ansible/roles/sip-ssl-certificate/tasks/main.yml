@@ -1,33 +1,4 @@
 # Creating store & certificate to every node for all service to be used by server & client
-- name: Ensure a list of packages installed
-  yum:
-    name: "{{ packages }}"
-    state: present
-  vars:
-    packages:
-    - python
-    - python-setuptools
-
-- name: Installing pip on all saw-services hosts
-  easy_install:
-    name: pip
-    state: present
-
-- name: Installing libraries on all saw-services hosts using Ansible pip module
-  pip:
-    name: "{{ packages }}"
-    extra_args: --ignore-installed -U
-  vars:
-    packages:
-    - ipaddress
-    - enum34
-    - pyOpenSSL==19.0.0
-
-- name: Removing existing pyOpenSSL if exists
-  yum:
-    name: pyOpenSSL
-    autoremove: true
-
 - name: Ensure directory exists for local self-signed TLS certs.
   file:
     path: "{{ inventory_dir }}/certificate"

@@ -76,3 +76,34 @@
   command: systemctl stop saw-*.socket
 - name: Stop systemd units with old SAW prefix before upgrading
   command: systemctl stop saw-*
+- name: Ensure a list of packages installed
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - python
+    - python-setuptools
+
+- name: Installing pip on all saw-services hosts
+  easy_install:
+    name: pip
+    state: present
+
+- name: Installing libraries on all saw-services hosts using Ansible pip module
+  pip:
+    name: "{{ packages }}"
+    extra_args: --ignore-installed -U
+  vars:
+    packages:
+    - ipaddress
+    - enum34
+    - pyOpenSSL==19.0.0
+
+- name: Removing existing pyOpenSSL if exists
+  yum:
+    name: pyOpenSSL
+    autoremove: true
+ 
+ 
+ 
