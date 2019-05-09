@@ -176,9 +176,9 @@ class DashboardFunctions {
         return null;
       }
       const analysisId =
-      analysisType === Constants.CHART || analysisType == Constants.PIVOT
-        ? createdAnalysis.analysis.id
-        : createdAnalysis.contents.analyze[0].id;
+        analysisType === Constants.CHART || analysisType == Constants.PIVOT
+          ? createdAnalysis.analysis.id
+          : createdAnalysis.contents.analyze[0].executionId.split('::')[0];
       const analysis = {
         analysisName: name,
         analysisId: analysisId
