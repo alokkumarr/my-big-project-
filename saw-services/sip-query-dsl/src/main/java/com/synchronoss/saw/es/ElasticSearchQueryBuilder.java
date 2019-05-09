@@ -41,14 +41,13 @@ public class ElasticSearchQueryBuilder {
   private static final String EPOCH_MILLIS = "epoch_millis";
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
-  String dataSecurityString;
   private static String appenderForGTLTE = "||/M";
 
   public String buildDataQuery(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
       throws IOException, ProcessingException {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
-      DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
+    DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
     if (size == null || size.equals(0)) size = 1000;
     searchSourceBuilder.size(size);
     if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
@@ -64,9 +63,8 @@ public class ElasticSearchQueryBuilder {
       List<Filter> filters = sipQuery.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
 
+      builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode, builder);
       builder = buildFilters(filters, builder);
-
-        builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder); 
 
       boolQueryBuilder = buildBooleanQuery(sipQuery, builder);
       searchSourceBuilder.query(boolQueryBuilder);

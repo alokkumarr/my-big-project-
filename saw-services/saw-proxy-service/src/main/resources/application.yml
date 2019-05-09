@@ -31,4 +31,10 @@ elastic-xpack :
           cluster-password: xuw3dUraHapret
 metastore:
     base:  hdfs:///main/
+
+metadata:
+  service:
+    host: http://localhost:9501
+
+
          
