@@ -1,6 +1,7 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
@@ -293,15 +295,14 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     List<Object> responseObjectFuture = null;
-      // TODO: Change this to sipQuer.getSipQuery()
-  //  SipQuery savedQuery = getSipQuery("workbench::sample-spark",metaDataServiceExport,request);
+    SipQuery savedQuery = getSipQuery(sipQuery.getSemanticId(),metaDataServiceExport,request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
-//    DataSecurityKey dataSecurityKeyNode =
-//        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery.getArtifacts(), dataSecurityKey);
+    DataSecurityKey dataSecurityKeyNode =
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery.getArtifacts(), dataSecurityKey);
 
       try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
@@ -309,7 +310,7 @@ public class StorageProxyController {
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipQuery));
-      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKey); //TODO: Chnage to dataSecurityNode
+      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKeyNode);
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
