@@ -16,9 +16,8 @@
         <java.version>1.8</java.version>
         <maven.assembly.version>2.5.5</maven.assembly.version>
         <project.basedir>.</project.basedir>
-        <mapr.client>6.0.1-mapr</mapr.client>
+      <!--TODO: Check this version-->
         <hbase.version>1.1.8-mapr-1710-m7-6.0.1</hbase.version>
-        <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
         <common.lang>2.6</common.lang>
     </properties>
     <dependencies>

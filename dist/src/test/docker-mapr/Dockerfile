@@ -75,7 +75,7 @@ RUN systemctl enable sip-mapr-configure
 #COPY mapr-spark-worker.service /etc/systemd/system/
 #RUN systemctl enable mapr-spark-worker
 #
-#ENV spark_home=/opt/mapr/spark/spark-2.2.1
+#ENV spark_home=/opt/mapr/spark/spark-2.3.2
 #RUN echo "export SPARK_MASTER_HOST=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo "export SPARK_MASTER_IP=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo 'export SPARK_DIST_CLASSPATH=$MAPR_SPARK_CLASSPATH:$(hadoop classpath)' >> $spark_home/conf/spark-env.sh
@@ -84,7 +84,7 @@ RUN systemctl enable sip-mapr-configure
 
 # Install Apache Livy
 RUN yum -y -q install mapr-livy
-ENV livy_home=/opt/mapr/livy/livy-0.3.0
+ENV livy_home=/opt/mapr/livy/livy-0.5.0
 ENV livy_conf=$livy_home/conf/livy.conf
 RUN echo "livy.spark.master = local[*]" > $livy_conf
 # Workaround: The Workbench JAR exceeds the default maximum upload

@@ -26,8 +26,13 @@
     <json-core>1.2.5</json-core>
     <jjwt.version>0.7.0</jjwt.version>
     <metadata.api>${revision}</metadata.api>
-    <mapr.db.version>6.0.1-mapr</mapr.db.version>
+    <mapr.db.version>6.1.0-mapr</mapr.db.version>
+    <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
     <jjwt.version>0.7.0</jjwt.version>
+    <spark-version>2.3.2</spark-version>
+
+    <!-- TODO: Check livy version 0.5.0 (not getting resolved) -->
+    <livy.version>0.5.0-incubating</livy.version>
   </properties>
 
   <dependencies>
@@ -246,13 +251,13 @@
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.11</artifactId>
-      <version>2.2.1</version>
+      <version>${spark-version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_2.11</artifactId>
-      <version>2.2.1</version>
+      <version>${spark-version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -262,9 +267,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.cloudera.livy</groupId>
+      <groupId>org.apache.livy</groupId>
       <artifactId>livy-client-http</artifactId>
-      <version>0.3.0</version>
+      <version>${livy.version}</version>
     </dependency>
 
     <dependency>
@@ -275,7 +280,7 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client</artifactId>
-      <version>2.7.0-mapr-1803</version>
+      <version>${mapr.hadoop.client.version}</version>
       <scope>provided</scope>
     </dependency>
 

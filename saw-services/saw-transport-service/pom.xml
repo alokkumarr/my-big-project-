@@ -18,9 +18,8 @@
         <project.basedir>.</project.basedir>
         <play2.version>2.5.10</play2.version>
         <play2.plugin.version>1.0.0-beta5</play2.plugin.version>
-        <mapr.client>6.0.1-mapr</mapr.client>
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
-        <io.netty.version>4.0.42.Final</io.netty.version>
+        <io.netty.version>4.1.36.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
         <rpm.bda.root>/opt</rpm.bda.root>
         <rpm.release>1</rpm.release>
@@ -29,11 +28,12 @@
         <scala.major.version>2.11</scala.major.version>
         <app.user>mapr</app.user>
         <app.group>mapr</app.group>
-        <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
         <es.version>6.3.0</es.version>
         <threeten.extra>1.2</threeten.extra>
         <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
         <rpm.ts.root>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}</rpm.ts.root>
+
+      <!--TODO: Check this version-->
         <hbase.version>1.1.8-mapr-1710-m7-6.0.1</hbase.version>
     </properties>
     <dependencies>
@@ -465,13 +465,13 @@
         <dependency>
           <groupId>com.mapr.streams</groupId>
           <artifactId>mapr-streams</artifactId>
-          <version>6.0.1-mapr</version>
+          <version>${mapr.streams.version}</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>org.apache.kafka</groupId>
           <artifactId>kafka-clients</artifactId>
-          <version>1.0.1-mapr-1803</version>
+          <version>${kafka.client.version}</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
@@ -797,9 +797,9 @@
                       <file>rpm-scripts/preremove</file>
                     </beforeRemoval>
                     <requires>
-                      <require>mapr-client &gt;= 6.0.1</require>
-                      <require>mapr-spark &gt;= 2.2.1</require>
-                      <require>mapr-kafka &gt;= 1.0.1</require>
+                      <require>mapr-client &gt;= 6.1.0</require>
+                      <require>mapr-spark &gt;= 2.3.2</require>
+                      <require>mapr-kafka &gt;= 1.1.1</require>
                       <require>mapr-hbase &gt;= 1.1.8</require>
                       <require>perl &gt;= 5.16.3</require>
                     </requires>

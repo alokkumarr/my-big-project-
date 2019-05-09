@@ -15,10 +15,9 @@
 		<java.version>1.8</java.version>
 		<maven.assembly.version>2.5.5</maven.assembly.version>
 		<project.basedir>.</project.basedir>
+
+    <!-- TODO: check this version -->
 		<hbase.version>1.1.8-mapr-1710-m7-6.0.1</hbase.version>
-		<mapr.client>6.0.1-mapr</mapr.client>
-		<mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
-		<spark-version>2.2.1</spark-version>
 	</properties>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->

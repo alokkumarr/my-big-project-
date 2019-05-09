@@ -19,7 +19,7 @@ unmanagedJars := Seq.empty[sbt.Attributed[java.io.File]]
 
 //Generic Java modules and libraries
 libraryDependencies ++= Seq(
-  "com.mapr" % "mapr-release" % "6.0.1-mapr",
+  "com.mapr" % "mapr-release" % "6.1.0-mapr",
   "org.reactivemongo" %% "reactivemongo-play-json" % "0.11.11",
   "ch.qos.logback" % "logback-classic" % "1.0.13",
   "org.elasticsearch.client" % "transport" % "5.3.0",
@@ -40,11 +40,11 @@ libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.3.0"
 
 libraryDependencies += "org.apache.hbase" % "hbase-client" % "1.1.8-mapr-1710-m7-6.0.1"
 libraryDependencies += "org.apache.hbase" % "hbase-common" % "1.1.8-mapr-1710-m7-6.0.1"
-libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0-mapr-1803"
-libraryDependencies += "com.mapr.streams" % "mapr-streams" % "6.0.1-mapr"
-libraryDependencies += "org.apache.kafka" % "kafka-clients" % "1.0.1-mapr-1803"
-libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "2.2.1"
-libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "2.2.1"
+libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0-mapr-1808"
+libraryDependencies += "com.mapr.streams" % "mapr-streams" % "6.1.0-mapr"
+libraryDependencies += "org.apache.kafka" % "kafka-clients" % "1.0.1-mapr-1808"
+libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "2.3.2"
+libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "2.3.2"
 
 libraryDependencies += "org.asynchttpclient" % "async-http-client" % "2.0.0"
 libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.2"
@@ -53,7 +53,7 @@ libraryDependencies += "org.apache.httpcomponents" % "httpcore" % "4.4.5"
 libraryDependencies += "commons-httpclient" % "commons-httpclient" % "3.1"
 libraryDependencies += "org.threeten" % "threeten-extra" % "1.2"
 
-libraryDependencies += "com.typesafe.play" %% "filters-helpers" % "2.5.10"
+libraryDependencies += "com.typesafe.play" %% "filters-helpers" % "2.7.2"
 
 
 
