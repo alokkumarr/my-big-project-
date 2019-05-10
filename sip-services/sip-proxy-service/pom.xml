@@ -255,7 +255,7 @@
 					    The spring-boot-start-test dependency adds JUnit in the
 					    compile scope so exclude JUnit explicitly from packaging
 					-->
-					<excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,junit,org.ojai,org.scala-lang</excludeGroupIds>
+					<excludeGroupIds>com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,junit,org.ojai,org.scala-lang</excludeGroupIds>
 					<layout>ZIP</layout>
 				</configuration>
 			</plugin>
