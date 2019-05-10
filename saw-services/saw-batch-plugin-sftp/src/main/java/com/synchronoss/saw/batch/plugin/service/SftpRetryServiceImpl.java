@@ -14,6 +14,7 @@ import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.logs.constants.SourceType;
+import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 
 import java.util.ArrayList;
@@ -109,6 +110,9 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                         destinationLocation, channelId, routeId, 
                         fileExclusions, isDisable, SourceType.RETRY.name(),
                         lastModifiedHoursLmt, jobId));
+                BisJobEntity job = sipLogService.retriveJobById(jobId);
+                job.setJobStatus("INPROGRESS");
+                sipLogService.saveJob(job);
                 
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);

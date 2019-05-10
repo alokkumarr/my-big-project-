@@ -786,6 +786,7 @@ public class SftpServiceImpl extends SipPluginContract {
       sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
           BisComponentState.HOST_NOT_REACHABLE.value(), BisProcessState.FAILED.value(),
           source, jobEntity.getJobId());
+      sipLogService.updateJobLog(jobEntity.getJobId(), "FAILED", 0, 0);
     }
     logger.trace(
         "TransferData ends here with the channelId " + channelId + " and routeId " + routeId);
