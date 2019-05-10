@@ -410,16 +410,22 @@ public class QueryBuilderUtil {
    */
   public static DataSecurityKey checkDSKApplicableAnalysis(
       List<Artifact> artifactList, DataSecurityKey dataSecurityKey) {
+    List<DataSecurityKeyDef> dataSecurityKeyDefList = dataSecurityKey.getDataSecuritykey();
+    List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
     String artifactName = null;
     List<Field> fieldList;
     for (Artifact artifact : artifactList) {
       artifactName = artifact.getArtifactsName();
       fieldList = artifact.getFields();
-      if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKey)) {
-        return dataSecurityKey;
+      for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
+        if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
+          dataSecurityKeyDefs.add(dataSecurityKeyDef);
+        }
       }
     }
-    return null;
+    DataSecurityKey dataSecurityKeyNew = new DataSecurityKey();
+    dataSecurityKeyNew.setDataSecuritykey(dataSecurityKeyDefs);
+    return dataSecurityKeyNew;
   }
 
   /**
@@ -428,14 +434,13 @@ public class QueryBuilderUtil {
    *
    * @param artifactName
    * @param fieldList
-   * @param dataSecurityKey
+   * @param dataSecurityKeyDef
    * @return
    */
   public static boolean checkDSKApplicableAnalysis(
-      String artifactName, List<Field> fieldList, DataSecurityKey dataSecurityKey) {
-    List<DataSecurityKeyDef> dataSecurityKeyDefList = dataSecurityKey.getDataSecuritykey();
-    for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-      return isColumnApplicable(artifactName, fieldList, dataSecurityKeyDef);
+      String artifactName, List<Field> fieldList, DataSecurityKeyDef dataSecurityKeyDef) {
+    if (isColumnApplicable(artifactName, fieldList, dataSecurityKeyDef)) {
+      return true;
     }
 
     return false;
