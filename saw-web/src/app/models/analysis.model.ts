@@ -30,6 +30,7 @@ export interface Analysis {
   id: string;
   isScheduled: string;
   mapSettings?: MapSettings;
+  modifiedTime?: string;
   metric: string;
   metricId: string;
   metricName: string;

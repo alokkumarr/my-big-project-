@@ -355,8 +355,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         finished: null
       }
     ).finished;
-
     this.executedAt = finished ? this.utcToLocal(finished) : this.executedAt;
+    if (isUndefined(this.executedAt)) {
+      this.executedAt = moment(this.analysis.modifiedTime).local().format('YYYY/MM/DD h:mm A');
+    }
   }
 
   loadExecutedAnalyses(analysisId, isDSL) {
