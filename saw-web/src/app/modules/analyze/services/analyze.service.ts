@@ -502,7 +502,7 @@ export class AnalyzeService {
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&ExecutionType=${mode}&executedBy=${this._jwtService.getLoginId()}`,
+        }&ExecutionType=${mode}`,
         model.sipQuery
       )
       .pipe(
