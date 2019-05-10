@@ -1,7 +1,13 @@
 import { environment } from './src/environments/environment';
 
 let apiUrl;
-const endpoints = { security: 'security', services: 'services' };
+const endpoints = {
+  security: 'security',
+  services: 'services',
+  productModules: 'pm',
+  weatherData: 'weatherdata',
+  staticMap: 'staticmap'
+};
 
 /* eslint-disable */
 if (environment.production) {
@@ -22,6 +28,8 @@ export default {
   },
   api: {
     url: `${apiUrl}/${endpoints.services}`,
-    pluginUrl: `${apiUrl}/web`
+    productModulesUrl: `${apiUrl}/${endpoints.productModules}`,
+    weatherDataUrl: `${apiUrl}/${endpoints.weatherData}`,
+    staticMapUrl: `${apiUrl}/${endpoints.staticMap}`
   }
 };

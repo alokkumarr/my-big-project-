@@ -17,6 +17,7 @@ import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { environment } from '../../../environments/environment';
 import { MarkerDataPoint } from './types';
+import API_URL from '../../../../appConfig';
 
 @Component({
   selector: 'map-box',
@@ -81,7 +82,8 @@ export class MapBoxComponent implements OnChanges {
     // console.log('attributeStyleMap', canvas[0]);
     const [lng, lat] = this.center;
     const style = last(split(this.mapStyle, '/'));
-    const base = 'https://api.mapbox.com/styles/v1/mapbox';
+    const apiBaseURL = get(API_URL, 'api.staticMapUrl');
+    const base = `${apiBaseURL}/styles/v1/mapbox`;
     const url = `${base}/${style}/static/${lng},${lat},${
       this.zoom
     },0,0/${size}?access_token=${token}`;
