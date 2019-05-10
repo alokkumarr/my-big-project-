@@ -34,12 +34,12 @@
         sip_keystore_password: >-
           {{ lookup('password', inventory_dir
             + '/sip-keystore-password chars=ascii_letters,digits') }}
-        #when: sip_secure
+        when: sip_secure
 
     - name: Setting the keystore store path
       set_fact:
         store_path: /etc/bda/keystore
-      #when: sip_secure
+      when: sip_secure
 
 - import_playbook: modules/sip-security/ansible/site.yml
 - import_playbook: modules/sip-services/ansible/site.yml
