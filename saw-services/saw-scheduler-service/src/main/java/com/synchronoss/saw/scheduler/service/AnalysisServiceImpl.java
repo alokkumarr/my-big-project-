@@ -229,19 +229,19 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     @Override
     public void executeDslAnalysis(String analysisId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
         String dslUrl = metadataAnalysisUrl + "/" + analysisId;
         logger.debug("URL for SIP Query :" + dslUrl);
         TempAnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, TempAnalysisResponse.class);
 
         logger.debug("Analysis body :" + analysisResponse.getAnalysis());
         JsonNode sipQuery = analysisResponse.getAnalysis().get("sipQuery");
-        logger.debug("SIP Query :" + analysisResponse.getAnalysis());
+        logger.debug("SIP Query :" + analysisResponse.getAnalysis().get("sipQuery"));
 
         String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType="+"scheduled";
-        HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery, headers);
+        HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
 
-        restTemplate.postForObject(url, requestEntity, String.class);
+        JsonNode jsonNode = restTemplate.postForObject(url, requestEntity, JsonNode.class);
+        logger.debug("Execute Scheduler Response :" + jsonNode.asText());
+
     }
 }

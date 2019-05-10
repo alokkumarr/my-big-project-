@@ -30,10 +30,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -288,12 +285,12 @@ public class StorageProxyController {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
     Ticket authTicket = getTicket(request);
-    if (authTicket == null) {
+		if (authTicket == null && !executionType.equals(ExecutionType.scheduled)) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
+    List<TicketDSKDetails> dskList = authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
     SipQuery savedQuery = getSipQuery(sipQuery.getSemanticId(),metaDataServiceExport,request);
     ObjectMapper objectMapper = new ObjectMapper();
