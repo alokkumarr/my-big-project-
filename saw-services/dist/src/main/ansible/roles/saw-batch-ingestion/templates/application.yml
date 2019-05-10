@@ -53,6 +53,10 @@ application:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
+transfer:
+  core-pool-size: 10
+  max-pool-size: 50
+  queue-capacity: 10000
 sip:
   service:
     index: {{ groups['saw-services'].index(inventory_hostname) }}

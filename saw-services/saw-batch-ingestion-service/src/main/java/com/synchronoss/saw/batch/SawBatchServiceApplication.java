@@ -6,6 +6,7 @@ import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ExitCodeEvent;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -42,6 +43,13 @@ public class SawBatchServiceApplication {
 
   @Autowired
   private Environment environment;
+  
+  @Value("${transfer.core-pool-size}")
+  private String transferCorePoolSize; 
+  @Value("${transfer.max-pool-size}")
+  private String transferMaxPoolSize;
+  @Value("${transfer.queue-capacity}")
+  private String transferQueueCapacity;
 
   /**
    * This is the entry method of the class.
@@ -123,8 +131,9 @@ public class SawBatchServiceApplication {
   public TaskExecutor transferWorkerExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
-    executor.setMaxPoolSize(10);
+    executor.setMaxPoolSize(50);
     executor.setQueueCapacity(25);
+    executor.setThreadNamePrefix("Transferworker-");
 
     return executor;
   }
