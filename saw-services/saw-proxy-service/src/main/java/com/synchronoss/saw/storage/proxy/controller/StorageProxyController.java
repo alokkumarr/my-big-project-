@@ -279,7 +279,6 @@ public class StorageProxyController {
       @RequestParam(name = "size", required = false) Integer size,
       @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
-      @RequestParam(name = "executedBy", required = false) String executedBy,
       HttpServletRequest request,
       HttpServletResponse response)
       throws JsonProcessingException {
@@ -301,6 +300,7 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+    String executedBy = authTicket.getMasterLoginId();
     DataSecurityKey dataSecurityKeyNode =
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery.getArtifacts(), dataSecurityKey);
 
