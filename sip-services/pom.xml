@@ -181,7 +181,6 @@
 		<module>sip-common</module>
     <module>sip-query-dsl</module>
 		<module>sip-metadata-service</module>
-    <module>saw-metadata-service</module>
 		<module>sip-data-access</module>
 		<module>sip-transport-service</module>
 		<module>sip-es-querybuilder</module>
