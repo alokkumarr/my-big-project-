@@ -520,7 +520,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             element = executionResultStore.read(executionId);
            ExecutionResult executionResult = gson.fromJson(element,ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
-            executionResponse.setExecutedBy("");
+            executionResponse.setExecutedBy(executionResult.getExecutedBy());
             executionResponse.setSipQuery(executionResult.getSipQuery());
         } catch (Exception e) {
             logger.error("Error occurred while fetching the execution result data" , e);
@@ -545,7 +545,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             ExecutionResult executionResult = objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
-            executionResponse.setExecutedBy("");
+            executionResponse.setExecutedBy(executionResult.getExecutedBy());
             executionResponse.setSipQuery(executionResult.getSipQuery());
         } catch (Exception e) {
             logger.error("Error occurred while fetching the execution result data" , e);
