@@ -8,8 +8,10 @@ import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.LimitType;
 import com.synchronoss.saw.model.Store;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class ChartConverter implements AnalysisSipDslConverter {
   @Override
@@ -158,8 +160,10 @@ public class ChartConverter implements AnalysisSipDslConverter {
     String chartType = null;
     String chartTitle = null;
     JsonObject labelOptions = null;
-    JsonElement xaxis = null;
-    JsonElement yaxis = null;
+    Map<String, String> label = new LinkedHashMap<String, String>();
+    Map<Object, Object> legend = new LinkedHashMap<Object, Object>();
+    String xaxis = null;
+    String yaxis = null;
 
     if (oldAnalysisDefinition.has("isInverted")) {
       isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
@@ -167,6 +171,11 @@ public class ChartConverter implements AnalysisSipDslConverter {
 
     if (oldAnalysisDefinition.has("legend")) {
       legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
+      legendObject
+          .entrySet()
+          .forEach(
+              (Map.Entry<String, JsonElement> entry) ->
+                  legend.put(entry.getKey(), entry.getValue().getAsString()));
     }
 
     if (oldAnalysisDefinition.has("chartType")) {
@@ -178,23 +187,28 @@ public class ChartConverter implements AnalysisSipDslConverter {
     }
 
     if (oldAnalysisDefinition.has("labelOptions")) {
-      labelOptions = oldAnalysisDefinition.get("labelOptions").getAsJsonObject();
+      labelOptions = oldAnalysisDefinition.getAsJsonObject("labelOptions");
+      labelOptions
+          .entrySet()
+          .forEach(
+              (Map.Entry<String, JsonElement> entry) ->
+                  label.put(entry.getKey(), entry.getValue().getAsString()));
     }
 
     if (oldAnalysisDefinition.has("xAxis")) {
-      xaxis = oldAnalysisDefinition.get("xAxis");
+      xaxis = oldAnalysisDefinition.get("xAxis").getAsString();
     }
 
     if (oldAnalysisDefinition.has("yAxis")) {
-      yaxis = oldAnalysisDefinition.get("yAxis");
+      yaxis = oldAnalysisDefinition.get("yAxis").getAsString();
     }
     ChartOptions chartOptions = new ChartOptions();
 
     chartOptions.setInverted(isInverted);
-    chartOptions.setLegend(legendObject);
+    chartOptions.setLegend(legend);
     chartOptions.setChartTitle(chartTitle);
     chartOptions.setChartType(chartType);
-    chartOptions.setLabelOptions(labelOptions);
+    chartOptions.setLabelOptions(label);
     chartOptions.setxAxis(xaxis);
     chartOptions.setyAxis(yaxis);
     return chartOptions;

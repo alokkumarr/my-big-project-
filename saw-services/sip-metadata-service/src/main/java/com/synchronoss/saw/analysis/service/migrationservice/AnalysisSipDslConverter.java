@@ -49,6 +49,10 @@ public interface AnalysisSipDslConverter {
       Boolean designerEdit = oldAnalysisDefinition.get(FieldNames.EDIT).getAsBoolean();
       analysis.setDesignerEdit(designerEdit);
     }
+    if (oldAnalysisDefinition.has(FieldNames.USER_ID)
+        && !oldAnalysisDefinition.get(FieldNames.USER_ID).isJsonNull()) {
+      //analysis.setUserId(oldAnalysisDefinition.get(FieldNames.USER_ID).getAsLong());
+    }
 
     if (oldAnalysisDefinition.has(FieldNames.DESCRIPTION)
         && !oldAnalysisDefinition.get(FieldNames.DESCRIPTION).isJsonNull()) {
@@ -271,7 +275,7 @@ public interface AnalysisSipDslConverter {
       JsonArray obj = modelObject.get(FieldNames.MODEL_VALUE).getAsJsonArray();
       List<Object> modelValues = new ArrayList<>();
       for (JsonElement arr : obj) {
-        modelValues.add(arr.getAsJsonPrimitive());
+        modelValues.add(arr.getAsString());
       }
       model.setModelValues(modelValues);
     }
