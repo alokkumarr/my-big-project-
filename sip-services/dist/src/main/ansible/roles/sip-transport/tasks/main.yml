@@ -22,16 +22,32 @@
     - restart saw-transport
     - restart saw-transport-executor-regular
     - restart saw-transport-executor-fast
+
 - name: Updating a environment variable in /opt/saw/service/conf/service.env
   blockinfile:
     path: /opt/saw/service/conf/service.env
     marker: "# {mark} SECURE"
     block: |
-        SIP_SECURE={{ sip_secure }}
+        SIP_SECURE=true
   notify:
     - restart saw-transport
     - restart saw-transport-executor-regular
     - restart saw-transport-executor-fast
+  when: sip_secure
+
+- name: Updating a environment variable in /opt/saw/service/conf/service.env
+  blockinfile:
+    path: /opt/saw/service/conf/service.env
+    marker: "# {mark} SECURE"
+    block: |
+        SIP_SECURE=false
+  notify:
+    - restart saw-transport
+    - restart saw-transport-executor-regular
+    - restart saw-transport-executor-fast
+  when: not sip_secure
+
+
 - name: Updating a environment variable in /opt/saw/service/conf/service.env
   blockinfile:
     path: /opt/saw/service/conf/service.env
@@ -44,7 +60,7 @@
     - restart saw-transport
     - restart saw-transport-executor-regular
     - restart saw-transport-executor-fast
-  when: sip_secure
+  when: "sip_secure | default(False)"
 
 - name: Create Transport Service environment file
   file: path=/etc/bda/saw-transport-service-env state=touch

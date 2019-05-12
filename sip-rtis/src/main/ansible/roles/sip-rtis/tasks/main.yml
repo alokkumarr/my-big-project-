@@ -19,10 +19,21 @@
     path: /etc/bda/rtis.env
     marker: "# {mark} SECURE"
     block: |
-        SIP_SECURE={{ sip_secure }}
+        SIP_SECURE=true
   notify:
     - restart sip-rtis
-    
+  when: sip_secure
+
+- name: Updating a environment variable in /etc/bda/rtis.env
+  blockinfile:
+    path: /etc/bda/rtis.env
+    marker: "# {mark} SECURE"
+    block: |
+        SIP_SECURE=false
+  notify:
+    - restart sip-rtis
+  when: not sip_secure
+
 - name: Updating a environment variable in /etc/bda/rtis.env
   blockinfile:
     path: /etc/bda/rtis.env
@@ -33,7 +44,7 @@
         HTTP_DISABLED=-Dhttp.port=disabled
   notify:
     - restart sip-rtis
-  when: sip_secure
+  when: "sip_secure | default(False)"
 
 - name: Create symbolink link to current Spark version
   file:

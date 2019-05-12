@@ -54,10 +54,10 @@ public class RestUtil {
    * creating rest template using SSL connection.
    */
   public RestTemplate restTemplate() {
-    logger.info("restTemplate trustStore: " + trustStore);
-    logger.info("restTemplate keyStore: " + keyStore);
-    logger.info("restTemplate keyStorePassword: " + keyStorePassword);
-    logger.info("restTemplate trustStorePassword: " + trustStore);
+    logger.trace("restTemplate trustStore: " + trustStore);
+    logger.trace("restTemplate keyStore: " + keyStore);
+    logger.trace("restTemplate keyStorePassword: " + keyStorePassword);
+    logger.trace("restTemplate trustStorePassword: " + trustStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -85,10 +85,10 @@ public class RestUtil {
    */
   public RestTemplate restTemplate(String keyStore, String keyPassword, String trustStore,
       String trustPassword) {
-    logger.info("restTemplate with parameter trustStore: " + trustStore);
-    logger.info("restTemplate with parameter keyStore: " + keyStore);
-    logger.info("restTemplate with parameter keyStorePassword: " + keyPassword);
-    logger.info("restTemplate with parameter trustStorePassword: " + trustPassword);
+    logger.trace("restTemplate with parameter trustStore: " + trustStore);
+    logger.trace("restTemplate with parameter keyStore: " + keyStore);
+    logger.trace("restTemplate with parameter keyStorePassword: " + keyPassword);
+    logger.trace("restTemplate with parameter trustStorePassword: " + trustPassword);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -117,10 +117,10 @@ public class RestUtil {
    * AsyncRestTemplate changes to WebClient
    */
   public AsyncRestTemplate asyncRestTemplate() {
-    logger.info("asyncRestTemplate trustStore: " + trustStore);
-    logger.info("asyncRestTemplate keyStore: " + keyStore);
-    logger.info("asyncRestTemplate keyStorePassword: " + keyStorePassword);
-    logger.info("asyncRestTemplate trustStorePassword: " + trustStore);
+    logger.trace("asyncRestTemplate trustStore: " + trustStore);
+    logger.trace("asyncRestTemplate keyStore: " + keyStore);
+    logger.trace("asyncRestTemplate keyStorePassword: " + keyStorePassword);
+    logger.trace("asyncRestTemplate trustStorePassword: " + trustStore);
 
     AsyncRestTemplate restTemplate = null;
     if (sipSslEnable) {
@@ -150,10 +150,10 @@ public class RestUtil {
    * creating a https client.
    */
   public HttpClient getHttpClient() throws Exception {
-    logger.info("getHttpClient trustStore: " + trustStore);
-    logger.info("getHttpClient keyStore: " + keyStore);
-    logger.info("getHttpClient keyStorePassword: " + keyStorePassword);
-    logger.info("getHttpClient trustStorePassword: " + trustStore);
+    logger.trace("getHttpClient trustStore: " + trustStore);
+    logger.trace("getHttpClient keyStore: " + keyStore);
+    logger.trace("getHttpClient keyStorePassword: " + keyStorePassword);
+    logger.trace("getHttpClient trustStorePassword: " + trustStore);
 
     if (client != null) {
       return client;
@@ -177,10 +177,10 @@ public class RestUtil {
   private SSLContext getSsLContext(String keyStore, String keyPassword, String trustStore,
       String trustPassword) throws KeyStoreException, NoSuchAlgorithmException,
       CertificateException, IOException, KeyManagementException, UnrecoverableKeyException {
-    logger.info("getSsLContext trustStore: " + trustStore);
-    logger.info("getSsLContext keyStore: " + keyStore);
-    logger.info("getSsLContext keyStorePassword: " + keyPassword);
-    logger.info("getSsLContext trustStorePassword: " + trustStore);
+    logger.trace("getSsLContext trustStore: " + trustStore);
+    logger.trace("getSsLContext keyStore: " + keyStore);
+    logger.trace("getSsLContext keyStorePassword: " + keyPassword);
+    logger.trace("getSsLContext trustStorePassword: " + trustStore);
 
     SSLContext sslContext = SSLContextBuilder.create()
         .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())

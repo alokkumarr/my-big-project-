@@ -24,7 +24,8 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-  {% if sip_secure %}
+
+  {% if sip_secure | default(False) %}
 
   ssl:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
@@ -45,10 +46,11 @@ management:
       exposure:
         include: info, health, prometheus
 
+   {% if sip_secure | default(False) %}
+
 sip:
    ssl:
-     enable : {{ sip_secure  | default('false') }}
-   {% if sip_secure %}
+     enable : true
 
    trust:
        store: ${server.ssl.trust-store}
@@ -57,16 +59,20 @@ sip:
       store: ${server.ssl.key-store}
       password: ${server.ssl.key-store-password}
 
+   {% else %}
+
+sip:
+   ssl:
+     enable : false
+
   {% endif %}
 
 
-{% if sip_secure %}
+{% if sip_secure | default(False) %}
 
 connector: https
 
-
 {% else %}
-
 
 connector: http
 
