@@ -23,87 +23,101 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class QueryBuilderUtil {
 
-	public final static String DATE_FORMAT = "yyyy-MM-dd";
-	public final static String SPACE_REGX = "\\s+";
-	public final static String EMPTY_STRING = "";
-    private static String HITS= "hits";
-    private static String _SOURCE ="_source";
-	public static Map<String,String> dateFormats = new HashMap<String, String>();
-	static {
+  public static final String DATE_FORMAT = "yyyy-MM-dd";
+  public static final String SPACE_REGX = "\\s+";
+  public static final String EMPTY_STRING = "";
+  private static String HITS = "hits";
+  private static String _SOURCE = "_source";
+  public static Map<String, String> dateFormats = new HashMap<String, String>();
 
-      Map<String, String> formats = new HashMap<String, String>();
-      formats.put("YYYY", "year");
-      formats.put("MMMYYYY", "month");
-      formats.put("MMYYYY", "month");
-      formats.put("MMMdYYYY", "day");
-      formats.put("MMMMdYYYY,h:mm:ssa", "hour");
-      dateFormats = Collections.unmodifiableMap(formats);
+  static {
+    Map<String, String> formats = new HashMap<String, String>();
+    formats.put("YYYY", "year");
+    formats.put("MMMYYYY", "month");
+    formats.put("MMYYYY", "month");
+    formats.put("MMMdYYYY", "day");
+    formats.put("MMMMdYYYY,h:mm:ssa", "hour");
+    dateFormats = Collections.unmodifiableMap(formats);
   }
 
-    /**
-     *
-     * @param field
-     * @param aggregationName
-     * @return
-     */
-	public static AggregationBuilder aggregationBuilder (Field field,
-	     String aggregationName)
+  /**
+   * @param field
+   * @param aggregationName
+   * @return
+   */
+  public static AggregationBuilder aggregationBuilder(Field field, String aggregationName) {
 
-	{
-		AggregationBuilder aggregationBuilder = null;
+    AggregationBuilder aggregationBuilder = null;
 
-		if (field.getType().name().equals(Field.Type.DATE.name())
-		    || field.getType().name().equals(Field.Type.TIMESTAMP.name()))
-		{
-            if(field.getDateFormat()==null|| field.getDateFormat().isEmpty())
-                field.setDateFormat(DATE_FORMAT);
-		  if (field.getGroupInterval()!=null){
-			aggregationBuilder = AggregationBuilders.
-					dateHistogram(aggregationName).field(field.getColumnName()).format(field.getDateFormat()).
-					dateHistogramInterval(groupInterval(field.getGroupInterval().value())).order(BucketOrder.key(false));
-			}
-		  else {
-		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(field.getColumnName())
-		        .format(field.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
-		  }
-		}
-		else {
-          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(field.getColumnName()).size(BuilderUtil.SIZE);
-		}
+    if (field.getType().name().equals(Field.Type.DATE.name())
+        || field.getType().name().equals(Field.Type.TIMESTAMP.name())) {
+      if (field.getDateFormat() == null || field.getDateFormat().isEmpty())
+        field.setDateFormat(DATE_FORMAT);
+      if (field.getGroupInterval() != null) {
+        aggregationBuilder =
+            AggregationBuilders.dateHistogram(aggregationName)
+                .field(field.getColumnName())
+                .format(field.getDateFormat())
+                .dateHistogramInterval(groupInterval(field.getGroupInterval().value()))
+                .order(BucketOrder.key(false));
+      } else {
+        aggregationBuilder =
+            AggregationBuilders.terms(aggregationName)
+                .field(field.getColumnName())
+                .format(field.getDateFormat())
+                .order(BucketOrder.key(false))
+                .size(BuilderUtil.SIZE);
+      }
+    } else {
+      aggregationBuilder =
+          AggregationBuilders.terms(aggregationName)
+              .field(field.getColumnName())
+              .size(BuilderUtil.SIZE);
+    }
 
-		return aggregationBuilder;
-	}
+    return aggregationBuilder;
+  }
 
-    /**
-     * Group interval for the DateHistogram.
-     * @param groupInterval
-     * @return
-     */
-     public static DateHistogramInterval groupInterval(String groupInterval)
-     {
-    	 DateHistogramInterval histogramInterval = null;
-    	    switch (groupInterval)
-    	    {
-    	    case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
-    	    case "day" :
-            case "all":
-    	        histogramInterval =  DateHistogramInterval.DAY; break;
-    	    case "year" : histogramInterval =  DateHistogramInterval.YEAR; break;
-    	    case "quarter" : histogramInterval =  DateHistogramInterval.QUARTER; break;
-    	    case "hour" : histogramInterval =  DateHistogramInterval.HOUR;break;
-    	    case "week" : histogramInterval =  DateHistogramInterval.WEEK;break;
-    	    }
-    	    return histogramInterval;
-     }
+  /**
+   * Group interval for the DateHistogram.
+   *
+   * @param groupInterval
+   * @return
+   */
+  public static DateHistogramInterval groupInterval(String groupInterval) {
+    DateHistogramInterval histogramInterval = null;
+    switch (groupInterval) {
+      case "month":
+        histogramInterval = DateHistogramInterval.MONTH;
+        break;
+      case "day":
+      case "all":
+        histogramInterval = DateHistogramInterval.DAY;
+        break;
+      case "year":
+        histogramInterval = DateHistogramInterval.YEAR;
+        break;
+      case "quarter":
+        histogramInterval = DateHistogramInterval.QUARTER;
+        break;
+      case "hour":
+        histogramInterval = DateHistogramInterval.HOUR;
+        break;
+      case "week":
+        histogramInterval = DateHistogramInterval.WEEK;
+        break;
+    }
+    return histogramInterval;
+  }
 
-    /**
-     * Aggregation builder for data fields.
-     * @param field
-     * @return
-     */
-	public static AggregationBuilder aggregationBuilderDataField(Field field)
-	{
-		AggregationBuilder aggregationBuilder = null;
+  /**
+   * Aggregation builder for data fields.
+   *
+   * @param field
+   * @return
+   */
+  public static AggregationBuilder aggregationBuilderDataField(Field field) {
+    AggregationBuilder aggregationBuilder = null;
 
     switch (field.getAggregate()) {
       case SUM:
@@ -142,7 +156,7 @@ public class QueryBuilderUtil {
         break;
       case PERCENTAGE_BY_ROW:
         aggregationBuilder =
-               AggregationBuilders.sum(field.getDataField()).field(field.getColumnName());
+            AggregationBuilders.sum(field.getDataField()).field(field.getColumnName());
         break;
     }
     return aggregationBuilder;
@@ -350,16 +364,16 @@ public class QueryBuilderUtil {
   public static void getAggregationBuilder(
       List<?> dataFields, SearchSourceBuilder preSearchSourceBuilder) {
 
-                    for (Object dataField : dataFields) {
-                        if (dataField instanceof com.synchronoss.saw.model.Field) {
-                            Field field = (Field) dataField;
-                            if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
-                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
-                                    field.getDataField()).field(field.getColumnName()));
-                            }
-                        }
-                    }
+    for (Object dataField : dataFields) {
+      if (dataField instanceof com.synchronoss.saw.model.Field) {
+        Field field = (Field) dataField;
+        if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
+          preSearchSourceBuilder.aggregation(
+              AggregationBuilders.sum(field.getDataField()).field(field.getColumnName()));
+        }
+      }
     }
+  }
 
   /**
    * query builder for DSK node. TODO: Original DSK was supporting only string format, So query
@@ -384,6 +398,77 @@ public class QueryBuilderUtil {
       }
     }
     return builder;
+  }
+
+  /**
+   * This method will validate whether Data security keys will be applicable for the * analysis and
+   * return the list of Key which all are applicable.
+   *
+   * @param artifactList
+   * @param dataSecurityKey
+   * @return
+   */
+  public static DataSecurityKey checkDSKApplicableAnalysis(
+      List<Artifact> artifactList, DataSecurityKey dataSecurityKey) {
+    List<DataSecurityKeyDef> dataSecurityKeyDefList = dataSecurityKey.getDataSecuritykey();
+    List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
+    String artifactName = null;
+    List<Field> fieldList;
+    for (Artifact artifact : artifactList) {
+      artifactName = artifact.getArtifactsName();
+      fieldList = artifact.getFields();
+      for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
+        if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
+          dataSecurityKeyDefs.add(dataSecurityKeyDef);
+        }
+      }
+    }
+    DataSecurityKey dataSecurityKeyNew = new DataSecurityKey();
+    dataSecurityKeyNew.setDataSecuritykey(dataSecurityKeyDefs);
+    return dataSecurityKeyNew;
+  }
+
+  /**
+   * This method will validate whether Data security keys will be applicable for the * analysis and
+   * return the list of Key which all are applicable.
+   *
+   * @param artifactName
+   * @param fieldList
+   * @param dataSecurityKeyDef
+   * @return
+   */
+  public static boolean checkDSKApplicableAnalysis(
+      String artifactName, List<Field> fieldList, DataSecurityKeyDef dataSecurityKeyDef) {
+    if (isColumnApplicable(artifactName, fieldList, dataSecurityKeyDef)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Ths method will check whether DSK columns is available in selected artifacts.
+   *
+   * @param artifactName
+   * @param fieldList
+   * @param dataSecurityKeyDef
+   * @return
+   */
+  public static boolean isColumnApplicable(
+      String artifactName, List<Field> fieldList, DataSecurityKeyDef dataSecurityKeyDef) {
+
+    String colName = dataSecurityKeyDef.getName();
+    for (Field field : fieldList) {
+      String[] col = field.getColumnName().split("\\.");
+      if (colName.equalsIgnoreCase(field.getColumnName())
+          || colName.equalsIgnoreCase(artifactName + "." + col[0])
+          || colName.equalsIgnoreCase(col[0])
+          || colName.equalsIgnoreCase(artifactName + "." + col)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

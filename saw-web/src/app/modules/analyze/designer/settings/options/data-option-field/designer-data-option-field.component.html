@@ -95,7 +95,7 @@
         (analysisType !== 'pivot' && hasDateInterval) ||
         (analysisType === 'pivot' &&
           hasDateInterval &&
-          (asPivotColumn(artifactColumn).dateInterval === 'day' || asPivotColumn(artifactColumn).groupInterval === 'day'))
+          asPivotColumn(artifactColumn).groupInterval === 'day')
       "
       fxLayout="row"
       fxLayoutAlign="start center"

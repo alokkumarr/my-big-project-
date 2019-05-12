@@ -1,6 +1,7 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
@@ -39,6 +41,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,6 +68,9 @@ public class StorageProxyController {
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
 
   @Autowired private StorageProxyService proxyService;
+
+  @Value("${metadata.service.host}")
+  private String metaDataServiceExport;
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -273,6 +279,7 @@ public class StorageProxyController {
       @RequestParam(name = "size", required = false) Integer size,
       @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
+      @RequestParam(name = "executedBy", required = false) String executedBy,
       HttpServletRequest request,
       HttpServletResponse response)
       throws JsonProcessingException {
@@ -288,18 +295,22 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     List<Object> responseObjectFuture = null;
+    SipQuery savedQuery = getSipQuery(sipQuery.getSemanticId(),metaDataServiceExport,request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
-    try {
+    DataSecurityKey dataSecurityKeyNode =
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery.getArtifacts(), dataSecurityKey);
+
+      try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipQuery));
-      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKey);
+      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKeyNode);
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
@@ -312,6 +323,7 @@ public class StorageProxyController {
         executionResult.setData(responseObjectFuture);
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
+        executionResult.setExecutedBy(executedBy);
         proxyService.saveDslExecutionResult(executionResult);
       }
     } catch (IOException e) {

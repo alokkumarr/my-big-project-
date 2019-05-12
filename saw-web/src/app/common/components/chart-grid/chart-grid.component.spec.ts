@@ -57,7 +57,11 @@ describe('Chart Grid Component', () => {
       .then(() => {
         fixture = TestBed.createComponent(ChartGridComponent);
         component = fixture.componentInstance;
-        component.analysis = { chartType: 'map', type: 'chart' };
+        component.analysis = {
+          chartOptions: { chartType: 'map' },
+          chartType: 'map',
+          type: 'chart'
+        };
         component.updater = new BehaviorSubject<Object[]>([]);
         fixture.detectChanges();
       });

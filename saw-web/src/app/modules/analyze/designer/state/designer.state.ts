@@ -39,8 +39,7 @@ import {
   DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
-  DesignerResetState,
-  DesignerUpdatePivotGroupIntreval
+  DesignerResetState
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import {
@@ -117,14 +116,23 @@ export class DesignerState {
 
     /* If analysis is chart and this is a date field, assign a default
       groupInterval. For pivots, use dateInterval if available */
-    const groupInterval = {
-      groupInterval:
-        analysis.type === 'chart' && artifactColumn.type === 'date'
-          ? CHART_DATE_FORMATS_OBJ[
+    const groupInterval = { groupInterval: null };
+
+    if (artifactColumn.type === 'date') {
+      switch (analysis.type) {
+        case 'chart':
+          groupInterval.groupInterval =
+            CHART_DATE_FORMATS_OBJ[
               artifactColumn.dateFormat || <string>artifactColumn.format
-            ].groupInterval
-          : artifactColumn.dateInterval
-    };
+            ].groupInterval;
+          break;
+        case 'pivot':
+          groupInterval.groupInterval = 'day';
+          break;
+        default:
+          break;
+      }
+    }
 
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
@@ -599,9 +607,15 @@ export class DesignerState {
         filter.model = {
           operator: 'BTW',
           otherValue: filter.model.lte
-            ? moment(filter.model.lte).endOf('day').valueOf()
+            ? moment(filter.model.lte)
+                .endOf('day')
+                .valueOf()
             : null,
-          value: filter.model.gte ? moment(filter.model.gte).startOf('day').valueOf() : null,
+          value: filter.model.gte
+            ? moment(filter.model.gte)
+                .startOf('day')
+                .valueOf()
+            : null,
           format: 'epoch_millis'
         };
       }
@@ -626,27 +640,5 @@ export class DesignerState {
   @Action(DesignerResetState)
   resetState({ patchState }: StateContext<DesignerStateModel>) {
     patchState(cloneDeep(defaultDesignerState));
-  }
-
-  @Action(DesignerUpdatePivotGroupIntreval)
-  updatePivotGroupIntreval(
-    { patchState, getState }: StateContext<DesignerStateModel>,
-    { artifactColumn }: DesignerUpdatePivotGroupIntreval
-  ) {
-    const analysis = getState().analysis;
-    const sipQuery = analysis.sipQuery;
-    sipQuery.artifacts.forEach(table => {
-      if (table.artifactsName === artifactColumn.table) {
-        table.fields.forEach(row => {
-          if (row.columnName === artifactColumn.columnName) {
-            row.groupInterval = artifactColumn.dateInterval;
-            delete row.format;
-          }
-        });
-      }
-    });
-    return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery } }
-    });
   }
 }

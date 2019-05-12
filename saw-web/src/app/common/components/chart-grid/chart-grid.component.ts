@@ -11,7 +11,6 @@ import * as moment from 'moment';
 
 import { ChartService } from '../../services';
 import {
-  AnalysisChart,
   ArtifactColumnReport,
   AnalysisDSL,
   SqlBuilderChart
@@ -43,7 +42,7 @@ interface ReportGridField {
 export class ChartGridComponent implements OnInit {
   @Input() updater: BehaviorSubject<Object[]>;
   @Input('analysis')
-  set setAnalysis(analysis: AnalysisChart | AnalysisDSL) {
+  set setAnalysis(analysis: AnalysisDSL) {
     this.analysis = analysis;
     this.initChartOptions(analysis);
   }
@@ -59,7 +58,7 @@ export class ChartGridComponent implements OnInit {
   }
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
-  public analysis: AnalysisChart | AnalysisDSL;
+  public analysis: AnalysisDSL;
   public chartOptions: Object;
   public toggleToGrid = false;
   public chartToggleData: any;
@@ -148,9 +147,7 @@ export class ChartGridComponent implements OnInit {
 
   fetchColumnData(axisName, value) {
     let alias = axisName;
-    const columns = isDSLAnalysis(this.analysis)
-      ? this.analysis.sipQuery.artifacts[0].fields
-      : this.analysis.artifacts[0].columns;
+    const columns = this.analysis.sipQuery.artifacts[0].fields;
     forEach(columns, column => {
       if (axisName === column.name) {
         const columnFormat =
@@ -208,15 +205,34 @@ export class ChartGridComponent implements OnInit {
   }
 
   get chartTitle() {
-    return (
-      (isDSLAnalysis(this.analysis)
-        ? this.analysis.chartOptions.chartTitle
-        : this.analysis.chartTitle) || this.analysis.name
-    );
+    return this.analysis.chartOptions.chartTitle || this.analysis.name;
   }
 
-  getChartUpdates(data, analysis) {
+  /**
+   * Returns a mapping of columnNames to date formats.
+   * Used to parse date data to make sure we sort correctly.
+   * Date formats are needed, because some formats can't be parsed
+   * by moment correctly without explicit format string.
+   *
+   * @param {AnalysisDSL} analysis
+   * @returns {{ [columnName: string]: string }}
+   * @memberof ChartGridComponent
+   */
+  getDateFormats(analysis: AnalysisDSL): { [columnName: string]: string } {
+    return analysis.sipQuery.artifacts[0].fields.reduce((res, field) => {
+      if (field.type !== 'date') {
+        return res;
+      }
+      res[field.columnName] = this._chartService.getMomentDateFormat(
+        field.dateFormat
+      );
+      return res;
+    }, {});
+  }
+
+  getChartUpdates(data, analysis: AnalysisDSL) {
     const sorts = analysis.sipQuery.sorts;
+    const dateFormats = this.getDateFormats(analysis);
     const labels = {
       x: get(analysis, 'xAxis.title', null),
       y: get(analysis, 'yAxis.title', null)
@@ -225,28 +241,34 @@ export class ChartGridComponent implements OnInit {
     if (!isEmpty(sorts)) {
       orderedData = orderBy(
         data,
-        map(sorts, 'columnName'),
+        map(sorts, sort =>
+          sort.type === 'date'
+            ? row =>
+                /* If the sort is for date column, parse dates to timestamp to make sure sorting is correct */
+                moment(
+                  row[sort.columnName],
+                  dateFormats[sort.columnName]
+                ).valueOf()
+            : /* Otherwise, sort normally */
+              row => row[sort.columnName]
+        ),
         map(sorts, 'order')
       );
     }
 
-    this.chartToggleData = this.trimKeyword(data);
+    this.chartToggleData = this.trimKeyword(orderedData);
 
     return [
       ...this._chartService.dataToChangeConfig(
-        isDSLAnalysis(analysis)
-          ? analysis.chartOptions.chartType
-          : analysis.chartType,
+        analysis.chartOptions.chartType,
         analysis.sipQuery,
         orderedData || data,
-        { labels, labelOptions: analysis.labelOptions, sorts }
+        { labels, labelOptions: analysis.chartOptions.labelOptions, sorts }
       ),
       { path: 'title.exportFilename', data: analysis.name },
       {
         path: 'chart.inverted',
-        data: isDSLAnalysis(analysis)
-          ? analysis.chartOptions.isInverted
-          : analysis.isInverted
+        data: analysis.chartOptions.isInverted
       }
     ];
   }

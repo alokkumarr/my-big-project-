@@ -237,7 +237,7 @@ public interface AnalysisSipDslConverter {
     if (modelObject.has(FieldNames.PRESENT)) {
       String presetVal = modelObject.get(FieldNames.PRESENT).getAsString();
 
-      if (!presetVal.equalsIgnoreCase(FieldNames.NA)) {
+      if (presetVal != null) {
         model.setPreset(Model.Preset.fromValue(modelObject.get(FieldNames.PRESENT).getAsString()));
       }
     }
@@ -379,6 +379,11 @@ public interface AnalysisSipDslConverter {
 
     if (fieldObject.has(FieldNames.DISPLAY_NAME)) {
       field.setDisplayName(fieldObject.get(FieldNames.DISPLAY_NAME).getAsString());
+    } else {
+      String displayName =
+          extractDisplayNameFromArtifactsArray(
+              fieldObject.get(FieldNames.COLUMN_NAME).getAsString(), artifactsArray);
+      field.setDisplayName(displayName);
     }
 
     // alias and aliasName are used alternatively in different types of analysis.
@@ -532,5 +537,55 @@ public interface AnalysisSipDslConverter {
     }
 
     return aliasName;
+  }
+
+  /**
+   * Extracts displayName from artifacts array.
+   *
+   * @param columnName Name of the column
+   * @param artifactsArray JsonArray which contains artifacts
+   * @return displayName - on successful extraction null - on failure
+   */
+  default String extractDisplayNameFromArtifactsArray(String columnName, JsonArray artifactsArray) {
+    String displayName = null;
+
+    for (JsonElement artifactElement : artifactsArray) {
+      displayName = getDisplayNameFromArtifactObject(columnName, artifactElement.getAsJsonObject());
+
+      if (displayName != null) {
+        break;
+      }
+    }
+
+    return displayName;
+  }
+
+  /**
+   * Extracts displayName from artifacts array.
+   *
+   * @param columnName Name of the column
+   * @param artifactObject JsonObject
+   * @return displayName - on successful extraction null - on failure
+   */
+  default String getDisplayNameFromArtifactObject(String columnName, JsonObject artifactObject) {
+    String displayName = null;
+    if (artifactObject.has("columns")) {
+      JsonArray columns = artifactObject.getAsJsonArray("columns");
+
+      for (JsonElement columnElement : columns) {
+        JsonObject column = columnElement.getAsJsonObject();
+
+        String artifactColumnName = column.get("columnName").getAsString();
+
+        if (columnName.equalsIgnoreCase(artifactColumnName)) {
+          if (column.has("displayName")) {
+            displayName = column.get("displayName").getAsString();
+
+            break;
+          }
+        }
+      }
+    }
+    return displayName;
   }
 }

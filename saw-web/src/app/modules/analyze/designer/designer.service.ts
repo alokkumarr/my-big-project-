@@ -19,7 +19,7 @@ import * as unset from 'lodash/unset';
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
 import { AnalysisType, Analysis } from '../types';
-import { AnalysisDSL } from '../../../models';
+import { AnalysisDSL, AnalysisPivotDSL } from '../../../models';
 
 import {
   IDEsignerSettingGroupAdapter,
@@ -66,7 +66,7 @@ export class DesignerService {
   createAnalysis(
     semanticId: string,
     type: AnalysisType
-  ): Promise<Analysis | AnalysisDSL> {
+  ): Promise<Analysis | AnalysisDSL | AnalysisPivotDSL> {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 
@@ -146,7 +146,7 @@ export class DesignerService {
     };
 
     const applyNonDatafieldDefaults = artifactColumn => {
-      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+      artifactColumn.groupInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
     const canAcceptDataType = canAcceptNumberType;
