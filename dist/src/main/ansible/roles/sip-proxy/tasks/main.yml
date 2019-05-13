@@ -19,12 +19,37 @@
 # environments have been upgraded.
 - name: Stop NGINX service
   systemd: name=nginx state=stopped
+- name: Generate private key for incoming connections
+  openssl_privatekey:
+    path: /etc/sip/sip-proxy-key.pem
+  when: "sip_secure | default(false)"
+- name: Generate certificate signing request
+  openssl_csr:
+    path: /etc/sip/sip-proxy.csr
+    privatekey_path: /etc/sip/sip-proxy-key.pem
+    common_name: "{{ inventory_hostname }}"
+  when: "sip_secure | default(false)"
+- name: Generate self-signed certificate for incoming connections
+  openssl_certificate:
+    path: /etc/sip/sip-proxy.crt
+    privatekey_path: /etc/sip/sip-proxy-key.pem
+    csr_path: /etc/sip/sip-proxy.csr
+    provider: selfsigned
+  when: "sip_secure | default(false)"
+- name: Combine key and certificate into single file for HAProxy
+  shell: cat /etc/sip/sip-proxy-key.pem /etc/sip/sip-proxy.crt > /etc/sip/sip-proxy.pem
+  when: "sip_secure | default(false)"
 - name: Install HAProxy package
   yum: name=haproxy state=present
 - name: Install HAProxy configuration
   template: src=haproxy.cfg dest=/etc/haproxy
   notify:
     - restart haproxy
+- name: Copy internal CA certificate to host
+  copy:
+    src: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
+    dest: /etc/sip/internal-ca.crt
+  when: "sip_secure | default(false)"
 - name: Create HAProxy error pages directory
   file: path=/etc/haproxy/errors state=directory
 - name: Install HAProxy error pages
