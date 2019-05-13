@@ -231,7 +231,7 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = fpGet(`data`, resp);
+        const data = fpGet(`data`, resp) || [];
         const queryBuilder = options.isDSL
           ? fpGet(`sipQuery`, resp)
           : fpGet(`queryBuilder`, resp);
@@ -275,7 +275,7 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = fpGet(`data`, resp);
+        const data = fpGet(`data`, resp) || [];
         const queryBuilder = options.isDSL
           ? fpGet(`sipQuery`, resp)
           : fpGet(`queryBuilder`, resp);
