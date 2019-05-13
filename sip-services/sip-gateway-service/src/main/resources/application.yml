@@ -152,7 +152,7 @@ api:
 
 sip:
    ssl:
-     enable : true
+     enable : false
    trust:
        store: /Users/spau0004/Desktop/keystore/truststore.jks
        password: sip@123

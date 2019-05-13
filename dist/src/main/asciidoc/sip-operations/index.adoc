@@ -380,7 +380,7 @@ adding the following to the SIP environment configuration file
 
         [all:vars]
         sip_secure=True
- 
+
 NOTE: The `sip_secure` configuration parameter must be set before the
 first installation of SIP and not changed thereafter.  Changing the
 value after the initial installation for an existing environment is
@@ -832,6 +832,16 @@ has been archived before next schedule. The reason to mention this scenario so t
 configure the `sip_bis_retry_diffs_in_minutes` accordingly.
 
     sip_bis_retry_diffs_in_minutes=5
+
+
+
+The below parameter will switch on or off to activate secure or non-secure
+communication in sip platform
+
+sip_secure=True/False
+
+Note: This is mandatory field it has to be either 'False' or 'True'. Please observe the case of `T & F`
+# of `True` & `False` Note: true or false will result into an error
 
 == Loading semantic metadata
 

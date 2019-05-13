@@ -40,9 +40,7 @@ public class ApiDocIT extends BaseIT {
     writeApiDoc("security", "/saw/security/v2/api-docs");
     writeApiDoc("semantic", servicePath("internal/semantic"));
     writeApiDoc("workbench", servicePath("internal/workbench"));
-    // This is commented due to SipBisHealthIndicator has been
-    // deactivated for time being to unblock team member
-    //writeApiDoc("batch", servicePath("ingestion/batch"));
+    writeApiDoc("batch", servicePath("ingestion/batch"));
   }
 
   /**
