@@ -4,8 +4,10 @@ import first from 'lodash/first';
 import split from 'lodash/split';
 import reduce from 'lodash/reduce';
 import get from 'lodash/get';
+import fpGroupBy from 'lodash/fp/groupBy';
 import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
+import fpFlatMap from 'lodash/fp/flatMap';
 import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { MarkerDataPoint } from './types';
@@ -44,9 +46,13 @@ export class MapBoxComponent implements OnChanges {
     this.mapStyle = settings.mapStyle;
   }
 
-  @Input('sqlBuilder') set setSqlBuilder(sqlBuilder) {
-    this.coordinateField = first(sqlBuilder.nodeFields);
-    this.dataFields = sqlBuilder.dataFields;
+  @Input('sipQuery') set setSipQuery(sipQuery) {
+    const groupedFields = fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpGroupBy('area')
+    )(sipQuery.artifacts);
+    this.coordinateField = first(groupedFields.x);
+    this.dataFields = groupedFields.y;
   }
 
   @Input() data: any[];
@@ -78,7 +84,7 @@ export class MapBoxComponent implements OnChanges {
 
     // set center if possible
     if (features.length > 0) {
-      const centerIndex = features.length / 2;
+      const centerIndex = Math.ceil(features.length / 2);
       this.center = features[centerIndex].geometry['coordinates'];
     }
   }
@@ -100,7 +106,7 @@ export class MapBoxComponent implements OnChanges {
       {}
     );
     return map(data, (datum, index) => {
-      const coordinatesKey = coordinateField.columnName;
+      const [coordinatesKey] = split(coordinateField.columnName, '.');
       const [lng, lat] = split(datum[coordinatesKey], ',');
       const lnglat = [parseFloat(lng), parseFloat(lat)];
       const aggregates: MarkerDataPoint = fpPipe(
@@ -109,10 +115,11 @@ export class MapBoxComponent implements OnChanges {
         fpMap(([key, value]) => {
           const { alias, displayName, aggregate } = get(fieldsMap, key);
           const aggregateFun = AGGREGATE_TYPES_OBJ[aggregate].designerLabel;
+          const label = alias ? alias : `${aggregateFun}(${displayName})`;
           return {
             key,
             value,
-            label: `${aggregateFun}(${alias || displayName})`
+            label
           };
         })
       )(datum);

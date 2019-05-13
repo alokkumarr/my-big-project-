@@ -7,10 +7,6 @@ import {
 } from './designer-map-chart.component';
 import { ChartService } from '../../../../common/services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
-import {
-  ArtifactColumn,
-  ArtifactColumnChart
-} from '../../../../models/artifact-column.model';
 
 @Component({
   // tslint:disable-next-line
@@ -22,27 +18,91 @@ class ChartStubComponent {
   @Input() options: any;
 }
 
-class ChartStubService {}
+class ChartStubService {
+  splitToSeries = () => [{ data: [] }];
+  analysisLegend2ChartLegend = () => {};
+}
 class MapDataStubService {
   getMapData = jasmine.createSpy('getMapData').and.returnValue(of('mapData'));
 }
 
-const normalSqlBuilder = {
-  nodeFields: [{ checked: 'x' } as ArtifactColumn],
-  dataFields: [{ checked: 'y' } as ArtifactColumn],
-  filters: [],
-  booleanCriteria: 'AND'
-};
-const sqlBuilderWithXFieldContainingRegion = {
-  nodeFields: [
-    ({
-      checked: 'x',
-      region: { name: '', path: '' }
-    } as unknown) as ArtifactColumnChart
+const normalSipQuery = {
+  artifacts: [
+    {
+      artifactsName: '',
+      fields: [
+        {
+          area: 'x',
+          alias: '',
+          columnName: '',
+          dataField: '',
+          displayName: '',
+          groupInterval: '',
+          name: '',
+          type: '',
+          table: ''
+        },
+        {
+          area: 'y',
+          alias: '',
+          columnName: '',
+          dataField: '',
+          displayName: '',
+          groupInterval: '',
+          name: '',
+          type: '',
+          table: ''
+        }
+      ]
+    }
   ],
-  dataFields: [{ checked: 'y' } as ArtifactColumn],
   filters: [],
-  booleanCriteria: 'AND'
+  booleanCriteria: 'AND',
+  sorts: [],
+  store: {
+    dataStore: '',
+    storageType: ''
+  }
+};
+
+const sipQueryWithXFieldContainingRegion = {
+  artifacts: [
+    {
+      artifactsName: '',
+      fields: [
+        {
+          area: 'x',
+          geoRegion: { name: '', path: '' },
+          alias: '',
+          columnName: '',
+          dataField: '',
+          displayName: '',
+          groupInterval: '',
+          name: '',
+          type: '',
+          table: ''
+        },
+        {
+          area: 'y',
+          alias: '',
+          columnName: '',
+          dataField: '',
+          displayName: '',
+          groupInterval: '',
+          name: '',
+          type: '',
+          table: ''
+        }
+      ]
+    }
+  ],
+  filters: [],
+  booleanCriteria: 'AND',
+  sorts: [],
+  store: {
+    dataStore: '',
+    storageType: ''
+  }
 };
 
 describe('Designer Map Chart Component', () => {
@@ -51,7 +111,7 @@ describe('Designer Map Chart Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: ChartService, useValue: ChartStubService },
+        { provide: ChartService, useValue: new ChartStubService() },
         { provide: MapDataService, useClass: MapDataStubService }
       ],
       declarations: [DesignerMapChartComponent, ChartStubComponent],
@@ -63,22 +123,22 @@ describe('Designer Map Chart Component', () => {
       });
   }));
 
-  it('should set x and y fields from sqlBuilder', () => {
+  it('should set x and y fields from sipQuery', () => {
     const component = fixture.componentInstance;
-    component.sqlBuilder = normalSqlBuilder;
+    component.sipQuery = normalSipQuery;
     expect(component._fields.x).not.toBeNull();
     expect(component._fields.y).not.toBeNull();
   });
 
-  it('should change the state to OK when we get sqlBuilder with a nodeField that has a region', () => {
+  it('should change the state to NO_MAP_SELECTED when we get sipQuery with no region for the x field', () => {
     const component = fixture.componentInstance;
-    component.sqlBuilder = normalSqlBuilder;
+    component.sipQuery = normalSipQuery;
     expect(component.currentState).toEqual(MapChartStates.NO_MAP_SELECTED);
   });
 
-  it('should change the state to OK when we get sqlBuilder with a nodeField that has a region', () => {
+  it('should change the state to OK when we get sipQuery with an x field that has a region', () => {
     const component = fixture.componentInstance;
-    component.sqlBuilder = sqlBuilderWithXFieldContainingRegion;
+    component.sipQuery = sipQueryWithXFieldContainingRegion;
     expect(component.currentState).toEqual(MapChartStates.OK);
   });
 });

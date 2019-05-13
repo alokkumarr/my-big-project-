@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.model.geomap.MapOptions;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -81,6 +82,9 @@ public class Analysis {
 
   @JsonProperty("chartOptions")
   private ChartOptions chartOptions;
+
+  @JsonProperty("mapOptions")
+  private MapOptions mapOptions;
 
   @JsonProperty("designerEdit")
   private Boolean designerEdit;
@@ -261,6 +265,26 @@ public class Analysis {
   @JsonProperty("sipQuery")
   public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
+  }
+
+  /**
+   * Retrieves Map related properties like Type and Style.
+   *
+   * @return MapOptions Object
+   */
+  @JsonProperty("mapOptions")
+  public MapOptions getMapOptions() {
+    return mapOptions;
+  }
+
+  /**
+   * Set map options.
+   *
+   * @param mapOptions Map options
+   */
+  @JsonProperty("mapOptions")
+  public void setMapOptions(MapOptions mapOptions) {
+    this.mapOptions = mapOptions;
   }
 
   @Override

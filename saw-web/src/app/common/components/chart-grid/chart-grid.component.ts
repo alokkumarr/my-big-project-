@@ -13,7 +13,8 @@ import { ChartService } from '../../services';
 import {
   ArtifactColumnReport,
   AnalysisDSL,
-  SqlBuilderChart
+  SqlBuilderChart,
+  AnalysisChartDSL
 } from '../../types';
 import { isDSLAnalysis } from 'src/app/modules/analyze/types';
 
@@ -139,7 +140,7 @@ export class ChartGridComponent implements OnInit {
     };
     this.chartOptions = this._chartService.getChartConfigFor(
       isDSLAnalysis(analysis)
-        ? analysis.chartOptions.chartType
+        ? (<AnalysisChartDSL>analysis).chartOptions.chartType
         : analysis.chartType,
       { chart, legend }
     );
@@ -205,7 +206,7 @@ export class ChartGridComponent implements OnInit {
   }
 
   get chartTitle() {
-    return this.analysis.chartOptions.chartTitle || this.analysis.name;
+    return get(this.analysis, 'chartOptions.chartTitle') || this.analysis.name;
   }
 
   /**
@@ -260,15 +261,19 @@ export class ChartGridComponent implements OnInit {
 
     return [
       ...this._chartService.dataToChangeConfig(
-        analysis.chartOptions.chartType,
+        get(analysis, 'chartOptions.chartType'),
         analysis.sipQuery,
         orderedData || data,
-        { labels, labelOptions: analysis.chartOptions.labelOptions, sorts }
+        {
+          labels,
+          labelOptions: get(analysis, 'chartOptions.labelOptions'),
+          sorts
+        }
       ),
       { path: 'title.exportFilename', data: analysis.name },
       {
         path: 'chart.inverted',
-        data: analysis.chartOptions.isInverted
+        data: get(analysis, 'chartOptions.isInverted')
       }
     ];
   }

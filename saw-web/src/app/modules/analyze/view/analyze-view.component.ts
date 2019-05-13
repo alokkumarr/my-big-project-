@@ -52,6 +52,7 @@ export class AnalyzeViewComponent implements OnInit {
     ['chart', 'Chart'],
     ['report', 'Report'],
     ['pivot', 'Pivot'],
+    ['map', 'Map'],
     ['scheduled', 'Scheduled']
   ].map(([value, label]) => ({ value, label }));
   public filterObj = {

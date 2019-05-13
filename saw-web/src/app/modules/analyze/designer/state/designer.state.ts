@@ -4,6 +4,10 @@ import * as get from 'lodash/get';
 import * as unset from 'lodash/unset';
 import * as findIndex from 'lodash/findIndex';
 import * as forEach from 'lodash/forEach';
+import * as reduce from 'lodash/reduce';
+import * as set from 'lodash/set';
+import * as remove from 'lodash/remove';
+import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
@@ -12,7 +16,12 @@ import moment from 'moment';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
-import { DesignerStateModel, DSLChartOptionsModel } from '../types';
+import {
+  DesignerStateModel,
+  DSLChartOptionsModel,
+  AnalysisChartDSL,
+  AnalysisMapDSL
+} from '../types';
 import {
   DesignerInitGroupAdapters,
   DesignerAddColumnToGroupAdapter,
@@ -23,7 +32,7 @@ import {
   DesignerInitForkAnalysis,
   DesignerInitNewAnalysis,
   DesignerUpdateAnalysisMetadata,
-  DesignerUpdateAnalysisChartType,
+  DesignerUpdateAnalysisSubType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
@@ -36,6 +45,8 @@ import {
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
+  DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns,
+  DesignerMergeSupportsIntoAnalysis,
   DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
@@ -87,6 +98,54 @@ export class DesignerState {
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
     return state.groupAdapters;
+  }
+
+  @Action(DesignerMergeSupportsIntoAnalysis)
+  mergeSupportsIntoAnalysis(
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { supports }: DesignerMergeSupportsIntoAnalysis
+  ) {
+    const analysis = getState().analysis;
+
+    set(analysis, 'supports', supports);
+
+    return patchState({
+      analysis: { ...analysis }
+    });
+  }
+
+  @Action(DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns)
+  mergeMetricArtifactColumnWithAnalysisArtifactColumns(
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    {
+      metricArtifactColumns
+    }: DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const artifacts = sipQuery.artifacts;
+
+    const metricArtifactMap = reduce(
+      metricArtifactColumns,
+      (accumulator, column) => {
+        accumulator[column.columnName] = column;
+        return accumulator;
+      },
+      {}
+    );
+
+    forEach(artifacts, artifact => {
+      forEach(artifact.fields, column => {
+        const metricColumn = metricArtifactMap[column.columnName];
+        if (metricColumn.geoType) {
+          column.geoType = metricColumn.geoType;
+        }
+      });
+    });
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+    });
   }
 
   @Action(DesignerLoadMetric)
@@ -154,6 +213,7 @@ export class DesignerState {
       ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {}),
       name: artifactColumn.name,
       type: artifactColumn.type,
+      geoType: artifactColumn.geoType,
       table: artifactColumn.table || (<any>artifactColumn).tableName,
       ...(isDateType
         ? {
@@ -174,6 +234,11 @@ export class DesignerState {
         artifactColumnToBeAdded
       ];
     }
+
+    // cleanup empty artifacts
+    remove(sipQuery.artifacts, artifact => {
+      return isEmpty(artifact.fields);
+    });
 
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
@@ -337,19 +402,31 @@ export class DesignerState {
     });
   }
 
-  @Action(DesignerUpdateAnalysisChartType)
+  @Action(DesignerUpdateAnalysisSubType)
   updateChartType(
     { patchState, getState }: StateContext<DesignerStateModel>,
-    { chartType }: DesignerUpdateAnalysisChartType
+    { subType }: DesignerUpdateAnalysisSubType
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
-    return patchState({
-      analysis: {
-        ...analysis,
-        chartOptions: { ...chartOptions, chartType }
-      }
-    });
+    switch (analysis.type) {
+      case 'chart':
+        const chartOptions =
+          (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
+        return patchState({
+          analysis: {
+            ...analysis,
+            chartOptions: { ...chartOptions, chartType: subType }
+          }
+        });
+      case 'map':
+        const mapOptions = (<AnalysisMapDSL>analysis).mapOptions;
+        return patchState({
+          analysis: {
+            ...analysis,
+            mapOptions: { ...mapOptions, mapType: subType }
+          }
+        });
+    }
   }
 
   @Action(DesignerUpdateAnalysisChartInversion)
@@ -358,7 +435,8 @@ export class DesignerState {
     { isInverted }: DesignerUpdateAnalysisChartInversion
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
     return patchState({
       analysis: {
         ...analysis,
@@ -373,7 +451,8 @@ export class DesignerState {
     { chartTitle }: DesignerUpdateAnalysisChartTitle
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
     return patchState({
       analysis: {
         ...analysis,
@@ -388,7 +467,8 @@ export class DesignerState {
     { legend }: DesignerUpdateAnalysisChartLegend
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
     return patchState({
       analysis: {
         ...analysis,
@@ -403,7 +483,8 @@ export class DesignerState {
     { labelOptions }: DesignerUpdateAnalysisChartLabelOptions
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
     return patchState({
       analysis: {
         ...analysis,
@@ -418,7 +499,8 @@ export class DesignerState {
     { xAxis }: DesignerUpdateAnalysisChartXAxis
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
     return patchState({
       analysis: {
         ...analysis,
@@ -433,7 +515,8 @@ export class DesignerState {
     { yAxis }: DesignerUpdateAnalysisChartYAxis
   ) {
     const analysis = getState().analysis;
-    const chartOptions = analysis.chartOptions || defaultDSLChartOptions;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
     return patchState({
       analysis: {
         ...analysis,
@@ -480,14 +563,14 @@ export class DesignerState {
         groupAdapters = this._designerService.getPivotGroupAdapters(fields);
         break;
       case 'chart':
-        const { chartOptions } = analysis;
+        const { chartOptions } = <AnalysisChartDSL>analysis;
         groupAdapters = this._designerService.getChartGroupAdapters(
           fields,
           chartOptions.chartType
         );
         break;
       case 'map':
-        const { mapOptions } = analysis;
+        const { mapOptions } = <AnalysisMapDSL>analysis;
         groupAdapters = this._designerService.getMapGroupAdapters(
           fields,
           mapOptions.mapType

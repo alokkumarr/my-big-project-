@@ -39,11 +39,13 @@
   >
   </report-grid-upgraded>
   <designer-map-chart
-    *ngIf="analysis.type | isAnalysisType: 'mapChart':analysis?.chartType"
+    *ngIf="
+      analysis.type | isAnalysisType: 'mapChart':analysis?.mapOptions?.mapType
+    "
     [chartType]="chartType"
     [data]="previewData"
     [auxSettings]="{ legend: analysis.legend }"
-    [sqlBuilder]="analysis.sqlBuilder"
+    [sipQuery]="analysis.sipQuery"
   >
   </designer-map-chart>
   <designer-chart
@@ -59,13 +61,13 @@
   >
   </designer-chart>
   <div
-    *ngIf="analysis.type | isAnalysisType: 'map':analysis?.chartType"
+    *ngIf="analysis.type | isAnalysisType: 'map':analysis?.mapOptions?.mapType"
     class="map-container"
   >
     <designer-map
       [auxSettings]="analysis.mapOptions"
       [data]="previewData"
-      [sqlBuilder]="analysis.sqlBuilder"
+      [sipQuery]="analysis.sipQuery"
     >
     </designer-map>
   </div>

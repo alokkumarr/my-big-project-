@@ -13,7 +13,12 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as clone from 'lodash/clone';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Analysis, AnalysisDSL, AnalysisType, AnalysisPivotDSL } from '../../../models';
+import {
+  Analysis,
+  AnalysisDSL,
+  AnalysisType,
+  AnalysisPivotDSL
+} from '../../../models';
 
 import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
@@ -21,6 +26,7 @@ import AppConfig from '../../../../../appConfig';
 import { zip, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
+import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
@@ -226,7 +232,9 @@ export class AnalyzeService {
       .toPromise()
       .then(resp => {
         const data = fpGet(`data`, resp);
-        const queryBuilder = options.isDSL ? fpGet(`sipQuery`, resp) : fpGet(`queryBuilder`, resp);
+        const queryBuilder = options.isDSL
+          ? fpGet(`sipQuery`, resp)
+          : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
         return {
@@ -268,7 +276,9 @@ export class AnalyzeService {
       .toPromise()
       .then(resp => {
         const data = fpGet(`data`, resp);
-        const queryBuilder = options.isDSL ? fpGet(`sipQuery`, resp) : fpGet(`queryBuilder`, resp);
+        const queryBuilder = options.isDSL
+          ? fpGet(`sipQuery`, resp)
+          : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
         return {
@@ -614,11 +624,22 @@ export class AnalyzeService {
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
-  createAnalysis(metricId, type): Promise<AnalysisPivotDSL | AnalysisDSL | Analysis> {
+  getSemanticObect(semanticId: string) {
+    return this.getRequest(
+      `internal/semantic/workbench/${semanticId}`
+    ).toPromise();
+  }
+
+  createAnalysis(
+    metricId,
+    type
+  ): Promise<AnalysisPivotDSL | AnalysisDSL | Analysis> {
     // return this.createAnalysisNonDSL(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
-      ? this.createAnalysisDSL(type === 'chart' ?
-          this.newAnalysisChartModel(metricId, type) : this.newAnalysisPivotModel(metricId, type)
+      ? this.createAnalysisDSL(
+          type === 'chart'
+            ? this.newAnalysisChartModel(metricId, type)
+            : this.newAnalysisPivotModel(metricId, type)
         ).toPromise()
       : this.createAnalysisNonDSL(metricId, type);
   }
@@ -650,6 +671,22 @@ export class AnalyzeService {
     semanticId: string,
     type: AnalysisType
   ): Partial<AnalysisDSL> {
+    const chartOptions = {
+      chartType: 'column',
+      chartTitle: 'Untitled Analysis',
+      isInverted: false,
+      legend: {
+        align: 'right',
+        layout: 'vertical'
+      },
+      xAxis: {
+        title: null
+      },
+      yAxis: {
+        title: null
+      }
+    };
+    const mapOptions = DEFAULT_MAP_SETTINGS;
     return {
       type,
       semanticId,
@@ -669,24 +706,10 @@ export class AnalyzeService {
           storageType: 'ES'
         }
       },
-      chartOptions: {
-        chartType: 'column',
-        chartTitle: '',
-        isInverted: false,
-        legend: {
-          align: 'right',
-          layout: 'vertical'
-        },
-        xAxis: {
-          title: null
-        },
-        yAxis: {
-          title: null
-        }
-      }
+      chartOptions: type === 'chart' ? chartOptions : null,
+      mapOptions: type === 'map' ? mapOptions : null
     };
   }
-
 
   newAnalysisPivotModel(
     semanticId: string,
