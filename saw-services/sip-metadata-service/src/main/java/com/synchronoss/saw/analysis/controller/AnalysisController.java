@@ -8,6 +8,7 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -222,8 +223,7 @@ public class AnalysisController {
   public List<ObjectNode> getAnalysisByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "category") String id,
-      @RequestParam(name = "userId", required = false) Long userId) {
+      @RequestParam(name = "category") String id) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {
@@ -232,7 +232,9 @@ public class AnalysisController {
 
       // TODO: return analysis response here. Will be taken care in the future.
     }
-    if (userId != null) {
+    Long userId = authTicket.getUserId();
+    Boolean privateCategory = SipMetadataUtils.checkPrivateCategory(authTicket, id);
+    if (privateCategory) {
       return analysisService.getAnalysisByCategoryForUserId(id, userId, authTicket);
     }
     return analysisService.getAnalysisByCategory(id, authTicket);

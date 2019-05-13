@@ -10,6 +10,9 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
+import com.synchronoss.bda.sip.jwt.token.ProductModules;
+import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
@@ -453,5 +456,34 @@ public class SipMetadataUtils {
     }
 
     return null;
+  }
+
+  /**
+   * checks  category is private or not.
+   *
+   * @param ticket Ticket
+   * @param categoryId String
+   * @return Boolean.
+   */
+  public static Boolean checkPrivateCategory(Ticket ticket, String categoryId) {
+    for (Products product : ticket.getProducts()) {
+      List<ProductModules> productModules = product.getProductModules();
+      for (ProductModules prodMod : productModules) {
+        List<ProductModuleFeature> productModuleFeature = prodMod.getProdModFeature();
+        for (ProductModuleFeature prodModFeat : productModuleFeature) {
+          if (prodModFeat.getProdModFeatureName().equalsIgnoreCase("My Analysis")) {
+            List<ProductModuleFeature> productModuleSubfeatures =
+                prodModFeat.getProductModuleSubFeatures();
+            for (ProductModuleFeature prodModSubFeat : productModuleSubfeatures) {
+              String cat = String.valueOf(prodModSubFeat.getProdModFeatureID());
+              if (categoryId.equalsIgnoreCase(cat)) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 }
