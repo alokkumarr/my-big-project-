@@ -77,11 +77,13 @@ public class StorageProxyUtil {
   public static List<DataSecurityKeyDef> getDsks(List<TicketDSKDetails> dskList) {
     DataSecurityKeyDef dataSecurityKeyDef;
     List<DataSecurityKeyDef> dskDefList = new ArrayList<>();
-    for (TicketDSKDetails dsk : dskList) {
-      dataSecurityKeyDef = new DataSecurityKeyDef();
-      dataSecurityKeyDef.setName(dsk.getName());
-      dataSecurityKeyDef.setValues(dsk.getValues());
-      dskDefList.add(dataSecurityKeyDef);
+    if (dskDefList != null && !dskList.isEmpty()) {
+      for (TicketDSKDetails dsk : dskList) {
+        dataSecurityKeyDef = new DataSecurityKeyDef();
+        dataSecurityKeyDef.setName(dsk.getName());
+        dataSecurityKeyDef.setValues(dsk.getValues());
+        dskDefList.add(dataSecurityKeyDef);
+      }
     }
     return (dskDefList);
   }
