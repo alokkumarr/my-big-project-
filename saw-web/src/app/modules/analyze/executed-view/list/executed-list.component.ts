@@ -53,9 +53,10 @@ export class ExecutedListComponent {
         dataField: 'finished',
         dataType: 'date',
         calculateCellValue: rowData => {
-          return rowData.finishedTime
+          const timeStamp = rowData.finished || rowData.finishedTime;
+          return timeStamp
             ? moment
-                .utc(rowData.finishedTime)
+                .utc(timeStamp)
                 .local()
                 .format('YYYY/MM/DD h:mm A')
             : null;
