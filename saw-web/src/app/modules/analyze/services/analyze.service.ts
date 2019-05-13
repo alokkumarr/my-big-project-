@@ -13,7 +13,12 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as clone from 'lodash/clone';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Analysis, AnalysisDSL, AnalysisType, AnalysisPivotDSL } from '../../../models';
+import {
+  Analysis,
+  AnalysisDSL,
+  AnalysisType,
+  AnalysisPivotDSL
+} from '../../../models';
 
 import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
@@ -225,8 +230,10 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = fpGet(`data`, resp);
-        const queryBuilder = options.isDSL ? fpGet(`sipQuery`, resp) : fpGet(`queryBuilder`, resp);
+        const data = fpGet(`data`, resp) || [];
+        const queryBuilder = options.isDSL
+          ? fpGet(`sipQuery`, resp)
+          : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
         return {
@@ -267,8 +274,10 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = fpGet(`data`, resp);
-        const queryBuilder = options.isDSL ? fpGet(`sipQuery`, resp) : fpGet(`queryBuilder`, resp);
+        const data = fpGet(`data`, resp) || [];
+        const queryBuilder = options.isDSL
+          ? fpGet(`sipQuery`, resp)
+          : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
         return {
@@ -614,11 +623,16 @@ export class AnalyzeService {
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
-  createAnalysis(metricId, type): Promise<AnalysisPivotDSL | AnalysisDSL | Analysis> {
+  createAnalysis(
+    metricId,
+    type
+  ): Promise<AnalysisPivotDSL | AnalysisDSL | Analysis> {
     // return this.createAnalysisNonDSL(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
-      ? this.createAnalysisDSL(type === 'chart' ?
-          this.newAnalysisChartModel(metricId, type) : this.newAnalysisPivotModel(metricId, type)
+      ? this.createAnalysisDSL(
+          type === 'chart'
+            ? this.newAnalysisChartModel(metricId, type)
+            : this.newAnalysisPivotModel(metricId, type)
         ).toPromise()
       : this.createAnalysisNonDSL(metricId, type);
   }
@@ -686,7 +700,6 @@ export class AnalyzeService {
       }
     };
   }
-
 
   newAnalysisPivotModel(
     semanticId: string,
