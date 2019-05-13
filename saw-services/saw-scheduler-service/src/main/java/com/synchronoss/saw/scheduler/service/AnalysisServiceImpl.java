@@ -1,7 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.slf4j.Logger;
@@ -233,10 +233,10 @@ public class AnalysisServiceImpl implements AnalysisService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         String dslUrl = metadataAnalysisUrl + "/" + analysisId;
         logger.debug("URL for SIP Query :" + dslUrl);
-        TempAnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, TempAnalysisResponse.class);
+        AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
         logger.debug("Analysis body :" + analysisResponse.getAnalysis());
-        JsonNode sipQuery = analysisResponse.getAnalysis().get("sipQuery");
+        SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
         logger.debug("SIP Query :" + analysisResponse.getAnalysis());
 
         String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType="+"scheduled";

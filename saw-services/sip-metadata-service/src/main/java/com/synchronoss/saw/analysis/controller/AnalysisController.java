@@ -2,11 +2,9 @@ package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
-import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -178,22 +176,22 @@ public class AnalysisController {
       value = "Fetch Analysis definition API",
       nickname = "FetchAnalysis",
       notes = "",
-      response = TempAnalysisResponse.class)
+      response = AnalysisResponse.class)
   @RequestMapping(
       value = "/{id}",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public TempAnalysisResponse getAnalysis(
+  public AnalysisResponse getAnalysis(
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id) {
 
-    TempAnalysisResponse analysisResponse = new TempAnalysisResponse();
+    AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
-    /**if (authTicket == null) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication token");
-    }*/
+    /**
+     * if (authTicket == null) { response.setStatus(401); analysisResponse.setMessage("Invalid
+     * authentication token"); }
+     */
     analysisResponse.setAnalysis(analysisService.getAnalysis(id, authTicket));
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);
@@ -212,12 +210,12 @@ public class AnalysisController {
       value = "Fetch Analysis definition API",
       nickname = "FetchAnalysis",
       notes = "",
-      response = AnalysisResponse.class)
+      response = List.class)
   @RequestMapping(
       value = "",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public List<ObjectNode> getAnalysisByCategory(
+  public List<Analysis> getAnalysisByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestParam(name = "category") String id) {

@@ -128,6 +128,15 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         return null;
     }
 
+    public Document readDocumet(String id) throws Exception {
+        Document ds = _read(id);
+        if (ds != null) {
+            logger.trace("Entity: " + ds.asJsonString());
+            return ds;
+        }
+        return null;
+    }
+
     public void delete(JsonElement src) throws Exception {
         if (!src.getAsJsonObject().has(DataSetProperties.Id.toString()))
             throw new Exception("Metadata document does contain ID");
