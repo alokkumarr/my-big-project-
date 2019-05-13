@@ -649,13 +649,15 @@ public class SftpServiceImpl extends SipPluginContract {
     BisJobEntity jobEntity = this.executeSipJob(channelId, routeId, filePattern);
     
     logger.info(
-        "TransferData starts here with the channelId " + channelId + " and routeId " + routeId
+        "Scanning file pattern starts here with the channelId " 
+        + channelId + " and routeId " + routeId
         + "for job Id::" + jobEntity.getJobId());
     
     List<BisDataMetaInfo> listOfFiles = new ArrayList<>();
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory.getSessionFactory(channelId);
     try (Session<?> session = sesionFactory.getSession()) {
       if (session != null & session.isOpen()) {
+        
         logger.trace("connected successfully " + channelId);
         logger.trace("session opened starts here ");
         Optional<BisRouteEntity> routeEntity = this.findRouteById(routeId);
@@ -733,7 +735,7 @@ public class SftpServiceImpl extends SipPluginContract {
               Thread thread = Thread.currentThread();
               
               logger.info(
-                         "Transfer data started with routeId: " + routeId 
+                         "scanning pattern started with routeId: " + routeId 
                          + " started time: " + new Date());
               logger.info("Thread Id started with: " + thread);
               // Adding to a list has been removed as a part of optimization
@@ -755,14 +757,14 @@ public class SftpServiceImpl extends SipPluginContract {
               long durationInMillis =
                          Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
               logger.info(
-                         "Transfer data ended with routeId: " + routeId 
+                         "scanning pattern ended with routeId: " + routeId 
                          + " ended time: " + new Date());
               logger.info("Thread Id ended with: " + thread);
               logger.info("Total time taken in seconds to complete the "
                           + "process with channel Id: "
                          + channelId + " routeId: " + routeId + ": "
                          + TimeUnit.MILLISECONDS.toSeconds(durationInMillis));
-              logger.trace("invocation of method transferData when "
+              logger.trace("invocation of method scanning pattern when "
                          + "directory is availble in destination with location "
                          + "ends here " + sourceLocation
                          + " & file pattern " + filePattern);
@@ -789,7 +791,7 @@ public class SftpServiceImpl extends SipPluginContract {
       sipLogService.updateJobLog(jobEntity.getJobId(), "FAILED", 0, 0);
     }
     logger.trace(
-        "TransferData ends here with the channelId " + channelId + " and routeId " + routeId);
+        "scanning pattern ends here with the channelId " + channelId + " and routeId " + routeId);
     return listOfFiles;
   }
 
@@ -1290,7 +1292,7 @@ public class SftpServiceImpl extends SipPluginContract {
               try {
                 final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
                 bisDataMetaInfo.setProcessId(logId);
-
+                logger.info("Local file path ::" + localFile.getPath());
                 sipLogService.upsertInProgressStatus(logId, localFile.getPath(),
                     Date.from(fileTransStartTime.toInstant()));
                 if (stream != null) {

@@ -17,13 +17,12 @@ import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.service.SipLogging;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import javassist.NotFoundException;
-
+import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -37,8 +36,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import sncr.bda.core.file.FileProcessor;
+import sncr.bda.core.file.FileProcessorFactory;
+
+
 
 @Service
 public class RetryExecutorService {
@@ -49,6 +52,8 @@ public class RetryExecutorService {
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+  
+
 
   @Autowired
   private SipLogging sipLogService;
@@ -104,6 +109,16 @@ public class RetryExecutorService {
 
   @Autowired
   private SipRetryPluginFactory factory;
+  
+  FileProcessor processor;
+  
+  
+  @PostConstruct
+  private void init() throws Exception {
+    
+    processor = FileProcessorFactory.getFileProcessor(defaultDestinationLocation);
+
+  }
 
   /**
    * This is method to handle inconsistency during failure. Step1: Check if any
@@ -313,7 +328,14 @@ public class RetryExecutorService {
       if (fileDelete != null && fileDelete
           .getParentFile() != null) {
         logger.trace("Parent Directory deleted : " + fileDelete);
-        File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
+        try {
+          processor.deleteFile(fileDelete.getPath(), 
+              defaultDestinationLocation, mapRfsUser);
+        } catch (IOException ex) {
+          logger.error("Error during delete of currupted file:" 
+              + ex.getMessage());
+        }
+        /*File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
           @Override
           public boolean accept(File file) {
             return !file.isHidden();
@@ -324,7 +346,7 @@ public class RetryExecutorService {
         } else {
           logger.trace("Directory deleted :", fileDelete);
           IntegrationUtils.removeDirectory(fileDelete.getParentFile());
-        }
+        }*/
       }
     } else {
       logger.trace("Corrupted file does not exist.");
