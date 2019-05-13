@@ -228,6 +228,20 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       });
   }
 
+  imageUrl2DataUrl(imageUrl) {
+    return fetch(imageUrl)
+      .then(response => response.blob())
+      .then(
+        blob =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          })
+      );
+  }
+
   changeMapCanvasesToImage() {
     const mapBoxComponents = Array.from(
       this.downloadContainer.nativeElement.getElementsByTagName('map-box')
@@ -241,16 +255,13 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       const { height, width } = canvas.style;
       const imageElem = document.createElement('img');
 
-      imageElem.src = imageUrl;
-      imageElem.height = parseInt(height, 10);
-      imageElem.width = parseInt(width, 10);
-      backupImgCanvasPairs.push({ canvas, imageElem });
-      canvas.replaceWith(imageElem);
-
-      return new Promise(resolve => {
-        imageElem.addEventListener('load', () => {
-          resolve();
-        });
+      return this.imageUrl2DataUrl(imageUrl).then((dataUrl: string) => {
+        imageElem.src = dataUrl;
+        imageElem.crossOrigin = 'anonymous';
+        imageElem.height = parseInt(height, 10);
+        imageElem.width = parseInt(width, 10);
+        backupImgCanvasPairs.push({ canvas, imageElem });
+        canvas.replaceWith(imageElem);
       });
     });
 
@@ -266,7 +277,6 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   downloadDashboard() {
     this.changeMapCanvasesToImage().then(backupImgCanvasPairs => {
       this.turnHtml2pdf().then(() => {
-        console.log('backupCanvases', backupImgCanvasPairs);
         forEach(backupImgCanvasPairs, ({ canvas, imageElem }) => {
           imageElem.replaceWith(canvas);
         });

@@ -79,7 +79,6 @@ export class MapBoxComponent implements OnChanges {
     );
     const { height, width } = canvas.style;
     const size = `${parseInt(width, 10)}x${parseInt(height, 10)}`;
-    // console.log('attributeStyleMap', canvas[0]);
     const [lng, lat] = this.center;
     const style = last(split(this.mapStyle, '/'));
     const apiBaseURL = get(API_URL, 'api.staticMapUrl');
