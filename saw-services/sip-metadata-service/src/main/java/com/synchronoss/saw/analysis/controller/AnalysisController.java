@@ -208,7 +208,7 @@ public class AnalysisController {
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
-   * @param id Category id
+   * @param categoryId Category id
    * @return List of Analysis
    */
   @ApiOperation(
@@ -223,7 +223,7 @@ public class AnalysisController {
   public List<ObjectNode> getAnalysisByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "category") String id) {
+      @RequestParam(name = "category") String categoryId) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {
@@ -233,10 +233,10 @@ public class AnalysisController {
       // TODO: return analysis response here. Will be taken care in the future.
     }
     Long userId = authTicket.getUserId();
-    Boolean privateCategory = SipMetadataUtils.checkPrivateCategory(authTicket, id);
+    Boolean privateCategory = SipMetadataUtils.checkPrivateCategory(authTicket, categoryId);
     if (privateCategory) {
-      return analysisService.getAnalysisByCategoryForUserId(id, userId, authTicket);
+      return analysisService.getAnalysisByCategoryForUserId(categoryId, userId, authTicket);
     }
-    return analysisService.getAnalysisByCategory(id, authTicket);
+    return analysisService.getAnalysisByCategory(categoryId, authTicket);
   }
 }
