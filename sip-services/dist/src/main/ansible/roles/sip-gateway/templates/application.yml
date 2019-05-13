@@ -174,11 +174,12 @@ api:
             method: DELETE
             path: '[/]ingestion/batch.*'
 
-sip:
-   ssl:
-     enable : {{ sip_secure  | default('false') }}
 
    {% if sip_secure %}
+
+sip:
+   ssl:
+     enable : true
 
    trust:
        store: ${server.ssl.trust-store}
@@ -186,5 +187,12 @@ sip:
    key:
       store: ${server.ssl.key-store}
       password: ${server.ssl.key-store-password}
+
+  {% else %}
+
+sip:
+   ssl:
+     enable : false
+     
 
   {% endif %}
