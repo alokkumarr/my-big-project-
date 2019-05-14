@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -510,14 +512,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     public ExecutionResponse fetchExecutionsData(String executionId)
     {
         ExecutionResponse executionResponse = new ExecutionResponse();
-        JsonNode element = null;
         ObjectMapper objectMapper = new ObjectMapper();
         ExecutionResultStore executionResultStore =
             null;
         try {
             executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
-            element = objectMapper.readTree(executionResultStore.readDocumet(executionId).asJsonString());
-            ExecutionResult executionResult = objectMapper.treeToValue(element, ExecutionResult.class);
+            Document doc = executionResultStore.readDocumet(executionId);
+            logger.info("Doc : "+doc.asJsonString());
+            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            ExecutionResult executionResult = objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
             executionResponse.setExecutedBy("");
             executionResponse.setSipQuery(executionResult.getSipQuery());
