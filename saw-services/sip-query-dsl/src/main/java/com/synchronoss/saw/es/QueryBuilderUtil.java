@@ -410,16 +410,20 @@ public class QueryBuilderUtil {
    */
   public static DataSecurityKey checkDSKApplicableAnalysis(
       List<Artifact> artifactList, DataSecurityKey dataSecurityKey) {
-    List<DataSecurityKeyDef> dataSecurityKeyDefList = dataSecurityKey.getDataSecuritykey();
+    List<DataSecurityKeyDef> dataSecurityKeyDefList =
+        dataSecurityKey.getDataSecuritykey() != null ? dataSecurityKey.getDataSecuritykey() : null;
     List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
     String artifactName = null;
     List<Field> fieldList;
-    for (Artifact artifact : artifactList) {
-      artifactName = artifact.getArtifactsName();
-      fieldList = artifact.getFields();
-      for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-        if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
-          dataSecurityKeyDefs.add(dataSecurityKeyDef);
+    if ((artifactList != null && !artifactList.isEmpty())
+        && (dataSecurityKeyDefList != null && !dataSecurityKeyDefList.isEmpty())) {
+      for (Artifact artifact : artifactList) {
+        artifactName = artifact.getArtifactsName();
+        fieldList = artifact.getFields();
+        for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
+          if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
+            dataSecurityKeyDefs.add(dataSecurityKeyDef);
+          }
         }
       }
     }

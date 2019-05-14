@@ -27,6 +27,7 @@ public class Analysis {
       "module",
       "createdTime",
       "createdBy",
+      "userId",
       "modifiedTime",
       "modifiedBy",
       "designerEdit",
@@ -70,6 +71,9 @@ public class Analysis {
 
   @JsonProperty("createdBy")
   private String createdBy;
+
+  @JsonProperty("userId")
+  private Long userId;
 
   @JsonProperty("modifiedTime")
   private Long modifiedTime;
@@ -149,6 +153,7 @@ public class Analysis {
     this.id = id;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("parentAnalysisId")
   public String getParentAnalysisId() {
     return parentAnalysisId;
@@ -217,6 +222,17 @@ public class Analysis {
     this.createdBy = createdBy;
   }
 
+  @JsonProperty("userId")
+  public Long getUserId() {
+    return userId;
+  }
+
+  @JsonProperty("userId")
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("modifiedTime")
   public Long getModifiedTime() {
     return modifiedTime;
@@ -227,6 +243,7 @@ public class Analysis {
     this.modifiedTime = modifiedTime;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("modifiedBy")
   public String getModifiedBy() {
     return modifiedBy;
@@ -237,16 +254,19 @@ public class Analysis {
     this.modifiedBy = modifiedBy;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("chartOptions")
   public ChartOptions getChartOptions() {
     return this.chartOptions;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("chartOptions")
   public void setChartOptions(ChartOptions chartOptions) {
     this.chartOptions = chartOptions;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("designerEdit")
   public Boolean getDesignerEdit() {
     return this.designerEdit;
@@ -273,6 +293,7 @@ public class Analysis {
    * @return MapOptions Object
    */
   @JsonProperty("mapOptions")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public MapOptions getMapOptions() {
     return mapOptions;
   }
@@ -300,6 +321,7 @@ public class Analysis {
         .append("module", module)
         .append("createdTime", createdTime)
         .append("createdBy", createdBy)
+        .append("userId", userId)
         .append("modifiedTime", modifiedTime)
         .append("modifiedBy", modifiedBy)
         .append("chartOptions", chartOptions)
@@ -322,6 +344,7 @@ public class Analysis {
         .append(sipQuery)
         .append(id)
         .append(createdBy)
+        .append(userId)
         .append(semanticId)
         .append(customerCode)
         .append(name)
@@ -349,6 +372,7 @@ public class Analysis {
         .append(sipQuery, rhs.sipQuery)
         .append(id, rhs.id)
         .append(createdBy, rhs.createdBy)
+        .append(userId,rhs.userId)
         .append(semanticId, rhs.semanticId)
         .append(customerCode, rhs.customerCode)
         .append(name, rhs.name)

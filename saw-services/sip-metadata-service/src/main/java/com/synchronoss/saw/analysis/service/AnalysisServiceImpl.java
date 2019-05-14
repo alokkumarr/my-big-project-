@@ -156,4 +156,27 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
     return analysisList;
   }
+
+  @Override
+  public List<Analysis> getAnalysisByCategoryForUserId(
+      String categoryId, Long userId, Ticket ticket) throws SipReadEntityException {
+    List<Document> doc = null;
+    List<Analysis> objDocs = new ArrayList<>();
+    try {
+      analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+      doc = analysisMetadataStore.searchByCategoryForUserId(categoryId, userId);
+      if (doc == null) {
+        return null;
+      }
+      for (Document d : doc) {
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objDocs.add(objectMapper.readValue(d.asJsonString(), Analysis.class));
+      }
+    } catch (Exception e) {
+      logger.error("Exception occurred while fetching analysis by category for userId", e);
+      throw new SipReadEntityException(
+          "Exception occurred while fetching analysis by category for userId", e);
+    }
+    return objDocs;
+  }
 }

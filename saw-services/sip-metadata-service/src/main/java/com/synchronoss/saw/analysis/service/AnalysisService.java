@@ -27,4 +27,9 @@ public interface AnalysisService {
   List<Analysis> getAnalysisByCategory(
       @NotNull(message = "AnalysisID cannot be null") @NotNull String categoryID,
       @Valid Ticket ticket);
+
+  List<Analysis> getAnalysisByCategoryForUserId(
+      @NotNull(message = "categoryID cannot be null") @NotNull String categoryID,
+      @NotNull(message = "userId cannot be null") @NotNull Long userId,
+      @Valid Ticket ticket);
 }
