@@ -8,6 +8,7 @@ import {
 import { MatDialog, MatSidenav } from '@angular/material';
 import * as html2pdf from 'html2pdf.js';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import * as Bowser from 'bowser';
 
 import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -16,7 +17,11 @@ import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { FirstDashboardGuard } from '../../guards';
-import { JwtService, ConfigService } from '../../../../common/services';
+import {
+  JwtService,
+  ConfigService,
+  ToastService
+} from '../../../../common/services';
 import { PREFERENCES } from '../../../../common/services/configuration.service';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
@@ -32,6 +37,11 @@ function downloadDataUrlFromJavascript(filename, dataUrl) {
   const blob = dataURItoBlob(dataUrl);
   saveAs(blob, filename);
 }
+
+const browser = get(
+  Bowser.getParser(window.navigator.userAgent).getBrowser(),
+  'name'
+);
 
 @Component({
   selector: 'observe-view',
@@ -67,7 +77,8 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     private filters: GlobalFilterService,
     private configService: ConfigService,
     private jwt: JwtService,
-    private _route: ActivatedRoute
+    private _route: ActivatedRoute,
+    public _toastMessage: ToastService
   ) {
     const navigationListener = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -275,6 +286,18 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   downloadDashboard() {
+    const mapBoxComponents = Array.from(
+      this.downloadContainer.nativeElement.getElementsByTagName('map-box')
+    );
+
+    if (browser !== 'Chrome' && !isEmpty(mapBoxComponents)) {
+      const title = 'Browser not supported.';
+      const msg =
+        'Downloading dashboard with map analyses only works with Chrome browser at the moment.';
+      this._toastMessage.warn(msg, title);
+      return;
+    }
+
     this.changeMapCanvasesToImage().then(backupImgCanvasPairs => {
       this.turnHtml2pdf().then(() => {
         forEach(backupImgCanvasPairs, ({ canvas, imageElem }) => {
