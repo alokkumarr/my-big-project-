@@ -1,7 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.slf4j.Logger;
@@ -234,21 +234,22 @@ public class AnalysisServiceImpl implements AnalysisService {
     return null;
   }
 
-  @Override
-  public void executeDslAnalysis(String analysisId) {
-    String dslUrl = metadataAnalysisUrl + "/" + analysisId;
-    logger.debug("URL for SIP Query : " + dslUrl);
-    TempAnalysisResponse analysisResponse =
-        restTemplate.getForObject(dslUrl, TempAnalysisResponse.class);
 
-    logger.debug("Analysis body :" + analysisResponse.getAnalysis());
-    JsonNode sipQuery = analysisResponse.getAnalysis().get("sipQuery");
-    logger.debug("SIP Query :" + analysisResponse.getAnalysis().get("sipQuery"));
+    @Override
+    public void executeDslAnalysis(String analysisId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String dslUrl = metadataAnalysisUrl + "/" + analysisId;
+        logger.debug("URL for SIP Query :" + dslUrl);
+        AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
-    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=" + "scheduled";
-    HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
+        logger.debug("Analysis body :" + analysisResponse.getAnalysis());
+        SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
+        logger.debug("SIP Query :" + analysisResponse.getAnalysis());
 
-    JsonNode jsonNode = restTemplate.postForObject(url, requestEntity, JsonNode.class);
-    logger.debug("Execute Scheduler Response :" + jsonNode.asText());
-  }
+        String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType="+"scheduled";
+        HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery, headers);
+
+        restTemplate.postForObject(url, requestEntity, String.class);
+    }
 }

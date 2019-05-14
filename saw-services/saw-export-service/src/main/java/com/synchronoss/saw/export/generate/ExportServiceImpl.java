@@ -1,8 +1,13 @@
 package com.synchronoss.saw.export.generate;
 
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
@@ -898,7 +903,6 @@ public class ExportServiceImpl implements ExportService {
    */
   public SipQuery getSipQuery(String analysisId) {
     SipQuery sipQuery = null;
-    try {
       ObjectMapper objectMapper = new ObjectMapper();
       RestTemplate restTemplate = new RestTemplate();
       HttpHeaders headers = new HttpHeaders();
@@ -906,15 +910,11 @@ public class ExportServiceImpl implements ExportService {
 
       String url = metaDataServiceExport + "/dslanalysis/" + analysisId;
       logger.debug("SIP query url for analysis fetch : " + url);
-      TempAnalysisResponse analysisResponse =
-          restTemplate.getForObject(url, TempAnalysisResponse.class);
-      JsonNode tempJsonNode = analysisResponse.getAnalysis().get("sipQuery");
+      AnalysisResponse analysisResponse =
+          restTemplate.getForObject(url, AnalysisResponse.class);
+      sipQuery = analysisResponse.getAnalysis().getSipQuery();
 
-      sipQuery = objectMapper.readValue(tempJsonNode.toString(), SipQuery.class);
       logger.debug("Fetched SIP query for analysis : " + sipQuery.toString());
-    } catch (IOException ex) {
-      logger.error("Sip query not fetched from analysis");
-    }
-    return sipQuery;
+      return sipQuery;
   }
 }

@@ -1,7 +1,7 @@
 package com.synchronoss.saw.analysis.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -60,8 +60,7 @@ public class AnalysisServiceImpl implements AnalysisService {
   private void init() throws Exception {
     if (migrationRequires) {
       logger.trace("Migration initiated.. " + migrationRequires);
-      new MigrateAnalysis()
-          .convertBinaryToJson(tableName,basePath,analysisUri);
+      new MigrateAnalysis().convertBinaryToJson(tableName, basePath, analysisUri);
     }
     logger.trace("Migration ended..");
   }
@@ -113,32 +112,31 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   // TODO : Response to be changed back to Analysis type
   @Override
-  public ObjectNode getAnalysis(String analysisId, Ticket ticket) throws SipReadEntityException {
-    JsonElement doc;
+  public Analysis getAnalysis(String analysisId, Ticket ticket) throws SipReadEntityException {
+    Document doc;
     Analysis analysis;
-    ObjectNode analysisNode;
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      doc = analysisMetadataStore.read(analysisId);
+      doc = analysisMetadataStore.readDocumet(analysisId);
       if (doc == null) {
         return null;
       }
-      //      analysis = gson.fromJson(doc, Analysis.class);
       ObjectMapper mapper = new ObjectMapper();
-      analysisNode = (ObjectNode) mapper.readTree(gson.toJson(doc));
+      mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      analysis = mapper.readValue(doc.asJsonString(), Analysis.class);
     } catch (Exception e) {
       logger.error("Exception occurred while fetching analysis", e);
       throw new SipReadEntityException("Exception occurred while fetching analysis", e);
     }
-    return analysisNode;
+    return analysis;
   }
 
   @Override
-  public List<ObjectNode> getAnalysisByCategory(String categoryId, Ticket ticket)
+  public List<Analysis> getAnalysisByCategory(String categoryId, Ticket ticket)
       throws SipReadEntityException {
     List<Document> doc = null;
     Analysis analysis;
-    List<ObjectNode> objDocs = new ArrayList<>();
+    List<Analysis> analysisList = new ArrayList<>();
     Map<String, String> category = new HashMap<>();
     category.put("category", categoryId);
     try {
@@ -148,29 +146,31 @@ public class AnalysisServiceImpl implements AnalysisService {
         return null;
       }
       ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       for (Document d : doc) {
-        objDocs.add((ObjectNode) mapper.readTree(gson.toJson(d)));
+        analysisList.add(mapper.readValue(d.asJsonString(), Analysis.class));
       }
     } catch (Exception e) {
       logger.error("Exception occurred while fetching analysis", e);
       throw new SipReadEntityException("Exception occurred while fetching analysis", e);
     }
-    return objDocs;
+    return analysisList;
   }
 
   @Override
-  public List<ObjectNode> getAnalysisByCategoryForUserId(
+  public List<Analysis> getAnalysisByCategoryForUserId(
       String categoryId, Long userId, Ticket ticket) throws SipReadEntityException {
     List<Document> doc = null;
-    List<ObjectNode> objDocs = new ArrayList<>();
+    List<Analysis> objDocs = new ArrayList<>();
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      doc = analysisMetadataStore.searchByCategoryForUserId(categoryId,userId);
+      doc = analysisMetadataStore.searchByCategoryForUserId(categoryId, userId);
       if (doc == null) {
         return null;
       }
       for (Document d : doc) {
-        objDocs.add((ObjectNode) objectMapper.readTree(gson.toJson(d)));
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objDocs.add(objectMapper.readValue(d.asJsonString(), Analysis.class));
       }
     } catch (Exception e) {
       logger.error("Exception occurred while fetching analysis by category for userId", e);
