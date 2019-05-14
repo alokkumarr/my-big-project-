@@ -72,7 +72,6 @@ public class SipJobsLogController {
   /**
    * Returns list of job logs by jobType type such as SFTP or S3..etc
    * 
-   * @param jobType type of job
    * @return logs
    */
   @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "", 
