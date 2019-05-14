@@ -35,7 +35,7 @@ export interface ArtifactColumnChart extends ArtifactColumn {
   dateFormat?: string;
   dateInterval?: string;
   geoType?: string;
-  region?: Region;
+  geoRegion?: Region;
 }
 
 export interface ArtifactColumnPivot extends ArtifactColumn {

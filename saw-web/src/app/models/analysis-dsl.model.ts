@@ -59,9 +59,6 @@ export interface AnalysisBaseDSL {
   description: string; // todo
   edit: boolean; // todo - this field needs to be removed and worked around
   id: string;
-  mapOptions?: {
-    mapType: string;
-  };
   metricName?: string; // required for exporting analyses from admin module
   modifiedBy: string; // email
   modifiedTime?: string;
@@ -95,5 +92,14 @@ export interface AnalysisChartDSL extends AnalysisBaseDSL {
   };
 }
 
-export type AnalysisDSL = AnalysisChartDSL;
 export type AnalysisPivotDSL = AnalysisBaseDSL;
+export interface AnalysisMapDSL extends AnalysisBaseDSL {
+  mapOptions: {
+    mapType: string;
+    mapStyle: string;
+    legend?: Legend;
+    labelOptions?: LabelOptions;
+  };
+}
+
+export type AnalysisDSL = AnalysisChartDSL | AnalysisMapDSL;

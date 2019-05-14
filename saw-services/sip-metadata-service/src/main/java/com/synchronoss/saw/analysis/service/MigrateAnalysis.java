@@ -14,6 +14,7 @@ import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.util.FieldNames;
 import java.io.File;
@@ -89,6 +90,7 @@ public class MigrateAnalysis {
       JsonObject analysisBinaryObject = jelement.getAsJsonObject();
       JsonArray analysisList =
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
+
 
       JsonObject migrationStatus = convertAllAnalysis(analysisList);
 
@@ -185,15 +187,18 @@ public class MigrateAnalysis {
         throw new UnsupportedOperationException("ES Report migration not supported yet");
       case "report":
         throw new UnsupportedOperationException("DL Report migration not supported yet");
+      case "map":
+        converter = new GeoMapConverter();
+        break;
       default:
-        logger.error("Unknown chart type");
+        logger.error("Unknown report type");
         break;
     }
 
     if (converter != null) {
       analysis = converter.convert(analysisObject);
     } else {
-      logger.error("Unknown chart type");
+      logger.error("Unknown report type");
     }
 
     return analysis;

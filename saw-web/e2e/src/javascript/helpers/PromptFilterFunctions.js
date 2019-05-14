@@ -209,6 +209,10 @@ class PromptFilterFunctions {
             );
             savedAlaysisPage.actionsMenuBtn.click();
 
+            commonFunctions.waitFor.elementToBePresent(
+              savedAlaysisPage.executeMenuOption
+            );
+
             commonFunctions.waitFor.elementToBeVisible(
               savedAlaysisPage.executeMenuOption
             );

@@ -52,7 +52,8 @@ export {
   DEFAULT_PRECISION
 };
 
-export const DSL_ANALYSIS_TYPES = ['chart', 'pivot'];
+
+export const DSL_ANALYSIS_TYPES = ['chart', 'map','pivot'];
 
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'

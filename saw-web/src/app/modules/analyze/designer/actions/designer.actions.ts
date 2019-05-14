@@ -75,10 +75,10 @@ export class DesignerUpdateAnalysisMetadata {
   constructor(public metadata: Partial<AnalysisDSL>) {}
 }
 
-export class DesignerUpdateAnalysisChartType {
+export class DesignerUpdateAnalysisSubType {
   /* Use for only new DSL analyses */
-  static readonly type = '[Designer] Update chartType for analysis';
-  constructor(public chartType: string) {}
+  static readonly type = '[Designer] Update subType for analysis';
+  constructor(public subType: string) {}
 }
 
 export class DesignerUpdateSorts {
@@ -157,6 +157,18 @@ export class DesignerRemoveArtifactColumn {
   constructor(
     public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
   ) {}
+}
+
+export class DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns {
+  static readonly type =
+    '[Designer] Merge metric artifactColumns with analysis artifactColumns';
+  constructor(public metricArtifactColumns: ArtifactColumnDSL[]) {}
+}
+
+export class DesignerMergeSupportsIntoAnalysis {
+  static readonly type =
+    '[Designer] Merge supports from metric data into analysis';
+  constructor(public supports: any[]) {}
 }
 export class DesignerRemoveAllArtifactColumns {
   static readonly type = '[Designer] Remove all artifact columns from analysis';

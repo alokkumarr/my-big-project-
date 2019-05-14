@@ -169,7 +169,7 @@
             *ngIf="analysisType | isAnalysisType: 'map':analysisSubtype"
             [auxSettings]="auxSettings"
             [data]="data"
-            [sqlBuilder]="sqlBuilder"
+            [sipQuery]="sipQuery"
           >
           </designer-map>
           <designer-map-chart
@@ -178,7 +178,7 @@
             [chartType]="analysisSubtype"
             [auxSettings]="auxSettings"
             [data]="data"
-            [sqlBuilder]="sqlBuilder"
+            [sipQuery]="sipQuery"
           >
           </designer-map-chart>
           <designer-chart

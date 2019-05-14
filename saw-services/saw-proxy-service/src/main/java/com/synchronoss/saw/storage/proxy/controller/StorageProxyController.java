@@ -30,10 +30,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -218,7 +215,9 @@ public class StorageProxyController {
           @Valid
           @RequestBody
           SIPDSL sipdsl,
-      @RequestParam(name = "size", required = false) Integer size, HttpServletRequest request, HttpServletResponse response)
+      @RequestParam(name = "size", required = false) Integer size,
+      HttpServletRequest request,
+      HttpServletResponse response)
       throws JsonProcessingException {
     logger.debug("Request Body:{}", sipdsl);
     if (sipdsl == null) {
@@ -242,7 +241,7 @@ public class StorageProxyController {
       // "contents");
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipdsl));
-      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size,dataSecurityKey);
+      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size, dataSecurityKey);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -287,14 +286,15 @@ public class StorageProxyController {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
     Ticket authTicket = getTicket(request);
-    if (authTicket == null) {
+    if (authTicket == null && !executionType.equals(ExecutionType.scheduled)) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
+    List<TicketDSKDetails> dskList =
+        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
-    SipQuery savedQuery = getSipQuery(sipQuery.getSemanticId(),metaDataServiceExport,request);
+    SipQuery savedQuery = getSipQuery(sipQuery.getSemanticId(), metaDataServiceExport, request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -304,7 +304,7 @@ public class StorageProxyController {
     DataSecurityKey dataSecurityKeyNode =
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery.getArtifacts(), dataSecurityKey);
 
-      try {
+    try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
       Long startTime = new Date().getTime();
@@ -392,26 +392,26 @@ public class StorageProxyController {
     return null;
   }
 
-    /**
-     * API to fetch the execution Data.
-     *
-     * @param executionId
-     * @return ExecutionResponse
-     */
-    @RequestMapping(
-        value = "/internal/proxy/storage/{id}/lastExecutions/data",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ExecutionResponse lastExecutionsData(
-        @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
-            String executionId) {
-        try {
-            logger.info("Storage Proxy request to fetch list of executions");
-            return proxyService.fetchLastExecutionsData(executionId);
-        } catch (Exception e) {
-            logger.error("error occurred while fetching execution data", e);
-        }
-        return null;
+  /**
+   * API to fetch the execution Data.
+   *
+   * @param executionId
+   * @return ExecutionResponse
+   */
+  @RequestMapping(
+      value = "/internal/proxy/storage/{id}/lastExecutions/data",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ExecutionResponse lastExecutionsData(
+      @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
+          String executionId) {
+    try {
+      logger.info("Storage Proxy request to fetch list of executions");
+      return proxyService.fetchLastExecutionsData(executionId);
+    } catch (Exception e) {
+      logger.error("error occurred while fetching execution data", e);
     }
+    return null;
+  }
 }

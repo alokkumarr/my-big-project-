@@ -17,6 +17,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as startsWith from 'lodash/startsWith';
 import * as includes from 'lodash/includes';
 import * as some from 'lodash/some';
+import * as get from 'lodash/get';
 import { Observable, Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 
@@ -32,7 +33,14 @@ const methodsMap = {
   styleUrls: ['analysis-sub-type-chooser.component.scss']
 })
 export class AnalysisSubTypeChooserComponent implements OnInit, OnDestroy {
-  @Select(state => state.designerState.analysis.chartOptions.chartType)
+  @Select(state => {
+    const analysis = state.designerState.analysis;
+    const subTypePath =
+      analysis.type === 'chart'
+        ? 'chartOptions.chartType'
+        : 'mapOptions.mapType';
+    return get(analysis, subTypePath);
+  })
   subType$: Observable<string>;
   subType: string;
   subscriptions: Array<Subscription> = [];

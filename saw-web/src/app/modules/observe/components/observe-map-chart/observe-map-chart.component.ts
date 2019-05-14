@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
-import { flattenChartData } from '../../../../common/utils/dataFlattener';
 import * as isUndefined from 'lodash/isUndefined';
 
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
@@ -19,8 +18,8 @@ import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
   templateUrl: './observe-map-chart.component.html',
   styleUrls: ['./observe-map-chart.component.scss']
 })
-
-export class ObserveMapChartComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ObserveMapChartComponent
+  implements OnInit, OnDestroy, AfterViewInit {
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
@@ -32,9 +31,7 @@ export class ObserveMapChartComponent implements OnInit, OnDestroy, AfterViewIni
   public requesterSubscription: Subscription;
   public data: Array<any>;
 
-  constructor(
-    public analyzeService: AnalyzeService
-  ) {}
+  constructor(public analyzeService: AnalyzeService) {}
 
   ngOnInit() {
     this.subscribeToRequester();
@@ -70,9 +67,8 @@ export class ObserveMapChartComponent implements OnInit, OnDestroy, AfterViewIni
       .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE)
       .then(
         ({ data }) => {
-          const parsedData = flattenChartData(data, this.analysis.sqlBuilder);
-          this.data = parsedData;
-          return parsedData;
+          this.data = data;
+          return data;
         },
         err => {
           throw err;

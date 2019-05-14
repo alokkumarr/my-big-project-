@@ -77,6 +77,7 @@ export class AggregateChooserComponent implements OnInit {
     }
     if (!isGroupBy && this.aggregate === 'percentagebyrow') {
       this.aggregate = 'percentage';
+      this.change.emit(this.aggregate);
     }
 
     if (isGroupBy && this.enablePercentByRow) {
