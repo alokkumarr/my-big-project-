@@ -1,9 +1,7 @@
 package com.synchronoss.saw.analysis.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
-
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -22,11 +20,11 @@ public interface AnalysisService {
       @NotNull(message = "AnalysisID cannot be null") @NotNull String analysisID,
       @Valid Ticket ticket);
 
-  ObjectNode getAnalysis(
+  Analysis getAnalysis(
       @NotNull(message = "AnalysisID cannot be null") @NotNull String analysisID,
       @Valid Ticket ticket);
 
-  List<ObjectNode> getAnalysisByCategory(
+  List<Analysis> getAnalysisByCategory(
       @NotNull(message = "AnalysisID cannot be null") @NotNull String categoryID,
       @Valid Ticket ticket);
 }
