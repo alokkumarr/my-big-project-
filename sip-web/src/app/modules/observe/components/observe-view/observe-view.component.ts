@@ -308,7 +308,17 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
             width: elem.scrollWidth,
             height: elem.scrollHeight,
             windowWidth: elem.scrollWidth,
-            windowHeight: elem.scrollHeight
+            windowHeight: elem.scrollHeight,
+            onclone: cloned => {
+              // need this for html2pdf download to wirk with gridster library
+              // https://github.com/niklasvh/html2canvas/issues/1720
+              const gridsterItems = Array.from(
+                cloned.querySelectorAll('gridster-item')
+              );
+              forEach(gridsterItems, item => {
+                item.style.transition = 'unset';
+              });
+            }
           },
           jsPDF: {
             unit: 'px',

@@ -17,7 +17,6 @@ import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { environment } from '../../../environments/environment';
 import { MarkerDataPoint } from './types';
-import API_URL from '../../../../appConfig';
 
 @Component({
   selector: 'map-box',
@@ -46,20 +45,7 @@ export class MapBoxComponent implements OnChanges {
 
   @HostBinding('attr.data-image-url') imageUrl: string;
 
-  constructor(private _elemRef: ElementRef) {
-    // preserveDrawingBuffer has to be set to true so that when downloading the dashboard,
-    // so that when using canvas.toDataURL() it still has the data preserved
-    HTMLCanvasElement.prototype.getContext = (function(origFn) {
-      return function(type, attributes) {
-        if (type === 'webgl') {
-          attributes = Object.assign({}, attributes, {
-            preserveDrawingBuffer: true
-          });
-        }
-        return origFn.call(this, type, attributes);
-      };
-    })(HTMLCanvasElement.prototype.getContext);
-  }
+  constructor(private _elemRef: ElementRef) {}
 
   ngOnChanges(changes) {
     if (this.data && this.coordinateField && this.dataFields) {
@@ -81,7 +67,7 @@ export class MapBoxComponent implements OnChanges {
     const size = `${parseInt(width, 10)}x${parseInt(height, 10)}`;
     const [lng, lat] = this.center;
     const style = last(split(this.mapStyle, '/'));
-    const apiBaseURL = get(API_URL, 'api.staticMapUrl');
+    const apiBaseURL = 'https://api.mapbox.com';
     const base = `${apiBaseURL}/styles/v1/mapbox`;
     const url = `${base}/${style}/static/${lng},${lat},${
       this.zoom
