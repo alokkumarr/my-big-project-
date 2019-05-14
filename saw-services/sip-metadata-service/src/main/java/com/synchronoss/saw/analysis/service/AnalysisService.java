@@ -27,6 +27,11 @@ public interface AnalysisService {
       @Valid Ticket ticket);
 
   List<ObjectNode> getAnalysisByCategory(
-      @NotNull(message = "AnalysisID cannot be null") @NotNull String categoryID,
+      @NotNull(message = "categoryID cannot be null") @NotNull String categoryID,
+      @Valid Ticket ticket);
+
+  List<ObjectNode> getAnalysisByCategoryForUserId(
+      @NotNull(message = "categoryID cannot be null") @NotNull String categoryID,
+      @NotNull(message = "userId cannot be null")  @NotNull Long userId,
       @Valid Ticket ticket);
 }

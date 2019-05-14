@@ -8,6 +8,7 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -83,6 +84,7 @@ public class AnalysisController {
       analysisResponse.setMessage("Invalid authentication tol=ken");
     }
     analysis.setCreatedBy(authTicket.getUserFullName());
+    analysis.setUserId(authTicket.getUserId());
     analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, authTicket));
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
@@ -125,9 +127,10 @@ public class AnalysisController {
 
     if (authTicket == null) {
       response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication tol=ken");
+      analysisResponse.setMessage("Invalid authentication token");
     }
     analysis.setModifiedBy(authTicket.getUserFullName());
+    analysis.setUserId(authTicket.getUserId());
     analysisResponse.setAnalysis(analysisService.updateAnalysis(analysis, authTicket));
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
@@ -205,7 +208,7 @@ public class AnalysisController {
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
-   * @param id Category id
+   * @param categoryId Category id
    * @return List of Analysis
    */
   @ApiOperation(
@@ -220,15 +223,20 @@ public class AnalysisController {
   public List<ObjectNode> getAnalysisByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "category") String id) {
+      @RequestParam(name = "category") String categoryId) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {
       response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication tol=ken");
+      analysisResponse.setMessage("Invalid authentication token");
 
       // TODO: return analysis response here. Will be taken care in the future.
     }
-    return analysisService.getAnalysisByCategory(id, authTicket);
+    Long userId = authTicket.getUserId();
+    Boolean privateCategory = SipMetadataUtils.checkPrivateCategory(authTicket, categoryId);
+    if (privateCategory) {
+      return analysisService.getAnalysisByCategoryForUserId(categoryId, userId, authTicket);
+    }
+    return analysisService.getAnalysisByCategory(categoryId, authTicket);
   }
 }

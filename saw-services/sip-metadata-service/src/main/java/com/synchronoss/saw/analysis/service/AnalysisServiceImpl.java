@@ -157,4 +157,26 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
     return objDocs;
   }
+
+  @Override
+  public List<ObjectNode> getAnalysisByCategoryForUserId(
+      String categoryId, Long userId, Ticket ticket) throws SipReadEntityException {
+    List<Document> doc = null;
+    List<ObjectNode> objDocs = new ArrayList<>();
+    try {
+      analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+      doc = analysisMetadataStore.searchByCategoryForUserId(categoryId,userId);
+      if (doc == null) {
+        return null;
+      }
+      for (Document d : doc) {
+        objDocs.add((ObjectNode) objectMapper.readTree(gson.toJson(d)));
+      }
+    } catch (Exception e) {
+      logger.error("Exception occurred while fetching analysis by category for userId", e);
+      throw new SipReadEntityException(
+          "Exception occurred while fetching analysis by category for userId", e);
+    }
+    return objDocs;
+  }
 }
