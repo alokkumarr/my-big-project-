@@ -60,7 +60,7 @@
     - restart saw-transport
     - restart saw-transport-executor-regular
     - restart saw-transport-executor-fast
-  when: "sip_secure | default(False)"
+  when: sip_secure
 
 - name: Create Transport Service environment file
   file: path=/etc/bda/saw-transport-service-env state=touch

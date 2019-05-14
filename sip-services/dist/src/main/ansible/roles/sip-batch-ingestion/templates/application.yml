@@ -39,7 +39,7 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 
-  {% if sip_secure | default(False) %}
+  {% if sip_secure | default(false) %}
 
   ssl:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
@@ -73,8 +73,8 @@ sip:
     retry.page.size: 20
     max.inprogress.mins: 45
 
-   {% if sip_secure | default(False) %}
-   
+   {% if sip_secure %}
+
   ssl:
     enable : true
 
@@ -92,7 +92,7 @@ sip:
 
    {% endif %}
 
-{% if sip_secure | default(False) %}
+{% if sip_secure %}
 connector: https
 {% else %}
 connector: http

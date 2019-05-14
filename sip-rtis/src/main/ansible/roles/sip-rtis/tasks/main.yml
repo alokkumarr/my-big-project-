@@ -44,7 +44,7 @@
         HTTP_DISABLED=-Dhttp.port=disabled
   notify:
     - restart sip-rtis
-  when: "sip_secure | default(False)"
+  when: sip_secure
 
 - name: Create symbolink link to current Spark version
   file:

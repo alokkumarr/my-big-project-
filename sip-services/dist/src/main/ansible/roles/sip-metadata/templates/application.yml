@@ -20,7 +20,7 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 
-  {% if sip_secure | default(False) %}
+  {% if sip_secure %}
 
   ssl:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
@@ -51,7 +51,7 @@ sip:
   service:
     index: {{ groups['saw-services'].index(inventory_hostname) }}
 
-   {% if sip_secure | default(False) %}
+   {% if sip_secure %}
 
   ssl:
     enable : true
@@ -69,7 +69,7 @@ sip:
 
    {% endif %}
 
-{% if sip_secure | default(False) %}
+{% if sip_secure %}
 
 connector : https
 

@@ -25,7 +25,7 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 
-  {% if sip_secure | default(False) %}
+  {% if sip_secure %}
 
   ssl:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
@@ -50,7 +50,7 @@ application:
         max-pool-size: 50
         queue-capacity: 10000
 
-   {% if sip_secure | default(False) %}
+   {% if sip_secure %}
 
 sip:
   ssl:
@@ -71,7 +71,7 @@ sip:
 
 {% endif %}
 
-{% if sip_secure | default(False) %}
+{% if sip_secure %}
 
 connector : https
 
