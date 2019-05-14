@@ -838,7 +838,7 @@ configure the `sip_bis_retry_diffs_in_minutes` accordingly.
 The below parameter will switch on or off to activate secure or non-secure
 communication in sip platform
 
-sip_secure=True/False
+    sip_secure=True/False
 
 Note: This is mandatory field it has to be either 'False' or 'True'. Please observe the case of `T & F`
 # of `True` & `False` Note: true or false will result into an error
