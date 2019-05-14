@@ -153,7 +153,6 @@ public class Analysis {
     this.id = id;
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("parentAnalysisId")
   public String getParentAnalysisId() {
     return parentAnalysisId;
@@ -232,7 +231,6 @@ public class Analysis {
     this.userId = userId;
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("modifiedTime")
   public Long getModifiedTime() {
     return modifiedTime;
@@ -243,7 +241,6 @@ public class Analysis {
     this.modifiedTime = modifiedTime;
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("modifiedBy")
   public String getModifiedBy() {
     return modifiedBy;
@@ -266,7 +263,6 @@ public class Analysis {
     this.chartOptions = chartOptions;
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("designerEdit")
   public Boolean getDesignerEdit() {
     return this.designerEdit;
@@ -304,6 +300,7 @@ public class Analysis {
    * @param mapOptions Map options
    */
   @JsonProperty("mapOptions")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public void setMapOptions(MapOptions mapOptions) {
     this.mapOptions = mapOptions;
   }
