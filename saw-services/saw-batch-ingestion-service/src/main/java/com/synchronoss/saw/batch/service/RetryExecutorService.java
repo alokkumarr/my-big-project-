@@ -133,7 +133,7 @@ public class RetryExecutorService {
     // Mark long running 'InProgress to 'Failed'
     sipLogService.updateLongRunningTransfers(maxInprogressMins);
 
-    logger.info("recoverFromInconsistentState execution starts here");
+    logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
     logger.trace("Count listOfRetryIds :" + countOfRecords);
     int totalNoOfPages = IntegrationUtils.calculatePages(countOfRecords,
@@ -145,11 +145,11 @@ public class RetryExecutorService {
       logger.trace("Data listOfRetryIds :" + logs);
       for (BisFileLog log : logs) {
         logger
-            .info("Process Id which is in inconsistent state: " + log.getPid());
+            .trace("Process Id which is in inconsistent state: " + log.getPid());
         long routeId = log.getRouteSysId();
-        logger.info("Route Id which is in inconsistent state: " + routeId);
+        logger.trace("Route Id which is in inconsistent state: " + routeId);
         long channelId = log.getBisChannelSysId();
-        logger.info("Channel Id which is in inconsistent state: " + channelId);
+        logger.trace("Channel Id which is in inconsistent state: " + channelId);
         Optional<BisRouteEntity> bisRouteEntityPresent = this
             .findRouteById(routeId);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -193,7 +193,7 @@ public class RetryExecutorService {
                         BisComponentState.DATA_REMOVED.value());
                     sipRetryContract.retryFailedFileTransfer(channelId, routeId,
                         FilenameUtils.getName(log.getFileName()), isDisable,
-                        SourceType.RETRY.name());
+                        SourceType.RETRY.name(), log.getJob().getJobId());
                     // transferData(channelId, routeId,
                     // FilenameUtils.getName(log.getFileName()),
                     // isDisable, SourceType.RETRY.name());
@@ -214,7 +214,7 @@ public class RetryExecutorService {
                         "Inside the block of retry when process status is "
                             + " inside disable block :"
                             + BisComponentState.HOST_NOT_REACHABLE.value());
-                    logger.info("Channel Id with :"
+                    logger.trace("Channel Id with :"
                         + BisComponentState.HOST_NOT_REACHABLE.value()
                         + " will be triggered by retry in case of isDisable duplicate "
                         + isDisable + " : " + channelId);
@@ -250,7 +250,7 @@ public class RetryExecutorService {
                           + log.getPid());
                   sipRetryContract.retryFailedFileTransfer(channelId, routeId,
                       FilenameUtils.getName(log.getFileName()), isDisable,
-                      SourceType.RETRY.name());
+                      SourceType.RETRY.name(),log.getJob().getJobId());
                   // transferData(channelId, routeId,
                   // FilenameUtils.getName(log.getFileName()),
                   // isDisable, SourceType.RETRY.name());
@@ -268,7 +268,7 @@ public class RetryExecutorService {
                       "Inside the block of retry when process status is :"
                           + BisComponentState.HOST_NOT_REACHABLE.value());
                   // log.pid() has been added as part of SIP-6292
-                  logger.info("Channel Id with :"
+                  logger.trace("Channel Id with :"
                       + BisComponentState.HOST_NOT_REACHABLE.value()
                       + " will be triggered by retry in case of isDisable duplicate "
                       + isDisable + " : " + channelId);
@@ -333,7 +333,7 @@ public class RetryExecutorService {
               defaultDestinationLocation, mapRfsUser);
         } catch (IOException ex) {
           logger.error("Error during delete of currupted file:" 
-              + ex.getMessage());
+                + ex.getMessage());
         }
         /*File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
           @Override

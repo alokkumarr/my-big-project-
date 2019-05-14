@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -179,7 +180,8 @@ public class SawBisPluginController {
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
         response = sipTransferService.scanFilesForPattern(Long.valueOf(requestBody.getChannelId()),
-            Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
+            Long.valueOf(requestBody.getRouteId()), null, false, 
+            SourceType.REGULAR.name(), Optional.empty());
       } else {
         response = sipTransferService.immediateTransfer(requestBody);
       }
@@ -256,7 +258,7 @@ public class SawBisPluginController {
           .supplyAsync(() -> sipTransferService.scanFilesForPattern(
               Long.valueOf(requestBody.getChannelId()),
               Long.valueOf(requestBody.getRouteId()), null, false,
-              SourceType.REGULAR.name()), transactionPostExecutor)
+              SourceType.REGULAR.name(), Optional.empty()),transactionPostExecutor)
           .whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {

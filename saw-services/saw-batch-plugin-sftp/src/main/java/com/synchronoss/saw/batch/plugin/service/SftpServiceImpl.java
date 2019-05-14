@@ -149,13 +149,13 @@ public class SftpServiceImpl extends SipPluginContract {
     processor = FileProcessorFactory.getFileProcessor(defaultDestinationLocation);
 
     if (!processor.isDestinationExists(defaultDestinationLocation)) {
-      logger.info("Defautl drop location not found");
-      logger.info("Creating folders for default drop location :: "
+      logger.trace("Defautl drop location not found");
+      logger.trace("Creating folders for default drop location :: "
           + defaultDestinationLocation);
 
       processor.createDestination(defaultDestinationLocation, new StringBuffer());
 
-      logger.info("Default drop location folders created? :: "
+      logger.trace("Default drop location folders created? :: "
           + processor.isDestinationExists(defaultDestinationLocation));
       logger.info("Max in progress minutes:: " + this.maxInprogressMins);
     }
@@ -202,31 +202,31 @@ public class SftpServiceImpl extends SipPluginContract {
         connectionLogs.append("Establishing connection to host");
         String destinationLocation = this.processor.getFilePath(
             this.defaultDestinationLocation, destinationLoc, "");
-        logger.info("Is destination directories exists?:: "
+        logger.trace("Is destination directories exists?:: "
             + processor.isDestinationExists(destinationLocation));
         if (!processor.isDestinationExists(destinationLocation)) {
           connectionLogs.append(newLineChar);
-          logger.info("Destination directories doesnt exists. Creating...");
+          logger.trace("Destination directories doesnt exists. Creating...");
           connectionLogs.append("Destination directories doesnt exists. Creating...");
           processor.createDestination(destinationLocation,  connectionLogs);
           connectionLogs.append(newLineChar);
           connectionLogs.append("Destination directories created scucessfully!!");
-          logger.info("Destination directories created scucessfully!!");
+          logger.trace("Destination directories created scucessfully!!");
         }
         if (processor.isDestinationExists(destinationLocation)) {
           if (processor.isFileExistsWithPermissions(destinationLocation)) {
             String sourceLocation = (rootNode.get("sourceLocation").asText());
             connectionLogs.append(newLineChar);
             connectionLogs.append("Connecting to source location " + sourceLocation);
-            logger.info("Connecting to source location " + sourceLocation);
+            logger.trace("Connecting to source location " + sourceLocation);
             connectionLogs.append(newLineChar);
-            logger.info("Connecting to destination location " + destinationLocation);
+            logger.trace("Connecting to destination location " + destinationLocation);
             connectionLogs.append("Connecting to destination location " + destinationLocation);
             connectionLogs.append(newLineChar);
             connectionLogs.append("Connecting...");
             if (session.exists(sourceLocation)) {
               connectionLogs.append("Connection successful!!");
-              logger.info("Connection successful!!");
+              logger.trace("Connection successful!!");
               status = HttpStatus.OK;
               connectionLogs.append(newLineChar);
               connectionLogs.append(status);
@@ -642,11 +642,20 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Override
   public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
-      boolean isDisable, String source) throws SipNestedRuntimeException {
+      boolean isDisable, String source, Optional<Long>  jobId) throws SipNestedRuntimeException {
     Preconditions.checkNotNull(channelId != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(routeId != null, "payload.getRouteId() cannot be null");
     
-    BisJobEntity jobEntity = this.executeSipJob(channelId, routeId, filePattern);
+    BisJobEntity jobEntity = null;
+    if (source.equals(SourceType.REGULAR.toString())) {
+      jobEntity = this.executeSipJob(channelId, routeId, filePattern);
+    } else {
+      if (jobId.isPresent()) {
+        jobEntity =  sipLogService.retriveJobById(jobId.get());
+      }
+     
+    }
+    
     
     logger.info(
         "Scanning file pattern starts here with the channelId " 
@@ -740,7 +749,7 @@ public class SftpServiceImpl extends SipPluginContract {
               logger.info("Thread Id started with: " + thread);
               // Adding to a list has been removed as a part of optimization
               // SIP-6386
-              logger.info("Job id before callling transfer channel :: " 
+              logger.trace("Job id before callling transfer channel :: " 
                   + jobEntity.getJobId());
               SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
               transferDataFromChannel(template, sourceLocation, filePattern,
@@ -1190,7 +1199,7 @@ public class SftpServiceImpl extends SipPluginContract {
           rootNode = objectMapper.readTree(
                 route.getRouteMetadata());
           filePattern = rootNode.get("filePattern").asText();
-          logger.info("File pattern::" + filePattern);
+          logger.trace("File pattern::" + filePattern);
         } catch (IOException exception) {
           logger.error("Exception during parsing" 
                   + exception.getMessage());
@@ -1292,7 +1301,7 @@ public class SftpServiceImpl extends SipPluginContract {
               try {
                 final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
                 bisDataMetaInfo.setProcessId(logId);
-                logger.info("Local file path ::" + localFile.getPath());
+                logger.trace("Local file path ::" + localFile.getPath());
                 sipLogService.upsertInProgressStatus(logId, localFile.getPath(),
                     Date.from(fileTransStartTime.toInstant()));
                 if (stream != null) {
@@ -1336,14 +1345,14 @@ public class SftpServiceImpl extends SipPluginContract {
                   BisJobEntity bisJobEntity = sipLogService
                       .retriveJobById(jobId);
                   Long successCnt = bisJobEntity.getSuccessCount();
-                  logger.info(
+                  logger.trace(
                       "Before Success file log success cnt :: " + successCnt);
                   sipLogService.updateSuccessCnt(jobId, 
                       ++successCnt);
                   BisJobEntity bisJobEntity2 = sipLogService
                       .retriveJobById(jobId);
                   Long successCnt2 = bisJobEntity2.getSuccessCount();
-                  logger.info("After Success file log success cnt :: "
+                  logger.trace("After Success file log success cnt :: "
                       + (successCnt2));
 
                   sipLogService.updateJobStatus(jobId);

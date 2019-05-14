@@ -884,6 +884,7 @@ public class BatchIngestionIT extends BaseIT {
     final Boolean duplicate = Boolean.valueOf(routeData.get("disableDuplicate").asText());
     String processStatus = caller2.getString("logs[0].bisProcessState");
     assertTrue(duplicate.equals(Boolean.TRUE));
+    
     assertEquals("SUCCESS", result2);
     assertEquals("DATA_RECEIVED", processStatus);
     this.tearDownRoute();

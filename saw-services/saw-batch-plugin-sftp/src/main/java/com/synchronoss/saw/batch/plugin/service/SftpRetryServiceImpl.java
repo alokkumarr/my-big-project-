@@ -156,9 +156,9 @@ public class SftpRetryServiceImpl implements SipRetryContract {
 
   @Override
   public void retryFailedFileTransfer(Long channelId, Long routeId, String fileName,
-      boolean isDisable, String source) {
+      boolean isDisable, String source, Long jobId) {
     this.sftpServiceImpl.scanFilesForPattern(channelId, routeId, fileName,
-        isDisable, SourceType.RETRY.name());
+        isDisable, SourceType.RETRY.name(), Optional.of(jobId));
   }
 
 

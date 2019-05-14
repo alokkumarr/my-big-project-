@@ -546,6 +546,7 @@ public class SipLogging {
           && jobEntity.getTotalCount() == jobEntity.getSuccessCount()) {
         logger.info("Count matched success");
         jobEntity.setJobStatus("SUCCESS");
+        jobEntity.setEndTime(new Date());
        
       } else if (!jobEntity.getJobStatus().equals("OPEN") 
           && isJobPartiallyCompleted(jobId, jobEntity.getTotalCount())) {
@@ -555,6 +556,7 @@ public class SipLogging {
           && isJobFailed(jobId, jobEntity.getTotalCount())) {
         logger.info("Count matched failed");
         jobEntity.setJobStatus("FAILED");
+        jobEntity.setEndTime(new Date());
       } else {
         logger.info("update job status none matched");
       }

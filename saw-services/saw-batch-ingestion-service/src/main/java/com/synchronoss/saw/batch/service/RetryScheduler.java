@@ -19,7 +19,6 @@ public class RetryScheduler {
    */
   @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
   public void recoverFromInconsistentState() {
-    logger.info("Retry polling starts here");
     retryExecutor.recoverFromInconsistentState();
     
     

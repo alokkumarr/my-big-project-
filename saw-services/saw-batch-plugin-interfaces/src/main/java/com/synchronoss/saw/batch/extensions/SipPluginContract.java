@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -79,7 +81,7 @@ public abstract class SipPluginContract {
  * @param source TODO
    */
   public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
-      boolean isDisable, String source) throws SipNestedRuntimeException {
+      boolean isDisable, String source, Optional<Long> jobId) throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because it "
         + "will be overriden on the respective plugin module if required");
     return new ArrayList<>();

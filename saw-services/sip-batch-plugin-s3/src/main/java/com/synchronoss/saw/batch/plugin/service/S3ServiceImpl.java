@@ -2,6 +2,7 @@ package com.synchronoss.saw.batch.plugin.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -53,7 +54,7 @@ public class S3ServiceImpl extends SipPluginContract {
   
   @Override
   public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
-      boolean isDisable, String source) throws SipNestedRuntimeException {
+      boolean isDisable, String source, Optional<Long>  jobId) throws SipNestedRuntimeException {
     
     return null;
   }
