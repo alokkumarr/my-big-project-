@@ -32,7 +32,9 @@ export class ConfigureAlertService {
       .pipe(
         map(fpGet('contents.[0].ANALYZE')),
         map((artifacts: Array<any>) =>
-          artifacts.filter(artifact => artifact.repository.length === 1)
+          artifacts.filter(
+            artifact => artifact.repository && artifact.repository.length === 1
+          )
         )
       );
   }

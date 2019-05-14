@@ -10,7 +10,7 @@
   [showColumnLines]="false"
   [showRowLines]="false"
   [rowAlternationEnabled]="true"
-  [masterDetail]="{ enabled: false, template: 'detailTemplate' }"
+  [masterDetail]="{ enabled: true, template: 'detailTemplate' }"
   (onRowExpanding)="onRowExpanding($event.key)"
 >
   <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
@@ -64,7 +64,7 @@
   </div>
 
   <div *dxTemplate="let data of 'dateTemplate'">
-    <span>{{ data.data.startTime * 1000 | date: 'medium' }}</span>
+    <span>{{ data.data.startTime | date: 'medium' }}</span>
   </div>
 
   <div *dxTemplate="let alertDetail of 'detailTemplate'">
