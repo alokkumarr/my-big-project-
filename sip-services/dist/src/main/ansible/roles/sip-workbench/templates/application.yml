@@ -7,7 +7,6 @@ spring:
     name: saw-workbench-service
   servlet:
     multipart:
-      enabled : true
       max-request-size: 25MB
       max-file-size: 25MB
       file-size-threshold: 2KB
@@ -19,11 +18,24 @@ logging:
 server:
   address: localhost
   port: 9701
-  context-path: ''
-  maxHttpHeaderSize: 65536
+  servlet:
+    context-path: ''
+  max-http-header-size:  65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+
+  {% if sip_secure %}
+
+  ssl:
+   key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   key-alias: sip
+   key-store-password: "{{ sip_keystore_password }}"
+   trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
+   trust-store-password: "{{ sip_keystore_password }}"
+
+  {% endif %}
+
 management:
   endpoint:
     health:
@@ -37,12 +49,44 @@ application:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
+
+   {% if sip_secure %}
+
+sip:
+  ssl:
+    enable : true
+
+  trust:
+    store: ${server.ssl.trust-store}
+    password: ${server.ssl.trust-store-password}
+  key:
+    store: ${server.ssl.key-store}
+    password: ${server.ssl.key-store-password}
+
+{% else %}
+
+sip:
+  ssl:
+    enable : false
+
+{% endif %}
+
+{% if sip_secure %}
+
+connector : https
+
+{% else %}
+
+connector : http
+
+{% endif %}
+
 workbench:
         project-key: "{{ saw_workbench_project_key | default('workbench') }}"
         project-path: "{{ saw_workbench_project_path | default('/workbench') }}"
         project-root: "{{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip') }}"
         preview-limit: {{ saw_workbench_preview_limit | default('100') }}
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
-        storage-uri: "{{ saw_storage_proxy_uri | default('http://localhost:9800') }}"
+        storage-uri: ${connector}://localhost:9800
 metastore:
     base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"

@@ -6,6 +6,41 @@
   roles:
     - sip-host
     - sip-prometheus-node
+
+- name: Admin
+  hosts: sip-admin
+  become: true
+  roles:
+    - { role: sip-ssl-certificate, when: sip_secure }
+
+- name: SAW Services
+  hosts: saw-services
+  become: true
+  tasks:
+    - name: copying the certificates to the saw-services nodes
+      copy:
+        src: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
+        dest: /etc/bda/{{ ansible_host }}-certificate.crt
+      when: sip_secure
+
+    - name: copying the private to the saw-services nodes
+      copy:
+        src: "{{ inventory_dir }}/certificate/main-private.pem"
+        dest: /etc/bda/{{ ansible_host }}-key.pem
+      when: sip_secure
+
+    - name: Look up for keystore password
+      set_fact:
+        sip_keystore_password: >-
+          {{ lookup('password', inventory_dir
+            + '/sip-keystore-password chars=ascii_letters,digits') }}
+        when: sip_secure
+
+    - name: Setting the keystore store path
+      set_fact:
+        store_path: /etc/bda/keystore
+      when: sip_secure
+
 - import_playbook: modules/sip-security/ansible/site.yml
 - import_playbook: modules/sip-services/ansible/site.yml
 - import_playbook: modules/sip-web/ansible/site.yml
@@ -31,4 +66,4 @@
   hosts: saw-security
   become: true
   roles:
-    - sip-mariadb-exporter 
+    - sip-mariadb-exporter
