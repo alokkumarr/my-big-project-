@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -21,9 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
-
 @Api(value = "This Controller provides job level"
     + "operations for sip ingestion in synchronoss analytics platform ")
 @RestController
@@ -34,26 +32,27 @@ public class SipJobsLogController {
   SipJobDataRepository jobRepository;
   private static final Logger logger = LoggerFactory
       .getLogger(SipJobsLogController.class);
-  
+
   /**
-   * Returns list of job logs by jobType type such as
-   * BIS or Analysis..etc
+   * Returns list of job logs by jobType type such as SFTP or S3..etc
    * 
    * @param jobType type of job
    * @return logs
    */
-  @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "",
+  @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "", 
       response = SipJobDetails.class, responseContainer = "List")
-  @RequestMapping(value = "jobLogs/{jobType}", method = RequestMethod.GET)
-  @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
-          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 201, message = "Created"),
-          @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
-              message = "Unsupported Type. " + "Representation not supported for the resource")})
-  public List<SipJobDetails> logsByJobType(@PathVariable("jobType") String jobType) {
+  @RequestMapping(value = "/logs/jobs/{jobType}", method = RequestMethod.GET)
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+      @ApiResponse(code = 400, message = "Bad request"),
+      @ApiResponse(code = 201, message = "Created"),
+      @ApiResponse(code = 401, message = "Unauthorized"),
+      @ApiResponse(code = 415, message = "Unsupported Type. "
+          + "Representation not supported for the resource") })
+  public List<SipJobDetails> logsByJobType(
+      @PathVariable("jobType") String jobType) {
     logger.info("fetching job logs");
     List<BisJobEntity> jobLogs = this.jobRepository.findByjobType(jobType);
     logger.info("job logs fetching done");
@@ -62,11 +61,49 @@ public class SipJobsLogController {
       try {
         BeanUtils.copyProperties(sipJobEntity, sipJobDto);
       } catch (Exception exception) {
-        logger.error("exception during copying " 
-            + "properties to DTO" + exception.getMessage());
+        logger.error("exception during copying " + "properties to DTO"
+            + exception.getMessage());
       }
       return sipJobDto;
     }).collect(Collectors.toList());
+
+  }
+
+  /**
+   * Returns list of job logs by jobType type such as SFTP or S3..etc
+   * 
+   * @param jobType type of job
+   * @return logs
+   */
+  @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "", 
+      response = SipJobDetails.class, responseContainer = "List")
+  @RequestMapping(value = "/logs/jobs/{jobId}", method = RequestMethod.GET)
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator"),
+      @ApiResponse(code = 400, message = "Bad request"),
+      @ApiResponse(code = 201, message = "Created"),
+      @ApiResponse(code = 401, message = "Unauthorized"),
+      @ApiResponse(code = 415, message = "Unsupported Type. "
+          + "Representation not supported for the resource") })
+  public SipJobDetails jobLogsById(@PathVariable("jobId") Long jobId) {
+    logger.info("fetching job logs");
+    Optional<BisJobEntity> jobLogsData = this.jobRepository.findById(jobId);
+    BisJobEntity jobLog = null;
+    SipJobDetails sipJobDto = new SipJobDetails();
+    if (jobLogsData.isPresent()) {
+      jobLog = jobLogsData.get();
+      logger.info("job logs fetching done");
+
+      try {
+        BeanUtils.copyProperties(jobLog, sipJobDto);
+      } catch (Exception exception) {
+        logger.error("exception during copying " + "properties to DTO"
+            + exception.getMessage());
+      }
+    }
+    return sipJobDto;
 
   }
 

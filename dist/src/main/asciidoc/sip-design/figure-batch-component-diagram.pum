@@ -6,15 +6,22 @@ node "saw-batch-ingestion-ui" {
 
 node "saw-services" {
   [sip-portal] --> [saw-gateway]
-  [saw-batch--ingeston-service]
+  [saw-batch-ingeston-service]
   [saw-scheduler-service]
-  [saw-batch-log-service-plugin]
-  [saw-batch-sftp-service-plugin]
+}
 
+node "saw-batch-plugin-impl" {
+ [saw-batch-plugin-sftp]
+  [saw-batch-plugin-s3]
+   [saw-batch-log-service-plugin]
 }
 
 package "com.synchronoss.saw.batch.plugins" {
- Contract - [extensions]
+ Contract - [Transfer Extensions]
+}
+
+package "com.synchronoss.saw.batch.plugins" {
+ Contract - [Retry Extensions]
 }
 
 database "saw-storage" {
@@ -22,19 +29,22 @@ database "saw-storage" {
   [saw_security_tables]
   }
   folder "sip_batch_ingestion" {
-	[sip_batch_ingestion_tables]
+    [sip_batch_ingestion_tables]
   }
   folder "saw_scheduler" {
-	[saw_scheduler_tables]
+    [saw_scheduler_tables]
   }
   }
 
 [saw-gateway] --> [saw-batch-ingestion-service]
 [saw-batch-ingestion-service] <--> [saw-scheduler-service]
-[saw-batch-ingestion-service] <--> [saw-batch-log-service-plugin]
-[saw-batch-ingestion-service] <--> [saw-batch-sftp-service-plugin]
-[saw-batch-ingestion-service] --> [saw-batch-sftp-service-plugin]
+
+[saw-batch-ingestion-service] <--> [Transfer Extensions]
+[saw-batch-ingestion-service] <--> [Retry Extensions]
 [saw-scheduler-service] --> [saw_scheduler_tables]
-[saw-batch-sftp-service-plugin] --> [extensions]
-[saw-batch-log-service-plugin] --> [extensions]
+[saw-batch-plugin-sftp] --> [Transfer Extensions]
+[saw-batch-plugin-s3] --> [Transfer Extensions]
+[saw-batch-plugin-sftp] --> [Retry Extensions]
+[saw-batch-plugin-s3] --> [Retry Extensions]
+
 @enduml

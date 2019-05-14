@@ -131,8 +131,8 @@ public class SawBatchServiceApplication {
   public TaskExecutor transferWorkerExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
-    executor.setMaxPoolSize(50);
-    executor.setQueueCapacity(25);
+    executor.setMaxPoolSize(Integer.valueOf(transferMaxPoolSize));
+    executor.setQueueCapacity(Integer.valueOf(transferQueueCapacity));
     executor.setThreadNamePrefix("Transferworker-");
 
     return executor;
