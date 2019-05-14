@@ -20,7 +20,7 @@
           <mat-label>Filter Value</mat-label>
           <mat-select e2e="alert-date-preset" formControlName="datePreset">
             <mat-option
-              *ngFor="let presetFilter of dateFilters"
+              *ngFor="let presetFilter of datePresets"
               [value]="presetFilter.value"
             >
               {{ presetFilter.label }}
@@ -73,7 +73,7 @@
           fxFlex
           mat-raised-button
           color="primary"
-          [disabled]="!alertFilterForm.valid"
+          [disabled]="alertFilterForm.inValid || alertFilterForm.pristine"
           (click)="applyFilters()"
         >
           Apply

@@ -1,20 +1,25 @@
-import { State, Action, StateContext } from '@ngxs/store';
-import { AlertsAction } from './alerts.actions';
+import { State, Action, StateContext, Selector } from '@ngxs/store';
+import { ApplyAlertFilters } from './alerts.actions';
+import { AlertFiltersModel } from './alerts.model';
+import * as clone from 'lodash/clone';
 
-export class AlertsStateModel {
-  public items: string[];
-}
+const defaultAlertFilters: AlertFiltersModel = {
+  preset: 'TW',
+  groupBy: 'StartTime'
+};
 
-@State<AlertsStateModel>({
-  name: 'alerts',
-  defaults: {
-    items: []
-  }
+@State<AlertFiltersModel>({
+  name: 'alertsFilters',
+  defaults: <AlertFiltersModel>clone(defaultAlertFilters)
 })
-export class AlertsState {
-  @Action(AlertsAction)
-  add(ctx: StateContext<AlertsStateModel>, action: AlertsAction) {
-    const state = ctx.getState();
-    ctx.setState({ items: [ ...state.items, action.payload ] });
+export class AlertsFilterState {
+  @Selector()
+  static getAlertFilters(state: AlertFiltersModel) {
+    return state;
+  }
+
+  @Action(ApplyAlertFilters)
+  add(ctx: StateContext<AlertFiltersModel>, action: ApplyAlertFilters) {
+    ctx.patchState(action.alertFilters);
   }
 }

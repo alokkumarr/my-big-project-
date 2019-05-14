@@ -1,23 +1,32 @@
 import { TestBed, async } from '@angular/core/testing';
 import { NgxsModule, Store } from '@ngxs/store';
-import { AlertsState } from './alerts.state';
-import { AlertsAction } from './alerts.actions';
+import { AlertsFilterState } from './alerts.state';
+import { ApplyAlertFilters } from './alerts.actions';
+import { AlertFiltersModel } from './alerts.model';
+
+const ALERT_FILTER_PAYLOAD: AlertFiltersModel = {
+  preset: 'YTD',
+  groupBy: 'StartTime'
+};
 
 describe('Alerts actions', () => {
   let store: Store;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [NgxsModule.forRoot([AlertsState])]
+      imports: [NgxsModule.forRoot([AlertsFilterState])]
     }).compileComponents();
     store = TestBed.get(Store);
   }));
 
   it('should create an action and add an item', () => {
-    store.dispatch(new AlertsAction('item-1'));
-    store.select(state => state.alerts.items).subscribe((items: string[]) => {
-      expect(items).toEqual(jasmine.objectContaining([ 'item-1' ]));
-    });
+    store.dispatch(new ApplyAlertFilters(ALERT_FILTER_PAYLOAD));
+    store
+      .selectOnce(state => state.alertsFilters)
+      .subscribe((alertsFilters: AlertFiltersModel) => {
+        expect(alertsFilters).toEqual(
+          jasmine.objectContaining(ALERT_FILTER_PAYLOAD)
+        );
+      });
   });
-
 });

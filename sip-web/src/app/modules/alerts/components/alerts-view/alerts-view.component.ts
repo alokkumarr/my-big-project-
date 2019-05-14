@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertsService } from '../../services/alerts.service';
 import { GridData } from '../../alerts.interface';
+import { Select } from '@ngxs/store';
+import { AlertsFilterState } from './state/alerts.state';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'alerts-view',
@@ -9,6 +12,7 @@ import { GridData } from '../../alerts.interface';
 })
 export class AlertsViewComponent implements OnInit {
   public alertsDataLoader: (options: {}) => Promise<GridData>;
+  @Select(AlertsFilterState.getAlertFilters) filters$: Observable<any>;
 
   constructor(public _alertService: AlertsService) {
     this.setAlertLoaderForGrid();

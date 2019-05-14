@@ -22,7 +22,7 @@ import {
   AlertDetailComponent,
   AlertsFilterComponent
 } from './components/alerts-view/index';
-import { AlertsState } from './components/alerts-view/state/alerts.state';
+import { AlertsFilterState } from './components/alerts-view/state/alerts.state';
 import { IsAdminGuard } from '../admin/guards';
 
 const components = [
@@ -48,7 +48,7 @@ const components = [
     DxTemplateModule,
     DxDataGridModule,
     DxSelectBoxModule,
-    NgxsModule.forFeature([AlertsState])
+    NgxsModule.forFeature([AlertsFilterState])
   ],
   entryComponents: components,
   providers: [IsAdminGuard],

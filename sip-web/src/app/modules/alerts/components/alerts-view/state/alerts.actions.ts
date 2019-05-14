@@ -1,4 +1,6 @@
-export class AlertsAction {
-  static readonly type = '[Alerts] Add item';
-  constructor(public payload: string) { }
+import { AlertFiltersModel } from './alerts.model';
+
+export class ApplyAlertFilters {
+  static readonly type = '[Alerts] Apply Filters';
+  constructor(public alertFilters: AlertFiltersModel) {}
 }

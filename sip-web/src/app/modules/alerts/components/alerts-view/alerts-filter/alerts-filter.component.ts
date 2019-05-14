@@ -3,6 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as moment from 'moment';
 import { requireIf } from '../../../../../common/validators/index';
 import { Subscription } from 'rxjs';
+import { Store } from '@ngxs/store';
+import { ApplyAlertFilters } from '../state/alerts.actions';
 
 import {
   DATE_FORMAT,
@@ -16,13 +18,16 @@ import {
   styleUrls: ['./alerts-filter.component.scss']
 })
 export class AlertsFilterComponent implements OnInit, OnDestroy {
-  dateFilters = DATE_PRESETS;
+  datePresets = DATE_PRESETS;
   alertFilterForm: FormGroup;
   datePresetSubscription: Subscription;
   showDateFields = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private store: Store) {
     this.createForm();
+    setTimeout(() => {
+      this.applyFilters();
+    });
   }
 
   ngOnInit() {}
@@ -35,7 +40,7 @@ export class AlertsFilterComponent implements OnInit, OnDestroy {
 
   createForm() {
     this.alertFilterForm = this.fb.group({
-      datePreset: ['', Validators.required],
+      datePreset: [this.datePresets[2].value, Validators.required],
       gte: [
         moment(),
         [requireIf('datePreset', val => val === CUSTOM_DATE_PRESET_VALUE)]
@@ -58,7 +63,8 @@ export class AlertsFilterComponent implements OnInit, OnDestroy {
 
   prepareDateFilterModel() {
     const model = {
-      preset: this.alertFilterForm.get('datePreset').value
+      preset: this.alertFilterForm.get('datePreset').value,
+      groupBy: 'StartTime'
     };
 
     if (model.preset !== CUSTOM_DATE_PRESET_VALUE) {
@@ -78,7 +84,7 @@ export class AlertsFilterComponent implements OnInit, OnDestroy {
   }
 
   applyFilters() {
-    const payload = this.prepareDateFilterModel();
-    console.log(payload);
+    const filters = this.prepareDateFilterModel();
+    this.store.dispatch(new ApplyAlertFilters(filters));
   }
 }
