@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
@@ -507,18 +506,18 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return null;
   }
 
-  @Override
+    @Override
     public ExecutionResponse fetchExecutionsData(String executionId)
     {
-     ExecutionResponse executionResponse = new ExecutionResponse();
-        Gson gson = new Gson();
-        JsonElement element = null;
+        ExecutionResponse executionResponse = new ExecutionResponse();
+        JsonNode element = null;
+        ObjectMapper objectMapper = new ObjectMapper();
         ExecutionResultStore executionResultStore =
             null;
         try {
             executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
-            element = executionResultStore.read(executionId);
-           ExecutionResult executionResult = gson.fromJson(element,ExecutionResult.class);
+            element = objectMapper.readTree(executionResultStore.readDocumet(executionId).asJsonString());
+            ExecutionResult executionResult = objectMapper.treeToValue(element, ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
             executionResponse.setExecutedBy("");
             executionResponse.setSipQuery(executionResult.getSipQuery());
@@ -527,6 +526,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         }
         return executionResponse;
     }
+
 
     @Override
     public ExecutionResponse fetchLastExecutionsData(String dslQueryId)
