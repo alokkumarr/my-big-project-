@@ -694,11 +694,7 @@ public class BatchIngestionIT extends BaseIT {
     String result = path.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result);
     
-    try {
-      Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
-    } catch (InterruptedException e) {
-      log.debug("Interrupted");
-    }
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     
     JsonPath afterWaitPath = given(authSpec).when().get(
         ROUTE_HISTORY_PATH + channelId + "/" + routeId)
