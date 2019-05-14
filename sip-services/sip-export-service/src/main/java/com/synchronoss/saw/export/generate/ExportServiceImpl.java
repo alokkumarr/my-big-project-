@@ -254,7 +254,9 @@ public class ExportServiceImpl implements ExportService {
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
     }
 
-    if ((recipients != null && !recipients.equals("") && recipients.contains("@")) || (ftp != null && ftp != "") || (s3 != null && s3 != "")) {
+    if ((recipients != null && !recipients.equals("") && recipients.contains("@"))
+        || (ftp != null && ftp != "")
+        || (s3 != null && s3 != "")) {
       logger.trace("Recipients: " + recipients);
       dispatchReport(
           analysisId,
@@ -270,8 +272,6 @@ public class ExportServiceImpl implements ExportService {
           jobGroup,
           restTemplate);
     }
-
-
   }
 
   public ExportBean setExportBeanProps(Object dispatchBean) {
@@ -897,7 +897,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public boolean dispatchMail(
-      ExportBean bean, String recipients, ResponseEntity<DataResponse> entity) {
+      ExportBean bean, String recipients, ResponseEntity<DataResponse> entity, boolean zip) {
 
     ExportBean exportBean = new ExportBean();
     exportBean = bean;
@@ -931,23 +931,72 @@ public class ExportServiceImpl implements ExportService {
         osw.close();
         fos.close();
       } else {
-        streamToXlsxReport(
-            entity.getBody(), Long.parseLong(emailExportSize), exportBean);
+        streamToXlsxReport(entity.getBody(), Long.parseLong(emailExportSize), exportBean);
       }
 
-      MailSender.sendMail(
-          recipients,
-          exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-          serviceUtils.prepareMailBody(exportBean, mailBody),
-          exportBean.getFileName());
-      logger.debug("Email sent successfully");
+      File cfile = new File(exportBean.getFileName());
+      String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
-      logger.debug("Deleting exported file.");
-      try {
-        logger.debug("ExportBean.getFileName() to delete -  mail : "+exportBean.getFileName());
-        serviceUtils.deleteFile(exportBean.getFileName(), true);
-      } catch (IOException e) {
-        e.printStackTrace();
+      if (zip) {
+        FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+        ZipOutputStream zos = new ZipOutputStream(fos_zip);
+        zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+        byte[] readBuffer = new byte[2048];
+        int amountRead;
+        int written = 0;
+
+        try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+
+          while ((amountRead = inputStream.read(readBuffer)) > 0) {
+            zos.write(readBuffer, 0, amountRead);
+            written += amountRead;
+          }
+
+          logger.info("Written " + written + " bytes to " + zipFileName);
+
+        } catch (Exception e) {
+          logger.error("Error while writing to zip: " + e.getMessage());
+        }
+
+        zos.closeEntry();
+        zos.close();
+
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            exportBean.getFileName());
+        logger.debug("Email sent successfully");
+
+        logger.debug("Deleting exported file.");
+        try {
+          logger.debug(
+              "ExportBean.getFileName() to delete -  mail : "
+                  + zipFileName
+                  + ", "
+                  + exportBean.getFileName());
+          serviceUtils.deleteFile(exportBean.getFileName(), true);
+          serviceUtils.deleteFile(zipFileName, true);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+      } else {
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            exportBean.getFileName());
+        logger.debug("Email sent successfully");
+
+        logger.debug("Deleting exported file.");
+        try {
+          logger.debug("ExportBean.getFileName() to delete -  mail : " + exportBean.getFileName());
+          serviceUtils.deleteFile(exportBean.getFileName(), true);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
 
     } catch (IOException e) {
@@ -968,7 +1017,8 @@ public class ExportServiceImpl implements ExportService {
       boolean zip,
       String finalJobGroup,
       HttpEntity<?> requestEntity,
-      RestTemplate restTemplate, String userFileName) {
+      RestTemplate restTemplate,
+      String userFileName) {
     logger.trace("Inside S3 dispatcher");
 
     ExportBean exportBean = new ExportBean();
@@ -996,11 +1046,50 @@ public class ExportServiceImpl implements ExportService {
         exportBean);
 
     File cfile = new File(exportBean.getFileName());
+    String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
-    s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
+    if (zip) {
+      logger.debug("S3 - zip = true!!");
+      try {
+        FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+        ZipOutputStream zos = new ZipOutputStream(fos_zip);
+        zos.putNextEntry(new ZipEntry(cfile.getName()));
 
-    logger.debug("ExportBean.getFileName() - to delete in S3 : "+exportBean.getFileName());
-    deleteDispatchedFile(exportBean.getFileName());
+        byte[] readBuffer = new byte[2048];
+        int amountRead;
+        int written = 0;
+
+        try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+
+          while ((amountRead = inputStream.read(readBuffer)) > 0) {
+            zos.write(readBuffer, 0, amountRead);
+            written += amountRead;
+          }
+
+          logger.info("Written " + written + " bytes to " + zipFileName);
+
+        } catch (Exception e) {
+          logger.error("Error while writing to zip: " + e.getMessage());
+        }
+
+        zos.closeEntry();
+        zos.close();
+
+        s3DispatchExecutor(finalS3, finalJobGroup, new File(zipFileName), exportBean);
+
+        logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
+        deleteDispatchedFile(exportBean.getFileName());
+        deleteDispatchedFile(zipFileName);
+        logger.debug("ExportBean.getFileName() - to delete in S3 : " + zipFileName);
+
+      } catch (Exception e) {
+        logger.error("Error writing to zip!!");
+      }
+    } else {
+      s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
+      logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
+      deleteDispatchedFile(exportBean.getFileName());
+    }
   }
 
   public void s3DispatchExecutor(
@@ -1051,7 +1140,7 @@ public class ExportServiceImpl implements ExportService {
       boolean zip,
       String jobGroup,
       RestTemplate restTemplate) {
-      String userFileName = exportBean.getFileName();
+    String userFileName = exportBean.getFileName();
     AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     String url =
         apiExportOtherProperties
@@ -1070,39 +1159,39 @@ public class ExportServiceImpl implements ExportService {
           @Override
           public void onSuccess(ResponseEntity<DataResponse> entity) {
 
-              if (recipients != null && !recipients.equals("")) {
-                dispatchMail(exportBean, recipients, entity);
-              }
+            if (recipients != null && !recipients.equals("")) {
+              dispatchMail(exportBean, recipients, entity, zip);
+            }
 
             if (s3 != null && s3 != "") {
-                  logger.debug("S3 details set. Dispatching to S3");
-                  dispatchFileToS3(
-                      analysisId,
-                      executionId,
-                      analysisType,
-                      exportBean,
-                      s3,
-                      zip,
-                      jobGroup,
-                      requestEntity,
-                      restTemplate,
-                      userFileName);
-              }
+              logger.debug("S3 details set. Dispatching to S3");
+              dispatchFileToS3(
+                  analysisId,
+                  executionId,
+                  analysisType,
+                  exportBean,
+                  s3,
+                  zip,
+                  jobGroup,
+                  requestEntity,
+                  restTemplate,
+                  userFileName);
+            }
 
-              if (ftp != null && ftp != "") {
-                  logger.debug("ftp dispatch started : ");
-                  dispatchToFtp(
-                      analysisId,
-                      executionId,
-                      analysisType,
-                      exportBean,
-                      ftp,
-                      zip,
-                      jobGroup,
-                      requestEntity,
-                      restTemplate,
-                      userFileName);
-              }
+            if (ftp != null && ftp != "") {
+              logger.debug("ftp dispatch started : ");
+              dispatchToFtp(
+                  analysisId,
+                  executionId,
+                  analysisType,
+                  exportBean,
+                  ftp,
+                  zip,
+                  jobGroup,
+                  requestEntity,
+                  restTemplate,
+                  userFileName);
+            }
           }
 
           @Override
@@ -1212,7 +1301,8 @@ public class ExportServiceImpl implements ExportService {
       boolean zip,
       String finalJobGroup,
       HttpEntity<?> requestEntity,
-      RestTemplate restTemplate, String userFileName) {
+      RestTemplate restTemplate,
+      String userFileName) {
 
     ExportBean exportBean = new ExportBean();
     exportBean = bean;
@@ -1287,7 +1377,7 @@ public class ExportServiceImpl implements ExportService {
         fos_zip.close();
 
         // deleting the files
-        logger.debug("ExportBean.getFileName() - to delete file FTP : "+exportBean.getFileName());
+        logger.debug("ExportBean.getFileName() - to delete file FTP : " + exportBean.getFileName());
         logger.debug("Deleting exported file.");
         deleteDispatchedFile(exportBean.getFileName());
         deleteDispatchedFile(zipFileName);
