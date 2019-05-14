@@ -17,7 +17,7 @@ public class AnalysisMetadata extends MetadataStore
     super(tableName, baseTableLocation);
   }
 
-  /** Search All analysis based on category.
+  /**Search All analysis based on category.
    * @param keyValues Map
    * @return {@link List} of {@link Document}
    * @throws java.io.IOException MariaDbFetchExeception
@@ -32,6 +32,23 @@ public class AnalysisMetadata extends MetadataStore
       }
     }
 
+    cond.close();
+    cond.build();
+    return searchAsList(table, cond);
+  }
+
+  /**
+   * Search All analysis based on category for user.
+   *
+   * @param category string ,userId Long
+   * @return {@link List} of {@link Document}
+   * @throws Exception maprdbExecption
+   */
+  public List<Document> searchByCategoryForUserId(String category, Long userId) throws Exception {
+    QueryCondition cond = MapRDB.newCondition();
+    cond.and();
+    cond.is("category", QueryCondition.Op.EQUAL, category);
+    cond.is("userId", QueryCondition.Op.EQUAL, userId);
     cond.close();
     cond.build();
     return searchAsList(table, cond);

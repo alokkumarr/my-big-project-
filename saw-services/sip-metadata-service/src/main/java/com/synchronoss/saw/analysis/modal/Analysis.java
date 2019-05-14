@@ -27,6 +27,7 @@ public class Analysis {
       "module",
       "createdTime",
       "createdBy",
+      "userId",
       "modifiedTime",
       "modifiedBy",
       "designerEdit",
@@ -70,6 +71,9 @@ public class Analysis {
 
   @JsonProperty("createdBy")
   private String createdBy;
+
+  @JsonProperty("userId")
+  private Long userId;
 
   @JsonProperty("modifiedTime")
   private Long modifiedTime;
@@ -217,6 +221,16 @@ public class Analysis {
     this.createdBy = createdBy;
   }
 
+  @JsonProperty("userId")
+  public Long getUserId() {
+    return userId;
+  }
+
+  @JsonProperty("userId")
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
+
   @JsonProperty("modifiedTime")
   public Long getModifiedTime() {
     return modifiedTime;
@@ -300,6 +314,7 @@ public class Analysis {
         .append("module", module)
         .append("createdTime", createdTime)
         .append("createdBy", createdBy)
+        .append("userId", userId)
         .append("modifiedTime", modifiedTime)
         .append("modifiedBy", modifiedBy)
         .append("chartOptions", chartOptions)
@@ -322,6 +337,7 @@ public class Analysis {
         .append(sipQuery)
         .append(id)
         .append(createdBy)
+        .append(userId)
         .append(semanticId)
         .append(customerCode)
         .append(name)
@@ -349,6 +365,7 @@ public class Analysis {
         .append(sipQuery, rhs.sipQuery)
         .append(id, rhs.id)
         .append(createdBy, rhs.createdBy)
+        .append(userId,rhs.userId)
         .append(semanticId, rhs.semanticId)
         .append(customerCode, rhs.customerCode)
         .append(name, rhs.name)
