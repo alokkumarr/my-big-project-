@@ -853,7 +853,7 @@ public class BatchIngestionIT extends BaseIT {
     // First call
     given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
         .statusCode(200);
-
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     log.debug("Request URL for transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);

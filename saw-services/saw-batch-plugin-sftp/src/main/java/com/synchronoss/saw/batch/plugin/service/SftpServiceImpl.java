@@ -735,6 +735,9 @@ public class SftpServiceImpl extends SipPluginContract {
             
               logger.info("Already process running for the route" + routeId 
                     + "and concurrency disabled hence skipping transfer");
+              BisJobEntity job = sipLogService.retriveJobById(jobEntity.getJobId());
+              sipLogService.updateJobLog(jobEntity.getJobId(),"SUCCESS", 0L, 0L);
+              
             
             } else {
               logger.trace("invocation of method transferData when "
@@ -1010,7 +1013,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         .duplicateCheck(isDisableDuplicate, sourcelocation, entry)) {
                       logger.trace("file duplication completed " + sourcelocation + File.separator
                           + entry.getFilename() + " batchSize " + batchSize);
-                      logger.info("Before Inprogress log jobId :: " 
+                      logger.trace("Before Inprogress log jobId :: " 
                           + jobId);
                       prepareLogInfo(bisDataMetaInfo, pattern, "",
                           getActualRecDate(entry), entry.getAttrs().getSize(),
@@ -1018,7 +1021,7 @@ public class SftpServiceImpl extends SipPluginContract {
                           "", jobId);
 
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                      logger.info("After Inprogress log jobId :: " 
+                      logger.trace("After Inprogress log jobId :: " 
                           + jobId);
                       logId = bisDataMetaInfo.getProcessId();
                       logger.trace("Thread starts downloading file with Id  : " + logId);
@@ -1268,10 +1271,10 @@ public class SftpServiceImpl extends SipPluginContract {
           if (localDirectory != null && !this.processor
               .isDestinationExists(localDirectory.getPath())) {
 
-            logger.trace("directory where the file will be"
+            logger.info("directory where the file will be"
                 + " downnloaded does not exist so it will be created :"
                 + localDirectory.getAbsolutePath());
-            logger.trace("directory where the file will be downnloaded  :"
+            logger.info("directory where the file will be downnloaded  :"
                 + localDirectory.getAbsolutePath());
             this.processor.createDestination(localDirectory.getPath(),
                 new StringBuffer());
@@ -1280,7 +1283,7 @@ public class SftpServiceImpl extends SipPluginContract {
           final File localFile = createTargetFile(localDirectory, fileName);
 
           final File fileTobeDeleted = localFile;
-          logger.trace("Actual file name after downloaded in the  :"
+          logger.info("Actual file name after downloaded in the  :"
               + localDirectory.getAbsolutePath() + " file name "
               + localFile.getName());
           FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
@@ -1301,7 +1304,7 @@ public class SftpServiceImpl extends SipPluginContract {
               try {
                 final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
                 bisDataMetaInfo.setProcessId(logId);
-                logger.trace("Local file path ::" + localFile.getPath());
+                logger.info("Local file path ::" + localFile.getPath());
                 sipLogService.upsertInProgressStatus(logId, localFile.getPath(),
                     Date.from(fileTransStartTime.toInstant()));
                 if (stream != null) {
