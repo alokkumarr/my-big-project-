@@ -2,32 +2,43 @@
   stat: path=/etc/my.cnf.d/sip_mariadb_dare_key.enc
   register: path_sip_mariadb_dare_key
 
-- name: fail when sip_mariadb_dare_key is not defined
-  fail: msg="sip_mariadb_dare_key must be specified and cannot be blank"
-  when: sip_mariadb_dare_key is not defined or sip_mariadb_dare_key == ''
-
-- name: fail when sip_mariadb_dare_key_password is not defined
-  fail: msg="sip_mariadb_dare_key_password must be specified and cannot be blank"
-  when: sip_mariadb_dare_key_password is not defined or sip_mariadb_dare_key_password == ''  
-
-#encrypt the sip_mariadb_dare_key using openssl enc
-- name: encrypt sip_mariadb_dare_key
-  shell: echo "{{ sip_mariadb_dare_key }}" | openssl enc -aes-256-cbc -md sha1 -k "{{ sip_mariadb_dare_key_password }}" -out /etc/my.cnf.d/sip_mariadb_dare_key.enc
+- name: generate dare key
+  shell: "openssl rand -hex 32 | sed '1s/^/1;/'"
+  register: sip_mariadb_dare_key
+  run_once: true
+  delegate_to: "{{groups['saw-security'][0]}}"
   when: not path_sip_mariadb_dare_key.stat.exists
-  no_log: true
+
+- name: generate mariabd dare key password
+  command: openssl rand -base64 16
+  register: sip_mariadb_dare_key_password
+  run_once: true
+  delegate_to: "{{groups['saw-security'][0]}}"
+  when: not path_sip_mariadb_dare_key.stat.exists
+
+- name: keep dare key in a file
+  local_action: "copy content={{ sip_mariadb_dare_key.stdout }}  dest={{ inventory_dir + '/sip_mariadb_dare_key' }}"
+  run_once: true
+  delegate_to: "{{groups['saw-security'][0]}}"
+  when: sip_mariadb_dare_key_password.changed
+
+- name: keep dare key password in a file
+  local_action: "copy content={{ sip_mariadb_dare_key_password.stdout }}  dest={{ inventory_dir + '/sip_mariadb_dare_key_password' }}"
+  run_once: true
+  delegate_to: "{{groups['saw-security'][0]}}"
+  when: sip_mariadb_dare_key_password.changed
+
+# encrypt the sip_mariadb_dare_key using openssl enc
+- name: encrypt sip_mariadb_dare_key
+  shell: echo "{{ sip_mariadb_dare_key.stdout }}" | openssl enc -aes-256-cbc -md sha1 -k "{{ sip_mariadb_dare_key_password.stdout }}" -out /etc/my.cnf.d/sip_mariadb_dare_key.enc
+  when: not path_sip_mariadb_dare_key.stat.exists
+  register: encrpt_sip_mariadb_dare_key
 
 - name: Copy the dare configuration file to /etc/my.cnf.d/
-  template: 
+  template:
     src: sip-mariadb-dare.cnf.j2
     dest: /etc/my.cnf.d/sip-mariadb-dare.cnf
   notify:
     - restart mariadb
+  when: encrpt_sip_mariadb_dare_key.changed
   
-    
-
-
-
-
-
-
-

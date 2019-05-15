@@ -153,12 +153,10 @@ sip-app2
 
 [saw-security:vars]
 saw_security_email_host=sip-admin
-sip_mariadb_dare=true
+sip_secure=True
 ## generate random encryption keys using the openssl rand command. For example, to create a random 256-bit (32-byte) encryption key, you would run the following command:openssl rand -hex 32
 #Note: Dont share this key 
 #This key file will be encypted using openssl enc command
-sip_mariadb_dare_key=1;eef5809c433bc711acf96db19e527ede1038e3490aa0ad12227d5a9749347c03
-sip_mariadb_dare_key_password=sip123
 
 
 [saw-security-arbitrator]

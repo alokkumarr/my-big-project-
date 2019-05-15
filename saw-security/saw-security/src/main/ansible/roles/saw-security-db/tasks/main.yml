@@ -17,9 +17,9 @@
     - restart mariadb
 
 # Mariadb Security at rest - also known as DARE - Only for secure clusters
-- name: Include mariadb-dare.yml if sip_mariadb_dare=true
+- name: Include mariadb-dare.yml if sip_secure=true
   include: mariadb-dare.yml
-  when: sip_mariadb_dare | default (false) | bool == true
+  when: sip_secure | default (false) | bool == true
 # Workaround: MariaDB 10.3.10 introduced changes that cause the error
 # "/bin/galera_new_cluster: line 31: return: can only `return' from a
 # function or sourced script" when bootstrapping the cluster.  Remove
