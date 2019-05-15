@@ -370,6 +370,39 @@ Execute the following steps to install SIP product modules:
         cd saw
         ./sip-deploy-module <sip-config> <sip-module-package>
 
+== Security
+
+SIP sends data over the network and store data in persistent storage
+in an unencrypted form by default.  Optionally, SIP can be configured
+to encrypt data in flight and at rest.  Encryption can be enabled by
+adding the following to the SIP environment configuration file
+(`sip-config`), before the initial installation.
+
+        [all:vars]
+        sip_secure=True
+ 
+NOTE: The `sip_secure` configuration parameter must be set before the
+first installation of SIP and not changed thereafter.  Changing the
+value after the initial installation for an existing environment is
+not supported.
+
+=== Data in flight
+
+Enabling the secure mode will make SIP use HTTPS for communication
+between services and when acting as a client to the internal MariaDB
+Galera cluster, Elasticsearch cluster and MapR cluster.
+
+Connections between SIP services are secured using certificates signed
+by an internal certificate authority (CA).  The CA is located on the
+SIP node with the `sip-admin` role.
+
+=== Data at rest
+
+Enabling the secure mode will make the SIP internal MariaDB Galera
+cluster encrypt data stored in the database.  Database encryption is
+set up automatically on the first installation and happens thereafter
+transparently.
+
 == Monitoring
 
 To support monitoring of a SIP environment, services expose health
@@ -459,6 +492,43 @@ is available at the URL `http://<sip-admin>/prometheus/api/v1`, where
 `<sip-admin>` refers to a node configured in in the `sip-admin` role.
 The {prometheus_query}[Prometheus querying] documentation describes
 the full range of querying expressions available.
+
+=== Prometheus Elasticsearch Exporter Plugin
+
+Elasticsearch-exporter is a service which collects all relevant
+metricsfrom Elasticsearch cluster and makes them available to
+Prometheus via the Elasticsearch REST API. Currently monitoring is
+available cluster settings, status of the cluster, nodes and indices.
+
+==== Installation:
+
+On each elasticsearch nodes run the following command to install plugin
+
+        /usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://distfiles.compuscene.net/elasticsearch/elasticsearch-prometheus-exporter-6.3.1.0.zip
+
+Once the Installation is finished metrics are directly available at
+
+        http://<your-elasticsearch-host>:9200/_prometheus/metric
+
+NOTE: These mertics are collected at the Prometheus server and then
+visualised on Grafana Dashboard. Prometheus is already configured to
+collect the metrics from elasticsearch nodes.
+
+==== Upgrading
+
+Exporter plugin version has to be updated whenever we update the
+elasticsearch version on our environments. Compatibility matrix for
+plugin version with respective elasticsearch version can be found on
+the below location
+
+        https://github.com/vvanholl/elasticsearch-prometheus-exporter#compatibility-matrix
+
+=== Mariadb Prometheus Monitoring:
+
+Prometheus MySQL exporter is configured on sip servers where database
+is running for monitoring MariaDB and then visualizing data with
+Grafana. This will enable users to have a good view of database
+performance and know where to check whenever there is an issues.
 
 == High availability
 
