@@ -24,7 +24,7 @@ import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
 import { zip, Observable } from 'rxjs';
-import { first, map } from 'rxjs/operators';
+import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import { isDSLAnalysis } from '../designer/types';
@@ -628,10 +628,8 @@ export class AnalyzeService {
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
-  getSemanticObect(semanticId: string) {
-    return this.getRequest(
-      `internal/semantic/workbench/${semanticId}`
-    ).toPromise();
+  getSemanticObect(semanticId: string): Observable<any> {
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
   createAnalysis(
@@ -663,12 +661,47 @@ export class AnalyzeService {
   }
 
   createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
-    return <Observable<AnalysisDSL>>(
-      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
-        first(),
-        map((resp: { analysis: AnalysisDSL }) => resp.analysis)
-      )
+    return this.getSemanticObect(model.semanticId).pipe(
+      switchMap(semanticData => {
+        /* Set the store details from semantic data */
+        const repo = semanticData.esRepository;
+        model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
+        model.sipQuery.store.storageType = repo.storageType;
+
+        return <Observable<AnalysisDSL>>(
+          this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
+            first(),
+            map((resp: { analysis: AnalysisDSL }) => resp.analysis)
+          )
+        );
+      })
     );
+  }
+
+  newAnalysisModel(
+    semanticId: string,
+    type: AnalysisType
+  ): Partial<AnalysisDSL> {
+    return {
+      type,
+      semanticId,
+      name: 'Untitled Analysis',
+      description: '',
+      createdBy: this._jwtService.getLoginId(),
+      customerCode: 'SYNCHRONOSS',
+      projectCode: 'workbench',
+      module: 'ANALYZE',
+      sipQuery: {
+        artifacts: [],
+        booleanCriteria: 'AND',
+        filters: [],
+        sorts: [],
+        store: {
+          dataStore: null, // This is filled up when creating analysis
+          storageType: null
+        }
+      }
+    };
   }
 
   newAnalysisChartModel(
@@ -692,24 +725,7 @@ export class AnalyzeService {
     };
     const mapOptions = DEFAULT_MAP_SETTINGS;
     return {
-      type,
-      semanticId,
-      name: 'Untitled Analysis',
-      description: '',
-      createdBy: this._jwtService.getLoginId(),
-      customerCode: 'SYNCHRONOSS',
-      projectCode: 'workbench',
-      module: 'ANALYZE',
-      sipQuery: {
-        artifacts: [],
-        booleanCriteria: 'AND',
-        filters: [],
-        sorts: [],
-        store: {
-          dataStore: 'sampleAlias/sample', // make this dynamic
-          storageType: 'ES'
-        }
-      },
+      ...this.newAnalysisModel(semanticId, type),
       chartOptions: type === 'chart' ? chartOptions : null,
       mapOptions: type === 'map' ? mapOptions : null
     };
@@ -720,24 +736,7 @@ export class AnalyzeService {
     type: AnalysisType
   ): Partial<AnalysisPivotDSL> {
     return {
-      type,
-      semanticId,
-      name: 'Untitled Analysis',
-      description: '',
-      createdBy: this._jwtService.getLoginId(),
-      customerCode: 'SYNCHRONOSS',
-      projectCode: 'workbench',
-      module: 'ANALYZE',
-      sipQuery: {
-        artifacts: [],
-        booleanCriteria: 'AND',
-        filters: [],
-        sorts: [],
-        store: {
-          dataStore: 'sampleAlias/sample', // make this dynamic
-          storageType: 'ES'
-        }
-      }
+      ...this.newAnalysisModel(semanticId, type)
     };
   }
 

@@ -181,7 +181,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.analysis
       );
 
-      this._analyzeService.getSemanticObect(this.analysis.semanticId).then(semanticObj => {
+      this._analyzeService.getSemanticObect(this.analysis.semanticId).toPromise().then(semanticObj => {
         this._store.dispatch(new DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns(semanticObj.artifacts[0].columns));
         this._store.dispatch(new DesignerMergeSupportsIntoAnalysis(semanticObj.supports));
       });
