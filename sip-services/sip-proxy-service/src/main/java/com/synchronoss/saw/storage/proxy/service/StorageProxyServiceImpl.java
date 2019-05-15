@@ -1,10 +1,10 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
@@ -35,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -507,26 +508,28 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return null;
   }
 
-  @Override
+    @Override
     public ExecutionResponse fetchExecutionsData(String executionId)
     {
-     ExecutionResponse executionResponse = new ExecutionResponse();
-        Gson gson = new Gson();
-        JsonElement element = null;
+        ExecutionResponse executionResponse = new ExecutionResponse();
+        ObjectMapper objectMapper = new ObjectMapper();
         ExecutionResultStore executionResultStore =
             null;
         try {
             executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
-            element = executionResultStore.read(executionId);
-           ExecutionResult executionResult = gson.fromJson(element,ExecutionResult.class);
+            Document doc = executionResultStore.readDocumet(executionId);
+            logger.info("Doc : "+doc.asJsonString());
+            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            ExecutionResult executionResult = objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
-            executionResponse.setExecutedBy("");
+            executionResponse.setExecutedBy(executionResult.getExecutedBy());
             executionResponse.setSipQuery(executionResult.getSipQuery());
         } catch (Exception e) {
             logger.error("Error occurred while fetching the execution result data" , e);
         }
         return executionResponse;
     }
+
 
     @Override
     public ExecutionResponse fetchLastExecutionsData(String dslQueryId)
@@ -545,7 +548,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             ExecutionResult executionResult = objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
-            executionResponse.setExecutedBy("");
+            executionResponse.setExecutedBy(executionResult.getExecutedBy());
             executionResponse.setSipQuery(executionResult.getSipQuery());
         } catch (Exception e) {
             logger.error("Error occurred while fetching the execution result data" , e);

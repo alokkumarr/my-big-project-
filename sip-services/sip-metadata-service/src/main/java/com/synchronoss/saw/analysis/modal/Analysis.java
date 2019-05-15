@@ -251,11 +251,13 @@ public class Analysis {
     this.modifiedBy = modifiedBy;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("chartOptions")
   public ChartOptions getChartOptions() {
     return this.chartOptions;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("chartOptions")
   public void setChartOptions(ChartOptions chartOptions) {
     this.chartOptions = chartOptions;
@@ -287,6 +289,7 @@ public class Analysis {
    * @return MapOptions Object
    */
   @JsonProperty("mapOptions")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public MapOptions getMapOptions() {
     return mapOptions;
   }
@@ -297,6 +300,7 @@ public class Analysis {
    * @param mapOptions Map options
    */
   @JsonProperty("mapOptions")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public void setMapOptions(MapOptions mapOptions) {
     this.mapOptions = mapOptions;
   }

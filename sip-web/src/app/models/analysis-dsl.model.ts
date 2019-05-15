@@ -61,7 +61,7 @@ export interface AnalysisBaseDSL {
   id: string;
   metricName?: string; // required for exporting analyses from admin module
   modifiedBy: string; // email
-  modifiedTime: string;
+  modifiedTime?: string;
   module: string;
   name: string;
   parentAnalysisId?: string; // todo

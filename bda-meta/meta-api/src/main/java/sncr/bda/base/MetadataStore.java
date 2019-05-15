@@ -5,13 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
+import com.mapr.db.exceptions.DBException;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
-import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import com.mapr.db.exceptions.DBException;
 
 
 /**
@@ -124,6 +123,15 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         if (ds != null) {
             logger.trace("Entity: " + ds.asJsonString());
             return toJsonElement(ds);
+        }
+        return null;
+    }
+
+    public Document readDocumet(String id) throws Exception {
+        Document ds = _read(id);
+        if (ds != null) {
+            logger.trace("Entity: " + ds.asJsonString());
+            return ds;
         }
         return null;
     }

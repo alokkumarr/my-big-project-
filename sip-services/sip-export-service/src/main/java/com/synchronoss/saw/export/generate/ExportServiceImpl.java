@@ -2,7 +2,7 @@ package com.synchronoss.saw.export.generate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.saw.analysis.response.TempAnalysisResponse;
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.export.AmazonS3Handler;
 import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.ServiceUtils;
@@ -1413,23 +1413,17 @@ public class ExportServiceImpl implements ExportService {
    */
   public SipQuery getSipQuery(String analysisId) {
     SipQuery sipQuery = null;
-    try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      RestTemplate restTemplate = new RestTemplate();
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
+    ObjectMapper objectMapper = new ObjectMapper();
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
 
-      String url = metaDataServiceExport + "/dslanalysis/" + analysisId;
-      logger.debug("SIP query url for analysis fetch : " + url);
-      TempAnalysisResponse analysisResponse =
-          restTemplate.getForObject(url, TempAnalysisResponse.class);
-      JsonNode tempJsonNode = analysisResponse.getAnalysis().get("sipQuery");
+    String url = metaDataServiceExport + "/dslanalysis/" + analysisId;
+    logger.debug("SIP query url for analysis fetch : " + url);
+    AnalysisResponse analysisResponse = restTemplate.getForObject(url, AnalysisResponse.class);
+    sipQuery = analysisResponse.getAnalysis().getSipQuery();
 
-      sipQuery = objectMapper.readValue(tempJsonNode.toString(), SipQuery.class);
-      logger.debug("Fetched SIP query for analysis : " + sipQuery.toString());
-    } catch (IOException ex) {
-      logger.error("Sip query not fetched from analysis");
-    }
+    logger.debug("Fetched SIP query for analysis : " + sipQuery.toString());
     return sipQuery;
   }
 }

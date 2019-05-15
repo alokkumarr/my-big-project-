@@ -242,8 +242,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       .getArtifactsForDataSet(semanticId)
       .toPromise();
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
+    console.log(newAnalysis$);
     return Promise.all([artifacts$, newAnalysis$]).then(
       ([metric, newAnalysis]) => {
+        console.log(metric.metricName);
         this._store.dispatch(
           new DesignerLoadMetric({
             metricName: metric.metricName,
@@ -258,9 +260,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           (<AnalysisMapDSL>newAnalysis).mapOptions.mapType = chartType;
         }
         this.analysis = {
-          ...this.analysisStarter,
           ...(newAnalysis['analysis'] || newAnalysis),
-          artifacts
+          artifacts,
+          ...this.analysisStarter
         };
         isDSLAnalysis(this.analysis) &&
           this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
@@ -649,12 +651,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const clonedAnalysis = cloneDeep(requestAnalysis);
     // unset properties that are set by merging data from semantic layer
     // because these properties are not part of dsl analysis definition
-    unset(clonedAnalysis, 'supports');
-    forEach(clonedAnalysis.sipQuery.artifacts, artifact => {
-      forEach(artifact.fields, column => {
-        unset(column, 'geoType');
+    if (isDSLAnalysis(clonedAnalysis)) {
+      unset(clonedAnalysis, 'supports');
+      forEach(clonedAnalysis.sipQuery.artifacts, artifact => {
+        forEach(artifact.fields, column => {
+          unset(column, 'geoType');
+        });
       });
-    });
+    }
+
     this._designerService.getDataForAnalysis(clonedAnalysis).then(
       response => {
         if (

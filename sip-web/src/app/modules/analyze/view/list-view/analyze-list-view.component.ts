@@ -121,7 +121,7 @@ export class AnalyzeListViewComponent implements OnInit {
         calculateCellValue: rowData => {
           const cron = this.cronJobs ? this.cronJobs[rowData.id] : '';
           if (!cron) {
-            return 'No Schedule Set';
+            return '';
           }
           const { cronExpression, activeTab, timezone } = cron.jobDetails;
           return generateSchedule(cronExpression, activeTab, timezone);
