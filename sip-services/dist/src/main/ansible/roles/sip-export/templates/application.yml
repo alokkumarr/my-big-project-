@@ -20,10 +20,23 @@ server:
   address: localhost
   port: 9401
   context-path: ''
-  maxHttpHeaderSize: 65536
+  max-http-header-size:  65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+
+  {% if sip_secure %}
+
+  ssl:
+   key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   key-alias: sip
+   key-store-password: "{{ sip_keystore_password }}"
+   trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
+   trust-store-password: "{{ sip_keystore_password }}"
+
+  {% endif %}
+
+
 management:
   endpoint:
     health:
@@ -33,10 +46,41 @@ management:
       exposure:
         include: info, health, prometheus
 
+   {% if sip_secure %}
+
+sip:
+   ssl:
+     enable : true
+
+   trust:
+       store: ${server.ssl.trust-store}
+       password: ${server.ssl.trust-store-password}
+   key:
+      store: ${server.ssl.key-store}
+      password: ${server.ssl.key-store-password}
+
+   {% else %}
+
+sip:
+   ssl:
+     enable : false
+
+  {% endif %}
+
+
+{% if sip_secure %}
+
+connector: https
+
+{% else %}
+
+connector: http
+
+{% endif %}
 
 analysis:
     service:
-        host: http://localhost:9200/analysis
+        host: ${connector}://localhost:9200/analysis
     uiExportSize: "{{ saw_ui_export_size | default('10000') }}"
     emailExportSize: "{{ saw_email_export_size | default('50000') }}"
     ftpExportSize: "{{ saw_ftp_export_size | default('1000000') }}"

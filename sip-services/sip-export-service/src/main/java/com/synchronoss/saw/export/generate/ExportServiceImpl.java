@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import com.synchronoss.sip.utils.RestUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -101,12 +102,15 @@ public class ExportServiceImpl implements ExportService {
 
   @Autowired private ServiceUtils serviceUtils;
 
+  @Autowired
+  private RestUtil restUtil;
+
   @Override
   public DataResponse dataToBeExportedSync(
       String executionId, HttpServletRequest request, String analysisId)
       throws JSONValidationSAWException {
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = restUtil.restTemplate();
     // During report extraction time, this parameter will not be passed.
     // Hence we should use uiExportSize configuration parameter.
     String sizOfExport;
@@ -198,7 +202,7 @@ public class ExportServiceImpl implements ExportService {
               + "&analysisType="
               + analysisType;
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
         asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
     responseStringFuture.addCallback(
@@ -225,10 +229,10 @@ public class ExportServiceImpl implements ExportService {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
     // at times we need synchronous processing even in async as becasue of massive parallelism
     // it may halt entire system or may not complete the request
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = restUtil.restTemplate();
     Object dispatchBean = request.getBody();
 
     ExportBean exportBean = setExportBeanProps(dispatchBean);
@@ -415,7 +419,7 @@ public class ExportServiceImpl implements ExportService {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
     Object dispatchBean = request.getBody();
     String recipients = null;
     String ftp = null;
@@ -831,7 +835,7 @@ public class ExportServiceImpl implements ExportService {
   @Override
   public AnalysisMetaData getAnalysisMetadata(String analysisId) {
 
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = restUtil.restTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     String url = apiExportOtherProperties + "/md?analysisId=" + analysisId;
@@ -1045,7 +1049,7 @@ public class ExportServiceImpl implements ExportService {
       String jobGroup,
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
-    AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
     String url =
         apiExportOtherProperties
             + "/"

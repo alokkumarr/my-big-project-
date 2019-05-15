@@ -379,6 +379,36 @@ structure to visualize the data into platform.
 .Figure: SIP-DSL sequence Diagram with platform integration
 plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
 
+= Security
+
+By default SIP sends data over the network and store data in
+persistent storage in an unencrypted form.  SIP also optionally
+supports encryption of data in flight and at rest.
+
+== Data in flight
+
+Data in flight between SIP services are secured using HTTPS.  Data in
+flight between SIP services and MariaDB, MapR and Elasticsearch are
+also secured using SSL.  Data in flight internally inside MariaDB
+Galera clusters, MapR clusters and Elasticsearch clusters are secured
+using the respective vendor's default intracluster encryption
+solution.
+
+== Data at rest
+
+Data at rest is encrypted using each data storage's respective default
+encryption solution.  See the documentation of MariaDB, MapR and
+Elasticsearch respectively.
+
+Connections between SIP services use certificates signed by an
+internal certificate authority (CA).  The CA is located on the SIP
+node with the `sip-admin` role.
+
+NOTE: The `sip_secure` configuration parameter must be set before the
+first installation of SIP and not changed thereafter.  Changing the
+value after the initial installation for an existing environment is
+not supported.
+
 = Monitoring
 
 == Prometheus

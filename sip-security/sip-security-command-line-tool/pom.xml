@@ -225,6 +225,12 @@
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
+                  <name>${app.optDir}/bin/conf_init_secure</name>
+                  <file>../sip-security/bin/conf_init_secure</file>
+                  <ruleset>default</ruleset>
+                </entry>
+
+                <entry>
                   <name>${app.optDir}/bin/mk_conf.sh</name>
                   <file>../sip-security/bin/mk_conf.sh</file>
                   <ruleset>default</ruleset>

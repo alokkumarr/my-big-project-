@@ -6,6 +6,6 @@ After=sip-deploy.service
 Type=oneshot
 ExecStart=/root/saw-analyze-samples/sample-spark/load-metric
 SyslogIdentifier=sip-analyze-spark-samples
-
+EnvironmentFile=/etc/bda/secure.env
 [Install]
 WantedBy=sip-deploy.service
