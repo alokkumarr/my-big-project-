@@ -265,8 +265,8 @@ public class Model {
   }
 
   public enum Preset {
-    Yesterday("YESTERDAY"),
-    Today("TODAY"),
+    Yesterday("Yesterday"),
+    Today("Today"),
     YTD("YTD"),
     MTD("MTD"),
     LTM("LTM"),
@@ -294,12 +294,12 @@ public class Model {
 
     @Override
     public String toString() {
-      return this.value.toUpperCase();
+      return this.value;
     }
 
     @JsonValue
     public String value() {
-      return this.value.toUpperCase();
+      return this.value;
     }
 
     /**
@@ -310,7 +310,7 @@ public class Model {
      */
     @JsonCreator
     public static Model.Preset fromValue(String value) {
-      Model.Preset constant = CONSTANTS.get(value.toUpperCase());
+      Model.Preset constant = CONSTANTS.get(value);
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
